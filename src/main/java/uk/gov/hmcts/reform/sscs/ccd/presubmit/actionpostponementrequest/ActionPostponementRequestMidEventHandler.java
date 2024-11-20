@@ -6,7 +6,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.REFUSE;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInTheFuture;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -28,7 +27,6 @@ public class ActionPostponementRequestMidEventHandler extends IssueDocumentHandl
     private final GenerateFile generateFile;
     private final DocumentConfiguration documentConfiguration;
 
-    @Autowired
     public ActionPostponementRequestMidEventHandler(GenerateFile generateFile,
                                                     DocumentConfiguration documentConfiguration) {
         this.generateFile = generateFile;

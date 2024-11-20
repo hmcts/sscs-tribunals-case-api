@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.then;
@@ -19,15 +19,16 @@ import java.util.*;
 import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -44,11 +45,10 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 @RunWith(JUnitParamsRunner.class)
 public class SendToBulkPrintHandlerTest {
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
 
     @Mock
     private DocumentManagementServiceWrapper documentManagementServiceWrapper;
@@ -101,7 +101,7 @@ public class SendToBulkPrintHandlerTest {
 
     Template template = new Template("bla", "bla2");
 
-    @Before
+    @BeforeEach
     public void setUp() {
         when(callback.getEvent()).thenReturn(EventType.VALID_APPEAL_CREATED);
         handler = new SendToBulkPrintHandler(documentManagementServiceWrapper,
@@ -124,6 +124,7 @@ public class SendToBulkPrintHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"VALID_APPEAL_CREATED", "DRAFT_TO_VALID_APPEAL_CREATED", "VALID_APPEAL", "INTERLOC_VALID_APPEAL", "RESEND_TO_DWP", "APPEAL_TO_PROCEED"})
     public void givenAValidSendToBulkPrintEvent_thenReturnTrue(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
@@ -159,6 +160,7 @@ public class SendToBulkPrintHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"pip, 35", "childSupport, 42"})
     public void givenAMessageWhichFindsATemplate_thenConvertToSscsCaseDataAndAddPdfToCaseAndSendToBulkPrint(String benefitType, int expectedResponseDays) {
 
@@ -384,6 +386,7 @@ public class SendToBulkPrintHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"Online", "COR"})
     public void nonReceivedViaPaperCases_doesNotGetSentToBulkPrint(String receivedVia) {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", receivedVia, null, APPEAL_CREATED);

@@ -1,12 +1,11 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static java.lang.String.format;
+import static jakarta.xml.bind.DatatypeConverter.printBase64Binary;
 import static java.time.ZoneId.of;
 import static java.time.ZonedDateTime.now;
 import static java.util.Base64.getDecoder;
 import static java.util.Base64.getEncoder;
 import static javax.crypto.Mac.getInstance;
-import static javax.xml.bind.DatatypeConverter.printBase64Binary;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.nio.charset.Charset;
@@ -18,7 +17,6 @@ import java.util.Map;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.exception.InvalidSubscriptionTokenException;
@@ -41,7 +39,6 @@ public class MessageAuthenticationService {
     private Mac mac;
     private String macString;
 
-    @Autowired
     public MessageAuthenticationService(@Value("${subscriptions.mac.secret}") String macString) throws InvalidKeyException, NoSuchAlgorithmException {
         this.macString = macString;
         this.mac = initializeMac();
@@ -62,10 +59,10 @@ public class MessageAuthenticationService {
     public String generateToken(String appealNumber, String benefitType)  {
         try {
             long timestamp = now(of(ZONE_ID)).toInstant().toEpochMilli() / 1000;
-            String originalMessage = format("%s|%s|%d", appealNumber, benefitType, timestamp);
+            String originalMessage = "%s|%s|%d".formatted(appealNumber, benefitType, timestamp);
             byte[] digest = mac.doFinal(originalMessage.getBytes(CHARSET));
             String macSubString =  printBase64Binary(digest).substring(0,10);
-            String macToken = format("%s|%s", originalMessage, macSubString);
+            String macToken = "%s|%s".formatted(originalMessage, macSubString);
             return getEncoder().withoutPadding().encodeToString(macToken.getBytes(CHARSET));
         } catch (Exception ex) {
             TokenException tokenException = new TokenException(ex);
@@ -101,7 +98,7 @@ public class MessageAuthenticationService {
         mac.update(originalMessage.getBytes(CHARSET));
         byte[] digest = mac.doFinal();
         String macSubString = printBase64Binary(digest).substring(0, 10);
-        String macToken = format("%s|%s", originalMessage, macSubString);
+        String macToken = "%s|%s".formatted(originalMessage, macSubString);
         if (!decrypted.equals(macToken)) {
             throw logInvalidSubscriptionTokenException(new Exception(ERROR_MESSAGE + encryptedToken), encryptedToken);
         }

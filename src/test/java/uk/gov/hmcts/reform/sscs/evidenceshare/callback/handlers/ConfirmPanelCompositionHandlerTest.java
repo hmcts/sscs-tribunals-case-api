@@ -1,8 +1,7 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
@@ -16,11 +15,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
-import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -33,7 +32,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 
-@RunWith(JUnitParamsRunner.class)
 public class ConfirmPanelCompositionHandlerTest {
 
     ConfirmPanelCompositionHandler handler;
@@ -54,7 +52,7 @@ public class ConfirmPanelCompositionHandlerTest {
     @Captor
     private ArgumentCaptor<Consumer<SscsCaseDetails>> consumerArgumentCaptor;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
 
@@ -68,7 +66,7 @@ public class ConfirmPanelCompositionHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
 
-    @Test
+    @ParameterizedTest
     public void givenAValidSubmittedEvent_thenReturnTrue() {
         assertTrue(handler.canHandle(SUBMITTED, buildTestCallbackForGivenData(
             SscsCaseData.builder()
@@ -80,8 +78,8 @@ public class ConfirmPanelCompositionHandlerTest {
                     .build()).build(), INTERLOCUTORY_REVIEW_STATE, CONFIRM_PANEL_COMPOSITION)));
     }
 
-    @Test
-    @Parameters(method = "generateAllPossibleOtherPartyWithHearingOptions")
+    @ParameterizedTest
+    @MethodSource("generateAllPossibleOtherPartyWithHearingOptions")
     public void givenFqpmSetAndDueDateSetAndAllOtherPartyHearingOptionsSet_thenCaseStateIsReadyToList(HearingOptions hearingOptions) {
 
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
@@ -99,8 +97,8 @@ public class ConfirmPanelCompositionHandlerTest {
                 eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any(), any(Consumer.class));
     }
 
-    @Test
-    @Parameters(method = "generateAllPossibleOtherPartyWithHearingOptions")
+    @ParameterizedTest
+    @MethodSource("generateAllPossibleOtherPartyWithHearingOptions")
     public void givenFqpmSetAndNoDueDateSetAndAllOtherPartyHearingOptionsSet_thenCaseStateIsReadyToList(HearingOptions hearingOptions) {
 
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
@@ -119,6 +117,7 @@ public class ConfirmPanelCompositionHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"YES", "NO"})
     public void givenFqpmSetAndNoDueDateSetAndNotAllOtherPartyHearingOptionsSet_thenCaseStateIsReadyToList(String isFqpmRequired) {
 
@@ -138,6 +137,7 @@ public class ConfirmPanelCompositionHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"YES", "NO"})
     public void givenFqpmSetAndDueDateSetAndNotAllOtherPartyHearingOptionsSet_thenCaseStateIsNotListable(String isFqpmRequired) {
 
@@ -157,8 +157,8 @@ public class ConfirmPanelCompositionHandlerTest {
                 eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
     }
 
-    @Test
-    @Parameters(method = "generateOtherPartyOptions")
+    @ParameterizedTest
+    @MethodSource("generateOtherPartyOptions")
     public void givenFqpmSetAndDueDateSetAndNoOtherParty_thenCaseStateIsNotListable(List<CcdValue<OtherParty>> otherParties) {
 
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
@@ -176,8 +176,8 @@ public class ConfirmPanelCompositionHandlerTest {
                 eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
     }
 
-    @Test
-    @Parameters(method = "generateOtherPartyOptions")
+    @ParameterizedTest
+    @MethodSource("generateOtherPartyOptions")
     public void givenFqpmSetAndDueDateSetAndDormantAndNoOtherParty_thenCaseStateIsRemainDormant(List<CcdValue<OtherParty>> otherParties) {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
             SscsCaseData.builder()
@@ -193,7 +193,7 @@ public class ConfirmPanelCompositionHandlerTest {
         verify(updateCcdCaseService, times(0)).updateCaseV2(anyLong(), anyString(), anyString(), anyString(), any(), any(Consumer.class));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenCaseStateIsResponseReceived_thenCaseStateIsUnchangedAndReviewStateIsNone() {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
             SscsCaseData.builder()
@@ -210,7 +210,7 @@ public class ConfirmPanelCompositionHandlerTest {
         assertEquals(sscsCaseDetails.getData().getInterlocReviewState(), InterlocReviewState.NONE);
     }
 
-    private Object[] generateOtherPartyOptions() {
+    private static Object[] generateOtherPartyOptions() {
         return new Object[]{
             new Object[]{
                 null
@@ -221,7 +221,7 @@ public class ConfirmPanelCompositionHandlerTest {
         };
     }
 
-    private Object[] generateAllPossibleOtherPartyWithHearingOptions() {
+    private static Object[] generateAllPossibleOtherPartyWithHearingOptions() {
         return new Object[]{
             new Object[]{
                 HearingOptions.builder().wantsToAttend("Yes").build()

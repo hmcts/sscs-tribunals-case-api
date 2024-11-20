@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.placeholders;
 
-import static junit.framework.TestCase.assertNull;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.*;
 
 import java.time.LocalDateTime;
@@ -9,22 +9,19 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import org.joda.time.DateTimeUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderService;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @TestPropertySource(locations = "classpath:config/application_es_it.properties")
 @ActiveProfiles("integration")
@@ -48,7 +45,7 @@ public class PlaceholderServiceIt {
     protected AirLookupService airLookupService;
 
 
-    @Before
+    @BeforeEach
     public void setup() {
         DateTimeUtils.setCurrentMillisFixed(1550000000000L);
         now = (DateTimeFormatter.ISO_LOCAL_DATE).format(LocalDateTime.now());

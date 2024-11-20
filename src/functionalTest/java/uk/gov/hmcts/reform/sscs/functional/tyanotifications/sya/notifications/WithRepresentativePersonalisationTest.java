@@ -4,8 +4,8 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 
 import java.lang.reflect.Field;
 import java.util.List;
-import junitparams.Parameters;
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.functional.tyanotifications.AbstractFunctionalTest;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
@@ -90,8 +90,8 @@ public class WithRepresentativePersonalisationTest extends AbstractFunctionalTes
         super(30);
     }
 
-    @Test
-    @Parameters(method = "eventTypeAndSubscriptions")
+    @ParameterizedTest
+    @MethodSource("eventTypeAndSubscriptions")
     public void givenEventAndRepsSubscription_shouldSendNotificationToReps(NotificationEventType notificationEventType)
         throws Exception {
         //Given
@@ -108,7 +108,7 @@ public class WithRepresentativePersonalisationTest extends AbstractFunctionalTes
         assertNotificationBodyContains(notifications, repsSmsId);
     }
 
-    @Test
+    @ParameterizedTest
     public void givenHearingPostponedEventAndRepsSubscription_shouldSendEmailOnlyNotificationToReps()
         throws Exception {
 
@@ -137,7 +137,7 @@ public class WithRepresentativePersonalisationTest extends AbstractFunctionalTes
     }
 
     @SuppressWarnings({"Indentation", "unused"})
-    private Object[] eventTypeAndSubscriptions() {
+    private static Object[] eventTypeAndSubscriptions() {
         return new Object[]{
             new Object[]{APPEAL_LAPSED},
             new Object[]{APPEAL_WITHDRAWN},

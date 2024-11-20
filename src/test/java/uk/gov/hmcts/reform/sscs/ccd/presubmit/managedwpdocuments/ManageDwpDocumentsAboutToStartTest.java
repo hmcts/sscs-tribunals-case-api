@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.managedwpdocuments;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
@@ -15,8 +15,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_RESPONSE
 import com.google.common.collect.Lists;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -51,7 +51,7 @@ public class ManageDwpDocumentsAboutToStartTest {
 
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         dwpDocumentService = new DwpDocumentService();
@@ -70,6 +70,7 @@ public class ManageDwpDocumentsAboutToStartTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"MANAGE_DWP_DOCUMENTS"})
     public void givenAValidEvent_thenReturnTrue(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);

@@ -13,13 +13,13 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
 
-import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -30,7 +30,6 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.RetryNotificationService;
 
-@RunWith(JUnitParamsRunner.class)
 public class FilterNotificationsEventsHandlerTest {
     @Mock
     private NotificationService notificationService;
@@ -46,7 +45,7 @@ public class FilterNotificationsEventsHandlerTest {
     private SscsCaseData oldCaseData;
     private AutoCloseable autoCloseable;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         autoCloseable = openMocks(this);
 
@@ -70,12 +69,13 @@ public class FilterNotificationsEventsHandlerTest {
             .build();
     }
 
-    @After
+    @AfterEach
     public void after() throws Exception {
         autoCloseable.close();
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "ACTION_HEARING_RECORDING_REQUEST",
         "ACTION_POSTPONEMENT_REQUEST_WELSH",
@@ -121,6 +121,7 @@ public class FilterNotificationsEventsHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "DO_NOT_SEND",
         "SYA_APPEAL_CREATED",
@@ -131,7 +132,8 @@ public class FilterNotificationsEventsHandlerTest {
         willNotHandle(callback);
     }
 
-    @Parameters({"DO_NOT_SEND", "SYA_APPEAL_CREATED"})
+    // JunitParamsRunnerToParameterized conversion not supported
+@Parameters({"DO_NOT_SEND", "SYA_APPEAL_CREATED"})
     public void willThrowExceptionIfTriesToHandleEvents(NotificationEventType notificationEventType) {
         callback.setNotificationEventType(notificationEventType);
 
@@ -139,6 +141,7 @@ public class FilterNotificationsEventsHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"grant", "refuse"})
     public void willHandleActionPostponementRequestEvents(String actionSelected) {
         callback.setNotificationEventType(ACTION_POSTPONEMENT_REQUEST);
@@ -148,6 +151,7 @@ public class FilterNotificationsEventsHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"sendToJudge", "refuseOnTheDay"})
     public void willNotHandleActionPostponementRequestEvents(String actionSelected) {
         callback.setNotificationEventType(ACTION_POSTPONEMENT_REQUEST);
@@ -156,7 +160,7 @@ public class FilterNotificationsEventsHandlerTest {
         willNotHandle(callback);
     }
 
-    @Test
+    @ParameterizedTest
     public void willHandleForNonGapsHearingRoutes() {
         callback.setNotificationEventType(HEARING_BOOKED);
         newCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
@@ -164,7 +168,7 @@ public class FilterNotificationsEventsHandlerTest {
         willHandle(callback);
     }
 
-    @Test
+    @ParameterizedTest
     public void wontHandleForGapsHearingRoutes() {
         callback.setNotificationEventType(HEARING_BOOKED);
         newCaseData.getSchedulingAndListingFields().setHearingRoute(GAPS);
@@ -172,8 +176,8 @@ public class FilterNotificationsEventsHandlerTest {
         willNotHandle(callback);
     }
 
-    @Test
-    @Parameters(method = "eventTypeAndNewAppointees")
+    @ParameterizedTest
+    @MethodSource("eventTypeAndNewAppointees")
     public void willHandleDeathOfAppellantEventsWithNewAppointee(NotificationEventType notificationEventType,
                                                                  Appointee existing, Appointee newlyAdded) {
         callback.setNotificationEventType(notificationEventType);
@@ -189,8 +193,8 @@ public class FilterNotificationsEventsHandlerTest {
         willHandle(callback);
     }
 
-    @Test
-    @Parameters(method = "eventTypeAndNoNewAppointees")
+    @ParameterizedTest
+    @MethodSource("eventTypeAndNoNewAppointees")
     public void willNotHandleDeathOfAppellantEventsWithoutNewAppointee(NotificationEventType notificationEventType,
                                                                        Appointee existing, Appointee newlyAdded) {
         callback.setNotificationEventType(notificationEventType);
@@ -206,7 +210,7 @@ public class FilterNotificationsEventsHandlerTest {
         willNotHandle(callback);
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldCallToRescheduleNotificationWhenErrorIsNotificationServiceExceptionError() {
         doThrow(new NotificationServiceException("error msg test", new RuntimeException("error")))
             .when(notificationService)
@@ -220,7 +224,7 @@ public class FilterNotificationsEventsHandlerTest {
             eq(1), eq(new CcdNotificationWrapper(callback)), any(NotificationServiceException.class));
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldRescheduleNotificationWhenErrorIsNotANotificationServiceException() {
         doThrow(new RuntimeException("error msg test"))
             .when(notificationService)
@@ -253,7 +257,7 @@ public class FilterNotificationsEventsHandlerTest {
         return appointee ? YES.getValue() : NO.getValue();
     }
 
-    private Object[] eventTypeAndNewAppointees() {
+    private static Object[] eventTypeAndNewAppointees() {
         Appointee appointeeBefore = Appointee.builder().name(Name.builder().firstName("John").build()).build();
         Appointee appointeeAfter = Appointee.builder().name(Name.builder().firstName("Harry").build()).build();
         return new Object[]{
@@ -264,7 +268,7 @@ public class FilterNotificationsEventsHandlerTest {
         };
     }
 
-    private Object[] eventTypeAndNoNewAppointees() {
+    private static Object[] eventTypeAndNoNewAppointees() {
         Appointee appointee = Appointee.builder().name(Name.builder().firstName("John").build()).build();
         return new Object[]{
             new Object[]{DEATH_OF_APPELLANT, null, null},

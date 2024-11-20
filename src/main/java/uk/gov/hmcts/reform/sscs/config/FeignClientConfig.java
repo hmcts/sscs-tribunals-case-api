@@ -26,14 +26,14 @@ public class FeignClientConfig {
     }
 
     @Bean
-    public ErrorDecoder errorDecoder(ObjectMapper objectMapper) {
+    ErrorDecoder errorDecoder(ObjectMapper objectMapper) {
         return new FeignClientErrorDecoder(appInsightsService, objectMapper);
     }
 
     @Bean
-    public Retryer retryer(@Value("${feign.client.retryer.period}") long period,
-                           @Value("${feign.client.retryer.maxPeriod}") long maxPeriod,
-                           @Value("${feign.client.retryer.maxAttempts}") int maxAttempts) {
+    Retryer retryer(@Value("${feign.client.retryer.period}") long period,
+        @Value("${feign.client.retryer.maxPeriod}") long maxPeriod,
+        @Value("${feign.client.retryer.maxAttempts}") int maxAttempts) {
         return new Retryer.Default(period, maxPeriod, maxAttempts);
     }
 

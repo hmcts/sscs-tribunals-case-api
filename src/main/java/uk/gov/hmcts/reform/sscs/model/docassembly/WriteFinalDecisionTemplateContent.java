@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.model.docassembly;
 
-import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
@@ -114,18 +113,18 @@ public abstract class WriteFinalDecisionTemplateContent {
         final String firstSentence = "Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State.";
         final String secondSentence;
         if ("noRecommendation".equals(code)) {
-            secondSentence = format("The Tribunal makes no recommendation as to when the Department should reassess %s.", appellantName);
+            secondSentence = "The Tribunal makes no recommendation as to when the Department should reassess %s.".formatted(appellantName);
         } else if ("doNotReassess".equals(code)) {
             secondSentence = "In view of the degree of disability found by the Tribunal, and unless the regulations change, the Tribunal would recommend that the appellant is not re-assessed.";
         } else if (startsWith(code, "doNotReassess")) {
-            secondSentence = format("The Tribunal recommends that the Department does not reassess %s within %s months from today's date.", appellantName, removeStart(code, "doNotReassess"));
+            secondSentence = "The Tribunal recommends that the Department does not reassess %s within %s months from today's date.".formatted(appellantName, removeStart(code, "doNotReassess"));
         } else if (startsWith(code, "reassess")) {
-            secondSentence = format("The Tribunal recommends that the Department reassesses %s within %s months from today's date.", appellantName, removeStart(code, "reassess"));
+            secondSentence = "The Tribunal recommends that the Department reassesses %s within %s months from today's date.".formatted(appellantName, removeStart(code, "reassess"));
         } else {
-            throw new IllegalArgumentException(format("Error: Unknown DWP reassess award code, please check if this code '%s' is in the FixedLists in the CCD file.", code));
+            throw new IllegalArgumentException("Error: Unknown DWP reassess award code, please check if this code '%s' is in the FixedLists in the CCD file.".formatted(code));
         }
         // Placeholder for SSCS-8308 (Ryan)
-        return format("%s %s", firstSentence, secondSentence);
+        return "%s %s".formatted(firstSentence, secondSentence);
     }
 
     public void addReasonsIfPresent(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {

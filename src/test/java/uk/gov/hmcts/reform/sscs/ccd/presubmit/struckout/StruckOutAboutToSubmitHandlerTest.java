@@ -3,7 +3,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.struckout;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -19,8 +20,8 @@ import java.time.LocalDate;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -51,7 +52,7 @@ public class StruckOutAboutToSubmitHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         handler = new StruckOutAboutToSubmitHandler(listAssistHearingMessageHelper, false);
@@ -83,15 +84,18 @@ public class StruckOutAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsExceptionIfItCannotHandleTheAppeal() {
-        when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThrows(IllegalStateException.class, () -> {
+            when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        });
     }
 
     @Test

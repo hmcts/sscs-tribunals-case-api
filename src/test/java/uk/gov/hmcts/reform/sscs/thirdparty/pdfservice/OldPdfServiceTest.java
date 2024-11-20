@@ -10,7 +10,7 @@ import static org.mockito.Mockito.when;
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.util.HashMap;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.Statement;
 import uk.gov.hmcts.reform.sscs.util.DataFixtures;

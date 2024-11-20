@@ -4,15 +4,15 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(JUnitParamsRunner.class)
@@ -73,12 +73,14 @@ public class DateTimeUtilsTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"2018-12-02", "2020-05-14"})
     public void validGetLocalDateWillReturnAnOption(String dateString) {
         assertThat(DateTimeUtils.getLocalDate(dateString), is(of(LocalDate.parse(dateString))));
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"null", "", " "})
     public void nullOrEmptyGetLocalDateWillReturnAnEmptyOption(@Nullable String dateString) {
         assertThat(DateTimeUtils.getLocalDate(dateString), is(empty()));

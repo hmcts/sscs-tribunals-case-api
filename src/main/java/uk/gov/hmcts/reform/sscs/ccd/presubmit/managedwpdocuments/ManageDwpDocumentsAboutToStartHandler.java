@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -28,7 +27,6 @@ public class ManageDwpDocumentsAboutToStartHandler extends ResponseEventsAboutTo
 
     private final DwpDocumentService dwpDocumentService;
 
-    @Autowired
     public ManageDwpDocumentsAboutToStartHandler(DwpDocumentService dwpDocumentService) {
         this.dwpDocumentService = dwpDocumentService;
     }

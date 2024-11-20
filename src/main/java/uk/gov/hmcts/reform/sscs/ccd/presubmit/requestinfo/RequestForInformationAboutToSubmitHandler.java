@@ -36,7 +36,7 @@ public class RequestForInformationAboutToSubmitHandler implements PreSubmitCallb
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        log.info(String.format("Handling request info incomplete application event for caseId %s", sscsCaseData.getCcdCaseId()));
+        log.info("Handling request info incomplete application event for caseId %s".formatted(sscsCaseData.getCcdCaseId()));
 
         if ("yes".equalsIgnoreCase(sscsCaseData.getResponseRequired())) {
             sscsCaseData.setInterlocReviewState(AWAITING_INFORMATION);
@@ -46,7 +46,7 @@ public class RequestForInformationAboutToSubmitHandler implements PreSubmitCallb
             || State.INCOMPLETE_APPLICATION.equals(caseDetails.getState())
             || State.INTERLOCUTORY_REVIEW_STATE.equals(caseDetails.getState())) {
 
-            log.info(String.format("Setting state to incompleteApplicationInformationRequested for caseId %s", sscsCaseData.getCcdCaseId()));
+            log.info("Setting state to incompleteApplicationInformationRequested for caseId %s".formatted(sscsCaseData.getCcdCaseId()));
             sscsCaseData.setState(State.INCOMPLETE_APPLICATION_INFORMATION_REQUESTED);
         }
 

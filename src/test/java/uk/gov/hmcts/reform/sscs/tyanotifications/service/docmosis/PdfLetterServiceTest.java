@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.SscsCaseDataUtils.getWelshDate;
@@ -21,7 +21,7 @@ import junitparams.Parameters;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -83,6 +83,7 @@ public class PdfLetterServiceTest {
         .build();
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPELLANT, Yes, true", "APPELLANT, Yes, false", "REPRESENTATIVE, No, true", "REPRESENTATIVE, No, false"})
     public void willCreateAPdfToTheCorrectAddress(final SubscriptionType subscriptionType, String isScottish, boolean isScottishPoBoxFeatureEnabled) {
         NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
@@ -180,8 +181,8 @@ public class PdfLetterServiceTest {
         verify(docmosisPdfService).createPdfFromMap(placeholderCaptor.capture(), eq(notification.getDocmosisLetterTemplate()));
         verify(docmosisPdfService).createPdf(any(), anyString());
         Map<String, Object> placeholderCaptorValue = placeholderCaptor.getValue();
-        assertEquals("Welsh generated date", getWelshDate().apply(placeholderCaptorValue.get(GENERATED_DATE_LITERAL),
-            dateTimeFormatter), placeholderCaptorValue.get(WELSH_GENERATED_DATE_LITERAL));
+        assertEquals(getWelshDate().apply(placeholderCaptorValue.get(GENERATED_DATE_LITERAL),
+            dateTimeFormatter), placeholderCaptorValue.get(WELSH_GENERATED_DATE_LITERAL), "Welsh generated date");
     }
 
 
@@ -338,22 +339,24 @@ public class PdfLetterServiceTest {
         assertTrue(ArrayUtils.isEmpty(bytes));
     }
 
-    @Test(expected = NotificationClientRuntimeException.class)
+    @Test
     public void willHandleLoadingAnInvalidPdf() {
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
-            APPEAL_RECEIVED,
-            appellant,
-            representative,
-            null
-        );
-        Notification notification = Notification.builder().template(Template.builder().docmosisTemplateId("some.doc").build()).placeholders(new HashMap<>()).build();
+        assertThrows(NotificationClientRuntimeException.class, () -> {
+            NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+                APPEAL_RECEIVED,
+                appellant,
+                representative,
+                null
+            );
+            Notification notification = Notification.builder().template(Template.builder().docmosisTemplateId("some.doc").build()).placeholders(new HashMap<>()).build();
 
-        when(docmosisPdfService.createPdfFromMap(any(), anyString())).thenReturn("Invalid PDF".getBytes());
-        when(docmosisPdfService.createPdf(any(), anyString())).thenReturn("Invalid PDF".getBytes());
-        pdfLetterService.generateLetter(wrapper, notification,
-            new SubscriptionWithType(EMPTY_SUBSCRIPTION, SubscriptionType.REPRESENTATIVE, appellant, representative));
-        pdfLetterService.buildCoversheet(wrapper,
-            new SubscriptionWithType(EMPTY_SUBSCRIPTION, SubscriptionType.REPRESENTATIVE, appellant, representative));
+            when(docmosisPdfService.createPdfFromMap(any(), anyString())).thenReturn("Invalid PDF".getBytes());
+            when(docmosisPdfService.createPdf(any(), anyString())).thenReturn("Invalid PDF".getBytes());
+            pdfLetterService.generateLetter(wrapper, notification,
+                new SubscriptionWithType(EMPTY_SUBSCRIPTION, SubscriptionType.REPRESENTATIVE, appellant, representative));
+            pdfLetterService.buildCoversheet(wrapper,
+                new SubscriptionWithType(EMPTY_SUBSCRIPTION, SubscriptionType.REPRESENTATIVE, appellant, representative));
+        });
     }
 
     @Test

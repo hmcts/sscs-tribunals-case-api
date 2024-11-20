@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionhearingrecordingrequest;
 
-import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.*;
@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -53,7 +53,7 @@ public class ActionHearingRecordingRequestMidEventHandlerTest {
     private final UserDetails userDetails = UserDetails.builder().roles(new ArrayList<>(asList("caseworker-sscs", UserRole.CTSC_CLERK.getValue()))).build();
 
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
 
@@ -83,6 +83,7 @@ public class ActionHearingRecordingRequestMidEventHandlerTest {
 
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"REPRESENTATIVE", "APPELLANT", "DWP", "JOINT_PARTY"})
     public void changingRequestFromGrantedToRefusedReturnsWarning(PartyItemList party) {
 
@@ -99,6 +100,7 @@ public class ActionHearingRecordingRequestMidEventHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"REPRESENTATIVE", "APPELLANT", "DWP", "JOINT_PARTY"})
     public void changingRequestFromRefusedToGrantedReturnsWarning(PartyItemList party) {
 
@@ -125,6 +127,7 @@ public class ActionHearingRecordingRequestMidEventHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPELLANT", "DWP", "JOINT_PARTY", "REPRESENTATIVE"})
     public void changingFromRequestedToRefusedHasNoWarningsOrErrors(PartyItemList party) {
         sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(
@@ -346,6 +349,7 @@ public class ActionHearingRecordingRequestMidEventHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"OTHER_PARTY,1", "OTHER_PARTY_REPRESENTATIVE,3"})
     public void givenCaseWithOtherParties_changingRequestFromGrantedToRefusedReturnsWarning(PartyItemList party, String otherPartyId) {
 
@@ -371,6 +375,7 @@ public class ActionHearingRecordingRequestMidEventHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"OTHER_PARTY,1", "OTHER_PARTY_REPRESENTATIVE,3"})
     public void givenCaseWithOtherParties_changingRequestFromRefusedToGrantedReturnsWarning(PartyItemList party, String otherPartyId) {
 
@@ -435,15 +440,18 @@ public class ActionHearingRecordingRequestMidEventHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_START", "ABOUT_TO_SUBMIT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsExceptionIfItCannotHandleTheAppeal() {
-        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThrows(IllegalStateException.class, () -> {
+            when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        });
     }
 
     static Hearing getHearing(String hearingId) {
@@ -451,7 +459,7 @@ public class ActionHearingRecordingRequestMidEventHandlerTest {
                 .hearingId(hearingId)
                 .hearingDate("2021-05-18")
                 .time("12:00")
-                .venue(Venue.builder().name(format("Venue %s", hearingId)).build())
+                .venue(Venue.builder().name("Venue %s".formatted(hearingId)).build())
                 .build();
         return Hearing.builder().value(hearingDetails).build();
     }

@@ -24,12 +24,12 @@ public class ApiAuthCheckerConfiguration {
     }
 
     @Bean
-    public Function<HttpServletRequest, Collection<String>> authorizedRolesExtractor() {
+    Function<HttpServletRequest, Collection<String>> authorizedRolesExtractor() {
         return any -> ImmutableSet.copyOf(authorisedRoles);
     }
 
     @Bean
-    public Function<HttpServletRequest, Optional<String>> userIdExtractor() {
+    Function<HttpServletRequest, Optional<String>> userIdExtractor() {
         return any -> Optional.empty();
     }
 }

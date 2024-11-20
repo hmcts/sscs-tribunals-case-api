@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournmentnoticewelsh;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
@@ -18,13 +18,14 @@ import java.util.List;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -43,13 +44,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 @RunWith(JUnitParamsRunner.class)
 public class IssueAdjournmentNoticeWelshAboutToSubmitHandlerTest {
     private static final String DOCUMENT_URL = "dm-store/documents/123";
     private static final String USER_AUTHORISATION = "Bearer token";
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
 
     private IssueAdjournmentNoticeWelshAboutToSubmitHandler handler;
 
@@ -65,7 +65,7 @@ public class IssueAdjournmentNoticeWelshAboutToSubmitHandlerTest {
     private SscsCaseData sscsCaseData;
 
 
-    @Before
+    @BeforeEach
     public void setUp() {
         handler = new IssueAdjournmentNoticeWelshAboutToSubmitHandler();
         when(callback.getEvent()).thenReturn(EventType.ISSUE_ADJOURNMENT_NOTICE_WELSH);
@@ -107,6 +107,7 @@ public class IssueAdjournmentNoticeWelshAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPEAL_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
     public void givenANonHandleEvidenceEvent_thenReturnFalse(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
@@ -114,6 +115,7 @@ public class IssueAdjournmentNoticeWelshAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ISSUE_ADJOURNMENT_NOTICE_WELSH"})
     public void givenAValidHandleAndEventType_thenReturnTrue(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
@@ -121,6 +123,7 @@ public class IssueAdjournmentNoticeWelshAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));

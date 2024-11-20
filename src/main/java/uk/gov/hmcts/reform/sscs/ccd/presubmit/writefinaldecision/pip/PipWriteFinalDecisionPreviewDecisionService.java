@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
@@ -30,7 +29,6 @@ import uk.gov.hmcts.reform.sscs.service.*;
 @Component
 public class PipWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisionPreviewDecisionServiceBase {
 
-    @Autowired
     public PipWriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
                                                        PipDecisionNoticeQuestionService decisionNoticeQuestionService, PipDecisionNoticeOutcomeService decisionNoticeOutcomeService, DocumentConfiguration documentConfiguration, VenueDataLoader venueDataLoader) {
         super(generateFile, userDetailsService, decisionNoticeQuestionService, decisionNoticeOutcomeService, documentConfiguration, venueDataLoader);

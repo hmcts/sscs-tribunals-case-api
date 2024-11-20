@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationServiceTest.verifyExpectedLogMessage;
 
@@ -11,13 +12,13 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import java.net.UnknownHostException;
 import java.time.ZonedDateTime;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.jobscheduler.model.Job;
@@ -29,7 +30,7 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.reminder.JobGroupGenerator;
 import uk.gov.service.notify.NotificationClientException;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class NotificationHandlerTest {
 
     private static final NotificationEventType A_NOTIFICATION_THAT_CAN_TRIGGER_OUT_OF_HOURS = NotificationEventType.SYA_APPEAL_CREATED;
@@ -52,7 +53,7 @@ public class NotificationHandlerTest {
     @Captor
     private ArgumentCaptor<ILoggingEvent> captorLoggingEvent;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         underTest = new NotificationHandler(outOfHoursCalculator, jobScheduler, jobGroupGenerator);
 
@@ -158,47 +159,53 @@ public class NotificationHandlerTest {
         assertThat(value.payload, is(expectedPayload));
     }
 
-    @Test(expected = NotificationClientRuntimeException.class)
-    public void shouldThrowNotificationClientRuntimeExceptionForAnyNotificationException() throws Exception {
-        doThrow(new NotificationClientException(new UnknownHostException()))
-            .when(sendNotification)
-            .send();
-        stubData();
-        try {
-            underTest.sendNotification(notificationWrapper, "someTemplate", "Email", sendNotification);
-        } catch (NotificationClientRuntimeException e) {
-            verifyExpectedLogMessage(mockAppender, captorLoggingEvent, notificationWrapper.getNewSscsCaseData().getCcdCaseId(), "Could not send Email notification for case id: 123", Level.ERROR);
-            throw e;
-        }
+    @Test
+    public void shouldThrowNotificationClientRuntimeExceptionForAnyNotificationException() {
+        assertThrows(NotificationClientRuntimeException.class, () -> {
+            doThrow(new NotificationClientException(new UnknownHostException()))
+                .when(sendNotification)
+                .send();
+            stubData();
+            try {
+                underTest.sendNotification(notificationWrapper, "someTemplate", "Email", sendNotification);
+            } catch (NotificationClientRuntimeException e) {
+                verifyExpectedLogMessage(mockAppender, captorLoggingEvent, notificationWrapper.getNewSscsCaseData().getCcdCaseId(), "Could not send Email notification for case id: 123", Level.ERROR);
+                throw e;
+            }
+        });
     }
 
-    @Test(expected = NotificationServiceException.class)
-    public void shouldLogGovNotifyErrorCodeWhenNotificationClientExceptionIsThrown() throws Exception {
-        doThrow(new NotificationClientException("Should return a 400 error code"))
-            .when(sendNotification)
-            .send();
-        stubData();
-        try {
-            underTest.sendNotification(notificationWrapper, "someTemplate", "Email", sendNotification);
-        } catch (NotificationServiceException ex) {
-            verifyExpectedLogMessage(mockAppender, captorLoggingEvent, notificationWrapper.getNewSscsCaseData().getCcdCaseId(), "Error code 400 on GovUKNotify for case id: 123, template: someTemplate", Level.ERROR);
-            throw ex;
-        }
+    @Test
+    public void shouldLogGovNotifyErrorCodeWhenNotificationClientExceptionIsThrown() {
+        assertThrows(NotificationServiceException.class, () -> {
+            doThrow(new NotificationClientException("Should return a 400 error code"))
+                .when(sendNotification)
+                .send();
+            stubData();
+            try {
+                underTest.sendNotification(notificationWrapper, "someTemplate", "Email", sendNotification);
+            } catch (NotificationServiceException ex) {
+                verifyExpectedLogMessage(mockAppender, captorLoggingEvent, notificationWrapper.getNewSscsCaseData().getCcdCaseId(), "Error code 400 on GovUKNotify for case id: 123, template: someTemplate", Level.ERROR);
+                throw ex;
+            }
+        });
     }
 
-    @Test(expected = NotificationServiceException.class)
-    public void shouldNotContinueWithAGovNotifyException() throws Exception {
-        stubData();
-        doThrow(new NotificationClientException(new RuntimeException()))
-            .when(sendNotification)
-            .send();
+    @Test
+    public void shouldNotContinueWithAGovNotifyException() {
+        assertThrows(NotificationServiceException.class, () -> {
+            stubData();
+            doThrow(new NotificationClientException(new RuntimeException()))
+                .when(sendNotification)
+                .send();
 
-        try {
-            underTest.sendNotification(notificationWrapper, "someTemplate", "Email", sendNotification);
-        } catch (Throwable throwable) {
-            verifyExpectedLogMessage(mockAppender, captorLoggingEvent, notificationWrapper.getNewSscsCaseData().getCcdCaseId(), "Could not send Email notification for case id:", Level.ERROR);
-            throw throwable;
-        }
+            try {
+                underTest.sendNotification(notificationWrapper, "someTemplate", "Email", sendNotification);
+            } catch (Throwable throwable) {
+                verifyExpectedLogMessage(mockAppender, captorLoggingEvent, notificationWrapper.getNewSscsCaseData().getCcdCaseId(), "Could not send Email notification for case id:", Level.ERROR);
+                throw throwable;
+            }
+        });
     }
 
     @Test

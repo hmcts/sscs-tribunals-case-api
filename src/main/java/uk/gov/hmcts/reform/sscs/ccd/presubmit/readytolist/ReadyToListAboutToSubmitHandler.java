@@ -4,7 +4,6 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -27,8 +26,8 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
     private final HearingMessagingServiceFactory hearingMessagingServiceFactory;
 
     public ReadyToListAboutToSubmitHandler(@Value("${feature.gaps-switchover.enabled}") boolean gapsSwitchOverFeature,
-                                           @Autowired RegionalProcessingCenterService regionalProcessingCenterService,
-                                           @Autowired HearingMessagingServiceFactory hearingMessagingServiceFactory) {
+                                           RegionalProcessingCenterService regionalProcessingCenterService,
+                                           HearingMessagingServiceFactory hearingMessagingServiceFactory) {
         this.gapsSwitchOverFeature = gapsSwitchOverFeature;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.hearingMessagingServiceFactory = hearingMessagingServiceFactory;

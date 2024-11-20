@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -48,7 +47,6 @@ public class BundlingHandler {
     private final DwpDocumentService dwpDocumentService;
     private final BundleAudioVideoPdfService bundleAudioVideoPdfService;
 
-    @Autowired
     public BundlingHandler(ServiceRequestExecutor serviceRequestExecutor,
                                             DwpDocumentService dwpDocumentService,
                                             BundleAudioVideoPdfService bundleAudioVideoPdfService,

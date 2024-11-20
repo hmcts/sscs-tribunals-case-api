@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGeneratorFactory;
 public class ServiceTokenGeneratorConfiguration {
 
     @Bean
-    public AuthTokenGenerator authTokenGenerator(
+    AuthTokenGenerator authTokenGenerator(
         @Value("${idam.s2s-auth.totp_secret}") String secret,
         @Value("${idam.s2s-auth.microservice}") String microService,
         ServiceAuthorisationApi serviceAuthorisationApi

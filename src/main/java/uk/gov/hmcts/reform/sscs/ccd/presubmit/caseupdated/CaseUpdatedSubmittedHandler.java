@@ -7,7 +7,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -24,7 +23,6 @@ public class CaseUpdatedSubmittedHandler implements PreSubmitCallbackHandler<Ssc
     private IdamService idamService;
     private final UpdateCcdCaseService updateCcdCaseService;
 
-    @Autowired
     public CaseUpdatedSubmittedHandler(IdamService idamService, UpdateCcdCaseService updateCcdCaseService) {
         this.idamService = idamService;
         this.updateCcdCaseService = updateCcdCaseService;

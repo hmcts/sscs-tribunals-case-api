@@ -18,5 +18,5 @@ public interface DocumentStoreClient {
             @RequestHeader(AUTHORIZATION) String authorisation,
             @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
             @RequestHeader("user-id") String userId,
-            @PathVariable("documentId") String documentId);
+            @PathVariable String documentId);
 }

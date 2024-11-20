@@ -6,7 +6,6 @@ import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInTheFuture;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -27,7 +26,6 @@ public class DirectionIssuedMidEventHandler extends IssueDocumentHandler impleme
     private final GenerateFile generateFile;
     private final DocumentConfiguration documentConfiguration;
 
-    @Autowired
     public DirectionIssuedMidEventHandler(GenerateFile generateFile,
                                           DocumentConfiguration documentConfiguration) {
         this.generateFile = generateFile;

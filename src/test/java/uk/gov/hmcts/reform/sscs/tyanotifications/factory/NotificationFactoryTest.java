@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.factory;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -17,13 +17,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -87,7 +87,7 @@ public class NotificationFactoryTest {
     @Mock
     private WithRepresentativePersonalisation withRepresentativePersonalisation;
 
-    @Before
+    @BeforeEach
     public void setup() {
         openMocks(this);
         factory = new NotificationFactory(personalisationFactory);
@@ -122,6 +122,7 @@ public class NotificationFactoryTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPELLANT, appellantEmail", "REPRESENTATIVE, repsEmail"})
     public void givenAppealLapsedEventAndSubscriptionType_shouldInferRightSubscriptionToCreateNotification(
         SubscriptionType subscriptionType, String expectedEmail) {
@@ -158,6 +159,7 @@ public class NotificationFactoryTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPELLANT, appellantEmail", "REPRESENTATIVE, repsEmail"})
     public void givenAppealDwpLapsedEventAndSubscriptionType_shouldInferRightSubscriptionToCreateNotification(
         SubscriptionType subscriptionType, String expectedEmail) {
@@ -194,6 +196,7 @@ public class NotificationFactoryTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPOINTEE, appointeeEmail", "REPRESENTATIVE, repsEmail"})
     public void givenAppealCreatedEventAndSubscriptionType_shouldInferRightSubscriptionToCreateNotification(
         SubscriptionType subscriptionType, String expectedEmail) {
@@ -233,6 +236,7 @@ public class NotificationFactoryTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPOINTEE, appointeeEmail", "REPRESENTATIVE, repsEmail"})
     public void givenValidAppealCreatedEventAndSubscriptionType_shouldInferRightSubscriptionToCreateNotification(
         SubscriptionType subscriptionType, String expectedEmail) {
@@ -423,6 +427,7 @@ public class NotificationFactoryTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"null", ""})
     public void givenAnEmptyBenefitType_shouldNotThrowExceptionAndGenerateTemplate(@Nullable String benefitType) {
 

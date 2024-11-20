@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.functional.sya;
 
 import static io.restassured.RestAssured.baseURI;
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_CCD;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_CCD_CHILD_SUPPORT;
@@ -19,18 +19,14 @@ import io.restassured.specification.RequestSpecification;
 import java.time.LocalDate;
 import junitparams.JUnitParamsRunner;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpStatus;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.apache.hc.core5.http.HttpStatus;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -43,12 +39,6 @@ import uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer;
 @Slf4j
 public class SubmitAppealTest {
 
-    @ClassRule
-    public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
-
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
-
     @Value("${test-url}")
     private String testUrl;
 
@@ -60,7 +50,7 @@ public class SubmitAppealTest {
 
     private IdamTokens idamTokens;
 
-    @Before
+    @BeforeEach
     public void setup() {
         baseURI = testUrl;
         idamTokens = idamService.getIdamTokens();
@@ -123,7 +113,7 @@ public class SubmitAppealTest {
 
         SscsCaseDetails sscsCaseDetails = submitHelper.findCaseInCcd(id, idamTokens);
 
-        log.info(String.format("SYA created with CCD ID %s", id));
+        log.info("SYA created with CCD ID %s".formatted(id));
 
         assertThatJson(sscsCaseDetails.getData())
             .whenIgnoringPaths(
@@ -202,7 +192,7 @@ public class SubmitAppealTest {
         final Long id = getCcdIdFromLocationHeader(response.getHeader("Location"));
         SscsCaseDetails sscsCaseDetails = submitHelper.findCaseInCcd(id, idamTokens);
 
-        log.info(String.format("SYA created with CCD ID %s", id));
+        log.info("SYA created with CCD ID %s".formatted(id));
         assertEquals("validAppeal", sscsCaseDetails.getState());
 
         //create a case with different mrn date

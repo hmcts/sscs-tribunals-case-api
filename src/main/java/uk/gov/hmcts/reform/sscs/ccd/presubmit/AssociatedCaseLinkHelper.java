@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -22,7 +21,6 @@ public class AssociatedCaseLinkHelper {
     @Value("${feature.add-link-to-other-associated-cases-v2.enabled}")
     private boolean addLinkToOtherAssociatedCasesV2Enabled;
 
-    @Autowired
     public AssociatedCaseLinkHelper(CcdService ccdService, IdamService idamService, UpdateCcdCaseService updateCcdCaseService) {
         this.ccdService = ccdService;
         this.idamService = idamService;

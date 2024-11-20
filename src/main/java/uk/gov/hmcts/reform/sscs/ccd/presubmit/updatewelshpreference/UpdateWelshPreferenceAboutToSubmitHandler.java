@@ -5,7 +5,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_A
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.WELSH_TRANSLATION;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -21,7 +20,6 @@ public class UpdateWelshPreferenceAboutToSubmitHandler implements PreSubmitCallb
 
     public AddNoteService addNoteService;
 
-    @Autowired
     public UpdateWelshPreferenceAboutToSubmitHandler(AddNoteService addNoteService) {
         this.addNoteService = addNoteService;
     }

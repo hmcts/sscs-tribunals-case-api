@@ -1,16 +1,14 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import junitparams.JUnitParamsRunner;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -28,7 +26,7 @@ public class AdjournCaseCcdServiceTest {
     @Mock
     private VenueDataLoader venueDataLoader;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         openMocks(this);
         service = new AdjournCaseCcdService(new VenueRpcDetailsService(venueDataLoader));

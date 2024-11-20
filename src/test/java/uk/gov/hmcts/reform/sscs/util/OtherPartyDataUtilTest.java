@@ -2,9 +2,7 @@ package uk.gov.hmcts.reform.sscs.util;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyUcb;
@@ -13,14 +11,15 @@ import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.sendNewOtherParty
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
-@RunWith(JUnitParamsRunner.class)
 public class OtherPartyDataUtilTest {
 
     public static final String ID_1 = "17a74540-c1b6-49e2-a81b-a9dbd2259251";
@@ -50,8 +49,9 @@ public class OtherPartyDataUtilTest {
         assertEquals(YesNo.NO.getValue(), getOtherPartyUcb(otherParties));
     }
 
-    @Test
-    @Parameters({"UPDATE_OTHER_PARTY_DATA", "DWP_UPLOAD_RESPONSE"})
+    @ParameterizedTest
+    // JunitParamsRunnerToParameterized conversion not supported
+    @ValueSource(strings = {"UPDATE_OTHER_PARTY_DATA", "DWP_UPLOAD_RESPONSE"})
     public void givenNewOtherPartyAdded_thenAssignAnIdAndNotificationFlag(EventType eventType) {
         List<CcdValue<OtherParty>> otherParties = Arrays.asList(
             buildOtherPartyWithAppointeeAndRep(null, null, null));
@@ -170,29 +170,29 @@ public class OtherPartyDataUtilTest {
             });
     }
 
-    @Test
-    @Parameters(method = "buildOtherPartyBeforeAndAfterCollections")
+    @ParameterizedTest
+    @MethodSource("buildOtherPartyBeforeAndAfterCollections")
     public void givenNewOtherPartyAdded_thenReturnTrue(List<CcdValue<OtherParty>> before, List<CcdValue<OtherParty>> after, boolean hasNewOtherParty) {
         assertEquals(hasNewOtherParty, OtherPartyDataUtil.hasNewOtherPartyAdded(before,after));
     }
 
-    public Object[] buildOtherPartyBeforeAndAfterCollections() {
-        return new Object[] {
-            new Object[] { null, null, false },
-            new Object[] { null, List.of(), false },
-            new Object[] { null, List.of(buildOtherParty(ID_1)), true },
-            new Object[] { List.of(), List.of(buildOtherParty(ID_1)), true },
-            new Object[] { List.of(buildOtherParty(ID_1), buildOtherParty(ID_2)), List.of(buildOtherParty(ID_1), buildOtherParty(ID_2)), false },
-            new Object[] { List.of(buildOtherParty(ID_1), buildOtherParty(ID_2)), List.of(buildOtherParty(ID_1), buildOtherParty(ID_2), buildOtherParty(ID_3)), true },
-            new Object[] { List.of(buildOtherParty(ID_1), buildOtherParty(ID_2)), List.of(buildOtherParty(ID_1), buildOtherParty(ID_3)), true },
+    public static Object[] buildOtherPartyBeforeAndAfterCollections() {
+        return new Object[]{
+            new Object[]{null, null, false},
+            new Object[]{null, List.of(), false},
+            new Object[]{null, List.of(buildOtherParty(ID_1)), true},
+            new Object[]{List.of(), List.of(buildOtherParty(ID_1)), true},
+            new Object[]{List.of(buildOtherParty(ID_1), buildOtherParty(ID_2)), List.of(buildOtherParty(ID_1), buildOtherParty(ID_2)), false},
+            new Object[]{List.of(buildOtherParty(ID_1), buildOtherParty(ID_2)), List.of(buildOtherParty(ID_1), buildOtherParty(ID_2), buildOtherParty(ID_3)), true},
+            new Object[]{List.of(buildOtherParty(ID_1), buildOtherParty(ID_2)), List.of(buildOtherParty(ID_1), buildOtherParty(ID_3)), true},
         };
     }
 
-    private CcdValue<OtherParty> buildOtherParty(String id) {
+    private static CcdValue<OtherParty> buildOtherParty(String id) {
         return buildOtherParty(id, true);
     }
 
-    private CcdValue<OtherParty> buildOtherParty(String id, boolean ucb) {
+    private static CcdValue<OtherParty> buildOtherParty(String id, boolean ucb) {
         return CcdValue.<OtherParty>builder()
                 .value(OtherParty.builder()
                         .id(id)
@@ -223,7 +223,7 @@ public class OtherPartyDataUtilTest {
                 .build();
     }
 
-    private Name name(String name, String id) {
+    private static Name name(String name, String id) {
         return Name.builder().firstName(name).lastName(id).build();
     }
 
@@ -303,13 +303,12 @@ public class OtherPartyDataUtilTest {
         assertThat(otherPartyName).isNull();
     }
 
-    @Test
-    @Parameters({
-        "1, OtherParty 1",
-        "3, Appointee 3",
-        "4, Rep 4"
+    @ParameterizedTest
+    @CsvSource({
+        "1,OtherParty 1",
+        "3,Appointee 3",
+        "4,Rep 4"
     })
-
     public void getOtherPartyNameFromId_forOtherPartyRepReturnsRepName(String otherPartyId, String expectedName) {
         List<CcdValue<OtherParty>> otherParties = List.of(
             buildOtherParty("1"),

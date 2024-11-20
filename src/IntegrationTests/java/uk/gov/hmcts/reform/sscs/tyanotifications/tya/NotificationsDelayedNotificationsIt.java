@@ -10,24 +10,24 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import junitparams.Parameters;
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 
 public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         super.setup();
 
         setupReminderController(getNotificationService());
     }
 
-    @Test
-    @Parameters(method = "generateAppointeeNotificationScenariosForDelayedNotifications")
+    @ParameterizedTest
+    @MethodSource("generateAppointeeNotificationScenariosForDelayedNotifications")
     public void shouldSendAppointeeNotificationsForADelayedNotificationEventForAnOralOrPaperHearingAndForEachSubscription(
         NotificationEventType notificationEventType, String hearingType, List<String> expectedEmailTemplateIds,
         List<String> expectedSmsTemplateIds, List<String> expectedLetterTemplateIds, String appointeeEmailSubs,
@@ -66,8 +66,8 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
         validateLetterNotifications(expectedLetterTemplateIds, wantedNumberOfSendLetterInvocations, expectedName);
     }
 
-    @Test
-    @Parameters(method = "generateRepsNotificationScenariosForDelayedNotifications")
+    @ParameterizedTest
+    @MethodSource("generateRepsNotificationScenariosForDelayedNotifications")
     public void shouldSendRepsNotificationsForADelayedNotificationEventForAnOralOrPaperHearingAndForEachSubscription(
         NotificationEventType notificationEventType, String hearingType, List<String> expectedEmailTemplateIds,
         List<String> expectedSmsTemplateIds, List<String> expectedLetterTemplateIds, String appellantEmailSubs, String appellantSmsSubs, String repsEmailSubs,
@@ -99,7 +99,7 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
     }
 
     @SuppressWarnings({"Indentation", "unused"})
-    private Object[] generateAppointeeNotificationScenariosForDelayedNotifications() {
+    private static Object[] generateAppointeeNotificationScenariosForDelayedNotifications() {
         return new Object[]{
             new Object[]{
                 APPEAL_RECEIVED,
@@ -221,7 +221,7 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
         };
     }
 
-    private Object[] generateRepsNotificationScenariosForDelayedNotifications() {
+    private static Object[] generateRepsNotificationScenariosForDelayedNotifications() {
         return new Object[]{
             new Object[]{
                 APPEAL_RECEIVED,

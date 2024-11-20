@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
 import java.util.function.Consumer;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -17,7 +16,6 @@ public class PanelCompositionService {
     private final IdamService idamService;
     private final UpdateCcdCaseService updateCcdCaseService;
 
-    @Autowired
     public PanelCompositionService(UpdateCcdCaseService updateCcdCaseService, IdamService idamService) {
         this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;

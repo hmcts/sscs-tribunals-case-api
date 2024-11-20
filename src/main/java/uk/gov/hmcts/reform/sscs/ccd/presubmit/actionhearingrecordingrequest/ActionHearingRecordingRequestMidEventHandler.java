@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -31,7 +30,6 @@ public class ActionHearingRecordingRequestMidEventHandler implements PreSubmitCa
 
     private final ActionHearingRecordingRequestService actionHearingRecordingRequestService;
 
-    @Autowired
     public ActionHearingRecordingRequestMidEventHandler(ActionHearingRecordingRequestService actionHearingRecordingRequestService) {
         this.actionHearingRecordingRequestService = actionHearingRecordingRequestService;
     }
@@ -162,7 +160,7 @@ public class ActionHearingRecordingRequestMidEventHandler implements PreSubmitCa
     @NotNull
     private String selectHearingTitle(Hearing hearing, List<Hearing> hearings) {
         int index = hearings.indexOf(hearing) + 1;
-        return String.format("Hearing %s", index);
+        return "Hearing %s".formatted(index);
     }
 
     private void validateRequest(ProcessHearingRecordingRequest processHearingRecordingRequest, PreSubmitCallbackResponse<SscsCaseData> response) {

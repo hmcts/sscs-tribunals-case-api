@@ -4,7 +4,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.HEARING_REMINDER;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.POSTPONEMENT;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobNotFoundException;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobRemover;
@@ -18,7 +17,6 @@ public class HearingReminderRemover implements ReminderHandler {
     private final JobGroupGenerator jobGroupGenerator;
     private final JobRemover jobRemover;
 
-    @Autowired
     public HearingReminderRemover(
         JobGroupGenerator jobGroupGenerator,
         JobRemover jobRemover

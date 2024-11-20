@@ -251,10 +251,10 @@ public abstract class SubmitAppealServiceBase {
             }
         } catch (Exception e) {
             throw new CcdException(
-                    String.format("Error found in the creating case process for case with Id - %s"
-                                    + " and Nino - %s and Benefit type - %s and exception: %s",
-                            caseDetails != null ? caseDetails.getId() : "", caseData.getAppeal().getAppellant().getIdentity().getNino(),
-                            caseData.getAppeal().getBenefitType().getCode(), e.getMessage()), e);
+                ("Error found in the creating case process for case with Id - %s"
+                    + " and Nino - %s and Benefit type - %s and exception: %s").formatted(
+                    caseDetails != null ? caseDetails.getId() : "", caseData.getAppeal().getAppellant().getIdentity().getNino(),
+                    caseData.getAppeal().getBenefitType().getCode(), e.getMessage()), e);
         }
 
         log.info("Duplicate case {} found for Nino {} and benefit type {}. "
@@ -262,8 +262,8 @@ public abstract class SubmitAppealServiceBase {
                 caseDetails.getId(), caseData.getAppeal().getAppellant().getIdentity().getNino(),
                 caseData.getAppeal().getBenefitType().getCode());
         throw new DuplicateCaseException(
-                String.format("An appeal has already been submitted, for that decision date %s ",
-                        caseData.getAppeal().getMrnDetails().getMrnDate()));
+            "An appeal has already been submitted, for that decision date %s ".formatted(
+                caseData.getAppeal().getMrnDetails().getMrnDate()));
     }
 
     private void associateCase(IdamTokens idamTokens,

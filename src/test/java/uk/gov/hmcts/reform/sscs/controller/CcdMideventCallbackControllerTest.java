@@ -21,10 +21,9 @@ import java.time.LocalDateTime;
 import java.util.*;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -36,8 +35,7 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
 import org.springframework.http.converter.xml.SourceHttpMessageConverter;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -60,17 +58,11 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesService2;
 import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesStatus;
 
+@ExtendWith(SpringExtension.class)
 @RunWith(JUnitParamsRunner.class)
 public class CcdMideventCallbackControllerTest {
-
-    // begin: needed to use spring runner and junitparamsRunner together
-    @ClassRule
-    public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
     public static final String JURISDICTION = "SSCS";
     public static final long ID = 1234L;
-
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
 
     // end
 
@@ -98,7 +90,7 @@ public class CcdMideventCallbackControllerTest {
     @MockBean
     private AdjournCaseMidEventValidationService adjournCaseMidEventValidationService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         DynamicListItem listItem = new DynamicListItem("", "");
 

@@ -117,7 +117,7 @@ class HearingsCaseMappingTest extends HearingsMappingBase {
             .build();
         Mockito.when(refData.getExUiUrl()).thenReturn(EX_UI_URL);
         String result = HearingsCaseMapping.getCaseDeepLink(wrapper.getCaseData(), refData);
-        String expected = String.format(HearingsCaseMapping.CASE_DETAILS_URL, EX_UI_URL, CASE_ID);
+        String expected = HearingsCaseMapping.CASE_DETAILS_URL.formatted(EX_UI_URL, CASE_ID);
 
         assertEquals(expected, result);
     }

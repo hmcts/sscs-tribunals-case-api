@@ -5,16 +5,16 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 import java.util.*;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.actuate.health.*;
 
 public class TribunalCaseApiHealthAggregatorTest {
 
     private TribunalCaseApiHealthAggregator tribunalCaseApiHealthAggregator;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         tribunalCaseApiHealthAggregator = new TribunalCaseApiHealthAggregator();
@@ -36,7 +36,7 @@ public class TribunalCaseApiHealthAggregatorTest {
         Status actual = tribunalCaseApiHealthAggregator.getAggregateStatus();
 
         // then
-        Assert.assertEquals(Health.up().build().getStatus(), actual);
+        Assertions.assertEquals(Health.up().build().getStatus(), actual);
     }
 
     @Test
@@ -56,7 +56,7 @@ public class TribunalCaseApiHealthAggregatorTest {
         Status actual = tribunalCaseApiHealthAggregator.getAggregateStatus();
 
         // then
-        Assert.assertEquals(Health.up().build().getStatus(), actual);
+        Assertions.assertEquals(Health.up().build().getStatus(), actual);
     }
 
 }

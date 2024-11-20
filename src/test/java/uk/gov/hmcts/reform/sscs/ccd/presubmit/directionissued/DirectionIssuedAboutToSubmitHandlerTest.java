@@ -4,14 +4,25 @@ import static java.util.Collections.emptySet;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.DIRECTION_ACTION_REQUIRED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REJECT_HEARING_RECORDING_REQUEST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_INFORMATION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.NONE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.WELSH_TRANSLATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
@@ -24,18 +35,44 @@ import java.util.List;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ExtensionNextEvent;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PrePostHearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsInterlocDirectionDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.model.dwp.Mapping;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityType;
@@ -49,9 +86,6 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     private static final String DOCUMENT_URL = "dm-store/documents/123";
     private static final String DOCUMENT_URL2 = "dm-store/documents/456";
     private static final String DUMMY_REGIONAL_CENTER = "dummyRegionalCenter";
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
 
     @Mock
     private FooterService footerService;
@@ -82,7 +116,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     @Mock
     private PreSubmitCallbackResponse<SscsCaseData> response;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, false);
 
@@ -136,6 +170,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPEAL_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
     public void givenANonHandleEvidenceEvent_thenReturnFalse(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
@@ -143,6 +178,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"DIRECTION_ISSUED", "DIRECTION_ISSUED_WELSH"})
     public void givenAValidHandleAndEventType_thenReturnTrue(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
@@ -150,17 +186,18 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenGenerateNoticeIsYes_thenReturnTrue() {
         assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
-    @Test
+    @ParameterizedTest
     public void willCopyThePreviewFileToTheInterlocDirectionDocumentAndAddFooter() {
         when(caseDetails.getState()).thenReturn(State.READY_TO_LIST);
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -175,7 +212,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals(DirectionType.APPEAL_TO_PROCEED.toString(), response.getData().getDirectionTypeDl().getValue().getCode());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDirectionNoticeAlreadyExistsAndThenManuallyUploadANewNotice_thenIssueTheNewDocumentWithFooter() {
         handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, true);
         sscsCaseData.setPrePostHearing(PrePostHearing.PRE);
@@ -209,7 +246,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDirectionTypeIsNull_displayAnError() {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(null);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -220,7 +257,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @SuppressWarnings({"Indentation", "unused"})
-    private Object[] getDirectionNoticeConfidentialMembers() {
+    private static Object[] getDirectionNoticeConfidentialMembers() {
         return new Object[]{
             new Object[]{ConfidentialityType.GENERAL.getCode(), false, DIRECTION_ACTION_REQUIRED},
             new Object[]{ConfidentialityType.CONFIDENTIAL.getCode(), true, DIRECTION_ACTION_REQUIRED},
@@ -231,8 +268,8 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         };
     }
 
-    @Test
-    @Parameters(method = "getDirectionNoticeConfidentialMembers")
+    @ParameterizedTest
+    @MethodSource("getDirectionNoticeConfidentialMembers")
     public void givenDirectionNoticeCheckFtaStateBasedOnConfidentiality(String confidentialityType, boolean isFtaChosen, DwpState newFtaState) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setConfidentialityType(confidentialityType);
@@ -243,7 +280,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertThat(response.getData().getDwpState(), is(newFtaState));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDirectionTypeOfProvideInformation_setInterlocStateToAwaitingInformationAndDirectionTypeIsNull() {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.PROVIDE_INFORMATION.toString()));
         sscsCaseData.setDirectionDueDate("11/07/2025");
@@ -252,7 +289,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals(AWAITING_INFORMATION, response.getData().getInterlocReviewState());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDirectionTypeOfAppealToProceedAndCaseIsPreValidInterloc_setInterlocStateToAwaitingAdminActionAndDirectionTypeIsSet() {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()));
         when(caseDetails.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
@@ -264,7 +301,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals(DirectionType.APPEAL_TO_PROCEED.toString(), response.getData().getDirectionTypeDl().getValue().getCode());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDirectionTypeOfAppealToProceedAndCaseIsPreValidInterloc_willNotReturnValidationErrorsFromExternalService() {
         String errorMessage = "There was an error in the external service";
         when(response.getErrors()).thenReturn(ImmutableSet.of(errorMessage));
@@ -275,7 +312,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals(0, response.getErrors().size());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDirectionTypeOfAppealToProceedAndCaseIsPostValidInterloc_setInterlocStateToAwaitingAdminActionAndDirectionTypeIsSet() {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()));
         when(caseDetailsBefore.getState()).thenReturn(State.WITH_DWP);
@@ -289,6 +326,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"pip, 35", "childSupport, 42"})
     public void givenDirectionTypeOfAppealToProceed_shouldSetDwpRegionalCentre(String benefitType, int expectedResponseDays) {
         Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
@@ -308,6 +346,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"pip, 35", "childSupport, 42"})
     public void givenDirectionTypeOfAppealToProceedWhenDwpIssuingOfficeIsNull_shouldSetDefaultDwpRegionalCentre(String benefitType, int expectedResponseDays) {
         Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
@@ -317,6 +356,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"pip, 35", "childSupport, 42"})
     public void givenDirectionTypeOfAppealToProceedWhenDwpIssuingOfficeIsEmpty_shouldSetDefaultDwpRegionalCentre(String benefitType, int expectedResponseDays) {
         Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
@@ -326,6 +366,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"pip, 35", "childSupport, 42"})
     public void givenDirectionTypeOfAppealToProceedWhenNoMrnDetails_shouldSetDefaultDwpRegionalCentre(String benefitType, int expectedResponseDays) {
         Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
@@ -348,7 +389,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals(DUMMY_REGIONAL_CENTER, response.getData().getDwpRegionalCentre());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDirectionTypeOfGrantExtension_setDwpStateAndDirectionTypeIsNotSet() {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.GRANT_EXTENSION.toString()));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -358,6 +399,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"pip, 35", "childSupport, 42"})
     public void givenDirectionTypeOfRefuseExtensionAndExtensionNextEventIsSendToListing_setResponseReceivedStateAndInterlocStateToAwaitingAdminAction(String benefitType, int expectedResponseDays) {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_EXTENSION.toString()));
@@ -372,6 +414,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"pip, 35", "childSupport, 42"})
     public void givenDirectionTypeOfRefuseExtensionAndExtensionNextEventIsSendToValidAppeal_setWithDwpStateAndDoNotSetInterlocState(String benefitType, int expectedResponseDays) {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_EXTENSION.toString()));
@@ -383,7 +426,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertValues(response, null, DIRECTION_ACTION_REQUIRED, State.WITH_DWP, expectedResponseDays);
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDirectionTypeOfGrantReinstatementAndNotInterlocReview_setState() {
 
         callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
@@ -402,7 +445,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertNull(response.getData().getInterlocReviewState());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDirectionTypeOfGrantReinstatementAndInterlocReview_setState() {
 
         callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
@@ -420,7 +463,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals(DwpState.REINSTATEMENT_GRANTED, response.getData().getDwpState());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDirectionTypeOfRefuseReinstatementkeepState() {
 
         callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
@@ -438,7 +481,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals(DwpState.REINSTATEMENT_REFUSED, response.getData().getDwpState());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDirectionTypeOfGrantReinstatementForWelshCaseDont_setStates() {
 
         callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
@@ -459,7 +502,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals("Yes", response.getData().getTranslationWorkOutstanding());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDirectionTypeOfRefuseReinstatementForWelshCaseDont_setStates() {
 
         callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
@@ -480,7 +523,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals("Yes", response.getData().getTranslationWorkOutstanding());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDirectionTypeOfGrantUrgentHearingAndInterlocReview_setState() {
 
         callback.getCaseDetails().getCaseData().setState(State.INTERLOCUTORY_REVIEW_STATE);
@@ -498,7 +541,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals(DIRECTION_ACTION_REQUIRED, response.getData().getDwpState());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDirectionTypeOfRefuseUrgentHearingkeepState() {
 
         callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
@@ -518,7 +561,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals(DIRECTION_ACTION_REQUIRED, response.getData().getDwpState());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDirectionTypeOfRefuseHearingRecordingRequest_setInterlocReviewStateAndInterlocReferralReason() {
 
         callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
@@ -535,6 +578,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"file.png", "file.jpg", "file.doc"})
     public void givenManuallyUploadedFileIsNotAPdf_thenAddAnErrorToResponse(String filename) {
         sscsCaseData.getDocumentStaging().setPreviewDocument(null);
@@ -554,7 +598,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         }
     }
 
-    @Test
+    @ParameterizedTest
     public void givenNoPdfIsUploaded_thenAddAnErrorToResponse() {
         sscsCaseData.getDocumentStaging().setPreviewDocument(null);
 
@@ -568,7 +612,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         }
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldErrorWhenDirectionTypeIsProvideInformationAndNoDueDate() {
         sscsCaseData.setDirectionDueDate(null);
         sscsCaseData.getDirectionTypeDl().setValue(new DynamicListItem(DirectionType.PROVIDE_INFORMATION.toString(), "appeal To Proceed"));
@@ -578,7 +622,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals("Please populate the direction due date", response.getErrors().toArray()[0]);
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDecisionIssuedEventAndCaseIsWelsh_SetFieldsAndCallServicesCorrectly() {
         when(caseDetailsBefore.getState()).thenReturn(State.WITH_DWP);
         sscsCaseData.setLanguagePreferenceWelsh("Yes");
@@ -600,7 +644,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         verifyNoInteractions(serviceRequestExecutor);
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDecisionIssuedWelshEvent_SetFieldsAndCallServicesCorrectly() {
 
         expectedWelshDocument = SscsWelshDocument.builder()
@@ -628,6 +672,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"pip, 35", "childSupport, 42"})
     public void givenWelshDirectionTypeOfRefuseExtensionAndExtensionNextEventIsSendToListing_setResponseReceivedStateAndInterlocStateToAwaitingAdminAction(String benefitType, int expectedResponseDays) {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_EXTENSION.toString()));
@@ -643,6 +688,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"pip, 35", "childSupport, 42"})
     public void givenWelshDirectionTypeOfRefuseExtensionAndExtensionNextEventIsSendToValidAppeal_setWithDwpStateAndDoNotSetInterlocState(String benefitType, int expectedResponseDays) {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_EXTENSION.toString()));
@@ -657,7 +703,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertValues(response, null, DIRECTION_ACTION_REQUIRED, State.WITH_DWP, expectedResponseDays);
     }
 
-    @Test
+    @ParameterizedTest
     public void givenIssueDirectionNoticeForAppealToProceedForPreValidCase_thenSetNonDigitalToDigitalCase() {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()));
         when(caseDetails.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
@@ -668,7 +714,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertThat(response.getData().getCreatedInGapsFrom(), is(READY_TO_LIST.getId()));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenIssueDirectionNoticeForAppealToProceedForPreValidCase_thenSetNoDigitalToDigitalCase() {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()));
         when(caseDetails.getState()).thenReturn(State.INCOMPLETE_APPLICATION);
@@ -679,7 +725,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertThat(response.getData().getCreatedInGapsFrom(), is(READY_TO_LIST.getId()));
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldNotClearInterlocReferralReasonIfPostHearingsNotEnabled() {
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_CORRECTION_APPLICATION);
 
@@ -688,7 +734,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals(InterlocReferralReason.REVIEW_CORRECTION_APPLICATION, response.getData().getInterlocReferralReason());
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldClearInterlocReferralReason() {
         handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, true);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_CORRECTION_APPLICATION);
@@ -708,7 +754,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertThat(response.getData().getDwpDueDate(), is(LocalDate.now().plusDays(expectedResponseDays).toString()));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenNoUploadedAndGeneratedDoc_thenReturnError() {
         sscsCaseData.getDocumentGeneration().setGenerateNotice(NO);
 
@@ -718,7 +764,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertThat(response.getErrors(), hasItem("You need to upload a PDF document"));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenGenerateNoticeIsYes_thenReturnCaseDataPreviewDoc() {
         DocumentLink url = sscsCaseData.getDocumentStaging().getPreviewDocument();
 
@@ -727,7 +773,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         verify(footerService).createFooterAndAddDocToCase(eq(url), any(), any(), any(), any(), any(), any());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenGenerateNoticeIsSetToNoAndInterlocDocIsNotNull_thenReturnRelevantDocLink() {
         sscsCaseData.getDocumentGeneration().setGenerateNotice(NO);
         assertFalse(sscsCaseData.getDocumentGeneration().getGenerateNotice().toBoolean());

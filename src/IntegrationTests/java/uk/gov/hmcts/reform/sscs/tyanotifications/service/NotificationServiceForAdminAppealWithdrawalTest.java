@@ -5,8 +5,8 @@ import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADMIN_APPEAL_WITHDRAWN;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
@@ -18,7 +18,7 @@ public class NotificationServiceForAdminAppealWithdrawalTest extends Notificatio
     @Value("${notification.english.appealWithdrawn.appellant.docmosisId}")
     private String adminAppealWithdrawalDocmosisId;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         setNotificationService(initialiseNotificationService());
     }

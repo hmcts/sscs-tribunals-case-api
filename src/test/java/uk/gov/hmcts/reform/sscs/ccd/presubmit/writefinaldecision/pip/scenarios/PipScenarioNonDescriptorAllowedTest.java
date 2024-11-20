@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.scenarios;
 
 import java.util.Arrays;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipTemplateContent;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
@@ -28,24 +28,26 @@ public class PipScenarioNonDescriptorAllowedTest {
 
         PipTemplateContent content = PipScenario.SCENARIO_NON_DESCRIPTOR.getContent(body);
 
-        String expectedContent = "The appeal is allowed.\n"
-                + "\n"
-                + "The decision made by the Secretary of State on 20/09/2020 is set aside.\n"
-                + "\n"
-                + "My summary\n"
-                + "\n"
-                + "My first reasons\n"
-                + "\n"
-                + "My second reasons\n"
-                + "\n"
-                + "Something else\n"
-                + "\n"
-                + "This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative did not attend.\n"
-                + "\n";
+        String expectedContent = """
+                The appeal is allowed.
+                
+                The decision made by the Secretary of State on 20/09/2020 is set aside.
+                
+                My summary
+                
+                My first reasons
+                
+                My second reasons
+                
+                Something else
+                
+                This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative did not attend.
+                
+                """;
 
-        Assert.assertEquals(7, content.getComponents().size());
+        Assertions.assertEquals(7, content.getComponents().size());
 
-        Assert.assertEquals(expectedContent, content.toString());
+        Assertions.assertEquals(expectedContent, content.toString());
 
     }
 

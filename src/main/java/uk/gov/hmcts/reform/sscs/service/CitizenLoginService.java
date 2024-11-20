@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static java.lang.String.format;
 import static java.util.stream.Stream.concat;
 import static java.util.stream.Stream.of;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
@@ -60,7 +59,7 @@ public class CitizenLoginService {
     }
 
     public List<OnlineHearing> findCasesForCitizen(IdamTokens idamTokens, String tya) {
-        log.info(format("Find case: Searching for case with tya [%s] for user [%s]", tya, idamTokens.getUserId()));
+        log.info("Find case: Searching for case with tya [%s] for user [%s]".formatted(tya, idamTokens.getUserId()));
         List<CaseDetails> caseDetails = citizenCcdService.searchForCitizenAllCases(idamTokens);
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
                 .map(sscsCcdConvertService::getCaseDetails)
@@ -68,21 +67,21 @@ public class CitizenLoginService {
                 .peek(this::attachOtherPartyDetails)
                 .toList();
         if (!isBlank(tya)) {
-            log.info(format("Find case: Filtering for case with tya [%s] for user [%s]", tya, idamTokens.getUserId()));
+            log.info("Find case: Filtering for case with tya [%s] for user [%s]".formatted(tya, idamTokens.getUserId()));
             List<OnlineHearing> convert = convert(
                     sscsCaseDetails.stream()
                             .filter(casesWithSubscriptionMatchingTya(tya))
                             .toList(),
                     idamTokens.getEmail()
             );
-            log.info(format("Find case: Found [%s] cases for tya [%s] for user [%s]", convert.size(), tya, idamTokens.getUserId()));
+            log.info("Find case: Found [%s] cases for tya [%s] for user [%s]".formatted(convert.size(), tya, idamTokens.getUserId()));
 
             return convert;
         }
 
-        log.info(format("Searching for case without for user [%s]", idamTokens.getUserId()));
+        log.info("Searching for case without for user [%s]".formatted(idamTokens.getUserId()));
         List<OnlineHearing> convert = convert(sscsCaseDetails, idamTokens.getEmail());
-        log.info(format("Found [%s] cases without tya for user [%s]", convert.size(), idamTokens.getUserId()));
+        log.info("Found [%s] cases without tya for user [%s]".formatted(convert.size(), idamTokens.getUserId()));
         return convert;
     }
 
@@ -96,38 +95,37 @@ public class CitizenLoginService {
     }
 
     public List<OnlineHearing> findActiveCasesForCitizen(IdamTokens idamTokens) {
-        log.info(format("Find case: Searching for active case with for user [%s]", idamTokens.getUserId()));
+        log.info("Find case: Searching for active case with for user [%s]".formatted(idamTokens.getUserId()));
         List<CaseDetails> caseDetails = citizenCcdService.searchForCitizenAllCases(idamTokens);
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
                 .map(sscsCcdConvertService::getCaseDetails)
                 .filter(AppealNumberGenerator::filterActiveCasesForCitizen)
                 .toList();
 
-        log.info(format("Searching for active case without for user [%s]", idamTokens.getUserId()));
+        log.info("Searching for active case without for user [%s]".formatted(idamTokens.getUserId()));
         List<OnlineHearing> convert = convert(sscsCaseDetails, idamTokens.getEmail());
-        log.info(format("Found [%s] active cases for user [%s]", convert.size(), idamTokens.getUserId()));
+        log.info("Found [%s] active cases for user [%s]".formatted(convert.size(), idamTokens.getUserId()));
         return convert;
     }
 
     public List<OnlineHearing> findDormantCasesForCitizen(IdamTokens idamTokens) {
-        log.info(format("Find case: Searching for dormant case with for user [%s]", idamTokens.getUserId()));
+        log.info("Find case: Searching for dormant case with for user [%s]".formatted(idamTokens.getUserId()));
         List<CaseDetails> caseDetails = citizenCcdService.searchForCitizenAllCases(idamTokens);
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
                 .map(sscsCcdConvertService::getCaseDetails)
                 .filter(AppealNumberGenerator::filterDormantCasesForCitizen)
                 .toList();
 
-        log.info(format("Searching for dormant case without for user [%s]", idamTokens.getUserId()));
+        log.info("Searching for dormant case without for user [%s]".formatted(idamTokens.getUserId()));
         List<OnlineHearing> convert = convert(sscsCaseDetails, idamTokens.getEmail());
-        log.info(format("Found [%s] dormant cases for user [%s]", convert.size(), idamTokens.getUserId()));
+        log.info("Found [%s] dormant cases for user [%s]".formatted(convert.size(), idamTokens.getUserId()));
         return convert;
     }
 
     private List<OnlineHearing> convert(List<SscsCaseDetails> sscsCaseDetails, String email) {
         return sscsCaseDetails.stream()
                 .map(sscsCase -> onlineHearingService.loadHearing(sscsCase, null, email))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .flatMap(Optional::stream)
                 .toList();
     }
 
@@ -135,27 +133,27 @@ public class CitizenLoginService {
         SscsCaseDetails caseByAppealNumber = ccdService.findCaseByAppealNumber(tya, idamService.getIdamTokens());
 
         if (caseByAppealNumber != null) {
-            log.info(format("Associate case: Found case to assign id [%s] for tya [%s] email [%s] postcode [%s]", caseByAppealNumber.getId(), tya, email, postcode));
+            log.info("Associate case: Found case to assign id [%s] for tya [%s] email [%s] postcode [%s]".formatted(caseByAppealNumber.getId(), tya, email, postcode));
             String appealPostcode = caseByAppealNumber.getData().getAppeal().getAppellant().getAddress().getPostcode();
             if (appealPostcode != null && !appealPostcode.isEmpty()) {
                 if (postcodeUtil.hasAppellantOrOtherPartyPostcode(caseByAppealNumber, postcode, email)) {
-                    log.info(format("Associate case: Found case to assign id [%s] for tya [%s] email [%s] postcode [%s] matches postcode", caseByAppealNumber.getId(), tya, email, postcode));
+                    log.info("Associate case: Found case to assign id [%s] for tya [%s] email [%s] postcode [%s] matches postcode".formatted(caseByAppealNumber.getId(), tya, email, postcode));
                     if (caseHasSubscriptionWithTyaAndEmail(caseByAppealNumber, tya, email)) {
-                        log.info(format("Found case to assign id [%s] for tya [%s] email [%s] postcode [%s] has subscription", caseByAppealNumber.getId(), tya, email, postcode));
+                        log.info("Found case to assign id [%s] for tya [%s] email [%s] postcode [%s] has subscription".formatted(caseByAppealNumber.getId(), tya, email, postcode));
                         citizenCcdService.addUserToCase(idamService.getIdamTokens(), citizenIdamTokens.getUserId(), caseByAppealNumber.getId());
                         updateCaseWithLastLoggedIntoMya(email, caseByAppealNumber);
                         return onlineHearingService.loadHearing(caseByAppealNumber, tya, email);
                     } else {
-                        log.info(format("Associate case: Subscription does not match id [%s] for tya [%s] email [%s] postcode [%s]", caseByAppealNumber.getId(), tya, email, postcode));
+                        log.info("Associate case: Subscription does not match id [%s] for tya [%s] email [%s] postcode [%s]".formatted(caseByAppealNumber.getId(), tya, email, postcode));
                     }
                 } else {
-                    log.info(format("Associate case: Postcode does not match id [%s] for tya [%s] email [%s] postcode [%s]", caseByAppealNumber.getId(), tya, email, postcode));
+                    log.info("Associate case: Postcode does not match id [%s] for tya [%s] email [%s] postcode [%s]".formatted(caseByAppealNumber.getId(), tya, email, postcode));
                 }
             } else {
-                log.info(format("Associate case: Found case to assign id [%s], however no appellant post code exists", caseByAppealNumber.getId()));
+                log.info("Associate case: Found case to assign id [%s], however no appellant post code exists".formatted(caseByAppealNumber.getId()));
             }
         } else {
-            log.info(format("Associate case: No case found for tya [%s] email [%s] postcode [%s]", tya, email, postcode));
+            log.info("Associate case: No case found for tya [%s] email [%s] postcode [%s]".formatted(tya, email, postcode));
         }
         return Optional.empty();
     }

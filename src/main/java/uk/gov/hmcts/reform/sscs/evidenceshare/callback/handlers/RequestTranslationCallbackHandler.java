@@ -5,7 +5,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CASE_UPDATED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.REQUEST_TRANSLATION_FROM_WLU;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -26,7 +25,6 @@ public class RequestTranslationCallbackHandler implements CallbackHandler<SscsCa
     private final CcdService ccdService;
     private final IdamService idamService;
 
-    @Autowired
     public RequestTranslationCallbackHandler(RequestTranslationService requestTranslationService,
                                              CcdService ccdService,
                                              IdamService idamService) {

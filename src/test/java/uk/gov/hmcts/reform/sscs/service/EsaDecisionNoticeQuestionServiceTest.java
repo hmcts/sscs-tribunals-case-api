@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.util.Optional;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityAnswer;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaActivityQuestion;
@@ -23,8 +23,8 @@ public class EsaDecisionNoticeQuestionServiceTest extends DecisionNoticeQuestion
     @Test
     public void givenASelectedQuestionKey_thenExtractTheQuestionFromTheText() {
         EsaActivityQuestion question = service.extractQuestionFromKey(EsaActivityQuestionKey.MOBILISING_UNAIDED);
-        Assert.assertNotNull(question);
-        Assert.assertEquals("mobilisingUnaided", question.getKey());
+        Assertions.assertNotNull(question);
+        Assertions.assertEquals("mobilisingUnaided", question.getKey());
         assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", question.getValue());
         assertEquals(EsaActivityType.PHYSICAL_DISABILITIES, question.getActivityType());
     }
@@ -35,13 +35,13 @@ public class EsaDecisionNoticeQuestionServiceTest extends DecisionNoticeQuestion
         SscsCaseData sscsCaseData = SscsCaseData.builder().build();
 
         Optional<ActivityAnswer> answerOptional = service.getAnswerForActivityQuestionKey(sscsCaseData, EsaSchedule3QuestionKey.MOBILISING_UNAIDED.getKey());
-        Assert.assertNotNull(answerOptional);
-        Assert.assertTrue(answerOptional.isPresent());
+        Assertions.assertNotNull(answerOptional);
+        Assertions.assertTrue(answerOptional.isPresent());
 
-        Assert.assertEquals("1", answerOptional.get().getActivityAnswerNumber());
-        Assert.assertNull(answerOptional.get().getActivityAnswerLetter());
-        Assert.assertNull(answerOptional.get().getActivityAnswerValue());
-        Assert.assertEquals(0, answerOptional.get().getActivityAnswerPoints());
+        Assertions.assertEquals("1", answerOptional.get().getActivityAnswerNumber());
+        Assertions.assertNull(answerOptional.get().getActivityAnswerLetter());
+        Assertions.assertNull(answerOptional.get().getActivityAnswerValue());
+        Assertions.assertEquals(0, answerOptional.get().getActivityAnswerPoints());
     }
 
     @Test
@@ -51,12 +51,12 @@ public class EsaDecisionNoticeQuestionServiceTest extends DecisionNoticeQuestion
 
         for (EsaSchedule3QuestionKey key :  EsaSchedule3QuestionKey.values()) {
             Optional<ActivityAnswer> answerOptional = service.getAnswerForActivityQuestionKey(sscsCaseData, key.getKey());
-            Assert.assertNotNull(answerOptional);
-            Assert.assertTrue(answerOptional.isPresent());
-            Assert.assertNotNull(answerOptional.get().getActivityAnswerNumber());
-            Assert.assertNull(answerOptional.get().getActivityAnswerLetter());
-            Assert.assertNull(answerOptional.get().getActivityAnswerValue());
-            Assert.assertEquals(0, answerOptional.get().getActivityAnswerPoints());
+            Assertions.assertNotNull(answerOptional);
+            Assertions.assertTrue(answerOptional.isPresent());
+            Assertions.assertNotNull(answerOptional.get().getActivityAnswerNumber());
+            Assertions.assertNull(answerOptional.get().getActivityAnswerLetter());
+            Assertions.assertNull(answerOptional.get().getActivityAnswerValue());
+            Assertions.assertEquals(0, answerOptional.get().getActivityAnswerPoints());
         }
 
 

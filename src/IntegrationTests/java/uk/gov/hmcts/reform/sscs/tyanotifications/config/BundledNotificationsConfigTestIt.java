@@ -7,9 +7,9 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEvent
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
 
 import java.util.*;
-import junitparams.Parameters;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Template;
@@ -31,8 +31,8 @@ public class BundledNotificationsConfigTestIt extends AbstractNotificationConfig
     private static final Set<AppealHearingType> APPEAL_HEARING_TYPES = Set.of(PAPER, ORAL);
     private static final Set<HearingRoute> HEARING_ROUTE_TYPES = Set.of(HearingRoute.GAPS, HearingRoute.LIST_ASSIST);
 
-    @Test
-    @Parameters(method = "bundledLetterTemplateNames")
+    @ParameterizedTest
+    @MethodSource("bundledLetterTemplateNames")
     public void given_bundledLetters_should_notHaveTemplate(NotificationEventType eventType) {
         List<Template> templates = getTemplates(eventType);
 
@@ -60,7 +60,7 @@ public class BundledNotificationsConfigTestIt extends AbstractNotificationConfig
         return templates;
     }
 
-    private Object[] bundledLetterTemplateNames() {
+    private static Object[] bundledLetterTemplateNames() {
         Set<NotificationEventType> bundledLetterEventTypes = new HashSet<>(EVENT_TYPES_FOR_BUNDLED_LETTER);
         bundledLetterEventTypes.removeAll(BUNDLED_LETTER_EVENT_TYPES_IGNORED);
         return bundledLetterEventTypes.toArray();

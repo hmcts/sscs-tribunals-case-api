@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service.reminder;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_RESPOND;
@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -39,7 +39,7 @@ public class EvidenceReminderTest {
 
     private EvidenceReminder evidenceReminder;
 
-    @Before
+    @BeforeEach
     public void setup() {
         openMocks(this);
         evidenceReminder = new EvidenceReminder(
@@ -71,6 +71,7 @@ public class EvidenceReminderTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"DWP_RESPONSE_RECEIVED", "DWP_UPLOAD_RESPONSE"})
     public void schedulesReminder(NotificationEventType eventType) {
 
@@ -130,12 +131,14 @@ public class EvidenceReminderTest {
         assertTrue(jobCaptor.getAllValues().isEmpty());
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void canScheduleReturnFalseWhenDwpResponseReceivedThrowError() {
+        assertThrows(Exception.class, () -> {
 
-        CcdNotificationWrapper wrapper = null;
+            CcdNotificationWrapper wrapper = null;
 
-        assertFalse(evidenceReminder.canSchedule(wrapper));
+            assertFalse(evidenceReminder.canSchedule(wrapper));
+        });
     }
 
     @Test

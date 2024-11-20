@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.helper;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
@@ -88,8 +88,8 @@ public class IntegrationTestHelper {
                     .collect(Collectors.joining(", "));
 
             assertTrue(
-                message + " (" + expectedValue + " != " + jobKeys.size() + ") [" + observedGroups + "]",
-                jobKeys.size() == expectedValue
+                jobKeys.size() == expectedValue,
+                message + " (" + expectedValue + " != " + jobKeys.size() + ") [" + observedGroups + "]"
             );
 
         } catch (SchedulerException e) {
@@ -116,8 +116,8 @@ public class IntegrationTestHelper {
                     .collect(Collectors.joining(", "));
 
             assertTrue(
-                message + " (" + expectedValue + " != " + jobKeys.size() + ") [" + observedGroups + "]",
-                jobKeys.size() == expectedValue
+                jobKeys.size() == expectedValue,
+                message + " (" + expectedValue + " != " + jobKeys.size() + ") [" + observedGroups + "]"
             );
 
         } catch (SchedulerException e) {
@@ -137,7 +137,7 @@ public class IntegrationTestHelper {
                 quartzScheduler.getJobKeys(GroupMatcher.jobGroupContains(groupMatch));
 
             if (jobKeys.isEmpty()) {
-                assertTrue(message + " -- job group match not found", false);
+                assertTrue(false, message + " -- job group match not found");
             }
 
             List<String> triggersAt =
@@ -155,8 +155,8 @@ public class IntegrationTestHelper {
                     .collect(Collectors.toList());
 
             assertTrue(
-                message + " -- " + expectedTriggerAt + " not found in collection [" + String.join(", ", triggersAt) + "]",
-                triggersAt.contains(expectedTriggerAt)
+                triggersAt.contains(expectedTriggerAt),
+                message + " -- " + expectedTriggerAt + " not found in collection [" + String.join(", ", triggersAt) + "]"
             );
 
         } catch (SchedulerException e) {

@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -31,7 +30,6 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
 
     private final DwpAddressLookupService service;
 
-    @Autowired
     public HmctsResponseReviewedAboutToStartHandler(DwpAddressLookupService service) {
         this.service = service;
     }

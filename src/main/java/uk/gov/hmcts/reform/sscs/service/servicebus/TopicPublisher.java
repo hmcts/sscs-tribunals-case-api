@@ -6,7 +6,6 @@ import jakarta.jms.Message;
 import jakarta.jms.Session;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.IllegalStateException;
 import org.springframework.jms.connection.CachingConnectionFactory;
@@ -26,7 +25,6 @@ public class TopicPublisher {
 
     private final ConnectionFactory connectionFactory;
 
-    @Autowired
     public TopicPublisher(JmsTemplate jmsTemplate,
                           @Value("${amqp.topic}") final String destination,
                           ConnectionFactory connectionFactory) {
@@ -51,9 +49,9 @@ public class TopicPublisher {
             log.info("Message sent with message id {} for caseId {}", msg.get().getJMSMessageID(), caseId);
 
         } catch (IllegalStateException e) {
-            if (connectionFactory instanceof CachingConnectionFactory) {
+            if (connectionFactory instanceof CachingConnectionFactory factory) {
                 log.info("Send failed for caseId {}, attempting to reset connection...", caseId);
-                ((CachingConnectionFactory) connectionFactory).resetConnection();
+                factory.resetConnection();
                 log.info("Resending..");
                 jmsTemplate.send(destination, (Session session) -> session.createTextMessage(message));
                 log.info("In catch, message sent for caseId {}, messageId unknown", caseId);

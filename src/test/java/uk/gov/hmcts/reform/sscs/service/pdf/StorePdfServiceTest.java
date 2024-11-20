@@ -6,8 +6,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.*;
 
 import java.net.URISyntaxException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ByteArrayResource;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.domain.UpdateDocParams;
@@ -37,7 +37,7 @@ public class StorePdfServiceTest {
     private String someOnlineHearingId;
     private PdfStoreService pdfStoreService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         pdfService = mock(OldPdfService.class);
         sscsPdfService = mock(CcdPdfService.class);

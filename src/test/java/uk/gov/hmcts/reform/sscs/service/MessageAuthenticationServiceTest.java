@@ -1,20 +1,20 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.exception.InvalidSubscriptionTokenException;
 
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class MessageAuthenticationServiceTest {
 
     public static final String APPEAL_NUMBER = "dfdsf435345";
@@ -25,7 +25,7 @@ public class MessageAuthenticationServiceTest {
 
     private MessageAuthenticationService service;
 
-    @Before
+    @BeforeEach
     public void setUp() throws NoSuchAlgorithmException, InvalidKeyException {
         service = new MessageAuthenticationService(macString);
     }

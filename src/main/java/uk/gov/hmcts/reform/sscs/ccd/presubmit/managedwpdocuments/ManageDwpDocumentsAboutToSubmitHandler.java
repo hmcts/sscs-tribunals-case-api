@@ -6,7 +6,6 @@ import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -26,7 +25,6 @@ public class ManageDwpDocumentsAboutToSubmitHandler extends ResponseEventsAboutT
 
     private final DwpDocumentService dwpDocumentService;
 
-    @Autowired
     public ManageDwpDocumentsAboutToSubmitHandler(DwpDocumentService dwpDocumentService) {
         this.dwpDocumentService = dwpDocumentService;
     }

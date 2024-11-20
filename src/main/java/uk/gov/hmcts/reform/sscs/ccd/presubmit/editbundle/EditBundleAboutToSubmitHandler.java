@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.editbundle;
 import static java.util.Objects.requireNonNull;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -28,7 +27,6 @@ public class EditBundleAboutToSubmitHandler implements PreSubmitCallbackHandler<
 
     private static String EDIT_BUNDLE_ENDPOINT = "/api/stitch-ccd-bundles";
 
-    @Autowired
     public EditBundleAboutToSubmitHandler(ServiceRequestExecutor serviceRequestExecutor,
                                           @Value("${bundle.url}") String bundleUrl,
                                           DocumentConfiguration documentConfiguration) {

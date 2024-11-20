@@ -6,9 +6,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import junitparams.JUnitParamsRunner;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -21,41 +21,41 @@ public class UcActivityTypeTest {
     @Mock
     private SscsUcCaseData sscsUcCaseData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
     }
 
     @Test
     public void testPhysicalDisablitiesName() {
-        Assert.assertEquals("Physical Disabilities", UcActivityType.PHYSICAL_DISABILITIES.getName());
+        Assertions.assertEquals("Physical Disabilities", UcActivityType.PHYSICAL_DISABILITIES.getName());
     }
 
     @Test
     public void testMentalAssessmentGetName() {
-        Assert.assertEquals("Mental, cognitive and intellectual function assessment", UcActivityType.MENTAL_ASSESSMENT.getName());
+        Assertions.assertEquals("Mental, cognitive and intellectual function assessment", UcActivityType.MENTAL_ASSESSMENT.getName());
     }
 
     @Test
     public void testPhysicalDisabilitiesAnswersExtractor() {
 
         Function<SscsCaseData, List<String>> answersExtractor = UcActivityType.PHYSICAL_DISABILITIES.getAnswersExtractor();
-        Assert.assertNotNull(answersExtractor);
+        Assertions.assertNotNull(answersExtractor);
         Mockito.when(sscsUcCaseData.getUcWriteFinalDecisionPhysicalDisabilitiesQuestion()).thenReturn(Arrays.asList("physicalDisabilitiesAnswer1", "physicalDisabilitiesAnswer2"));
         SscsCaseData sscsCaseData = SscsCaseData.builder().sscsUcCaseData(sscsUcCaseData).build();
         List<String> answers = answersExtractor.apply(sscsCaseData);
-        Assert.assertEquals(Arrays.asList("physicalDisabilitiesAnswer1", "physicalDisabilitiesAnswer2"), answers);
+        Assertions.assertEquals(Arrays.asList("physicalDisabilitiesAnswer1", "physicalDisabilitiesAnswer2"), answers);
     }
 
     @Test
     public void testMentalAssessmentAnswersExtractor() {
 
         Function<SscsCaseData, List<String>> answersExtractor = UcActivityType.MENTAL_ASSESSMENT.getAnswersExtractor();
-        Assert.assertNotNull(answersExtractor);
+        Assertions.assertNotNull(answersExtractor);
         SscsCaseData sscsCaseData = SscsCaseData.builder().sscsUcCaseData(sscsUcCaseData).build();
         Mockito.when(sscsUcCaseData.getUcWriteFinalDecisionMentalAssessmentQuestion()).thenReturn(Arrays.asList("mentalAssessmentAnswer1", "mentalAssessmentAnswer2"));
         List<String> answers = answersExtractor.apply(sscsCaseData);
-        Assert.assertEquals(Arrays.asList("mentalAssessmentAnswer1", "mentalAssessmentAnswer2"), answers);
+        Assertions.assertEquals(Arrays.asList("mentalAssessmentAnswer1", "mentalAssessmentAnswer2"), answers);
     }
 
 }

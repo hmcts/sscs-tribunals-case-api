@@ -53,7 +53,7 @@ class ProcessHmcMessageServiceTestV1 extends AbstractProcessHmcMessageServiceTes
     @Override
     void verifyUpdateCaseDataCalledCorrectlyForHmcStatus(CcdCaseService ccdCaseService, UpdateCcdCaseService updateCcdCaseService,
                                                          SscsCaseData caseData, HmcStatus hmcStatus, HearingGetResponse hearingGetResponse) throws UpdateCaseException {
-        String ccdUpdateDescription = String.format(hmcStatus.getCcdUpdateDescription(), HEARING_ID);
+        String ccdUpdateDescription = hmcStatus.getCcdUpdateDescription().formatted(HEARING_ID);
         verify(updateCcdCaseService, never()).updateCaseV2DynamicEvent(anyLong(), any(), any());
         verify(ccdCaseService, times(1))
             .updateCaseData(caseData,

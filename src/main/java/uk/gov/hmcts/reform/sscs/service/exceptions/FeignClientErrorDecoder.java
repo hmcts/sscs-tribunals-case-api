@@ -140,7 +140,7 @@ public class FeignClientErrorDecoder implements ErrorDecoder {
         try (InputStream bodyIs = response.body().asInputStream()) {
             return new String(bodyIs.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            return String.format("Unable to resolve original error message: %s", e.getMessage());
+            return "Unable to resolve original error message: %s".formatted(e.getMessage());
         }
     }
 

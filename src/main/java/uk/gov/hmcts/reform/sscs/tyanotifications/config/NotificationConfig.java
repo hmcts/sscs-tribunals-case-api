@@ -6,7 +6,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference.WELSH;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -45,7 +44,7 @@ public class NotificationConfig {
 
     private Environment env;
 
-    NotificationConfig(@Autowired Environment env) {
+    NotificationConfig(Environment env) {
         this.env = env;
     }
 

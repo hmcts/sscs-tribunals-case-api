@@ -4,17 +4,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
 import org.hamcrest.Matcher;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(JUnitParamsRunner.class)
 public class SyaCaseWrapperTest {
 
-    @Test
-    @Parameters(method = "generateSyaCaseWrapperScenarios")
+    @ParameterizedTest
+    @MethodSource("generateSyaCaseWrapperScenarios")
     public void givenAppellantOrAppointeeAreNotProvided_ThenGetContactDetailsShouldNotBreak(
         SyaCaseWrapper syaCaseWrapper, Matcher<SyaContactDetails> matcher) {
         SyaContactDetails contactDetails = syaCaseWrapper.getContactDetails();
@@ -22,7 +19,7 @@ public class SyaCaseWrapperTest {
     }
 
     @SuppressWarnings({"unused"})
-    private Object[] generateSyaCaseWrapperScenarios() {
+    private static Object[] generateSyaCaseWrapperScenarios() {
         SyaCaseWrapper caseWithNullAppellantAndNullAppointee = buildCaseWithAppellantAndAppointeeAreBothNull();
         SyaCaseWrapper caseWithAppellantAndAppointee = buildCaseWithAppellantAndAppointeeNotNull();
         SyaCaseWrapper caseWithAppellantWithSameAddressAsAppointeeAndNullAppointee =
@@ -31,13 +28,13 @@ public class SyaCaseWrapperTest {
         return new Object[]{
             new Object[]{caseWithNullAppellantAndNullAppointee, nullValue()},
             new Object[]{caseWithAppellantWithSameAddressAsAppointeeAndNullAppointee,
-                    equalTo(caseWithAppellantWithSameAddressAsAppointeeAndNullAppointee.getAppellant().getContactDetails())},
+                equalTo(caseWithAppellantWithSameAddressAsAppointeeAndNullAppointee.getAppellant().getContactDetails())},
             new Object[]{caseWithAppellantAndAppointee,
                 equalTo(caseWithAppellantAndAppointee.getAppellant().getContactDetails())}
         };
     }
 
-    private SyaCaseWrapper buildCaseWithAppellantAndNullAppointee() {
+    private static SyaCaseWrapper buildCaseWithAppellantAndNullAppointee() {
         SyaCaseWrapper caseWithAppellantAndNullAppointee = new SyaCaseWrapper();
         caseWithAppellantAndNullAppointee.setAppellant(buildSyaAppellant(true));
         caseWithAppellantAndNullAppointee.setIsAppointee(true);
@@ -46,14 +43,14 @@ public class SyaCaseWrapperTest {
         return caseWithAppellantAndNullAppointee;
     }
 
-    private SyaCaseWrapper buildCaseWithAppellantAndAppointeeNotNull() {
+    private static SyaCaseWrapper buildCaseWithAppellantAndAppointeeNotNull() {
         SyaCaseWrapper caseWithAppellantAndAppointeeNotNull = new SyaCaseWrapper();
         caseWithAppellantAndAppointeeNotNull.setAppellant(buildSyaAppellant(false));
         caseWithAppellantAndAppointeeNotNull.setAppointee(buildSyaAppointee());
         return caseWithAppellantAndAppointeeNotNull;
     }
 
-    private SyaAppointee buildSyaAppointee() {
+    private static SyaAppointee buildSyaAppointee() {
         SyaAppointee appointee = new SyaAppointee();
         SyaContactDetails appointeeContactDetails = new SyaContactDetails();
         appointeeContactDetails.setEmailAddress("appointee@test.com");
@@ -61,7 +58,7 @@ public class SyaCaseWrapperTest {
         return appointee;
     }
 
-    private SyaAppellant buildSyaAppellant(boolean isAddressSameAsAppointee) {
+    private static SyaAppellant buildSyaAppellant(boolean isAddressSameAsAppointee) {
         SyaAppellant appellant = new SyaAppellant();
         SyaContactDetails contactDetails = new SyaContactDetails();
         contactDetails.setEmailAddress("appellant@test.com");
@@ -70,7 +67,7 @@ public class SyaCaseWrapperTest {
         return appellant;
     }
 
-    private SyaCaseWrapper buildCaseWithAppellantAndAppointeeAreBothNull() {
+    private static SyaCaseWrapper buildCaseWithAppellantAndAppointeeAreBothNull() {
         SyaCaseWrapper syaCaseWrapperWithNullAppellantAndNullAppointee = new SyaCaseWrapper();
         syaCaseWrapperWithNullAppellantAndNullAppointee.setAppellant(null);
         syaCaseWrapperWithNullAppellantAndNullAppointee.setAppointee(null);

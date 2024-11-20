@@ -14,23 +14,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.quality.Strictness;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 
+@ExtendWith(MockitoExtension.class)
 @RunWith(JUnitParamsRunner.class)
 public class NotificationsCallbackDispatcherTest {
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
 
     @Mock
     private CallbackHandler roboticsHandler;
@@ -42,6 +38,7 @@ public class NotificationsCallbackDispatcherTest {
     private CallbackHandler issueAppellantAppointeeFurtherEvidenceHandler;
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "EARLIEST,LATE,LATEST",
         "LATE,LATEST,EARLIEST",

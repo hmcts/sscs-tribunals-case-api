@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -25,7 +24,6 @@ public class UploadHearingRecordingMidEventHandler implements PreSubmitCallbackH
     private final IdamService idamService;
     private DocumentDownloadService documentDownloadService;
 
-    @Autowired
     public UploadHearingRecordingMidEventHandler(DocumentDownloadService documentDownloadService,
                                                  IdamService idamService) {
         this.documentDownloadService = documentDownloadService;

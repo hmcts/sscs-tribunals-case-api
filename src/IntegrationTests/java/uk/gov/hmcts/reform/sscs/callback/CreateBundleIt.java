@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.mock;
@@ -12,8 +12,8 @@ import java.io.IOException;
 import java.util.Collections;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -71,7 +71,7 @@ public class CreateBundleIt extends AbstractEventIt {
     @Captor
     private ArgumentCaptor<HttpEntity<Callback<SscsCaseData>>> captor;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();

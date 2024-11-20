@@ -79,7 +79,7 @@ public class PdfRequestUtil {
         pdfUrlBuilder.append(".pdf");
 
         if (isBlank(requestDetails)) {
-            String responseErrorMsg = String.format("Please enter request details to generate a %s document", pdfType.toString().toLowerCase());
+            String responseErrorMsg = "Please enter request details to generate a %s document".formatted(pdfType.toString().toLowerCase());
             response.addError(responseErrorMsg);
             return response;
         }
@@ -129,7 +129,7 @@ public class PdfRequestUtil {
             .append(" application: ")
             .append(requestDetails)
             .append("\n");
-        title = String.format("%s Application from %s", requestTypeDescriptionEn, "FTA");
+        title = "%s Application from %s".formatted(requestTypeDescriptionEn, "FTA");
     }
 
     private static DocumentLink getPreviewDocument(

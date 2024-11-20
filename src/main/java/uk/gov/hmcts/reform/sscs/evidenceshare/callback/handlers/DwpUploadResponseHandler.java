@@ -11,7 +11,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -28,7 +27,6 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
     private final IdamService idamService;
     private final UpdateCcdCaseService updateCcdCaseService;
 
-    @Autowired
     public DwpUploadResponseHandler(UpdateCcdCaseService updateCcdCaseService,
                                     IdamService idamService) {
         this.updateCcdCaseService = updateCcdCaseService;

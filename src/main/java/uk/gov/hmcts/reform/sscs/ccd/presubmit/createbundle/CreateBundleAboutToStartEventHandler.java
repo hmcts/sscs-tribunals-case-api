@@ -8,7 +8,6 @@ import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -39,7 +38,6 @@ public class CreateBundleAboutToStartEventHandler implements PreSubmitCallbackHa
     private final BundleAudioVideoPdfService bundleAudioVideoPdfService;
     private IdamService idamService;
 
-    @Autowired
     public CreateBundleAboutToStartEventHandler(ServiceRequestExecutor serviceRequestExecutor,
                                                 DwpDocumentService dwpDocumentService,
                                                 BundleAudioVideoPdfService bundleAudioVideoPdfService,

@@ -8,7 +8,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.sscs.config.SpringConfig;
 import uk.gov.hmcts.reform.sscs.domain.CaseData;
 import uk.gov.hmcts.reform.sscs.exception.OrchestratorJsonException;
@@ -30,7 +33,7 @@ public class CcdCallbackOrchestratorController {
         this.mapper = SpringConfig.mapper();
     }
 
-    @RequestMapping(value = "/send", produces = APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    @PostMapping(value = "/send", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> send(
         @RequestHeader(AuthorisationService.SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
         @RequestBody String body) {

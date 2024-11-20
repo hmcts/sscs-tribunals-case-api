@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen;
 
 import java.util.Arrays;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen.scenarios.GenScenario;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
@@ -26,9 +26,9 @@ public class GenTemplateContentTest {
                 .anythingElse("Something else").build();
 
         GenTemplateContent content = GenScenario.SCENARIO_NON_DESCRIPTOR.getContent(body);
-        Assert.assertEquals("GEN", content.getBenefitTypeInitials());
-        Assert.assertEquals("Generic Benefit Type", content.getBenefitTypeNameWithoutInitials());
-        Assert.assertNull(content.getRegulationsYear());
+        Assertions.assertEquals("GEN", content.getBenefitTypeInitials());
+        Assertions.assertEquals("Generic Benefit Type", content.getBenefitTypeNameWithoutInitials());
+        Assertions.assertNull(content.getRegulationsYear());
     }
 
 }

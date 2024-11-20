@@ -190,15 +190,13 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
         List<String> primaryCriteriaSatisfiedMessages =
             primaryConditions.stream()
                 .map(c -> c.getOptionalIsSatisfiedMessage(sscsCaseData))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .flatMap(Optional::stream)
                 .collect(Collectors.toList());
 
         List<String> validationErrorMessages =
                 validationConditions.stream()
                 .map(e -> e.getOptionalErrorMessage(sscsCaseData))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .flatMap(Optional::stream)
                 .collect(Collectors.toList());
 
         List<String> criteriaSatisfiedMessages = new ArrayList<>();

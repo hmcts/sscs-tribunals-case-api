@@ -41,7 +41,7 @@ public class HearingsJmsConfig {
     private String clientId;
 
     private ConnectionFactory hmcHearingJmsConnectionFactory() {
-        String connection = String.format(AMQP_CONNECTION_STRING_TEMPLATE, namespace + connectionPostfix, idleTimeout);
+        String connection = AMQP_CONNECTION_STRING_TEMPLATE.formatted(namespace + connectionPostfix, idleTimeout);
         JmsConnectionFactory jmsConnectionFactory = new JmsConnectionFactory(connection);
         jmsConnectionFactory.setUsername(username);
         jmsConnectionFactory.setPassword(password);
@@ -51,7 +51,7 @@ public class HearingsJmsConfig {
 
     @Bean
     @ConditionalOnProperty({"feature.bypass-hearing-api-service.enabled", "flags.hmc-to-hearings-api.enabled"})
-    public JmsListenerContainerFactory<DefaultMessageListenerContainer> hmcHearingsEventTopicContainerFactory(
+    JmsListenerContainerFactory<DefaultMessageListenerContainer> hmcHearingsEventTopicContainerFactory(
         DefaultJmsListenerContainerFactoryConfigurer configurer) {
         ConnectionFactory hmcHearingJmsConnectionFactory = hmcHearingJmsConnectionFactory();
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();

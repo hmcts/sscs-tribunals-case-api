@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -13,16 +13,17 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
@@ -34,10 +35,10 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.exception.WelshException;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.RequestTranslationService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 @RunWith(JUnitParamsRunner.class)
 public class RequestTranslationCallbackHandlerTest {
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -56,17 +57,19 @@ public class RequestTranslationCallbackHandlerTest {
     @Captor
     ArgumentCaptor<SscsCaseData> captor;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         handler = new RequestTranslationCallbackHandler(requestTranslationService, ccdCaseService, idamService);
 
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "ABOUT_TO_SUBMIT"})
     public void givenCallbackIsNotSubmitted_willThrowAnException(CallbackType callbackType) {
-        handler.handle(callbackType,
-            HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().languagePreferenceWelsh("No").build(), APPEAL_CREATED, REQUEST_TRANSLATION_FROM_WLU));
+        assertThrows(IllegalStateException.class, () ->
+            handler.handle(callbackType,
+                HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().languagePreferenceWelsh("No").build(), APPEAL_CREATED, REQUEST_TRANSLATION_FROM_WLU)));
     }
 
     @Test

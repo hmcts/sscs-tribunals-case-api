@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.managedwpdocuments;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -17,8 +17,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -47,7 +47,7 @@ public class ManageDwpDocumentsAboutToSubmitHandlerTest {
     @Spy
     private DwpDocumentService dwpDocumentService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
 
@@ -66,6 +66,7 @@ public class ManageDwpDocumentsAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
@@ -90,6 +91,7 @@ public class ManageDwpDocumentsAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "DWP_EVIDENCE_BUNDLE, true, You must upload an edited DWP evidence bundle",
         "DWP_RESPONSE, true, You must upload an edited DWP response document"
@@ -114,6 +116,7 @@ public class ManageDwpDocumentsAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "DWP_EVIDENCE_BUNDLE, true, You must upload an edited DWP evidence bundle",
         "DWP_RESPONSE, true, You must upload an edited DWP response document"
@@ -137,6 +140,7 @@ public class ManageDwpDocumentsAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "DWP_EVIDENCE_BUNDLE, true, Only one edited DWP evidence bundle should be seen against each case\\, please correct",
         "DWP_EVIDENCE_BUNDLE, false, Only one DWP evidence bundle should be seen against each case\\, please correct",

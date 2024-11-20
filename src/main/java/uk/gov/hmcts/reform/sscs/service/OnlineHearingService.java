@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
@@ -35,8 +34,8 @@ public class OnlineHearingService {
     private final IdamService idamService;
 
     public OnlineHearingService(
-            @Autowired CcdService ccdService,
-            @Autowired IdamService idamService) {
+            CcdService ccdService,
+            IdamService idamService) {
         this.ccdService = ccdService;
         this.idamService = idamService;
     }

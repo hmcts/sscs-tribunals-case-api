@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevid
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
@@ -13,13 +13,14 @@ import java.util.*;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -33,8 +34,6 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
     private final List<ScannedDocument> scannedDocumentList = new ArrayList<>();
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
     private ActionFurtherEvidenceMidEventHandler handler;
     @Mock
     private Callback<SscsCaseData> callback;
@@ -44,7 +43,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     private FooterService footerService;
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         handler = new ActionFurtherEvidenceMidEventHandler(footerService, false, false);
 
@@ -89,6 +88,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"sendToInterlocReviewByTcw, Send to Interloc - Review by Tcw", "sendToInterlocReviewByJudge, Send to Interloc - Review by Judge"})
     public void givenAPostponementRequestInInterlocTcwOrJudgeActionAndCaseInHearing_thenAddNoError(String furtherEvidenceActionCode, String furtherEvidenceActionLabel) {
 
@@ -381,6 +381,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"null", " ", "    "})
     public void givenADocumentWithNoDocFileName_thenAddAnErrorToResponse(@Nullable String filename) {
         List<ScannedDocument> docs = new ArrayList<>();
@@ -445,6 +446,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"OTHER_PARTY", "OTHER_PARTY_REPRESENTATIVE"})
     public void givenARequestWithOtherPartySelectedAsOriginalSenderAndOtherPartyHearingPreferencesDocumentSelected_thenNoErrorShown(PartyItemList partyItemList) {
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
@@ -488,6 +490,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"setAsideApplication", "correctionApplication","statementOfReasonsApplication",
         "libertyToApplyApplication", "permissionToAppealApplication"})
     public void givenAGapsCaseAndPostponementRequest_thenAddAnErrorToResponse(String doctype) {
@@ -543,10 +546,12 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsExceptionIfItCannotHandleTheAppeal() {
-        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        assertThrows(IllegalStateException.class, () -> {
+            when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+            handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        });
     }
 
 }

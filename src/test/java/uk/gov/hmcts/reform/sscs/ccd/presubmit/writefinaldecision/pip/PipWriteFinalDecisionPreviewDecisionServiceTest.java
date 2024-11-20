@@ -1,9 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
@@ -14,10 +11,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import junitparams.NamedParameters;
-import junitparams.Parameters;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
@@ -56,50 +52,50 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
             pipDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
     }
 
-    @NamedParameters("previewEndDateAndRateCombinations")
+
     @SuppressWarnings("unused")
-    private Object[] previewEndDateAndRateCombinations() {
-        return new Object[] {
-            new Object[] {"2018-11-10", "standardRate", "lower", "lower"},
-            new Object[] {"2018-11-10", "standardRate", "same", "lower"},
-            new Object[] {"2018-11-10", "standardRate", "higher", "lower"},
-            new Object[] {"2018-11-10", "standardRate", "lower", "same"},
-            new Object[] {"2018-11-10", "standardRate", "same", "same"},
-            new Object[] {"2018-11-10", "standardRate", "higher", "same"},
-            new Object[] {"2018-11-10", "enhancedRate", "same", "lower"},
-            new Object[] {"2018-11-10", "enhancedRate", "higher", "lower"},
-            new Object[] {"2018-11-10", "enhancedRate", "same", "same"},
-            new Object[] {"2018-11-10", "enhancedRate", "higher", "same"},
-            new Object[] {"2018-11-10", "noAward", "lower", "lower"},
-            new Object[] {"2018-11-10", "noAward", "same", "lower"},
-            new Object[] {"2018-11-10", "noAward", "lower", "same"},
-            new Object[] {"2018-11-10", "noAward", "same", "same"},
-            new Object[] {"2018-11-10", "notConsidered", "lower", "lower"},
-            new Object[] {"2018-11-10", "notConsidered", "same", "lower"},
-            new Object[] {"2018-11-10", "notConsidered", "higher", "lower"},
-            new Object[] {"2018-11-10", "notConsidered", "lower", "same"},
-            new Object[] {"2018-11-10", "notConsidered", "same", "same"},
-            new Object[] {"2018-11-10", "notConsidered", "higher", "same"},
-            new Object[] {null, "standardRate", "lower", "lower"},
-            new Object[] {null, "standardRate", "same", "lower"},
-            new Object[] {null, "standardRate", "higher", "lower"},
-            new Object[] {null, "standardRate", "lower", "same"},
-            new Object[] {null, "standardRate", "same", "same"},
-            new Object[] {null, "standardRate", "higher", "same"},
-            new Object[] {null, "enhancedRate", "same", "lower"},
-            new Object[] {null, "enhancedRate", "higher", "lower"},
-            new Object[] {null, "enhancedRate", "same", "same"},
-            new Object[] {null, "enhancedRate", "higher", "same"},
-            new Object[] {null, "noAward", "lower", "lower"},
-            new Object[] {null, "noAward", "same", "lower"},
-            new Object[] {null, "noAward", "lower", "same"},
-            new Object[] {null, "noAward", "same", "same"},
-            new Object[] {null, "notConsidered", "lower", "lower"},
-            new Object[] {null, "notConsidered", "same", "lower"},
-            new Object[] {null, "notConsidered", "higher", "lower"},
-            new Object[] {null, "notConsidered", "lower", "same"},
-            new Object[] {null, "notConsidered", "same", "same"},
-            new Object[] {null, "notConsidered", "higher", "same"},
+    private static Object[] previewEndDateAndRateCombinations() {
+        return new Object[]{
+            new Object[]{"2018-11-10", "standardRate", "lower", "lower"},
+            new Object[]{"2018-11-10", "standardRate", "same", "lower"},
+            new Object[]{"2018-11-10", "standardRate", "higher", "lower"},
+            new Object[]{"2018-11-10", "standardRate", "lower", "same"},
+            new Object[]{"2018-11-10", "standardRate", "same", "same"},
+            new Object[]{"2018-11-10", "standardRate", "higher", "same"},
+            new Object[]{"2018-11-10", "enhancedRate", "same", "lower"},
+            new Object[]{"2018-11-10", "enhancedRate", "higher", "lower"},
+            new Object[]{"2018-11-10", "enhancedRate", "same", "same"},
+            new Object[]{"2018-11-10", "enhancedRate", "higher", "same"},
+            new Object[]{"2018-11-10", "noAward", "lower", "lower"},
+            new Object[]{"2018-11-10", "noAward", "same", "lower"},
+            new Object[]{"2018-11-10", "noAward", "lower", "same"},
+            new Object[]{"2018-11-10", "noAward", "same", "same"},
+            new Object[]{"2018-11-10", "notConsidered", "lower", "lower"},
+            new Object[]{"2018-11-10", "notConsidered", "same", "lower"},
+            new Object[]{"2018-11-10", "notConsidered", "higher", "lower"},
+            new Object[]{"2018-11-10", "notConsidered", "lower", "same"},
+            new Object[]{"2018-11-10", "notConsidered", "same", "same"},
+            new Object[]{"2018-11-10", "notConsidered", "higher", "same"},
+            new Object[]{null, "standardRate", "lower", "lower"},
+            new Object[]{null, "standardRate", "same", "lower"},
+            new Object[]{null, "standardRate", "higher", "lower"},
+            new Object[]{null, "standardRate", "lower", "same"},
+            new Object[]{null, "standardRate", "same", "same"},
+            new Object[]{null, "standardRate", "higher", "same"},
+            new Object[]{null, "enhancedRate", "same", "lower"},
+            new Object[]{null, "enhancedRate", "higher", "lower"},
+            new Object[]{null, "enhancedRate", "same", "same"},
+            new Object[]{null, "enhancedRate", "higher", "same"},
+            new Object[]{null, "noAward", "lower", "lower"},
+            new Object[]{null, "noAward", "same", "lower"},
+            new Object[]{null, "noAward", "lower", "same"},
+            new Object[]{null, "noAward", "same", "same"},
+            new Object[]{null, "notConsidered", "lower", "lower"},
+            new Object[]{null, "notConsidered", "same", "lower"},
+            new Object[]{null, "notConsidered", "higher", "lower"},
+            new Object[]{null, "notConsidered", "lower", "same"},
+            new Object[]{null, "notConsidered", "same", "same"},
+            new Object[]{null, "notConsidered", "higher", "same"},
         };
     }
 
@@ -135,6 +131,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     }
 
     @Override
+    @ParameterizedTest
     public void givenGeneratedDateIsAlreadySetGeneratedNonDescriptorFlow_thenSetNewGeneratedDate() {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -151,6 +148,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     }
 
     @Override
+    @ParameterizedTest
     public void givenGeneratedDateIsAlreadySetNonGeneratedDescriptorFlow_thenDoSetNewGeneratedDate() {
         setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(NO);
@@ -168,6 +166,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     }
 
     @Override
+    @ParameterizedTest
     public void givenGeneratedDateIsAlreadySetNonGeneratedNonDescriptorFlow_thenDoSetNewGeneratedDate() {
         setDescriptorFlowIndicator("no", sscsCaseData);
         setHigherRateScenarioFields(sscsCaseData);
@@ -189,7 +188,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         return true;
     }
 
-    @Test
+    @ParameterizedTest
     public void willSetPreviewFileForDailyLivingMobility_whenNotGeneratingNotice() {
 
         setCommonPreviewParams(sscsCaseData, null);
@@ -202,7 +201,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -239,7 +238,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
     }
 
-    @Test
+    @ParameterizedTest
     public void willSetPreviewFileForNotDailyLivingMobility_whenNotGeneratingNotice() {
 
         setCommonPreviewParams(sscsCaseData, null);
@@ -252,7 +251,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -289,8 +288,8 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
     }
 
-    @Test
-    @Parameters(named = "previewEndDateAndRateCombinations")
+    @ParameterizedTest
+    @MethodSource("previewEndDateAndRateCombinations")
     public void willSetPreviewFile_whenMobilityDescriptorsOnly_ForEndDateAndRate(String endDate, String rate, String descriptorsComparedToDwp,
         String nonDescriptorsComparedWithDwp) {
 
@@ -315,12 +314,12 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         if ("notConsidered".equals(rate)) {
             assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
-            Assert.assertEquals(1, response.getErrors().size());
+            Assertions.assertEquals(1, response.getErrors().size());
         } else {
 
             assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
             assertEquals(DocumentLink.builder()
-                .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+                .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
                 .documentBinaryUrl(URL + "/binary")
                 .documentUrl(URL)
                 .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -380,8 +379,8 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         }
     }
 
-    @Test
-    @Parameters(named = "previewEndDateAndRateCombinations")
+    @ParameterizedTest
+    @MethodSource("previewEndDateAndRateCombinations")
     public void willSetPreviewFile_whenDailyLivingDescriptorsOnly_ForEndDateAndRate(String endDate, String rate, String descriptorsComparedToDwp,
         String nonDescriptorsComparedWithDwp) {
 
@@ -404,12 +403,12 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         if ("notConsidered".equals(rate)) {
             assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
-            Assert.assertEquals(1, response.getErrors().size());
+            Assertions.assertEquals(1, response.getErrors().size());
         } else {
 
             assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
             assertEquals(DocumentLink.builder()
-                .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+                .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
                 .documentBinaryUrl(URL + "/binary")
                 .documentUrl(URL)
                 .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -472,8 +471,8 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         }
     }
 
-    @Test
-    @Parameters(named = "previewEndDateAndRateCombinations")
+    @ParameterizedTest
+    @MethodSource("previewEndDateAndRateCombinations")
     public void willSetPreviewFile_whenMobilityDescriptorsOnly_ForEndDateAndRateForIssueDecision(String endDate, String rate, String descriptorsComparedToDwp,
         String nonDescriptorsComparedWithDwp) {
 
@@ -495,12 +494,12 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         if ("notConsidered".equals(rate)) {
             assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
-            Assert.assertEquals(1, response.getErrors().size());
+            Assertions.assertEquals(1, response.getErrors().size());
         } else {
 
             assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
             assertEquals(DocumentLink.builder()
-                .documentFilename(String.format("Final Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+                .documentFilename("Final Decision Notice issued on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
                 .documentBinaryUrl(URL + "/binary")
                 .documentUrl(URL)
                 .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -565,7 +564,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         }
     }
 
-    @Test
+    @ParameterizedTest
     public void willSetPreviewFileWithNullReasons_WhenReasonsListIsEmpty() {
 
         final String endDate = "2020-10-10";
@@ -590,7 +589,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());

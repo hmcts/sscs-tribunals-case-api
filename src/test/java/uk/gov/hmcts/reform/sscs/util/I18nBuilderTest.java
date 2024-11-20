@@ -5,15 +5,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
 import java.util.Map;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.ResourceManager;
 
 public class I18nBuilderTest {
 
     I18nBuilder i18n;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         i18n = new I18nBuilder(new ResourceManager());
     }

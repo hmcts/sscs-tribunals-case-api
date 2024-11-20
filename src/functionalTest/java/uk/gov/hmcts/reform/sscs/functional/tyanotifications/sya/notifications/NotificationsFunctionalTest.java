@@ -1,14 +1,14 @@
 package uk.gov.hmcts.reform.sscs.functional.tyanotifications.sya.notifications;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import junitparams.Parameters;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReasonableAdjustmentStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -234,6 +234,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "pip,judge\\, doctor and disability expert",
         "esa,judge and a doctor",
@@ -423,7 +424,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
 
     @Test
     // Put back when covid19 feature turned off
-    @Ignore
+    @Disabled
     public void shouldSendAppointeeHearingBookedNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(HEARING_BOOKED,
             BASE_PATH_TYAN + "appointee/" + HEARING_BOOKED.getId() + "Callback.json");

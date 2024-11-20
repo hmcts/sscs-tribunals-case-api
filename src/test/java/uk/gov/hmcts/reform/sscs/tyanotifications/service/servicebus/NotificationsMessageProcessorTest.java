@@ -6,8 +6,8 @@ import static org.mockito.MockitoAnnotations.openMocks;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
@@ -32,7 +32,7 @@ public class NotificationsMessageProcessorTest {
     private NotificationsMessageProcessor topicConsumer;
     private Exception exception;
 
-    @Before
+    @BeforeEach
     public void setup() {
         openMocks(this);
         topicConsumer = new NotificationsMessageProcessor(deserializer, filterNotificationsEventsHandler);

@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -50,7 +49,6 @@ public class RoboticsService {
 
     private final Random rn;
 
-    @Autowired
     public RoboticsService(
         PdfStoreService pdfStoreService,
         EmailService emailService,

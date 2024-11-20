@@ -72,12 +72,12 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
     protected List<String> getAllDefinitionFilesToLoadAt(String definitionsPath) {
         if (environment.name().toUpperCase().equals(CcdEnvironment.PREVIEW.name())) {
             return List.of(
-                    String.format("definitions/bulkscan/CCD_BulkScanningDefinition_%s.xlsx", "PR"),
-                    String.format("definitions/benefit/CCD_SSCSDefinition_%s.xlsx", "PR")
+                "definitions/bulkscan/CCD_BulkScanningDefinition_%s.xlsx".formatted("PR"),
+                "definitions/benefit/CCD_SSCSDefinition_%s.xlsx".formatted("PR")
             );
         } else {
             return List.of(
-                    String.format("definitions/benefit/CCD_SSCSDefinition_%s.xlsx", environment.name().toUpperCase())
+                "definitions/benefit/CCD_SSCSDefinition_%s.xlsx".formatted(environment.name().toUpperCase())
             );
         }
     }
@@ -96,8 +96,7 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
     @Override
     protected boolean shouldTolerateDataSetupFailure(Throwable e) {
         int httpStatusCode504 = 504;
-        if (e instanceof ImportException) {
-            ImportException importException = (ImportException) e;
+        if (e instanceof ImportException importException) {
             return importException.getHttpStatusCode() == httpStatusCode504;
         }
         if (e instanceof SSLException) {

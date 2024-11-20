@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_TO_PROCEED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 
 public class AppealToProceedFunctionalTest extends AbstractFunctionalTest {

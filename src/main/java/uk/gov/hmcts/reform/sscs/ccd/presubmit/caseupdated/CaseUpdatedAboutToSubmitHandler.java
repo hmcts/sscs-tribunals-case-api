@@ -392,21 +392,21 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (entity != null) {
             if (entity.getName() != null) {
                 if (isBlank(entity.getName().getFirstName())) {
-                    listOfWarnings.add(String.format(WARNING_MESSAGE, FIRST_NAME, partyType));
+                    listOfWarnings.add(WARNING_MESSAGE.formatted(FIRST_NAME, partyType));
                 }
                 if (isBlank(entity.getName().getLastName())) {
-                    listOfWarnings.add(String.format(WARNING_MESSAGE, LAST_NAME, partyType));
+                    listOfWarnings.add(WARNING_MESSAGE.formatted(LAST_NAME, partyType));
                 }
             }
             if (entity.getIdentity() != null) {
                 if (isBlank(entity.getIdentity().getDob())) {
-                    listOfWarnings.add(String.format(WARNING_MESSAGE, "Date of Birth", partyType));
+                    listOfWarnings.add(WARNING_MESSAGE.formatted("Date of Birth", partyType));
                 }
                 if (!IBCA_BENEFIT_CODE.equals(benefitCode) && isBlank(entity.getIdentity().getNino())) {
-                    listOfWarnings.add(String.format(WARNING_MESSAGE, "National Insurance Number", partyType));
+                    listOfWarnings.add(WARNING_MESSAGE.formatted("National Insurance Number", partyType));
                 }
                 if (IBCA_BENEFIT_CODE.equals(benefitCode) && isBlank(entity.getIdentity().getIbcaReference())) {
-                    listOfWarnings.add(String.format(WARNING_MESSAGE, "IBCA Reference Number", partyType));
+                    listOfWarnings.add(WARNING_MESSAGE.formatted("IBCA Reference Number", partyType));
                 }
             }
         }
@@ -442,17 +442,17 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
         if (entity != null && entity.getName() != null) {
             if (isBlank(entity.getName().getFirstName())) {
-                listOfErrors.add(String.format(ERROR_MESSAGE, FIRST_NAME, entityType));
+                listOfErrors.add(ERROR_MESSAGE.formatted(FIRST_NAME, entityType));
             }
             if (isBlank(entity.getName().getLastName())) {
-                listOfErrors.add(String.format(ERROR_MESSAGE, LAST_NAME, entityType));
+                listOfErrors.add(ERROR_MESSAGE.formatted(LAST_NAME, entityType));
             }
         } else {
             if (entityType.equals("Representative")) {
                 listOfErrors.add(REP_ERROR_MESSAGE);
             } else {
-                listOfErrors.add(String.format(ERROR_MESSAGE, FIRST_NAME, entityType));
-                listOfErrors.add(String.format(ERROR_MESSAGE, LAST_NAME, entityType));
+                listOfErrors.add(ERROR_MESSAGE.formatted(FIRST_NAME, entityType));
+                listOfErrors.add(ERROR_MESSAGE.formatted(LAST_NAME, entityType));
             }
         }
         return listOfErrors;

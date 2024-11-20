@@ -15,8 +15,8 @@ import java.util.Collections;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -38,7 +38,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         handler = new ActionHearingRecordingRequestAboutToSubmitHandler();
@@ -215,6 +215,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"appellant", "representative", "jointParty"})
     public void givenAGrantedFromVoidCitizenHearingRecording_thenAddToReleasedList(String party) {
         SscsHearingRecording recording1 = getHearingRecording();
@@ -240,6 +241,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"otherParty", "otherPartyRep"})
     public void givenAGrantedFromVoidCitizenHearingRecordingAndOtherPartyRequest_thenAddToReleasedList(String party) {
         SscsHearingRecording recording1 = getHearingRecording();
@@ -270,6 +272,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"appellant", "representative", "jointParty"})
     public void givenAGrantedFromRequestedCitizenHearingRecording_thenRemoveFromRequestedListAndAddToReleasedList(String party) {
         SscsHearingRecordingDetails recording1 = SscsHearingRecordingDetails.builder().hearingId("an_id1").build();
@@ -297,6 +300,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"otherParty", "otherPartyRep"})
     public void givenAGrantedFromRequestedCitizenHearingRecordingForOtherPartyRequest_thenRemoveFromRequestedListAndAddToReleasedList(String party) {
         SscsHearingRecordingDetails recording1 = SscsHearingRecordingDetails.builder().hearingId("an_id1").build();
@@ -330,6 +334,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"appellant", "representative", "jointParty"})
     public void givenARefusedFromRequestedCitizenHearingRecording_thenRemoveFromRequestedListAndDoNotAddToReleasedList(String party) {
         SscsHearingRecordingDetails recording1 = SscsHearingRecordingDetails.builder().hearingId("an_id1").build();
@@ -356,6 +361,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"otherParty", "otherPartyRep"})
     public void givenARefusedFromRequestedCitizenHearingRecordingForOtherPartyRequest_thenRemoveFromRequestedListAndDoNotAddToReleasedList(String party) {
         SscsHearingRecordingDetails recording1 = SscsHearingRecordingDetails.builder().hearingId("an_id1").build();
@@ -388,6 +394,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"appellant", "representative", "jointParty"})
     public void givenARefusedFromGrantedCitizenHearingRecording_thenRemoveFromReleasedList(String party) {
         SscsHearingRecordingDetails recording1 = SscsHearingRecordingDetails.builder().hearingId("an_id1").build();
@@ -415,6 +422,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"otherParty", "otherPartyRep"})
     public void givenARefusedFromGrantedCitizenHearingRecordingForOtherPartyRequest_thenRemoveFromReleasedList(String party) {
         SscsHearingRecordingDetails recording1 = SscsHearingRecordingDetails.builder().hearingId("an_id1").build();
@@ -448,6 +456,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"appellant", "representative", "jointParty"})
     public void givenAGrantedFromRefusedCitizenHearingRecording_thenRemoveFromRequestedListAndAddToReleasedList(String party) {
         SscsHearingRecordingDetails recording1 = SscsHearingRecordingDetails.builder().hearingId("an_id1").build();
@@ -472,6 +481,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"otherParty", "otherPartyRep"})
     public void givenAGrantedFromRefusedCitizenHearingRecordingForOtherPartyRequest_thenRemoveFromRequestedListAndAddToReleasedList(String party) {
         SscsHearingRecordingDetails recording1 = SscsHearingRecordingDetails.builder().hearingId("an_id1").build();
@@ -503,6 +513,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"appellant", "representative", "jointParty"})
     public void givenARequestedCitizenHearingRecording_thenDoNotAddToReleasedOrRefused(String party) {
         SscsHearingRecordingDetails recording1 = SscsHearingRecordingDetails.builder().hearingId("an_id1").build();

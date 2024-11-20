@@ -1,10 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
@@ -17,8 +13,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
@@ -90,7 +86,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -141,10 +137,10 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertEquals(8, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
         Optional<TemplateComponent<?>> schedule2DescriptorTable = payload.getWriteFinalDecisionTemplateContent().getComponents().stream().filter(c -> EsaTemplateComponentId.SCHEDULE_2_DESCRIPTORS.name().equals(c.getId())).findFirst();
-        Assert.assertNotNull(schedule2DescriptorTable);
-        Assert.assertTrue(schedule2DescriptorTable.isPresent());
+        Assertions.assertNotNull(schedule2DescriptorTable);
+        Assertions.assertTrue(schedule2DescriptorTable.isPresent());
         DescriptorTable table = (DescriptorTable)schedule2DescriptorTable.get();
-        Assert.assertEquals(1, table.getContent().size());
+        Assertions.assertEquals(1, table.getContent().size());
     }
 
     @Test
@@ -166,7 +162,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -210,8 +206,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertEquals(7, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
         Optional<TemplateComponent<?>> schedule2DescriptorTable = payload.getWriteFinalDecisionTemplateContent().getComponents().stream().filter(c -> EsaTemplateComponentId.SCHEDULE_2_DESCRIPTORS.name().equals(c.getId())).findFirst();
-        Assert.assertNotNull(schedule2DescriptorTable);
-        Assert.assertFalse(schedule2DescriptorTable.isPresent());
+        Assertions.assertNotNull(schedule2DescriptorTable);
+        Assertions.assertFalse(schedule2DescriptorTable.isPresent());
     }
 
     @Test
@@ -232,7 +228,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -321,7 +317,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -384,7 +380,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -444,7 +440,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -509,7 +505,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -568,7 +564,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -626,7 +622,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -697,7 +693,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -806,7 +802,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-                .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+                .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
                 .documentBinaryUrl(URL + "/binary")
                 .documentUrl(URL)
                 .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -883,7 +879,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -989,7 +985,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -1118,6 +1114,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     }
 
     @Override
+    @Test
     public void givenGeneratedDateIsAlreadySetGeneratedNonDescriptorFlow_thenSetNewGeneratedDate() {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -1133,6 +1130,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     }
 
     @Override
+    @Test
     public void givenGeneratedDateIsAlreadySetNonGeneratedDescriptorFlow_thenDoSetNewGeneratedDate() {
         setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(NO);
@@ -1149,6 +1147,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     }
 
     @Override
+    @Test
     public void givenGeneratedDateIsAlreadySetNonGeneratedNonDescriptorFlow_thenDoSetNewGeneratedDate() {
         setDescriptorFlowIndicator("no", sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(NO);
@@ -1190,7 +1189,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -1259,7 +1258,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -1327,7 +1326,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -1395,7 +1394,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -1460,7 +1459,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -1528,7 +1527,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -1595,7 +1594,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -1657,7 +1656,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -1725,7 +1724,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -1827,7 +1826,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -1924,7 +1923,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -2024,9 +2023,9 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        Assert.assertEquals(1, response.getErrors().size());
+        Assertions.assertEquals(1, response.getErrors().size());
 
-        Assert.assertEquals("You have awarded less than 15 points and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.", response.getErrors().iterator().next());
+        Assertions.assertEquals("You have awarded less than 15 points and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.", response.getErrors().iterator().next());
 
         assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
@@ -2057,7 +2056,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -2127,7 +2126,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());

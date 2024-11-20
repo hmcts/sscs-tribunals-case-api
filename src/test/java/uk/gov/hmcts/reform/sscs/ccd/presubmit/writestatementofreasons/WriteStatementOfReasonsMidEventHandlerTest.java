@@ -166,7 +166,7 @@ class WriteStatementOfReasonsMidEventHandlerTest {
         DocumentLink previewDocument = response.getData().getDocumentStaging().getPreviewDocument();
         assertThat(previewDocument).isNotNull();
 
-        String expectedFilename = String.format("Statement of Reasons issued on %s.pdf",
+        String expectedFilename = "Statement of Reasons issued on %s.pdf".formatted(
             LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 
         assertThat(previewDocument.getDocumentFilename()).isEqualTo(expectedFilename);

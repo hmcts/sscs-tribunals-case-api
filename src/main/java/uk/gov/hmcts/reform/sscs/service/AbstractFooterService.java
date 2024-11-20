@@ -73,7 +73,7 @@ public abstract class AbstractFooterService<D extends AbstractDocument> {
         byte[] newContent;
 
         try {
-            newContent = alter.shrinkAndWatermarkPdf(oldContent, leftText, String.format("Addition %s", rightText));
+            newContent = alter.shrinkAndWatermarkPdf(oldContent, leftText, "Addition %s".formatted(rightText));
         } catch (Exception e) {
             log.error("Caught exception :" + e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);

@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -13,8 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -49,7 +49,7 @@ public class ReciprocalLinkHandlerTest {
 
     HashMap<String, String> map = new HashMap<String, String>();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         when(callback.getEvent()).thenReturn(EventType.VALID_APPEAL_CREATED);
@@ -68,6 +68,7 @@ public class ReciprocalLinkHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"VALID_APPEAL_CREATED", "DRAFT_TO_VALID_APPEAL_CREATED", "NON_COMPLIANT", "DRAFT_TO_NON_COMPLIANT", "INCOMPLETE_APPLICATION_RECEIVED", "DRAFT_TO_INCOMPLETE_APPLICATION"})
     public void givenAValidEvent_thenReturnTrue(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
@@ -83,6 +84,7 @@ public class ReciprocalLinkHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "ABOUT_TO_SUBMIT"})
     public void givenANonReciprocalLinkCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));

@@ -21,12 +21,12 @@ public enum HearingHandler {
                 sscsCaseData.getSchedulingAndListingFields().setHearingState(HearingState.CREATE_HEARING);
             }
             PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-            log.info(String.format("createdInGapsFrom is %s for caseId %s", sscsCaseData.getCreatedInGapsFrom(), sscsCaseData.getCcdCaseId()));
+            log.info("createdInGapsFrom is %s for caseId %s".formatted(sscsCaseData.getCreatedInGapsFrom(), sscsCaseData.getCcdCaseId()));
 
             if (sscsCaseData.getCreatedInGapsFrom() == null
                 || StringUtils.equalsIgnoreCase(sscsCaseData.getCreatedInGapsFrom(), State.VALID_APPEAL.getId())) {
                 callbackResponse.addError("Case already created in GAPS at valid appeal.");
-                log.warn(String.format("Case already created in GAPS at valid appeal for caseId %s.", sscsCaseData.getCcdCaseId()));
+                log.warn("Case already created in GAPS at valid appeal for caseId %s.".formatted(sscsCaseData.getCcdCaseId()));
             }
             return callbackResponse;
         }
@@ -39,7 +39,7 @@ public enum HearingHandler {
             PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
             if (gapsSwitchOverFeature) {
-                log.info(String.format("Handling List Assist request for case ID: %s", sscsCaseData.getCcdCaseId()));
+                log.info("Handling List Assist request for case ID: %s".formatted(sscsCaseData.getCcdCaseId()));
 
                 HearingRoute hearingRoute = HearingRoute.LIST_ASSIST;
                 HearingState hearingState = HearingState.CREATE_HEARING;

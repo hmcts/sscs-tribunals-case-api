@@ -8,8 +8,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -23,7 +23,7 @@ public class AddedDocumentsUtilTest {
 
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setup() {
         addedDocumentsUtil = new AddedDocumentsUtil(true);
         sscsCaseData = new SscsCaseData();

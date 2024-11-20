@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
-import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
@@ -83,7 +82,7 @@ public class LetterUtils {
         if (SubscriptionType.REPRESENTATIVE.equals(subscriptionWithType.getSubscriptionType())) {
             return SendNotificationHelper.getRepSalutation(wrapper.getNewSscsCaseData().getAppeal().getRep(), false);
         } else if (SubscriptionType.JOINT_PARTY.equals(subscriptionWithType.getSubscriptionType())) {
-            return format("%s %s", wrapper.getNewSscsCaseData().getJointParty().getName().getFirstName(), wrapper.getNewSscsCaseData().getJointParty().getName().getLastName());
+            return "%s %s".formatted(wrapper.getNewSscsCaseData().getJointParty().getName().getFirstName(), wrapper.getNewSscsCaseData().getJointParty().getName().getLastName());
         } else {
             if (nonNull(subscriptionWithType.getPartyId()) && isNotEmpty(wrapper.getNewSscsCaseData().getOtherParties())) {
                 return getNameForOtherParty(wrapper.getNewSscsCaseData(), subscriptionWithType.getPartyId()).map(Name::getFullNameNoTitle).orElse("");

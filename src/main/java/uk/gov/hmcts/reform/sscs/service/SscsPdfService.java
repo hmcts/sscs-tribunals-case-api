@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
@@ -24,7 +23,6 @@ public class SscsPdfService {
     private final CcdPdfService ccdPdfService;
     private final ResourceManager resourceManager;
 
-    @Autowired
     public SscsPdfService(@Value("${appellant.appeal.html.template.path}") String appellantTemplatePath,
                           @Value("${appellant.appeal.html.welsh.template.path}") String appellantWelshTemplatePath,
                           PDFServiceClient pdfServiceClient,

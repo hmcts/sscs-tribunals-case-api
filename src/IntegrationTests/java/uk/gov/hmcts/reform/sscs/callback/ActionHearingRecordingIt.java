@@ -4,7 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -25,8 +25,8 @@ import java.util.Arrays;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -48,7 +48,7 @@ public class ActionHearingRecordingIt extends AbstractEventIt {
 
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         openMocks(this);
         super.setup();
@@ -88,6 +88,7 @@ public class ActionHearingRecordingIt extends AbstractEventIt {
 
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"REPRESENTATIVE", "APPELLANT", "DWP", "JOINT_PARTY"})
     public void midEventChangingRequestFromRefusedToGrantedReturnsWarning(PartyItemList party) throws Exception {
 
@@ -174,6 +175,7 @@ public class ActionHearingRecordingIt extends AbstractEventIt {
 
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"appellant", "representative", "jointParty"})
     public void aboutToSubmitGivenAGrantedFromRequestedCitizenHearingRecording_thenRemoveFromRequestedListAndAddToReleasedList(String party) throws Exception {
         SscsHearingRecordingDetails recording1 = SscsHearingRecordingDetails.builder().hearingId("1").build();
@@ -202,6 +204,7 @@ public class ActionHearingRecordingIt extends AbstractEventIt {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"otherParty", "otherPartyRep"})
     public void aboutToSubmitGivenAGrantedFromRequestedCitizenHearingRecordingForOtherPartyRequest_thenRemoveFromRequestedListAndAddToReleasedList(String party) throws Exception {
         SscsHearingRecordingDetails recording1 = SscsHearingRecordingDetails.builder().hearingId("1").build();

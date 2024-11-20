@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -16,7 +16,7 @@ public class NotificationValidServiceTest {
     private NotificationValidService notificationValidService;
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setup() {
         notificationValidService = new NotificationValidService();
         sscsCaseData = SscsCaseData.builder().build();

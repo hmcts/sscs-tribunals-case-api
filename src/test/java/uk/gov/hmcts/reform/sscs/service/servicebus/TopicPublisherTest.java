@@ -1,23 +1,24 @@
 package uk.gov.hmcts.reform.sscs.service.servicebus;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 import jakarta.jms.Message;
 import java.net.NoRouteToHostException;
 import java.util.concurrent.atomic.AtomicReference;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.jms.IllegalStateException;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessagePostProcessor;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TopicPublisherTest {
 
     private static final String DESTINATION = "Bermuda";
@@ -50,13 +51,15 @@ public class TopicPublisherTest {
         MessagePostProcessor lambda = lambdaCaptor.getValue();
         lambda.postProcessMessage(message);
 
-        Assert.assertEquals(messageId, msg.get().getJMSMessageID());
+        Assertions.assertEquals(messageId, msg.get().getJMSMessageID());
     }
 
-    @Test(expected = NoRouteToHostException.class)
-    public void recoverMessageThrowsThePassedException() throws Throwable {
-        Exception exception = new NoRouteToHostException("");
-        underTest.recoverMessage(exception);
+    @Test
+    public void recoverMessageThrowsThePassedException() {
+        assertThrows(NoRouteToHostException.class, () -> {
+            Exception exception = new NoRouteToHostException("");
+            underTest.recoverMessage(exception);
+        });
     }
 
     @Test
@@ -89,13 +92,16 @@ public class TopicPublisherTest {
 
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void sendMessageWhenOtherThrowException() {
-        doThrow(Exception.class).when(jmsTemplate).convertAndSend(anyString(),any(), any());
+        assertThrows(Exception.class, () -> {
+            doThrow(Exception.class).when(jmsTemplate).convertAndSend(anyString(), any(), any());
 
-        underTest.sendMessage("a message", "1", new AtomicReference<>());
+            underTest.sendMessage("a message", "1", new AtomicReference<>());
 
-        Assert.assertTrue(false);
+            Assertions.assertTrue(false);
+
+        });
 
     }
 }

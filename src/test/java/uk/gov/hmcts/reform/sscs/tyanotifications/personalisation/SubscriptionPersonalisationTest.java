@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.personalisation;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -16,9 +14,9 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import javax.annotation.Resource;
-import org.junit.Before;
-import org.junit.Test;
+import jakarta.annotation.Resource;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -71,7 +69,7 @@ public class SubscriptionPersonalisationTest {
         .tya("GLSCRR").email("test@email.com")
         .mobile("07983495065").subscribeEmail("Yes").subscribeSms("Yes").wantSmsNotifications("Yes").build();
 
-    @Before
+    @BeforeEach
     public void setup() {
         openMocks(this);
         when(config.getManageEmailsLink()).thenReturn(Link.builder().linkUrl("http://manageemails.com/mac").build());

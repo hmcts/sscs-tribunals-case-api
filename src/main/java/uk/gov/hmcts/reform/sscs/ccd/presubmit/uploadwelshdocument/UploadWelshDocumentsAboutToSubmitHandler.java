@@ -7,7 +7,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -33,7 +32,6 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
         nextEventMap.put(DocumentType.FINAL_DECISION_NOTICE.getValue(), EventType.ISSUE_FINAL_DECISION_WELSH.getCcdType());
     }
 
-    @Autowired
     public UploadWelshDocumentsAboutToSubmitHandler(WelshFooterService welshFooterService) {
         this.welshFooterService = welshFooterService;
     }

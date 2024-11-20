@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -11,8 +11,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 import java.util.Collections;
 import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -45,7 +45,7 @@ public class PanelCompositionServiceTest {
     private ArgumentCaptor<Consumer<SscsCaseDetails>> consumerArgumentCaptor;
 
 
-    @Before
+    @BeforeEach
     public void setup() {
         openMocks(this);
         panelCompositionService = new PanelCompositionService(updateCcdCaseService, idamService);

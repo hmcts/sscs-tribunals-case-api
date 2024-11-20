@@ -21,22 +21,22 @@ import org.springframework.jms.core.JmsTemplate;
 public class MessagingConfig {
 
     @Bean
-    public String jmsUrlString(@Value("${amqp.amqp-connection-string-template}") final String amqpConnectionStringTemplate,
-                               @Value("${amqp.idleTimeout}") final Long idleTimeout,
-                               @Value("${amqp.host}") final String host) {
-        return String.format(amqpConnectionStringTemplate, host, idleTimeout);
+    String jmsUrlString(@Value("${amqp.amqp-connection-string-template}") final String amqpConnectionStringTemplate,
+        @Value("${amqp.idleTimeout}") final Long idleTimeout,
+        @Value("${amqp.host}") final String host) {
+        return amqpConnectionStringTemplate.formatted(host, idleTimeout);
     }
 
     @Bean
-    public ConnectionFactory jmsConnectionFactory(@Value("${spring.application.name}") final String clientId,
-                                                  @Value("${amqp.username}") final String username,
-                                                  @Value("${amqp.password}") final String password,
-                                                  @Autowired final String jmsUrlString,
-                                                  @Autowired(required = false) final SSLContext jmsSslContext,
-                                                  @Value("${amqp.prefetch.override}") final boolean prefetchOverride,
-                                                  @Value("${amqp.prefetch.topicPrefetch}") final int topicPrefetch,
-                                                  @Value("${amqp.reconnectOnException}") final boolean reconnectOnException
-                                                  ) {
+    ConnectionFactory jmsConnectionFactory(@Value("${spring.application.name}") final String clientId,
+        @Value("${amqp.username}") final String username,
+        @Value("${amqp.password}") final String password,
+        @Autowired final String jmsUrlString,
+        @Autowired(required = false) final SSLContext jmsSslContext,
+        @Value("${amqp.prefetch.override}") final boolean prefetchOverride,
+        @Value("${amqp.prefetch.topicPrefetch}") final int topicPrefetch,
+        @Value("${amqp.reconnectOnException}") final boolean reconnectOnException
+    ) {
         JmsConnectionFactory jmsConnectionFactory = new JmsConnectionFactory(jmsUrlString);
         jmsConnectionFactory.setUsername(username);
         jmsConnectionFactory.setPassword(password);
@@ -59,14 +59,14 @@ public class MessagingConfig {
     }
 
     @Bean
-    public JmsTemplate jmsTemplate(ConnectionFactory jmsConnectionFactory) {
+    JmsTemplate jmsTemplate(ConnectionFactory jmsConnectionFactory) {
         JmsTemplate returnValue = new JmsTemplate();
         returnValue.setConnectionFactory(jmsConnectionFactory);
         return returnValue;
     }
 
     @Bean
-    public JmsListenerContainerFactory topicJmsListenerContainerFactory(ConnectionFactory connectionFactory) {
+    JmsListenerContainerFactory topicJmsListenerContainerFactory(ConnectionFactory connectionFactory) {
         log.info("Creating JMSListenerContainer bean for topics..");
         DefaultJmsListenerContainerFactory returnValue = new DefaultJmsListenerContainerFactory();
         returnValue.setConnectionFactory(connectionFactory);

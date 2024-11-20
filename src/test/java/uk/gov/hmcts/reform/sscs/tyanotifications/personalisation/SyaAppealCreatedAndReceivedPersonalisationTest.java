@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.personalisation;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.*;
@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Resource;
-import org.junit.Before;
-import org.junit.Test;
+import jakarta.annotation.Resource;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -37,7 +37,7 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
     @Spy
     private PersonalisationConfiguration syaAppealCreatedPersonalisationConfiguration;
 
-    @Before
+    @BeforeEach
     public void setup() {
         openMocks(this);
         Map<String, String> englishMap = new HashMap<>();
@@ -130,9 +130,12 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setMrnDetails(new HashMap<>(), response);
 
-        assertEquals("Date of MRN: 3 May 2018\n"
-                + "\nReason for late appeal: My train was cancelled.\n"
-                + "\nReason for no MRN: My dog ate my homework.",
+        assertEquals("""
+                Date of MRN: 3 May 2018
+                
+                Reason for late appeal: My train was cancelled.
+                
+                Reason for no MRN: My dog ate my homework.""",
             result.get(MRN_DETAILS_LITERAL));
     }
 
@@ -146,10 +149,12 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setMrnDetails(new HashMap<>(), response);
 
-        assertEquals("Date of MRN: 3 May 2018\n"
-                + "\nReason for late appeal: My train was cancelled.",
+        assertEquals("""
+                Date of MRN: 3 May 2018
+                
+                Reason for late appeal: My train was cancelled.""",
             result.get(MRN_DETAILS_LITERAL));
-        assertNull("Welsh mrn details should be set", result.get(HEARING_DETAILS_LITERAL_WELSH));
+        assertNull(result.get(HEARING_DETAILS_LITERAL_WELSH), "Welsh mrn details should be set");
     }
 
     @Test
@@ -163,12 +168,16 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setMrnDetails(new HashMap<>(), response);
 
-        assertEquals("Date of MRN: 2018-05-03\n"
-                + "\nReason for late appeal: My train was cancelled.",
+        assertEquals("""
+                Date of MRN: 2018-05-03
+                
+                Reason for late appeal: My train was cancelled.""",
             result.get(MRN_DETAILS_LITERAL));
 
-        assertEquals("Dyddiad yr MRN: 3 Mai 2018\n"
-                + "\nRheswm dros apêl hwyr: My train was cancelled.",
+        assertEquals("""
+                Dyddiad yr MRN: 3 Mai 2018
+                
+                Rheswm dros apêl hwyr: My train was cancelled.""",
             result.get(MRN_DETAILS_LITERAL_WELSH));
     }
 
@@ -187,12 +196,18 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setYourDetails(new HashMap<>(), response);
 
-        assertEquals("Name: Manish Sharma\n"
-                + "\nDate of birth: 12 March 1971\n"
-                + "\nNational Insurance number: NP 27 28 67 B\n"
-                + "\nAddress: 122 Breach Street, The Village, My town, Cardiff, CF11 2HB\n"
-                + "\nEmail: manish.sharma@gmail.com\n"
-                + "\nPhone: 0797 243 8179",
+        assertEquals("""
+                Name: Manish Sharma
+                
+                Date of birth: 12 March 1971
+                
+                National Insurance number: NP 27 28 67 B
+                
+                Address: 122 Breach Street, The Village, My town, Cardiff, CF11 2HB
+                
+                Email: manish.sharma@gmail.com
+                
+                Phone: 0797 243 8179""",
             result.get(YOUR_DETAILS_LITERAL));
     }
 
@@ -212,20 +227,32 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setYourDetails(new HashMap<>(), response);
 
-        assertEquals("Name: Manish Sharma\n"
-                + "\nDate of birth: 1971-03-12\n"
-                + "\nNational Insurance number: NP 27 28 67 B\n"
-                + "\nAddress: 122 Breach Street, The Village, My town, Cardiff, CF11 2HB\n"
-                + "\nEmail: manish.sharma@gmail.com\n"
-                + "\nPhone: 0797 243 8179",
+        assertEquals("""
+                Name: Manish Sharma
+                
+                Date of birth: 1971-03-12
+                
+                National Insurance number: NP 27 28 67 B
+                
+                Address: 122 Breach Street, The Village, My town, Cardiff, CF11 2HB
+                
+                Email: manish.sharma@gmail.com
+                
+                Phone: 0797 243 8179""",
             result.get(YOUR_DETAILS_LITERAL));
 
-        assertEquals("Enw: Manish Sharma\n"
-                + "\nDyddiad geni: 12 Mawrth 1971\n"
-                + "\nRhif Yswiriant Gwladol: NP 27 28 67 B\n"
-                + "\nCyfeiriad: 122 Breach Street, The Village, My town, Cardiff, CF11 2HB\n"
-                + "\nE-bost: manish.sharma@gmail.com\n"
-                + "\nRhif ffôn: 0797 243 8179",
+        assertEquals("""
+                Enw: Manish Sharma
+                
+                Dyddiad geni: 12 Mawrth 1971
+                
+                Rhif Yswiriant Gwladol: NP 27 28 67 B
+                
+                Cyfeiriad: 122 Breach Street, The Village, My town, Cardiff, CF11 2HB
+                
+                E-bost: manish.sharma@gmail.com
+                
+                Rhif ffôn: 0797 243 8179""",
             result.get(YOUR_DETAILS_LITERAL_WELSH));
     }
 
@@ -244,12 +271,18 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setYourDetails(new HashMap<>(), response);
 
-        assertEquals("Name: Manish Sharma\n"
-                + "\nDate of birth: 12 March 1971\n"
-                + "\nNational Insurance number: NP 27 28 67 B\n"
-                + "\nAddress: 122 Breach Street, My town, Cardiff, CF11 2HB\n"
-                + "\nEmail: Not provided\n"
-                + "\nPhone: Not provided",
+        assertEquals("""
+                Name: Manish Sharma
+                
+                Date of birth: 12 March 1971
+                
+                National Insurance number: NP 27 28 67 B
+                
+                Address: 122 Breach Street, My town, Cardiff, CF11 2HB
+                
+                Email: Not provided
+                
+                Phone: Not provided""",
             result.get(YOUR_DETAILS_LITERAL));
     }
 
@@ -269,20 +302,32 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setYourDetails(new HashMap<>(), response);
 
-        assertEquals("Name: Manish Sharma\n"
-                + "\nDate of birth: 1971-03-12\n"
-                + "\nNational Insurance number: NP 27 28 67 B\n"
-                + "\nAddress: 122 Breach Street, My town, Cardiff, CF11 2HB\n"
-                + "\nEmail: Not provided\n"
-                + "\nPhone: Not provided",
+        assertEquals("""
+                Name: Manish Sharma
+                
+                Date of birth: 1971-03-12
+                
+                National Insurance number: NP 27 28 67 B
+                
+                Address: 122 Breach Street, My town, Cardiff, CF11 2HB
+                
+                Email: Not provided
+                
+                Phone: Not provided""",
             result.get(YOUR_DETAILS_LITERAL));
 
-        assertEquals("Enw: Manish Sharma\n"
-                + "\nDyddiad geni: 12 Mawrth 1971\n"
-                + "\nRhif Yswiriant Gwladol: NP 27 28 67 B\n"
-                + "\nCyfeiriad: 122 Breach Street, My town, Cardiff, CF11 2HB\n"
-                + "\nE-bost: Nis ddarparwyd\n"
-                + "\nRhif ffôn: Nis ddarparwyd",
+        assertEquals("""
+                Enw: Manish Sharma
+                
+                Dyddiad geni: 12 Mawrth 1971
+                
+                Rhif Yswiriant Gwladol: NP 27 28 67 B
+                
+                Cyfeiriad: 122 Breach Street, My town, Cardiff, CF11 2HB
+                
+                E-bost: Nis ddarparwyd
+                
+                Rhif ffôn: Nis ddarparwyd""",
             result.get(YOUR_DETAILS_LITERAL_WELSH));
     }
 
@@ -298,8 +343,10 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setTextMessageReminderDetails(new HashMap<>(), response.getSubscriptions().getAppellantSubscription());
 
-        assertEquals("Receive text message reminders: yes\n"
-                + "\nMobile number: 07955555708",
+        assertEquals("""
+                Receive text message reminders: yes
+                
+                Mobile number: 07955555708""",
             result.get(TEXT_MESSAGE_REMINDER_DETAILS_LITERAL));
     }
 
@@ -315,12 +362,16 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setTextMessageReminderDetails(new HashMap<>(), response.getSubscriptions().getAppellantSubscription());
 
-        assertEquals("Receive text message reminders: yes\n"
-                + "\nMobile number: 07955555708",
+        assertEquals("""
+                Receive text message reminders: yes
+                
+                Mobile number: 07955555708""",
             result.get(TEXT_MESSAGE_REMINDER_DETAILS_LITERAL));
 
-        assertEquals("Eisiau negeseuon testun atgoffa: ydw\n"
-                + "\nRhif ffôn symudol: 07955555708",
+        assertEquals("""
+                Eisiau negeseuon testun atgoffa: ydw
+                
+                Rhif ffôn symudol: 07955555708""",
             result.get(TEXT_MESSAGE_REMINDER_DETAILS_LITERAL_WELSH));
     }
 
@@ -374,12 +425,18 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setAppointeeDetails(new HashMap<>(), response);
 
-        assertEquals("Have an appointee: yes\n"
-                + "\nName: Peter Smith\n"
-                + "\nDate of birth: 12 March 1981\n"
-                + "\nAddress: Ground Floor, Gazette Buildings, 168 Corporation Street, Cardiff, CF11 6TF\n"
-                + "\nEmail: peter.smith@cab.org.uk\n"
-                + "\nPhone: 03444 77 1010",
+        assertEquals("""
+                Have an appointee: yes
+                
+                Name: Peter Smith
+                
+                Date of birth: 12 March 1981
+                
+                Address: Ground Floor, Gazette Buildings, 168 Corporation Street, Cardiff, CF11 6TF
+                
+                Email: peter.smith@cab.org.uk
+                
+                Phone: 03444 77 1010""",
             result.get(APPOINTEE_DETAILS_LITERAL));
 
         assertNull(result.get(APPOINTEE_DETAILS_LITERAL_WELSH));
@@ -403,20 +460,32 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setAppointeeDetails(new HashMap<>(), response);
 
-        assertEquals("Have an appointee: yes\n"
-                + "\nName: Peter Smith\n"
-                + "\nDate of birth: 1971-03-12\n"
-                + "\nAddress: Ground Floor, Gazette Buildings, 168 Corporation Street, Cardiff, CF11 6TF\n"
-                + "\nEmail: peter.smith@cab.org.uk\n"
-                + "\nPhone: 03444 77 1010",
+        assertEquals("""
+                Have an appointee: yes
+                
+                Name: Peter Smith
+                
+                Date of birth: 1971-03-12
+                
+                Address: Ground Floor, Gazette Buildings, 168 Corporation Street, Cardiff, CF11 6TF
+                
+                Email: peter.smith@cab.org.uk
+                
+                Phone: 03444 77 1010""",
             result.get(APPOINTEE_DETAILS_LITERAL));
 
-        assertEquals("A oes gennych chi benodai: ydw\n"
-                + "\nEnw: Peter Smith\n"
-                + "\nDyddiad geni: 12 Mawrth 1971\n"
-                + "\nCyfeiriad: Ground Floor, Gazette Buildings, 168 Corporation Street, Cardiff, CF11 6TF\n"
-                + "\nE-bost: peter.smith@cab.org.uk\n"
-                + "\nRhif ffôn: 03444 77 1010",
+        assertEquals("""
+                A oes gennych chi benodai: ydw
+                
+                Enw: Peter Smith
+                
+                Dyddiad geni: 12 Mawrth 1971
+                
+                Cyfeiriad: Ground Floor, Gazette Buildings, 168 Corporation Street, Cardiff, CF11 6TF
+                
+                E-bost: peter.smith@cab.org.uk
+                
+                Rhif ffôn: 03444 77 1010""",
             result.get(APPOINTEE_DETAILS_LITERAL_WELSH));
     }
 
@@ -434,12 +503,18 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setAppointeeDetails(new HashMap<>(), response);
 
-        assertEquals("Have an appointee: yes\n"
-                + "\nName: Peter Smith\n"
-                + "\nDate of birth: 12 March 1981\n"
-                + "\nAddress: Ground Floor, Gazette Buildings, 168 Corporation Street, Cardiff, CF11 6TF\n"
-                + "\nEmail: Not provided\n"
-                + "\nPhone: Not provided",
+        assertEquals("""
+                Have an appointee: yes
+                
+                Name: Peter Smith
+                
+                Date of birth: 12 March 1981
+                
+                Address: Ground Floor, Gazette Buildings, 168 Corporation Street, Cardiff, CF11 6TF
+                
+                Email: Not provided
+                
+                Phone: Not provided""",
             result.get(APPOINTEE_DETAILS_LITERAL));
     }
 
@@ -473,12 +548,18 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setRepresentativeDetails(new HashMap<>(), response);
 
-        assertEquals("Have a representative: yes\n"
-                + "\nName: Peter Smith\n"
-                + "\nOrganisation: Citizens Advice\n"
-                + "\nAddress: Ground Floor, Gazette Buildings, 168 Corporation Street, Cardiff, CF11 6TF\n"
-                + "\nEmail: peter.smith@cab.org.uk\n"
-                + "\nPhone: 03444 77 1010",
+        assertEquals("""
+                Have a representative: yes
+                
+                Name: Peter Smith
+                
+                Organisation: Citizens Advice
+                
+                Address: Ground Floor, Gazette Buildings, 168 Corporation Street, Cardiff, CF11 6TF
+                
+                Email: peter.smith@cab.org.uk
+                
+                Phone: 03444 77 1010""",
             result.get(REPRESENTATIVE_DETAILS_LITERAL));
 
         assertNull(result.get(REPRESENTATIVE_DETAILS_LITERAL_WELSH));
@@ -551,8 +632,12 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         assertEquals("Yes", result.get(SHOW_OTHER_PARTY_DETAILS));
 
-        assertEquals("Name: Harrison Kane\n"
-                + "\nAddress: First Floor, My Building, 222 Corporation Street, Glasgow, GL11 6TF\n\n",
+        assertEquals("""
+                Name: Harrison Kane
+                
+                Address: First Floor, My Building, 222 Corporation Street, Glasgow, GL11 6TF
+                
+                """,
             result.get(OTHER_PARTY_DETAILS));
         assertNull(result.get(OTHER_PARTY_DETAILS_WELSH));
         assertThat(result.get(YOUR_DETAILS_LITERAL).toString()).contains("Child maintenance number: 123456");
@@ -598,10 +683,16 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         assertEquals("Yes", result.get(SHOW_OTHER_PARTY_DETAILS));
 
-        assertEquals("Name: Harrison Kane\n"
-                + "\nAddress: First Floor, My Building, 222 Corporation Street, Glasgow, GL11 6TF\n\n"
-                + "Name: Lucas Moura\n"
-                + "\nAddress: Second Floor, My House, 333 Corporation Street, London, EC1 6TF\n\n",
+        assertEquals("""
+                Name: Harrison Kane
+                
+                Address: First Floor, My Building, 222 Corporation Street, Glasgow, GL11 6TF
+                
+                Name: Lucas Moura
+                
+                Address: Second Floor, My House, 333 Corporation Street, London, EC1 6TF
+                
+                """,
             result.get(OTHER_PARTY_DETAILS));
         assertNull(result.get(OTHER_PARTY_DETAILS_WELSH));
         assertThat(result.get(YOUR_DETAILS_LITERAL).toString()).contains("Child maintenance number: 123456");
@@ -642,8 +733,12 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         assertEquals("Yes", result.get(SHOW_OTHER_PARTY_DETAILS));
 
-        assertEquals("Name: Not provided\n"
-                + "\nAddress: Not provided\n\n",
+        assertEquals("""
+                Name: Not provided
+                
+                Address: Not provided
+                
+                """,
             result.get(OTHER_PARTY_DETAILS));
         assertNull(result.get(OTHER_PARTY_DETAILS_WELSH));
         assertThat(result.get(YOUR_DETAILS_LITERAL).toString()).contains("Child maintenance number: 123456");
@@ -664,20 +759,32 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setRepresentativeDetails(new HashMap<>(), response);
 
-        assertEquals("Have a representative: yes\n"
-                + "\nName: Peter Smith\n"
-                + "\nOrganisation: Citizens Advice\n"
-                + "\nAddress: Ground Floor, Gazette Buildings, 168 Corporation Street, Cardiff, CF11 6TF\n"
-                + "\nEmail: peter.smith@cab.org.uk\n"
-                + "\nPhone: 03444 77 1010",
+        assertEquals("""
+                Have a representative: yes
+                
+                Name: Peter Smith
+                
+                Organisation: Citizens Advice
+                
+                Address: Ground Floor, Gazette Buildings, 168 Corporation Street, Cardiff, CF11 6TF
+                
+                Email: peter.smith@cab.org.uk
+                
+                Phone: 03444 77 1010""",
             result.get(REPRESENTATIVE_DETAILS_LITERAL));
 
-        assertEquals("A oes gennych chi gynrychiolydd: ydw\n"
-                + "\nEnw: Peter Smith\n"
-                + "\nSefydliad: Citizens Advice\n"
-                + "\nCyfeiriad: Ground Floor, Gazette Buildings, 168 Corporation Street, Cardiff, CF11 6TF\n"
-                + "\nE-bost: peter.smith@cab.org.uk\n"
-                + "\nRhif ffôn: 03444 77 1010",
+        assertEquals("""
+                A oes gennych chi gynrychiolydd: ydw
+                
+                Enw: Peter Smith
+                
+                Sefydliad: Citizens Advice
+                
+                Cyfeiriad: Ground Floor, Gazette Buildings, 168 Corporation Street, Cardiff, CF11 6TF
+                
+                E-bost: peter.smith@cab.org.uk
+                
+                Rhif ffôn: 03444 77 1010""",
             result.get(REPRESENTATIVE_DETAILS_LITERAL_WELSH));
     }
 
@@ -694,12 +801,18 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setRepresentativeDetails(new HashMap<>(), response);
 
-        assertEquals("Have a representative: yes\n"
-                + "\nName: Peter Smith\n"
-                + "\nOrganisation: Not provided\n"
-                + "\nAddress: Ground Floor, Gazette Buildings, 168 Corporation Street, Cardiff, CF11 6TF\n"
-                + "\nEmail: Not provided\n"
-                + "\nPhone: Not provided",
+        assertEquals("""
+                Have a representative: yes
+                
+                Name: Peter Smith
+                
+                Organisation: Not provided
+                
+                Address: Ground Floor, Gazette Buildings, 168 Corporation Street, Cardiff, CF11 6TF
+                
+                Email: Not provided
+                
+                Phone: Not provided""",
             result.get(REPRESENTATIVE_DETAILS_LITERAL));
         assertNull(result.get(REPRESENTATIVE_DETAILS_LITERAL_WELSH));
     }
@@ -718,20 +831,32 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setRepresentativeDetails(new HashMap<>(), response);
 
-        assertEquals("Have a representative: yes\n"
-                + "\nName: Peter Smith\n"
-                + "\nOrganisation: Not provided\n"
-                + "\nAddress: Ground Floor, Gazette Buildings, 168 Corporation Street, Cardiff, CF11 6TF\n"
-                + "\nEmail: Not provided\n"
-                + "\nPhone: Not provided",
+        assertEquals("""
+                Have a representative: yes
+                
+                Name: Peter Smith
+                
+                Organisation: Not provided
+                
+                Address: Ground Floor, Gazette Buildings, 168 Corporation Street, Cardiff, CF11 6TF
+                
+                Email: Not provided
+                
+                Phone: Not provided""",
             result.get(REPRESENTATIVE_DETAILS_LITERAL));
 
-        assertEquals("A oes gennych chi gynrychiolydd: ydw\n"
-                + "\nEnw: Peter Smith\n"
-                + "\nSefydliad: Nis ddarparwyd\n"
-                + "\nCyfeiriad: Ground Floor, Gazette Buildings, 168 Corporation Street, Cardiff, CF11 6TF\n"
-                + "\nE-bost: Nis ddarparwyd\n"
-                + "\nRhif ffôn: Nis ddarparwyd",
+        assertEquals("""
+                A oes gennych chi gynrychiolydd: ydw
+                
+                Enw: Peter Smith
+                
+                Sefydliad: Nis ddarparwyd
+                
+                Cyfeiriad: Ground Floor, Gazette Buildings, 168 Corporation Street, Cardiff, CF11 6TF
+                
+                E-bost: Nis ddarparwyd
+                
+                Rhif ffôn: Nis ddarparwyd""",
             result.get(REPRESENTATIVE_DETAILS_LITERAL_WELSH));
 
 
@@ -765,9 +890,12 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setReasonsForAppealingDetails(new HashMap<>(), response);
 
-        assertEquals("What you disagree with: I want to appeal\n"
-                + "\nWhy you disagree with it: Because I do\n"
-                + "\nAnything else you want to tell the tribunal: Some other reason",
+        assertEquals("""
+                What you disagree with: I want to appeal
+                
+                Why you disagree with it: Because I do
+                
+                Anything else you want to tell the tribunal: Some other reason""",
             result.get(REASONS_FOR_APPEALING_DETAILS_LITERAL));
         assertNull(result.get(REASONS_FOR_APPEALING_DETAILS_LITERAL_WELSH));
     }
@@ -787,14 +915,20 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setReasonsForAppealingDetails(new HashMap<>(), response);
 
-        assertEquals("What you disagree with: I want to appeal\n"
-                + "\nWhy you disagree with it: Because I do\n"
-                + "\nAnything else you want to tell the tribunal: Some other reason",
+        assertEquals("""
+                What you disagree with: I want to appeal
+                
+                Why you disagree with it: Because I do
+                
+                Anything else you want to tell the tribunal: Some other reason""",
             result.get(REASONS_FOR_APPEALING_DETAILS_LITERAL));
 
-        assertEquals("Beth ydych chi’n anghytuno ag o: I want to appeal\n"
-                + "\nPam ydych chi’n anghytuno ag o: Because I do\n"
-                + "\nUnrhyw beth arall yr hoffech ddweud wrth y tribiwnlys: Some other reason",
+        assertEquals("""
+                Beth ydych chi’n anghytuno ag o: I want to appeal
+                
+                Pam ydych chi’n anghytuno ag o: Because I do
+                
+                Unrhyw beth arall yr hoffech ddweud wrth y tribiwnlys: Some other reason""",
             result.get(REASONS_FOR_APPEALING_DETAILS_LITERAL_WELSH));
 
     }
@@ -815,11 +949,16 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setReasonsForAppealingDetails(new HashMap<>(), response);
 
-        assertEquals("What you disagree with: I want to appeal\n"
-                + "\nWhy you disagree with it: Because I do\n"
-                + "\nWhat you disagree with: I want to appeal again\n"
-                + "\nWhy you disagree with it: I'm in the mood\n"
-                + "\nAnything else you want to tell the tribunal: Some other reason",
+        assertEquals("""
+                What you disagree with: I want to appeal
+                
+                Why you disagree with it: Because I do
+                
+                What you disagree with: I want to appeal again
+                
+                Why you disagree with it: I'm in the mood
+                
+                Anything else you want to tell the tribunal: Some other reason""",
             result.get(REASONS_FOR_APPEALING_DETAILS_LITERAL));
     }
 
@@ -888,8 +1027,10 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setHearingDetails(new HashMap<>(), response);
 
-        assertEquals("Attending the hearing: yes\n"
-                + "\nDates you can't attend: 3 January 2018",
+        assertEquals("""
+                Attending the hearing: yes
+                
+                Dates you can't attend: 3 January 2018""",
             result.get(HEARING_DETAILS_LITERAL));
     }
 
@@ -910,10 +1051,12 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setHearingDetails(new HashMap<>(), response);
 
-        assertEquals("Attending the hearing: yes\n"
-                + "\nDates you can't attend: 3 January 2018, 5 January 2018",
+        assertEquals("""
+                Attending the hearing: yes
+                
+                Dates you can't attend: 3 January 2018, 5 January 2018""",
             result.get(HEARING_DETAILS_LITERAL));
-        assertNull("Welsh details not be set ", result.get(HEARING_DETAILS_LITERAL_WELSH));
+        assertNull(result.get(HEARING_DETAILS_LITERAL_WELSH), "Welsh details not be set ");
     }
 
     @Test
@@ -934,12 +1077,16 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setHearingDetails(new HashMap<>(), response);
 
-        assertEquals("Attending the hearing: yes\n"
-                + "\nDates you can't attend: 3 January 2018, 5 January 2018",
+        assertEquals("""
+                Attending the hearing: yes
+                
+                Dates you can't attend: 3 January 2018, 5 January 2018""",
             result.get(HEARING_DETAILS_LITERAL));
 
-        assertEquals("Ydych chi'n bwriadu mynychu'r gwrandawiad: ydw\n"
-                + "\nDyddiadau na allwch fynychu: 3 Ionawr 2018, 5 Ionawr 2018",
+        assertEquals("""
+                Ydych chi'n bwriadu mynychu'r gwrandawiad: ydw
+                
+                Dyddiadau na allwch fynychu: 3 Ionawr 2018, 5 Ionawr 2018""",
             result.get(HEARING_DETAILS_LITERAL_WELSH));
     }
 
@@ -963,11 +1110,16 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setHearingArrangementDetails(new HashMap<>(), response);
 
-        assertEquals("Language interpreter: Required\n"
-                + "\nSign interpreter: Required\n"
-                + "\nHearing loop: Required\n"
-                + "\nDisabled access: Required\n"
-                + "\nAny other arrangements: Other",
+        assertEquals("""
+                Language interpreter: Required
+                
+                Sign interpreter: Required
+                
+                Hearing loop: Required
+                
+                Disabled access: Required
+                
+                Any other arrangements: Other""",
             result.get(HEARING_ARRANGEMENT_DETAILS_LITERAL));
         assertNull(result.get(HEARING_ARRANGEMENT_DETAILS_LITERAL_WELSH));
 
@@ -994,18 +1146,28 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setHearingArrangementDetails(new HashMap<>(), response);
 
-        assertEquals("Language interpreter: Required\n"
-                + "\nSign interpreter: Required\n"
-                + "\nHearing loop: Required\n"
-                + "\nDisabled access: Required\n"
-                + "\nAny other arrangements: Other",
+        assertEquals("""
+                Language interpreter: Required
+                
+                Sign interpreter: Required
+                
+                Hearing loop: Required
+                
+                Disabled access: Required
+                
+                Any other arrangements: Other""",
             result.get(HEARING_ARRANGEMENT_DETAILS_LITERAL));
 
-        assertEquals("Dehonglydd iaith arwyddion: Gofynnol\n"
-                + "\nDehonglydd iaith arwyddion: Gofynnol\n"
-                + "\nDolen glyw: Gofynnol\n"
-                + "\nMynediad i bobl anab: Gofynnol\n"
-                + "\nUnrhyw drefniadau eraill: Other",
+        assertEquals("""
+                Dehonglydd iaith arwyddion: Gofynnol
+                
+                Dehonglydd iaith arwyddion: Gofynnol
+                
+                Dolen glyw: Gofynnol
+                
+                Mynediad i bobl anab: Gofynnol
+                
+                Unrhyw drefniadau eraill: Other""",
             result.get(HEARING_ARRANGEMENT_DETAILS_LITERAL_WELSH));
 
     }
@@ -1022,11 +1184,16 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setHearingArrangementDetails(new HashMap<>(), response);
 
-        assertEquals("Language interpreter: Not required\n"
-                + "\nSign interpreter: Not required\n"
-                + "\nHearing loop: Not required\n"
-                + "\nDisabled access: Not required\n"
-                + "\nAny other arrangements: Not required",
+        assertEquals("""
+                Language interpreter: Not required
+                
+                Sign interpreter: Not required
+                
+                Hearing loop: Not required
+                
+                Disabled access: Not required
+                
+                Any other arrangements: Not required""",
             result.get(HEARING_ARRANGEMENT_DETAILS_LITERAL));
         assertNull(result.get(HEARING_ARRANGEMENT_DETAILS_LITERAL_WELSH));
     }
@@ -1044,18 +1211,28 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setHearingArrangementDetails(new HashMap<>(), response);
 
-        assertEquals("Language interpreter: Not required\n"
-                + "\nSign interpreter: Not required\n"
-                + "\nHearing loop: Not required\n"
-                + "\nDisabled access: Not required\n"
-                + "\nAny other arrangements: Not required",
+        assertEquals("""
+                Language interpreter: Not required
+                
+                Sign interpreter: Not required
+                
+                Hearing loop: Not required
+                
+                Disabled access: Not required
+                
+                Any other arrangements: Not required""",
             result.get(HEARING_ARRANGEMENT_DETAILS_LITERAL));
 
-        assertEquals("Dehonglydd iaith arwyddion: Dim yn ofynnol\n"
-                + "\nDehonglydd iaith arwyddion: Dim yn ofynnol\n"
-                + "\nDolen glyw: Dim yn ofynnol\n"
-                + "\nMynediad i bobl anab: Dim yn ofynnol\n"
-                + "\nUnrhyw drefniadau eraill: Dim yn ofynnol",
+        assertEquals("""
+                Dehonglydd iaith arwyddion: Dim yn ofynnol
+                
+                Dehonglydd iaith arwyddion: Dim yn ofynnol
+                
+                Dolen glyw: Dim yn ofynnol
+                
+                Mynediad i bobl anab: Dim yn ofynnol
+                
+                Unrhyw drefniadau eraill: Dim yn ofynnol""",
             result.get(HEARING_ARRANGEMENT_DETAILS_LITERAL_WELSH));
 
     }
@@ -1071,11 +1248,16 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
 
         Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setHearingArrangementDetails(new HashMap<>(), response);
 
-        assertEquals("Language interpreter: Not required\n"
-                + "\nSign interpreter: Not required\n"
-                + "\nHearing loop: Not required\n"
-                + "\nDisabled access: Not required\n"
-                + "\nAny other arrangements: Not required",
+        assertEquals("""
+                Language interpreter: Not required
+                
+                Sign interpreter: Not required
+                
+                Hearing loop: Not required
+                
+                Disabled access: Not required
+                
+                Any other arrangements: Not required""",
             result.get(HEARING_ARRANGEMENT_DETAILS_LITERAL));
     }
 

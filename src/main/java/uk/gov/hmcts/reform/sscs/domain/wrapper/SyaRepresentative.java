@@ -61,7 +61,7 @@ public class SyaRepresentative {
     }
 
     public String getFullName() {
-        return String.format("%s %s", firstName, lastName);
+        return "%s %s".formatted(firstName, lastName);
     }
 
     @Override

@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevid
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -23,15 +23,18 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -47,9 +50,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 @RunWith(JUnitParamsRunner.class)
 public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
     @Mock
     private CcdService ccdService;
 
@@ -67,14 +67,14 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
     private ActionFurtherEvidenceSubmittedCallbackHandler handler;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, ccdClient, sscsCcdConvertService, idamService, false, false);
     }
 
 
-    @Test
-    @Parameters(method = "generateCanHandleScenarios")
+    @ParameterizedTest
+    @MethodSource("generateCanHandleScenarios")
     public void givenCanHandleIsCalled_shouldReturnCorrectResult(CallbackType callbackType,
                                                                  Callback<SscsCaseData> callback,
                                                                  boolean expectedResult) {
@@ -83,7 +83,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         assertEquals(expectedResult, actualResult);
     }
 
-    private Object[] generateCanHandleScenarios() {
+    private static Object[] generateCanHandleScenarios() {
         Callback<SscsCaseData> callbackWithValidEventAndInformationReceivedForInterlocTcwOption =
             buildCallback("informationReceivedForInterlocTcw", ACTION_FURTHER_EVIDENCE);
         Callback<SscsCaseData> callbackWithValidEventAndInformationReceivedForInterlocJudgeOption =
@@ -117,7 +117,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             new Object[]{SUBMITTED, callbackWithValidEventAndSendToInterlocReviewByTcwOption, true}};
     }
 
-    private Callback<SscsCaseData> buildCallback(String dynamicListItemCode, EventType eventType) {
+    private static Callback<SscsCaseData> buildCallback(String dynamicListItemCode, EventType eventType) {
         DynamicList dynamicList = new DynamicList(new DynamicListItem(dynamicListItemCode, "label"),
             Collections.singletonList(new DynamicListItem(dynamicListItemCode, "label")));
         SscsCaseData sscsCaseData = SscsCaseData.builder()
@@ -162,6 +162,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "informationReceivedForInterlocJudge, REVIEW_BY_JUDGE, interlocInformationReceivedActionFurtherEvidence",
         "informationReceivedForInterlocTcw, REVIEW_BY_TCW, interlocInformationReceivedActionFurtherEvidence",
@@ -211,6 +212,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "SET_ASIDE, setAsideRequest",
         "CORRECTION, correctionRequest",
@@ -258,8 +260,9 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, sscsCaseData.getInterlocReviewState());
     }
 
-    @Ignore("Re-enable once new post hearings B types are added to the enum")
+    @Disabled("Re-enable once new post hearings B types are added to the enum")
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({ // TODO add remaining post hearing B types once implemented
     })
     public void givenPostHearingNotImplementedAndFurtherEvidenceActionIsReviewByJudge_shouldThrowException(
@@ -292,10 +295,11 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, ccdClient, sscsCcdConvertService, idamService, true, false);
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> handler.handle(SUBMITTED, callback, USER_AUTHORISATION));
-        assertEquals(String.format("Post hearing request type is not implemented or recognised: %s", requestType), exception.getMessage());
+        assertEquals("Post hearing request type is not implemented or recognised: %s".formatted(requestType), exception.getMessage());
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "LIBERTY_TO_APPLY, libertyToApplyRequest",
         "PERMISSION_TO_APPEAL, permissionToAppealRequest"

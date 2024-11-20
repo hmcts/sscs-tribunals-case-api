@@ -1,19 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadwelshdocument;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
 import java.util.Arrays;
 import java.util.List;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -23,7 +19,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 
-@RunWith(JUnitParamsRunner.class)
 public class UploadWelshDocumentsAboutToStartHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
@@ -38,7 +33,7 @@ public class UploadWelshDocumentsAboutToStartHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         handler = new UploadWelshDocumentsAboutToStartHandler();
@@ -48,23 +43,24 @@ public class UploadWelshDocumentsAboutToStartHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
 
-    @Test
+    @ParameterizedTest
     public void givenAUploadWelshDocumentEvent_thenReturnTrue() {
         assertTrue(handler.canHandle(ABOUT_TO_START, callback));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenANonUploadWelshDocument_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
         assertFalse(handler.canHandle(ABOUT_TO_START, callback));
     }
 
-    @Test(expected = NullPointerException.class)
+    @ParameterizedTest
     public void givenNullCallback_shouldThrowException() {
-        handler.handle(CallbackType.ABOUT_TO_SUBMIT, null, "user token");
+        assertThrows(NullPointerException.class, () ->
+            handler.handle(CallbackType.ABOUT_TO_SUBMIT, null, "user token"));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenNoDocumentWithSscsDocumentTranslationStatus_thenDisplayError() {
         sscsCaseData = CaseDataUtils.buildMinimalCaseData();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -73,8 +69,8 @@ public class UploadWelshDocumentsAboutToStartHandlerTest {
         assertEquals("Event cannot be triggered - no documents awaiting translation on this case", error);
     }
 
-    @Test
-    @Parameters(method = "generateSscsDocuments")
+    @ParameterizedTest
+    @MethodSource("generateSscsDocuments")
     public void originalDocumentDropDownWhenSscsDocumentTranslationStatusIsSet(@Nullable List<SscsDocument> sscsDocuments) {
         sscsCaseData = SscsCaseData.builder()
                 .sscsDocument(sscsDocuments)
@@ -87,17 +83,17 @@ public class UploadWelshDocumentsAboutToStartHandlerTest {
         assertEquals("test.pdf", response.getData().getOriginalDocuments().getListItems().get(0).getCode());
     }
 
-    public Object[] generateSscsDocuments() {
+    public static Object[] generateSscsDocuments() {
         SscsDocument sscs1Doc = SscsDocument.builder()
-                .value(SscsDocumentDetails.builder()
-                        .documentLink(DocumentLink.builder()
-                                .documentUrl("/anotherUrl")
-                                .documentFilename("test.pdf")
-                                .build())
-                        .documentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED)
-                        .documentType(DocumentType.SSCS1.getValue())
-                        .build())
-                .build();
+            .value(SscsDocumentDetails.builder()
+                .documentLink(DocumentLink.builder()
+                    .documentUrl("/anotherUrl")
+                    .documentFilename("test.pdf")
+                    .build())
+                .documentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED)
+                .documentType(DocumentType.SSCS1.getValue())
+                .build())
+            .build();
 
         SscsDocument sscs2Doc = SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
@@ -110,9 +106,9 @@ public class UploadWelshDocumentsAboutToStartHandlerTest {
                 .build())
             .build();
 
-        List<SscsDocument> docs = Arrays.asList(sscs1Doc,sscs2Doc);
+        List<SscsDocument> docs = Arrays.asList(sscs1Doc, sscs2Doc);
 
-        return new Object[] {
+        return new Object[]{
             new Object[]{docs}
         };
     }

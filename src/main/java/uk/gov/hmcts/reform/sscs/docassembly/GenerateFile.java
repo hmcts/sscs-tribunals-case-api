@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.docassembly;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.docassembly.DocAssemblyClient;
 import uk.gov.hmcts.reform.docassembly.domain.DocAssemblyRequest;
@@ -18,7 +17,6 @@ public class GenerateFile {
 
     private final IdamService idamService;
 
-    @Autowired
     public GenerateFile(DocAssemblyClient docAssemblyClient, IdamService idamService) {
         this.docAssemblyClient = docAssemblyClient;
         this.idamService = idamService;

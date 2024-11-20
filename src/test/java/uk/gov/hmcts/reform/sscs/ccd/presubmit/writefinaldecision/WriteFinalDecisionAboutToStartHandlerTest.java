@@ -48,7 +48,7 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
                 .documentType("doctype")
                 .build())
             .build()));
-        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")))).build();
+        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("Decision Notice issued on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")))).build();
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");

@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -14,8 +14,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -41,7 +41,7 @@ public class IssueFinalDecisionIt extends AbstractEventIt {
     @MockBean
     private EvidenceManagementService evidenceManagementService;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         json = getJson("callback/issueFinalDecisionDescriptorCallback.json");
         super.setup();

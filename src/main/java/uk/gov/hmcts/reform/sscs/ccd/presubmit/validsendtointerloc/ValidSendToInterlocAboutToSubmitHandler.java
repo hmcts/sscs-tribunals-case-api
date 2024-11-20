@@ -8,7 +8,6 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -24,7 +23,6 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
 
     private final PostponementRequestService postponementRequestService;
 
-    @Autowired
     public ValidSendToInterlocAboutToSubmitHandler(PostponementRequestService postponementRequestService) {
         this.postponementRequestService = postponementRequestService;
     }

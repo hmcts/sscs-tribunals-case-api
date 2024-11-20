@@ -23,7 +23,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -85,7 +85,7 @@ public class BaseHandler {
     @Value("${test-url}")
     protected String testUrl;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         baseURI = testUrl;
         useRelaxedHTTPSValidation();

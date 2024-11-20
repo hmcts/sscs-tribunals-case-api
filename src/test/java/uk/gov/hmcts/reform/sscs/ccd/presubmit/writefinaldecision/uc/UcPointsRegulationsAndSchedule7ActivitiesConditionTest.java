@@ -7,13 +7,10 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import junitparams.JUnitParamsRunner;
-import junitparams.NamedParameters;
-import junitparams.Parameters;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -23,7 +20,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcScenario;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 
-@RunWith(JUnitParamsRunner.class)
 public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
 
     @Mock
@@ -32,70 +28,70 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
     @Mock
     private DecisionNoticeQuestionService questionService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
     }
 
-    @NamedParameters("wcaAppealAndScheduleAndRegulationQuestionCombinations")
-    @SuppressWarnings("unused")
-    private Object[] wcaAppealAndScheduleAndRegulationQuestionCombinations() {
-        return new Object[] {
-            new Boolean[] {false, null, null, null},
-            new Boolean[] {false, null, null, false},
-            new Boolean[] {false, null, null, true},
-            new Boolean[] {false, null, false, null},
-            new Boolean[] {false, null, false, false},
-            new Boolean[] {false, null, false, true},
-            new Boolean[] {false, null, true, null},
-            new Boolean[] {false, null, true, false},
-            new Boolean[] {false, null, true, true},
-            new Boolean[] {false, false, null, null},
-            new Boolean[] {false, false, null, false},
-            new Boolean[] {false, false, null, true},
-            new Boolean[] {false, false, false, null},
-            new Boolean[] {false, false, false, false},
-            new Boolean[] {false, false, false, true},
-            new Boolean[] {false, false, true, null},
-            new Boolean[] {false, false, true, false},
-            new Boolean[] {false, false, true, true},
-            new Boolean[] {false, true, null, null},
-            new Boolean[] {false, true, null, false},
-            new Boolean[] {false, true, null, true},
-            new Boolean[] {false, true, false, null},
-            new Boolean[] {false, true, false, false},
-            new Boolean[] {false, true, false, true},
-            new Boolean[] {false, true, true, null},
-            new Boolean[] {false, true, true, false},
-            new Boolean[] {false, true, true, true},
 
-            new Boolean[] {true, null, null, null},
-            new Boolean[] {true, null, null, false},
-            new Boolean[] {true, null, null, true},
-            new Boolean[] {true, null, false, null},
-            new Boolean[] {true, null, false, false},
-            new Boolean[] {true, null, false, true},
-            new Boolean[] {true, null, true, null},
-            new Boolean[] {true, null, true, false},
-            new Boolean[] {true, null, true, true},
-            new Boolean[] {true, false, null, null},
-            new Boolean[] {true, false, null, false},
-            new Boolean[] {true, false, null, true},
-            new Boolean[] {true, false, false, null},
-            new Boolean[] {true, false, false, false},
-            new Boolean[] {true, false, false, true},
-            new Boolean[] {true, false, true, null},
-            new Boolean[] {true, false, true, false},
-            new Boolean[] {true, false, true, true},
-            new Boolean[] {true, true, null, null},
-            new Boolean[] {true, true, null, false},
-            new Boolean[] {true, true, null, true},
-            new Boolean[] {true, true, false, null},
-            new Boolean[] {true, true, false, false},
-            new Boolean[] {true, true, false, true},
-            new Boolean[] {true, true, true, null},
-            new Boolean[] {true, true, true, false},
-            new Boolean[] {true, true, true, true},
+    @SuppressWarnings("unused")
+    private static Object[] wcaAppealAndScheduleAndRegulationQuestionCombinations() {
+        return new Object[]{
+            new Boolean[]{false, null, null, null},
+            new Boolean[]{false, null, null, false},
+            new Boolean[]{false, null, null, true},
+            new Boolean[]{false, null, false, null},
+            new Boolean[]{false, null, false, false},
+            new Boolean[]{false, null, false, true},
+            new Boolean[]{false, null, true, null},
+            new Boolean[]{false, null, true, false},
+            new Boolean[]{false, null, true, true},
+            new Boolean[]{false, false, null, null},
+            new Boolean[]{false, false, null, false},
+            new Boolean[]{false, false, null, true},
+            new Boolean[]{false, false, false, null},
+            new Boolean[]{false, false, false, false},
+            new Boolean[]{false, false, false, true},
+            new Boolean[]{false, false, true, null},
+            new Boolean[]{false, false, true, false},
+            new Boolean[]{false, false, true, true},
+            new Boolean[]{false, true, null, null},
+            new Boolean[]{false, true, null, false},
+            new Boolean[]{false, true, null, true},
+            new Boolean[]{false, true, false, null},
+            new Boolean[]{false, true, false, false},
+            new Boolean[]{false, true, false, true},
+            new Boolean[]{false, true, true, null},
+            new Boolean[]{false, true, true, false},
+            new Boolean[]{false, true, true, true},
+
+            new Boolean[]{true, null, null, null},
+            new Boolean[]{true, null, null, false},
+            new Boolean[]{true, null, null, true},
+            new Boolean[]{true, null, false, null},
+            new Boolean[]{true, null, false, false},
+            new Boolean[]{true, null, false, true},
+            new Boolean[]{true, null, true, null},
+            new Boolean[]{true, null, true, false},
+            new Boolean[]{true, null, true, true},
+            new Boolean[]{true, false, null, null},
+            new Boolean[]{true, false, null, false},
+            new Boolean[]{true, false, null, true},
+            new Boolean[]{true, false, false, null},
+            new Boolean[]{true, false, false, false},
+            new Boolean[]{true, false, false, true},
+            new Boolean[]{true, false, true, null},
+            new Boolean[]{true, false, true, false},
+            new Boolean[]{true, false, true, true},
+            new Boolean[]{true, true, null, null},
+            new Boolean[]{true, true, null, false},
+            new Boolean[]{true, true, null, true},
+            new Boolean[]{true, true, false, null},
+            new Boolean[]{true, true, false, false},
+            new Boolean[]{true, true, false, true},
+            new Boolean[]{true, true, true, null},
+            new Boolean[]{true, true, true, false},
+            new Boolean[]{true, true, true, true},
 
         };
     }
@@ -200,8 +196,8 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
     /**
      * Test the continuity of boundaries between point ranges and regulation and schedule answers. (ie. this test will fail if there are any gaps, or overlap between the boundaries)
      */
-    @Test
-    @Parameters(named = "wcaAppealAndScheduleAndRegulationQuestionCombinations")
+    @ParameterizedTest
+    @MethodSource("wcaAppealAndScheduleAndRegulationQuestionCombinations")
     public void testThatAtExactlyOneConditionIsApplicableForAllPointsAndActivityCombinations(
         Boolean wcaAppeal,
         Boolean doesSchedule8Paragraph4Apply, Boolean schedule7ActivitiesSelected,
@@ -278,20 +274,19 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
                         }
                     }
 
-                    Assert.assertEquals(
-                        "Expected 1 condition to be satisfied for points:" + points + ":" + wcaAppeal + ":" + doesSchedule8Paragraph4Apply + ":" + schedule7ActivitiesSelected + ":" + doesSchedule9Paragraph4Apply + ":" + supportGroupOnly +  " but "
-                            + conditionApplicableCount + " were satisfied",
-                        1, conditionApplicableCount);
+                    Assertions.assertEquals(
+                        1, conditionApplicableCount, "Expected 1 condition to be satisfied for points:" + points + ":" + wcaAppeal + ":" + doesSchedule8Paragraph4Apply + ":" + schedule7ActivitiesSelected + ":" + doesSchedule9Paragraph4Apply + ":" + supportGroupOnly +  " but "
+                            + conditionApplicableCount + " were satisfied");
 
                     if (isValidCombinationExpected) {
 
-                        Assert.assertTrue("Unexpected error for:" + points + ":" + wcaAppeal + ":" + doesSchedule8Paragraph4Apply
-                            + ":" + schedule7ActivitiesSelected + ":" + doesSchedule9Paragraph4Apply + ":" + supportGroupOnly, matchingCondition
-                            .getOptionalErrorMessage(questionService, caseData).isEmpty());
+                        Assertions.assertTrue(matchingCondition
+                            .getOptionalErrorMessage(questionService, caseData).isEmpty(), "Unexpected error for:" + points + ":" + wcaAppeal + ":" + doesSchedule8Paragraph4Apply
+                            + ":" + schedule7ActivitiesSelected + ":" + doesSchedule9Paragraph4Apply + ":" + supportGroupOnly);
                     } else {
-                        Assert.assertTrue("Expected an error for:" + points + ":" + wcaAppeal + ":" + doesSchedule8Paragraph4Apply
-                            + ":" + schedule7ActivitiesSelected + ":" + doesSchedule9Paragraph4Apply + ":" + supportGroupOnly, matchingCondition
-                            .getOptionalErrorMessage(questionService, caseData).isPresent());
+                        Assertions.assertTrue(matchingCondition
+                            .getOptionalErrorMessage(questionService, caseData).isPresent(), "Expected an error for:" + points + ":" + wcaAppeal + ":" + doesSchedule8Paragraph4Apply
+                            + ":" + schedule7ActivitiesSelected + ":" + doesSchedule9Paragraph4Apply + ":" + supportGroupOnly);
                     }
 
                     if (matchingCondition != null && matchingCondition
@@ -312,29 +307,28 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
                             }
                         }
 
-                        Assert.assertEquals(
-                            "Expected 1 allowed or refused condition to be satisfied for points:" + points + ":" + wcaAppeal + ":" + doesSchedule8Paragraph4Apply + ":" + schedule7ActivitiesSelected + ":" + doesSchedule9Paragraph4Apply + ":" + allowed
+                        Assertions.assertEquals(
+                            1, allowedOrRefusedConditionApplicableCount, "Expected 1 allowed or refused condition to be satisfied for points:" + points + ":" + wcaAppeal + ":" + doesSchedule8Paragraph4Apply + ":" + schedule7ActivitiesSelected + ":" + doesSchedule9Paragraph4Apply + ":" + allowed
                                 + ":" + supportGroupOnly + " but "
-                                + allowedOrRefusedConditionApplicableCount + " were satisfied",
-                            1, allowedOrRefusedConditionApplicableCount);
+                                + allowedOrRefusedConditionApplicableCount + " were satisfied");
 
                         if (isValidAllowedOrRefusedCombinationExpected) {
 
 
-                            Assert.assertTrue("Unexpected error for:" + points + ":" + wcaAppeal + ":" + doesSchedule8Paragraph4Apply
-                                + ":" + schedule7ActivitiesSelected + ":" + doesSchedule9Paragraph4Apply, matchingAllowedOrRefusedCondition
-                                .getOptionalErrorMessage(questionService, caseData).isEmpty());
+                            Assertions.assertTrue(matchingAllowedOrRefusedCondition
+                                .getOptionalErrorMessage(questionService, caseData).isEmpty(), "Unexpected error for:" + points + ":" + wcaAppeal + ":" + doesSchedule8Paragraph4Apply
+                                + ":" + schedule7ActivitiesSelected + ":" + doesSchedule9Paragraph4Apply);
 
 
                             // Assert that for a valid allowed/refused condition, we can always retrieve a single scenario
                             // which we will use to generate content
                             UcScenario scenario = matchingAllowedOrRefusedCondition.getUcScenario(caseData);
-                            Assert.assertNotNull(scenario);
+                            Assertions.assertNotNull(scenario);
 
                         } else {
-                            Assert.assertTrue("Expected an error for:" + points + ":" + wcaAppeal + ":" + doesSchedule8Paragraph4Apply
-                                + ":" + schedule7ActivitiesSelected + ":" + doesSchedule9Paragraph4Apply, matchingAllowedOrRefusedCondition
-                                .getOptionalErrorMessage(questionService, caseData).isPresent());
+                            Assertions.assertTrue(matchingAllowedOrRefusedCondition
+                                .getOptionalErrorMessage(questionService, caseData).isPresent(), "Expected an error for:" + points + ":" + wcaAppeal + ":" + doesSchedule8Paragraph4Apply
+                                + ":" + schedule7ActivitiesSelected + ":" + doesSchedule9Paragraph4Apply);
                         }
 
                     }
@@ -345,14 +339,14 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
         }
     }
 
-    @Test
+    @ParameterizedTest
     public void testAllPointsConditionAttributesAreNotNull() {
         for (UcPointsRegulationsAndSchedule7ActivitiesCondition ucPointsCondition : UcPointsRegulationsAndSchedule7ActivitiesCondition.values()) {
-            Assert.assertNotNull(ucPointsCondition.getAnswersExtractor());
-            Assert.assertSame(ucPointsCondition.getAnswersExtractor(), UcPointsRegulationsAndSchedule7ActivitiesCondition.getAllAnswersExtractor());
-            Assert.assertNotNull(ucPointsCondition.getEnumClass());
-            Assert.assertEquals(UcPointsRegulationsAndSchedule7ActivitiesCondition.class, ucPointsCondition.getEnumClass());
-            Assert.assertNotNull(ucPointsCondition.getPointsRequirementCondition());
+            Assertions.assertNotNull(ucPointsCondition.getAnswersExtractor());
+            Assertions.assertSame(ucPointsCondition.getAnswersExtractor(), UcPointsRegulationsAndSchedule7ActivitiesCondition.getAllAnswersExtractor());
+            Assertions.assertNotNull(ucPointsCondition.getEnumClass());
+            Assertions.assertEquals(UcPointsRegulationsAndSchedule7ActivitiesCondition.class, ucPointsCondition.getEnumClass());
+            Assertions.assertNotNull(ucPointsCondition.getPointsRequirementCondition());
         }
     }
 }

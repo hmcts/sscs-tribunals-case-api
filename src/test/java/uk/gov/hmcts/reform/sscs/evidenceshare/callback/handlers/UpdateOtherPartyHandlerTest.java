@@ -3,8 +3,7 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
@@ -17,11 +16,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.function.Consumer;
-import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -34,7 +33,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 
-@RunWith(JUnitParamsRunner.class)
 public class UpdateOtherPartyHandlerTest {
 
     UpdateOtherPartyHandler handler;
@@ -55,7 +53,7 @@ public class UpdateOtherPartyHandlerTest {
     @Captor
     private ArgumentCaptor<Consumer<SscsCaseDetails>> consumerArgumentCaptor;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
 
@@ -69,7 +67,7 @@ public class UpdateOtherPartyHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
 
-    @Test
+    @ParameterizedTest
     public void givenAValidSubmittedEvent_thenReturnTrue() {
         assertTrue(handler.canHandle(SUBMITTED, HandlerHelper.buildTestCallbackForGivenData(
             SscsCaseData.builder()
@@ -81,8 +79,8 @@ public class UpdateOtherPartyHandlerTest {
                     .build()).build(), INTERLOCUTORY_REVIEW_STATE, UPDATE_OTHER_PARTY_DATA)));
     }
 
-    @Test
-    @Parameters(method = "generateAllPossibleOtherPartyWithHearingOptions")
+    @ParameterizedTest
+    @MethodSource("generateAllPossibleOtherPartyWithHearingOptions")
     public void givenFqpmSetAndDueDateSetAndAllOtherPartyHearingOptionsSet_thenCaseStateIsReadyToList(HearingOptions hearingOptions) {
 
         final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
@@ -104,8 +102,8 @@ public class UpdateOtherPartyHandlerTest {
         assertThat(sscsCaseDetails.getData().getDirectionDueDate(), is(nullValue()));
     }
 
-    @Test
-    @Parameters(method = "generateAllPossibleOtherPartyWithHearingOptions")
+    @ParameterizedTest
+    @MethodSource("generateAllPossibleOtherPartyWithHearingOptions")
     public void givenFqpmSetAndNoDueDateSetAndAllOtherPartyHearingOptionsSet_thenCaseStateIsReadyToList(HearingOptions hearingOptions) {
 
         final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
@@ -124,6 +122,7 @@ public class UpdateOtherPartyHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"YES", "NO"})
     public void givenFqpmSetAndNoDueDateSetAndNotAllOtherPartyHearingOptionsSet_thenCaseStateIsReadyToList(String isFqpmRequired) {
 
@@ -145,6 +144,7 @@ public class UpdateOtherPartyHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"YES", "NO"})
     public void givenFqpmSetAndDueDateSetAndNotAllOtherPartyHearingOptionsSet_thenCaseStateIsNotListable(String isFqpmRequired) {
 
@@ -164,7 +164,7 @@ public class UpdateOtherPartyHandlerTest {
             eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenNoFqpmSetAndNoDueDateSetAndNotAllOtherPartyHearingOptionsSet_thenCaseStateIsNotListable() {
 
         final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
@@ -182,7 +182,7 @@ public class UpdateOtherPartyHandlerTest {
             eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenNoFqpmSetAndDueDateSetAndNotAllOtherPartyHearingOptionsSet_thenCaseStateIsNotListable() {
 
         final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
@@ -200,8 +200,8 @@ public class UpdateOtherPartyHandlerTest {
             eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
     }
 
-    @Test
-    @Parameters(method = "generateAllPossibleOtherPartyWithHearingOptions")
+    @ParameterizedTest
+    @MethodSource("generateAllPossibleOtherPartyWithHearingOptions")
     public void givenNoFqpmSetAndNoDueDateSetAndAllOtherPartyHearingOptionsSet_thenCaseStateIsNotListable(HearingOptions hearingOptions) {
 
         final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
@@ -220,6 +220,7 @@ public class UpdateOtherPartyHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPEAL_CREATED, 1", "DORMANT_APPEAL_STATE, 0", "DRAFT, 1", "DRAFT_ARCHIVED, 1",
         "HEARING, 1", "INCOMPLETE_APPLICATION, 1", "INCOMPLETE_APPLICATION_INFORMATION_REQUESTED, 1",
         "INTERLOCUTORY_REVIEW_STATE, 1", "POST_HEARING, 1", "READY_TO_LIST, 1", "RESPONSE_RECEIVED, 0",
@@ -240,7 +241,7 @@ public class UpdateOtherPartyHandlerTest {
             eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
     }
 
-    private Object[] generateAllPossibleOtherPartyWithHearingOptions() {
+    private static Object[] generateAllPossibleOtherPartyWithHearingOptions() {
         return new Object[]{
             new Object[]{
                 HearingOptions.builder().wantsToAttend("Yes").build()

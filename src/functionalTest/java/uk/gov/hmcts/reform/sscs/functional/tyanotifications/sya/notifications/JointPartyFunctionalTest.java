@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.functional.tyanotifications.sya.notifications;
 
 import static org.apache.commons.lang3.StringUtils.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
 
 import java.io.IOException;
@@ -10,10 +10,10 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.reform.sscs.functional.tyanotifications.AbstractFunctionalTest;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.service.notify.Notification;
@@ -84,9 +84,9 @@ public class JointPartyFunctionalTest extends AbstractFunctionalTest {
     }
 
     // TODO: SSCS-11436
-    @Test
-    @Ignore
-    @Parameters(method = "eventTypeAndSubscriptions")
+    @ParameterizedTest
+    @Disabled
+    @MethodSource("eventTypeAndSubscriptions")
     public void givenEventAndJointPartySubscription_shouldSendNotificationToJointParty(
         NotificationEventType notificationEventType, @Nullable String hearingType,
         int expectedNumberOfLetters, boolean isDocmosisLetter)
@@ -132,7 +132,7 @@ public class JointPartyFunctionalTest extends AbstractFunctionalTest {
         }
     }
 
-    @Test
+    @ParameterizedTest
     public void sendsDirectionIssuedProvideInformationLetterToAppellantRepresentativeAndJointParty() throws IOException, NotificationClientException {
 
         NotificationEventType notificationEventType = NotificationEventType.DIRECTION_ISSUED;
@@ -164,7 +164,7 @@ public class JointPartyFunctionalTest extends AbstractFunctionalTest {
     }
 
     @SuppressWarnings({"Indentation", "unused"})
-    private Object[] eventTypeAndSubscriptions() {
+    private static Object[] eventTypeAndSubscriptions() {
         final int expectedNumberOfLettersIsThree = 3;
         final int expectedNumberOfLettersIsTwo = 2;
         final int expectedNumberOfLettersIsOne = 1;

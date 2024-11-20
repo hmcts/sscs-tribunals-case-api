@@ -6,11 +6,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasProperty;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -35,13 +31,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -78,7 +74,6 @@ import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
 
-@RunWith(JUnitParamsRunner.class)
 public class DwpUploadResponseAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     public static final int UUID_SIZE = 36;
@@ -103,7 +98,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     private AddedDocumentsUtil addedDocumentsUtil;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         addedDocumentsUtil = new AddedDocumentsUtil(false);
 
@@ -138,12 +133,12 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
     }
 
-    @Test
+    @ParameterizedTest
     public void givenADwpUploadResponseEvent_thenReturnTrue() {
         assertTrue(dwpUploadResponseAboutToSubmitHandler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenANonDwpUploadResponseEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
@@ -151,14 +146,14 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     }
 
-    @Test
+    @ParameterizedTest
     public void givenADwpUploadResponseEvent_thenSetCaseCode() {
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals("022CC", response.getData().getCaseCode());
         assertEquals(LocalDate.now().toString(), response.getData().getDwpResponseDate());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenADwpUploadResponseEventWithEmptyBenefitCode_displayAnError() {
         callback.getCaseDetails().getCaseData().setBenefitCode(null);
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -170,7 +165,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         }
     }
 
-    @Test
+    @ParameterizedTest
     public void givenADwpUploadResponseEventWithEmptyIssueCode_displayAnError() {
         callback.getCaseDetails().getCaseData().setIssueCode(null);
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -182,7 +177,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         }
     }
 
-    @Test
+    @ParameterizedTest
     public void givenADwpUploadResponseEventWithEmptyDwpResponseDoc_displayAnError() {
         callback.getCaseDetails().getCaseData().setDwpResponseDocument(null);
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -192,7 +187,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("FTA response document cannot be empty.", response.getErrors().iterator().next());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenADwpUploadResponseEventWithEmptyDwpEvidenceBundle_displayAnError() {
         callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(null);
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -202,7 +197,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("FTA evidence bundle cannot be empty.", response.getErrors().iterator().next());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenADwpUploadResponseEventWithDwpFurtherInfoIsNo_assertNoErrors() {
         callback.getCaseDetails().getCaseData().setDwpFurtherInfo("No");
 
@@ -212,14 +207,14 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(NO, response.getData().getHasUnprocessedAudioVideoEvidence());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenADwpUploadResponseEventWithExistingAudioVideoEvidence_assertFlagIsSet() {
         callback.getCaseDetails().getCaseData().setAudioVideoEvidence(List.of(AudioVideoEvidence.builder().build()));
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(YES, response.getData().getHasUnprocessedAudioVideoEvidence());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenADwpUploadResponseEventWithIssueCodeSetToDD_displayAnError() {
         callback.getCaseDetails().getCaseData().setIssueCode("DD");
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -231,7 +226,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         }
     }
 
-    @Test
+    @ParameterizedTest
     public void givenADwpUploadResponseEventWithResponseDocumentsAndDwpDocumentsBundleFeatureFlagOn_assertRenameFilenameAndMoveDocumentsToDwpDocumentsCollection() {
 
         List<DwpDocument> existingDwpDocuments = new ArrayList();
@@ -348,7 +343,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(REVIEW_BY_JUDGE, response.getData().getInterlocReviewState());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenAUcCaseWithSingleElementSelected_thenSetCaseCodeToUs() {
         List<String> elementList = new ArrayList<>();
         elementList.add("testElement");
@@ -365,7 +360,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertNull(response.getData().getInterlocReviewState());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenAUcCaseWithMultipleElementSelected_thenSetCaseCodeToUm() {
         List<String> elementList = new ArrayList<>();
         elementList.add("testElement");
@@ -382,7 +377,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertNull(response.getData().getInterlocReviewState());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenUcCaseWithPheNoFurtherInfo_thenSetReviewByJudge() {
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder()
@@ -415,7 +410,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
 
-    @Test
+    @ParameterizedTest
     public void givenUcCaseWithPheNoFurtherInfo2ndCall_thenNoError() {
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder()
@@ -449,7 +444,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(LocalDate.now(), response.getData().getInterlocReferralDate());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenUcCaseWithPheYesFurtherInfo_thenDontReviewByJudge() {
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder()
@@ -482,7 +477,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(LocalDate.now(), response.getData().getInterlocReferralDate());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenUcCaseWithPhmeAndEditedEvidenceBundle_thenMustHaveEditedDwpResponseDoc() {
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder()
@@ -503,7 +498,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         }
     }
 
-    @Test
+    @ParameterizedTest
     public void givenUcCaseWithPhmeAndEditedResponse_thenMustHaveEditedDwpEvidenceBundle() {
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
         callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(DwpResponseDocument.builder()
@@ -524,7 +519,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         }
     }
 
-    @Test
+    @ParameterizedTest
     public void givenUcCaseWithAppendix12Document_thenMoveDocumentToDwpDocumentsCollection() {
         callback.getCaseDetails().getCaseData().setAppendix12Doc(DwpResponseDocument.builder().documentFileName("testA").documentLink(DocumentLink.builder().documentFilename("My document name.pdf").build()).build());
         List<DwpDocument> dwpResponseDocuments = new ArrayList<>();
@@ -555,8 +550,8 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         ));
     }
 
-    @Test
-    @Parameters(method = "emptyAppendix12Documents")
+    @ParameterizedTest
+    @MethodSource("emptyAppendix12Documents")
     public void givenEmptyAppendix12Document_thenDoNotMoveDocumentToDwpDocumentsCollection(@Nullable DwpResponseDocument dwpResponseDocument) {
         callback.getCaseDetails().getCaseData().setAppendix12Doc(dwpResponseDocument);
         callback.getCaseDetails().getCaseData().setDwpResponseDocument(dwpResponseDocument);
@@ -574,7 +569,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         };
     }
 
-    @Test
+    @ParameterizedTest
     public void givenUcbSelectedAndNoUcbDocument_displayAnError() {
         sscsCaseData.setDwpUcb(YES.getValue());
         sscsCaseData.setDwpUcbEvidenceDocument(null);
@@ -584,7 +579,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertThat(response.getErrors().iterator().next(), is("Please upload a UCB document"));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenUcbSelectedIsNo_thenTheFieldsAreCleared() {
         sscsCaseData.setDwpUcb(NO.getValue());
         sscsCaseData.setDwpUcbEvidenceDocument(getPdfDocument().getDocumentLink());
@@ -596,7 +591,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertThat(sscsCaseData.getDwpDocuments().size(), is(2));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenUcbSelectedAndUploadedUcbDoc_thenNoErrors() {
         sscsCaseData.setDwpUcb(YES.getValue());
         sscsCaseData.setDwpUcbEvidenceDocument(getPdfDocument().getDocumentLink());
@@ -608,7 +603,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertThat(sscsCaseData.getDwpDocuments().size(), is(3));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenHandleAudioVideoDocuments_thenItMovesToAudioVideoListAndFillsInFieldsSendToTcw() {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
                 .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename.mp4").build())
@@ -632,7 +627,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE, callback.getCaseDetails().getCaseData().getInterlocReferralReason());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenHandleAudioVideoDocumentsNoRip1_thenItMovesToAudioVideoListAndFillsInFieldsSendToTcw() {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
             .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename.mp4").build()).build();
@@ -646,7 +641,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(1, callback.getCaseDetails().getCaseData().getAudioVideoEvidence().size());
         AudioVideoEvidence audioVideoEvidence = callback.getCaseDetails().getCaseData().getAudioVideoEvidence().get(0);
         assertEquals("/url", audioVideoEvidence.getValue().getDocumentLink().getDocumentUrl());
-        assertNull("rip1", audioVideoEvidence.getValue().getRip1Document());
+        assertNull(audioVideoEvidence.getValue().getRip1Document(), "rip1");
         assertEquals("filename.mp4", audioVideoEvidence.getValue().getFileName());
         assertEquals(UploadParty.DWP, audioVideoEvidence.getValue().getPartyUploaded());
         assertNotNull(audioVideoEvidence.getValue().getDateAdded());
@@ -654,20 +649,20 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE, callback.getCaseDetails().getCaseData().getInterlocReferralReason());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenHandleNullAudioVideoDocuments_thenNoAudioVideoList() {
         dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData);
         assertNull(sscsCaseData.getAudioVideoEvidence());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenHandleEmptyAudioVideoDocuments_thenNoAudioVideoList() {
         sscsCaseData.setDwpUploadAudioVideoEvidence(Collections.emptyList());
         dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData);
         assertNull(sscsCaseData.getAudioVideoEvidence());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenExistingAudioVideo_thenItGetsAddedToListSendToTcw() {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
                 .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename.mp4").build())
@@ -691,7 +686,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE, callback.getCaseDetails().getCaseData().getInterlocReferralReason());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenHandleAudioVideoDocumentsAndPhme_thenItMovesToAudioVideoListAndFillsInFieldsSendToJudge() {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
                 .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename.mp4").build())
@@ -717,7 +712,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertNull(callback.getCaseDetails().getCaseData().getInterlocReferralReason());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenHandleAudioVideoDocumentsAndInterlocReviewStateAlreadyReviewByJudge_thenLeaveAsReviewByJudge() {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
                 .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename.mp4").build())
@@ -743,7 +738,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE, callback.getCaseDetails().getCaseData().getInterlocReferralReason());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenAudioVideoDocuments_shouldComputeCorrectAudioVideoTotals() throws JsonProcessingException {
         dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
             new AddNoteService(userDetailsService), new AddedDocumentsUtil(true));
@@ -793,7 +788,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
                 org.assertj.core.api.Assertions.entry("videoDocument", 1));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenPreExistingAudioVideoDocuments_shouldComputeCorrectAudioVideoTotalsForAvAddedThisEvent() throws JsonProcessingException {
         dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
             new AddNoteService(userDetailsService), new AddedDocumentsUtil(true));
@@ -845,7 +840,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             .containsOnly(org.assertj.core.api.Assertions.entry("videoDocument", 1));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenNoNewAudioVideoDocuments_shouldStillClearAddedDocuments() {
         dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
             new AddNoteService(userDetailsService), new AddedDocumentsUtil(true));
@@ -863,7 +858,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             .isNull();
     }
 
-    @Test
+    @ParameterizedTest
     public void givenADwpUploadResponseEventWithRemovedDwpDocumentsThenHandle() {
 
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(new DwpResponseDocument(null, null));
@@ -875,7 +870,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertTrue(response.getErrors().isEmpty());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenADwpUploadResponseEventWithRip1DocumentAndNoAvFile_displayAnError() {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(null)
                 .rip1Document(DocumentLink.builder().documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("surveillance").build()).build();
@@ -894,7 +889,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         }
     }
 
-    @Test
+    @ParameterizedTest
     public void givenADwpUploadResponseEventWithRip1DocumentAndAvFile_thenDoNotDisplayAnError() {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
                 .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename.mp4").build())
@@ -911,7 +906,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(0, response.getErrors().size());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenADwpUploadResponseEventWithAvFileAndNoRip1Document_thenDoNotDisplayAnError() {
         AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
                 .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename.mp4").build())
@@ -928,7 +923,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     }
 
-    @Test
+    @ParameterizedTest
     public void givenADwpUploadResponseEventWithEmptyDocument_thenHandleThisCorrectly() {
 
         callback.getCaseDetails().getCaseData().setDwpAT38Document(DwpResponseDocument.builder().build());
@@ -965,7 +960,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         return DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("0101").documentFilename("a.pdf").build()).build();
     }
 
-    @Test
+    @ParameterizedTest
     public void dwpResponseDocument_mustBeAPdf() {
         callback.getCaseDetails().getCaseData().setDwpResponseDocument(getMovieDocument());
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -973,7 +968,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertThat(response.getErrors().iterator().next(), is("FTA response document must be a PDF."));
     }
 
-    @Test
+    @ParameterizedTest
     public void dwpEvidenceBundleDocument_mustBeAPdf() {
         callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(getMovieDocument());
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -981,7 +976,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertThat(response.getErrors().iterator().next(), is("FTA evidence bundle must be a PDF."));
     }
 
-    @Test
+    @ParameterizedTest
     public void at38_mustBeAPdf() {
         callback.getCaseDetails().getCaseData().setDwpAT38Document(getMovieDocument());
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -989,7 +984,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertThat(response.getErrors().iterator().next(), is("FTA AT38 document must be a PDF."));
     }
 
-    @Test
+    @ParameterizedTest
     public void dwpEditedEvidenceDocument_mustBeAPdf() {
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(getPdfDocument());
@@ -999,7 +994,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertThat(response.getErrors().iterator().next(), is("FTA edited response document must be a PDF."));
     }
 
-    @Test
+    @ParameterizedTest
     public void dwpEditedEvidenceBundle_mustBeAPdf() {
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
         callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(getPdfDocument());
@@ -1009,7 +1004,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertThat(response.getErrors().iterator().next(), is("FTA edited evidence bundle must be a PDF."));
     }
 
-    @Test
+    @ParameterizedTest
     public void appendix12_mustBeAPdf() {
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
         callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(getPdfDocument());
@@ -1020,7 +1015,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertThat(response.getErrors().iterator().next(), is("Appendix 12 document must be a PDF."));
     }
 
-    @Test
+    @ParameterizedTest
     public void ucbEvidenceDocument_mustBeAPdf() {
         sscsCaseData.setDwpUcb(YES.getValue());
         sscsCaseData.setDwpUcbEvidenceDocument(getMovieDocument().getDocumentLink());
@@ -1030,7 +1025,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertThat(response.getErrors().iterator().next(), is("UCB document must be a PDF."));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenADwpUploadResponseEventPhmeChildSupportThenErrorAdded() {
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
@@ -1048,7 +1043,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
                 is("Potential harmful evidence is not a valid selection for child support cases"));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenADwpUploadResponseEventChildSupConfNonChildSupportThenNoErrorAdded() {
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
@@ -1067,7 +1062,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
                 is("Child support - Confidentiality is not a valid selection for this case"));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenADwpUploadResponseEventPhmeNonChildSupportThenNoErrorAdded() {
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
@@ -1084,7 +1079,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(0, response.getErrors().size());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenADwpUploadResponseEventChildSupConfChildSupportThenNoErrorAdded() {
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
@@ -1118,7 +1113,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertThat(response.getErrors().iterator().next(), is("Benefit code cannot be changed on cases with registered 'Other Party'"));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenChildSupportCaseAndCaseCodeIsChangedToNonChildSupportCodeAndCaseHasNoOtherParty_thenShowWarning() {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         sscsCaseData.setBenefitCode("001");
@@ -1132,6 +1127,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"022", "023", "024", "025", "026", "028"})
     public void givenChildSupportCaseAndCaseCodeIsSetToChildSupportCode_thenNoWarningOrErrorIsShown(String childSupportBenefitCode) {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
@@ -1144,7 +1140,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertThat(response.getWarnings().size(), is(0));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenChildSupportCaseAndCaseCodeIsAlreadyANonChildSupportCase_thenShowErrorOrWarning() {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         sscsCaseData.setBenefitCode("001");
@@ -1156,7 +1152,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertThat(response.getWarnings().size(), is(0));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenOtherPartiesUcbIsYes_thenUpdateCasedataOtherPartyUcb() {
         sscsCaseData.setOtherParties(Arrays.asList(buildOtherParty(ID_2), buildOtherParty(ID_1)));
         sscsCaseData.getAppeal().getBenefitType().setCode("childSupport");
@@ -1165,7 +1161,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(YesNo.YES.getValue(), response.getData().getOtherPartyUcb());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenNewOtherPartyAdded_thenAssignAnId() {
         sscsCaseData.setOtherParties(Arrays.asList(
             buildOtherPartyWithAppointeeAndRep(null, null, null)));
@@ -1184,7 +1180,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             });
     }
 
-    @Test
+    @ParameterizedTest
     public void givenExistingOtherParties_thenNewOtherPartyAssignedNewId() {
         sscsCaseData.setOtherParties(Arrays.asList(
             buildOtherParty(ID_2),
@@ -1219,7 +1215,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             .isEqualTo(DateTimeUtils.generateDwpResponseDueDate(NEW_OTHER_PARTY_RESPONSE_DUE_DAYS));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenExistingOtherPartiesWithAppointeeAndRep_thenNewOtherPartyAssignedNewId() {
         sscsCaseData.setOtherParties(Arrays.asList(
             buildOtherParty(ID_2),
@@ -1253,7 +1249,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             });
     }
 
-    @Test
+    @ParameterizedTest
     public void givenExistingOtherParties_thenNewOtherPartyAppointeeAndRepAssignedNewId() {
         sscsCaseData.setOtherParties(Arrays.asList(
             buildOtherPartyWithAppointeeAndRep(ID_2, null, null),
@@ -1307,7 +1303,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
                 .build();
     }
 
-    @Test
+    @ParameterizedTest
     public void givenChildSupportCaseAppellantWantsConfidentialWithEditedDocs_thenNoError() {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequired(YES).build());
@@ -1325,6 +1321,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
         "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
     public void givenChildSupportCaseAppellantWantsConfidentialNoEditedDocs_thenShowError(String shortName) {
@@ -1341,7 +1338,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertThat(YES, is(response.getData().getIsConfidentialCase()));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenChildSupportCaseOtherPartyWantsConfidentialWithEditedDocs_thenNoError() {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequired(NO).build());
@@ -1365,6 +1362,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
         "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
     public void givenChildSupportCaseOtherPartyWantsConfidentialNoEditedDocs_thenShowError(String shortName) {
@@ -1387,6 +1385,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
         "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
     public void givenChildSupportCaseAppellantAndOtherPartyWantsConfidentialNoEditedDocs_thenShow2Error(String shortName) {
@@ -1411,6 +1410,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
         "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
     public void givenChildSupportCaseThatIsNotConfidentialNoEditedDocs_thenNoWarning(String shortName) {
@@ -1426,6 +1426,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
     public void givenSscs5CaseAndCaseCodeIsSetToSscs5Code_thenNoErrorIsShown(String sscs5BenefitCode) {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("taxCredit").build());
@@ -1439,6 +1440,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
     public void givenSscs5CaseAndCaseCodeIsChangedToNonSscs5_thenShowError(String sscs5BenefitCode) {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("guardiansAllowance").build());
@@ -1453,6 +1455,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
     public void givenNonSscs5CaseAndCaseCodeIsSetToSscs5Code_thenErrorIsShown(String sscs5BenefitCode) {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
@@ -1466,7 +1469,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("Benefit code cannot be changed to the selected code", response.getErrors().stream().findFirst().get());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDynamicDwpStateHasBeenChosen_thenSetDwpState() {
         sscsCaseData.setDynamicDwpState(new DynamicList("Withdrawn"));
 

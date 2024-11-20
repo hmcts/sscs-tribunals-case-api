@@ -85,8 +85,7 @@ public class HmcHearingsEventTopicListener {
         } catch (JsonProcessingException | CaseException | MessageProcessingException
                  | HearingUpdateException | ExhaustedRetryException ex) {
             log.error("Unable to successfully deliver HMC message: {}", convertedMessage, ex);
-            throw new HmcEventProcessingException(String.format(
-                "Unable to successfully deliver HMC message: %s",
+            throw new HmcEventProcessingException("Unable to successfully deliver HMC message: %s".formatted(
                 convertedMessage
             ), ex);
         }

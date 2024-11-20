@@ -1,24 +1,24 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service.reminder;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.HEARING_REMINDER;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.POSTPONEMENT;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobNotFoundException;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobRemover;
 import uk.gov.hmcts.reform.sscs.tyanotifications.SscsCaseDataUtils;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class HearingReminderRemoverTest {
 
     @Mock
@@ -28,7 +28,7 @@ public class HearingReminderRemoverTest {
 
     private HearingReminderRemover hearingReminderRemoverTest;
 
-    @Before
+    @BeforeEach
     public void setup() {
         hearingReminderRemoverTest = new HearingReminderRemover(
             jobGroupGenerator,

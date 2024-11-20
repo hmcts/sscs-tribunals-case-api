@@ -28,7 +28,6 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -62,9 +61,9 @@ public class CreateCaseController {
     private final IdamService idamService;
 
     public CreateCaseController(
-        @Autowired SubmitAppealServiceBase submitAppealServiceBase,
-        @Autowired CcdService ccdService,
-        @Autowired IdamService idamService
+        SubmitAppealServiceBase submitAppealServiceBase,
+        CcdService ccdService,
+        IdamService idamService
     ) {
         this.submitAppealServiceBase = submitAppealServiceBase;
         this.ccdService = ccdService;
@@ -84,10 +83,10 @@ public class CreateCaseController {
     @PostMapping(value = "/api/case", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, String>> createCase(
         @Parameter(description = "email address of the appellant must be unique in CCD", example = "foo@bar.com", required = true)
-        @RequestParam("email")String email,
+        @RequestParam String email,
         @Parameter(description = "mobile number of appellant. Optional if not set will not subscribe for sms.")
-        @RequestParam(value = "mobile", required = false) String mobile,
-        @RequestParam(value = "hearingType", defaultValue = "oral") String hearingType
+        @RequestParam(required = false) String mobile,
+        @RequestParam(defaultValue = "oral") String hearingType
     ) throws URISyntaxException {
         SscsCaseDetails caseDetails = ccdService.createCase(
             createSscsCase(email, mobile, hearingType),

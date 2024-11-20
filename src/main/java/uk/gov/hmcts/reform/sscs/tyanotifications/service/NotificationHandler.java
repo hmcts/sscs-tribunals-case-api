@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 import java.net.UnknownHostException;
 import java.time.ZonedDateTime;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.jobscheduler.model.Job;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobScheduler;
@@ -22,7 +21,6 @@ public class NotificationHandler {
     private final JobScheduler jobScheduler;
     private final JobGroupGenerator jobGroupGenerator;
 
-    @Autowired
     public NotificationHandler(OutOfHoursCalculator outOfHoursCalculator, JobScheduler jobScheduler, JobGroupGenerator jobGroupGenerator) {
         this.outOfHoursCalculator = outOfHoursCalculator;
         this.jobScheduler = jobScheduler;

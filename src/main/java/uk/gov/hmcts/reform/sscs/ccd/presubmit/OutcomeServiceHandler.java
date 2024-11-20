@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -10,7 +9,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 @Service
 public class OutcomeServiceHandler extends EventToFieldPreSubmitCallbackHandler {
 
-    @Autowired
     public OutcomeServiceHandler() {
         super(createMappings());
     }

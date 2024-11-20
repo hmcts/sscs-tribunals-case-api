@@ -13,8 +13,8 @@ import static uk.gov.hmcts.reform.sscs.util.DataFixtures.someOnlineHearing;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CountryOfResidence;
@@ -32,7 +32,7 @@ public class CitizenControllerTest {
     private IdamService idamService;
     private UserDetails idamUserDetails;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         citizenLoginService = mock(CitizenLoginService.class);
         idamService = mock(IdamService.class);

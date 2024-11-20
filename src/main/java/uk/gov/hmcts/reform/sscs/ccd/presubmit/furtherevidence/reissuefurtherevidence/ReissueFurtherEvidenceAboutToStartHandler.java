@@ -101,7 +101,7 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
             if (doc instanceof SscsWelshDocument) {
                 filenameLabel = getBilingualLabel(doc);
             }
-            return String.format("%s -  %s", filenameLabel, userFriendlyName(doc.getValue().getDocumentType()));
+            return "%s -  %s".formatted(filenameLabel, userFriendlyName(doc.getValue().getDocumentType()));
         }
     }
 

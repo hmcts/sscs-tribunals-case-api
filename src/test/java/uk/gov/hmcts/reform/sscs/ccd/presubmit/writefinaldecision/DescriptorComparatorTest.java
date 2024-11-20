@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 
 public class DescriptorComparatorTest {
@@ -18,8 +18,8 @@ public class DescriptorComparatorTest {
 
         descriptors.sort(new DescriptorLexicographicalComparator());
 
-        Assert.assertEquals("a", descriptors.get(0).getActivityAnswerLetter());
-        Assert.assertEquals("b", descriptors.get(1).getActivityAnswerLetter());
+        Assertions.assertEquals("a", descriptors.get(0).getActivityAnswerLetter());
+        Assertions.assertEquals("b", descriptors.get(1).getActivityAnswerLetter());
 
     }
 
@@ -33,11 +33,11 @@ public class DescriptorComparatorTest {
 
         descriptors.sort(new DescriptorLexicographicalComparator());
 
-        Assert.assertEquals("2", descriptors.get(0).getActivityQuestionNumber());
-        Assert.assertEquals("a", descriptors.get(0).getActivityAnswerLetter());
+        Assertions.assertEquals("2", descriptors.get(0).getActivityQuestionNumber());
+        Assertions.assertEquals("a", descriptors.get(0).getActivityAnswerLetter());
 
-        Assert.assertEquals("3", descriptors.get(1).getActivityQuestionNumber());
-        Assert.assertEquals("b", descriptors.get(1).getActivityAnswerLetter());
+        Assertions.assertEquals("3", descriptors.get(1).getActivityQuestionNumber());
+        Assertions.assertEquals("b", descriptors.get(1).getActivityAnswerLetter());
 
     }
 
@@ -51,11 +51,11 @@ public class DescriptorComparatorTest {
 
         descriptors.sort(new DescriptorLexicographicalComparator());
 
-        Assert.assertEquals("2", descriptors.get(0).getActivityQuestionNumber());
-        Assert.assertEquals("a", descriptors.get(0).getActivityAnswerLetter());
+        Assertions.assertEquals("2", descriptors.get(0).getActivityQuestionNumber());
+        Assertions.assertEquals("a", descriptors.get(0).getActivityAnswerLetter());
 
-        Assert.assertEquals("3", descriptors.get(1).getActivityQuestionNumber());
-        Assert.assertEquals("a", descriptors.get(1).getActivityAnswerLetter());
+        Assertions.assertEquals("3", descriptors.get(1).getActivityQuestionNumber());
+        Assertions.assertEquals("a", descriptors.get(1).getActivityAnswerLetter());
 
     }
 

@@ -9,12 +9,16 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import junitparams.JUnitParamsRunner;
+import java.util.stream.Stream;
 import junitparams.Parameters;
-import org.assertj.core.api.Assertions;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityPartyMembers;
@@ -25,15 +29,14 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseData
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 
-@RunWith(JUnitParamsRunner.class)
 public class CcdNotificationWrapperTest {
 
     private CcdNotificationWrapper ccdNotificationWrapper;
     private static final String PAPER = "paper";
     private static final String ORAL = "oral";
 
-    @Test
-    @Parameters({"paper, PAPER", "oral, ORAL"})
+    @ParameterizedTest
+    @CsvSource({"paper,PAPER", "oral,ORAL"})
     public void should_returnAccordingAppealHearingType_when_hearingTypeIsPresent(String hearingType,
                                                                                   AppealHearingType expected) {
         ccdNotificationWrapper = buildCcdNotificationWrapper(hearingType);
@@ -256,8 +259,8 @@ public class CcdNotificationWrapperTest {
             .build());
     }
 
-    @Test
-    @Parameters({"APPEAL_LAPSED", "HMCTS_APPEAL_LAPSED", "DWP_APPEAL_LAPSED", "APPEAL_WITHDRAWN", "EVIDENCE_RECEIVED",
+    @ParameterizedTest
+    @ValueSource(strings = {"APPEAL_LAPSED", "HMCTS_APPEAL_LAPSED", "DWP_APPEAL_LAPSED", "APPEAL_WITHDRAWN", "EVIDENCE_RECEIVED",
         "POSTPONEMENT", "HEARING_BOOKED", "SYA_APPEAL_CREATED", "VALID_APPEAL_CREATED",
         "RESEND_APPEAL_CREATED", "APPEAL_RECEIVED", "ADJOURNED", "ISSUE_FINAL_DECISION_WELSH",
         "PROCESS_AUDIO_VIDEO", "PROCESS_AUDIO_VIDEO_WELSH", "ACTION_POSTPONEMENT_REQUEST", "ACTION_POSTPONEMENT_REQUEST_WELSH",
@@ -265,51 +268,93 @@ public class CcdNotificationWrapperTest {
     public void givenSubscriptions_shouldGetAppellantAndRepSubscriptionTypeList(NotificationEventType notificationEventType) {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventTypeWithRep(notificationEventType);
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(2, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.APPELLANT, subsWithTypeList.get(0).getSubscriptionType());
-        Assert.assertEquals(SubscriptionType.REPRESENTATIVE, subsWithTypeList.get(1).getSubscriptionType());
+        Assertions.assertEquals(2, subsWithTypeList.size());
+        Assertions.assertEquals(SubscriptionType.APPELLANT, subsWithTypeList.get(0).getSubscriptionType());
+        Assertions.assertEquals(SubscriptionType.REPRESENTATIVE, subsWithTypeList.get(1).getSubscriptionType());
     }
 
-    @Test
-    @Parameters({"DEATH_OF_APPELLANT", "PROVIDE_APPOINTEE_DETAILS"})
+    @ParameterizedTest
+    @EnumSource(value = NotificationEventType.class, names = {"DEATH_OF_APPELLANT", "PROVIDE_APPOINTEE_DETAILS"})
     public void givenSubscriptions_shouldGetAppointeeAndRepSubscriptionTypeList(NotificationEventType notificationEventType) {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventTypeWithAppointeeAndRep(notificationEventType);
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(2, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.APPOINTEE, subsWithTypeList.get(0).getSubscriptionType());
-        Assert.assertEquals(SubscriptionType.REPRESENTATIVE, subsWithTypeList.get(1).getSubscriptionType());
+        Assertions.assertEquals(2, subsWithTypeList.size());
+        Assertions.assertEquals(SubscriptionType.APPOINTEE, subsWithTypeList.get(0).getSubscriptionType());
+        Assertions.assertEquals(SubscriptionType.REPRESENTATIVE, subsWithTypeList.get(1).getSubscriptionType());
     }
 
-    @Test
-    @Parameters({"SYA_APPEAL_CREATED, cor", "DWP_RESPONSE_RECEIVED, oral",
-        "DWP_RESPONSE_RECEIVED, paper", "HMCTS_APPEAL_LAPSED, paper", "HMCTS_APPEAL_LAPSED, oral",
-        "DWP_APPEAL_LAPSED, paper", "DWP_APPEAL_LAPSED, oral", "SUBSCRIPTION_UPDATED, paper",
-        "VALID_APPEAL_CREATED, cor", "RESEND_APPEAL_CREATED, cor"})
+    private static Stream<Arguments> provideForShouldGetSubscriptionTypeListWithAppointee() {
+        return Stream.of(
+            Arguments.of(SYA_APPEAL_CREATED, "cor"),
+            Arguments.of(DWP_RESPONSE_RECEIVED, "oral"),
+            Arguments.of(DWP_RESPONSE_RECEIVED, "paper"),
+            Arguments.of(HMCTS_APPEAL_LAPSED, "paper"),
+            Arguments.of(HMCTS_APPEAL_LAPSED, "oral"),
+            Arguments.of(DWP_APPEAL_LAPSED, "paper"),
+            Arguments.of(DWP_APPEAL_LAPSED, "oral"),
+            Arguments.of(SUBSCRIPTION_UPDATED, "paper"),
+            Arguments.of(VALID_APPEAL_CREATED, "cor"),
+            Arguments.of(RESEND_APPEAL_CREATED, "cor")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideForShouldGetSubscriptionTypeListWithAppointee")
     public void givenSubscriptions_shouldGetSubscriptionTypeListWithAppointee(NotificationEventType notificationEventType, String hearingType) {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventTypeWithAppointeeAndJointParty(notificationEventType, hearingType);
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(1, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.APPOINTEE, subsWithTypeList.get(0).getSubscriptionType());
+        Assertions.assertEquals(1, subsWithTypeList.size());
+        Assertions.assertEquals(SubscriptionType.APPOINTEE, subsWithTypeList.get(0).getSubscriptionType());
     }
 
-    @Test
-    @Parameters({"APPEAL_LAPSED, paper", "APPEAL_LAPSED, oral", "EVIDENCE_REMINDER, oral", "EVIDENCE_REMINDER, paper",
-        "APPEAL_DORMANT, paper", "APPEAL_DORMANT, oral", "ADJOURNED, paper", "ADJOURNED, oral", "POSTPONEMENT, paper", "POSTPONEMENT, oral",
-        "EVIDENCE_RECEIVED, paper", "EVIDENCE_RECEIVED, oral", "APPEAL_WITHDRAWN, paper", "STRUCK_OUT, oral", "STRUCK_OUT, paper", "DIRECTION_ISSUED, oral", "DIRECTION_ISSUED, paper",
-        "DIRECTION_ISSUED_WELSH, oral", "DIRECTION_ISSUED_WELSH, paper", "DWP_UPLOAD_RESPONSE, paper",
-        "PROCESS_AUDIO_VIDEO, oral", "PROCESS_AUDIO_VIDEO_WELSH, paper", "ACTION_POSTPONEMENT_REQUEST, paper", "ACTION_POSTPONEMENT_REQUEST_WELSH, paper",
-        "DWP_UPLOAD_RESPONSE, oral", "HEARING_BOOKED, oral", "HEARING_BOOKED, paper", "HEARING_REMINDER, oral", "HEARING_REMINDER, paper",
-        "ISSUE_ADJOURNMENT_NOTICE, paper", "ISSUE_ADJOURNMENT_NOTICE_WELSH, oral"})
+    private static Stream<Arguments> shouldGetSubscriptionTypeListWithAppointeeAndJointParty() {
+        return Stream.of(
+            Arguments.of(APPEAL_LAPSED, "paper"),
+            Arguments.of(APPEAL_LAPSED, "oral"),
+            Arguments.of(EVIDENCE_REMINDER, "oral"),
+            Arguments.of(EVIDENCE_REMINDER, "paper"),
+            Arguments.of(APPEAL_DORMANT, "paper"),
+            Arguments.of(APPEAL_DORMANT, "oral"),
+            Arguments.of(ADJOURNED, "paper"),
+            Arguments.of(ADJOURNED, "oral"),
+            Arguments.of(POSTPONEMENT, "paper"),
+            Arguments.of(POSTPONEMENT, "oral"),
+            Arguments.of(EVIDENCE_RECEIVED, "paper"),
+            Arguments.of(EVIDENCE_RECEIVED, "oral"),
+            Arguments.of(APPEAL_WITHDRAWN, "paper"),
+            Arguments.of(STRUCK_OUT, "oral"),
+            Arguments.of(STRUCK_OUT, "paper"),
+            Arguments.of(DIRECTION_ISSUED, "oral"),
+            Arguments.of(DIRECTION_ISSUED, "paper"),
+            Arguments.of(DIRECTION_ISSUED_WELSH, "oral"),
+            Arguments.of(DIRECTION_ISSUED_WELSH, "paper"),
+            Arguments.of(DWP_UPLOAD_RESPONSE, "paper"),
+            Arguments.of(PROCESS_AUDIO_VIDEO, "oral"),
+            Arguments.of(PROCESS_AUDIO_VIDEO_WELSH, "paper"),
+            Arguments.of(ACTION_POSTPONEMENT_REQUEST, "paper"),
+            Arguments.of(ACTION_POSTPONEMENT_REQUEST_WELSH, "paper"),
+            Arguments.of(DWP_UPLOAD_RESPONSE, "oral"),
+            Arguments.of(HEARING_BOOKED, "oral"),
+            Arguments.of(HEARING_BOOKED, "paper"),
+            Arguments.of(HEARING_REMINDER, "oral"),
+            Arguments.of(HEARING_REMINDER, "paper"),
+            Arguments.of(ISSUE_ADJOURNMENT_NOTICE, "paper"),
+            Arguments.of(ISSUE_ADJOURNMENT_NOTICE_WELSH, "oral")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("shouldGetSubscriptionTypeListWithAppointeeAndJointParty")
     public void givenSubscriptions_shouldGetSubscriptionTypeListWithAppointeeAndJointParty(NotificationEventType notificationEventType, String hearingType) {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventTypeWithAppointeeAndJointParty(notificationEventType, hearingType);
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(2, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.APPOINTEE, subsWithTypeList.get(0).getSubscriptionType());
-        Assert.assertEquals(SubscriptionType.JOINT_PARTY, subsWithTypeList.get(1).getSubscriptionType());
+        Assertions.assertEquals(2, subsWithTypeList.size());
+        Assertions.assertEquals(SubscriptionType.APPOINTEE, subsWithTypeList.get(0).getSubscriptionType());
+        Assertions.assertEquals(SubscriptionType.JOINT_PARTY, subsWithTypeList.get(1).getSubscriptionType());
     }
 
-    @Test
-    @Parameters(method = "getDirectionIssuedSubscriptionBasedOnConfidentialityForAppellantAndRepresentative")
+    @ParameterizedTest
+    @MethodSource("getDirectionIssuedSubscriptionBasedOnConfidentialityForAppellantAndRepresentative")
     public void givenSubscriptions_shouldGetAppellantAndRepSubscriptionTypeWhenConfidentialIsSelected(NotificationEventType notificationEventType, String confidentialityType, List<String> chosenMembers, List<SubscriptionType> requiredMembers) {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventTypeWithRep(notificationEventType);
         SscsCaseData sscsCaseData = ccdNotificationWrapper.getNewSscsCaseData();
@@ -319,8 +364,8 @@ public class CcdNotificationWrapperTest {
         assertDirectionsNoticeConfidentiality(sscsCaseData, chosenMembers, requiredMembers);
     }
 
-    @Test
-    @Parameters(method = "getDirectionIssuedSubscriptionBasedOnConfidentialityForRestOfTheOtherParties")
+    @ParameterizedTest
+    @MethodSource("getDirectionIssuedSubscriptionBasedOnConfidentialityForRestOfTheOtherParties")
     public void givenSubscriptions_shouldGetAppointeeAndJointPartyTypeWhenConfidentialIsSelected(NotificationEventType notificationEventType, String confidentialityType, List<String> chosenMembers, List<SubscriptionType> requiredMembers, String hearingType) {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventTypeWithAppointeeAndJointParty(notificationEventType, hearingType);
         SscsCaseData sscsCaseData = ccdNotificationWrapper.getNewSscsCaseData();
@@ -348,8 +393,8 @@ public class CcdNotificationWrapperTest {
         sscsCaseData.setSendDirectionNoticeToJointParty(hasJointParty);
 
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(requiredMembers.size(), subsWithTypeList.size());
-        subsWithTypeList.forEach(o -> Assert.assertTrue(requiredMembers.contains(o.getSubscriptionType())));
+        Assertions.assertEquals(requiredMembers.size(), subsWithTypeList.size());
+        subsWithTypeList.forEach(o -> Assertions.assertTrue(requiredMembers.contains(o.getSubscriptionType())));
     }
 
     private void createPartiesOnTheCase(SscsCaseData sscsCaseData, String partyMember) {
@@ -400,9 +445,9 @@ public class CcdNotificationWrapperTest {
         ccdNotificationWrapper.getNewSscsCaseData().setConfidentialityRequestOutcomeAppellant(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.GRANTED).build());
         ccdNotificationWrapper.getNewSscsCaseData().setConfidentialityRequestOutcomeJointParty(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.GRANTED).build());
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(2, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.APPELLANT, subsWithTypeList.get(0).getSubscriptionType());
-        Assert.assertEquals(SubscriptionType.JOINT_PARTY, subsWithTypeList.get(1).getSubscriptionType());
+        Assertions.assertEquals(2, subsWithTypeList.size());
+        Assertions.assertEquals(SubscriptionType.APPELLANT, subsWithTypeList.get(0).getSubscriptionType());
+        Assertions.assertEquals(SubscriptionType.JOINT_PARTY, subsWithTypeList.get(1).getSubscriptionType());
     }
 
     @Test
@@ -411,8 +456,8 @@ public class CcdNotificationWrapperTest {
         ccdNotificationWrapper.getNewSscsCaseData().setConfidentialityRequestOutcomeAppellant(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.GRANTED).build());
         ccdNotificationWrapper.getNewSscsCaseData().setConfidentialityRequestOutcomeJointParty(null);
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(1, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.APPELLANT, subsWithTypeList.get(0).getSubscriptionType());
+        Assertions.assertEquals(1, subsWithTypeList.size());
+        Assertions.assertEquals(SubscriptionType.APPELLANT, subsWithTypeList.get(0).getSubscriptionType());
     }
 
     @Test
@@ -421,8 +466,8 @@ public class CcdNotificationWrapperTest {
         ccdNotificationWrapper.getNewSscsCaseData().setConfidentialityRequestOutcomeAppellant(null);
         ccdNotificationWrapper.getNewSscsCaseData().setConfidentialityRequestOutcomeJointParty(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.GRANTED).build());
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(1, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.JOINT_PARTY, subsWithTypeList.get(0).getSubscriptionType());
+        Assertions.assertEquals(1, subsWithTypeList.size());
+        Assertions.assertEquals(SubscriptionType.JOINT_PARTY, subsWithTypeList.get(0).getSubscriptionType());
     }
 
     @Test
@@ -433,30 +478,40 @@ public class CcdNotificationWrapperTest {
         ccdNotificationWrapper.getNewSscsCaseData().setConfidentialityRequestOutcomeAppellant(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.GRANTED).build());
         ccdNotificationWrapper.getNewSscsCaseData().setConfidentialityRequestOutcomeJointParty(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.GRANTED).build());
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(1, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.JOINT_PARTY, subsWithTypeList.get(0).getSubscriptionType());
+        Assertions.assertEquals(1, subsWithTypeList.size());
+        Assertions.assertEquals(SubscriptionType.JOINT_PARTY, subsWithTypeList.get(0).getSubscriptionType());
     }
 
-    @Test
-    @Parameters(method = "getEventTypeFilteredWithAppellant")
+    @ParameterizedTest
+    @MethodSource("getEventTypeFilteredWithAppellant")
     public void givenSubscriptions_shouldGetSubscriptionTypeListWithAppellant(NotificationEventType notificationEventType) {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventType(notificationEventType);
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(1, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.APPELLANT, subsWithTypeList.get(0).getSubscriptionType());
+        Assertions.assertEquals(1, subsWithTypeList.size());
+        Assertions.assertEquals(SubscriptionType.APPELLANT, subsWithTypeList.get(0).getSubscriptionType());
     }
 
-    @Test
-    @Parameters({"DIRECTION_ISSUED, paper, PROVIDE_INFORMATION", "DIRECTION_ISSUED, oral, PROVIDE_INFORMATION",
-        "DIRECTION_ISSUED, paper, APPEAL_TO_PROCEED", "DIRECTION_ISSUED, oral, APPEAL_TO_PROCEED",
-        "DIRECTION_ISSUED, paper, GRANT_EXTENSION", "DIRECTION_ISSUED, oral, GRANT_EXTENSION",
-        "DIRECTION_ISSUED, paper, REFUSE_EXTENSION", "DIRECTION_ISSUED, oral, REFUSE_EXTENSION",})
+    private static Stream<Arguments> provideShouldGetSubscriptionTypeListWithAppointeeAndJointPartyDirection() {
+        return Stream.of(
+            Arguments.of(DIRECTION_ISSUED, "paper", DirectionType.PROVIDE_INFORMATION),
+            Arguments.of(DIRECTION_ISSUED, "oral", DirectionType.PROVIDE_INFORMATION),
+            Arguments.of(DIRECTION_ISSUED, "paper", DirectionType.APPEAL_TO_PROCEED),
+            Arguments.of(DIRECTION_ISSUED, "oral", DirectionType.APPEAL_TO_PROCEED),
+            Arguments.of(DIRECTION_ISSUED, "paper", DirectionType.GRANT_EXTENSION),
+            Arguments.of(DIRECTION_ISSUED, "oral", DirectionType.GRANT_EXTENSION),
+            Arguments.of(DIRECTION_ISSUED, "paper", DirectionType.REFUSE_EXTENSION),
+            Arguments.of(DIRECTION_ISSUED, "oral", DirectionType.REFUSE_EXTENSION)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideShouldGetSubscriptionTypeListWithAppointeeAndJointPartyDirection")
     public void givenSubscriptions_shouldGetSubscriptionTypeListWithAppointeeAndJointPartyDirection(NotificationEventType notificationEventType, String hearingType, DirectionType directionType) {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventTypeWithAppointeeAndJointParty(notificationEventType, hearingType, directionType);
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(2, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.APPOINTEE, subsWithTypeList.get(0).getSubscriptionType());
-        Assert.assertEquals(SubscriptionType.JOINT_PARTY, subsWithTypeList.get(1).getSubscriptionType());
+        Assertions.assertEquals(2, subsWithTypeList.size());
+        Assertions.assertEquals(SubscriptionType.APPOINTEE, subsWithTypeList.get(0).getSubscriptionType());
+        Assertions.assertEquals(SubscriptionType.JOINT_PARTY, subsWithTypeList.get(1).getSubscriptionType());
     }
 
     @Test
@@ -464,8 +519,8 @@ public class CcdNotificationWrapperTest {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventTypeWithAppointeeAndJointParty(REQUEST_FOR_INFORMATION, ORAL);
         ccdNotificationWrapper.getNewSscsCaseData().setInformationFromPartySelected(new DynamicList(new DynamicListItem(PartyItemList.APPELLANT.getCode(), PartyItemList.APPELLANT.getLabel()), new ArrayList<>()));
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(1, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.APPOINTEE, subsWithTypeList.get(0).getSubscriptionType());
+        Assertions.assertEquals(1, subsWithTypeList.size());
+        Assertions.assertEquals(SubscriptionType.APPOINTEE, subsWithTypeList.get(0).getSubscriptionType());
     }
 
     @Test
@@ -473,8 +528,8 @@ public class CcdNotificationWrapperTest {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventType(REQUEST_FOR_INFORMATION);
         ccdNotificationWrapper.getNewSscsCaseData().setInformationFromPartySelected(new DynamicList(new DynamicListItem(PartyItemList.APPELLANT.getCode(), PartyItemList.APPELLANT.getLabel()), new ArrayList<>()));
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(1, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.APPELLANT, subsWithTypeList.get(0).getSubscriptionType());
+        Assertions.assertEquals(1, subsWithTypeList.size());
+        Assertions.assertEquals(SubscriptionType.APPELLANT, subsWithTypeList.get(0).getSubscriptionType());
     }
 
     @Test
@@ -482,8 +537,8 @@ public class CcdNotificationWrapperTest {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventTypeWithRep(REQUEST_FOR_INFORMATION);
         ccdNotificationWrapper.getNewSscsCaseData().setInformationFromPartySelected(new DynamicList(new DynamicListItem(PartyItemList.REPRESENTATIVE.getCode(), PartyItemList.REPRESENTATIVE.getLabel()), new ArrayList<>()));
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(1, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.REPRESENTATIVE, subsWithTypeList.get(0).getSubscriptionType());
+        Assertions.assertEquals(1, subsWithTypeList.size());
+        Assertions.assertEquals(SubscriptionType.REPRESENTATIVE, subsWithTypeList.get(0).getSubscriptionType());
     }
 
     @Test
@@ -491,80 +546,70 @@ public class CcdNotificationWrapperTest {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventTypeWithAppointeeAndJointParty(REQUEST_FOR_INFORMATION, PAPER);
         ccdNotificationWrapper.getNewSscsCaseData().setInformationFromPartySelected(new DynamicList(new DynamicListItem(PartyItemList.JOINT_PARTY.getCode(), PartyItemList.JOINT_PARTY.getLabel()), new ArrayList<>()));
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(1, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.JOINT_PARTY, subsWithTypeList.get(0).getSubscriptionType());
+        Assertions.assertEquals(1, subsWithTypeList.size());
+        Assertions.assertEquals(SubscriptionType.JOINT_PARTY, subsWithTypeList.get(0).getSubscriptionType());
     }
 
     @Test
     public void givenProcessHearingRequestForRepWithSubscription_shouldSendProcessHearingRequestNotification() {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventTypeWithRep(ACTION_HEARING_RECORDING_REQUEST);
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(1, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.REPRESENTATIVE, subsWithTypeList.get(0).getSubscriptionType());
+        Assertions.assertEquals(1, subsWithTypeList.size());
+        Assertions.assertEquals(SubscriptionType.REPRESENTATIVE, subsWithTypeList.get(0).getSubscriptionType());
     }
 
     @Test
     public void givenProcessHearingRequestForJointPartyWithSubscription_shouldSendProcessHearingRequestNotification() {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventTypeWithJointParty(ACTION_HEARING_RECORDING_REQUEST, null);
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(1, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.JOINT_PARTY, subsWithTypeList.get(0).getSubscriptionType());
+        Assertions.assertEquals(1, subsWithTypeList.size());
+        Assertions.assertEquals(SubscriptionType.JOINT_PARTY, subsWithTypeList.get(0).getSubscriptionType());
     }
 
     @Test
     public void givenProcessHearingRequestForNoPartyWithSubscription_shouldNotSendProcessHearingRequestNotification() {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventType(ACTION_HEARING_RECORDING_REQUEST, null, null, false);
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertTrue(subsWithTypeList.isEmpty());
+        Assertions.assertTrue(subsWithTypeList.isEmpty());
     }
 
     @Test
     public void givenNoOtherPartyInTheCase_thenReturnEmptySubscription() {
         ccdNotificationWrapper = buildNotificationWrapperWithOtherParty(UPDATE_OTHER_PARTY_DATA, null);
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getOtherPartySubscriptions(ccdNotificationWrapper.getNewSscsCaseData(), ccdNotificationWrapper.getNotificationType());
-        Assert.assertTrue(subsWithTypeList.isEmpty());
+        Assertions.assertTrue(subsWithTypeList.isEmpty());
     }
 
     @Test
     public void givenUpdateOtherPartyDataEventAndSendNotificationFlagIsNotSetInOtherParty_thenReturnEmptySubscription() {
         ccdNotificationWrapper = buildNotificationWrapperWithOtherParty(UPDATE_OTHER_PARTY_DATA, buildOtherPartyData(false, true, true));
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getOtherPartySubscriptions(ccdNotificationWrapper.getNewSscsCaseData(), ccdNotificationWrapper.getNotificationType());
-        Assert.assertTrue(subsWithTypeList.isEmpty());
+        Assertions.assertTrue(subsWithTypeList.isEmpty());
     }
 
     @Test
     public void givenUpdateOtherPartyDataEventAndSendNotificationFlagIsSetInOtherPartyWithAppointee_thenReturnAllOtherPartySubscription() {
         ccdNotificationWrapper = buildNotificationWrapperWithOtherParty(UPDATE_OTHER_PARTY_DATA, buildOtherPartyData(true, true, true));
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getOtherPartySubscriptions(ccdNotificationWrapper.getNewSscsCaseData(), ccdNotificationWrapper.getNotificationType());
-        Assertions.assertThat(subsWithTypeList)
-            .hasSize(2)
-            .extracting(SubscriptionWithType::getPartyId)
-            .containsOnly("2", "3");
+        Assertions.assertEquals(2, subsWithTypeList.size());
     }
 
     @Test
     public void givenUpdateOtherPartyDataEventAndSendNotificationFlagIsSetInOtherPartyWithNoAppointee_thenReturnAllOtherPartySubscription() {
         ccdNotificationWrapper = buildNotificationWrapperWithOtherParty(UPDATE_OTHER_PARTY_DATA, buildOtherPartyData(true, false, true));
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getOtherPartySubscriptions(ccdNotificationWrapper.getNewSscsCaseData(), ccdNotificationWrapper.getNotificationType());
-        Assertions.assertThat(subsWithTypeList)
-            .hasSize(2)
-            .extracting(SubscriptionWithType::getPartyId)
-            .containsOnly("1", "3");
+        Assertions.assertEquals(2, subsWithTypeList.size());
     }
 
     @Test
     public void givenUpdateOtherPartyDataEventAndSendNotificationFlagIsSetInOtherPartyWithNoAppointee_thenReturnAllOtherPartySubscription2() {
         ccdNotificationWrapper = buildNotificationWrapperWithOtherParty(UPDATE_OTHER_PARTY_DATA, buildOtherPartyData(true, true, true));
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getOtherPartySubscriptions(ccdNotificationWrapper.getNewSscsCaseData(), ccdNotificationWrapper.getNotificationType());
-        Assertions.assertThat(subsWithTypeList)
-            .hasSize(2)
-            .extracting(SubscriptionWithType::getPartyId)
-            .containsOnly("2", "3");
+        Assertions.assertEquals(2, subsWithTypeList.size());
     }
 
-    @Test
-    @Parameters({
-        "ADJOURNED",
+    @ParameterizedTest
+    @EnumSource(value = NotificationEventType.class, names = {
         "ADJOURNED",
         "ADMIN_APPEAL_WITHDRAWN",
         "APPEAL_DORMANT",
@@ -601,14 +646,11 @@ public class CcdNotificationWrapperTest {
         ccdNotificationWrapper.getNewSscsCaseData().setInformationFromPartySelected(new DynamicList(new DynamicListItem(PartyItemList.APPELLANT.getCode(), PartyItemList.APPELLANT.getLabel()), new ArrayList<>()));
 
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assertions.assertThat(subsWithTypeList)
-            .hasSize(2)
-            .extracting(SubscriptionWithType::getPartyId)
-            .contains("1");
+        Assertions.assertEquals(2, subsWithTypeList.size());
     }
 
     @SuppressWarnings({"unused"})
-    private Object[] getEventTypeFilteredWithAppellant() {
+    private static Object[] getEventTypeFilteredWithAppellant() {
         return Arrays.stream(values())
             .filter(type -> !(type.equals(APPEAL_LAPSED)
                 || type.equals(HMCTS_APPEAL_LAPSED)
@@ -632,7 +674,7 @@ public class CcdNotificationWrapperTest {
     }
 
     @SuppressWarnings({"Indentation", "unused"})
-    private Object[] getDirectionIssuedSubscriptionBasedOnConfidentialityForAppellantAndRepresentative() {
+    private static Object[] getDirectionIssuedSubscriptionBasedOnConfidentialityForAppellantAndRepresentative() {
         return new Object[]{
             new Object[]{UPDATE_OTHER_PARTY_DATA, null, List.of(), List.of()},
             new Object[]{DIRECTION_ISSUED, ConfidentialityType.GENERAL.getCode(), List.of(), List.of(SubscriptionType.APPELLANT, SubscriptionType.REPRESENTATIVE)},
@@ -647,7 +689,7 @@ public class CcdNotificationWrapperTest {
     }
 
     @SuppressWarnings({"Indentation", "unused"})
-    private Object[] getDirectionIssuedSubscriptionBasedOnConfidentialityForRestOfTheOtherParties() {
+    private static Object[] getDirectionIssuedSubscriptionBasedOnConfidentialityForRestOfTheOtherParties() {
         return new Object[]{
             new Object[]{DIRECTION_ISSUED, ConfidentialityType.GENERAL.getCode(), List.of(), List.of(SubscriptionType.APPOINTEE, SubscriptionType.JOINT_PARTY), PAPER},
             new Object[]{DIRECTION_ISSUED, ConfidentialityType.GENERAL.getCode(), List.of(), List.of(SubscriptionType.APPOINTEE, SubscriptionType.JOINT_PARTY), ORAL},

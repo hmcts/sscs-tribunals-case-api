@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import lombok.Getter;
 import lombok.ToString;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
@@ -80,7 +80,7 @@ public enum SyaJsonMessageSerializer {
 
     private String getSerialisedMessage(String fileName) {
         try {
-            return new String(Files.readAllBytes(Paths.get("src/test/resources/sya/" + fileName)));
+            return new String(Files.readAllBytes(Path.of("src/test/resources/sya/" + fileName)));
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

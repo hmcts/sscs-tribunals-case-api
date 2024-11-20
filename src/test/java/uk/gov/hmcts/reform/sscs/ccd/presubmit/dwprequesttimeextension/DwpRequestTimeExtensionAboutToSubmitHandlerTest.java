@@ -1,7 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwprequesttimeextension;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.EXTENSION_REQUESTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.TIME_EXTENSION;
 
@@ -12,19 +13,26 @@ import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpResponseDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -32,9 +40,6 @@ public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
 
     @Spy
     private Callback<SscsCaseData> callback;
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
     private DwpRequestTimeExtensionAboutToSubmitHandler handler;
     private final DocumentLink expectedDocumentLink = DocumentLink.builder()
         .documentBinaryUrl("/BinaryUrl")
@@ -44,7 +49,7 @@ public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
 
     private DwpDocumentService dwpDocumentService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         dwpDocumentService = new DwpDocumentService();
         handler = new DwpRequestTimeExtensionAboutToSubmitHandler(dwpDocumentService);
@@ -52,6 +57,7 @@ public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
 
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "APPEAL_RECEIVED, ABOUT_TO_SUBMIT, false, true",
         "DWP_REQUEST_TIME_EXTENSION, ABOUT_TO_SUBMIT, true, true",
@@ -81,14 +87,15 @@ public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
         assertEquals(expected, actualResult);
     }
 
-    @Test(expected = NullPointerException.class)
+    @ParameterizedTest
     public void givenNullCallback_canHandleThrowException() {
-        handler.canHandle(CallbackType.ABOUT_TO_SUBMIT,
-            null);
+        assertThrows(NullPointerException.class, () ->
+            handler.canHandle(CallbackType.ABOUT_TO_SUBMIT,
+                null));
     }
 
-    @Test
-    @Parameters(method = "generateSscsCaseDataWithDifferentSscsDocumentLength")
+    @ParameterizedTest
+    @MethodSource("generateSscsCaseDataWithDifferentSscsDocumentLength")
     public void handle(@Nullable List<SscsDocument> sscsDocuments) {
         createTestData(sscsDocuments, EventType.DWP_REQUEST_TIME_EXTENSION, true);
 
@@ -128,7 +135,7 @@ public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
         callback = new Callback<>(caseDetails, Optional.empty(), eventType, false);
     }
 
-    public Object[] generateSscsCaseDataWithDifferentSscsDocumentLength() {
+    public static Object[] generateSscsCaseDataWithDifferentSscsDocumentLength() {
         SscsDocument sscs1Doc = SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
                 .documentLink(DocumentLink.builder()
@@ -161,13 +168,15 @@ public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
         };
     }
 
-    @Test(expected = IllegalStateException.class)
+    @ParameterizedTest
     public void givenUnHandleCallbackType_shouldThrowException() {
-        handler.handle(CallbackType.ABOUT_TO_START, callback, "user token");
+        assertThrows(IllegalStateException.class, () ->
+            handler.handle(CallbackType.ABOUT_TO_START, callback, "user token"));
     }
 
-    @Test(expected = NullPointerException.class)
+    @ParameterizedTest
     public void givenNullCallback_shouldThrowException() {
-        handler.handle(CallbackType.ABOUT_TO_SUBMIT, null, "user token");
+        assertThrows(NullPointerException.class, () ->
+            handler.handle(CallbackType.ABOUT_TO_SUBMIT, null, "user token"));
     }
 }

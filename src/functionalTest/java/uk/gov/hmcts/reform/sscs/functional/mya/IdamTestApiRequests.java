@@ -1,16 +1,16 @@
 package uk.gov.hmcts.reform.sscs.functional.mya;
 
-import static org.apache.http.client.methods.RequestBuilder.post;
-import static org.apache.http.entity.ContentType.APPLICATION_JSON;
+import static org.apache.hc.core5.http.io.support.ClassicRequestBuilder.post;
+import static org.apache.hc.core5.http.ContentType.APPLICATION_JSON;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Collections;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.entity.StringEntity;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.springframework.http.HttpStatus;
 
 public class IdamTestApiRequests {
@@ -42,6 +42,6 @@ public class IdamTestApiRequests {
                 .setEntity(new StringEntity(body, APPLICATION_JSON))
                 .build());
 
-        assertThat(httpResponse.getStatusLine().getStatusCode(), is(HttpStatus.CREATED.value()));
+        assertThat(httpResponse.getCode(), is(HttpStatus.CREATED.value()));
     }
 }

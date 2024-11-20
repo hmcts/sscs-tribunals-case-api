@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.tya;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.*;
 
@@ -13,9 +13,7 @@ import java.util.UUID;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
 import org.apache.pdfbox.io.IOUtils;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -28,8 +26,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -53,12 +49,6 @@ import uk.gov.service.notify.*;
 @ActiveProfiles("integration")
 @AutoConfigureMockMvc
 public class NotificationsItBase {
-    // Below rules are needed to use the junitParamsRunner together with SpringRunner
-    @ClassRule
-    public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
-
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
 
     protected MockMvc mockMvc;
 
@@ -141,7 +131,7 @@ public class NotificationsItBase {
 
     protected NotificationService service;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         NotificationSender sender = new NotificationSender(notificationClient, null, notificationTestRecipients, markdownTransformationService, saveCorrespondenceAsyncService, saveCorrespondence);
 

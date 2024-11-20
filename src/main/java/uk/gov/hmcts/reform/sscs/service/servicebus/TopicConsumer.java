@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.service.servicebus;
 
-import static java.lang.String.format;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 
 import lombok.extern.slf4j.Slf4j;
@@ -91,7 +90,7 @@ public class TopicConsumer {
                  | DwpAddressLookupException
                  | NoMrnDetailsException exception) {
             // unrecoverable. Catch to remove it from the queue.
-            log.error(format("Caught unrecoverable error: %s for message id %s", exception.getMessage(), messageId), exception);
+            log.error("Caught unrecoverable error: %s for message id %s".formatted(exception.getMessage(), messageId), exception);
         }
     }
 }

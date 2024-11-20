@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.procesaudiovideo;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -24,8 +24,8 @@ import java.util.Map;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -69,7 +69,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
 
     private SscsDocument expectedDocument;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
 
@@ -149,6 +149,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPEAL_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
     public void givenANonHandleEvidenceEvent_thenReturnFalse(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
@@ -161,6 +162,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
@@ -594,6 +596,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "SEND_TO_JUDGE", "SEND_TO_ADMIN"
     })
@@ -613,15 +616,17 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertThat(response.getData().getAppealNotePad().getNotesCollection().get(0), is(Note.builder().value(NoteDetails.builder().noteDate(LocalDate.now().toString()).noteDetail(note).author(userName).build()).build()));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void shouldAddNoteAndNoUserDetails_thenThrowsException() {
-        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenThrow(new IllegalStateException("Unable to obtain signed in user details"));
+        assertThrows(IllegalStateException.class, () -> {
+            when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenThrow(new IllegalStateException("Unable to obtain signed in user details"));
 
-        sscsCaseData.setProcessAudioVideoAction(new DynamicList(SEND_TO_ADMIN.getCode()));
-        final String note = "This is a note";
-        sscsCaseData.setTempNoteDetail(note);
+            sscsCaseData.setProcessAudioVideoAction(new DynamicList(SEND_TO_ADMIN.getCode()));
+            final String note = "This is a note";
+            sscsCaseData.setTempNoteDetail(note);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+            final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        });
     }
 
     @Test
@@ -674,6 +679,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ADMIT_EVIDENCE, AWAITING_INFORMATION, AWAITING_INFORMATION",
         "ADMIT_EVIDENCE, REVIEW_BY_JUDGE, REVIEW_BY_JUDGE",
         "ADMIT_EVIDENCE, AWAITING_ADMIN_ACTION, AWAITING_ADMIN_ACTION",

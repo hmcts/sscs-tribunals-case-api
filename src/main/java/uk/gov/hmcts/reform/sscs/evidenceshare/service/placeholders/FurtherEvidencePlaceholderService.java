@@ -7,7 +7,6 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -19,7 +18,6 @@ public class FurtherEvidencePlaceholderService {
 
     private final PlaceholderService placeholderService;
 
-    @Autowired
     public FurtherEvidencePlaceholderService(PlaceholderService placeholderService) {
         this.placeholderService = placeholderService;
     }

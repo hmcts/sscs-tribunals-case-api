@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.controller;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +19,6 @@ public class FunctionalTestController {
     private final AuthorisationService authorisationService;
     private final TopicConsumer consumer;
 
-    @Autowired
     public FunctionalTestController(AuthorisationService authorisationService, TopicConsumer consumer) {
         this.authorisationService = authorisationService;
         this.consumer = consumer;

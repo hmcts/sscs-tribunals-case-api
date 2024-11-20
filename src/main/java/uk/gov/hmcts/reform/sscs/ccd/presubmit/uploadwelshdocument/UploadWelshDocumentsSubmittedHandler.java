@@ -8,7 +8,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurth
 import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -28,7 +27,6 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
     private final CcdService ccdService;
     private final IdamService idamService;
 
-    @Autowired
     public UploadWelshDocumentsSubmittedHandler(CcdService ccdService, IdamService idamService) {
         this.ccdService = ccdService;
         this.idamService = idamService;

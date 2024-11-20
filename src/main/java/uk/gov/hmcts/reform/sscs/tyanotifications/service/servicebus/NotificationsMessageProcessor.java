@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service.servicebus;
 
-import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.getNotificationByCcdEvent;
@@ -72,7 +71,7 @@ public class NotificationsMessageProcessor {
                 messageId);
         } catch (Exception exception) {
             // unrecoverable. Catch to remove it from the queue.
-            log.error(format(" Message id %s Caught unrecoverable error: %s", exception.getMessage(), messageId), exception);
+            log.error(" Message id %s Caught unrecoverable error: %s".formatted(exception.getMessage(), messageId), exception);
         }
     }
 }

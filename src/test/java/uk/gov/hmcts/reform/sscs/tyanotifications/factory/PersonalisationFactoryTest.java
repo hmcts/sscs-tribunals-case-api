@@ -1,15 +1,15 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.factory;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DO_NOT_SEND;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SUBSCRIPTION_UPDATED;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -37,7 +37,7 @@ public class PersonalisationFactoryTest {
     @InjectMocks
     private PersonalisationFactory factory;
 
-    @Before
+    @BeforeEach
     public void setup() {
         openMocks(this);
     }
@@ -55,6 +55,7 @@ public class PersonalisationFactoryTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPEAL_LAPSED", "APPEAL_LAPSED", "DWP_APPEAL_LAPSED",
         "HMCTS_APPEAL_LAPSED", "APPEAL_WITHDRAWN", "APPEAL_DORMANT",
         "ADJOURNED", "POSTPONEMENT", "HEARING_BOOKED", "EVIDENCE_REMINDER",
@@ -69,6 +70,7 @@ public class PersonalisationFactoryTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"SYA_APPEAL_CREATED", "VALID_APPEAL_CREATED", "APPEAL_RECEIVED",
         "CASE_UPDATED"})
     public void createSyaAppealCreatedPersonalisationWhenNotificationApplied(NotificationEventType eventType) {

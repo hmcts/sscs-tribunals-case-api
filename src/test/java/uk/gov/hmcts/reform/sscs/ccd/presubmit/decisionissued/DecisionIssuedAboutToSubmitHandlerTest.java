@@ -149,7 +149,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
         DwpState currentDwpState = response.getData().getDwpState();
         String assertionMsg = "dwpState value (%s) is not as expected (%s)";
-        assertEquals(expectedDwpState, currentDwpState, String.format(assertionMsg, currentDwpState, expectedDwpState));
+        assertEquals(expectedDwpState, currentDwpState, assertionMsg.formatted(currentDwpState, expectedDwpState));
         assertEquals(expectedInterlocReviewState, response.getData().getInterlocReviewState());
         assertNull(response.getData().getDirectionDueDate());
         verifyNoInteractions(hearingMessageHelper);

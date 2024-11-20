@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -17,22 +18,19 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.Reason;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaAppellant;
@@ -72,15 +70,8 @@ import uk.gov.hmcts.reform.sscs.model.draft.SessionTheHearing;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceBase;
 import uk.gov.hmcts.reform.sscs.service.v2.SubmitAppealService;
 
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(SpringExtension.class)
 public abstract class AbstractSyaControllerTest {
-
-    // being: it needed to run springRunner and junitParamsRunner
-    @ClassRule
-    public static final SpringClassRule SCR = new SpringClassRule();
-
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
     // end
 
 
@@ -97,7 +88,7 @@ public abstract class AbstractSyaControllerTest {
 
     abstract boolean v2SubmitAppealIsEnable();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         if (v2SubmitAppealIsEnable()) {
             controller = new SyaController(submitAppealServiceV2);
@@ -236,8 +227,8 @@ public abstract class AbstractSyaControllerTest {
                 .andExpect(status().isNoContent());
     }
 
-    @Test
-    @Parameters(method = "generateInvalidScenariosPut")
+    @ParameterizedTest
+    @MethodSource("generateInvalidScenariosPut")
     public void givenParameterIsNotValid_whenPutDraftIsCalled_shouldReturn204Response(String payload, String token)
         throws Exception {
         mockMvc.perform(put("/drafts")
@@ -247,8 +238,8 @@ public abstract class AbstractSyaControllerTest {
             .andExpect(status().isNoContent());
     }
 
-    @Test
-    @Parameters(method = "generateInvalidScenariosPost")
+    @ParameterizedTest
+    @MethodSource("generateInvalidScenariosPost")
     public void givenParameterIsNotValid_whenPostDraftIsCalled_shouldReturn204Response(String payload, String token)
             throws Exception {
         mockMvc.perform(post("/drafts")
@@ -258,8 +249,8 @@ public abstract class AbstractSyaControllerTest {
                 .andExpect(status().isNoContent());
     }
 
-    @Test
-    @Parameters(method = "generateInvalidScenariosDelete")
+    @ParameterizedTest
+    @MethodSource("generateInvalidScenariosDelete")
     public void givenParameterIsNotValid_whenArchiveDraftIsCalled_shouldReturn204Response(String payload, String token)
             throws Exception {
         mockMvc.perform(delete("/drafts/555")
@@ -269,21 +260,25 @@ public abstract class AbstractSyaControllerTest {
                 .andExpect(status().isNoContent());
     }
 
-    private Object[] generateInvalidScenariosPut() throws Exception {
+    private static Object[] generateInvalidScenariosPut() throws Exception {
 
         String validPayload = getSyaCaseWrapperJson("json/sya.json");
 
         String emptyPayload = "{}";
-        String noBenefitCode = "{\n"
-                + "  \"benefitType\": {\n"
-                + "    \"description\": \"Personal Independence Payment\"\n"
-                + "  }\n"
-                + "}";
-        String emptyBenefitCode = "{\n"
-                + "  \"benefitType\": {\n"
-                + "    \"code\": \"\"\n"
-                + "  }\n"
-                + "}";
+        String noBenefitCode = """
+            {
+              "benefitType": {
+                "description": "Personal Independence Payment"
+              }
+            }\
+            """;
+        String emptyBenefitCode = """
+            {
+              "benefitType": {
+                "code": ""
+              }
+            }\
+            """;
 
         String validUserToken = "Bearer myToken";
         String invalidUserToken = "";
@@ -296,29 +291,35 @@ public abstract class AbstractSyaControllerTest {
         };
     }
 
-    private Object[] generateInvalidScenariosPost() throws Exception {
+    private static Object[] generateInvalidScenariosPost() throws Exception {
 
         String validPayload = getSyaCaseWrapperJson("json/sya_with_ccdId.json");
 
         String emptyPayload = "{}";
-        String noBenefitCode = "{\n"
-                + "  \"benefitType\": {\n"
-                + "    \"description\": \"Personal Independence Payment\"\n"
-                + "  },\n"
-                + "  \"ccdId\": 1234 \n"
-                + "}";
-        String emptyBenefitCode = "{\n"
-                + "  \"benefitType\": {\n"
-                + "    \"code\": \"\"\n"
-                + "  },\n"
-                + "  \"ccdId\": 1234 \n"
-                + "}";
+        String noBenefitCode = """
+            {
+              "benefitType": {
+                "description": "Personal Independence Payment"
+              },
+              "ccdId": 1234\s
+            }\
+            """;
+        String emptyBenefitCode = """
+            {
+              "benefitType": {
+                "code": ""
+              },
+              "ccdId": 1234\s
+            }\
+            """;
 
-        String emptyCcdId = "{\n"
-                + "  \"benefitType\": {\n"
-                + "    \"code\": \"ESA\"\n"
-                + "  }\n"
-                + "}";
+        String emptyCcdId = """
+            {
+              "benefitType": {
+                "code": "ESA"
+              }
+            }\
+            """;
 
         String validUserToken = "Bearer myToken";
         String invalidUserToken = "";
@@ -332,16 +333,18 @@ public abstract class AbstractSyaControllerTest {
         };
     }
 
-    private Object[] generateInvalidScenariosDelete() throws Exception {
+    private static Object[] generateInvalidScenariosDelete() throws Exception {
 
         String validPayload = getSyaCaseWrapperJson("json/sya_with_ccdId.json");
 
         String emptyPayload = "{}";
-        String emptyCcdId = "{\n"
-                + "  \"benefitType\": {\n"
-                + "    \"code\": \"ESA\"\n"
-                + "  }\n"
-                + "}";
+        String emptyCcdId = """
+            {
+              "benefitType": {
+                "code": "ESA"
+              }
+            }\
+            """;
 
         String validUserToken = "Bearer myToken";
         String invalidUserToken = "";
@@ -673,45 +676,50 @@ public abstract class AbstractSyaControllerTest {
                 .andExpect(status().isNoContent());
     }
 
-    @Test(expected = NullPointerException.class)
-    public void testLoggingMethodNullBenefitType() throws Exception {
-        SyaAppellant appellant = new SyaAppellant();
-        appellant.setTitle("Mr");
-        appellant.setLastName("Lastname");
+    @Test
+    public void testLoggingMethodNullBenefitType() {
+        assertThrows(NullPointerException.class, () -> {
+            SyaAppellant appellant = new SyaAppellant();
+            appellant.setTitle("Mr");
+            appellant.setLastName("Lastname");
 
-        SyaContactDetails contactDetails = new SyaContactDetails();
-        contactDetails.setEmailAddress("appellant@test.com");
-        appellant.setContactDetails(contactDetails);
-        appellant.setNino("1234");
+            SyaContactDetails contactDetails = new SyaContactDetails();
+            contactDetails.setEmailAddress("appellant@test.com");
+            appellant.setContactDetails(contactDetails);
+            appellant.setNino("1234");
 
-        SyaCaseWrapper caseWithNullBenefitCode = new SyaCaseWrapper();
-        caseWithNullBenefitCode.setAppellant(appellant);
-        caseWithNullBenefitCode.setCcdCaseId("123456");
+            SyaCaseWrapper caseWithNullBenefitCode = new SyaCaseWrapper();
+            caseWithNullBenefitCode.setAppellant(appellant);
+            caseWithNullBenefitCode.setCcdCaseId("123456");
 
-        SyaReasonsForAppealing reasons = new SyaReasonsForAppealing();
-        Reason reason = new Reason();
-        reason.setReasonForAppealing("my reason");
-        reason.setWhatYouDisagreeWith("i disagree");
-        reasons.setReasons(Collections.singletonList(reason));
-        caseWithNullBenefitCode.setReasonsForAppealing(reasons);
+            SyaReasonsForAppealing reasons = new SyaReasonsForAppealing();
+            Reason reason = new Reason();
+            reason.setReasonForAppealing("my reason");
+            reason.setWhatYouDisagreeWith("i disagree");
+            reasons.setReasons(Collections.singletonList(reason));
+            caseWithNullBenefitCode.setReasonsForAppealing(reasons);
 
-        controller.createAppeals(null, caseWithNullBenefitCode);
+            controller.createAppeals(null, caseWithNullBenefitCode);
+        });
     }
 
-    @Test(expected = NullPointerException.class)
-    public void testLoggingMethodNullNino() throws Exception {
-        SyaCaseWrapper caseWithNullNino = new SyaCaseWrapper();
-        caseWithNullNino.setBenefitType(new SyaBenefitType("Universal Credit", "UC"));
-        caseWithNullNino.setCcdCaseId("123456");
+    @Test
+    public void testLoggingMethodNullNino() {
+        assertThrows(NullPointerException.class, () -> {
+            SyaCaseWrapper caseWithNullNino = new SyaCaseWrapper();
+            caseWithNullNino.setBenefitType(new SyaBenefitType("Universal Credit", "UC"));
+            caseWithNullNino.setCcdCaseId("123456");
 
-        controller.createAppeals(null, caseWithNullNino);
+            controller.createAppeals(null, caseWithNullNino);
+
+        });
 
     }
 
 
-    private String getSyaCaseWrapperJson(String resourcePath) throws IOException, URISyntaxException {
-        URL resource = getClass().getClassLoader().getResource(resourcePath);
-        return String.join("\n", Files.readAllLines(Paths.get(Objects.requireNonNull(resource).toURI())));
+    private static String getSyaCaseWrapperJson(String resourcePath) throws IOException, URISyntaxException {
+        URL resource = AbstractSyaControllerTest.class.getClassLoader().getResource(resourcePath);
+        return String.join("\n", Files.readAllLines(Path.of(Objects.requireNonNull(resource).toURI())));
     }
 
     void mockSubmitAppealService(SubmitAppealServiceBase submitAppealServiceBase,

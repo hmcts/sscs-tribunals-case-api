@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -14,21 +14,20 @@ import java.util.Map;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.quality.Strictness;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 
+@ExtendWith(MockitoExtension.class)
 @RunWith(JUnitParamsRunner.class)
 public class FurtherEvidencePlaceholderServiceTest {
 
@@ -45,9 +44,6 @@ public class FurtherEvidencePlaceholderServiceTest {
         .county("Prudential Buildings Appointee")
         .postcode("L2 5UZ")
         .build();
-
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
 
     @Mock
     private PlaceholderService placeholderService;
@@ -76,7 +72,7 @@ public class FurtherEvidencePlaceholderServiceTest {
     @Captor
     ArgumentCaptor<Address> captor;
 
-    @Before
+    @BeforeEach
     public void setup() {
         sscsCaseDataWithAppointee = SscsCaseData.builder()
             .appeal(Appeal.builder()
@@ -269,6 +265,7 @@ public class FurtherEvidencePlaceholderServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         ",, Sir/Madam, NO",
         "  ,  , Sir/Madam, NO",
@@ -306,6 +303,7 @@ public class FurtherEvidencePlaceholderServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         ",, Sir/Madam, OTHER_PARTY_LETTER",
         "  ,  , Sir/Madam, OTHER_PARTY_LETTER",
@@ -341,6 +339,7 @@ public class FurtherEvidencePlaceholderServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         ",, Sir/Madam, OTHER_PARTY_LETTER",
         "  ,  , Sir/Madam, OTHER_PARTY_LETTER",
@@ -379,6 +378,7 @@ public class FurtherEvidencePlaceholderServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         ",, Sir/Madam, OTHER_PARTY_LETTER",
         "  ,  , Sir/Madam, OTHER_PARTY_LETTER",

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.requesthearingrecording;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -12,8 +11,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -39,7 +38,7 @@ public class RequestHearingRecordingAboutToStartHandlerTest {
     @Mock
     private HearingRecordingRequestService hearingRecordingRequestService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         handler = new RequestHearingRecordingAboutToStartHandler(hearingRecordingRequestService);
@@ -59,6 +58,7 @@ public class RequestHearingRecordingAboutToStartHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_SUBMIT", "MID_EVENT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
@@ -77,9 +77,11 @@ public class RequestHearingRecordingAboutToStartHandlerTest {
         assertEquals(response, result);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsExceptionIfItCannotHandleTheAppeal() {
-        when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
-        handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertThrows(IllegalStateException.class, () -> {
+            when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
+            handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        });
     }
 }

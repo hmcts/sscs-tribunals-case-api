@@ -8,9 +8,7 @@ import java.util.List;
 import junitparams.JUnitParamsRunner;
 import lombok.Getter;
 import lombok.Setter;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -19,8 +17,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -38,10 +34,6 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis.PdfLetterServi
 @AutoConfigureMockMvc
 @Getter
 public class NotificationServiceBase {
-    @ClassRule
-    public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
     static final String DATE = "2018-01-01T14:01:18.243";
     private static final String APPEAL_NUMBER = "GLSCRR";
     static final String YES = "Yes";
@@ -96,7 +88,7 @@ public class NotificationServiceBase {
         .build();
 
 
-    @Before
+    @BeforeEach
     public void setup() {
         openMocks(this);
         notificationService = initialiseNotificationService();

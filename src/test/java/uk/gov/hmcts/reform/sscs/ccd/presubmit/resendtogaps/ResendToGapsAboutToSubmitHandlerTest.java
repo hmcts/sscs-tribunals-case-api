@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -14,8 +14,8 @@ import java.util.Set;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -53,7 +53,7 @@ public class ResendToGapsAboutToSubmitHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
 
@@ -77,6 +77,7 @@ public class ResendToGapsAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPEAL_RECEIVED"})
     public void shouldReturnFalse_givenANonHandledEvent(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
@@ -84,6 +85,7 @@ public class ResendToGapsAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"RESEND_CASE_TO_GAPS2"})
     public void shouldReturnTrue_givenAHandledEvent(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
@@ -104,6 +106,7 @@ public class ResendToGapsAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"required,$.apellant,nino,apellant.nino is missing/not populated - please correct.",
         "required,,nino,nino is missing/not populated - please correct.",
         "minLength,$.apellant.nino,,apellant.nino is missing/not populated - please correct.",

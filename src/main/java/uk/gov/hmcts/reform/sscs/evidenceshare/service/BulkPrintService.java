@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
-import static java.lang.String.format;
 import static java.util.Base64.getEncoder;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 
@@ -15,7 +14,6 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -51,7 +49,6 @@ public class BulkPrintService implements PrintService {
     private final BulkPrintServiceHelper bulkPrintServiceHelper;
     private final CcdNotificationService ccdNotificationService;
 
-    @Autowired
     public BulkPrintService(SendLetterApi sendLetterApi,
                             IdamService idamService,
                             BulkPrintServiceHelper bulkPrintServiceHelper,
@@ -132,17 +129,17 @@ public class BulkPrintService implements PrintService {
         try {
             return sendLetter(authToken, sscsCaseData, encodedData, recipient);
         } catch (HttpClientErrorException e) {
-            log.info(format("Failed to send to bulk print for case %s with error %s. Non-pdf's/broken pdf's seen in list of documents, please correct.",
+            log.info("Failed to send to bulk print for case %s with error %s. Non-pdf's/broken pdf's seen in list of documents, please correct.".formatted(
                 sscsCaseData.getCcdCaseId(), e.getMessage()));
             throw new NonPdfBulkPrintException(e);
 
         } catch (Exception e) {
             if (reTryNumber > maxRetryAttempts) {
-                String message = format("Failed to send to bulk print for case %s with error %s.",
+                String message = "Failed to send to bulk print for case %s with error %s.".formatted(
                     sscsCaseData.getCcdCaseId(), e.getMessage());
                 throw new BulkPrintException(message, e);
             }
-            log.info(String.format("Caught recoverable error %s, retrying %s out of %s",
+            log.info("Caught recoverable error %s, retrying %s out of %s".formatted(
                 e.getMessage(), reTryNumber, maxRetryAttempts));
             return sendLetterWithRetry(authToken, sscsCaseData, encodedData, reTryNumber + 1, recipient);
         }

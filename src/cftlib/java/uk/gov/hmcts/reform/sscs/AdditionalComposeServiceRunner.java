@@ -2,12 +2,12 @@ package uk.gov.hmcts.reform.sscs;
 
 import static java.lang.Boolean.parseBoolean;
 
+import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.rse.ccd.lib.ControlPlane;

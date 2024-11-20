@@ -16,7 +16,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -43,7 +42,6 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
 
-    @Autowired
     public DirectionIssuedAboutToSubmitHandler(FooterService footerService,
                                                DwpAddressLookupService dwpAddressLookupService,
                                                @Value("${dwp.response.due.days}") int dwpResponseDueDays,

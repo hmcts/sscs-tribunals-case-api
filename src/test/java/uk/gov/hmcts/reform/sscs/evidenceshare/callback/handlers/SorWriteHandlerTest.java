@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -17,9 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Ignore;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -156,7 +156,7 @@ public class SorWriteHandlerTest {
             jointParty.getName().getFullNameNoTitle()));
     }
 
-    @Ignore
+    @Disabled
     @Test
     void checkOtherPartyNameReturns() { //might not need these and above tests, only need to test if correct letter gets generated for each party as party name test is already created
         SscsCaseData caseData = buildCaseData();

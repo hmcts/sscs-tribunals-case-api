@@ -4,7 +4,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -25,7 +24,6 @@ public class DecisionIssuedMidEventHandler extends IssueDocumentHandler implemen
     private final DocumentConfiguration documentConfiguration;
 
 
-    @Autowired
     public DecisionIssuedMidEventHandler(GenerateFile generateFile, DocumentConfiguration documentConfiguration) {
         this.generateFile = generateFile;
         this.documentConfiguration = documentConfiguration;

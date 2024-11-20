@@ -6,7 +6,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getBenefitByCodeOrThro
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -23,7 +22,6 @@ public class NotificationFactory {
     private final PersonalisationFactory personalisationFactory;
     private final Map<NotificationEventType, Personalisation> map = newHashMap();
 
-    @Autowired
     NotificationFactory(PersonalisationFactory personalisationFactory) {
         this.personalisationFactory = personalisationFactory;
     }

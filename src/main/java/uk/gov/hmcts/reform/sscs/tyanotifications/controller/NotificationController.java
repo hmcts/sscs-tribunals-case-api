@@ -5,7 +5,6 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.buildSscsCaseDataWrapper;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -32,7 +31,6 @@ public class NotificationController {
     private final SscsCaseCallbackDeserializer deserializer;
     private final IdamService idamService;
 
-    @Autowired
     public NotificationController(NotificationService notificationService,
                                   AuthorisationService authorisationService,
                                   CcdService ccdService,

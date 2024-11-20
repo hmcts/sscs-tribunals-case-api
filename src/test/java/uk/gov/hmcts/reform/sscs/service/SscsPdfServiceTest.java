@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Map;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -47,13 +47,14 @@ public class SscsPdfServiceTest {
 
     ArgumentCaptor<Map> argumentCaptor = ArgumentCaptor.forClass(Map.class);
 
-    @Before
+    @BeforeEach
     public void setup() {
         openMocks(this);
         service = new SscsPdfService(TEMPLATE_PATH, WELSH_TEMPLATE_PATH, pdfServiceClient, ccdPdfService, resourceManager);
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "PIP, Taliad Annibyniaeth Personol (PIP), Personal Independence Payment (PIP)",
         "ESA, Lwfans Cyflogaeth a Chymorth (ESA), Employment and Support Allowance (ESA)",
@@ -88,6 +89,7 @@ public class SscsPdfServiceTest {
 
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "PIP, Personal Independence Payment (PIP)",
         "ESA, Employment and Support Allowance (ESA)",

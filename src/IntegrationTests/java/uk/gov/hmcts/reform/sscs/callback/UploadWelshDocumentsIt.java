@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -14,8 +12,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -47,7 +45,7 @@ public class UploadWelshDocumentsIt extends AbstractEventIt {
     @MockBean
     private AuthTokenGenerator authTokenGenerator;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         setup("callback/uploadWelshDocuments.json");
     }

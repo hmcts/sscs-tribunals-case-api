@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.requesthearingrecording;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -31,7 +31,7 @@ public class RequestHearingRecordingAboutToSubmitHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         handler = new RequestHearingRecordingAboutToSubmitHandler();
@@ -39,12 +39,15 @@ public class RequestHearingRecordingAboutToSubmitHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.DWP_REQUEST_HEARING_RECORDING);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
-        DynamicListItem item1 = new DynamicListItem("an_id1", "\t\n"
-                + "venue 1 name 15:15 20 January 2020");
-        DynamicListItem item2 = new DynamicListItem("an_id2", "\t\n"
-                + "venue 2 name 15:15 20 February 2020");
-        DynamicListItem item3 = new DynamicListItem("an_id3", "\t\n"
-                + "venue 1 name 15:15 20 March 2020");
+        DynamicListItem item1 = new DynamicListItem("an_id1", """
+                	
+                venue 1 name 15:15 20 January 2020""");
+        DynamicListItem item2 = new DynamicListItem("an_id2", """
+                	
+                venue 2 name 15:15 20 February 2020""");
+        DynamicListItem item3 = new DynamicListItem("an_id3", """
+                	
+                venue 1 name 15:15 20 March 2020""");
 
         List<DynamicListItem> validHearings = new ArrayList<>();
         validHearings.add(item1);

@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 import static java.util.Objects.requireNonNull;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.DWP;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.HMCTS;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.REP_SALUTATION;
@@ -21,17 +21,17 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
-import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.pdfbox.io.IOUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
@@ -41,7 +41,6 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationClientRun
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 
-@RunWith(JUnitParamsRunner.class)
 public class LetterUtilsTest {
     private static final Subscription EMPTY_SUBSCRIPTION = Subscription.builder().build();
 
@@ -49,7 +48,7 @@ public class LetterUtilsTest {
     private JointParty jointPartyWithId;
     private SscsCaseData caseData;
 
-    @Test
+    @ParameterizedTest
     public void useAppellantAddressForLetter() {
         NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
             SYA_APPEAL_CREATED,
@@ -67,7 +66,7 @@ public class LetterUtilsTest {
         return new SubscriptionWithType(Subscription.builder().build(), subscriptionType, party, entity);
     }
 
-    @Test
+    @ParameterizedTest
     public void useAppointeeAddressForLetter() {
         NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
             SYA_APPEAL_CREATED,
@@ -81,7 +80,7 @@ public class LetterUtilsTest {
                 APPELLANT_WITH_ADDRESS_AND_APPOINTEE.getAppointee())));
     }
 
-    @Test
+    @ParameterizedTest
     public void useRepAddressForLetter() {
         NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
             SYA_APPEAL_CREATED,
@@ -94,7 +93,7 @@ public class LetterUtilsTest {
             getSubscriptionWithType(REPRESENTATIVE, APPELLANT_WITH_ADDRESS_AND_APPOINTEE, REP_WITH_ADDRESS)));
     }
 
-    @Test
+    @ParameterizedTest
     public void useAppellantNameForLetter() {
         NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
             SYA_APPEAL_CREATED,
@@ -108,7 +107,7 @@ public class LetterUtilsTest {
                 APPELLANT_WITH_ADDRESS)));
     }
 
-    @Test
+    @ParameterizedTest
     public void useAppointeeNameForLetter() {
         NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
             SYA_APPEAL_CREATED,
@@ -123,7 +122,7 @@ public class LetterUtilsTest {
                     APPELLANT_WITH_ADDRESS_AND_APPOINTEE.getAppointee())));
     }
 
-    @Test
+    @ParameterizedTest
     public void useJointPartyAddressForLetter() {
         Address jointPartyAddress = Address.builder().county("county").line1("line1").line2("line2").postcode("EN1 1AF").build();
         NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapperJointParty(
@@ -139,7 +138,7 @@ public class LetterUtilsTest {
             wrapper.getNewSscsCaseData().getJointParty(), wrapper.getNewSscsCaseData().getJointParty())));
     }
 
-    @Test
+    @ParameterizedTest
     public void useAppellantAddressForJointPartyIfSameAsAppellantLetter() {
         NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapperJointParty(
             SYA_APPEAL_CREATED,
@@ -159,8 +158,8 @@ public class LetterUtilsTest {
             wrapper.getNewSscsCaseData().getJointParty(), wrapper.getNewSscsCaseData().getJointParty())));
     }
 
-    @Test
-    @Parameters(method = "repNamesForLetters")
+    @ParameterizedTest
+    @MethodSource("repNamesForLetters")
     public void useRepNameForLetter(Name name, String expectedResult) {
         Representative rep = Representative.builder()
             .name(name)
@@ -178,7 +177,7 @@ public class LetterUtilsTest {
             getSubscriptionWithType(REPRESENTATIVE, APPELLANT_WITH_ADDRESS_AND_APPOINTEE, rep)));
     }
 
-    private Object[] repNamesForLetters() {
+    private static Object[] repNamesForLetters() {
 
         return new Object[]{
             new Object[]{Name.builder().firstName("Re").lastName("Presentative").build(), "Re Presentative"},
@@ -187,7 +186,7 @@ public class LetterUtilsTest {
         };
     }
 
-    @Test
+    @ParameterizedTest
     public void successfulBundleLetter() throws IOException {
         byte[] sampleDirectionText = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/direction-text.pdf"));
         byte[] sampleDirectionCoversheet = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/direction-notice-coversheet-sample.pdf"));
@@ -195,21 +194,26 @@ public class LetterUtilsTest {
         assertNotNull(buildBundledLetter(sampleDirectionCoversheet, sampleDirectionText));
     }
 
-    @Test(expected = NotificationClientRuntimeException.class)
-    public void shouldNotBundleLetterWhenCoverSheetIsNull() throws IOException {
-        byte[] sampleDirectionText = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/direction-text.pdf"));
+    @ParameterizedTest
+    public void shouldNotBundleLetterWhenCoverSheetIsNull() {
+        assertThrows(NotificationClientRuntimeException.class, () -> {
+            byte[] sampleDirectionText = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/direction-text.pdf"));
 
-        buildBundledLetter(null, sampleDirectionText);
+            buildBundledLetter(null, sampleDirectionText);
+        });
     }
 
-    @Test(expected = NotificationClientRuntimeException.class)
-    public void shouldNotBundleLetterWhenAttachmentIsNull() throws IOException {
-        byte[] sampleDirectionCoversheet = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/direction-notice-coversheet-sample.pdf"));
+    @ParameterizedTest
+    public void shouldNotBundleLetterWhenAttachmentIsNull() {
+        assertThrows(NotificationClientRuntimeException.class, () -> {
+            byte[] sampleDirectionCoversheet = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/direction-notice-coversheet-sample.pdf"));
 
-        buildBundledLetter(sampleDirectionCoversheet, null);
+            buildBundledLetter(sampleDirectionCoversheet, null);
+        });
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"1", "2", "3", "4"})
     public void willAddABlankPageAtTheEndIfAnOddPageIsGiven(int pages) throws IOException {
         PDDocument originalDocument = new PDDocument();
@@ -234,6 +238,7 @@ public class LetterUtilsTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPELLANT", "JOINT_PARTY", "APPOINTEE", "REPRESENTATIVE"})
     public void isAlternativeLetterFormatRequired(SubscriptionType subscriptionType) {
         NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapperWithReasonableAdjustment();
@@ -241,7 +246,7 @@ public class LetterUtilsTest {
             subscriptionType, null, null)));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenAnOtherParty_thenIsAlternativeLetterFormatRequired() {
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
         CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder()
@@ -264,7 +269,7 @@ public class LetterUtilsTest {
         assertTrue(LetterUtils.isAlternativeLetterFormatRequired(wrapper, subscriptionWithType));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenAnOtherPartyWithAppointeeThatWantsReasonableAdjustment_thenIsAlternativeLetterFormatRequiredForAppointee() {
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
         CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder()
@@ -290,7 +295,7 @@ public class LetterUtilsTest {
         assertTrue(LetterUtils.isAlternativeLetterFormatRequired(wrapper, subscriptionWithType));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenAnOtherPartyWithRepThatWantsReasonableAdjustment_thenIsAlternativeLetterFormatRequiredForOtherPartyRep() {
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
         CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder()
@@ -315,7 +320,7 @@ public class LetterUtilsTest {
         assertTrue(LetterUtils.isAlternativeLetterFormatRequired(wrapper, subscriptionWithType));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenAnOtherPartyWithReasonableAdjustmentAndSubscriptionIsSearchingForDifferentPartyId_thenNoAlternativeLetterFormatRequired() {
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
         CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder()
@@ -338,7 +343,7 @@ public class LetterUtilsTest {
         assertFalse(LetterUtils.isAlternativeLetterFormatRequired(wrapper, subscriptionWithType));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenAnOtherPartyNoReasonableAdjustmentRequired_thenNoAlternativeLetterFormatRequired() {
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
         CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder()
@@ -362,6 +367,7 @@ public class LetterUtilsTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"OTHER_PARTY, 4", "OTHER_PARTY, 3", "OTHER_PARTY, 2"})
     public void useOtherPartyLetterNameAndAddress(SubscriptionType subscriptionType, String otherPartyId) {
         NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapperOtherParty(SYA_APPEAL_CREATED, Appellant.builder().build(), null);
@@ -402,7 +408,7 @@ public class LetterUtilsTest {
             .orElse(""));
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         appellantWithId = Appellant.builder()
             .id("APP123456")
@@ -473,6 +479,7 @@ public class LetterUtilsTest {
     @DisplayName("When sender is appellant, representative or Joint party"
         + " then return name of corresponding party")
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"appellant,Tom Cat", "representative,Representative Appellant", "jointParty,Joint Party", "jointParty1, "})
     public void testGetNameForSenderRepresentative(String senderType, String senderName) {
         DynamicList sender = new DynamicList(new DynamicListItem(senderType, senderType), new ArrayList<>());
@@ -480,14 +487,14 @@ public class LetterUtilsTest {
         assertEquals(senderName, LetterUtils.getNameForSender(caseData));
     }
 
-    @Test
+    @ParameterizedTest
     public void testGetNameForDwpSender() {
         DynamicList sender = new DynamicList(new DynamicListItem(DWP.getCode(), DWP.getCode()), new ArrayList<>());
         caseData.setOriginalSender(sender);
         assertEquals(DWP.getLabel(), LetterUtils.getNameForSender(caseData));
     }
 
-    @Test
+    @ParameterizedTest
     public void testGetNameForHmctsSender() {
         DynamicList sender = new DynamicList(new DynamicListItem(HMCTS.getCode(), HMCTS.getCode()), new ArrayList<>());
         caseData.setOriginalSender(sender);
@@ -495,7 +502,7 @@ public class LetterUtilsTest {
     }
 
     @DisplayName("When sender is null then return empty string")
-    @Test
+    @ParameterizedTest
     public void getNameForSender_senderIsNull_returnEmpty() {
         caseData.setOriginalSender(null);
         assertEquals("", LetterUtils.getNameForSender(caseData));
@@ -504,6 +511,7 @@ public class LetterUtilsTest {
     @DisplayName("When sender is an Other Party or his representative "
         + "then return name of respective other party or his representative.")
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"otherPartyOP123456,Other,Party", "otherPartyRepOPREP123456,OtherParty,Representative"})
     public void getOtherPartyName_senderIsValid_returnName(String senderId, String firstName, String lastName) {
         DynamicList sender = new DynamicList(new DynamicListItem(senderId, senderId), new ArrayList<>());
@@ -517,6 +525,7 @@ public class LetterUtilsTest {
     @DisplayName("When sender is an invalid Other Party or his representative "
         + "then return empty.")
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"otherPartyInvalid", "otherPartyRepInvalid"})
     public void getOtherPartyName_senderIsInValid_returnEmpty(String senderId) {
         DynamicList sender = new DynamicList(new DynamicListItem(senderId, senderId), new ArrayList<>());
@@ -526,7 +535,7 @@ public class LetterUtilsTest {
 
     @DisplayName("When the notification event type is other than ACTION_FURTHER_EVIDENCE or POST_HEARING_REQUEST "
         + "then return empty string.")
-    @Test
+    @ParameterizedTest
     public void getNotificationTypeForActionFurtherEvidence_InvalidActionType_returnEmpty() {
         DynamicList sender = new DynamicList(new DynamicListItem("appellant", "Other party 1 - Representative - R Basker R Nadar"), new ArrayList<>());
         caseData.setOriginalSender(sender);
@@ -537,6 +546,7 @@ public class LetterUtilsTest {
 
     @DisplayName("When sender and subscriber is appellant then return confirmation")
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"CORRECTION_REQUEST", "LIBERTY_TO_APPLY_REQUEST", "STATEMENT_OF_REASONS_REQUEST", "SET_ASIDE_REQUEST"})
     public void getNotificationTypeForActionFurtherEvidence_ValidActionTypeAndValidSubscriber_returnConfirmation(NotificationEventType eventType) {
         DynamicList sender = new DynamicList(new DynamicListItem("appellant", "Appellant"), new ArrayList<>());
@@ -549,6 +559,7 @@ public class LetterUtilsTest {
     @DisplayName("When sender is an appellant, representative or joint party and subscriber is other than sender "
         + "then return notification.")
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"appellant", "representative", "jointParty"})
     public void getNotificationTypeForActionFurtherEvidence_ValidActionTypeAndInValidSubscriber_returnNotice(String requester) {
         DynamicList sender = new DynamicList(new DynamicListItem(requester, requester), new ArrayList<>());
@@ -568,6 +579,7 @@ public class LetterUtilsTest {
 
     @DisplayName("When sender and subscriber is a Joint party then return confirmation.")
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"CORRECTION_REQUEST", "LIBERTY_TO_APPLY_REQUEST", "STATEMENT_OF_REASONS_REQUEST", "SET_ASIDE_REQUEST"})
     public void getNotificationTypeForActionFurtherEvidence_ValidJointPartySub_returnConfirmation(NotificationEventType eventType) {
         DynamicList sender = new DynamicList(new DynamicListItem("jointParty", "jointParty"), new ArrayList<>());
@@ -579,6 +591,7 @@ public class LetterUtilsTest {
 
     @DisplayName("When sender is an other party and subscriber is other than sender then return notification.")
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"CORRECTION_REQUEST", "LIBERTY_TO_APPLY_REQUEST", "STATEMENT_OF_REASONS_REQUEST", "SET_ASIDE_REQUEST"})
     public void getNotificationTypeForActionFurtherEvidence_InValidOtherPartySubscriber_returnNotice(NotificationEventType eventType) {
         DynamicList sender = new DynamicList(new DynamicListItem("otherParty", "otherParty"), new ArrayList<>());
@@ -592,6 +605,7 @@ public class LetterUtilsTest {
     @DisplayName("When other party or his representative send the request "
         + "then other party and his representative should receive confirmation.")
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"otherPartyOP123456,OP123456", "otherPartyOP123456,otherPartyOPREP123456", "otherPartyOPREP123456,OPREP123456", "otherPartyOPREP123456,OP123456"})
     public void getNotificationTypeForActionFurtherEvidence_ValidOtherPartyAndRepSub_returnConfirmation(String senderType, String subscriber) {
         DynamicList sender = new DynamicList(new DynamicListItem(senderType, senderType), new ArrayList<>());
@@ -603,6 +617,7 @@ public class LetterUtilsTest {
 
     @DisplayName("When sender and subscriber is an other party or his representative then return true")
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"OPREP123456,OPREP123456", "OPREP123456,OP123456"})
     public void isValidOtherPartyRepresentative_ValidOtherPartyAndRep_returnTrue(String senderId, String subscriptionId) {
         List<CcdValue<OtherParty>> otherParties = buildOtherPartyData();
@@ -612,6 +627,7 @@ public class LetterUtilsTest {
 
     @DisplayName("When the sender/original requester is other than representative then return false.")
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"CORRECTION_REQUEST", "LIBERTY_TO_APPLY_REQUEST", "STATEMENT_OF_REASONS_REQUEST", "SET_ASIDE_REQUEST"})
     public void isValidAppellantRepresentativeForSetAsideRequest_givenNonRepresentative_thenReturnFalse(NotificationEventType eventType) {
         DynamicList sender = new DynamicList(new DynamicListItem("otherPartyOP123456", "OPREP123456"), new ArrayList<>());
@@ -624,6 +640,7 @@ public class LetterUtilsTest {
     @DisplayName("When the sender/original requester is representative and subscriber is appellant or representative"
         + " then return true.")
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APP123456", "REP123456"})
     public void isValidAppellantRepresentativeForSetAsideRequest_givenValidRepresentative_thenReturnTrue(String partyId) {
         DynamicList sender = new DynamicList(new DynamicListItem("representative", "representative"), new ArrayList<>());
@@ -635,7 +652,7 @@ public class LetterUtilsTest {
     }
 
     @DisplayName("When the subscription id is null then return false.")
-    @Test
+    @ParameterizedTest
     public void isValidOtherParty_givenSubscriberIsNull_thenReturnFalse() {
         DynamicList sender = new DynamicList(new DynamicListItem("otherPartyOPREP123456", "OPREP123456"), new ArrayList<>());
         caseData.setOriginalSender(sender);
@@ -646,6 +663,7 @@ public class LetterUtilsTest {
 
     @DisplayName("When the subscription id is invalid then return false.")
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"jointParty", "otherParty"})
     public void isValidOtherParty_givenSubscriberIsInValid_thenReturnFalse(String senderType) {
         DynamicList sender = new DynamicList(new DynamicListItem(senderType, senderType), new ArrayList<>());
@@ -656,7 +674,7 @@ public class LetterUtilsTest {
     }
 
     @DisplayName("When the other party data present and valid then return true.")
-    @Test
+    @ParameterizedTest
     public void isValidOtherParty_givenSubscriberIsValid_thenReturnTrue() {
         DynamicList sender = new DynamicList(new DynamicListItem("otherPartyOP123456", "otherParty"), new ArrayList<>());
         caseData.setOriginalSender(sender);

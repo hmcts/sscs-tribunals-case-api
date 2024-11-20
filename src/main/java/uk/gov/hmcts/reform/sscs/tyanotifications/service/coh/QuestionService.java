@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service.coh;
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -11,7 +10,6 @@ public class QuestionService {
     private final CohClient cohClient;
     private final IdamService idamService;
 
-    @Autowired
     public QuestionService(CohClient cohClient, IdamService idamService) {
         this.cohClient = cohClient;
         this.idamService = idamService;

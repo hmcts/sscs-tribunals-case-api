@@ -1,10 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision.uc;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -26,8 +23,8 @@ import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -75,7 +72,7 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
             .buildValidatorFactory()
             .getValidator();
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         openMocks(this);
         UcDecisionNoticeOutcomeService ucDecisionNoticeOutcomeService = new UcDecisionNoticeOutcomeService(new UcDecisionNoticeQuestionService());
@@ -159,7 +156,7 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     public void givenAnIssueFinalDecisionEventRemoveDraftDecisionNotice() {
-        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
+        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("Decision Notice issued on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
         SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
         sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(docLink);
         sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -178,7 +175,7 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     public void givenAnIssueFinalDecisionEventWhenDocumentTypeIsNullThenRemoveDraftDecisionNotice() {
-        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
+        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("Decision Notice issued on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
         SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
         sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(docLink);
         sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -197,7 +194,7 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     public void givenAnIssueFinalDecisionEventForGenerateNoticeFlowWhenAllowedOrRefusedIsNull_ThenDisplayAnError() {
-        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
+        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("Decision Notice issued on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().setWcaAppeal(YES);
         callback.getCaseDetails().getCaseData().setSupportGroupOnlyAppeal("Yes");
@@ -292,15 +289,18 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsExceptionIfItCannotHandleTheAppeal() {
-        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThrows(IllegalStateException.class, () -> {
+            when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        });
     }
 
     @Test
@@ -310,7 +310,7 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
 
         DocumentLink docLink = DocumentLink.builder()
                 .documentUrl("bla.com")
-                .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+                .documentFilename("Decision Notice issued on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
                 .build();
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -328,7 +328,7 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
 
         DocumentLink docLink = DocumentLink.builder()
                 .documentUrl("bla.com")
-                .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+                .documentFilename("Decision Notice issued on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
                 .build();
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -364,7 +364,7 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
 
         DocumentLink docLink = DocumentLink.builder()
                 .documentUrl("bla.com")
-                .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+                .documentFilename("Decision Notice issued on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
                 .build();
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -400,7 +400,7 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
 
         DocumentLink docLink = DocumentLink.builder()
                 .documentUrl("bla.com")
-                .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+                .documentFilename("Decision Notice issued on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
                 .build();
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -434,7 +434,7 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     public void givenWriteFinalDecisionPostHearingsEnabledAndNoIssueFinalDate_shouldUpdateFinalCaseData() {
-        String filename = String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
+        String filename = "Decision Notice issued on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
         DocumentLink docLink = DocumentLink.builder()
                 .documentUrl("bla.com")
                 .documentFilename(filename)

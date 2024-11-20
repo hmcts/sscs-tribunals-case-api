@@ -52,7 +52,7 @@ public class VoidCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        log.info(String.format("Handling send to void state for case id %s", sscsCaseData.getCcdCaseId()));
+        log.info("Handling send to void state for case id %s".formatted(sscsCaseData.getCcdCaseId()));
 
         sscsCaseData.setDirectionDueDate(null);
         sscsCaseData.setInterlocReviewState(null);

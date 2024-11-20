@@ -6,14 +6,12 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.JUnitSoftAssertions;
-import org.junit.Ignore;
 import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.client.RefDataApi;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -26,7 +24,6 @@ import uk.gov.hmcts.reform.sscs.service.VenueService;
  * returns valid court venue information. The main incidence for this test is in sscs-common's RefDataService
  * but the test is here to cache auth information for performance purposes.
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @Slf4j
 @TestPropertySource(locations = "classpath:config/application_refdata_test.properties")
@@ -50,7 +47,7 @@ public class RefDataClientTest {
     private VenueDataLoader venueDataLoader;
 
     // TODO: SSCS-11275 - re-enable when ref data is fixed
-    @Ignore
+    @Disabled
     @Test
     public void testVenueRefDataForVenueName() {
         List<String> failedIds = new ArrayList<>();

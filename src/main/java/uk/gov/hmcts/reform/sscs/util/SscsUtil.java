@@ -438,7 +438,7 @@ public class SscsUtil {
     public static String generateUniqueIbcaId(Appellant appellant) {
         String appellantLastName = appellant.getName().getLastName();
         String ibcaReference = appellant.getIdentity().getIbcaReference();
-        return String.format(ID_FORMAT, appellantLastName, ibcaReference);
+        return ID_FORMAT.formatted(appellantLastName, ibcaReference);
     }
 
     public static void updateHearingChannel(SscsCaseData caseData, HearingChannel hearingChannel) {

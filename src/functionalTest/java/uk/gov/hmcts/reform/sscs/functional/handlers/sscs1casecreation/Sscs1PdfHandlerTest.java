@@ -5,21 +5,18 @@ import static org.hamcrest.Matchers.equalTo;
 
 import io.restassured.http.ContentType;
 import java.io.IOException;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 
-@RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
 public class Sscs1PdfHandlerTest {
@@ -29,7 +26,7 @@ public class Sscs1PdfHandlerTest {
     @Autowired
     private IdamService idamService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         baseURI = testUrl;
         useRelaxedHTTPSValidation();

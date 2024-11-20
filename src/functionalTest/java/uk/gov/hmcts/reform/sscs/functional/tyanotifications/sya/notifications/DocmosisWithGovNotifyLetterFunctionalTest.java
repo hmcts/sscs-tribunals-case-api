@@ -9,17 +9,14 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.reform.sscs.functional.tyanotifications.AbstractFunctionalTest;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.service.notify.Notification;
 import uk.gov.service.notify.NotificationClientException;
 
-@RunWith(JUnitParamsRunner.class)
 public class DocmosisWithGovNotifyLetterFunctionalTest extends AbstractFunctionalTest {
 
     public static final String EXPECTED_LETTER_SUBJECT = "Pre-compiled PDF";
@@ -46,9 +43,9 @@ public class DocmosisWithGovNotifyLetterFunctionalTest extends AbstractFunctiona
     }
 
     // TODO: SSCS-11436
-    @Test
-    @Ignore
-    @Parameters(method = "eventTypes")
+    @ParameterizedTest
+    @Disabled
+    @MethodSource("eventTypes")
     public void shouldSendDocmosisLetters(NotificationEventType notificationEventType)
         throws IOException, NotificationClientException {
         simulateCcdCallback(notificationEventType);
@@ -63,8 +60,8 @@ public class DocmosisWithGovNotifyLetterFunctionalTest extends AbstractFunctiona
             );
     }
 
-    @Test
-    @Parameters(method = "expectedNumberOfLetters")
+    @ParameterizedTest
+    @MethodSource("expectedNumberOfLetters")
     public void shouldSendCorrectNumberOfDocmosisLetters(NotificationEventType notificationEventType,
                                                          int expectedNumberOfLetters)
         throws IOException, NotificationClientException {
@@ -81,13 +78,13 @@ public class DocmosisWithGovNotifyLetterFunctionalTest extends AbstractFunctiona
             );
     }
 
-    private Object[] eventTypes() {
+    private static Object[] eventTypes() {
         Set<NotificationEventType> docmosisLetters = new HashSet<>(DOCMOSIS_LETTERS);
         docmosisLetters.removeAll(DOCMOSIS_LETTERS_WITH_NO_TEST_CALLBACK);
         return docmosisLetters.toArray();
     }
 
-    private Object[] expectedNumberOfLetters() {
+    private static Object[] expectedNumberOfLetters() {
         int expectedNumberOfLettersIsOne = 1;
         int expectedNumberOfLettersIsTwo = 2;
         int expectedNumberOfLettersIsThree = 3;

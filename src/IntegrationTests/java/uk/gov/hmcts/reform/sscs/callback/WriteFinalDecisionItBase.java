@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,8 +12,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -112,16 +110,16 @@ public abstract class WriteFinalDecisionItBase extends AbstractEventIt {
         assertEquals(false, payload.isDailyLivingIsSeverelyLimited());
         assertNull(payload.getDailyLivingAwardRate());
         assertNull(payload.getDailyLivingDescriptors());
-        Assert.assertNull(payload.getDailyLivingNumberOfPoints());
+        Assertions.assertNull(payload.getDailyLivingNumberOfPoints());
         assertEquals(false, payload.isMobilityIsEntited());
         assertEquals(false, payload.isMobilityIsSeverelyLimited());
         assertNull(payload.getMobilityAwardRate());
         assertNull(payload.getMobilityDescriptors());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
+        Assertions.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertNotNull(payload.getDetailsOfDecision());
-        Assert.assertEquals("The details of the decision", payload.getDetailsOfDecision());
+        Assertions.assertEquals("The details of the decision", payload.getDetailsOfDecision());
         assertEquals("Something else.", payload.getAnythingElse());
     }
 

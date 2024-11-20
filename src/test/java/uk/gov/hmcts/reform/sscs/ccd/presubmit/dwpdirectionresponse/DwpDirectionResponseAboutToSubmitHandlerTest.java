@@ -2,14 +2,15 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpdirectionresponse;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import java.time.LocalDateTime;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -19,7 +20,7 @@ public class DwpDirectionResponseAboutToSubmitHandlerTest {
     private Callback<SscsCaseData> callback;
     private DwpDirectionResponseAboutToSubmitHandler handler;
 
-    @Before
+    @BeforeEach
     public void setup() {
         callback = mock(Callback.class);
         handler = new DwpDirectionResponseAboutToSubmitHandler();
@@ -37,14 +38,16 @@ public class DwpDirectionResponseAboutToSubmitHandlerTest {
         assertThat(handler.canHandle(ABOUT_TO_START, callback), is(false));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void cannotHandleNullCallback() {
-        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, null), is(false));
+        assertThrows(NullPointerException.class, () ->
+            assertThat(handler.canHandle(ABOUT_TO_SUBMIT, null), is(false)));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void cannotHandleNullCallbackType() {
-        assertThat(handler.canHandle(null, callback), is(false));
+        assertThrows(NullPointerException.class, () ->
+            assertThat(handler.canHandle(null, callback), is(false)));
     }
 
     @Test

@@ -1,13 +1,13 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 import java.io.IOException;
 import java.util.function.Function;
 import junitparams.JUnitParamsRunner;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -36,7 +36,7 @@ public abstract class IssueNoticeHandlerTestBase {
     protected abstract IssueNoticeHandler createIssueNoticeHandler(GenerateFile generateFile, UserDetailsService userDetailsService,
                                                                    Function<LanguagePreference, String> templateId);
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         openMocks(this);
 

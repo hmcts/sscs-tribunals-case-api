@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service.scheduler;
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_ENUMS_USING_TO_STRING;
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE;
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_ENUMS_USING_TO_STRING;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.EVIDENCE_REMINDER;
@@ -16,8 +16,8 @@ import java.time.LocalDateTime;
 import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
@@ -61,7 +61,7 @@ public class CcdActionExecutorTest {
 
     private IdamTokens idamTokens;
 
-    @Before
+    @BeforeEach
     public void setup() {
         openMocks(this);
 
@@ -110,9 +110,10 @@ public class CcdActionExecutorTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"123, 0", "124,1", "333, 3"})
     public void shouldReturnTheCorrectCaseAndRetryValueFromAPayload(long caseId, int retry) {
-        String payload = (retry == 0) ? String.format("%s", caseId) : String.format("%s,%s", caseId, retry);
+        String payload = (retry == 0) ? "%s".formatted(caseId) : "%s,%s".formatted(caseId, retry);
         long actualCaseId = ccdActionExecutor.getCaseId(payload);
         long actualRetry = ccdActionExecutor.getRetry(payload);
         assertEquals(caseId, actualCaseId);
@@ -129,6 +130,7 @@ public class CcdActionExecutorTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"1", "2", "3"})
     public void shouldScheduleToRetryAgainWhenNotificationFails(int retry) {
         when(ccdService.getByCaseId(eq(123456L), eq(idamTokens))).thenReturn(caseDetails);

@@ -16,7 +16,6 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
@@ -45,7 +44,6 @@ public class PdfLetterService {
     private final DocmosisTemplatesConfig docmosisTemplatesConfig;
     private final EvidenceProperties evidenceProperties;
 
-    @Autowired
     public PdfLetterService(DocmosisPdfService docmosisPdfService, DocmosisTemplatesConfig docmosisTemplatesConfig, EvidenceProperties evidenceProperties) {
         this.docmosisPdfService = docmosisPdfService;
         this.docmosisTemplatesConfig = docmosisTemplatesConfig;

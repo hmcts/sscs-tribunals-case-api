@@ -282,7 +282,7 @@ class AdjournCasePreviewServiceTest {
     private static void checkPreviewDocument(PreSubmitCallbackResponse<SscsCaseData> response) {
         assertThat(response.getData().getAdjournment().getPreviewDocument()).isNotNull();
         assertThat(response.getData().getAdjournment().getPreviewDocument()).isEqualTo(DocumentLink.builder()
-            .documentFilename(String.format("Draft Adjournment Notice generated on %s.pdf",
+            .documentFilename("Draft Adjournment Notice generated on %s.pdf".formatted(
                 LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)

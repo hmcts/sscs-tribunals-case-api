@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.sscs.util;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 
@@ -14,7 +14,7 @@ public class PartiesOnCaseUtilTest {
 
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder()
                 .benefitType(BenefitType.builder().code(CHILD_SUPPORT.getShortName()).build())

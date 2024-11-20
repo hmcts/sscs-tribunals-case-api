@@ -6,8 +6,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -24,7 +24,7 @@ public class StatementControllerTest {
     private StatementController statementController;
     private AppellantStatementService appellantStatementService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         onlineHearingId = "someOnlineHearingId";
         caseId = 12345L;

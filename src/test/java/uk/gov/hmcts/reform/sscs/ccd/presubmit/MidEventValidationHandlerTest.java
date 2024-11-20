@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
@@ -12,8 +12,8 @@ import java.time.LocalDate;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -56,7 +56,7 @@ public class MidEventValidationHandlerTest {
             .buildValidatorFactory()
             .getValidator();
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         openMocks(this);
         handler = new MidEventValidationHandler(validator);
@@ -74,6 +74,7 @@ public class MidEventValidationHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"NOT_LISTABLE", "UPDATE_NOT_LISTABLE"})
     public void givenAValidMidEventValidationCaseEvent_thenReturnTrue(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
@@ -87,12 +88,14 @@ public class MidEventValidationHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_START", "ABOUT_TO_SUBMIT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"NOT_LISTABLE", "UPDATE_NOT_LISTABLE"})
     public void givenDirectionsDueDateIsToday_ThenDisplayAnError(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
@@ -112,6 +115,7 @@ public class MidEventValidationHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"NOT_LISTABLE", "UPDATE_NOT_LISTABLE"})
     public void givenDirectionsDueDateIsBeforeToday_ThenDisplayAnError(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
@@ -132,6 +136,7 @@ public class MidEventValidationHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"NOT_LISTABLE", "UPDATE_NOT_LISTABLE"})
     public void givenDirectionsDueDateIsAfterToday_ThenDoNotDisplayAnError(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
@@ -150,9 +155,11 @@ public class MidEventValidationHandlerTest {
         assertEquals(0, response.getErrors().size());
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsExceptionIfItCannotHandleTheEvent() {
-        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        assertThrows(IllegalStateException.class, () -> {
+            when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+            handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        });
     }
 }

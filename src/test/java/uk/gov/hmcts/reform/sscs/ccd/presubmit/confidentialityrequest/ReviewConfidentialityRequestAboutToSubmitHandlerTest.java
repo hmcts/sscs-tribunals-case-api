@@ -3,9 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.confidentialityrequest;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -17,9 +15,9 @@ import java.time.LocalDate;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -42,7 +40,7 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         openMocks(this);
         handler = new ReviewConfidentialityRequestAboutToSubmitHandler(false);
@@ -74,7 +72,8 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         return outcome == null ? null : DatedRequestOutcome.builder().date(LocalDate.now()).requestOutcome(outcome).build();
     }
 
-    @Parameters({
+    // JunitParamsRunnerToParameterized conversion not supported
+@Parameters({
         "null, null",
         "null, GRANTED",
         "null, REFUSED",
@@ -103,7 +102,8 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(jointPartyOutcome), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
     }
 
-    @Parameters({"null", "GRANTED", "REFUSED"})
+    // JunitParamsRunnerToParameterized conversion not supported
+@Parameters({"null", "GRANTED", "REFUSED"})
     @Test
     public void givenAppellantConfidentialityRequestOnlyIsInProgressShouldDisplayAnErrorIfGrantedOrRefusedSetIncorrectly(@Nullable RequestOutcome jointPartyRequestOutcome) {
 
@@ -125,7 +125,8 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
 
     }
 
-    @Parameters({"null", "GRANTED", "REFUSED"})
+    // JunitParamsRunnerToParameterized conversion not supported
+@Parameters({"null", "GRANTED", "REFUSED"})
     @Test
     public void givenAppellantConfidentialityRequestOnlyIsInProgressShouldNotDisplayAnErrorIfGrantedSet(@Nullable RequestOutcome jointPartyRequestOutcome) {
 
@@ -141,13 +142,14 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION, sscsCaseData.getInterlocReviewState());
         assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.GRANTED), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
 
-        Assert.assertNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
-        Assert.assertNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
+        Assertions.assertNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
+        Assertions.assertNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
         assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(jointPartyRequestOutcome), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
 
     }
 
-    @Parameters({
+    // JunitParamsRunnerToParameterized conversion not supported
+@Parameters({
         "null, something",
         "null, grantConfidentialityRequest",
         "null, refuseConfidentialityRequest",
@@ -179,12 +181,13 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(jointPartyRequestOutcome), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
 
-        Assert.assertNotNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
-        Assert.assertNotNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
+        Assertions.assertNotNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
+        Assertions.assertNotNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
 
     }
 
-    @Parameters({"null", "GRANTED", "REFUSED"})
+    // JunitParamsRunnerToParameterized conversion not supported
+@Parameters({"null", "GRANTED", "REFUSED"})
     @Test
     public void givenAppellantConfidentialityRequestOnlyIsInProgressShouldNotDisplayAnErrorIfRefusedSet(@Nullable RequestOutcome jointPartyRequestOutcome) {
 
@@ -196,16 +199,17 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         assertEquals(0, response.getErrors().size());
 
         assertEquals(FE_ACTIONED_NR, sscsCaseData.getDwpState());
-        Assert.assertNull(sscsCaseData.getInterlocReviewState());
+        Assertions.assertNull(sscsCaseData.getInterlocReviewState());
         assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.REFUSED), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
 
-        Assert.assertNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
-        Assert.assertNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
+        Assertions.assertNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
+        Assertions.assertNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
         assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(jointPartyRequestOutcome), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
 
     }
 
-    @Parameters({"something", "grantConfidentialityRequest", "refuseConfidentialityRequest"})
+    // JunitParamsRunnerToParameterized conversion not supported
+@Parameters({"something", "grantConfidentialityRequest", "refuseConfidentialityRequest"})
     @Test
     public void givenAppellantConfidentialityRequestOnlyIsInProgressShouldDisplayAnErrorIfAppellantRefusedSetAndJointPartyReviewValueSet(String jointPartyReviewValue) {
 
@@ -223,14 +227,15 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, sscsCaseData.getInterlocReviewState());
         assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
 
-        Assert.assertNull(sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assertions.assertNull(sscsCaseData.getConfidentialityRequestOutcomeJointParty());
 
-        Assert.assertNotNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
-        Assert.assertNotNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
+        Assertions.assertNotNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
+        Assertions.assertNotNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
 
     }
 
-    @Parameters({"null", "GRANTED", "REFUSED"})
+    // JunitParamsRunnerToParameterized conversion not supported
+@Parameters({"null", "GRANTED", "REFUSED"})
     @Test
     public void givenJointPartyConfidentialityRequestOnlyIsInProgressShouldDisplayAnErrorIfGrantedOrRefusedSetIncorrectly(@Nullable RequestOutcome appellantRequestOutcome) {
 
@@ -251,7 +256,8 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
 
     }
 
-    @Parameters({"null", "GRANTED", "REFUSED"})
+    // JunitParamsRunnerToParameterized conversion not supported
+@Parameters({"null", "GRANTED", "REFUSED"})
     @Test
     public void givenJointPartyConfidentialityRequestOnlyIsInProgressShouldNotDisplayAnErrorIfGrantedSet(@Nullable RequestOutcome appellantRequestOutcome) {
 
@@ -267,12 +273,13 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.GRANTED), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
 
         assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(appellantRequestOutcome), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
-        Assert.assertNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
-        Assert.assertNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
+        Assertions.assertNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
+        Assertions.assertNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
 
     }
 
-    @Parameters({
+    // JunitParamsRunnerToParameterized conversion not supported
+@Parameters({
         "null, something",
         "null, grantConfidentialityRequest",
         "null, refuseConfidentialityRequest",
@@ -302,13 +309,14 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
 
         assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(appellantRequestOutcome), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
-        Assert.assertNotNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
-        Assert.assertNotNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
+        Assertions.assertNotNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
+        Assertions.assertNotNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
 
     }
 
 
-    @Parameters({"null", "GRANTED", "REFUSED"})
+    // JunitParamsRunnerToParameterized conversion not supported
+@Parameters({"null", "GRANTED", "REFUSED"})
     @Test
     public void givenJointPartyConfidentialityRequestOnlyIsInProgressShouldNotDisplayAnErrorIfRefusedSet(@Nullable RequestOutcome appellantRequestOutcome) {
 
@@ -320,16 +328,17 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         assertEquals(0, response.getErrors().size());
 
         assertEquals(FE_ACTIONED_NR, sscsCaseData.getDwpState());
-        Assert.assertNull(sscsCaseData.getInterlocReviewState());
+        Assertions.assertNull(sscsCaseData.getInterlocReviewState());
         assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.REFUSED), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
 
         assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(appellantRequestOutcome), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
-        Assert.assertNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
-        Assert.assertNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
+        Assertions.assertNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
+        Assertions.assertNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
 
     }
 
-    @Parameters({"something", "grantConfidentialityRequest", "refuseConfidentialityRequest"})
+    // JunitParamsRunnerToParameterized conversion not supported
+@Parameters({"something", "grantConfidentialityRequest", "refuseConfidentialityRequest"})
     @Test
     public void givenJointPartyConfidentialityRequestOnlyIsInProgressShouldDisplayAnErrorIfAppellantRefusedSetAndAppellantReviewValueSet(String appellantReviewValue) {
 
@@ -347,11 +356,11 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, sscsCaseData.getInterlocReviewState());
 
         assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        Assert.assertNull(sscsCaseData.getConfidentialityRequestOutcomeAppellant());
-        Assert.assertNotNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
-        Assert.assertNotNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
-        Assert.assertNull(sscsCaseData.getIsConfidentialCase());
-        Assert.assertNull(sscsCaseData.getIsProgressingViaGaps());
+        Assertions.assertNull(sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assertions.assertNotNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
+        Assertions.assertNotNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
+        Assertions.assertNull(sscsCaseData.getIsConfidentialCase());
+        Assertions.assertNull(sscsCaseData.getIsProgressingViaGaps());
     }
 
     @Test
@@ -429,13 +438,14 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         assertEquals(FE_ACTIONED_NR, sscsCaseData.getDwpState());
         assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.REFUSED), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
         assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.REFUSED), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
-        Assert.assertNull(sscsCaseData.getInterlocReviewState());
-        Assert.assertNull(sscsCaseData.getIsConfidentialCase());
-        Assert.assertNull(sscsCaseData.getIsProgressingViaGaps());
+        Assertions.assertNull(sscsCaseData.getInterlocReviewState());
+        Assertions.assertNull(sscsCaseData.getIsConfidentialCase());
+        Assertions.assertNull(sscsCaseData.getIsProgressingViaGaps());
 
     }
 
-    @Parameters({
+    // JunitParamsRunnerToParameterized conversion not supported
+@Parameters({
         "grantConfidentialityRequest",
         "refuseConfidentialityRequest"
     })
@@ -458,8 +468,8 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
         assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, sscsCaseData.getInterlocReviewState());
-        Assert.assertNull(sscsCaseData.getIsConfidentialCase());
-        Assert.assertNull(sscsCaseData.getIsProgressingViaGaps());
+        Assertions.assertNull(sscsCaseData.getIsConfidentialCase());
+        Assertions.assertNull(sscsCaseData.getIsProgressingViaGaps());
     }
 
     @Test
@@ -485,6 +495,7 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"something", "grantConfidentialityRequest", "refuseConfidentialityRequest"})
     public void givenBothRequestsInProgressShouldDisplayAnErrorIfJointPartyReviewValuePopulatedAndAppellantReviewValueNotSet(String jointPartyReviewValue) {
 
@@ -558,18 +569,22 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsExceptionIfItCannotHandleTheRequest() {
-        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThrows(IllegalStateException.class, () -> {
+            when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        });
     }
 
-    @Parameters({
+    // JunitParamsRunnerToParameterized conversion not supported
+@Parameters({
         "null, null, null, null",
         "null, GRANTED, null, null",
         "null, REFUSED, null, null",

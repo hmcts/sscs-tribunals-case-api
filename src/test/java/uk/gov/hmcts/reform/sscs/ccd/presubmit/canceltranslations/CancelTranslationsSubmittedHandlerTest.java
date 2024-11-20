@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.canceltranslations;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
@@ -11,11 +11,10 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurth
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Consumer;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -31,7 +30,6 @@ import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
-@RunWith(JUnitParamsRunner.class)
 public class CancelTranslationsSubmittedHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
@@ -66,7 +64,7 @@ public class CancelTranslationsSubmittedHandlerTest {
     @Captor
     private ArgumentCaptor<Consumer<SscsCaseDetails>> sscsCaseDataCaptor;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         handler = new CancelTranslationsSubmittedHandler(
@@ -86,8 +84,8 @@ public class CancelTranslationsSubmittedHandlerTest {
 
     }
 
-    @Test
-    @Parameters(method = "generateCanHandleScenarios")
+    @ParameterizedTest
+    @MethodSource("generateCanHandleScenarios")
     public void givenCanHandleIsCalled_shouldReturnCorrectResult(CallbackType callbackType,
                                                                  Callback<SscsCaseData> callback,
                                                                  boolean expectedResult) {
@@ -229,7 +227,7 @@ public class CancelTranslationsSubmittedHandlerTest {
         assertNull(caseData.getSscsWelshPreviewNextEvent());
     }
 
-    private Object[] generateCanHandleScenarios() {
+    private static Object[] generateCanHandleScenarios() {
         Callback<SscsCaseData> callbackWithValidEventOption = buildCallback(EventType.SEND_TO_DWP.getCcdType(), State.VALID_APPEAL);
         return new Object[]{new Object[]{SUBMITTED, buildCallback("sendToDwp", State.VALID_APPEAL), true},
             new Object[]{ABOUT_TO_SUBMIT, buildCallback(EventType.SEND_TO_DWP.getCcdType(), State.VALID_APPEAL), false},
@@ -238,7 +236,7 @@ public class CancelTranslationsSubmittedHandlerTest {
         };
     }
 
-    private Callback<SscsCaseData> buildCallback(String sscsWelshPreviewNextEvent, State state) {
+    private static Callback<SscsCaseData> buildCallback(String sscsWelshPreviewNextEvent, State state) {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .sscsWelshPreviewNextEvent(sscsWelshPreviewNextEvent)
             .state(state)

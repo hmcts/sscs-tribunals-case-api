@@ -6,7 +6,6 @@ import static uk.gov.hmcts.reform.sscs.idam.UserRole.DWP;
 import java.util.List;
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -28,7 +27,6 @@ public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbac
     private final FooterService footerService;
     private final IdamService idamService;
 
-    @Autowired
     public PostponementRequestAboutToSubmitHandler(PostponementRequestService postponementRequestService, FooterService footerService, IdamService idamService) {
         this.postponementRequestService = postponementRequestService;
         this.footerService = footerService;

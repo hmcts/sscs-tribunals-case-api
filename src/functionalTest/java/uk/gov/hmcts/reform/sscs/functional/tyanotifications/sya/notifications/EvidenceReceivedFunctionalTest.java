@@ -8,7 +8,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import junitparams.Parameters;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.functional.tyanotifications.AbstractFunctionalTest;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType;
@@ -38,6 +38,7 @@ public class EvidenceReceivedFunctionalTest extends AbstractFunctionalTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ORAL", "PAPER"})
     public void givenEvidenceReceivedWithRepsSubscription_shouldSendNotificationToReps(AppealHearingType appealHearingType)
         throws Exception {

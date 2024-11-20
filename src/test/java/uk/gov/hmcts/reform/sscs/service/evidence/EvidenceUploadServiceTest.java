@@ -5,11 +5,7 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -20,7 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -36,14 +32,15 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
@@ -73,6 +70,8 @@ import uk.gov.hmcts.reform.sscs.service.pdf.data.UploadedEvidence;
 import uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement.DocumentStoreService;
 import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 @RunWith(JUnitParamsRunner.class)
 public class EvidenceUploadServiceTest {
 
@@ -110,10 +109,7 @@ public class EvidenceUploadServiceTest {
     @Captor
     private ArgumentCaptor<Consumer<SscsCaseDetails>> captor;
 
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-
-    @Before
+    @BeforeEach
     public void setUp() {
         updateCcdCaseService = mock(UpdateCcdCaseService.class);
         onlineHearingService = mock(OnlineHearingService.class);
@@ -239,6 +235,7 @@ public class EvidenceUploadServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters(method =
             "evidenceUploadByAppellantScenario, evidenceUploadByRepScenario, "
                     + "evidenceUploadByJointPartyScenario, evidenceUploadByAppellantWithOtherSubscribersPresenceScenario")
@@ -288,6 +285,7 @@ public class EvidenceUploadServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters(method =
             "evidenceUploadByAppellantScenario, evidenceUploadByRepScenario, "
                     + "evidenceUploadByJointPartyScenario, evidenceUploadByAppellantWithOtherSubscribersPresenceScenario,"
@@ -342,6 +340,7 @@ public class EvidenceUploadServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({".mp3, null, REVIEW_BY_TCW", ".mp3, REVIEW_BY_TCW, REVIEW_BY_TCW", ".mp3, REVIEW_BY_JUDGE, REVIEW_BY_JUDGE", ".mp4, null, REVIEW_BY_TCW", ".mp4, REVIEW_BY_TCW, REVIEW_BY_TCW", ".mp4, REVIEW_BY_JUDGE, REVIEW_BY_JUDGE"})
     public void givenACaseWithScannedDocumentsAndDraftAudioOrVideoDocument_thenMoveDraftToScannedDocumentsAndUpdateCaseInCcdAndSetCorrectInterlocReviewState(String fileExtension,
                                                                                                                                                              @Nullable InterlocReviewState initialInterlocReviewState,
@@ -598,6 +597,7 @@ public class EvidenceUploadServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({".mp3, audioDocument", ".mp4, videoDocument"})
     public void givenUploadWithAvEvidence_shouldInsertIntoAddedDocumentsMap(String fileExtension, String documentType) throws IOException {
         evidenceUploadService(new AddedDocumentsUtil(true));
@@ -758,6 +758,7 @@ public class EvidenceUploadServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         JP_EMAIL + ", JOINT_PARTY, null, null",
         REP_EMAIL + ", REP, null, null",
@@ -823,7 +824,7 @@ public class EvidenceUploadServiceTest {
         File file = new File(Objects.requireNonNull(
                 this.getClass().getClassLoader().getResource("dummy.pdf")).getFile());
         assertThat(file.getName(), equalTo("dummy.pdf"));
-        return Files.readAllBytes(Paths.get(file.getPath()));
+        return Files.readAllBytes(Path.of(file.getPath()));
     }
 
     @SuppressWarnings("unused")

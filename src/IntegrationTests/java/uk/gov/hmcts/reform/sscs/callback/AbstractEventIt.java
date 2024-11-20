@@ -16,14 +16,14 @@ import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -40,13 +40,11 @@ import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
 @TestPropertySource(locations = "classpath:config/application_it.properties")
 @ActiveProfiles("integration")
+@ExtendWith(SpringExtension.class)
 public abstract class AbstractEventIt {
 
     protected static final String JURISDICTION = "Benefit";
     protected static final String AN_Test = "AN Test";
-
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
 
     protected MockMvc mockMvc;
 

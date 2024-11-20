@@ -4,7 +4,6 @@ import static java.util.Objects.requireNonNull;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -23,7 +22,6 @@ public class CreateWelshNoticeSubmittedHandler implements PreSubmitCallbackHandl
     private final UpdateCcdCaseService updateCcdCaseService;
     private final IdamService idamService;
 
-    @Autowired
     public CreateWelshNoticeSubmittedHandler(UpdateCcdCaseService updateCcdCaseService, IdamService idamService) {
         this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;

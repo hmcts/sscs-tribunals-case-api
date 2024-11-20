@@ -58,10 +58,9 @@ public class HearingUpdateService {
         VenueDetails venueDetails = venueService.getVenueDetailsForActiveVenueByEpimsId(hearingEpimsId);
 
         if (isNull(venueDetails)) {
-            throw new InvalidMappingException(String.format(
-                    "Invalid epims Id %s, unable to find active venue with that id, regarding Case Id %s",
-                    hearingEpimsId,
-                    sscsCaseData.getCcdCaseId()
+            throw new InvalidMappingException("Invalid epims Id %s, unable to find active venue with that id, regarding Case Id %s".formatted(
+                hearingEpimsId,
+                sscsCaseData.getCcdCaseId()
             ));
         }
 
@@ -116,12 +115,11 @@ public class HearingUpdateService {
 
         if (hearingSessions.size() != EXPECTED_SESSIONS) {
             throw new InvalidHearingDataException(
-                    String.format(
-                            "Invalid HearingDaySchedule, should have 1 session but instead has %d sessions, for Case Id %s and Hearing Id %s",
-                            hearingSessions.size(),
-                            sscsCaseData.getCcdCaseId(),
-                            hearingId
-                    ));
+                "Invalid HearingDaySchedule, should have 1 session but instead has %d sessions, for Case Id %s and Hearing Id %s".formatted(
+                    hearingSessions.size(),
+                    sscsCaseData.getCcdCaseId(),
+                    hearingId
+                ));
         }
         return hearingSessions.get(0);
     }

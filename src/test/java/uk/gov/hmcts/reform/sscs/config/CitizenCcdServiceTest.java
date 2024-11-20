@@ -1,8 +1,9 @@
 package uk.gov.hmcts.reform.sscs.config;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -11,8 +12,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_ARCHIVED;
 
 import java.util.Collections;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
@@ -43,7 +44,7 @@ public class CitizenCcdServiceTest {
     @Mock
     private CcdService ccdService;
 
-    @Before
+    @BeforeEach
     public void setup() {
         openMocks(this);
         citizenCcdService = new CitizenCcdService(citizenCcdClient, sscsCcdConvertService, ccdService);

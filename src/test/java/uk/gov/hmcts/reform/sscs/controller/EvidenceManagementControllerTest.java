@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.controller;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -12,8 +13,8 @@ import static uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceBase.DM_STORE_
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Collections;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,20 +46,22 @@ public class EvidenceManagementControllerTest {
 
     private EvidenceManagementController controller;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         controller = new EvidenceManagementController(evidenceManagementService, evidenceManagementSecureDocStoreService, fileToPdfConversionService, false, null);
     }
 
-    @Test(expected = EvidenceDocumentsMissingException.class)
-    public void shouldThrowEvidenceDocumentsMissingExceptionIfThereAreNoFilesInTheRequest() throws JsonProcessingException {
-        controller.upload(null);
+    @Test
+    public void shouldThrowEvidenceDocumentsMissingExceptionIfThereAreNoFilesInTheRequest() {
+        assertThrows(EvidenceDocumentsMissingException.class, () ->
+            controller.upload(null));
     }
 
-    @Test(expected = EvidenceDocumentsMissingException.class)
-    public void shouldThrowEvidenceDocumentsMissingExceptionForEmptyFileList() throws JsonProcessingException {
-        controller.upload(Collections.emptyList());
+    @Test
+    public void shouldThrowEvidenceDocumentsMissingExceptionForEmptyFileList() {
+        assertThrows(EvidenceDocumentsMissingException.class, () ->
+            controller.upload(Collections.emptyList()));
     }
 
     @Test
@@ -131,15 +134,17 @@ public class EvidenceManagementControllerTest {
         assertThat(actualUploadResponseEmbedded.getBody(), equalTo(json));
     }
 
-    @Test(expected = FileToPdfConversionException.class)
-    public void shouldUploadEvidenceDocumentListLogsParseException() throws JsonProcessingException {
+    @Test
+    public void shouldUploadEvidenceDocumentListLogsParseException() {
+        assertThrows(FileToPdfConversionException.class, () -> {
 
-        MultipartFile file = mock(MultipartFile.class);
-        List<MultipartFile> files = Collections.singletonList(file);
+            MultipartFile file = mock(MultipartFile.class);
+            List<MultipartFile> files = Collections.singletonList(file);
 
-        when(fileToPdfConversionService.convert(files)).thenThrow(
-            new FileToPdfConversionException("Conversion to PDF error", new RuntimeException()));
+            when(fileToPdfConversionService.convert(files)).thenThrow(
+                new FileToPdfConversionException("Conversion to PDF error", new RuntimeException()));
 
-        controller.upload(files);
+            controller.upload(files);
+        });
     }
 }

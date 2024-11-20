@@ -15,12 +15,12 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Objects;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +40,7 @@ public class CreateCaseControllerTest {
     private MockMvc mockMvc;
     private CreateCaseController controller;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         ccdService = mock(CcdService.class);
         submitAppealService = mock(SubmitAppealService.class);
@@ -105,6 +105,6 @@ public class CreateCaseControllerTest {
 
     private String getSyaCaseWrapperJson(String resourcePath) throws IOException, URISyntaxException {
         URL resource = getClass().getClassLoader().getResource(resourcePath);
-        return String.join("\n", Files.readAllLines(Paths.get(Objects.requireNonNull(resource).toURI())));
+        return String.join("\n", Files.readAllLines(Path.of(Objects.requireNonNull(resource).toURI())));
     }
 }

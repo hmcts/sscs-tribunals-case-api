@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
@@ -11,8 +10,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -44,7 +43,7 @@ public class RequestTranslationServiceTest {
     private ArgumentCaptor<List<EmailAttachment>> captor;
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
         requestTranslationService = new RequestTranslationService(pdfStoreService,

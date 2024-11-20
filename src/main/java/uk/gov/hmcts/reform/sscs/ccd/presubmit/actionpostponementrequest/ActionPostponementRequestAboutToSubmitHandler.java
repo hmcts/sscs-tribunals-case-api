@@ -97,7 +97,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         } else {
             log.info("Action postponement request: unhandled requested action {} for case {}", actionRequested,
                 caseId);
-            response.addError(String.format("Unhandleable Postponement Request %s", actionRequested));
+            response.addError("Unhandleable Postponement Request %s".formatted(actionRequested));
         }
 
         return response;

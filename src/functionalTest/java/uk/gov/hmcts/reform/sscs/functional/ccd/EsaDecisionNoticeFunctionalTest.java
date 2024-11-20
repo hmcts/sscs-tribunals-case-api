@@ -10,30 +10,25 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.apache.http.HttpResponse;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.util.EntityUtils;
+import lombok.SneakyThrows;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.sscs.functional.mya.BaseFunctionTest;
 
+@ExtendWith(SpringExtension.class)
 @RunWith(JUnitParamsRunner.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
-
-    @ClassRule
-    public static final SpringClassRule scr = new SpringClassRule();
-
-    @Rule
-    public final SpringMethodRule smr = new SpringMethodRule();
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -223,6 +218,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "noRecommendation, The Tribunal makes no recommendation as to when the Department should reassess Joe Bloggs.",
         "doNotReassess, In view of the degree of disability found by the Tribunal\\, and unless the regulations change\\, the Tribunal would recommend that the appellant is not re-assessed.",
@@ -255,6 +251,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "noRecommendation, The Tribunal makes no recommendation as to when the Department should reassess Joe Bloggs.",
         "doNotReassess, In view of the degree of disability found by the Tribunal\\, and unless the regulations change\\, the Tribunal would recommend that the appellant is not re-assessed.",
@@ -376,13 +373,14 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
     private byte[] callPreviewFinalDecision(String json) throws IOException {
         HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(json), "PreviewFinalDecision");
         CcdEventResponse ccdEventResponse = getCcdEventResponse(httpResponse);
-        assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
+        assertThat(httpResponse.getCode(), is(200));
         assertThat(ccdEventResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument(), is(not(nullValue())));
         return sscsMyaBackendRequests.toBytes(ccdEventResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
     }
 
-    private CcdEventResponse getCcdEventResponse(HttpResponse httpResponse) throws IOException {
-        String response = EntityUtils.toString(httpResponse.getEntity());
+    @SneakyThrows
+    private CcdEventResponse getCcdEventResponse(HttpResponse httpResponse) {
+        String response = EntityUtils.toString(((ClassicHttpResponse)httpResponse).getEntity());
         return objectMapper.readValue(response, CcdEventResponse.class);
     }
 }

@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.generatecoversheet;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -24,7 +23,6 @@ public class GenerateCoversheetAboutToStartHandler implements PreSubmitCallbackH
     private final CoversheetService coversheetService;
     private final PdfStoreService pdfStoreService;
 
-    @Autowired
     public GenerateCoversheetAboutToStartHandler(CoversheetService coversheetService, PdfStoreService pdfStoreService) {
         this.coversheetService = coversheetService;
         this.pdfStoreService = pdfStoreService;

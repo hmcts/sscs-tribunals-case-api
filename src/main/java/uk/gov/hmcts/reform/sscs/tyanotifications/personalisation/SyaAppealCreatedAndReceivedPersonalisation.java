@@ -142,7 +142,7 @@ public class SyaAppealCreatedAndReceivedPersonalisation extends WithRepresentati
     private Map<String, Object> setAppointeeName(Map<String, Object> personalisation, SscsCaseData sscsCaseData) {
         Appointee appointee = sscsCaseData.getAppeal().getAppellant().getAppointee();
         if (hasAppointee(appointee, sscsCaseData.getAppeal().getAppellant().getIsAppointee())) {
-            personalisation.put(APPOINTEE_NAME, String.format("%s %s",
+            personalisation.put(APPOINTEE_NAME, "%s %s".formatted(
                 appointee.getName().getFirstName(),
                 appointee.getName().getLastName()));
         }

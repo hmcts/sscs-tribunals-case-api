@@ -7,8 +7,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
@@ -22,7 +22,7 @@ public class ConfidentialityRequestUtilTest {
 
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setup() {
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
                 .appeal(Appeal.builder().build())
@@ -46,6 +46,7 @@ public class ConfidentialityRequestUtilTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"GRANTED", "null"})
     public void noRequestInProgressReturnsFalse(@Nullable RequestOutcome outcome) {
         sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(outcome));

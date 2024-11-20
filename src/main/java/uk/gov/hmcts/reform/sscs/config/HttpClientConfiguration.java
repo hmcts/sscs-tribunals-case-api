@@ -15,12 +15,12 @@ import org.springframework.web.client.RestTemplate;
 public class HttpClientConfiguration {
 
     @Bean
-    public Client getFeignHttpClient() {
+    Client getFeignHttpClient() {
         return new ApacheHttp5Client(getHttpClient());
     }
 
     @Bean
-    public RestTemplate restTemplate() {
+    RestTemplate restTemplate() {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(getHttpClient()));
         return restTemplate;

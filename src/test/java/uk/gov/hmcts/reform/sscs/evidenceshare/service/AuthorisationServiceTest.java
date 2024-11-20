@@ -1,13 +1,14 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 import feign.FeignException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
@@ -23,7 +24,7 @@ public class AuthorisationServiceTest {
 
     private static final String SERVICE_NAME = "SSCS";
 
-    @Before
+    @BeforeEach
     public void setup() {
         openMocks(this);
         service = new AuthorisationService(serviceAuthorisationApi);
@@ -36,22 +37,28 @@ public class AuthorisationServiceTest {
         assertTrue(service.authorise(SERVICE_NAME));
     }
 
-    @Test(expected = ClientAuthorisationException.class)
+    @Test
     public void shouldHandleAnAuthorisationException() {
-        when(serviceAuthorisationApi.getServiceName(any())).thenThrow(new CustomFeignException(400, ""));
-        service.authorise(SERVICE_NAME);
+        assertThrows(ClientAuthorisationException.class, () -> {
+            when(serviceAuthorisationApi.getServiceName(any())).thenThrow(new CustomFeignException(400, ""));
+            service.authorise(SERVICE_NAME);
+        });
     }
 
-    @Test(expected = AuthorisationException.class)
+    @Test
     public void shouldHandleAnUnknownFeignException() {
-        when(serviceAuthorisationApi.getServiceName(any())).thenThrow(new CustomFeignException(501, ""));
-        service.authorise(SERVICE_NAME);
+        assertThrows(AuthorisationException.class, () -> {
+            when(serviceAuthorisationApi.getServiceName(any())).thenThrow(new CustomFeignException(501, ""));
+            service.authorise(SERVICE_NAME);
+        });
     }
 
-    @Test(expected = AuthorisationException.class)
+    @Test
     public void shouldHandleAnUnknownFeignException2() {
-        when(serviceAuthorisationApi.getServiceName(any())).thenThrow(new CustomFeignException(399, ""));
-        service.authorise(SERVICE_NAME);
+        assertThrows(AuthorisationException.class, () -> {
+            when(serviceAuthorisationApi.getServiceName(any())).thenThrow(new CustomFeignException(399, ""));
+            service.authorise(SERVICE_NAME);
+        });
     }
 
     private class CustomFeignException extends FeignException {

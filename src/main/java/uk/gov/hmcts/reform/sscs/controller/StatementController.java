@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +16,6 @@ import uk.gov.hmcts.reform.sscs.service.AppellantStatementService;
 public class StatementController {
     private final AppellantStatementService appellantStatementService;
 
-    @Autowired
     public StatementController(AppellantStatementService appellantStatementService) {
         this.appellantStatementService = appellantStatementService;
     }
@@ -35,7 +33,7 @@ public class StatementController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity uploadStatement(
-        @PathVariable("identifier") String identifier,
+        @PathVariable String identifier,
         @RequestBody Statement statement) {
         log.info("upload statement for caseId {} and tya code {}", identifier, statement.getTya());
         return appellantStatementService

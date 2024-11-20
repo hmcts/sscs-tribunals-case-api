@@ -8,8 +8,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.ccd.client.CaseAccessApi;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
@@ -32,7 +32,7 @@ public class CitizenCcdClientTest {
     @Mock
     private IdamTokens idamTokens;
 
-    @Before
+    @BeforeEach
     public void setup() {
         openMocks(this);
         citizenCcdClient = new CitizenCcdClient(ccdRequestDetails, coreCaseDataApi, caseAccessApi, false);

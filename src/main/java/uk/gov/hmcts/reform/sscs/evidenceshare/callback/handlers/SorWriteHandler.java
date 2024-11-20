@@ -11,7 +11,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -45,7 +44,6 @@ public class SorWriteHandler implements CallbackHandler<SscsCaseData> {
 
     private final PdfStoreService pdfStoreService;
 
-    @Autowired
     public SorWriteHandler(DocmosisTemplateConfig docmosisTemplateConfig, SorPlaceholderService sorPlaceholderService,
                            BulkPrintService bulkPrintService, CoverLetterService coverLetterService, PdfStoreService pdfStoreService) {
         this.docmosisTemplateConfig = docmosisTemplateConfig;
@@ -89,7 +87,7 @@ public class SorWriteHandler implements CallbackHandler<SscsCaseData> {
                 party.getClass().getSimpleName(),
                 partyId);
 
-            String letterName = String.format(LETTER_NAME, placeholders.get(ADDRESS_NAME), LocalDateTime.now());
+            String letterName = LETTER_NAME.formatted(placeholders.get(ADDRESS_NAME), LocalDateTime.now());
 
             var generatedPdf = coverLetterService.generateCoverLetterRetry(entry.getValue(),
                 docmosisTemplate, letterName, placeholders, 1);

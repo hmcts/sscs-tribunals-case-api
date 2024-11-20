@@ -1,9 +1,8 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,10 +19,8 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -34,8 +31,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
@@ -60,13 +55,6 @@ import uk.gov.hmcts.reform.sscs.service.servicebus.TopicConsumer;
 @SpringBootTest
 @TestPropertySource(locations = "classpath:config/application_es_it.properties")
 public class IssueFurtherEvidenceServiceIt {
-
-    // Below rules are needed to use the junitParamsRunner together with SpringRunner
-    @ClassRule
-    public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
-
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
     //end of rules needed for junitParamsRunner
 
     @MockBean
@@ -126,7 +114,7 @@ public class IssueFurtherEvidenceServiceIt {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         Map<String, String> nameMap;
         Map<String, Map<String, String>> englishDocs = new HashMap<>();
@@ -169,7 +157,7 @@ public class IssueFurtherEvidenceServiceIt {
 
     @Test
     public void appealWithAppellantAndFurtherEvidenceFromAppellant_shouldSend609_97ToAppellantAndNotSend609_98() throws IOException {
-        assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
+        assertNotNull(handler, "IssueFurtherEvidenceHandler must be autowired");
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
@@ -205,9 +193,10 @@ public class IssueFurtherEvidenceServiceIt {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"Rep", "JointParty"})
     public void appealWithAppellantAndRepFurtherEvidenceFromAppellant_shouldSend609_97ToAppellantAnd609_98ToParty(String party) throws IOException {
-        assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
+        assertNotNull(handler, "IssueFurtherEvidenceHandler must be autowired");
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
@@ -218,7 +207,7 @@ public class IssueFurtherEvidenceServiceIt {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource(String.format("evidenceshare/issueFurtherEvidenceCallbackWith%s.json", party))).getFile();
+            .getResource("evidenceshare/issueFurtherEvidenceCallbackWith%s.json".formatted(party))).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         mockCcdCaseDataForStartEvent(json);
@@ -249,7 +238,7 @@ public class IssueFurtherEvidenceServiceIt {
 
     @Test
     public void appealWithAppellantAndRepFurtherEvidenceFromRep_shouldSend609_97ToRepAnd609_98ToAppellant() throws IOException {
-        assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
+        assertNotNull(handler, "IssueFurtherEvidenceHandler must be autowired");
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
@@ -291,7 +280,7 @@ public class IssueFurtherEvidenceServiceIt {
 
     @Test
     public void appealWithAppellantFurtherEvidenceAndRepFurtherEvidence_shouldSend609_97ToRepAndAppellantAnd609_98ToAppellantAndRep() throws IOException {
-        assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
+        assertNotNull(handler, "IssueFurtherEvidenceHandler must be autowired");
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
@@ -343,7 +332,7 @@ public class IssueFurtherEvidenceServiceIt {
 
     @Test
     public void appealWithFurtherEvidenceFromDwp_shouldNotSend609_97AndSend609_98ToAppellant() throws IOException {
-        assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
+        assertNotNull(handler, "IssueFurtherEvidenceHandler must be autowired");
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
@@ -379,9 +368,10 @@ public class IssueFurtherEvidenceServiceIt {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"Rep", "JointParty"})
     public void appealWithRepAndFurtherEvidenceFromDwp_shouldNotSend609_97AndSend609_98ToAppellantAndParty(String party) throws IOException {
-        assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
+        assertNotNull(handler, "IssueFurtherEvidenceHandler must be autowired");
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
@@ -392,7 +382,7 @@ public class IssueFurtherEvidenceServiceIt {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource(String.format("evidenceshare/issueFurtherEvidenceCallbackWith%sAndEvidenceFromDwp.json", party))).getFile();
+            .getResource("evidenceshare/issueFurtherEvidenceCallbackWith%sAndEvidenceFromDwp.json".formatted(party))).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         mockCcdCaseDataForStartEvent(json);
@@ -422,9 +412,10 @@ public class IssueFurtherEvidenceServiceIt {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"OtherParty", "OtherPartyAppointee"})
     public void appealWithAppellantAndOtherPartyAndFurtherEvidenceFromOtherParty_shouldSend609_97ToOtherPartyAndSend609_98ToAppellant(String otherPartyType) throws IOException {
-        assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
+        assertNotNull(handler, "IssueFurtherEvidenceHandler must be autowired");
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
@@ -435,7 +426,7 @@ public class IssueFurtherEvidenceServiceIt {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource(String.format("evidenceshare/issueFurtherEvidenceCallbackWith%sEvidence.json", otherPartyType))).getFile();
+            .getResource("evidenceshare/issueFurtherEvidenceCallbackWith%sEvidence.json".formatted(otherPartyType))).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         mockCcdCaseDataForStartEvent(json);
@@ -467,7 +458,7 @@ public class IssueFurtherEvidenceServiceIt {
 
     @Test
     public void appealWithAppellantAndOtherPartyRepAndFurtherEvidenceFromOtherPartyRep_shouldSend609_97ToOtherPartyRepAndSend609_98ToOtherPartyAndAppellant() throws IOException {
-        assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
+        assertNotNull(handler, "IssueFurtherEvidenceHandler must be autowired");
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
@@ -514,7 +505,7 @@ public class IssueFurtherEvidenceServiceIt {
 
     @Test
     public void appealWithAppellantAndMultipleOtherPartiesAndMultipleFurtherEvidenceFromOtherParties_shouldSend609_97ToOtherPartyRepAndSend609_98ToAllOtherPartiesAndAppellant() throws IOException {
-        assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
+        assertNotNull(handler, "IssueFurtherEvidenceHandler must be autowired");
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
@@ -586,7 +577,7 @@ public class IssueFurtherEvidenceServiceIt {
 
     @Test
     public void appealWithAppellantAndFurtherEvidenceFromAppellantWithReasonableAdjustment_shouldReloadCaseData() throws IOException {
-        assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
+        assertNotNull(handler, "IssueFurtherEvidenceHandler must be autowired");
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
@@ -626,7 +617,7 @@ public class IssueFurtherEvidenceServiceIt {
 
     @Test
     public void shouldFailSendingFurtherEvidenceWhenAppellantNameIsMissingAndBulkPrintServiceShouldNotBeInvoked() throws IOException {
-        assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
+        assertNotNull(handler, "IssueFurtherEvidenceHandler must be autowired");
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
                 .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));

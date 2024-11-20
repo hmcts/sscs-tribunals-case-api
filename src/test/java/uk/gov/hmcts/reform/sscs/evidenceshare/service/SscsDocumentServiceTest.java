@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -17,14 +18,12 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.apache.commons.io.IOUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.quality.Strictness;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -39,11 +38,9 @@ import uk.gov.hmcts.reform.sscs.exception.UnsupportedDocumentTypeException;
 import uk.gov.hmcts.reform.sscs.helper.PdfHelper;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 
+@ExtendWith(MockitoExtension.class)
 @RunWith(JUnitParamsRunner.class)
 public class SscsDocumentServiceTest {
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
 
     @Mock
     private PdfStoreService pdfStoreService;
@@ -67,6 +64,7 @@ public class SscsDocumentServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "APPELLANT_EVIDENCE,appellantEvidenceDoc, false",
         "REPRESENTATIVE_EVIDENCE,repsEvidenceDoc, false",
@@ -91,6 +89,7 @@ public class SscsDocumentServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "OTHER_PARTY_EVIDENCE, otherPartyDoc, false, 1",
         "OTHER_PARTY_REPRESENTATIVE_EVIDENCE, otherPartyRepDoc, false, 2",
@@ -156,12 +155,14 @@ public class SscsDocumentServiceTest {
         assertEquals(pdf.getName(), result.get().getName());
     }
 
-    @Test(expected = BulkPrintException.class)
-    public void resizedPdfPropogatesException() throws Exception {
-        when(pdfHelper.scaleToA4(any())).thenThrow(new Exception());
-        byte[] pdfContent = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("myPdf.pdf"));
-        Pdf pdf = new Pdf(pdfContent, "file.pdf");
-        sscsDocumentService.resizedPdf(pdf);
+    @Test
+    public void resizedPdfPropogatesException() {
+        assertThrows(BulkPrintException.class, () -> {
+            when(pdfHelper.scaleToA4(any())).thenThrow(new Exception());
+            byte[] pdfContent = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("myPdf.pdf"));
+            Pdf pdf = new Pdf(pdfContent, "file.pdf");
+            sscsDocumentService.resizedPdf(pdf);
+        });
     }
 
     private List<SscsDocument> createTestData(boolean withEditedDocument) {

@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -23,16 +23,17 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
@@ -49,11 +50,10 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.service.FurtherEvidenceService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 @RunWith(JUnitParamsRunner.class)
 public class IssueFurtherEvidenceHandlerTest {
-
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private FurtherEvidenceService furtherEvidenceService;
@@ -110,75 +110,87 @@ public class IssueFurtherEvidenceHandlerTest {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
 
-    @Before
+    @BeforeEach
     public void setup() {
         given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(true);
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void givenCallbackIsNull_whenHandleIsCalled_shouldThrowException() {
-        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED, null);
+        assertThrows(NullPointerException.class, () ->
+            issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED, null));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "ABOUT_TO_SUBMIT"})
     public void givenCallbackIsNotSubmitted_willThrowAnException(CallbackType callbackType) {
-        issueFurtherEvidenceHandler.handle(callbackType,
-            HandlerHelper.buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
+        assertThrows(IllegalStateException.class, () ->
+            issueFurtherEvidenceHandler.handle(callbackType,
+                HandlerHelper.buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE)));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"REISSUE_FURTHER_EVIDENCE", "EVIDENCE_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
     public void givenEventTypeIsNotIssueFurtherEvidence_willThrowAnException(EventType eventType) {
-        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
-            HandlerHelper.buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, eventType));
+        assertThrows(IllegalStateException.class, () ->
+            issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
+                HandlerHelper.buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, eventType)));
     }
 
-    @Test(expected = RequiredFieldMissingException.class)
+    @Test
     public void givenCaseDataInCallbackIsNull_shouldThrowException() {
-        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
-            HandlerHelper.buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
+        assertThrows(RequiredFieldMissingException.class, () ->
+            issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
+                HandlerHelper.buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE)));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void givenCallbackIsNull_whenCanHandleIsCalled_shouldThrowException() {
-        issueFurtherEvidenceHandler.canHandle(CallbackType.SUBMITTED, null);
+        assertThrows(NullPointerException.class, () ->
+            issueFurtherEvidenceHandler.canHandle(CallbackType.SUBMITTED, null));
     }
 
-    @Test(expected = RequiredFieldMissingException.class)
+    @Test
     public void givenCaseDataInCallbackIsNull_whenCanHandleIsCalled_shouldThrowException() {
-        issueFurtherEvidenceHandler.canHandle(CallbackType.SUBMITTED,
-            HandlerHelper.buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
+        assertThrows(RequiredFieldMissingException.class, () ->
+            issueFurtherEvidenceHandler.canHandle(CallbackType.SUBMITTED,
+                HandlerHelper.buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE)));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void givenHandleMethodIsCalled_shouldThrowExceptionIfCanNotBeHandled() {
-        given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(false);
+        assertThrows(IllegalStateException.class, () -> {
+            given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(false);
 
-        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
-            HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().build(), INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
+            issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
+                HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().build(), INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
+        });
     }
 
-    @Test(expected = PostIssueFurtherEvidenceTasksException.class)
+    @Test
     public void givenExceptionWhenPostIssueFurtherEvidenceTasks_shouldHandleIt() {
-        doThrow(RuntimeException.class).when(updateCcdCaseService).updateCaseV2(
+        assertThrows(PostIssueFurtherEvidenceTasksException.class, () -> {
+            doThrow(RuntimeException.class).when(updateCcdCaseService).updateCaseV2(
                 any(Long.class),
                 eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(IdamTokens.class),
                 functionArgumentCaptor.capture()
-        );
-        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+            );
+            when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
 
-        var caseDataMap = OBJECT_MAPPER.convertValue(caseData, new TypeReference<Map<String, Object>>() {
+            var caseDataMap = OBJECT_MAPPER.convertValue(caseData, new TypeReference<Map<String, Object>>() {
+            });
+            var startEventResponse = StartEventResponse.builder().caseDetails(CaseDetails.builder().data(caseDataMap).build()).build();
+
+            when(ccdClient.startEvent(any(IdamTokens.class), any(), eq(EventType.ISSUE_FURTHER_EVIDENCE.getCcdType()))).thenReturn(startEventResponse);
+
+            var sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
+            when(sscsCcdConvertService.getCaseDetails(startEventResponse)).thenReturn(sscsCaseDetails);
+
+            issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED, HandlerHelper.buildTestCallbackForGivenData(caseData,
+                INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
         });
-        var startEventResponse = StartEventResponse.builder().caseDetails(CaseDetails.builder().data(caseDataMap).build()).build();
-
-        when(ccdClient.startEvent(any(IdamTokens.class), any(), eq(EventType.ISSUE_FURTHER_EVIDENCE.getCcdType()))).thenReturn(startEventResponse);
-
-        var sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
-        when(sscsCcdConvertService.getCaseDetails(startEventResponse)).thenReturn(sscsCaseDetails);
-
-        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED, HandlerHelper.buildTestCallbackForGivenData(caseData,
-            INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
     }
 
     @Test
@@ -214,7 +226,7 @@ public class IssueFurtherEvidenceHandlerTest {
 
         captor.getValue().accept(sscsCaseDetails);
 
-        assertEquals("hmctsDwpState has incorrect value", "failedSendingFurtherEvidence", caseData.getHmctsDwpState());
+        assertEquals("failedSendingFurtherEvidence", caseData.getHmctsDwpState(), "hmctsDwpState has incorrect value");
     }
 
     @Test
@@ -309,6 +321,7 @@ public class IssueFurtherEvidenceHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"OTHER_PARTY_EVIDENCE", "OTHER_PARTY_REPRESENTATIVE_EVIDENCE"})
     public void givenACaseWithAnOtherPartyDocumentNotIssued_shouldIssueEvidenceForOtherParty(DocumentType documentType) {
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
@@ -357,6 +370,7 @@ public class IssueFurtherEvidenceHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"OTHER_PARTY_EVIDENCE", "OTHER_PARTY_REPRESENTATIVE_EVIDENCE"})
     public void givenACaseWithMultipleOtherPartyDocumentsNotIssuedForTheSameOtherPartyId_shouldIssueEvidenceForOtherParty(DocumentType documentType) {
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
@@ -407,6 +421,7 @@ public class IssueFurtherEvidenceHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"OTHER_PARTY_EVIDENCE", "OTHER_PARTY_REPRESENTATIVE_EVIDENCE"})
     public void givenACaseWithMultipleOtherPartyDocumentsNotIssuedForMultipleOtherPartyIds_shouldIssueEvidenceForAllOtherParties(DocumentType documentType) {
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());

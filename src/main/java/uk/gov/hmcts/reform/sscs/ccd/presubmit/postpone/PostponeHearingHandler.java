@@ -85,7 +85,7 @@ public class PostponeHearingHandler implements PreSubmitCallbackHandler<SscsCase
             summary = "Not Listable after Hearing Postponed";
             description = "Setting case to Not Listable after Hearing Postponed";
         } else {
-            response.addError(String.format("Invalid event type: %s for Hearing Postponed Event", postponementEvent));
+            response.addError("Invalid event type: %s for Hearing Postponed Event".formatted(postponementEvent));
             return response;
         }
 

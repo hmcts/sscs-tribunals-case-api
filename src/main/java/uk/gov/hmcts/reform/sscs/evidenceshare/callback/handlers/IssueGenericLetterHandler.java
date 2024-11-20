@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
@@ -44,7 +43,6 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
 
     private String docmosisCoverSheetTemplate;
 
-    @Autowired
     public IssueGenericLetterHandler(BulkPrintService bulkPrintService,
                                      GenericLetterPlaceholderService genericLetterPlaceholderService,
                                      CoverLetterService coverLetterService,
@@ -176,7 +174,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
     }
 
     private static String getLetterName(Map<String, Object> placeholders) {
-        return String.format(LETTER_NAME, placeholders.get(ADDRESS_NAME), LocalDateTime.now());
+        return LETTER_NAME.formatted(placeholders.get(ADDRESS_NAME), LocalDateTime.now());
     }
 
     private void sendToAllParties(long caseId, SscsCaseData caseData, List<Pdf> documents) {

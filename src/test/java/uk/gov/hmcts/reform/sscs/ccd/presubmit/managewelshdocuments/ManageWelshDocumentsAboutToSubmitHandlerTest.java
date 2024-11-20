@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.managewelshdocuments;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import java.time.LocalDateTime;
@@ -9,9 +9,9 @@ import java.util.Arrays;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -27,7 +27,7 @@ public class ManageWelshDocumentsAboutToSubmitHandlerTest {
     private ManageWelshDocumentsAboutToSubmitHandler handler = new ManageWelshDocumentsAboutToSubmitHandler(
             new AddedDocumentsUtil(true), true);
 
-    @Before
+    @BeforeEach
     public void setUp() {
     }
 
@@ -37,6 +37,7 @@ public class ManageWelshDocumentsAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, createCallBack(null, null)));
@@ -86,7 +87,7 @@ public class ManageWelshDocumentsAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void givenCaseHasExistingDocumentsWithNullTypeWhenTypeSet_thenSetUploadedWelshDocumentTypes() {
         SscsCaseData sscsCaseDataBefore =  SscsCaseData.builder()
                 .sscsWelshDocuments(Arrays.asList(

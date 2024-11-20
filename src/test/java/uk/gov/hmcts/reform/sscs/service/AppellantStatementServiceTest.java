@@ -9,8 +9,8 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.util.DataFixtures.someStatement;
 
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.service.pdf.MyaEventActionContext;
@@ -24,7 +24,7 @@ public class AppellantStatementServiceTest {
     private AppellantStatementService appellantStatementService;
     private String someOnlineHearing;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         storeAppellantStatementService = mock(StoreAppellantStatementService.class);
         onlineHearingService = mock(OnlineHearingService.class);

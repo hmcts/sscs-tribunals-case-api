@@ -8,7 +8,6 @@ import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -36,7 +35,6 @@ public class RequestTranslationService {
     @Value("${wlu.email.dateOfReturn}")
     private String translationReturnDate;
 
-    @Autowired
     public RequestTranslationService(
         PdfStoreService pdfStoreService,
         EmailService emailService,
@@ -105,15 +103,15 @@ public class RequestTranslationService {
         ListUtils.emptyIfNull(docs).stream().filter(doc -> SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(doc.getValue().getDocumentTranslationStatus()))
             .forEach(doc -> {
                 doc.getValue().setDocumentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED);
-                if (doc instanceof SscsDocument) {
+                if (doc instanceof SscsDocument document) {
                     final String sscsFilename = getDocumentFileName.apply(doc.getValue());
                     if (sscsFilename != null) {
-                        map.put(sscsFilename, downloadBinary((SscsDocument) doc, caseId));
+                        map.put(sscsFilename, downloadBinary(document, caseId));
                     }
-                } else if (doc instanceof DwpDocument) {
+                } else if (doc instanceof DwpDocument document) {
                     final String sscsFilename = getDwpDocumentFileName.apply((DwpDocumentDetails) doc.getValue());
                     if (sscsFilename != null) {
-                        map.put(sscsFilename, downloadBinary((DwpDocument) doc, caseId));
+                        map.put(sscsFilename, downloadBinary(document, caseId));
                     }
                 }
             });

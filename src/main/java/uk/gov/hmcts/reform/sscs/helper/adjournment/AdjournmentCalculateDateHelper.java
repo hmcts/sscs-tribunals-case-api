@@ -32,8 +32,7 @@ public final class AdjournmentCalculateDateHelper {
         } else if (DATE_TO_BE_FIXED.equals(dateType)) {
             return null;
         } else {
-            throw new IllegalArgumentException(String.format(
-                "Unexpected nextHearingDateType for case id %s: '%s'",
+            throw new IllegalArgumentException("Unexpected nextHearingDateType for case id %s: '%s'".formatted(
                 caseData.getCcdCaseId(),
                 dateType));
         }
@@ -52,8 +51,7 @@ public final class AdjournmentCalculateDateHelper {
         } else if (PROVIDE_PERIOD.equals(dateOrPeriod)) {
             return calculateProvidePeriod(caseData);
         } else {
-            throw new IllegalArgumentException(String.format(
-                "Unexpected nextHearingDateOrPeriod for case id %s: '%s'",
+            throw new IllegalArgumentException("Unexpected nextHearingDateOrPeriod for case id %s: '%s'".formatted(
                 caseData.getCcdCaseId(),
                 dateOrPeriod));
         }
@@ -64,14 +62,13 @@ public final class AdjournmentCalculateDateHelper {
             caseData.getAdjournment().getNextHearingFirstAvailableDateAfterPeriod();
 
         if (dateAfterPeriod == null) {
-            throw new IllegalArgumentException(String.format(
-                "firstAvailableDateAfterPeriod unexpectedly null for case id %s",
+            throw new IllegalArgumentException("firstAvailableDateAfterPeriod unexpectedly null for case id %s".formatted(
                 caseData.getCcdCaseId()));
         }
 
         Integer days = dateAfterPeriod.getCcdDefinition();
         LocalDate result = LocalDate.now().plusDays(days);
-        logAdjournmentDate(caseData, String.format("first available date after %s days: %s", days, result));
+        logAdjournmentDate(caseData, "first available date after %s days: %s".formatted(days, result));
         return result;
     }
 
@@ -79,12 +76,11 @@ public final class AdjournmentCalculateDateHelper {
         LocalDate date = caseData.getAdjournment().getNextHearingFirstAvailableDateAfterDate();
 
         if (date == null) {
-            throw new IllegalArgumentException(String.format(
-                "firstAvailableDateAfterDate unexpectedly null for case id %s",
+            throw new IllegalArgumentException("firstAvailableDateAfterDate unexpectedly null for case id %s".formatted(
                 caseData.getCcdCaseId()));
         }
 
-        logAdjournmentDate(caseData, String.format("first available date after %s", date));
+        logAdjournmentDate(caseData, "first available date after %s".formatted(date));
         return date;
     }
 

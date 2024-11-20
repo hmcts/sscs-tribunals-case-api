@@ -4,7 +4,6 @@ import static java.util.Objects.nonNull;
 
 import java.time.ZonedDateTime;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.TyanRetryConfig;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
@@ -17,7 +16,6 @@ public class RetryNotificationService {
     private NotificationHandler notificationHandler;
     private TyanRetryConfig tyanRetryConfig;
 
-    @Autowired
     RetryNotificationService(NotificationHandler notificationHandler, TyanRetryConfig tyanRetryConfig) {
         this.notificationHandler = notificationHandler;
         this.tyanRetryConfig = tyanRetryConfig;

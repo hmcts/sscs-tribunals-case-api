@@ -236,7 +236,7 @@ class PostHearingRequestAboutToSubmitHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
-        String expectedFileName = String.format("%s Application from FTA.pdf", postHearingRequestType.getDescriptionEn());
+        String expectedFileName = "%s Application from FTA.pdf".formatted(postHearingRequestType.getDescriptionEn());
         DocumentLink expectedDocument = uploadedDocument.toBuilder()
             .documentFilename(expectedFileName)
             .build();

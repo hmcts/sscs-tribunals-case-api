@@ -25,7 +25,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -56,7 +55,6 @@ public class SendNotificationService {
     private final PdfLetterService pdfLetterService;
     private final PdfStoreService pdfStoreService;
 
-    @Autowired
     public SendNotificationService(
         NotificationSender notificationSender,
         NotificationHandler notificationHandler,

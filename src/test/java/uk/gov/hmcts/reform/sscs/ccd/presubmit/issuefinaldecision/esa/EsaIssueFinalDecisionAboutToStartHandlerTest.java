@@ -1,9 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision.esa;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
@@ -21,9 +18,9 @@ import java.util.List;
 import java.util.Map;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -93,7 +90,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
 
     private DecisionNoticeService decisionNoticeService;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         openMocks(this);
 
@@ -151,6 +148,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_SUBMIT", "MID_EVENT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
@@ -194,7 +192,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
         // CHeck that the document has the correct (updated) issued date.
         assertNotNull(previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Final Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
+            .documentFilename("Final Decision Notice issued on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -203,9 +201,9 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
             true, true);
 
         // Check that the generated date has not been updated
-        Assert.assertNotNull(payload.getGeneratedDate());
-        Assert.assertEquals(LocalDate.parse("2018-01-01"), payload.getGeneratedDate());
-        Assert.assertNotNull(payload.getWriteFinalDecisionTemplateContent());
+        Assertions.assertNotNull(payload.getGeneratedDate());
+        Assertions.assertEquals(LocalDate.parse("2018-01-01"), payload.getGeneratedDate());
+        Assertions.assertNotNull(payload.getWriteFinalDecisionTemplateContent());
     }
 
     @Test
@@ -231,7 +229,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
         // CHeck that the document has the correct (updated) issued date.
         assertNotNull(previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Final Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
+            .documentFilename("Final Decision Notice issued on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
@@ -240,9 +238,9 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
             false, true);
 
         // Check that the generated date has not been updated
-        Assert.assertNotNull(payload.getGeneratedDate());
-        Assert.assertEquals(LocalDate.parse("2018-01-01"), payload.getGeneratedDate());
-        Assert.assertNotNull(payload.getWriteFinalDecisionTemplateContent());
+        Assertions.assertNotNull(payload.getGeneratedDate());
+        Assertions.assertEquals(LocalDate.parse("2018-01-01"), payload.getGeneratedDate());
+        Assertions.assertNotNull(payload.getWriteFinalDecisionTemplateContent());
     }
 
     @Test
@@ -257,13 +255,15 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
         assertEquals("No draft final decision notice found on case. Please use 'Write final decision' event before trying to issue.", error);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsExceptionIfItCannotHandleTheAppeal() {
+        assertThrows(IllegalStateException.class, () -> {
 
-        when(esaDecisionNoticeOutcomeService.getBenefitType()).thenReturn("ESA");
+            when(esaDecisionNoticeOutcomeService.getBenefitType()).thenReturn("ESA");
 
-        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+            when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+            handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        });
     }
 
     private NoticeIssuedTemplateBody verifyTemplateBody(String image, String expectedName, String expectedAppointeeName, String dateOfDecision, boolean allowed, boolean isSetAside, boolean isDraft,

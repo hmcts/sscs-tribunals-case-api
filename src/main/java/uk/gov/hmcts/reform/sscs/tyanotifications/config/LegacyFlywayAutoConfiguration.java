@@ -15,6 +15,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationInitializer;
 import org.springframework.boot.jdbc.SchemaManagement;
 import org.springframework.boot.jdbc.SchemaManagementProvider;
+import org.springframework.boot.sql.init.dependency.DependsOnDatabaseInitialization;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -25,8 +26,9 @@ import org.springframework.jdbc.core.JdbcOperations;
 public class LegacyFlywayAutoConfiguration {
 
     @Bean
+    @DependsOnDatabaseInitialization
     @Primary
-    public SchemaManagementProvider flywayDefaultDdlModeProvider(ObjectProvider<Flyway> flyways) {
+    SchemaManagementProvider flywayDefaultDdlModeProvider(ObjectProvider<Flyway> flyways) {
         return new SchemaManagementProvider() {
             @Override
             public SchemaManagement getSchemaManagement(DataSource dataSource) {
@@ -36,14 +38,14 @@ public class LegacyFlywayAutoConfiguration {
     }
 
     @Bean(initMethod = "migrate")
-    public Flyway flyway(DataSource dataSource) {
+    Flyway flyway(DataSource dataSource) {
         Flyway flyway = Flyway.configure().baselineOnMigrate(true).dataSource(dataSource).load();
         flyway.migrate();
         return flyway;
     }
 
     @Bean
-    public FlywayMigrationInitializer flywayInitializer(Flyway flyway) {
+    FlywayMigrationInitializer flywayInitializer(Flyway flyway) {
         return new FlywayMigrationInitializer(flyway, null);
     }
 

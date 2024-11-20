@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpchallengevalidity;
 
 import static java.util.Objects.requireNonNull;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -19,7 +18,6 @@ public class DwpChallengeValidityAboutToSubmitHandler implements PreSubmitCallba
 
     private DwpDocumentService dwpDocumentService;
 
-    @Autowired
     public DwpChallengeValidityAboutToSubmitHandler(DwpDocumentService dwpDocumentService) {
         this.dwpDocumentService = dwpDocumentService;
     }

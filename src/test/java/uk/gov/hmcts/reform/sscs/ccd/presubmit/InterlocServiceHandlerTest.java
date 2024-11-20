@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -11,8 +11,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.WELSH_TRAN
 import java.time.LocalDate;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -38,7 +38,7 @@ public class InterlocServiceHandlerTest {
     @Mock
     private Callback<SscsCaseData> callback;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         handler = new InterlocServiceHandler();
@@ -50,6 +50,7 @@ public class InterlocServiceHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "TCW_DIRECTION_ISSUED, ABOUT_TO_SUBMIT, true",
         "JUDGE_DIRECTION_ISSUED, ABOUT_TO_SUBMIT, true",
@@ -70,12 +71,14 @@ public class InterlocServiceHandlerTest {
         assertEquals(expected, handler.canHandle(callbackType, callback));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void givenNullCallback_shouldThrowException() {
-        handler.canHandle(ABOUT_TO_SUBMIT, null);
+        assertThrows(NullPointerException.class, () ->
+            handler.canHandle(ABOUT_TO_SUBMIT, null));
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "TCW_DIRECTION_ISSUED, AWAITING_INFORMATION",
         "JUDGE_DIRECTION_ISSUED, AWAITING_INFORMATION",
@@ -93,6 +96,7 @@ public class InterlocServiceHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "TCW_REFER_TO_JUDGE, REVIEW_BY_JUDGE",
         "DWP_CHALLENGE_VALIDITY, REVIEW_BY_TCW",
@@ -112,6 +116,7 @@ public class InterlocServiceHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "NON_COMPLIANT, REVIEW_BY_TCW",
         "NON_COMPLIANT_SEND_TO_INTERLOC, REVIEW_BY_TCW",
@@ -131,6 +136,7 @@ public class InterlocServiceHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "NON_COMPLIANT, REVIEW_BY_TCW",
         "NON_COMPLIANT_SEND_TO_INTERLOC, REVIEW_BY_TCW",
@@ -151,14 +157,16 @@ public class InterlocServiceHandlerTest {
         assertNull(response.getData().getDirectionDueDate());
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwExceptionIfCannotHandleEventType() {
-        when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
+        assertThrows(IllegalStateException.class, () -> {
+            when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
 
-        sscsCaseData = SscsCaseData.builder().interlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE).build();
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+            sscsCaseData = SscsCaseData.builder().interlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE).build();
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        });
     }
 
 }

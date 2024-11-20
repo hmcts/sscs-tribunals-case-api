@@ -1,10 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments;
 
-import static java.lang.String.format;
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -26,8 +25,8 @@ import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -57,7 +56,7 @@ public class UploadDocumentFurtherEvidenceMidEventHandlerTest extends BaseHandle
     @Mock
     private FooterService footerService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         handler = new UploadDocumentFurtherEvidenceMidEventHandler(hearingRecordingRequestService, footerService);
@@ -81,7 +80,7 @@ public class UploadDocumentFurtherEvidenceMidEventHandlerTest extends BaseHandle
                         .hearingType("Adjourned")
                         .uploadDate(LocalDate.now().toString())
                         .recordings(List.of(HearingRecordingDetails.builder()
-                                .value(DocumentLink.builder().documentBinaryUrl(format("https://example/%s", hearingId)).build())
+                                .value(DocumentLink.builder().documentBinaryUrl("https://example/%s".formatted(hearingId)).build())
                                 .build()))
                         .build())
                 .build();
@@ -93,6 +92,7 @@ public class UploadDocumentFurtherEvidenceMidEventHandlerTest extends BaseHandle
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_SUBMIT", "ABOUT_TO_START", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
@@ -179,6 +179,7 @@ public class UploadDocumentFurtherEvidenceMidEventHandlerTest extends BaseHandle
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPELLANT", "REPRESENTATIVE", "JOINT_PARTY"})
     public void givenARequestHearingRecordingEvent_thenBuildTheUi(PartyItemList partyItem) {
         PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(callback.getCaseDetails().getCaseData());
@@ -197,6 +198,7 @@ public class UploadDocumentFurtherEvidenceMidEventHandlerTest extends BaseHandle
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "MID_EVENT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,representativeEvidence,appellantEvidence,FILE_UPLOAD_IS_EMPTY",
         "MID_EVENT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,representativeEvidence,appellantEvidence,FILE_UPLOAD_IS_NULL",
@@ -323,10 +325,12 @@ public class UploadDocumentFurtherEvidenceMidEventHandlerTest extends BaseHandle
         assertEquals(1, numberOfExpectedError);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsExceptionIfItCannotHandleTheAppeal() {
-        when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
-        handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        assertThrows(IllegalStateException.class, () -> {
+            when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
+            handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        });
     }
 
 }

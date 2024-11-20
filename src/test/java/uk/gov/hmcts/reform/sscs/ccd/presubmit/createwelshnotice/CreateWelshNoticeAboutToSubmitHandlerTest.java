@@ -2,9 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.createwelshnotice;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -18,15 +16,16 @@ import java.util.Map;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -44,9 +43,6 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
     private static final String ENGLISH_PDF = "english.pdf";
 
     private CreateWelshNoticeAboutToSubmitHandler handler;
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
     @Mock
     private DocmosisPdfService docmosisPdfService;
     @Mock
@@ -61,7 +57,7 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         handler = new CreateWelshNoticeAboutToSubmitHandler(docmosisPdfService, pdfStoreService, welshFooterService, template);
@@ -78,6 +74,7 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"DIRECTION_NOTICE, DIRECTION_ISSUED_WELSH, DIRECTIONS NOTICE, HYSBYSIAD CYFARWYDDIADAU",
         "DECISION_NOTICE, DECISION_ISSUED_WELSH, DECISION NOTICE, HYSBYSIAD O BENDERFYNIAD",
         "ADJOURNMENT_NOTICE, ISSUE_ADJOURNMENT_NOTICE_WELSH, ADJOURNMENT NOTICE, ADJOURNMENT NOTICE",
@@ -110,6 +107,7 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"taxCredit", "childSupport"})
     public void shouldHideNinoForSscs2AndSscs5(String benefitCode) {
         byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};

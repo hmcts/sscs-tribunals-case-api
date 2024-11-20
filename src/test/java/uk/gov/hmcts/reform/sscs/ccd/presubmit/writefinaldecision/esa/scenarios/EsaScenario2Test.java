@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios;
 
 import java.util.Arrays;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaTemplateContent;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
@@ -47,28 +47,30 @@ public class EsaScenario2Test {
          */
 
 
-        String expectedContent = "The appeal is refused.\n"
-            + "\n"
-            + "The decision made by the Secretary of State on 20/09/2020 is confirmed.\n"
-            + "\n"
-            + "Felix Sydney continues to have limited capability for work but does not have limited capability for work-related activity and cannot be treated as having limited capability for work-related activity.\n"
-            + "\n"
-            + "This is because no descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 applied. Regulation 35 did not apply.\n"
-            + "\n"
-            + "The Secretary of State has accepted that Felix Sydney has limited capability for work. This was not in issue.\n"
-            + "\n"
-            + "My first reasons\n"
-            + "\n"
-            + "My second reasons\n"
-            + "\n"
-            + "Something else\n"
-            + "\n"
-            + "This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
-            + "\n";
+        String expectedContent = """
+            The appeal is refused.
+            
+            The decision made by the Secretary of State on 20/09/2020 is confirmed.
+            
+            Felix Sydney continues to have limited capability for work but does not have limited capability for work-related activity and cannot be treated as having limited capability for work-related activity.
+            
+            This is because no descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 applied. Regulation 35 did not apply.
+            
+            The Secretary of State has accepted that Felix Sydney has limited capability for work. This was not in issue.
+            
+            My first reasons
+            
+            My second reasons
+            
+            Something else
+            
+            This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.
+            
+            """;
 
-        Assert.assertEquals(9, content.getComponents().size());
+        Assertions.assertEquals(9, content.getComponents().size());
 
-        Assert.assertEquals(expectedContent, content.toString());
+        Assertions.assertEquals(expectedContent, content.toString());
 
     }
 }

@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 public class SwaggerDocumentationConfig {
 
     @Bean
-    public OpenAPI customImplementation() {
+    OpenAPI customImplementation() {
         return new OpenAPI()
             .info(new Info()
                 .title("tribunals-case-api")

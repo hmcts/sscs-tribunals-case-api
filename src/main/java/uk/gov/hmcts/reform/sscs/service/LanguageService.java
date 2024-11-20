@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -20,7 +19,6 @@ public class LanguageService {
 
     private JSONArray languagesJson;
 
-    @Autowired
     public LanguageService() throws IOException {
         String languages = IOUtils.resourceToString(REFERENCE_LANGUAGES_JSON,
             StandardCharsets.UTF_8, Thread.currentThread().getContextClassLoader());

@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
@@ -34,6 +34,7 @@ public class ActionHearingRecordingRequestServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPELLANT", "DWP", "JOINT_PARTY"})
     public void getRequestStatusWithNoHearingRecordingRequests_willReturnEmpty(PartyItemList party) {
         SscsCaseData sscsCaseData = SscsCaseData.builder().hearings(newArrayList(HEARING)).build();
@@ -42,6 +43,7 @@ public class ActionHearingRecordingRequestServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPELLANT", "DWP", "JOINT_PARTY"})
     public void getRequestStatusWithHearingRecordingRequests_willReturnRequested(PartyItemList party) {
         final SscsHearingRecordingCaseData sscsHearingRecordingCaseData = SscsHearingRecordingCaseData.builder()
@@ -53,6 +55,7 @@ public class ActionHearingRecordingRequestServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPELLANT", "DWP", "JOINT_PARTY"})
     public void getRequestStatusWithHearingRecordingGranted_willReturnGranted(PartyItemList party) {
         final SscsHearingRecordingCaseData sscsHearingRecordingCaseData = SscsHearingRecordingCaseData.builder()
@@ -70,6 +73,7 @@ public class ActionHearingRecordingRequestServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPELLANT", "DWP", "JOINT_PARTY"})
     public void getRequestStatusWithHearingRecordingRefused_willReturnRefused(PartyItemList party) {
         final SscsHearingRecordingCaseData sscsHearingRecordingCaseData = SscsHearingRecordingCaseData.builder()
@@ -88,6 +92,7 @@ public class ActionHearingRecordingRequestServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "APPELLANT, GRANTED", "APPELLANT, REFUSED", "APPELLANT, REQUESTED",
         "DWP, GRANTED",  "DWP, REFUSED", "DWP, REQUESTED",

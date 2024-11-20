@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.sscs.functional.mya;
 
-import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.apache.http.client.methods.RequestBuilder.*;
-import static org.apache.http.entity.ContentType.APPLICATION_JSON;
+import static org.apache.hc.core5.http.ContentType.APPLICATION_JSON;
+import static org.apache.hc.core5.http.io.support.ClassicRequestBuilder.delete;
+import static org.apache.hc.core5.http.io.support.ClassicRequestBuilder.get;
+import static org.apache.hc.core5.http.io.support.ClassicRequestBuilder.post;
+import static org.apache.hc.core5.http.io.support.ClassicRequestBuilder.put;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static uk.gov.hmcts.reform.sscs.service.evidence.EvidenceUploadService.DM_STORE_USER_ID;
@@ -11,18 +13,19 @@ import static uk.gov.hmcts.reform.sscs.service.evidence.EvidenceUploadService.DM
 import java.io.IOException;
 import java.net.URI;
 import java.util.Objects;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.support.ClassicRequestBuilder;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.ContentDisposition;
@@ -49,29 +52,31 @@ public class SscsMyaBackendRequests {
         this.evidenceManagementService = evidenceManagementService;
     }
 
-    public JSONArray getOnlineHearingForCitizen(String tya, String email) throws IOException {
+    @SneakyThrows
+    public JSONArray getOnlineHearingForCitizen(String tya, String email) {
         String uri = (StringUtils.isNotBlank(tya)) ? "/api/citizen/" + tya : "/api/citizen";
         HttpResponse getOnlineHearingResponse = getRequest(uri, email);
 
         // Retry if failed first time
-        if (getOnlineHearingResponse.getStatusLine().getStatusCode() != HttpStatus.OK.value()) {
+        if (getOnlineHearingResponse.getCode() != HttpStatus.OK.value()) {
             getOnlineHearingResponse = getRequest(uri, email);
         }
 
-        assertThat(getOnlineHearingResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
+        assertThat(getOnlineHearingResponse.getCode(), is(HttpStatus.OK.value()));
 
-        String responseBody = EntityUtils.toString(getOnlineHearingResponse.getEntity());
+        String responseBody = EntityUtils.toString(((CloseableHttpResponse) getOnlineHearingResponse).getEntity());
 
         return new JSONArray(responseBody);
     }
 
-    public JSONObject assignCaseToUser(String tya, String email, String postcode) throws IOException {
+    @SneakyThrows
+    public JSONObject assignCaseToUser(String tya, String email, String postcode) {
         StringEntity entity = new StringEntity("{\"email\":\"" + email + "\", \"postcode\":\"" + postcode + "\"}", APPLICATION_JSON);
 
         HttpResponse response = postRequest("/api/citizen/" + tya, entity, email);
-        assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
+        assertThat(response.getCode(), is(HttpStatus.OK.value()));
 
-        String responseBody = EntityUtils.toString(response.getEntity());
+        String responseBody = EntityUtils.toString(((CloseableHttpResponse) response).getEntity());
 
         return new JSONObject(responseBody);
     }
@@ -80,17 +85,18 @@ public class SscsMyaBackendRequests {
         StringEntity entity = new StringEntity(EMPTY, APPLICATION_JSON);
 
         HttpResponse response = putRequest("/api/citizen/cases/" + caseId + "/log", entity);
-        assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
+        assertThat(response.getCode(), is(HttpStatus.NO_CONTENT.value()));
     }
 
-    public CreatedCcdCase createOralCase(String emailAddress) throws IOException {
+    @SneakyThrows
+    public CreatedCcdCase createOralCase(String emailAddress) {
         HttpResponse createCaseResponse = client.execute(post(baseUrl + "/api/case?hearingType=oral&email=" + emailAddress)
                 .setHeader("Content-Length", "0")
                 .build());
 
-        assertThat(createCaseResponse.getStatusLine().getStatusCode(), is(HttpStatus.CREATED.value()));
+        assertThat(createCaseResponse.getCode(), is(HttpStatus.CREATED.value()));
 
-        String responseBody = EntityUtils.toString(createCaseResponse.getEntity());
+        String responseBody = EntityUtils.toString(((CloseableHttpResponse) createCaseResponse).getEntity());
         JSONObject jsonObject = new JSONObject(responseBody);
         System.out.println("Case id " + jsonObject.getString("id"));
         return new CreatedCcdCase(
@@ -111,7 +117,7 @@ public class SscsMyaBackendRequests {
                 .build();
 
         HttpResponse response = putRequest("/api/continuous-online-hearings/" + hearingId + "/evidence", data);
-        assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
+        assertThat(response.getCode(), is(HttpStatus.OK.value()));
     }
 
     public void uploadSingleHearingEvidence(String hearingId, String fileName, String body, String idamEmail) throws IOException {
@@ -124,12 +130,12 @@ public class SscsMyaBackendRequests {
                 .build();
 
         HttpResponse response = postRequest("/api/continuous-online-hearings/" + hearingId + "/singleevidence?body=" + body + "&idamEmail=" + idamEmail, data);
-        assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
+        assertThat(response.getCode(), is(HttpStatus.NO_CONTENT.value()));
     }
 
     public void deleteUploadEvidence(Long caseId, String evidenceId) throws IOException {
         HttpResponse response = client.execute(addHeaders(delete(baseUrl + "/api/continuous-online-hearings/" + caseId + "/evidence/" + evidenceId)).build());
-        assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
+        assertThat(response.getCode(), is(HttpStatus.NO_CONTENT.value()));
     }
 
     public void submitHearingEvidence(String hearingId, String description) throws IOException {
@@ -139,58 +145,62 @@ public class SscsMyaBackendRequests {
                         + "  \"idamEmail\": \"mya-sscs-6920@mailinator.com\"\n"
                         + "}", APPLICATION_JSON)
         );
-        assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
+        assertThat(response.getCode(), is(HttpStatus.NO_CONTENT.value()));
     }
 
-    public JSONArray getDraftHearingEvidence(String hearingId) throws IOException {
+    @SneakyThrows
+    public JSONArray getDraftHearingEvidence(String hearingId) {
         HttpResponse response = getRequest("/api/continuous-online-hearings/" + hearingId + "/evidence");
-        assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
+        assertThat(response.getCode(), is(HttpStatus.OK.value()));
 
-        String responseBody = EntityUtils.toString(response.getEntity());
+        String responseBody = EntityUtils.toString(((CloseableHttpResponse) response).getEntity());
 
         return new JSONArray(responseBody);
     }
 
     public void uploadAppellantStatement(String hearingId, String statement) throws IOException {
         String uri = "/api/continuous-online-hearings/" + hearingId + "/statement";
-        String stringEntity = "{\n"
-                + "  \"body\": \"statement\",\n"
-                + "  \"tya\": \"Q9jE2FQuRR\"\n"
-                + "}";
+        String stringEntity = """
+                {
+                  "body": "statement",
+                  "tya": "Q9jE2FQuRR"
+                }\
+                """;
         HttpResponse getQuestionResponse = postRequest(uri, new StringEntity(stringEntity, APPLICATION_JSON));
 
-        assertThat(getQuestionResponse.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
+        assertThat(getQuestionResponse.getCode(), is(HttpStatus.NO_CONTENT.value()));
     }
 
     public String getCoversheet(String caseId) throws IOException {
         CloseableHttpResponse getCoverSheetResponse = getRequest("/api/continuous-online-hearings/" + caseId + "/evidence/coversheet");
 
-        assertThat(getCoverSheetResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
+        assertThat(getCoverSheetResponse.getCode(), is(HttpStatus.OK.value()));
         Header fileNameHeader = getCoverSheetResponse.getFirstHeader("Content-Disposition");
         return ContentDisposition.parse(fileNameHeader.getValue()).getFilename();
     }
 
 
-    public String updateSubscription(String appellantTya, String userEmail) throws IOException {
-        HttpResponse response = postRequest(format("/appeals/%s/subscriptions/%s", appellantTya, appellantTya),
-                new StringEntity(format("{ \"subscription\" : {\"email\" : \"%s\"}}", userEmail), APPLICATION_JSON));
+    @SneakyThrows
+    public String updateSubscription(String appellantTya, String userEmail) {
+        HttpResponse response = postRequest("/appeals/%s/subscriptions/%s".formatted(appellantTya, appellantTya),
+                new StringEntity("{ \"subscription\" : {\"email\" : \"%s\"}}".formatted(userEmail), APPLICATION_JSON));
 
-        assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
-        return EntityUtils.toString(response.getEntity());
+        assertThat(response.getCode(), is(HttpStatus.OK.value()));
+        return EntityUtils.toString(((CloseableHttpResponse) response).getEntity());
     }
 
     public void unsubscribeSubscription(String appellantTya, String userEmail) throws IOException {
-        HttpResponse response = client.execute(addHeaders(delete(format("%s/appeals/%s/subscriptions/%s", baseUrl, appellantTya, appellantTya))).build());
-        assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
+        HttpResponse response = client.execute(addHeaders(delete("%s/appeals/%s/subscriptions/%s".formatted(baseUrl, appellantTya, appellantTya))).build());
+        assertThat(response.getCode(), is(HttpStatus.OK.value()));
     }
 
-    private RequestBuilder addHeaders(RequestBuilder requestBuilder) {
+    private ClassicRequestBuilder addHeaders(ClassicRequestBuilder requestBuilder) {
         return requestBuilder
                 .setHeader(HttpHeaders.AUTHORIZATION, idamTokens.getIdamOauth2Token())
                 .setHeader("ServiceAuthorization", idamTokens.getServiceAuthorization());
     }
 
-    private RequestBuilder addHeaders(RequestBuilder requestBuilder, String email) {
+    private ClassicRequestBuilder addHeaders(ClassicRequestBuilder requestBuilder, String email) {
         String userToken = citizenIdamService.getUserToken(email, "Apassword123");
         return requestBuilder
                 .setHeader(HttpHeaders.AUTHORIZATION, userToken)
@@ -226,7 +236,7 @@ public class SscsMyaBackendRequests {
     }
 
     public HttpResponse midEvent(HttpEntity body, String postfixUrl) throws IOException {
-        return client.execute(addHeaders(post(format("%s/ccdMidEvent%s", baseUrl, postfixUrl))
+        return client.execute(addHeaders(post("%s/ccdMidEvent%s".formatted(baseUrl, postfixUrl))
             .setHeader("Accept", APPLICATION_JSON.toString())
             .setHeader("Content-type", APPLICATION_JSON.toString())).setEntity(body).build());
     }

@@ -13,8 +13,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.test.context.ActiveProfiles;
@@ -51,7 +51,7 @@ public class NotificationControllerTest {
 
     private ObjectMapper mapper;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         openMocks(this);
 

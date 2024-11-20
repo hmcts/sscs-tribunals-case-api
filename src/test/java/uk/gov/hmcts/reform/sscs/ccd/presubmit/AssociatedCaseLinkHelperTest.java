@@ -1,8 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ASSOCIATE_CASE;
@@ -15,15 +14,15 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -34,9 +33,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @RunWith(JUnitParamsRunner.class)
 public class AssociatedCaseLinkHelperTest {
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.LENIENT);
 
     @Mock
     private CcdService ccdService;
@@ -49,7 +45,7 @@ public class AssociatedCaseLinkHelperTest {
     @Captor
     private ArgumentCaptor<Consumer<SscsCaseDetails>> caseDetailsCaptor;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         associatedCaseLinkHelper = new AssociatedCaseLinkHelper(ccdService, idamService, updateCcdCaseService);
 
@@ -123,6 +119,7 @@ public class AssociatedCaseLinkHelperTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"true", "false"})
     public void shouldNotLinkCaseByNinoIfPreviousNinoIsPresent(String addLinkToOtherAssociatedCasesV2Enabled) {
         Boolean addLinkToOtherAssociatedCasesV2Boolean = Boolean.valueOf(addLinkToOtherAssociatedCasesV2Enabled);
@@ -153,6 +150,7 @@ public class AssociatedCaseLinkHelperTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"true", "false"})
     public void shouldLinkCaseByNinoButNotToOthersIfCaseIdIsNull(String addLinkToOtherAssociatedCasesV2Enabled) {
         Boolean addLinkToOtherAssociatedCasesV2Boolean = Boolean.valueOf(addLinkToOtherAssociatedCasesV2Enabled);
@@ -240,6 +238,7 @@ public class AssociatedCaseLinkHelperTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"true", "false"})
     public void addNoAssociatedCases(String addLinkToOtherAssociatedCasesV2Enabled) {
         Boolean addLinkToOtherAssociatedCasesV2Boolean = Boolean.valueOf(addLinkToOtherAssociatedCasesV2Enabled);
@@ -257,6 +256,7 @@ public class AssociatedCaseLinkHelperTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"true", "false"})
     public void getMatchedCases(String addLinkToOtherAssociatedCasesV2Enabled) {
         Boolean addLinkToOtherAssociatedCasesV2Boolean = Boolean.valueOf(addLinkToOtherAssociatedCasesV2Enabled);

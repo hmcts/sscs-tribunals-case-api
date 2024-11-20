@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -40,7 +39,6 @@ public class EvidenceUploadController {
     private final EvidenceUploadService evidenceUploadService;
     private final CoversheetService coversheetService;
 
-    @Autowired
     public EvidenceUploadController(
             EvidenceUploadService evidenceUploadService,
             CoversheetService coversheetService) {
@@ -64,8 +62,8 @@ public class EvidenceUploadController {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Evidence> uploadEvidence(
-        @Parameter(description = "either the online hearing or CCD case id", example = "xxxxx-xxxx-xxxx-xxxx") @PathVariable("identifier") String identifier,
-        @RequestParam("file") MultipartFile file
+        @Parameter(description = "either the online hearing or CCD case id", example = "xxxxx-xxxx-xxxx-xxxx") @PathVariable String identifier,
+        @RequestParam MultipartFile file
     ) {
         return uploadEvidence(() -> evidenceUploadService.uploadDraftEvidence(identifier, file));
     }
@@ -92,7 +90,7 @@ public class EvidenceUploadController {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<List<Evidence>> listDraftEvidence(
-        @PathVariable("identifier") String identifier
+        @PathVariable String identifier
     ) {
         return ResponseEntity.ok(evidenceUploadService.listDraftHearingEvidence(identifier));
     }
@@ -112,8 +110,8 @@ public class EvidenceUploadController {
     )
     public ResponseEntity<Void> deleteEvidence(
         @Parameter(description = "either the online hearing or CCD case id", example = "xxxxx-xxxx-xxxx-xxxx")
-        @PathVariable("identifier") String identifier,
-        @PathVariable("evidenceId") String evidenceId
+        @PathVariable String identifier,
+        @PathVariable String evidenceId
     ) {
         boolean hearingFound = evidenceUploadService.deleteDraftEvidence(identifier, evidenceId);
         return hearingFound ? ResponseEntity.noContent().build() : notFound().build();
@@ -136,10 +134,10 @@ public class EvidenceUploadController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity submitSingleEvidence(
-        @Parameter(description = "either the online hearing or CCD case id", example = "xxxxx-xxxx-xxxx-xxxx") @PathVariable("identifier") String identifier,
-        @RequestParam("file") MultipartFile file,
-        @RequestParam("body") String body,
-        @RequestParam("idamEmail") String idamEmail
+        @Parameter(description = "either the online hearing or CCD case id", example = "xxxxx-xxxx-xxxx-xxxx") @PathVariable String identifier,
+        @RequestParam MultipartFile file,
+        @RequestParam String body,
+        @RequestParam String idamEmail
     ) {
         boolean evidenceSubmitted = evidenceUploadService.submitSingleHearingEvidence(identifier, new EvidenceDescription(body, idamEmail), file);
         return evidenceSubmitted ? ResponseEntity.noContent().build() : notFound().build();
@@ -160,7 +158,7 @@ public class EvidenceUploadController {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity submitEvidence(
-        @PathVariable("identifier") String identifier,
+        @PathVariable String identifier,
         @RequestBody EvidenceDescription description
     ) {
         boolean evidenceSubmitted = evidenceUploadService.submitHearingEvidence(identifier, description);
@@ -180,7 +178,7 @@ public class EvidenceUploadController {
         produces = MediaType.APPLICATION_PDF_VALUE
     )
     public ResponseEntity<ByteArrayResource> getCoverSheet(
-        @Parameter(description = "either the online hearing or CCD case id", example = "xxxxx-xxxx-xxxx-xxxx") @PathVariable("identifier") String identifier
+        @Parameter(description = "either the online hearing or CCD case id", example = "xxxxx-xxxx-xxxx-xxxx") @PathVariable String identifier
     ) {
         Optional<byte[]> coverSheet = coversheetService.createCoverSheet(identifier);
         return coverSheet.map(pdfBytes ->

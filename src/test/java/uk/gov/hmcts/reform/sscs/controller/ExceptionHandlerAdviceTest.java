@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscs.controller;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.context.request.WebRequest;

@@ -3,14 +3,15 @@ package uk.gov.hmcts.reform.sscs.controller;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -21,7 +22,6 @@ import uk.gov.hmcts.reform.sscs.exception.AppealNotFoundException;
 import uk.gov.hmcts.reform.sscs.exception.DocumentNotFoundException;
 import uk.gov.hmcts.reform.sscs.service.DocumentDownloadService;
 import uk.gov.hmcts.reform.sscs.service.TribunalsService;
-
 
 
 public class TyaControllerTest {
@@ -37,7 +37,7 @@ public class TyaControllerTest {
 
     private TyaController controller;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         controller = new TyaController(tribunalsService, documentDownloadService);
@@ -71,14 +71,16 @@ public class TyaControllerTest {
         assertThat(receivedAppeal.getBody(), equalTo(node.toString()));
     }
 
-    @Test(expected = AppealNotFoundException.class)
-    public void testToThrowAppealNotFoundExceptionIfAppealNotFound() throws CcdException {
-        //Given
-        when(tribunalsService.findAppeal(CASE_ID, true)).thenThrow(
-            new AppealNotFoundException(CASE_ID));
+    @Test
+    public void testToThrowAppealNotFoundExceptionIfAppealNotFound() {
+        assertThrows(AppealNotFoundException.class, () -> {
+            //Given
+            when(tribunalsService.findAppeal(CASE_ID, true)).thenThrow(
+                new AppealNotFoundException(CASE_ID));
 
-        //When
-        controller.getAppealByCaseId(CASE_ID, true);
+            //When
+            controller.getAppealByCaseId(CASE_ID, true);
+        });
     }
 
     @Test
@@ -95,14 +97,16 @@ public class TyaControllerTest {
         assertThat(receivedDocument.getBody(), instanceOf(ByteArrayResource.class));
     }
 
-    @Test(expected = DocumentNotFoundException.class)
-    public void testToThrowDocumentNotFoundExceptionIfError() throws CcdException {
-        //Given
-        when(documentDownloadService.downloadFile(URL)).thenThrow(
+    @Test
+    public void testToThrowDocumentNotFoundExceptionIfError() {
+        assertThrows(DocumentNotFoundException.class, () -> {
+            //Given
+            when(documentDownloadService.downloadFile(URL)).thenThrow(
                 new DocumentNotFoundException());
 
-        //When
-        controller.getAppealDocument(URL);
+            //When
+            controller.getAppealDocument(URL);
+        });
     }
 
 }

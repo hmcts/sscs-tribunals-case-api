@@ -1,8 +1,7 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -18,10 +17,8 @@ import java.util.function.Function;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -31,8 +28,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
@@ -60,13 +55,6 @@ import uk.gov.hmcts.reform.sscs.service.servicebus.TopicConsumer;
 @SpringBootTest
 @TestPropertySource(locations = "classpath:config/application_es_it.properties")
 public class ReissueFurtherEvidenceServiceIt {
-
-    // Below rules are needed to use the junitParamsRunner together with SpringRunner
-    @ClassRule
-    public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
-
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
     //end of rules needed for junitParamsRunner
 
     @MockBean
@@ -125,7 +113,7 @@ public class ReissueFurtherEvidenceServiceIt {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         Map<String, String> nameMap;
         Map<String, Map<String, String>> englishDocs = new HashMap<>();
@@ -160,7 +148,7 @@ public class ReissueFurtherEvidenceServiceIt {
         template.put(LanguagePreference.WELSH, welshDocs);
 
         MimeMessage message = new MimeMessage(session);
-        assertNotNull("ReissueFurtherEvidenceHandler must be autowired", handler);
+        assertNotNull(handler, "ReissueFurtherEvidenceHandler must be autowired");
 
         fileContent = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("evidenceshare/myPdf.pdf"));
 

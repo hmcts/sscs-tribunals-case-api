@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournment;
 
 import static java.util.Objects.requireNonNull;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -20,7 +19,6 @@ public class IssueAdjournmentNoticeAboutToStartHandler implements PreSubmitCallb
 
     private final AdjournCasePreviewService previewService;
 
-    @Autowired
     public IssueAdjournmentNoticeAboutToStartHandler(AdjournCasePreviewService previewService) {
         this.previewService = previewService;
     }

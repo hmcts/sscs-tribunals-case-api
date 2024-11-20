@@ -143,7 +143,7 @@ public final class OverridesMapping {
             Language language = refData.getSignLanguages().getSignLanguage(signLanguage);
 
             if (isNull(language)) {
-                throw new InvalidMappingException(String.format("The language %s cannot be mapped", signLanguage));
+                throw new InvalidMappingException("The language %s cannot be mapped".formatted(signLanguage));
             }
 
             return language;
@@ -153,7 +153,7 @@ public final class OverridesMapping {
             Language language = refData.getVerbalLanguages().getVerbalLanguage(verbalLanguage);
 
             if (isNull(language)) {
-                throw new InvalidMappingException(String.format("The language %s cannot be mapped", verbalLanguage));
+                throw new InvalidMappingException("The language %s cannot be mapped".formatted(verbalLanguage));
             }
 
             return language;

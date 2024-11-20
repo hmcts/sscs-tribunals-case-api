@@ -4,11 +4,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.sscs.exception.NoMrnDetailsException;
 import uk.gov.hmcts.reform.sscs.service.exceptions.ClientAuthorisationException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.servicebus.NotificationsMessageProcessor;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TopicConsumerTest {
 
     private static final String MESSAGE = "message";
@@ -40,7 +40,7 @@ public class TopicConsumerTest {
     private TopicConsumer topicConsumer;
     private Exception exception;
 
-    @Before
+    @BeforeEach
     public void setup() {
         topicConsumer = new TopicConsumer(RETRY_THREE_TIMES, dispatcher, deserializer, notificationsMessageProcessor, false);
     }

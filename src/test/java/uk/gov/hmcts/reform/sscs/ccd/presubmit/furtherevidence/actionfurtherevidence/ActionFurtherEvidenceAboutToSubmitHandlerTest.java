@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevid
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
@@ -38,14 +38,17 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.apache.commons.collections4.CollectionUtils;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -66,9 +69,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     private static final String NO = "No";
     private static final String YES = "Yes";
 
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
-
     private ActionFurtherEvidenceAboutToSubmitHandler actionFurtherEvidenceAboutToSubmitHandler;
 
     @Mock
@@ -88,7 +88,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     private List<ScannedDocument> scannedDocumentList = new ArrayList<>();
     private final BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder = new BundleAdditionFilenameBuilder();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService,
             bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false, false);
@@ -200,6 +200,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         + "and review by judge is selected, "
         + "and original sender is DWP, "
         + "then DWP State is updated and types are set")
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "setAsideApplication, SET_ASIDE_REQUESTED, SET_ASIDE",
         "correctionApplication, CORRECTION_REQUESTED, CORRECTION",
@@ -248,6 +249,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         + "and review by judge is selected, "
         + "and original sender is NOT DWP, "
         + "then DWP State is NOT updated and types are set")
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "setAsideApplication, SET_ASIDE",
         "correctionApplication, CORRECTION",
@@ -294,6 +296,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @DisplayName("Given a valid post hearing application request from an FTA user with 'Admin Action X' selected, "
         + "then DWP state and Interloc Review state are updated, "
         + "and post hearing request type and document type are identified as expected.")
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "ADMIN_ACTION_CORRECTION, correctionApplication, CORRECTION_REQUESTED, CORRECTION",
     })
@@ -338,6 +341,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @DisplayName("Given a post hearing document is uploaded from an FTA user "
         + "and post hearings flag is disabled, "
         + "then DWP state and post hearing are not updated.")
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "setAsideApplication",
         "correctionApplication",
@@ -384,6 +388,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @DisplayName("Given a post hearing B document is uploaded from an FTA user "
         + "and post hearings B flag is disabled, "
         + "then DWP state and post hearing are not updated.")
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "libertyToApplyApplication",
         "permissionToAppealApplication"
@@ -423,6 +428,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "setAsideApplication",
         "statementOfReasonsApplication",
@@ -456,11 +462,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         assertThat(response.getErrors(), hasSize(1));
         assertThat(response.getErrors(), hasItem(
-                String.format("'Further Evidence Action' must be set to '%s'",
-                        SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel())));
+            "'Further Evidence Action' must be set to '%s'".formatted(
+                SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel())));
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "correctionApplication,Admin action correction",
     })
@@ -491,11 +498,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         assertThat(response.getErrors(), hasSize(1));
         assertThat(response.getErrors(), hasItem(
-            String.format("'Further Evidence Action' must be set to '%s' or '%s'",
+            "'Further Evidence Action' must be set to '%s' or '%s'".formatted(
                 SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel(), actionLabel)));
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "setAsideApplication,APPELLANT",
         "setAsideApplication,REPRESENTATIVE",
@@ -550,6 +558,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "setAsideApplication,APPELLANT",
         "setAsideApplication,REPRESENTATIVE",
@@ -607,6 +616,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "setAsideApplication,APPELLANT",
         "setAsideApplication,REPRESENTATIVE",
@@ -652,8 +662,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertEquals(1, response.getData().getSscsDocument().stream().filter(doc -> "A".equals(doc.getValue().getBundleAddition())).count());
     }
 
-    @Test
-    @Parameters(method = "generateFurtherEvidenceActionListScenarios")
+    @ParameterizedTest
+    @MethodSource("generateFurtherEvidenceActionListScenarios")
     public void givenACaseWithScannedDocuments_shouldMoveToSscsDocuments(@Nullable DynamicList furtherEvidenceActionList,
                                                                          @Nullable DynamicList originalSender,
                                                                          @Nullable String evidenceHandle,
@@ -703,6 +713,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"true", "false"})
     public void givenACaseWithScannedDocumentOfTypeCoversheet_shouldNotMoveToSscsDocumentsAndWarningShouldBeReturned(boolean ignoreWarnings) {
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
@@ -740,6 +751,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"true", "false"})
     public void givenACaseWithAnEmptyScannedDocumentType_shouldMoveToSscsDocumentsAndWarningShouldBeReturned(boolean ignoreWarnings) {
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
@@ -825,7 +837,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertEquals(YES, response.getData().getEvidenceHandled());
     }
 
-    private Object[] generateFurtherEvidenceActionListScenarios() {
+    private static Object[] generateFurtherEvidenceActionListScenarios() {
         DynamicList furtherEvidenceActionListOtherDocuments =
             buildFurtherEvidenceActionItemListForGivenOption("otherDocumentManual",
                 "Other document type - action manually");
@@ -895,7 +907,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         return new DynamicList(value, Collections.singletonList(value));
     }
 
-    private DynamicList buildFurtherEvidenceActionItemListForGivenOption(String code, String label) {
+    private static DynamicList buildFurtherEvidenceActionItemListForGivenOption(String code, String label) {
         DynamicListItem selectedOption = new DynamicListItem(code, label);
         return new DynamicList(selectedOption,
             Collections.singletonList(selectedOption));
@@ -1023,8 +1035,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertNull(updated.getData().getDwpFurtherEvidenceStates());
     }
 
-    @Test
-    @Parameters(method = "generateIssueFurtherEvidenceAddressEmptyScenarios")
+    @ParameterizedTest
+    @MethodSource("generateIssueFurtherEvidenceAddressEmptyScenarios")
     public void givenIssueFurtherEvidenceAndEmptyAppellantAddress_shouldReturnAnErrorToUser(Appeal appeal, String... parties) {
         Callback<SscsCaseData> callback = buildCallback(ISSUE_FURTHER_EVIDENCE.getCode(), State.INTERLOCUTORY_REVIEW_STATE);
 
@@ -1037,7 +1049,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         }
     }
 
-    private Object[] generateIssueFurtherEvidenceAddressEmptyScenarios() {
+    private static Object[] generateIssueFurtherEvidenceAddressEmptyScenarios() {
 
         return new Object[]{
             new Object[]{Appeal.builder().appellant(Appellant.builder().address(Address.builder().build()).build()).build(), "Appellant"},
@@ -1135,6 +1147,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"null", " ", "    "})
     public void givenADocumentWithNoDocFileName_thenAddAnErrorToResponse(@Nullable String filename) {
         List<ScannedDocument> docs = new ArrayList<>();
@@ -1156,6 +1169,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"null", "DORMANT_APPEAL_STATE", "VOID_STATE"})
     public void shouldReviewByJudgeAndUpdatePreviousStateWhenActionManuallyAndHasReinstatementRequestDocument(@Nullable State previousState) {
 
@@ -1179,6 +1193,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"VALID_APPEAL", "READY_TO_LIST"})
     public void shouldReviewByJudgeButNotUpdatePreviousStateWhenActionManuallyAndHasReinstatementRequestDocument(@Nullable State previousState) {
 
@@ -1229,6 +1244,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"VALID_APPEAL", "READY_TO_LIST"})
     public void shouldReviewByJudgeButNotUpdatePreviousStateWhenActionManuallyAndHasUrgentHearingRequestDocument(@Nullable State previousState) {
 
@@ -1251,6 +1267,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"READY_TO_LIST,1", "RESPONSE_RECEIVED,1", "DORMANT_APPEAL_STATE,1", "HEARING,1", "WITH_DWP,1", "VALID_APPEAL,0", "NOT_LISTABLE,1", "LISTING_ERROR,1", "HANDLING_ERROR,1"})
     public void shouldSetBundleAdditionBasedOnPreviousState(@Nullable State state, int occurrence) {
 
@@ -1279,6 +1296,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ISSUE_FURTHER_EVIDENCE,No,1", "OTHER_DOCUMENT_MANUAL,Yes,1", "OTHER_DOCUMENT_MANUAL,No,0",
         "SEND_TO_INTERLOC_REVIEW_BY_TCW,Yes,1", "SEND_TO_INTERLOC_REVIEW_BY_TCW,No,0",
         "SEND_TO_INTERLOC_REVIEW_BY_JUDGE,Yes,1", "SEND_TO_INTERLOC_REVIEW_BY_JUDGE,No,0",
@@ -1310,6 +1328,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ADMIN_ACTION_CORRECTION","SEND_TO_INTERLOC_REVIEW_BY_JUDGE"})
     public void shouldSetBundleAdditionForCorrectionApplication(FurtherEvidenceActionDynamicListItems actionType) {
 
@@ -1382,6 +1401,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"SEND_TO_INTERLOC_REVIEW_BY_JUDGE", "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE"})
     public void givenConfidentialRequestWhenJointPartyExistsFromOriginalSenderAppellant_thenUpdateCaseWithConfidentialFields(FurtherEvidenceActionDynamicListItems furtherEvidenceActionDynamicListItem) {
 
@@ -1405,6 +1425,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "SEND_TO_INTERLOC_REVIEW_BY_JUDGE, Yes",
         "SEND_TO_INTERLOC_REVIEW_BY_JUDGE, No",
@@ -1556,6 +1577,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"SEND_TO_INTERLOC_REVIEW_BY_JUDGE", "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE"})
     public void givenConfidentialRequestWhenJointPartyDoesNotExistFromOriginalSenderAppellant_thenShowError(FurtherEvidenceActionDynamicListItems furtherEvidenceActionDynamicListItem) {
 
@@ -1753,6 +1775,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPELLANT", "REPRESENTATIVE", "DWP", "JOINT_PARTY", "HMCTS"})
     public void shouldIssueToAllParties_willAddFooterTextToDocument(PartyItemList sender) {
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(ISSUE_FURTHER_EVIDENCE.code, ISSUE_FURTHER_EVIDENCE.label));
@@ -1775,6 +1798,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "ISSUE_FURTHER_EVIDENCE,Yes,1",
         "ISSUE_FURTHER_EVIDENCE,No,1",
@@ -1807,6 +1831,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "otherParty,    1, Other Party",
         "otherPartyRep, 2, Rep Party"
@@ -1840,7 +1865,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertEquals(expectedName, response.getData().getSscsDocument().get(0).getValue().getOriginalSenderOtherPartyName());
     }
 
-    @Parameters({"ISSUE_FURTHER_EVIDENCE,No,0", "ISSUE_FURTHER_EVIDENCE,Yes,0", "ISSUE_FURTHER_EVIDENCE,null,0",
+    // JunitParamsRunnerToParameterized conversion not supported
+@Parameters({"ISSUE_FURTHER_EVIDENCE,No,0", "ISSUE_FURTHER_EVIDENCE,Yes,0", "ISSUE_FURTHER_EVIDENCE,null,0",
         "OTHER_DOCUMENT_MANUAL,Yes,0", "OTHER_DOCUMENT_MANUAL,No,0", "OTHER_DOCUMENT_MANUAL,null,1",
         "SEND_TO_INTERLOC_REVIEW_BY_TCW,Yes,0", "SEND_TO_INTERLOC_REVIEW_BY_TCW,No,0", "SEND_TO_INTERLOC_REVIEW_BY_TCW,,1",
         "SEND_TO_INTERLOC_REVIEW_BY_JUDGE,Yes,0", "SEND_TO_INTERLOC_REVIEW_BY_JUDGE,No,0","SEND_TO_INTERLOC_REVIEW_BY_JUDGE,,1",
@@ -2047,6 +2073,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"SEND_TO_INTERLOC_REVIEW_BY_JUDGE, CONFIDENTIALITY_REQUEST"})
     public void givenScannedDocumentsAreUploaded_thenUpdateCaseWithListOfScannedDocumentTypes(FurtherEvidenceActionDynamicListItems furtherEvidenceActionDynamicListItem, ScannedDocumentType documentType) {
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(furtherEvidenceActionDynamicListItem.code, furtherEvidenceActionDynamicListItem.label));

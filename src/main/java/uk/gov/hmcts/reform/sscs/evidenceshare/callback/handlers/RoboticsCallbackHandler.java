@@ -8,7 +8,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
@@ -38,7 +37,6 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
     @Value("${feature.gaps-switchover.enabled}")
     private boolean gapsSwitchOverFeature;
 
-    @Autowired
     public RoboticsCallbackHandler(RoboticsService roboticsService,
                                    CcdService ccdService,
                                    IdamService idamService,

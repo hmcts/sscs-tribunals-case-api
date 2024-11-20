@@ -9,7 +9,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.PHE_REQ
 import java.time.format.DateTimeFormatter;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.LocalDate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -25,7 +24,6 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
     implements PreSubmitCallbackHandler<SscsCaseData> {
     private final DwpDocumentService dwpDocumentService;
 
-    @Autowired
     public HmctsResponseReviewedAboutToSubmitHandler(DwpDocumentService dwpDocumentService) {
         this.dwpDocumentService = dwpDocumentService;
     }

@@ -1,25 +1,26 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
 import static java.util.Collections.emptyList;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import jakarta.mail.internet.MimeMessage;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import uk.gov.hmcts.reform.sscs.domain.email.Email;
 import uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment;
 import uk.gov.hmcts.reform.sscs.exception.EmailSendFailedException;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class EmailServiceTest {
 
     private static final String EMAIL_FROM = "no-reply@example.com";
@@ -35,7 +36,7 @@ public class EmailServiceTest {
     @Mock
     private MimeMessage mimeMessage;
 
-    @Before
+    @BeforeEach
     public void beforeEachTest() {
         EmailSenderProvider emailSenderProvider = Mockito.mock(EmailSenderProvider.class);
         emailService = new EmailService(emailSenderProvider);
@@ -69,23 +70,29 @@ public class EmailServiceTest {
         verify(javaMailSender).send(mimeMessage);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testSendEmailThrowsMailException() {
-        Email emailData = SampleEmailData.getDefault();
-        doThrow(mock(MailException.class)).when(javaMailSender).send(any(MimeMessage.class));
-        emailService.sendEmail(1L, emailData);
+        assertThrows(RuntimeException.class, () -> {
+            Email emailData = SampleEmailData.getDefault();
+            doThrow(mock(MailException.class)).when(javaMailSender).send(any(MimeMessage.class));
+            emailService.sendEmail(1L, emailData);
+        });
     }
 
-    @Test(expected = EmailSendFailedException.class)
+    @Test
     public void testSendEmailThrowsInvalidArgumentExceptionForInvalidTo() {
-        Email emailData = SampleEmailData.getWithToNull();
-        emailService.sendEmail(1L, emailData);
+        assertThrows(EmailSendFailedException.class, () -> {
+            Email emailData = SampleEmailData.getWithToNull();
+            emailService.sendEmail(1L, emailData);
+        });
     }
 
-    @Test(expected = EmailSendFailedException.class)
+    @Test
     public void testSendEmailThrowsInvalidArgumentExceptionForInvalidSubject() {
-        Email emailData = SampleEmailData.getWithSubjectNull();
-        emailService.sendEmail(1L, emailData);
+        assertThrows(EmailSendFailedException.class, () -> {
+            Email emailData = SampleEmailData.getWithSubjectNull();
+            emailService.sendEmail(1L, emailData);
+        });
     }
 
     public static class SampleEmailData {

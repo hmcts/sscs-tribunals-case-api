@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
@@ -22,8 +22,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -51,13 +51,14 @@ public class ManualCaseCreatedHandlerTest {
     @InjectMocks
     private ManualCaseCreatedHandler handler;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
     }
 
-    @Parameters({"ABOUT_TO_START", "MID_EVENT", "ABOUT_TO_SUBMIT"})
+    // JunitParamsRunnerToParameterized conversion not supported
+@Parameters({"ABOUT_TO_START", "MID_EVENT", "ABOUT_TO_SUBMIT"})
     public void shouldThrowException_givenCallbackIsNotSubmitted(CallbackType callbackType) {
         Callback<SscsCaseData> sscsCaseDataCallback = buildTestCallbackForGivenData(null, READY_TO_LIST, VALID_APPEAL_CREATED);
 
@@ -67,6 +68,7 @@ public class ManualCaseCreatedHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"VALID_APPEAL_CREATED", "INCOMPLETE_APPLICATION_RECEIVED", "NON_COMPLIANT"})
     public void shouldReturnTrue_givenAQualifyingEvent(EventType eventType) {
         assertTrue(handler.canHandle(SUBMITTED,

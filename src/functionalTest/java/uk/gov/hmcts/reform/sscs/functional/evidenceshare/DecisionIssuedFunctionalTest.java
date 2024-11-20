@@ -11,9 +11,9 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import java.io.IOException;
-import org.apache.http.HttpStatus;
-import org.junit.Before;
-import org.junit.Test;
+import org.apache.hc.core5.http.HttpStatus;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
@@ -40,7 +40,7 @@ public class DecisionIssuedFunctionalTest extends AbstractFunctionalTest {
         super();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         baseURI = testUrl;
         useRelaxedHTTPSValidation();

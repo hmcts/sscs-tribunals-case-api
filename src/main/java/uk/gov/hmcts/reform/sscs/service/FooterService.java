@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -17,7 +16,6 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @Slf4j
 public class FooterService extends AbstractFooterService<SscsDocument> {
 
-    @Autowired
     public FooterService(PdfStoreService pdfStoreService, PdfWatermarker alter) {
         super(pdfStoreService, alter);
     }

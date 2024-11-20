@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -13,8 +11,8 @@ import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWi
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -85,40 +83,42 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isIndefinite());
         assertEquals(true, payload.isEsaIsEntited());
         assertEquals("lower rate", payload.getEsaAwardRate());
-        Assert.assertNotNull(payload.getEsaSchedule2Descriptors());
+        Assertions.assertNotNull(payload.getEsaSchedule2Descriptors());
         assertEquals(1, payload.getEsaSchedule2Descriptors().size());
         assertEquals(15, payload.getEsaSchedule2Descriptors().get(0).getActivityAnswerPoints());
         assertEquals("a", payload.getEsaSchedule2Descriptors().get(0).getActivityAnswerLetter());
         assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getEsaSchedule2Descriptors().get(0).getActivityAnswerValue());
         assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getEsaSchedule2Descriptors().get(0).getActivityQuestionValue());
         assertEquals("1", payload.getEsaSchedule2Descriptors().get(0).getActivityQuestionNumber());
-        Assert.assertNotNull(payload.getEsaNumberOfPoints());
+        Assertions.assertNotNull(payload.getEsaNumberOfPoints());
         assertEquals(15, payload.getEsaNumberOfPoints().intValue());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
+        Assertions.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
-        assertEquals("The appeal is allowed.\n"
-                + "\n"
-                + "The decision made by the Secretary of State on 01/09/2018 is set aside.\n"
-                + "\n"
-                + "AN Test has limited capability for work.\n"
-                + "\n"
-                + "In applying the Work Capability Assessment 15 points were scored from the activities and descriptors in Schedule 2 of the Employment and Support Allowance (ESA) Regulations 2008 made up as follows:\n"
-                + "\n"
-                + "1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.\ta.Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.\t15\n"
-                + "\n"
-                + "\n"
-                + "AN Test does not have limited capability for work-related activity because no descriptor from Schedule 3 of the ESA Regulations applied. Regulation 35 did not apply.\n"
-                + "\n"
-                + "My reasons for decision\n"
-                + "\n"
-                + "Something else.\n"
-                + "\n"
-                + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
-                + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
+        assertEquals("""
+                The appeal is allowed.
+                
+                The decision made by the Secretary of State on 01/09/2018 is set aside.
+                
+                AN Test has limited capability for work.
+                
+                In applying the Work Capability Assessment 15 points were scored from the activities and descriptors in Schedule 2 of the Employment and Support Allowance (ESA) Regulations 2008 made up as follows:
+                
+                1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.	a.Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.	15
+                
+                
+                AN Test does not have limited capability for work-related activity because no descriptor from Schedule 3 of the ESA Regulations applied. Regulation 35 did not apply.
+                
+                My reasons for decision
+                
+                Something else.
+                
+                This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.
+                
+                """, parentPayload.getWriteFinalDecisionTemplateContent().toString());
     }
 
     @Override
@@ -170,16 +170,16 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isIndefinite());
         assertEquals(false, payload.isEsaIsEntited());
         assertEquals("no award", payload.getEsaAwardRate());
-        Assert.assertNotNull(payload.getEsaSchedule2Descriptors());
+        Assertions.assertNotNull(payload.getEsaSchedule2Descriptors());
         assertEquals(0, payload.getEsaSchedule2Descriptors().size());
         assertEquals(0, payload.getEsaNumberOfPoints().intValue());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
+        Assertions.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
-        Assert.assertEquals(EsaScenario.SCENARIO_1, esaTemplateContent.getScenario());
+        Assertions.assertEquals(EsaScenario.SCENARIO_1, esaTemplateContent.getScenario());
     }
 
     @Test
@@ -225,22 +225,22 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isIndefinite());
         assertEquals(false, payload.isEsaIsEntited());
         assertEquals("no award", payload.getEsaAwardRate());
-        Assert.assertNotNull(payload.getEsaSchedule2Descriptors());
+        Assertions.assertNotNull(payload.getEsaSchedule2Descriptors());
         assertEquals(1, payload.getEsaSchedule2Descriptors().size());
         assertEquals(9, payload.getEsaSchedule2Descriptors().get(0).getActivityAnswerPoints());
         assertEquals("c", payload.getEsaSchedule2Descriptors().get(0).getActivityAnswerLetter());
         assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getEsaSchedule2Descriptors().get(0).getActivityAnswerValue());
         assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getEsaSchedule2Descriptors().get(0).getActivityQuestionValue());
         assertEquals("1", payload.getEsaSchedule2Descriptors().get(0).getActivityQuestionNumber());
-        Assert.assertNotNull(payload.getEsaNumberOfPoints());
+        Assertions.assertNotNull(payload.getEsaNumberOfPoints());
         assertEquals(9, payload.getEsaNumberOfPoints().intValue());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
+        Assertions.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
-        Assert.assertEquals(EsaScenario.SCENARIO_1, esaTemplateContent.getScenario());
+        Assertions.assertEquals(EsaScenario.SCENARIO_1, esaTemplateContent.getScenario());
     }
 
     @Test
@@ -431,15 +431,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isIndefinite());
         assertEquals(true, payload.isEsaIsEntited());
         assertEquals("lower rate", payload.getEsaAwardRate());
-        Assert.assertNull(payload.getEsaSchedule2Descriptors());
+        Assertions.assertNull(payload.getEsaSchedule2Descriptors());
         assertNull(payload.getEsaNumberOfPoints());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
+        Assertions.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
-        Assert.assertEquals(EsaScenario.SCENARIO_2, esaTemplateContent.getScenario());
+        Assertions.assertEquals(EsaScenario.SCENARIO_2, esaTemplateContent.getScenario());
     }
 
     @Test
@@ -558,15 +558,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isIndefinite());
         assertEquals(true, payload.isEsaIsEntited());
         assertEquals("higher rate", payload.getEsaAwardRate());
-        Assert.assertNull(payload.getEsaSchedule2Descriptors());
+        Assertions.assertNull(payload.getEsaSchedule2Descriptors());
         assertNull(payload.getEsaNumberOfPoints());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
+        Assertions.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
-        Assert.assertEquals(EsaScenario.SCENARIO_3, esaTemplateContent.getScenario());
+        Assertions.assertEquals(EsaScenario.SCENARIO_3, esaTemplateContent.getScenario());
     }
 
     @Test
@@ -684,15 +684,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isIndefinite());
         assertEquals(true, payload.isEsaIsEntited());
         assertEquals("higher rate", payload.getEsaAwardRate());
-        Assert.assertNull(payload.getEsaSchedule2Descriptors());
+        Assertions.assertNull(payload.getEsaSchedule2Descriptors());
         assertNull(payload.getEsaNumberOfPoints());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
+        Assertions.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
-        Assert.assertEquals(EsaScenario.SCENARIO_4, esaTemplateContent.getScenario());
+        Assertions.assertEquals(EsaScenario.SCENARIO_4, esaTemplateContent.getScenario());
     }
 
     @Test
@@ -787,22 +787,22 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isIndefinite());
         assertEquals(true, payload.isEsaIsEntited());
         assertEquals("lower rate", payload.getEsaAwardRate());
-        Assert.assertNotNull(payload.getEsaSchedule2Descriptors());
+        Assertions.assertNotNull(payload.getEsaSchedule2Descriptors());
         assertEquals(1, payload.getEsaSchedule2Descriptors().size());
         assertEquals(15, payload.getEsaSchedule2Descriptors().get(0).getActivityAnswerPoints());
         assertEquals("a", payload.getEsaSchedule2Descriptors().get(0).getActivityAnswerLetter());
         assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getEsaSchedule2Descriptors().get(0).getActivityAnswerValue());
         assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getEsaSchedule2Descriptors().get(0).getActivityQuestionValue());
         assertEquals("1", payload.getEsaSchedule2Descriptors().get(0).getActivityQuestionNumber());
-        Assert.assertNotNull(payload.getEsaNumberOfPoints());
+        Assertions.assertNotNull(payload.getEsaNumberOfPoints());
         assertEquals(15, payload.getEsaNumberOfPoints().intValue());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
+        Assertions.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
-        Assert.assertEquals(EsaScenario.SCENARIO_5, esaTemplateContent.getScenario());
+        Assertions.assertEquals(EsaScenario.SCENARIO_5, esaTemplateContent.getScenario());
     }
 
     @Test
@@ -922,22 +922,22 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isIndefinite());
         assertEquals(true, payload.isEsaIsEntited());
         assertEquals("higher rate", payload.getEsaAwardRate());
-        Assert.assertNotNull(payload.getEsaSchedule2Descriptors());
+        Assertions.assertNotNull(payload.getEsaSchedule2Descriptors());
         assertEquals(1, payload.getEsaSchedule2Descriptors().size());
         assertEquals(15, payload.getEsaSchedule2Descriptors().get(0).getActivityAnswerPoints());
         assertEquals("a", payload.getEsaSchedule2Descriptors().get(0).getActivityAnswerLetter());
         assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getEsaSchedule2Descriptors().get(0).getActivityAnswerValue());
         assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getEsaSchedule2Descriptors().get(0).getActivityQuestionValue());
         assertEquals("1", payload.getEsaSchedule2Descriptors().get(0).getActivityQuestionNumber());
-        Assert.assertNotNull(payload.getEsaNumberOfPoints());
+        Assertions.assertNotNull(payload.getEsaNumberOfPoints());
         assertEquals(15, payload.getEsaNumberOfPoints().intValue());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
+        Assertions.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
-        Assert.assertEquals(EsaScenario.SCENARIO_6, esaTemplateContent.getScenario());
+        Assertions.assertEquals(EsaScenario.SCENARIO_6, esaTemplateContent.getScenario());
     }
 
     @Test
@@ -1085,22 +1085,22 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isIndefinite());
         assertEquals(true, payload.isEsaIsEntited());
         assertEquals("lower rate", payload.getEsaAwardRate());
-        Assert.assertNotNull(payload.getEsaSchedule2Descriptors());
+        Assertions.assertNotNull(payload.getEsaSchedule2Descriptors());
         assertEquals(1, payload.getEsaSchedule2Descriptors().size());
         assertEquals(9, payload.getEsaSchedule2Descriptors().get(0).getActivityAnswerPoints());
         assertEquals("c", payload.getEsaSchedule2Descriptors().get(0).getActivityAnswerLetter());
         assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getEsaSchedule2Descriptors().get(0).getActivityAnswerValue());
         assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getEsaSchedule2Descriptors().get(0).getActivityQuestionValue());
         assertEquals("1", payload.getEsaSchedule2Descriptors().get(0).getActivityQuestionNumber());
-        Assert.assertNotNull(payload.getEsaNumberOfPoints());
+        Assertions.assertNotNull(payload.getEsaNumberOfPoints());
         assertEquals(9, payload.getEsaNumberOfPoints().intValue());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
+        Assertions.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
-        Assert.assertEquals(EsaScenario.SCENARIO_7, esaTemplateContent.getScenario());
+        Assertions.assertEquals(EsaScenario.SCENARIO_7, esaTemplateContent.getScenario());
     }
 
     @Test
@@ -1250,22 +1250,22 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isIndefinite());
         assertEquals(true, payload.isEsaIsEntited());
         assertEquals("higher rate", payload.getEsaAwardRate());
-        Assert.assertNotNull(payload.getEsaSchedule2Descriptors());
+        Assertions.assertNotNull(payload.getEsaSchedule2Descriptors());
         assertEquals(1, payload.getEsaSchedule2Descriptors().size());
         assertEquals(9, payload.getEsaSchedule2Descriptors().get(0).getActivityAnswerPoints());
         assertEquals("c", payload.getEsaSchedule2Descriptors().get(0).getActivityAnswerLetter());
         assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getEsaSchedule2Descriptors().get(0).getActivityAnswerValue());
         assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getEsaSchedule2Descriptors().get(0).getActivityQuestionValue());
         assertEquals("1", payload.getEsaSchedule2Descriptors().get(0).getActivityQuestionNumber());
-        Assert.assertNotNull(payload.getEsaNumberOfPoints());
+        Assertions.assertNotNull(payload.getEsaNumberOfPoints());
         assertEquals(9, payload.getEsaNumberOfPoints().intValue());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
+        Assertions.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
-        Assert.assertEquals(EsaScenario.SCENARIO_8, esaTemplateContent.getScenario());
+        Assertions.assertEquals(EsaScenario.SCENARIO_8, esaTemplateContent.getScenario());
     }
 
     @Test
@@ -1335,22 +1335,22 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isIndefinite());
         assertEquals(true, payload.isEsaIsEntited());
         assertEquals("higher rate", payload.getEsaAwardRate());
-        Assert.assertNotNull(payload.getEsaSchedule2Descriptors());
+        Assertions.assertNotNull(payload.getEsaSchedule2Descriptors());
         assertEquals(1, payload.getEsaSchedule2Descriptors().size());
         assertEquals(9, payload.getEsaSchedule2Descriptors().get(0).getActivityAnswerPoints());
         assertEquals("c", payload.getEsaSchedule2Descriptors().get(0).getActivityAnswerLetter());
         assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getEsaSchedule2Descriptors().get(0).getActivityAnswerValue());
         assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getEsaSchedule2Descriptors().get(0).getActivityQuestionValue());
         assertEquals("1", payload.getEsaSchedule2Descriptors().get(0).getActivityQuestionNumber());
-        Assert.assertNotNull(payload.getEsaNumberOfPoints());
+        Assertions.assertNotNull(payload.getEsaNumberOfPoints());
         assertEquals(9, payload.getEsaNumberOfPoints().intValue());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
+        Assertions.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
-        Assert.assertEquals(EsaScenario.SCENARIO_9, esaTemplateContent.getScenario());
+        Assertions.assertEquals(EsaScenario.SCENARIO_9, esaTemplateContent.getScenario());
     }
 
     @Test
@@ -1420,28 +1420,30 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isIndefinite());
         assertEquals(false, payload.isEsaIsEntited());
         assertNull(payload.getEsaAwardRate());
-        Assert.assertNull(payload.getEsaSchedule2Descriptors());
-        Assert.assertNull(payload.getEsaNumberOfPoints());
+        Assertions.assertNull(payload.getEsaSchedule2Descriptors());
+        Assertions.assertNull(payload.getEsaNumberOfPoints());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
+        Assertions.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
-        assertEquals("The appeal is refused.\n"
-                + "\n"
-                + "The decision made by the Secretary of State on 01/09/2018 is confirmed.\n"
-                + "\n"
-                + "This is my summary.\n"
-                + "\n"
-                + "My reasons for decision\n"
-                + "\n"
-                + "Something else.\n"
-                + "\n"
-                + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
-                + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
+        assertEquals("""
+                The appeal is refused.
+                
+                The decision made by the Secretary of State on 01/09/2018 is confirmed.
+                
+                This is my summary.
+                
+                My reasons for decision
+                
+                Something else.
+                
+                This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.
+                
+                """, parentPayload.getWriteFinalDecisionTemplateContent().toString());
         EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
-        Assert.assertEquals(EsaScenario.SCENARIO_10, esaTemplateContent.getScenario());
+        Assertions.assertEquals(EsaScenario.SCENARIO_10, esaTemplateContent.getScenario());
     }
 
     @Test
@@ -1487,28 +1489,30 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isIndefinite());
         assertEquals(false, payload.isEsaIsEntited());
         assertNull(payload.getEsaAwardRate());
-        Assert.assertNull(payload.getEsaSchedule2Descriptors());
-        Assert.assertNull(payload.getEsaNumberOfPoints());
+        Assertions.assertNull(payload.getEsaSchedule2Descriptors());
+        Assertions.assertNull(payload.getEsaNumberOfPoints());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
+        Assertions.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
-        assertEquals("The appeal is allowed.\n"
-                + "\n"
-                + "The decision made by the Secretary of State on 01/09/2018 is set aside.\n"
-                + "\n"
-                + "This is my summary.\n"
-                + "\n"
-                + "My reasons for decision\n"
-                + "\n"
-                + "Something else.\n"
-                + "\n"
-                + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
-                + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
+        assertEquals("""
+                The appeal is allowed.
+                
+                The decision made by the Secretary of State on 01/09/2018 is set aside.
+                
+                This is my summary.
+                
+                My reasons for decision
+                
+                Something else.
+                
+                This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.
+                
+                """, parentPayload.getWriteFinalDecisionTemplateContent().toString());
         EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
-        Assert.assertEquals(EsaScenario.SCENARIO_10, esaTemplateContent.getScenario());
+        Assertions.assertEquals(EsaScenario.SCENARIO_10, esaTemplateContent.getScenario());
     }
 
 
@@ -1555,26 +1559,28 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isIndefinite());
         assertEquals(false, payload.isEsaIsEntited());
         assertNull(payload.getEsaAwardRate());
-        Assert.assertNull(payload.getEsaSchedule2Descriptors());
-        Assert.assertNull(payload.getEsaNumberOfPoints());
+        Assertions.assertNull(payload.getEsaSchedule2Descriptors());
+        Assertions.assertNull(payload.getEsaNumberOfPoints());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
+        Assertions.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
-        assertEquals("The appeal is allowed.\n"
-                + "\n"
-                + "The decision made by the Secretary of State on 01/09/2018 is set aside.\n"
-                + "\n"
-                + "This is my summary.\n"
-                + "\n"
-                + "My reasons for decision\n"
-                + "\n"
-                + "Something else.\n"
-                + "\n"
-                + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
-                + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
+        assertEquals("""
+                The appeal is allowed.
+                
+                The decision made by the Secretary of State on 01/09/2018 is set aside.
+                
+                This is my summary.
+                
+                My reasons for decision
+                
+                Something else.
+                
+                This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.
+                
+                """, parentPayload.getWriteFinalDecisionTemplateContent().toString());
     }
 
     @Test
@@ -1620,22 +1626,22 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isIndefinite());
         assertEquals(true, payload.isEsaIsEntited());
         assertEquals("higher rate", payload.getEsaAwardRate());
-        Assert.assertNotNull(payload.getEsaSchedule2Descriptors());
+        Assertions.assertNotNull(payload.getEsaSchedule2Descriptors());
         assertEquals(1, payload.getEsaSchedule2Descriptors().size());
         assertEquals(15, payload.getEsaSchedule2Descriptors().get(0).getActivityAnswerPoints());
         assertEquals("a", payload.getEsaSchedule2Descriptors().get(0).getActivityAnswerLetter());
         assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getEsaSchedule2Descriptors().get(0).getActivityAnswerValue());
         assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getEsaSchedule2Descriptors().get(0).getActivityQuestionValue());
         assertEquals("1", payload.getEsaSchedule2Descriptors().get(0).getActivityQuestionNumber());
-        Assert.assertNotNull(payload.getEsaNumberOfPoints());
+        Assertions.assertNotNull(payload.getEsaNumberOfPoints());
         assertEquals(15, payload.getEsaNumberOfPoints().intValue());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
+        Assertions.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
-        Assert.assertEquals(EsaScenario.SCENARIO_12, esaTemplateContent.getScenario());
+        Assertions.assertEquals(EsaScenario.SCENARIO_12, esaTemplateContent.getScenario());
     }
 
     @Test

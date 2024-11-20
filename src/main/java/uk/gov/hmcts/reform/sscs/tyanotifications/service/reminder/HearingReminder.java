@@ -7,7 +7,6 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
@@ -29,7 +28,6 @@ public class HearingReminder implements ReminderHandler {
     private long beforeFirstHearingReminder;
     private long beforeSecondHearingReminder;
 
-    @Autowired
     public HearingReminder(
         JobGroupGenerator jobGroupGenerator,
         JobScheduler jobScheduler,

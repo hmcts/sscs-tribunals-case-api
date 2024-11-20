@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
@@ -25,7 +24,6 @@ public class DocumentManagementServiceWrapper {
     private final CcdService ccdService;
     private final Integer maxRetryAttempts;
 
-    @Autowired
     public DocumentManagementServiceWrapper(DocumentManagementService documentManagementService,
                                             CcdService ccdService,
                                             @Value("${send-letter.maxRetryAttempts}") Integer maxRetryAttempts) {
@@ -52,7 +50,7 @@ public class DocumentManagementServiceWrapper {
             if (reTryNumber > maxRetryAttempts) {
                 throw new PdfStoreException(e.getMessage(), e);
             }
-            log.info(String.format("Caught recoverable error %s, retrying %s out of %s",
+            log.info("Caught recoverable error %s, retrying %s out of %s".formatted(
                 e.getMessage(), reTryNumber, maxRetryAttempts));
             generateDocumentAndAddToCcdWithRetry(holder, caseData, reTryNumber + 1, idamTokens);
         }

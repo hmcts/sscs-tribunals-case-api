@@ -20,7 +20,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.retry.ExhaustedRetryException;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
@@ -46,7 +44,6 @@ import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @EnableRetry
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = {HearingsService.class})
 @TestPropertySource(properties = {
     "retry.hearing-response-update.backoff=100",

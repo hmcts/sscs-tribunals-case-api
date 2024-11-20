@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
@@ -14,16 +14,14 @@ import java.util.List;
 import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.quality.Strictness;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -36,11 +34,9 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.service.FurtherEvidenceService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
+@ExtendWith(MockitoExtension.class)
 @RunWith(JUnitParamsRunner.class)
 public class ReissueFurtherEvidenceHandlerTest {
-
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
 
     @Mock
     private FurtherEvidenceService furtherEvidenceService;
@@ -61,54 +57,64 @@ public class ReissueFurtherEvidenceHandlerTest {
     @Captor
     private ArgumentCaptor<Consumer<SscsCaseDetails>> sscsCaseDetailsCaptor;
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void givenCallbackIsNull_whenHandleIsCalled_shouldThrowException() {
-        handler.handle(CallbackType.SUBMITTED, null);
+        assertThrows(NullPointerException.class, () ->
+            handler.handle(CallbackType.SUBMITTED, null));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "ABOUT_TO_SUBMIT"})
     public void givenCallbackIsNotSubmitted_willThrowAnException(CallbackType callbackType) {
-        handler.handle(callbackType,
-            HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder()
-                .reissueArtifactUi(ReissueArtifactUi.builder()
-                    .build()).build(), INTERLOCUTORY_REVIEW_STATE, REISSUE_FURTHER_EVIDENCE));
+        assertThrows(IllegalStateException.class, () ->
+            handler.handle(callbackType,
+                HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder()
+                    .reissueArtifactUi(ReissueArtifactUi.builder()
+                        .build()).build(), INTERLOCUTORY_REVIEW_STATE, REISSUE_FURTHER_EVIDENCE)));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ISSUE_FURTHER_EVIDENCE", "EVIDENCE_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
     public void givenEventTypeIsNotReIssueFurtherEvidence_willThrowAnException(EventType eventType) {
-        handler.handle(CallbackType.SUBMITTED,
-            HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder()
-                .reissueArtifactUi(ReissueArtifactUi.builder()
-                    .build()).build(), INTERLOCUTORY_REVIEW_STATE, eventType));
+        assertThrows(IllegalStateException.class, () ->
+            handler.handle(CallbackType.SUBMITTED,
+                HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder()
+                    .reissueArtifactUi(ReissueArtifactUi.builder()
+                        .build()).build(), INTERLOCUTORY_REVIEW_STATE, eventType)));
     }
 
-    @Test(expected = RequiredFieldMissingException.class)
+    @Test
     public void givenCaseDataInCallbackIsNull_shouldThrowException() {
-        handler.handle(CallbackType.SUBMITTED,
-            HandlerHelper.buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, REISSUE_FURTHER_EVIDENCE));
+        assertThrows(RequiredFieldMissingException.class, () ->
+            handler.handle(CallbackType.SUBMITTED,
+                HandlerHelper.buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, REISSUE_FURTHER_EVIDENCE)));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void givenCallbackIsNull_whenCanHandleIsCalled_shouldThrowException() {
-        handler.canHandle(CallbackType.SUBMITTED, null);
+        assertThrows(NullPointerException.class, () ->
+            handler.canHandle(CallbackType.SUBMITTED, null));
     }
 
-    @Test(expected = RequiredFieldMissingException.class)
+    @Test
     public void givenCaseDataInCallbackIsNull_whenCanHandleIsCalled_shouldThrowException() {
-        handler.canHandle(CallbackType.SUBMITTED,
-            HandlerHelper.buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, REISSUE_FURTHER_EVIDENCE));
+        assertThrows(RequiredFieldMissingException.class, () ->
+            handler.canHandle(CallbackType.SUBMITTED,
+                HandlerHelper.buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, REISSUE_FURTHER_EVIDENCE)));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void givenHandleMethodIsCalled_shouldThrowExceptionIfCanNotBeHandled() {
-        given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(false);
+        assertThrows(IllegalStateException.class, () -> {
+            given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(false);
 
-        handler.handle(CallbackType.SUBMITTED,
-            HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().reissueArtifactUi(ReissueArtifactUi.builder()
+            handler.handle(CallbackType.SUBMITTED,
+                HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().reissueArtifactUi(ReissueArtifactUi.builder()
                     .reissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem("url", "label"), null)).build())
-                .build(), INTERLOCUTORY_REVIEW_STATE, REISSUE_FURTHER_EVIDENCE));
+                    .build(), INTERLOCUTORY_REVIEW_STATE, REISSUE_FURTHER_EVIDENCE));
+        });
     }
 
     @Test
@@ -148,6 +154,7 @@ public class ReissueFurtherEvidenceHandlerTest {
 
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPELLANT_EVIDENCE, true, true, true",
         "REPRESENTATIVE_EVIDENCE, false, false, true",
         "DWP_EVIDENCE, true, true, true",
@@ -237,6 +244,7 @@ public class ReissueFurtherEvidenceHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPELLANT_EVIDENCE, true, true, true",
         "REPRESENTATIVE_EVIDENCE, false, false, true",
         "DWP_EVIDENCE, true, true, true",
@@ -331,6 +339,7 @@ public class ReissueFurtherEvidenceHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPELLANT_EVIDENCE, true, true, true, false, false",
         "REPRESENTATIVE_EVIDENCE, false, false, true, false, false",
         "DWP_EVIDENCE, true, true, true, false, false",
@@ -450,6 +459,7 @@ public class ReissueFurtherEvidenceHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPELLANT_EVIDENCE, true, true, true, false, false",
         "REPRESENTATIVE_EVIDENCE, false, false, true, false, false",
         "DWP_EVIDENCE, true, true, true, false, false",
@@ -574,6 +584,7 @@ public class ReissueFurtherEvidenceHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"Second.doc", "SecondRedacted.doc",})
     public void givenIssueFurtherEvidenceCallback_shouldReissueChosenEvidence(String chosenDoc) {
 

@@ -1,7 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.attachscanneddocs;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
@@ -10,8 +11,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -32,7 +33,7 @@ public class AttachScannedDocsAboutToSubmitHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         handler = new AttachScannedDocsAboutToSubmitHandler();
@@ -167,7 +168,7 @@ public class AttachScannedDocsAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, testCallback, USER_AUTHORISATION);
 
-        assertNotNull("Scanned document in case data should not be null, after passing through firstDocument", response.getData().getScannedDocuments());
+        assertNotNull(response.getData().getScannedDocuments(), "Scanned document in case data should not be null, after passing through firstDocument");
     }
 
     @Test

@@ -2,8 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adminsendtowithdwp;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -12,8 +11,8 @@ import java.time.LocalDate;
 import java.util.Collections;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -36,7 +35,7 @@ public class AdminSendToWithDwpAboutToSubmitHandlerTest {
     private SscsCaseData sscsCaseData;
 
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         handler = new AdminSendToWithDwpAboutToSubmitHandler(35, 42);
@@ -48,6 +47,7 @@ public class AdminSendToWithDwpAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPEAL_RECEIVED"})
     public void givenANonHandleAdminSendToWithDwpEvent_thenReturnFalse(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
@@ -55,12 +55,14 @@ public class AdminSendToWithDwpAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"pip, 35", "childSupport, 42"})
     public void setsDateSentToDwpForAdminSendToDwpEvent(String benefitType, int expectedResponseDays) {
 
@@ -89,10 +91,12 @@ public class AdminSendToWithDwpAboutToSubmitHandlerTest {
         assertThat(response.getData().getInterlocReferralReason(), is(InterlocReferralReason.NONE));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsExceptionIfItCannotHandleTheAppeal() {
-        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThrows(IllegalStateException.class, () -> {
+            when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        });
     }
 
 }

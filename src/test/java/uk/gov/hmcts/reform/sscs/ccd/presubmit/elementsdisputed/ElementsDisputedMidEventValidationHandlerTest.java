@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.elementsdisputed;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
@@ -14,8 +14,8 @@ import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -48,7 +48,7 @@ public class ElementsDisputedMidEventValidationHandlerTest {
             .buildValidatorFactory()
             .getValidator();
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         openMocks(this);
         handler = new ElementsDisputedMidEventValidationHandler(validator);
@@ -64,6 +64,7 @@ public class ElementsDisputedMidEventValidationHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"DWP_UPLOAD_RESPONSE", "HMCTS_RESPONSE_REVIEWED", "AMEND_ELEMENTS_ISSUES"})
     public void givenAnElementsDisputedEventType_thenReturnTrue(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
@@ -78,6 +79,7 @@ public class ElementsDisputedMidEventValidationHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_START", "ABOUT_TO_SUBMIT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
@@ -551,9 +553,11 @@ public class ElementsDisputedMidEventValidationHandlerTest {
         assertTrue(response.getErrors().isEmpty());
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsExceptionIfItCannotHandleTheEvent() {
-        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        assertThrows(IllegalStateException.class, () -> {
+            when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+            handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        });
     }
 }

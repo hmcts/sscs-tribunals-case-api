@@ -7,7 +7,6 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
@@ -24,7 +23,6 @@ public class SorPlaceholderService {
     @Value("${helpline.telephone}")
     private String helplineTelephone;
 
-    @Autowired
     public SorPlaceholderService(PlaceholderService placeholderService) {
         this.placeholderService = placeholderService;
     }

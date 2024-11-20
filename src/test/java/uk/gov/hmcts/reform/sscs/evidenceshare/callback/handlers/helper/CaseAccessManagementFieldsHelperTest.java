@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.helper;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.FormType.SSCS1;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.FormType.SSCS5;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.helper.CaseAccessManagementFieldsHelper.*;

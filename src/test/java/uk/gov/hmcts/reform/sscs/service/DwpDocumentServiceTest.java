@@ -1,13 +1,13 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
@@ -17,7 +17,7 @@ public class DwpDocumentServiceTest {
 
     private DwpDocumentService dwpDocumentService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         dwpDocumentService = new DwpDocumentService();
 

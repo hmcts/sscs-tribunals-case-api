@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.functional.handlers.actionfurtherevidence;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -13,15 +13,11 @@ import java.util.Objects;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.apache.commons.io.FileUtils;
-import org.apache.http.HttpStatus;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.apache.hc.core5.http.HttpStatus;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -33,15 +29,10 @@ import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
 public class ActionFurtherEvidenceSubmittedCallbackHandlerTest extends BaseHandler {
-
-    @ClassRule
-    public static final SpringClassRule scr = new SpringClassRule();
     protected static final String CASE_ID_TO_BE_REPLACED = "12345678";
 
-    @Rule
-    public final SpringMethodRule smr = new SpringMethodRule();
-
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "NON_COMPLIANT, informationReceivedForInterlocJudge, interlocutoryReviewState, reviewByJudge",
         "CREATE_WITH_DWP_TEST_CASE, sendToInterlocReviewByJudge, withDwp, reviewByJudge",

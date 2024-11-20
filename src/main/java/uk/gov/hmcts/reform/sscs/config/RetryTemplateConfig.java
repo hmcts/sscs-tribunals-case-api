@@ -8,7 +8,7 @@ import org.springframework.retry.support.RetryTemplate;
 @Configuration
 public class RetryTemplateConfig {
     @Bean
-    public RetryTemplate retryTemplate() {
+    RetryTemplate retryTemplate() {
         RetryTemplate retryTemplate = new RetryTemplate();
 
         FixedBackOffPolicy fixedBackOffPolicy = new FixedBackOffPolicy();

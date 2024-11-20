@@ -3,10 +3,8 @@ package uk.gov.hmcts.reform.sscs.functional.tyanotifications;
 import static helper.EnvironmentProfileValueSource.getEnvOrEmpty;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toSet;
-import static junit.framework.TestCase.fail;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.slf4j.LoggerFactory.getLogger;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SYA_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.SscsCaseDataUtils.*;
@@ -25,9 +23,8 @@ import junitparams.JUnitParamsRunner;
 import lombok.Getter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +33,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.ProfileValueSourceConfiguration;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Event;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -59,13 +54,7 @@ import uk.gov.service.notify.NotificationClientException;
 public abstract class AbstractFunctionalTest {
 
     private static final Logger log = getLogger(AuthorisationService.class);
-
-    // Below rules are needed to use the junitParamsRunner together with SpringRunner
-    @ClassRule
-    public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
     protected static final String BASE_PATH_TYAN = "tyanotifications/";
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
     //end of rules needed for junitParamsRunner
 
     @Rule
@@ -96,7 +85,7 @@ public abstract class AbstractFunctionalTest {
     @Autowired
     protected CcdService ccdService;
 
-    @Before
+    @BeforeEach
     public void setup() {
         idamTokens = idamService.getIdamTokens();
         createCase();
@@ -338,8 +327,7 @@ public abstract class AbstractFunctionalTest {
         Set<String> subjects = notifications.stream()
             .filter(notification -> UUID.fromString(templateId).equals(notification.getTemplateId()))
             .map(Notification::getSubject)
-            .filter(Optional::isPresent)
-            .map(Optional::get)
+            .flatMap(Optional::stream)
             .collect(Collectors.toSet());
 
         assertThat(matches).allSatisfy(match ->

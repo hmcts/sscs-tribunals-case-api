@@ -4,7 +4,7 @@ import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SUBSCRIPTION_UPDATED;
 
 import junitparams.Parameters;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
@@ -54,6 +54,7 @@ public class NotificationServiceForSubscriptionUpdatedTest extends NotificationS
     private String subscriptionOldSmsId;
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"appellant", "representative", "appointee"})
     public void unsubscribeFromSmsAndEmail_doesNotSendAnyEmailsOrSms(String who) {
         Subscription newSubscription = getSubscription().toBuilder()
@@ -64,6 +65,7 @@ public class NotificationServiceForSubscriptionUpdatedTest extends NotificationS
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"appellant", "representative", "appointee"})
     public void unsubscribeFromEmail_doesNotSendAnyEmailsOrSms(String who) {
         Subscription newSubscription = getSubscription().toBuilder().subscribeEmail(NotificationServiceBase.NO).subscribeSms(NotificationServiceBase.YES).build();
@@ -71,6 +73,7 @@ public class NotificationServiceForSubscriptionUpdatedTest extends NotificationS
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"appellant", "representative", "appointee"})
     public void unsubscribeFromSms_doesNotSendAnyEmailsOrSms(String who) {
         Subscription newSubscription = getSubscription().toBuilder().subscribeEmail(NotificationServiceBase.YES).subscribeSms(NotificationServiceBase.NO).build();
@@ -78,6 +81,7 @@ public class NotificationServiceForSubscriptionUpdatedTest extends NotificationS
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"appellant", "representative", "appointee"})
     public void subscribeEmail_willSendSubscriptionEmail(String who) throws NotificationClientException {
         Subscription newSubscription = getSubscription().toBuilder().email(NotificationServiceBase.EMAIL_TEST_2).subscribeEmail(NotificationServiceBase.YES).subscribeSms(NotificationServiceBase.NO).build();
@@ -182,6 +186,7 @@ public class NotificationServiceForSubscriptionUpdatedTest extends NotificationS
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"appellant", "representative", "appointee"})
     public void changeEmail_willSendChangeEmailToOldAndNewEmail(String who) throws NotificationClientException {
         SscsCaseData newSscsCaseData = getSscsCaseData(getSubscription(), who);

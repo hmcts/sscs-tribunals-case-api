@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -29,7 +28,6 @@ public class ElementsDisputedMidEventValidationHandler implements PreSubmitCallb
 
     private Validator validator;
 
-    @Autowired
     public ElementsDisputedMidEventValidationHandler(Validator validator) {
         this.validator = validator;
     }

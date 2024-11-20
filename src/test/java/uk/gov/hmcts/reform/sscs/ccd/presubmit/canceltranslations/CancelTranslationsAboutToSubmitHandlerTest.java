@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.canceltranslations;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CANCEL_TRANSLATIONS;
@@ -14,14 +14,15 @@ import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -34,13 +35,10 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private CancelTranslationsAboutToSubmitHandler handler;
 
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
-
     @Mock
     private Callback<SscsCaseData> callback;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         handler = new CancelTranslationsAboutToSubmitHandler();
@@ -54,6 +52,7 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE",
         "ABOUT_TO_START,CANCEL_TRANSLATIONS"
@@ -65,16 +64,20 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void givenCanHandleIsCalled_shouldThrowExceptionWhenCallBackTypeNull() {
-        boolean actualResult = handler.canHandle(null, callback);
-        assertTrue(actualResult);
+        assertThrows(NullPointerException.class, () -> {
+            boolean actualResult = handler.canHandle(null, callback);
+            assertTrue(actualResult);
+        });
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void givenCanHandleIsCalled_shouldThrowExceptionWhenCallBackNull() {
-        boolean actualResult = handler.canHandle(ABOUT_TO_SUBMIT, null);
-        assertTrue(actualResult);
+        assertThrows(NullPointerException.class, () -> {
+            boolean actualResult = handler.canHandle(ABOUT_TO_SUBMIT, null);
+            assertTrue(actualResult);
+        });
     }
 
 

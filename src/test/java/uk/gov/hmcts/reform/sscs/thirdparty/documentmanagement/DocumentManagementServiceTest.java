@@ -1,12 +1,13 @@
 package uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement;
 
 import static java.util.Collections.singletonList;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,7 +23,7 @@ public class DocumentManagementServiceTest {
     private DocumentStoreService documentStoreService;
     private DocumentStoreClient documentStoreClient;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         authToken = "authToken";
         files = singletonList(mock(MultipartFile.class));
@@ -41,11 +42,13 @@ public class DocumentManagementServiceTest {
         verify(documentUploadClientApi).upload("oauth2Token", authToken, "sscs", files);
     }
 
-    @Test(expected = IllegalFileTypeException.class)
+    @Test
     public void throwsIllegalFileTypeExceptionIfDocumentStoreCannotStoreFile() {
-        when(documentUploadClientApi.upload(any(), any(), any(), any())).thenThrow(new HttpClientErrorException(HttpStatus.UNPROCESSABLE_ENTITY));
+        assertThrows(IllegalFileTypeException.class, () -> {
+            when(documentUploadClientApi.upload(any(), any(), any(), any())).thenThrow(new HttpClientErrorException(HttpStatus.UNPROCESSABLE_ENTITY));
 
-        documentStoreService.upload(files);
+            documentStoreService.upload(files);
+        });
     }
 
     @Test

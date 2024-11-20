@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -35,10 +34,10 @@ public class FurtherEvidenceService {
     private PrintService bulkPrintService;
 
 
-    public FurtherEvidenceService(@Autowired CoverLetterService coverLetterService,
-                                  @Autowired SscsDocumentService sscsDocumentService,
-                                  @Autowired PrintService bulkPrintService,
-                                  @Autowired DocmosisTemplateConfig docmosisTemplateConfig) {
+    public FurtherEvidenceService(CoverLetterService coverLetterService,
+                                  SscsDocumentService sscsDocumentService,
+                                  PrintService bulkPrintService,
+                                  DocmosisTemplateConfig docmosisTemplateConfig) {
         this.coverLetterService = coverLetterService;
         this.sscsDocumentService = sscsDocumentService;
         this.bulkPrintService = bulkPrintService;

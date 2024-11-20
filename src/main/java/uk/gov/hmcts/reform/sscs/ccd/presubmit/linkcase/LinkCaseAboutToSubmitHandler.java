@@ -6,7 +6,6 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.collect.Lists;
 import java.util.*;
 import java.util.function.Consumer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -24,7 +23,6 @@ public class LinkCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
     private final UpdateCcdCaseService updateCcdCaseService;
     private final IdamService idamService;
 
-    @Autowired
     public LinkCaseAboutToSubmitHandler(CcdService ccdService, UpdateCcdCaseService updateCcdCaseService,
                                         IdamService idamService) {
         this.ccdService = ccdService;

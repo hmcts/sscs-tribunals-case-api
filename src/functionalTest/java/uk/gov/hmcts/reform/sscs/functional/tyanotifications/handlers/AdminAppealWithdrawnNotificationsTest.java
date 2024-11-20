@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.functional.tyanotifications.handlers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADMIN_APPEAL_WITHDRAWN;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.CASE_UPDATED;
 
@@ -10,9 +10,9 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import junitparams.Parameters;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.rules.Timeout;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Correspondence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrespondenceType;
@@ -33,12 +33,13 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
     @Rule
     public Timeout globalTimeout = Timeout.seconds(100);
 
-    @Before
+    @BeforeEach
     public void setUp() {
         initialiseCcdCase();
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "Appellant, 8620e023-f663-477e-a771-9cfad50ee30f, 446c7b23-7342-42e1-adff-b4c367e951cb, 1, 1, 1",
         "Appointee, 8620e023-f663-477e-a771-9cfad50ee30f, 446c7b23-7342-42e1-adff-b4c367e951cb, 1, 1, 1",

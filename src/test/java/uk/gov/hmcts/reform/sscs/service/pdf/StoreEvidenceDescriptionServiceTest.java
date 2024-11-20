@@ -2,13 +2,13 @@ package uk.gov.hmcts.reform.sscs.service.pdf;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.util.Collections;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.EvidenceDescription;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfAppealDetails;
@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.OldPdfService;
 public class StoreEvidenceDescriptionServiceTest {
     private StoreEvidenceDescriptionService storeEvidenceDescriptionService;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         storeEvidenceDescriptionService = new StoreEvidenceDescriptionService(
                 mock(OldPdfService.class),

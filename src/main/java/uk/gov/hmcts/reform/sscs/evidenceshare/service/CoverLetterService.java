@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -34,7 +33,6 @@ public class CoverLetterService {
 
     private int maxRetryAttempts;
 
-    @Autowired
     public CoverLetterService(FurtherEvidencePlaceholderService furtherEvidencePlaceholderService,
                               PdfStoreService pdfStoreService,
                               @Qualifier("docmosisPdfGenerationService") PdfGenerationService pdfGenerationService,

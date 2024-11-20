@@ -69,7 +69,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandler implements PreSubmitCall
                         .findFirst();
             }
             if (optionalSelectedDocument.isEmpty()) {
-                errors.add(String.format("Could not find the selected document with url '%s' to re-issue further evidence in the appeal with id '%s'.", selectedDocumentUrl.get(), sscsCaseData.getCcdCaseId()));
+                errors.add("Could not find the selected document with url '%s' to re-issue further evidence in the appeal with id '%s'.".formatted(selectedDocumentUrl.get(), sscsCaseData.getCcdCaseId()));
             } else {
                 AbstractDocumentDetails documentDetails = optionalSelectedDocument.get().getValue();
                 documentDetails.setEvidenceIssued("No");

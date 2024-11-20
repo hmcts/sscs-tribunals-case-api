@@ -23,9 +23,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.runner.RunWith;
@@ -75,7 +74,6 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
 
     private SscsDocument expectedDocument;
 
-    @Before
     @BeforeEach
     public void setUp() {
         openMocks(this);

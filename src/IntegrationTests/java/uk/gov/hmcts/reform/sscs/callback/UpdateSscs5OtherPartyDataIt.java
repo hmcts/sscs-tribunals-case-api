@@ -11,8 +11,8 @@ import static uk.gov.hmcts.reform.sscs.idam.UserRole.CTSC_CLERK;
 
 import java.io.IOException;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -37,7 +37,7 @@ public class UpdateSscs5OtherPartyDataIt extends AbstractEventIt {
     @MockBean
     private IdamService idamService;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         setup("callback/updateOtherPartySscs5Callback.json");
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());

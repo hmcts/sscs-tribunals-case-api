@@ -11,8 +11,8 @@ import static org.mockito.Mockito.when;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
@@ -42,7 +42,7 @@ public class CoversheetServiceTest {
     private static final String template = "template";
     private static final String hmctsImgVal = "hmctsImgVal";
 
-    @Before
+    @BeforeEach
     public void setUp() {
         onlineHearingId = "onlineHearingId";
         onlineHearingService = mock(OnlineHearingService.class);

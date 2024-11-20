@@ -14,14 +14,11 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
@@ -30,8 +27,7 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
 import org.springframework.http.converter.xml.SourceHttpMessageConverter;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -51,18 +47,11 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
+@ExtendWith(SpringExtension.class)
 @SuppressWarnings("unchecked")
-@RunWith(JUnitParamsRunner.class)
 public class CcdCallbackControllerTest {
-
-    // begin: needed to use spring runner and junitparamsRunner together
-    @ClassRule
-    public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
     public static final String JURISDICTION = "SSCS";
     public static final long ID = 1234L;
-
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
 
     // end
 
@@ -89,7 +78,7 @@ public class CcdCallbackControllerTest {
 
     private CcdCallbackController controller;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
         mockMvc = standaloneSetup(controller)
@@ -100,7 +89,7 @@ public class CcdCallbackControllerTest {
             .build();
     }
 
-    @Test
+    @ParameterizedTest
     public void handleCcdAboutToStartCallbackAndUpdateCaseData() throws Exception {
         String path = getClass().getClassLoader().getResource("sya/allDetailsForGeneratePdf.json").getFile();
         String content = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
@@ -125,7 +114,7 @@ public class CcdCallbackControllerTest {
             .andExpect(content().json("{\"data\": {\"originalSender\": {\"value\": {\"code\": \"1\", \"label\": \"2\"}}}}"));
     }
 
-    @Test
+    @ParameterizedTest
     public void handleCcdAboutToSubmitCallbackAndUpdateCaseData() throws Exception {
         String path = getClass().getClassLoader().getResource("sya/allDetailsForGeneratePdf.json").getFile();
         String content = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
@@ -149,7 +138,7 @@ public class CcdCallbackControllerTest {
             .andExpect(content().json("{\"data\": {\"interlocReviewState\": \"welshTranslation\"}}"));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenSubmittedCallbackForActionFurtherEvidenceEvent_shouldReturnOk() throws Exception {
         Callback<SscsCaseData> callback = buildCallbackForTestScenarioForGivenEvent();
         given(deserializer.deserialize(anyString())).willReturn(callback);
@@ -176,8 +165,8 @@ public class CcdCallbackControllerTest {
         return new Callback<>(caseDetail, Optional.empty(), EventType.ACTION_FURTHER_EVIDENCE, false);
     }
 
-    @Test
-    @Parameters(method = "getEdgeScenariosForTheRequest")
+    @ParameterizedTest
+    @MethodSource("getEdgeScenariosForTheRequest")
     public void givenCcdSubmittedEventCallbackForActionFurtherEvidenceEvent_messageAndServiceAuthShouldNotBeNull(
         MockHttpServletRequestBuilder requestBuilder) throws Exception {
 
@@ -188,7 +177,7 @@ public class CcdCallbackControllerTest {
         verifyNoInteractions(ccdService);
     }
 
-    public Object[] getEdgeScenariosForTheRequest() {
+    public static Object[] getEdgeScenariosForTheRequest() {
         String urlTemplate = "/ccdSubmittedEvent";
         MockHttpServletRequestBuilder requestWithS2SNull = post(urlTemplate)
             .contentType(MediaType.APPLICATION_JSON)

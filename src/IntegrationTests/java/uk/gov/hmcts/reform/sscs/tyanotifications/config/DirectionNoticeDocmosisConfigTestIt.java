@@ -9,7 +9,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.personalisation.Personalisation
 public class DirectionNoticeDocmosisConfigTestIt extends AbstractNotificationConfigTest {
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "APPEAL_TO_PROCEED, TB-SCS-GNO-ENG-00551.docx, TB-SCS-GNO-ENG-00551.docx, TB-SCS-GNO-ENG-00551.docx",
         "PROVIDE_INFORMATION, TB-SCS-GNO-ENG-00067.docx, TB-SCS-GNO-ENG-00089.docx, TB-SCS-GNO-ENG-00067.docx",
@@ -68,6 +69,7 @@ public class DirectionNoticeDocmosisConfigTestIt extends AbstractNotificationCon
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "GRANT_EXTENSION, TB-SCS-GNO-WEL-00591.docx, TB-SCS-GNO-WEL-00591.docx, TB-SCS-GNO-WEL-00591.docx",
         "REFUSE_EXTENSION, TB-SCS-GNO-WEL-00592.docx, TB-SCS-GNO-WEL-00592.docx, TB-SCS-GNO-WEL-00592.docx",

@@ -1,7 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.fenoaction;
 
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FE_RECEIVED;
 
 import java.io.IOException;
@@ -11,7 +12,7 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import net.javacrumbs.jsonunit.core.Option;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -26,6 +27,7 @@ public class FeNoActionAboutToStartHandlerTest extends BaseHandlerTest {
     private static final String FE_NO_ACTION_CALLBACK_JSON = "fenoaction/feNoActionAboutToStartCallback.json";
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "ABOUT_TO_START,FE_NO_ACTION,withDwp,true",
         "ABOUT_TO_SUBMIT,FE_NO_ACTION,withDwp,false",
@@ -66,7 +68,8 @@ public class FeNoActionAboutToStartHandlerTest extends BaseHandlerTest {
         assertEquals(listOptions, actualCaseData.getData().getDwpStateFeNoAction().getListItems());
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "ABOUT_TO_SUBMIT,FE_NO_ACTION,withDwp",
         "ABOUT_TO_START,UPLOAD_DOCUMENT,appealCreated",
@@ -74,10 +77,10 @@ public class FeNoActionAboutToStartHandlerTest extends BaseHandlerTest {
         "null,UPLOAD_DOCUMENT,withDwp"
     })
     public void handleCornerCaseScenarios(@Nullable CallbackType callbackType, @Nullable EventType eventType,
-                                          @Nullable String state)
-        throws IOException {
-        handler.handle(callbackType, buildTestCallbackGivenData(eventType, state,
-            "appellantEvidence", "", FE_NO_ACTION_CALLBACK_JSON), USER_AUTHORISATION);
+                                          @Nullable String state) {
+        assertThrows(IllegalStateException.class, () ->
+            handler.handle(callbackType, buildTestCallbackGivenData(eventType, state,
+                "appellantEvidence", "", FE_NO_ACTION_CALLBACK_JSON), USER_AUTHORISATION));
     }
 
 }

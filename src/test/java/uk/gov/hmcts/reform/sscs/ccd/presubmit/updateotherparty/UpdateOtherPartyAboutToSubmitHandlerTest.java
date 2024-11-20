@@ -5,8 +5,9 @@ import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.any;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
@@ -23,8 +24,8 @@ import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -60,7 +61,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
             .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
             .build();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         handler = new UpdateOtherPartyAboutToSubmitHandler(idamService);
@@ -76,10 +77,12 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
         sscsCaseData.setAppeal(appeal);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsExceptionIfItCannotHandleTheAppeal() {
-        when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThrows(IllegalStateException.class, () -> {
+            when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        });
     }
 
     @Test
@@ -101,6 +104,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
     public void givenANonAboutToSubmitEvent_thenReturnFalse(CallbackType callbackType) {
         when(callback.getEvent()).thenReturn(EventType.UPDATE_OTHER_PARTY_DATA);
@@ -286,6 +290,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
         "childBenefit", "thirtyHoursFreeChildcare", "guaranteedMinimumPension", "nationalInsuranceCredits"})
     public void givenSscs5CaseOtherPartyWithRole_thenWarningIsReturned(String benefit) {
@@ -303,6 +308,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
         "childBenefit", "thirtyHoursFreeChildcare", "guaranteedMinimumPension", "nationalInsuranceCredits"})
     public void givenSscs5CaseOtherPartyWithNoRole_thenNoErrorsOrWarningIsReturned(String benefit) {
@@ -320,6 +326,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
         "childBenefit", "thirtyHoursFreeChildcare", "guaranteedMinimumPension", "nationalInsuranceCredits"})
     public void givenSscs5CaseOtherPartyWithRoleWarningIgnored_thenCaseIsUpdated(String benefit) {
@@ -372,6 +379,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
         "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
     public void givenNonSscs1PaperCaseOtherPartyWantsToAttendYes_thenCaseIsOralAndWarningShown(String shortName) {
@@ -410,6 +418,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
         "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
     public void givenNonSscs1PaperCaseOtherPartyWantsToAttendNo_thenCaseIsNotChangedAndNoWarningShown(String shortName) {
@@ -428,6 +437,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"paper,No,Yes", "oral,No,No", "online,Yes,Yes"})
     public void givenSscs1CaseOtherPartyWantsToAttendYes_thenHearingTypeNotChangedAndNoWarningShown(
         String hearingType, String wantsToAttend1, String wantsToAttend2) {

@@ -1,10 +1,6 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.RESPONSE_SUBMITTED_DWP;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_UPLOAD_RESPONSE;
@@ -15,16 +11,14 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.quality.Strictness;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -34,10 +28,9 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 
+@ExtendWith(MockitoExtension.class)
 @RunWith(JUnitParamsRunner.class)
 public class DwpUploadResponseHandlerTest {
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
 
     @Mock
     private IdamService idamService;
@@ -49,57 +42,69 @@ public class DwpUploadResponseHandlerTest {
     @Captor
     private ArgumentCaptor<Consumer<SscsCaseDetails>> consumerArgumentCaptor;
 
-    @Before
+    @BeforeEach
     public void setup() {
         handler = new DwpUploadResponseHandler(updateCcdCaseService, idamService);
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void givenCallbackIsNull_whenHandleIsCalled_shouldThrowException() {
-        handler.handle(CallbackType.SUBMITTED, null);
+        assertThrows(NullPointerException.class, () ->
+            handler.handle(CallbackType.SUBMITTED, null));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "ABOUT_TO_SUBMIT"})
     public void givenCallbackIsNotSubmitted_willThrowAnException(CallbackType callbackType) {
-        handler.handle(callbackType,
-            HandlerHelper.buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE));
+        assertThrows(IllegalStateException.class, () ->
+            handler.handle(callbackType,
+                HandlerHelper.buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE)));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"REISSUE_FURTHER_EVIDENCE", "EVIDENCE_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
     public void givenEventTypeIsNotIssueFurtherEvidence_willThrowAnException(EventType eventType) {
-        handler.handle(CallbackType.SUBMITTED,
-            HandlerHelper.buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, eventType));
+        assertThrows(IllegalStateException.class, () ->
+            handler.handle(CallbackType.SUBMITTED,
+                HandlerHelper.buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, eventType)));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"REISSUE_FURTHER_EVIDENCE", "EVIDENCE_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
     public void givenAppealIsNullEvidence_willThrowAnException(EventType eventType) {
-        handler.handle(CallbackType.SUBMITTED, HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().createdInGapsFrom(State.READY_TO_LIST.getId()).appeal(null).build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE));
+        assertThrows(IllegalStateException.class, () ->
+            handler.handle(CallbackType.SUBMITTED, HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().createdInGapsFrom(State.READY_TO_LIST.getId()).appeal(null).build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE)));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"REISSUE_FURTHER_EVIDENCE", "EVIDENCE_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
     public void givenBenefitCodeIsNullEvidence_willThrowAnException(EventType eventType) {
-        Callback<SscsCaseData> sscsCaseData = HandlerHelper.buildTestCallbackForGivenData(
-            SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No")
-                .elementsDisputedIsDecisionDisputedByOthers("No").appeal(Appeal.builder()
+        assertThrows(IllegalStateException.class, () -> {
+            Callback<SscsCaseData> sscsCaseData = HandlerHelper.buildTestCallbackForGivenData(
+                SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No")
+                    .elementsDisputedIsDecisionDisputedByOthers("No").appeal(Appeal.builder()
                     .benefitType(null)
                     .build()).build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE);
-        handler.handle(CallbackType.SUBMITTED, sscsCaseData);
+            handler.handle(CallbackType.SUBMITTED, sscsCaseData);
+        });
     }
 
-    @Test(expected = RequiredFieldMissingException.class)
+    @Test
     public void givenCaseDataInCallbackIsNull_shouldThrowException() {
-        handler.handle(CallbackType.SUBMITTED,
-            HandlerHelper.buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE));
+        assertThrows(RequiredFieldMissingException.class, () ->
+            handler.handle(CallbackType.SUBMITTED,
+                HandlerHelper.buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE)));
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void givenCallbackIsNull_whenCanHandleIsCalled_shouldThrowException() {
-        handler.canHandle(CallbackType.SUBMITTED, null);
+        assertThrows(NullPointerException.class, () ->
+            handler.canHandle(CallbackType.SUBMITTED, null));
     }
 
     @Test
@@ -456,6 +461,7 @@ public class DwpUploadResponseHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"WITH_DWP", "READY_TO_LIST",})
     public void givenAStateForTheCaseAndWhenDwpUploadResponseForSscs2IsRunWhileContainsFurtherInformationIsNoThenDoNotUpdateState(State state) {
         final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(

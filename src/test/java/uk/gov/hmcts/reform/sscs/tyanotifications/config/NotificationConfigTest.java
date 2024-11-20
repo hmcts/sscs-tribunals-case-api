@@ -9,7 +9,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.core.env.Environment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
@@ -25,6 +25,7 @@ public class NotificationConfigTest {
     private final Environment env = mock(Environment.class);
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "emailTemplateName, notification.english.emailTemplateName.emailId, emailTemplateId, smsTemplateName, notification.english.smsTemplateName.smsId, smsTemplateId, letterTemplateName, notification.english.letterTemplateName.letterId, letterTemplateId, notification.english.letterTemplateName.docmosisId, docmosisTemplateId, docmosisTemplateId, validAppeal",
         "emailTemplateName, notification.english.oral.emailTemplateName.emailId, onlineEmailTemplateId, smsTemplateName, notification.english.oral.smsTemplateName.smsId, onlineSmsTemplateId, appealReceived, notification.english.oral.appealReceived.letterId, onlineLetterTemplateId, notification.english.oral.appealReceived.docmosisId, docmosisTemplateId, docmosisTemplateId, readyToList",
@@ -55,6 +56,7 @@ public class NotificationConfigTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "emailTemplateName, notification.welsh.emailTemplateName.emailId, emailTemplateId, smsTemplateName, notification.welsh.smsTemplateName.smsId, smsTemplateId, letterTemplateName, notification.welsh.letterTemplateName.letterId, letterTemplateId, notification.welsh.letterTemplateName.docmosisId, docmosisTemplateId, docmosisTemplateId, validAppeal",
         "emailTemplateName, notification.welsh.oral.emailTemplateName.emailId, onlineEmailTemplateId, smsTemplateName, notification.welsh.oral.smsTemplateName.smsId, onlineSmsTemplateId, appealReceived, notification.welsh.oral.appealReceived.letterId, onlineLetterTemplateId, notification.welsh.oral.appealReceived.docmosisId, docmosisTemplateId, docmosisTemplateId, readyToList",

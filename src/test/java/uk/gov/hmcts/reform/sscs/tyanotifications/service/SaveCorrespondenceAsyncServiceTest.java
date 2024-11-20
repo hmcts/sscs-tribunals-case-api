@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -8,8 +9,8 @@ import static org.mockito.MockitoAnnotations.openMocks;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Correspondence;
@@ -37,7 +38,7 @@ public class SaveCorrespondenceAsyncServiceTest {
     private NotificationClient notificationClient;
 
 
-    @Before
+    @BeforeEach
     public void setup() throws NotificationClientException {
         openMocks(this);
         service = new SaveCorrespondenceAsyncService(ccdNotificationsPdfService);
@@ -56,11 +57,14 @@ public class SaveCorrespondenceAsyncServiceTest {
         verify(ccdNotificationsPdfService).mergeLetterCorrespondenceIntoCcdV2(any(), eq(Long.valueOf(CCD_ID)), eq(correspondence));
     }
 
-    @Test(expected = NotificationClientException.class)
+    @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"400 PDFNotReadyError", "400 BadRequestError"})
-    public void notificationClientExceptionIsReThrown(String message) throws NotificationClientException {
-        when(notificationClient.getPdfForLetter(eq(NOTIFICATION_ID))).thenThrow(new NotificationClientException(message));
-        service.saveLetter(notificationClient, NOTIFICATION_ID, correspondence, CCD_ID);
+    public void notificationClientExceptionIsReThrown(String message) {
+        assertThrows(NotificationClientException.class, () -> {
+            when(notificationClient.getPdfForLetter(eq(NOTIFICATION_ID))).thenThrow(new NotificationClientException(message));
+            service.saveLetter(notificationClient, NOTIFICATION_ID, correspondence, CCD_ID);
+        });
     }
 
     @Test
@@ -70,6 +74,7 @@ public class SaveCorrespondenceAsyncServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPELLANT, APPELLANT", "REPRESENTATIVE, REPRESENTATIVE", "APPOINTEE, APPOINTEE", "JOINT_PARTY, JOINT_PARTY", "OTHER_PARTY, OTHER_PARTY"})
     public void willUploadPdfFormatLettersDirectlyIntoCcd(SubscriptionType subscriptionType, LetterType letterType) {
         service.saveLetter(new byte[]{}, correspondence, CCD_ID, subscriptionType);

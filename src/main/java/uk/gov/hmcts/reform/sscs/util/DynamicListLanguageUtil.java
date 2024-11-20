@@ -51,7 +51,7 @@ public class DynamicListLanguageUtil {
         String mrdReference = language.getMrdReference();
 
         if (nonNull(dialectReference)) {
-            reference = String.format("%s-%s", reference, dialectReference);
+            reference = "%s-%s".formatted(reference, dialectReference);
             name = language.getDialectEn();
         }
 

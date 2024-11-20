@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.extractor;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_RESPOND;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_RECEIVED;
 
@@ -11,8 +11,8 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.tyanotifications.SscsCaseDataUtils;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
@@ -23,12 +23,13 @@ public class DwpResponseReceivedDateExtractorTest {
 
     private DwpResponseReceivedDateExtractor dwpResponseReceivedDateExtractor;
 
-    @Before
+    @BeforeEach
     public void setUp() throws NoSuchAlgorithmException {
         dwpResponseReceivedDateExtractor = new DwpResponseReceivedDateExtractor();
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"DWP_RESPONSE_RECEIVED", "DWP_UPLOAD_RESPONSE"})
     public void extractsDwpResponseReceivedDate(NotificationEventType eventType) {
 

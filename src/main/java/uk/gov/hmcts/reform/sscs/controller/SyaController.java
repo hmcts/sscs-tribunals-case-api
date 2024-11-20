@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -43,7 +42,6 @@ public class SyaController {
 
     private final SubmitAppealServiceBase submitAppealServiceBase;
 
-    @Autowired
     public SyaController(SubmitAppealServiceBase submitAppealServiceBase) {
         this.submitAppealServiceBase = submitAppealServiceBase;
     }

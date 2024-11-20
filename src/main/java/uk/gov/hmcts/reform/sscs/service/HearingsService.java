@@ -280,8 +280,8 @@ public class HearingsService {
 
         } catch (FeignException e) {
             UpdateCaseException exc = new UpdateCaseException(
-                    String.format("The case with Case id: %s could not be updated using updateCaseV2 with status %s, %s",
-                            caseId, e.status(), e));
+                "The case with Case id: %s could not be updated using updateCaseV2 with status %s, %s".formatted(
+                    caseId, e.status(), e));
             log.error(exc.getMessage(), exc);
             throw exc;
         }

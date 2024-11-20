@@ -10,15 +10,12 @@ import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import java.io.IOException;
 import java.time.LocalDate;
-import org.apache.http.HttpStatus;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.apache.hc.core5.http.HttpStatus;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
-@RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
 public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandler {

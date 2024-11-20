@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -14,12 +14,13 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtil
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.SendNotificationServiceTest.APPELLANT_WITH_ADDRESS_AND_APPOINTEE;
 
 import java.util.Arrays;
-import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType;
@@ -28,12 +29,11 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.*;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 
-@RunWith(JUnitParamsRunner.class)
 public class NotificationUtilsTest {
     @Mock
     private NotificationValidService notificationValidService;
 
-    @Before
+    @BeforeEach
     public void setup() {
         openMocks(this);
     }
@@ -100,8 +100,8 @@ public class NotificationUtilsTest {
         assertFalse(hasAppointee(Appointee.builder().name(Name.builder().firstName("First").lastName("Last").build()).build(), "No"));
     }
 
-    @Test
-    @Parameters({"Yes", "", "null"})
+    @ParameterizedTest
+    @ValueSource(strings = {"Yes", "", "null"})
     public void trueWhenIsAppointeeIs(@Nullable String value) {
         assertTrue(hasAppointee(Appointee.builder().name(Name.builder().firstName("First").lastName("Last").build()).build(), value));
     }
@@ -280,8 +280,8 @@ public class NotificationUtilsTest {
         assertTrue(NotificationUtils.isOkToSendNotification(wrapper, HEARING_BOOKED, subscription, notificationValidService));
     }
 
-    @Test
-    @Parameters(method = "isNotOkToSendNotificationResponses")
+    @ParameterizedTest
+    @MethodSource("isNotOkToSendNotificationResponses")
     public void isNotOkToSendNotification(boolean isNotificationStillValidToSendResponse, boolean isHearingTypeValidToSendNotificationResponse) {
         NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
             SYA_APPEAL_CREATED,
@@ -315,8 +315,8 @@ public class NotificationUtilsTest {
         assertTrue(isOkToSendSmsNotification(wrapper, subscription, notification, STRUCK_OUT, notificationValidService));
     }
 
-    @Test
-    @Parameters(method = "isNotOkToSendSmsNotificationScenarios")
+    @ParameterizedTest
+    @MethodSource("isNotOkToSendSmsNotificationScenarios")
     public void okToSendSmsNotificationisNotValid(Subscription subscription, Notification notification) {
         when(notificationValidService.isNotificationStillValidToSend(any(), any())).thenReturn(true);
         when(notificationValidService.isHearingTypeValidToSendNotification(any(), any())).thenReturn(true);
@@ -343,8 +343,8 @@ public class NotificationUtilsTest {
         assertTrue(isOkToSendEmailNotification(wrapper, subscription, notification, notificationValidService));
     }
 
-    @Test
-    @Parameters(method = "isNotOkToSendEmailNotificationScenarios")
+    @ParameterizedTest
+    @MethodSource("isNotOkToSendEmailNotificationScenarios")
     public void okToSendEmailNotificationisNotValid(Subscription subscription, Notification notification) {
         when(notificationValidService.isNotificationStillValidToSend(any(), any())).thenReturn(true);
         when(notificationValidService.isHearingTypeValidToSendNotification(any(), any())).thenReturn(true);
@@ -451,7 +451,7 @@ public class NotificationUtilsTest {
         };
     }
 
-    private Object[] isNotOkToSendNotificationResponses() {
+    private static Object[] isNotOkToSendNotificationResponses() {
         return new Object[]{
             new Object[]{
                 false, false
@@ -511,7 +511,7 @@ public class NotificationUtilsTest {
         return new CcdNotificationWrapper(notificationSscsCaseDataWrapper);
     }
 
-    public Object[] isNotOkToSendSmsNotificationScenarios() {
+    public static Object[] isNotOkToSendSmsNotificationScenarios() {
         return new Object[]{
             new Object[]{
                 null,
@@ -544,7 +544,7 @@ public class NotificationUtilsTest {
         };
     }
 
-    public Object[] isNotOkToSendEmailNotificationScenarios() {
+    public static Object[] isNotOkToSendEmailNotificationScenarios() {
         return new Object[]{
             new Object[]{
                 null,
@@ -577,8 +577,8 @@ public class NotificationUtilsTest {
         };
     }
 
-    @Test
-    @Parameters(method = "getLatestHearingScenarios")
+    @ParameterizedTest
+    @MethodSource("getLatestHearingScenarios")
     public void getLatestHearingTest(
         SscsCaseData sscsCaseData, String expectedHearingId, String expectedDate, String expectedTime) {
         Hearing hearing = sscsCaseData.getLatestHearing();
@@ -594,7 +594,7 @@ public class NotificationUtilsTest {
         assertNull(hearing);
     }
 
-    private Hearing createHearing(String hearingId, String hearingDate, String hearingTime) {
+    private static Hearing createHearing(String hearingId, String hearingDate, String hearingTime) {
         return Hearing.builder().value(HearingDetails.builder()
             .hearingDate(hearingDate)
             .hearingId(hearingId)
@@ -602,7 +602,7 @@ public class NotificationUtilsTest {
             .build()).build();
     }
 
-    public Object[] getLatestHearingScenarios() {
+    public static Object[] getLatestHearingScenarios() {
         return new Object[]{
             new Object[]{
                 SscsCaseData.builder()

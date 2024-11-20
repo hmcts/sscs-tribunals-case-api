@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,7 +42,6 @@ public class CitizenController {
     private final CitizenLoginService citizenLoginService;
     private final IdamService idamService;
 
-    @Autowired
     public CitizenController(CitizenLoginService citizenLoginService,
                              IdamService idamService) {
         this.citizenLoginService = citizenLoginService;
@@ -76,7 +74,7 @@ public class CitizenController {
         @Parameter(description = "user authorisation header", example = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdW")
         @RequestHeader(AUTHORIZATION) String authorisation,
         @Parameter(description = "tya number for an user and appeal", example = "A123-B123-c123-Dgdg")
-        @PathVariable("tya") String tya) {
+        @PathVariable String tya) {
 
         List<OnlineHearing> casesForCitizen = citizenLoginService.findCasesForCitizen(getUserTokens(authorisation), tya);
 
@@ -144,7 +142,7 @@ public class CitizenController {
         @Parameter(description = "user authorisation header", example = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdW")
         @RequestHeader(AUTHORIZATION) String authorisation,
         @Parameter(description = "tya number for an user and appeal", example = "A123-B123-c123-Dgdg")
-        @PathVariable("tya") String tya,
+        @PathVariable String tya,
         @Parameter(description = "email address of the appellant", example = "foo@bar.com")
         @RequestBody() AssociateCaseDetails associateCaseDetails
     ) {
@@ -173,7 +171,7 @@ public class CitizenController {
         @Parameter(description = "user authorisation header", example = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdW")
         @RequestHeader(AUTHORIZATION) String authorisation,
         @Parameter(description = "case id for an user and appeal", example = "12345678")
-        @PathVariable("caseId") String caseId
+        @PathVariable String caseId
     ) {
 
         IdamTokens citizenTokens = getUserTokens(authorisation);

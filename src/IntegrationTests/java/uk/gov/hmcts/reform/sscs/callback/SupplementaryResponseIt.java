@@ -15,8 +15,8 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,7 +39,7 @@ public class SupplementaryResponseIt extends AbstractEventIt {
     public static final String SUP_RESPONSE_OTHER_DOC_PDF_NAME = "other" + SUP_RESPONSE_DOC_PDF_NAME;
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         super.setup();
         sscsCaseData = SscsCaseData.builder()

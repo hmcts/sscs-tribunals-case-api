@@ -45,7 +45,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -99,7 +98,6 @@ public class EvidenceUploadService {
     private static final DraftHearingDocumentExtractor draftHearingDocumentExtractor = new DraftHearingDocumentExtractor();
     private static final String UPLOAD_DOCUMENT_DESCRIPTION = "Uploaded a further evidence document";
 
-    @Autowired
     public EvidenceUploadService(DocumentStoreService documentStoreService,
                                  IdamService idamService, OnlineHearingService onlineHearingService,
                                  StoreEvidenceDescriptionService storeEvidenceDescriptionService,
@@ -319,7 +317,7 @@ public class EvidenceUploadService {
         String appellantOrRepsFileNamePrefix = workOutFileNamePrefix(caseData, idamEmail);
         SscsCaseData data = storePdfContext.getDocument().getData();
         long uploadCounter = getCountOfNextUploadDoc(data.getScannedDocuments(), data.getSscsDocument());
-        return String.format("%s upload %s - %s.pdf", appellantOrRepsFileNamePrefix, uploadCounter, ccdCaseId);
+        return "%s upload %s - %s.pdf".formatted(appellantOrRepsFileNamePrefix, uploadCounter, ccdCaseId);
     }
 
     private void appendEvidenceUploadsToStatementAndStoreIt(SscsCaseData sscsCaseData,

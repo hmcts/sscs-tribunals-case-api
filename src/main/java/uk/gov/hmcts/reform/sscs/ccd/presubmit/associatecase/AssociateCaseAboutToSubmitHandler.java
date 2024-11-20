@@ -4,7 +4,6 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -28,7 +27,6 @@ public class AssociateCaseAboutToSubmitHandler implements PreSubmitCallbackHandl
 
 
 
-    @Autowired
     public AssociateCaseAboutToSubmitHandler(CcdService ccdService, AssociatedCaseLinkHelper associatedCaseLinkHelper, IdamService idamService) {
         this.ccdService = ccdService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;

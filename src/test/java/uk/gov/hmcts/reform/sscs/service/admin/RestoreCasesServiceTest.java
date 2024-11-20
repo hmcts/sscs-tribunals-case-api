@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service.admin;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -11,14 +12,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -27,7 +28,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class RestoreCasesServiceTest {
 
     private RestoreCasesService restoreCasesService;
@@ -46,7 +47,7 @@ public class RestoreCasesServiceTest {
 
     private final String date = "2020-08-28";
 
-    @Before
+    @BeforeEach
     public void setup() {
         restoreCasesService = new RestoreCasesService(ccdService, updateCcdCaseService, idamService, new ObjectMapper());
         Mockito.when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -72,15 +73,15 @@ public class RestoreCasesServiceTest {
             eventTypeCaptor.capture(),
             summaryCaptor.capture(), descriptionCaptor.capture(), idamTokensCaptor.capture());
 
-        Assert.assertEquals(Arrays.asList(1L, 2L), caseIdCaptor.getAllValues());
-        Assert.assertEquals(Arrays.asList("readyToList", "readyToList"), eventTypeCaptor.getAllValues());
-        Assert.assertEquals(Arrays.asList("Ready to list", "Ready to list"), summaryCaptor.getAllValues());
-        Assert.assertEquals(Arrays.asList("Ready to list event triggered", "Ready to list event triggered"), descriptionCaptor.getAllValues());
-        Assert.assertEquals(Arrays.asList(idamTokens, idamTokens), idamTokensCaptor.getAllValues());
+        Assertions.assertEquals(Arrays.asList(1L, 2L), caseIdCaptor.getAllValues());
+        Assertions.assertEquals(Arrays.asList("readyToList", "readyToList"), eventTypeCaptor.getAllValues());
+        Assertions.assertEquals(Arrays.asList("Ready to list", "Ready to list"), summaryCaptor.getAllValues());
+        Assertions.assertEquals(Arrays.asList("Ready to list event triggered", "Ready to list event triggered"), descriptionCaptor.getAllValues());
+        Assertions.assertEquals(Arrays.asList(idamTokens, idamTokens), idamTokensCaptor.getAllValues());
 
-        Assert.assertFalse(status.isCompleted());
-        Assert.assertTrue(status.isOk());
-        Assert.assertEquals("RestoreCasesStatus{processedCount=2, successCount=2, failureCount=0, failureIds=[], completed=false}", status.toString());
+        Assertions.assertFalse(status.isCompleted());
+        Assertions.assertTrue(status.isOk());
+        Assertions.assertEquals("RestoreCasesStatus{processedCount=2, successCount=2, failureCount=0, failureIds=[], completed=false}", status.toString());
 
     }
 
@@ -104,15 +105,15 @@ public class RestoreCasesServiceTest {
             eventTypeCaptor.capture(),
             summaryCaptor.capture(), descriptionCaptor.capture(), idamTokensCaptor.capture());
 
-        Assert.assertEquals(Arrays.asList(1L, 2L), caseIdCaptor.getAllValues());
-        Assert.assertEquals(Arrays.asList("readyToList", "readyToList"), eventTypeCaptor.getAllValues());
-        Assert.assertEquals(Arrays.asList("Ready to list", "Ready to list"), summaryCaptor.getAllValues());
-        Assert.assertEquals(Arrays.asList("Ready to list event triggered", "Ready to list event triggered"), descriptionCaptor.getAllValues());
-        Assert.assertEquals(Arrays.asList(idamTokens, idamTokens), idamTokensCaptor.getAllValues());
+        Assertions.assertEquals(Arrays.asList(1L, 2L), caseIdCaptor.getAllValues());
+        Assertions.assertEquals(Arrays.asList("readyToList", "readyToList"), eventTypeCaptor.getAllValues());
+        Assertions.assertEquals(Arrays.asList("Ready to list", "Ready to list"), summaryCaptor.getAllValues());
+        Assertions.assertEquals(Arrays.asList("Ready to list event triggered", "Ready to list event triggered"), descriptionCaptor.getAllValues());
+        Assertions.assertEquals(Arrays.asList(idamTokens, idamTokens), idamTokensCaptor.getAllValues());
 
-        Assert.assertFalse(status.isCompleted());
-        Assert.assertTrue(status.isOk());
-        Assert.assertEquals("RestoreCasesStatus{processedCount=2, successCount=2, failureCount=0, failureIds=[], completed=false}", status.toString());
+        Assertions.assertFalse(status.isCompleted());
+        Assertions.assertTrue(status.isOk());
+        Assertions.assertEquals("RestoreCasesStatus{processedCount=2, successCount=2, failureCount=0, failureIds=[], completed=false}", status.toString());
 
     }
 
@@ -136,9 +137,9 @@ public class RestoreCasesServiceTest {
             eventTypeCaptor.capture(),
             summaryCaptor.capture(), descriptionCaptor.capture(), idamTokensCaptor.capture());
 
-        Assert.assertTrue(status.isCompleted());
-        Assert.assertTrue(status.isOk());
-        Assert.assertEquals("RestoreCasesStatus{processedCount=0, successCount=0, failureCount=0, failureIds=[], completed=true}", status.toString());
+        Assertions.assertTrue(status.isCompleted());
+        Assertions.assertTrue(status.isOk());
+        Assertions.assertEquals("RestoreCasesStatus{processedCount=0, successCount=0, failureCount=0, failureIds=[], completed=true}", status.toString());
 
     }
 
@@ -168,15 +169,15 @@ public class RestoreCasesServiceTest {
             eventTypeCaptor.capture(),
             summaryCaptor.capture(), descriptionCaptor.capture(), idamTokensCaptor.capture());
 
-        Assert.assertEquals(Arrays.asList(1L, 2L), caseIdCaptor.getAllValues());
-        Assert.assertEquals(Arrays.asList("readyToList", "readyToList"), eventTypeCaptor.getAllValues());
-        Assert.assertEquals(Arrays.asList("Ready to list", "Ready to list"), summaryCaptor.getAllValues());
-        Assert.assertEquals(Arrays.asList("Ready to list event triggered", "Ready to list event triggered"), descriptionCaptor.getAllValues());
-        Assert.assertEquals(Arrays.asList(idamTokens, idamTokens), idamTokensCaptor.getAllValues());
+        Assertions.assertEquals(Arrays.asList(1L, 2L), caseIdCaptor.getAllValues());
+        Assertions.assertEquals(Arrays.asList("readyToList", "readyToList"), eventTypeCaptor.getAllValues());
+        Assertions.assertEquals(Arrays.asList("Ready to list", "Ready to list"), summaryCaptor.getAllValues());
+        Assertions.assertEquals(Arrays.asList("Ready to list event triggered", "Ready to list event triggered"), descriptionCaptor.getAllValues());
+        Assertions.assertEquals(Arrays.asList(idamTokens, idamTokens), idamTokensCaptor.getAllValues());
 
-        Assert.assertFalse(status.isCompleted());
-        Assert.assertFalse(status.isOk());
-        Assert.assertEquals("RestoreCasesStatus{processedCount=2, successCount=1, failureCount=1, failureIds=[2], completed=false}", status.toString());
+        Assertions.assertFalse(status.isCompleted());
+        Assertions.assertFalse(status.isOk());
+        Assertions.assertEquals("RestoreCasesStatus{processedCount=2, successCount=1, failureCount=1, failureIds=[2], completed=false}", status.toString());
 
     }
 
@@ -203,15 +204,15 @@ public class RestoreCasesServiceTest {
             eventTypeCaptor.capture(),
             summaryCaptor.capture(), descriptionCaptor.capture(), idamTokensCaptor.capture());
 
-        Assert.assertEquals(Arrays.asList(1L, 2L), caseIdCaptor.getAllValues());
-        Assert.assertEquals(Arrays.asList("readyToList", "readyToList"), eventTypeCaptor.getAllValues());
-        Assert.assertEquals(Arrays.asList("Ready to list", "Ready to list"), summaryCaptor.getAllValues());
-        Assert.assertEquals(Arrays.asList("Ready to list event triggered", "Ready to list event triggered"), descriptionCaptor.getAllValues());
-        Assert.assertEquals(Arrays.asList(idamTokens, idamTokens), idamTokensCaptor.getAllValues());
+        Assertions.assertEquals(Arrays.asList(1L, 2L), caseIdCaptor.getAllValues());
+        Assertions.assertEquals(Arrays.asList("readyToList", "readyToList"), eventTypeCaptor.getAllValues());
+        Assertions.assertEquals(Arrays.asList("Ready to list", "Ready to list"), summaryCaptor.getAllValues());
+        Assertions.assertEquals(Arrays.asList("Ready to list event triggered", "Ready to list event triggered"), descriptionCaptor.getAllValues());
+        Assertions.assertEquals(Arrays.asList(idamTokens, idamTokens), idamTokensCaptor.getAllValues());
 
-        Assert.assertFalse(status.isCompleted());
-        Assert.assertFalse(status.isOk());
-        Assert.assertEquals("RestoreCasesStatus{processedCount=2, successCount=1, failureCount=1, failureIds=[2], completed=false}", status.toString());
+        Assertions.assertFalse(status.isCompleted());
+        Assertions.assertFalse(status.isOk());
+        Assertions.assertEquals("RestoreCasesStatus{processedCount=2, successCount=1, failureCount=1, failureIds=[2], completed=false}", status.toString());
 
     }
 
@@ -235,11 +236,11 @@ public class RestoreCasesServiceTest {
             eventTypeCaptor.capture(),
             summaryCaptor.capture(), descriptionCaptor.capture(), idamTokensCaptor.capture());
 
-        Assert.assertEquals(List.of(1L), caseIdCaptor.getAllValues());
-        Assert.assertEquals(List.of("readyToList"), eventTypeCaptor.getAllValues());
-        Assert.assertEquals(List.of("Ready to list"), summaryCaptor.getAllValues());
-        Assert.assertEquals(List.of("Ready to list event triggered"), descriptionCaptor.getAllValues());
-        Assert.assertEquals(List.of(idamTokens), idamTokensCaptor.getAllValues());
+        Assertions.assertEquals(List.of(1L), caseIdCaptor.getAllValues());
+        Assertions.assertEquals(List.of("readyToList"), eventTypeCaptor.getAllValues());
+        Assertions.assertEquals(List.of("Ready to list"), summaryCaptor.getAllValues());
+        Assertions.assertEquals(List.of("Ready to list event triggered"), descriptionCaptor.getAllValues());
+        Assertions.assertEquals(List.of(idamTokens), idamTokensCaptor.getAllValues());
     }
 
     @Test
@@ -262,11 +263,11 @@ public class RestoreCasesServiceTest {
             eventTypeCaptor.capture(),
             summaryCaptor.capture(), descriptionCaptor.capture(), idamTokensCaptor.capture());
 
-        Assert.assertEquals(List.of(2L), caseIdCaptor.getAllValues());
-        Assert.assertEquals(List.of("readyToList"), eventTypeCaptor.getAllValues());
-        Assert.assertEquals(List.of("Ready to list"), summaryCaptor.getAllValues());
-        Assert.assertEquals(List.of("Ready to list event triggered"), descriptionCaptor.getAllValues());
-        Assert.assertEquals(List.of(idamTokens), idamTokensCaptor.getAllValues());
+        Assertions.assertEquals(List.of(2L), caseIdCaptor.getAllValues());
+        Assertions.assertEquals(List.of("readyToList"), eventTypeCaptor.getAllValues());
+        Assertions.assertEquals(List.of("Ready to list"), summaryCaptor.getAllValues());
+        Assertions.assertEquals(List.of("Ready to list event triggered"), descriptionCaptor.getAllValues());
+        Assertions.assertEquals(List.of(idamTokens), idamTokensCaptor.getAllValues());
     }
 
     @Test
@@ -289,86 +290,102 @@ public class RestoreCasesServiceTest {
             eventTypeCaptor.capture(),
             summaryCaptor.capture(), descriptionCaptor.capture(), idamTokensCaptor.capture());
 
-        Assert.assertEquals(List.of(1L), caseIdCaptor.getAllValues());
-        Assert.assertEquals(List.of("readyToList"), eventTypeCaptor.getAllValues());
-        Assert.assertEquals(List.of("Ready to list"), summaryCaptor.getAllValues());
-        Assert.assertEquals(List.of("Ready to list event triggered"), descriptionCaptor.getAllValues());
-        Assert.assertEquals(List.of(idamTokens), idamTokensCaptor.getAllValues());
+        Assertions.assertEquals(List.of(1L), caseIdCaptor.getAllValues());
+        Assertions.assertEquals(List.of("readyToList"), eventTypeCaptor.getAllValues());
+        Assertions.assertEquals(List.of("Ready to list"), summaryCaptor.getAllValues());
+        Assertions.assertEquals(List.of("Ready to list event triggered"), descriptionCaptor.getAllValues());
+        Assertions.assertEquals(List.of(idamTokens), idamTokensCaptor.getAllValues());
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testRestoreNextBatchOfCasesThrowsIllegalStateExceptionWhenAReturnedCaseHasIncorrectDwpFurtherInfo() {
-        final String date = "2020-08-28";
+        assertThrows(IllegalStateException.class, () -> {
+            final String date = "2020-08-28";
 
-        List<SscsCaseDetails> cases = new ArrayList<>();
-        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(3L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("Something else").build()).build());
+            List<SscsCaseDetails> cases = new ArrayList<>();
+            cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
+            cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
+            cases.add(SscsCaseDetails.builder().id(3L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("Something else").build()).build());
 
-        Map<String, String> searchCriteria = new HashMap<>();
-        searchCriteria.put("last_state_modified_date", date);
-        searchCriteria.put("case.dwpFurtherInfo", "No");
-        searchCriteria.put("state", "responseReceived");
+            Map<String, String> searchCriteria = new HashMap<>();
+            searchCriteria.put("last_state_modified_date", date);
+            searchCriteria.put("case.dwpFurtherInfo", "No");
+            searchCriteria.put("state", "responseReceived");
 
-        Mockito.when(ccdService.findCaseByQuery(any(SearchSourceBuilder.class), Mockito.eq(idamTokens))).thenReturn(cases);
+            Mockito.when(ccdService.findCaseByQuery(any(SearchSourceBuilder.class), Mockito.eq(idamTokens))).thenReturn(cases);
 
-        restoreCasesService.restoreNextBatchOfCases(date);
+            restoreCasesService.restoreNextBatchOfCases(date);
+
+        });
 
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testRestoreNextBatchOfCasesThrowsIllegalStateExceptionWhenAReturnedCaseHasIncorrectCaseDetailsState() {
-        final String date = "2020-08-28";
+        assertThrows(IllegalStateException.class, () -> {
+            final String date = "2020-08-28";
 
-        List<SscsCaseDetails> cases = new ArrayList<>();
-        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(3L).state("somethingElse").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
+            List<SscsCaseDetails> cases = new ArrayList<>();
+            cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
+            cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
+            cases.add(SscsCaseDetails.builder().id(3L).state("somethingElse").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
 
-        Mockito.when(ccdService.findCaseByQuery(any(SearchSourceBuilder.class), Mockito.eq(idamTokens))).thenReturn(cases);
+            Mockito.when(ccdService.findCaseByQuery(any(SearchSourceBuilder.class), Mockito.eq(idamTokens))).thenReturn(cases);
 
-        restoreCasesService.restoreNextBatchOfCases(date);
+            restoreCasesService.restoreNextBatchOfCases(date);
+
+        });
 
     }
 
-    @Test(expected = JsonProcessingException.class)
-    public void testGetRestoreCasesDateWhenInvalidJson() throws JsonProcessingException {
-        String json = "invalidJson";
-        restoreCasesService.getRestoreCasesDate(json);
+    @Test
+    public void testGetRestoreCasesDateWhenInvalidJson() {
+        assertThrows(JsonProcessingException.class, () -> {
+            String json = "invalidJson";
+            restoreCasesService.getRestoreCasesDate(json);
+        });
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testGetRestoreCasesDateWhenNoCaseDetails() throws JsonProcessingException {
-        String json = "{}}";
-        restoreCasesService.getRestoreCasesDate(json);
+    @Test
+    public void testGetRestoreCasesDateWhenNoCaseDetails() {
+        assertThrows(IllegalStateException.class, () -> {
+            String json = "{}}";
+            restoreCasesService.getRestoreCasesDate(json);
+        });
     }
 
     @Test
     public void testGetRestoreCasesDateWhenValidJsonWithRestoreCasesDate() throws JsonProcessingException {
         String json = "{\"case_details\" : {\"case_data\" : {\"restoreCasesDate\" : \"2020-08-28\"}}}";
         String date = restoreCasesService.getRestoreCasesDate(json);
-        Assert.assertEquals("2020-08-28", date);
+        Assertions.assertEquals("2020-08-28", date);
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testGetRestoreCasesDateWhenJsonWithoutRestoreCasesDate() throws JsonProcessingException {
-        String json = "{\"case_details\" : {\"case_data\" : {}}}";
-        String date = restoreCasesService.getRestoreCasesDate(json);
-        Assert.assertEquals("2020-08-28", date);
+    @Test
+    public void testGetRestoreCasesDateWhenJsonWithoutRestoreCasesDate() {
+        assertThrows(IllegalStateException.class, () -> {
+            String json = "{\"case_details\" : {\"case_data\" : {}}}";
+            String date = restoreCasesService.getRestoreCasesDate(json);
+            Assertions.assertEquals("2020-08-28", date);
+        });
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testGetRestoreCasesDateWhenJsonWithoutCaseData() throws JsonProcessingException {
-        String json = "{\"case_details\" : {}}";
-        String date = restoreCasesService.getRestoreCasesDate(json);
-        Assert.assertEquals("2020-08-28", date);
+    @Test
+    public void testGetRestoreCasesDateWhenJsonWithoutCaseData() {
+        assertThrows(IllegalStateException.class, () -> {
+            String json = "{\"case_details\" : {}}";
+            String date = restoreCasesService.getRestoreCasesDate(json);
+            Assertions.assertEquals("2020-08-28", date);
+        });
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testGetRestoreCasesDateWhenJsonWithoutCaseDetails() throws JsonProcessingException {
-        String json = "{}";
-        String date = restoreCasesService.getRestoreCasesDate(json);
-        Assert.assertEquals("2020-08-28", date);
+    @Test
+    public void testGetRestoreCasesDateWhenJsonWithoutCaseDetails() {
+        assertThrows(IllegalStateException.class, () -> {
+            String json = "{}";
+            String date = restoreCasesService.getRestoreCasesDate(json);
+            Assertions.assertEquals("2020-08-28", date);
+        });
     }
 
 }

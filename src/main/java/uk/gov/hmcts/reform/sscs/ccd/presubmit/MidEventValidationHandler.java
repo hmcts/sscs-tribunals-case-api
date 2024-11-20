@@ -7,7 +7,6 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -21,7 +20,6 @@ public class MidEventValidationHandler implements PreSubmitCallbackHandler<SscsC
 
     private final Validator validator;
 
-    @Autowired
     public MidEventValidationHandler(Validator validator) {
         this.validator = validator;
     }

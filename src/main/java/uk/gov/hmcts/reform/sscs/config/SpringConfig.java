@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer
 public class SpringConfig {
 
     @Bean
-    public SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer() {
+    SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer() {
         return new SscsCaseCallbackDeserializer(mapper());
     }
 

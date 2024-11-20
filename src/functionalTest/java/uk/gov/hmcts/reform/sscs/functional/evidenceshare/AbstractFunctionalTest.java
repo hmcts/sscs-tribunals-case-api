@@ -23,16 +23,12 @@ import java.util.Objects;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.ProfileValueSourceConfiguration;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -52,13 +48,6 @@ public abstract class AbstractFunctionalTest {
     private static final String EVIDENCE_DOCUMENT_TYPE = "EVIDENCE_DOCUMENT";
     private static final String EXISTING_DOCUMENT_PDF = "existing-document.pdf";
     private static final String EXISTING_DOCUMENT_TYPE = "EXISTING_DOCUMENT";
-
-    // Below rules are needed to use the junitParamsRunner together with SpringRunner
-    @ClassRule
-    public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
-
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
     //end of rules needed for junitParamsRunner
 
     @Autowired

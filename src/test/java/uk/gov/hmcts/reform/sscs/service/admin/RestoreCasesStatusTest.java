@@ -2,12 +2,12 @@ package uk.gov.hmcts.reform.sscs.service.admin;
 
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class RestoreCasesStatusTest {
 
     @Test
@@ -19,9 +19,9 @@ public class RestoreCasesStatusTest {
 
         RestoreCasesStatus status = new RestoreCasesStatus(processedCount, successCount, failureIds, completed);
 
-        Assert.assertFalse(status.isCompleted());
-        Assert.assertFalse(status.isOk());
-        Assert.assertEquals("RestoreCasesStatus{processedCount=10, "
+        Assertions.assertFalse(status.isCompleted());
+        Assertions.assertFalse(status.isOk());
+        Assertions.assertEquals("RestoreCasesStatus{processedCount=10, "
             + "successCount=4, failureCount=6, failureIds=[1, 2, 3, 4, 5, 6], "
             + "completed=false}", status.toString());
 
@@ -36,9 +36,9 @@ public class RestoreCasesStatusTest {
 
         RestoreCasesStatus status = new RestoreCasesStatus(processedCount, successCount, failureIds, completed);
 
-        Assert.assertFalse(status.isCompleted());
-        Assert.assertFalse(status.isOk());
-        Assert.assertEquals("RestoreCasesStatus{processedCount=10, "
+        Assertions.assertFalse(status.isCompleted());
+        Assertions.assertFalse(status.isOk());
+        Assertions.assertEquals("RestoreCasesStatus{processedCount=10, "
             + "successCount=9, failureCount=1, failureIds=[1], "
             + "completed=false}", status.toString());
 
@@ -53,9 +53,9 @@ public class RestoreCasesStatusTest {
 
         RestoreCasesStatus status = new RestoreCasesStatus(processedCount, successCount, failureIds, completed);
 
-        Assert.assertTrue(status.isCompleted());
-        Assert.assertFalse(status.isOk());
-        Assert.assertEquals("RestoreCasesStatus{processedCount=10, "
+        Assertions.assertTrue(status.isCompleted());
+        Assertions.assertFalse(status.isOk());
+        Assertions.assertEquals("RestoreCasesStatus{processedCount=10, "
             + "successCount=9, failureCount=1, failureIds=[1], "
             + "completed=true}", status.toString());
 
@@ -70,9 +70,9 @@ public class RestoreCasesStatusTest {
 
         RestoreCasesStatus status = new RestoreCasesStatus(processedCount, successCount, failureIds, completed);
 
-        Assert.assertFalse(status.isCompleted());
-        Assert.assertTrue(status.isOk());
-        Assert.assertEquals("RestoreCasesStatus{processedCount=10, "
+        Assertions.assertFalse(status.isCompleted());
+        Assertions.assertTrue(status.isOk());
+        Assertions.assertEquals("RestoreCasesStatus{processedCount=10, "
             + "successCount=10, failureCount=0, failureIds=[], "
             + "completed=false}", status.toString());
 
@@ -87,9 +87,9 @@ public class RestoreCasesStatusTest {
 
         RestoreCasesStatus status = new RestoreCasesStatus(processedCount, successCount, failureIds, completed);
 
-        Assert.assertTrue(status.isCompleted());
-        Assert.assertTrue(status.isOk());
-        Assert.assertEquals("RestoreCasesStatus{processedCount=10, "
+        Assertions.assertTrue(status.isCompleted());
+        Assertions.assertTrue(status.isOk());
+        Assertions.assertEquals("RestoreCasesStatus{processedCount=10, "
             + "successCount=10, failureCount=0, failureIds=[], "
             + "completed=true}", status.toString());
 

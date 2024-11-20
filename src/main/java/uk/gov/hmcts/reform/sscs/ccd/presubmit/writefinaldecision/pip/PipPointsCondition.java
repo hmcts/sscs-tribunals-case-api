@@ -109,7 +109,7 @@ public enum PipPointsCondition implements PointsCondition<PipPointsCondition> {
             return Optional.empty();
         }
         int totalPoints = collection.stream().map(answerText -> questionService.getAnswerForActivityQuestionKey(sscsCaseData,
-            answerText)).filter(Optional::isPresent).map(Optional::get).mapToInt(ActivityAnswer::getActivityAnswerPoints).sum();
+            answerText)).flatMap(Optional::stream).mapToInt(ActivityAnswer::getActivityAnswerPoints).sum();
 
         return getPointsRequirementCondition().test(totalPoints) ? Optional.empty() :
             Optional.of(getErrorMessage());

@@ -1,17 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createwelshnotice;
 
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -43,7 +41,7 @@ public class CreateWelshNoticeAboutToStartHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         handler = new CreateWelshNoticeAboutToStartHandler();
@@ -64,9 +62,10 @@ public class CreateWelshNoticeAboutToStartHandlerTest {
         assertFalse(handler.canHandle(ABOUT_TO_START, callback));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void givenNullCallback_shouldThrowException() {
-        handler.handle(CallbackType.ABOUT_TO_SUBMIT, null, "user token");
+        assertThrows(NullPointerException.class, () ->
+            handler.handle(CallbackType.ABOUT_TO_SUBMIT, null, "user token"));
     }
 
     @Test
@@ -79,6 +78,7 @@ public class CreateWelshNoticeAboutToStartHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"DIRECTION_NOTICE", "ADJOURNMENT_NOTICE", "DECISION_NOTICE", "AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE", "POSTPONEMENT_REQUEST_DIRECTION_NOTICE"})
     public void originalDocumentDropDownWhenSscsDocumentTranslationStatusIsSet(DocumentType documentType) {
         sscsCaseData = SscsCaseData.builder()

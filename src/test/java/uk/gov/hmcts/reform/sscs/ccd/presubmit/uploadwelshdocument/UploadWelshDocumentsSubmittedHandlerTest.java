@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadwelshdocument;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
@@ -12,11 +12,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -28,7 +29,6 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
-@RunWith(JUnitParamsRunner.class)
 public class UploadWelshDocumentsSubmittedHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
@@ -48,7 +48,7 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         handler = new UploadWelshDocumentsSubmittedHandler(ccdService, idamService);
@@ -61,8 +61,8 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
 
     }
 
-    @Test
-    @Parameters(method = "generateCanHandleScenarios")
+    @ParameterizedTest
+    @MethodSource("generateCanHandleScenarios")
     public void givenCanHandleIsCalled_shouldReturnCorrectResult(CallbackType callbackType,
                                                                  Callback<SscsCaseData> callback,
                                                                  boolean expectedResult) {
@@ -182,8 +182,8 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
         assertEquals(State.APPEAL_CREATED, caseData.getPreviousState());
     }
 
-    @Test
-    @Parameters({
+    @ParameterizedTest
+    @EnumSource(value = State.class, names = {
         "DORMANT_APPEAL_STATE",
         "VOID_STATE",
     })
@@ -290,7 +290,7 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
         assertEquals(State.INTERLOCUTORY_REVIEW_STATE, caseData.getState());
     }
 
-    private Object[] generateCanHandleScenarios() {
+    private static Object[] generateCanHandleScenarios() {
         Callback<SscsCaseData> callbackWithValidEventOption = buildCallback(EventType.SEND_TO_DWP.getCcdType());
         return new Object[]{new Object[]{SUBMITTED, buildCallback("sendToDwp"), true},
             new Object[]{ABOUT_TO_SUBMIT, buildCallback(EventType.SEND_TO_DWP.getCcdType()), false},
@@ -299,7 +299,7 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
         };
     }
 
-    private Callback<SscsCaseData> buildCallback(String sscsWelshPreviewNextEvent) {
+    private static Callback<SscsCaseData> buildCallback(String sscsWelshPreviewNextEvent) {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .sscsWelshPreviewNextEvent(sscsWelshPreviewNextEvent)
             .state(State.VALID_APPEAL)
@@ -309,7 +309,7 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
         return new Callback<>(caseDetails, Optional.empty(), UPLOAD_WELSH_DOCUMENT, false);
     }
 
-    private Callback<SscsCaseData> buildCallbackInterlocReviewState() {
+    private static Callback<SscsCaseData> buildCallbackInterlocReviewState() {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .state(State.INTERLOCUTORY_REVIEW_STATE)
             .build();

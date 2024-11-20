@@ -6,7 +6,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static uk.gov.hmcts.reform.sscs.service.pdf.util.PdfDateUtil.reformatDate;
 import static uk.gov.hmcts.reform.sscs.service.pdf.util.PdfDateUtil.reformatDateTimeToDate;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class PdfDateUtilTest {
     @Test

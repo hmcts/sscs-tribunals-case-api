@@ -4,7 +4,6 @@ import static java.util.Objects.requireNonNull;
 
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -25,7 +24,6 @@ public class HmctsResponseReviewedSubmittedHandler extends ResponseEventsAboutTo
     private final CcdService ccdService;
     private final IdamService idamService;
 
-    @Autowired
     public HmctsResponseReviewedSubmittedHandler(CcdService ccdService, IdamService idamService) {
         this.ccdService = ccdService;
         this.idamService = idamService;
@@ -68,7 +66,7 @@ public class HmctsResponseReviewedSubmittedHandler extends ResponseEventsAboutTo
         } catch (FeignException e) {
             log.error(
                     "{}. CCD response: {}",
-                    String.format("Could not update event %s for case %d", eventType, caseId),
+                "Could not update event %s for case %d".formatted(eventType, caseId),
                     // exception.contentUTF8() uses response body internally
                     e.responseBody().isPresent() ? e.contentUTF8() : e.getMessage()
             );

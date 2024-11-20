@@ -14,7 +14,7 @@ public interface CohClient {
     QuestionRounds getQuestionRounds(
         @RequestHeader(AUTHORIZATION) String authorisation,
         @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization,
-        @PathVariable("onlineHearingId") String onlineHearingId
+        @PathVariable String onlineHearingId
     );
 
 }

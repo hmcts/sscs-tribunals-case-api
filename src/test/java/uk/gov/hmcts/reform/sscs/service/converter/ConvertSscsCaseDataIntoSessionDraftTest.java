@@ -1,10 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service.converter;
 
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
@@ -12,17 +8,13 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveAMrn;
@@ -34,14 +26,9 @@ import uk.gov.hmcts.reform.sscs.model.draft.SessionNoMrn;
 import uk.gov.hmcts.reform.sscs.service.DocumentDownloadService;
 import uk.gov.hmcts.reform.sscs.transform.deserialize.HearingOptionArrangements;
 
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = ConvertSscsCaseDataIntoSessionDraft.class)
 public class ConvertSscsCaseDataIntoSessionDraftTest {
-    @ClassRule
-    public static final SpringClassRule SCR = new SpringClassRule();
-
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
 
     private SscsCaseData caseData;
 
@@ -51,19 +38,22 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
     private ConvertSscsCaseDataIntoSessionDraft convertSscsCaseDataIntoSessionDraft;
     private SessionDraft actual;
 
-    @Test(expected = NullPointerException.class)
+    @ParameterizedTest
     public void attemptToConvertNull() {
-        convertSscsCaseDataIntoSessionDraft.convert(null);
+        assertThrows(NullPointerException.class, () ->
+            convertSscsCaseDataIntoSessionDraft.convert(null));
     }
 
-    @Test(expected = NullPointerException.class)
+    @ParameterizedTest
     public void attemptToConvertNullAppeal() {
-        SscsCaseData caseData = SscsCaseData.builder().build();
-        convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        assertThrows(NullPointerException.class, () -> {
+            SscsCaseData caseData = SscsCaseData.builder().build();
+            convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        });
     }
 
-    @Test
-    @Parameters(method = "getSscsDocumentScenarios")
+    @ParameterizedTest
+    @MethodSource("getSscsDocumentScenarios")
     public void givenEvidenceDescriptionIsProvided_shouldReturnSessionEvidenceDescription(
         List<SscsDocument> sscsDocumentList) {
 
@@ -79,7 +69,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("my evidence description", actual.getEvidenceDescription().getDescribeTheEvidence());
     }
 
-    private Object[] getSscsDocumentScenarios() {
+    private static Object[] getSscsDocumentScenarios() {
         List<SscsDocument> sscsDocumentList = Collections.singletonList(SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
                 .documentComment("my evidence description")
@@ -95,7 +85,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
     }
 
 
-    @Test
+    @ParameterizedTest
     public void givenDwpIssuingOfficeEsa_shouldReturnResponseWithDwpIssuingOfficeEsa() {
         caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
@@ -119,7 +109,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("2019", actualSessionDraft.getMrnDate().getMrnDateDetails().getYear());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenBenefitType_shouldReturnResponseBenefitTypeStringWithoutCode() {
         caseData = SscsCaseData.builder()
                 .appeal(Appeal.builder()
@@ -135,8 +125,8 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                 actualSessionDraft.getBenefitType().getBenefitType());
     }
 
-    @Test
-    @Parameters(method = "generateMrnLateScenarios")
+    @ParameterizedTest
+    @MethodSource("generateMrnLateScenarios")
     public void givenMrnIsLate_shouldResponseWithCorrectMrnLateResponse(
         MrnDetails mrnDetails, String expectedReason) {
 
@@ -159,7 +149,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
     }
 
     @SuppressWarnings({"unused"})
-    private Object[] generateMrnLateScenarios() {
+    private static Object[] generateMrnLateScenarios() {
         MrnDetails mrnDetailsOverThirteenMonthsLate = MrnDetails.builder()
             .mrnLateReason("thirteen late reasons")
             .mrnDate("2017-03-01")
@@ -188,8 +178,8 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         };
     }
 
-    @Test
-    @Parameters(method = "generateMrnPossibleScenarios")
+    @ParameterizedTest
+    @MethodSource("generateMrnPossibleScenarios")
     public void givenMrnPathIsCompleted_shouldBuildHaveMrnSessionObjectCorrectly(MrnDetails mrnDetails,
                                                                                  SessionDraft expectedSessionDraft) {
         caseData = SscsCaseData.builder()
@@ -207,7 +197,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
     }
 
     @SuppressWarnings({"unused"})
-    private Object[] generateMrnPossibleScenarios() {
+    private static Object[] generateMrnPossibleScenarios() {
         MrnDetails mrnDetailsIsNull = MrnDetails.builder()
             .mrnLateReason(null)
             .mrnDate(null)
@@ -243,21 +233,24 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         };
     }
 
-    @Test(expected = NullPointerException.class)
+    @ParameterizedTest
     public void convertNullCaseData() {
-        convertSscsCaseDataIntoSessionDraft.convert(null);
+        assertThrows(NullPointerException.class, () ->
+            convertSscsCaseDataIntoSessionDraft.convert(null));
     }
 
-    @Test(expected = NullPointerException.class)
+    @ParameterizedTest
     public void convertCaseDataWithNullAppeal() {
-        caseData = SscsCaseData.builder()
-            .appeal(null)
-            .build();
+        assertThrows(NullPointerException.class, () -> {
+            caseData = SscsCaseData.builder()
+                .appeal(null)
+                .build();
 
-        convertSscsCaseDataIntoSessionDraft.convert(caseData);
+            convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        });
     }
 
-    @Test
+    @ParameterizedTest
     public void convertPopulatedCaseData() {
         caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
@@ -361,7 +354,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("no", actual.getSameAddress().getIsAddressSameAsAppointee());
         assertEquals("yes", actual.getTextReminders().getDoYouWantTextMsgReminders());
         assertEquals("yes", actual.getSendToNumber().getUseSameNumber());
-        assertNull("no", actual.getRepresentative());
+        assertNull(actual.getRepresentative(), "no");
         assertEquals("I think I should get more", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getReasonForAppealing());
         assertEquals("Underpayment", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getWhatYouDisagreeWith());
         assertEquals("I can't think of anything else", actual.getOtherReasonForAppealing().getOtherReasonForAppealing());
@@ -370,7 +363,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertNull(actual.getRepresentativeDetails());
     }
 
-    @Test
+    @ParameterizedTest
     public void convertPopulatedCaseDataWithDifferentMobileNumber() {
         caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
@@ -453,7 +446,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("no", actual.getSendToNumber().getUseSameNumber());
     }
 
-    @Test
+    @ParameterizedTest
     public void convertPopulatedCaseDataWithNoMrn() {
         SscsCaseData caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
@@ -549,7 +542,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("appellant@gmail.com", actual.getAppellantContactDetails().getEmailAddress());
         assertEquals("yes", actual.getTextReminders().getDoYouWantTextMsgReminders());
         assertEquals("yes", actual.getSendToNumber().getUseSameNumber());
-        assertNull("no", actual.getRepresentative());
+        assertNull(actual.getRepresentative(), "no");
         assertEquals("I think I should get more", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getReasonForAppealing());
         assertEquals("Underpayment", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getWhatYouDisagreeWith());
         assertEquals("I can't think of anything else", actual.getOtherReasonForAppealing().getOtherReasonForAppealing());
@@ -557,7 +550,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertNull(actual.getRepresentativeDetails());
     }
 
-    @Test
+    @ParameterizedTest
     public void convertPopulatedCaseDataWithAppointee() {
         SscsCaseData caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
@@ -616,7 +609,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("no", actual.getSameAddress().getIsAddressSameAsAppointee());
     }
 
-    @Test
+    @ParameterizedTest
     public void convertPopulatedCaseDataWithAppointeeAtSameAddress() {
         SscsCaseData caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
@@ -674,7 +667,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("yes", actual.getSameAddress().getIsAddressSameAsAppointee());
     }
 
-    @Test
+    @ParameterizedTest
     public void convertPopulatedCaseDataWithAppointeeNotSpecified() {
         SscsCaseData caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
@@ -709,8 +702,8 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertNull(actual.getAppointee());
     }
 
-    @Test
-    @Parameters(method = "getDifferentRepsScenarios")
+    @ParameterizedTest
+    @MethodSource("getDifferentRepsScenarios")
     public void givenRepsWithPostcodeLookUp_shouldReturnCorrectJson(Representative rep,
                                                                     String expectedPostcodeLookup,
                                                                     String expectedPostcodeAddress,
@@ -728,7 +721,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals(expectedType, actual.getRepresentativeDetails().getType());
     }
 
-    private Object[] getDifferentRepsScenarios() {
+    private static Object[] getDifferentRepsScenarios() {
         Representative repWithNoLookupData = Representative.builder()
             .hasRepresentative("Yes")
             .name(Name.builder()
@@ -797,7 +790,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         };
     }
 
-    @Test
+    @ParameterizedTest
     public void convertPopulatedCaseDataWithRep() {
         caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
@@ -928,7 +921,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("TS3 3ST", actual.getRepresentativeDetails().getPostCode());
     }
 
-    @Test
+    @ParameterizedTest
     public void convertPopulatedCaseDataWithRepNoAddress() {
         SscsCaseData caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
@@ -1017,7 +1010,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertNull(actual.getRepresentativeDetails().getPostCode());
     }
 
-    @Test
+    @ParameterizedTest
     public void convertPopulatedCaseDataWithRepNoContact() {
         SscsCaseData caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
@@ -1108,7 +1101,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertNull(actual.getRepresentativeDetails().getEmailAddress());
     }
 
-    @Test
+    @ParameterizedTest
     public void convertPopulatedCaseDataWhenAttendingHearing() {
         caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
@@ -1189,7 +1182,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("999", actual.getHearingOptions().getSelectOptions().getTelephone().getPhoneNumber());
     }
 
-    @Test
+    @ParameterizedTest
     public void convertPopulatedCaseDataWhenAttendingHearingWithSupport() {
         caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
@@ -1294,7 +1287,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         );
     }
 
-    @Test
+    @ParameterizedTest
     public void convertPopulatedCaseDataWhenAttendingHearingWithSupportNoInterpreter() {
         caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
@@ -1391,7 +1384,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         );
     }
 
-    @Test
+    @ParameterizedTest
     public void convertPopulatedCaseDataWhenAttendingHearingWithSupportNoArrangements() {
         caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
@@ -1420,7 +1413,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertFalse(actual.getHearingArrangements().getSelection().getAccessibleHearingRoom().getRequested());
     }
 
-    @Test
+    @ParameterizedTest
     public void convertPopulatedCaseDataWhenAttendingHearingWithSupportNullObjectsArrangements() {
         caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
@@ -1447,8 +1440,8 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertNull(actual.getHearingArrangements());
     }
 
-    @Test
-    @Parameters(method = "getHearingOptionsScenarios")
+    @ParameterizedTest
+    @MethodSource("getHearingOptionsScenarios")
     public void givenHearingWithSupportAndNoArrangement_shouldReturnNullSessionHearingArrangements(
         HearingOptions hearingOptions, SessionHearingArrangements expected) {
 
@@ -1464,7 +1457,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
     }
 
     @SuppressWarnings("unused")
-    private Object[] getHearingOptionsScenarios() {
+    private static Object[] getHearingOptionsScenarios() {
         HearingOptions hearingOptionsWithNullArrangement = HearingOptions.builder()
             .wantsToAttend("Yes")
             .wantsSupport("Yes")
@@ -1508,7 +1501,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
     }
 
 
-    @Test
+    @ParameterizedTest
     public void convertPopulatedCaseDataWhenAttendingHearingWithSupportNotListedArrangements() {
         caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
@@ -1535,7 +1528,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertNull(actual.getHearingArrangements());
     }
 
-    @Test
+    @ParameterizedTest
     public void convertPopulatedCaseDataWhenAttendingHearingWithSupportNullArrangements() {
         caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
@@ -1566,7 +1559,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertFalse(actual.getHearingArrangements().getSelection().getAccessibleHearingRoom().getRequested());
     }
 
-    @Test
+    @ParameterizedTest
     public void convertPopulatedCaseDataWhenAttendingHearingButCantAttendOnSomeDates() {
         caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
@@ -1671,7 +1664,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("2099", actual.getDatesCantAttend().getDatesCantAttend().get(1).getYear());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenCaseWithPcqId_shouldReturnResponseWithPcqId() {
         caseData = SscsCaseData.builder().appeal(Appeal.builder().build()).pcqId("12345").build();
 
@@ -1679,7 +1672,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("12345", actualSessionDraft.getPcqId().getPcqId());
     }
 
-    @Test
+    @ParameterizedTest
     public void convertPopulatedCaseDataWhenLanguagePreferenceWelshIsGiven() {
         caseData = SscsCaseData.builder()
                 .appeal(Appeal.builder()
@@ -1703,7 +1696,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("yes", actual.getLanguagePreferenceWelsh().getLanguagePreferenceWelsh());
     }
 
-    @Test
+    @ParameterizedTest
     public void convertPopulatedCaseDataWhenLanguagePreferenceWelshIsNotGiven() {
         caseData = SscsCaseData.builder()
                 .appeal(Appeal.builder()

@@ -44,7 +44,7 @@ public class DocmosisHealthIndicator implements HealthIndicator {
 
             if (response != null && response.containsKey("ready")) {
                 Object readyValue = response.get("ready");
-                if ((readyValue instanceof String && "true".equalsIgnoreCase((String) readyValue))
+                if ((readyValue instanceof String string && "true".equalsIgnoreCase(string))
                     || (readyValue instanceof Boolean && Boolean.TRUE.equals(readyValue))) {
                     return new Health.Builder().up().build();
                 } else {

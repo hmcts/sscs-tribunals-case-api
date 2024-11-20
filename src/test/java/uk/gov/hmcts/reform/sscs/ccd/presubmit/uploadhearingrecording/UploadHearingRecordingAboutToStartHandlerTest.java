@@ -3,9 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadhearingrecording;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
@@ -18,8 +16,8 @@ import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -53,7 +51,7 @@ public class UploadHearingRecordingAboutToStartHandlerTest {
     private CaseDetails<SscsCaseData> caseDetails;
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         handler = new UploadHearingRecordingAboutToStartHandler();
@@ -72,12 +70,14 @@ public class UploadHearingRecordingAboutToStartHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_SUBMIT", "MID_EVENT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPEAL_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
     public void givenNonUploadHearingRecordingEvent_thenReturnFalse(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
@@ -142,6 +142,7 @@ public class UploadHearingRecordingAboutToStartHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"null", "", " ", "  "})
     public void givenHearingsListHasPastDate_WithInvalidTime_ReturnList(@Nullable String time) {
         List<Hearing> hearingList = new ArrayList<>();
@@ -164,6 +165,7 @@ public class UploadHearingRecordingAboutToStartHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"null", "", " ", "  "})
     public void givenHearingsIsOnToday_WithInvalidTime_ReturnList(@Nullable String time) {
         List<Hearing> hearingList = new ArrayList<>();

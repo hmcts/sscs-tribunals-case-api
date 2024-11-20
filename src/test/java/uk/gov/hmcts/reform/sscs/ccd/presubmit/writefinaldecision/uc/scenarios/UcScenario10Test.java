@@ -1,15 +1,14 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios;
 
-import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcTemplateContent;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcScenario;
@@ -20,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody
 public class UcScenario10Test {
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"true, allowed", "false, refused"})
     public void testScenario10(boolean isAllowed, String allowedText) {
 
@@ -48,19 +48,22 @@ public class UcScenario10Test {
 
         UcTemplateContent content = UcScenario.SCENARIO_10.getContent(body);
 
-        String expectedContent = format("The appeal is %s.\n"
-                + "\n"
-                + "The decision made by the Secretary of State on 20/09/2020 is confirmed.\n"
-                + "\n"
-                + "This is the summary of outcome decision\n"
-                + "\n"
-                + "My first reasons\n"
-                + "\n"
-                + "My second reasons\n"
-                + "\n"
-                + "Something else\n"
-                + "\n"
-                + "This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n\n",
+        String expectedContent = ("""
+            The appeal is %s.
+            
+            The decision made by the Secretary of State on 20/09/2020 is confirmed.
+            
+            This is the summary of outcome decision
+            
+            My first reasons
+            
+            My second reasons
+            
+            Something else
+            
+            This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.
+            
+            """).formatted(
             allowedText);
 
         assertEquals(7, content.getComponents().size());

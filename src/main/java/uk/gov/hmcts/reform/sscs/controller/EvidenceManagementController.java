@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +35,6 @@ public class EvidenceManagementController {
     private final boolean secureDocStoreEnabled;
     private final IdamService idamService;
 
-    @Autowired
     public EvidenceManagementController(EvidenceManagementService evidenceManagementService,
                                         EvidenceManagementSecureDocStoreService evidenceManagementSecureDocStoreService,
                                         FileToPdfConversionService fileToPdfConversionService,

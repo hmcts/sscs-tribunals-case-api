@@ -4,8 +4,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 public class PostcodeUtilTest {
@@ -14,7 +14,7 @@ public class PostcodeUtilTest {
     private final String postcode = "CM11 1AB";
     private SscsCaseDetails sscsCaseDetails;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         sscsCaseDetails = SscsCaseDetails.builder()
                 .data(SscsCaseData.builder()

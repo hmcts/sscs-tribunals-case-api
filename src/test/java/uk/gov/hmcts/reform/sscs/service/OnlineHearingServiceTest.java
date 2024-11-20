@@ -4,7 +4,8 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -12,8 +13,8 @@ import java.util.List;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
@@ -32,7 +33,7 @@ public class OnlineHearingServiceTest {
     private IdamTokens idamTokens;
     private IdamService idamService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         ccdService = mock(CcdService.class);
         idamTokens = IdamTokens.builder().build();
@@ -65,6 +66,7 @@ public class OnlineHearingServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"appellantTya,appellant@hmct.com", "appointeeTya, appointee@hmct.com"})
     public void loadHearingWithTyaAndEmailForAppellant(String tya, String email) {
         SscsCaseDetails sscsCaseDetails = createCaseDetails(someCaseId, "caseref", "firstname", "lastname", "paper");
@@ -75,6 +77,7 @@ public class OnlineHearingServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"otherpartyTya,otherparty@hmct.com", "otherpartyAppointeeTya,otherpartyAppointee@hmct.com"})
     public void loadHearingWithTyaAndEmailForOtherParty(String tya, String email) {
         SscsCaseDetails sscsCaseDetails = createCaseDetails(someCaseId, "caseref", "firstname", "lastname", "paper");

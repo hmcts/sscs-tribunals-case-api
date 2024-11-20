@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.requesthearingrecording;
 import static java.util.Objects.requireNonNull;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -20,7 +19,6 @@ public class RequestHearingRecordingAboutToStartHandler implements PreSubmitCall
 
     private final HearingRecordingRequestService hearingRecordingRequestService;
 
-    @Autowired
     public RequestHearingRecordingAboutToStartHandler(HearingRecordingRequestService hearingRecordingRequestService) {
         this.hearingRecordingRequestService = hearingRecordingRequestService;
     }

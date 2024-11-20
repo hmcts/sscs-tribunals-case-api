@@ -17,10 +17,10 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -71,7 +71,7 @@ public class PostponeHearingHandlerTest {
     @InjectMocks
     private PostponeHearingHandler handler;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         closeable = openMocks(this);
 
@@ -97,13 +97,14 @@ public class PostponeHearingHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(caseData);
     }
 
-    @After
+    @AfterEach
     public void releaseMocks() throws Exception {
         closeable.close();
     }
 
     @DisplayName("When given an valid event and ScheduleListing Feature is Enabled canHandle returns true")
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"POSTPONED"})
     public void canHandleValidEvents(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
@@ -112,6 +113,7 @@ public class PostponeHearingHandlerTest {
 
     @DisplayName("When given an invalid event canHandle returns false")
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPEAL_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
     public void canHandleInvalidEvents(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);

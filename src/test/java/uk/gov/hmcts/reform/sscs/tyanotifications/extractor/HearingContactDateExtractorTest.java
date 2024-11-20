@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.extractor;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
 
@@ -8,8 +8,8 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -28,7 +28,7 @@ public class HearingContactDateExtractorTest {
 
     private HearingContactDateExtractor hearingContactDateExtractor;
 
-    @Before
+    @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
         hearingContactDateExtractor = new HearingContactDateExtractor(
@@ -37,6 +37,7 @@ public class HearingContactDateExtractorTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "DWP_RESPONSE_RECEIVED, oral, 2018-01-01T14:02:18Z[Europe/London]",
         "DWP_RESPONSE_RECEIVED, paper, 2018-01-01T14:03:18Z[Europe/London]",
@@ -59,6 +60,7 @@ public class HearingContactDateExtractorTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"DWP_RESPONSE_RECEIVED", "DWP_UPLOAD_RESPONSE"})
     public void givenDwpResponseReceivedEvent_thenExtractDateForReferenceEvent(NotificationEventType eventType) {
 

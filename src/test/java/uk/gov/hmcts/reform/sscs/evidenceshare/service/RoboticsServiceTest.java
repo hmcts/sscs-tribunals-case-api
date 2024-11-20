@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -17,8 +16,8 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -88,7 +87,7 @@ public class RoboticsServiceTest {
 
     private CaseDetails<SscsCaseData> caseData;
 
-    @Before
+    @BeforeEach
     public void setup() {
         openMocks(this);
 
@@ -122,6 +121,7 @@ public class RoboticsServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"CARDIFF", "GLASGOW", "", "null"})
     public void generatingRoboticsSendsAnEmail(String rpcName) {
 
@@ -145,6 +145,7 @@ public class RoboticsServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"CARDIFF", "GLASGOW", "", "null"})
     public void generatingRoboticsWhenThrowValidationErrors(String rpcName) {
 
@@ -173,6 +174,7 @@ public class RoboticsServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"Paper", "Online"})
     public void givenACaseWithEvidenceToDownload_thenCreateRoboticsFileWithDownloadedEvidence(String receivedVia) {
 
@@ -361,6 +363,7 @@ public class RoboticsServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ESA, Balham DRT, Watford DRT", "PIP, DWP PIP (1), DWP PIP (2)", "PIP, PIP (AE), DWP PIP (AE)"})
     public void givenACaseAndDwpIssuingOfficeIsClosed_thenFindNewIssuingOfficeAndUpdateCaseInCcdAndRobotics(String benefitType, String existingOffice, String newOffice) {
         given(dwpAddressLookupService.getDwpMappingByOffice(benefitType, existingOffice)).willReturn(Optional.of(
@@ -378,6 +381,7 @@ public class RoboticsServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ESA, Balham DRT, Watford DRT", "PIP, DWP PIP (1), DWP PIP (2)", "PIP, PIP (AE), DWP PIP (AE)"})
     public void givenACaseAndDwpOriginatingOfficeIsClosed_thenFindNewOriginatingOfficeAndUpdateCaseInCcdAndRobotics(String benefitType, String existingOffice, String newOffice) {
         given(dwpAddressLookupService.getDwpMappingByOffice(benefitType, existingOffice)).willReturn(Optional.of(
@@ -397,6 +401,7 @@ public class RoboticsServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ESA, Balham DRT, Watford DRT", "PIP, DWP PIP (1), DWP PIP (2)", "PIP, PIP (AE), DWP PIP (AE)"})
     public void givenACaseAndDwpPresentingOfficeIsClosed_thenFindNewPresentingOfficeAndUpdateCaseInCcdAndRobotics(String benefitType, String existingOffice, String newOffice) {
         given(dwpAddressLookupService.getDwpMappingByOffice(benefitType, existingOffice)).willReturn(Optional.of(
@@ -416,6 +421,7 @@ public class RoboticsServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ESA, Balham DRT, Watford DRT", "PIP, DWP PIP (1), DWP PIP (2)", "PIP, PIP (AE), DWP PIP (AE)"})
     public void givenACaseAndOfficeUsedInAllOfficeFieldsIsClosed_thenFindNewOfficeAndUpdateAllOfficesForCaseInCcdAndRobotics(String benefitType, String existingOffice, String newOffice) {
         given(dwpAddressLookupService.getDwpMappingByOffice(benefitType, existingOffice)).willReturn(Optional.of(

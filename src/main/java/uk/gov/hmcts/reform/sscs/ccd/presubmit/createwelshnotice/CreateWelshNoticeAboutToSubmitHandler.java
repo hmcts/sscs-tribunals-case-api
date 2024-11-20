@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -48,7 +47,6 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
         NEXT_EVENT_MAP.put(POSTPONEMENT_REQUEST_DIRECTION_NOTICE.getValue(), ACTION_POSTPONEMENT_REQUEST_WELSH.getCcdType());
     }
 
-    @Autowired
     public CreateWelshNoticeAboutToSubmitHandler(DocmosisPdfService docmosisPdfService,
                                                  PdfStoreService pdfStoreService,
                                                  WelshFooterService welshFooterService,
@@ -82,8 +80,8 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
         Map<String, Object> placeholderMap = caseDataMap(callback.getCaseDetails().getCaseData());
         LocalDate dateAdded =
             Optional.ofNullable(caseData.getDocumentStaging().getDateAdded()).orElse(LocalDate.now());
-        final String filename = String.format("%s on %s.pdf", caseData.getDocumentTypes().getValue().getCode(),
-                dateAdded.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+        final String filename = "%s on %s.pdf".formatted(caseData.getDocumentTypes().getValue().getCode(),
+            dateAdded.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
         byte[] content = docmosisPdfService.createPdf(placeholderMap, directionTemplatePath);
 
         DocumentLink newDocLink = null;

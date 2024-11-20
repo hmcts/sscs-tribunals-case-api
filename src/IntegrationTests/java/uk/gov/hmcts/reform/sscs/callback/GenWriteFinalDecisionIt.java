@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -19,13 +19,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import junitparams.JUnitParamsRunner;
-import junitparams.NamedParameters;
-import junitparams.Parameters;
 import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -39,10 +36,9 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.Paragraph;
 import uk.gov.hmcts.reform.sscs.model.docassembly.TemplateComponent;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateContent;
 
-@RunWith(JUnitParamsRunner.class)
 public class GenWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
-    @Test
+    @ParameterizedTest
     public void callToMidEventCallback_willValidateTheDate() throws Exception {
         setup();
         setJsonAndReplace("callback/writeFinalDecisionDescriptorDLA.json", "START_DATE_PLACEHOLDER", "2019-10-10");
@@ -55,12 +51,12 @@ public class GenWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals("Decision notice end date must be after decision notice start date", result.getErrors().toArray()[0]);
     }
 
-    @Test
+    @ParameterizedTest
     public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForDescriptorRoute() throws Exception {
         // N/A for GEN
     }
 
-    @Test
+    @ParameterizedTest
     public void callToAboutToSubmitHandler_willWriteManuallyUploadedFinalDecisionToCase() throws Exception {
         setup("callback/writeFinalDecisionManualUploadDescriptorDLA.json");
 
@@ -77,182 +73,182 @@ public class GenWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals("Draft Decision Notice generated on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + ".pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
     }
 
-    @NamedParameters("noAwardComparisons")
+
     @SuppressWarnings("unused")
-    private Object[] noAwardComparisons() {
-        return new Object[] {
-            new Object[] {"lower", false, true, false},
-            new Object[] {"same", false, false, false},
-            new Object[] {"lower", false, true, true},
-            new Object[] {"same", false, false, true}
+    private static Object[] noAwardComparisons() {
+        return new Object[]{
+            new Object[]{"lower", false, true, false},
+            new Object[]{"same", false, false, false},
+            new Object[]{"lower", false, true, true},
+            new Object[]{"same", false, false, true}
         };
     }
 
-    @NamedParameters("noAwardNoAwardComparisons")
+
     @SuppressWarnings("unused")
-    private Object[] noAwardNoAwardComparisons() {
-        return new Object[] {
-            new Object[] {"lower", "lower", false, true, false},
-            new Object[] {"lower", "same", false, true, false},
-            new Object[] {"same", "lower", false, true, false},
-            new Object[] {"same", "same", false, false, false},
-            new Object[] {"lower", "lower", false, true, true},
-            new Object[] {"lower", "same", false, true, true},
-            new Object[] {"same", "lower", false, true, true},
-            new Object[] {"same", "same", false, false, true}
+    private static Object[] noAwardNoAwardComparisons() {
+        return new Object[]{
+            new Object[]{"lower", "lower", false, true, false},
+            new Object[]{"lower", "same", false, true, false},
+            new Object[]{"same", "lower", false, true, false},
+            new Object[]{"same", "same", false, false, false},
+            new Object[]{"lower", "lower", false, true, true},
+            new Object[]{"lower", "same", false, true, true},
+            new Object[]{"same", "lower", false, true, true},
+            new Object[]{"same", "same", false, false, true}
         };
     }
 
-    @NamedParameters("noAwardStandardRateComparisons")
+
     @SuppressWarnings("unused")
-    private Object[] noAwardStandardRateComparisons() {
-        return new Object[] {
-            new Object[] {"lower", "lower", false, true, false},
-            new Object[] {"lower", "same", false, true, false},
-            new Object[] {"lower", "higher", true, true, false},
-            new Object[] {"same", "lower", false, true, false},
-            new Object[] {"same", "same", false, false, false},
-            new Object[] {"same", "higher", true, true, false},
-            new Object[] {"lower", "lower", false, true, true},
-            new Object[] {"lower", "same", false, true, true},
-            new Object[] {"lower", "higher", true, true, true},
-            new Object[] {"same", "lower", false, true, true},
-            new Object[] {"same", "same", false, false, true},
-            new Object[] {"same", "higher", true, true, true}
+    private static Object[] noAwardStandardRateComparisons() {
+        return new Object[]{
+            new Object[]{"lower", "lower", false, true, false},
+            new Object[]{"lower", "same", false, true, false},
+            new Object[]{"lower", "higher", true, true, false},
+            new Object[]{"same", "lower", false, true, false},
+            new Object[]{"same", "same", false, false, false},
+            new Object[]{"same", "higher", true, true, false},
+            new Object[]{"lower", "lower", false, true, true},
+            new Object[]{"lower", "same", false, true, true},
+            new Object[]{"lower", "higher", true, true, true},
+            new Object[]{"same", "lower", false, true, true},
+            new Object[]{"same", "same", false, false, true},
+            new Object[]{"same", "higher", true, true, true}
         };
     }
 
-    @NamedParameters("noAwardEnhancedRateComparisons")
+
     @SuppressWarnings("unused")
-    private Object[] noAwardEnhancedRateComparisons() {
-        return new Object[] {
-            new Object[] {"lower", "same", false, true, false},
-            new Object[] {"lower", "higher", true, true, false},
-            new Object[] {"same", "same", false, false, false},
-            new Object[] {"same", "higher", true, true, false},
-            new Object[] {"lower", "same", false, true, true},
-            new Object[] {"lower", "higher", true, true, true},
-            new Object[] {"same", "same", false, false, true},
-            new Object[] {"same", "higher", true, true, true}
+    private static Object[] noAwardEnhancedRateComparisons() {
+        return new Object[]{
+            new Object[]{"lower", "same", false, true, false},
+            new Object[]{"lower", "higher", true, true, false},
+            new Object[]{"same", "same", false, false, false},
+            new Object[]{"same", "higher", true, true, false},
+            new Object[]{"lower", "same", false, true, true},
+            new Object[]{"lower", "higher", true, true, true},
+            new Object[]{"same", "same", false, false, true},
+            new Object[]{"same", "higher", true, true, true}
         };
     }
 
-    @NamedParameters("standardRateComparisons")
+
     @SuppressWarnings("unused")
-    private Object[] standardRateComparisons() {
-        return new Object[] {
-            new Object[] {"lower", false, true, false},
-            new Object[] {"same", false, false, false},
-            new Object[] {"higher", true, true, false},
-            new Object[] {"lower", false, true, true},
-            new Object[] {"same", false, false, true},
-            new Object[] {"higher", true, true, true}
+    private static Object[] standardRateComparisons() {
+        return new Object[]{
+            new Object[]{"lower", false, true, false},
+            new Object[]{"same", false, false, false},
+            new Object[]{"higher", true, true, false},
+            new Object[]{"lower", false, true, true},
+            new Object[]{"same", false, false, true},
+            new Object[]{"higher", true, true, true}
         };
     }
 
-    @NamedParameters("allowed")
+
     @SuppressWarnings("unused")
-    private Object[] allowed() {
-        return new Object[] {
-            new Object[] {false},
-            new Object[] {true}
+    private static Object[] allowed() {
+        return new Object[]{
+            new Object[]{false},
+            new Object[]{true}
         };
     }
 
-    @NamedParameters("standardRateStandardRateComparisons")
+
     @SuppressWarnings("unused")
-    private Object[] standardRateStandardRateComparisons() {
-        return new Object[] {
-            new Object[] {"lower", "lower", false, true, false},
-            new Object[] {"same", "lower", false, true, false},
-            new Object[] {"higher", "lower", true, true, false},
-            new Object[] {"lower", "same", false, true, false},
-            new Object[] {"same", "same", false, false, false},
-            new Object[] {"higher", "same", true, true, false},
-            new Object[] {"lower", "higher", true, true, false},
-            new Object[] {"same", "higher", true, true, false},
-            new Object[] {"higher", "higher", true, true, false},
-            new Object[] {"lower", "lower", false, true, true},
-            new Object[] {"same", "lower", false, true, true},
-            new Object[] {"higher", "lower", true, true, true},
-            new Object[] {"lower", "same", false, true, true},
-            new Object[] {"same", "same", false, false, true},
-            new Object[] {"higher", "same", true, true, true},
-            new Object[] {"lower", "higher", true, true, true},
-            new Object[] {"same", "higher", true, true, true},
-            new Object[] {"higher", "higher", true, true, true},
+    private static Object[] standardRateStandardRateComparisons() {
+        return new Object[]{
+            new Object[]{"lower", "lower", false, true, false},
+            new Object[]{"same", "lower", false, true, false},
+            new Object[]{"higher", "lower", true, true, false},
+            new Object[]{"lower", "same", false, true, false},
+            new Object[]{"same", "same", false, false, false},
+            new Object[]{"higher", "same", true, true, false},
+            new Object[]{"lower", "higher", true, true, false},
+            new Object[]{"same", "higher", true, true, false},
+            new Object[]{"higher", "higher", true, true, false},
+            new Object[]{"lower", "lower", false, true, true},
+            new Object[]{"same", "lower", false, true, true},
+            new Object[]{"higher", "lower", true, true, true},
+            new Object[]{"lower", "same", false, true, true},
+            new Object[]{"same", "same", false, false, true},
+            new Object[]{"higher", "same", true, true, true},
+            new Object[]{"lower", "higher", true, true, true},
+            new Object[]{"same", "higher", true, true, true},
+            new Object[]{"higher", "higher", true, true, true},
         };
     }
 
-    @NamedParameters("standardRateEnhancedRateComparisons")
+
     @SuppressWarnings("unused")
-    private Object[] standardRateEnhancedRateComparisons() {
-        return new Object[] {
-            new Object[] {"lower", "same", false, true, false},
-            new Object[] {"same", "same", false, false, false},
-            new Object[] {"higher", "same", true, true, false},
-            new Object[] {"lower", "higher", true, true, false},
-            new Object[] {"same", "higher", true, true, false},
-            new Object[] {"higher", "higher", true, true, false},
-            new Object[] {"lower", "same", false, true, true},
-            new Object[] {"same", "same", false, false, true},
-            new Object[] {"higher", "same", true, true, true},
-            new Object[] {"lower", "higher", true, true, true},
-            new Object[] {"same", "higher", true, true, true},
-            new Object[] {"higher", "higher", true, true, true}
+    private static Object[] standardRateEnhancedRateComparisons() {
+        return new Object[]{
+            new Object[]{"lower", "same", false, true, false},
+            new Object[]{"same", "same", false, false, false},
+            new Object[]{"higher", "same", true, true, false},
+            new Object[]{"lower", "higher", true, true, false},
+            new Object[]{"same", "higher", true, true, false},
+            new Object[]{"higher", "higher", true, true, false},
+            new Object[]{"lower", "same", false, true, true},
+            new Object[]{"same", "same", false, false, true},
+            new Object[]{"higher", "same", true, true, true},
+            new Object[]{"lower", "higher", true, true, true},
+            new Object[]{"same", "higher", true, true, true},
+            new Object[]{"higher", "higher", true, true, true}
         };
     }
 
-    @NamedParameters("enhancedRateEnhancedRateComparisons")
+
     @SuppressWarnings("unused")
-    private Object[] enhancedRateEnhancedRateComparisons() {
-        return new Object[] {
-            new Object[] {"same", "same", false, false, false},
-            new Object[] {"higher", "same", true, true, false},
-            new Object[] {"same", "higher", true, true, false},
-            new Object[] {"higher", "higher", true, true, false},
-            new Object[] {"same", "same", false, false, true},
-            new Object[] {"higher", "same", true, true, true},
-            new Object[] {"same", "higher", true, true, true},
-            new Object[] {"higher", "higher", true, true, true}
+    private static Object[] enhancedRateEnhancedRateComparisons() {
+        return new Object[]{
+            new Object[]{"same", "same", false, false, false},
+            new Object[]{"higher", "same", true, true, false},
+            new Object[]{"same", "higher", true, true, false},
+            new Object[]{"higher", "higher", true, true, false},
+            new Object[]{"same", "same", false, false, true},
+            new Object[]{"higher", "same", true, true, true},
+            new Object[]{"same", "higher", true, true, true},
+            new Object[]{"higher", "higher", true, true, true}
         };
     }
 
-    @NamedParameters("enhancedRateComparisons")
+
     @SuppressWarnings("unused")
-    private Object[] enhancedRateComparisons() {
-        return new Object[] {
-            new Object[] {"same", false, false, false},
-            new Object[] {"higher", true, true, false},
-            new Object[] {"same", false, false, true},
-            new Object[] {"higher", true, true, true}
+    private static Object[] enhancedRateComparisons() {
+        return new Object[]{
+            new Object[]{"same", false, false, false},
+            new Object[]{"higher", true, true, false},
+            new Object[]{"same", false, false, true},
+            new Object[]{"higher", true, true, true}
         };
     }
 
-    @NamedParameters("hearingTypeCombinations")
+
     @SuppressWarnings("unused")
-    private Object[] hearingTypeCombinations() {
-        return new Object[] {
-            new Object[] {"video", true, false},
-            new Object[] {"video", true, true},
-            new Object[] {"video", true, false},
-            new Object[] {"video", true, true},
-            new Object[] {"paper", false, false},
-            new Object[] {"paper", false, true},
-            new Object[] {"paper", true, false},
-            new Object[] {"paper", true, true},
-            new Object[] {"telephone", true, false},
-            new Object[] {"telephone", true, true},
-            new Object[] {"telephone", true, false},
-            new Object[] {"telephone", true, true},
-            new Object[] {"triage", false, false},
-            new Object[] {"triage", false, true},
-            new Object[] {"triage", true, false},
-            new Object[] {"triage", true, true},
-            new Object[] {"faceToFace", true, false},
-            new Object[] {"faceToFace", true, true},
-            new Object[] {"faceToFace", true, false},
-            new Object[] {"faceToFace", true, true},
+    private static Object[] hearingTypeCombinations() {
+        return new Object[]{
+            new Object[]{"video", true, false},
+            new Object[]{"video", true, true},
+            new Object[]{"video", true, false},
+            new Object[]{"video", true, true},
+            new Object[]{"paper", false, false},
+            new Object[]{"paper", false, true},
+            new Object[]{"paper", true, false},
+            new Object[]{"paper", true, true},
+            new Object[]{"telephone", true, false},
+            new Object[]{"telephone", true, true},
+            new Object[]{"telephone", true, false},
+            new Object[]{"telephone", true, true},
+            new Object[]{"triage", false, false},
+            new Object[]{"triage", false, true},
+            new Object[]{"triage", true, false},
+            new Object[]{"triage", true, true},
+            new Object[]{"faceToFace", true, false},
+            new Object[]{"faceToFace", true, true},
+            new Object[]{"faceToFace", true, false},
+            new Object[]{"faceToFace", true, true},
         };
     }
 
@@ -277,26 +273,26 @@ public class GenWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     private void assertIsParagraphWithText(List<TemplateComponent<?>> components, int paragraphNumber, String text) {
         List<TemplateComponent<?>> filteredComponents = components.stream().filter(c -> c.isParagraph()).collect(Collectors.toList());
         Paragraph paragraph = Paragraph.class.cast(filteredComponents.get(paragraphNumber - 1));
-        Assert.assertEquals(text, paragraph.getContent());
+        Assertions.assertEquals(text, paragraph.getContent());
     }
 
     private void assertIsDescriptorTableWithDescriptors(List<TemplateComponent<?>> components, int componentIndex, Descriptor... descriptors) {
         DescriptorTable table = DescriptorTable.class.cast(components.get(componentIndex));
         List<Descriptor> tableDescriptors = table.getContent();
         tableDescriptors.forEach(c -> System.out.println(c.getActivityQuestionValue()));
-        Assert.assertEquals(descriptors.length, tableDescriptors.size());
+        Assertions.assertEquals(descriptors.length, tableDescriptors.size());
         for (int i = 0; i < descriptors.length; i++) {
             System.out.println(tableDescriptors.get(i));
-            Assert.assertEquals(descriptors[i].getActivityAnswerPoints(), tableDescriptors.get(i).getActivityAnswerPoints());
-            Assert.assertEquals(descriptors[i].getActivityAnswerValue(), tableDescriptors.get(i).getActivityAnswerValue());
-            Assert.assertEquals(descriptors[i].getActivityQuestionValue(), tableDescriptors.get(i).getActivityQuestionValue());
-            Assert.assertEquals(descriptors[i].getActivityQuestionNumber(), tableDescriptors.get(i).getActivityQuestionNumber());
-            Assert.assertEquals(descriptors[i].getActivityAnswerLetter(), tableDescriptors.get(i).getActivityAnswerLetter());
+            Assertions.assertEquals(descriptors[i].getActivityAnswerPoints(), tableDescriptors.get(i).getActivityAnswerPoints());
+            Assertions.assertEquals(descriptors[i].getActivityAnswerValue(), tableDescriptors.get(i).getActivityAnswerValue());
+            Assertions.assertEquals(descriptors[i].getActivityQuestionValue(), tableDescriptors.get(i).getActivityQuestionValue());
+            Assertions.assertEquals(descriptors[i].getActivityQuestionNumber(), tableDescriptors.get(i).getActivityQuestionNumber());
+            Assertions.assertEquals(descriptors[i].getActivityAnswerLetter(), tableDescriptors.get(i).getActivityAnswerLetter());
         }
     }
 
-    @Test
-    @Parameters(named = "allowed")
+    @ParameterizedTest
+    @MethodSource("allowed")
     public void nonDescriptorFlow_shouldGeneratePdfWithExpectedText(boolean allowed) throws Exception {
         setup();
         String json = getJsonCallbackForTestAndReplace("callback/dlaScenarioCallbackNonDescriptorFlow.json", Arrays.asList("ALLOWED_OR_REFUSED"),
@@ -336,11 +332,11 @@ public class GenWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 6, "Anything else.");
         assertIsParagraphWithText(components, 7,
                 "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
-        Assert.assertEquals(7, components.size());
+        Assertions.assertEquals(7, components.size());
     }
 
-    @Test
-    @Parameters(named = "allowed")
+    @ParameterizedTest
+    @MethodSource("allowed")
     public void nonDescriptorFlowHmrc_shouldGeneratePdfWithExpectedText(boolean allowed) throws Exception {
         setup();
         String json = getJsonCallbackForTestAndReplace("callback/hmrcScenarioCallbackNonDescriptorFlow.json", Arrays.asList("ALLOWED_OR_REFUSED"),
@@ -380,11 +376,11 @@ public class GenWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 6, "Anything else.");
         assertIsParagraphWithText(components, 7,
                 "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
-        Assert.assertEquals(7, components.size());
+        Assertions.assertEquals(7, components.size());
     }
 
-    @Test
-    @Parameters(named = "hearingTypeCombinations")
+    @ParameterizedTest
+    @MethodSource("hearingTypeCombinations")
     public void notConsideredNoAward_shouldGeneratePdfWithExpectedTextForHearingType(String hearingType, boolean appellantAttended, boolean presentingOfficerAttended) throws Exception {
         setup();
         String comparedToDwpMobility = "lower";
@@ -515,9 +511,9 @@ public class GenWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         }
 
         if (additionalParagraph) {
-            Assert.assertEquals(10, components.size());
+            Assertions.assertEquals(10, components.size());
         } else {
-            Assert.assertEquals(9, components.size());
+            Assertions.assertEquals(9, components.size());
         }
     }
 

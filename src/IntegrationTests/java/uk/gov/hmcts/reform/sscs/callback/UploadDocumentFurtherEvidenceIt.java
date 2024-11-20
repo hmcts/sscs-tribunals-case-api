@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.sscs.callback;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -19,8 +19,8 @@ import java.util.Collections;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,7 +41,7 @@ public class UploadDocumentFurtherEvidenceIt extends AbstractEventIt {
 
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         openMocks(this);
         super.setup();
@@ -214,6 +214,7 @@ public class UploadDocumentFurtherEvidenceIt extends AbstractEventIt {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"audio.mp3","video.mp4"})
     public void aboutToSubmitHandleHappyPathWhenAudioVideoFileUploaded(String fileName) throws Exception {
         DocumentLink documentLink = DocumentLink.builder().documentFilename(fileName).documentBinaryUrl("http://doc/222").documentUrl("http://doc/skw").build();

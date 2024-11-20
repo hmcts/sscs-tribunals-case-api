@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service.reminder;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class JobGroupGeneratorTest {
 

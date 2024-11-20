@@ -141,7 +141,7 @@ class PostHearingReviewMidEventHandlerTest {
         DocumentLink previewDocument = response.getData().getDocumentStaging().getPostHearingPreviewDocument();
         assertThat(previewDocument).isNotNull();
 
-        String expectedFilename = String.format("%s Granted Decision Notice issued on %s.pdf",
+        String expectedFilename = "%s Granted Decision Notice issued on %s.pdf".formatted(
             postHearingReviewType.getShortDescriptionEn(),
             LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 
@@ -184,8 +184,8 @@ class PostHearingReviewMidEventHandlerTest {
         DocumentLink previewDocument = response.getData().getDocumentStaging().getPostHearingPreviewDocument();
         assertThat(previewDocument).isNotNull();
 
-        String expectedFilename = String.format("Review Granted issued on %s.pdf",
-                LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+        String expectedFilename = "Review Granted issued on %s.pdf".formatted(
+            LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 
         assertThat(previewDocument.getDocumentFilename()).isEqualTo(expectedFilename);
         assertThat(previewDocument.getDocumentBinaryUrl()).isEqualTo(URL + "/binary");
@@ -225,8 +225,8 @@ class PostHearingReviewMidEventHandlerTest {
         DocumentLink previewDocument = response.getData().getDocumentStaging().getPostHearingPreviewDocument();
         assertThat(previewDocument).isNotNull();
 
-        String expectedFilename = String.format("Decision Notice issued on %s.pdf",
-                LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+        String expectedFilename = "Decision Notice issued on %s.pdf".formatted(
+            LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 
         assertThat(previewDocument.getDocumentFilename()).isEqualTo(expectedFilename);
         assertThat(previewDocument.getDocumentBinaryUrl()).isEqualTo(URL + "/binary");

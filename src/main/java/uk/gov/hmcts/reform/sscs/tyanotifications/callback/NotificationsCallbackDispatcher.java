@@ -5,7 +5,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
@@ -15,7 +14,6 @@ public class NotificationsCallbackDispatcher {
 
     private final List<CallbackHandler> callbackHandlers;
 
-    @Autowired
     public NotificationsCallbackDispatcher(List<CallbackHandler> callbackHandlers) {
         requireNonNull(callbackHandlers, "callbackHandlers must not be null");
         this.callbackHandlers = callbackHandlers;

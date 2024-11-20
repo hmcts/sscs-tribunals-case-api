@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.factory;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.openMocks;
 
@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
@@ -34,7 +34,7 @@ public class DocumentRequestFactoryTest {
     @InjectMocks
     private DocumentRequestFactory factory;
 
-    @Before
+    @BeforeEach
     public void setup() {
         openMocks(this);
     }

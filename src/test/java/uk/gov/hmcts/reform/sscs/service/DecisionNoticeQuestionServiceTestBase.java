@@ -2,16 +2,16 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import java.io.IOException;
 import java.util.Optional;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityAnswer;
 
 public abstract class DecisionNoticeQuestionServiceTestBase<S extends DecisionNoticeQuestionService> {
 
     protected S service;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         service = createDecisionNoticeQuestionService();
     }
@@ -21,14 +21,14 @@ public abstract class DecisionNoticeQuestionServiceTestBase<S extends DecisionNo
     @Test
     public void givenANonMatchedNumber_thenReturnEmptyAnswer() {
         Optional<ActivityAnswer> answer = service.extractAnswerFromSelectedValue("random");
-        Assert.assertNotNull(answer);
-        Assert.assertFalse(answer.isPresent());
+        Assertions.assertNotNull(answer);
+        Assertions.assertFalse(answer.isPresent());
     }
 
     @Test
     public void givenANullNumber_thenReturnEmptyAnswer() {
         Optional<ActivityAnswer> answer = service.extractAnswerFromSelectedValue(null);
-        Assert.assertNotNull(answer);
-        Assert.assertFalse(answer.isPresent());
+        Assertions.assertNotNull(answer);
+        Assertions.assertFalse(answer.isPresent());
     }
 }

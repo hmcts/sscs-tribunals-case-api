@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
-import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.UNREGISTERED;
@@ -13,7 +12,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -71,7 +69,6 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
     private final int dwpResponseDueDaysChildSupport;
 
-    @Autowired
     public SendToBulkPrintHandler(DocumentManagementServiceWrapper documentManagementServiceWrapper,
                                   DocumentRequestFactory documentRequestFactory,
                                   PdfStoreService pdfStoreService,
@@ -123,7 +120,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
         try {
             bulkPrintInfo = bulkPrintCase(callback);
         } catch (NonPdfBulkPrintException | UnableToContactThirdPartyException | NoDl6DocumentException e) {
-            log.info(format("Error when bulk-printing caseId: %s. %s", callback.getCaseDetails().getId(), e.getMessage()), e);
+            log.info("Error when bulk-printing caseId: %s. %s".formatted(callback.getCaseDetails().getId(), e.getMessage()), e);
             updateCaseToFlagError(caseData, e.getMessage());
         } catch (Exception e) {
             log.info("Error when bulk-printing caseId: {}", callback.getCaseDetails().getId(), e);
@@ -192,7 +189,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
             if (holder.getTemplate() == null) {
                 throw new BulkPrintException(
-                    format("Failed to send to bulk print for case %s because no template was found",
+                    "Failed to send to bulk print for case %s because no template was found".formatted(
                         caseData.getCcdCaseId()));
             }
             log.info("Generating DL document for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
@@ -224,7 +221,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
                     .build();
             } else {
                 throw new BulkPrintException(
-                    format("Failed to send to bulk print for case %s. No print id returned",
+                    "Failed to send to bulk print for case %s. No print id returned".formatted(
                         caseData.getCcdCaseId()));
             }
 

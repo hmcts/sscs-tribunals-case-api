@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -31,7 +30,6 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
     private EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService;
     private VenueDataLoader venueDataLoader;
 
-    @Autowired
     public EsaWriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
         EsaDecisionNoticeQuestionService decisionNoticeQuestionService, EsaDecisionNoticeOutcomeService outcomeService, DocumentConfiguration documentConfiguration, VenueDataLoader venueDataLoader) {
         super(generateFile, userDetailsService, decisionNoticeQuestionService, outcomeService, documentConfiguration, venueDataLoader);
@@ -80,7 +78,7 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
             builder.esaAwardRate(null);
             Optional<AwardType> esaAwardTypeOptional = caseData.isWcaAppeal() ? EsaPointsRegulationsAndSchedule3ActivitiesCondition
                 .getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(decisionNoticeQuestionService, caseData).getAwardType() : empty();
-            if (!esaAwardTypeOptional.isEmpty()) {
+            if (esaAwardTypeOptional.isPresent()) {
                 String esaAwardType = esaAwardTypeOptional.get().getKey();
                 if (esaAwardType != null) {
                     builder.esaAwardRate(join(

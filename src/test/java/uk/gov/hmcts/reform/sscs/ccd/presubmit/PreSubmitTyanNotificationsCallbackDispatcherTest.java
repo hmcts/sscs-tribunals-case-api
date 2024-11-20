@@ -3,28 +3,25 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.google.common.collect.ImmutableSet;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 @SuppressWarnings("unchecked")
 public class PreSubmitTyanNotificationsCallbackDispatcherTest {
     private static final String USER_AUTHORISATION = "Bearer token";
@@ -41,7 +38,7 @@ public class PreSubmitTyanNotificationsCallbackDispatcherTest {
 
     private PreSubmitCallbackDispatcher<CaseData> preSubmitCallbackDispatcher;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         preSubmitCallbackDispatcher = new PreSubmitCallbackDispatcher<>(
             Arrays.asList(

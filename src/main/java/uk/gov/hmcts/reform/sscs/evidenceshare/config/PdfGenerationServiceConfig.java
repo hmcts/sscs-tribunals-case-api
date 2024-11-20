@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
 @Configuration
 public class PdfGenerationServiceConfig {
     @Bean
-    public DocmosisPdfGenerationService docmosisPdfGenerationService(
+    DocmosisPdfGenerationService docmosisPdfGenerationService(
         @Value("${service.pdf-service.uri}") String pdfServiceEndpoint,
         @Value("${service.pdf-service.accessKey}") String pdfServiceAccessKey,
         RestTemplate restTemplate) {

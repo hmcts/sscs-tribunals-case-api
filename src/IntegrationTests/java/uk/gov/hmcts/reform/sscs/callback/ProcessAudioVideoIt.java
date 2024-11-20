@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -18,8 +18,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -59,7 +59,7 @@ public class ProcessAudioVideoIt extends AbstractEventIt {
     @MockBean
     private UserDetailsService userDetailsService;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         when(generateFile.assemble(any())).thenReturn("document.url");
 

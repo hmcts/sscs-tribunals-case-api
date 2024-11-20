@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.sscs.bundling;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -23,8 +23,8 @@ import java.util.Collections;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -73,7 +73,7 @@ public class BundlingHandlerTest {
     private final ArgumentCaptor<BundleCallback> capture = ArgumentCaptor.forClass(BundleCallback.class);
 
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         DwpDocumentService dwpDocumentService = new DwpDocumentService();
@@ -92,6 +92,7 @@ public class BundlingHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"Yes, bundleWelshConfig", " No, bundleEnglishConfig"})
     public void givenCaseWithLanguagePreference_thenPopulateConfigFileName(String languagePreference, String expectedConfigFile) {
 
@@ -144,6 +145,7 @@ public class BundlingHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"Yes, bundleWelshConfig", " No, bundleEnglishConfig"})
     public void givenCaseWithEditedDwpDocsAndPheNotGranted_thenReturnErrorMessageAndDoNotSendRequestToBundleService(String languagePreference, String expectedConfigFile) {
         addMandatoryDwpDocuments();
@@ -257,6 +259,7 @@ public class BundlingHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"appellant, YES", "appellant, NO", "jointParty, YES", "jointParty, NO"})
     public void givenCaseWithPendingEnhancedConfidentiality_thenReturnErrorMessage(String party, YesNo pheGranted) {
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(NO.getValue());
@@ -282,6 +285,7 @@ public class BundlingHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"appellant", "jointParty"})
     public void givenCaseWithPendingEnhancedConfidentialityAndPendingPhmeRequest_thenReturnTwoErrorMessages(String party) {
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(NO.getValue());
@@ -307,6 +311,7 @@ public class BundlingHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"No, bundleEnglishEditedConfig, bundleEnglishConfig", "Yes, bundleWelshEditedConfig, bundleWelshConfig"})
     public void givenEnhancedConfidentialityCaseWithEditedDocuments_thenPopulateEditedAndUneditedConfigFileName(String langPreference, String expectedBundleConfig1, String expectedBundleConfig2) {
         addMandatoryNonEditedDwpDocuments();
@@ -445,6 +450,7 @@ public class BundlingHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"Yes, bundleWelshConfig", "No, bundleEnglishConfig"})
     public void givenEnhancedConfidentialityCaseWithNoEditedDocs_thenPopulateUneditedConfigFileName(String langPreference, String expectedBundleName) {
         addMandatoryNonEditedDwpDocuments();
@@ -462,6 +468,7 @@ public class BundlingHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"Yes, bundleWelshConfig", "No, bundleEnglishConfig"})
     public void givenEnhancedConfidentialityCaseAndPhmeGrantedWithNoEditedDocs_thenPopulateUneditedConfigFileName(String langPreference, String expectedBundleName) {
         addMandatoryNonEditedDwpDocuments();

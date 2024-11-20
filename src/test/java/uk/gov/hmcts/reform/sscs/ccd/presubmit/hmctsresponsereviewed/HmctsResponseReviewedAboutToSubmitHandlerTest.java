@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasProperty;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -18,8 +18,8 @@ import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.*;
@@ -44,7 +44,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
     private SscsCaseData sscsCaseDataBefore;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         DwpDocumentService dwpDocumentService = new DwpDocumentService();
@@ -73,6 +73,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
@@ -215,10 +216,12 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
         assertThat(sscsCaseData.getDwpDocuments().size(), is(1));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsExceptionIfItCannotHandleTheAppeal() {
-        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThrows(IllegalStateException.class, () -> {
+            when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        });
     }
 
     @Test
@@ -384,6 +387,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"022", "023", "024", "025", "026", "028"})
     public void givenChildSupportCaseAndCaseCodeIsSetToChildSupportCode_thenNoWarningOrErrorIsShown(
         String childSupportBenefitCode) {
@@ -427,6 +431,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
     public void givenSscs5CaseAndCaseCodeIsSetToSscs5Code_thenNoErrorIsShown(String sscs5BenefitCode) {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childBenefit").build());
@@ -441,6 +446,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
     public void givenSscs5CaseAndCaseCodeIsChangedToNonSscs5_thenShowError(String sscs5BenefitCode) {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("thirtyHoursFreeChildcare").build());
@@ -457,6 +463,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
     public void givenNonSscs5CaseAndCaseCodeIsSetToSscs5Code_thenErrorIsShown(String sscs5BenefitCode) {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("ESA").build());

@@ -305,7 +305,7 @@ public final class HearingsPartiesMapping {
             String signLanguage = hearingOptions.getSignLanguageType();
             language = refData.getSignLanguages().getSignLanguage(signLanguage);
             if (isNull(language)) {
-                throw new InvalidMappingException(String.format("The language %s cannot be mapped", signLanguage));
+                throw new InvalidMappingException("The language %s cannot be mapped".formatted(signLanguage));
             }
         }
 
@@ -313,7 +313,7 @@ public final class HearingsPartiesMapping {
             String verbalLanguage = hearingOptions.getLanguages();
             language = refData.getVerbalLanguages().getVerbalLanguage(verbalLanguage);
             if (isNull(language)) {
-                throw new InvalidMappingException(String.format("The language %s cannot be mapped", verbalLanguage));
+                throw new InvalidMappingException("The language %s cannot be mapped".formatted(verbalLanguage));
             }
         }
         return language;
@@ -323,15 +323,15 @@ public final class HearingsPartiesMapping {
         if (isNull(language)) {
             return null;
         }
-        return String.format(LANGUAGE_REFERENCE_TEMPLATE,
-                language.getReference(), getDialectReference(language));
+        return LANGUAGE_REFERENCE_TEMPLATE.formatted(
+            language.getReference(), getDialectReference(language));
     }
 
     private static String getDialectReference(Language language) {
         if (isBlank(language.getDialectReference())) {
             return "";
         }
-        return String.format(LANGUAGE_DIALECT_TEMPLATE, language.getDialectReference());
+        return LANGUAGE_DIALECT_TEMPLATE.formatted(language.getDialectReference());
     }
 
     @Nullable

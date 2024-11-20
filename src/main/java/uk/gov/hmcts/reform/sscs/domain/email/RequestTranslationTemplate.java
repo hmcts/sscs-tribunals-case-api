@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.domain.email;
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.FeatureToggleService;
@@ -17,7 +16,7 @@ public class RequestTranslationTemplate {
     private final String subject;
 
     public RequestTranslationTemplate(
-        @Autowired FeatureToggleService featureToggleService,
+        FeatureToggleService featureToggleService,
         @Value("${wlu.email.from}") String from,
         @Value("${wlu.email.from-send-grid}") String fromSendGrid,
         @Value("${wlu.email.to}") String to,

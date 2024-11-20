@@ -11,7 +11,6 @@ import java.util.Objects;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -27,7 +26,6 @@ public class PlaceholderService {
     private final ExelaAddressConfig exelaAddressConfig;
     private final boolean scottishPoBoxEnabled;
 
-    @Autowired
     public PlaceholderService(PdfDocumentConfig pdfDocumentConfig,
                               ExelaAddressConfig exelaAddressConfig,
                               @Value("${feature.scottish-po-box.enabled}") boolean scottishPoBoxEnabled) {

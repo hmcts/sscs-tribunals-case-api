@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.sya;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -35,11 +35,9 @@ import java.util.Properties;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -51,8 +49,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
@@ -78,13 +74,6 @@ import uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceBase;
 @AutoConfigureMockMvc(addFilters = false)
 @RunWith(JUnitParamsRunner.class)
 public class SyaEndpointsIt extends AbstractEventIt {
-
-    // being: it needed to run springRunner and junitParamsRunner
-    @ClassRule
-    public static final SpringClassRule SCR = new SpringClassRule();
-
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
     // end
 
     private static final String PDF = "abc";
@@ -129,7 +118,7 @@ public class SyaEndpointsIt extends AbstractEventIt {
     @Captor
     private ArgumentCaptor<CaseDataContent> caseDataCaptor;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         mapper = new ObjectMapper().findAndRegisterModules();
 
@@ -173,7 +162,7 @@ public class SyaEndpointsIt extends AbstractEventIt {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void givenAValidAppeal_createValidAppealCreatedCase() throws Exception {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
 
@@ -308,7 +297,8 @@ public class SyaEndpointsIt extends AbstractEventIt {
     }
 
     @Test
-    @Ignore
+    @Disabled
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"PIP, DWP PIP (1), Newcastle",
         "ESA, Inverness DRT, Inverness DRT",
         "UC,, Universal Credit",

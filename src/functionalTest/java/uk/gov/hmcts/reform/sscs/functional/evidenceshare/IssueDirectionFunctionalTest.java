@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
 import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
-import static junit.framework.TestCase.assertNull;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DIRECTION_ISSUED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
 
@@ -12,9 +12,9 @@ import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import java.io.IOException;
 import java.time.LocalDate;
-import org.apache.http.HttpStatus;
-import org.junit.Before;
-import org.junit.Test;
+import org.apache.hc.core5.http.HttpStatus;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -37,7 +37,7 @@ public class IssueDirectionFunctionalTest extends AbstractFunctionalTest {
         super();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         baseURI = testUrl;
         useRelaxedHTTPSValidation();

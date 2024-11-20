@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityAnswer;
@@ -21,7 +20,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcQuestionKe
 @Service
 public class UcDecisionNoticeQuestionService extends DecisionNoticeQuestionService {
 
-    @Autowired
     public UcDecisionNoticeQuestionService() throws IOException {
         super("UC", Arrays.asList(UcPointsRegulationsAndSchedule7ActivitiesCondition.class, UcAllowedOrRefusedCondition.class));
     }

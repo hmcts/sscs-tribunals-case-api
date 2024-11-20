@@ -2,9 +2,7 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -14,9 +12,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import java.util.ArrayList;
 import java.util.List;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -24,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -32,7 +28,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.robotics.RoboticsJsonMapper;
 import uk.gov.hmcts.reform.sscs.robotics.RoboticsWrapper;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @TestPropertySource(locations = "classpath:config/application_es_it.properties")
 public class RoboticsServiceIt {
@@ -68,7 +63,7 @@ public class RoboticsServiceIt {
     private SscsCaseDetails sscsCaseDetails;
 
 
-    @Before
+    @BeforeEach
     public void setup() {
         caseData = SscsCaseData.builder()
             .ccdCaseId("123456")

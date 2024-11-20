@@ -11,9 +11,9 @@ import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.assertj.core.groups.Tuple;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -48,7 +48,7 @@ public class PostponementRequestServiceTest {
 
     private PreSubmitCallbackResponse<SscsCaseData> response;
 
-    @Before
+    @BeforeEach
     public void setup() {
 
         caseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build())
@@ -79,6 +79,7 @@ public class PostponementRequestServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"REP", "APPELLANT", "APPOINTEE"})
     public void testProcessPostponementRequest(UploadParty uploadParty) {
         DynamicListItem value = new DynamicListItem(uploadParty.getValue(), uploadParty.getLabel());

@@ -2,7 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.withdrawnappeals;
 
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -20,12 +21,13 @@ import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -44,9 +46,6 @@ import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 @RunWith(JUnitParamsRunner.class)
 public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
 
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
-
     @Mock
     private Callback<SscsCaseData> callback;
     @Mock
@@ -62,6 +61,7 @@ public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
     private AdminAppealWithdrawnHandler handler = new AdminAppealWithdrawnHandler(hearingMessageHelper, false);
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "ABOUT_TO_SUBMIT,ADMIN_APPEAL_WITHDRAWN,true",
         "ABOUT_TO_START,ADMIN_APPEAL_WITHDRAWN,false",
@@ -120,15 +120,16 @@ public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
         verifyNoInteractions(hearingMessageHelper);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "ABOUT_TO_START,ADMIN_APPEAL_WITHDRAWN",
         "ABOUT_TO_SUBMIT,null",
         "null,ADMIN_APPEAL_WITHDRAWN"
     })
-    public void handleCornerCaseScenarios(@Nullable CallbackType callbackType, @Nullable EventType eventType)
-        throws IOException {
-        handler.handle(callbackType, buildTestCallbackGivenEvent(eventType, ADMIN_APPEAL_WITHDRAWN_CALLBACK_JSON), USER_AUTHORISATION);
+    public void handleCornerCaseScenarios(@Nullable CallbackType callbackType, @Nullable EventType eventType) {
+        assertThrows(IllegalStateException.class, () ->
+            handler.handle(callbackType, buildTestCallbackGivenEvent(eventType, ADMIN_APPEAL_WITHDRAWN_CALLBACK_JSON), USER_AUTHORISATION));
     }
 
     @Test

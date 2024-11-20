@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SYA_APPEAL_CREATED;
@@ -10,14 +10,15 @@ import java.util.HashMap;
 import java.util.Map;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.TyanRetryConfig;
@@ -27,11 +28,10 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 import uk.gov.service.notify.NotificationClientException;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 @RunWith(JUnitParamsRunner.class)
 public class RetryNotificationServiceTest {
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
     private static final int MAX_RETRY = 3;
     private final Map<Integer, Integer> delayInSecondsMap = new HashMap<Integer, Integer>() {{
             put(1, 100);
@@ -46,7 +46,7 @@ public class RetryNotificationServiceTest {
     private NotificationHandler notificationHandler;
     private RetryNotificationService service;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         service = new RetryNotificationService(notificationHandler, tyanRetryConfig);
         tyanRetryConfig.setMax(MAX_RETRY);
@@ -54,6 +54,7 @@ public class RetryNotificationServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"400", "403"})
     public void shouldNotRescheduleErrorWhenGovNotifyHttpStatus(int govNotifyHttpStatus) {
         NotificationClientException exception = mock(NotificationClientException.class);
@@ -64,6 +65,7 @@ public class RetryNotificationServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"4", "5"})
     public void shouldNotRescheduleNotificationWhenRetryAboveMaxRetry(int retry) {
         NotificationClientException exception = mock(NotificationClientException.class);
@@ -74,6 +76,7 @@ public class RetryNotificationServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"-1", "0", "-2"})
     public void shouldNotRescheduleNotificationWhenRetryIsBelowOne(int retry) {
         NotificationClientException exception = mock(NotificationClientException.class);
@@ -91,6 +94,7 @@ public class RetryNotificationServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"500,1", "492,2", "0,3"})
     public void shouldRescheduleErrorWhenGovNotifyHttpStatusAndRetry(int govNotifyHttpStatus, int retry) {
         NotificationClientException exception = mock(NotificationClientException.class);

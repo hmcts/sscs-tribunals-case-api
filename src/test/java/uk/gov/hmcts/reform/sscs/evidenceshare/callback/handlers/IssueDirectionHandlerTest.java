@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -15,25 +15,25 @@ import feign.FeignException;
 import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 @RunWith(JUnitParamsRunner.class)
 public class IssueDirectionHandlerTest {
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
 
     @Mock
     private UpdateCcdCaseService updateCcdCaseService;
@@ -46,16 +46,18 @@ public class IssueDirectionHandlerTest {
     @Captor
     ArgumentCaptor<Consumer<SscsCaseDetails>> caseDataConsumerCaptor;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         handler = new IssueDirectionHandler(updateCcdCaseService, idamService);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "ABOUT_TO_SUBMIT"})
     public void givenCallbackIsNotSubmitted_willThrowAnException(CallbackType callbackType) {
-        handler.handle(callbackType,
-            HandlerHelper.buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, DIRECTION_ISSUED));
+        assertThrows(IllegalStateException.class, () ->
+            handler.handle(callbackType,
+                HandlerHelper.buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, DIRECTION_ISSUED)));
     }
 
     @Test
@@ -78,9 +80,10 @@ public class IssueDirectionHandlerTest {
         assertFalse(handler.canHandle(SUBMITTED, HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().directionTypeDl(null).build(), INTERLOCUTORY_REVIEW_STATE, DIRECTION_ISSUED)));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void givenCallbackIsNull_whenCanHandleIsCalled_shouldThrowException() {
-        handler.canHandle(SUBMITTED, null);
+        assertThrows(NullPointerException.class, () ->
+            handler.canHandle(SUBMITTED, null));
     }
 
     @Test
@@ -105,18 +108,20 @@ public class IssueDirectionHandlerTest {
         assertNull((sscsCaseData.getDirectionTypeDl()));
     }
 
-    @Test(expected = FeignException.UnprocessableEntity.class)
+    @Test
     public void unProcessableEntityErrorIsReThrown() {
-        when(updateCcdCaseService.updateCaseV2(
-                        eq(1L),
-                        eq(EventType.APPEAL_TO_PROCEED.getCcdType()),
-                        eq("Appeal to proceed"),
-                        eq("Appeal proceed event triggered"),
-                        any(),
-                        any(Consumer.class)
-                )
-        ).thenThrow(FeignException.UnprocessableEntity.class);
+        assertThrows(FeignException.UnprocessableEntity.class, () -> {
+            when(updateCcdCaseService.updateCaseV2(
+                eq(1L),
+                eq(EventType.APPEAL_TO_PROCEED.getCcdType()),
+                eq("Appeal to proceed"),
+                eq("Appeal proceed event triggered"),
+                any(),
+                any(Consumer.class)
+            )
+            ).thenThrow(FeignException.UnprocessableEntity.class);
 
-        handler.handle(SUBMITTED, HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString())).build(), INTERLOCUTORY_REVIEW_STATE, DIRECTION_ISSUED));
+            handler.handle(SUBMITTED, HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString())).build(), INTERLOCUTORY_REVIEW_STATE, DIRECTION_ISSUED));
+        });
     }
 }

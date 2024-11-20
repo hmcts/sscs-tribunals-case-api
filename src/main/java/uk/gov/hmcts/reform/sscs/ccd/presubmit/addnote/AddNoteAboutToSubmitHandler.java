@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -24,7 +23,6 @@ public class AddNoteAboutToSubmitHandler implements PreSubmitCallbackHandler<Ssc
 
     protected final AddNoteService addNoteService;
 
-    @Autowired
     public AddNoteAboutToSubmitHandler(AddNoteService addNoteService) {
         this.addNoteService = addNoteService;
     }

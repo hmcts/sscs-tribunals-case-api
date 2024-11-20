@@ -11,7 +11,6 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -36,7 +35,6 @@ public class StoreAppellantStatementService extends StorePdfService<PdfAppellant
     private static final String OTHER_PARTY_STATEMENT = "Other party statement ";
     private static final String OTHER_PARTY_REP_STATEMENT = "Other party representative statement ";
 
-    @Autowired
     public StoreAppellantStatementService(
         @Qualifier("oldPdfService") PdfService pdfService,
         @Value("${personalStatement.html.template.path}") String pdfTemplatePath,
@@ -66,11 +64,11 @@ public class StoreAppellantStatementService extends StorePdfService<PdfAppellant
             }
         }
         if (isOtherParty(data.getCaseDetails().getData(), withTyaPredicate(data.getStatement().getTya()))) {
-            statementPrefix = String.format(OTHER_PARTY_STATEMENT + "%s ", getOtherPartyName(data.getCaseDetails().getData(), withTyaPredicate(data.getStatement().getTya())));
+            statementPrefix = (OTHER_PARTY_STATEMENT + "%s ").formatted(getOtherPartyName(data.getCaseDetails().getData(), withTyaPredicate(data.getStatement().getTya())));
         } else if (isOtherPartyRep(data.getCaseDetails().getData(), withTyaPredicate(data.getStatement().getTya()))) {
-            statementPrefix = String.format(OTHER_PARTY_REP_STATEMENT + "%s ", getOtherPartyName(data.getCaseDetails().getData(), withTyaPredicate(data.getStatement().getTya())));
+            statementPrefix = (OTHER_PARTY_REP_STATEMENT + "%s ").formatted(getOtherPartyName(data.getCaseDetails().getData(), withTyaPredicate(data.getStatement().getTya())));
         } else if (isOtherPartyAppointee(data.getCaseDetails().getData(), withTyaPredicate(data.getStatement().getTya()))) {
-            statementPrefix = String.format(OTHER_PARTY_STATEMENT + "%s ", "Appointee " + getOtherPartyName(data.getCaseDetails().getData(), withTyaPredicate(data.getStatement().getTya())));
+            statementPrefix = (OTHER_PARTY_STATEMENT + "%s ").formatted("Appointee " + getOtherPartyName(data.getCaseDetails().getData(), withTyaPredicate(data.getStatement().getTya())));
         }
         return statementPrefix;
     }

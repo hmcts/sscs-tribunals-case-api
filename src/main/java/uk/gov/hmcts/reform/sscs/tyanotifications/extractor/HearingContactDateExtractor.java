@@ -4,7 +4,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.PAPER;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -19,7 +18,6 @@ public class HearingContactDateExtractor {
     private final long subsequentDelay;
     private final long paperCaseDecisionDateInitialDelay;
 
-    @Autowired
     HearingContactDateExtractor(
         DwpResponseReceivedDateExtractor dwpResponseReceivedDateExtractor,
         @Value("${reminder.hearingContactDate.initialDelay.seconds}") long initialDelay,

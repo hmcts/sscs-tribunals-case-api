@@ -1,8 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -19,8 +18,8 @@ import java.util.Collections;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -49,7 +48,7 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
     @Mock
     private IdamService idamService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         handler = new HmctsResponseReviewedSubmittedHandler(ccdService, idamService);
@@ -73,6 +72,7 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "ABOUT_TO_SUBMIT"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
@@ -115,10 +115,12 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
         verify(ccdService).updateCase(any(SscsCaseData.class), eq(123L), eq(READY_TO_LIST.getCcdType()), eq("Ready to list"), eq("Makes an appeal ready to list"), any(IdamTokens.class));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsExceptionIfItCannotHandleTheAppeal() {
-        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+        assertThrows(IllegalStateException.class, () -> {
+            when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+            handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+        });
     }
 
     @Test

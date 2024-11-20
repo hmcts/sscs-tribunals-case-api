@@ -1,15 +1,15 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.io.IOException;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -21,12 +21,13 @@ public class DecisionNoticeOutcomeServiceTest {
 
     private DecisionNoticeOutcomeService service;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         service = new PipDecisionNoticeOutcomeService(new PipDecisionNoticeQuestionService());
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "higher, higher, decisionInFavourOfAppellant",
         "higher, same, decisionInFavourOfAppellant",
@@ -51,12 +52,13 @@ public class DecisionNoticeOutcomeServiceTest {
 
         Outcome outcome = service.determineOutcome(caseData);
 
-        Assert.assertNotNull(outcome);
+        Assertions.assertNotNull(outcome);
 
         assertEquals(expectedOutcome, outcome.getId());
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "higher, higher, decisionInFavourOfAppellant",
         "higher, same, decisionInFavourOfAppellant",
@@ -82,7 +84,7 @@ public class DecisionNoticeOutcomeServiceTest {
 
         Outcome outcome = service.determineOutcome(caseData);
 
-        Assert.assertNotNull(outcome);
+        Assertions.assertNotNull(outcome);
 
         assertEquals(expectedOutcome, outcome.getId());
     }
@@ -102,7 +104,7 @@ public class DecisionNoticeOutcomeServiceTest {
 
         Outcome outcome = service.determineOutcome(caseData);
 
-        Assert.assertNull(outcome);
+        Assertions.assertNull(outcome);
     }
 
     @Test
@@ -120,7 +122,7 @@ public class DecisionNoticeOutcomeServiceTest {
 
         Outcome outcome = service.determineOutcome(caseData);
 
-        Assert.assertNull(outcome);
+        Assertions.assertNull(outcome);
     }
 
     @Test
@@ -138,12 +140,13 @@ public class DecisionNoticeOutcomeServiceTest {
 
         Outcome outcome = service.determineOutcome(caseData);
 
-        Assert.assertNull(outcome);
+        Assertions.assertNull(outcome);
 
     }
 
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "higher, higher",
         "higher, same",
@@ -167,7 +170,7 @@ public class DecisionNoticeOutcomeServiceTest {
 
         Outcome outcome = service.determineOutcome(caseData);
 
-        Assert.assertNull(outcome);
+        Assertions.assertNull(outcome);
     }
 
     @Test
@@ -186,11 +189,12 @@ public class DecisionNoticeOutcomeServiceTest {
 
         Outcome outcome = service.determineOutcome(caseData);
 
-        Assert.assertNull(outcome);
+        Assertions.assertNull(outcome);
 
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "higher, higher, decisionUpheld",
         "higher, same, decisionUpheld",
@@ -216,12 +220,13 @@ public class DecisionNoticeOutcomeServiceTest {
 
         Outcome outcome = service.determineOutcome(caseData);
 
-        Assert.assertNotNull(outcome);
+        Assertions.assertNotNull(outcome);
 
         assertEquals(expectedOutcome, outcome.getId());
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "higher, higher, decisionInFavourOfAppellant",
         "higher, same, decisionInFavourOfAppellant",
@@ -247,12 +252,13 @@ public class DecisionNoticeOutcomeServiceTest {
 
         Outcome outcome = service.determineOutcome(caseData);
 
-        Assert.assertNotNull(outcome);
+        Assertions.assertNotNull(outcome);
 
         assertEquals(expectedOutcome, outcome.getId());
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "higher, higher",
         "higher, same",
@@ -276,10 +282,11 @@ public class DecisionNoticeOutcomeServiceTest {
 
         Outcome outcome = service.determineOutcome(caseData);
 
-        Assert.assertNull(outcome);
+        Assertions.assertNull(outcome);
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "higher, higher, decisionUpheld",
         "higher, same, decisionUpheld",
@@ -305,12 +312,13 @@ public class DecisionNoticeOutcomeServiceTest {
 
         Outcome outcome = service.determineOutcome(caseData);
 
-        Assert.assertNotNull(outcome);
+        Assertions.assertNotNull(outcome);
 
         assertEquals(expectedOutcome, outcome.getId());
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "higher, higher, decisionInFavourOfAppellant",
         "higher, same, decisionInFavourOfAppellant",
@@ -336,12 +344,13 @@ public class DecisionNoticeOutcomeServiceTest {
 
         Outcome outcome = service.determineOutcome(caseData);
 
-        Assert.assertNotNull(outcome);
+        Assertions.assertNotNull(outcome);
 
         assertEquals(expectedOutcome, outcome.getId());
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "higher, higher",
         "higher, same",
@@ -365,11 +374,12 @@ public class DecisionNoticeOutcomeServiceTest {
 
         Outcome outcome = service.determineOutcome(caseData);
 
-        Assert.assertNull(outcome);
+        Assertions.assertNull(outcome);
     }
 
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "higher, higher, decisionUpheld",
         "higher, same, decisionUpheld",
@@ -395,12 +405,13 @@ public class DecisionNoticeOutcomeServiceTest {
 
         Outcome outcome = service.determineOutcome(caseData);
 
-        Assert.assertNotNull(outcome);
+        Assertions.assertNotNull(outcome);
 
         assertEquals(expectedOutcome, outcome.getId());
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "higher, higher, decisionInFavourOfAppellant",
         "higher, same, decisionInFavourOfAppellant",
@@ -426,12 +437,13 @@ public class DecisionNoticeOutcomeServiceTest {
 
         Outcome outcome = service.determineOutcome(caseData);
 
-        Assert.assertNotNull(outcome);
+        Assertions.assertNotNull(outcome);
 
         assertEquals(expectedOutcome, outcome.getId());
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "higher, higher",
         "higher, same",
@@ -454,6 +466,6 @@ public class DecisionNoticeOutcomeServiceTest {
 
         Outcome outcome = service.determineOutcome(caseData);
 
-        Assert.assertNull(outcome);
+        Assertions.assertNull(outcome);
     }
 }

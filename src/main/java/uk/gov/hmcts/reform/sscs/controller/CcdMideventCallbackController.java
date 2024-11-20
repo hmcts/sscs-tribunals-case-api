@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
 import static java.util.Objects.isNull;
-import static org.apache.http.HttpHeaders.AUTHORIZATION;
+import static org.apache.hc.core5.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.ResponseEntity.ok;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADMIN_ACTION_CORRECTION;
 import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
@@ -9,7 +9,6 @@ import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTH
 import com.opencsv.CSVReader;
 import java.io.InputStreamReader;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
@@ -54,7 +53,6 @@ public class CcdMideventCallbackController {
     @Value("${feature.postHearingsB.enabled}")
     private boolean isPostHearingsBEnabled;
 
-    @Autowired
     public CcdMideventCallbackController(AuthorisationService authorisationService,
                                          SscsCaseCallbackDeserializer deserializer,
                                          DecisionNoticeService decisionNoticeService,

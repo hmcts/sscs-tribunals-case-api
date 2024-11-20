@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo;
 import static java.util.Objects.requireNonNull;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -20,7 +19,6 @@ public class ProcessAudioVideoEvidenceAboutToStartHandler implements PreSubmitCa
 
     private final IdamService idamService;
 
-    @Autowired
     public ProcessAudioVideoEvidenceAboutToStartHandler(IdamService idamService) {
         this.idamService = idamService;
     }

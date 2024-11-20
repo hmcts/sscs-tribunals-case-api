@@ -2,20 +2,20 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.sscs.builder.TrackYourAppealJsonBuilder;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
@@ -29,7 +29,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.tya.SubscriptionRequest;
 
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TribunalsServiceTest {
 
     private static final String APPEAL_NUMBER = "asfefsdf3223";
@@ -69,7 +69,7 @@ public class TribunalsServiceTest {
 
     private ObjectNode rootObjectNode;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         idamTokens = IdamTokens.builder().build();
 
@@ -85,11 +85,13 @@ public class TribunalsServiceTest {
         rootObjectNode.set("appeal", caseNode);
     }
 
-    @Test(expected = AppealNotFoundException.class)
-    public void shouldThrowExceptionIfCaseIdNotFound() throws CcdException {
-        given(ccdClient.readForCaseworker(idamTokens, CASE_ID)).willReturn(null);
+    @Test
+    public void shouldThrowExceptionIfCaseIdNotFound() {
+        assertThrows(AppealNotFoundException.class, () -> {
+            given(ccdClient.readForCaseworker(idamTokens, CASE_ID)).willReturn(null);
 
-        tribunalsService.findAppeal(CASE_ID, true);
+            tribunalsService.findAppeal(CASE_ID, true);
+        });
     }
 
     @Test

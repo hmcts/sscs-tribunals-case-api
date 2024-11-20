@@ -1,11 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -38,19 +34,19 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.apache.http.HttpStatus;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.apache.hc.core5.http.HttpStatus;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
@@ -83,11 +79,9 @@ import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
 import uk.gov.hmcts.reform.sscs.service.converter.ConvertAIntoBService;
 import uk.gov.hmcts.reform.sscs.service.v2.SubmitAppealService;
 
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public abstract class AbstractSubmitAppealServiceTest {
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.LENIENT);
 
     @Mock
     private CcdService ccdService;
@@ -177,7 +171,7 @@ public abstract class AbstractSubmitAppealServiceTest {
                 "epimsId" : "37792"
               }""";
 
-    @Before
+    @BeforeEach
     public void setup() {
         appealData.getMrn().setDate(LocalDate.now().minusMonths(1));
 
@@ -215,7 +209,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         given(emailHelper.generateUniqueEmailId(any(Appellant.class))).willReturn("Bloggs_33C");
     }
 
-    @Test
+    @ParameterizedTest
     public void givenCaseDoesNotExistInCcd_shouldCreateCaseWithAppealDetailsWithValidAppealCreatedEvent() {
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
@@ -228,7 +222,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         assertEquals("No", capture.getValue().getIsSaveAndReturn());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDraftCaseDoesExistAndCaseSubmitted_shouldUpdateCaseWithAppealDetailsWithDraftToValidAppealCreatedEvent() {
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
@@ -245,7 +239,7 @@ public abstract class AbstractSubmitAppealServiceTest {
 
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDraftCaseDoesExistAndCaseSubmittedHasNullBenefitType_shouldUpdateCaseWithAppealDetailsWithDraftToValidAppealCreatedEvent() {
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
@@ -271,7 +265,7 @@ public abstract class AbstractSubmitAppealServiceTest {
 
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDraftCaseDoesExistAndCaseSubmittedHasNullNino_shouldUpdateCaseWithAppealDetailsWithDraftToValidAppealCreatedEvent() {
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
@@ -298,7 +292,7 @@ public abstract class AbstractSubmitAppealServiceTest {
 
     }
 
-    @Test
+    @ParameterizedTest
     public void givenAssociatedCaseAlreadyExistsInCcd_shouldCreateCaseWithAppealDetailsAndAssociatedCase() {
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
@@ -322,7 +316,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         assertEquals("12345678", capture.getValue().getAssociatedCase().get(0).getValue().getCaseReference());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenAssociatedCaseAlreadyExistsInCcd_shouldCreateCaseWithAppealDetailsAndAssociatedCaseWithoutMrn() {
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
@@ -346,7 +340,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         assertEquals("12345678", capture.getValue().getAssociatedCase().get(0).getValue().getCaseReference());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenCaseDoesNotExistInCcdAndMrnDateIsMissing_shouldCreateCaseWithAppealDetailsWithIncompleteApplicationEvent() {
         byte[] expected = {};
         appealData.getMrn().setDate(null);
@@ -362,7 +356,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         assertEquals("No", capture.getValue().getIsSaveAndReturn());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDraftCaseDoesExistAndMrnDateIsMissingAndCaseSubmitted_shouldUpdateCaseWithAppealDetailsWithDraftToIncompleteApplicationEvent() {
         byte[] expected = {};
         appealData.getMrn().setDate(null);
@@ -382,7 +376,7 @@ public abstract class AbstractSubmitAppealServiceTest {
 
     }
 
-    @Test
+    @ParameterizedTest
     public void givenCaseDoesNotExistInCcdAndMrnDateIsGreaterThan13Months_shouldCreateCaseWithAppealDetailsWithNonCompliantReceivedEvent() {
         byte[] expected = {};
         appealData.getMrn().setDate(LocalDate.now().minusMonths(13).minusDays(1));
@@ -397,7 +391,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         assertEquals("No", capture.getValue().getIsSaveAndReturn());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDraftCaseDoesExistAndMrnDateIsGreaterThan13MonthsAndCaseSubmitted_shouldUpdateCaseWithAppealDetailsWithDraftToNonCompliantEvent() {
         byte[] expected = {};
         appealData.getMrn().setDate(LocalDate.now().minusMonths(13).minusDays(1));
@@ -445,7 +439,7 @@ public abstract class AbstractSubmitAppealServiceTest {
 
     public abstract void verifyArchiveDraft(CitizenCcdService citizenCcdService);
 
-    @Test
+    @ParameterizedTest
     public void shouldCreateDraftCaseWithAppealDetailsWithDraftEventNotForcedCreate() {
         givenSaveCaseWillReturnSaveCaseOperation(citizenCcdService, 123L, SaveCaseOperation.CREATE);
 
@@ -464,7 +458,7 @@ public abstract class AbstractSubmitAppealServiceTest {
 
     public abstract void verifyUpdateCaseCalledByUpdateDraftAppeal(CitizenCcdService citizenCcdService);
 
-    @Test
+    @ParameterizedTest
     public void shouldUpdateDraftCase() {
 
         uk.gov.hmcts.reform.ccd.client.model.CaseDetails caseDetails =
@@ -479,19 +473,21 @@ public abstract class AbstractSubmitAppealServiceTest {
         assertTrue(result.isPresent());
     }
 
-    @Test(expected = FeignException.class)
+    @ParameterizedTest
     public void shouldRaiseExceptionOnUpdateDraftEvent() {
-        FeignException feignException = mock(FeignException.class);
-        given(feignException.status()).willReturn(404);
-        givenUpdateCaseWillThrowException(citizenCcdService, feignException);
+        assertThrows(FeignException.class, () -> {
+            FeignException feignException = mock(FeignException.class);
+            given(feignException.status()).willReturn(404);
+            givenUpdateCaseWillThrowException(citizenCcdService, feignException);
 
-        Optional<SaveCaseResult> result = callUpdateDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData);
+            Optional<SaveCaseResult> result = callUpdateDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData);
 
-        verifyArchiveDraftAppeal(citizenCcdService);
-        assertFalse(result.isPresent());
+            verifyArchiveDraftAppeal(citizenCcdService);
+            assertFalse(result.isPresent());
+        });
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldSuppressExceptionIfIts409OnUpdateDraftCaseWithAppealDetailsWithDraftEvent() {
         FeignException feignException = mock(FeignException.class);
         given(feignException.status()).willReturn(409);
@@ -503,15 +499,17 @@ public abstract class AbstractSubmitAppealServiceTest {
         assertFalse(result.isPresent());
     }
 
-    @Test(expected = ApplicationErrorException.class)
+    @ParameterizedTest
     public void shouldRaisedExceptionOnUpdateDraftWhenCitizenRoleIsNotPresent() {
-        given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
-        Optional<SaveCaseResult> result = callUpdateDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData);
+        assertThrows(ApplicationErrorException.class, () -> {
+            given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
+            Optional<SaveCaseResult> result = callUpdateDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData);
 
-        assertFalse(result.isPresent());
+            assertFalse(result.isPresent());
+        });
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldArchiveDraftCase() {
         givenArchiveDraftAppealWillReturnCaseDetails(citizenCcdService, CaseDetails.builder().build());
 
@@ -521,27 +519,31 @@ public abstract class AbstractSubmitAppealServiceTest {
         assertTrue(result.isPresent());
     }
 
-    @Test(expected = FeignException.class)
+    @ParameterizedTest
     public void shouldRaiseExceptionOnArchiveDraftEvent() {
-        FeignException feignException = mock(FeignException.class);
-        given(feignException.status()).willReturn(404);
-        givenArchiveDraftAppealWillThrow(citizenCcdService, feignException);
+        assertThrows(FeignException.class, () -> {
+            FeignException feignException = mock(FeignException.class);
+            given(feignException.status()).willReturn(404);
+            givenArchiveDraftAppealWillThrow(citizenCcdService, feignException);
 
-        Optional<SaveCaseResult> result = callArchiveDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData, 112L);
+            Optional<SaveCaseResult> result = callArchiveDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData, 112L);
 
-        verifyArchiveDraftAppeal(citizenCcdService);
-        assertFalse(result.isPresent());
+            verifyArchiveDraftAppeal(citizenCcdService);
+            assertFalse(result.isPresent());
+        });
     }
 
-    @Test(expected = ApplicationErrorException.class)
+    @ParameterizedTest
     public void shouldRaisedExceptionOnArchiveDraftWhenCitizenRoleIsNotPresent() {
-        given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
-        Optional<SaveCaseResult> result = callArchiveDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData, 121L);
+        assertThrows(ApplicationErrorException.class, () -> {
+            given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
+            Optional<SaveCaseResult> result = callArchiveDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData, 121L);
 
-        assertFalse(result.isPresent());
+            assertFalse(result.isPresent());
+        });
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldCreateDraftCaseWithAppealDetailsWithDraftEventForcedCreate() {
         given(citizenCcdService.createDraft(any(SscsCaseData.class), any(IdamTokens.class)))
                 .willReturn(SaveCaseResult.builder()
@@ -556,19 +558,21 @@ public abstract class AbstractSubmitAppealServiceTest {
 
     }
 
-    @Test(expected = FeignException.class)
+    @ParameterizedTest
     public void shouldRaisedExceptionOnCreateDraftCaseWithAppealDetailsWithDraftEvent() {
-        FeignException feignException = mock(FeignException.class);
-        given(feignException.status()).willReturn(404);
-        givenSaveCaseWillThrow(citizenCcdService, feignException);
+        assertThrows(FeignException.class, () -> {
+            FeignException feignException = mock(FeignException.class);
+            given(feignException.status()).willReturn(404);
+            givenSaveCaseWillThrow(citizenCcdService, feignException);
 
-        Optional<SaveCaseResult> result = callSubmitDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData, false);
+            Optional<SaveCaseResult> result = callSubmitDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData, false);
 
-        verifyCitizenCcdService(citizenCcdService);
-        assertFalse(result.isPresent());
+            verifyCitizenCcdService(citizenCcdService);
+            assertFalse(result.isPresent());
+        });
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldHandleScConflictWithNullNinoForSubmitDraftAppeal() {
         FeignException feignException = mock(FeignException.class);
         given(feignException.status()).willReturn(HttpStatus.SC_CONFLICT);
@@ -582,7 +586,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         assertEquals(result, Optional.empty());
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldHandleScConflictWithNullNinoForUpdateDraftAppeal() {
         FeignException feignException = mock(FeignException.class);
         given(feignException.status()).willReturn(409);
@@ -595,15 +599,17 @@ public abstract class AbstractSubmitAppealServiceTest {
         assertEquals(result, Optional.empty());
     }
 
-    @Test(expected = ApplicationErrorException.class)
+    @ParameterizedTest
     public void shouldRaisedExceptionOnCreateDraftWhenCitizenRoleIsNotPresent() {
-        given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
-        Optional<SaveCaseResult> result = callSubmitDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData, false);
+        assertThrows(ApplicationErrorException.class, () -> {
+            given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
+            Optional<SaveCaseResult> result = callSubmitDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData, false);
 
-        assertFalse(result.isPresent());
+            assertFalse(result.isPresent());
+        });
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldSuppressExceptionIfIts409OnCreateDraftCaseWithAppealDetailsWithDraftEvent() {
         FeignException feignException = mock(FeignException.class);
         given(feignException.status()).willReturn(409);
@@ -615,7 +621,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         assertFalse(result.isPresent());
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldGetADraftIfItExists() {
         when(citizenCcdService.findCase(any())).thenReturn(Collections.singletonList(SscsCaseData.builder().build()));
         when(convertAIntoBService.convert(any(SscsCaseData.class))).thenReturn(SessionDraft.builder().build());
@@ -623,20 +629,22 @@ public abstract class AbstractSubmitAppealServiceTest {
         assertTrue(optionalSessionDraft.isPresent());
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldGetNoDraftIfNoneExists() {
         when(citizenCcdService.findCase(any())).thenReturn(Collections.emptyList());
         Optional<SessionDraft> optionalSessionDraft = submitAppealService.getDraftAppeal("authorisation");
         assertFalse(optionalSessionDraft.isPresent());
     }
 
-    @Test(expected = ApplicationErrorException.class)
+    @ParameterizedTest
     public void shouldThrowExceptionOnGetDraftWhenCitizenRoleNotPresent() {
-        given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
-        submitAppealService.getDraftAppeal("authorisation");
+        assertThrows(ApplicationErrorException.class, () -> {
+            given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
+            submitAppealService.getDraftAppeal("authorisation");
+        });
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldGetAllDraftsIfItExists() {
 
         SscsCaseData caseData =  SscsCaseData.builder().build();
@@ -647,21 +655,23 @@ public abstract class AbstractSubmitAppealServiceTest {
         assertEquals(3, sessionDrafts.size());
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldGetEmptyListIfNoDraftsExists() {
         when(citizenCcdService.findCase(any())).thenReturn(Collections.emptyList());
         List<SessionDraft> sessionDrafts = submitAppealService.getDraftAppeals("authorisation");
         assertEquals(0, sessionDrafts.size());
     }
 
-    @Test(expected = ApplicationErrorException.class)
+    @ParameterizedTest
     public void shouldThrowExceptionOnGetDraftsWhenCitizenRoleNotPresent() {
-        given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
-        submitAppealService.getDraftAppeals("authorisation");
+        assertThrows(ApplicationErrorException.class, () -> {
+            given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
+            submitAppealService.getDraftAppeals("authorisation");
+        });
     }
 
-    @Test
-    @Parameters(method = "generateDifferentRpcScenarios")
+    @ParameterizedTest
+    @MethodSource("generateDifferentRpcScenarios")
     public void givenAppellantPostCode_shouldSetRegionAndRpcCorrectly(String expectedRpc, String appellantPostCode) throws JsonProcessingException {
         RegionalProcessingCenter rpc = getRpcObjectForGivenJsonRpc(expectedRpc);
         when(regionalProcessingCenterService.getByPostcode(RegionalProcessingCenterService.getFirstHalfOfPostcode(appellantPostCode)))
@@ -687,7 +697,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         assertEquals(expectedRpcObject.getName(), caseData.getRegion());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenAppointeePostCode_shouldSetRegionAndRpcToAppointee() throws JsonProcessingException {
         when(regionalProcessingCenterService.getByPostcode("B1")).thenReturn(getRpcObjectForGivenJsonRpc(BIRMINGHAM_RPC));
         when(airLookupService.lookupAirVenueNameByPostCode(eq("B1 1AA"), any())).thenReturn("Birmingham");
@@ -706,6 +716,7 @@ public abstract class AbstractSubmitAppealServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"", "null"})
     public void givenAppointeeWithNoPostCode_shouldSetRegionAndRpcToNull(@Nullable String postCode) {
         SyaContactDetails appointeeContactDetails = new SyaContactDetails();
@@ -718,7 +729,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         assertNull(caseData.getRegionalProcessingCenter());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenAppointeeWithNoContactData_shouldSetRegionAndRpcToAppellant() throws JsonProcessingException {
         when(regionalProcessingCenterService.getByPostcode("TN32")).thenReturn(getRpcObjectForGivenJsonRpc(BRADFORD_RPC));
         when(airLookupService.lookupAirVenueNameByPostCode(eq("TN32 6PL"), any())).thenReturn("Bradford");
@@ -764,7 +775,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         return mapper.readValue(jsonRpc, RegionalProcessingCenter.class);
     }
 
-    public Object[] generateDifferentRpcScenarios() {
+    public static Object[] generateDifferentRpcScenarios() {
         return new Object[]{
             new Object[]{BRADFORD_RPC, "TN32 6PL"},
             new Object[]{BRADFORD_RPC, "OX1 1AE"},
@@ -775,7 +786,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         };
     }
 
-    @Test
+    @ParameterizedTest
     public void givenAPipCase_thenSetCreatedInGapsFromFieldToReadyToList() {
         SyaCaseWrapper appealData = getSyaCaseWrapper();
         SyaBenefitType syaBenefitType = new SyaBenefitType("PIP", "PIP");
@@ -789,7 +800,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         assertEquals(READY_TO_LIST.getId(), caseData.getCreatedInGapsFrom());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenAEsaCase_thenSetCreatedInGapsFromToReadyToList() {
         SyaCaseWrapper appealData = getSyaCaseWrapper();
         SyaBenefitType syaBenefitType = new SyaBenefitType("ESA", "ESA");
@@ -803,7 +814,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         assertEquals(READY_TO_LIST.getId(), caseData.getCreatedInGapsFrom());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenAUcCaseWithRecoveryFromEstatesOffice_thenSetOfficeCorrectly() {
         SyaCaseWrapper appealData = getSyaCaseWrapper();
         SyaBenefitType syaBenefitType = new SyaBenefitType("Universal Credit", "UC");
@@ -819,77 +830,85 @@ public abstract class AbstractSubmitAppealServiceTest {
         assertEquals("UC Recovery from Estates", caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
     }
 
-    @Test(expected = CcdException.class)
+    @ParameterizedTest
     public void givenExceptionWhenSearchingForCaseInCcd_shouldThrowException() {
-        given(ccdService.findCaseBy(eq("data.appeal.appellant.identity.nino"), eq(appealData.getAppellant().getNino()), any(IdamTokens.class)))
-            .willThrow(RuntimeException.class);
+        assertThrows(CcdException.class, () -> {
+            given(ccdService.findCaseBy(eq("data.appeal.appellant.identity.nino"), eq(appealData.getAppellant().getNino()), any(IdamTokens.class)))
+                .willThrow(RuntimeException.class);
 
-        submitAppealService.submitAppeal(appealData, userToken);
+            submitAppealService.submitAppeal(appealData, userToken);
+        });
     }
 
-    @Test(expected = CcdException.class)
+    @ParameterizedTest
     public void givenCaseDoesNotExistInCcdAndGivenExceptionWhenCreatingCaseInCcd_shouldThrowException() {
-        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any(IdamTokens.class)))
-            .willReturn(null);
+        assertThrows(CcdException.class, () -> {
+            given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any(IdamTokens.class)))
+                .willReturn(null);
 
-        given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
-            .willThrow(RuntimeException.class);
+            given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
+                .willThrow(RuntimeException.class);
 
-        submitAppealService.submitAppeal(appealData, userToken);
+            submitAppealService.submitAppeal(appealData, userToken);
+        });
     }
 
-    @Test(expected = DuplicateCaseException.class)
+    @ParameterizedTest
     public void givenCaseIsADuplicate_shouldNotResendEmails() {
-        given(ccdService.findCaseBy(eq("data.appeal.appellant.identity.nino"), eq(appealData.getAppellant().getNino()), any()))
+        assertThrows(DuplicateCaseException.class, () -> {
+            given(ccdService.findCaseBy(eq("data.appeal.appellant.identity.nino"), eq(appealData.getAppellant().getNino()), any()))
                 .willReturn(Collections.singletonList(
-                        SscsCaseDetails.builder()
-                                .id(12345678L)
-                                .data(SscsCaseData.builder()
-                                        .appeal(Appeal.builder()
-                                                .appellant(Appellant.builder().identity(Identity.builder().nino(appealData.getAppellant().getNino()).build()).build())
-                                                .benefitType(BenefitType.builder().code(appealData.getBenefitType().getCode()).build())
-                                                .mrnDetails(MrnDetails.builder().mrnDate(appealData.getMrn().getDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
-                                                        .build()).build()).build()).build()
+                    SscsCaseDetails.builder()
+                        .id(12345678L)
+                        .data(SscsCaseData.builder()
+                            .appeal(Appeal.builder()
+                                .appellant(Appellant.builder().identity(Identity.builder().nino(appealData.getAppellant().getNino()).build()).build())
+                                .benefitType(BenefitType.builder().code(appealData.getBenefitType().getCode()).build())
+                                .mrnDetails(MrnDetails.builder().mrnDate(appealData.getMrn().getDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
+                                    .build()).build()).build()).build()
                 ));
 
-        submitAppealService.submitAppeal(appealData, userToken);
+            submitAppealService.submitAppeal(appealData, userToken);
 
-        then(pdfServiceClient).should(never()).generateFromHtml(any(byte[].class), anyMap());
+            then(pdfServiceClient).should(never()).generateFromHtml(any(byte[].class), anyMap());
+        });
     }
 
-    @Test(expected = DuplicateCaseException.class)
+    @ParameterizedTest
     public void givenCaseAlreadyExistsInCcd_shouldNotCreateCaseWithAppealDetails() {
-        given(ccdService.findCaseBy(eq("data.appeal.appellant.identity.nino"), eq(appealData.getAppellant().getNino()), any()))
+        assertThrows(DuplicateCaseException.class, () -> {
+            given(ccdService.findCaseBy(eq("data.appeal.appellant.identity.nino"), eq(appealData.getAppellant().getNino()), any()))
                 .willReturn(Arrays.asList(
-                        SscsCaseDetails.builder()
-                                .data(SscsCaseData.builder()
-                                        .appeal(Appeal.builder()
-                                                .appellant(Appellant.builder().identity(Identity.builder().nino(appealData.getAppellant().getNino()).build()).build())
-                                                .benefitType(BenefitType.builder().code(appealData.getBenefitType().getCode()).build())
-                                                .mrnDetails(MrnDetails.builder().mrnDate(appealData.getMrn().getDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
-                                                        .build()).build()).build()).build(),
-                        SscsCaseDetails.builder()
-                                .data(SscsCaseData.builder()
-                                        .appeal(Appeal.builder()
-                                                .appellant(Appellant.builder().identity(Identity.builder().nino(appealData.getAppellant().getNino()).build()).build())
-                                                .benefitType(BenefitType.builder().code("ESA").build())
-                                                .mrnDetails(MrnDetails.builder().mrnDate(appealData.getMrn().getDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
-                                                        .build()).build()).build()).build(),
-                        SscsCaseDetails.builder()
-                                .data(SscsCaseData.builder()
-                                        .appeal(Appeal.builder()
-                                                .appellant(Appellant.builder().identity(Identity.builder().nino(appealData.getAppellant().getNino()).build()).build())
-                                                .benefitType(BenefitType.builder().code(appealData.getBenefitType().getCode()).build())
-                                                .mrnDetails(MrnDetails.builder().mrnDate(LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE))
-                                                        .build()).build()).build()).build()
+                    SscsCaseDetails.builder()
+                        .data(SscsCaseData.builder()
+                            .appeal(Appeal.builder()
+                                .appellant(Appellant.builder().identity(Identity.builder().nino(appealData.getAppellant().getNino()).build()).build())
+                                .benefitType(BenefitType.builder().code(appealData.getBenefitType().getCode()).build())
+                                .mrnDetails(MrnDetails.builder().mrnDate(appealData.getMrn().getDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
+                                    .build()).build()).build()).build(),
+                    SscsCaseDetails.builder()
+                        .data(SscsCaseData.builder()
+                            .appeal(Appeal.builder()
+                                .appellant(Appellant.builder().identity(Identity.builder().nino(appealData.getAppellant().getNino()).build()).build())
+                                .benefitType(BenefitType.builder().code("ESA").build())
+                                .mrnDetails(MrnDetails.builder().mrnDate(appealData.getMrn().getDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
+                                    .build()).build()).build()).build(),
+                    SscsCaseDetails.builder()
+                        .data(SscsCaseData.builder()
+                            .appeal(Appeal.builder()
+                                .appellant(Appellant.builder().identity(Identity.builder().nino(appealData.getAppellant().getNino()).build()).build())
+                                .benefitType(BenefitType.builder().code(appealData.getBenefitType().getCode()).build())
+                                .mrnDetails(MrnDetails.builder().mrnDate(LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE))
+                                    .build()).build()).build()).build()
                 ));
 
-        submitAppealService.submitAppeal(appealData, userToken);
+            submitAppealService.submitAppeal(appealData, userToken);
 
-        verify(ccdService, never()).createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class));
+            verify(ccdService, never()).createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class));
+        });
     }
 
-    @Test
+    @ParameterizedTest
     public void givenAssociatedCase_thenAddAssociatedCaseLinkToCase() {
         SscsCaseDetails matchingCase = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().build()).build();
         List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
@@ -904,7 +923,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         assertEquals("12345678", caseData.getAssociatedCase().get(0).getValue().getCaseReference());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenMultipleAssociatedCases_thenAddAllAssociatedCaseLinksToCase() {
         SscsCaseDetails matchingCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().build()).build();
         SscsCaseDetails matchingCase2 = SscsCaseDetails.builder().id(56765676L).data(SscsCaseData.builder().build()).build();
@@ -922,7 +941,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         assertEquals("56765676", caseData.getAssociatedCase().get(1).getValue().getCaseReference());
     }
 
-    @Test
+    @ParameterizedTest
     public void addNoAssociatedCases() {
         List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
 
@@ -935,7 +954,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         verify(ccdService, times(0)).updateCase(any(), any(), eq(ASSOCIATE_CASE.getCcdType()), eq("Associate case"), eq("Associated case added"), any());
     }
 
-    @Test
+    @ParameterizedTest
     public void getMatchedCases() {
         given(ccdService.findCaseBy(any(), any(), any())).willReturn(Collections.singletonList(
             SscsCaseDetails.builder().id(12345678L).build()
@@ -946,6 +965,7 @@ public abstract class AbstractSubmitAppealServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "PIP, n1w1 wal, Birmingham, appellant, 1, 21",
         "ESA, n1w1 wal, Birmingham, appellant, 1, 21",

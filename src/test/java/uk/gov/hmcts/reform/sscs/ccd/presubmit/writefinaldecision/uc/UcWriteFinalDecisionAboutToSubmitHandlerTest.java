@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
@@ -13,12 +13,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import junitparams.JUnitParamsRunner;
-import junitparams.NamedParameters;
-import junitparams.Parameters;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
@@ -28,16 +25,15 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.UcDecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.UcDecisionNoticeQuestionService;
 
-@RunWith(JUnitParamsRunner.class)
 public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDecisionAboutToSubmitHandlerTestBase<UcDecisionNoticeQuestionService> {
 
     public UcWriteFinalDecisionAboutToSubmitHandlerTest() throws IOException {
         super(new UcDecisionNoticeQuestionService());
     }
 
-    @NamedParameters("schedule7ActivityAndSchedule9Paragraph4Combinations")
+
     @SuppressWarnings("unused")
-    private Object[] schedule7ActivityAndSchedule9Paragraph4Combinations() {
+    private static Object[] schedule7ActivityAndSchedule9Paragraph4Combinations() {
         return new Object[]{
             new Boolean[]{null, null},
             new Boolean[]{false, null},
@@ -51,9 +47,9 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         };
     }
 
-    @NamedParameters("schedule7ActivityCombinations")
+
     @SuppressWarnings("unused")
-    private Object[] schedule7ActivityCombinations() {
+    private static Object[] schedule7ActivityCombinations() {
         return new Object[]{
             new Boolean[]{null},
             new Boolean[]{false},
@@ -61,8 +57,8 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         };
     }
 
-    @Test
-    @Parameters(named = "schedule7ActivityAndSchedule9Paragraph4Combinations")
+    @ParameterizedTest
+    @MethodSource("schedule7ActivityAndSchedule9Paragraph4Combinations")
     public void givenSchedule8Paragraph4FieldIsPopulatedWithYesAndPointsAreTooHigh_thenOnlyDisplayAnErrorIfSchedule7ActivitiesNotPopulated(Boolean schedule7Activities, Boolean schedule9Paragraph4) {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -90,10 +86,10 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         if ((schedule7Activities != null && schedule7Activities.booleanValue())
             || schedule7Activities != null && !schedule7Activities.booleanValue() && schedule9Paragraph4 != null) {
-            Assert.assertEquals(0, response.getErrors().size());
+            Assertions.assertEquals(0, response.getErrors().size());
 
         } else {
-            Assert.assertEquals(1, response.getErrors().size());
+            Assertions.assertEquals(1, response.getErrors().size());
 
             String error = response.getErrors().stream().findFirst().orElse("");
             if (schedule7Activities == null) {
@@ -133,8 +129,8 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         }
     }
 
-    @Test
-    @Parameters(named = "schedule7ActivityAndSchedule9Paragraph4Combinations")
+    @ParameterizedTest
+    @MethodSource("schedule7ActivityAndSchedule9Paragraph4Combinations")
     public void givenSchedule8Paragraph4FieldIsPopulatedWithNoAndPointsAreTooHigh_thenOnlyDisplayAnErrorIfSchedule7ActivitiesNotPopulated(Boolean schedule7Activities, Boolean schedule9Paragraph4) {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -163,10 +159,10 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         if ((schedule7Activities != null && schedule7Activities.booleanValue())
             || schedule7Activities != null && !schedule7Activities.booleanValue() && schedule9Paragraph4 != null) {
-            Assert.assertEquals(0, response.getErrors().size());
+            Assertions.assertEquals(0, response.getErrors().size());
 
         } else {
-            Assert.assertEquals(1, response.getErrors().size());
+            Assertions.assertEquals(1, response.getErrors().size());
 
             String error = response.getErrors().stream().findFirst().orElse("");
             if (schedule7Activities == null) {
@@ -207,8 +203,8 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
     }
 
 
-    @Test
-    @Parameters(named = "schedule7ActivityAndSchedule9Paragraph4Combinations")
+    @ParameterizedTest
+    @MethodSource("schedule7ActivityAndSchedule9Paragraph4Combinations")
     public void givenSchedule8Paragraph4FieldIsNotPopulatedAndPointsAreLowAndRequireItToBePopulated_thenDisplayAnError(Boolean schedule7Activities, Boolean schedule9Paragraph4) {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -229,15 +225,15 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(1, response.getErrors().size());
+        Assertions.assertEquals(1, response.getErrors().size());
 
         String error = response.getErrors().stream().findFirst().orElse("");
 
         assertEquals("You have awarded less than 15 points and specified that Support Group Only Appeal does not apply, but have a missing answer for the Schedule 8 Paragraph 4 question. Please review your previous selection.", error);
     }
 
-    @Test
-    @Parameters(named = "schedule7ActivityCombinations")
+    @ParameterizedTest
+    @MethodSource("schedule7ActivityCombinations")
     public void givenSchedule9Paragraph4FieldIsPopulatedWithYesAndSchedule8Paragraph4FieldIsPopulatedWithNoAndPointsAreCorrectForSchedule8Paragraph4ButIncorrectForSchedule9Paragraph4_thenDoNoDisplayAnError(Boolean schedule7Activities) {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -258,12 +254,12 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(0, response.getErrors().size());
+        Assertions.assertEquals(0, response.getErrors().size());
 
     }
 
-    @Test
-    @Parameters(named = "schedule7ActivityCombinations")
+    @ParameterizedTest
+    @MethodSource("schedule7ActivityCombinations")
     public void givenSchedule9Paragraph4FieldIsPopulatedWithNoAndSchedule8Paragraph4FieldIsPopulatedWithNoAndPointsAreCorrectForSchedule8Paragraph4ButIncorrectForSchedule9Paragraph4_thenDisplayAnError(Boolean schedule7Activities) {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -289,7 +285,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         if (sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesApply() != null) {
-            Assert.assertEquals(1, response.getErrors().size());
+            Assertions.assertEquals(1, response.getErrors().size());
 
             String error = response.getErrors().stream().findFirst().orElse("");
             if (schedule7Activities == null) {
@@ -306,12 +302,12 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
                     error);
             }
         } else {
-            Assert.assertEquals(0, response.getErrors().size());
+            Assertions.assertEquals(0, response.getErrors().size());
 
         }
     }
 
-    @Test
+    @ParameterizedTest
     public void givenSchedule8Paragraph4FieldIsPopulatedWithYesAndPointsAreCorrectForSchedule8Paragraph4AndActivitiesSelectedOnly_thenDoNotDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -333,10 +329,10 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(0, response.getErrors().size());
+        Assertions.assertEquals(0, response.getErrors().size());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenSchedule8Paragraph4FieldIsPopulatedWithYesAndPointsAreCorrectForSchedule8Paragraph4AndActivitiesSelectedAndSchedule9Paragraph4SetToNo_thenDoNotDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -356,15 +352,15 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertNull(sscsCaseData.getSscsUcCaseData().getSchedule9Paragraph4Selection());
-        Assert.assertNotNull(sscsCaseData.getSscsUcCaseData().getSchedule7Selections());
-        Assert.assertFalse(sscsCaseData.getSscsUcCaseData().getSchedule7Selections().isEmpty());
+        Assertions.assertNull(sscsCaseData.getSscsUcCaseData().getSchedule9Paragraph4Selection());
+        Assertions.assertNotNull(sscsCaseData.getSscsUcCaseData().getSchedule7Selections());
+        Assertions.assertFalse(sscsCaseData.getSscsUcCaseData().getSchedule7Selections().isEmpty());
 
-        Assert.assertEquals(0, response.getErrors().size());
+        Assertions.assertEquals(0, response.getErrors().size());
 
     }
 
-    @Test
+    @ParameterizedTest
     public void givenSchedule8Paragraph4FieldIsPopulatedWithYesAndPointsAreCorrectForSchedule8Paragraph4AndActivitiesSelectedAndSchedule9Paragraph4SetToYes_thenDoDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -384,14 +380,14 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertNull(sscsCaseData.getSscsUcCaseData().getSchedule9Paragraph4Selection());
-        Assert.assertNotNull(sscsCaseData.getSscsUcCaseData().getSchedule7Selections());
-        Assert.assertFalse(sscsCaseData.getSscsUcCaseData().getSchedule7Selections().isEmpty());
+        Assertions.assertNull(sscsCaseData.getSscsUcCaseData().getSchedule9Paragraph4Selection());
+        Assertions.assertNotNull(sscsCaseData.getSscsUcCaseData().getSchedule7Selections());
+        Assertions.assertFalse(sscsCaseData.getSscsUcCaseData().getSchedule7Selections().isEmpty());
 
-        Assert.assertEquals(0, response.getErrors().size());
+        Assertions.assertEquals(0, response.getErrors().size());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenSchedule8Paragraph4FieldIsPopulatedWithYesAndPointsAreCorrectForSchedule8Paragraph4AndNoActivitiesSelectedAndSchedule9Paragraph4SetToNo_thenDoNotDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -414,10 +410,10 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(0, response.getErrors().size());
+        Assertions.assertEquals(0, response.getErrors().size());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenSchedule8Paragraph4FieldIsPopulatedWithYesAndPointsAreCorrectForSchedule8Paragraph4AndNoActivitiesSelectedAndSchedule9Paragraph4SetToYes_thenDoNotDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -440,10 +436,10 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(0, response.getErrors().size());
+        Assertions.assertEquals(0, response.getErrors().size());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenSchedule8Paragraph4FieldIsPopulatedWithYesAndPointsAreCorrectForSchedule8Paragraph4AndNoActivitiesSelectedAndSchedule9Paragraph4IsNotSet_thenDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -462,13 +458,13 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(1, response.getErrors().size());
+        Assertions.assertEquals(1, response.getErrors().size());
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("You have awarded less than 15 points, specified that Schedule 8 Paragraph 4 applies and not provided an answer to the Schedule 9 Paragraph 4 question, but have made no selections for the Schedule 7 Activities question. Please review your previous selection.", error);
     }
 
-    @Test
+    @ParameterizedTest
     public void givenSchedule8Paragraph4FieldIsNotPopulatedAndPointsAreCorrectForSchedule8Paragraph4AndActivitiesSelectedOnly_thenDoNotDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -488,10 +484,10 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(0, response.getErrors().size());
+        Assertions.assertEquals(0, response.getErrors().size());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenSchedule8Paragraph4FieldIsNotPopulatedAndPointsAreCorrectForSchedule8Paragraph4AndActivitiesSelectedAndSchedule9Paragraph4SetToNo_thenDoNotDisplayAnErrorButResetSchedule9Paragraph4OnSubmit() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -510,14 +506,14 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertNull(sscsCaseData.getSscsUcCaseData().getSchedule9Paragraph4Selection());
-        Assert.assertNotNull(sscsCaseData.getSscsUcCaseData().getSchedule7Selections());
-        Assert.assertFalse(sscsCaseData.getSscsUcCaseData().getSchedule7Selections().isEmpty());
+        Assertions.assertNull(sscsCaseData.getSscsUcCaseData().getSchedule9Paragraph4Selection());
+        Assertions.assertNotNull(sscsCaseData.getSscsUcCaseData().getSchedule7Selections());
+        Assertions.assertFalse(sscsCaseData.getSscsUcCaseData().getSchedule7Selections().isEmpty());
 
-        Assert.assertEquals(0, response.getErrors().size());
+        Assertions.assertEquals(0, response.getErrors().size());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenSchedule8Paragraph4FieldIsNotPopulatedAndPointsAreCorrectForSchedule8Paragraph4AndActivitiesSelectedAndSchedule9Paragraph4SetToYes_thenDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -536,14 +532,14 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertNull(sscsCaseData.getSscsUcCaseData().getSchedule9Paragraph4Selection());
-        Assert.assertNotNull(sscsCaseData.getSscsUcCaseData().getSchedule7Selections());
-        Assert.assertFalse(sscsCaseData.getSscsUcCaseData().getSchedule7Selections().isEmpty());
+        Assertions.assertNull(sscsCaseData.getSscsUcCaseData().getSchedule9Paragraph4Selection());
+        Assertions.assertNotNull(sscsCaseData.getSscsUcCaseData().getSchedule7Selections());
+        Assertions.assertFalse(sscsCaseData.getSscsUcCaseData().getSchedule7Selections().isEmpty());
 
-        Assert.assertEquals(0,  response.getErrors().size());
+        Assertions.assertEquals(0,  response.getErrors().size());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenSchedule8Paragraph4FieldIsNotPopulatedAndPointsAreCorrectForSchedule8Paragraph4AndNoActivitiesSelectedAndSchedule9Paragraph4SetToNo_thenDoNotDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -565,13 +561,13 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(0, response.getErrors().size());
+        Assertions.assertEquals(0, response.getErrors().size());
     }
 
 
 
 
-    @Test
+    @ParameterizedTest
     public void givenSchedule8Paragraph4FieldIsNotPopulatedAndPointsAreCorrectForSchedule8Paragraph4AndNoActivitiesSelectedAndSchedule9Paragraph4SetToYes_thenDoNotDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -593,10 +589,10 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(0, response.getErrors().size());
+        Assertions.assertEquals(0, response.getErrors().size());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenSchedule8Paragraph4FieldIsNotPopulatedAndPointsAreCorrectForSchedule8Paragraph4AndNoActivitiesSelectedAndSchedule9Paragraph4IsNotSet_thenDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -615,7 +611,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(1, response.getErrors().size());
+        Assertions.assertEquals(1, response.getErrors().size());
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("You have awarded 15 points or more and not provided an answer to the Schedule 9 Paragraph 4 question, but have made no selections for the Schedule 7 Activities question. Please review your previous selection.", error);
     }
@@ -641,6 +637,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
     }
 
     @Override
+    @ParameterizedTest
     public void givenDraftFinalDecisionAlreadyExistsOnCase_thenOverwriteExistingDraft() {
         SscsDocument doc = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("oldDraft.doc").documentType(DRAFT_DECISION_NOTICE.getValue()).build()).build();
         List<SscsDocument> docs = new ArrayList<>();
@@ -654,11 +651,11 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getData().getSscsDocument().size());
-        assertEquals((String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))), response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals(("Draft Decision Notice generated on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))), response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
     }
 
     // Refused scenario 1
-    @Test
+    @ParameterizedTest
     public void givenNonSupportGroupRefusedScenario_Schedule8Paragraph4FieldIsPopulatedWithNoAndPointsAreCorrectForSchedule8Paragraph4AndNoOtherFieldsPopulated_WhenRefused_thenDoNotDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -678,11 +675,11 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(0, response.getErrors().size());
+        Assertions.assertEquals(0, response.getErrors().size());
     }
 
     // Refused scenario 1 with error due to explicitly allowed
-    @Test
+    @ParameterizedTest
     public void givenNonSupportGroupRefusedScenario_Schedule8Paragraph4FieldIsPopulatedWithNoAndPointsAreCorrectForSchedule8Paragraph4AndNoOtherFieldsPopulated_WhenIncorrectlyAllowed_thenDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -702,15 +699,15 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(1, response.getErrors().size());
+        Assertions.assertEquals(1, response.getErrors().size());
 
         String error = response.getErrors().iterator().next();
 
-        Assert.assertEquals("You have awarded less than 15 points, specified that the appeal is allowed and specified that Support Group Only Appeal does not apply, but have answered No for the Schedule 8 Paragraph 4 question. Please review your previous selection.", error);
+        Assertions.assertEquals("You have awarded less than 15 points, specified that the appeal is allowed and specified that Support Group Only Appeal does not apply, but have answered No for the Schedule 8 Paragraph 4 question. Please review your previous selection.", error);
     }
 
     // Refused scenario 1 with error due to support group being set
-    @Test
+    @ParameterizedTest
     public void givenNonSupportGroupScenario_Schedule8Paragraph4FieldIsPopulatedWithNoAndPointsAreCorrectForSchedule8Paragraph4AndNoOtherFieldsPopulated_WhenIncorrectlySupportGroup_thenDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -730,15 +727,15 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(1, response.getErrors().size());
+        Assertions.assertEquals(1, response.getErrors().size());
 
         String error = response.getErrors().iterator().next();
 
-        Assert.assertEquals("You have specified that Support Group Only Appeal applies and not provided an answer to the Schedule 9 Paragraph 4 question, but have have a missing answer for the Schedule 7 Activities question. Please review your previous selection.", error);
+        Assertions.assertEquals("You have specified that Support Group Only Appeal applies and not provided an answer to the Schedule 9 Paragraph 4 question, but have have a missing answer for the Schedule 7 Activities question. Please review your previous selection.", error);
     }
 
     // Refused scenario 2
-    @Test
+    @ParameterizedTest
     public void givenSupportGroupRefusedScenario_Schedule8Paragraph4FieldIsPopulatedWithYesAndPointsAreCorrectForSchedule8Paragraph4AndNoActivitiesSelectedAndSchedule9Paragraph4SetToNo_WhenRefused_thenDoNotDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -761,11 +758,11 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(0, response.getErrors().size());
+        Assertions.assertEquals(0, response.getErrors().size());
     }
 
     // Refused scenario 2 - with error due to explicitly allowed.
-    @Test
+    @ParameterizedTest
     public void givenSupportGroupRefusedScenario_Schedule8Paragraph4FieldIsPopulatedWithYesAndPointsAreCorrectForSchedule8Paragraph4AndNoActivitiesSelectedAndSchedule9Paragraph4SetToNo_WhenIncorrectlyAllowed_thenDoDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -788,16 +785,16 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(1, response.getErrors().size());
+        Assertions.assertEquals(1, response.getErrors().size());
 
         String error = response.getErrors().iterator().next();
 
-        Assert.assertEquals("You have specified that the appeal is allowed, specified that Support Group Only Appeal applies and made no selections for the Schedule 7 Activities question, but have answered No for the Schedule 9 Paragraph 4 question. Please review your previous selection.", error);
+        Assertions.assertEquals("You have specified that the appeal is allowed, specified that Support Group Only Appeal applies and made no selections for the Schedule 7 Activities question, but have answered No for the Schedule 9 Paragraph 4 question. Please review your previous selection.", error);
 
     }
 
     // Refused scenario 2 - with error due to support group not being set.
-    @Test
+    @ParameterizedTest
     public void givenSupportGroupRefusedScenario_Schedule8Paragraph4FieldIsPopulatedWithYesAndPointsAreCorrectForSchedule8Paragraph4AndNoActivitiesSelectedAndSchedule9Paragraph4SetToNo_WhenIncorrectlyNotSupportGroup_thenDoDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -820,17 +817,17 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(1, response.getErrors().size());
+        Assertions.assertEquals(1, response.getErrors().size());
 
         String error = response.getErrors().iterator().next();
 
-        Assert.assertEquals("You have specified that the appeal is refused and specified that Support Group Only Appeal does not apply, but have answered Yes for the Schedule 8 Paragraph 4 question, submitted an unexpected answer for the Schedule 7 Activities question and submitted an unexpected answer for the Schedule 9 Paragraph 4 question. Please review your previous selection.", error);
+        Assertions.assertEquals("You have specified that the appeal is refused and specified that Support Group Only Appeal does not apply, but have answered Yes for the Schedule 8 Paragraph 4 question, submitted an unexpected answer for the Schedule 7 Activities question and submitted an unexpected answer for the Schedule 9 Paragraph 4 question. Please review your previous selection.", error);
 
     }
 
 
     // Refused Scenario 3
-    @Test
+    @ParameterizedTest
     public void givenSupportGroupRefusedScenario_Schedule8Paragraph4FieldIsNotPopulatedAndPointsAreCorrectForSchedule8Paragraph4AndNoActivitiesSelectedAndSchedule9Paragraph4SetToNo_WhenRefused_thenDoNotDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -852,11 +849,11 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(0, response.getErrors().size());
+        Assertions.assertEquals(0, response.getErrors().size());
     }
 
     // Refused Scenario 3 - with error due to explictly allowed
-    @Test
+    @ParameterizedTest
     public void givenSupportGroupRefusedScenario_Schedule8Paragraph4FieldIsNotPopulatedAndPointsAreCorrectForSchedule8Paragraph4AndNoActivitiesSelectedAndSchedule9Paragraph4SetToNo_WhenIncorrectlyAllowed_thenDoDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -878,16 +875,16 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(1, response.getErrors().size());
+        Assertions.assertEquals(1, response.getErrors().size());
 
         String error = response.getErrors().iterator().next();
 
-        Assert.assertEquals("You have specified that the appeal is allowed, specified that Support Group Only Appeal applies and made no selections for the Schedule 7 Activities question, but have answered No for the Schedule 9 Paragraph 4 question. Please review your previous selection.", error);
+        Assertions.assertEquals("You have specified that the appeal is allowed, specified that Support Group Only Appeal applies and made no selections for the Schedule 7 Activities question, but have answered No for the Schedule 9 Paragraph 4 question. Please review your previous selection.", error);
 
     }
 
     // Refused Scenario 3 - with error due to non support group answer
-    @Test
+    @ParameterizedTest
     public void givenSupportGroupRefusedScenario_Schedule8Paragraph4FieldIsNotPopulatedAndPointsAreCorrectForSchedule8Paragraph4AndNoActivitiesSelectedAndSchedule9Paragraph4SetToNo_WhenIncorrectlyNotSupportGroup_thenDoDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -909,16 +906,16 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(1, response.getErrors().size());
+        Assertions.assertEquals(1, response.getErrors().size());
 
         String error = response.getErrors().iterator().next();
 
-        Assert.assertEquals("You have specified that the appeal is refused and specified that Support Group Only Appeal does not apply, but have not awarded less than 15 points, a missing answer for the Schedule 8 Paragraph 4 question, submitted an unexpected answer for the Schedule 7 Activities question and submitted an unexpected answer for the Schedule 9 Paragraph 4 question. Please review your previous selection.", error);
+        Assertions.assertEquals("You have specified that the appeal is refused and specified that Support Group Only Appeal does not apply, but have not awarded less than 15 points, a missing answer for the Schedule 8 Paragraph 4 question, submitted an unexpected answer for the Schedule 7 Activities question and submitted an unexpected answer for the Schedule 9 Paragraph 4 question. Please review your previous selection.", error);
 
     }
 
     // Allowed scenario 1
-    @Test
+    @ParameterizedTest
     public void givenNonSupportGroupAllowedScenario_Schedule8Paragraph4FieldIsNotPopulatedAndPointsAreCorrectForSchedule8Paragraph4AndNoSchedule7ActivitesAndSchedule9Paragraph4False_WhenAllowed_thenDoNotDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -941,11 +938,11 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(0, response.getErrors().size());
+        Assertions.assertEquals(0, response.getErrors().size());
     }
 
     // Allowed scenario 1 - with error due to incorrect setting of refused
-    @Test
+    @ParameterizedTest
     public void givenNonSupportGroupAllowedScenario_Schedule8Paragraph4FieldIsNotPopulatedAndPointsAreCorrectForSchedule8Paragraph4AndNoSchedule7ActivitesAndSchedule9Paragraph4False_WhenRefused_thenDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -967,15 +964,15 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(1, response.getErrors().size());
+        Assertions.assertEquals(1, response.getErrors().size());
 
         String error = response.getErrors().iterator().next();
 
-        Assert.assertEquals("You have specified that the appeal is refused and specified that Support Group Only Appeal does not apply, but have not awarded less than 15 points, a missing answer for the Schedule 8 Paragraph 4 question, submitted an unexpected answer for the Schedule 7 Activities question and submitted an unexpected answer for the Schedule 9 Paragraph 4 question. Please review your previous selection.", error);
+        Assertions.assertEquals("You have specified that the appeal is refused and specified that Support Group Only Appeal does not apply, but have not awarded less than 15 points, a missing answer for the Schedule 8 Paragraph 4 question, submitted an unexpected answer for the Schedule 7 Activities question and submitted an unexpected answer for the Schedule 9 Paragraph 4 question. Please review your previous selection.", error);
     }
 
     // Allowed scenario 1 - with error due to missing schedule 9 paragraph 4
-    @Test
+    @ParameterizedTest
     public void givenNonSupportGroupAllowedScenario_Schedule8Paragraph4FieldIsNotPopulatedAndPointsAreCorrectForSchedule8Paragraph4AndNoSchedule7ActivitesAndSchedule9Paragraph4NotSpecified_WhenAllowed_thenDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -995,15 +992,15 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(1, response.getErrors().size());
+        Assertions.assertEquals(1, response.getErrors().size());
 
         String error = response.getErrors().iterator().next();
 
-        Assert.assertEquals("You have awarded 15 points or more and not provided an answer to the Schedule 9 Paragraph 4 question, but have made no selections for the Schedule 7 Activities question. Please review your previous selection.", error);
+        Assertions.assertEquals("You have awarded 15 points or more and not provided an answer to the Schedule 9 Paragraph 4 question, but have made no selections for the Schedule 7 Activities question. Please review your previous selection.", error);
     }
 
     // Allowed scenario 2
-    @Test
+    @ParameterizedTest
     public void givenNonSupportGroupAllowedScenario_Schedule8Paragraph4FieldIsNotPopulatedAndPointsAreCorrectForSchedule8Paragraph4AndSchedule7ActivitesAndSchedule9Paragraph4NotSet_WhenAllowed_thenDoNotDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -1025,11 +1022,11 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(0, response.getErrors().size());
+        Assertions.assertEquals(0, response.getErrors().size());
     }
 
     // Allowed scenario 2 - with error due to incorrectly refused
-    @Test
+    @ParameterizedTest
     public void givenNonSupportGroupAllowedScenario_Schedule8Paragraph4FieldIsNotPopulatedAndPointsAreCorrectForSchedule8Paragraph4AndSchedule7ActivitesAndSchedule9Paragraph4NotSet_WhenRefused_thenDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -1051,15 +1048,15 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(1, response.getErrors().size());
+        Assertions.assertEquals(1, response.getErrors().size());
 
         String error = response.getErrors().iterator().next();
 
-        Assert.assertEquals("You have specified that the appeal is refused and specified that Support Group Only Appeal does not apply, but have not awarded less than 15 points, a missing answer for the Schedule 8 Paragraph 4 question and submitted an unexpected answer for the Schedule 7 Activities question. Please review your previous selection.", error);
+        Assertions.assertEquals("You have specified that the appeal is refused and specified that Support Group Only Appeal does not apply, but have not awarded less than 15 points, a missing answer for the Schedule 8 Paragraph 4 question and submitted an unexpected answer for the Schedule 7 Activities question. Please review your previous selection.", error);
     }
 
     // Allowed scenario 2 - with error due to no schedule 3 answers
-    @Test
+    @ParameterizedTest
     public void givenNonSupportGroupAllowedScenario_Schedule8Paragraph4FieldIsNotPopulatedAndPointsAreCorrectForSchedule8Paragraph4AndNoSchedule7ActivitesAndSchedule9Paragraph4NotSet_WhenAllowed_thenDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -1080,10 +1077,10 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(1, response.getErrors().size());
+        Assertions.assertEquals(1, response.getErrors().size());
 
         String error = response.getErrors().iterator().next();
 
-        Assert.assertEquals("You have awarded 15 points or more and not provided an answer to the Schedule 9 Paragraph 4 question, but have made no selections for the Schedule 7 Activities question. Please review your previous selection.", error);
+        Assertions.assertEquals("You have awarded 15 points or more and not provided an answer to the Schedule 9 Paragraph 4 question, but have made no selections for the Schedule 7 Activities question. Please review your previous selection.", error);
     }
 }

@@ -13,7 +13,6 @@ import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInTheFuture;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -35,7 +34,6 @@ public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandl
     private final DocumentConfiguration documentConfiguration;
     private final IdamService idamService;
 
-    @Autowired
     public ProcessAudioVideoEvidenceMidEventHandler(GenerateFile generateFile,
                                                     DocumentConfiguration documentConfiguration,
                                                     IdamService idamService) {

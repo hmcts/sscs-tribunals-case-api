@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.dormant;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -14,8 +14,8 @@ import java.util.Collections;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -39,7 +39,7 @@ public class DormantEventsAboutToSubmitHandlerTest {
     private CaseDetails<SscsCaseData> caseDetails;
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
 
@@ -55,12 +55,14 @@ public class DormantEventsAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"HMCTS_LAPSE_CASE", "CONFIRM_LAPSED", "WITHDRAWN", "LAPSED_REVISED", "DORMANT", "ADMIN_SEND_TO_DORMANT_APPEAL_STATE", "ADMIN_APPEAL_WITHDRAWN", "ISSUE_FINAL_DECISION"})
     public void clearInterlocReviewStateAndDirectionDueDateForDormantEvents_whenSchedulingListingDisabled(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
@@ -76,6 +78,7 @@ public class DormantEventsAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"CONFIRM_LAPSED, LAPSED", "ADMIN_SEND_TO_DORMANT_APPEAL_STATE, OTHER", "LAPSED_REVISED, LAPSED",
         "WITHDRAWN, WITHDRAWN"})
     public void sendCancellationReasonAsOther_withEligibleCases_whenSchedulingListingEnabled(EventType eventType,
@@ -99,10 +102,12 @@ public class DormantEventsAboutToSubmitHandlerTest {
             eq(cancellationReason));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsExceptionIfItCannotHandleTheAppeal() {
-        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThrows(IllegalStateException.class, () -> {
+            when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        });
     }
 
 }

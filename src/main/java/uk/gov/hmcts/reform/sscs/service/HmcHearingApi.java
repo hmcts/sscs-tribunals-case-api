@@ -59,6 +59,6 @@ public interface HmcHearingApi {
             @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization,
             @RequestHeader(value = HMCTS_DEPLOYMENT_ID, required = false) String hmctsDeploymentId,
             @PathVariable String id,
-            @RequestParam(name = "isValid", required = false) Boolean isValid
+            @RequestParam(required = false) Boolean isValid
     );
 }

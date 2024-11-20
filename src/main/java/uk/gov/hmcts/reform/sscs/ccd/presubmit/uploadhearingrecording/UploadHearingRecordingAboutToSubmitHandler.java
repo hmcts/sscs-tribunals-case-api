@@ -10,7 +10,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -29,7 +28,6 @@ public class UploadHearingRecordingAboutToSubmitHandler implements PreSubmitCall
     private static final DateTimeFormatter HEARING_DOCUMENT_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd MMM yyyy");
     private final IdamService idamService;
 
-    @Autowired
     public UploadHearingRecordingAboutToSubmitHandler(IdamService idamService) {
         this.idamService = idamService;
     }

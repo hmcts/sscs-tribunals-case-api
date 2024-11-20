@@ -5,7 +5,6 @@ import java.security.SecureRandom;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Random;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +18,7 @@ public class OutOfHoursCalculator {
     private Random rand = SecureRandom.getInstanceStrong();
 
     public OutOfHoursCalculator(
-        @Autowired DateTimeProvider dateTimeProvider,
+        DateTimeProvider dateTimeProvider,
         @Value("${outOfHours.startHour}") int startHour,
         @Value("${outOfHours.endHour}") int endHour) throws NoSuchAlgorithmException {
         this.dateTimeProvider = dateTimeProvider;

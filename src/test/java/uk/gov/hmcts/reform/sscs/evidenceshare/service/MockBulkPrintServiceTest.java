@@ -1,22 +1,22 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 
 import java.util.Optional;
 import java.util.UUID;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.service.CcdNotificationsPdfService;
 
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class MockBulkPrintServiceTest {
 
     private MockBulkPrintService mockBulkPrintService;
@@ -25,7 +25,7 @@ public class MockBulkPrintServiceTest {
 
     private BulkPrintServiceHelper bulkPrintServiceHelper;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         ccdNotificationsPdfService = new CcdNotificationsPdfService();
         bulkPrintServiceHelper = new BulkPrintServiceHelper(ccdNotificationsPdfService);

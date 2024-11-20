@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.controller;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
@@ -15,8 +16,8 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +44,7 @@ public class SubscriptionsControllerTest {
 
     private SubscriptionsController controller;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         controller = new SubscriptionsController(macService, tribunalsService);
@@ -68,14 +69,16 @@ public class SubscriptionsControllerTest {
             .andExpect(content().json("{\"token\":{\"decryptedToken\":\"rgfd\",\"benefitType\":\"pip\",\"subscriptionId\":1,\"appealId\":\"sdkfdkwfid\"}}"));
     }
 
-    @Test(expected = InvalidSubscriptionTokenException.class)
-    public void shouldThrowInvalidSubscriptionTokenException() throws JsonProcessingException {
-        // Given
-        when(macService.decryptMacToken(anyString()))
-            .thenThrow(InvalidSubscriptionTokenException.class);
+    @Test
+    public void shouldThrowInvalidSubscriptionTokenException() {
+        assertThrows(InvalidSubscriptionTokenException.class, () -> {
+            // Given
+            when(macService.decryptMacToken(anyString()))
+                .thenThrow(InvalidSubscriptionTokenException.class);
 
-        // When
-        controller.validateMacToken("abcde12345");
+            // When
+            controller.validateMacToken("abcde12345");
+        });
     }
 
     @Test

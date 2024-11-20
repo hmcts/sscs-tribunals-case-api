@@ -7,8 +7,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
 import uk.gov.hmcts.reform.sscs.service.coversheet.PdfCoverSheet;
 
@@ -20,7 +20,7 @@ public class DocmosisPdfServiceTest {
     private PdfCoverSheet pdfCoverSheet;
     private DocmosisPdfGenerationService docmosisPdfGenerationService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         expectedPdf = new byte[]{2, 4, 6, 0, 1};
         template = "template";

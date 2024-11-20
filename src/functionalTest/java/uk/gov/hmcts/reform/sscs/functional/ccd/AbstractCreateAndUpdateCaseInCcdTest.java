@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.functional.ccd;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_TEST_CASE;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
@@ -9,9 +9,8 @@ import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessi
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.util.TestPropertyValues;
@@ -19,7 +18,6 @@ import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EvidenceReceived;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EvidenceReceivedInformation;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EvidenceReceivedInformationDetails;
@@ -32,7 +30,6 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
-@RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @ContextConfiguration(initializers = AbstractCreateAndUpdateCaseInCcdTest.Initializer.class)
 @SpringBootTest
@@ -46,7 +43,7 @@ public abstract class AbstractCreateAndUpdateCaseInCcdTest {
 
     private IdamTokens idamTokens;
 
-    @Before
+    @BeforeEach
     public void setup() {
         idamTokens = idamService.getIdamTokens();
     }

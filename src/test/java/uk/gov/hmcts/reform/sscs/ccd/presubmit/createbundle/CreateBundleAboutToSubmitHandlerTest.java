@@ -7,8 +7,8 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import junitparams.JUnitParamsRunner;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -35,7 +35,7 @@ public class CreateBundleAboutToSubmitHandlerTest {
 
     private PreSubmitCallbackResponse<SscsCaseData> bundlingResponse;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         sscsCaseData = SscsCaseData.builder().build();

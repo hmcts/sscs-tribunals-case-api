@@ -5,7 +5,6 @@ import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyName
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.withTyaPredicate;
 
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.Statement;
 import uk.gov.hmcts.reform.sscs.service.pdf.MyaEventActionContext;
@@ -17,7 +16,6 @@ public class AppellantStatementService {
     private final StoreAppellantStatementService storeAppellantStatementService;
     private final OnlineHearingService onlineHearingService;
 
-    @Autowired
     public AppellantStatementService(
             StoreAppellantStatementService storeAppellantStatementService,
             OnlineHearingService onlineHearingService) {

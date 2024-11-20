@@ -18,21 +18,18 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Objects;
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaEvidence;
 import uk.gov.hmcts.reform.sscs.functional.sya.SubmitHelper;
 
 
-@RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
 public class EvidenceDocumentUploadTest {
@@ -43,7 +40,7 @@ public class EvidenceDocumentUploadTest {
     @Autowired
     private SubmitHelper submitHelper;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         baseURI = testUrl;
         useRelaxedHTTPSValidation();

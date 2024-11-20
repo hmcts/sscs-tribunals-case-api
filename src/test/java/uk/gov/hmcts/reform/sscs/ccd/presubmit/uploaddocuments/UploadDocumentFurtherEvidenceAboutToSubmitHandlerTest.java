@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments;
 
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DOCUMENT_FURTHER_EVIDENCE;
@@ -24,8 +22,8 @@ import java.util.Map;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -69,7 +67,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
 
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         addedDocumentsUtil = new AddedDocumentsUtil(false);
 
@@ -140,6 +138,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"audio.mp3","video.mp4"})
     public void handleHappyPathWhenAudioVideoFileUploaded(String fileName) throws IOException {
         Callback<SscsCaseData> callback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE,
@@ -173,6 +172,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"audio.mp3","video.mp4"})
     public void errorThrownWhenAudioVideoDocumentHasIncorrectDocumentType(String fileName) throws IOException {
         Callback<SscsCaseData> callback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE,
@@ -470,17 +470,18 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
         assertEquals("Hearing record not found", actualCaseData.getErrors().toArray()[0]);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "ABOUT_TO_START,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp",
         "ABOUT_TO_SUBMIT,null,withDwp",
         "null,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp"
     })
     public void handleCornerCaseScenarios(@Nullable CallbackType callbackType, @Nullable EventType eventType,
-                                          @Nullable String state)
-        throws IOException {
-        handler.handle(callbackType, buildTestCallbackGivenData(eventType, state,
-            "representativeEvidence", "appellantEvidence",
-            UPLOAD_DOCUMENT_FE_CALLBACK_JSON), USER_AUTHORISATION);
+                                          @Nullable String state) {
+        assertThrows(IllegalStateException.class, () ->
+            handler.handle(callbackType, buildTestCallbackGivenData(eventType, state,
+                "representativeEvidence", "appellantEvidence",
+                UPLOAD_DOCUMENT_FE_CALLBACK_JSON), USER_AUTHORISATION));
     }
 }

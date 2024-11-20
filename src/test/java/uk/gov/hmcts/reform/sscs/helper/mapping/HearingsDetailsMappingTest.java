@@ -584,7 +584,7 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
 
         String result = HearingsDetailsMapping.getListingComments(caseData);
 
-        assertThat(result).isEqualToNormalizingNewlines(expected.replace("\\n", String.format("%n")));
+        assertThat(result).isEqualToNormalizingNewlines(expected.replace("\\n", "%n".formatted()));
     }
 
     @Test

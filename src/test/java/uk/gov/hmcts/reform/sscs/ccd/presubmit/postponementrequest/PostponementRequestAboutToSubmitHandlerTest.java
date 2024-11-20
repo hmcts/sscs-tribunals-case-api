@@ -4,9 +4,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -22,9 +20,9 @@ import java.util.Collections;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -77,7 +75,7 @@ public class PostponementRequestAboutToSubmitHandlerTest {
 
     private final UserDetails userDetails = UserDetails.builder().roles(new ArrayList<>(asList("caseworker-sscs", UserRole.CTSC_CLERK.getValue()))).build();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         handler = new PostponementRequestAboutToSubmitHandler(new PostponementRequestService(), footerService, idamService);
@@ -132,6 +130,7 @@ public class PostponementRequestAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
     public void givenANonPostponementRequestCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
@@ -185,7 +184,7 @@ public class PostponementRequestAboutToSubmitHandlerTest {
     public void givenAPostponementRequest_AddGeneratedDocumentToBundle() {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         List<SscsDocument> sscsDocuments = response.getData().getSscsDocument();
-        Assert.assertEquals(sscsDocuments, Collections.singletonList(expectedDocument));
+        Assertions.assertEquals(sscsDocuments, Collections.singletonList(expectedDocument));
         assertEquals("A", response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
     }
 }

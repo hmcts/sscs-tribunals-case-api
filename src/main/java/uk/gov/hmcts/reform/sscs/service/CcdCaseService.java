@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
@@ -38,7 +37,6 @@ public class CcdCaseService {
     private final SscsCcdConvertService sscsCcdConvertService;
     private final CoreCaseDataApi coreCaseDataApi;
 
-    @Autowired
     public CcdCaseService(CcdService ccdService, IdamService idamService, CoreCaseDataApi coreCaseDataApi,
                           SscsCcdConvertService sscsCcdConvertService) {
         this.ccdService = ccdService;
@@ -61,7 +59,7 @@ public class CcdCaseService {
         SscsCaseDetails caseDetails = ccdService.getByCaseId(caseId, idamTokens);
 
         if (caseDetails == null) {
-            String cause = String.format("The case data for Case id: %s could not be found", caseId);
+            String cause = "The case data for Case id: %s could not be found".formatted(caseId);
             GetCaseException exc = new GetCaseException(cause);
             log.error(cause, exc);
             throw exc;
@@ -87,8 +85,8 @@ public class CcdCaseService {
                     ccdType, event.getSummary(), event.getDescription(), idamTokens);
         } catch (FeignException e) {
             UpdateCaseException exc = new UpdateCaseException(
-                    String.format("The case with Case id: %s could not be updated with status %s, %s",
-                            caseId, e.status(), e));
+                "The case with Case id: %s could not be updated with status %s, %s".formatted(
+                    caseId, e.status(), e));
             log.error(exc.getMessage(), exc);
             throw exc;
         }
@@ -107,8 +105,8 @@ public class CcdCaseService {
             return ccdService.updateCase(caseData, caseId, event.getCcdType(), summary, description, idamTokens);
         } catch (FeignException e) {
             UpdateCaseException exc = new UpdateCaseException(
-                    String.format("The case with Case id: %s could not be updated with status %s, %s",
-                            caseId, e.status(), e));
+                "The case with Case id: %s could not be updated with status %s, %s".formatted(
+                    caseId, e.status(), e));
             log.error(exc.getMessage(), exc);
             throw exc;
         }

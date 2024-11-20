@@ -1,11 +1,7 @@
 package uk.gov.hmcts.reform.sscs.transform.deserialize;
 
-import static junit.framework.TestCase.assertNull;
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.*;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
@@ -16,8 +12,8 @@ import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -42,7 +38,7 @@ public abstract class AbstractSubmitYourAppealToCcdCaseDataDeserializerTest {
 
     private RegionalProcessingCenter regionalProcessingCenter;
 
-    @Before
+    @BeforeEach
     public void setup() {
         openMocks(this);
         regionalProcessingCenter = getRegionalProcessingCenter();
@@ -75,7 +71,8 @@ public abstract class AbstractSubmitYourAppealToCcdCaseDataDeserializerTest {
             .isEqualTo(APPELLANT_NO_CONTACT_DETAILS_CCD.getSerializedMessage());
     }
 
-    @Parameters({"DWP PIP ( 9),PIP,DWP PIP (9)", "null,carersAllowance,null",
+    // JunitParamsRunnerToParameterized conversion not supported
+@Parameters({"DWP PIP ( 9),PIP,DWP PIP (9)", "null,carersAllowance,null",
         "null,bereavementBenefit,null","null,maternityAllowance,null",
         "null,bereavementSupportPaymentScheme,null"})
     @Test
@@ -103,6 +100,7 @@ public abstract class AbstractSubmitYourAppealToCcdCaseDataDeserializerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"Universal Credit, Universal Credit", "Recovery from Estates, UC Recovery from Estates"})
     public void givenAUniversalCreditCaseFromSyaAndMrnIsPopulated_thenUseTheIssuingOfficeFromSya(String mrnOffice, String expectedOffice) {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
@@ -116,7 +114,8 @@ public abstract class AbstractSubmitYourAppealToCcdCaseDataDeserializerTest {
         assertEquals(expectedOffice, caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
     }
 
-    @Parameters({
+    // JunitParamsRunnerToParameterized conversion not supported
+@Parameters({
         "DWP PIP (1),PIP,Newcastle", "DWP PIP (2),PIP,Glasgow", "DWP PIP (3),PIP,Bellevale", "DWP PIP (4),PIP,Glasgow",
         "DWP PIP (5),PIP,Springburn", "DWP PIP (6),PIP,Blackpool", "DWP PIP (7),PIP,Blackpool", "DWP PIP (8),PIP,Blackpool",
         "DWP PIP (9),PIP,Blackpool", "Inverness DRT,ESA,Inverness DRT","DWP PIP (),PIP,Bellevale",
@@ -139,7 +138,8 @@ public abstract class AbstractSubmitYourAppealToCcdCaseDataDeserializerTest {
         assertEquals(expectedDwpRegionalCenter, caseData.getDwpRegionalCentre());
     }
 
-    @Parameters({"DWP PIP (1),PIP,Cardiff", "DWP PIP (2),Pip,Glasgow"})
+    // JunitParamsRunnerToParameterized conversion not supported
+@Parameters({"DWP PIP (1),PIP,Cardiff", "DWP PIP (2),Pip,Glasgow"})
     @Test
     public void dontSetIsScottishCase(@Nullable String dwpIssuingOffice,
                                                                        @Nullable String benefitCode,
@@ -385,7 +385,7 @@ public abstract class AbstractSubmitYourAppealToCcdCaseDataDeserializerTest {
     public void willAddTyaNumberForAppointee() {
         final SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS.getDeserializeMessage();
         final SscsCaseData caseData = callConvertSyaToCcdCaseDataRelevantVersion(syaCaseWrapper, false);
-        assertEquals("Tya number should have a size of 10", 10, caseData.getSubscriptions().getAppointeeSubscription().getTya().length());
+        assertEquals(10, caseData.getSubscriptions().getAppointeeSubscription().getTya().length(), "Tya number should have a size of 10");
     }
 
     @Test
@@ -441,8 +441,8 @@ public abstract class AbstractSubmitYourAppealToCcdCaseDataDeserializerTest {
         syaCaseWrapper.getRepresentative().getContactDetails().setPhoneNumber("0203 444 4432");
         SscsCaseData caseData = callConvertSyaToCcdCaseDataRelevantVersion(syaCaseWrapper,
             regionalProcessingCenter.getName(), regionalProcessingCenter, false);
-        assertFalse("rep should be not sms subscribed",
-            caseData.getSubscriptions().getRepresentativeSubscription().isSmsSubscribed());
+        assertFalse(caseData.getSubscriptions().getRepresentativeSubscription().isSmsSubscribed(),
+            "rep should be not sms subscribed");
     }
 
     @Test
@@ -453,8 +453,9 @@ public abstract class AbstractSubmitYourAppealToCcdCaseDataDeserializerTest {
         SscsCaseData caseData = callConvertSyaToCcdCaseDataRelevantVersion(syaCaseWrapper,
             regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertTrue(caseData.getSubscriptions().getRepresentativeSubscription().isSmsSubscribed());
-        assertEquals("mobile numbers should be equal", "+447404621944",
-            caseData.getSubscriptions().getRepresentativeSubscription().getMobile());
+        assertEquals("+447404621944",
+            caseData.getSubscriptions().getRepresentativeSubscription().getMobile(),
+            "mobile numbers should be equal");
     }
 
     @Test

@@ -39,8 +39,8 @@ public class EmailService {
             if (email.hasAttachments()) {
                 for (EmailAttachment emailAttachment : email.getAttachments()) {
                     InputStreamSource data = emailAttachment.getData();
-                    if (data instanceof ByteArrayResource) {
-                        attachmentsSize += ((ByteArrayResource) data).contentLength();
+                    if (data instanceof ByteArrayResource resource) {
+                        attachmentsSize += resource.contentLength();
                     } else {
                         log.error("Cannot calculate attachment size as not a ByteArrayResource when expected to be.");
                     }

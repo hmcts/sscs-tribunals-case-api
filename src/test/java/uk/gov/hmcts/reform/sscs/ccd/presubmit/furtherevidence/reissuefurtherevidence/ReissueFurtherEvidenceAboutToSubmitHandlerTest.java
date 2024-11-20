@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.reissuefurtherevidence;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -13,8 +12,8 @@ import java.util.stream.Stream;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -40,7 +39,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
     private SscsDocument document1;
     private SscsDocument document2;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         handler = new ReissueFurtherEvidenceAboutToSubmitHandler();
@@ -94,6 +93,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPEAL_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
     public void givenANonHandleEvidenceEvent_thenReturnFalse(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
@@ -101,12 +101,14 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"url1, file1.pdf - representativeEvidence, APPELLANT", "editedUrl, editedFile1.pdf, APPELLANT", "url2, file2.pdf - appellantEvidence, DWP", "welshUrl1, welshFile1.pdf - appellantEvidence, APPELLANT", "welshUrl2, welshFile2.pdf - representativeEvidence, APPELLANT"})
     public void setsEvidenceHandledFlagToNoForDocumentSelected(String selectedUrl, String selectedLabel, PartyItemList newSender) {
 
@@ -150,6 +152,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"videoRecording.mp4, videoDocument", "audioEvidence.mp3, audioDocument"})
     public void doesNotReturnErrorIfAvEvidenceIsPresent(String fileName, String fileType) {
         SscsDocument avDocument = SscsDocument.builder().value(
@@ -179,6 +182,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"Yes", "No"})
     public void doesNotReturnAnErrorIfNoSelectedOriginalSender(String includeOtherParty) {
         sscsCaseData.setOriginalSender(null);
@@ -204,6 +208,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"Yes", "No"})
     public void returnsAnErrorIfThereIsNoPartySelectedToReIssueFurtherEvidence(String includeOtherParty) {
         ReissueArtifactUi reissueFurtherEvidence = sscsCaseData.getReissueArtifactUi();
@@ -244,10 +249,12 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
         assertEquals("Cannot re-issue to the representative as there is no representative on the appeal.", response.getErrors().toArray()[0]);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsExceptionIfItCannotHandleTheAppeal() {
-        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThrows(IllegalStateException.class, () -> {
+            when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        });
     }
 
     public static CcdValue<OtherParty> buildOtherParty(String id) {

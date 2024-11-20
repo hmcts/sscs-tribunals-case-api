@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
@@ -11,14 +11,13 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFin
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import java.time.LocalDate;
-import junitparams.JUnitParamsRunner;
-import junitparams.NamedParameters;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -30,7 +29,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 
-@RunWith(JUnitParamsRunner.class)
 public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
 
     protected static final String USER_AUTHORISATION = "Bearer token";
@@ -72,7 +70,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
 
     protected abstract WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService, boolean isPostHearingsEnabled);
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
 
@@ -105,30 +103,30 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
     }
 
 
-    @Test
+    @ParameterizedTest
     public void givenANonWriteFinalDecisionEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
         assertFalse(handler.canHandle(MID_EVENT, callback));
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_START", "ABOUT_TO_SUBMIT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
     }
 
 
-    @NamedParameters("descriptorFlowValues")
     @SuppressWarnings("unused")
-    private Object[] descriptorFlowValues() {
+    private static Object[] descriptorFlowValues() {
         return new Object[]{
             new String[]{null},
             new String[]{"Yes"}
         };
     }
 
-    @Test
-    @Parameters(named = "descriptorFlowValues")
+    @ParameterizedTest
+    @MethodSource("descriptorFlowValues")
     public void givenAnEndDateIsBeforeStartDate_thenDisplayAnError(String descriptorFlowValue) {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionStartDate("2020-01-01");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDate("2019-01-01");
@@ -141,8 +139,8 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
         assertEquals("Decision notice end date must be after decision notice start date", error);
     }
 
-    @Test
-    @Parameters(named = "descriptorFlowValues")
+    @ParameterizedTest
+    @MethodSource("descriptorFlowValues")
     public void givenADecisionDateIsInFuture_thenDisplayAnError(String descriptorFlowValue) {
 
         LocalDate tomorrow = LocalDate.now().plusDays(1);
@@ -157,8 +155,8 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
         assertEquals("Decision notice date of decision must not be in the future", error);
     }
 
-    @Test
-    @Parameters(named = "descriptorFlowValues")
+    @ParameterizedTest
+    @MethodSource("descriptorFlowValues")
     public void givenADecisionDateIsToday_thenDoNotDisplayAnError(String descriptorFlowValue) {
 
         setValidPointsAndActivitiesScenario(sscsCaseData, descriptorFlowValue);
@@ -173,8 +171,8 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
         assertEquals(0, response.getErrors().size());
     }
 
-    @Test
-    @Parameters(named = "descriptorFlowValues")
+    @ParameterizedTest
+    @MethodSource("descriptorFlowValues")
     public void givenADecisionDateIsInPast_thenDoNotDisplayAnError(String descriptorFlowValue) {
 
 
@@ -191,6 +189,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"null", ""})
     public void givenAnFinalDecisionDateIsEmpty_thenIgnoreEndDateDescriptorFlow(@Nullable String endDate) {
 
@@ -206,6 +205,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"null", ""})
     public void givenAnFinalDecisionDateIsEmpty_thenIgnoreEndDateNonDescriptorFlow(@Nullable String endDate) {
 
@@ -220,8 +220,8 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
         assertEquals(0, response.getErrors().size());
     }
 
-    @Test
-    @Parameters(named = "descriptorFlowValues")
+    @ParameterizedTest
+    @MethodSource("descriptorFlowValues")
     public void givenAnEndDateIsSameAsStartDate_thenDisplayAnError(String descriptorFlowValue) {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionStartDate("2020-01-01");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDate("2020-01-01");
@@ -235,8 +235,8 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
         assertEquals("Decision notice end date must be after decision notice start date", error);
     }
 
-    @Test
-    @Parameters(named = "descriptorFlowValues")
+    @ParameterizedTest
+    @MethodSource("descriptorFlowValues")
     public void givenAnEndDateIsAfterStartDate_thenDoNotDisplayAnError(String descriptorFlowValue) {
 
         setValidPointsAndActivitiesScenario(sscsCaseData, descriptorFlowValue);
@@ -251,8 +251,8 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
         assertEquals(0, response.getErrors().size());
     }
 
-    @Test
-    @Parameters(named = "descriptorFlowValues")
+    @ParameterizedTest
+    @MethodSource("descriptorFlowValues")
     public void givenANonPdfDecisionNotice_thenDisplayAnError(String descriptorFlowValue) {
 
         setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
@@ -269,6 +269,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"typeOfAppeal", "previewDecisionNotice"})
     public void givenDeathOfAppellant_thenDisplayWarning(String pageId) {
         sscsCaseData.setIsAppellantDeceased(YesNo.YES);
@@ -282,7 +283,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
         assertThat(warning, is("Appellant is deceased. Copy the draft decision and amend offline, then upload the offline version."));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDeathOfAppellantButNotOnTheCorrectPage_thenDoNotDisplayWarning() {
         when(callback.getPageId()).thenReturn("incorrectPage");
         when(callback.isIgnoreWarnings()).thenReturn(false);
@@ -294,7 +295,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
         assertThat(response.getWarnings().size(), is(0));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDeathOfAppellantWithIgnoreWarnings_thenDoNotDisplayWarning() {
         when(callback.isIgnoreWarnings()).thenReturn(true);
         when(callback.getPageId()).thenReturn("typeOfAppeal");
@@ -306,7 +307,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
         assertThat(response.getWarnings().size(), is(0));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenNoDeathOfAppellant_thenDoNotDisplayWarning() {
         when(callback.getPageId()).thenReturn("typeOfAppeal");
         sscsCaseData.setIsAppellantDeceased(YesNo.NO);
@@ -331,7 +332,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
 
     protected abstract void shouldExhibitBenefitSpecificBehaviourWhenNoAwardsAreGivenAndNoActivitiesAreSelectedAndEndDateTypeIsIndefinite();
 
-    @Test
+    @ParameterizedTest
     public void shouldExhibitBenefitSpecificBehaviourWhenNoAwardsAreGivenAndNoActivitiesAreSelectedAndEndDateTypeIsNA() {
 
         setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
@@ -350,7 +351,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
 
     }
 
-    @Test
+    @ParameterizedTest
     public void whenCorrectionIsInProgressDecisionWasUploadedGenerateNoticeIsYes_thenThrowError() {
         handler = createValidationHandler(validator, decisionNoticeService, true);
 
@@ -364,7 +365,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
         assertTrue(response.getErrors().contains(CANT_UPLOAD_ERROR_MESSAGE));
     }
 
-    @Test
+    @ParameterizedTest
     public void whenCorrectionIsInProgressDecisionWasGeneratedGenerateNoticeIsYes_thenDontThrowError() {
         handler = createValidationHandler(validator, decisionNoticeService, true);
 
@@ -377,7 +378,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
         assertEquals(0, response.getErrors().size());
     }
 
-    @Test
+    @ParameterizedTest
     public void whenCorrectionIsInProgressDecisionWasUploadedGenerateNoticeIsNo_thenDontThrowError() {
         handler = createValidationHandler(validator, decisionNoticeService, true);
 
@@ -390,9 +391,11 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
         assertEquals(0, response.getErrors().size());
     }
 
-    @Test(expected = IllegalStateException.class)
+    @ParameterizedTest
     public void throwsExceptionIfItCannotHandleTheAppeal() {
-        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        assertThrows(IllegalStateException.class, () -> {
+            when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+            handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        });
     }
 }

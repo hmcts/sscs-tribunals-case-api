@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.service.admin;
 
-import static java.lang.String.format;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static uk.gov.hmcts.reform.sscs.ccd.service.SscsQueryBuilder.findCaseByResponseReceivedStateAndNoDwpFurtherInfoAndLastModifiedDateQuery;
 
@@ -16,7 +15,6 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -43,7 +41,6 @@ public class RestoreCasesService {
     private static final State REQUIRED_PRE_STATE = State.RESPONSE_RECEIVED;
     private static final EventType POST_STATE_EVENT_TYPE = EventType.READY_TO_LIST;
 
-    @Autowired
     public RestoreCasesService(CcdService ccdService,
         UpdateCcdCaseService updateCcdCaseService,
         IdamService idamService, ObjectMapper objectMapper) {
@@ -88,7 +85,7 @@ public class RestoreCasesService {
                 log.info("Succeeded in adding ready to list event to the queue for id {}", caseDetails.getId());
                 successIds.add(caseDetails.getId());
             } catch (Exception e) {
-                log.error(format("Failed to add ready to list event to the queue for id %s", caseDetails.getId()), e);
+                log.error("Failed to add ready to list event to the queue for id %s".formatted(caseDetails.getId()), e);
                 failureIds.add(caseDetails.getId());
             }
             processedCount++;
@@ -141,7 +138,7 @@ public class RestoreCasesService {
         boolean matchesCriteria = (DWP_FURTHER_INFO_REQUIRED_VALUE.equals(caseDetails.getData().getDwpFurtherInfo())
             && REQUIRED_PRE_STATE.getId().equals(caseDetails.getState()));
         if (!matchesCriteria) {
-            log.error(format("Matched case with id %s has state of %s and dwpFurtherInfo of %s which is inconsistent with search",
+            log.error("Matched case with id %s has state of %s and dwpFurtherInfo of %s which is inconsistent with search".formatted(
                 caseDetails.getId(), caseDetails.getState(), caseDetails.getData().getDwpFurtherInfo()));
         }
         return matchesCriteria;
@@ -154,7 +151,7 @@ public class RestoreCasesService {
             updateCcdCaseService.triggerCaseEventV2(caseDetails.getId(), POST_STATE_EVENT_TYPE.getCcdType(), "Ready to list", "Ready to list event triggered", idamService.getIdamTokens());
             log.info("Triggered case event V2 for case id {}", caseDetails.getEventId());
         } catch (FeignException.UnprocessableEntity e) {
-            log.error(format("%s event failed for caseId %s, root cause is %s", POST_STATE_EVENT_TYPE, caseDetails.getId(), getRootCauseMessage(e)), e);
+            log.error("%s event failed for caseId %s, root cause is %s".formatted(POST_STATE_EVENT_TYPE, caseDetails.getId(), getRootCauseMessage(e)), e);
             throw e;
         }
     }

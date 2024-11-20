@@ -2,12 +2,13 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -30,7 +31,7 @@ public class OutcomeServiceHandlerTest {
     @Mock
     private Callback<SscsCaseData> callback;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         handler = new OutcomeServiceHandler();
@@ -105,13 +106,15 @@ public class OutcomeServiceHandlerTest {
         assertThat(response.getData().getOutcome(), is("decisionUpheld"));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwExceptionIfCannotHandleEventType() {
-        when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
+        assertThrows(IllegalStateException.class, () -> {
+            when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
 
-        sscsCaseData = SscsCaseData.builder().interlocReviewState(InterlocReviewState.REVIEW_BY_TCW).build();
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+            sscsCaseData = SscsCaseData.builder().interlocReviewState(InterlocReviewState.REVIEW_BY_TCW).build();
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+            handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        });
     }
 }

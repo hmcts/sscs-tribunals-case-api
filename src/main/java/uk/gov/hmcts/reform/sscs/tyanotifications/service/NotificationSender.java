@@ -6,7 +6,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Recover;
@@ -33,7 +32,6 @@ public class NotificationSender {
     private final SaveCorrespondenceAsyncService saveCorrespondenceAsyncService;
     private final Boolean saveCorrespondence;
 
-    @Autowired
     public NotificationSender(@Qualifier("notificationClient") NotificationClient notificationClient,
                               @Qualifier("testNotificationClient") NotificationClient testNotificationClient,
                               NotificationTestRecipients notificationTestRecipients,

@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -31,7 +30,6 @@ public class UcWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisi
     private UcDecisionNoticeQuestionService ucDecisionNoticeQuestionService;
     private VenueDataLoader venueDataLoader;
 
-    @Autowired
     public UcWriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
         UcDecisionNoticeQuestionService decisionNoticeQuestionService, UcDecisionNoticeOutcomeService outcomeService, DocumentConfiguration documentConfiguration, VenueDataLoader venueDataLoader) {
         super(generateFile, userDetailsService, decisionNoticeQuestionService, outcomeService, documentConfiguration, venueDataLoader);
@@ -79,7 +77,7 @@ public class UcWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisi
             builder.ucAwardRate(null);
             Optional<AwardType> ucAwardTypeOptional = caseData.isWcaAppeal() ? UcPointsRegulationsAndSchedule7ActivitiesCondition
                 .getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(decisionNoticeQuestionService, caseData).getAwardType() : empty();
-            if (!ucAwardTypeOptional.isEmpty()) {
+            if (ucAwardTypeOptional.isPresent()) {
                 String ucAwardType = ucAwardTypeOptional.get().getKey();
                 if (ucAwardType != null) {
                     builder.ucAwardRate(join(

@@ -1,10 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionhearingrecordingrequest;
 
-import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
@@ -16,8 +14,8 @@ import java.util.Arrays;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -50,7 +48,7 @@ public class ActionHearingRecordingRequestAboutToStartHandlerTest {
 
     private final UserDetails userDetails = UserDetails.builder().roles(new ArrayList<>(asList("caseworker-sscs", UserRole.CTSC_CLERK.getValue()))).build();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
 
@@ -79,7 +77,7 @@ public class ActionHearingRecordingRequestAboutToStartHandlerTest {
                         .hearingType("Adjourned")
                         .uploadDate(LocalDate.now().toString())
                         .recordings(List.of(HearingRecordingDetails.builder()
-                                .value(DocumentLink.builder().documentBinaryUrl(format("https://example/%s", hearingId)).build())
+                                .value(DocumentLink.builder().documentBinaryUrl("https://example/%s".formatted(hearingId)).build())
                                 .build()))
                         .build())
                 .build();
@@ -139,15 +137,18 @@ public class ActionHearingRecordingRequestAboutToStartHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_SUBMIT", "MID_EVENT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsExceptionIfItCannotHandleTheAppeal() {
-        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThrows(IllegalStateException.class, () -> {
+            when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        });
     }
 
     public static SscsHearingRecording getHearingRecording(String id) {
@@ -161,7 +162,7 @@ public class ActionHearingRecordingRequestAboutToStartHandlerTest {
                 .hearingId(String.valueOf(hearingId))
                 .hearingDate("2021-05-18")
                 .time("12:00")
-                .venue(Venue.builder().name(format("Venue %s", hearingId)).build())
+                .venue(Venue.builder().name("Venue %s".formatted(hearingId)).build())
                 .build();
         return Hearing.builder().value(hearingDetails).build();
     }

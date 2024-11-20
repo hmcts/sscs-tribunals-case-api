@@ -7,12 +7,12 @@ import static org.mockito.BDDMockito.given;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.client.JudicialRefDataApi;
@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DynamicListLanguageUtilTest {
 
     private static final String IDAM_OAUTH2_TOKEN = "TestOauthToken";
@@ -42,7 +42,7 @@ public class DynamicListLanguageUtilTest {
     private List<JudicialUser> response;
 
 
-    @Before
+    @BeforeEach
     public void setup() {
         response = newArrayList(JudicialUser.builder()
             .personalCode("1234")

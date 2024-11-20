@@ -46,7 +46,7 @@ public class StruckOutAboutToSubmitHandler extends DormantEventsAboutToSubmitHan
         super.handle(callbackType, callback, userAuthorisation);
 
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-        log.info(String.format("Handling struckOut event for caseId %s", sscsCaseData.getCcdCaseId()));
+        log.info("Handling struckOut event for caseId %s".formatted(sscsCaseData.getCcdCaseId()));
 
         sscsCaseData.setDwpState(DwpState.STRIKE_OUT_ACTIONED);
         clearPostponementTransientFields(sscsCaseData);

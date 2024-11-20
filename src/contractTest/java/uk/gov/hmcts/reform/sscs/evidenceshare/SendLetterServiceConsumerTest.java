@@ -13,13 +13,12 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.hc.core5.http.HttpStatus;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -27,7 +26,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterResponse;
 import uk.gov.hmcts.reform.sendletter.api.model.v3.Document;
 import uk.gov.hmcts.reform.sendletter.api.model.v3.LetterV3;
@@ -35,7 +33,6 @@ import uk.gov.hmcts.reform.sendletter.api.proxy.SendLetterApiProxy;
 
 
 @SpringBootTest
-@ExtendWith(SpringExtension.class)
 @ExtendWith(PactConsumerTestExt.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @PactFolder("pacts")
@@ -79,7 +76,7 @@ public class SendLetterServiceConsumerTest {
     }
 
     private LetterV3 buildLetter() throws IOException, URISyntaxException {
-        Path pdfPath = Paths.get(ClassLoader.getSystemResource("files/myPdf.pdf").toURI());
+        Path pdfPath = Path.of(ClassLoader.getSystemResource("files/myPdf.pdf").toURI());
         byte[] pdf = Files.readAllBytes(pdfPath);
         String response = Base64.getEncoder().encodeToString(pdf);
         Map<String, Object> additionalData = new HashMap<>();

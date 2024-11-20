@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.scenarios;
 
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipTemplateContent;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
@@ -57,33 +57,35 @@ public class PipScenarioNoAwardNoAwardTest {
 
         PipTemplateContent content = PipScenario.SCENARIO_NO_AWARD_NO_AWARD.getContent(body);
 
-        String expectedContent = "The appeal is refused.\n"
-            + "\n"
-            + "The decision made by the Secretary of State on 20/09/2020 is confirmed.\n"
-            + "\n"
-            + "Felix Sydney is not entitled to the daily living component from 17/12/2020. They score 6 points. This is insufficient to meet the threshold for the test.\n"
-            + "\n"
-            + "1.Preparing Food\td.Needs prompting to be able to either prepare or cook a simple meal.\t2\n"
-            + "2.Taking Nutrition\td.Needs prompting to be able to take nutrition.\t4\n"
-            + "\n"
-            + "\n"
-            + "Felix Sydney does not qualify for an award of the mobility component from 17/12/2020. They score 0 points. This is insufficient to meet the threshold for the test.\n"
-            + "\n"
-            + "12.Moving Around\ta.Can stand and then move more than 200 metres, either aided or unaided.\t0\n"
-            + "\n"
-            + "\n"
-            + "My first reasons\n"
-            + "\n"
-            + "My second reasons\n"
-            + "\n"
-            + "Something else\n"
-            + "\n"
-            + "This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative did not attend.\n"
-            + "\n";
+        String expectedContent = """
+            The appeal is refused.
+            
+            The decision made by the Secretary of State on 20/09/2020 is confirmed.
+            
+            Felix Sydney is not entitled to the daily living component from 17/12/2020. They score 6 points. This is insufficient to meet the threshold for the test.
+            
+            1.Preparing Food	d.Needs prompting to be able to either prepare or cook a simple meal.	2
+            2.Taking Nutrition	d.Needs prompting to be able to take nutrition.	4
+            
+            
+            Felix Sydney does not qualify for an award of the mobility component from 17/12/2020. They score 0 points. This is insufficient to meet the threshold for the test.
+            
+            12.Moving Around	a.Can stand and then move more than 200 metres, either aided or unaided.	0
+            
+            
+            My first reasons
+            
+            My second reasons
+            
+            Something else
+            
+            This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative did not attend.
+            
+            """;
 
-        Assert.assertEquals(10, content.getComponents().size());
+        Assertions.assertEquals(10, content.getComponents().size());
 
-        Assert.assertEquals(expectedContent, content.toString());
+        Assertions.assertEquals(expectedContent, content.toString());
 
     }
 

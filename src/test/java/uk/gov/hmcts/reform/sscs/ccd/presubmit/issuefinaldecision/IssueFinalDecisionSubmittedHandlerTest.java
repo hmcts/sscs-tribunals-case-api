@@ -20,8 +20,8 @@ import jakarta.validation.Validator;
 import java.util.Optional;
 import java.util.function.Consumer;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -63,7 +63,7 @@ public class IssueFinalDecisionSubmittedHandlerTest {
         .buildValidatorFactory()
         .getValidator();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
 

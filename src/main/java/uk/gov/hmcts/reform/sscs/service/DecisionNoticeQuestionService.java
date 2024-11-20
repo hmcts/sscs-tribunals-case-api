@@ -30,7 +30,7 @@ public abstract class DecisionNoticeQuestionService {
     }
 
     protected DecisionNoticeQuestionService(String benefitType, List<Class<? extends PointsCondition<?>>> pointsConditionClasses) throws IOException {
-        String path = String.format(REFERENCE_DECISION_NOTICE_QUESTIONS_JSON, benefitType.toLowerCase());
+        String path = REFERENCE_DECISION_NOTICE_QUESTIONS_JSON.formatted(benefitType.toLowerCase());
         String decisionNoticeQuestions =
             IOUtils.resourceToString(path, StandardCharsets.UTF_8, Thread.currentThread().getContextClassLoader());
 
@@ -95,7 +95,7 @@ public abstract class DecisionNoticeQuestionService {
 
     public int getTotalPoints(SscsCaseData sscsCaseData, Collection<String> answerKeys) {
         return answerKeys.stream().map(answerText -> getAnswerForActivityQuestionKey(sscsCaseData,
-            answerText)).filter(Optional::isPresent).map(Optional::get).mapToInt(ActivityAnswer::getActivityAnswerPoints).sum();
+            answerText)).flatMap(Optional::stream).mapToInt(ActivityAnswer::getActivityAnswerPoints).sum();
     }
 
 

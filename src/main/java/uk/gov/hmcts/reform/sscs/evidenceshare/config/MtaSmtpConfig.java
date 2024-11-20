@@ -23,7 +23,7 @@ public class MtaSmtpConfig {
     private String smtpSslTrust;
 
     @Bean("mtaMailSender")
-    public JavaMailSender javaMailSender() {
+    JavaMailSender javaMailSender() {
         JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
         javaMailSender.setHost(emailHost);
         javaMailSender.setPort(emailPort);

@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
@@ -14,7 +12,7 @@ import java.util.Collections;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -134,6 +132,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "YES, NO",
         "NO,YES",
@@ -166,6 +165,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "YES, allowed, YES",
         "NO, refused, NO",
@@ -204,6 +204,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"STANDARD_RATE, STANDARD_RATE",})
     @Override
     public void shouldExhibitBenefitSpecificBehaviourWhenAnAnAwardIsGivenAndNoActivitiesSelected(AwardType dailyLiving, AwardType mobility) {
@@ -265,6 +266,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"YES, YES", "NO, NO"})
     public void givenGenerateNoticeValueAndCaseIsUc_thenShouldSetShowWorkCapabilityAssessment(YesNo isGenerateNotice, @Nullable YesNo showWorkCapabilityPage) {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(isGenerateNotice);

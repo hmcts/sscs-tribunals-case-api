@@ -28,7 +28,7 @@ public class LocalMessagingConfig {
      */
     @SuppressWarnings("squid:S4423")
     @Bean
-    public SSLContext jmsSslContext(@Value("${amqp.trustAllCerts}") final boolean trustAllCerts)
+    SSLContext jmsSslContext(@Value("${amqp.trustAllCerts}") final boolean trustAllCerts)
         throws NoSuchAlgorithmException, KeyManagementException {
 
         if (trustAllCerts) {

@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip;
 
 import static java.util.Collections.emptyList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
@@ -11,7 +11,7 @@ import jakarta.validation.Validator;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -90,6 +90,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "enhancedRate, same",
         "enhancedRate, higher",
@@ -123,6 +124,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "enhancedRate, same",
         "enhancedRate, higher",
@@ -151,6 +153,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "enhancedRate, same",
         "enhancedRate, higher",
@@ -179,6 +182,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "noAward, lower",
         "noAward, same",
@@ -205,6 +209,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "noAward, lower",
         "noAward, same",
@@ -231,6 +236,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "enhancedRate, same",
         "enhancedRate, higher",
@@ -255,6 +261,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "enhancedRate, same",
         "enhancedRate, higher",
@@ -280,6 +287,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "noAward, lower",
         "noAward, same",
@@ -308,6 +316,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "noAward, lower",
         "noAward, same",
@@ -336,6 +345,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "enhancedRate, same",
         "enhancedRate, higher",
@@ -361,6 +371,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "enhancedRate, same",
         "enhancedRate, higher",
@@ -386,6 +397,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "noAward, lower",
         "noAward, same",
@@ -414,6 +426,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "noAward, lower",
         "noAward, same",
@@ -443,6 +456,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "enhancedRate, same",
         "enhancedRate, higher",
@@ -475,6 +489,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "enhancedRate, same",
         "enhancedRate, higher",
@@ -505,6 +520,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "enhancedRate, same",
         "enhancedRate, higher",
@@ -534,6 +550,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "noAward, lower",
         "noAward, same",
@@ -561,6 +578,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "noAward, lower",
         "noAward, same",
@@ -588,6 +606,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "notConsidered, lower",
         "notConsidered, higher",
@@ -610,6 +629,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "enhancedRate, same",
         "enhancedRate, higher",
@@ -644,6 +664,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "enhancedRate, same",
         "enhancedRate, higher",
@@ -675,6 +696,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "notConsidered, lower",
         "notConsidered, higher",
@@ -698,6 +720,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "Yes, YES, NO",
         "Yes, NO, NO",
@@ -733,6 +756,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "STANDARD_RATE, STANDARD_RATE",
         "ENHANCED_RATE, ENHANCED_RATE",

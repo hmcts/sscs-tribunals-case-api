@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -25,11 +25,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -49,7 +49,6 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis.PdfLetterService;
 import uk.gov.service.notify.NotificationClientException;
 
-@RunWith(JUnitParamsRunner.class)
 public class SendNotificationServiceTest {
     private static final String YES = "Yes";
     public static final String NO = "No";
@@ -175,7 +174,7 @@ public class SendNotificationServiceTest {
     @Captor
     private ArgumentCaptor<NotificationHandler.SendNotification> sender;
 
-    @Before
+    @BeforeEach
     public void setup() {
         openMocks(this);
 
@@ -185,7 +184,7 @@ public class SendNotificationServiceTest {
         logger.addAppender(mockAppender);
     }
 
-    @Test
+    @ParameterizedTest
     public void getAppellantAddressToUseForLetter() {
         Address expectedAddress = APPELLANT_WITH_ADDRESS.getAddress();
         CcdNotificationWrapper wrapper = buildBaseWrapper(APPELLANT_WITH_ADDRESS);
@@ -200,7 +199,7 @@ public class SendNotificationServiceTest {
         assertEquals(expectedAddress.getPostcode(), actualAddress.getPostcode());
     }
 
-    @Test
+    @ParameterizedTest
     public void getAppointeeAddressToUseForLetter() {
         Address expectedAddress = APPOINTEE_WITH_ADDRESS.getAddress();
         CcdNotificationWrapper wrapper = buildBaseWrapper(APPELLANT_WITH_ADDRESS_AND_APPOINTEE);
@@ -215,7 +214,7 @@ public class SendNotificationServiceTest {
         assertEquals(expectedAddress.getPostcode(), actualAddress.getPostcode());
     }
 
-    @Test
+    @ParameterizedTest
     public void getRepAddressToUseForLetter() {
         Address expectedAddress = REP_WITH_ADDRESS.getAddress();
         CcdNotificationWrapper wrapper = buildBaseWrapper(APPELLANT_WITH_ADDRESS_AND_APPOINTEE, STRUCK_OUT, REP_WITH_ADDRESS);
@@ -230,7 +229,7 @@ public class SendNotificationServiceTest {
         assertEquals(expectedAddress.getPostcode(), actualAddress.getPostcode());
     }
 
-    @Test
+    @ParameterizedTest
     public void sendLetterNotificationForAppellant() throws NotificationClientException {
         SubscriptionWithType appellantEmptySubscription = new SubscriptionWithType(EMPTY_SUBSCRIPTION,
             SubscriptionType.APPELLANT, null, null);
@@ -240,7 +239,7 @@ public class SendNotificationServiceTest {
         verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
     }
 
-    @Test
+    @ParameterizedTest
     public void sendLetterNotificationForRep() throws NotificationClientException {
         SubscriptionWithType representativeEmptySubscription = new SubscriptionWithType(EMPTY_SUBSCRIPTION,
             SubscriptionType.REPRESENTATIVE, null, null);
@@ -250,7 +249,7 @@ public class SendNotificationServiceTest {
         verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
     }
 
-    @Test
+    @ParameterizedTest
     public void sendLetterNotificationForRepWithOrgName() throws NotificationClientException {
         SubscriptionWithType representativeEmptySubscription = new SubscriptionWithType(EMPTY_SUBSCRIPTION,
             SubscriptionType.REPRESENTATIVE, null, null);
@@ -261,7 +260,7 @@ public class SendNotificationServiceTest {
         verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
     }
 
-    @Test
+    @ParameterizedTest
     public void sendLetterNotificationForJointParty() throws NotificationClientException {
         SubscriptionWithType jointPartyEmptySubscription = new SubscriptionWithType(EMPTY_SUBSCRIPTION, JOINT_PARTY,
             null, null);
@@ -272,7 +271,7 @@ public class SendNotificationServiceTest {
         verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
     }
 
-    @Test
+    @ParameterizedTest
     public void doNotSendLetterNotificationIfAddressEmpty() throws NotificationClientException {
         SubscriptionWithType appellantEmptySubscription = new SubscriptionWithType(EMPTY_SUBSCRIPTION,
             SubscriptionType.APPELLANT, null, null);
@@ -283,7 +282,7 @@ public class SendNotificationServiceTest {
         verifyExpectedLogMessage(mockAppender, captorLoggingEvent, wrapper.getNewSscsCaseData().getCcdCaseId(), "Failed to send letter for event id", Level.ERROR);
     }
 
-    @Test
+    @ParameterizedTest
     public void doNotSendLetterNotificationIfNoAddress() {
         SubscriptionWithType appellantEmptySubscription = new SubscriptionWithType(EMPTY_SUBSCRIPTION,
             SubscriptionType.APPELLANT, null, null);
@@ -294,7 +293,7 @@ public class SendNotificationServiceTest {
         verifyExpectedLogMessage(mockAppender, captorLoggingEvent, wrapper.getNewSscsCaseData().getCcdCaseId(), "Failed to send letter for event id", Level.ERROR);
     }
 
-    @Test
+    @ParameterizedTest
     public void logErrorMessageWhenNoNotificationSent() {
         SubscriptionWithType appellantEmptySubscription = new SubscriptionWithType(EMPTY_SUBSCRIPTION,
             SubscriptionType.APPELLANT, null, null);
@@ -309,25 +308,25 @@ public class SendNotificationServiceTest {
         verifyExpectedLogMessage(mockAppender, captorLoggingEvent, wrapper.getNewSscsCaseData().getCcdCaseId(), "Did not send a notification for event", Level.ERROR);
     }
 
-    @Test
+    @ParameterizedTest
     public void getRepNameWhenRepHasName() {
         CcdNotificationWrapper wrapper = buildBaseWrapper(APPELLANT_WITH_ADDRESS, NotificationEventType.CASE_UPDATED, REP_WITH_ADDRESS);
         assertEquals(REP_WITH_ADDRESS.getName().getFullNameNoTitle(), getRepSalutation(wrapper.getNewSscsCaseData().getAppeal().getRep(), false));
     }
 
-    @Test
+    @ParameterizedTest
     public void getRepOrganisationWhenRepHasOrgButNoName() {
         CcdNotificationWrapper wrapper = buildBaseWrapper(APPELLANT_WITH_ADDRESS, NotificationEventType.CASE_UPDATED, REP_ORG_WITH_ADDRESS);
         assertEquals(wrapper.getNewSscsCaseData().getAppeal().getRep().getOrganisation(), getRepSalutation(wrapper.getNewSscsCaseData().getAppeal().getRep(), false));
     }
 
-    @Test
+    @ParameterizedTest
     public void getRepSalutationWhenRepHasOrgAndNoNameAndIngnoreOrgFlagSet() {
         CcdNotificationWrapper wrapper = buildBaseWrapper(APPELLANT_WITH_ADDRESS, NotificationEventType.CASE_UPDATED, REP_ORG_WITH_ADDRESS);
         assertEquals(REP_SALUTATION, getRepSalutation(wrapper.getNewSscsCaseData().getAppeal().getRep(), true));
     }
 
-    @Test
+    @ParameterizedTest
     public void getRepOrganisationWhenRepHasOrgButNameSetToUndefined() {
         Representative repOrgWithAddressUndefinedName = Representative.builder()
             .organisation("Rep Org")
@@ -339,7 +338,7 @@ public class SendNotificationServiceTest {
         assertEquals(repOrgWithAddressUndefinedName.getOrganisation(), getRepSalutation(wrapper.getNewSscsCaseData().getAppeal().getRep(), false));
     }
 
-    @Test
+    @ParameterizedTest
     public void getRepSalutationWhenRepHasNoOrgAndNameSetToUndefined() {
         Representative repWithAddressAndUndefinedName = Representative.builder()
             .name(Name.builder().firstName("undefined").lastName("undefined").build())
@@ -350,7 +349,7 @@ public class SendNotificationServiceTest {
         assertEquals(REP_SALUTATION, getRepSalutation(wrapper.getNewSscsCaseData().getAppeal().getRep(), false));
     }
 
-    @Test
+    @ParameterizedTest
     public void getRepSalutationWhenRepHasNoOrgAndNameSetToEmptyString() {
         Representative repWithAddressNoName = Representative.builder()
             .name(Name.builder().firstName("").lastName("").build())
@@ -361,7 +360,7 @@ public class SendNotificationServiceTest {
         assertEquals(REP_SALUTATION, getRepSalutation(wrapper.getNewSscsCaseData().getAppeal().getRep(), false));
     }
 
-    @Test
+    @ParameterizedTest
     public void getRepSalutationWhenOrgAndNameBothSetToEmptyString() {
         Representative repWithAddressNoName = Representative.builder()
             .organisation("")
@@ -373,31 +372,32 @@ public class SendNotificationServiceTest {
         assertEquals(REP_SALUTATION, getRepSalutation(wrapper.getNewSscsCaseData().getAppeal().getRep(), false));
     }
 
-    @Test
+    @ParameterizedTest
     public void getRepNameWhenRepHasOrgAndName() {
         CcdNotificationWrapper wrapper = buildBaseWrapper(APPELLANT_WITH_ADDRESS, NotificationEventType.CASE_UPDATED, REP_ORG_WITH_NAME_AND_ADDRESS);
         assertEquals(REP_ORG_WITH_NAME_AND_ADDRESS.getName().getFullNameNoTitle(), getRepSalutation(wrapper.getNewSscsCaseData().getAppeal().getRep(), false));
     }
 
-    @Test
+    @ParameterizedTest
     public void getRepNameWhenNameIsNotnull() {
         CcdNotificationWrapper wrapper = buildBaseWrapper(APPELLANT_WITH_ADDRESS, NotificationEventType.CASE_UPDATED, REP_WITH_ADDRESS);
         assertEquals(REP_WITH_ADDRESS.getName().getFullNameNoTitle(), getRepSalutation(wrapper.getNewSscsCaseData().getAppeal().getRep(), false));
     }
 
-    @Test
+    @ParameterizedTest
     public void getRepOrganisationWhenNameNoFirstName() {
         CcdNotificationWrapper wrapper = buildBaseWrapper(APPELLANT_WITH_ADDRESS, NotificationEventType.CASE_UPDATED, REP_ORG_WITH_ADDRESS);
         assertEquals(wrapper.getNewSscsCaseData().getAppeal().getRep().getOrganisation(), getRepSalutation(wrapper.getNewSscsCaseData().getAppeal().getRep(), false));
     }
 
-    @Test
+    @ParameterizedTest
     public void getRepNameWhenNameHasFirstNameLastNameAndOrg() {
         CcdNotificationWrapper wrapper = buildBaseWrapper(APPELLANT_WITH_ADDRESS, NotificationEventType.CASE_UPDATED, REP_ORG_WITH_NAME_AND_ADDRESS);
         assertEquals(REP_ORG_WITH_NAME_AND_ADDRESS.getName().getFullNameNoTitle(), getRepSalutation(wrapper.getNewSscsCaseData().getAppeal().getRep(), false));
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"CORRECTION_REFUSED", "CORRECTION_GRANTED"})
     public void validBundledLetterForCorrection(DwpState dwpState) {
         SscsCaseData caseData = buildBaseWrapper(APPELLANT_WITH_ADDRESS, ISSUE_FINAL_DECISION, READY_TO_LIST.getId()).getNewSscsCaseData();
@@ -407,19 +407,20 @@ public class SendNotificationServiceTest {
         assertNotNull(bundledLetterDocumentUrl);
     }
 
-    @Test
-    @Parameters(method = "bundledLetterTemplates")
+    @ParameterizedTest
+    @MethodSource("bundledLetterTemplates")
     public void validBundledLetterType(NotificationEventType eventType) {
         assertNotNull(getBundledLetterDocumentUrl(eventType, buildBaseWrapper(APPELLANT_WITH_ADDRESS, eventType, READY_TO_LIST.getId()).getNewSscsCaseData()));
     }
 
-    @Test
-    @Parameters(method = "nonBundledLetterTemplates")
+    @ParameterizedTest
+    @MethodSource("nonBundledLetterTemplates")
     public void invalidBundledLetterTileType(NotificationEventType eventType) {
         assertNull(getBundledLetterDocumentUrl(eventType, buildBaseWrapper(APPELLANT_WITH_ADDRESS, eventType, READY_TO_LIST.getId()).getNewSscsCaseData()));
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPEAL_RECEIVED", "DIRECTION_ISSUED", "DIRECTION_ISSUED_WELSH", "DECISION_ISSUED", "DECISION_ISSUED_WELSH", "ISSUE_FINAL_DECISION", "ISSUE_FINAL_DECISION_WELSH", "ISSUE_ADJOURNMENT_NOTICE", "DWP_UPLOAD_RESPONSE", "DWP_RESPONSE_RECEIVED"})
     public void sendLetterForNotificationType(NotificationEventType notificationEventType) {
         SubscriptionWithType appellantEmptySubscription = new SubscriptionWithType(EMPTY_SUBSCRIPTION, APPELLANT,
@@ -434,6 +435,7 @@ public class SendNotificationServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPEAL_RECEIVED", "DIRECTION_ISSUED", "DIRECTION_ISSUED_WELSH", "DECISION_ISSUED", "DECISION_ISSUED_WELSH", "ISSUE_FINAL_DECISION", "ISSUE_ADJOURNMENT_NOTICE", "DWP_UPLOAD_RESPONSE", "DWP_RESPONSE_RECEIVED"})
     public void saveAppellantReasonableAdjustmentLetterForNotificationType(NotificationEventType notificationEventType) {
         SubscriptionWithType appellantEmptySubscription = new SubscriptionWithType(EMPTY_SUBSCRIPTION, APPELLANT,
@@ -448,6 +450,7 @@ public class SendNotificationServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPEAL_RECEIVED", "DIRECTION_ISSUED", "DIRECTION_ISSUED_WELSH", "DECISION_ISSUED", "DECISION_ISSUED_WELSH", "ISSUE_FINAL_DECISION", "ISSUE_ADJOURNMENT_NOTICE", "DWP_UPLOAD_RESPONSE", "DWP_RESPONSE_RECEIVED"})
     public void saveRepReasonableAdjustmentLetterForNotificationType(NotificationEventType notificationEventType) {
         SubscriptionWithType repEmptySubscription = new SubscriptionWithType(EMPTY_SUBSCRIPTION, REPRESENTATIVE,
@@ -462,6 +465,7 @@ public class SendNotificationServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPEAL_RECEIVED", "DIRECTION_ISSUED", "DIRECTION_ISSUED_WELSH", "DECISION_ISSUED", "DECISION_ISSUED_WELSH", "ISSUE_FINAL_DECISION", "ISSUE_FINAL_DECISION_WELSH", "ISSUE_ADJOURNMENT_NOTICE", "DWP_UPLOAD_RESPONSE", "DWP_RESPONSE_RECEIVED"})
     public void saveAppointeeReasonableAdjustmentLetterForNotificationType(NotificationEventType notificationEventType) {
         SubscriptionWithType appointeeEmptySubscription = new SubscriptionWithType(EMPTY_SUBSCRIPTION, APPOINTEE,
@@ -476,6 +480,7 @@ public class SendNotificationServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPEAL_RECEIVED", "DIRECTION_ISSUED", "DIRECTION_ISSUED_WELSH", "DECISION_ISSUED", "DECISION_ISSUED_WELSH", "ISSUE_FINAL_DECISION", "ISSUE_FINAL_DECISION_WELSH", "ISSUE_ADJOURNMENT_NOTICE", "DWP_UPLOAD_RESPONSE", "DWP_RESPONSE_RECEIVED"})
     public void saveJointPartyReasonableAdjustmentLetterForNotificationType(NotificationEventType notificationEventType) {
         SubscriptionWithType jointPartyEmptySubscription = new SubscriptionWithType(EMPTY_SUBSCRIPTION, JOINT_PARTY,
@@ -489,7 +494,7 @@ public class SendNotificationServiceTest {
         verifyNotificationIsSaved(sender.getValue(), notificationEventType, CASE_ID, jointPartyEmptySubscription.getSubscriptionType());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenNonDigitalCase_willNotSendAppealLodgedLetters() {
         SubscriptionWithType appellantEmptySubscription = new SubscriptionWithType(EMPTY_SUBSCRIPTION, APPELLANT,
             null, null);
@@ -797,11 +802,11 @@ public class SendNotificationServiceTest {
         return new CcdNotificationWrapper(struckOutNotificationSscsCaseDataWrapper);
     }
 
-    public Object[] bundledLetterTemplates() {
+    public static Object[] bundledLetterTemplates() {
         return EVENT_TYPES_FOR_BUNDLED_LETTER.toArray();
     }
 
-    public Object[] nonBundledLetterTemplates() {
+    public static Object[] nonBundledLetterTemplates() {
         Object[] originalValues = Arrays.stream(NotificationEventType.values())
             .filter(type -> !EVENT_TYPES_FOR_BUNDLED_LETTER.contains(type))
             .toArray();

@@ -5,14 +5,10 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import junitparams.JUnitParamsRunner;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
@@ -27,21 +23,13 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
 @SpringBootTest
 @TestPropertySource(locations = "classpath:config/application_es_it.properties")
 public abstract class AbstractNotificationConfigTest {
-
-
-    // Below rules are  needed to use the junitParamsRunner together with SpringRunner
-    @ClassRule
-    public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
     public static final String SUBSCRIPTION_TEMPLATE_NAME_TEMPLATE = "%s.%s";
-
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
 
     @Autowired
     protected NotificationConfig notificationConfig;
 
     protected String getTemplateName(NotificationEventType notificationEventType, SubscriptionType subscriptionType) {
-        return String.format(SUBSCRIPTION_TEMPLATE_NAME_TEMPLATE,
+        return SUBSCRIPTION_TEMPLATE_NAME_TEMPLATE.formatted(
             notificationEventType.getId(),
             subscriptionType.name().toLowerCase());
     }

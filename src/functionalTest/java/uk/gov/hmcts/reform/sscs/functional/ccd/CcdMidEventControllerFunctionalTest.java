@@ -10,13 +10,15 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import java.io.IOException;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.util.EntityUtils;
-import org.junit.Test;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.functional.mya.BaseFunctionTest;
@@ -38,7 +40,7 @@ public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
     @Test
     public void shouldReturn400ForNoBody() throws IOException {
         HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(""), "");
-        assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(400);
+        assertThat(httpResponse.getCode()).isEqualTo(400);
     }
 
     @DisplayName("Should return 500 for unauthorised")
@@ -61,7 +63,7 @@ public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
     public void shouldReturnStatusOkForValidRequest() throws IOException {
         HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(
             getJsonCallbackForTest(WRITE_FINAL_DECISION_CALLBACK_JSON)), "");
-        assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
+        assertThat(httpResponse.getCode()).isEqualTo(HttpStatus.SC_OK);
     }
 
     @DisplayName("Adjourn case populate venue dropdown should populate next hearing venue dropdown")
@@ -70,7 +72,7 @@ public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
         HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(
             getJsonCallbackForTest(WRITE_FINAL_DECISION_CALLBACK_JSON)), "AdjournCasePopulateVenueDropdown");
         CcdEventResponse ccdEventResponse = getCcdEventResponse(httpResponse);
-        assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
+        assertThat(httpResponse.getCode()).isEqualTo(HttpStatus.SC_OK);
         DynamicList adjournCaseNextHearingVenueSelected = ccdEventResponse.getData().getAdjournment().getNextHearingVenueSelected();
         assertThat(adjournCaseNextHearingVenueSelected.getValue().getCode()).isEqualTo("");
         assertThat(adjournCaseNextHearingVenueSelected.getValue().getLabel()).isEqualTo("");
@@ -83,7 +85,7 @@ public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
         HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(
             getJsonCallbackForTest(WRITE_FINAL_DECISION_CALLBACK_JSON)), "PreviewFinalDecision");
         CcdEventResponse ccdEventResponse = getCcdEventResponse(httpResponse);
-        assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
+        assertThat(httpResponse.getCode()).isEqualTo(HttpStatus.SC_OK);
         assertThat(ccdEventResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument()).isNotNull();
     }
 
@@ -93,7 +95,7 @@ public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
         HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(getJsonCallbackForTest(
             ADJOURN_CASE_GAPS_CALLBACK_JSON)), "PreviewAdjournCase");
         CcdEventResponse ccdEventResponse = getCcdEventResponse(httpResponse);
-        assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
+        assertThat(httpResponse.getCode()).isEqualTo(HttpStatus.SC_OK);
         assertThat(ccdEventResponse.getData().getAdjournment().getPreviewDocument()).isNotNull();
     }
 
@@ -103,15 +105,17 @@ public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
         HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(getJsonCallbackForTest(
             ADJOURN_CASE_GAPS_CALLBACK_JSON)), "AdminRestoreCases");
         CcdEventResponse ccdEventResponse = getCcdEventResponse(httpResponse);
-        assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
+        assertThat(httpResponse.getCode()).isEqualTo(HttpStatus.SC_OK);
         assertThat(ccdEventResponse.getWarnings()).isEmpty();
         assertThat(ccdEventResponse.getErrors())
             .hasSize(1)
             .containsOnly("Unable to extract restoreCaseFileName");
     }
 
-    private CcdEventResponse getCcdEventResponse(HttpResponse httpResponse) throws IOException {
-        String response = EntityUtils.toString(httpResponse.getEntity());
+    @SneakyThrows
+    private CcdEventResponse getCcdEventResponse(HttpResponse httpResponse) {
+        String response = EntityUtils.toString(((ClassicHttpResponse)httpResponse).getEntity());
+
         return objectMapper.readValue(response, CcdEventResponse.class);
     }
 }

@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -11,8 +9,8 @@ import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessi
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -32,7 +30,7 @@ public class IsScottishHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         handler = new IsScottishHandler();
@@ -51,6 +49,7 @@ public class IsScottishHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"Glasgow,Yes", "GLASGOW,Yes", "NotGlas,No"})
     public void setIsScottishCorrectlyWhenExistingIsNull(@Nullable String dwpIssuingOffice, @Nullable String expectedIsScottish) {
 
@@ -96,6 +95,7 @@ public class IsScottishHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"Glasgow,Yes,No", "Glasgow,Yes,Yes", "NotGlas,No,No", "NotGlas,No,Yes"})
     public void changeIsScottishCorrectlyWhenAlreadySet(@Nullable String dwpIssuingOffice,
                                                                              @Nullable String expectedIsScottish,

@@ -2,7 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
@@ -12,14 +13,15 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.commons.util.StringUtils;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -38,16 +40,13 @@ public class ActionStrikeOutHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
-
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
     @Mock
     private Callback<SscsCaseData> callback;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         actionStrikeOutHandler = new ActionStrikeOutHandler();
 
@@ -59,6 +58,7 @@ public class ActionStrikeOutHandlerTest {
 
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "ACTION_STRIKE_OUT, ABOUT_TO_SUBMIT, true"
     })
@@ -67,12 +67,14 @@ public class ActionStrikeOutHandlerTest {
         assertEquals(expected, actionStrikeOutHandler.canHandle(callbackType, callback));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void givenNullCallback_shouldThrowException() {
-        actionStrikeOutHandler.canHandle(ABOUT_TO_SUBMIT, null);
+        assertThrows(NullPointerException.class, () ->
+            actionStrikeOutHandler.canHandle(ABOUT_TO_SUBMIT, null));
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "ACTION_STRIKE_OUT, strikeOut, STRIKE_OUT_ACTIONED",
         "ACTION_STRIKE_OUT, ,null",
@@ -95,14 +97,16 @@ public class ActionStrikeOutHandlerTest {
         }
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwExceptionIfCannotHandleEventType() {
-        when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
+        assertThrows(IllegalStateException.class, () -> {
+            when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
 
-        sscsCaseData = SscsCaseData.builder().dwpState(DwpState.IN_PROGRESS).build();
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+            sscsCaseData = SscsCaseData.builder().dwpState(DwpState.IN_PROGRESS).build();
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        actionStrikeOutHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+            actionStrikeOutHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        });
     }
 
     @Test

@@ -121,13 +121,13 @@ public class IssueGenericLetterMidEventValidationHandler implements PreSubmitCal
                 var party = otherParty.getValue();
 
                 if (party.hasAppointee() && isAddressEmpty(party.getAppointee().getAddress())) {
-                    errors.add(String.format(ADDRESS_IS_EMPTY, party.getAppointee().getName().getFullNameNoTitle()));
+                    errors.add(ADDRESS_IS_EMPTY.formatted(party.getAppointee().getName().getFullNameNoTitle()));
                 } else if (isAddressEmpty(party.getAddress())) {
-                    errors.add(String.format(ADDRESS_IS_EMPTY, party.getName().getFullNameNoTitle()));
+                    errors.add(ADDRESS_IS_EMPTY.formatted(party.getName().getFullNameNoTitle()));
                 }
 
                 if (party.hasRepresentative() && isAddressEmpty(party.getRep().getAddress())) {
-                    errors.add(String.format(ADDRESS_IS_EMPTY, party.getRep().getName().getFullNameNoTitle()));
+                    errors.add(ADDRESS_IS_EMPTY.formatted(party.getRep().getName().getFullNameNoTitle()));
                 }
             }
         }
@@ -143,7 +143,7 @@ public class IssueGenericLetterMidEventValidationHandler implements PreSubmitCal
             var party = getOtherPartyByEntityId(entityId, otherParties);
 
             if (party != null && isAddressEmpty(party.getAddress())) {
-                errors.add(String.format(ADDRESS_IS_EMPTY, party.getName().getFullNameNoTitle()));
+                errors.add(ADDRESS_IS_EMPTY.formatted(party.getName().getFullNameNoTitle()));
             }
         }
 

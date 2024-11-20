@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.service;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.PointsCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
@@ -17,7 +16,6 @@ public class DecisionNoticeService {
     private List<DecisionNoticeOutcomeService> decisionNoticeOutcomeServices;
     private List<WriteFinalDecisionPreviewDecisionServiceBase> previewDecisionServices;
 
-    @Autowired
     public DecisionNoticeService(List<DecisionNoticeQuestionService> decisionNoticeQuestionServices, List<DecisionNoticeOutcomeService> decisionNoticeOutcomeServices,
         List<WriteFinalDecisionPreviewDecisionServiceBase> previewDecisionServices) {
         this.decisionNoticeQuestionServices = decisionNoticeQuestionServices;

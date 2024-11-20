@@ -1,28 +1,25 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.personalisation;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.REPRESENTATIVE_NAME;
 
 import java.util.HashMap;
 import java.util.Map;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants;
 
-@RunWith(JUnitParamsRunner.class)
 public class WithRepresentativePersonalisationTest {
 
     private WithRepresentativePersonalisation withRepresentativePersonalisation =
         new WithRepresentativePersonalisation();
 
-    @Test
-    @Parameters(method = "generateSscsCaseDataForTest")
+    @ParameterizedTest
+    @MethodSource("generateSscsCaseDataForTest")
     public void givenSscsCaseData_shouldSetRepresentativeNameIfPresent(
         SscsCaseData sscsCaseData, String expected) {
         Map<String, Object> personalisation = withRepresentativePersonalisation.setRepresentativeName(
@@ -31,7 +28,7 @@ public class WithRepresentativePersonalisationTest {
     }
 
     @SuppressWarnings({"unused"})
-    private Object[] generateSscsCaseDataForTest() {
+    private static Object[] generateSscsCaseDataForTest() {
         SscsCaseData sscsCaseDataWithRepsFlagYes = SscsCaseData.builder()
             .appeal(Appeal.builder()
                 .rep(Representative.builder()

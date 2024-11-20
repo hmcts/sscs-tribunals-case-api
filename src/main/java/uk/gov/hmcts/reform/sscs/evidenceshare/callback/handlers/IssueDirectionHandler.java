@@ -1,13 +1,11 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
-import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_TO_PROCEED;
 
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -30,7 +28,6 @@ public class IssueDirectionHandler implements CallbackHandler<SscsCaseData> {
 
     private final IdamService idamService;
 
-    @Autowired
     public IssueDirectionHandler(UpdateCcdCaseService ccdService,
                                  IdamService idamService) {
         this.dispatchPriority = DispatchPriority.EARLY;
@@ -68,7 +65,7 @@ public class IssueDirectionHandler implements CallbackHandler<SscsCaseData> {
                     sscsCaseDetails -> sscsCaseDetails.getData().setDirectionTypeDl(null)
             );
         } catch (FeignException.UnprocessableEntity e) {
-            log.error(format("appealToProceed event failed for caseId %s, root cause is %s", callback.getCaseDetails().getId(), getRootCauseMessage(e)), e);
+            log.error("appealToProceed event failed for caseId %s, root cause is %s".formatted(callback.getCaseDetails().getId(), getRootCauseMessage(e)), e);
             throw e;
         }
     }

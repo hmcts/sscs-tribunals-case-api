@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.functional.mya;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -15,7 +14,6 @@ public class CitizenIdamService {
     private final String idamOauth2ClientSecret;
     private final String idamOauth2RedirectUrl;
 
-    @Autowired
     CitizenIdamService(IdamClient idamApiClient,
                        @Value("${idam.client.id}") String idamOauth2ClientId,
                        @Value("${idam.client.secret}") String idamOauth2ClientSecret,

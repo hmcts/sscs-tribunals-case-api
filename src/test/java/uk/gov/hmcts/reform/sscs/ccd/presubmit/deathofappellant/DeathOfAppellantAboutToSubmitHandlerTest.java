@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.deathofappellant;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -18,8 +18,8 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -56,7 +56,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
     private SscsCaseData sscsCaseData;
     private SscsCaseData sscsCaseDataBefore;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         handler = new DeathOfAppellantAboutToSubmitHandler(validator, hearingMessageHelper, false);
@@ -96,6 +96,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
@@ -192,6 +193,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"null, null", "no, null", "null, no", "no, no"})
     public void givenADeathOfAppellantEventThatHasWithAppointeeNoBeforeAndWithAppointeeNoAfter_thenSetInterlocReviewStateAndDwpState(@Nullable String isAppointeeBefore, @Nullable String isAppointeeAfter) {
 
@@ -294,10 +296,12 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
         assertEquals(RequestOutcome.GRANTED, response.getData().getConfidentialityRequestOutcomeJointParty().getRequestOutcome());
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsExceptionIfItCannotHandleTheAppeal() {
-        when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThrows(IllegalStateException.class, () -> {
+            when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        });
     }
 
 }

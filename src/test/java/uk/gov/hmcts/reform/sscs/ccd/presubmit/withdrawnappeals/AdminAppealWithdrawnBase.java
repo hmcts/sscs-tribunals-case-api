@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 public class AdminAppealWithdrawnBase {
     private ObjectMapper mapper;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         Jackson2ObjectMapperBuilder objectMapperBuilder =
             new Jackson2ObjectMapperBuilder()

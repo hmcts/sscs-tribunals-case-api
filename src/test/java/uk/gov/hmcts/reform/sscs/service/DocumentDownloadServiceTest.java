@@ -3,22 +3,20 @@ package uk.gov.hmcts.reform.sscs.service;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -30,7 +28,8 @@ import uk.gov.hmcts.reform.sscs.exception.DocumentNotFoundException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.UploadedEvidence;
 
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class DocumentDownloadServiceTest {
 
     @Mock
@@ -43,12 +42,9 @@ public class DocumentDownloadServiceTest {
     IdamService idamService;
     private DocumentDownloadService documentDownloadService;
 
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule();
-
     String urlString;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         documentDownloadService = new DocumentDownloadService(documentDownloadClientApi,
             authTokenGenerator, "http://dm-store:4506", false,
@@ -56,7 +52,7 @@ public class DocumentDownloadServiceTest {
         urlString = "http://dm-store:4506/documents/someDocId/binary";
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDocumentId_shouldReturnFileSize() {
         ResponseEntity<Resource> response = ResponseEntity.ok(new ByteArrayResource("test".getBytes()));
         given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
@@ -66,7 +62,7 @@ public class DocumentDownloadServiceTest {
         assertEquals(4L, size);
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDocumentId_shouldReturnFileSizeSecure() {
         documentDownloadService = new DocumentDownloadService(documentDownloadClientApi,
                 authTokenGenerator, "http://dm-store:4506", true,
@@ -80,7 +76,7 @@ public class DocumentDownloadServiceTest {
         assertEquals(4L, size);
     }
 
-    @Test
+    @ParameterizedTest
     public void givenFullDocumentUrl_shouldReturnFileSize() {
         ResponseEntity<Resource> response = ResponseEntity.ok(new ByteArrayResource("test".getBytes()));
         given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
@@ -90,7 +86,7 @@ public class DocumentDownloadServiceTest {
         assertEquals(4L, size);
     }
 
-    @Test
+    @ParameterizedTest
     public void givenFullDocumentUrl_shouldReturnFileSizeSecure() {
         documentDownloadService = new DocumentDownloadService(documentDownloadClientApi,
                 authTokenGenerator, "http://dm-store:4506", true,
@@ -104,7 +100,7 @@ public class DocumentDownloadServiceTest {
         assertEquals(4L, size);
     }
 
-    @Test
+    @ParameterizedTest
     public void givenUrl_shouldGetDownLoadUrl() {
         ResponseEntity<Resource> response = ResponseEntity.ok(new ByteArrayResource("test".getBytes()));
         given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
@@ -117,7 +113,7 @@ public class DocumentDownloadServiceTest {
             "/documents/19cd94a8-4280-406b-92c7-090b735159ca/binary");
     }
 
-    @Test
+    @ParameterizedTest
     public void givenErrorWhenDownloadingBinaryFile_shouldReturnZeroSizeByDefault() {
         given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
             .willThrow(RuntimeException.class);
@@ -126,7 +122,7 @@ public class DocumentDownloadServiceTest {
         assertEquals(0L, size);
     }
 
-    @Test
+    @ParameterizedTest
     public void givenErrorWhenDownloadingBinaryFile_shouldReturnZeroSizeByDefaultSecure() {
         documentDownloadService = new DocumentDownloadService(documentDownloadClientApi,
                 authTokenGenerator, "http://dm-store:4506", true,
@@ -139,8 +135,8 @@ public class DocumentDownloadServiceTest {
         assertEquals(0L, size);
     }
 
-    @Test
-    @Parameters(method = "getDifferentResponseScenarios")
+    @ParameterizedTest
+    @MethodSource("getDifferentResponseScenarios")
     public void givenResponseIsNull_shouldReturnZeroSizeByDefault(ResponseEntity<Resource> response) {
         //noinspection unchecked
         given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
@@ -150,7 +146,7 @@ public class DocumentDownloadServiceTest {
         assertEquals(0L, size);
     }
 
-    @Test
+    @ParameterizedTest
     public void canGetUploadedEvidence() {
         Resource expectedResource = mock(Resource.class);
 
@@ -170,7 +166,7 @@ public class DocumentDownloadServiceTest {
         assertThat(downloadFile, is(new UploadedEvidence(expectedResource, filename, contentType)));
     }
 
-    @Test
+    @ParameterizedTest
     public void canDownloadFile() {
         Resource expectedResource = mock(Resource.class);
 
@@ -192,7 +188,7 @@ public class DocumentDownloadServiceTest {
         assertTrue(downloadFile.getHeaders().get(HttpHeaders.CONTENT_TYPE).contains(contentType));
     }
 
-    @Test
+    @ParameterizedTest
     public void canDownloadFileSecure() {
         documentDownloadService = new DocumentDownloadService(documentDownloadClientApi,
                 authTokenGenerator, "http://dm-store:4506", true,
@@ -218,65 +214,73 @@ public class DocumentDownloadServiceTest {
         assertTrue(downloadFile.getHeaders().get(HttpHeaders.CONTENT_TYPE).contains(contentType));
     }
 
-    @Test(expected = DocumentNotFoundException.class)
+    @ParameterizedTest
     public void expectedExceptionForNullDownloadFile() {
-        given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
+        assertThrows(DocumentNotFoundException.class, () -> {
+            given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
                 .willReturn(null);
 
-        String urlString = "http://somedomain/documents/someDocId/binary";
-        documentDownloadService.downloadFile(urlString);
+            String urlString = "http://somedomain/documents/someDocId/binary";
+            documentDownloadService.downloadFile(urlString);
+        });
     }
 
-    @Test(expected = DocumentNotFoundException.class)
+    @ParameterizedTest
     public void expectedExceptionForNullDownloadFileSecure() {
-        documentDownloadService = new DocumentDownloadService(documentDownloadClientApi,
-            authTokenGenerator, "http://dm-store:4506", true,
-            evidenceManagementSecureDocStoreService, idamService);
-
-        given(evidenceManagementSecureDocStoreService.downloadResource(any(), any()))
-                .willReturn(null);
-
-        String urlString = "http://somedomain/documents/someDocId/binary";
-        documentDownloadService.downloadFile(urlString);
-    }
-
-
-    @Test(expected = DocumentNotFoundException.class)
-    public void expectedExceptionForError() {
-        given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
-                .willThrow();
-
-        String urlString = "http://somedomain/documents/someDocId/binary";
-        documentDownloadService.downloadFile(urlString);
-    }
-
-    @Test(expected = DocumentNotFoundException.class)
-    public void expectedExceptionForErrorSecure() {
-        documentDownloadService = new DocumentDownloadService(documentDownloadClientApi,
+        assertThrows(DocumentNotFoundException.class, () -> {
+            documentDownloadService = new DocumentDownloadService(documentDownloadClientApi,
                 authTokenGenerator, "http://dm-store:4506", true,
                 evidenceManagementSecureDocStoreService, idamService);
 
-        given(evidenceManagementSecureDocStoreService.downloadResource(any(), any()))
-                .willThrow();
+            given(evidenceManagementSecureDocStoreService.downloadResource(any(), any()))
+                .willReturn(null);
 
-        String urlString = "http://somedomain/documents/someDocId/binary";
-        documentDownloadService.downloadFile(urlString);
+            String urlString = "http://somedomain/documents/someDocId/binary";
+            documentDownloadService.downloadFile(urlString);
+        });
     }
 
-    @Test
+
+    @ParameterizedTest
+    public void expectedExceptionForError() {
+        assertThrows(DocumentNotFoundException.class, () -> {
+            given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
+                .willThrow();
+
+            String urlString = "http://somedomain/documents/someDocId/binary";
+            documentDownloadService.downloadFile(urlString);
+        });
+    }
+
+    @ParameterizedTest
+    public void expectedExceptionForErrorSecure() {
+        assertThrows(DocumentNotFoundException.class, () -> {
+            documentDownloadService = new DocumentDownloadService(documentDownloadClientApi,
+                authTokenGenerator, "http://dm-store:4506", true,
+                evidenceManagementSecureDocStoreService, idamService);
+
+            given(evidenceManagementSecureDocStoreService.downloadResource(any(), any()))
+                .willThrow();
+
+            String urlString = "http://somedomain/documents/someDocId/binary";
+            documentDownloadService.downloadFile(urlString);
+        });
+    }
+
+    @ParameterizedTest
     public void givenId_thenReturnUrl() {
         String id = "someDocId";
         assertEquals("/documents/" + id + "/binary", documentDownloadService.getDownloadUrl(id));
     }
 
-    @Test
+    @ParameterizedTest
     public void givenUrl_thenReturnUrl() {
         String id = "someDocId";
         assertEquals("/documents/" + id + "/binary", documentDownloadService.getDownloadUrl(urlString));
     }
 
     @SuppressWarnings("unused")
-    private Object[][] getDifferentResponseScenarios() {
+    private static Object[][] getDifferentResponseScenarios() {
         ResponseEntity<Resource> response = ResponseEntity.notFound().build();
         return new Object[][]{
             new Object[]{response},

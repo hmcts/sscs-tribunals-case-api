@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.*;
@@ -11,18 +11,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.quality.Strictness;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -33,11 +29,8 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.exception.UnableToContactThirdPart
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.FurtherEvidencePlaceholderService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CoverLetterServiceTest {
-
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
     @Mock
     private FurtherEvidencePlaceholderService furtherEvidencePlaceholderService;
     @Mock
@@ -48,14 +41,14 @@ public class CoverLetterServiceTest {
 
     private CoverLetterService coverLetterService;
 
-    @Before
+    @BeforeEach
     public void initMocks() {
         MockitoAnnotations.openMocks(this);
         coverLetterService = new CoverLetterService(furtherEvidencePlaceholderService, pdfStoreService, pdfGenerationService, 3);
     }
 
-    @Test
-    @Parameters(method = "generateNullScenarios")
+    @ParameterizedTest
+    @MethodSource("generateNullScenarios")
     public void givenNullArgs_shouldThrowException(byte[] coverLetterContent, List<Pdf> pdfsToBulkPrint) {
         try {
             coverLetterService.appendCoverLetter(coverLetterContent, pdfsToBulkPrint, "");
@@ -65,14 +58,14 @@ public class CoverLetterServiceTest {
         }
     }
 
-    private Object[] generateNullScenarios() {
+    private static Object[] generateNullScenarios() {
         return new Object[]{
             new Object[]{null, buildPdfListWithOneDoc()},
             new Object[]{new byte[]{'d', 'o', 'c'}, null}
         };
     }
 
-    @Test
+    @ParameterizedTest
     public void appendCoverLetter() {
         List<Pdf> pdfsToBulkPrint = buildPdfListWithOneDoc();
         coverLetterService.appendCoverLetter(new byte[]{'l', 'e', 't', 't', 'e', 'r'}, pdfsToBulkPrint, "609_97_OriginalSenderCoverLetter");
@@ -81,7 +74,7 @@ public class CoverLetterServiceTest {
         assertEquals(Arrays.toString(new byte[]{'d', 'o', 'c'}), Arrays.toString(pdfsToBulkPrint.get(1).getContent()));
     }
 
-    @Test
+    @ParameterizedTest
     public void generateCoverLetter() {
         SscsCaseData caseData = SscsCaseData.builder().build();
 
@@ -100,21 +93,23 @@ public class CoverLetterServiceTest {
         assertArgumentsForPdfGeneration();
     }
 
-    @Test(expected = UnableToContactThirdPartyException.class)
+    @ParameterizedTest
     public void generateCoverLetterHandleError() {
-        SscsCaseData caseData = SscsCaseData.builder().build();
+        assertThrows(UnableToContactThirdPartyException.class, () -> {
+            SscsCaseData caseData = SscsCaseData.builder().build();
 
-        given(furtherEvidencePlaceholderService
-            .populatePlaceholders(eq(caseData), eq(APPELLANT_LETTER), eq(null)))
-            .willReturn(Collections.singletonMap("someKey", "someValue"));
+            given(furtherEvidencePlaceholderService
+                .populatePlaceholders(eq(caseData), eq(APPELLANT_LETTER), eq(null)))
+                .willReturn(Collections.singletonMap("someKey", "someValue"));
 
-        when(pdfGenerationService.generatePdf(any(DocumentHolder.class)))
-            .thenThrow(new HttpClientErrorException(HttpStatus.valueOf(400)));
+            when(pdfGenerationService.generatePdf(any(DocumentHolder.class)))
+                .thenThrow(new HttpClientErrorException(HttpStatus.valueOf(400)));
 
-        coverLetterService.generateCoverLetter(caseData, APPELLANT_LETTER, "testName.doc", "testDocName", null);
+            coverLetterService.generateCoverLetter(caseData, APPELLANT_LETTER, "testName.doc", "testDocName", null);
+        });
     }
 
-    @Test
+    @ParameterizedTest
     public void givenDocumentLink_returnExpectedDocuments() {
         String documentFilename1 = "filename1";
         String documentFilename2 = "filename2";
@@ -147,7 +142,7 @@ public class CoverLetterServiceTest {
         assertEquals(2, pdfs.size());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenEditedDocs_returnEditedPdfs() {
         String uneditedSscsFilename = "sscs";
         String editedSscsFilename = "sscs_edited";
@@ -184,7 +179,7 @@ public class CoverLetterServiceTest {
     }
 
 
-    @Test
+    @ParameterizedTest
     public void givenNoDocumentExist_returnEmptyList() {
         String documentFilename1 = "filename1";
 
@@ -275,13 +270,13 @@ public class CoverLetterServiceTest {
             Arrays.toString(pdfsToBulkPrint.get(0).getContent()));
     }
 
-    private List<Pdf> buildPdfListWithOneDoc() {
+    private static List<Pdf> buildPdfListWithOneDoc() {
         List<Pdf> docList = new ArrayList<>(1);
         docList.add(buildPdf());
         return docList;
     }
 
-    private Pdf buildPdf() {
+    private static Pdf buildPdf() {
         byte[] content = new byte[]{'d', 'o', 'c'};
         return new Pdf(content, "doc");
     }

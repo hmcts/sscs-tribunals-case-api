@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios;
 
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcTemplateContent;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcScenario;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
@@ -35,32 +35,34 @@ public class UcScenario4Test {
 
         UcTemplateContent content = UcScenario.SCENARIO_4.getContent(body);
 
-        String expectedContent = "The appeal is allowed.\n"
-            + "\n"
-            + "The decision made by the Secretary of State on 20/09/2020 is set aside.\n"
-            + "\n"
-            + "Felix Sydney has limited capability for work-related activity. The matter is now remitted to the "
-                + "Secretary of State to make a final decision upon entitlement to Universal Credit (UC).\n"
-            + "\n"
-            + "The Secretary of State has accepted that Felix Sydney has limited capability for work. This was not in issue.\n"
-            + "\n"
-            + "The following activity and descriptor from Schedule 7 of the UC Regulations 2013 applied: \n"
-            + "\n"
-            + "12. Coping with change. Cannot cope with any change, due to cognitive impairment or mental disorder, to the extent that day to day life cannot be managed.\n"
-            + "\n"
-            + "\n"
-            + "My first reasons\n"
-            + "\n"
-            + "My second reasons\n"
-            + "\n"
-            + "Something else\n"
-            + "\n"
-            + "This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
-            + "\n";
+        String expectedContent = """
+            The appeal is allowed.
+            
+            The decision made by the Secretary of State on 20/09/2020 is set aside.
+            
+            Felix Sydney has limited capability for work-related activity. The matter is now remitted to the \
+            Secretary of State to make a final decision upon entitlement to Universal Credit (UC).
+            
+            The Secretary of State has accepted that Felix Sydney has limited capability for work. This was not in issue.
+            
+            The following activity and descriptor from Schedule 7 of the UC Regulations 2013 applied: 
+            
+            12. Coping with change. Cannot cope with any change, due to cognitive impairment or mental disorder, to the extent that day to day life cannot be managed.
+            
+            
+            My first reasons
+            
+            My second reasons
+            
+            Something else
+            
+            This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.
+            
+            """;
 
-        Assert.assertEquals(10, content.getComponents().size());
+        Assertions.assertEquals(10, content.getComponents().size());
 
-        Assert.assertEquals(expectedContent, content.toString());
+        Assertions.assertEquals(expectedContent, content.toString());
 
     }
 }

@@ -1,13 +1,12 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
-import static org.apache.http.HttpHeaders.AUTHORIZATION;
+import static org.apache.hc.core5.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.ResponseEntity.ok;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.*;
 import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
 
 import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,7 +30,6 @@ public class CcdCallbackController {
     private final PreSubmitCallbackDispatcher<SscsCaseData> dispatcher;
     private final SscsCaseCallbackDeserializer deserializer;
 
-    @Autowired
     public CcdCallbackController(AuthorisationService authorisationService,
                                  SscsCaseCallbackDeserializer deserializer,
                                  PreSubmitCallbackDispatcher<SscsCaseData> dispatcher) {
@@ -72,7 +70,7 @@ public class CcdCallbackController {
             @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
             @RequestHeader(AUTHORIZATION) String userAuthorisation,
             @RequestBody String message,
-            @RequestParam(value = "pageId", required = false, defaultValue = "") String pageId
+            @RequestParam(required = false, defaultValue = "") String pageId
     ) {
         Callback<SscsCaseData> callback = deserializer.deserialize(message);
         callback.setPageId(pageId);

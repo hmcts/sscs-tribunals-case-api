@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -28,7 +27,6 @@ public class ReciprocalLinkHandler implements CallbackHandler<SscsCaseData> {
 
     private final IdamService idamService;
 
-    @Autowired
     public ReciprocalLinkHandler(CcdService ccdService,
                                  IdamService idamService) {
         this.dispatchPriority = DispatchPriority.LATEST;

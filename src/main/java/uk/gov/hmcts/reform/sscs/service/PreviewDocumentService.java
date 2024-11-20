@@ -38,7 +38,7 @@ public class PreviewDocumentService {
     }
 
     private String createFileName(DocumentType documentType) {
-        return String.format("%s generated on %s.pdf", documentType.getLabel(), LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+        return "%s generated on %s.pdf".formatted(documentType.getLabel(), LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
     }
 
     private String setDocumentDateAdded() {

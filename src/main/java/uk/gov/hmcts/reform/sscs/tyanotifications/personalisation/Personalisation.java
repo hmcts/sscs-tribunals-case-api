@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.personalisation;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
@@ -62,7 +61,7 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.service.SendNotificationHelper;
 @Slf4j
 public class Personalisation<E extends NotificationWrapper> {
 
-    private static final String CRLF = format("%c%c", (char) 0x0D, (char) 0x0A);
+    private static final String CRLF = "%c%c".formatted((char) 0x0D, (char) 0x0A);
     public static final String TEMPLATE_NAME_TEMPLATE_WITH_DIRECTION_TYPE = "%s.%s.%s";
     public static final String TEMPLATE_NAME_TEMPLATE = "%s.%s";
 
@@ -427,7 +426,7 @@ public class Personalisation<E extends NotificationWrapper> {
     private String getAppointeeDescription(SubscriptionType subscriptionType, SscsCaseData ccdResponse) {
         if (APPOINTEE.equals(subscriptionType) && ccdResponse.getAppeal() != null
             && ccdResponse.getAppeal().getAppellant().getName() != null) {
-            return format("You are receiving this update as the appointee for %s.%s%s",
+            return "You are receiving this update as the appointee for %s.%s%s".formatted(
                 ccdResponse.getAppeal().getAppellant().getName().getFullNameNoTitle(), CRLF, CRLF);
         } else {
             return EMPTY;
@@ -715,7 +714,7 @@ public class Personalisation<E extends NotificationWrapper> {
 
     private static String getSubscriptionTemplateName(NotificationEventType notificationEventType,
                                                       SubscriptionType subscriptionType) {
-        return String.format(TEMPLATE_NAME_TEMPLATE,
+        return TEMPLATE_NAME_TEMPLATE.formatted(
             notificationEventType.getId(),
             subscriptionType.name().toLowerCase());
     }
@@ -723,7 +722,7 @@ public class Personalisation<E extends NotificationWrapper> {
     private static String getSubscriptionTemplateNameWithDirection(NotificationEventType notificationEventType,
                                                                    String directionType,
                                                                    SubscriptionType subscriptionType) {
-        return String.format(TEMPLATE_NAME_TEMPLATE_WITH_DIRECTION_TYPE,
+        return TEMPLATE_NAME_TEMPLATE_WITH_DIRECTION_TYPE.formatted(
             notificationEventType.getId(),
             directionType,
             subscriptionType.name().toLowerCase());

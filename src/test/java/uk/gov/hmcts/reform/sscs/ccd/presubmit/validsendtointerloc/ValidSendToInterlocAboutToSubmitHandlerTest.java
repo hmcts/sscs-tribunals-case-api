@@ -1,10 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 
-import static junit.framework.TestCase.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -16,8 +14,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -43,7 +41,7 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
     private SscsCaseData sscsCaseData;
 
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
 
@@ -59,6 +57,7 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPEAL_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
     public void givenANonHandleEvidenceEvent_thenReturnFalse(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
@@ -66,12 +65,14 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"REVIEW_BY_TCW", "REVIEW_BY_JUDGE"})
     public void setsEvidenceHandledFlagToNoForDocumentSelected(SelectWhoReviewsCase selectWhoReviewsCase) {
 
@@ -110,6 +111,7 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPELLANT, APPELLANT", "REPRESENTATIVE, REP", "JOINT_PARTY, JOINT_PARTY"})
     public void givenPostponementRequestInterlocSendToTcw_setsEvidenceHandledFlagToNoForDocumentSelected(PartyItemList originalSenderParty, UploadParty uploadParty) {
 
@@ -160,6 +162,7 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
     public void returnAnErrorIfNoSelectWhoReviewsCaseSelected(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
@@ -173,6 +176,7 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
     public void givenPostponementRequestInterlocSendToTcw_returnAnErrorIfNoOriginalSenderSelected(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
@@ -192,10 +196,12 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
         assertEquals("Must select original sender", response.getErrors().toArray()[0]);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsExceptionIfItCannotHandleTheAppeal() {
-        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThrows(IllegalStateException.class, () -> {
+            when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        });
     }
 
 }

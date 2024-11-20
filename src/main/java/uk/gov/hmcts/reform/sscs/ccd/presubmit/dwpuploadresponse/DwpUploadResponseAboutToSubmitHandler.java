@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
-import static java.lang.String.format;
 import static java.util.Collections.sort;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
@@ -25,7 +24,6 @@ import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -66,7 +64,6 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     private static final Enum<EventType> EVENT_TYPE = EventType.DWP_UPLOAD_RESPONSE;
 
 
-    @Autowired
     public DwpUploadResponseAboutToSubmitHandler(DwpDocumentService dwpDocumentService, AddNoteService addNoteService,
                                                  AddedDocumentsUtil addedDocumentsUtil) {
         this.dwpDocumentService = dwpDocumentService;
@@ -306,7 +303,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
     private void validateDocumentIsAPdf(String documentMessage, DocumentLink documentLink, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (!isFileAPdf(documentLink)) {
-            preSubmitCallbackResponse.addError(format("%s must be a PDF.", documentMessage));
+            preSubmitCallbackResponse.addError("%s must be a PDF.".formatted(documentMessage));
         }
     }
 

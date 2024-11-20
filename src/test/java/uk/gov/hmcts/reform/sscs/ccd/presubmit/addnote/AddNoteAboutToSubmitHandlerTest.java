@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.addnote;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -15,8 +15,8 @@ import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -44,7 +44,7 @@ public class AddNoteAboutToSubmitHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         AddNoteService addNoteService = new AddNoteService(userDetailsService);
@@ -124,6 +124,7 @@ public class AddNoteAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"APPEAL_RECEIVED"})
     public void givenANonAddNoteEvent_thenReturnFalse(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
@@ -131,16 +132,19 @@ public class AddNoteAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"ADD_NOTE"})
     public void givenAHandleAddNoteEvent_thenReturnTrue(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
         assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsExceptionIfItCannotHandleTheAppeal() {
-        when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThrows(IllegalStateException.class, () -> {
+            when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        });
     }
 
     @Test
@@ -157,6 +161,7 @@ public class AddNoteAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "TIME_EXTENSION",
         "PHE_REQUEST",
@@ -180,7 +185,7 @@ public class AddNoteAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        String expectedNote = String.format("Referred to interloc for review by judge - %s - Here is my note",
+        String expectedNote = "Referred to interloc for review by judge - %s - Here is my note".formatted(
             value.getDescription());
 
         assertEquals(1, response.getData().getAppealNotePad().getNotesCollection().size());
@@ -237,15 +242,17 @@ public class AddNoteAboutToSubmitHandlerTest {
         assertEquals(LocalDate.now().toString(), response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDate());
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testNoUserDetails_thenThrowsException() {
-        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenThrow(new IllegalStateException("Unable to obtain signed in user details"));
+        assertThrows(IllegalStateException.class, () -> {
+            when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenThrow(new IllegalStateException("Unable to obtain signed in user details"));
 
-        sscsCaseData.setTempNoteDetail("Here is my note");
+            sscsCaseData.setTempNoteDetail("Here is my note");
 
-        sscsCaseData.setAppealNotePad(NotePad.builder().notesCollection(null).build());
+            sscsCaseData.setAppealNotePad(NotePad.builder().notesCollection(null).build());
 
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        });
     }
 
     @NotNull

@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
@@ -46,7 +45,6 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
     private final SscsCcdConvertService sscsCcdConvertService;
     private final CcdClient ccdClient;
 
-    @Autowired
     public IssueFurtherEvidenceHandler(FurtherEvidenceService furtherEvidenceService,
                                        UpdateCcdCaseService updateCcdCaseService,
                                        IdamService idamService,
@@ -126,7 +124,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         } catch (Exception e) {
             handleIssueFurtherEvidenceException(caseData);
             String errorMsg = "Failed sending further evidence for case(%s)...";
-            throw new IssueFurtherEvidenceException(String.format(errorMsg, caseData.getCcdCaseId()), e);
+            throw new IssueFurtherEvidenceException(errorMsg.formatted(caseData.getCcdCaseId()), e);
         }
         log.info("Issued for caseId {}", caseData.getCcdCaseId());
     }
@@ -164,7 +162,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         } catch (Exception e) {
             String errorMsg = "Failed to update document evidence issued flags after issuing further evidence "
                     + "for case(%s)";
-            throw new PostIssueFurtherEvidenceTasksException(String.format(errorMsg, caseId), e);
+            throw new PostIssueFurtherEvidenceTasksException(errorMsg.formatted(caseId), e);
         }
     }
 

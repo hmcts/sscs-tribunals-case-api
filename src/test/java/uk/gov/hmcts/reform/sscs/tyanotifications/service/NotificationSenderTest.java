@@ -2,8 +2,7 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender.DATE_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender.ZONE_ID_LONDON;
@@ -17,15 +16,16 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.pdfbox.io.IOUtils;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationTestRecipients;
@@ -33,10 +33,10 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.service.notify.*;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 @RunWith(JUnitParamsRunner.class)
 public class NotificationSenderTest {
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
     public static final String CCD_CASE_ID = "78980909090099";
     public static final SscsCaseData SSCS_CASE_DATA = SscsCaseData.builder().build();
     public static final String SMS_SENDER = "sms-sender";
@@ -75,7 +75,7 @@ public class NotificationSenderTest {
     @Captor
     private ArgumentCaptor<Correspondence> correspondenceArgumentCaptor;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         templateId = "templateId";
         personalisation = Collections.emptyMap();
@@ -297,46 +297,58 @@ public class NotificationSenderTest {
         verifyNoMoreInteractions(saveCorrespondenceAsyncService);
     }
 
-    @Test(expected = NotificationClientException.class)
+    @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"null", "NotificationClientException"})
-    public void shouldCatchAndThrowAnyExceptionFromGovNotifyOnSendEmail(String error) throws NotificationClientException {
-        String emailAddress = "test123@hmcts.net";
-        Exception exception = (error.equals("null")) ? new NullPointerException(error) : new NotificationClientException(error);
-        doThrow(exception).when(testNotificationClient).sendEmail(templateId, emailAddress, personalisation, reference);
+    public void shouldCatchAndThrowAnyExceptionFromGovNotifyOnSendEmail(String error) {
+        assertThrows(NotificationClientException.class, () -> {
+            String emailAddress = "test123@hmcts.net";
+            Exception exception = (error.equals("null")) ? new NullPointerException(error) : new NotificationClientException(error);
+            doThrow(exception).when(testNotificationClient).sendEmail(templateId, emailAddress, personalisation, reference);
 
-        notificationSender.sendEmail(templateId, emailAddress, personalisation, reference, NotificationEventType.APPEAL_RECEIVED, SSCS_CASE_DATA);
+            notificationSender.sendEmail(templateId, emailAddress, personalisation, reference, NotificationEventType.APPEAL_RECEIVED, SSCS_CASE_DATA);
+        });
     }
 
-    @Test(expected = NotificationClientException.class)
+    @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"null", "NotificationClientException"})
-    public void shouldCatchAndThrowAnyExceptionFromGovNotifyOnSendSms(String error) throws NotificationClientException {
-        String smsNumber = "07999999000";
-        Exception exception = (error.equals("null")) ? new NullPointerException(error) : new NotificationClientException(error);
-        doThrow(exception).when(notificationClient).sendSms(templateId, smsNumber, personalisation, reference, "Sender");
+    public void shouldCatchAndThrowAnyExceptionFromGovNotifyOnSendSms(String error) {
+        assertThrows(NotificationClientException.class, () -> {
+            String smsNumber = "07999999000";
+            Exception exception = (error.equals("null")) ? new NullPointerException(error) : new NotificationClientException(error);
+            doThrow(exception).when(notificationClient).sendSms(templateId, smsNumber, personalisation, reference, "Sender");
 
-        notificationSender.sendSms(templateId, smsNumber, personalisation, reference, "Sender", NotificationEventType.APPEAL_RECEIVED, SSCS_CASE_DATA);
+            notificationSender.sendSms(templateId, smsNumber, personalisation, reference, "Sender", NotificationEventType.APPEAL_RECEIVED, SSCS_CASE_DATA);
+        });
     }
 
-    @Test(expected = NotificationClientException.class)
+    @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"null", "NotificationClientException"})
-    public void shouldCatchAndThrowAnyExceptionFromGovNotifyOnSendLetter(String error) throws NotificationClientException {
-        String postcode = "TS1 1ST";
-        Address address = Address.builder().line1("1 Appellant Ave").town("Sometown").county("Somecounty").postcode(postcode).build();
-        Exception exception = (error.equals("null")) ? new NullPointerException(error) : new NotificationClientException(error);
-        doThrow(exception).when(notificationClient).sendLetter(any(), any(), any());
+    public void shouldCatchAndThrowAnyExceptionFromGovNotifyOnSendLetter(String error) {
+        assertThrows(NotificationClientException.class, () -> {
+            String postcode = "TS1 1ST";
+            Address address = Address.builder().line1("1 Appellant Ave").town("Sometown").county("Somecounty").postcode(postcode).build();
+            Exception exception = (error.equals("null")) ? new NullPointerException(error) : new NotificationClientException(error);
+            doThrow(exception).when(notificationClient).sendLetter(any(), any(), any());
 
-        notificationSender.sendLetter(templateId, address, personalisation, NotificationEventType.APPEAL_RECEIVED, "Bob Squires", CCD_CASE_ID);
+            notificationSender.sendLetter(templateId, address, personalisation, NotificationEventType.APPEAL_RECEIVED, "Bob Squires", CCD_CASE_ID);
+        });
     }
 
-    @Test(expected = NotificationClientException.class)
+    @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"null", "NotificationClientException"})
-    public void shouldCatchAndThrowAnyExceptionFromGovNotifyOnSendBundledLetter(String error) throws NotificationClientException, IOException {
-        Exception exception = (error.equals("null")) ? new NullPointerException(error) : new NotificationClientException(error);
-        doThrow(exception).when(notificationClient).sendPrecompiledLetterWithInputStream(any(), any());
+    public void shouldCatchAndThrowAnyExceptionFromGovNotifyOnSendBundledLetter(String error) {
+        assertThrows(NotificationClientException.class, () -> {
+            Exception exception = (error.equals("null")) ? new NullPointerException(error) : new NotificationClientException(error);
+            doThrow(exception).when(notificationClient).sendPrecompiledLetterWithInputStream(any(), any());
 
-        String postcode = "LN8 4DX";
-        byte[] sampleDirectionCoversheet = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/direction-notice-coversheet-sample.pdf"));
-        notificationSender.sendBundledLetter(postcode, sampleDirectionCoversheet, NotificationEventType.APPEAL_RECEIVED, "Bob Squires", CCD_CASE_ID);
+            String postcode = "LN8 4DX";
+            byte[] sampleDirectionCoversheet = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/direction-notice-coversheet-sample.pdf"));
+            notificationSender.sendBundledLetter(postcode, sampleDirectionCoversheet, NotificationEventType.APPEAL_RECEIVED, "Bob Squires", CCD_CASE_ID);
+        });
     }
 
     @Test

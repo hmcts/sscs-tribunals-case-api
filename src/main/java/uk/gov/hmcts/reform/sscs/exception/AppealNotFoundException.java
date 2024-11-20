@@ -7,11 +7,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class AppealNotFoundException extends RuntimeException {
 
     public AppealNotFoundException(String appealNumber) {
-        super(String.format("Appeal not found for appeal number: %s ", appealNumber));
+        super("Appeal not found for appeal number: %s ".formatted(appealNumber));
     }
 
     public AppealNotFoundException(Long caseId) {
-        super(String.format("Appeal not found for case id: %s ", caseId));
+        super("Appeal not found for case id: %s ".formatted(caseId));
     }
 
 }

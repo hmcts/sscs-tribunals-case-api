@@ -17,7 +17,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -38,7 +37,6 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
 
     private static final Enum<EventType> EVENT_TYPE = EventType.UPLOAD_DOCUMENT_FURTHER_EVIDENCE;
 
-    @Autowired
     public UploadDocumentFurtherEvidenceAboutToSubmitHandler(AddedDocumentsUtil addedDocumentsUtil) {
         this.addedDocumentsUtil = addedDocumentsUtil;
     }

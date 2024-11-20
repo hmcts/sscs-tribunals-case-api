@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadwelshdocument;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_WELSH_DOCUMENT;
@@ -8,16 +8,16 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_
 
 import java.time.LocalDateTime;
 import java.util.*;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -25,14 +25,12 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.WelshFooterService;
 
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class UploadWelshDocumentsAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
     private UploadWelshDocumentsAboutToSubmitHandler handler;
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -45,7 +43,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         handler = new UploadWelshDocumentsAboutToSubmitHandler(welshFooterService);
@@ -55,8 +53,8 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
 
-    @Test
-    @Parameters(method = "generateCanHandleScenarios")
+    @ParameterizedTest
+    @MethodSource("generateCanHandleScenarios")
     public void givenCanHandleIsCalled_shouldReturnCorrectResult(CallbackType callbackType,
                                                                  Callback<SscsCaseData> callback,
                                                                  boolean expectedResult) {
@@ -245,13 +243,13 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
         assertNull(caseData.getSscsWelshPreviewNextEvent());
     }
 
-    private Object[] generateCanHandleScenarios() {
+    private static Object[] generateCanHandleScenarios() {
         Callback<SscsCaseData> callbackWithValidEventOption =
             buildCallback("callbackWithValidEventOption", UPLOAD_WELSH_DOCUMENT, buildSscsDocuments(false), buildSscsWelshDocuments(DocumentType.SSCS1.getValue()), null, State.VALID_APPEAL);
         return new Object[]{new Object[]{ABOUT_TO_SUBMIT, callbackWithValidEventOption, true}};
     }
 
-    private Callback<SscsCaseData> buildCallback(String dynamicListItemCode, EventType eventType,
+    private static Callback<SscsCaseData> buildCallback(String dynamicListItemCode, EventType eventType,
                                                  List<SscsDocument> sscsDocuments, List<SscsWelshDocument> welshDocuments, List<DwpDocument> dwpDocuments, State state) {
 
         final DynamicList dynamicList = new DynamicList(new DynamicListItem(dynamicListItemCode, "label"),
@@ -268,7 +266,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
         return new Callback<>(caseDetails, Optional.empty(), eventType, false);
     }
 
-    private List<SscsDocument> buildSscsDocuments(boolean moreThanOneDoc) {
+    private static List<SscsDocument> buildSscsDocuments(boolean moreThanOneDoc) {
 
         SscsDocument sscs1Doc = buildSscsDocument("english.pdf", "/anotherUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.SSCS1.getValue(), "A");
 
@@ -291,7 +289,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
         return dwpDocuments;
     }
 
-    private List<SscsWelshDocument> buildSscsWelshDocuments(String documentType) {
+    private static List<SscsWelshDocument> buildSscsWelshDocuments(String documentType) {
         return Arrays.asList(SscsWelshDocument.builder()
             .value(SscsWelshDocumentDetails.builder()
                 .documentLink(DocumentLink.builder()
@@ -313,7 +311,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
             .build());
     }
 
-    private SscsDocument buildSscsDocument(String filename, String documentUrl, SscsDocumentTranslationStatus translationRequested, String documentType, String bundleAddition) {
+    private static SscsDocument buildSscsDocument(String filename, String documentUrl, SscsDocumentTranslationStatus translationRequested, String documentType, String bundleAddition) {
         return SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
                 .documentLink(DocumentLink.builder()

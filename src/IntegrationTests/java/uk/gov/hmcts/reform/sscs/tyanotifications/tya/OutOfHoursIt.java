@@ -12,10 +12,8 @@ import java.time.ZonedDateTime;
 import java.util.UUID;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.quartz.Scheduler;
@@ -28,8 +26,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -57,13 +53,6 @@ import uk.gov.service.notify.SendSmsResponse;
 @ActiveProfiles("integration")
 @AutoConfigureMockMvc
 public class OutOfHoursIt {
-
-    // Below rules are needed to use the junitParamsRunner together with SpringRunner
-    @ClassRule
-    public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
-
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
 
     MockMvc mockMvc;
 
@@ -136,7 +125,7 @@ public class OutOfHoursIt {
     @Mock
     private SaveCorrespondenceAsyncService saveCorrespondenceAsyncService;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         outOfHoursCalculator = mock(OutOfHoursCalculator.class);
         LocalDateTime dateBefore = LocalDateTime.now();

@@ -1,9 +1,6 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.UNREGISTERED;
@@ -19,7 +16,9 @@ import java.util.*;
 import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
-import org.junit.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -30,8 +29,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.document.domain.Document;
@@ -62,13 +59,6 @@ import uk.gov.hmcts.reform.sscs.service.servicebus.TopicConsumer;
 @SpringBootTest
 @TestPropertySource(locations = "classpath:config/application_es_it.properties")
 public class EvidenceShareServiceIt {
-
-    // Below rules are needed to use the junitParamsRunner together with SpringRunner
-    @ClassRule
-    public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
-
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
     //end of rules needed for junitParamsRunner
 
     @MockBean
@@ -149,14 +139,14 @@ public class EvidenceShareServiceIt {
 
     Optional<UUID> expectedOptionalUuid = Optional.of(UUID.fromString("0f14d0ab-9605-4a62-a9e4-5ed26688389b"));
 
-    @Before
+    @BeforeEach
     public void setup() {
         message = new MimeMessage(session);
         when(mailSender.createMimeMessage()).thenReturn(message);
 
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
 
-        assertNotNull("SendToBulkPrintHandler must be autowired", bulkPrintHandler);
+        assertNotNull(bulkPrintHandler, "SendToBulkPrintHandler must be autowired");
     }
 
     @Test
@@ -226,10 +216,10 @@ public class EvidenceShareServiceIt {
 
         topicConsumer.onMessage(json, "1");
 
-        Assert.assertEquals(3, documentCaptor.getValue().size());
-        Assert.assertEquals("dl16-12345656789.pdf", documentCaptor.getValue().get(0).getName());
-        Assert.assertEquals("sscs1.pdf", documentCaptor.getValue().get(1).getName());
-        Assert.assertEquals("filename1.pdf", documentCaptor.getValue().get(2).getName());
+        Assertions.assertEquals(3, documentCaptor.getValue().size());
+        Assertions.assertEquals("dl16-12345656789.pdf", documentCaptor.getValue().get(0).getName());
+        Assertions.assertEquals("sscs1.pdf", documentCaptor.getValue().get(1).getName());
+        Assertions.assertEquals("filename1.pdf", documentCaptor.getValue().get(2).getName());
 
         verify(restTemplate).postForEntity(anyString(), any(), eq(byte[].class));
         verify(evidenceManagementService).upload(any(), eq("sscs"));
@@ -268,10 +258,10 @@ public class EvidenceShareServiceIt {
 
         topicConsumer.onMessage(json, "1");
 
-        Assert.assertEquals(3, documentCaptor.getValue().size());
-        Assert.assertEquals("dl16-12345656789.pdf", documentCaptor.getValue().get(0).getName());
-        Assert.assertEquals("sscs1.pdf", documentCaptor.getValue().get(1).getName());
-        Assert.assertEquals("filename1.pdf", documentCaptor.getValue().get(2).getName());
+        Assertions.assertEquals(3, documentCaptor.getValue().size());
+        Assertions.assertEquals("dl16-12345656789.pdf", documentCaptor.getValue().get(0).getName());
+        Assertions.assertEquals("sscs1.pdf", documentCaptor.getValue().get(1).getName());
+        Assertions.assertEquals("filename1.pdf", documentCaptor.getValue().get(2).getName());
 
         verify(restTemplate).postForEntity(anyString(), any(), eq(byte[].class));
         verify(evidenceManagementSecureDocStoreService).upload(any(), any());

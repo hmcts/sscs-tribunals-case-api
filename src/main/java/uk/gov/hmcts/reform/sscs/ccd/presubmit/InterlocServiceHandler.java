@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
@@ -22,7 +21,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 @Slf4j
 public class InterlocServiceHandler extends EventToFieldPreSubmitCallbackHandler {
 
-    @Autowired
     public InterlocServiceHandler() {
         super(createMappings());
     }

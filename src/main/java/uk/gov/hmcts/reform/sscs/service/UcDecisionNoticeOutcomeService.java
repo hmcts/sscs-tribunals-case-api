@@ -4,7 +4,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -18,7 +17,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcPointsRegu
 @Service
 public class UcDecisionNoticeOutcomeService extends DecisionNoticeOutcomeService {
 
-    @Autowired
     public UcDecisionNoticeOutcomeService(UcDecisionNoticeQuestionService questionService) {
         super("UC", questionService);
     }

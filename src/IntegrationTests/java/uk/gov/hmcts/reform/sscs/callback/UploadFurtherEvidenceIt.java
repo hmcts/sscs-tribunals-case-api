@@ -1,11 +1,10 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
-import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
@@ -15,8 +14,8 @@ import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,7 +31,7 @@ public class UploadFurtherEvidenceIt extends AbstractEventIt {
     public static final String JURISDICTION = "Benefit";
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         super.setup();
         sscsCaseData = SscsCaseData.builder()
@@ -45,9 +44,10 @@ public class UploadFurtherEvidenceIt extends AbstractEventIt {
 
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"pdf", "PDF", "mp3", "MP3", "mp4", "MP4"})
     public void shouldMoveOneDraftUploadsToSscsDocumentsOrAudioVideoEvidence(String fileType) throws Exception {
-        final List<DraftSscsDocument> draftDocs = getDraftSscsDocuments(format("document.%s", fileType));
+        final List<DraftSscsDocument> draftDocs = getDraftSscsDocuments("document.%s".formatted(fileType));
         sscsCaseData.setDraftFurtherEvidenceDocuments(draftDocs);
         setJson(sscsCaseData, UPLOAD_FURTHER_EVIDENCE);
         

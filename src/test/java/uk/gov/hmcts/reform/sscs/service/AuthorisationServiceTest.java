@@ -1,18 +1,18 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import feign.FeignException;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class AuthorisationServiceTest {
 
     @Mock
@@ -20,7 +20,7 @@ public class AuthorisationServiceTest {
 
     private AuthorisationService authorisationService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         authorisationService = new AuthorisationService(serviceAuthorisationApi);
     }
@@ -35,14 +35,16 @@ public class AuthorisationServiceTest {
         verify(serviceAuthorisationApi).getServiceName(serviceAuthHeader);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void shouldThrowExcpetionWhenNotAuthorise() {
-        String serviceAuthHeader = "anyString";
-        when(serviceAuthorisationApi.getServiceName(serviceAuthHeader)).thenThrow(FeignException.class);
+        assertThrows(RuntimeException.class, () -> {
+            String serviceAuthHeader = "anyString";
+            when(serviceAuthorisationApi.getServiceName(serviceAuthHeader)).thenThrow(FeignException.class);
 
-        authorisationService.authorise(serviceAuthHeader);
+            authorisationService.authorise(serviceAuthHeader);
 
-        assertFalse(true);
+            assertFalse(true);
+        });
     }
 
 }

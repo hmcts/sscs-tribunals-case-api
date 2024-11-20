@@ -106,7 +106,7 @@ public class TribunalsCaseApiApplication implements CommandLineRunner {
     }
 
     @Bean
-    public RestTemplate restTemplate() {
+    RestTemplate restTemplate() {
         List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
         messageConverters.add(new ByteArrayHttpMessageConverter());
         messageConverters.add(new StringHttpMessageConverter());
@@ -130,7 +130,7 @@ public class TribunalsCaseApiApplication implements CommandLineRunner {
     }
 
     @Bean
-    public JavaMailSender javaMailSender() {
+    JavaMailSender javaMailSender() {
         JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
         javaMailSender.setHost(emailHost);
         javaMailSender.setPort(emailPort);
@@ -150,7 +150,7 @@ public class TribunalsCaseApiApplication implements CommandLineRunner {
     }
 
     @Bean
-    public OkHttpClient okHttpClient() {
+    OkHttpClient okHttpClient() {
         int timeout = 10;
         return new OkHttpClient.Builder()
             .connectTimeout(timeout, TimeUnit.MINUTES)
@@ -160,7 +160,7 @@ public class TribunalsCaseApiApplication implements CommandLineRunner {
     }
 
     @Bean
-    public CcdRequestDetails getRequestDetails(
+    CcdRequestDetails getRequestDetails(
         @Value("${core_case_data.jurisdictionId}") String coreCaseDataJurisdictionId,
         @Value("${core_case_data.caseTypeId}") String coreCaseDataCaseTypeId) {
         return CcdRequestDetails.builder()
@@ -170,7 +170,7 @@ public class TribunalsCaseApiApplication implements CommandLineRunner {
     }
 
     @Bean
-    public DocmosisPdfGenerationService docmosisPdfGenerationService(
+    DocmosisPdfGenerationService docmosisPdfGenerationService(
         @Value("${docmosis.uri}") String docmosisServiceEndpoint,
         @Value("${docmosis.accessKey}") String docmosisServiceAccessKey,
         RestTemplate restTemplate
@@ -203,17 +203,17 @@ public class TribunalsCaseApiApplication implements CommandLineRunner {
 
     @Bean
     @Primary
-    public NotificationClient notificationClient() {
+    NotificationClient notificationClient() {
         return new NotificationClient(apiKey);
     }
 
     @Bean
-    public NotificationClient testNotificationClient() {
+    NotificationClient testNotificationClient() {
         return new NotificationClient(testApiKey);
     }
 
     @Bean
-    public MessageSource messageSource() {
+    MessageSource messageSource() {
         ReloadableResourceBundleMessageSource bean = new ReloadableResourceBundleMessageSource();
         bean.setBasename("classpath:application");
         bean.setDefaultEncoding("UTF-8");
@@ -222,18 +222,18 @@ public class TribunalsCaseApiApplication implements CommandLineRunner {
 
     @Bean
     @ConditionalOnProperty("spring.flyway.enabled")
-    public JobFactory jobFactory(ApplicationContext context, FlywayMigrationInitializer flywayInitializer) {
+    JobFactory jobFactory(ApplicationContext context, FlywayMigrationInitializer flywayInitializer) {
         return (new QuartzConfiguration()).jobFactory(context);
     }
 
     @Bean
-    public JobMapper getJobMapper(CcdActionDeserializer ccdActionDeserializer,
-                                  NotificationService notificationService,
-                                  RetryNotificationService retryNotificationService,
-                                  CcdService ccdService,
-                                  UpdateCcdCaseService updateCcdCaseService,
-                                  IdamService idamService,
-                                  SscsCaseCallbackDeserializer deserializer) {
+    JobMapper getJobMapper(CcdActionDeserializer ccdActionDeserializer,
+        NotificationService notificationService,
+        RetryNotificationService retryNotificationService,
+        CcdService ccdService,
+        UpdateCcdCaseService updateCcdCaseService,
+        IdamService idamService,
+        SscsCaseCallbackDeserializer deserializer) {
         // Had to wire these up like this Spring will not wire up CcdActionExecutor otherwise.
         CcdActionExecutor ccdActionExecutor = new CcdActionExecutor(notificationService, retryNotificationService, ccdService, updateCcdCaseService, idamService, deserializer);
         return new JobMapper(asList(
@@ -242,8 +242,8 @@ public class TribunalsCaseApiApplication implements CommandLineRunner {
     }
 
     @Bean
-    public JobClassMapper getJobClassMapper(CohActionSerializer cohActionSerializer,
-                                            CcdActionSerializer ccdActionSerializer) {
+    JobClassMapper getJobClassMapper(CohActionSerializer cohActionSerializer,
+        CcdActionSerializer ccdActionSerializer) {
         return new JobClassMapper(asList(
             new JobClassMapping<>(CohJobPayload.class, cohActionSerializer),
             new JobClassMapping<>(String.class, ccdActionSerializer)

@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 public class LaunchDarklyConfiguration {
 
     @Bean
-    public LDClient ldClient(@Value("${ld.sdk-key}") String sdkKey) {
+    LDClient ldClient(@Value("${ld.sdk-key}") String sdkKey) {
         return new LDClient(sdkKey);
     }
 }

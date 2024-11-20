@@ -7,8 +7,8 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -35,7 +35,7 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
     @Mock
     private UserDetailsService userDetailsService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
 

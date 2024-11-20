@@ -23,7 +23,6 @@ import uk.gov.service.notify.NotificationClientException;
 public class SaveCorrespondenceAsyncService {
     private final CcdNotificationsPdfService ccdNotificationsPdfService;
 
-    @Autowired
     public SaveCorrespondenceAsyncService(CcdNotificationsPdfService ccdNotificationsPdfService) {
         this.ccdNotificationsPdfService = ccdNotificationsPdfService;
     }

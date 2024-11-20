@@ -11,8 +11,8 @@ import static org.springframework.http.HttpStatus.*;
 
 import java.util.List;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +33,7 @@ public class EvidenceUploadControllerTest {
     private Evidence evidence;
     private CoversheetService coversheetService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         evidenceUploadService = mock(EvidenceUploadService.class);
         coversheetService = mock(CoversheetService.class);

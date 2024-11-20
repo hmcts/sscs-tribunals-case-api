@@ -1,14 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.withdrawnappeals;
 
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.WITHDRAWN;
 
 import java.io.IOException;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -24,6 +25,7 @@ public class DwpActionWithdrawalHandlerTest extends AdminAppealWithdrawnBase {
     private final DwpActionWithdrawalHandler handler = new DwpActionWithdrawalHandler();
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "ABOUT_TO_SUBMIT,DWP_ACTION_WITHDRAWAL,WITHDRAWAL_RECEIVED,true",
         "ABOUT_TO_SUBMIT,DWP_ACTION_WITHDRAWAL,REGISTERED,false",
@@ -90,14 +92,15 @@ public class DwpActionWithdrawalHandlerTest extends AdminAppealWithdrawnBase {
             .isEqualTo(expectedCaseData);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "ABOUT_TO_START,DWP_ACTION_WITHDRAWAL",
         "ABOUT_TO_SUBMIT,null",
         "null,DWP_ACTION_WITHDRAWAL"
     })
-    public void handleCornerCaseScenarios(@Nullable CallbackType callbackType, @Nullable EventType eventType)
-        throws IOException {
-        handler.handle(callbackType, buildTestCallbackGivenEvent(eventType, DWP_ACTION_WITHDRAWAL_CALLBACK_JSON), USER_AUTHORISATION);
+    public void handleCornerCaseScenarios(@Nullable CallbackType callbackType, @Nullable EventType eventType) {
+        assertThrows(IllegalStateException.class, () ->
+            handler.handle(callbackType, buildTestCallbackGivenEvent(eventType, DWP_ACTION_WITHDRAWAL_CALLBACK_JSON), USER_AUTHORISATION));
     }
 }

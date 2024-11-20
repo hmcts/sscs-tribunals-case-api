@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -16,15 +16,16 @@ import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
@@ -54,9 +55,6 @@ public class FooterServiceTest {
 
     private FooterService footerService;
 
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule();
-
     @Captor
     private ArgumentCaptor<String> stringCaptor;
 
@@ -75,7 +73,7 @@ public class FooterServiceTest {
     private String expectedDocumentUrl = "document-self-href";
     private String expectedBinaryUrl = "document-binary-href";
 
-    @Before
+    @BeforeEach
     public void setup() {
         footerService = new FooterService(pdfStoreService, pdfWatermarker);
 
@@ -112,6 +110,7 @@ public class FooterServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "DIRECTION_NOTICE, issued",
         "STATEMENT_OF_EVIDENCE, issued",
@@ -137,7 +136,7 @@ public class FooterServiceTest {
         assertEquals(2, sscsCaseData.getSscsDocument().size());
         SscsDocumentDetails footerDoc = sscsCaseData.getSscsDocument().get(0).getValue();
         assertEquals(documentType.getValue(), footerDoc.getDocumentType());
-        String expectedFilename = String.format("Addition A - %s %s on %s.pdf", documentType.getLabel(), verb, now);
+        String expectedFilename = "Addition A - %s %s on %s.pdf".formatted(documentType.getLabel(), verb, now);
         assertEquals(expectedFilename, footerDoc.getDocumentFileName());
         assertEquals(now, footerDoc.getDocumentDateAdded());
         assertEquals(expectedDocumentUrl, footerDoc.getDocumentLink().getDocumentUrl());
@@ -209,6 +208,7 @@ public class FooterServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"", "A", "B", "C", "D", "X", "Y"})
     public void canWorkOutTheNextAppendixValue(String currentAppendix) {
         List<SscsDocument> sscsDocuments = new ArrayList<>();
@@ -238,6 +238,7 @@ public class FooterServiceTest {
 
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"Z", "Z1", "Z9", "Z85", "Z100"})
     public void canWorkOutTheNextAppendixValueAfterZ(String currentAppendix) {
         SscsDocument theDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition(currentAppendix).build()).build();
@@ -271,6 +272,7 @@ public class FooterServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"Z!", "Z3$", "ZN"})
     public void nextAppendixCanHandleInvalidDataThatAreNotNumbersAfterZ(String currentAppendix) {
         SscsDocument theDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition(currentAppendix).build()).build();

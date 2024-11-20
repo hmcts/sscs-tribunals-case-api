@@ -11,9 +11,8 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -25,7 +24,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -42,7 +40,6 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.service.OutOfHoursCalculator;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis.PdfLetterService;
 import uk.gov.service.notify.*;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("integration")
 @AutoConfigureMockMvc
@@ -92,7 +89,7 @@ public class HearingReminderIt {
     @MockBean
     private IdamService idamService;
 
-    @Before
+    @BeforeEach
     public void setup() throws NotificationClientException {
         controller = new NotificationController(notificationService, authorisationService, ccdService, deserializer, idamService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();

@@ -1,15 +1,13 @@
 package uk.gov.hmcts.reform.sscs.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -40,6 +38,7 @@ public class AudioVideoEvidenceUtilTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "appellantEvidence",
         "jointPartyEvidence",
@@ -52,6 +51,7 @@ public class AudioVideoEvidenceUtilTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "test.mp3, audioDocument",
         "test2.mp4, videoDocument",
@@ -67,6 +67,7 @@ public class AudioVideoEvidenceUtilTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "jointPartyEvidence, Joint party",
         "representativeEvidence, Representative",

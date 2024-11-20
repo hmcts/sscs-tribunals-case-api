@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
@@ -18,7 +17,6 @@ public class AdjournCaseCcdService {
 
     private final VenueRpcDetailsService venueRpcDetailsService;
 
-    @Autowired
     public AdjournCaseCcdService(VenueRpcDetailsService venueRpcDetailsService) {
         this.venueRpcDetailsService = venueRpcDetailsService;
     }

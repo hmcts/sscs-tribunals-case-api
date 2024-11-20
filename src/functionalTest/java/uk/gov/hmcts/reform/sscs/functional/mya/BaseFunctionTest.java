@@ -1,34 +1,24 @@
 package uk.gov.hmcts.reform.sscs.functional.mya;
 
 import static java.lang.Long.valueOf;
-import static org.apache.http.conn.ssl.SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
 
 import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpHost;
-import org.apache.http.client.HttpClient;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.ssl.SSLContextBuilder;
-import org.junit.Before;
-import org.junit.runner.RunWith;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = {TribunalsCaseApiApplication.class, CitizenIdamService.class})
 @Slf4j
 public abstract class BaseFunctionTest {
@@ -52,7 +42,7 @@ public abstract class BaseFunctionTest {
     private String idamApiUrl;
     protected IdamTestApiRequests idamTestApiRequests;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         myaClient = buildClient("USE_MYA_PROXY");
         client = buildClient("USE_BACKEND_PROXY");
@@ -61,7 +51,7 @@ public abstract class BaseFunctionTest {
     }
 
     protected String createRandomEmail() {
-        int randomNumber = (int) (Math.random() * 10000000);
+        int randomNumber = (int) (ThreadLocalRandom.current().nextDouble() * 10000000);
         String emailAddress = "test" + randomNumber + "@hmcts.net";
         log.info("emailAddress " + emailAddress);
         return emailAddress;
@@ -82,17 +72,8 @@ public abstract class BaseFunctionTest {
         return createdCcdCase;
     }
 
-    private CloseableHttpClient buildClient(String proxySystemProperty) throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
-        SSLContextBuilder builder = new SSLContextBuilder();
-        builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-        SSLConnectionSocketFactory sslsf =
-                new SSLConnectionSocketFactory(builder.build(), ALLOW_ALL_HOSTNAME_VERIFIER);
-
-        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create()
-                .setSSLSocketFactory(sslsf);
-        if (System.getenv(proxySystemProperty) != null) {
-            httpClientBuilder = httpClientBuilder.setProxy(new HttpHost("proxyout.reform.hmcts.net", 8080));
-        }
+    private CloseableHttpClient buildClient(String proxySystemProperty) {
+        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
         return httpClientBuilder.build();
     }
 

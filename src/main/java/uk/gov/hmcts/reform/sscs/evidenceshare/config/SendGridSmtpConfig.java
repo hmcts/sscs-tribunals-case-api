@@ -45,7 +45,7 @@ public class SendGridSmtpConfig {
     }
 
     @Bean("sendGridMailSender")
-    public JavaMailSender javaMailSender() {
+    JavaMailSender javaMailSender() {
         JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
         javaMailSender.setHost(host);
         javaMailSender.setPort(port);

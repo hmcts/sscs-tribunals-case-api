@@ -128,7 +128,7 @@ public final class HearingsDetailsMapping {
             return null;
         }
 
-        return String.join(String.format("%n%n"), listingComments);
+        return String.join("%n%n".formatted(), listingComments);
     }
 
     private static List<String> addAdjournmentTimeSelectionComments(SscsCaseData caseData) {
@@ -145,7 +145,7 @@ public final class HearingsDetailsMapping {
 
             String adjournCaseNextHearingSpecificTime = adjournCaseTime.getAdjournCaseNextHearingSpecificTime();
             if (isNotEmpty(adjournCaseNextHearingSpecificTime)) {
-                var provideTime = String.format("Provide time: %S", adjournCaseNextHearingSpecificTime);
+                var provideTime = "Provide time: %S".formatted(adjournCaseNextHearingSpecificTime);
                 listingComments.add(provideTime);
             }
 
@@ -155,11 +155,11 @@ public final class HearingsDetailsMapping {
     }
 
     public static String getComment(Party party, String comment) {
-        return String.format("%s%n%s", getCommentSubheader(party), comment);
+        return "%s%n%s".formatted(getCommentSubheader(party), comment);
     }
 
     public static String getCommentSubheader(Party party) {
-        return String.format("%s - %s:", getPartyRole(party), getEntityName(party));
+        return "%s - %s:".formatted(getPartyRole(party), getEntityName(party));
     }
 
     public static String getPartyRole(Party party) {

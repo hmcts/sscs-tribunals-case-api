@@ -1,9 +1,6 @@
 package uk.gov.hmcts.reform.sscs.callback;
-
-import static junit.framework.TestCase.assertNull;
-import static junit.framework.TestCase.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -27,9 +24,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.hamcrest.core.StringEndsWith;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,7 +73,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
     @MockBean
     UploadResponse uploadResponse;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         setup("callback/actionFurtherEvidenceCallback.json");
     }
@@ -93,6 +89,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"form", "coversheet"})
     public void shouldHandleActionFurtherEvidenceEventCallback(String documentType) throws Exception {
         json = getJson("callback/actionFurtherEvidenceCallback.json");
@@ -112,7 +109,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
 
         List<SscsDocument> documentList = result.getData().getSscsDocument();
         if (documentType.equalsIgnoreCase("coversheet")) {
-            Assert.assertTrue(CollectionUtils.isEmpty(documentList));
+            assertTrue(CollectionUtils.isEmpty(documentList));
             assertNull(result.getData().getScannedDocuments());
         } else {
             assertEquals(1, documentList.size());
@@ -352,6 +349,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"dormantAppealState", "readyToList","responseReceived"})
     public void shouldAddAppendixToFooterOfPdfOnEventCallback(String state) throws Exception {
         json = getJson("callback/appealDormantCallback.json");
@@ -378,10 +376,11 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
         byte[] newBytes = captor.getValue().get(0).getBytes();
         PDDocument newPdf = PDDocument.load(newBytes);
         String text = new PDFTextStripper().getText(newPdf);
-        assertThat(text, StringEndsWith.endsWith(String.format("Appellant evidence Addition A | Page 1%n")));
+        assertThat(text, StringEndsWith.endsWith("Appellant evidence Addition A | Page 1%n".formatted()));
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"appealCreated", "incompleteApplication", "validAppeal"})
     public void shouldNotAddAppendixToFooterOfPdfOnEventCallback(String state) throws Exception {
         json = getJson("callback/appealDormantCallback.json");

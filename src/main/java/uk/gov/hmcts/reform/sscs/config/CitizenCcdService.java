@@ -10,7 +10,6 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -32,7 +31,6 @@ public class CitizenCcdService {
     private final SscsCcdConvertService sscsCcdConvertService;
     private final CcdService ccdService;
 
-    @Autowired
     CitizenCcdService(CitizenCcdClient citizenCcdClient,
                       SscsCcdConvertService sscsCcdConvertService,
                       CcdService ccdService) {

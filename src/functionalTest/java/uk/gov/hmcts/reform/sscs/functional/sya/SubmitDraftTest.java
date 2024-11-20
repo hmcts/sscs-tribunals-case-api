@@ -8,8 +8,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static uk.gov.hmcts.reform.sscs.functional.sya.SubmitAppealTest.getCcdIdFromLocationHeader;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_DWP_REGIONAL_CENTRE;
@@ -26,17 +26,15 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.http.HttpStatus;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.apache.hc.core5.http.HttpStatus;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -49,12 +47,11 @@ import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.idam.UserDetailsTransformer;
 import uk.gov.hmcts.reform.sscs.util.SyaServiceHelper;
 
-@RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
 @Slf4j
 
-@Ignore
+@Disabled
 public class SubmitDraftTest {
 
     private static final String LOCATION_HEADER_NAME = "Location";
@@ -88,7 +85,7 @@ public class SubmitDraftTest {
     @Autowired
     private SubmitHelper submitHelper;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         baseURI = testUrl;
         useRelaxedHTTPSValidation();
@@ -107,7 +104,7 @@ public class SubmitDraftTest {
         draftAppeal = buildTestDraftAppeal();
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws InterruptedException {
         List<SscsCaseData> savedDrafts = findCase(citizenIdamTokens);
 
@@ -190,7 +187,7 @@ public class SubmitDraftTest {
 
         SscsCaseDetails sscsCaseDetails = submitHelper.findCaseInCcd(id, userIdamTokens);
 
-        log.info(String.format("SYA created with CCD ID %s", id));
+        log.info("SYA created with CCD ID %s".formatted(id));
 
         assertThatJson(sscsCaseDetails.getData())
             .whenIgnoringPaths(
@@ -259,7 +256,7 @@ public class SubmitDraftTest {
             .assertThat().header(LOCATION_HEADER_NAME, not(isEmptyOrNullString())).log().all(true);
         String response2Header = response.getHeader(LOCATION_HEADER_NAME);
 
-        assertEquals("the draft updated is not the same", responseHeader, response2Header);
+        assertEquals(responseHeader, response2Header, "the draft updated is not the same");
     }
 
     @Test

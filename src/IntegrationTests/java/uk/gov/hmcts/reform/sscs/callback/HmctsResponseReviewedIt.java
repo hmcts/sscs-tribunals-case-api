@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -13,8 +13,8 @@ import java.time.LocalDate;
 import java.util.Collections;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,7 +42,7 @@ public class HmctsResponseReviewedIt extends AbstractEventIt {
     @MockBean
     private IdamService idamService;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
@@ -84,6 +84,7 @@ public class HmctsResponseReviewedIt extends AbstractEventIt {
 
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"Yes,VALID_SEND_TO_INTERLOC", "No,READY_TO_LIST"})
     public void callToSubmittedHandler_willTriggerValidSendToInterlocEvent(String yesOrNo, EventType eventType) throws Exception {
         json = json.replaceAll("IS_INTERLOC_REQUIRED_VALUE", yesOrNo);

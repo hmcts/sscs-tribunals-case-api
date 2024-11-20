@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.domain.email;
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.FeatureToggleService;
@@ -17,7 +16,7 @@ public class RoboticsEmailTemplate {
     private final String pipAeTo;
 
     public RoboticsEmailTemplate(
-        @Autowired FeatureToggleService featureToggleService,
+        FeatureToggleService featureToggleService,
         @Value("${robotics.email.from}") String from,
         @Value("${robotics.email.from-send-grid}") String fromSendGrid,
         @Value("${robotics.email.to}") String to,

@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.editbundle;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -11,8 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import junitparams.JUnitParamsRunner;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -45,7 +45,7 @@ public class EditBundleAboutToSubmitHandlerTest {
 
     private Map<LanguagePreference, String> coverPage;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         handler = new EditBundleAboutToSubmitHandler(serviceRequestExecutor, "bundleUrl.com", documentConfiguration);

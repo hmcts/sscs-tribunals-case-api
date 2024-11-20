@@ -33,7 +33,7 @@ public class HmcHearingApiService {
                 hearingId,
                 null);
         if (isNull(hearingResponse)) {
-            throw new GetHearingException(String.format("Failed to retrieve hearing with Id: %s from HMC", hearingId));
+            throw new GetHearingException("Failed to retrieve hearing with Id: %s from HMC".formatted(hearingId));
         }
         return hearingResponse;
     }

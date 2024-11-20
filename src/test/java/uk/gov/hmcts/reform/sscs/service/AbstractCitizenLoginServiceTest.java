@@ -18,8 +18,8 @@ import static uk.gov.hmcts.reform.sscs.util.DataFixtures.someOnlineHearing;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
@@ -62,7 +62,7 @@ public abstract class AbstractCitizenLoginServiceTest {
 
     abstract boolean v2IsEnabled();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         citizenIdamTokens = IdamTokens.builder()
                 .userId("someUserId")

@@ -6,7 +6,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
@@ -32,7 +31,6 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
     @Value("${feature.update-case-only-hearing-v2.enabled}")
     private boolean updateCaseOnlyHearingV2Enabled;
 
-    @Autowired
     public ReissueFurtherEvidenceHandler(FurtherEvidenceService furtherEvidenceService,
                                          CcdService ccdService,
                                          IdamService idamService,
@@ -116,7 +114,7 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
     }
 
     private String getNoSelectedDocumentErrorMessage(SscsCaseData caseData) {
-        return String.format("Cannot find the selected document to reissue with url %s for caseId %s.",
+        return "Cannot find the selected document to reissue with url %s for caseId %s.".formatted(
             caseData.getReissueArtifactUi().getReissueFurtherEvidenceDocument().getValue().getCode(),
             caseData.getCcdCaseId());
     }

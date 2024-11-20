@@ -157,10 +157,10 @@ public class IssueDocumentHandler {
                 .userAuthentication(userAuthorisation)
                 .build();
 
-        log.info(String.format("Generating %s document isScottish = %s", documentTypeLabel, isScottish));
+        log.info("Generating %s document isScottish = %s".formatted(documentTypeLabel, isScottish));
         final String generatedFileUrl = generateFile.assemble(params);
         documentTypeLabel = documentTypeLabel + ((DRAFT_CORRECTED_NOTICE.equals(documentType) || DRAFT_DECISION_NOTICE.equals(documentType) || DRAFT_ADJOURNMENT_NOTICE.equals(documentType)) ? " generated" : " issued");
-        final String filename = String.format("%s on %s.pdf", documentTypeLabel, dateAdded.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+        final String filename = "%s on %s.pdf".formatted(documentTypeLabel, dateAdded.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 
         DocumentLink previewFile = DocumentLink.builder()
                 .documentFilename(filename)

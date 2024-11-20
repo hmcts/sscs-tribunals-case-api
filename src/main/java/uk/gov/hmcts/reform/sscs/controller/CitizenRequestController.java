@@ -41,7 +41,7 @@ public class CitizenRequestController {
     })
     @GetMapping(value = "/{identifier}/hearingrecording", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<HearingRecordingResponse> getHearingRecording(@RequestHeader(AUTHORIZATION) String authorisation,
-                                                                        @PathVariable("identifier") String identifier) {
+                                                                        @PathVariable String identifier) {
         return citizenRequestService.findHearingRecordings(identifier, authorisation)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -57,8 +57,8 @@ public class CitizenRequestController {
     @PostMapping(value = "/{identifier}/recordingrequest",
             produces = APPLICATION_JSON_VALUE)
     public ResponseEntity submitHearingRecordingRequest(@RequestHeader(AUTHORIZATION) String authorisation,
-                                                        @PathVariable("identifier") String identifier,
-                                                        @RequestParam("hearingIds") List<String> hearingIds) {
+                                                        @PathVariable String identifier,
+                                                        @RequestParam List<String> hearingIds) {
         boolean requested = citizenRequestService.requestHearingRecordings(identifier, hearingIds, authorisation);
         return requested ? ResponseEntity.noContent().build() : notFound().build();
     }

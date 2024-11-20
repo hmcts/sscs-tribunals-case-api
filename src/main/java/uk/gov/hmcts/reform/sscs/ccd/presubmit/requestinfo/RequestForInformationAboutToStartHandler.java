@@ -34,7 +34,7 @@ public class RequestForInformationAboutToStartHandler implements PreSubmitCallba
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        log.info(String.format("Handling request info incomplete application event for caseId %s", sscsCaseData.getCcdCaseId()));
+        log.info("Handling request info incomplete application event for caseId %s".formatted(sscsCaseData.getCcdCaseId()));
 
         setPartiesToRequestInfoFrom(sscsCaseData);
 

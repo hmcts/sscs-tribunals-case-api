@@ -19,7 +19,7 @@ public class HearingServiceBusClientConfig {
     private String queueName;
 
     @Bean
-    public ServiceBusSenderClient hearingServiceBusClient() {
+    ServiceBusSenderClient hearingServiceBusClient() {
         return new ServiceBusClientBuilder()
             .connectionString(connectionString)
             .sender()

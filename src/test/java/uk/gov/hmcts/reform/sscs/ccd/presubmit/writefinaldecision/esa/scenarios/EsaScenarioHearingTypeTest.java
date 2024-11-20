@@ -1,53 +1,63 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios;
 
 import java.util.Arrays;
-import junitparams.JUnitParamsRunner;
-import junitparams.NamedParameters;
-import junitparams.Parameters;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaTemplateContent;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
 
-@RunWith(JUnitParamsRunner.class)
 public class EsaScenarioHearingTypeTest {
 
-    @NamedParameters("hearingTypeParameters")
+
     @SuppressWarnings("unused")
-    private Object[] allNextHearingTypeParameters() {
-        return new Object[] {
-            new Object[] {"triage", false, false, "The tribunal considered the appeal bundle to page A1.\n"},
-            new Object[] {"faceToFace", true, true, "This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"},
-            new Object[] {"faceToFace", true, false, "This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative did not attend.\n"},
-            new Object[] {"faceToFace", false, true, "Felix Sydney the appellant requested an oral hearing but did not attend today. First Tier Agency representative attended on behalf of the Respondent."
-                    + "\n\n" + "Having considered the appeal bundle to page A1 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Felix Sydney of the hearing and that it is in the interests of justice to proceed today. \n"},
-            new Object[] {"faceToFace", false, false, "Felix Sydney the appellant requested an oral hearing but did not attend today. First Tier Agency representative did not attend."
-                    + "\n\n" + "Having considered the appeal bundle to page A1 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Felix Sydney of the hearing and that it is in the interests of justice to proceed today. \n"},
-            new Object[] {"paper", false, false, "No party has objected to the matter being decided without a hearing.\n\nHaving considered the appeal bundle to page A1 and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way.\n"},
-            new Object[] {"telephone", true, true, "This has been a remote hearing in the form of a telephone hearing. Felix Sydney the appellant attended and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"},
-            new Object[] {"telephone", true, false, "This has been a remote hearing in the form of a telephone hearing. Felix Sydney the appellant attended and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative did not attend.\n"},
-            new Object[] {"telephone", false, true, "This has been a remote hearing in the form of a telephone hearing. Felix Sydney the appellant did not attend the hearing today. First Tier Agency representative attended on behalf of the Respondent.\n"
-                    + "\n"
-                    + "Having considered the appeal bundle to page A1 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Felix Sydney of the hearing and that it is in the interests of justice to proceed today. \n"},
-            new Object[] {"telephone", false, false, "This has been a remote hearing in the form of a telephone hearing. Felix Sydney the appellant did not attend the hearing today. First Tier Agency representative did not attend.\n"
-                    + "\n"
-                    + "Having considered the appeal bundle to page A1 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Felix Sydney of the hearing and that it is in the interests of justice to proceed today. \n"},
-            new Object[] {"video", true, true, "This has been a remote hearing in the form of a video hearing. Felix Sydney the appellant attended and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"},
-            new Object[] {"video", true, false, "This has been a remote hearing in the form of a video hearing. Felix Sydney the appellant attended and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative did not attend.\n"},
-            new Object[] {"video", false, true, "This has been a remote hearing in the form of a video hearing. Felix Sydney the appellant did not attend the hearing today. First Tier Agency representative attended on behalf of the Respondent.\n"
-                    + "\n"
-                    + "Having considered the appeal bundle to page A1 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Felix Sydney of the hearing and that it is in the interests of justice to proceed today. \n"},
-            new Object[] {"video", false, false, "This has been a remote hearing in the form of a video hearing. Felix Sydney the appellant did not attend the hearing today. First Tier Agency representative did not attend.\n"
-                    + "\n"
-                    + "Having considered the appeal bundle to page A1 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Felix Sydney of the hearing and that it is in the interests of justice to proceed today. \n"},
+    private static Object[] allNextHearingTypeParameters() {
+        return new Object[]{
+            new Object[]{"triage", false, false, "The tribunal considered the appeal bundle to page A1.\n"},
+            new Object[]{"faceToFace", true, true, "This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"},
+            new Object[]{"faceToFace", true, false, "This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative did not attend.\n"},
+            new Object[]{"faceToFace", false, true, """
+                Felix Sydney the appellant requested an oral hearing but did not attend today. First Tier Agency representative attended on behalf of the Respondent.
+                
+                Having considered the appeal bundle to page A1 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Felix Sydney of the hearing and that it is in the interests of justice to proceed today.\s
+                """},
+            new Object[]{"faceToFace", false, false, """
+                Felix Sydney the appellant requested an oral hearing but did not attend today. First Tier Agency representative did not attend.
+                
+                Having considered the appeal bundle to page A1 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Felix Sydney of the hearing and that it is in the interests of justice to proceed today.\s
+                """},
+            new Object[]{"paper", false, false, "No party has objected to the matter being decided without a hearing.\n\nHaving considered the appeal bundle to page A1 and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way.\n"},
+            new Object[]{"telephone", true, true, "This has been a remote hearing in the form of a telephone hearing. Felix Sydney the appellant attended and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"},
+            new Object[]{"telephone", true, false, "This has been a remote hearing in the form of a telephone hearing. Felix Sydney the appellant attended and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative did not attend.\n"},
+            new Object[]{"telephone", false, true, """
+                This has been a remote hearing in the form of a telephone hearing. Felix Sydney the appellant did not attend the hearing today. First Tier Agency representative attended on behalf of the Respondent.
+                
+                Having considered the appeal bundle to page A1 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Felix Sydney of the hearing and that it is in the interests of justice to proceed today.\s
+                """},
+            new Object[]{"telephone", false, false, """
+                This has been a remote hearing in the form of a telephone hearing. Felix Sydney the appellant did not attend the hearing today. First Tier Agency representative did not attend.
+                
+                Having considered the appeal bundle to page A1 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Felix Sydney of the hearing and that it is in the interests of justice to proceed today.\s
+                """},
+            new Object[]{"video", true, true, "This has been a remote hearing in the form of a video hearing. Felix Sydney the appellant attended and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"},
+            new Object[]{"video", true, false, "This has been a remote hearing in the form of a video hearing. Felix Sydney the appellant attended and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative did not attend.\n"},
+            new Object[]{"video", false, true, """
+                This has been a remote hearing in the form of a video hearing. Felix Sydney the appellant did not attend the hearing today. First Tier Agency representative attended on behalf of the Respondent.
+                
+                Having considered the appeal bundle to page A1 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Felix Sydney of the hearing and that it is in the interests of justice to proceed today.\s
+                """},
+            new Object[]{"video", false, false, """
+                This has been a remote hearing in the form of a video hearing. Felix Sydney the appellant did not attend the hearing today. First Tier Agency representative did not attend.
+                
+                Having considered the appeal bundle to page A1 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Felix Sydney of the hearing and that it is in the interests of justice to proceed today.\s
+                """},
         };
     }
 
 
-    @Test
-    @Parameters(named = "hearingTypeParameters")
+    @ParameterizedTest
+    @MethodSource("allNextHearingTypeParameters")
     public void testScenario3(String hearingType, boolean appellantAttended, boolean presentingOfficerAttended, String expectedHearingType) {
         WriteFinalDecisionTemplateBody body =
                 WriteFinalDecisionTemplateBody.builder()
@@ -89,8 +99,8 @@ public class EsaScenarioHearingTypeTest {
                 + expectedHearingType
                 + "\n";
 
-        Assert.assertEquals(appellantAttended || "triage".equals(hearingType) ? 10 : 11, content.getComponents().size());
+        Assertions.assertEquals(appellantAttended || "triage".equals(hearingType) ? 10 : 11, content.getComponents().size());
 
-        Assert.assertEquals(expectedContent, content.toString());
+        Assertions.assertEquals(expectedContent, content.toString());
     }
 }

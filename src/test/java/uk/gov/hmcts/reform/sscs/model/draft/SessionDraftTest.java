@@ -12,7 +12,7 @@ import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_
 import java.util.Arrays;
 import java.util.Collections;
 import net.javacrumbs.jsonunit.core.Option;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SessionDraftTest {
     @Test

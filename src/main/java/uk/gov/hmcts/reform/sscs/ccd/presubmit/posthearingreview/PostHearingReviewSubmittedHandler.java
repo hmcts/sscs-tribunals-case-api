@@ -66,8 +66,8 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
         CcdCallbackMap callbackMap = getCcdCallbackMap(postHearing, typeSelected);
 
         if (isNull(callbackMap)) {
-            response.addError(String.format("Invalid Action Post Hearing Application Type Selected %s or action "
-                    + "selected as callback is null",
+            response.addError(("Invalid Action Post Hearing Application Type Selected %s or action "
+                + "selected as callback is null").formatted(
                 typeSelected));
             return response;
         }

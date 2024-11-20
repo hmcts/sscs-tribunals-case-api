@@ -5,7 +5,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
@@ -33,7 +32,6 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
     @Value("${feature.trigger-eventV2.enabled}")
     private boolean isTriggerEventV2Enabled;
 
-    @Autowired
     public AppealReceivedHandler(CcdService ccdService,
                                  UpdateCcdCaseService updateCcdCaseService,
                                  IdamService idamService) {

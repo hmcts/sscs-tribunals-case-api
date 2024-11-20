@@ -1,13 +1,13 @@
 package uk.gov.hmcts.reform.sscs.functional.tyanotifications.sya.notifications;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.functional.tyanotifications.AbstractFunctionalTest;
@@ -46,6 +46,7 @@ public class OtherPartyFunctionalTest extends AbstractFunctionalTest {
 
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"oral-,DWP_UPLOAD_RESPONSE, oralDwpUploadResponseJointPartySmsId, oralDwpUploadResponseOtherPartyEmailId"})
     public void willSendDwpUploadResponse(@Nullable String prefix, NotificationEventType notificationEventType, String... fieldNames) throws Exception {
 
@@ -65,6 +66,7 @@ public class OtherPartyFunctionalTest extends AbstractFunctionalTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "ADJOURNED, 0, hearingAdjournedOtherPartyEmailTemplateId, hearingAdjournedOtherPartySmsTemplateId",
         "POSTPONEMENT, 0, hearingPostponedOtherPartyEmailTemplateId",

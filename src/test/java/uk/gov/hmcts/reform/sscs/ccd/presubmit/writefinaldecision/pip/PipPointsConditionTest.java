@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 import java.io.IOException;
@@ -7,9 +8,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -29,7 +30,7 @@ public class PipPointsConditionTest {
     @Mock
     private DecisionNoticeQuestionService decisionNoticeQuestionService;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         openMocks(this);
     }
@@ -52,8 +53,7 @@ public class PipPointsConditionTest {
                 }
             }
 
-            Assert.assertEquals("Expected 1 condition to be satisfied for points:" + points + " for activity type DAILY_LIVING but " + pointsConditionSatisfiedCount + " were satisfied",
-                1, pointsConditionSatisfiedCount);
+            Assertions.assertEquals(1, pointsConditionSatisfiedCount, "Expected 1 condition to be satisfied for points:" + points + " for activity type DAILY_LIVING but " + pointsConditionSatisfiedCount + " were satisfied");
         }
     }
 
@@ -74,7 +74,7 @@ public class PipPointsConditionTest {
         Optional<String> optionalErrorMessage = pointsCondition
             .getOptionalErrorMessage(decisionNoticeQuestionService, caseData);
 
-        Assert.assertFalse(optionalErrorMessage.isPresent());
+        Assertions.assertFalse(optionalErrorMessage.isPresent());
 
     }
 
@@ -99,9 +99,9 @@ public class PipPointsConditionTest {
                     .pipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f")
                     .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build()).build());
 
-        Assert.assertTrue(optionalErrorMessage.isPresent());
-        Assert.assertEquals(pointsCondition.getErrorMessage(), optionalErrorMessage.get());
-        Assert.assertEquals("You have previously selected an enhanced rate award "
+        Assertions.assertTrue(optionalErrorMessage.isPresent());
+        Assertions.assertEquals(pointsCondition.getErrorMessage(), optionalErrorMessage.get());
+        Assertions.assertEquals("You have previously selected an enhanced rate award "
             + "for Daily Living. The points awarded don't match. "
             + "Please review your previous selection.", optionalErrorMessage.get());
     }
@@ -127,9 +127,9 @@ public class PipPointsConditionTest {
                         .pipSscsCaseData(SscsPipCaseData.builder()
                     .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build()).build());
 
-        Assert.assertTrue(optionalErrorMessage.isPresent());
-        Assert.assertEquals(pointsCondition.getErrorMessage(), optionalErrorMessage.get());
-        Assert.assertEquals("You have previously selected a standard rate award "
+        Assertions.assertTrue(optionalErrorMessage.isPresent());
+        Assertions.assertEquals(pointsCondition.getErrorMessage(), optionalErrorMessage.get());
+        Assertions.assertEquals("You have previously selected a standard rate award "
             + "for Daily Living. The points awarded don't match. "
             + "Please review your previous selection.", optionalErrorMessage.get());
     }
@@ -155,7 +155,7 @@ public class PipPointsConditionTest {
         Optional<String> optionalErrorMessage = pointsCondition
             .getOptionalErrorMessage(this.decisionNoticeQuestionService, caseData);
 
-        Assert.assertFalse(optionalErrorMessage.isPresent());
+        Assertions.assertFalse(optionalErrorMessage.isPresent());
 
     }
 
@@ -181,17 +181,19 @@ public class PipPointsConditionTest {
                     .pipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f")
                     .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build()).build());
 
-        Assert.assertTrue(optionalErrorMessage.isEmpty());
+        Assertions.assertTrue(optionalErrorMessage.isEmpty());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testGetStandardErrorMessage_WhenNotConsideredDailyLiving() {
-        PipPointsCondition.getStandardErrorMessage(AwardType.NOT_CONSIDERED, PipActivityType.DAILY_LIVING);
+        assertThrows(IllegalArgumentException.class, () ->
+            PipPointsCondition.getStandardErrorMessage(AwardType.NOT_CONSIDERED, PipActivityType.DAILY_LIVING));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testGetStandardErrorMessage_WhenNotConsideredMobility() {
-        PipPointsCondition.getStandardErrorMessage(AwardType.NOT_CONSIDERED, PipActivityType.MOBILITY);
+        assertThrows(IllegalArgumentException.class, () ->
+            PipPointsCondition.getStandardErrorMessage(AwardType.NOT_CONSIDERED, PipActivityType.MOBILITY));
     }
 
     /**
@@ -211,8 +213,7 @@ public class PipPointsConditionTest {
                     }
                 }
             }
-            Assert.assertEquals("Expected 1 condition to be satisfied for points:" + points + " for activity type MOBILITY but " + pointsConditionSatisfiedCount + " were satisfied",
-                1, pointsConditionSatisfiedCount);
+            Assertions.assertEquals(1, pointsConditionSatisfiedCount, "Expected 1 condition to be satisfied for points:" + points + " for activity type MOBILITY but " + pointsConditionSatisfiedCount + " were satisfied");
         }
     }
 
@@ -266,17 +267,17 @@ public class PipPointsConditionTest {
                 }
 
                 if (dailyLivingPoints < 8 && mobilityPoints < 8) {
-                    Assert.assertEquals(2, conditionPasses);
-                    Assert.assertEquals(0, conditionFails);
+                    Assertions.assertEquals(2, conditionPasses);
+                    Assertions.assertEquals(0, conditionFails);
                 } else if (dailyLivingPoints < 8 && mobilityPoints >= 8) {
-                    Assert.assertEquals(1, conditionFails);
-                    Assert.assertEquals(1, conditionPasses);
+                    Assertions.assertEquals(1, conditionFails);
+                    Assertions.assertEquals(1, conditionPasses);
                 } else if (dailyLivingPoints >= 8 && mobilityPoints < 8) {
-                    Assert.assertEquals(1, conditionFails);
-                    Assert.assertEquals(1, conditionPasses);
+                    Assertions.assertEquals(1, conditionFails);
+                    Assertions.assertEquals(1, conditionPasses);
                 } else if (dailyLivingPoints >= 8 && mobilityPoints >= 8) {
-                    Assert.assertEquals(2, conditionFails);
-                    Assert.assertEquals(0, conditionPasses);
+                    Assertions.assertEquals(2, conditionFails);
+                    Assertions.assertEquals(0, conditionPasses);
                 } else {
                     throw new IllegalStateException("Points condition not covered - daily living = " + dailyLivingPoints + " and mobility = " + mobilityPoints);
                 }
@@ -318,23 +319,23 @@ public class PipPointsConditionTest {
                     }
                 }
                 if (dailyLivingPoints < 8 && mobilityPoints < 8) {
-                    Assert.assertEquals(1, conditionPasses);
-                    Assert.assertEquals(1, conditionFails);
+                    Assertions.assertEquals(1, conditionPasses);
+                    Assertions.assertEquals(1, conditionFails);
                 } else if (dailyLivingPoints < 8 && mobilityPoints < 12) {
-                    Assert.assertEquals(0, conditionFails);
-                    Assert.assertEquals(2, conditionPasses);
+                    Assertions.assertEquals(0, conditionFails);
+                    Assertions.assertEquals(2, conditionPasses);
                 } else if (dailyLivingPoints < 8 && mobilityPoints >= 12) {
-                    Assert.assertEquals(1, conditionFails);
-                    Assert.assertEquals(1, conditionPasses);
+                    Assertions.assertEquals(1, conditionFails);
+                    Assertions.assertEquals(1, conditionPasses);
                 } else if (dailyLivingPoints >= 8 && mobilityPoints < 8) {
-                    Assert.assertEquals(2, conditionFails);
-                    Assert.assertEquals(0, conditionPasses);
+                    Assertions.assertEquals(2, conditionFails);
+                    Assertions.assertEquals(0, conditionPasses);
                 } else if (dailyLivingPoints >= 8 && mobilityPoints < 12) {
-                    Assert.assertEquals(1, conditionFails);
-                    Assert.assertEquals(1, conditionPasses);
+                    Assertions.assertEquals(1, conditionFails);
+                    Assertions.assertEquals(1, conditionPasses);
                 } else if (dailyLivingPoints >= 8 && mobilityPoints >= 12) {
-                    Assert.assertEquals(2, conditionFails);
-                    Assert.assertEquals(0, conditionPasses);
+                    Assertions.assertEquals(2, conditionFails);
+                    Assertions.assertEquals(0, conditionPasses);
                 } else {
                     throw new IllegalStateException("Points condition not covered - daily living = " + dailyLivingPoints + " and mobility = " + mobilityPoints);
                 }
@@ -376,23 +377,23 @@ public class PipPointsConditionTest {
                     }
                 }
                 if (dailyLivingPoints < 8 && mobilityPoints < 8) {
-                    Assert.assertEquals(1, conditionPasses);
-                    Assert.assertEquals(1, conditionFails);
+                    Assertions.assertEquals(1, conditionPasses);
+                    Assertions.assertEquals(1, conditionFails);
                 } else if (dailyLivingPoints < 8 && mobilityPoints < 12) {
-                    Assert.assertEquals(1, conditionFails);
-                    Assert.assertEquals(1, conditionPasses);
+                    Assertions.assertEquals(1, conditionFails);
+                    Assertions.assertEquals(1, conditionPasses);
                 } else if (dailyLivingPoints < 8 && mobilityPoints >= 12) {
-                    Assert.assertEquals(0, conditionFails);
-                    Assert.assertEquals(2, conditionPasses);
+                    Assertions.assertEquals(0, conditionFails);
+                    Assertions.assertEquals(2, conditionPasses);
                 } else if (dailyLivingPoints >= 8 && mobilityPoints < 8) {
-                    Assert.assertEquals(2, conditionFails);
-                    Assert.assertEquals(0, conditionPasses);
+                    Assertions.assertEquals(2, conditionFails);
+                    Assertions.assertEquals(0, conditionPasses);
                 } else if (dailyLivingPoints >= 8 && mobilityPoints < 12) {
-                    Assert.assertEquals(2, conditionFails);
-                    Assert.assertEquals(0, conditionPasses);
+                    Assertions.assertEquals(2, conditionFails);
+                    Assertions.assertEquals(0, conditionPasses);
                 } else if (dailyLivingPoints >= 8 && mobilityPoints >= 12) {
-                    Assert.assertEquals(1, conditionFails);
-                    Assert.assertEquals(1, conditionPasses);
+                    Assertions.assertEquals(1, conditionFails);
+                    Assertions.assertEquals(1, conditionPasses);
                 } else {
                     throw new IllegalStateException("Points condition not covered - daily living = " + dailyLivingPoints + " and mobility = " + mobilityPoints);
                 }
@@ -435,23 +436,23 @@ public class PipPointsConditionTest {
                 }
 
                 if (dailyLivingPoints < 8 && mobilityPoints < 8) {
-                    Assert.assertEquals(1, conditionPasses);
-                    Assert.assertEquals(1, conditionFails);
+                    Assertions.assertEquals(1, conditionPasses);
+                    Assertions.assertEquals(1, conditionFails);
                 } else if (dailyLivingPoints < 8 && mobilityPoints >= 8) {
-                    Assert.assertEquals(2, conditionFails);
-                    Assert.assertEquals(0, conditionPasses);
+                    Assertions.assertEquals(2, conditionFails);
+                    Assertions.assertEquals(0, conditionPasses);
                 } else if (dailyLivingPoints >= 8 && dailyLivingPoints < 12 && mobilityPoints < 8) {
-                    Assert.assertEquals(0, conditionFails);
-                    Assert.assertEquals(2, conditionPasses);
+                    Assertions.assertEquals(0, conditionFails);
+                    Assertions.assertEquals(2, conditionPasses);
                 } else if (dailyLivingPoints >= 8 && dailyLivingPoints < 12 && mobilityPoints >= 8) {
-                    Assert.assertEquals(1, conditionFails);
-                    Assert.assertEquals(1, conditionPasses);
+                    Assertions.assertEquals(1, conditionFails);
+                    Assertions.assertEquals(1, conditionPasses);
                 } else if (dailyLivingPoints >= 12 && mobilityPoints < 8) {
-                    Assert.assertEquals(1, conditionFails);
-                    Assert.assertEquals(1, conditionPasses);
+                    Assertions.assertEquals(1, conditionFails);
+                    Assertions.assertEquals(1, conditionPasses);
                 } else if (dailyLivingPoints >= 12 && mobilityPoints >= 8) {
-                    Assert.assertEquals(2, conditionFails);
-                    Assert.assertEquals(0, conditionPasses);
+                    Assertions.assertEquals(2, conditionFails);
+                    Assertions.assertEquals(0, conditionPasses);
                 } else {
                     throw new IllegalStateException("Points condition not covered - daily living = " + dailyLivingPoints + " and mobility = " + mobilityPoints);
                 }
@@ -493,32 +494,32 @@ public class PipPointsConditionTest {
                     }
                 }
                 if (dailyLivingPoints < 8 && mobilityPoints < 8) {
-                    Assert.assertEquals(0, conditionPasses);
-                    Assert.assertEquals(2, conditionFails);
+                    Assertions.assertEquals(0, conditionPasses);
+                    Assertions.assertEquals(2, conditionFails);
                 } else if (dailyLivingPoints < 8 && mobilityPoints < 12) {
-                    Assert.assertEquals(1, conditionFails);
-                    Assert.assertEquals(1, conditionPasses);
+                    Assertions.assertEquals(1, conditionFails);
+                    Assertions.assertEquals(1, conditionPasses);
                 } else if (dailyLivingPoints < 8 && mobilityPoints >= 12) {
-                    Assert.assertEquals(2, conditionFails);
-                    Assert.assertEquals(0, conditionPasses);
+                    Assertions.assertEquals(2, conditionFails);
+                    Assertions.assertEquals(0, conditionPasses);
                 } else if (dailyLivingPoints >= 8 && dailyLivingPoints < 12 && mobilityPoints < 8) {
-                    Assert.assertEquals(1, conditionFails);
-                    Assert.assertEquals(1, conditionPasses);
+                    Assertions.assertEquals(1, conditionFails);
+                    Assertions.assertEquals(1, conditionPasses);
                 } else if (dailyLivingPoints >= 8 && dailyLivingPoints < 12 && mobilityPoints < 12) {
-                    Assert.assertEquals(0, conditionFails);
-                    Assert.assertEquals(2, conditionPasses);
+                    Assertions.assertEquals(0, conditionFails);
+                    Assertions.assertEquals(2, conditionPasses);
                 } else if (dailyLivingPoints >= 8 && dailyLivingPoints < 12 && mobilityPoints >= 12) {
-                    Assert.assertEquals(1, conditionFails);
-                    Assert.assertEquals(1, conditionPasses);
+                    Assertions.assertEquals(1, conditionFails);
+                    Assertions.assertEquals(1, conditionPasses);
                 } else if (dailyLivingPoints >= 12 && mobilityPoints < 8) {
-                    Assert.assertEquals(2, conditionFails);
-                    Assert.assertEquals(0, conditionPasses);
+                    Assertions.assertEquals(2, conditionFails);
+                    Assertions.assertEquals(0, conditionPasses);
                 } else if (dailyLivingPoints >= 12 && mobilityPoints < 12) {
-                    Assert.assertEquals(1, conditionFails);
-                    Assert.assertEquals(1, conditionPasses);
+                    Assertions.assertEquals(1, conditionFails);
+                    Assertions.assertEquals(1, conditionPasses);
                 } else if (dailyLivingPoints >= 12 && mobilityPoints >= 12) {
-                    Assert.assertEquals(2, conditionFails);
-                    Assert.assertEquals(0, conditionPasses);
+                    Assertions.assertEquals(2, conditionFails);
+                    Assertions.assertEquals(0, conditionPasses);
                 } else {
                     throw new IllegalStateException("Points condition not covered - daily living = " + dailyLivingPoints + " and mobility = " + mobilityPoints);
                 }
@@ -560,26 +561,26 @@ public class PipPointsConditionTest {
                     }
                 }
                 if (dailyLivingPoints < 8 && mobilityPoints < 8) {
-                    Assert.assertEquals(0, conditionPasses);
-                    Assert.assertEquals(2, conditionFails);
+                    Assertions.assertEquals(0, conditionPasses);
+                    Assertions.assertEquals(2, conditionFails);
                 } else if (dailyLivingPoints < 8 && mobilityPoints < 12) {
-                    Assert.assertEquals(2, conditionFails);
-                    Assert.assertEquals(0, conditionPasses);
+                    Assertions.assertEquals(2, conditionFails);
+                    Assertions.assertEquals(0, conditionPasses);
                 } else if (dailyLivingPoints < 8 && mobilityPoints >= 12) {
-                    Assert.assertEquals(1, conditionFails);
-                    Assert.assertEquals(1, conditionPasses);
+                    Assertions.assertEquals(1, conditionFails);
+                    Assertions.assertEquals(1, conditionPasses);
                 } else if (dailyLivingPoints >= 8 && dailyLivingPoints < 12 && mobilityPoints < 12) {
-                    Assert.assertEquals(1, conditionFails);
-                    Assert.assertEquals(1, conditionPasses);
+                    Assertions.assertEquals(1, conditionFails);
+                    Assertions.assertEquals(1, conditionPasses);
                 } else if (dailyLivingPoints >= 8 && dailyLivingPoints < 12 && mobilityPoints >= 12) {
-                    Assert.assertEquals(0, conditionFails);
-                    Assert.assertEquals(2, conditionPasses);
+                    Assertions.assertEquals(0, conditionFails);
+                    Assertions.assertEquals(2, conditionPasses);
                 } else if (dailyLivingPoints >= 12 && mobilityPoints < 12) {
-                    Assert.assertEquals(2, conditionFails);
-                    Assert.assertEquals(0, conditionPasses);
+                    Assertions.assertEquals(2, conditionFails);
+                    Assertions.assertEquals(0, conditionPasses);
                 } else if (dailyLivingPoints >= 12 && mobilityPoints >= 12) {
-                    Assert.assertEquals(1, conditionFails);
-                    Assert.assertEquals(1, conditionPasses);
+                    Assertions.assertEquals(1, conditionFails);
+                    Assertions.assertEquals(1, conditionPasses);
                 } else {
                     throw new IllegalStateException("Points condition not covered - daily living = " + dailyLivingPoints + " and mobility = " + mobilityPoints);
                 }
@@ -622,17 +623,17 @@ public class PipPointsConditionTest {
                 }
 
                 if (dailyLivingPoints < 12 && mobilityPoints < 8) {
-                    Assert.assertEquals(1, conditionPasses);
-                    Assert.assertEquals(1, conditionFails);
+                    Assertions.assertEquals(1, conditionPasses);
+                    Assertions.assertEquals(1, conditionFails);
                 } else if (dailyLivingPoints < 12 && mobilityPoints >= 8) {
-                    Assert.assertEquals(2, conditionFails);
-                    Assert.assertEquals(0, conditionPasses);
+                    Assertions.assertEquals(2, conditionFails);
+                    Assertions.assertEquals(0, conditionPasses);
                 } else if (dailyLivingPoints >= 12 && mobilityPoints < 8) {
-                    Assert.assertEquals(0, conditionFails);
-                    Assert.assertEquals(2, conditionPasses);
+                    Assertions.assertEquals(0, conditionFails);
+                    Assertions.assertEquals(2, conditionPasses);
                 } else if (dailyLivingPoints >= 12 && mobilityPoints >= 8) {
-                    Assert.assertEquals(1, conditionFails);
-                    Assert.assertEquals(1, conditionPasses);
+                    Assertions.assertEquals(1, conditionFails);
+                    Assertions.assertEquals(1, conditionPasses);
                 } else {
                     throw new IllegalStateException("Points condition not covered - daily living = " + dailyLivingPoints + " and mobility = " + mobilityPoints);
                 }
@@ -674,23 +675,23 @@ public class PipPointsConditionTest {
                     }
                 }
                 if (dailyLivingPoints < 12 && mobilityPoints < 8) {
-                    Assert.assertEquals(0, conditionPasses);
-                    Assert.assertEquals(2, conditionFails);
+                    Assertions.assertEquals(0, conditionPasses);
+                    Assertions.assertEquals(2, conditionFails);
                 } else if (dailyLivingPoints < 12 && mobilityPoints < 12) {
-                    Assert.assertEquals(1, conditionFails);
-                    Assert.assertEquals(1, conditionPasses);
+                    Assertions.assertEquals(1, conditionFails);
+                    Assertions.assertEquals(1, conditionPasses);
                 } else if (dailyLivingPoints < 12 && mobilityPoints >= 12) {
-                    Assert.assertEquals(2, conditionFails);
-                    Assert.assertEquals(0, conditionPasses);
+                    Assertions.assertEquals(2, conditionFails);
+                    Assertions.assertEquals(0, conditionPasses);
                 } else if (dailyLivingPoints >= 12 && mobilityPoints < 8) {
-                    Assert.assertEquals(1, conditionFails);
-                    Assert.assertEquals(1, conditionPasses);
+                    Assertions.assertEquals(1, conditionFails);
+                    Assertions.assertEquals(1, conditionPasses);
                 } else if (dailyLivingPoints >= 12 && mobilityPoints < 12) {
-                    Assert.assertEquals(0, conditionFails);
-                    Assert.assertEquals(2, conditionPasses);
+                    Assertions.assertEquals(0, conditionFails);
+                    Assertions.assertEquals(2, conditionPasses);
                 } else if (dailyLivingPoints >= 12 && mobilityPoints >= 12) {
-                    Assert.assertEquals(1, conditionFails);
-                    Assert.assertEquals(1, conditionPasses);
+                    Assertions.assertEquals(1, conditionFails);
+                    Assertions.assertEquals(1, conditionPasses);
                 } else {
                     throw new IllegalStateException("Points condition not covered - daily living = " + dailyLivingPoints + " and mobility = " + mobilityPoints);
                 }
@@ -733,17 +734,17 @@ public class PipPointsConditionTest {
                     }
                 }
                 if (dailyLivingPoints < 12 && mobilityPoints < 12) {
-                    Assert.assertEquals(0, conditionPasses);
-                    Assert.assertEquals(2, conditionFails);
+                    Assertions.assertEquals(0, conditionPasses);
+                    Assertions.assertEquals(2, conditionFails);
                 } else if (dailyLivingPoints < 12 && mobilityPoints >= 12) {
-                    Assert.assertEquals(1, conditionFails);
-                    Assert.assertEquals(1, conditionPasses);
+                    Assertions.assertEquals(1, conditionFails);
+                    Assertions.assertEquals(1, conditionPasses);
                 } else if (dailyLivingPoints >= 12 && mobilityPoints < 12) {
-                    Assert.assertEquals(1, conditionFails);
-                    Assert.assertEquals(1, conditionPasses);
+                    Assertions.assertEquals(1, conditionFails);
+                    Assertions.assertEquals(1, conditionPasses);
                 } else {
-                    Assert.assertEquals(0, conditionFails);
-                    Assert.assertEquals(2, conditionPasses);
+                    Assertions.assertEquals(0, conditionFails);
+                    Assertions.assertEquals(2, conditionPasses);
                 }
             }
         }
@@ -752,13 +753,13 @@ public class PipPointsConditionTest {
     @Test
     public void testAllPointsConditionAttributesAreNotNull() {
         for (PipPointsCondition pipPointsCondition : PipPointsCondition.values()) {
-            Assert.assertNotNull(pipPointsCondition.getErrorMessage());
-            Assert.assertNotNull(pipPointsCondition.getActivityType());
-            Assert.assertNotNull(pipPointsCondition.getPointsRequirementCondition());
-            Assert.assertNotNull(pipPointsCondition.getAnswersExtractor());
-            Assert.assertNotNull(pipPointsCondition.getEnumClass());
-            Assert.assertEquals(PipPointsCondition.class, pipPointsCondition.getEnumClass());
-            Assert.assertNotNull(pipPointsCondition.awardType);
+            Assertions.assertNotNull(pipPointsCondition.getErrorMessage());
+            Assertions.assertNotNull(pipPointsCondition.getActivityType());
+            Assertions.assertNotNull(pipPointsCondition.getPointsRequirementCondition());
+            Assertions.assertNotNull(pipPointsCondition.getAnswersExtractor());
+            Assertions.assertNotNull(pipPointsCondition.getEnumClass());
+            Assertions.assertEquals(PipPointsCondition.class, pipPointsCondition.getEnumClass());
+            Assertions.assertNotNull(pipPointsCondition.awardType);
         }
     }
 

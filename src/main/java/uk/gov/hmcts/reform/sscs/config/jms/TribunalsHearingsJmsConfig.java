@@ -45,7 +45,7 @@ public class TribunalsHearingsJmsConfig {
     private String clientId;
 
     private ConnectionFactory tribunalsHearingsJmsConnectionFactory() {
-        String connection = String.format(amqpConnectionStringTemplate, namespace + connectionPostfix, idleTimeout);
+        String connection = amqpConnectionStringTemplate.formatted(namespace + connectionPostfix, idleTimeout);
         JmsConnectionFactory jmsConnectionFactory = new JmsConnectionFactory(connection);
         jmsConnectionFactory.setUsername(username);
         jmsConnectionFactory.setPassword(password);
@@ -54,7 +54,7 @@ public class TribunalsHearingsJmsConfig {
     }
 
     @Bean
-    public JmsListenerContainerFactory<DefaultMessageListenerContainer> tribunalsHearingsEventQueueContainerFactory(
+    JmsListenerContainerFactory<DefaultMessageListenerContainer> tribunalsHearingsEventQueueContainerFactory(
         DefaultJmsListenerContainerFactoryConfigurer defaultJmsListenerContainerFactoryConfigurer) {
         ConnectionFactory tribunalsHearingsJmsConnectionFactory = tribunalsHearingsJmsConnectionFactory();
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();

@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -34,7 +33,6 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
     public static final String SUPPLEMENTARY_RESPONSE_DOCUMENT_CANNOT_BE_EMPTY = "Supplementary response document cannot be empty";
     private final AddedDocumentsUtil addedDocumentsUtil;
 
-    @Autowired
     public SupplementaryResponseAboutToSubmitHandler(AddedDocumentsUtil addedDocumentsUtil) {
         this.addedDocumentsUtil = addedDocumentsUtil;
     }

@@ -1,26 +1,26 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class UcPointsConditionTest {
 
     @Test
     public void testConditionsWhenLessThan15() {
-        Assert.assertFalse(UcPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN.getPointsRequirementCondition().test(14));
-        Assert.assertTrue(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(14));
+        Assertions.assertFalse(UcPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN.getPointsRequirementCondition().test(14));
+        Assertions.assertTrue(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(14));
     }
 
     @Test
     public void testConditionWhenEqualTo15() {
-        Assert.assertTrue(UcPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN.getPointsRequirementCondition().test(15));
-        Assert.assertFalse(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(15));
+        Assertions.assertTrue(UcPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN.getPointsRequirementCondition().test(15));
+        Assertions.assertFalse(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(15));
     }
 
     @Test
     public void testConditionWhenGreaterThan15() {
-        Assert.assertTrue(UcPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN.getPointsRequirementCondition().test(16));
-        Assert.assertFalse(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(16));
+        Assertions.assertTrue(UcPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN.getPointsRequirementCondition().test(16));
+        Assertions.assertFalse(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(16));
     }
 
     /**
@@ -39,15 +39,14 @@ public class UcPointsConditionTest {
                 }
             }
 
-            Assert.assertEquals("Expected 1 condition to be satisfied for points:" + points + " but " + pointsConditionSatisfiedCount + " were satisfied",
-                1, pointsConditionSatisfiedCount);
+            Assertions.assertEquals(1, pointsConditionSatisfiedCount, "Expected 1 condition to be satisfied for points:" + points + " but " + pointsConditionSatisfiedCount + " were satisfied");
         }
     }
 
     @Test
     public void testAllPointsConditionAttributesAreNotNull() {
         for (UcPointsCondition ucPointsCondition : UcPointsCondition.values()) {
-            Assert.assertNotNull(ucPointsCondition.getPointsRequirementCondition());
+            Assertions.assertNotNull(ucPointsCondition.getPointsRequirementCondition());
         }
     }
 }

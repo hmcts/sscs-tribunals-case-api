@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.markdocsfortranslation;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.MARK_DOCS_FOR_TRANSATION;
@@ -15,14 +13,15 @@ import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -36,19 +35,18 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 @RunWith(JUnitParamsRunner.class)
 public class MarkDocumentsForTranslationAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
     private MarkDocumentsForTranslationAboutToSubmitHandler handler;
 
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
-
     @Mock
     private Callback<SscsCaseData> callback;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         handler = new MarkDocumentsForTranslationAboutToSubmitHandler();
@@ -62,6 +60,7 @@ public class MarkDocumentsForTranslationAboutToSubmitHandlerTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE",
         "ABOUT_TO_START,CANCEL_TRANSLATIONS"
@@ -73,16 +72,20 @@ public class MarkDocumentsForTranslationAboutToSubmitHandlerTest {
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void givenCanHandleIsCalled_shouldThrowExceptionWhenCallBackTypeNull() {
-        boolean actualResult = handler.canHandle(null, callback);
-        assertTrue(actualResult);
+        assertThrows(NullPointerException.class, () -> {
+            boolean actualResult = handler.canHandle(null, callback);
+            assertTrue(actualResult);
+        });
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void givenCanHandleIsCalled_shouldThrowExceptionWhenCallBackNull() {
-        boolean actualResult = handler.canHandle(ABOUT_TO_SUBMIT, null);
-        assertTrue(actualResult);
+        assertThrows(NullPointerException.class, () -> {
+            boolean actualResult = handler.canHandle(ABOUT_TO_SUBMIT, null);
+            assertTrue(actualResult);
+        });
     }
 
 

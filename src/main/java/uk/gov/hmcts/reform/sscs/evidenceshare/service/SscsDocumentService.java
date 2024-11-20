@@ -11,7 +11,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
@@ -29,7 +28,6 @@ public class SscsDocumentService {
     private final PdfStoreService pdfStoreService;
     private final PdfHelper pdfHelper;
 
-    @Autowired
     public SscsDocumentService(PdfStoreService pdfStoreService, PdfHelper pdfHelper) {
         this.pdfStoreService = pdfStoreService;
         this.pdfHelper = pdfHelper;

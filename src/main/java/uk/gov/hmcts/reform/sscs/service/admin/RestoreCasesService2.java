@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.service.admin;
 
-import static java.lang.String.format;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish.IsScottishHandler.isScottishCase;
 import static uk.gov.hmcts.reform.sscs.exception.BenefitMappingException.createException;
@@ -20,7 +19,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -46,7 +44,6 @@ public class RestoreCasesService2 {
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final AirLookupService airLookupService;
 
-    @Autowired
     public RestoreCasesService2(CcdService ccdService,
                                 UpdateCcdCaseService updateCcdCaseService,
                                 IdamService idamService,
@@ -95,7 +92,7 @@ public class RestoreCasesService2 {
                 log.info("Succeeded in restoring missing case details for id {}", sscsCaseDetails.getId());
                 successIds.add(sscsCaseDetails.getId());
             } catch (Exception e) {
-                log.error(format("Failed to restore case data for id %s", caseId), e);
+                log.error("Failed to restore case data for id %s".formatted(caseId), e);
                 failureIds.add(Long.valueOf(caseId));
             }
             processedCount++;
@@ -147,7 +144,7 @@ public class RestoreCasesService2 {
             log.info("UpdateCaseV2 Complete. {} event for id {}", eventToTrigger, sscsCaseDetails.getId());
 
         } catch (FeignException.UnprocessableEntity e) {
-            log.error(format("%s event failed for caseId %s, root cause is %s", eventToTrigger, sscsCaseDetails.getId(), getRootCauseMessage(e)), e);
+            log.error("%s event failed for caseId %s, root cause is %s".formatted(eventToTrigger, sscsCaseDetails.getId(), getRootCauseMessage(e)), e);
             throw e;
         }
     }

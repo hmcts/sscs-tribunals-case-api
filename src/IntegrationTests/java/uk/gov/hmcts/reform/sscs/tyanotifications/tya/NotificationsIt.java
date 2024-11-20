@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.tya;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.BENEFIT_NAME_ACRONYM_LITERAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.BENEFIT_NAME_ACRONYM_LITERAL_WELSH;
@@ -13,12 +13,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
-import junitparams.NamedParameters;
 import junitparams.Parameters;
 import org.apache.commons.io.FileUtils;
 import org.apache.pdfbox.io.IOUtils;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.quartz.SchedulerException;
 import org.springframework.http.HttpStatus;
@@ -34,7 +35,7 @@ public class NotificationsIt extends NotificationsItBase {
     private static final String GAPS_ROUTE = "gaps";
     private static final String LIST_ASSIST_ROUTE = "listAssist";
 
-    @Test
+    @ParameterizedTest
     public void shouldSendNotificationForAnAdjournedRequestForAnOralHearing() throws Exception {
         json = json.replace("appealReceived", "hearingAdjourned");
 
@@ -45,7 +46,7 @@ public class NotificationsIt extends NotificationsItBase {
         verify(notificationClient, times(2)).sendSms(any(), any(), any(), any(), any());
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldNotSendNotificationForAnAdjournedRequestForAPaperHearing() throws Exception {
         updateJsonForPaperHearing();
         json = json.replace("appealReceived", "hearingAdjourned");
@@ -57,7 +58,7 @@ public class NotificationsIt extends NotificationsItBase {
         verify(notificationClient, never()).sendSms(any(), any(), any(), any(), any());
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldSendNotificationForAnEvidenceReceivedRequestForAnOralHearing() throws Exception {
         json = json.replace("appealReceived", "evidenceReceived");
 
@@ -68,7 +69,7 @@ public class NotificationsIt extends NotificationsItBase {
         verify(notificationClient, times(2)).sendSms(any(), any(), any(), any(), any());
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldSendEmailNotificationOnlyForAnEvidenceReceivedRequestToAnAppellantForAPaperHearing() throws Exception {
         updateJsonForPaperHearing();
         json = json.replace("appealReceived", "evidenceReceived");
@@ -82,7 +83,7 @@ public class NotificationsIt extends NotificationsItBase {
         verify(notificationClient, times(1)).sendSms(any(), any(), any(), any(), any());
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldSendNotificationForAHearingPostponedRequestForAnOralHearingForListAssist() throws Exception {
         json = json.replace("appealReceived", "hearingPostponed");
         json = json.replace(HEARING_ROUTE_FIELD, LIST_ASSIST_ROUTE);
@@ -98,7 +99,7 @@ public class NotificationsIt extends NotificationsItBase {
         }
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldNotSendNotificationForAHearingPostponedRequestForAPaperHearing() throws Exception {
         updateJsonForPaperHearing();
         json = json.replace("appealReceived", "hearingPostponed");
@@ -110,8 +111,8 @@ public class NotificationsIt extends NotificationsItBase {
         verify(notificationClient, never()).sendSms(any(), any(), any(), any(), any());
     }
 
-    @Test
-    @Parameters(method = "generateDelayedNotificationScenarios")
+    @ParameterizedTest
+    @MethodSource("generateDelayedNotificationScenarios")
     public void shouldScheduleDelayedNotificationsForAnEvent(
         NotificationEventType notificationEventType, String message, int expectedValue) throws Exception {
 
@@ -130,8 +131,8 @@ public class NotificationsIt extends NotificationsItBase {
         IntegrationTestHelper.assertScheduledJobCount(quartzScheduler, message, notificationEventType.getId(), expectedValue);
     }
 
-    @Test
-    @Parameters(method = "generateRepsNotificationScenarios")
+    @ParameterizedTest
+    @MethodSource("generateRepsNotificationScenarios")
     public void shouldSendRepsNotificationsForAnEventForAnOralOrPaperHearingAndForEachSubscription(
         NotificationEventType notificationEventType, String hearingType, String hearingRoute, List<String> expectedEmailTemplateIds,
         List<String> expectedSmsTemplateIds, List<String> expectedLetterTemplateIds, String appellantEmailSubs, String appellantSmsSubs, String repsEmailSubs,
@@ -162,7 +163,7 @@ public class NotificationsIt extends NotificationsItBase {
         validateLetterNotifications(expectedLetterTemplateIds, wantedNumberOfSendLetterInvocations, expectedName);
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldSetCarersAllowanceDescriptionInAcronymField() throws Exception {
         String path = getClass().getClassLoader().getResource("json/ccdResponseTest.json").getFile();
         json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
@@ -181,7 +182,7 @@ public class NotificationsIt extends NotificationsItBase {
         assertEquals("Lwfans Gofalwr", personalisation.get(BENEFIT_NAME_ACRONYM_LITERAL_WELSH));
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldSetBereavementBenefitDescriptionInAcronymField() throws Exception {
         String path = getClass().getClassLoader().getResource("json/ccdResponseTest.json").getFile();
         json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
@@ -200,8 +201,8 @@ public class NotificationsIt extends NotificationsItBase {
         assertEquals("Budd-dal Profedigaeth", personalisation.get(BENEFIT_NAME_ACRONYM_LITERAL_WELSH));
     }
 
-    @Test
-    @Parameters(method = "generateBundledLetterNotificationScenarios")
+    @ParameterizedTest
+    @MethodSource("generateBundledLetterNotificationScenarios")
     public void shouldSendRepsBundledLetterNotificationsForAnEventForAnOralOrPaperHearingAndForEachSubscription(
         NotificationEventType notificationEventType, String hearingType, String hearingRoute, boolean hasRep, boolean hasAppointee, int wantedNumberOfSendLetterInvocations) throws Exception {
 
@@ -225,9 +226,9 @@ public class NotificationsIt extends NotificationsItBase {
         verify(notificationClient, times(wantedNumberOfSendLetterInvocations)).sendPrecompiledLetterWithInputStream(any(), any());
     }
 
-    @Test
-    @Parameters(method = "generateAppointeeNotificationScenarios")
-    @Ignore
+    @ParameterizedTest
+    @MethodSource("generateAppointeeNotificationScenarios")
+    @Disabled
     // SSCS-11586
     @SuppressWarnings("unchecked")
     public void shouldSendAppointeeNotificationsForAnEventForAnOralOrPaperHearingAndForEachSubscription(
@@ -289,9 +290,9 @@ public class NotificationsIt extends NotificationsItBase {
         return json;
     }
 
-    @Test
-    @Parameters(method = "generateJointPartyNotificationScenarios")
-    @Ignore
+    @ParameterizedTest
+    @MethodSource("generateJointPartyNotificationScenarios")
+    @Disabled
     // SSCS-11586
     public void shouldSendJointPartyNotificationsForAnEventForAnOralOrPaperHearingAndForEachSubscription(
         NotificationEventType notificationEventType, String hearingType, String hearingRoute, List<String> expectedEmailTemplateIds,
@@ -328,7 +329,7 @@ public class NotificationsIt extends NotificationsItBase {
 
 
     @SuppressWarnings({"Indentation", "unused"})
-    private Object[] generateJointPartyNotificationScenarios() {
+    private static Object[] generateJointPartyNotificationScenarios() {
         return new Object[]{
             // GAPS
             new Object[]{
@@ -1142,7 +1143,7 @@ public class NotificationsIt extends NotificationsItBase {
     }
 
     @SuppressWarnings({"Indentation", "unused"})
-    private Object[] generateRepsNotificationScenarios() {
+    private static Object[] generateRepsNotificationScenarios() {
         return new Object[]{
             // GAPS
             new Object[]{
@@ -2829,7 +2830,7 @@ public class NotificationsIt extends NotificationsItBase {
         };
     }
 
-    private Object[] generateDelayedNotificationScenarios() {
+    private static Object[] generateDelayedNotificationScenarios() {
         return new Object[]{
             new Object[]{
                 APPEAL_RECEIVED,
@@ -2850,7 +2851,7 @@ public class NotificationsIt extends NotificationsItBase {
     }
 
     @SuppressWarnings({"Indentation", "unused"})
-    private Object[] generateBundledLetterNotificationScenarios() {
+    private static Object[] generateBundledLetterNotificationScenarios() {
         return new Object[]{
             // GAPS
             new Object[]{
@@ -3658,7 +3659,7 @@ public class NotificationsIt extends NotificationsItBase {
     }
 
     @SuppressWarnings({"Indentation", "unused"})
-    private Object[] generateAppointeeNotificationScenarios() {
+    private static Object[] generateAppointeeNotificationScenarios() {
         return new Object[]{
             // GAPS
             new Object[]{
@@ -4757,8 +4758,8 @@ public class NotificationsIt extends NotificationsItBase {
         };
     }
 
-    @Test
-    @Ignore
+    @ParameterizedTest
+    @Disabled
     // SSCS-11586
     public void shouldSendNotificationForHearingBookedRequestForAnOralHearing() throws Exception {
         json = json.replace("appealReceived", "hearingBooked");
@@ -4772,7 +4773,7 @@ public class NotificationsIt extends NotificationsItBase {
         verify(notificationClient, times(2)).sendSms(any(), any(), any(), any(), any());
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldNotSendNotificationForHearingBookedRequestForAPaperHearing() throws Exception {
         updateJsonForPaperHearing();
         json = json.replace("appealReceived", "hearingBooked");
@@ -4786,7 +4787,7 @@ public class NotificationsIt extends NotificationsItBase {
         verify(notificationClient, never()).sendSms(any(), any(), any(), any(), any());
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldNotSendNotificationForHearingBookedRequestForHearingInThePastForAnOralHearing() throws Exception {
         json = json.replace("appealReceived", "hearingBooked");
 
@@ -4797,7 +4798,7 @@ public class NotificationsIt extends NotificationsItBase {
         verify(notificationClient, never()).sendSms(any(), any(), any(), any(), any());
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldSendAppellantNotificationForEvidenceReminderForAnOralHearing() throws Exception {
         json = json.replace("appealReceived", "evidenceReminder");
 
@@ -4808,7 +4809,7 @@ public class NotificationsIt extends NotificationsItBase {
         verify(notificationClient).sendSms(eq("7d36718b-1193-4b3d-86bd-db54612c5363"), any(), any(), any(), any());
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldSendAppellantNotificationForEvidenceReminderForAPaperHearing() throws Exception {
         updateJsonForPaperHearing();
         json = json.replace("appealReceived", "evidenceReminder");
@@ -4820,8 +4821,8 @@ public class NotificationsIt extends NotificationsItBase {
         verify(notificationClient).sendSms(eq("56a6c0c8-a251-482d-be83-95a7a1bf528c"), any(), any(), any(), any());
     }
 
-    @Test
-    @Ignore
+    @ParameterizedTest
+    @Disabled
     // SSCS-11586
     public void shouldSendNotificationForHearingReminderForAnOralHearing() throws Exception {
         json = json.replace("appealReceived", "hearingReminder");
@@ -4835,7 +4836,7 @@ public class NotificationsIt extends NotificationsItBase {
         verify(notificationClient, times(2)).sendSms(any(), any(), any(), any(), any());
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldNotSendNotificationForHearingReminderForAPaperHearing() throws Exception {
         updateJsonForPaperHearing();
         json = json.replace("appealReceived", "hearingReminder");
@@ -4849,7 +4850,7 @@ public class NotificationsIt extends NotificationsItBase {
         verify(notificationClient, never()).sendSms(any(), any(), any(), any(), any());
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldSendNotificationForSyaAppealCreatedRequestForAnOralHearing() throws Exception {
         json = json.replace("appealReceived", "appealCreated");
 
@@ -4860,7 +4861,7 @@ public class NotificationsIt extends NotificationsItBase {
         verify(notificationClient, times(2)).sendSms(any(), any(), any(), any(), any());
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldSendNotificationForSyaAppealCreatedRequestForAPaperHearing() throws Exception {
         updateJsonForPaperHearing();
         json = json.replace("appealReceived", "appealCreated");
@@ -4871,7 +4872,7 @@ public class NotificationsIt extends NotificationsItBase {
         verify(notificationClient, times(2)).sendSms(any(), any(), any(), any(), any());
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldSendSubscriptionCreatedNotificationForSubscriptionUpdatedRequestWithNewSubscribeSmsRequestForAnOralHearing() throws Exception {
         json = json.replace("appealReceived", "subscriptionUpdated");
         json = updateEmbeddedJson(json, "No", "case_details", "case_data", "subscriptions", "appellantSubscription", "subscribeEmail");
@@ -4928,7 +4929,7 @@ public class NotificationsIt extends NotificationsItBase {
         verifyNoMoreInteractions(notificationClient);
     }*/
 
-    @Test
+    @ParameterizedTest
     public void shouldNotSendSubscriptionUpdatedNotificationForSubscriptionUpdatedRequestWithSameEmailAddress() throws Exception {
         json = json.replace("appealReceived", "subscriptionUpdated");
         json = json.replace("sscstest@greencroftconsulting.com", "tester@hmcts.net");
@@ -4943,7 +4944,7 @@ public class NotificationsIt extends NotificationsItBase {
         verify(notificationClient, never()).sendSms(any(), any(), any(), any(), any());
     }
 
-    @Test
+    @ParameterizedTest
     public void givenAnUnknownRpcCase_thenDoNotProcessNotifications() throws Exception {
         String path = getClass().getClassLoader().getResource("json/ccdResponseWithNoOldCaseRef.json").getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
@@ -4964,7 +4965,7 @@ public class NotificationsIt extends NotificationsItBase {
         verify(notificationClient, never()).sendSms(any(), any(), any(), any(), any());
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldReturn400WhenAuthHeaderIsMissing() throws Exception {
         HttpServletResponse response = getResponse(getRequestWithoutAuthHeader(json));
 
@@ -4974,6 +4975,7 @@ public class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"subscriptionUpdated", "appealReceived", "directionIssued", "nonCompliant"})
     public void shouldNotSendNotificationWhenAppealDormantAndNotificationType(String notificationEventType) throws Exception {
         json = json.replace("appealCreated", State.DORMANT_APPEAL_STATE.toString());
@@ -4987,6 +4989,7 @@ public class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"appealLapsed", "appealDormant"})
     public void shouldSendNotificationWhenAppealDormantAndNotificationType(String notificationEventType) throws Exception {
         json = json.replace("appealCreated", State.DORMANT_APPEAL_STATE.toString());
@@ -5007,6 +5010,7 @@ public class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"appealWithdrawn", "directionIssued"})
     public void shouldSendNotificationLetterWhenAppealDormantAndNotificationType(String notificationEventType) throws Exception {
         json = json.replace("appealCreated", State.DORMANT_APPEAL_STATE.toString());
@@ -5021,7 +5025,7 @@ public class NotificationsIt extends NotificationsItBase {
         verifyNoMoreInteractions(notificationClient);
     }
 
-    @Test
+    @ParameterizedTest
     public void givenAStruckOutEvent_shouldStillSendStruckOutNotificationWhenAppealDormant() throws Exception {
 
         String filename = "json/ccdResponse_struckOut.json";
@@ -5043,6 +5047,7 @@ public class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"adjournCase", "issueFinalDecision", "decisionIssued", "directionIssued"})
     public void givenAReissueEvent_shouldStillSendDirectionIssued(String furtherEvidenceType) throws Exception {
 
@@ -5065,19 +5070,19 @@ public class NotificationsIt extends NotificationsItBase {
         verifyNoMoreInteractions(notificationClient);
     }
 
-    @NamedParameters("grantedOrRefused")
+
     @SuppressWarnings("unused")
-    private Object[] grantedOrRefused() {
+    private static Object[] grantedOrRefused() {
         return new Object[]{
-            new DatedRequestOutcome[] {DatedRequestOutcome.builder()
+            new DatedRequestOutcome[]{DatedRequestOutcome.builder()
                 .requestOutcome(RequestOutcome.GRANTED).date(LocalDate.now()).build()},
-            new DatedRequestOutcome[] {DatedRequestOutcome.builder()
+            new DatedRequestOutcome[]{DatedRequestOutcome.builder()
                 .requestOutcome(RequestOutcome.REFUSED).date(LocalDate.now()).build()},
         };
     }
 
-    @Test
-    @Parameters(named = "grantedOrRefused")
+    @ParameterizedTest
+    @MethodSource("grantedOrRefused")
     public void givenAppellantConfidentialityRequest_shouldSendConfidentialityLetter(DatedRequestOutcome requestOutcome) throws Exception {
         String path = getClass().getClassLoader().getResource("json/ccdResponseWithJointParty.json").getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
@@ -5091,8 +5096,8 @@ public class NotificationsIt extends NotificationsItBase {
         verify(notificationClient, times(1)).sendPrecompiledLetterWithInputStream(any(), any());
     }
 
-    @Test
-    @Parameters(named = "grantedOrRefused")
+    @ParameterizedTest
+    @MethodSource("grantedOrRefused")
     public void givenJointPartyConfidentialityRequest_shouldSendConfidentialityLetter(DatedRequestOutcome requestOutcome) throws Exception {
         String path = getClass().getClassLoader().getResource("json/ccdResponseWithJointParty.json").getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
@@ -5106,8 +5111,8 @@ public class NotificationsIt extends NotificationsItBase {
         verify(notificationClient, times(1)).sendPrecompiledLetterWithInputStream(any(), any());
     }
 
-    @Test
-    @Parameters(named = "grantedOrRefused")
+    @ParameterizedTest
+    @MethodSource("grantedOrRefused")
     public void givenJointPartyAndAppellantConfidentialityRequest_shouldSendBothConfidentialityLetters(DatedRequestOutcome requestOutcome) throws Exception {
         String path = getClass().getClassLoader().getResource("json/ccdResponseWithJointParty.json").getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
@@ -5123,6 +5128,7 @@ public class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({
         "appellant, Dexter Vasquez, true",
         "appellant, Appointee Appointee, false",

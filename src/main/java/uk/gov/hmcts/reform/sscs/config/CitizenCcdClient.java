@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -30,7 +29,6 @@ public class CitizenCcdClient {
     private final CaseAccessApi caseAccessApi;
     private final boolean elasticSearchEnabled;
 
-    @Autowired
     CitizenCcdClient(CcdRequestDetails ccdRequestDetails,
                      CoreCaseDataApi coreCaseDataApi,
                      CaseAccessApi caseAccessApi,

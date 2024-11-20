@@ -6,7 +6,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.times;
@@ -27,8 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import junitparams.JUnitParamsRunner;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -82,7 +82,7 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
     @Mock
     private IdamService idamService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
 
@@ -138,7 +138,7 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getData().getDocumentStaging().getPreviewDocument(), is(notNullValue()));
         final DocumentLink expectedDocumentLink = DocumentLink.builder()
-                .documentFilename(String.format("Directions Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+                .documentFilename("Directions Notice issued on %s.pdf".formatted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
                 .documentBinaryUrl(URL + "/binary")
                 .documentUrl(URL)
                 .build();

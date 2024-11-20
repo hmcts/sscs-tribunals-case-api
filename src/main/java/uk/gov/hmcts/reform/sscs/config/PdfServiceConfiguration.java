@@ -16,7 +16,7 @@ public class PdfServiceConfiguration {
     private String pdfApiUrl;
 
     @Bean
-    public PDFServiceClient pdfServiceClient(
+    PDFServiceClient pdfServiceClient(
         RestTemplate restTemplate,
         ObjectMapper objectMapper
     ) {

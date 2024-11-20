@@ -5,8 +5,8 @@ import static org.hamcrest.Matchers.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Event;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -15,7 +15,7 @@ public class PaperCaseEventFilterUtilTest {
 
     private List<Event> eventsList;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         eventsList = new ArrayList<>();
         eventsList.add(new Event(new EventDetails("2017-06-24T14:09:24.883", "appealReceived", "Appeal received")));

@@ -1,16 +1,17 @@
 package uk.gov.hmcts.reform.sscs.functional.tyanotifications.sya.notifications;
 
 import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import junitparams.Parameters;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.functional.tyanotifications.AbstractFunctionalTest;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
@@ -169,13 +170,14 @@ public class WelshNotificationsFunctionalTest extends AbstractFunctionalTest {
         super(30);
     }
 
+    @BeforeEach
     @Override
     public void setup() {
         idamTokens = idamService.getIdamTokens();
         createCase(true);
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldSendEvidenceReceivedNotificationWelsh() throws NotificationClientException, IOException {
         simulateWelshCcdCallback(EVIDENCE_RECEIVED);
         tryFetchNotificationsForTestCase(
@@ -186,7 +188,7 @@ public class WelshNotificationsFunctionalTest extends AbstractFunctionalTest {
         );
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldSendPaperEvidenceReceivedNotificationWelsh() throws NotificationClientException, IOException {
         simulateCcdCallback(EVIDENCE_RECEIVED, BASE_PATH_TYAN + "paper-" + EVIDENCE_RECEIVED.getId() + "CallbackWelsh.json");
         tryFetchNotificationsForTestCase(
@@ -197,7 +199,7 @@ public class WelshNotificationsFunctionalTest extends AbstractFunctionalTest {
     }
 
 
-    @Test
+    @ParameterizedTest
     public void shouldSendHearingPostponedNotificationWelsh() throws NotificationClientException, IOException {
         simulateWelshCcdCallback(POSTPONEMENT);
 
@@ -205,8 +207,8 @@ public class WelshNotificationsFunctionalTest extends AbstractFunctionalTest {
     }
 
     // TODO: SSCS-11436
-    @Test
-    @Ignore
+    @ParameterizedTest
+    @Disabled
     public void shouldSendHearingBookedNotificationWelsh() throws NotificationClientException, IOException {
         simulateCcdCallback(HEARING_BOOKED, "tyanotifications/appointee/" + HEARING_BOOKED.getId() + "CallbackWelsh.json");
 
@@ -219,7 +221,7 @@ public class WelshNotificationsFunctionalTest extends AbstractFunctionalTest {
     }
 
 
-    @Test
+    @ParameterizedTest
     public void shouldSendHearingAdjournedNotificationWelsh() throws NotificationClientException, IOException {
         simulateWelshCcdCallback(ADJOURNED);
 
@@ -231,7 +233,7 @@ public class WelshNotificationsFunctionalTest extends AbstractFunctionalTest {
         );
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldSendSubscriptionCreatedNotificationWelsh() throws NotificationClientException, IOException {
 
         simulateWelshCcdCallback(SUBSCRIPTION_CREATED);
@@ -240,14 +242,14 @@ public class WelshNotificationsFunctionalTest extends AbstractFunctionalTest {
     }
 
 
-    @Test
+    @ParameterizedTest
     public void shouldSendSubscriptionUpdatedNotificationWelsh() throws NotificationClientException, IOException {
         simulateWelshCcdCallback(SUBSCRIPTION_UPDATED);
 
         tryFetchNotificationsForTestCase(subscriptionUpdatedEmailTemplateIdWelsh);
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldSendAppealCreatedAppellantNotificationWelsh() throws NotificationClientException, IOException {
         simulateCcdCallback(SYA_APPEAL_CREATED, BASE_PATH_TYAN + SYA_APPEAL_CREATED.getId() + "CallbackWelsh.json");
         List<Notification> notifications = tryFetchNotificationsForTestCase(appealCreatedAppellantEmailIdWelsh, appealCreatedAppellantSmsIdWelsh);
@@ -256,7 +258,7 @@ public class WelshNotificationsFunctionalTest extends AbstractFunctionalTest {
     }
 
 
-    @Test
+    @ParameterizedTest
     public void shouldSendValidAppealCreatedAppellantNotificationWelsh() throws NotificationClientException, IOException {
         simulateCcdCallback(VALID_APPEAL_CREATED, BASE_PATH_TYAN + SYA_APPEAL_CREATED.getId() + "CallbackWelsh.json");
         List<Notification> notifications = tryFetchNotificationsForTestCase(appealCreatedAppellantEmailIdWelsh, appealCreatedAppellantSmsIdWelsh);
@@ -264,7 +266,7 @@ public class WelshNotificationsFunctionalTest extends AbstractFunctionalTest {
         assertNotificationBodyContains(notifications, appealCreatedAppellantEmailIdWelsh, "appeal has been received");
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldSendAppealCreatedAppointeeNotificationWelsh() throws NotificationClientException, IOException {
         simulateCcdCallback(SYA_APPEAL_CREATED, BASE_PATH_TYAN + SYA_APPEAL_CREATED.getId() + "AppointeeCallbackWelsh.json");
         List<Notification> notifications = tryFetchNotificationsForTestCase(appealCreatedAppointeeEmailIdWelsh, appealCreatedAppointeeSmsIdWelsh);
@@ -273,7 +275,7 @@ public class WelshNotificationsFunctionalTest extends AbstractFunctionalTest {
     }
 
 
-    @Test
+    @ParameterizedTest
     public void shouldSendValidAppealCreatedAppointeeNotificationWelsh() throws NotificationClientException, IOException {
         simulateCcdCallback(VALID_APPEAL_CREATED, BASE_PATH_TYAN + SYA_APPEAL_CREATED.getId() + "AppointeeCallbackWelsh.json");
         List<Notification> notifications = tryFetchNotificationsForTestCase(appealCreatedAppointeeEmailIdWelsh, appealCreatedAppointeeSmsIdWelsh);
@@ -281,7 +283,7 @@ public class WelshNotificationsFunctionalTest extends AbstractFunctionalTest {
         assertNotificationBodyContains(notifications, appealCreatedAppointeeEmailIdWelsh, "appointee");
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldSendAppointeeEvidenceReminderForPaperCaseNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(EVIDENCE_REMINDER,
             BASE_PATH_TYAN + "appointee/paper-" + EVIDENCE_REMINDER.getId() + "CallbackWelsh.json");
@@ -302,7 +304,7 @@ public class WelshNotificationsFunctionalTest extends AbstractFunctionalTest {
         );
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldSendPaperAppealDormantNotificationWelsh() throws NotificationClientException, IOException {
         simulateCcdCallback(APPEAL_DORMANT, BASE_PATH_TYAN + "paper-" + APPEAL_DORMANT.getId() + "CallbackWelsh.json");
         tryFetchNotificationsForTestCase(
@@ -312,13 +314,13 @@ public class WelshNotificationsFunctionalTest extends AbstractFunctionalTest {
             appealDormantPaperAppellantEmailTemplateIdWelsh);
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldSendOralAppealDormantNotificationWelsh() throws NotificationClientException, IOException {
         simulateCcdCallback(APPEAL_DORMANT, BASE_PATH_TYAN + "oral-" + APPEAL_DORMANT.getId() + "CallbackWelsh.json");
         tryFetchNotificationsForTestCase(appealDormantOralJointPartyEmailTemplateIdWelsh, appealDormantOralAppellantEmailTemplateIdWelsh);
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldSendAppealLapsedNotificationToAppointeeJointPartyAndRep() throws NotificationClientException, IOException {
         simulateCcdCallback(APPEAL_LAPSED,
             "tyanotifications/appointee/" + APPEAL_LAPSED.getId() + "CallbackWelsh.json");
@@ -341,7 +343,7 @@ public class WelshNotificationsFunctionalTest extends AbstractFunctionalTest {
         assertEquals("Pre-compiled PDF", letterNotification.get(1).getSubject().orElse("Unknown Subject"));
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldSendAppointeeAppealWithdrawnNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(APPEAL_WITHDRAWN,
             "tyanotifications/appointee/" + APPEAL_WITHDRAWN.getId() + "CallbackWelsh.json");
@@ -363,11 +365,11 @@ public class WelshNotificationsFunctionalTest extends AbstractFunctionalTest {
         List<Notification> letters = fetchLetters();
         assertEquals(letters.size(), 3);
         for (int i = 0; i < 3; i++) {
-            assertEquals(letters.get(i).toString(), "Pre-compiled PDF", letters.get(i).getSubject().orElse("Unknown Subject"));
+            assertEquals("Pre-compiled PDF", letters.get(i).getSubject().orElse("Unknown Subject"), letters.get(i).toString());
         }
     }
 
-    @Test
+    @ParameterizedTest
     public void shouldSendAppointeeEvidenceReminderForOralCaseNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(EVIDENCE_REMINDER,
             "tyanotifications/appointee/oral-" + EVIDENCE_REMINDER.getId() + "CallbackWelsh.json");
@@ -388,8 +390,8 @@ public class WelshNotificationsFunctionalTest extends AbstractFunctionalTest {
         );
     }
 
-    @Test
-    @Parameters(method = "docmosisTestSetup")
+    @ParameterizedTest
+    @MethodSource("docmosisTestSetup")
     public void shouldSendDocmosisLettersViaGovNotify(NotificationEventType notificationEventType,
                                                       Optional<String> resourceParam,
                                                       int expectedNumberOfLetters) throws IOException, NotificationClientException {
@@ -403,7 +405,7 @@ public class WelshNotificationsFunctionalTest extends AbstractFunctionalTest {
     }
 
     @SuppressWarnings({"Indentation", "unused"})
-    private Object[] docmosisTestSetup() {
+    private static Object[] docmosisTestSetup() {
         return new Object[]{
             new Object[]{NON_COMPLIANT, Optional.empty(), 2},
             new Object[]{DRAFT_TO_NON_COMPLIANT, Optional.empty(), 2},

@@ -4,8 +4,8 @@ import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.*;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
@@ -15,7 +15,7 @@ public class TrackYourAppealJsonBuilderTest {
 
     private TrackYourAppealJsonBuilder trackYourAppealJsonBuilder;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         trackYourAppealJsonBuilder = new TrackYourAppealJsonBuilder();
     }

@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -28,7 +27,6 @@ public class ActionHearingRecordingRequestAboutToStartHandler implements PreSubm
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static DateTimeFormatter resultFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy");
 
-    @Autowired
     public ActionHearingRecordingRequestAboutToStartHandler(ActionHearingRecordingRequestService actionHearingRecordingRequestService) {
         this.actionHearingRecordingRequestService = actionHearingRecordingRequestService;
     }

@@ -1,38 +1,39 @@
 package uk.gov.hmcts.reform.sscs.service.bundle;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static uk.gov.hmcts.reform.sscs.service.bundle.BundleAudioVideoPdfService.DATEFORMATTER;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.docassembly.PdfTemplateContent;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.DocmosisPdfService;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 @RunWith(JUnitParamsRunner.class)
 public class BundleAudioVideoPdfServiceTest {
 
     private BundleAudioVideoPdfService service;
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
     @Mock
     private DocmosisPdfService docmosisPdfService;
     @Mock
@@ -48,7 +49,7 @@ public class BundleAudioVideoPdfServiceTest {
     String nowFormatted;
     String yesterdayFormatted;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         service = new BundleAudioVideoPdfService(docmosisPdfService, pdfStoreService, "gateway-link", "dm-store-url");

@@ -4,10 +4,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -31,16 +28,18 @@ import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.pdfbox.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -61,7 +60,6 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationFactory;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis.PdfLetterService;
 
-@RunWith(JUnitParamsRunner.class)
 public class NotificationServiceTest {
 
     static Appellant APPELLANT_WITH_ADDRESS = Appellant.builder()
@@ -139,7 +137,7 @@ public class NotificationServiceTest {
     @Captor
     private ArgumentCaptor<CcdNotificationWrapper> ccdNotificationWrapperCaptor;
 
-    @Before
+    @BeforeEach
     public void setup() {
         openMocks(this);
 
@@ -172,8 +170,8 @@ public class NotificationServiceTest {
         logger.addAppender(mockAppender);
     }
 
-    @Test
-    @Parameters(method = "generateNotificationTypeAndSubscriptionsScenarios")
+    @ParameterizedTest
+    @MethodSource("generateNotificationTypeAndSubscriptionsScenarios")
     public void givenNotificationEventTypeAndDifferentSubscriptionCombinations_shouldManageNotificationAndSubscriptionAccordingly(
         NotificationEventType notificationEventType,
         int wantedNumberOfEmailNotificationsSent,
@@ -241,8 +239,8 @@ public class NotificationServiceTest {
     }
 
 
-    @Test
-    @Parameters(method = "generateNotificationTypeAndSubscriptionsAppointeeScenarios")
+    @ParameterizedTest
+    @MethodSource("generateNotificationTypeAndSubscriptionsAppointeeScenarios")
     public void givenNotificationEventTypeAndAppointeeSubscriptionCombinations_shouldManageNotificationAndSubscriptionAccordingly(
         NotificationEventType notificationEventType, int wantedNumberOfEmailNotificationsSent,
         int wantedNumberOfSmsNotificationsSent, Subscription appointeeSubscription, Subscription repsSubscription,
@@ -296,7 +294,7 @@ public class NotificationServiceTest {
 
 
     @SuppressWarnings({"Indentation", "UnusedPrivateMethod"})
-    private Object[] generateNotificationTypeAndSubscriptionsScenarios() {
+    private static Object[] generateNotificationTypeAndSubscriptionsScenarios() {
         return new Object[]{
             new Object[]{
                 APPEAL_LAPSED,
@@ -665,7 +663,7 @@ public class NotificationServiceTest {
     }
 
     @SuppressWarnings("Indentation")
-    private Object[] generateNotificationTypeAndSubscriptionsAppointeeScenarios() {
+    private static Object[] generateNotificationTypeAndSubscriptionsAppointeeScenarios() {
         return new Object[]{
             new Object[]{
                 SYA_APPEAL_CREATED,
@@ -913,7 +911,7 @@ public class NotificationServiceTest {
     }
 
     @NotNull
-    private List<CcdValue<OtherParty>> buildOtherParties(YesNo newOtherPartyNotification, Subscription otherPartySubscription) {
+    private static List<CcdValue<OtherParty>> buildOtherParties(YesNo newOtherPartyNotification, Subscription otherPartySubscription) {
         return List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder()
             .sendNewOtherPartyNotification(newOtherPartyNotification)
             .id("1")
@@ -1148,8 +1146,8 @@ public class NotificationServiceTest {
         verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
     }
 
-    @Test
-    @Parameters({"VALID_APPEAL_CREATED", "DRAFT_TO_VALID_APPEAL_CREATED", "APPEAL_RECEIVED",
+    @ParameterizedTest
+    @EnumSource(value = NotificationEventType.class, names = {"VALID_APPEAL_CREATED", "DRAFT_TO_VALID_APPEAL_CREATED", "APPEAL_RECEIVED",
         "DWP_UPLOAD_RESPONSE"})
     public void delayScheduleOfEvents(NotificationEventType eventType) {
         sscsCaseData.setCaseCreated(LocalDate.now().toString());
@@ -1415,8 +1413,8 @@ public class NotificationServiceTest {
         verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
     }
 
-    @Test
-    @Parameters(method = "allEventTypesExceptRequestForInformationAndProcessingHearingRequest")
+    @ParameterizedTest
+    @MethodSource("allEventTypesExceptRequestForInformationAndProcessingHearingRequest")
     public void shouldNotLogErrorWhenNotRequestForInformation(NotificationEventType eventType) {
         CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(
             getSscsCaseDataBuilderSettingInformationFromAppellant(APPELLANT_WITH_ADDRESS, null, null, "yes").build(),
@@ -1485,8 +1483,8 @@ public class NotificationServiceTest {
         then(notificationHandler).shouldHaveNoMoreInteractions();
     }
 
-    @Test
-    @Parameters({"HEARING_BOOKED", "HEARING_REMINDER"})
+    @ParameterizedTest
+    @EnumSource(value = NotificationEventType.class, names = {"HEARING_BOOKED", "HEARING_REMINDER"})
     public void willNotSendHearingNotifications_whenCovid19FeatureTrue(NotificationEventType notificationEventType) {
         CcdNotificationWrapper ccdNotificationWrapper = buildBaseWrapper(notificationEventType, APPELLANT_WITH_ADDRESS, null, null);
         ccdNotificationWrapper.getNewSscsCaseData().setCreatedInGapsFrom(State.VALID_APPEAL.getId());
@@ -1626,6 +1624,7 @@ public class NotificationServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"DIRECTION_ISSUED", "DECISION_ISSUED", "ISSUE_FINAL_DECISION", "DIRECTION_ISSUED_WELSH", "DECISION_ISSUED_WELSH"})
     public void givenReissueDocumentEventReceivedAndResendToOtherPartyYes_thenOverrideNotificationTypeAndSendToOtherParty(NotificationEventType notificationEventType) throws IOException {
 
@@ -1654,6 +1653,7 @@ public class NotificationServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"DIRECTION_ISSUED, No", "DIRECTION_ISSUED, null", "DECISION_ISSUED, No", "DECISION_ISSUED, null",
         "DIRECTION_ISSUED_WELSH, No", "DIRECTION_ISSUED_WELSH, null", "DECISION_ISSUED_WELSH, No", "DECISION_ISSUED_WELSH, null",
         "ISSUE_FINAL_DECISION, No", "ISSUE_FINAL_DECISION, null", "ISSUE_FINAL_DECISION_WELSH, No", "ISSUE_FINAL_DECISION_WELSH, null", "ISSUE_ADJOURNMENT_NOTICE, No", "ISSUE_ADJOURNMENT_NOTICE, null"})
@@ -1669,6 +1669,7 @@ public class NotificationServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"DIRECTION_ISSUED", "DECISION_ISSUED", "ISSUE_FINAL_DECISION", "DIRECTION_ISSUED_WELSH", "DECISION_ISSUED_WELSH"})
     public void givenReissueDocumentEventReceivedAndResendToAppellantYes_thenOverrideNotificationTypeAndSendToAppellant(NotificationEventType notificationEventType) throws IOException {
         CcdNotificationWrapper ccdNotificationWrapper = buildBaseWrapper(REISSUE_DOCUMENT, APPELLANT_WITH_ADDRESS, null, SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build());
@@ -1722,6 +1723,7 @@ public class NotificationServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"DRAFT_TO_NON_COMPLIANT, NON_COMPLIANT"})
     public void givenNotificationTypeToBeOverriden_thenOverrideNotificationTypeAndSend(NotificationEventType receivedNotificationType, NotificationEventType sentNotificationType) throws IOException {
         CcdNotificationWrapper ccdNotificationWrapper = buildBaseWrapper(receivedNotificationType, APPELLANT_WITH_ADDRESS, null, SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build());
@@ -1747,6 +1749,7 @@ public class NotificationServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"DIRECTION_ISSUED, No", "DIRECTION_ISSUED, null", "DECISION_ISSUED, No", "DECISION_ISSUED, null",
         "DIRECTION_ISSUED_WELSH, No", "DIRECTION_ISSUED_WELSH, null", "DECISION_ISSUED_WELSH, No", "DECISION_ISSUED_WELSH, null",
         "ISSUE_FINAL_DECISION, No", "ISSUE_FINAL_DECISION, null", "ISSUE_FINAL_DECISION_WELSH, No", "ISSUE_FINAL_DECISION_WELSH, null", "ISSUE_ADJOURNMENT_NOTICE, No", "ISSUE_ADJOURNMENT_NOTICE, null"})
@@ -1762,6 +1765,7 @@ public class NotificationServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"DIRECTION_ISSUED", "DECISION_ISSUED", "DIRECTION_ISSUED_WELSH", "DECISION_ISSUED_WELSH", "ISSUE_FINAL_DECISION", "ISSUE_ADJOURNMENT_NOTICE"})
     public void givenReissueDocumentEventReceivedAndResendToRepYes_thenOverrideNotificationTypeAndSendToRep(NotificationEventType notificationEventType) throws IOException {
         CcdNotificationWrapper ccdNotificationWrapper = buildBaseWrapper(REISSUE_DOCUMENT, APPELLANT_WITH_ADDRESS, Representative.builder().hasRepresentative("yes").address(Address.builder().line1("test").postcode("Bla").build()).build(), SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build());
@@ -1815,6 +1819,7 @@ public class NotificationServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"DIRECTION_ISSUED, No", "DIRECTION_ISSUED, null", "DECISION_ISSUED, No", "DECISION_ISSUED, null",
         "DIRECTION_ISSUED, No", "DIRECTION_ISSUED, null", "DECISION_ISSUED, No", "DECISION_ISSUED, null",
         "ISSUE_FINAL_DECISION, No", "ISSUE_FINAL_DECISION, null", "ISSUE_FINAL_DECISION_WELSH, No", "ISSUE_FINAL_DECISION_WELSH, null", "ISSUE_ADJOURNMENT_NOTICE, No", "ISSUE_ADJOURNMENT_NOTICE, null"})
@@ -1831,6 +1836,7 @@ public class NotificationServiceTest {
 
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"DIRECTION_ISSUED, Yes", "DECISION_ISSUED, Yes", "ISSUE_ADJOURNMENT_NOTICE, Yes", "PROCESS_AUDIO_VIDEO, Yes", "ISSUE_FINAL_DECISION, Yes", "ACTION_POSTPONEMENT_REQUEST, Yes"})
     public void givenIssueDocumentEventReceivedAndWelshLanguagePref_thenDoNotSendToNotifications(NotificationEventType notificationEventType, @Nullable String languagePrefWelsh) {
         CcdNotificationWrapper ccdNotificationWrapper = buildBaseWrapper(notificationEventType, APPELLANT_WITH_ADDRESS, Representative.builder().hasRepresentative("no").build(), SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build());
@@ -1844,6 +1850,7 @@ public class NotificationServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"issueDirectionsNotice", "excludeEvidence", "admitEvidence"})
     public void givenProcessAudioVideo_thenProcessNotificationForCertainActions(String action) {
         CcdNotificationWrapper ccdNotificationWrapper = buildBaseWrapper(PROCESS_AUDIO_VIDEO, APPELLANT_WITH_ADDRESS, Representative.builder().hasRepresentative("no").build(), SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build());
@@ -1856,6 +1863,7 @@ public class NotificationServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"sendToJudge", "sendToAdmin"})
     public void givenProcessAudioVideo_thenDoProcessNotificationForCertainActions(String action) {
         CcdNotificationWrapper ccdNotificationWrapper = buildBaseWrapper(PROCESS_AUDIO_VIDEO, APPELLANT_WITH_ADDRESS, Representative.builder().hasRepresentative("no").build(), SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build());
@@ -1866,6 +1874,7 @@ public class NotificationServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"DIRECTION_ISSUED_WELSH, Yes", "DECISION_ISSUED_WELSH, Yes"})
     public void givenIssueDocumentEventReceivedAndEventWelsh_thenDoSendNotifications(NotificationEventType notificationEventType, @Nullable String languagePrefWelsh) {
         CcdNotificationWrapper ccdNotificationWrapper = buildBaseWrapper(notificationEventType, APPELLANT_WITH_ADDRESS, Representative.builder().hasRepresentative("no").build(), SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build());
@@ -2000,12 +2009,12 @@ public class NotificationServiceTest {
 
 
     @SuppressWarnings({"Indentation", "UnusedPrivateMethod"})
-    private Object[] allEventTypesExceptRequestForInformationAndProcessingHearingRequest() {
+    private static Object[] allEventTypesExceptRequestForInformationAndProcessingHearingRequest() {
         return Arrays.stream(NotificationEventType.values()).filter(eventType -> (
-            !REQUEST_FOR_INFORMATION.equals(eventType)
-                && !ACTION_HEARING_RECORDING_REQUEST.equals(eventType)
-                && !EVENTS_FOR_ACTION_FURTHER_EVIDENCE.contains(eventType)
-                && !EVENT_TYPES_FOR_BUNDLED_LETTER.contains(eventType))
+                !REQUEST_FOR_INFORMATION.equals(eventType)
+                    && !ACTION_HEARING_RECORDING_REQUEST.equals(eventType)
+                    && !EVENTS_FOR_ACTION_FURTHER_EVIDENCE.contains(eventType)
+                    && !EVENT_TYPES_FOR_BUNDLED_LETTER.contains(eventType))
         ).toArray();
     }
 
@@ -2376,6 +2385,7 @@ public class NotificationServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"CORRECTION_REQUEST", "LIBERTY_TO_APPLY_REQUEST", "STATEMENT_OF_REASONS_REQUEST", "SET_ASIDE_REQUEST"})
     public void givenNotificationEventTypeAndSenderIsInValid_shouldManageNotificationAndSubscriptionAccordingly(NotificationEventType eventType) {
         DynamicList sender = new DynamicList(new DynamicListItem("dwp", "dwp"), new ArrayList<>());
@@ -2390,6 +2400,7 @@ public class NotificationServiceTest {
 
     @DisplayName("When the original sender is null and Event type is VALID_SEND_TO_INTERLOC then return false.")
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"CORRECTION_REQUEST", "LIBERTY_TO_APPLY_REQUEST", "STATEMENT_OF_REASONS_REQUEST", "SET_ASIDE_REQUEST"})
     public void isNotificationStillValidToSendSetAsideRequest_senderIsNull_returnFalse(NotificationEventType eventType) {
         SscsCaseData caseData = SscsCaseData.builder().ccdCaseId("1234").originalSender(null).build();
@@ -2398,6 +2409,7 @@ public class NotificationServiceTest {
 
     @DisplayName("When the original sender is not null and sender is dwp then return false.")
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"CORRECTION_REQUEST", "LIBERTY_TO_APPLY_REQUEST", "STATEMENT_OF_REASONS_REQUEST", "SET_ASIDE_REQUEST"})
     public void isNotificationStillValidToSendSetAsideRequest_senderIsInValid_returnFalse(NotificationEventType eventType) {
         DynamicList sender = new DynamicList(new DynamicListItem("dwp", "dwp"), new ArrayList<>());
@@ -2408,6 +2420,7 @@ public class NotificationServiceTest {
     @DisplayName("When the original sender is not null, Event type is VALID_SEND_TO_INTERLOC and sender is other than dwp "
         + "then return true.")
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"CORRECTION_REQUEST", "LIBERTY_TO_APPLY_REQUEST", "STATEMENT_OF_REASONS_REQUEST", "SET_ASIDE_REQUEST"})
     public void isNotificationStillValidToSendSetAsideRequest_senderIsValid_returnFalse(NotificationEventType eventType) {
         DynamicList sender = new DynamicList(new DynamicListItem("appellant", "appellant"), new ArrayList<>());

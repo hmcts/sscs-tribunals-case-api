@@ -73,7 +73,7 @@ class ProcessHmcMessageServiceTestV2 extends AbstractProcessHmcMessageServiceTes
         assert dynamicEventUpdateResult.eventType().equals(expectedEventType);
         assert dynamicEventUpdateResult.summary().equals(hmcStatus.getCcdUpdateSummary());
 
-        String ccdUpdateDescription = String.format(hmcStatus.getCcdUpdateDescription(), HEARING_ID);
+        String ccdUpdateDescription = hmcStatus.getCcdUpdateDescription().formatted(HEARING_ID);
         assert dynamicEventUpdateResult.description().equals(ccdUpdateDescription);
     }
 }

@@ -1,15 +1,15 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 import java.util.Arrays;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -30,7 +30,7 @@ public class HearingRecordingRequestServiceTest {
 
     private HearingRecordingRequestService hearingRecordingRequestService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         hearingRecordingRequestService = new HearingRecordingRequestService();
@@ -61,6 +61,7 @@ public class HearingRecordingRequestServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"DWP", "APPELLANT", "REPRESENTATIVE", "JOINT_PARTY"})
     public void givenAHearingWithRecordingAndASelectedPartyItem_thenHearingInRequestableListAndCorrectMessageDisplayed(PartyItemList partyItemList) {
         sscsCaseData.setHearings(singletonList(Hearing.builder().value(
@@ -75,6 +76,7 @@ public class HearingRecordingRequestServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"DWP", "APPELLANT", "REPRESENTATIVE", "JOINT_PARTY"})
     public void givenThreeHearingsWithRecordingAndASelectedPartyItem_thenThreeHearingInRequestableList(PartyItemList partyItemList) {
         PreSubmitCallbackResponse<SscsCaseData> response = hearingRecordingRequestService.buildHearingRecordingUi(new PreSubmitCallbackResponse<>(sscsCaseData), partyItemList);
@@ -82,6 +84,7 @@ public class HearingRecordingRequestServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"DWP", "APPELLANT", "REPRESENTATIVE", "JOINT_PARTY"})
     public void givenAHearingsRequestedAndASelectedPartyItem_thenHearingInRequestedList(PartyItemList partyItemList) {
         SscsHearingRecording sscsHearingRecording = SscsHearingRecording.builder().value(SscsHearingRecordingDetails.builder().hearingId("an_id2").build()).build();
@@ -95,6 +98,7 @@ public class HearingRecordingRequestServiceTest {
     }
 
     @Test
+    // JunitParamsRunnerToParameterized conversion not supported
     @Parameters({"DWP", "APPELLANT", "REPRESENTATIVE", "JOINT_PARTY"})
     public void givenAHearingsReleasedAndASelectedPartyItem_thenHearingInReleasedList(PartyItemList partyItemList) {
         SscsHearingRecording sscsHearingRecording = SscsHearingRecording.builder().value(SscsHearingRecordingDetails.builder().hearingId("an_id2").build()).build();

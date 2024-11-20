@@ -5,12 +5,13 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
@@ -24,7 +25,7 @@ public class QuestionServiceTest {
     private String serviceAuthHeader;
     private IdamTokens idamTokens;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         cohClient = mock(CohClient.class);
         idamService = mock(IdamService.class);
@@ -60,12 +61,14 @@ public class QuestionServiceTest {
         assertThat(questionRequiredByDate, is(expectedDate));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void questionRoundsMustHaveAtLeastOneQuestion() {
-        when(cohClient.getQuestionRounds(authHeader, serviceAuthHeader, someHearingId))
-            .thenReturn(new QuestionRounds(1, singletonList(new QuestionRound(emptyList()))));
+        assertThrows(IllegalStateException.class, () -> {
+            when(cohClient.getQuestionRounds(authHeader, serviceAuthHeader, someHearingId))
+                .thenReturn(new QuestionRounds(1, singletonList(new QuestionRound(emptyList()))));
 
-        new QuestionService(cohClient, idamService).getQuestionRequiredByDate(someHearingId);
+            new QuestionService(cohClient, idamService).getQuestionRequiredByDate(someHearingId);
+        });
     }
 
     @Test

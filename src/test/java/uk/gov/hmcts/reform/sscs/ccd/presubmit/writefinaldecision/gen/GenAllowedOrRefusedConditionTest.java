@@ -2,38 +2,34 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen;
 
 import static org.mockito.MockitoAnnotations.openMocks;
 
-import junitparams.JUnitParamsRunner;
-import junitparams.NamedParameters;
-import junitparams.Parameters;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFinalDecisionCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 
-@RunWith(JUnitParamsRunner.class)
 public class GenAllowedOrRefusedConditionTest {
 
     @Mock
     private DecisionNoticeQuestionService questionService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
     }
 
-    @NamedParameters("allowedOrRefusedConditions")
+
     @SuppressWarnings("unused")
-    private Object[] allowedOrRefusedConditions() {
-        return new Object[] {
-            new String[] {"allowed"},
-            new String[] {"refused"},
-            new String[] {"somethingElse"},
-            new String[] {null}
+    private static Object[] allowedOrRefusedConditions() {
+        return new Object[]{
+            new String[]{"allowed"},
+            new String[]{"refused"},
+            new String[]{"somethingElse"},
+            new String[]{null}
         };
     }
 
@@ -41,8 +37,8 @@ public class GenAllowedOrRefusedConditionTest {
         return ("allowed".equals(allowedOrRefused) || "refused".equals(allowedOrRefused));
     }
 
-    @Test
-    @Parameters(named = "allowedOrRefusedConditions")
+    @ParameterizedTest
+    @MethodSource("allowedOrRefusedConditions")
     public void testThatAtExactlyOneConditionIsApplicableForAllAllowedAndRefusedConditions(
         String allowedOrRefused) {
 
@@ -70,33 +66,31 @@ public class GenAllowedOrRefusedConditionTest {
 
         if (isValidCombinationExpected) {
 
-            Assert.assertEquals(
-                "Expected 1 condition to be satisfied for points:" + allowedOrRefused + " but "
-                    + conditionApplicableCount + " were satisfied",
-                1, conditionApplicableCount);
+            Assertions.assertEquals(
+                1, conditionApplicableCount, "Expected 1 condition to be satisfied for points:" + allowedOrRefused + " but "
+                    + conditionApplicableCount + " were satisfied");
 
         } else {
-            Assert.assertEquals(
-                "Expected 0 conditions to be satisfied for points:" + allowedOrRefused + " but "
-                    + conditionApplicableCount + " were satisfied",
-                0, conditionApplicableCount);
+            Assertions.assertEquals(
+                0, conditionApplicableCount, "Expected 0 conditions to be satisfied for points:" + allowedOrRefused + " but "
+                    + conditionApplicableCount + " were satisfied");
         }
 
         if ("allowed".equals(allowedOrRefused)) {
-            Assert.assertEquals(GenAllowedOrRefusedCondition.ALLOWED_CONDITION, matchingCondition);
+            Assertions.assertEquals(GenAllowedOrRefusedCondition.ALLOWED_CONDITION, matchingCondition);
         } else if ("refused".equals(allowedOrRefused)) {
-            Assert.assertEquals(GenAllowedOrRefusedCondition.REFUSED_CONDITION, matchingCondition);
+            Assertions.assertEquals(GenAllowedOrRefusedCondition.REFUSED_CONDITION, matchingCondition);
         }
     }
 
-    @Test
+    @ParameterizedTest
     public void testAllPointsConditionAttributesAreNotNull() {
         for (GenAllowedOrRefusedCondition condition : GenAllowedOrRefusedCondition.values()) {
-            Assert.assertNotNull(condition.getAnswersExtractor());
-            Assert.assertSame(condition.getAnswersExtractor(), GenAllowedOrRefusedCondition.getAllAnswersExtractor());
-            Assert.assertNotNull(condition.getEnumClass());
-            Assert.assertEquals(GenAllowedOrRefusedCondition.class, condition.getEnumClass());
-            Assert.assertNotNull(condition.getPointsRequirementCondition());
+            Assertions.assertNotNull(condition.getAnswersExtractor());
+            Assertions.assertSame(condition.getAnswersExtractor(), GenAllowedOrRefusedCondition.getAllAnswersExtractor());
+            Assertions.assertNotNull(condition.getEnumClass());
+            Assertions.assertEquals(GenAllowedOrRefusedCondition.class, condition.getEnumClass());
+            Assertions.assertNotNull(condition.getPointsRequirementCondition());
         }
     }
 }

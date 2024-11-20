@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwprequesttimeextension;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -19,7 +18,6 @@ public class DwpRequestTimeExtensionAboutToSubmitHandler implements PreSubmitCal
 
     private DwpDocumentService dwpDocumentService;
 
-    @Autowired
     public DwpRequestTimeExtensionAboutToSubmitHandler(DwpDocumentService dwpDocumentService) {
         this.dwpDocumentService = dwpDocumentService;
     }

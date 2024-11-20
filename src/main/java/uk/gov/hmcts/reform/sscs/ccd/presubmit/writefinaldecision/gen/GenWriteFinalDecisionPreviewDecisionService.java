@@ -4,7 +4,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -24,7 +23,6 @@ import uk.gov.hmcts.reform.sscs.service.*;
 @Component
 public class GenWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisionPreviewDecisionServiceBase {
 
-    @Autowired
     public GenWriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
                                                        GenDecisionNoticeQuestionService decisionNoticeQuestionService, GenDecisionNoticeOutcomeService decisionNoticeOutcomeService, DocumentConfiguration documentConfiguration,
                                                        VenueDataLoader venueDataLoader) {

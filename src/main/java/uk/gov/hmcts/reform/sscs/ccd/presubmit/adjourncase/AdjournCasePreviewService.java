@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -54,7 +53,6 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     private final SignLanguagesService signLanguagesService;
     private final AirLookupService airLookupService;
 
-    @Autowired
     public AdjournCasePreviewService(GenerateFile generateFile,
                                      UserDetailsService userDetailsService,
                                      VenueDataLoader venueDataLoader,
@@ -211,9 +209,9 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                 String languageLabel = caseData.getAdjournment().getInterpreterLanguage().getValue().getLabel();
                 String languageKey = caseData.getAdjournment().getInterpreterLanguage().getValue().getCode();
                 Language hmrcRefLanguage = signLanguagesService.getLanguageByHmcReference(languageKey);
-                String interpreterDescription = String.format("an interpreter in %s", languageLabel);
+                String interpreterDescription = "an interpreter in %s".formatted(languageLabel);
                 if (nonNull(hmrcRefLanguage)) {
-                    interpreterDescription = String.format("a sign language interpreter (%s)", languageLabel);
+                    interpreterDescription = "a sign language interpreter (%s)".formatted(languageLabel);
                 }
                 adjournCaseBuilder.interpreterDescription(interpreterDescription);
             } else {
@@ -229,7 +227,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         String formattedUnits = duration == 1
             ? durationUnits.toString().substring(0, durationUnits.toString().length() - 1)
             : durationUnits.toString();
-        return String.format("%d %s", duration, formattedUnits);
+        return "%d %s".formatted(duration, formattedUnits);
     }
 
 
@@ -253,7 +251,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                 if (adjournment.getNextHearingFirstAvailableDateAfterPeriod() == null) {
                     throw new IllegalStateException("No value set for adjournCaseNextHearingFirstAvailableDateAfterPeriod in case data");
                 }
-                hearingDateSentence = String.format("%s after %s",
+                hearingDateSentence = "%s after %s".formatted(
                     hearingDateSentence,
                     issueDate.plusDays(adjournment.getNextHearingFirstAvailableDateAfterPeriod().getCcdDefinition())
                         .format(DateTimeFormatter.ofPattern(DOCUMENT_DATE_PATTERN)));

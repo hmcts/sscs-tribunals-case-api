@@ -89,8 +89,7 @@ public abstract class DecisionNoticeOutcomeService {
                 decisionNoticeQuestionService, sscsCaseData))
             .map(pointsCondition ->
                 pointsCondition.getOptionalErrorMessage(decisionNoticeQuestionService, sscsCaseData))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
+            .flatMap(Optional::stream)
             .toList();
     }
 }
