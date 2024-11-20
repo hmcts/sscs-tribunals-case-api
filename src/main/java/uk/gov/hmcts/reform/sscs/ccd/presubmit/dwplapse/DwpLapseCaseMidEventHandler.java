@@ -41,8 +41,7 @@ public class DwpLapseCaseMidEventHandler implements PreSubmitCallbackHandler<Ssc
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
-        // TODO replace with common isIba function when available
-        if (isIbcaCase(caseData)) {
+        if (caseData.isIbcCase()) {
             if (caseData.getInterlocReviewState() != InterlocReviewState.REVIEW_BY_JUDGE) {
                 sscsCaseDataPreSubmitCallbackResponse.addError("Interlocutory review state must be set to 'Review by Judge'");
             }
@@ -53,19 +52,5 @@ public class DwpLapseCaseMidEventHandler implements PreSubmitCallbackHandler<Ssc
         }
 
         return sscsCaseDataPreSubmitCallbackResponse;
-    }
-
-    // TODO remove for common isIba function when available
-    private boolean isIbcaCase(SscsCaseData caseData) {
-        final String selectedBenefitType = Optional.of(caseData)
-            .map(SscsCaseData::getAppeal)
-            .map(Appeal::getBenefitType)
-            .map(BenefitType::getDescriptionSelection)
-            .map(DynamicList::getValue)
-            .filter(ObjectUtils::isNotEmpty)
-            .map(DynamicListItem::getCode)
-            .orElse(null);
-
-        return IBCA_BENEFIT_CODE.equals(caseData.getBenefitCode()) || IBCA_BENEFIT_CODE.equals(selectedBenefitType);
     }
 }
