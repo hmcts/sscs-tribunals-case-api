@@ -69,6 +69,8 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
                 preSubmitCallbackResponse.addError("There are no completed hearings on the case.");
             }
         } catch (Exception e) {
+            log.info("AddHearingOutcome failed for caseId {} with error {}", callback.getCaseDetails().getId(), e.getMessage());
+
             preSubmitCallbackResponse.addError("There was an error while retrieving hearing details; please try again after some time.");
         }
         return preSubmitCallbackResponse;
