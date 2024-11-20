@@ -3,12 +3,10 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updateotherparty;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.INFECTED_BLOOD_COMPENSATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_OTHER_PARTY_DATA;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getUpdatedDirectionDueDate;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.validateHearingOptionsAndExcludeDates;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SYSTEM_USER;
-import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.clearOtherPartiesIfEmpty;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartiesWithClearedRoles;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyUcb;
@@ -106,7 +104,7 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
             return response;
         }
         //Check if role is not entered for a Child support case
-        if (!isIbcCase(sscsCaseData) && roleAbsentForOtherParties(sscsCaseData.getOtherParties())) {
+        if (!sscsCaseData.isIbcCase() && roleAbsentForOtherParties(sscsCaseData.getOtherParties())) {
             response.addError(ERR_ROLE_REQUIRED);
         }
         return response;
@@ -146,9 +144,5 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
 
     private boolean isBenefitTypeValidForOtherPartyValidation(final Optional<Benefit> benefitType) {
         return benefitType.filter(benefit -> SscsType.SSCS5.equals(benefit.getSscsType())).isPresent();
-    }
-
-    private boolean isIbcCase(SscsCaseData sscsCaseData) {
-        return IBCA_BENEFIT_CODE.equals(sscsCaseData.getBenefitCode()) || INFECTED_BLOOD_COMPENSATION.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode());
     }
 }

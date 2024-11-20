@@ -7,7 +7,6 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_OTHER_PARTY_DATA;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -43,7 +42,7 @@ public class UpdateOtherPartyMidEventHandler implements PreSubmitCallbackHandler
 
         return callbackType.equals(CallbackType.MID_EVENT)
                 && callback.getEvent() == UPDATE_OTHER_PARTY_DATA
-                && isIbcaCase(callback.getCaseDetails().getCaseData())
+                && callback.getCaseDetails().getCaseData().isIbcCase()
                 && nonNull(callback.getCaseDetails().getCaseData().getOtherParties());
     }
 
@@ -93,9 +92,5 @@ public class UpdateOtherPartyMidEventHandler implements PreSubmitCallbackHandler
             }
         }
         return validationErrors;
-    }
-
-    private boolean isIbcaCase(SscsCaseData caseData) {
-        return IBCA_BENEFIT_CODE.equals(caseData.getBenefitCode());
     }
 }
