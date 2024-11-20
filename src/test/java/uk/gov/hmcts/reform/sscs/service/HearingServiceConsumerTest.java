@@ -110,7 +110,8 @@ public class HearingServiceConsumerTest {
 
         Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(
             response,
-            HEARING_REQUEST_ID
+            HEARING_REQUEST_ID,
+            false
         );
         //reset the DLVs
         caseData.getSchedulingAndListingFields().setDefaultListingValues(null);
@@ -165,7 +166,8 @@ public class HearingServiceConsumerTest {
 
         Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(
             response,
-            HEARING_REQUEST_ID
+            HEARING_REQUEST_ID,
+                false
         );
         //reset the DLVs
         caseData.getSchedulingAndListingFields().setDefaultListingValues(null);
@@ -202,7 +204,8 @@ public class HearingServiceConsumerTest {
 
         Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(
             response,
-            HEARING_REQUEST_ID
+            HEARING_REQUEST_ID,
+                false
         );
         //reset the DLVs
         caseData.getSchedulingAndListingFields().setDefaultListingValues(null);

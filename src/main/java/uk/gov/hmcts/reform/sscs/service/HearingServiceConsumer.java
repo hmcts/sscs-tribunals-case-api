@@ -29,10 +29,14 @@ public class HearingServiceConsumer {
 
     }
 
-    public Consumer<SscsCaseDetails> getCreateHearingCaseDetailsConsumerV2(HmcUpdateResponse response, Long hearingRequestId) {
+    public Consumer<SscsCaseDetails> getCreateHearingCaseDetailsConsumerV2(HmcUpdateResponse response, Long hearingRequestId, boolean isUpdateHearing) {
         return sscsCaseDetails -> {
             try {
-                OverridesMapping.setDefaultListingValues(sscsCaseDetails.getData(), refData);
+                if (isUpdateHearing) {
+                    OverridesMapping.setOverrideValues(sscsCaseDetails.getData(), refData);
+                } else {
+                    OverridesMapping.setDefaultListingValues(sscsCaseDetails.getData(), refData);
+                }
                 updateCaseDataWithHearingResponse(response, hearingRequestId, sscsCaseDetails.getData());
             } catch (ListingException e) {
                 throw new RuntimeException(e);
