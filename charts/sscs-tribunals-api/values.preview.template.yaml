@@ -130,7 +130,7 @@ em-stitching:
     devcpuLimits: 2
     devmemoryLimits: 4Gi
     environment:
-      SPRING_DATASOURCE_HOST: ia-preview.postgres.database.azure.com
+      SPRING_DATASOURCE_HOST: sscs-preview.postgres.database.azure.com
       SPRING_DATASOURCE_USERNAME: hmcts
       SPRING_DATASOURCE_NAME: "pr-${CHANGE_ID}-emstitch"
       SPRING_DATASOURCE_PASSWORD: hmcts
@@ -149,10 +149,6 @@ em-stitching:
         secretRef: postgres
         key: PASSWORD
         disabled: false
-    keyVaults:
-      sscs:
-        secrets:
-          - AppInsightsInstrumentationKey
 
 ccd-case-document-am-api:
   enabled: true
