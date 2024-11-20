@@ -6,7 +6,6 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.*;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.INFECTED_BLOOD_COMPENSATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getBenefitByCodeOrThrowException;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getLongBenefitNameDescriptionWithOptionalAcronym;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelComposition.JUDGE_DOCTOR_AND_DISABILITY_EXPERT_IF_APPLICABLE;
@@ -165,8 +164,7 @@ public class Personalisation<E extends NotificationWrapper> {
             if (hasBenefitType(ccdResponse)) {
                 benefit = getBenefitByCodeOrThrowException(ccdResponse.getAppeal().getBenefitType().getCode());
 
-                // TODO use common isIbc boolean when available
-                if (INFECTED_BLOOD_COMPENSATION.equals(benefit)) {
+                if (ccdResponse.isIbcCase()) {
                     personalisation.put(BENEFIT_NAME_ACRONYM_LITERAL, IBC_ACRONYM);
                     personalisation.put(BENEFIT_NAME_ACRONYM_LITERAL_WELSH, IBC_ACRONYM_WELSH);
                 } else if (benefit.isHasAcronym()) {
@@ -591,8 +589,7 @@ public class Personalisation<E extends NotificationWrapper> {
             personalisation.put(REGIONAL_OFFICE_POSTCODE_LITERAL, rpc.getPostcode());
         }
 
-        // TODO use common isIbc boolean when available
-        if (!Objects.equals(ccdResponse.getIsScottishCase(), "Yes") && ccdResponse.getBenefitType().orElse(Benefit.PIP).equals(Benefit.INFECTED_BLOOD_COMPENSATION)) {
+        if (!Objects.equals(ccdResponse.getIsScottishCase(), "Yes") && ccdResponse.isIbcCase()) {
             personalisation.put(PHONE_NUMBER_WELSH, "03001234567");
             personalisation.put(PHONE_NUMBER, "03001231234");
         } else {

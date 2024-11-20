@@ -4,7 +4,6 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.*;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.defaultToEmptyStringIfNull;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.truncateAddressLine;
-import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -52,7 +51,7 @@ public class PlaceholderService {
         }
 
         String shouldHideNino = shouldHideNino(appeal);
-        String shouldHideIbcaReference = shouldHideIbcaReference(appeal);
+        String shouldHideIbcaReference = caseData.isIbcCase() ? YesNo.NO.getValue() : YesNo.YES.getValue();
 
         placeholders.put(BENEFIT_TYPE_LITERAL, description);
         placeholders.put(APPELLANT_FULL_NAME_LITERAL, appeal.getAppellant().getName().getAbbreviatedFullName());
@@ -61,8 +60,7 @@ public class PlaceholderService {
         placeholders.put(NINO_LITERAL, defaultToEmptyStringIfNull(appeal.getAppellant().getIdentity().getNino()));
         placeholders.put(SHOULD_HIDE_IBCA_REFERENCE, shouldHideIbcaReference);
         placeholders.put(IBCA_REFERENCE_LITERAL, defaultToEmptyStringIfNull(appeal.getAppellant().getIdentity().getIbcaReference()));
-        // TODO - use common isIbc boolean when available to populate SSCS_URL_LITERAL
-        placeholders.put(SSCS_URL_LITERAL, IBCA_BENEFIT_CODE.equals(caseData.getBenefitCode()) ? IBCA_URL : SSCS_URL);
+        placeholders.put(SSCS_URL_LITERAL, caseData.isIbcCase() ? IBCA_URL : SSCS_URL);
         placeholders.put(GENERATED_DATE_LITERAL, LocalDateTime.now().toLocalDate().toString());
         placeholders.put(pdfDocumentConfig.getHmctsImgKey(), pdfDocumentConfig.getHmctsImgVal());
         if (caseData.isLanguagePreferenceWelsh()) {
@@ -150,11 +148,5 @@ public class PlaceholderService {
                         || Benefit.INFECTED_BLOOD_COMPENSATION.getShortName().equals(appeal.getBenefitType().getCode()))
                 ? YesNo.YES.getValue()
                 : YesNo.NO.getValue();
-    }
-
-    private String shouldHideIbcaReference(Appeal appeal) {
-        return appeal.getBenefitType() != null && Benefit.INFECTED_BLOOD_COMPENSATION.getShortName().equals(appeal.getBenefitType().getCode())
-                ? YesNo.NO.getValue()
-                : YesNo.YES.getValue();
     }
 }
