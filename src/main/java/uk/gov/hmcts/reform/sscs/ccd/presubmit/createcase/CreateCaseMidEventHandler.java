@@ -4,7 +4,6 @@ import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isIbcaCase;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -36,8 +35,7 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
                 || callback.getEvent() == EventType.CASE_UPDATED)
                 && Objects.nonNull(callback.getCaseDetails())
                 && Objects.nonNull(callback.getCaseDetails().getCaseData())
-                && isIbcaCase(callback.getCaseDetails().getCaseData()
-        );
+                && callback.getCaseDetails().getCaseData().isIbcCase();
     }
 
     @Override
