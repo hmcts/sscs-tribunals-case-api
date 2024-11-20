@@ -77,7 +77,7 @@ java:
     HMC_API_URL: "http://hmc-cft-hearing-service-aat.service.core-compute-aat.internal"
     #Messaging
     HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-aat"
-    HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-pr-4119"
+    HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-pr-4114"
     TRIBUNALS_EVENT_QUEUE_NAME: "${SERVICE_NAME}-servicebus-tribunals-to-hearing-api"
     TRIBUNALS_EVENT_QUEUE_POLICY_NAME: "RootManageSharedAccessKey"
     TRIBUNALS_EVENT_QUEUE_NAMESPACE: "sscs-sb-preview"
