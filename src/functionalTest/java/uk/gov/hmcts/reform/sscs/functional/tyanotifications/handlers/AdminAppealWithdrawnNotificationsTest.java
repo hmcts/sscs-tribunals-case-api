@@ -96,15 +96,12 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
             logger.info("Correspondence is null");
             return 0;
         }
-        logger.info("Correspondence: {}", correspondence);
+        logger.info("looking for letter for {} Correspondence: {}", subscription, correspondence);
         return correspondence.stream()
-            .peek(c -> logger.info("Correspondence: {}", c))
             .filter(c -> c.getValue().getCorrespondenceType() == CorrespondenceType.Letter)
             .filter(c -> c.getValue().getDocumentLink().getDocumentFilename().contains(ADMIN_APPEAL_WITHDRAWN.getId()))
             .filter(c -> {
-                boolean match = isAMatch(subscription, c.getValue().getTo());
-                logger.info("Match: {}", match);
-                return match;
+                return isAMatch(subscription, c.getValue().getTo());
             })
             .count();
     }
