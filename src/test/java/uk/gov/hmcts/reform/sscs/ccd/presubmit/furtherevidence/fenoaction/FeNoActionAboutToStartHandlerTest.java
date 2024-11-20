@@ -31,7 +31,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.BaseHandlerTest;
 
 @RunWith(JUnitParamsRunner.class)
-public class FeNoActionAboutToStartHandlerTest extends BaseHandlerTest {
+class FeNoActionAboutToStartHandlerTest extends BaseHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     private FeNoActionAboutToStartHandler handler = new FeNoActionAboutToStartHandler();
