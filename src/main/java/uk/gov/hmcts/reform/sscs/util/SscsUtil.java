@@ -8,8 +8,14 @@ import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
-import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.FACE_TO_FACE;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.NOT_ATTENDING;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.TELEPHONE;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.VIDEO;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -589,5 +595,7 @@ public class SscsUtil {
             }
         }
     }
+
+
 }
 
