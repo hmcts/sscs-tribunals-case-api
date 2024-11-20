@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.fenoaction;
 
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isIbcaCase;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -26,7 +28,8 @@ public class FeNoActionAboutToStartHandler implements PreSubmitCallbackHandler<S
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         if (!DwpState.FE_RECEIVED.equals(caseData.getDwpState())) {
             PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
-            response.addError("The dwp state value has to be 'FE received' in order to run this event");
+            String body = isIbcaCase(caseData) ? "FTA" : "dwp";
+            response.addError("The " + body + " state value has to be 'FE received' in order to run this event");
             return response;
         }
         List<DynamicListItem> listOptions = new ArrayList<>();
