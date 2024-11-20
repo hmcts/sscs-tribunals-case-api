@@ -30,8 +30,8 @@
     "Description": "Amend a hearing outcome",
     "DisplayOrder": 141,
     "PreConditionState(s)": "*",
+    "CallBackURLAboutToStartEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToStart",
     "PostConditionState": "*",
-    "EventEnablingCondition": "hearingOutcomes!=\"\"",
     "SecurityClassification": "Public"
   }
 ]
