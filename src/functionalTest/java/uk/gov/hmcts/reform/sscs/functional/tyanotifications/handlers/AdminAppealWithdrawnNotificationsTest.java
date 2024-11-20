@@ -62,7 +62,7 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
         simulateCcdCallback(ADMIN_APPEAL_WITHDRAWN, "tyanotifications/handlers/" + ADMIN_APPEAL_WITHDRAWN.getId() + subscription
             + "Callback.json");
 
-        logger.info("Test executing for subscription {} with case id {} ",subscription,caseReference);
+        logger.info("Test executing for subscription {} with case id {}, ref {} ",subscription,caseId, caseReference);
 
         List<Notification> notifications = tryFetchNotificationsForTestCase(emailId, smsId);
 

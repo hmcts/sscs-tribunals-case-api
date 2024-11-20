@@ -226,6 +226,7 @@ public abstract class AbstractFunctionalTest {
                 matchingNotifications =
                     allNotifications
                         .stream()
+                        .peek(notification -> log.info("Each notification: {}", notification))
                         .filter(notification -> expectedText == null || StringUtils.contains(notification.getBody(), expectedText))
                         .filter(notification -> asList(expectedTemplateIds).contains(notification.getTemplateId().toString()))
                         .collect(toSet());
