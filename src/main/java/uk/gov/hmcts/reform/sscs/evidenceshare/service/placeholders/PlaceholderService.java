@@ -61,6 +61,7 @@ public class PlaceholderService {
         placeholders.put(NINO_LITERAL, defaultToEmptyStringIfNull(appeal.getAppellant().getIdentity().getNino()));
         placeholders.put(SHOULD_HIDE_IBCA_REFERENCE, shouldHideIbcaReference);
         placeholders.put(IBCA_REFERENCE_LITERAL, defaultToEmptyStringIfNull(appeal.getAppellant().getIdentity().getIbcaReference()));
+        // TODO - use common isIbc boolean when available to populate SSCS_URL_LITERAL
         placeholders.put(SSCS_URL_LITERAL, IBCA_BENEFIT_CODE.equals(caseData.getBenefitCode()) ? IBCA_URL : SSCS_URL);
         placeholders.put(GENERATED_DATE_LITERAL, LocalDateTime.now().toLocalDate().toString());
         placeholders.put(pdfDocumentConfig.getHmctsImgKey(), pdfDocumentConfig.getHmctsImgVal());

@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.*;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderHelper.buildCaseData;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderHelper.buildCaseDataWithoutBenefitType;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -21,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.config.PdfDocumentConfig;
 import uk.gov.hmcts.reform.sscs.evidenceshare.config.ExelaAddressConfig;
@@ -231,5 +233,50 @@ public class PlaceholderServiceTest {
         service.build(caseData, placeholders, address, welshDate);
 
         assertEquals("Yes", placeholders.get(SHOULD_HIDE_NINO));
+    }
+
+    @Test
+    public void givenAnIbcaCase_thenPopulateThePlaceholders() {
+        caseData.setBenefitCode(IBCA_BENEFIT_CODE);
+        caseData.getAppeal().setBenefitType(BenefitType.builder()
+                .code("infectedBloodCompensation")
+                .description("Infected Blood Compensation")
+                .build()
+        );
+        caseData.getAppeal().getAppellant().setIdentity(Identity.builder().ibcaReference("IBCA123456").build());
+
+        Address address = Address.builder()
+                .line1("Unit 2")
+                .line2("156 The Road")
+                .town("Lechworth")
+                .county("Bedford")
+                .postcode("L2 5UZ").build();
+
+        service.build(caseData, placeholders, address, now);
+
+        assertEquals("HM Courts & Tribunals Service", placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL));
+        assertEquals("Social Security & Child Support Appeals", placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE2_LITERAL));
+        assertEquals("Prudential Buildings", placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE3_LITERAL));
+        assertEquals("36 Dale Street", placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE4_LITERAL));
+        assertEquals("LIVERPOOL", placeholders.get(REGIONAL_OFFICE_COUNTY_LITERAL));
+        assertEquals("L2 5UZ", placeholders.get(REGIONAL_OFFICE_POSTCODE_LITERAL));
+        assertEquals(now, placeholders.get(GENERATED_DATE_LITERAL));
+        assertEquals(now, placeholders.get(CASE_CREATED_DATE_LITERAL));
+        assertEquals("Mr T Tibbs", placeholders.get(APPELLANT_FULL_NAME_LITERAL));
+        assertEquals("INFECTED BLOOD COMPENSATION", placeholders.get(BENEFIT_TYPE_LITERAL));
+        assertEquals("123456", placeholders.get(CASE_ID_LITERAL));
+        assertEquals(IBCA_URL, placeholders.get(SSCS_URL_LITERAL));
+        assertEquals("Line 1", placeholders.get(EXELA_ADDRESS_LINE1_LITERAL));
+        assertEquals("Line 2", placeholders.get(EXELA_ADDRESS_LINE2_LITERAL));
+        assertEquals("Line 3", placeholders.get(EXELA_ADDRESS_LINE3_LITERAL));
+        assertEquals("Unit 2", placeholders.get(RECIPIENT_ADDRESS_LINE_1_LITERAL));
+        assertEquals("156 The Road", placeholders.get(RECIPIENT_ADDRESS_LINE_2_LITERAL));
+        assertEquals("Lechworth", placeholders.get(RECIPIENT_ADDRESS_LINE_3_LITERAL));
+        assertEquals("Bedford", placeholders.get(RECIPIENT_ADDRESS_LINE_4_LITERAL));
+        assertEquals("L2 5UZ", placeholders.get(RECIPIENT_ADDRESS_LINE_5_LITERAL));
+        assertEquals("Yes", placeholders.get(SHOULD_HIDE_NINO));
+        assertEquals("", placeholders.get(NINO_LITERAL));
+        assertEquals("No", placeholders.get(SHOULD_HIDE_IBCA_REFERENCE));
+        assertEquals("IBCA123456", placeholders.get(IBCA_REFERENCE_LITERAL));
     }
 }
