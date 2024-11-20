@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.*;
 
 import java.time.LocalDate;
@@ -22,6 +23,7 @@ import java.util.Objects;
 import java.util.Optional;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -564,6 +566,19 @@ public class SscsUtil {
             default -> {
             }
         }
+    }
+
+    public static boolean isIbcaCase(SscsCaseData caseData) {
+        final String selectedBenefitType = Optional.of(caseData)
+                .map(SscsCaseData::getAppeal)
+                .map(Appeal::getBenefitType)
+                .map(BenefitType::getDescriptionSelection)
+                .map(DynamicList::getValue)
+                .filter(ObjectUtils::isNotEmpty)
+                .map(DynamicListItem::getCode)
+                .orElse(null);
+
+        return IBCA_BENEFIT_CODE.equals(caseData.getBenefitCode()) || IBCA_BENEFIT_CODE.equals(selectedBenefitType);
     }
 }
 
