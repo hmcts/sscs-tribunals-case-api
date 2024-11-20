@@ -149,6 +149,10 @@ em-stitching:
         secretRef: postgres
         key: PASSWORD
         disabled: false
+    keyVaults:
+      sscs:
+        secrets:
+          - AppInsightsInstrumentationKey
 
 ccd-case-document-am-api:
   enabled: true
