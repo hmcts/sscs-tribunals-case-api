@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.config;
 
+import javax.annotation.PostConstruct;
 import javax.jms.ConnectionFactory;
 import javax.net.ssl.SSLContext;
 import lombok.extern.slf4j.Slf4j;
@@ -7,8 +8,10 @@ import org.apache.qpid.jms.JmsConnectionFactory;
 import org.apache.qpid.jms.policy.JmsDefaultPrefetchPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerContainerFactory;
@@ -18,7 +21,26 @@ import org.springframework.jms.core.JmsTemplate;
 @Configuration
 @Slf4j
 @EnableJms
+@ConditionalOnProperty(name = "amqp.enabled", havingValue = "true", matchIfMissing = true)
 public class MessagingConfig {
+    @Autowired
+    private Environment environment;
+    @Value("${amqp.enabled}")
+    private boolean amqpEnabled;
+
+    @PostConstruct
+    public void init() {
+        System.out.println("AMQP Enabled: " + amqpEnabled);
+        System.out.println("Active Profile: " + getActiveProfileName());
+    }
+
+    public String getActiveProfileName() {
+        String[] activeProfiles = environment.getActiveProfiles();
+        if (activeProfiles.length > 0) {
+            return activeProfiles[0];
+        }
+        return "No active profile found";
+    }
 
     @Bean
     public String jmsUrlString(@Value("${amqp.amqp-connection-string-template}") final String amqpConnectionStringTemplate,

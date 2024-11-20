@@ -182,13 +182,6 @@ withPipeline(type, product, component) {
             """
         }
     }
-
-    afterSuccess('smoketest:preview') {
-        runE2eTests()
-    }
-    afterSuccess('smoketest:aat') {
-        runE2eTests()
-    }
 }
 
 def generateDefinitions() {

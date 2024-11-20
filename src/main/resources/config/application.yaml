@@ -56,6 +56,7 @@ subscriptions:
         secret: ${SUBSCRIPTIONS_MAC_SECRET:our-big-secret}
 
 amqp:
+    enabled: true
     host: ${AMQP_HOST:localhost}
     password: ${AMQP_PASSWORD:guest}
     subscription: ${SUBSCRIPTION_NAME:test.queue}
@@ -2082,6 +2083,8 @@ spring:
             on-profile: integration, functional
     flyway:
         enabled: false
+amqp:
+    enabled: false
 job.scheduler:
     autoStart: false
     retryPolicy:
@@ -2093,5 +2096,3 @@ job.scheduler:
                 instanceId: AUTO
             jobStore:
                 class: org.quartz.simpl.RAMJobStore
-
-
