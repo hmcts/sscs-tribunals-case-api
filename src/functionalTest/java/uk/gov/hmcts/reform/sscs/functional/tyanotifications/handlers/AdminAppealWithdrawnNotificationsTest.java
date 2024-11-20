@@ -56,15 +56,21 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
         int expectedNumSmsNotifications,
         int expectedNumLetters) throws Exception {
 
+
+        logger.info("Test started for subscription {} ",subscription);
+
         simulateCcdCallback(ADMIN_APPEAL_WITHDRAWN, "tyanotifications/handlers/" + ADMIN_APPEAL_WITHDRAWN.getId() + subscription
             + "Callback.json");
 
-        delayInSeconds(5);
+        logger.info("Test executing for subscription {} with case id {} ",subscription,caseReference);
+
         List<Notification> notifications = tryFetchNotificationsForTestCase(emailId, smsId);
 
         assertEquals(expectedNumEmailNotifications, getNumberOfNotificationsForGivenEmailOrSmsTemplateId(notifications, emailId));
         assertEquals(expectedNumSmsNotifications, getNumberOfNotificationsForGivenEmailOrSmsTemplateId(notifications, smsId));
         assertTrue(fetchLetters(expectedNumLetters, subscription));
+        logger.info("Test successfully executed for subscription {} ",subscription);
+
     }
 
     private boolean fetchLetters(int expectedNumLetters, String subscription) {
