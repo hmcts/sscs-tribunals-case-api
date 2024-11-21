@@ -79,16 +79,15 @@ export class AccessibilitySteps extends BaseStep {
         let bundleDate = new Date();
         let formattedDate = bundleDate.toISOString().split('T')[0].split('-').reverse().join('-');
 
-
-
         await this.homePage.chooseEvent("Create a bundle");
         await this.createBundlePage.verifyPageContent();
         await axeTest(this.page);
         await this.createBundlePage.confirmSubmission();
         await expect(this.homePage.summaryTab).toBeVisible();
 
-        await this.homePage.delay(15000);
+        await this.homePage.delay(10000);
         await this.homePage.reloadPage();
+        await expect(this.homePage.summaryTab).toBeVisible();
         await this.homePage.navigateToTab("Bundles");
 
         await this.bundlesTab.verifyBundlesTabContentByKeyValueForASpan(`${bundleTestData.stitchStatusLabel}`, `${bundleTestData.stitchStatusDone}`);

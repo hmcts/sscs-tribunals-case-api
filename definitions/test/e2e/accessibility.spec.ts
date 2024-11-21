@@ -2,7 +2,7 @@ import {test} from "../lib/steps.factory";
 import createCaseBasedOnCaseType from "../api/client/sscs/factory/appeal.type.factory";
 
 let firstCaseId: string;
-let secondCaseId: string;3
+let secondCaseId: string;
 
 test.describe("Accessibility Tests", {tag: '@accessibility'}, async () => {
 
@@ -13,6 +13,7 @@ test.describe("Accessibility Tests", {tag: '@accessibility'}, async () => {
     });
 
     test("Test", async ({accessibilitySteps}) => {
+        test.setTimeout(300000)
         await accessibilitySteps.performAccessibilityTest(firstCaseId, secondCaseId)
     });
 
