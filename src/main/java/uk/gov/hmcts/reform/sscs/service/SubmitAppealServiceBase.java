@@ -198,11 +198,10 @@ public abstract class SubmitAppealServiceBase {
 
             return handleMoveToNonCompliant(caseData, saveAndReturnCase, moveToNoneCompliant);
         } else {
-            boolean isIba = caseData.getBenefitCode().equals(Benefit.INFECTED_BLOOD_COMPENSATION.getBenefitCode());
             Identity identity = appeal.getAppellant().getIdentity();
             log.info("Moving case for {} {} to incomplete due to MRN Details {} present and MRN Date {} present",
-                isIba ? "Ibca Reference" : "NINO",
-                isIba ? identity.getIbcaReference() : maskNino(identity.getNino()),
+                caseData.isIbcCase() ? "Ibca Reference" : "NINO",
+                caseData.isIbcCase() ? identity.getIbcaReference() : maskNino(identity.getNino()),
                 (mrnDetails != null ? "" : "not"),
                 (mrnDetails != null && mrnDetails.getMrnDate() != null ? "" : "not"));
             return saveAndReturnCase ? DRAFT_TO_INCOMPLETE_APPLICATION : INCOMPLETE_APPLICATION_RECEIVED;
@@ -211,12 +210,11 @@ public abstract class SubmitAppealServiceBase {
 
     private Pair<List<SscsCaseDetails>, SscsCaseDetails> getMatchedNinoCasesAndCaseDetails(SscsCaseData caseData,
                                                                                            IdamTokens idamTokens,
-                                                                                           boolean isIba,
                                                                                            String nino,
                                                                                            String ibcaReference) {
         SscsCaseDetails caseDetails = null;
         List<SscsCaseDetails> matchedByNinoCases = List.of();
-        if (!isIba) {
+        if (!caseData.isIbcCase()) {
             matchedByNinoCases = getMatchedCases(nino, idamTokens);
             if (!matchedByNinoCases.isEmpty()) {
                 log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino "
@@ -234,12 +232,11 @@ public abstract class SubmitAppealServiceBase {
     private SscsCaseDetails createOrUpdateCase(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens) {
         SscsCaseDetails caseDetails = null;
         String benefitShortName = caseData.getAppeal().getBenefitType().getCode();
-        boolean isIba = caseData.getBenefitCode().equals(Benefit.INFECTED_BLOOD_COMPENSATION.getBenefitCode());
         String nino = caseData.getAppeal().getAppellant().getIdentity().getNino();
         String ibcaReference = caseData.getAppeal().getAppellant().getIdentity().getIbcaReference();
         try {
             Pair<List<SscsCaseDetails>, SscsCaseDetails> matchedByNinoCasesCaseDetails =
-                getMatchedNinoCasesAndCaseDetails(caseData, idamTokens, isIba, nino, ibcaReference);
+                getMatchedNinoCasesAndCaseDetails(caseData, idamTokens, nino, ibcaReference);
             List<SscsCaseDetails> matchedByNinoCases = matchedByNinoCasesCaseDetails.getLeft();
             caseDetails = matchedByNinoCasesCaseDetails.getRight();
             if (caseDetails == null) {
@@ -285,8 +282,8 @@ public abstract class SubmitAppealServiceBase {
             }
         } catch (Exception e) {
             String caseId = caseDetails != null ? caseDetails.getId().toString() : "";
-            String referenceName = isIba ? "IBCA Reference" : "Nino";
-            String referenceValue = isIba ? ibcaReference : maskNino(nino);
+            String referenceName = caseData.isIbcCase() ? "IBCA Reference" : "Nino";
+            String referenceValue = caseData.isIbcCase() ? ibcaReference : maskNino(nino);
             throw new CcdException(
                 String.format("Error found in the creating case process for case with Id - %s"
                         + " and %s - %s and Benefit type - %s and exception: %s",
