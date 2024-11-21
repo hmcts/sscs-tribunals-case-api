@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 import static java.util.Objects.requireNonNull;
 
 import java.util.List;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -45,9 +46,10 @@ public class PreSubmitCallbackDispatcher<T extends CaseData> {
 
                 PreSubmitCallbackResponse<T> callbackResponseFromHandler = callbackHandler.handle(callbackType, callback, userAuthorisation);
                 if (callbackResponseFromHandler.getData() instanceof SscsCaseData) {
-                    log.info("CallbackType {} callbackHandler {} case data {} InterlocReviewState {}",
+                    log.info("CallbackType {} callbackHandler {} case data {} SelectWhoReviewsCase {} InterlocReviewState {}",
                             callbackType,
                             callbackHandler,
+                            Objects.hashCode(callbackResponseFromHandler.getData()),
                             ((SscsCaseData) callbackResponseFromHandler.getData()).getSelectWhoReviewsCase(),
                             ((SscsCaseData) callbackResponseFromHandler.getData()).getInterlocReviewState());
                 }
