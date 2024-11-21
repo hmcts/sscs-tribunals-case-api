@@ -34,14 +34,10 @@ public class DwpLapseCaseMidEventHandler implements PreSubmitCallbackHandler<Ssc
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
-        if (caseData.isIbcCase()) {
-            if (caseData.getInterlocReviewState() != InterlocReviewState.REVIEW_BY_JUDGE) {
-                sscsCaseDataPreSubmitCallbackResponse.addError("Interlocutory review state must be set to 'Review by Judge'");
-            }
-        } else {
-            if (caseData.getDwpLT203() == null) {
-                sscsCaseDataPreSubmitCallbackResponse.addError("Select or fill the required Select document for upload field");
-            }
+        if (caseData.isIbcCase() && caseData.getInterlocReviewState() != InterlocReviewState.REVIEW_BY_JUDGE) {
+            sscsCaseDataPreSubmitCallbackResponse.addError("Interlocutory review state must be set to 'Review by Judge'");
+        } else if (!caseData.isIbcCase() && caseData.getDwpLT203() == null) {
+            sscsCaseDataPreSubmitCallbackResponse.addError("Select or fill the required Select document for upload field");
         }
 
         return sscsCaseDataPreSubmitCallbackResponse;
