@@ -45,7 +45,7 @@ public class PreSubmitCallbackDispatcher<T extends CaseData> {
 
                 PreSubmitCallbackResponse<T> callbackResponseFromHandler = callbackHandler.handle(callbackType, callback, userAuthorisation);
                 if (callbackResponseFromHandler.getData() instanceof SscsCaseData) {
-                    log.info("CallbackType {} callbackHandler {} case data {}",
+                    log.info("CallbackType {} callbackHandler {} case data {} InterlocReviewState {}",
                             callbackType,
                             callbackHandler,
                             ((SscsCaseData) callbackResponseFromHandler.getData()).getSelectWhoReviewsCase(),
