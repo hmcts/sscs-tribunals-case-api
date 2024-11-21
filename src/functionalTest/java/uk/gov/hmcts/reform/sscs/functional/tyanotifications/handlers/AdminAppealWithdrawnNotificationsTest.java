@@ -66,6 +66,8 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
 
         List<Notification> notifications = tryFetchNotificationsForTestCase(emailId, smsId);
 
+        delayInSeconds(30);
+
         List<Notification> letterNotifications = tryFetchLetterNotificationsForTestCase();
 
 
