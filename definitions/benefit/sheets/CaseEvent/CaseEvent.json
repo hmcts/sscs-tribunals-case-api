@@ -1434,6 +1434,7 @@
     "DisplayOrder": 1010,
     "PreConditionState(s)": "hearing;incompleteApplication;incompleteApplicationInformationReqsted;interlocutoryReviewState;notListable;readyToList;responseReceived;validAppeal;withDwp;handlingError",
     "PostConditionState": "*",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "SecurityClassification": "Public",
     "ShowSummary": "Y",
