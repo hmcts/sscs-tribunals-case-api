@@ -66,7 +66,15 @@ public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallback
             listOptions.add(new DynamicListItem(POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId(), POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getLabel()));
         }
 
-        sscsCaseData.setSelectWhoReviewsCase(new DynamicList(new DynamicListItem("", ""), listOptions));
+        String selectedCode = "";
+        String selectedLabel = "";
+        if (sscsCaseData.getSelectWhoReviewsCase() != null) {
+            selectedCode = sscsCaseData.getSelectWhoReviewsCase().getValue().getCode();
+            selectedLabel = sscsCaseData.getSelectWhoReviewsCase().getValue().getLabel();
+        }
+
+        sscsCaseData.setSelectWhoReviewsCase(new DynamicList(new DynamicListItem(selectedCode,
+                selectedLabel), listOptions));
     }
 
     private void setOriginalSenderDropdown(SscsCaseData sscsCaseData) {
