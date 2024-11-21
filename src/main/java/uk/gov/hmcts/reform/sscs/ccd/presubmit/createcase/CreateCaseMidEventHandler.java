@@ -50,7 +50,7 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
             caseData.getAppeal().getAppellant().getAddress().setPortOfEntry(selectedPortOfEntryLocationCode);
         }
 
-        if (callback.getEvent() == EventType.CASE_UPDATED && isNotEmpty(caseData.getRegionalProcessingCenter()) && caseData.getRegionalProcessingCenter().getHearingRoute().equals(HearingRoute.GAPS)) {
+        if (callback.getEvent() == EventType.CASE_UPDATED && caseData.getRegionalProcessingCenter() != null && caseData.getRegionalProcessingCenter().getHearingRoute().equals(HearingRoute.GAPS)) {
             errorResponse.addError(HEARING_ROUTE_ERROR_MESSAGE);
         }
 
