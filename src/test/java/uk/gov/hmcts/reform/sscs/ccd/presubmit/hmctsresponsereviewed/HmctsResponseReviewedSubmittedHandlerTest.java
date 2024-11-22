@@ -96,8 +96,8 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
 
     @Test
     public void givenAHmctsResponseReviewedSubmittedEventAndInterlocIsRequiredForJudge_thenTriggerValidSendToInterlocEvent() {
-
-        sscsCaseData = sscsCaseData.toBuilder().isInterlocRequired("Yes").selectWhoReviewsCase(new DynamicList(new DynamicListItem("reviewByJudge", "Review by Judge"), null)).build();
+        DynamicListItem value = new DynamicListItem("reviewByJudge", "Review by Judge");
+        sscsCaseData = sscsCaseData.toBuilder().isInterlocRequired("Yes").selectWhoReviewsCase(new DynamicList(value, null)).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
@@ -110,12 +110,19 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
                 eq("Send a case to a Judge for review"),
                 any(IdamTokens.class),
                 consumerArgumentCaptor.capture());
+
+        Consumer<SscsCaseDetails> mutator = consumerArgumentCaptor.getValue();
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build();
+        mutator.accept(sscsCaseDetails);
+
+        assertEquals(value, sscsCaseDetails.getData().getSelectWhoReviewsCase().getValue());
     }
 
     @Test
     public void givenAHmctsResponseReviewedSubmittedEventAndInterlocIsRequiredForTcw_thenTriggerValidSendToInterlocEvent() {
 
-        sscsCaseData = sscsCaseData.toBuilder().isInterlocRequired("Yes").selectWhoReviewsCase(new DynamicList(new DynamicListItem("reviewByTcw", "Review by TCW"), null)).build();
+        DynamicListItem value = new DynamicListItem("reviewByTcw", "Review by TCW");
+        sscsCaseData = sscsCaseData.toBuilder().isInterlocRequired("Yes").selectWhoReviewsCase(new DynamicList(value, null)).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
@@ -128,6 +135,11 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
                 eq("Send a case to a TCW for review"),
                 any(IdamTokens.class),
                 consumerArgumentCaptor.capture());
+        Consumer<SscsCaseDetails> mutator = consumerArgumentCaptor.getValue();
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build();
+        mutator.accept(sscsCaseDetails);
+
+        assertEquals(value, sscsCaseDetails.getData().getSelectWhoReviewsCase().getValue());
     }
 
     @Test
