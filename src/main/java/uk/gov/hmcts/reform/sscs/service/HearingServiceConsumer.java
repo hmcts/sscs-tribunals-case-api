@@ -33,7 +33,9 @@ public class HearingServiceConsumer {
         return sscsCaseDetails -> {
             try {
                 if (isUpdateHearing) {
-                    OverridesMapping.setOverrideValues(sscsCaseDetails.getData(), refData);
+                    if (isNull(sscsCaseDetails.getData().getSchedulingAndListingFields().getOverrideFields())) {
+                        OverridesMapping.setOverrideValues(sscsCaseDetails.getData(), refData);
+                    }
                 } else {
                     OverridesMapping.setDefaultListingValues(sscsCaseDetails.getData(), refData);
                 }
