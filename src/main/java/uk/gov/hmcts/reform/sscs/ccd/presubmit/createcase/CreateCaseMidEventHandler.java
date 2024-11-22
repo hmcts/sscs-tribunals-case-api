@@ -1,29 +1,22 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
-import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
-import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Entity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
@@ -31,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
 @Component
 @Slf4j
 public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+    private static final String HEARING_ROUTE_ERROR_MESSAGE = "Hearing route must be List Assist";
 
     private final PostcodeValidator postcodeValidator = new PostcodeValidator();
 
@@ -43,8 +37,7 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
                 || callback.getEvent() == EventType.CASE_UPDATED)
                 && Objects.nonNull(callback.getCaseDetails())
                 && Objects.nonNull(callback.getCaseDetails().getCaseData())
-                && isIbcaCase(callback.getCaseDetails().getCaseData()
-        );
+                && callback.getCaseDetails().getCaseData().isIbcCase();
     }
 
     @Override
@@ -55,6 +48,10 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
         if (NO.equals(caseData.getAppeal().getAppellant().getAddress().getInMainlandUk())) {
             final String selectedPortOfEntryLocationCode = caseData.getAppeal().getAppellant().getAddress().getUkPortOfEntryList().getValue().getCode();
             caseData.getAppeal().getAppellant().getAddress().setPortOfEntry(selectedPortOfEntryLocationCode);
+        }
+
+        if (callback.getEvent() == EventType.CASE_UPDATED && caseData.getRegionalProcessingCenter() != null && HearingRoute.GAPS.equals(caseData.getRegionalProcessingCenter().getHearingRoute())) {
+            errorResponse.addError(HEARING_ROUTE_ERROR_MESSAGE);
         }
 
         errorResponse.addErrors(validateAddress(caseData.getAppeal().getAppellant()));
@@ -89,18 +86,5 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
         }
 
         return validationErrors;
-    }
-
-    private boolean isIbcaCase(SscsCaseData caseData) {
-        final String selectedBenefitType = Optional.of(caseData)
-                .map(SscsCaseData::getAppeal)
-                .map(Appeal::getBenefitType)
-                .map(BenefitType::getDescriptionSelection)
-                .map(DynamicList::getValue)
-                .filter(ObjectUtils::isNotEmpty)
-                .map(DynamicListItem::getCode)
-                .orElse(null);
-
-        return IBCA_BENEFIT_CODE.equals(caseData.getBenefitCode()) || IBCA_BENEFIT_CODE.equals(selectedBenefitType);
     }
 }
