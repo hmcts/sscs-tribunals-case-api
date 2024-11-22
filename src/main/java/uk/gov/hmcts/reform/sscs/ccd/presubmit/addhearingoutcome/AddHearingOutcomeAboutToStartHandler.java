@@ -59,7 +59,7 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
                 List<HearingDetails> selectedHearings = sscsCaseData.getHearings()
                         .stream()
                         .map(Hearing::getValue)
-                        .filter(value -> value.getStart()!=null)
+                        .filter(value -> value.getStart() != null)
                         .filter(value -> hmcHearings.stream()
                                 .anyMatch(hmcHearing -> Objects
                                         .equals(hmcHearing.getHearingId().toString(), value.getHearingId())))
