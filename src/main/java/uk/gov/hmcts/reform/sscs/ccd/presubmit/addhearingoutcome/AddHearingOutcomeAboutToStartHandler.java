@@ -56,8 +56,10 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
             HearingsGetResponse response = hmcHearingsApiService.getHearingsRequest(Long.toString(caseDetails.getId()), HmcStatus.COMPLETED);
             List<CaseHearing> hmcHearings = response.getCaseHearings();
             if (!hmcHearings.isEmpty()) {
-                List<HearingDetails> selectedHearings = sscsCaseData.getHearings().stream()
+                List<HearingDetails> selectedHearings = sscsCaseData.getHearings()
+                        .stream()
                         .map(Hearing::getValue)
+                        .filter(value -> value.getStart()!=null)
                         .filter(value -> hmcHearings.stream()
                                 .anyMatch(hmcHearing -> Objects
                                         .equals(hmcHearing.getHearingId().toString(), value.getHearingId())))
