@@ -6,11 +6,12 @@ public final class PlaceholderConstants {
     public static final String WELSH_CASE_CREATED_DATE_LITERAL = "welsh_case_created_date";
     public static final String BENEFIT_TYPE_LITERAL = "benefit_type";
     public static final String SHOULD_HIDE_NINO = "should_hide_nino";
-    public static final String SHOULD_HIDE_IBCA_REFERENCE = "should_hide_ibca_reference";
     public static final String APPELLANT_FULL_NAME_LITERAL = "appellant_full_name";
     public static final String CASE_ID_LITERAL = "case_id";
     public static final String NINO_LITERAL = "nino";
-    public static final String IBCA_REFERENCE_LITERAL = "ibca_reference";
+    public static final String LABEL = "label";
+    public static final String NINO_LABEL = "NI No";
+    public static final String IBCA_REFERENCE_LABEL = "IBCA Reference";
     public static final String GENERATED_DATE_LITERAL = "generated_date";
     public static final String WELSH_GENERATED_DATE_LITERAL = "welsh_generated_date";
     public static final String SSCS_URL_LITERAL = "sscs_url";
