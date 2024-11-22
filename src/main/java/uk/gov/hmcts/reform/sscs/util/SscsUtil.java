@@ -485,22 +485,13 @@ public class SscsUtil {
     public static void handleIbcaCase(SscsCaseData caseData) {
         caseData.getAppeal().getHearingOptions().setHearingRoute(LIST_ASSIST);
         caseData.getAppeal().getMrnDetails().setDwpIssuingOffice("IBCA");
-        RegionalProcessingCenter regionalProcessingCenter = caseData.getRegionalProcessingCenter();
-        RegionalProcessingCenter listAssistRegionalProcessingCenter = RegionalProcessingCenter.builder()
-            .faxNumber(regionalProcessingCenter.getFaxNumber())
-            .address4(regionalProcessingCenter.getAddress4())
-            .phoneNumber(regionalProcessingCenter.getPhoneNumber())
-            .name(regionalProcessingCenter.getName())
-            .address1(regionalProcessingCenter.getAddress1())
-            .address2(regionalProcessingCenter.getAddress2())
-            .address3(regionalProcessingCenter.getAddress3())
-            .postcode(regionalProcessingCenter.getPostcode())
-            .city(regionalProcessingCenter.getCity())
-            .email(regionalProcessingCenter.getEmail())
-            .hearingRoute(LIST_ASSIST)
-            .epimsId(regionalProcessingCenter.getEpimsId())
-            .build();
-        caseData.setRegionalProcessingCenter(listAssistRegionalProcessingCenter);
+        if (caseData.getRegionalProcessingCenter() != null) {
+            RegionalProcessingCenter listAssistRegionalProcessingCenter = caseData.getRegionalProcessingCenter()
+                .toBuilder()
+                .hearingRoute(LIST_ASSIST)
+                .build();
+            caseData.setRegionalProcessingCenter(listAssistRegionalProcessingCenter);
+        }
     }
 
     public static String generateUniqueIbcaId(Appellant appellant) {
