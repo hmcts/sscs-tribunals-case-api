@@ -60,12 +60,15 @@ public class HmctsResponseReviewedSubmittedHandler extends ResponseEventsAboutTo
             updateCase(
                     callback.getCaseDetails().getId(),
                     VALID_SEND_TO_INTERLOC,
-                    (caseId, eventType) -> updateCcdCaseService.triggerCaseEventV2(
+                    (caseId, eventType) -> updateCcdCaseService.updateCaseV2(
                             caseId,
                             eventType.getCcdType(),
                             "Send to interloc",
                             "Send a case to a " + whoToReview + " for review",
-                            idamService.getIdamTokens()));
+                            idamService.getIdamTokens(),
+                            (SscsCaseDetails sscsCaseDetails) -> sscsCaseDetails.getData().setSelectWhoReviewsCase(
+                                    sscsCaseData.getSelectWhoReviewsCase()
+                            )));
         } else {
             updateCase(
                     callback.getCaseDetails().getId(),
