@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FE_RECEIVED;
-import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,11 +22,16 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.BaseHandlerTest;
 
 @RunWith(JUnitParamsRunner.class)
-class FeNoActionAboutToStartHandlerTest extends BaseHandlerTest {
+public class FeNoActionAboutToStartHandlerTest extends BaseHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     private FeNoActionAboutToStartHandler handler = new FeNoActionAboutToStartHandler();
@@ -107,13 +111,13 @@ class FeNoActionAboutToStartHandlerTest extends BaseHandlerTest {
 
     @ParameterizedTest
     @EnumSource(value = DwpState.class, mode = EnumSource.Mode.EXCLUDE, names = {"FE_RECEIVED"})
-    void returns_fta_error_for_not_FE_received_non_ibca(DwpState dwpState) {
+    void returns_fta_error_for_not_FE_received_ibca(DwpState dwpState) {
         MockitoAnnotations.openMocks(this);
         when(mockCallback.getEvent()).thenReturn(EventType.FE_NO_ACTION);
         when(mockCallback.getCaseDetails()).thenReturn(mockCaseDetails);
         when(mockCaseDetails.getCaseData()).thenReturn(mockCaseData);
         when(mockCaseData.getDwpState()).thenReturn(dwpState);
-        when(mockCaseData.getBenefitCode()).thenReturn(IBCA_BENEFIT_CODE);
+        when(mockCaseData.isIbcCase()).thenReturn(true);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_START, mockCallback, USER_AUTHORISATION);
         assertEquals(1, response.getErrors().size());
         assertTrue(response.getErrors().contains("The FTA state value has to be 'FE received' in order to run this event"));

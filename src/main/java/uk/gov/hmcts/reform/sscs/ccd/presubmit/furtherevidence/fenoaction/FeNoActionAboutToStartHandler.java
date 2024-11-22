@@ -1,14 +1,16 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.fenoaction;
 
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isIbcaCase;
-
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
@@ -28,7 +30,7 @@ public class FeNoActionAboutToStartHandler implements PreSubmitCallbackHandler<S
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         if (!DwpState.FE_RECEIVED.equals(caseData.getDwpState())) {
             PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
-            String body = isIbcaCase(caseData) ? "FTA" : "dwp";
+            String body = caseData.isIbcCase() ? "FTA" : "dwp";
             response.addError("The " + body + " state value has to be 'FE received' in order to run this event");
             return response;
         }
