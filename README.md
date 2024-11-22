@@ -65,7 +65,7 @@ hmc-to-sscs-subscription-pr-XXXX
 6. And on that subscription create a Correlation filters with these values:
 ```
 hmctsServiceId:BBA3
-deploymentId:deployment-sscs-tribunals-api-pr-xxxx
+hmctsDeploymentId:deployment-sscs-tribunals-api-pr-xxxx
 ```
 
 7. Once this has been completed go to values.hearings.preview.template.yaml and you will need to replace
