@@ -368,15 +368,15 @@
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "outcome_dwpresponsewriter", "TabLabel": "Outcome", "TabDisplayOrder": 30, "CaseFieldID": "didPoAttend", "TabFieldDisplayOrder": 2},
 
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "hearing_outcome_superuser", "TabLabel": "Hearing outcome", "TabDisplayOrder": 31, "CaseFieldID": "isConfidentialCaseLabel", "TabFieldDisplayOrder": 1, "TabShowCondition": "hearingOutcomes=\"*\"", "FieldShowCondition": "isConfidentialCase =\"Yes\""},
-  {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "TabID": "hearing_outcome_superuser", "TabLabel": "Hearing outcome", "TabDisplayOrder": 31, "CaseFieldID": "hearingOutcomes", "TabFieldDisplayOrder": 1, "TabShowCondition": "hearingOutcomes=\"*\""},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "TabID": "hearing_outcome_superuser", "TabLabel": "Hearing outcome", "TabDisplayOrder": 31, "CaseFieldID": "hearingOutcomes", "TabFieldDisplayOrder": 1},
 
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "hearing_outcome_judge", "TabLabel": "Hearing outcome", "TabDisplayOrder": 31, "CaseFieldID": "isConfidentialCaseLabel", "TabFieldDisplayOrder": 1, "TabShowCondition": "hearingOutcomes=\"*\"", "FieldShowCondition": "isConfidentialCase =\"Yes\""},
-  {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-judge", "TabID": "hearing_outcome_judge", "TabLabel": "Hearing outcome", "TabDisplayOrder": 31, "CaseFieldID": "hearingOutcomes", "TabFieldDisplayOrder": 1, "TabShowCondition": "hearingOutcomes=\"*\""},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-judge", "TabID": "hearing_outcome_judge", "TabLabel": "Hearing outcome", "TabDisplayOrder": 31, "CaseFieldID": "hearingOutcomes", "TabFieldDisplayOrder": 1},
 
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "hearing_outcome_registrar", "TabLabel": "Hearing outcome", "TabDisplayOrder": 31, "CaseFieldID": "isConfidentialCaseLabel", "TabFieldDisplayOrder": 1, "TabShowCondition": "hearingOutcomes=\"*\"", "FieldShowCondition": "isConfidentialCase =\"Yes\""},
-  {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-registrar", "TabID": "hearing_outcome_registrar", "TabLabel": "Hearing outcome", "TabDisplayOrder": 31, "CaseFieldID": "hearingOutcomes", "TabFieldDisplayOrder": 1, "TabShowCondition": "hearingOutcomes=\"*\""},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-registrar", "TabID": "hearing_outcome_registrar", "TabLabel": "Hearing outcome", "TabDisplayOrder": 31, "CaseFieldID": "hearingOutcomes", "TabFieldDisplayOrder": 1},
 
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "hearing_outcome_dwp_response_writer", "TabLabel": "Hearing outcome", "TabDisplayOrder": 31, "CaseFieldID": "isConfidentialCaseLabel", "TabFieldDisplayOrder": 1, "TabShowCondition": "hearingOutcomes=\"*\"", "FieldShowCondition": "isConfidentialCase =\"Yes\""},
-  {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-dwpresponsewriter", "TabID": "hearing_outcome_dwp_response_writer", "TabLabel": "Hearing outcome", "TabDisplayOrder": 31, "CaseFieldID": "hearingOutcomes", "TabFieldDisplayOrder": 1, "TabShowCondition": "hearingOutcomes=\"*\""}
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-dwpresponsewriter", "TabID": "hearing_outcome_dwp_response_writer", "TabLabel": "Hearing outcome", "TabDisplayOrder": 31, "CaseFieldID": "hearingOutcomes", "TabFieldDisplayOrder": 1}
 
 ]
