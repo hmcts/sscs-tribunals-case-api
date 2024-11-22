@@ -94,12 +94,13 @@ public class HmctsResponseReviewedIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
-        verify(updateCcdCaseService).triggerCaseEventV2(
+        verify(updateCcdCaseService).updateCaseV2(
                 eq(12345656789L),
                 eq(VALID_SEND_TO_INTERLOC.getCcdType()),
                 any(String.class),
                 any(String.class),
-                any(IdamTokens.class));
+                any(IdamTokens.class),
+                any(Consumer.class));
     }
 
     @Test
