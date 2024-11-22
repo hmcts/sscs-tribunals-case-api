@@ -251,7 +251,7 @@ public class HearingServiceConsumerTest {
     }
 
     @Test
-    public void testCreateHearingCaseDataConsumerWithHearingUpdateAndWithOverrideFields() {
+    void testCreateHearingCaseDataConsumerWithHearingUpdateAndWithOverrideFields() {
         setupResponse();
 
         caseData.setHearings(new ArrayList<>());
@@ -264,6 +264,46 @@ public class HearingServiceConsumerTest {
                 HEARING_REQUEST_ID,
                 true
         );
+        sscsCaseDetailsConsumer.accept(sscsCaseDetails);
+
+        List<Hearing> hearings = sscsCaseDetails.getData().getHearings();
+        assertThat(hearings).isNotEmpty();
+        assertEquals(1, hearings.size()); // hearing added
+        assertEquals("123", hearings.get(0).getValue().getHearingId());
+        assertEquals(1234L, hearings.get(0).getValue().getVersionNumber());
+    }
+
+    @Test
+    void testCreateHearingCaseDataConsumerWithHearingUpdateAndWithOverrideFieldsIsNull() {
+        setupResponse();
+
+        caseData.setHearings(new ArrayList<>());
+        caseData.getHearings().add(Hearing.builder().value(HearingDetails.builder().hearingId(String.valueOf(HEARING_REQUEST_ID)).build()).build());
+        given(refData.isAdjournmentFlagEnabled()).willReturn(false);
+        given(sessionCategoryMaps.getSessionCategory(
+                BENEFIT_CODE,
+                ISSUE_CODE,
+                false,
+                false
+        )).willReturn(new SessionCategoryMap(
+                BenefitCode.PIP_NEW_CLAIM,
+                Issue.DD,
+                false,
+                false,
+                SessionCategory.CATEGORY_03,
+                null
+        ));
+        given(refData.getHearingDurations()).willReturn(hearingDurations);
+        given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
+        given(refData.getVenueService()).willReturn(venueService);
+        given(venueService.getEpimsIdForVenue(PROCESSING_VENUE)).willReturn("219164");
+        given(hearingDurations.getHearingDurationBenefitIssueCodes(caseData)).willReturn(90);
+        Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(
+                response,
+                HEARING_REQUEST_ID,
+                true
+        );
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
         sscsCaseDetailsConsumer.accept(sscsCaseDetails);
 
         List<Hearing> hearings = sscsCaseDetails.getData().getHearings();
