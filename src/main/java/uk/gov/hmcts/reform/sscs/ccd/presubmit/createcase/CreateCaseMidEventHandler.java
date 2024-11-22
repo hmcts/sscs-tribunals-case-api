@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Entity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
 @Component
 @Slf4j
 public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+    private static final String HEARING_ROUTE_ERROR_MESSAGE = "Hearing route must be List Assist";
 
     private final PostcodeValidator postcodeValidator = new PostcodeValidator();
 
@@ -46,6 +48,10 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
         if (NO.equals(caseData.getAppeal().getAppellant().getAddress().getInMainlandUk())) {
             final String selectedPortOfEntryLocationCode = caseData.getAppeal().getAppellant().getAddress().getUkPortOfEntryList().getValue().getCode();
             caseData.getAppeal().getAppellant().getAddress().setPortOfEntry(selectedPortOfEntryLocationCode);
+        }
+
+        if (callback.getEvent() == EventType.CASE_UPDATED && caseData.getRegionalProcessingCenter() != null && HearingRoute.GAPS.equals(caseData.getRegionalProcessingCenter().getHearingRoute())) {
+            errorResponse.addError(HEARING_ROUTE_ERROR_MESSAGE);
         }
 
         errorResponse.addErrors(validateAddress(caseData.getAppeal().getAppellant()));
