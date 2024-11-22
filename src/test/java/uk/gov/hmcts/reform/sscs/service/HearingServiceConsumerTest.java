@@ -249,4 +249,27 @@ public class HearingServiceConsumerTest {
         assertEquals("123", hearings.get(0).getValue().getHearingId());
         assertEquals(1234L, hearings.get(0).getValue().getVersionNumber());
     }
+
+    @Test
+    public void testCreateHearingCaseDataConsumerWithHearingUpdateAndWithOverrideFields() {
+        setupResponse();
+
+        caseData.setHearings(new ArrayList<>());
+        caseData.getHearings().add(Hearing.builder().value(HearingDetails.builder().hearingId(String.valueOf(HEARING_REQUEST_ID)).build()).build());
+        caseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
+
+        Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(
+                response,
+                HEARING_REQUEST_ID,
+                true
+        );
+        sscsCaseDetailsConsumer.accept(sscsCaseDetails);
+
+        List<Hearing> hearings = sscsCaseDetails.getData().getHearings();
+        assertThat(hearings).isNotEmpty();
+        assertEquals(1, hearings.size()); // hearing added
+        assertEquals("123", hearings.get(0).getValue().getHearingId());
+        assertEquals(1234L, hearings.get(0).getValue().getVersionNumber());
+    }
 }
