@@ -46,12 +46,13 @@ public class PreSubmitCallbackDispatcher<T extends CaseData> {
 
                 PreSubmitCallbackResponse<T> callbackResponseFromHandler = callbackHandler.handle(callbackType, callback, userAuthorisation);
                 if (callbackResponseFromHandler.getData() instanceof SscsCaseData) {
-                    log.info("CallbackType {} callbackHandler {} case data {} SelectWhoReviewsCase {} InterlocReviewState {}",
+                    log.info("CallbackType {} callbackHandler {} case data object {} SelectWhoReviewsCase {} InterlocReviewState {} case id {}",
                             callbackType,
                             callbackHandler,
-                            Objects.hashCode(callbackResponseFromHandler.getData()),
+                            System.identityHashCode(callbackResponseFromHandler.getData()),
                             ((SscsCaseData) callbackResponseFromHandler.getData()).getSelectWhoReviewsCase(),
-                            ((SscsCaseData) callbackResponseFromHandler.getData()).getInterlocReviewState());
+                            ((SscsCaseData) callbackResponseFromHandler.getData()).getInterlocReviewState(),
+                            ((SscsCaseData) callbackResponseFromHandler.getData()).getCcdCaseId());
                 }
                 callbackResponse.setData(callbackResponseFromHandler.getData());
                 callbackResponse.addErrors(callbackResponseFromHandler.getErrors());
