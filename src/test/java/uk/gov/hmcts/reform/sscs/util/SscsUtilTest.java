@@ -26,7 +26,6 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getPortsOfEntry;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getPostHearingReviewDocumentType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getWriteFinalDecisionDocumentType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleIbcaCase;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isIbcaCase;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.updateHearingChannel;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.updateHearingInterpreter;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.validateBenefitIssueCode;
@@ -562,7 +561,7 @@ class SscsUtilTest {
                         .build()
                 )
                 .build();
-        assertTrue(isIbcaCase(caseData));
+        assertTrue(caseData.isIbcCase());
     }
 
     @Test
@@ -585,6 +584,6 @@ class SscsUtilTest {
                         .build()
                 )
                 .build();
-        assertFalse(isIbcaCase(caseData));
+        assertFalse(caseData.isIbcCase());
     }
 }

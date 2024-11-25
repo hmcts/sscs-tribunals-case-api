@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isIbcaCase;
 
 import java.util.Arrays;
 import java.util.List;
@@ -45,7 +44,7 @@ public class DwpUploadResponseAboutToStartHandler extends ResponseEventsAboutToS
             updateDwpStateList(sscsCaseData);
         }
 
-        if (isIbcaCase(sscsCaseData)) {
+        if (sscsCaseData.isIbcCase()) {
             final String benefitCode = sscsCaseData.getBenefitCode();
             sscsCaseData.setBenefitCodeIbcaOnly(benefitCode);
 
