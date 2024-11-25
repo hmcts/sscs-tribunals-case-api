@@ -18,6 +18,7 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.INVALID_BENEFIT_ISSUE_CODE;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.clearPostponementTransientFields;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.generateUniqueIbcaId;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getIssueFinalDecisionDocumentType;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getPortOfEntryFromCode;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getPortsOfEntry;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getPostHearingReviewDocumentType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getWriteFinalDecisionDocumentType;
@@ -33,6 +34,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -59,16 +61,18 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Postponement;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 
 @ExtendWith(MockitoExtension.class)
 class SscsUtilTest {
     public static final String UNEXPECTED_POST_HEARING_REVIEW_TYPE_AND_ACTION = "getting the document type has an unexpected postHearingReviewType and action";
-  
+
     private SessionCategoryMapService categoryMapService = new SessionCategoryMapService();
     private PostHearing postHearing;
     private SscsCaseData caseData;
@@ -164,7 +168,7 @@ class SscsUtilTest {
     void givenActionTypePta_shouldReturnPtaDocument(PermissionToAppealActions action, DocumentType expectedDocumentType) {
         postHearing.setReviewType(PostHearingReviewType.PERMISSION_TO_APPEAL);
         postHearing.getPermissionToAppeal().setAction(action);
-      
+
         DocumentType documentType = getPostHearingReviewDocumentType(postHearing, true);
 
         assertThat(documentType).isEqualTo(expectedDocumentType);
@@ -217,7 +221,7 @@ class SscsUtilTest {
         postHearing.getCorrection().setIsCorrectionFinalDecisionInProgress(YesNo.YES);
         assertThat(getIssueFinalDecisionDocumentType(caseData, false)).isEqualTo(FINAL_DECISION_NOTICE);
     }
-  
+
     @Test
     void givenPostHearingsEnabledFalse_clearPostHearingsFieldClearsDocumentFields_butDoesNotAlterPostHearing() {
         postHearing.setRequestType(PostHearingRequestType.SET_ASIDE);
@@ -481,20 +485,38 @@ class SscsUtilTest {
         assertThat(portsOfEntry.getListItems()).hasSize(90);
     }
 
+
+    @ParameterizedTest
+    @EnumSource(value = UkPortOfEntry.class)
+    void shouldReturnPortOfEntryFromCode(UkPortOfEntry portOfEntry) {
+        final DynamicListItem portOfEntryItem = getPortOfEntryFromCode(portOfEntry.getLocationCode());
+        assertThat(portOfEntryItem.getCode()).isEqualTo(portOfEntry.getLocationCode());
+        assertThat(portOfEntryItem.getLabel()).isEqualTo(portOfEntry.getLabel());
+    }
+
+    @Test
+    void shouldReturnNullPortOfEntryFromInvalidCode() {
+        final DynamicListItem portOfEntryItem = getPortOfEntryFromCode("invalid-code");
+        assertThat(portOfEntryItem.getCode()).isNull();
+        assertThat(portOfEntryItem.getLabel()).isNull();
+    }
+
     @Test
     void shouldPopulateIbcaFieldsOnHandleIbcaCase() {
         final SscsCaseData caseData = SscsCaseData.builder()
-                .appeal(Appeal.builder()
-                        .mrnDetails(MrnDetails.builder().build())
-                        .hearingOptions(HearingOptions.builder().build())
-                        .build()
-                )
-                .build();
+            .appeal(Appeal.builder()
+                .mrnDetails(MrnDetails.builder().build())
+                .hearingOptions(HearingOptions.builder().build())
+                .build()
+            )
+            .regionalProcessingCenter(RegionalProcessingCenter.builder().build())
+            .build();
 
         handleIbcaCase(caseData);
 
         assertThat(caseData.getAppeal().getHearingOptions().getHearingRoute()).isEqualTo(LIST_ASSIST);
         assertThat(caseData.getAppeal().getMrnDetails().getDwpIssuingOffice()).isEqualTo("IBCA");
+        assertThat(caseData.getRegionalProcessingCenter().getHearingRoute()).isEqualTo(LIST_ASSIST);
     }
 
     @Test
