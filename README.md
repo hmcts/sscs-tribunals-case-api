@@ -42,7 +42,7 @@ Once the application running locally, please make sure
 ## Running tribunals with hearings enabled
 If you need to test Tribunals with HMC Hearings you must carry out the following steps:
 1. First you need to create a pull request on github for your branch
-2. The branch should have the labels: enable_keep_helm, pr-values:hearings
+2. The branch should have the labels: `enable_keep_helm`, `pr-values:hearings`
 3. Once this is done you then need to upload a CCD Definition file to AAT CCD. This definition file should have a unique CaseType ID in this format (4120 represents the Pull request number):
 
 ```bash
@@ -65,7 +65,7 @@ hmc-to-sscs-subscription-pr-XXXX
 6. And on that subscription create a Correlation filters with these values:
 ```
 hmctsServiceId:BBA3
-deploymentId:deployment-sscs-tribunals-api-pr-xxxx
+hmctsDeploymentId:deployment-sscs-tribunals-api-pr-xxxx
 ```
 
 7. Once this has been completed go to values.hearings.preview.template.yaml and you will need to replace
@@ -218,3 +218,7 @@ In order to include Bundling & Hearings tests as part of preview pipeline, QA's 
 ## Gotchas
 
 PRs that start with _"Bump"_ won't have a preview environment. The decision was made after we realised that most the preview environments were created by Depandabot.
+
+### Preview cases not listing 
+Elastic indices may be missing on preview. They can be recreated by login into ccd admin for e.g. - https://admin-web-sscs-tribunals-api-pr-4091.preview.platform.hmcts.net/ and clicking on "Create Elasticsearch Indices" link. 
+This would avoid re-triggering the pipeline build and save time.
