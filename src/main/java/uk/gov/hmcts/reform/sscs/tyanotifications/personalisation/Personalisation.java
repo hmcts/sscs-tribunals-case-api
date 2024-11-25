@@ -393,7 +393,7 @@ public class Personalisation<E extends NotificationWrapper> {
         if ("yes".equalsIgnoreCase(ccdResponse.getIsScottishCase())) {
             personalisation.put(HELPLINE_PHONE_NUMBER, config.getHelplineTelephoneScotland());
         } else if (benefit.equals(Benefit.INFECTED_BLOOD_COMPENSATION)) {
-            personalisation.put(HELPLINE_PHONE_NUMBER, "03001231234");
+            personalisation.put(HELPLINE_PHONE_NUMBER, "01274267247");
         } else {
             personalisation.put(HELPLINE_PHONE_NUMBER, config.getHelplineTelephone());
         }
@@ -589,9 +589,14 @@ public class Personalisation<E extends NotificationWrapper> {
             personalisation.put(REGIONAL_OFFICE_POSTCODE_LITERAL, rpc.getPostcode());
         }
 
-        if (!Objects.equals(ccdResponse.getIsScottishCase(), "Yes") && ccdResponse.isIbcCase()) {
-            personalisation.put(PHONE_NUMBER_WELSH, "03001234567");
-            personalisation.put(PHONE_NUMBER, "03001231234");
+        if (ccdResponse.isIbcCase()) {
+            personalisation.put(PHONE_NUMBER_WELSH, "0300 303 5170");
+            personalisation.put(
+                    PHONE_NUMBER,
+                    Objects.equals(ccdResponse.getIsScottishCase(), "Yes")
+                            ? config.getHelplineTelephoneScotland()
+                            : "01274267247"
+            );
         } else {
             personalisation.put(PHONE_NUMBER_WELSH, evidenceProperties.getAddress().getTelephoneWelsh());
             personalisation.put(PHONE_NUMBER, determinePhoneNumber(rpc));
