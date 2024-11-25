@@ -4930,5 +4930,17 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "1.0",
     "PageLabel": "Migrate case for Work Allocation"
+  },
+  {
+    "CaseEventID": "setHearingRoute",
+    "CaseFieldID": "hearingRoute",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "23/11/2022",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "setHearingRoute",
+    "PageLabel": "Set Hearing Route",
+    "ShowSummaryChangeOption": "Y"
   }
 ]
