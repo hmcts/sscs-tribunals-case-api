@@ -63,8 +63,7 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
 
         if(checkFromCorrespondence) {
             assertTrue(fetchLettersFromCase(expectedNumLetters, subscription));
-        }
-        else {
+        } else {
             List<Notification> letterNotifications = fetchLetters();
             assertThat(letterNotifications).hasSize(expectedNumLetters);
         }
