@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_TO_INCOMPLETE_APPLICATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_TO_NON_COMPLIANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_TO_VALID_APPEAL_CREATED;
@@ -20,16 +21,11 @@ import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLinkDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseManagementLocation;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
-import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -80,7 +76,7 @@ public abstract class SubmitAppealServiceBase {
         this.idamService = idamService;
         this.convertAIntoBService = convertAIntoBService;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
-        this.caseAccessManagementFeature = caseAccessManagementFeature;
+        this.caseAccessManagementFeature  = caseAccessManagementFeature;
         this.airLookupService = airLookupService;
         this.refDataService = refDataService;
         this.venueService = venueService;
@@ -133,8 +129,8 @@ public abstract class SubmitAppealServiceBase {
         }
 
         log.info("GET Draft case with CCD Id {} , IDAM Id {} and roles {} ",
-            (caseDetails == null) ? null : caseDetails.getCcdCaseId(), idamTokens.getUserId(),
-            idamTokens.getRoles());
+                (caseDetails == null) ? null : caseDetails.getCcdCaseId(), idamTokens.getUserId(),
+                idamTokens.getRoles());
 
         return (sessionDraft != null) ? Optional.of(sessionDraft) : Optional.empty();
     }
@@ -150,67 +146,37 @@ public abstract class SubmitAppealServiceBase {
         log.info("GET all Draft cases with IDAM Id {} and roles {}", idamTokens.getUserId(), idamTokens.getRoles());
 
         return caseDetailsList.stream()
-            .map(convertAIntoBService::convert)
-            .toList();
-    }
-
-    protected String maskNino(String nino) {
-        return "XXXX" + (nino == null ? "" : nino.substring(4));
+                .map(convertAIntoBService::convert)
+                .toList();
     }
 
     protected EventType findEventType(SscsCaseData caseData, boolean saveAndReturnCase) {
-        Appeal appeal = caseData.getAppeal();
-        MrnDetails mrnDetails = appeal.getMrnDetails();
-        if (mrnDetails != null && mrnDetails.getMrnDate() != null) {
-            LocalDate mrnDate = LocalDate.parse(mrnDetails.getMrnDate());
+
+        if (caseData.getAppeal().getMrnDetails() != null && caseData.getAppeal().getMrnDetails().getMrnDate() != null) {
+            LocalDate mrnDate = LocalDate.parse(caseData.getAppeal().getMrnDetails().getMrnDate());
             boolean moveToNoneCompliant = mrnDate.plusMonths(13L).isBefore(LocalDate.now());
 
             return handleMoveToNonCompliant(caseData, saveAndReturnCase, moveToNoneCompliant);
         } else {
-            Identity identity = appeal.getAppellant().getIdentity();
-            log.info("Moving case for {} {} to incomplete due to MRN Details {} present and MRN Date {} present",
-                caseData.isIbcCase() ? "Ibca Reference" : "NINO",
-                caseData.isIbcCase() ? identity.getIbcaReference() : maskNino(identity.getNino()),
-                (mrnDetails != null ? "" : "not"),
-                (mrnDetails != null && mrnDetails.getMrnDate() != null ? "" : "not"));
+            log.info("Moving case for NINO {} to incomplete due to MRN Details {} present and MRN Date {} present",
+                    caseData.getAppeal().getAppellant().getIdentity().getNino(),
+                    (caseData.getAppeal().getMrnDetails() != null ? "" : "not"),
+                    (caseData.getAppeal().getMrnDetails().getMrnDate() != null ? "" : "not"));
             return saveAndReturnCase ? DRAFT_TO_INCOMPLETE_APPLICATION : INCOMPLETE_APPLICATION_RECEIVED;
         }
     }
 
-    protected Pair<List<SscsCaseDetails>, SscsCaseDetails> getMatchedNinoCasesAndCaseDetails(SscsCaseData caseData,
-                                                                                           IdamTokens idamTokens,
-                                                                                           String nino,
-                                                                                           String ibcaReference) {
-        SscsCaseDetails caseDetails = null;
-        List<SscsCaseDetails> matchedByNinoCases = List.of();
-        if (!caseData.isIbcCase()) {
-            matchedByNinoCases = getMatchedCases(nino, idamTokens);
-            if (!matchedByNinoCases.isEmpty()) {
-                log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino "
-                    + maskNino(nino) + " before filtering non exact matches");
-            } else {
-                log.info("No matching cases for Nino {}", maskNino(nino));
-            }
-            caseDetails = matchedByNinoCases.stream().filter(createNinoAndBenefitTypeAndMrnDatePredicate(caseData)).findFirst().orElse(null);
-        } else {
-            log.info("Case is IBA with reference {}", ibcaReference);
-        }
-        return Pair.of(matchedByNinoCases, caseDetails);
-    }
 
     protected void associateCase(IdamTokens idamTokens,
                                SscsCaseDetails caseDetails,
                                String userToken) {
-        if (null != caseDetails && StringUtils.isNotEmpty(userToken)) {
+        if (nonNull(caseDetails) && isNotEmpty(userToken)) {
             citizenCcdService.associateCaseToCitizen(getUserTokens(userToken), caseDetails.getId(), idamTokens);
         }
     }
 
-    protected String resolvePostCode(SyaCaseWrapper appeal, boolean isIba) {
-        Boolean inMainlandUk = appeal.getContactDetails().getInMainlandUk();
-        if (isIba && inMainlandUk != null && inMainlandUk.equals(Boolean.FALSE)) {
-            return appeal.getAppellant().getContactDetails().getPortOfEntry();
-        } else if (Boolean.TRUE.equals(appeal.getIsAppointee())) {
+    protected String resolvePostCode(SyaCaseWrapper appeal) {
+        if (Boolean.TRUE.equals(appeal.getIsAppointee())) {
             return Optional.ofNullable(appeal.getAppointee())
                     .map(SyaAppointee::getContactDetails)
                     .map(SyaContactDetails::getPostCode)
@@ -224,29 +190,29 @@ public abstract class SubmitAppealServiceBase {
     @NotNull
     private EventType handleMoveToNonCompliant(SscsCaseData caseData, boolean saveAndReturnCase, boolean moveToNoneCompliant) {
         if (moveToNoneCompliant) {
-            log.info("Moving case for NINO {} to non-compliant as MRN Date is older than 13 months", maskNino(caseData.getAppeal().getAppellant().getIdentity().getNino()));
+            log.info("Moving case for NINO {} to non-compliant as MRN Date is older than 13 months", caseData.getAppeal().getAppellant().getIdentity().getNino());
             return saveAndReturnCase ? DRAFT_TO_NON_COMPLIANT : NON_COMPLIANT;
         } else {
-            log.info("Valid appeal to be created for case with NINO {}", maskNino(caseData.getAppeal().getAppellant().getIdentity().getNino()));
+            log.info("Valid appeal to be created for case with NINO {}", caseData.getAppeal().getAppellant().getIdentity().getNino());
             return saveAndReturnCase ? DRAFT_TO_VALID_APPEAL_CREATED : VALID_APPEAL_CREATED;
         }
     }
 
     protected List<SscsCaseDetails> getMatchedCases(String nino, IdamTokens idamTokens) {
-        log.info("Find matching cases for Nino " + maskNino(nino));
+        log.info("Find matching cases for Nino " + nino);
         return ccdService.findCaseBy("data.appeal.appellant.identity.nino", nino, idamTokens);
     }
 
     protected Predicate<SscsCaseDetails> createNinoAndBenefitTypeAndMrnDatePredicate(SscsCaseData caseData) {
         return c -> c.getData().getAppeal().getAppellant().getIdentity() != null
-            && c.getData().getAppeal().getAppellant().getIdentity().getNino().equalsIgnoreCase(caseData.getAppeal().getAppellant().getIdentity().getNino())
-            && c.getData().getAppeal().getBenefitType() != null
-            && c.getData().getAppeal().getBenefitType().getCode().equals(caseData.getAppeal().getBenefitType().getCode())
-            && c.getData().getAppeal().getMrnDetails().getMrnDate() != null
-            && c.getData().getAppeal().getMrnDetails().getMrnDate().equalsIgnoreCase(caseData.getAppeal().getMrnDetails().getMrnDate());
+                && c.getData().getAppeal().getAppellant().getIdentity().getNino().equalsIgnoreCase(caseData.getAppeal().getAppellant().getIdentity().getNino())
+                && c.getData().getAppeal().getBenefitType() != null
+                && c.getData().getAppeal().getBenefitType().getCode().equals(caseData.getAppeal().getBenefitType().getCode())
+                && c.getData().getAppeal().getMrnDetails().getMrnDate() != null
+                && c.getData().getAppeal().getMrnDetails().getMrnDate().equalsIgnoreCase(caseData.getAppeal().getMrnDetails().getMrnDate());
     }
 
-    public void addAssociatedCases(final SscsCaseData caseData, List<SscsCaseDetails> matchedByNinoCases) {
+    protected void addAssociatedCases(final SscsCaseData caseData, List<SscsCaseDetails> matchedByNinoCases) {
         log.info("Adding {} associated cases for case id {}", matchedByNinoCases.size(), caseData.getCcdCaseId());
 
         List<CaseLink> caseLinks = matchedByNinoCases.stream().map(sscsCaseDetails -> CaseLink.builder().value(
@@ -264,12 +230,12 @@ public abstract class SubmitAppealServiceBase {
     protected IdamTokens getUserTokens(String oauth2Token) {
         UserDetails userDetails = idamService.getUserDetails(oauth2Token);
         return IdamTokens.builder()
-            .idamOauth2Token(oauth2Token)
-            .serviceAuthorization(idamService.generateServiceAuthorization())
-            .userId(userDetails.getId())
-            .roles(userDetails.getRoles())
-            .email(userDetails.getEmail())
-            .build();
+                .idamOauth2Token(oauth2Token)
+                .serviceAuthorization(idamService.generateServiceAuthorization())
+                .userId(userDetails.getId())
+                .roles(userDetails.getRoles())
+                .email(userDetails.getEmail())
+                .build();
     }
 
     protected boolean hasValidCitizenRole(IdamTokens idamTokens) {
@@ -283,21 +249,21 @@ public abstract class SubmitAppealServiceBase {
     protected void logError(SyaCaseWrapper appeal, IdamTokens idamTokens) {
         if (nonNull(appeal.getAppellant().getNino())) {
             log.error("The case data has been altered outside of this transaction for case with nino {} and idam id {}",
-                maskNino(appeal.getAppellant().getNino()),
-                idamTokens.getUserId());
+                    appeal.getAppellant().getNino(),
+                    idamTokens.getUserId());
         } else {
             log.error("The case data has been altered outside of this transaction for idam id {}",
-                idamTokens.getUserId());
+                    idamTokens.getUserId());
         }
     }
 
 
     protected SscsCaseData convertAppealToSscsCaseData(SyaCaseWrapper appeal,
                                              Function<RegionalProcessingCenter, SscsCaseData> getCaseData) {
-        boolean isIba = appeal.getBenefitType().getCode().equals(Benefit.INFECTED_BLOOD_COMPENSATION.getShortName());
-        String postCode = resolvePostCode(appeal, isIba);
-        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(isIba ? postCode : getFirstHalfOfPostcode(postCode));
 
+        String postCode = resolvePostCode(appeal);
+        String firstHalfOfPostcode = getFirstHalfOfPostcode(postCode);
+        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode);
 
         SscsCaseData sscsCaseData = getCaseData.apply(rpc);
 
@@ -320,9 +286,7 @@ public abstract class SubmitAppealServiceBase {
         }
 
         log.info("{} - setting venue name to {}",
-                isIba
-                        ? sscsCaseData.getAppeal().getAppellant().getIdentity().getIbcaReference()
-                        : maskNino(sscsCaseData.getAppeal().getAppellant().getIdentity().getNino()),
+                sscsCaseData.getAppeal().getAppellant().getIdentity().getNino(),
                 sscsCaseData.getProcessingVenue());
 
         return sscsCaseData;

@@ -3,23 +3,32 @@ package uk.gov.hmcts.reform.sscs.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ASSOCIATE_CASE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Rule;
@@ -41,13 +50,16 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaAppointee;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaContactDetails;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaMrn;
 import uk.gov.hmcts.reform.sscs.exception.ApplicationErrorException;
 import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
@@ -67,7 +79,7 @@ public abstract class AbstractSubmitAppealServiceTest {
     private CitizenCcdService citizenCcdService;
 
     @Mock
-    protected RegionalProcessingCenterService regionalProcessingCenterService;
+    private RegionalProcessingCenterService regionalProcessingCenterService;
 
     @Mock
     private IdamService idamService;
@@ -76,13 +88,13 @@ public abstract class AbstractSubmitAppealServiceTest {
     private ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
 
     @Mock
-    protected AirLookupService airLookupService;
+    private AirLookupService airLookupService;
 
     @Mock
-    protected RefDataService refDataService;
+    private RefDataService refDataService;
 
     @Mock
-    protected VenueService venueService;
+    private VenueService venueService;
 
     @Mock
     protected PDFServiceClient pdfServiceClient;
@@ -190,7 +202,6 @@ public abstract class AbstractSubmitAppealServiceTest {
         given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().roles(List.of("citizen")).build());
         given(emailHelper.generateUniqueEmailId(any(Appellant.class))).willReturn("Bloggs_33C");
     }
-
 
     public abstract void givenSaveCaseWillReturnSaveCaseOperation(CitizenCcdService citizenCcdService,
                                          Long caseDetailsId,
@@ -436,11 +447,98 @@ public abstract class AbstractSubmitAppealServiceTest {
         submitAppealService.getDraftAppeals("authorisation");
     }
 
+    @Test
+    @Parameters(method = "generateDifferentRpcScenarios")
+    public void givenAppellantPostCode_shouldSetRegionAndRpcCorrectly(String expectedRpc, String appellantPostCode) throws JsonProcessingException {
+        RegionalProcessingCenter rpc = getRpcObjectForGivenJsonRpc(expectedRpc);
+        when(regionalProcessingCenterService.getByPostcode(RegionalProcessingCenterService.getFirstHalfOfPostcode(appellantPostCode)))
+            .thenReturn(getRpcObjectForGivenJsonRpc(expectedRpc));
+        when(airLookupService.lookupAirVenueNameByPostCode(eq(appellantPostCode), any())).thenReturn(rpc.getCity());
+        when(venueService.getEpimsIdForVenue(rpc.getCity())).thenReturn("1234");
+        when(refDataService.getCourtVenueRefDataByEpimsId("1234")).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("1").build());
 
-    protected SyaCaseWrapper getSyaWrapperWithAppointee(SyaContactDetails appointeeContact) {
+        SyaCaseWrapper appealData = getSyaCaseWrapper();
+        appealData.getAppellant().getContactDetails().setPostCode(appellantPostCode);
+
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
+
+        RegionalProcessingCenter actualRpc = caseData.getRegionalProcessingCenter();
+        RegionalProcessingCenter expectedRpcObject = getRpcObjectForGivenJsonRpc(expectedRpc);
+        assertThat(actualRpc)
+            .usingRecursiveComparison()
+            .ignoringFields("hearingRoute","epimsId")
+            .isEqualTo(expectedRpcObject);
+        assertThat(actualRpc)
+            .extracting("hearingRoute","epimsId")
+            .doesNotContainNull();
+        assertEquals(expectedRpcObject.getName(), caseData.getRegion());
+    }
+
+    @Test
+    public void givenAppointeePostCode_shouldSetRegionAndRpcToAppointee() throws JsonProcessingException {
+        when(regionalProcessingCenterService.getByPostcode("B1")).thenReturn(getRpcObjectForGivenJsonRpc(BIRMINGHAM_RPC));
+        when(airLookupService.lookupAirVenueNameByPostCode(eq("B1 1AA"), any())).thenReturn("Birmingham");
+
+        when(venueService.getEpimsIdForVenue("Birmingham")).thenReturn("1234");
+        when(refDataService.getCourtVenueRefDataByEpimsId("1234")).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("1").build());
+
+        SyaContactDetails appointeeContactDetails = new SyaContactDetails();
+        appointeeContactDetails.setPostCode("B1 1AA");
+
+        SyaCaseWrapper appealData = getSyaWrapperWithAppointee(appointeeContactDetails);
+
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
+
+        assertRpc(caseData, BIRMINGHAM_RPC);
+    }
+
+    @Test
+    @Parameters({"", "null"})
+    public void givenAppointeeWithNoPostCode_shouldSetRegionAndRpcToNull(@Nullable String postCode) {
+        SyaContactDetails appointeeContactDetails = new SyaContactDetails();
+        appointeeContactDetails.setPostCode(postCode);
+
+        SyaCaseWrapper appealData = getSyaWrapperWithAppointee(appointeeContactDetails);
+
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
+
+        assertNull(caseData.getRegionalProcessingCenter());
+    }
+
+    @Test
+    public void givenAppointeeWithNoContactData_shouldSetRegionAndRpcToAppellant() throws JsonProcessingException {
+        when(regionalProcessingCenterService.getByPostcode("TN32")).thenReturn(getRpcObjectForGivenJsonRpc(BRADFORD_RPC));
+        when(airLookupService.lookupAirVenueNameByPostCode(eq("TN32 6PL"), any())).thenReturn("Bradford");
+        when(venueService.getEpimsIdForVenue("Bradford")).thenReturn("1234");
+        when(refDataService.getCourtVenueRefDataByEpimsId("1234")).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("1").build());
+
+        SyaCaseWrapper appealData = getSyaWrapperWithAppointee(null);
+        appealData.setIsAppointee(false);
+
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
+
+        assertRpc(caseData, BRADFORD_RPC);
+    }
+
+    private void assertRpc(SscsCaseData caseData, String expectedRpc) throws JsonProcessingException {
+        RegionalProcessingCenter actualRpc = caseData.getRegionalProcessingCenter();
+        RegionalProcessingCenter expectedRpcObject = getRpcObjectForGivenJsonRpc(expectedRpc);
+        assertThat(actualRpc)
+            .usingRecursiveComparison()
+            .ignoringFields("hearingRoute","epimsId")
+            .isEqualTo(expectedRpcObject);
+        assertThat(actualRpc)
+            .extracting("hearingRoute","epimsId")
+            .doesNotContainNull();
+
+        assertEquals(expectedRpcObject.getName(), caseData.getRegion());
+    }
+
+    private SyaCaseWrapper getSyaWrapperWithAppointee(SyaContactDetails appointeeContact) {
         SyaAppointee appointee = new SyaAppointee();
         appointee.setContactDetails(appointeeContact);
 
+        SyaCaseWrapper appealData = getSyaCaseWrapper();
         appealData.getAppellant().getContactDetails().setPostCode("TN32 6PL");
         appealData.setAppointee(appointee);
         appealData.setIsAppointee(true);
@@ -448,7 +546,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         return appealData;
     }
 
-    protected RegionalProcessingCenter getRpcObjectForGivenJsonRpc(String jsonRpc) throws JsonProcessingException {
+    private RegionalProcessingCenter getRpcObjectForGivenJsonRpc(String jsonRpc) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(jsonRpc, RegionalProcessingCenter.class);
     }
@@ -464,11 +562,97 @@ public abstract class AbstractSubmitAppealServiceTest {
         };
     }
 
-    public Object[] generateDifferentRpcScenariosIba() {
-        return new Object[]{
-            new Object[]{BRADFORD_RPC, "GB000084"},
-            new Object[]{BRADFORD_RPC, "GB003090"}
-        };
+    @Test
+    public void givenAPipCase_thenSetCreatedInGapsFromFieldToReadyToList() {
+        SyaCaseWrapper appealData = getSyaCaseWrapper();
+        SyaBenefitType syaBenefitType = new SyaBenefitType("PIP", "PIP");
+        appealData.setBenefitType(syaBenefitType);
+
+        SyaMrn mrn = new SyaMrn();
+        mrn.setDwpIssuingOffice("2");
+        appealData.setMrn(mrn);
+
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
+        assertEquals(READY_TO_LIST.getId(), caseData.getCreatedInGapsFrom());
+    }
+
+    @Test
+    public void givenAEsaCase_thenSetCreatedInGapsFromToReadyToList() {
+        SyaCaseWrapper appealData = getSyaCaseWrapper();
+        SyaBenefitType syaBenefitType = new SyaBenefitType("ESA", "ESA");
+        appealData.setBenefitType(syaBenefitType);
+
+        SyaMrn mrn = new SyaMrn();
+        mrn.setDwpIssuingOffice("Chesterfield DRT");
+        appealData.setMrn(mrn);
+
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
+        assertEquals(READY_TO_LIST.getId(), caseData.getCreatedInGapsFrom());
+    }
+
+    @Test
+    public void givenAUcCaseWithRecoveryFromEstatesOffice_thenSetOfficeCorrectly() {
+        SyaCaseWrapper appealData = getSyaCaseWrapper();
+        SyaBenefitType syaBenefitType = new SyaBenefitType("Universal Credit", "UC");
+        appealData.setBenefitType(syaBenefitType);
+
+        SyaMrn mrn = new SyaMrn();
+        mrn.setDwpIssuingOffice("Recovery from Estates");
+        appealData.setMrn(mrn);
+
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
+        assertEquals(READY_TO_LIST.getId(), caseData.getCreatedInGapsFrom());
+        assertEquals("RfE", caseData.getDwpRegionalCentre());
+        assertEquals("UC Recovery from Estates", caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
+    }
+
+    @Test
+    public void givenAssociatedCase_thenAddAssociatedCaseLinkToCase() {
+        SscsCaseDetails matchingCase = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().build()).build();
+        List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
+        matchedByNinoCases.add(matchingCase);
+
+        SscsCaseData caseData = SscsCaseData.builder().ccdCaseId("00000000").build();
+        submitAppealService.addAssociatedCases(
+                caseData,
+            matchedByNinoCases);
+
+        assertEquals(1, caseData.getAssociatedCase().size());
+        assertEquals("Yes", caseData.getLinkedCasesBoolean());
+        assertEquals("12345678", caseData.getAssociatedCase().get(0).getValue().getCaseReference());
+    }
+
+    @Test
+    public void givenMultipleAssociatedCases_thenAddAllAssociatedCaseLinksToCase() {
+        SscsCaseDetails matchingCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().build()).build();
+        SscsCaseDetails matchingCase2 = SscsCaseDetails.builder().id(56765676L).data(SscsCaseData.builder().build()).build();
+        List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
+        matchedByNinoCases.add(matchingCase1);
+        matchedByNinoCases.add(matchingCase2);
+
+        SscsCaseData caseData = SscsCaseData.builder().ccdCaseId("00000000").build();
+        submitAppealService.addAssociatedCases(
+                caseData,
+                matchedByNinoCases);
+
+        assertEquals(2, caseData.getAssociatedCase().size());
+        assertEquals("Yes", caseData.getLinkedCasesBoolean());
+        assertEquals("12345678", caseData.getAssociatedCase().get(0).getValue().getCaseReference());
+        assertEquals("56765676", caseData.getAssociatedCase().get(1).getValue().getCaseReference());
+    }
+
+    @Test
+    public void addNoAssociatedCases() {
+        List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
+
+        SscsCaseData caseData = SscsCaseData.builder().ccdCaseId("00000000").build();
+        submitAppealService.addAssociatedCases(
+                caseData,
+            matchedByNinoCases);
+
+        assertNull(caseData.getAssociatedCase());
+        assertEquals("No", caseData.getLinkedCasesBoolean());
+        verify(ccdService, times(0)).updateCase(any(), any(), eq(ASSOCIATE_CASE.getCcdType()), eq("Associate case"), eq("Associated case added"), any());
     }
 
     @Test
@@ -481,19 +665,49 @@ public abstract class AbstractSubmitAppealServiceTest {
         assertEquals(1, matchedCases.size());
     }
 
+    @Test
+    @Parameters({
+        "PIP, n1w1 wal, Birmingham, appellant, 1, 21",
+        "ESA, n1w1 wal, Birmingham, appellant, 1, 21",
+        "UC, n1w1 wal, Birmingham, appellant, 1, 21",
+        "PIP, NN85 1ss, Northampton, appellant, 2, 30",
+        "ESA, NN85 1ss, Northampton, appellant, 2, 30",
+        "UC, NN85 1ss, Northampton, appellant, 2, 30",
+        "PIP, n1w1 wal, Birmingham, appointee, 1, 21",
+        "ESA, n1w1 wal, Birmingham, appointee, 1, 21",
+        "UC, n1w1 wal, Birmingham, appointee, 1, 21",
+        "PIP, NN85 1ss, Northampton, appointee, 2, 30",
+        "ESA, NN85 1ss, Northampton, appointee, 2, 30",
+        "UC, NN85 1ss, Northampton, appointee, 2, 30",
+    })
+    public void shouldSetProcessingVenueBasedOnBenefitTypeAndPostCode(String benefitCode, String postcode, String expectedVenue, String appellantOrAppointee, String epimsId, String regionId) {
+        String firstHalfOfPostcode = RegionalProcessingCenterService.getFirstHalfOfPostcode(postcode);
+        when(regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode)).thenReturn(
+            RegionalProcessingCenter.builder()
+                .name("rpcName")
+                .postcode("rpcPostcode")
+                .epimsId(epimsId)
+                .build());
 
+        when(venueService.getEpimsIdForVenue(expectedVenue)).thenReturn(epimsId);
+        when(airLookupService.lookupAirVenueNameByPostCode(eq(postcode), any())).thenReturn(expectedVenue);
+        when(refDataService.getCourtVenueRefDataByEpimsId(epimsId)).thenReturn(CourtVenue.builder().courtStatus("Open").regionId(regionId).build());
 
-    protected void assertRpc(SscsCaseData caseData, String expectedRpc) throws JsonProcessingException {
-        RegionalProcessingCenter actualRpc = caseData.getRegionalProcessingCenter();
-        RegionalProcessingCenter expectedRpcObject = getRpcObjectForGivenJsonRpc(expectedRpc);
-        assertThat(actualRpc)
-                .usingRecursiveComparison()
-                .ignoringFields("hearingRoute","epimsId")
-                .isEqualTo(expectedRpcObject);
-        assertThat(actualRpc)
-                .extracting("hearingRoute","epimsId")
-                .doesNotContainNull();
+        boolean isAppellant = appellantOrAppointee.equals("appellant");
+        SyaCaseWrapper appealData = getSyaCaseWrapper(isAppellant ? "json/sya.json" : "sya/allDetailsWithAppointeeWithDifferentAddress.json");
+        SyaBenefitType syaBenefitType = new SyaBenefitType(benefitCode, benefitCode);
+        appealData.setBenefitType(syaBenefitType);
+        if (isAppellant) {
+            appealData.getAppellant().getContactDetails().setPostCode(postcode);
+        } else {
+            appealData.getAppointee().getContactDetails().setPostCode(postcode);
+        }
 
-        assertEquals(expectedRpcObject.getName(), caseData.getRegion());
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
+
+        assertEquals(expectedVenue, caseData.getProcessingVenue());
+        assertNotNull(caseData.getCaseManagementLocation());
+        assertEquals(epimsId, caseData.getCaseManagementLocation().getBaseLocation());
+        assertEquals(regionId, caseData.getCaseManagementLocation().getRegion());
     }
 }

@@ -13,7 +13,4 @@ public class SyaContactDetails {
     private String emailAddress;
     private String postcodeLookup;
     private String postcodeAddress;
-    private String portOfEntry;
-    private String country;
-    private Boolean inMainlandUk;
 }
