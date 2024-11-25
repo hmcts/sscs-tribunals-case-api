@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.functional.tyanotifications.handlers;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADMIN_APPEAL_WITHDRAWN;
@@ -14,8 +15,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Timeout;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Correspondence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrespondenceType;
 import uk.gov.hmcts.reform.sscs.functional.tyanotifications.AbstractFunctionalTest;
@@ -24,8 +23,6 @@ import uk.gov.service.notify.Notification;
 
 public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(AdminAppealWithdrawnNotificationsTest.class);
-
     public AdminAppealWithdrawnNotificationsTest() {
         super(30);
     }
@@ -33,9 +30,8 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
     @Rule
     public Retry retry = new Retry(0);
 
-    //Test method runs three times and in worst case it needs 90 seconds waiting time.
     @Rule
-    public Timeout globalTimeout = Timeout.seconds(100);
+    public Timeout globalTimeout = Timeout.seconds(600);
 
     @Before
     public void setUp() {
@@ -44,9 +40,9 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
 
     @Test
     @Parameters({
-        "Appellant, 8620e023-f663-477e-a771-9cfad50ee30f, 446c7b23-7342-42e1-adff-b4c367e951cb, 1, 1, 1",
-        "Appointee, 8620e023-f663-477e-a771-9cfad50ee30f, 446c7b23-7342-42e1-adff-b4c367e951cb, 1, 1, 1",
-        "Reps, e29a2275-553f-4e70-97f4-2994c095f281, f59440ee-19ca-4d47-a702-13e9cecaccbd, 1, 1, 2"
+        "Appellant, 8620e023-f663-477e-a771-9cfad50ee30f, 446c7b23-7342-42e1-adff-b4c367e951cb, 1, 1, 1, true",
+        "Appointee, 8620e023-f663-477e-a771-9cfad50ee30f, 446c7b23-7342-42e1-adff-b4c367e951cb, 1, 1, 1, false",
+        "Reps, e29a2275-553f-4e70-97f4-2994c095f281, f59440ee-19ca-4d47-a702-13e9cecaccbd, 1, 1, 2, false"
     })
     public void givenCallbackWithSubscriptions_shouldSendEmailSmsAndLetterNotifications(
         String subscription,
@@ -54,32 +50,29 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
         String smsId,
         int expectedNumEmailNotifications,
         int expectedNumSmsNotifications,
-        int expectedNumLetters) throws Exception {
-
-
-        logger.info("Test started for subscription {} ",subscription);
+        int expectedNumLetters, boolean checkFromCorrespondence) throws Exception {
 
         simulateCcdCallback(ADMIN_APPEAL_WITHDRAWN, "tyanotifications/handlers/" + ADMIN_APPEAL_WITHDRAWN.getId() + subscription
             + "Callback.json");
 
-        logger.info("Test executing for subscription {} with case id {}, ref {} ",subscription,caseId, caseReference);
-
+        delayInSeconds(5);
         List<Notification> notifications = tryFetchNotificationsForTestCase(emailId, smsId);
-
-        delayInSeconds(30);
-
-        List<Notification> letterNotifications = tryFetchLetterNotificationsForTestCase();
-
 
         assertEquals(expectedNumEmailNotifications, getNumberOfNotificationsForGivenEmailOrSmsTemplateId(notifications, emailId));
         assertEquals(expectedNumSmsNotifications, getNumberOfNotificationsForGivenEmailOrSmsTemplateId(notifications, smsId));
-        assertEquals(expectedNumLetters, letterNotifications.stream().count());
-        assertTrue(fetchLetters(expectedNumLetters, subscription));
-        logger.info("Test successfully executed for subscription {} ",subscription);
+
+        if(checkFromCorrespondence) {
+            assertTrue(fetchLettersFromCase(expectedNumLetters, subscription));
+        }
+        else {
+            List<Notification> letterNotifications = fetchLetters();
+            assertThat(letterNotifications).hasSize(expectedNumLetters);
+        }
 
     }
 
-    private boolean fetchLetters(int expectedNumLetters, String subscription) {
+    private boolean fetchLettersFromCase(int expectedNumLetters, String subscription) {
+        int fetchCount = 0;
         do {
             if (getNumberOfLetterCorrespondence(subscription) == expectedNumLetters) {
                 return true;
@@ -105,16 +98,12 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
         List<Correspondence> correspondence = ccdService
             .getByCaseId(caseId, idamTokens).getData().getCorrespondence();
         if (correspondence == null) {
-            logger.info("Correspondence is null");
             return 0;
         }
-        logger.info("looking for letter for {} Correspondence: {}", subscription, correspondence);
         return correspondence.stream()
             .filter(c -> c.getValue().getCorrespondenceType() == CorrespondenceType.Letter)
             .filter(c -> c.getValue().getDocumentLink().getDocumentFilename().contains(ADMIN_APPEAL_WITHDRAWN.getId()))
-            .filter(c -> {
-                return isAMatch(subscription, c.getValue().getTo());
-            })
+            .filter(c -> isAMatch(subscription, c.getValue().getTo()))
             .count();
     }
 

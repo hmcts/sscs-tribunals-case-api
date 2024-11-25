@@ -159,19 +159,15 @@ public abstract class AbstractFunctionalTest {
     }
 
     public List<Notification> tryFetchNotificationsForTestCaseWithExpectedText(String expectedText, String... expectedTemplateIds) throws NotificationClientException {
-        return tryFetchNotificationsForTestCaseWithFlag(false, expectedText, caseReference, expectedTemplateIds);
+        return tryFetchNotificationsForTestCaseWithFlag(false, expectedText, expectedTemplateIds);
     }
 
     public List<Notification> tryFetchNotificationsForTestCase(String... expectedTemplateIds) throws NotificationClientException {
-        return tryFetchNotificationsForTestCaseWithFlag(false, null, caseReference, expectedTemplateIds);
-    }
-
-    public List<Notification> tryFetchLetterNotificationsForTestCase(String... expectedTemplateIds) throws NotificationClientException {
-        return tryFetchNotificationsForTestCaseWithFlag(false, null, caseId.toString());
+        return tryFetchNotificationsForTestCaseWithFlag(false, null, expectedTemplateIds);
     }
 
     public List<Notification> tryFetchNotificationsForTestCaseWithFlag(boolean notificationNotFoundFlag,
-                                                                       String expectedText, String reference,
+                                                                       String expectedText,
                                                                        String... expectedTemplateIds)
         throws NotificationClientException {
 
@@ -218,15 +214,14 @@ public abstract class AbstractFunctionalTest {
 
                 delayInSeconds(5);
 
-                allNotifications = client.getNotifications("", "", reference, "").getNotifications();
+                allNotifications = client.getNotifications("", "", caseReference, "").getNotifications();
                 String allNotifTemplateIds = allNotifications.stream().map(notif ->
                         notif.getTemplateId().toString()).collect(Collectors.joining(","));
-                log.info("allNotifications for case {}: templateIds:{}", reference, allNotifTemplateIds);
+                log.info("allNotifications for case {}: templateIds:{}", caseReference, allNotifTemplateIds);
 
                 matchingNotifications =
                     allNotifications
                         .stream()
-                        .peek(notification -> log.info("Each notification: {}", notification))
                         .filter(notification -> expectedText == null || StringUtils.contains(notification.getBody(), expectedText))
                         .filter(notification -> asList(expectedTemplateIds).contains(notification.getTemplateId().toString()))
                         .collect(toSet());
