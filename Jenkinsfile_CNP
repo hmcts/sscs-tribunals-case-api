@@ -187,9 +187,18 @@ withPipeline(type, product, component) {
     afterSuccess('smoketest:preview') {
         runE2eTests()
     }
+
+    afterSuccess('functionalTest:preview') {
+        addDocmosisLettersToBuildArtifacts()
+    }
+
     afterSuccess('smoketest:aat') {
         runE2eTests()
     }
+}
+
+def addDocmosisLettersToBuildArtifacts() {
+    steps.archiveArtifacts artifacts: "ft_docmosis_letters/**"
 }
 
 def generateDefinitions() {

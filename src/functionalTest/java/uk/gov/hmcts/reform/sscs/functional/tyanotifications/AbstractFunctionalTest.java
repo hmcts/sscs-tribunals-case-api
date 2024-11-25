@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.functional.tyanotifications;
 
-import static helper.EnvironmentProfileValueSource.getEnvOrEmpty;
+import static java.time.LocalTime.now;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toSet;
 import static junit.framework.TestCase.fail;
@@ -9,7 +9,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.slf4j.LoggerFactory.getLogger;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SYA_APPEAL_CREATED;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.SscsCaseDataUtils.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.SscsCaseDataUtils.buildSscsCaseData;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.SscsCaseDataUtils.buildSscsCaseDataWelsh;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.SscsCaseDataUtils.subscribeRep;
 
 import helper.EnvironmentProfileValueSource;
 import io.restassured.RestAssured;
@@ -18,7 +20,16 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.*;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import junitparams.JUnitParamsRunner;
@@ -252,6 +263,29 @@ public abstract class AbstractFunctionalTest {
 
         }
         return allNotifications;
+    }
+
+    public List<Notification> saveLetterPdfs(List<Notification> notifications) {
+        LocalTime start = LocalTime.now();
+        notifications.stream()
+                .filter(notification -> notification.getNotificationType().equals("letter"))
+                .forEach(notification -> {
+                    try {
+                        final byte[] pdfForLetter = client.getPdfForLetter(String.valueOf(notification.getId()));
+                        FileUtils.writeByteArrayToFile(
+                                new File("ft_docmosis_letters/" + notification.getId() + ".pdf"),
+                                pdfForLetter
+                        );
+                        notifications.remove(notification);
+                    } catch (NotificationClientException | IOException e) {
+                        if (now().isAfter(start.plusSeconds(60))) {
+                            log.error("Failed to save all letter pdfs, {} remain unsaved", notifications.size());
+                            throw new RuntimeException("Timeout reached before saving all letter pdfs", e);
+                        }
+                        delayInSeconds(5);
+                    }
+                });
+        return notifications;
     }
 
     protected void simulateWelshCcdCallback(NotificationEventType eventType) throws IOException {

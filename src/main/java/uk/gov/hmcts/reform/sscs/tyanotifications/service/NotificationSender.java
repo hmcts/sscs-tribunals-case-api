@@ -144,7 +144,7 @@ public class NotificationSender {
 
         NotificationClient client = getLetterNotificationClient(address.getPostcode());
 
-        final SendLetterResponse sendLetterResponse = getSendLetterResponse(templateId, personalisation, ccdCaseId, client);
+        final SendLetterResponse sendLetterResponse = sendLetterViaGovNotify(templateId, personalisation, ccdCaseId, client);
 
         if (saveCorrespondence) {
             final Correspondence correspondence = getLetterCorrespondence(notificationEventType, name);
@@ -155,7 +155,7 @@ public class NotificationSender {
     }
 
     @Retryable
-    private SendLetterResponse getSendLetterResponse(String templateId, Map<String, Object> personalisation, String ccdCaseId, NotificationClient client) throws NotificationClientException {
+    private SendLetterResponse sendLetterViaGovNotify(String templateId, Map<String, Object> personalisation, String ccdCaseId, NotificationClient client) throws NotificationClientException {
         final SendLetterResponse sendLetterResponse;
         try {
             sendLetterResponse = client.sendLetter(templateId, personalisation, ccdCaseId);
