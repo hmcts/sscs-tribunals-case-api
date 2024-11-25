@@ -11,7 +11,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
-import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.FACE_TO_FACE;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.NOT_ATTENDING;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
@@ -29,7 +28,6 @@ import java.util.Objects;
 import java.util.Optional;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -61,6 +59,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.PermissionToAppealActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -429,6 +428,14 @@ public class SscsUtil {
         return new DynamicList(null, items);
     }
 
+    public static DynamicListItem getPortOfEntryFromCode(String locationCode) {
+        return Arrays.stream(UkPortOfEntry.values())
+            .filter(ukPortOfEntry -> ukPortOfEntry.getLocationCode().equals(locationCode))
+            .findFirst()
+            .map(ukPortOfEntry -> new DynamicListItem(ukPortOfEntry.getLocationCode(), ukPortOfEntry.getLabel()))
+            .orElseGet(() -> new DynamicListItem(null, null));
+    }
+
     public static DynamicList getBenefitDescriptions(boolean isInfectedBloodCompensationEnabled) {
         List<DynamicListItem> items = Arrays.stream(Benefit.values())
                 .filter(benefit -> isInfectedBloodCompensationEnabled || !benefit.getShortName().equals("infectedBloodCompensation"))
@@ -478,6 +485,13 @@ public class SscsUtil {
     public static void handleIbcaCase(SscsCaseData caseData) {
         caseData.getAppeal().getHearingOptions().setHearingRoute(LIST_ASSIST);
         caseData.getAppeal().getMrnDetails().setDwpIssuingOffice("IBCA");
+        if (caseData.getRegionalProcessingCenter() != null) {
+            RegionalProcessingCenter listAssistRegionalProcessingCenter = caseData.getRegionalProcessingCenter()
+                .toBuilder()
+                .hearingRoute(LIST_ASSIST)
+                .build();
+            caseData.setRegionalProcessingCenter(listAssistRegionalProcessingCenter);
+        }
     }
 
     public static String generateUniqueIbcaId(Appellant appellant) {
@@ -609,19 +623,6 @@ public class SscsUtil {
             default -> {
             }
         }
-    }
-
-    public static boolean isIbcaCase(SscsCaseData caseData) {
-        final String selectedBenefitType = Optional.of(caseData)
-                .map(SscsCaseData::getAppeal)
-                .map(Appeal::getBenefitType)
-                .map(BenefitType::getDescriptionSelection)
-                .map(DynamicList::getValue)
-                .filter(ObjectUtils::isNotEmpty)
-                .map(DynamicListItem::getCode)
-                .orElse(null);
-
-        return IBCA_BENEFIT_CODE.equals(caseData.getBenefitCode()) || IBCA_BENEFIT_CODE.equals(selectedBenefitType);
     }
 }
 
