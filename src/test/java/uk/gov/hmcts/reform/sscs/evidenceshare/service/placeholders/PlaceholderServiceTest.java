@@ -148,6 +148,7 @@ public class PlaceholderServiceTest {
         assertEquals("L2 5UZ", placeholders.get(RECIPIENT_ADDRESS_LINE_5_LITERAL));
         assertEquals("SC123/12/1234", placeholders.get(SC_NUMBER_LITERAL));
         assertEquals("No", placeholders.get(SHOULD_HIDE_NINO));
+        assertEquals("NI No", placeholders.get(LABEL));
     }
 
     @Test
@@ -274,9 +275,8 @@ public class PlaceholderServiceTest {
         assertEquals("Lechworth", placeholders.get(RECIPIENT_ADDRESS_LINE_3_LITERAL));
         assertEquals("Bedford", placeholders.get(RECIPIENT_ADDRESS_LINE_4_LITERAL));
         assertEquals("L2 5UZ", placeholders.get(RECIPIENT_ADDRESS_LINE_5_LITERAL));
-        assertEquals("Yes", placeholders.get(SHOULD_HIDE_NINO));
-        assertEquals("", placeholders.get(NINO_LITERAL));
-        assertEquals("No", placeholders.get(SHOULD_HIDE_IBCA_REFERENCE));
-        assertEquals("IBCA123456", placeholders.get(IBCA_REFERENCE_LITERAL));
+        assertEquals("No", placeholders.get(SHOULD_HIDE_NINO));
+        assertEquals("IBCA123456", placeholders.get(NINO_LITERAL));
+        assertEquals("IBCA Reference", placeholders.get(LABEL));
     }
 }

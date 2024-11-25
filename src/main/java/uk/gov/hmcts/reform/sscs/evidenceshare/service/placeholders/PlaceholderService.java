@@ -43,23 +43,20 @@ public class PlaceholderService {
         if (description == null && appeal.getBenefitType() != null && appeal.getBenefitType().getCode() != null) {
             description = Benefit.getBenefitOptionalByCode(appeal.getBenefitType().getCode()).map(Benefit::getDescription).orElse(StringUtils.EMPTY);
         }
-
+        String shouldHideNino = appeal.getBenefitType() != null && Benefit.CHILD_SUPPORT.getShortName().equals(appeal.getBenefitType().getCode()) ? YesNo.YES.getValue() : YesNo.NO.getValue();
         if (description != null) {
             description = description.toUpperCase();
         } else {
             description = StringUtils.EMPTY;
         }
 
-        String shouldHideNino = shouldHideNino(appeal);
-        String shouldHideIbcaReference = caseData.isIbcCase() ? YesNo.NO.getValue() : YesNo.YES.getValue();
-
+        placeholders.put(SHOULD_HIDE_NINO, shouldHideNino);
         placeholders.put(BENEFIT_TYPE_LITERAL, description);
         placeholders.put(APPELLANT_FULL_NAME_LITERAL, appeal.getAppellant().getName().getAbbreviatedFullName());
         placeholders.put(CASE_ID_LITERAL, caseData.getCcdCaseId());
-        placeholders.put(SHOULD_HIDE_NINO, shouldHideNino);
-        placeholders.put(NINO_LITERAL, defaultToEmptyStringIfNull(appeal.getAppellant().getIdentity().getNino()));
-        placeholders.put(SHOULD_HIDE_IBCA_REFERENCE, shouldHideIbcaReference);
-        placeholders.put(IBCA_REFERENCE_LITERAL, defaultToEmptyStringIfNull(appeal.getAppellant().getIdentity().getIbcaReference()));
+        String ninoLiteral = defaultToEmptyStringIfNull(caseData.isIbcCase() ? appeal.getAppellant().getIdentity().getIbcaReference() : appeal.getAppellant().getIdentity().getNino());
+        placeholders.put(NINO_LITERAL, ninoLiteral);
+        placeholders.put(LABEL, caseData.isIbcCase() ? IBCA_REFERENCE_LABEL : NINO_LABEL);
         placeholders.put(SSCS_URL_LITERAL, caseData.isIbcCase() ? IBCA_URL : SSCS_URL);
         placeholders.put(GENERATED_DATE_LITERAL, LocalDateTime.now().toLocalDate().toString());
         placeholders.put(pdfDocumentConfig.getHmctsImgKey(), pdfDocumentConfig.getHmctsImgVal());
@@ -142,11 +139,4 @@ public class PlaceholderService {
             .toArray(String[]::new);
     }
 
-    private String shouldHideNino(Appeal appeal) {
-        return appeal.getBenefitType() != null
-                && (Benefit.CHILD_SUPPORT.getShortName().equals(appeal.getBenefitType().getCode())
-                        || Benefit.INFECTED_BLOOD_COMPENSATION.getShortName().equals(appeal.getBenefitType().getCode()))
-                ? YesNo.YES.getValue()
-                : YesNo.NO.getValue();
-    }
 }
