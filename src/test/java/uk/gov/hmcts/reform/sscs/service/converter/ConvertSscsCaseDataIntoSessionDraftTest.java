@@ -351,6 +351,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("12", actual.getAppellantDob().getDate().getMonth());
         assertEquals("1998", actual.getAppellantDob().getDate().getYear());
         assertEquals("SC 94 27 06 A", actual.getAppellantNino().getNino());
+        assertNull(actual.getAppellantIbcaReference());
         assertEquals("1 Appellant Close", actual.getAppellantContactDetails().getAddressLine1());
         assertNull(actual.getAppellantContactDetails().getAddressLine2());
         assertEquals("Appellant-town", actual.getAppellantContactDetails().getTownCity());
@@ -1727,4 +1728,248 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertNull(actual.getLanguagePreferenceWelsh());
     }
 
+    @Test
+    public void convertPopulatedIbcCaseData() {
+        caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder()
+                    .code("infectedBloodCompensation")
+                    .description("Infected Blood Compensation")
+                    .build()
+                )
+                .appellant(Appellant.builder()
+                    .name(Name.builder()
+                        .title("Mrs.")
+                        .firstName("Ap")
+                        .lastName("Pellant")
+                        .build()
+                    )
+                    .ibcRole("myself")
+                    .identity(Identity.builder()
+                        .dob("1998-12-31")
+                        .ibcaReference("1234567890")
+                        .build()
+                    )
+                    .address(Address.builder()
+                        .line1("1 Appellant Close")
+                        .town("Appellant-town")
+                        .county("Appellant-county")
+                        .postcode("TS1 1ST")
+                        .inMainlandUk(YesNo.YES)
+                        .build()
+                    )
+                    .contact(Contact.builder()
+                        .mobile("07911123456")
+                        .email("appellant@gmail.com")
+                        .build()
+                    )
+                    .build()
+                )
+                .mrnDetails(MrnDetails.builder()
+                    .mrnDate("2010-02-01")
+                    .mrnLateReason("Forgot to send it")
+                    .build()
+                )
+                .appealReasons(
+                    AppealReasons.builder()
+                        .reasons(
+                            Collections.singletonList(
+                                AppealReason.builder()
+                                    .value(AppealReasonDetails.builder()
+                                        .reason("Underpayment")
+                                        .description("I think I should get more")
+                                        .build()
+                                    )
+                                    .build()
+                            )
+                        )
+                        .otherReasons("I can't think of anything else")
+                        .build()
+                )
+                .hearingOptions(null)
+                .rep(Representative.builder().build())
+                .build()
+            )
+            .subscriptions(Subscriptions.builder()
+                .appellantSubscription(Subscription.builder()
+                    .subscribeEmail("Yes")
+                    .email("appellant@gmail.com")
+                    .subscribeSms("Yes")
+                    .mobile("07911123456")
+                    .build()
+                )
+                .build()
+            )
+            .sscsDocument(Collections.emptyList())
+            .evidencePresent("no")
+            .ccdCaseId("123456")
+            .build();
+
+        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        assertEquals("Infected Blood Compensation", actual.getBenefitType().getBenefitType());
+        assertEquals("yes", actual.getCreateAccount().getCreateAccount());
+        assertEquals("yes", actual.getHaveAMrn().getHaveAMrn());
+        assertEquals("1", actual.getMrnDate().getMrnDateDetails().getDay());
+        assertEquals("2", actual.getMrnDate().getMrnDateDetails().getMonth());
+        assertEquals("2010", actual.getMrnDate().getMrnDateDetails().getYear());
+        assertNull(actual.getDwpIssuingOffice());
+        assertNull(actual.getAppointee());
+        assertEquals("myself", actual.getAppellantIbcRole().getIbcRole());
+        assertEquals("Mrs.", actual.getAppellantName().getTitle());
+        assertEquals("Ap", actual.getAppellantName().getFirstName());
+        assertEquals("Pellant", actual.getAppellantName().getLastName());
+        assertEquals("31", actual.getAppellantDob().getDate().getDay());
+        assertEquals("12", actual.getAppellantDob().getDate().getMonth());
+        assertEquals("1998", actual.getAppellantDob().getDate().getYear());
+        assertNull(actual.getAppellantNino());
+        assertEquals("1234567890", actual.getAppellantIbcaReference().getIbcaReference());
+        assertNull(actual.getAppellantInternationalContactDetails());
+        assertEquals("1 Appellant Close", actual.getAppellantContactDetails().getAddressLine1());
+        assertNull(actual.getAppellantContactDetails().getAddressLine2());
+        assertEquals("Appellant-town", actual.getAppellantContactDetails().getTownCity());
+        assertEquals("Appellant-county", actual.getAppellantContactDetails().getCounty());
+        assertNull(actual.getAppellantContactDetails().getCountry());
+        assertNull(actual.getAppellantContactDetails().getPortOfEntry());
+        assertEquals("TS1 1ST", actual.getAppellantContactDetails().getPostCode());
+        assertEquals("07911123456", actual.getAppellantContactDetails().getPhoneNumber());
+        assertEquals("appellant@gmail.com", actual.getAppellantContactDetails().getEmailAddress());
+        assertEquals("yes", actual.getAppellantInMainlandUk().getInMainlandUk());
+        assertNull(actual.getSameAddress());
+        assertEquals("yes", actual.getTextReminders().getDoYouWantTextMsgReminders());
+        assertEquals("yes", actual.getSendToNumber().getUseSameNumber());
+        assertNull("no", actual.getRepresentative());
+        assertEquals("I think I should get more", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getReasonForAppealing());
+        assertEquals("Underpayment", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getWhatYouDisagreeWith());
+        assertEquals("I can't think of anything else", actual.getOtherReasonForAppealing().getOtherReasonForAppealing());
+        assertEquals("no", actual.getEvidenceProvide().getEvidenceProvide());
+        assertEquals("123456", actual.getCcdCaseId());
+        assertNull(actual.getRepresentativeDetails());
+    }
+
+    @Test
+    public void convertPopulatedIbcInternationalCaseData() {
+        caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder()
+                    .code("infectedBloodCompensation")
+                    .description("Infected Blood Compensation")
+                    .build()
+                )
+                .appellant(Appellant.builder()
+                    .address(Address.builder()
+                        .line1("1 Appellant Close")
+                        .town("Appellant-town")
+                        .country("Iceland")
+                        .postcode("TS1 1ST")
+                        .portOfEntry("some-port")
+                        .inMainlandUk(YesNo.NO)
+                        .build()
+                    )
+                    .contact(Contact.builder()
+                        .mobile("07911123456")
+                        .email("appellant@gmail.com")
+                        .build()
+                    )
+                    .build()
+                )
+                .build()
+            )
+            .ccdCaseId("123456")
+            .build();
+
+        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        assertEquals("Infected Blood Compensation", actual.getBenefitType().getBenefitType());
+        assertEquals("yes", actual.getCreateAccount().getCreateAccount());
+        assertNull(actual.getAppellantContactDetails());
+        assertEquals("1 Appellant Close", actual.getAppellantInternationalContactDetails().getAddressLine1());
+        assertNull(actual.getAppellantInternationalContactDetails().getAddressLine2());
+        assertEquals("Appellant-town", actual.getAppellantInternationalContactDetails().getTownCity());
+        assertNull(actual.getAppellantInternationalContactDetails().getCounty());
+        assertEquals("Iceland", actual.getAppellantInternationalContactDetails().getCountry());
+        assertEquals("some-port", actual.getAppellantInternationalContactDetails().getPortOfEntry());
+        assertEquals("TS1 1ST", actual.getAppellantInternationalContactDetails().getPostCode());
+        assertEquals("07911123456", actual.getAppellantInternationalContactDetails().getPhoneNumber());
+        assertEquals("appellant@gmail.com", actual.getAppellantInternationalContactDetails().getEmailAddress());
+        assertEquals("no", actual.getAppellantInMainlandUk().getInMainlandUk());
+        assertNull("no", actual.getRepresentative());
+        assertNull(actual.getRepresentativeDetails());
+    }
+
+    @Test
+    public void convertPopulatedIbcRepCaseData() {
+        caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder()
+                    .code("infectedBloodCompensation")
+                    .description("Infected Blood Compensation")
+                    .build()
+                )
+                .rep(Representative.builder()
+                    .hasRepresentative("Yes")
+                    .name(Name.builder().title("Miss.").firstName("Re").lastName("Presentative").build())
+                    .contact(null)
+                    .address(Address.builder()
+                        .line1("1 Rep Cres")
+                        .town("Rep-town")
+                        .county("Rep-county")
+                        .postcode("TS3 3ST")
+                        .inMainlandUk(YesNo.YES)
+                        .build())
+                    .build())
+                .build()
+            )
+            .ccdCaseId("123456")
+            .build();
+
+        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        assertEquals("Infected Blood Compensation", actual.getBenefitType().getBenefitType());
+        assertEquals("yes", actual.getCreateAccount().getCreateAccount());
+        assertEquals("yes", actual.getRepresentative().getHasRepresentative());
+        assertNull(actual.getRepresentativeInternationalDetails());
+        assertEquals("1 Rep Cres", actual.getRepresentativeDetails().getAddressLine1());
+        assertNull(actual.getRepresentativeDetails().getAddressLine2());
+        assertEquals("Rep-town", actual.getRepresentativeDetails().getTownCity());
+        assertEquals("Rep-county", actual.getRepresentativeDetails().getCounty());
+        assertEquals("TS3 3ST", actual.getRepresentativeDetails().getPostCode());
+        assertEquals("yes", actual.getRepresentativeInMainlandUk().getInMainlandUk());
+    }
+
+    @Test
+    public void convertPopulatedIbcInternationalRepCaseData() {
+        caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder()
+                    .code("infectedBloodCompensation")
+                    .description("Infected Blood Compensation")
+                    .build()
+                )
+                .rep(Representative.builder()
+                    .hasRepresentative("Yes")
+                    .name(Name.builder().title("Miss.").firstName("Re").lastName("Presentative").build())
+                    .contact(null)
+                    .address(Address.builder()
+                        .line1("1 Rep Cres")
+                        .town("Rep-town")
+                        .country("Iceland")
+                        .postcode("TS3 3ST")
+                        .inMainlandUk(YesNo.NO)
+                        .build())
+                    .build())
+                .build()
+            )
+            .ccdCaseId("123456")
+            .build();
+
+        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        assertEquals("Infected Blood Compensation", actual.getBenefitType().getBenefitType());
+        assertEquals("yes", actual.getCreateAccount().getCreateAccount());
+        assertEquals("yes", actual.getRepresentative().getHasRepresentative());
+        assertNull(actual.getRepresentativeDetails());
+        assertEquals("1 Rep Cres", actual.getRepresentativeInternationalDetails().getAddressLine1());
+        assertNull(actual.getRepresentativeInternationalDetails().getAddressLine2());
+        assertEquals("Rep-town", actual.getRepresentativeInternationalDetails().getTownCity());
+        assertEquals("Iceland", actual.getRepresentativeInternationalDetails().getCountry());
+        assertEquals("TS3 3ST", actual.getRepresentativeInternationalDetails().getPostCode());
+        assertEquals("no", actual.getRepresentativeInMainlandUk().getInMainlandUk());
+    }
 }
