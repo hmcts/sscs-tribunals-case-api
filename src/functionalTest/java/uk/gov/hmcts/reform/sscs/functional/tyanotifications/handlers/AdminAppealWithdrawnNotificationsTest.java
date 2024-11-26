@@ -71,7 +71,6 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
     }
 
     private boolean fetchLettersFromCase(int expectedNumLetters, String subscription) {
-        int fetchCount = 0;
         do {
             if (getNumberOfLetterCorrespondence(subscription) == expectedNumLetters) {
                 return true;
