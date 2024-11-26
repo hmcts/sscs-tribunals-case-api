@@ -16,7 +16,6 @@ import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyUcb;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isValidBenefitTypeForConfidentiality;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.sendNewOtherPartyNotification;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isIbcaCase;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -98,12 +97,15 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             return preSubmitCallbackResponse;
         }
 
-        if (isIbcaCase(sscsCaseData)) {
+        if (sscsCaseData.isIbcCase()) {
             final String benefitCode = sscsCaseData.getBenefitCodeIbcaOnly();
             sscsCaseData.setBenefitCode(benefitCode);
 
             final String issueCode = sscsCaseData.getIssueCodeIbcaOnly();
             sscsCaseData.setIssueCode(issueCode);
+
+            sscsCaseData.setBenefitCodeIbcaOnly(null);
+            sscsCaseData.setIssueCodeIbcaOnly(null);
         }
 
         updateDwpState(sscsCaseData);
@@ -134,9 +136,6 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         }
         sscsCaseData.setDirectionDueDate(getUpdatedDirectionDueDate(sscsCaseData));
         updateBenefitType(sscsCaseData);
-
-        sscsCaseData.setBenefitCodeIbcaOnly(null);
-        sscsCaseData.setIssueCodeIbcaOnly(null);
 
         return preSubmitCallbackResponse;
     }
