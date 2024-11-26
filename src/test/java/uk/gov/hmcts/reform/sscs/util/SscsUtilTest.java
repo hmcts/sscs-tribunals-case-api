@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getIssueFinalDecisionDocume
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getPortOfEntryFromCode;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getPortsOfEntry;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getPostHearingReviewDocumentType;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getSscsType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getWriteFinalDecisionDocumentType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleIbcaCase;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.updateHearingChannel;
