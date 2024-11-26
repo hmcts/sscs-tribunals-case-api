@@ -264,14 +264,13 @@ public abstract class AbstractFunctionalTest {
         return allNotifications;
     }
 
-    public List<String> saveLetterPdfs(List<Notification> notifications) {
-        int maxSecondsToWaitForPdf = 60;
-        List<String> savedNotifications = new ArrayList<>();
+    public List<UUID> saveLetterPdfs(List<Notification> notifications) {
+        List<UUID> savedLetters = new ArrayList<>();
 
-        while (notifications.size() > savedNotifications.size() && maxSecondsToWaitForPdf > 0) {
+        while (notifications.size() > savedLetters.size()) {
             notifications.stream()
                 .filter(notification -> notification.getNotificationType().equals("letter"))
-                .filter(notification -> !savedNotifications.contains(String.valueOf(notification.getId())))
+                .filter(notification -> !savedLetters.contains(notification.getId()))
                 .forEach(notification -> {
                     try {
                         final byte[] pdfForLetter = client.getPdfForLetter(String.valueOf(notification.getId()));
@@ -279,16 +278,20 @@ public abstract class AbstractFunctionalTest {
                             new File("ft_docmosis_letters/" + notification.getId() + ".pdf"),
                             pdfForLetter
                         );
-                        savedNotifications.add(String.valueOf(notification.getId()));
+                        savedLetters.add(notification.getId());
                     } catch (NotificationClientException | IOException e) {
                         log.error("Failed to save all letter pdfs, {} remain unsaved", notifications.size());
                     }
                 });
-            maxSecondsToWaitForPdf -= 10;
-            delayInSeconds(10);
+            delayInSeconds(60);
         }
-        return savedNotifications;
+        return savedLetters;
     }
+
+    public void logFailedEventNotification(NotificationEventType notificationType, Exception e) {
+        log.error("Failed testing notification type {} with the following", notificationType, e);
+    }
+
 
     protected void simulateWelshCcdCallback(NotificationEventType eventType) throws IOException {
         String callbackJsonName = BASE_PATH_TYAN + eventType.getId() + "CallbackWelsh.json";
