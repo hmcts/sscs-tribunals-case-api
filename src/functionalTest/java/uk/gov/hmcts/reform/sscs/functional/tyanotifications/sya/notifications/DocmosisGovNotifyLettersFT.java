@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.functional.tyanotifications.sya.notifications;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.sscs.functional.tyanotifications.sya.notifications.DocmosisWithGovNotifyLetterFunctionalTest.DOCMOSIS_LETTERS_WITH_NO_TEST_CALLBACK;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists.DOCMOSIS_LETTERS;
 
 import java.io.IOException;

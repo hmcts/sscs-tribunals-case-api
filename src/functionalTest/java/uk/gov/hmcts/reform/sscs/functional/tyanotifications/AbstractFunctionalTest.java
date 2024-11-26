@@ -251,6 +251,11 @@ public abstract class AbstractFunctionalTest {
         } while (true);
     }
 
+    protected void simulateCcdCallbackToSendLetter(NotificationEventType eventType) throws IOException {
+        String callbackJsonName = BASE_PATH_TYAN + "actionPostponementRequestCallback.json";
+        simulateCcdCallback(eventType, callbackJsonName);
+    }
+
     public List<Notification> fetchLetters() throws NotificationClientException {
         List<Notification> allNotifications = new ArrayList<>();
         allNotifications = client.getNotifications("", "letter", caseId.toString(), "").getNotifications();
@@ -292,7 +297,6 @@ public abstract class AbstractFunctionalTest {
         log.error("Failed testing notification type {} with the following", notificationType, e);
     }
 
-
     protected void simulateWelshCcdCallback(NotificationEventType eventType) throws IOException {
         String callbackJsonName = BASE_PATH_TYAN + eventType.getId() + "CallbackWelsh.json";
         simulateCcdCallback(eventType, callbackJsonName);
@@ -300,11 +304,6 @@ public abstract class AbstractFunctionalTest {
 
     protected void simulateCcdCallback(NotificationEventType eventType) throws IOException {
         String callbackJsonName = BASE_PATH_TYAN + eventType.getId() + "Callback.json";
-        simulateCcdCallback(eventType, callbackJsonName);
-    }
-
-    protected void simulateCcdCallbackToSendLetter(NotificationEventType eventType) throws IOException {
-        String callbackJsonName = BASE_PATH_TYAN + "actionPostponementRequestCallback.json";
         simulateCcdCallback(eventType, callbackJsonName);
     }
 
