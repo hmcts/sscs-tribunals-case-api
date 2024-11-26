@@ -58,7 +58,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
 
     @Test(expected = NullPointerException.class)
     public void attemptToConvertNullAppeal() {
-        SscsCaseData caseData = SscsCaseData.builder().build();
+        caseData = SscsCaseData.builder().build();
         convertSscsCaseDataIntoSessionDraft.convert(caseData);
     }
 
@@ -74,7 +74,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
 
         given(documentDownloadService.getFileSize(anyString())).willReturn(1L);
 
-        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
 
         assertEquals("my evidence description", actual.getEvidenceDescription().getDescribeTheEvidence());
     }
@@ -335,38 +335,23 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .ccdCaseId("123456")
             .build();
 
-        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("Personal Independence Payment (PIP)", actual.getBenefitType().getBenefitType());
         assertEquals("yes", actual.getCreateAccount().getCreateAccount());
-        assertEquals("yes", actual.getHaveAMrn().getHaveAMrn());
-        assertEquals("1", actual.getMrnDate().getMrnDateDetails().getDay());
-        assertEquals("2", actual.getMrnDate().getMrnDateDetails().getMonth());
-        assertEquals("2010", actual.getMrnDate().getMrnDateDetails().getYear());
+        assertMrnDate(actual);
         assertEquals("1", actual.getDwpIssuingOffice().getPipNumber());
         assertEquals("no", actual.getAppointee().getIsAppointee());
-        assertEquals("Mrs.", actual.getAppellantName().getTitle());
-        assertEquals("Ap", actual.getAppellantName().getFirstName());
-        assertEquals("Pellant", actual.getAppellantName().getLastName());
-        assertEquals("31", actual.getAppellantDob().getDate().getDay());
-        assertEquals("12", actual.getAppellantDob().getDate().getMonth());
-        assertEquals("1998", actual.getAppellantDob().getDate().getYear());
+        assertAppellantName(actual);
+        assertAppellantDob(actual);
         assertEquals("SC 94 27 06 A", actual.getAppellantNino().getNino());
         assertNull(actual.getAppellantIbcaReference());
-        assertEquals("1 Appellant Close", actual.getAppellantContactDetails().getAddressLine1());
-        assertNull(actual.getAppellantContactDetails().getAddressLine2());
-        assertEquals("Appellant-town", actual.getAppellantContactDetails().getTownCity());
-        assertEquals("Appellant-county", actual.getAppellantContactDetails().getCounty());
-        assertEquals("TS1 1ST", actual.getAppellantContactDetails().getPostCode());
-        assertEquals("07911123456", actual.getAppellantContactDetails().getPhoneNumber());
-        assertEquals("appellant@gmail.com", actual.getAppellantContactDetails().getEmailAddress());
+        assertAppellantAddress(actual);
+        assertAppellantContact(actual);
         assertEquals("no", actual.getSameAddress().getIsAddressSameAsAppointee());
         assertEquals("yes", actual.getTextReminders().getDoYouWantTextMsgReminders());
         assertEquals("yes", actual.getSendToNumber().getUseSameNumber());
         assertNull("no", actual.getRepresentative());
-        assertEquals("I think I should get more", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getReasonForAppealing());
-        assertEquals("Underpayment", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getWhatYouDisagreeWith());
-        assertEquals("I can't think of anything else", actual.getOtherReasonForAppealing().getOtherReasonForAppealing());
-        assertEquals("no", actual.getEvidenceProvide().getEvidenceProvide());
+        assertReasonsAndEvidence(actual);
         assertEquals("123456", actual.getCcdCaseId());
         assertNull(actual.getRepresentativeDetails());
     }
@@ -448,7 +433,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .evidencePresent("no")
             .build();
 
-        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("07911123456", actual.getAppellantContactDetails().getPhoneNumber());
         assertEquals("yes", actual.getTextReminders().getDoYouWantTextMsgReminders());
         assertEquals("no", actual.getSendToNumber().getUseSameNumber());
@@ -456,7 +441,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
 
     @Test
     public void convertPopulatedCaseDataWithNoMrn() {
-        SscsCaseData caseData = SscsCaseData.builder()
+        caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder()
                     .code("PIP")
@@ -528,39 +513,27 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .evidencePresent("no")
             .build();
 
-        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("Personal Independence Payment (PIP)", actual.getBenefitType().getBenefitType());
         assertEquals("yes", actual.getCreateAccount().getCreateAccount());
         assertEquals("no", actual.getHaveAMrn().getHaveAMrn());
         assertEquals("I can't find the letter.", actual.getNoMrn().getReasonForNoMrn());
         assertEquals("no", actual.getAppointee().getIsAppointee());
-        assertEquals("Mrs.", actual.getAppellantName().getTitle());
-        assertEquals("Ap", actual.getAppellantName().getFirstName());
-        assertEquals("Pellant", actual.getAppellantName().getLastName());
-        assertEquals("31", actual.getAppellantDob().getDate().getDay());
-        assertEquals("12", actual.getAppellantDob().getDate().getMonth());
-        assertEquals("1998", actual.getAppellantDob().getDate().getYear());
+        assertAppellantName(actual);
+        assertAppellantDob(actual);
         assertEquals("SC 94 27 06 A", actual.getAppellantNino().getNino());
-        assertEquals("1 Appellant Close", actual.getAppellantContactDetails().getAddressLine1());
-        assertNull(actual.getAppellantContactDetails().getAddressLine2());
-        assertEquals("Appellant-town", actual.getAppellantContactDetails().getTownCity());
-        assertEquals("Appellant-county", actual.getAppellantContactDetails().getCounty());
-        assertEquals("TS1 1ST", actual.getAppellantContactDetails().getPostCode());
-        assertEquals("07911123456", actual.getAppellantContactDetails().getPhoneNumber());
-        assertEquals("appellant@gmail.com", actual.getAppellantContactDetails().getEmailAddress());
+        assertAppellantAddress(actual);
+        assertAppellantContact(actual);
         assertEquals("yes", actual.getTextReminders().getDoYouWantTextMsgReminders());
         assertEquals("yes", actual.getSendToNumber().getUseSameNumber());
         assertNull("no", actual.getRepresentative());
-        assertEquals("I think I should get more", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getReasonForAppealing());
-        assertEquals("Underpayment", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getWhatYouDisagreeWith());
-        assertEquals("I can't think of anything else", actual.getOtherReasonForAppealing().getOtherReasonForAppealing());
-        assertEquals("no", actual.getEvidenceProvide().getEvidenceProvide());
+        assertReasonsAndEvidence(actual);
         assertNull(actual.getRepresentativeDetails());
     }
 
     @Test
     public void convertPopulatedCaseDataWithAppointee() {
-        SscsCaseData caseData = SscsCaseData.builder()
+        caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder()
                     .code("PIP")
@@ -599,7 +572,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             )
             .build();
 
-        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("yes", actual.getAppointee().getIsAppointee());
         assertEquals("Mr.", actual.getAppointeeName().getTitle());
         assertEquals("Ap", actual.getAppointeeName().getFirstName());
@@ -619,7 +592,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
 
     @Test
     public void convertPopulatedCaseDataWithAppointeeAtSameAddress() {
-        SscsCaseData caseData = SscsCaseData.builder()
+        caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder()
                     .code("PIP")
@@ -657,7 +630,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             )
             .build();
 
-        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("yes", actual.getAppointee().getIsAppointee());
         assertEquals("Mr.", actual.getAppointeeName().getTitle());
         assertEquals("Ap", actual.getAppointeeName().getFirstName());
@@ -677,7 +650,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
 
     @Test
     public void convertPopulatedCaseDataWithAppointeeNotSpecified() {
-        SscsCaseData caseData = SscsCaseData.builder()
+        caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder()
                     .code("PIP")
@@ -884,54 +857,32 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .evidencePresent("no")
             .build();
 
-        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("Personal Independence Payment (PIP)", actual.getBenefitType().getBenefitType());
         assertEquals("yes", actual.getCreateAccount().getCreateAccount());
-        assertEquals("yes", actual.getHaveAMrn().getHaveAMrn());
-        assertEquals("1", actual.getMrnDate().getMrnDateDetails().getDay());
-        assertEquals("2", actual.getMrnDate().getMrnDateDetails().getMonth());
-        assertEquals("2010", actual.getMrnDate().getMrnDateDetails().getYear());
+        assertMrnDate(actual);
         assertEquals("1", actual.getDwpIssuingOffice().getPipNumber());
         assertEquals("no", actual.getAppointee().getIsAppointee());
-        assertEquals("Mrs.", actual.getAppellantName().getTitle());
-        assertEquals("Ap", actual.getAppellantName().getFirstName());
-        assertEquals("Pellant", actual.getAppellantName().getLastName());
-        assertEquals("31", actual.getAppellantDob().getDate().getDay());
-        assertEquals("12", actual.getAppellantDob().getDate().getMonth());
-        assertEquals("1998", actual.getAppellantDob().getDate().getYear());
+        assertAppellantName(actual);
+        assertAppellantDob(actual);
         assertEquals("SC 94 27 06 A", actual.getAppellantNino().getNino());
-        assertEquals("1 Appellant Close", actual.getAppellantContactDetails().getAddressLine1());
-        assertNull(actual.getAppellantContactDetails().getAddressLine2());
-        assertEquals("Appellant-town", actual.getAppellantContactDetails().getTownCity());
-        assertEquals("Appellant-county", actual.getAppellantContactDetails().getCounty());
-        assertEquals("TS1 1ST", actual.getAppellantContactDetails().getPostCode());
-        assertEquals("07911123456", actual.getAppellantContactDetails().getPhoneNumber());
-        assertEquals("appellant@gmail.com", actual.getAppellantContactDetails().getEmailAddress());
+        assertAppellantAddress(actual);
+        assertAppellantContact(actual);
         assertEquals("yes", actual.getTextReminders().getDoYouWantTextMsgReminders());
         assertEquals("yes", actual.getSendToNumber().getUseSameNumber());
         assertEquals("yes", actual.getRepresentative().getHasRepresentative());
         assertEquals("Miss.", actual.getRepresentativeDetails().getName().getTitle());
         assertEquals("Re", actual.getRepresentativeDetails().getName().getFirst());
         assertEquals("Presentative", actual.getRepresentativeDetails().getName().getLast());
-        assertEquals("I think I should get more", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getReasonForAppealing());
-        assertEquals("Underpayment", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getWhatYouDisagreeWith());
-        assertEquals("I can't think of anything else", actual.getOtherReasonForAppealing().getOtherReasonForAppealing());
-        assertEquals("no", actual.getEvidenceProvide().getEvidenceProvide());
-        assertEquals("Miss.", actual.getRepresentativeDetails().getName().getTitle());
-        assertEquals("Re", actual.getRepresentativeDetails().getName().getFirst());
-        assertEquals("Presentative", actual.getRepresentativeDetails().getName().getLast());
+        assertReasonsAndEvidence(actual);
         assertEquals("07333333333", actual.getRepresentativeDetails().getPhoneNumber());
         assertEquals("rep@gmail.com", actual.getRepresentativeDetails().getEmailAddress());
-        assertEquals("1 Rep Cres", actual.getRepresentativeDetails().getAddressLine1());
-        assertNull(actual.getRepresentativeDetails().getAddressLine2());
-        assertEquals("Rep-town", actual.getRepresentativeDetails().getTownCity());
-        assertEquals("Rep-county", actual.getRepresentativeDetails().getCounty());
-        assertEquals("TS3 3ST", actual.getRepresentativeDetails().getPostCode());
+        assertRepAddress(actual);
     }
 
     @Test
     public void convertPopulatedCaseDataWithRepNoAddress() {
-        SscsCaseData caseData = SscsCaseData.builder()
+        caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder()
                     .code("PIP")
@@ -1010,7 +961,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .evidencePresent("no")
             .build();
 
-        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertNull(actual.getRepresentativeDetails().getAddressLine1());
         assertNull(actual.getRepresentativeDetails().getAddressLine2());
         assertNull(actual.getRepresentativeDetails().getTownCity());
@@ -1020,7 +971,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
 
     @Test
     public void convertPopulatedCaseDataWithRepNoContact() {
-        SscsCaseData caseData = SscsCaseData.builder()
+        caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder()
                     .code("PIP")
@@ -1104,7 +1055,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .evidencePresent("no")
             .build();
 
-        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertNull(actual.getRepresentativeDetails().getPhoneNumber());
         assertNull(actual.getRepresentativeDetails().getEmailAddress());
     }
@@ -1180,7 +1131,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .evidencePresent("no")
             .build();
 
-        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("yes", actual.getTheHearing().getAttendHearing());
         assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
         assertEquals("no", actual.getHearingSupport().getArrangements());
@@ -1272,7 +1223,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .evidencePresent("no")
             .build();
 
-        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("yes", actual.getTheHearing().getAttendHearing());
         assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
         assertEquals("yes", actual.getHearingSupport().getArrangements());
@@ -1372,7 +1323,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .evidencePresent("no")
             .build();
 
-        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("yes", actual.getTheHearing().getAttendHearing());
         assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
         assertEquals("yes", actual.getHearingSupport().getArrangements());
@@ -1410,7 +1361,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .evidencePresent("no")
             .build();
 
-        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("yes", actual.getTheHearing().getAttendHearing());
         assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
         assertEquals("yes", actual.getHearingSupport().getArrangements());
@@ -1441,7 +1392,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .evidencePresent("no")
             .build();
 
-        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("yes", actual.getTheHearing().getAttendHearing());
         assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
         assertEquals("yes", actual.getHearingSupport().getArrangements());
@@ -1459,7 +1410,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                 .build())
             .build();
 
-        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
 
         assertEquals(expected, actual.getHearingArrangements());
     }
@@ -1529,7 +1480,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .evidencePresent("no")
             .build();
 
-        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("yes", actual.getTheHearing().getAttendHearing());
         assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
         assertEquals("yes", actual.getHearingSupport().getArrangements());
@@ -1556,7 +1507,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .evidencePresent("no")
             .build();
 
-        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("yes", actual.getTheHearing().getAttendHearing());
         assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
         assertEquals("yes", actual.getHearingSupport().getArrangements());
@@ -1657,7 +1608,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .evidencePresent("no")
             .build();
 
-        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("yes", actual.getTheHearing().getAttendHearing());
         assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
         assertEquals("no", actual.getHearingSupport().getArrangements());
@@ -1700,7 +1651,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                 .evidencePresent("no")
                 .languagePreferenceWelsh("yes")
                 .build();
-        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("yes", actual.getLanguagePreferenceWelsh().getLanguagePreferenceWelsh());
     }
 
@@ -1724,7 +1675,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                 .evidencePresent("no")
                 .languagePreferenceWelsh(null)
                 .build();
-        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertNull(actual.getLanguagePreferenceWelsh());
     }
 
@@ -1805,43 +1756,28 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .ccdCaseId("123456")
             .build();
 
-        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("Infected Blood Compensation", actual.getBenefitType().getBenefitType());
         assertEquals("yes", actual.getCreateAccount().getCreateAccount());
-        assertEquals("yes", actual.getHaveAMrn().getHaveAMrn());
-        assertEquals("1", actual.getMrnDate().getMrnDateDetails().getDay());
-        assertEquals("2", actual.getMrnDate().getMrnDateDetails().getMonth());
-        assertEquals("2010", actual.getMrnDate().getMrnDateDetails().getYear());
+        assertMrnDate(actual);
         assertNull(actual.getDwpIssuingOffice());
         assertNull(actual.getAppointee());
         assertEquals("myself", actual.getAppellantIbcRole().getIbcRole());
-        assertEquals("Mrs.", actual.getAppellantName().getTitle());
-        assertEquals("Ap", actual.getAppellantName().getFirstName());
-        assertEquals("Pellant", actual.getAppellantName().getLastName());
-        assertEquals("31", actual.getAppellantDob().getDate().getDay());
-        assertEquals("12", actual.getAppellantDob().getDate().getMonth());
-        assertEquals("1998", actual.getAppellantDob().getDate().getYear());
+        assertAppellantName(actual);
+        assertAppellantDob(actual);
         assertNull(actual.getAppellantNino());
         assertEquals("1234567890", actual.getAppellantIbcaReference().getIbcaReference());
         assertNull(actual.getAppellantInternationalContactDetails());
-        assertEquals("1 Appellant Close", actual.getAppellantContactDetails().getAddressLine1());
-        assertNull(actual.getAppellantContactDetails().getAddressLine2());
-        assertEquals("Appellant-town", actual.getAppellantContactDetails().getTownCity());
-        assertEquals("Appellant-county", actual.getAppellantContactDetails().getCounty());
+        assertAppellantAddress(actual);
         assertNull(actual.getAppellantContactDetails().getCountry());
         assertNull(actual.getAppellantContactDetails().getPortOfEntry());
-        assertEquals("TS1 1ST", actual.getAppellantContactDetails().getPostCode());
-        assertEquals("07911123456", actual.getAppellantContactDetails().getPhoneNumber());
-        assertEquals("appellant@gmail.com", actual.getAppellantContactDetails().getEmailAddress());
+        assertAppellantContact(actual);
         assertEquals("yes", actual.getAppellantInMainlandUk().getInMainlandUk());
         assertNull(actual.getSameAddress());
         assertEquals("yes", actual.getTextReminders().getDoYouWantTextMsgReminders());
         assertEquals("yes", actual.getSendToNumber().getUseSameNumber());
         assertNull("no", actual.getRepresentative());
-        assertEquals("I think I should get more", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getReasonForAppealing());
-        assertEquals("Underpayment", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getWhatYouDisagreeWith());
-        assertEquals("I can't think of anything else", actual.getOtherReasonForAppealing().getOtherReasonForAppealing());
-        assertEquals("no", actual.getEvidenceProvide().getEvidenceProvide());
+        assertReasonsAndEvidence(actual);
         assertEquals("123456", actual.getCcdCaseId());
         assertNull(actual.getRepresentativeDetails());
     }
@@ -1877,7 +1813,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .ccdCaseId("123456")
             .build();
 
-        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("Infected Blood Compensation", actual.getBenefitType().getBenefitType());
         assertEquals("yes", actual.getCreateAccount().getCreateAccount());
         assertNull(actual.getAppellantContactDetails());
@@ -1921,16 +1857,12 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .ccdCaseId("123456")
             .build();
 
-        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("Infected Blood Compensation", actual.getBenefitType().getBenefitType());
         assertEquals("yes", actual.getCreateAccount().getCreateAccount());
         assertEquals("yes", actual.getRepresentative().getHasRepresentative());
         assertNull(actual.getRepresentativeInternationalDetails());
-        assertEquals("1 Rep Cres", actual.getRepresentativeDetails().getAddressLine1());
-        assertNull(actual.getRepresentativeDetails().getAddressLine2());
-        assertEquals("Rep-town", actual.getRepresentativeDetails().getTownCity());
-        assertEquals("Rep-county", actual.getRepresentativeDetails().getCounty());
-        assertEquals("TS3 3ST", actual.getRepresentativeDetails().getPostCode());
+        assertRepAddress(actual);
         assertEquals("yes", actual.getRepresentativeInMainlandUk().getInMainlandUk());
     }
 
@@ -1960,7 +1892,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .ccdCaseId("123456")
             .build();
 
-        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("Infected Blood Compensation", actual.getBenefitType().getBenefitType());
         assertEquals("yes", actual.getCreateAccount().getCreateAccount());
         assertEquals("yes", actual.getRepresentative().getHasRepresentative());
@@ -1971,5 +1903,51 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("Iceland", actual.getRepresentativeInternationalDetails().getCountry());
         assertEquals("TS3 3ST", actual.getRepresentativeInternationalDetails().getPostCode());
         assertEquals("no", actual.getRepresentativeInMainlandUk().getInMainlandUk());
+    }
+
+    private static void assertMrnDate(SessionDraft actual) {
+        assertEquals("yes", actual.getHaveAMrn().getHaveAMrn());
+        assertEquals("1", actual.getMrnDate().getMrnDateDetails().getDay());
+        assertEquals("2", actual.getMrnDate().getMrnDateDetails().getMonth());
+        assertEquals("2010", actual.getMrnDate().getMrnDateDetails().getYear());
+    }
+    private static void assertAppellantName(SessionDraft actual) {
+        assertEquals("Mrs.", actual.getAppellantName().getTitle());
+        assertEquals("Ap", actual.getAppellantName().getFirstName());
+        assertEquals("Pellant", actual.getAppellantName().getLastName());
+    }
+
+    private static void assertAppellantDob(SessionDraft actual) {
+        assertEquals("31", actual.getAppellantDob().getDate().getDay());
+        assertEquals("12", actual.getAppellantDob().getDate().getMonth());
+        assertEquals("1998", actual.getAppellantDob().getDate().getYear());
+    }
+
+    private static void assertAppellantAddress(SessionDraft actual) {
+        assertEquals("1 Appellant Close", actual.getAppellantContactDetails().getAddressLine1());
+        assertNull(actual.getAppellantContactDetails().getAddressLine2());
+        assertEquals("Appellant-town", actual.getAppellantContactDetails().getTownCity());
+        assertEquals("Appellant-county", actual.getAppellantContactDetails().getCounty());
+        assertEquals("TS1 1ST", actual.getAppellantContactDetails().getPostCode());
+    }
+
+    private static void assertAppellantContact(SessionDraft actual) {
+        assertEquals("07911123456", actual.getAppellantContactDetails().getPhoneNumber());
+        assertEquals("appellant@gmail.com", actual.getAppellantContactDetails().getEmailAddress());
+    }
+
+    private static void assertReasonsAndEvidence(SessionDraft actual) {
+        assertEquals("I think I should get more", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getReasonForAppealing());
+        assertEquals("Underpayment", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getWhatYouDisagreeWith());
+        assertEquals("I can't think of anything else", actual.getOtherReasonForAppealing().getOtherReasonForAppealing());
+        assertEquals("no", actual.getEvidenceProvide().getEvidenceProvide());
+    }
+
+    private static void assertRepAddress(SessionDraft actual) {
+        assertEquals("1 Rep Cres", actual.getRepresentativeDetails().getAddressLine1());
+        assertNull(actual.getRepresentativeDetails().getAddressLine2());
+        assertEquals("Rep-town", actual.getRepresentativeDetails().getTownCity());
+        assertEquals("Rep-county", actual.getRepresentativeDetails().getCounty());
+        assertEquals("TS3 3ST", actual.getRepresentativeDetails().getPostCode());
     }
 }
