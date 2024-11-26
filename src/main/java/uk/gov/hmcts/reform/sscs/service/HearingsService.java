@@ -262,7 +262,8 @@ public class HearingsService {
                 event, event.getDescription());
 
         try {
-            Consumer<SscsCaseDetails> caseDataConsumer = hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(response, hearingRequestId);
+            boolean isUpdateHearing = HearingState.UPDATE_HEARING.equals(wrapper.getHearingState()) ? true : false;
+            Consumer<SscsCaseDetails> caseDataConsumer = hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(response, hearingRequestId, isUpdateHearing);
 
             updateCcdCaseService.updateCaseV2(
                     Long.parseLong(caseId),
