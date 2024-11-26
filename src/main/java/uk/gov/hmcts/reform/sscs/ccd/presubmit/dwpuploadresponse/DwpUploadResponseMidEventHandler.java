@@ -81,7 +81,6 @@ public class DwpUploadResponseMidEventHandler implements PreSubmitCallbackHandle
                                      PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
 
         Benefit benefit = Benefit.getBenefitByCodeOrThrowException(sscsCaseData.getAppeal().getBenefitType().getCode());
-        System.out.println(!IBCA_BENEFIT_CODE.equals(benefit.getBenefitCode()));
         if (!IBCA_BENEFIT_CODE.equals(benefit.getBenefitCode()) && IBCA_BENEFIT_CODE.equals(sscsCaseData.getBenefitCode())) {
             preSubmitCallbackResponse.addError("Please choose a valid benefit code");
         }
