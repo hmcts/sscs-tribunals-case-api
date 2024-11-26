@@ -303,6 +303,11 @@ public abstract class AbstractFunctionalTest {
         simulateCcdCallback(eventType, callbackJsonName);
     }
 
+    protected void simulateCcdCallbackToSendLetter(NotificationEventType eventType) throws IOException {
+        String callbackJsonName = BASE_PATH_TYAN + "actionPostponementRequestCallback.json";
+        simulateCcdCallback(eventType, callbackJsonName);
+    }
+
     public void simulateCcdCallback(NotificationEventType eventType, String resource) throws IOException {
         final String callbackUrl = getEnvOrEmpty("TEST_URL") + "/sendNotification";
 

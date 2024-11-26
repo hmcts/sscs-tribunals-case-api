@@ -29,21 +29,18 @@ public class DocmosisGovNotifyLettersFT extends AbstractFunctionalTest {
     @SneakyThrows
     @Test
     public void shouldSendDocmosisLettersViaGovNotify() {
-        DOCMOSIS_LETTERS.stream()
-                .filter(notificationEventType ->
-                        !DOCMOSIS_LETTERS_WITH_NO_TEST_CALLBACK.contains(notificationEventType))
-                .forEach(notificationEventType -> {
-                    try {
-                        simulateCcdCallback(notificationEventType);
-                        List<Notification> notifications = fetchLetters();
-                        saveLetterPdfs(notifications);
-                        assertThat(notifications)
-                                .extracting(Notification::getSubject)
-                                .allSatisfy(subject -> assertThat(subject).isPresent());
+        DOCMOSIS_LETTERS.forEach(notificationEventType -> {
+            try {
+                simulateCcdCallbackToSendLetter(notificationEventType);
+                List<Notification> notifications = fetchLetters();
+                saveLetterPdfs(notifications);
+                assertThat(notifications)
+                        .extracting(Notification::getSubject)
+                        .allSatisfy(subject -> assertThat(subject).isPresent());
 
-                    } catch (IOException | NotificationClientException e) {
-                        logFailedEventNotification(notificationEventType, e);
-                    }
-                });
+            } catch (IOException | NotificationClientException e) {
+                logFailedEventNotification(notificationEventType, e);
+            }
+        });
     }
 }
