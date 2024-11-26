@@ -59,6 +59,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.PermissionToAppealActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -427,6 +428,14 @@ public class SscsUtil {
         return new DynamicList(null, items);
     }
 
+    public static DynamicListItem getPortOfEntryFromCode(String locationCode) {
+        return Arrays.stream(UkPortOfEntry.values())
+            .filter(ukPortOfEntry -> ukPortOfEntry.getLocationCode().equals(locationCode))
+            .findFirst()
+            .map(ukPortOfEntry -> new DynamicListItem(ukPortOfEntry.getLocationCode(), ukPortOfEntry.getLabel()))
+            .orElseGet(() -> new DynamicListItem(null, null));
+    }
+
     public static DynamicList getBenefitDescriptions(boolean isInfectedBloodCompensationEnabled) {
         List<DynamicListItem> items = Arrays.stream(Benefit.values())
                 .filter(benefit -> isInfectedBloodCompensationEnabled || !benefit.getShortName().equals("infectedBloodCompensation"))
@@ -476,6 +485,13 @@ public class SscsUtil {
     public static void handleIbcaCase(SscsCaseData caseData) {
         caseData.getAppeal().getHearingOptions().setHearingRoute(LIST_ASSIST);
         caseData.getAppeal().getMrnDetails().setDwpIssuingOffice("IBCA");
+        if (caseData.getRegionalProcessingCenter() != null) {
+            RegionalProcessingCenter listAssistRegionalProcessingCenter = caseData.getRegionalProcessingCenter()
+                .toBuilder()
+                .hearingRoute(LIST_ASSIST)
+                .build();
+            caseData.setRegionalProcessingCenter(listAssistRegionalProcessingCenter);
+        }
     }
 
     public static String generateUniqueIbcaId(Appellant appellant) {
@@ -608,7 +624,5 @@ public class SscsUtil {
             }
         }
     }
-
-
 }
 
