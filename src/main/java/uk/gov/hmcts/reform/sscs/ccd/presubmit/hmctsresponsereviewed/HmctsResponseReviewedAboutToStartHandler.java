@@ -9,7 +9,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_RESPONSE
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.UCB;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_TCW;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isIbcaCase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,7 +59,7 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
         setDwpDocuments(sscsCaseData);
         setSelectWhoReviewsCase(sscsCaseData);
 
-        if (isIbcaCase(sscsCaseData)) {
+        if (sscsCaseData.isIbcCase()) {
             final String benefitCode = sscsCaseData.getBenefitCode();
             sscsCaseData.setBenefitCodeIbcaOnly(benefitCode);
 

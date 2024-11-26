@@ -5,7 +5,6 @@ import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.PHE_REQUEST;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isIbcaCase;
 
 import java.time.format.DateTimeFormatter;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +53,7 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse =
             new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (isIbcaCase(sscsCaseData)) {
+        if (sscsCaseData.isIbcCase()) {
             final String benefitCode = sscsCaseData.getBenefitCodeIbcaOnly();
             sscsCaseData.setBenefitCode(benefitCode);
 

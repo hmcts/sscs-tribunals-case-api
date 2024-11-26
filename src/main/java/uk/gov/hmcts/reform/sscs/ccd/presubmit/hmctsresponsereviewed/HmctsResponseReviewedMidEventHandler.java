@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isIbcaCase;
 
 import java.util.Objects;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -23,7 +22,7 @@ public class HmctsResponseReviewedMidEventHandler implements PreSubmitCallbackHa
                 && callback.getEvent() == EventType.HMCTS_RESPONSE_REVIEWED
                 && Objects.nonNull(callback.getCaseDetails())
                 && Objects.nonNull(callback.getCaseDetails().getCaseData())
-                && isIbcaCase(callback.getCaseDetails().getCaseData());
+                && callback.getCaseDetails().getCaseData().isIbcCase();
     }
 
     @Override
