@@ -76,7 +76,8 @@ def secrets = [
     's2s-${env}': [
         secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
         secret('microservicekey-ccd-data', 'CCD_DATA_STORE_S2S_SECRET'),
-        secret('microservicekey-ccd-definition', 'CCD_DEFINITION_STORE_S2S_SECRET')
+        secret('microservicekey-ccd-definition', 'CCD_DEFINITION_STORE_S2S_SECRET'),
+        secret('microservicekey-ccd-admin', 'ADMIN_S2S_KEY')
     ],
     'ccd-${env}': [
         secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_IDAM_CLIENT_SECRET'),
@@ -111,7 +112,7 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
   ]
 }
 
-def branchesToSync = ['demo', 'ithc', 'perftest']
+def branchesToSync = ['ithc', 'perftest']
 
 withPipeline(type, product, component) {
     def githubApi = new GithubAPI(this)
