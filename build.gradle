@@ -74,7 +74,7 @@ sourceSets {
         java {
             compileClasspath += main.output + test.output
             runtimeClasspath += main.output + test.output
-            srcDir('src/functionalTest/java')
+            srcDir('src/functionalTest/java/uk/gov/hmcts/reform/sscs/functional/tyanotifications/sya/notifications')
         }
     }
     contractTest {
