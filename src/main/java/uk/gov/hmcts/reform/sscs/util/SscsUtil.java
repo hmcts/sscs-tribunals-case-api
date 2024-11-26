@@ -8,8 +8,14 @@ import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
-import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.FACE_TO_FACE;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.NOT_ATTENDING;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.TELEPHONE;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.VIDEO;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -25,7 +31,45 @@ import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCasePanelMembersExcluded;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.JudicialUserPanel;
+import uk.gov.hmcts.reform.sscs.ccd.domain.LibertyToApplyActions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PermissionToAppealActions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFinalDecisionCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
@@ -39,6 +83,8 @@ public class SscsUtil {
 
     public static final String INVALID_BENEFIT_ISSUE_CODE = "Incorrect benefit/issue code combination";
     public static final String BENEFIT_CODE_NOT_IN_USE = "The benefit code selected is not in use";
+
+    private static final String ID_FORMAT = "%s_%s";
 
     private SscsUtil() {
         //
@@ -373,6 +419,23 @@ public class SscsUtil {
         return false;
     }
 
+    public static DynamicList getPortsOfEntry() {
+        List<DynamicListItem> items = Arrays.stream(UkPortOfEntry.values())
+                .sorted(Comparator.comparing(UkPortOfEntry::getLabel))
+                .map(ukPortOfEntry -> new DynamicListItem(ukPortOfEntry.getLocationCode(), ukPortOfEntry.getLabel()))
+                .toList();
+
+        return new DynamicList(null, items);
+    }
+
+    public static DynamicListItem getPortOfEntryFromCode(String locationCode) {
+        return Arrays.stream(UkPortOfEntry.values())
+            .filter(ukPortOfEntry -> ukPortOfEntry.getLocationCode().equals(locationCode))
+            .findFirst()
+            .map(ukPortOfEntry -> new DynamicListItem(ukPortOfEntry.getLocationCode(), ukPortOfEntry.getLabel()))
+            .orElseGet(() -> new DynamicListItem(null, null));
+    }
+
     public static DynamicList getBenefitDescriptions(boolean isInfectedBloodCompensationEnabled) {
         List<DynamicListItem> items = Arrays.stream(Benefit.values())
                 .filter(benefit -> isInfectedBloodCompensationEnabled || !benefit.getShortName().equals("infectedBloodCompensation"))
@@ -417,6 +480,24 @@ public class SscsUtil {
         benefitType.setDescription(benefit.getDescription());
         benefitType.setDescriptionSelection(null);
         caseData.setBenefitCode(code);
+    }
+
+    public static void handleIbcaCase(SscsCaseData caseData) {
+        caseData.getAppeal().getHearingOptions().setHearingRoute(LIST_ASSIST);
+        caseData.getAppeal().getMrnDetails().setDwpIssuingOffice("IBCA");
+        if (caseData.getRegionalProcessingCenter() != null) {
+            RegionalProcessingCenter listAssistRegionalProcessingCenter = caseData.getRegionalProcessingCenter()
+                .toBuilder()
+                .hearingRoute(LIST_ASSIST)
+                .build();
+            caseData.setRegionalProcessingCenter(listAssistRegionalProcessingCenter);
+        }
+    }
+
+    public static String generateUniqueIbcaId(Appellant appellant) {
+        String appellantLastName = appellant.getName().getLastName();
+        String ibcaReference = appellant.getIdentity().getIbcaReference();
+        return String.format(ID_FORMAT, appellantLastName, ibcaReference);
     }
 
     public static void updateHearingChannel(SscsCaseData caseData, HearingChannel hearingChannel) {

@@ -6,12 +6,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.UNREGISTERED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SENT_TO_DWP;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Consumer;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 import junitparams.JUnitParamsRunner;
@@ -33,7 +36,9 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
+import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
+import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -118,11 +123,14 @@ public class EvidenceShareServiceIt {
     @Autowired
     private PdfStoreService pdfStoreService;
 
+    @Autowired
+    private SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer;
+
     @Captor
     ArgumentCaptor<ArrayList<Pdf>> documentCaptor;
 
     @Captor
-    private ArgumentCaptor<SscsCaseData> caseDataCaptor;
+    private ArgumentCaptor<Consumer<SscsCaseDetails>> consumerArgumentCaptor;
 
     @MockBean
     protected AirLookupService airLookupService;
@@ -159,11 +167,14 @@ public class EvidenceShareServiceIt {
         json = json.replace("CCD_EVENT_ID", "validAppealCreated");
         json = json.replace("CREATED_IN_GAPS_FROM", "readyToList");
 
-        when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any())).thenReturn(SscsCaseDetails.builder().build());
+        when(updateCcdCaseService.updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any(), any())).thenReturn(SscsCaseDetails.builder().build());
 
         topicConsumer.onMessage(json, "1");
 
-        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any());
+        verify(updateCcdCaseService).updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any(), consumerArgumentCaptor.capture());
+
+        SscsCaseData sscsCaseData = verifySscsCaseData(json);
+        assertEquals(UNREGISTERED, sscsCaseData.getDwpState());
     }
 
     @Test
@@ -176,11 +187,13 @@ public class EvidenceShareServiceIt {
         json = json.replace("CCD_EVENT_ID", "validAppealCreated");
         json = json.replace("CREATED_IN_GAPS_FROM", "readyToList");
 
-        when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any())).thenReturn(SscsCaseDetails.builder().build());
+        when(updateCcdCaseService.updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any(), any())).thenReturn(SscsCaseDetails.builder().build());
 
         topicConsumer.onMessage(json, "1");
 
-        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any());
+        verify(updateCcdCaseService).updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any(), consumerArgumentCaptor.capture());
+        SscsCaseData sscsCaseData = verifySscsCaseData(json);
+        assertEquals(UNREGISTERED, sscsCaseData.getDwpState());
     }
 
     @Test
@@ -206,7 +219,7 @@ public class EvidenceShareServiceIt {
         when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any())).thenReturn(expectedOptionalUuid);
 
         String documentList = "Case has been sent to the FTA via Bulk Print with bulk print id: 0f14d0ab-9605-4a62-a9e4-5ed26688389b and with documents: dl16-12345656789.pdf, sscs1.pdf, filename1.pdf";
-        when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any())).thenReturn(SscsCaseDetails.builder().build());
+        when(updateCcdCaseService.updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq(documentList), any(), any())).thenReturn(SscsCaseDetails.builder().build());
 
         topicConsumer.onMessage(json, "1");
 
@@ -221,7 +234,9 @@ public class EvidenceShareServiceIt {
         verify(bulkPrintService).sendToBulkPrint(any(), any(), any());
         verify(emailService).sendEmail(anyLong(), any());
 
-        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any());
+        verify(updateCcdCaseService).updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq(documentList), any(), consumerArgumentCaptor.capture());
+
+        verifySscsCaseData(json);
     }
 
     @Test
@@ -246,7 +261,7 @@ public class EvidenceShareServiceIt {
         when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any())).thenReturn(expectedOptionalUuid);
 
         String documentList = "Case has been sent to the FTA via Bulk Print with bulk print id: 0f14d0ab-9605-4a62-a9e4-5ed26688389b and with documents: dl16-12345656789.pdf, sscs1.pdf, filename1.pdf";
-        when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any())).thenReturn(SscsCaseDetails.builder().build());
+        when(updateCcdCaseService.updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq(documentList), any(), any())).thenReturn(SscsCaseDetails.builder().build());
 
         topicConsumer.onMessage(json, "1");
 
@@ -261,7 +276,9 @@ public class EvidenceShareServiceIt {
         verify(bulkPrintService).sendToBulkPrint(any(), any(), any());
         verify(emailService).sendEmail(anyLong(), any());
 
-        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any());
+        verify(updateCcdCaseService).updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq(documentList), any(), consumerArgumentCaptor.capture());
+
+        verifySscsCaseData(json);
     }
 
     @Test
@@ -278,8 +295,7 @@ public class EvidenceShareServiceIt {
 
         verify(emailService).sendEmail(anyLong(), any());
 
-        verify(ccdService).updateCase(caseDataCaptor.capture(), any(), eq(EventType.CASE_UPDATED.getCcdType()), any(), any(), any());
-        assertEquals("DWP PIP (2)", caseDataCaptor.getValue().getAppeal().getMrnDetails().getDwpIssuingOffice());
+        verify(updateCcdCaseService).updateCaseV2(any(), eq(EventType.CASE_UPDATED.getCcdType()), any(), any(), any(), any());
     }
 
     @Test
@@ -290,15 +306,17 @@ public class EvidenceShareServiceIt {
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = json.replace("CREATED_IN_GAPS_FROM", "validAppeal");
 
-        ArgumentCaptor<SscsCaseData> caseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
-
         topicConsumer.onMessage(json, "1");
 
-        then(ccdService)
+        then(updateCcdCaseService)
             .should(times(1))
-            .updateCase(caseDataCaptor.capture(), any(), eq("sendToDwpError"), any(), any(), any());
-        assertNull(caseDataCaptor.getValue().getAppeal().getMrnDetails().getMrnDate());
-        assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
+            .updateCaseV2(any(), eq("sendToDwpError"), any(), any(), any(), consumerArgumentCaptor.capture());
+        Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
+        SscsCaseData sscsCaseData = sscsCaseDataCallback.getCaseDetails().getCaseData();
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+        assertNull(sscsCaseData.getAppeal().getMrnDetails().getMrnDate());
+        assertEquals("failedSending", sscsCaseData.getHmctsDwpState());
 
         verifyNoMoreInteractions(restTemplate);
         verifyNoMoreInteractions(evidenceManagementService);
@@ -317,7 +335,10 @@ public class EvidenceShareServiceIt {
 
         verifyNoMoreInteractions(restTemplate);
         verifyNoMoreInteractions(evidenceManagementService);
-        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any());
+        verify(updateCcdCaseService).updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any(), consumerArgumentCaptor.capture());
+
+        verifySscsCaseData(json);
+
         verify(emailService).sendEmail(anyLong(), any());
     }
 
@@ -332,7 +353,11 @@ public class EvidenceShareServiceIt {
 
         verifyNoMoreInteractions(restTemplate);
         verifyNoMoreInteractions(evidenceManagementService);
-        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any());
+        verify(updateCcdCaseService).updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any(), consumerArgumentCaptor.capture());
+
+        SscsCaseData sscsCaseData = verifySscsCaseData(json);
+        assertEquals(UNREGISTERED, sscsCaseData.getDwpState());
+
         verifyNoMoreInteractions(emailService);
     }
 
@@ -377,5 +402,16 @@ public class EvidenceShareServiceIt {
         uk.gov.hmcts.reform.ccd.document.am.model.Document document = uk.gov.hmcts.reform.ccd.document.am.model.Document.builder().links(links).build();
 
         return document;
+    }
+
+    private SscsCaseData verifySscsCaseData(String json) {
+        Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
+        SscsCaseData sscsCaseData = sscsCaseDataCallback.getCaseDetails().getCaseData();
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+        assertEquals(SENT_TO_DWP.getCcdType(), sscsCaseData.getHmctsDwpState());
+        assertNotNull(sscsCaseData.getDateSentToDwp());
+        assertNotNull(sscsCaseData.getDwpDueDate());
+        return sscsCaseData;
     }
 }

@@ -38,6 +38,11 @@ public class AppConstants {
     public static final String DWP_DOCUMENT_EDITED_EVIDENCE_FILENAME_PREFIX = "FTA edited evidence received";
     public static final String DATE_FORMAT_YYYYMMDD = "yyyy-MM-dd";
 
+    public static final String IBCA_BENEFIT_CODE = "093";
+    public static final String INFECTED_BLOOD_COMPENSATION = "infectedBloodCompensation";
+    public static final int FUNCTIONAL_FETCH_ATTEMPTS = 5;
+    public static final int FUNCTIONAL_RETRY_LIMIT = 3;
+
     private AppConstants() {
         //
     }

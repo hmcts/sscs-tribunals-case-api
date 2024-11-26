@@ -14,6 +14,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.CTSC_CLERK;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -1044,6 +1045,19 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
+    void givenIbaCaseAndIbcaReferenceEmpty_thenAddWarningMessages() {
+        DynamicListItem item = new DynamicListItem("093", "Infected Blood Appeal");
+        callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(new BenefitType("093", "Infected Blood Appeal", new DynamicList(item, null)));
+        callback.getCaseDetails().getCaseData().getAppeal().setMrnDetails(MrnDetails.builder().build());
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder().build());
+        callback.getCaseDetails().getCaseData().setRegionalProcessingCenter(RegionalProcessingCenter.builder().build());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getWarnings().size());
+        assertThat(response.getWarnings(), hasItems("IBCA Reference Number has not been provided for the Appellant, do you want to ignore this warning and proceed?"));
+    }
+
+    @Test
     void givenInvalidBenefitTypeAndDwpIssuingOfficeEmpty_thenAddWarningMessages() {
         callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("INVALID").build());
         callback.getCaseDetails().getCaseData().getAppeal().setMrnDetails(MrnDetails.builder().build());
@@ -1841,5 +1855,21 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
         String language = sscsCaseData.getAppeal().getHearingOptions().getLanguages();
 
         assertEquals(language, item.getLabel());
+    }
+
+    @Test
+    void shouldSuccessfullyUpdateCaseWithIbcaBenefitType() {
+        sscsCaseData.setBenefitCode(IBCA_BENEFIT_CODE);
+        sscsCaseData.getAppeal().getAppellant().getIdentity().setIbcaReference("IBCA12345");
+        sscsCaseData.getAppeal().getAppellant().getAddress().setInMainlandUk(NO);
+        sscsCaseData.getAppeal().getAppellant().getAddress().setPortOfEntry("GB000434");
+
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().build());
+        sscsCaseData.getAppeal().setMrnDetails(MrnDetails.builder().build());
+        sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder().build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
     }
 }

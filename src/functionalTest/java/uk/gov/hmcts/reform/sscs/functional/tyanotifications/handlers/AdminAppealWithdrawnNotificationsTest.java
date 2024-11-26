@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.functional.tyanotifications.handlers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.FUNCTIONAL_FETCH_ATTEMPTS;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADMIN_APPEAL_WITHDRAWN;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.CASE_UPDATED;
 
@@ -11,7 +12,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import junitparams.Parameters;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Timeout;
@@ -30,9 +30,8 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
     @Rule
     public Retry retry = new Retry(0);
 
-    //Test method runs three times and in worst case it needs 90 seconds waiting time.
     @Rule
-    public Timeout globalTimeout = Timeout.seconds(100);
+    public Timeout globalTimeout = Timeout.seconds(90);
 
     @Before
     public void setUp() {
@@ -40,7 +39,6 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
     }
 
     @Test
-    @Ignore
     @Parameters({
         "Appellant, 8620e023-f663-477e-a771-9cfad50ee30f, 446c7b23-7342-42e1-adff-b4c367e951cb, 1, 1, 1",
         "Appointee, 8620e023-f663-477e-a771-9cfad50ee30f, 446c7b23-7342-42e1-adff-b4c367e951cb, 1, 1, 1",
@@ -66,12 +64,15 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
     }
 
     private boolean fetchLetters(int expectedNumLetters, String subscription) {
+        int fetchCount = 0;
         do {
             if (getNumberOfLetterCorrespondence(subscription) == expectedNumLetters) {
                 return true;
             }
-            delayInSeconds(10);
-        } while (true);
+            fetchCount++;
+            delayInSeconds(5);
+        } while (fetchCount < FUNCTIONAL_FETCH_ATTEMPTS);
+        return false;
     }
 
     private void initialiseCcdCase() {
