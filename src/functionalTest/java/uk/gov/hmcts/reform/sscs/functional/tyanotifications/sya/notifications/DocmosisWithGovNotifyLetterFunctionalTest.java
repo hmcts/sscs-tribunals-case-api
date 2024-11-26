@@ -24,7 +24,7 @@ public class DocmosisWithGovNotifyLetterFunctionalTest extends AbstractFunctiona
 
     public static final String EXPECTED_LETTER_SUBJECT = "Pre-compiled PDF";
     //TODO: Add callback jsons for these letters to test them functionally
-    private static final Set<NotificationEventType> DOCMOSIS_LETTERS_WITH_NO_TEST_CALLBACK = EnumSet.of(
+    static final Set<NotificationEventType> DOCMOSIS_LETTERS_WITH_NO_TEST_CALLBACK = EnumSet.of(
         ACTION_HEARING_RECORDING_REQUEST,
         ACTION_POSTPONEMENT_REQUEST_WELSH,
         ADMIN_APPEAL_WITHDRAWN,

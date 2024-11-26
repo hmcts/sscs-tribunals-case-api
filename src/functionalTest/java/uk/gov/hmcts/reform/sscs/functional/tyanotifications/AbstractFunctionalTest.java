@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.functional.tyanotifications;
 
 import static helper.EnvironmentProfileValueSource.getEnvOrEmpty;
-import static java.time.LocalTime.now;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toSet;
 import static junit.framework.TestCase.fail;
@@ -21,7 +20,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -266,27 +264,30 @@ public abstract class AbstractFunctionalTest {
         return allNotifications;
     }
 
-    public List<Notification> saveLetterPdfs(List<Notification> notifications) {
-        LocalTime start = LocalTime.now();
-        notifications.stream()
+    public List<String> saveLetterPdfs(List<Notification> notifications) {
+        int maxSecondsToWaitForPdf = 60;
+        List<String> savedNotifications = new ArrayList<>();
+
+        while (notifications.size() > savedNotifications.size() && maxSecondsToWaitForPdf > 0) {
+            notifications.stream()
                 .filter(notification -> notification.getNotificationType().equals("letter"))
+                .filter(notification -> !savedNotifications.contains(String.valueOf(notification.getId())))
                 .forEach(notification -> {
                     try {
                         final byte[] pdfForLetter = client.getPdfForLetter(String.valueOf(notification.getId()));
                         FileUtils.writeByteArrayToFile(
-                                new File("ft_docmosis_letters/" + notification.getId() + ".pdf"),
-                                pdfForLetter
+                            new File("ft_docmosis_letters/" + notification.getId() + ".pdf"),
+                            pdfForLetter
                         );
-                        notifications.remove(notification);
+                        savedNotifications.add(String.valueOf(notification.getId()));
                     } catch (NotificationClientException | IOException e) {
-                        if (now().isAfter(start.plusSeconds(60))) {
-                            log.error("Failed to save all letter pdfs, {} remain unsaved", notifications.size());
-                            throw new RuntimeException("Timeout reached before saving all letter pdfs", e);
-                        }
-                        delayInSeconds(5);
+                        log.error("Failed to save all letter pdfs, {} remain unsaved", notifications.size());
                     }
                 });
-        return notifications;
+            maxSecondsToWaitForPdf -= 10;
+            delayInSeconds(10);
+        }
+        return savedNotifications;
     }
 
     protected void simulateWelshCcdCallback(NotificationEventType eventType) throws IOException {
