@@ -581,7 +581,6 @@ redis:
       enabled: false
 
 
-
 #Enable for queues/topics
 #If you need a subscription for a topic, topic name should be not longer than 10 characters
 servicebus:
