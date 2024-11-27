@@ -37,17 +37,17 @@ public class DocmosisGovNotifyLettersFT extends AbstractNotificationsFT {
     @ParameterizedTest
     @MethodSource("notificationEventTypesProvider")
     public void shouldSendDocmosisLettersViaGovNotify(NotificationEventType notificationEventType) {
-            try {
-                simulateCcdCallbackToSendLetter(notificationEventType);
-                List<Notification> notifications = fetchLetters();
-                saveLetterPdfs(notifications);
-                assertThat(notifications)
-                        .extracting(Notification::getSubject)
-                        .allSatisfy(subject -> assertThat(subject).isPresent());
+        try {
+            simulateCcdCallbackToSendLetter(notificationEventType);
+            List<Notification> notifications = fetchLetters();
+            saveLetterPdfs(notifications);
+            assertThat(notifications)
+                    .extracting(Notification::getSubject)
+                    .allSatisfy(subject -> assertThat(subject).isPresent());
 
-            } catch (IOException | NotificationClientException e) {
-                logFailedEventNotification(notificationEventType, e);
-            }
+        } catch (IOException | NotificationClientException e) {
+            logFailedEventNotification(notificationEventType, e);
+        }
     }
 
     private static Set<NotificationEventType> notificationEventTypesProvider() {
