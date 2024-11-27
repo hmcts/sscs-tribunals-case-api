@@ -307,9 +307,9 @@ public abstract class SubmitAppealServiceBase {
         }
     }
 
-    private String resolvePostCode(SyaCaseWrapper appeal, boolean isIba) {
+    private String resolvePostCode(SyaCaseWrapper appeal, boolean isIbc) {
         Boolean inMainlandUk = appeal.getContactDetails().getInMainlandUk();
-        if (isIba && inMainlandUk != null && inMainlandUk.equals(Boolean.FALSE)) {
+        if (isIbc && inMainlandUk != null && inMainlandUk.equals(Boolean.FALSE)) {
             return appeal.getAppellant().getContactDetails().getPortOfEntry();
         } else if (Boolean.TRUE.equals(appeal.getIsAppointee())) {
             return Optional.ofNullable(appeal.getAppointee())
