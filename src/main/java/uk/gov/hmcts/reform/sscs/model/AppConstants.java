@@ -42,6 +42,8 @@ public class AppConstants {
     public static final List<String> BENEFIT_CODES_FOR_ISSUE_AND_SEND_TO_ADMIN = List.of("093", "016", "022");
     public static final String IBCA_BENEFIT_CODE = "093";
     public static final String INFECTED_BLOOD_COMPENSATION = "infectedBloodCompensation";
+    public static final int FUNCTIONAL_FETCH_ATTEMPTS = 5;
+    public static final int FUNCTIONAL_RETRY_LIMIT = 3;
 
     private AppConstants() {
         //

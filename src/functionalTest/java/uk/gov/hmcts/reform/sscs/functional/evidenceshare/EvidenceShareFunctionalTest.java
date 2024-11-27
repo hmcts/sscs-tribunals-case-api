@@ -47,7 +47,8 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         assertEquals("dl6-" + ccdCaseId + ".pdf", docs.get(0).getValue().getDocumentFileName());
         assertEquals("withDwp", caseDetails.getState());
         assertEquals(LocalDate.now().toString(), caseData.getDateSentToDwp());
-        assertEquals(LocalDate.now().toString(), caseData.getDateCaseSentToGaps());
+        //since the SUBMITTED callback no longer contains the updated caseData, the dateCaseSentToGaps will not be present
+        //better to test that in the UTs
     }
 
     @Test
