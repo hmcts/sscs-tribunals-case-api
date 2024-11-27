@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.model;
 
 import java.util.List;
+import java.util.Objects;
 
 public class AppConstants {
 
@@ -39,7 +40,7 @@ public class AppConstants {
     public static final String DWP_DOCUMENT_EDITED_RESPONSE_FILENAME_PREFIX = "FTA edited response received";
     public static final String DWP_DOCUMENT_EDITED_EVIDENCE_FILENAME_PREFIX = "FTA edited evidence received";
     public static final String DATE_FORMAT_YYYYMMDD = "yyyy-MM-dd";
-    public static final List<String> BENEFIT_CODES_FOR_ISSUE_AND_SEND_TO_ADMIN = List.of("093", "016", "022");
+    public static final List<String> BENEFIT_CODES_FOR_ISSUE_AND_SEND_TO_ADMIN = Objects.equals(System.getenv("INFECTED_BLOOD_COMPENSATION_ENABLED"), "true") ? List.of("093", "016", "022") : List.of("093");
     public static final String IBCA_BENEFIT_CODE = "093";
     public static final String INFECTED_BLOOD_COMPENSATION = "infectedBloodCompensation";
     public static final int FUNCTIONAL_FETCH_ATTEMPTS = 5;
