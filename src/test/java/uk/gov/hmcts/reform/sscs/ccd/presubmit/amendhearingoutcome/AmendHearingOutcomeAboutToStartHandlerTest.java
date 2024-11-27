@@ -61,7 +61,7 @@ public class AmendHearingOutcomeAboutToStartHandlerTest {
         sscsCaseData.setHearingOutcomes(null);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_START,callback,USER_AUTHORISATION);
         assertThat(response.getErrors()).isNotEmpty();
-        assertThat(response.getErrors()).contains("There are no hearing outcomes on the case.");
+        assertThat(response.getErrors()).contains("There are no hearing outcomes recorded on the case. Please add a hearing outcome using 'Add a Hearing Outcome' event");
     }
 
 }

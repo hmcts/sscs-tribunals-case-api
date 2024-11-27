@@ -31,7 +31,7 @@ public class AmendHearingOutcomeAboutToStartHandler implements PreSubmitCallback
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         if (sscsCaseData.getHearingOutcomes() == null) {
-            preSubmitCallbackResponse.addError("There are no hearing outcomes on the case.");
+            preSubmitCallbackResponse.addError("There are no hearing outcomes recorded on the case. Please add a hearing outcome using 'Add a Hearing Outcome' event");
         }
 
         return preSubmitCallbackResponse;
