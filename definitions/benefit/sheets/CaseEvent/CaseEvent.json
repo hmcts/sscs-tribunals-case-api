@@ -2263,7 +2263,7 @@
     "DisplayOrder": 1650,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
-    "EventEnablingCondition": "appeal.benefitType.code=\"childSupport\" OR appeal.benefitType.code=\"taxCredit\" OR appeal.benefitType.code=\"guardiansAllowance\" OR appeal.benefitType.code=\"taxFreeChildcare\" OR appeal.benefitType.code=\"homeResponsibilitiesProtection\" OR appeal.benefitType.code=\"childBenefit\" OR appeal.benefitType.code=\"thirtyHoursFreeChildcare\" OR appeal.benefitType.code=\"guaranteedMinimumPension\" OR appeal.benefitType.code=\"nationalInsuranceCredits\"",
+    "EventEnablingCondition": "appeal.benefitType.code=\"childSupport\" OR appeal.benefitType.code=\"taxCredit\" OR appeal.benefitType.code=\"guardiansAllowance\" OR appeal.benefitType.code=\"taxFreeChildcare\" OR appeal.benefitType.code=\"homeResponsibilitiesProtection\" OR appeal.benefitType.code=\"childBenefit\" OR appeal.benefitType.code=\"thirtyHoursFreeChildcare\" OR appeal.benefitType.code=\"guaranteedMinimumPension\" OR appeal.benefitType.code=\"nationalInsuranceCredits\" OR appeal.benefitType.code=\"infectedBloodCompensation\"",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "ShowEventNotes": "Y",
@@ -2952,6 +2952,18 @@
     "PostConditionState": "postHearing",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "23/11/2022",
+    "CaseTypeID": "Benefit",
+    "ID": "setHearingRoute",
+    "Name": "Set Hearing Route",
+    "Description": "Set Hearing Route",
+    "DisplayOrder": 500,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "EventEnablingCondition": "appeal.benefitType.code=\"infectedBloodCompensation\""
   },
   {
     "LiveFrom": "23/11/2022",
