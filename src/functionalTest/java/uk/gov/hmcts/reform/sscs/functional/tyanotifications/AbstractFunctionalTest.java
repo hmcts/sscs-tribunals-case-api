@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.functional.tyanotifications;
 
-import static helper.EnvironmentProfileValueSource.getEnvOrEmpty;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toSet;
 import static junit.framework.TestCase.fail;
@@ -73,6 +72,9 @@ public abstract class AbstractFunctionalTest {
     // Below rules are needed to use the junitParamsRunner together with SpringRunner
     @ClassRule
     public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
+    protected static final String BASE_URL =
+            System.getenv("TEST_URL") != null ? System.getenv("TEST_URL") : "http://localhost:8008";
+
     protected static final String BASE_PATH_TYAN = "tyanotifications/";
     @Rule
     public final SpringMethodRule springMethodRule = new SpringMethodRule();
@@ -118,7 +120,6 @@ public abstract class AbstractFunctionalTest {
 
     protected void createCase() {
         this.createCase(false);
-
     }
 
     protected void createCase(boolean isWelsh) {
@@ -251,50 +252,17 @@ public abstract class AbstractFunctionalTest {
         } while (true);
     }
 
-    protected void simulateCcdCallbackToSendLetter(NotificationEventType eventType) throws IOException {
-        String callbackJsonName = BASE_PATH_TYAN + "actionPostponementRequestCallback.json";
-        simulateCcdCallback(eventType, callbackJsonName);
-    }
-
     public List<Notification> fetchLetters() throws NotificationClientException {
-        List<Notification> allNotifications = new ArrayList<>();
+        List<Notification> allNotifications;
         allNotifications = client.getNotifications("", "letter", caseId.toString(), "").getNotifications();
         int secondsLeft = maxSecondsToWaitForNotification;
+
         while (allNotifications.size() == 0 && secondsLeft > 0) {
             delayInSeconds(5);
             secondsLeft -= 5;
             allNotifications = client.getNotifications("", "letter", caseId.toString(), "").getNotifications();
-
         }
         return allNotifications;
-    }
-
-    public List<UUID> saveLetterPdfs(List<Notification> notifications) {
-        List<UUID> savedLetters = new ArrayList<>();
-
-        while (notifications.size() > savedLetters.size()) {
-            notifications.stream()
-                .filter(notification -> notification.getNotificationType().equals("letter"))
-                .filter(notification -> !savedLetters.contains(notification.getId()))
-                .forEach(notification -> {
-                    try {
-                        final byte[] pdfForLetter = client.getPdfForLetter(String.valueOf(notification.getId()));
-                        FileUtils.writeByteArrayToFile(
-                            new File("ft_docmosis_letters/" + notification.getId() + ".pdf"),
-                            pdfForLetter
-                        );
-                        savedLetters.add(notification.getId());
-                    } catch (NotificationClientException | IOException e) {
-                        log.error("Failed to save all letter pdfs, {} remain unsaved", notifications.size());
-                    }
-                });
-            delayInSeconds(60);
-        }
-        return savedLetters;
-    }
-
-    public void logFailedEventNotification(NotificationEventType notificationType, Exception e) {
-        log.error("Failed testing notification type {} with the following", notificationType, e);
     }
 
     protected void simulateWelshCcdCallback(NotificationEventType eventType) throws IOException {
@@ -308,8 +276,7 @@ public abstract class AbstractFunctionalTest {
     }
 
     public void simulateCcdCallback(NotificationEventType eventType, String resource) throws IOException {
-        final String callbackUrl = getEnvOrEmpty("TEST_URL") + "/sendNotification";
-
+        final String callbackUrl = BASE_URL + "/sendNotification";
         String json;
         try {
             log.info("Getting file {}", resource);
@@ -335,9 +302,8 @@ public abstract class AbstractFunctionalTest {
             .statusCode(HttpStatus.OK.value());
     }
 
-    private String updateJson(String json, NotificationEventType eventType) {
+    public String updateJson(String json, NotificationEventType eventType) {
         json = json.replace("12345656789", caseId.toString());
-        json = json.replace("SC022/14/12423", caseReference);
         json = json.replace("SC022/14/12423", caseReference);
         json = json.replace("EVENT_TYPE", eventType.getId());
 

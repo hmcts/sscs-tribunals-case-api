@@ -706,5 +706,5 @@
     }
   },
   "case_details_before": null,
-  "event_id": "appealCreated"
+  "event_id": "event_id_value"
 }
