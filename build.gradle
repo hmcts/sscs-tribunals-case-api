@@ -74,7 +74,7 @@ sourceSets {
         java {
             compileClasspath += main.output + test.output
             runtimeClasspath += main.output + test.output
-            srcDir('src/functionalTest/java/uk/gov/hmcts/reform/sscs/functional/tyanotifications/sya/notifications')
+            srcDir('src/functionalTest/java')
         }
     }
     contractTest {
@@ -118,9 +118,19 @@ tasks.register('functional', Test) {
     maxParallelForks = Runtime.runtime.availableProcessors()
 }
 
+tasks.register('notifications', Test) {
+    group = 'Notification Tests'
+    description = 'Simulates CCD callbacks to generate notifications, then retrieves pdfs from Gov.Notify'
+    setTestClassesDirs(sourceSets.functionalTest.output.classesDirs)
+    setClasspath(sourceSets.functionalTest.runtimeClasspath)
+    include "uk/gov/hmcts/reform/sscs/notifications/**"
+    exclude "uk/gov/hmcts/reform/sscs/smoke/**"
+    maxParallelForks = Runtime.runtime.availableProcessors()
+}
+
 tasks.register('smoke', Test) {
     group = 'verification'
-    description = 'Executes non-destructive smoke tests against a running Tribual Case API'
+    description = 'Executes non-destructive smoke tests against a running Tribunal Case API'
     setTestClassesDirs(sourceSets.functionalTest.output.classesDirs)
     setClasspath(sourceSets.functionalTest.runtimeClasspath)
     include "uk/gov/hmcts/reform/sscs/smoke/**"
@@ -535,7 +545,6 @@ tasks.register('runAndPublishConsumerPactTests', Test) {
     logger.lifecycle("Runs pact Tests")
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
-
 }
 
 tasks.register('getSscsCommonVersion') {

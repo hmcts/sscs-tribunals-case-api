@@ -117,6 +117,7 @@ def branchesToSync = ['ithc', 'perftest']
 withPipeline(type, product, component) {
     def githubApi = new GithubAPI(this)
     def isHearingsPr = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:hearings").size() > 0;
+    def notificationTestsEnabled = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "run-notification-tests").size() > 0;
 
     if (!isHearingsPr) {
         enableHighLevelDataSetup()
@@ -185,11 +186,10 @@ withPipeline(type, product, component) {
     }
 
     afterSuccess('smoketest:preview') {
-        //runE2eTests() // Will revert before merging
-    }
-
-    afterAlways('functionalTest:preview') {
-        addDocmosisLettersToBuildArtifacts()
+        if (notificationTestsEnabled) {
+            runNotificationTests()
+        }
+        runE2eTests() // Will revert before merging
     }
 
     afterSuccess('smoketest:aat') {
@@ -197,8 +197,14 @@ withPipeline(type, product, component) {
     }
 }
 
-def addDocmosisLettersToBuildArtifacts() {
-    steps.archiveArtifacts artifacts: "ft_docmosis_letters/**"
+def runNotificationTests() {
+    try {
+        stage('Notification tests') {
+            sh './gradlew notifications'
+        }
+    } finally {
+        steps.archiveArtifacts artifacts: "notification_pdfs/**"
+    }
 }
 
 def generateDefinitions() {

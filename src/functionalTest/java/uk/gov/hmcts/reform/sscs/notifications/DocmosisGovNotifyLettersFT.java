@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.functional.tyanotifications.sya.notifications;
+package uk.gov.hmcts.reform.sscs.notifications;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists.DOCMOSIS_LETTERS;
