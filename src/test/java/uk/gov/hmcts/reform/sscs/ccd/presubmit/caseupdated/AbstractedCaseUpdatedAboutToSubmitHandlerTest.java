@@ -1045,6 +1045,19 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
+    void givenIbaCaseAndIbcaReferenceEmpty_thenAddWarningMessages() {
+        DynamicListItem item = new DynamicListItem("093", "Infected Blood Appeal");
+        callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(new BenefitType("093", "Infected Blood Appeal", new DynamicList(item, null)));
+        callback.getCaseDetails().getCaseData().getAppeal().setMrnDetails(MrnDetails.builder().build());
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder().build());
+        callback.getCaseDetails().getCaseData().setRegionalProcessingCenter(RegionalProcessingCenter.builder().build());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getWarnings().size());
+        assertThat(response.getWarnings(), hasItems("IBCA Reference Number has not been provided for the Appellant, do you want to ignore this warning and proceed?"));
+    }
+
+    @Test
     void givenInvalidBenefitTypeAndDwpIssuingOfficeEmpty_thenAddWarningMessages() {
         callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("INVALID").build());
         callback.getCaseDetails().getCaseData().getAppeal().setMrnDetails(MrnDetails.builder().build());
@@ -1853,6 +1866,7 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
 
         sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().build());
         sscsCaseData.getAppeal().setMrnDetails(MrnDetails.builder().build());
+        sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder().build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
