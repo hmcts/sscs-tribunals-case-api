@@ -30,6 +30,7 @@ export class UploadResponse extends BaseStep {
 
         let pipCaseId = await createCaseBasedOnCaseType("PIP");
         await this.uploadResponseWithFurtherInfoAsDwpCaseWorker(pipCaseId);
+        await this.homePage.clickSignOut();
 
         await this.loginUserWithCaseId(credentials.amCaseWorker, true, pipCaseId);
         await this.homePage.navigateToTab("Summary");

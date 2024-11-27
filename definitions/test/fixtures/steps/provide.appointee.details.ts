@@ -50,6 +50,7 @@ export class ProvideAppointeeDetails extends BaseStep {
         await this.eventNameAndDescriptionPage.inputData(eventTestData.eventSummaryInput,
             eventTestData.eventDescriptionInput);
         await this.eventNameAndDescriptionPage.confirmSubmission();
+        await this.homePage.clickSignOut();
 
 
         await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
