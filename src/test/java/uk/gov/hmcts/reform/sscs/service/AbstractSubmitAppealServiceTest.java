@@ -769,7 +769,7 @@ public abstract class AbstractSubmitAppealServiceTest {
     @Parameters(method = "generateDifferentRpcScenariosIba")
     public void givenAppellantPostCode_shouldSetRegionAndRpcCorrectlyIba(String expectedRpc, String appellantLocationCode) throws JsonProcessingException {
         RegionalProcessingCenter rpc = getRpcObjectForGivenJsonRpc(expectedRpc);
-        when(regionalProcessingCenterService.getByPostcode(appellantLocationCode))
+        when(regionalProcessingCenterService.getByPostcode(appellantLocationCode, true))
             .thenReturn(getRpcObjectForGivenJsonRpc(expectedRpc));
         when(airLookupService.lookupAirVenueNameByPostCode(eq(appellantLocationCode), any())).thenReturn(rpc.getCity());
         when(venueService.getEpimsIdForVenue(rpc.getCity())).thenReturn("1234");

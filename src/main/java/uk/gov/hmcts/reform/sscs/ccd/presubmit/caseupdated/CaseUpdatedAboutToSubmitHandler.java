@@ -17,7 +17,6 @@ import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isConfidential;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleBenefitType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleIbcaCase;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isIbcaCase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -167,7 +166,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                 || isNotBlank(appellant.getAddress().getPortOfEntry()))) {
 
             String postCode = resolvePostCode(sscsCaseData);
-            RegionalProcessingCenter newRpc = regionalProcessingCenterService.getByPostcode(postCode, isIbcaCase(sscsCaseData));
+            RegionalProcessingCenter newRpc = regionalProcessingCenterService.getByPostcode(postCode, sscsCaseData.isIbcCase());
 
             maybeChangeIsScottish(sscsCaseData.getRegionalProcessingCenter(), newRpc, sscsCaseData);
 

@@ -9,7 +9,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INTERLOC_VALID_APPEA
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NOT_LISTABLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.RESEND_CASE_TO_GAPS2;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isIbcaCase;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -172,7 +171,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
         // Updating the RPC also done on CASE_UPDATED in tribunals-api.
         // We should update the case details before sending robotics.
         if (sscsCaseData.getAppeal().getAppellant() != null && sscsCaseData.getAppeal().getAppellant().getAddress() != null && sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode() != null) {
-            RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode(), isIbcaCase(sscsCaseData));
+            RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode(), sscsCaseData.isIbcCase());
             sscsCaseData.setRegionalProcessingCenter(rpc);
 
             if (rpc != null) {

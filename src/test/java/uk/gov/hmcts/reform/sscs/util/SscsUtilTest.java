@@ -43,6 +43,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Correction;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
@@ -560,7 +561,7 @@ class SscsUtilTest {
                         .build()
                 )
                 .build();
-        assertTrue(isIbcaCase(sscsCaseData));
+        assertTrue(sscsCaseData.isIbcCase());
     }
 
     @Test
@@ -583,6 +584,6 @@ class SscsUtilTest {
                         .build()
                 )
                 .build();
-        assertFalse(isIbcaCase(sscsCaseData));
+        assertFalse(sscsCaseData.isIbcCase());
     }
 }

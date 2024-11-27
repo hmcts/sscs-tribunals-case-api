@@ -6,7 +6,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing.PAPER
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.LocationType.COURT;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isIbcaCase;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -79,7 +78,7 @@ public final class HearingsLocationMapping {
     private static List<HearingLocation> getPaperCaseLocations(SscsCaseData caseData, ReferenceDataServiceHolder refData) throws ListingException {
         if (HearingChannelUtil.isPaperCase(caseData)) {
             RegionalProcessingCenter rpc = caseData.getRegionalProcessingCenter();
-            validatedRpc(rpc, refData, isIbcaCase(caseData));
+            validatedRpc(rpc, refData, caseData.isIbcCase());
 
             List<VenueDetails> venueDetailsList = refData
                     .getVenueService()
@@ -125,7 +124,7 @@ public final class HearingsLocationMapping {
             VenueService venueService = refData.getVenueService();
             if (PAPER.equals(adjournment.getTypeOfNextHearing())) {
                 RegionalProcessingCenter rpc = caseData.getRegionalProcessingCenter();
-                validatedRpc(rpc, refData, isIbcaCase(caseData));
+                validatedRpc(rpc, refData, caseData.isIbcCase());
 
                 List<VenueDetails> paperVenues = venueService.getActiveRegionalEpimsIdsForRpc(rpc.getEpimsId());
 

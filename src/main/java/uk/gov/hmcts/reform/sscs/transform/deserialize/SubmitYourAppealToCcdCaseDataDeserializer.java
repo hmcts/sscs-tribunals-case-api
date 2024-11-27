@@ -186,10 +186,10 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static Appeal getAppeal(SyaCaseWrapper syaCaseWrapper) {
-        boolean isIba = syaCaseWrapper.getBenefitType().getCode().equals(Benefit.INFECTED_BLOOD_COMPENSATION.getShortName());
-        MrnDetails mrnDetails = getMrnDetails(syaCaseWrapper, isIba);
+        boolean isIbc = syaCaseWrapper.getBenefitType().isIbc();
+        MrnDetails mrnDetails = getMrnDetails(syaCaseWrapper, isIbc);
 
-        Appellant appellant = getAppellant(syaCaseWrapper, isIba);
+        Appellant appellant = getAppellant(syaCaseWrapper, isIbc);
 
         BenefitType benefitType = BenefitType.builder()
             .code(syaCaseWrapper.getBenefitType().getCode())
@@ -200,7 +200,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
         AppealReasons appealReasons = getReasonsForAppealing(syaCaseWrapper.getReasonsForAppealing());
 
-        Representative representative = getRepresentative(syaCaseWrapper, isIba);
+        Representative representative = getRepresentative(syaCaseWrapper, isIbc);
 
         HearingSubtype hearingSubtype = getHearingSubType(syaCaseWrapper.getSyaHearingOptions());
 

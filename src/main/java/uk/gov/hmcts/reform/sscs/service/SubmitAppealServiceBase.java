@@ -24,7 +24,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLinkDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseManagementLocation;
