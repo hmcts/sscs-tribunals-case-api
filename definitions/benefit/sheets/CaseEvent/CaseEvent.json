@@ -2959,6 +2959,18 @@
   {
     "LiveFrom": "23/11/2022",
     "CaseTypeID": "Benefit",
+    "ID": "setHearingRoute",
+    "Name": "Set Hearing Route",
+    "Description": "Set Hearing Route",
+    "DisplayOrder": 500,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "EventEnablingCondition": "appeal.benefitType.code=\"infectedBloodCompensation\""
+  },
+  {
+    "LiveFrom": "23/11/2022",
+    "CaseTypeID": "Benefit",
     "ID": "correctionRequest",
     "Name": "Correction Request",
     "Description": "Correction Request",
