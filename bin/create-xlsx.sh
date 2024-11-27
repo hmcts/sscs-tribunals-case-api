@@ -3,14 +3,20 @@
 TYPE=${1}
 VERSION=${2}
 ENV=${3}
-LIKE_PROD=${4:-${ENV}}
-SHUTTERED=${5:-false}
+CHANGE_ID=${4}
+LIKE_PROD=${5:-${ENV}}
+SHUTTERED=${6:-false}
 
 RUN_DIR=`pwd`
 
 
 if [ -z "${VERSION}" ] || [ -z "${TYPE}" ] || [ -z "${ENV}" ]; then
     echo "Usage create-xlsx.sh [type] [version] [env]"
+    exit 1
+fi
+
+if [ ${ENV} == "pr" ] && [ -z "${CHANGE_ID}" ]; then
+    echo "please pass CHANGE_ID for pr environment"
     exit 1
 fi
 
@@ -56,6 +62,7 @@ if [ ${ENV} == "local" ]; then
     BULK_SCAN_API_URL="http://localhost:8090"
     BULK_SCAN_ORCHESTRATOR_URL="http://localhost:8099"
 elif [ ${ENV} == "pr" ]; then
+    UPPERCASE_ENV=${CHANGE_ID}
     EM_CCD_ORCHESTRATOR_URL="https://em-ccdorc-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     TRIBUNALS_API_URL="https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     TYA_NOTIFICATIONS_API_URL="http://sscs-tribunals-api-pr-${CHANGE_ID}-sscs-tya-notification"
