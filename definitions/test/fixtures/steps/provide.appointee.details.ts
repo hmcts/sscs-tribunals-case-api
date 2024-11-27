@@ -53,7 +53,7 @@ export class ProvideAppointeeDetails extends BaseStep {
         await this.homePage.clickSignOut();
 
 
-        await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+        await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
         await this.homePage.navigateToTab("Appeal Details");
         await this.appealDetailsTab.verifyAppealDetailsAppointeeDetails(appointeeDetailsData);
 
