@@ -1,17 +1,5 @@
 [
   {
-    "LiveFrom": "23/11/2022",
-    "CaseTypeID": "Benefit",
-    "ID": "setHearingRoute",
-    "Name": "Set Hearing Route",
-    "Description": "Set Hearing Route",
-    "DisplayOrder": 9990,
-    "PreConditionState(s)": "*",
-    "PostConditionState": "*",
-    "SecurityClassification": "Public",
-    "EventEnablingCondition": "appeal.benefitType.code!=\"infectedBloodCompensation\""
-  },
-  {
     "LiveFrom": "30/10/2024",
     "CaseTypeID": "Benefit",
     "ID": "addHearingOutcome",
