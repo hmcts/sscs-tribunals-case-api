@@ -9,16 +9,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.service.HmcHearingsApiService;
 
 @Component
 @Slf4j
 public class AmendHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-    private final HmcHearingsApiService hmcHearingsApiService;
-
-    public AmendHearingOutcomeAboutToStartHandler(HmcHearingsApiService hmcHearingsApiService) {
-        this.hmcHearingsApiService = hmcHearingsApiService;
-    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
