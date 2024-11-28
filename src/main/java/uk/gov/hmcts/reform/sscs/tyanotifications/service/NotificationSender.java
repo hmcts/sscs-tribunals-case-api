@@ -173,7 +173,7 @@ public class NotificationSender {
 
             ByteArrayInputStream bis = new ByteArrayInputStream(directionText);
 
-            final LetterResponse sendLetterResponse = getBundledLetterResponse(ccdCaseId, client, bis);
+            final LetterResponse sendLetterResponse = sendBundledLetter(ccdCaseId, client, bis);
 
             if (saveCorrespondence) {
                 final Correspondence correspondence = getLetterCorrespondence(notificationEventType, name);
@@ -185,7 +185,7 @@ public class NotificationSender {
     }
 
     @Retryable
-    private LetterResponse getBundledLetterResponse(String ccdCaseId, NotificationClient client, ByteArrayInputStream bis) throws NotificationClientException {
+    private LetterResponse sendBundledLetter(String ccdCaseId, NotificationClient client, ByteArrayInputStream bis) throws NotificationClientException {
         final LetterResponse sendLetterResponse;
         try {
             sendLetterResponse = client.sendPrecompiledLetterWithInputStream(ccdCaseId, bis);

@@ -20,6 +20,8 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEvent
 import uk.gov.service.notify.Notification;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
+import uk.gov.service.notify.Template;
+import uk.gov.service.notify.TemplateList;
 
 @RunWith(JUnitParamsRunner.class)
 public abstract class AbstractNotificationsFT extends AbstractFunctionalTest {
@@ -33,8 +35,11 @@ public abstract class AbstractNotificationsFT extends AbstractFunctionalTest {
 
     protected SscsCaseData caseData;
 
+    private TemplateList templates;
+
     public AbstractNotificationsFT(int maxSecondsToWaitForNotification) {
         super(maxSecondsToWaitForNotification);
+        this.templates = getAllTemplates();
     }
 
     protected void simulateCcdCallbackToSendLetter(NotificationEventType eventType) throws IOException {
@@ -47,23 +52,39 @@ public abstract class AbstractNotificationsFT extends AbstractFunctionalTest {
 
         while (notifications.size() > savedLetters.size()) {
             notifications.stream()
-                .filter(notification -> notification.getNotificationType().equals("letter"))
-                .filter(notification -> !savedLetters.contains(notification.getId()))
-                .forEach(notification -> {
-                    try {
-                        final byte[] pdfForLetter = client.getPdfForLetter(String.valueOf(notification.getId()));
-                        FileUtils.writeByteArrayToFile(
-                            new File("notification_pdfs/" + notification.getId() + ".pdf"),
-                            pdfForLetter
-                        );
-                        savedLetters.add(notification.getId());
-                    } catch (NotificationClientException | IOException e) {
-                        log.error("Failed to save all letter pdfs, {} remain unsaved", notifications.size());
-                    }
-                });
+                    .filter(notification -> notification.getNotificationType().equals("letter"))
+                    .filter(notification -> !savedLetters.contains(notification.getId()))
+                    .forEach(notification -> {
+                        try {
+                            final byte[] pdfForLetter = client.getPdfForLetter(String.valueOf(notification.getId()));
+                            Template template = getTemplateById(notification.getTemplateId());
+                            FileUtils.writeByteArrayToFile(
+                                    new File("notification_pdfs/" + template.getName() + ".pdf"),
+                                    pdfForLetter
+                            );
+                            savedLetters.add(notification.getId());
+                        } catch (NotificationClientException | IOException e) {
+                            log.error("Failed to save all letter pdfs, {} remain unsaved", notifications.size());
+                        }
+                    });
             delayInSeconds(60);
         }
         return savedLetters;
+    }
+
+    private Template getTemplateById(UUID templateId) {
+        return templates.getTemplates().stream()
+                .filter(t -> t.getId().equals(templateId))
+                .findFirst()
+                .orElseThrow();
+    }
+
+    public TemplateList getAllTemplates() {
+        try {
+            return client.getAllTemplates("letter");
+        } catch (NotificationClientException e) {
+            return null;
+        }
     }
 
     public void logFailedEventNotification(NotificationEventType notificationType, Exception e) {

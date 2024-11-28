@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import junitparams.JUnitParamsRunner;
 import lombok.SneakyThrows;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,8 +26,8 @@ public class DocmosisGovNotifyLettersFT extends AbstractNotificationsFT {
         super(30);
     }
 
-    @Rule
-    public Timeout globalTimeout = Timeout.seconds(600);
+    @ClassRule
+    public Timeout globalTimeout = Timeout.seconds(900);
 
     @BeforeEach
     public void setup() {
