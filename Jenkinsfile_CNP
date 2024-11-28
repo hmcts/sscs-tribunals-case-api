@@ -193,8 +193,8 @@ withPipeline(type, product, component) {
 }
 
 def generateDefinitions() {
-    sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT}"
-    sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT}"
+    sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${CHANGE_ID}"
+    sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT} ${CHANGE_ID}"
     steps.archiveArtifacts artifacts: "definitions/benefit/*.xlsx"
     steps.archiveArtifacts artifacts: "definitions/bulkscan/*.xlsx"
 }
