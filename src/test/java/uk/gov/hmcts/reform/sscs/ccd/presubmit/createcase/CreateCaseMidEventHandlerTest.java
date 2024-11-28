@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.INFECTED_BLOOD_COMPENSATION;
 
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
@@ -55,6 +57,30 @@ public class CreateCaseMidEventHandlerTest {
     void canHandleTest(EventType eventType) {
         SscsCaseData caseData = SscsCaseData.builder()
             .benefitCode(IBCA_BENEFIT_CODE)
+            .build();
+
+        when(callback.getEvent()).thenReturn(eventType);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        assertTrue(midEventHandler.canHandle(MID_EVENT, callback));
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = EventType.class, names = {
+        "VALID_APPEAL_CREATED",
+        "NON_COMPLIANT",
+        "INCOMPLETE_APPLICATION_RECEIVED",
+        "CASE_UPDATED"
+    })
+    void canHandleTest_caseCreateBenefitSelectionFromList(EventType eventType) {
+        DynamicList expectedList = new DynamicList(
+            new DynamicListItem(IBCA_BENEFIT_CODE, INFECTED_BLOOD_COMPENSATION), new ArrayList<>());
+
+        SscsCaseData caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().descriptionSelection(expectedList).build())
+                .build())
             .build();
 
         when(callback.getEvent()).thenReturn(eventType);
