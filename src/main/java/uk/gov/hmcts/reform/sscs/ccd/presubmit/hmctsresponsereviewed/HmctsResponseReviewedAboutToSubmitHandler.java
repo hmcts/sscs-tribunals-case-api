@@ -59,6 +59,9 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
 
             final String issueCode = sscsCaseData.getIssueCodeIbcaOnly();
             sscsCaseData.setIssueCode(issueCode);
+
+            sscsCaseData.setBenefitCodeIbcaOnly(null);
+            sscsCaseData.setIssueCodeIbcaOnly(null);
         }
 
         setCaseCode(preSubmitCallbackResponse, callback);
@@ -70,9 +73,6 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
         }
 
         validateInterlocReferralReason(sscsCaseData, preSubmitCallbackResponse);
-
-        sscsCaseData.setBenefitCodeIbcaOnly(null);
-        sscsCaseData.setIssueCodeIbcaOnly(null);
 
         return preSubmitCallbackResponse;
     }
