@@ -167,6 +167,8 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         } else if (DirectionType.REFUSE_HEARING_RECORDING_REQUEST.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
             caseData.setInterlocReferralReason(REJECT_HEARING_RECORDING_REQUEST);
+        } else if (DirectionType.ISSUE_AND_SEND_TO_ADMIN.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
+            caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
         } else {
             caseData.setInterlocReviewState(null);
         }
