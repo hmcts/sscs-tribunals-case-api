@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
@@ -71,7 +73,7 @@ public class SscsPdfService {
             placeholders.put("appellant_identity_dob",
                     LocalDateToWelshStringConverter.convert(sscsCaseData.getAppeal().getAppellant().getIdentity().getDob()));
             placeholders.put("appellant_appointee_identity_dob",
-                    LocalDateToWelshStringConverter.convert(sscsCaseData.getAppeal().getAppellant().getIdentity().getDob()));
+                    LocalDateToWelshStringConverter.convert(sscsCaseData.getAppeal().getAppellant().getAppointee().getIdentity().getDob()));
             if (sscsCaseData.getAppeal().getMrnDetails() != null && sscsCaseData.getAppeal().getMrnDetails().getMrnDate() != null) {
                 placeholders.put("date_of_decision",
                         LocalDateToWelshStringConverter.convert(sscsCaseData.getAppeal().getMrnDetails().getMrnDate()));
@@ -92,6 +94,8 @@ public class SscsPdfService {
                             "Yes") ? "ydw" : "nac ydw");
             placeholders.put("welshWantsToAttend", sscsCaseData.getAppeal().getHearingOptions().getWantsToAttend().equalsIgnoreCase(
                     "Yes") ? "ydw" : "nac ydw");
+            placeholders.put("welshInMainlandUk",
+                    YES.equals(sscsCaseData.getAppeal().getAppellant().getAddress().getInMainlandUk()) ? "ydw" : "nac ydw");
         }
         return pdfServiceClient.generateFromHtml(template, placeholders);
     }
