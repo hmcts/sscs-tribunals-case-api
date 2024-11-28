@@ -8,7 +8,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
-import static uk.gov.hmcts.reform.sscs.model.AppConstants.INFECTED_BLOOD_COMPENSATION;
 
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
@@ -37,6 +36,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 public class CreateCaseMidEventHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
+    private static final String IBCA_LABEL = "Infected Blood Compensation / 093";
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -75,7 +75,7 @@ public class CreateCaseMidEventHandlerTest {
     })
     void canHandleTest_caseCreateBenefitSelectionFromList(EventType eventType) {
         DynamicList expectedList = new DynamicList(
-            new DynamicListItem(IBCA_BENEFIT_CODE, INFECTED_BLOOD_COMPENSATION), new ArrayList<>());
+            new DynamicListItem(IBCA_BENEFIT_CODE, IBCA_LABEL), new ArrayList<>());
 
         SscsCaseData caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
