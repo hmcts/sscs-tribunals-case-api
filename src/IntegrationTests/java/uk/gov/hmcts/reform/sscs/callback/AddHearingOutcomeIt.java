@@ -4,12 +4,12 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +24,8 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -100,7 +101,7 @@ public class AddHearingOutcomeIt extends AbstractEventIt {
                         .withBody(getJson("json/hmcResponseForTest.json"))));
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToStart"));
-        assertHttpStatus(response, HttpStatus.OK);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
         assertThat(result.getData().getHearingOutcomeValue().getCompletedHearings().getListItems()).isNotEmpty();
         assertThat(result.getData().getHearingOutcomeValue().getCompletedHearings().getListItems().get(0).getCode())
@@ -115,7 +116,7 @@ public class AddHearingOutcomeIt extends AbstractEventIt {
                         .withStatus(200)
                         .withBody(EMPTY_HMC_RESPONSE)));
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToStart"));
-        assertHttpStatus(response, HttpStatus.OK);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
         assertThat(result.getErrors()).isNotEmpty();
         assertThat(result.getErrors()).contains("There are no completed hearings on the case.");
@@ -130,11 +131,57 @@ public class AddHearingOutcomeIt extends AbstractEventIt {
                         .withStatus(500)
                         .withBody("Internal server error")));
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToStart"));
-        assertHttpStatus(response, HttpStatus.OK);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
         assertThat(result.getErrors()).isNotEmpty();
         assertThat(result.getErrors()).contains("There was an error while retrieving hearing details; please try again after some time.");
     }
 
+    @Test void callToAboutToSubmitEventHandler_willSaveNewHearingOutcome() throws Exception {
+        setup("callback/addHearingOutcomeAboutToSubmitCallback.json");
+
+        hmcServer.stubFor(WireMock.get(
+                        urlEqualTo(PATH_HEARING + "/" + PATH_CASE_ID + QUERY_PARAM))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withBody(getJson("json/hmcResponseForTest.json"))));
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+        assertThat(result.getData().getHearingOutcomeValue().getHearingOutcomeId()).isNull();
+        assertThat(result.getData().getHearingOutcomeValue().getDidPoAttendHearing()).isNull();
+        assertThat(result.getData().getHearingOutcomeValue().getCompletedHearings()).isNull();
+        assertThat(result.getData().getHearingOutcomes().size())
+                .isEqualTo(1);
+        assertThat(result.getData().getHearingOutcomes().get(0).getValue().getHearingOutcomeId())
+                .isEqualTo("2030026198");
+        assertThat(result.getData().getHearingOutcomes().get(0).getValue().getCompletedHearingId())
+                .isEqualTo("2030011049");
+        assertThat(result.getData().getHearingOutcomes().get(0).getValue().getDidPoAttendHearing())
+                .isEqualTo(YesNo.YES);
+        assertThat(result.getData().getHearingOutcomes().get(0).getValue().getHearingStartDateTime())
+                .isEqualTo(LocalDateTime.of(2024,2,21,11,00));
+        assertThat(result.getData().getHearingOutcomes().get(0).getValue().getHearingChannelId())
+                .isEqualTo(HearingChannel.FACE_TO_FACE);
+        assertThat(result.getData().getHearingOutcomes().get(0).getValue().getEpimsId())
+                .isEqualTo("372653");
+    }
+
+    @Test void callToAboutToSubmitEventHandler_hearingIdWithExistingOutcomeShouldReturnError() throws Exception {
+        setup("callback/addHearingOutcomeWithPreExistingHearingOutcomeCallback.json");
+
+        hmcServer.stubFor(WireMock.get(
+                        urlEqualTo(PATH_HEARING + "/" + PATH_CASE_ID + QUERY_PARAM))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withBody(getJson("json/hmcResponseForTest.json"))));
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+        assertThat(result.getErrors())
+                .contains("A hearing outcome already exists for this hearing date. Please select a different hearing date");
+    }
 
 }
