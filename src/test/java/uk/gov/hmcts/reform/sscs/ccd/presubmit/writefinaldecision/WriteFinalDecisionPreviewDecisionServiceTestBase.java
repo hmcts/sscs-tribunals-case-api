@@ -1021,6 +1021,43 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     }
 
     @Test
+    public void givenFinalDecisionJudgeIsSetAndCorrectionInProgress_thenIdamSurnameShouldBeOriginal() {
+        when(caseDetails.getState()).thenReturn(State.POST_HEARING);
+        sscsCaseData.getPostHearing().getCorrection().setIsCorrectionFinalDecisionInProgress(YES);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision(DATE_OF_DECISION);
+        sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionIdamSurname(ORIGINAL_JUDGE_NAME);
+        setHigherRateScenarioFields(sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionJudge(ORIGINAL_JUDGE_NAME);
+        PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.CORRECTION_GRANTED, USER_AUTHORISATION, false, true, true);
+
+        verify(userDetailsService, atMostOnce()).buildLoggedInUserName(USER_AUTHORISATION);
+        assertEquals(ORIGINAL_JUDGE_NAME, response.getData().getSscsFinalDecisionCaseData().getFinalDecisionJudge());
+
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true, true, true, isDescriptorFlowSupported(), true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.CORRECTION_GRANTED));
+        String signedJudge = payload.getIdamSurname();
+        assertEquals(ORIGINAL_JUDGE_NAME, signedJudge);
+    }
+
+    @Test
+    public void givenFinalDecisionCorrectionIsNotInProgress_thenGetSignedInJudgeForIdamSurname() {
+        when(caseDetails.getState()).thenReturn(State.POST_HEARING);
+        sscsCaseData.getPostHearing().getCorrection().setIsCorrectionFinalDecisionInProgress(NO);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision(DATE_OF_DECISION);
+        setHigherRateScenarioFields(sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionJudge(ORIGINAL_JUDGE_NAME);
+        service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false, true, true);
+
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true,
+                true, true, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+        String signedJudge = payload.getIdamSurname();
+        assertEquals(LOGGED_IN_JUDGE_NAME, signedJudge);
+    }
+
+    @Test
     public void givenFinalDecisionJudgeIsSetAndCorrectionIsNotInProgress_thenGetSignedInJudgeName() {
         when(caseDetails.getState()).thenReturn(State.POST_HEARING);
         sscsCaseData.getPostHearing().getCorrection().setIsCorrectionFinalDecisionInProgress(NO);

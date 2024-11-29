@@ -3,11 +3,7 @@ tags:
 
 java:
   image: ${IMAGE_NAME}
-  memoryLimits: "8Gi"
-  memoryRequests: "1Gi"
-  cpuRequests: "2"
   ingressHost: ${SERVICE_FQDN}
-  cpuLimits: 2000m
   readinessDelay: 45
   devmemoryRequests: 1Gi
   devmemoryLimits: 2Gi
@@ -43,8 +39,10 @@ java:
     CITIZEN_LOGIN_SERVICE_V2: true
     ADD_LINK_TO_OTHER_ASSOCIATED_CASES_V2: true
     BYPASS_NOTIFICATIONS_SERVICE: true
+    BYPASS_HEARING_API_SERVICE: true
     HANDLE_CCD_CALLBACKMAP_V2: true
     TESTING_SUPPORT_ENABLED: true
+    EXUI_API_URL: "https://${SERVICE_NAME}-xui"
     TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
     SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
     AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
@@ -66,8 +64,14 @@ java:
     HOURS_END_TIME: 23
     RUN_DB_MIGRATION_ON_STARTUP: true
     TEST_RECIPIENTS_POSTCODE: "*"
-    INFECTED_BLOOD_APPEAL_ENABLED: true
+    INFECTED_BLOOD_COMPENSATION_ENABLED: true
     SUBMIT_APPEAL_SERVICE_V2_ENABLED: true
+    PROCESS_EVENT_MESSAGE_V2_ENABLED: true
+    UPDATE_CASE_ONLY_HEARING_V2_ENABLED: true
+    # START - SSCS-IB RELEASE VARIABLES
+    BUNDLE_ENGLISH_CONFIG: sscs-ib-bundle-config.yaml
+    BUNDLE_EDITED_CONFIG: sscs-ib-bundle-edited-config.yaml
+    # END - SSCS-IB RELEASE VARIABLES
   secrets:
     JOB_SCHEDULER_DB_PASSWORD:
       secretRef: postgres
@@ -76,6 +80,9 @@ java:
       secretRef: sscs-sb-preview
       key: connectionString
     AMQP_PASSWORD:
+      secretRef: sscs-sb-preview
+      key: primaryKey
+    TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
       secretRef: sscs-sb-preview
       key: primaryKey
   postgresql:
@@ -127,10 +134,10 @@ ccd-case-document-am-api:
 xui-webapp:
   enabled: true
   nodejs:
-    devmemoryLimits: "1Gi"
-    devcpuLimits: 1
     devmemoryRequests: "512Mi"
-    devcpuRequests: "500m"
+    devmemoryLimits: "1Gi"
+    devcpuRequests: "200m"
+    devcpuLimits: "1000m"
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
     image: hmctspublic.azurecr.io/xui/webapp:latest
@@ -147,7 +154,7 @@ xui-webapp:
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       SERVICES_S2S: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       SERVICES_HEARINGS_COMPONENT_API: http://jurisdiction-hearings-api-aat.service.core-compute-aat.internal
-      SERVICES_HEARINGS_COMPONENT_API_SSCS: http://${SERVICE_NAME}-sscs-hearings-api
+      SERVICES_HEARINGS_COMPONENT_API_SSCS: http://${SERVICE_NAME}-java
       SERVICES_PRD_LOCATION_API: http://rd-location-ref-api-aat.service.core-compute-aat.internal
       SERVICES_PRD_JUDICIAL_API: http://rd-judicial-api-aat.service.core-compute-aat.internal
       SERVICES_PRD_COMMONDATA_API: http://rd-commondata-api-aat.service.core-compute-aat.internal
@@ -440,7 +447,7 @@ ccd:
       disableKeyVaults: true
       devmemoryRequests: '1024Mi'
       devmemoryLimits: '2048Mi'
-      devcpuRequests: '900m'
+      devcpuRequests: '500m'
       autoscaling:
         enabled: false
         minReplicas: 1
@@ -469,7 +476,7 @@ ccd:
       imagePullPolicy: Always
       devmemoryRequests: '1524Mi'
       devmemoryLimits: '2048Mi'
-      devcpuRequests: '900m'
+      devcpuRequests: '500m'
       environment:
         DATA_STORE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
         DATA_STORE_DB_USERNAME: hmcts
@@ -534,8 +541,6 @@ elastic:
 sscs-tribunals-frontend:
   enabled: true
   nodejs:
-    memoryLimits: "2Gi"
-    cpuLimits: 2000m
     image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
     ingressHost: sya-${SERVICE_FQDN}
     registerAdditionalDns:
@@ -556,6 +561,7 @@ sscs-tribunals-frontend:
       SERVICES_IDAM_LOGIN_URL: https://idam-web-public.aat.platform.hmcts.net/login
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       UV_THREADPOOL_SIZE: 64
+      INFECTED_BLOOD_COMPENSATION_ENABLED: true
     keyVaults:
       sscs:
         secrets:
@@ -577,64 +583,6 @@ redis:
   master:
     persistence:
       enabled: false
-
-#Turning either hearings api (with either listener on) or cft hearing service on requires
-#service bus to be turned on.
-sscs-hearings-api:
-  enabled: true
-  java:
-    image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
-    releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
-    ingressHost: hearings-${SERVICE_FQDN}
-    environment:
-      ROOT_LOGGING_LEVEL: INFO
-      SSCS_LOG_LEVEL: DEBUG #Switch to debug to see requests being sent.
-      SERVICE_BUS_LOG_LEVEL: ERROR
-      LOG_OUTPUT: single
-      CREATE_CCD_ENDPOINT: false
-      IDAM_S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-      CASEWORKER_REF_API_URL: "http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal"
-      IDAM_API_URL: "https://idam-api.aat.platform.hmcts.net"
-      CORE_CASE_DATA_API_URL: ${CORE_CASE_DATA_API_URL}
-      COMMON_REF_API_URL: "http://rd-commondata-api-aat.service.core-compute-aat.internal"
-      JUDICIAL_REF_API_URL: "http://rd-judicial-api-aat.service.core-compute-aat.internal"
-      EXUI_API_URL: "https://${SERVICE_NAME}-xui"
-      HMC_API_URL: "http://hmc-cft-hearing-service-aat.service.core-compute-aat.internal"
-      #Messaging
-      HMC_HEARINGS_LISTENING_ENABLED: true
-      HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-aat"
-      HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-pr-3973"
-      TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
-      TRIBUNALS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
-      TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
-      TRIBUNALS_EVENT_QUEUE_NAMESPACE: sscs-sb-preview
-      HMC_HEARINGS_TOPIC_NAMESPACE: hmc-servicebus-aat
-      HMC_DEPLOYMENT_ID: deployment-${SERVICE_NAME}
-      HMC_DEPLOYMENT_FILTER_ENABLED: true
-      CORE_CASE_DATA_CASE_TYPE_ID: Benefit-${CHANGE_ID}
-      HEARINGS_CASE_UPDATE_V2_ENABLED: true
-      ADJOURNMENT_ENABLED: true
-    secrets:
-      TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
-        secretRef: sscs-sb-preview
-        key: primaryKey
-    keyVaults:
-      sscs:
-        secrets:
-          - name: hmc-servicebus-shared-access-key-tf
-            alias: HMC_HEARINGS_TOPIC_ACCESS_KEY
-          - name: sscs-hearing-manager-username
-            alias: IDAM_SSCS_SYSTEMUPDATE_USER
-          - name: sscs-hearing-manager-pass
-            alias: IDAM_SSCS_SYSTEMUPDATE_PASSWORD
-          - name: app-insights-connection-string
-            alias: app-insights-connection-string
-          - name: sscs-s2s-secret
-            alias: IDAM_S2S_AUTH_TOTP_SECRET
-          - name: idam-oauth-user
-            alias: IDAM_OAUTH2_CLIENT_ID
-          - name: idam-sscs-oauth2-client-secret
-            alias: IDAM_OAUTH2_CLIENT_SECRET
 
 
 #Enable for queues/topics
@@ -665,3 +613,9 @@ postgresql:
       - name: "pr-${CHANGE_ID}-role-assignment"
       - name: "pr-${CHANGE_ID}-hmc-cft-hearing-service"
       - name: "pr-${CHANGE_ID}-sscs-job-scheduler"
+
+ccd-def-cleanup:
+  enabled: true
+  change_id: ${CHANGE_ID}
+  case_type_ids:
+    - Benefit

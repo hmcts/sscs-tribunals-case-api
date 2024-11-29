@@ -6,13 +6,16 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.validateHearingOptionsAndExcludeDates;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isConfidential;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleBenefitType;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleIbcaCase;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -107,7 +110,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final Optional<CaseDetails<SscsCaseData>> caseDetailsBefore = callback.getCaseDetailsBefore();
-        final SscsCaseData sscsCaseData = associatedCaseLinkHelper.linkCaseByNino(caseDetails.getCaseData(), caseDetailsBefore);
+        final SscsCaseData sscsCaseData = !IBCA_BENEFIT_CODE.equals(caseDetails.getCaseData().getBenefitCode())
+                ? associatedCaseLinkHelper.linkCaseByNino(caseDetails.getCaseData(), caseDetailsBefore)
+                : caseDetails.getCaseData();
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
@@ -115,6 +120,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         final boolean hasSuperUserRole = userDetails.hasRole(SUPER_USER);
 
         handleBenefitType(sscsCaseData);
+        if (IBCA_BENEFIT_CODE.equals(sscsCaseData.getBenefitCode())) {
+            handleIbcaCase(sscsCaseData);
+        }
 
         if (isNotEmpty(sscsCaseData.getBenefitCode())) {
             validateBenefitIssueCode(sscsCaseData, preSubmitCallbackResponse);
@@ -129,7 +137,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         Appellant appellant = sscsCaseData.getAppeal().getAppellant();
         if (appellant != null
             && appellant.getAddress() != null
-            && isNotBlank(appellant.getAddress().getPostcode())) {
+            && (isNotBlank(appellant.getAddress().getPostcode())
+                || isNotBlank(appellant.getAddress().getPortOfEntry()))) {
 
             String postCode = resolvePostCode(sscsCaseData);
             RegionalProcessingCenter newRpc = regionalProcessingCenterService.getByPostcode(postCode);
@@ -209,9 +218,12 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private void validatingPartyAddresses(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
-        validateAddressAndPostcode(response, sscsCaseData.getAppeal().getAppellant(), "appellant");
+        if (!IBCA_BENEFIT_CODE.equals(sscsCaseData.getBenefitCode())
+                || YES.equals(sscsCaseData.getAppeal().getAppellant().getAddress().getInMainlandUk())) {
+            validateAddressAndPostcode(response, sscsCaseData.getAppeal().getAppellant(), "appellant");
+        }
 
-        if (sscsCaseData.isThereAJointParty()) {
+        if (!IBCA_BENEFIT_CODE.equals(sscsCaseData.getBenefitCode()) && sscsCaseData.isThereAJointParty()) {
             YesNo isJointPartyAddressSameAsAppellant = sscsCaseData.getJointParty().getJointPartyAddressSameAsAppellant();
             if (Objects.isNull(isJointPartyAddressSameAsAppellant) || !isJointPartyAddressSameAsAppellant.toBoolean()) {
                 validateAddressAndPostcode(response, sscsCaseData.getJointParty(), "joint party");
@@ -219,11 +231,11 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
 
         String isAppointee = sscsCaseData.getAppeal().getAppellant().getIsAppointee();
-        if (isYes(isAppointee)) {
+        if (!IBCA_BENEFIT_CODE.equals(sscsCaseData.getBenefitCode()) && isYes(isAppointee)) {
             validateAddressAndPostcode(response, sscsCaseData.getAppeal().getAppellant().getAppointee(), "appointee");
         }
 
-        if (sscsCaseData.isThereARepresentative()) {
+        if (!IBCA_BENEFIT_CODE.equals(sscsCaseData.getBenefitCode()) && sscsCaseData.isThereARepresentative()) {
             validateAddressAndPostcode(response, sscsCaseData.getAppeal().getRep(), "representative");
         }
     }
@@ -299,7 +311,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private boolean isBenefitTypeValidForHearingTypeValidation(Optional<Benefit> benefitType) {
         return benefitType.filter(benefit ->
                 SscsType.SSCS2.equals(benefit.getSscsType())
-                        || SscsType.SSCS5.equals(benefit.getSscsType()))
+                        || SscsType.SSCS5.equals(benefit.getSscsType())
+                        || SscsType.SSCS8.equals(benefit.getSscsType()))
                 .isPresent();
     }
 
@@ -373,7 +386,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
     }
 
-    private List<String> validatePartyCaseData(Entity entity, String partyType) {
+    private List<String> validatePartyCaseData(Entity entity, String partyType, String benefitCode) {
         List<String> listOfWarnings = new ArrayList<>();
 
         if (entity != null) {
@@ -389,8 +402,11 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                 if (isBlank(entity.getIdentity().getDob())) {
                     listOfWarnings.add(String.format(WARNING_MESSAGE, "Date of Birth", partyType));
                 }
-                if (isBlank(entity.getIdentity().getNino())) {
+                if (!IBCA_BENEFIT_CODE.equals(benefitCode) && isBlank(entity.getIdentity().getNino())) {
                     listOfWarnings.add(String.format(WARNING_MESSAGE, "National Insurance Number", partyType));
+                }
+                if (IBCA_BENEFIT_CODE.equals(benefitCode) && isBlank(entity.getIdentity().getIbcaReference())) {
+                    listOfWarnings.add(String.format(WARNING_MESSAGE, "IBCA Reference Number", partyType));
                 }
             }
         }
@@ -401,7 +417,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private void validateAppellantCaseData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         Appellant appellantInfo = sscsCaseData.getAppeal().getAppellant();
 
-        List<String> warnings = validatePartyCaseData(appellantInfo, "Appellant");
+        List<String> warnings = validatePartyCaseData(appellantInfo, "Appellant", sscsCaseData.getBenefitCode());
 
         if (!warnings.isEmpty()) {
             response.addWarnings(warnings);
@@ -413,7 +429,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         String isAppointee = sscsCaseData.getAppeal().getAppellant().getIsAppointee();
 
         if (isAppointee != null && isAppointee.equals("Yes") && appointeeInfo != null) {
-            List<String> warnings = validatePartyCaseData(appointeeInfo, "Appointee");
+            List<String> warnings = validatePartyCaseData(appointeeInfo, "Appointee", sscsCaseData.getBenefitCode());
 
             if (!warnings.isEmpty()) {
                 response.addWarnings(warnings);
@@ -537,16 +553,19 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private static String resolvePostCode(SscsCaseData sscsCaseData) {
-        if (YES.getValue().equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAppointee())) {
-            return Optional.ofNullable(sscsCaseData.getAppeal().getAppellant().getAppointee())
-                .map(Appointee::getAddress)
-                .map(Address::getPostcode)
-                .map(String::trim)
-                .filter(StringUtils::isNotEmpty)
-                .orElse(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode());
+        if (NO.equals(sscsCaseData.getAppeal().getAppellant().getAddress().getInMainlandUk())) {
+            return sscsCaseData.getAppeal().getAppellant().getAddress().getPortOfEntry();
+        } else {
+            if (YES.getValue().equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAppointee())) {
+                return Optional.ofNullable(sscsCaseData.getAppeal().getAppellant().getAppointee())
+                        .map(Appointee::getAddress)
+                        .map(Address::getPostcode)
+                        .map(String::trim)
+                        .filter(StringUtils::isNotEmpty)
+                        .orElse(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode());
+            }
+
+            return sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
         }
-
-        return sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
     }
-
 }

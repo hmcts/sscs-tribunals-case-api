@@ -1,14 +1,13 @@
 [
   {
-    "CaseEventID": "setHearingRoute",
-    "CaseFieldID": "hearingRoute",
+    "LiveFrom": "30/10/2024",
+    "CaseEventID": "addHearingOutcome",
+    "CaseFieldID": "hearingOutcomeValue",
     "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
-    "LiveFrom": "23/11/2022",
+    "DisplayContext": "COMPLEX",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
-    "PageID": "setHearingRoute",
-    "PageLabel": "Set Hearing Route",
+    "PageID": "1.0",
     "ShowSummaryChangeOption": "Y"
   }
 ]

@@ -84,7 +84,7 @@
     "CaseEventID": "addHearing",
     "CaseFieldID": "hearings",
     "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
+    "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
@@ -330,26 +330,6 @@
     "PageID": "1.0"
   },
   {
-    "LiveFrom": "05/07/2022",
-    "CaseEventID": "caseUpdated",
-    "CaseFieldID": "caseOutcome",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 15,
-    "PageID": "1.0"
-  },
-  {
-    "LiveFrom": "05/07/2022",
-    "CaseEventID": "caseUpdated",
-    "CaseFieldID": "didPoAttend",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 16,
-    "PageID": "1.0"
-  },
-  {
     "CaseEventID": "adjournCase",
     "CaseFieldID": "hearingRoute",
     "CaseTypeID": "Benefit",
@@ -575,158 +555,6 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "1.0",
     "PageLabel": "Correspondence"
-  },
-  {
-    "CaseEventID": "caseUpdated",
-    "CaseFieldID": "caseReference",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 1,
-    "PageID": "1.0",
-    "PageLabel": "Update case data"
-  },
-  {
-    "CaseEventID": "caseUpdated",
-    "CaseFieldID": "caseCreated",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 2,
-    "PageID": "1.0",
-    "PageLabel": "Update case data"
-  },
-  {
-    "CaseEventID": "caseUpdated",
-    "CaseFieldID": "region",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 3,
-    "PageID": "1.0",
-    "PageLabel": "Update case data"
-  },
-  {
-    "CaseEventID": "caseUpdated",
-    "CaseFieldID": "appeal",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "COMPLEX",
-    "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 4,
-    "PageID": "1.0",
-    "PageLabel": "Update case data"
-  },
-  {
-    "CaseEventID": "caseUpdated",
-    "CaseFieldID": "regionalProcessingCenter",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 5,
-    "PageID": "1.0",
-    "PageLabel": "Update case data"
-  },
-  {
-    "CaseEventID": "caseUpdated",
-    "CaseFieldID": "benefitCode",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
-    "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 6,
-    "FieldShowCondition": "appeal =\"DO_NOT_SHOW\"",
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "caseUpdated",
-    "CaseFieldID": "issueCode",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
-    "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 7,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "caseUpdated",
-    "CaseFieldID": "childMaintenanceNumber",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "appeal.benefitType.code = \"childSupport\"",
-    "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 8,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "caseUpdated",
-    "CaseFieldID": "jointParty",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 9,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "caseUpdated",
-    "CaseFieldID": "jointPartyName",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "FieldShowCondition": "jointParty=\"Yes\"",
-    "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 10,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "caseUpdated",
-    "CaseFieldID": "jointPartyAddressSameAsAppellant",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "FieldShowCondition": "jointParty=\"Yes\"",
-    "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 11,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "caseUpdated",
-    "CaseFieldID": "jointPartyAddress",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "COMPLEX",
-    "FieldShowCondition": "jointParty=\"Yes\"",
-    "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 12,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "caseUpdated",
-    "CaseFieldID": "jointPartyIdentity",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "FieldShowCondition": "jointParty=\"Yes\"",
-    "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 13,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "caseUpdated",
-    "CaseFieldID": "jointPartyContact",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "COMPLEX",
-    "FieldShowCondition": "jointParty=\"Yes\"",
-    "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 14,
-    "PageID": "1.0"
   },
   {
     "CaseEventID": "corDecision",
@@ -963,61 +791,7 @@
     "PageID": "1.0",
     "PageLabel": "Correspondence"
   },
-  {
-    "CaseEventID": "incompleteApplicationReceived",
-    "CaseFieldID": "appeal",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "COMPLEX",
-    "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 1,
-    "PageID": "1.0",
-    "PageLabel": "Incomplete appeal"
-  },
-  {
-    "CaseEventID": "incompleteApplicationReceived",
-    "CaseFieldID": "caseCreated",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 2,
-    "PageID": "1.0",
-    "PageLabel": "Incomplete appeal"
-  },
-  {
-    "CaseEventID": "incompleteApplicationReceived",
-    "CaseFieldID": "caseReference",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 3,
-    "PageID": "1.0",
-    "PageLabel": "Incomplete appeal"
-  },
-  {
-    "CaseEventID": "incompleteApplicationReceived",
-    "CaseFieldID": "region",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 4,
-    "PageID": "1.0",
-    "PageLabel": "Incomplete appeal"
-  },
-  {
-    "CaseEventID": "incompleteApplicationReceived",
-    "CaseFieldID": "isScottishCase",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 5,
-    "PageID": "1.0",
-    "PageLabel": "Incomplete appeal"
-  },
+
   {
     "CaseEventID": "interlocInformationReceived",
     "CaseFieldID": "interlocReviewState",
@@ -4255,6 +4029,19 @@
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
     "PageID": "1.0",
+    "PageLabel": "Update other party data",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=updateOtherPartyData1.0"
+  },
+  {
+    "CaseEventID": "updateOtherPartyData",
+    "CaseFieldID": "appeal",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "FieldShowCondition": "otherParties=\"DoNotShow\"",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
     "PageLabel": "Update other party data"
   },
   {
@@ -5156,5 +4943,17 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "1.0",
     "PageLabel": "Migrate case for Work Allocation"
+  },
+  {
+    "CaseEventID": "setHearingRoute",
+    "CaseFieldID": "hearingRoute",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "23/11/2022",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "setHearingRoute",
+    "PageLabel": "Set Hearing Route",
+    "ShowSummaryChangeOption": "Y"
   }
 ]

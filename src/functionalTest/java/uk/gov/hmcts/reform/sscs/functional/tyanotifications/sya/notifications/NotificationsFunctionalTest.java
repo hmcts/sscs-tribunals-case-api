@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.functional.tyanotifications.sya.notifications;
 
 import static org.junit.Assert.*;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.FUNCTIONAL_RETRY_LIMIT;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
 
 import java.io.IOException;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import junitparams.Parameters;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReasonableAdjustmentStatus;
@@ -15,6 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.functional.tyanotifications.AbstractFunctionalTest;
+import uk.gov.hmcts.reform.sscs.functional.tyanotifications.Retry;
 import uk.gov.service.notify.Notification;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -150,9 +153,17 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     @Value("${notification.english.paper.dwpUploadResponse.appellant.smsId}")
     private String paperDwpUploadResponseSmsId;
 
+    @Value("${notification.english.appealReceived.appellant.emailId}")
+    private String appealReceivedAppellantEmailId;
+    @Value("${notification.english.appealCreated.appellant.smsId}")
+    private String appealReceivedRepresentativeEmailId;
+
     public NotificationsFunctionalTest() {
         super(30);
     }
+
+    @Rule
+    public Retry retry = new Retry(FUNCTIONAL_RETRY_LIMIT);
 
     @Test
     public void shouldSendEvidenceReceivedNotification() throws NotificationClientException, IOException {
@@ -456,11 +467,14 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     }
 
     @Test
-    public void shouldSaveReasonableAdjustmentNotificationForAppellant() throws IOException {
+    public void shouldSaveReasonableAdjustmentNotificationForAppellant() throws IOException, NotificationClientException {
         simulateCcdCallback(APPEAL_RECEIVED, BASE_PATH_TYAN + APPEAL_RECEIVED.getId() + "AppellantReasonableAdjustmentCallback.json");
 
         delayInSeconds(10);
+        List<Notification> notifications = tryFetchNotificationsForTestCaseWithFlag(true, null, appealReceivedAppellantEmailId);
+        assertEquals(1, notifications.size());
 
+        delayInSeconds(10);
         SscsCaseDetails caseDetails = findCaseById(caseId);
         SscsCaseData caseData = caseDetails.getData();
 
@@ -470,11 +484,13 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     }
 
     @Test
-    public void shouldSaveReasonableAdjustmentNotificationForAppellantAndRep() throws IOException {
+    public void shouldSaveReasonableAdjustmentNotificationForAppellantAndRep() throws IOException, NotificationClientException {
         simulateCcdCallback(APPEAL_RECEIVED, BASE_PATH_TYAN + APPEAL_RECEIVED.getId() + "AppellantRepReasonableAdjustmentCallback.json");
+        delayInSeconds(10);
+        List<Notification> notifications = tryFetchNotificationsForTestCaseWithFlag(true, null, appealCreatedAppellantEmailId, appealCreatedAppellantSmsId);
+        assertEquals(2, notifications.size());
 
         delayInSeconds(10);
-
         SscsCaseDetails caseDetails = findCaseById(caseId);
         SscsCaseData caseData = caseDetails.getData();
 

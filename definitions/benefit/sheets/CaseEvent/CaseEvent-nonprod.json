@@ -1,13 +1,16 @@
 [
   {
-    "LiveFrom": "23/11/2022",
+    "LiveFrom": "30/10/2024",
     "CaseTypeID": "Benefit",
-    "ID": "setHearingRoute",
-    "Name": "Set Hearing Route",
-    "Description": "Set Hearing Route",
-    "DisplayOrder": 9990,
-    "PreConditionState(s)": "*",
+    "ID": "addHearingOutcome",
+    "Name": "Add hearing outcome",
+    "Description": "Add a hearing outcome",
+    "DisplayOrder": 140,
+    "PreConditionState(s)": "dormantAppealState;postHearing;withUT;hearing;readyToList",
+    "CallBackURLAboutToStartEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToStart",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "PostConditionState": "*",
+    "ShowEventNotes": "Y",
     "SecurityClassification": "Public"
   }
 ]

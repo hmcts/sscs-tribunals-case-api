@@ -69,8 +69,8 @@ public class CaseUpdatedAboutToStartHandlerTest {
     }
 
     @Test
-    void givenBenefitType_shouldHaveCorrectBenefitSelectionWithInfectedBloodAppealDisabled() {
-        ReflectionTestUtils.setField(handler, "isInfectedBloodAppealEnabled", false);
+    void givenBenefitType_shouldHaveCorrectBenefitSelectionWithInfectedBloodCompensationDisabled() {
+        ReflectionTestUtils.setField(handler, "isInfectedBloodCompensationEnabled", false);
 
         var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         var benefitSelection = result.getData().getAppeal().getBenefitType().getDescriptionSelection();
@@ -82,8 +82,8 @@ public class CaseUpdatedAboutToStartHandlerTest {
     }
 
     @Test
-    void givenBenefitType_shouldHaveCorrectBenefitSelectionWithInfectedBloodAppealEnabled() {
-        ReflectionTestUtils.setField(handler, "isInfectedBloodAppealEnabled", true);
+    void givenBenefitType_shouldHaveCorrectBenefitSelectionWithInfectedBloodCompensationEnabled() {
+        ReflectionTestUtils.setField(handler, "isInfectedBloodCompensationEnabled", true);
 
         var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         var benefitSelection = result.getData().getAppeal().getBenefitType().getDescriptionSelection();
@@ -91,8 +91,7 @@ public class CaseUpdatedAboutToStartHandlerTest {
         assertThat(benefitSelection).isNotNull();
         assertThat(benefitSelection.getValue()).isNotNull();
         assertThat(benefitSelection.getValue().getCode()).isEqualTo("002");
-        //TODO: update this test when PR raised to point at new SSCS Common changes for IBCA
-        assertThat(benefitSelection.getListItems().size()).isEqualTo(34);
+        assertThat(benefitSelection.getListItems().size()).isEqualTo(35);
     }
 
     @Test

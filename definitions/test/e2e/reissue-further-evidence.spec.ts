@@ -4,7 +4,7 @@ import createCaseBasedOnCaseType from '../api/client/sscs/factory/appeal.type.fa
 
     let caseId: string;
 
-test('Reissuing Further Evidence', { tag: '@nightly-pipeline' }, async ({ reissueFurtherEvidenceSteps }) => {
+test('Reissuing Further Evidence', async ({ reissueFurtherEvidenceSteps }) => {
         test.slow();
         caseId = await createCaseBasedOnCaseType('PIP');
         await reissueFurtherEvidenceSteps.performUploadDocumentFurtherEvidenceForReissueEvent(caseId, false);

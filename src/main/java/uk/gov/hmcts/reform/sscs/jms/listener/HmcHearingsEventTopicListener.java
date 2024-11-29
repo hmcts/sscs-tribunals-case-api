@@ -10,8 +10,10 @@ import org.apache.qpid.jms.message.JmsBytesMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jms.annotation.JmsListener;
+import org.springframework.retry.ExhaustedRetryException;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.exception.CaseException;
+import uk.gov.hmcts.reform.sscs.exception.HearingUpdateException;
 import uk.gov.hmcts.reform.sscs.exception.HmcEventProcessingException;
 import uk.gov.hmcts.reform.sscs.exception.MessageProcessingException;
 import uk.gov.hmcts.reform.sscs.model.hmc.message.HmcMessage;
@@ -33,7 +35,6 @@ public class HmcHearingsEventTopicListener {
 
     @Value("${flags.deployment-filter.enabled}")
     private boolean isDeploymentFilterEnabled;
-
     @Value("${feature.bypass-hearing-api-service.enabled}")
     private boolean isByPassHearingServiceEnabled;
 
@@ -54,11 +55,12 @@ public class HmcHearingsEventTopicListener {
     )
     public void onMessage(JmsBytesMessage message) throws JMSException, HmcEventProcessingException {
 
-        if (!isByPassHearingServiceEnabled && isDeploymentFilterEnabled && !isMessageReleventForDeployment(message)) {
+        log.info("isByPassHearingServiceEnabled && isDeploymentFilterEnabled && deploymentId ------------------------> {}, {}, {}", isByPassHearingServiceEnabled,
+                isDeploymentFilterEnabled, message.getStringProperty(HMCTS_DEPLOYMENT_ID));
+
+        if (isDeploymentFilterEnabled && !isMessageReleventForDeployment(message)) {
             return;
         }
-
-        log.info("Handling request by tribunal hearing api merge code");
 
         byte[] messageBytes = new byte[(int) message.getBodyLength()];
         message.readBytes(messageBytes);
@@ -72,18 +74,21 @@ public class HmcHearingsEventTopicListener {
                 String hearingId = hmcMessage.getHearingId();
 
                 log.info(
-                        "Attempting to process message from HMC hearings topic for event {}, Case ID {}, and Hearing ID {}.",
-                        hmcMessage.getHearingUpdate().getHmcStatus(),
-                        caseId,
-                        hearingId
+                    "Attempting to process message from HMC hearings topic for event {}, Case ID {}, and Hearing ID {}.",
+                    hmcMessage.getHearingUpdate().getHmcStatus(),
+                    caseId,
+                    hearingId
                 );
 
                 processHmcMessageService.processEventMessage(hmcMessage);
+
             }
-        } catch (JsonProcessingException | CaseException | MessageProcessingException ex) {
+        } catch (JsonProcessingException | CaseException | MessageProcessingException
+                 | HearingUpdateException | ExhaustedRetryException ex) {
+            log.error("Unable to successfully deliver HMC message: {}", convertedMessage, ex);
             throw new HmcEventProcessingException(String.format(
-                    "Unable to successfully deliver HMC message: %s",
-                    convertedMessage
+                "Unable to successfully deliver HMC message: %s",
+                convertedMessage
             ), ex);
         }
 
@@ -95,8 +100,8 @@ public class HmcHearingsEventTopicListener {
 
     private boolean isMessageReleventForDeployment(JmsBytesMessage message) throws JMSException {
         return hmctsDeploymentId.isEmpty()
-                && message.getStringProperty(HMCTS_DEPLOYMENT_ID) == null
-                || message.getStringProperty(HMCTS_DEPLOYMENT_ID) != null
-                && message.getStringProperty(HMCTS_DEPLOYMENT_ID).equals(hmctsDeploymentId);
+            && message.getStringProperty(HMCTS_DEPLOYMENT_ID) == null
+            || message.getStringProperty(HMCTS_DEPLOYMENT_ID) != null
+            && message.getStringProperty(HMCTS_DEPLOYMENT_ID).equals(hmctsDeploymentId);
     }
 }

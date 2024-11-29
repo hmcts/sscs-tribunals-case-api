@@ -30,8 +30,9 @@ export class UploadResponse extends BaseStep {
 
         let pipCaseId = await createCaseBasedOnCaseType("PIP");
         await this.uploadResponseWithFurtherInfoAsDwpCaseWorker(pipCaseId);
+        await this.homePage.clickSignOut();
 
-        await this.loginUserWithCaseId(credentials.amCaseWorker, true, pipCaseId);
+        await this.loginUserWithCaseId(credentials.amCaseWorker, false, pipCaseId);
         await this.homePage.navigateToTab("Summary");
         await this.summaryTab.verifyPresenceOfText("Response received");
 
@@ -221,6 +222,8 @@ export class UploadResponse extends BaseStep {
         for (const linkName of this.presetLinks) {
             await this.verifyHistoryTabLink(linkName);
         }
+
+        await this.homePage.clickBeforeTabBtn();
         await this.homePage.navigateToTab("Summary");
         await this.summaryTab.verifyPresenceOfText("Ready to list");
         // await performAppealDormantOnCase(ucCaseId);
