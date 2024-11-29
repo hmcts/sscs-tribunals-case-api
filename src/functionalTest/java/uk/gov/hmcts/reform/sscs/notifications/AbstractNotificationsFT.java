@@ -33,13 +33,12 @@ public abstract class AbstractNotificationsFT extends AbstractFunctionalTest {
     @Getter
     private NotificationClient client;
 
-    protected SscsCaseData caseData;
+    protected TemplateList templates;
 
-    private TemplateList templates;
+    protected SscsCaseData caseData;
 
     public AbstractNotificationsFT(int maxSecondsToWaitForNotification) {
         super(maxSecondsToWaitForNotification);
-        this.templates = getAllTemplates();
     }
 
     protected void simulateCcdCallbackToSendLetter(NotificationEventType eventType) throws IOException {
@@ -80,11 +79,14 @@ public abstract class AbstractNotificationsFT extends AbstractFunctionalTest {
     }
 
     public TemplateList getAllTemplates() {
-        try {
-            return client.getAllTemplates("letter");
-        } catch (NotificationClientException e) {
-            return null;
+        if (templates == null) {
+            try {
+                templates = client.getAllTemplates("letter");
+            } catch (NotificationClientException e) {
+                return null;
+            }
         }
+        return templates;
     }
 
     public void logFailedEventNotification(NotificationEventType notificationType, Exception e) {
