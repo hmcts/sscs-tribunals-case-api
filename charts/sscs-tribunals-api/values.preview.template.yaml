@@ -562,6 +562,7 @@ sscs-tribunals-frontend:
       SERVICES_IDAM_LOGIN_URL: https://idam-web-public.aat.platform.hmcts.net/login
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       UV_THREADPOOL_SIZE: 64
+      INFECTED_BLOOD_COMPENSATION_ENABLED: true
     keyVaults:
       sscs:
         secrets:
