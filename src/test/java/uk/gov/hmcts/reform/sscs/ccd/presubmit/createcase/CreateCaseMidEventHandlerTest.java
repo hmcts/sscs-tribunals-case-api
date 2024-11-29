@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
@@ -37,6 +38,7 @@ public class CreateCaseMidEventHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String IBCA_LABEL = "Infected Blood Compensation / 093";
+    private static final String CHILD_SUPPORT_LABEL = "Child Support / 022";
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -99,6 +101,23 @@ public class CreateCaseMidEventHandlerTest {
     })
     void cannotHandleTest(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
+        assertFalse(midEventHandler.canHandle(MID_EVENT, callback));
+    }
+
+    @Test
+    void cannotHandleTest_caseCreateBenefitSelectionFromList() {
+        DynamicList expectedList = new DynamicList(
+            new DynamicListItem(CHILD_SUPPORT.getBenefitCode(), CHILD_SUPPORT_LABEL), new ArrayList<>());
+
+        SscsCaseData caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().descriptionSelection(expectedList).build())
+                .build())
+            .build();
+
+        when(callback.getEvent()).thenReturn(EventType.INCOMPLETE_APPLICATION_RECEIVED);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
         assertFalse(midEventHandler.canHandle(MID_EVENT, callback));
     }
 
