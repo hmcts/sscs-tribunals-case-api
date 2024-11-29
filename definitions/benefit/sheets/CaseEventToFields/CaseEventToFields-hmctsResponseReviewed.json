@@ -147,7 +147,7 @@
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 10,
     "PageID": "1.0",
-    "FieldShowCondition": "appeal.benefitType.code!=\"UC\" AND appeal.benefitType.code!=\"infectedBloodCompensation\"",
+    "FieldShowCondition": "appeal.benefitType.code!=\"infectedBloodCompensation\" AND appeal.benefitType.code!=\"UC\" OR createdInGapsFrom!=\"readyToList\"",
     "ShowSummaryChangeOption": "Y"
   },
   {
@@ -171,7 +171,7 @@
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 11,
     "PageID": "1.0",
-    "FieldShowCondition": "appeal.benefitType.code!=\"UC\" AND appeal.benefitType.code!=\"infectedBloodCompensation\"",
+    "FieldShowCondition": "appeal.benefitType.code!=\"infectedBloodCompensation\" AND appeal.benefitType.code!=\"UC\" OR createdInGapsFrom!=\"readyToList\"",
     "ShowSummaryChangeOption": "Y"
   },
   {
