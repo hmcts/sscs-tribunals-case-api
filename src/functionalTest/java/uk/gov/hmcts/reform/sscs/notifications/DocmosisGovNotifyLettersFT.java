@@ -9,7 +9,6 @@ import java.util.Set;
 import junitparams.JUnitParamsRunner;
 import lombok.SneakyThrows;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
