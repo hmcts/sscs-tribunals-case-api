@@ -187,6 +187,19 @@
     "SecurityClassification": "Public"
   },
   {
+    "LiveFrom": "04/07/2022",
+    "CaseTypeID": "Benefit",
+    "ID": "addCaseOutcome",
+    "Name": "Add case outcome",
+    "Description": "Add a case outcome",
+    "DisplayOrder": 141,
+    "EventEnablingCondition": "caseOutcome=\"DONOTSHOW\"",
+    "PreConditionState(s)": "dormantAppealState;postHearing;withUT;hearing;readyToList",
+    "PostConditionState": "*",
+    "ShowEventNotes": "Y",
+    "SecurityClassification": "Public"
+  },
+  {
     "LiveFrom": "01/01/2018",
     "CaseTypeID": "Benefit",
     "ID": "adminSendToAppealCreated",
