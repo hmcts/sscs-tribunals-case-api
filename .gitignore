@@ -46,3 +46,6 @@ definitions/**/*.xlsx#
 # env files
 .aat-env
 .env.local
+
+# befta noise
+befta_recent_executions_info_PREVIEW.json
