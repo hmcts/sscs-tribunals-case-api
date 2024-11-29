@@ -174,17 +174,6 @@
     "PageLabel": "Select Override Values"
   },
   {
-    "LiveFrom": "04/07/2022",
-    "CaseEventID": "addCaseOutcome",
-    "CaseFieldID": "caseOutcome",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 1,
-    "PageID": "1.0",
-    "ShowSummaryChangeOption": "Y"
-  },
-  {
     "CaseEventID": "adminUpdateEvent",
     "CaseFieldID": "directionResponse",
     "CaseTypeID": "Benefit",
@@ -193,17 +182,6 @@
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 2,
     "PageID": "1.0"
-  },
-  {
-    "LiveFrom": "04/07/2022",
-    "CaseEventID": "addCaseOutcome",
-    "CaseFieldID": "didPoAttend",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 2,
-    "PageID": "1.0",
-    "ShowSummaryChangeOption": "Y"
   },
   {
     "CaseEventID": "adminUpdateEvent",
@@ -4954,6 +4932,17 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "setHearingRoute",
     "PageLabel": "Set Hearing Route",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "LiveFrom": "30/10/2024",
+    "CaseEventID": "addHearingOutcome",
+    "CaseFieldID": "hearingOutcomeValue",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "COMPLEX",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
     "ShowSummaryChangeOption": "Y"
   }
 ]

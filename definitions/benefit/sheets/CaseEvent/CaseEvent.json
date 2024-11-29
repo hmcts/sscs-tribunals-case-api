@@ -187,18 +187,6 @@
     "SecurityClassification": "Public"
   },
   {
-    "LiveFrom": "04/07/2022",
-    "CaseTypeID": "Benefit",
-    "ID": "addCaseOutcome",
-    "Name": "Add case outcome",
-    "Description": "Add a case outcome",
-    "DisplayOrder": 141,
-    "PreConditionState(s)": "dormantAppealState;postHearing;withUT;hearing;readyToList",
-    "PostConditionState": "*",
-    "ShowEventNotes": "Y",
-    "SecurityClassification": "Public"
-  },
-  {
     "LiveFrom": "01/01/2018",
     "CaseTypeID": "Benefit",
     "ID": "adminSendToAppealCreated",
@@ -3228,6 +3216,20 @@
     "DisplayOrder": 10006,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "30/10/2024",
+    "CaseTypeID": "Benefit",
+    "ID": "addHearingOutcome",
+    "Name": "Add hearing outcome",
+    "Description": "Add a hearing outcome",
+    "DisplayOrder": 140,
+    "PreConditionState(s)": "dormantAppealState;postHearing;withUT;hearing;readyToList",
+    "CallBackURLAboutToStartEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToStart",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
+    "PostConditionState": "*",
+    "ShowEventNotes": "Y",
     "SecurityClassification": "Public"
   }
 ]
