@@ -3,15 +3,12 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 import static java.util.Objects.requireNonNull;
 
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
-@Slf4j
 @Component
 public class PreSubmitCallbackDispatcher<T extends CaseData> {
 
@@ -44,15 +41,7 @@ public class PreSubmitCallbackDispatcher<T extends CaseData> {
             if (callbackHandler.canHandle(callbackType, callback)) {
 
                 PreSubmitCallbackResponse<T> callbackResponseFromHandler = callbackHandler.handle(callbackType, callback, userAuthorisation);
-                if (callbackResponseFromHandler.getData() instanceof SscsCaseData) {
-                    log.info("CallbackType {} callbackHandler {} case data object {} SelectWhoReviewsCase {} InterlocReviewState {} case id {}",
-                            callbackType,
-                            callbackHandler,
-                            System.identityHashCode(callbackResponseFromHandler.getData()),
-                            ((SscsCaseData) callbackResponseFromHandler.getData()).getSelectWhoReviewsCase(),
-                            ((SscsCaseData) callbackResponseFromHandler.getData()).getInterlocReviewState(),
-                            ((SscsCaseData) callbackResponseFromHandler.getData()).getCcdCaseId());
-                }
+
                 callbackResponse.setData(callbackResponseFromHandler.getData());
                 callbackResponse.addErrors(callbackResponseFromHandler.getErrors());
                 callbackResponse.addWarnings(callbackResponseFromHandler.getWarnings());

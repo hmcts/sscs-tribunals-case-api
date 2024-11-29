@@ -96,8 +96,13 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
 
     @Test
     public void givenAHmctsResponseReviewedSubmittedEventAndInterlocIsRequiredForJudge_thenTriggerValidSendToInterlocEvent() {
-        DynamicListItem value = new DynamicListItem("reviewByJudge", "Review by Judge");
-        sscsCaseData = sscsCaseData.toBuilder().isInterlocRequired("Yes").selectWhoReviewsCase(new DynamicList(value, null)).build();
+        DynamicListItem selectReviewer = new DynamicListItem("reviewByJudge", "Review by Judge");
+        DynamicListItem originalSender = new DynamicListItem("appellant", "Appellant (or Appointee)");
+
+        sscsCaseData = sscsCaseData.toBuilder().isInterlocRequired("Yes")
+                .selectWhoReviewsCase(new DynamicList(selectReviewer, null))
+                .originalSender(new DynamicList(originalSender, null))
+                .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
@@ -115,14 +120,20 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build();
         mutator.accept(sscsCaseDetails);
 
-        assertEquals(value, sscsCaseDetails.getData().getSelectWhoReviewsCase().getValue());
+        assertEquals(selectReviewer, sscsCaseDetails.getData().getSelectWhoReviewsCase().getValue());
+        assertEquals(originalSender, sscsCaseDetails.getData().getOriginalSender().getValue());
     }
 
     @Test
     public void givenAHmctsResponseReviewedSubmittedEventAndInterlocIsRequiredForTcw_thenTriggerValidSendToInterlocEvent() {
 
         DynamicListItem value = new DynamicListItem("reviewByTcw", "Review by TCW");
-        sscsCaseData = sscsCaseData.toBuilder().isInterlocRequired("Yes").selectWhoReviewsCase(new DynamicList(value, null)).build();
+        DynamicListItem originalSender = new DynamicListItem("appellant", "Appellant (or Appointee)");
+
+        sscsCaseData = sscsCaseData.toBuilder().isInterlocRequired("Yes")
+                .selectWhoReviewsCase(new DynamicList(value, null))
+                .originalSender(new DynamicList(originalSender, null))
+                .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
@@ -140,6 +151,7 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
         mutator.accept(sscsCaseDetails);
 
         assertEquals(value, sscsCaseDetails.getData().getSelectWhoReviewsCase().getValue());
+        assertEquals(originalSender, sscsCaseDetails.getData().getOriginalSender().getValue());
     }
 
     @Test
