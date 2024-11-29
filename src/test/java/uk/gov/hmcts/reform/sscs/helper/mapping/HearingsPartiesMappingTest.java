@@ -1188,7 +1188,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
     @ValueSource(strings = {"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
     void buildDwpOrgDetailsForHmrc(String benefitCode) {
         SscsCaseData caseData = SscsCaseData.builder().benefitCode(benefitCode).build();
-        OrganisationDetails orgDetails = HearingsPartiesMapping.getDwpOrganisationDetails(caseData);
+        OrganisationDetails orgDetails = HearingsPartiesMapping.getOrganisationDetails(caseData);
         assertThat(orgDetails.getOrganisationType()).isEqualTo("ORG");
         assertThat(orgDetails.getName()).isEqualTo("HMRC");
     }
@@ -1198,7 +1198,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
     @ValueSource(strings = {"001", "002", "003", "011", "012", "067", "073", "079"})
     void buildDwpOrgDetailsForDwp(String benefitCode) {
         SscsCaseData caseData = SscsCaseData.builder().benefitCode(benefitCode).build();
-        OrganisationDetails orgDetails = HearingsPartiesMapping.getDwpOrganisationDetails(caseData);
+        OrganisationDetails orgDetails = HearingsPartiesMapping.getOrganisationDetails(caseData);
         assertThat(orgDetails.getOrganisationType()).isEqualTo("ORG");
         assertThat(orgDetails.getName()).isEqualTo("DWP");
     }
