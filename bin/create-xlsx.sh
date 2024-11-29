@@ -15,11 +15,6 @@ if [ -z "${VERSION}" ] || [ -z "${TYPE}" ] || [ -z "${ENV}" ]; then
     exit 1
 fi
 
-if [ ${ENV} == "pr" ] && [ -z "${CHANGE_ID}" ]; then
-    echo "please pass CHANGE_ID for pr environment"
-    exit 1
-fi
-
 case ${TYPE} in
     "benefit" )
         CASE_TYPE_XLSX_NAME="SSCS" ;;
@@ -62,7 +57,7 @@ if [ ${ENV} == "local" ]; then
     BULK_SCAN_API_URL="http://localhost:8090"
     BULK_SCAN_ORCHESTRATOR_URL="http://localhost:8099"
 elif [ ${ENV} == "pr" ]; then
-    UPPERCASE_ENV=${CHANGE_ID}
+    if [ -n "${CHANGE_ID}" ]; then UPPERCASE_ENV=${CHANGE_ID}; fi
     EM_CCD_ORCHESTRATOR_URL="https://em-ccdorc-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     TRIBUNALS_API_URL="https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     TYA_NOTIFICATIONS_API_URL="http://sscs-tribunals-api-pr-${CHANGE_ID}-sscs-tya-notification"
