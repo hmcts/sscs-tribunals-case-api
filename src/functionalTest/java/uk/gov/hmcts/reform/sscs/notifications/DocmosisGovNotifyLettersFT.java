@@ -31,7 +31,6 @@ public class DocmosisGovNotifyLettersFT extends AbstractNotificationsFT {
     @BeforeEach
     public void setup() {
         super.setup();
-        this.templates = getAllTemplates();
     }
 
     @SneakyThrows

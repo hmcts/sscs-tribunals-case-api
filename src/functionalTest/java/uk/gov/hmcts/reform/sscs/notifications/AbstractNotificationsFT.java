@@ -20,8 +20,6 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEvent
 import uk.gov.service.notify.Notification;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
-import uk.gov.service.notify.Template;
-import uk.gov.service.notify.TemplateList;
 
 @RunWith(JUnitParamsRunner.class)
 public abstract class AbstractNotificationsFT extends AbstractFunctionalTest {
@@ -32,8 +30,6 @@ public abstract class AbstractNotificationsFT extends AbstractFunctionalTest {
     @Qualifier("testNotificationClient")
     @Getter
     private NotificationClient client;
-
-    protected TemplateList templates;
 
     protected SscsCaseData caseData;
 
@@ -56,9 +52,8 @@ public abstract class AbstractNotificationsFT extends AbstractFunctionalTest {
                     .forEach(notification -> {
                         try {
                             final byte[] pdfForLetter = client.getPdfForLetter(String.valueOf(notification.getId()));
-                            Template template = getTemplateById(notification.getTemplateId());
                             FileUtils.writeByteArrayToFile(
-                                    new File("notification_pdfs/" + template.getName() + ".pdf"),
+                                    new File("notification_pdfs/" + notification.getTemplateId() + ".pdf"),
                                     pdfForLetter
                             );
                             savedLetters.add(notification.getId());
@@ -69,24 +64,6 @@ public abstract class AbstractNotificationsFT extends AbstractFunctionalTest {
             delayInSeconds(60);
         }
         return savedLetters;
-    }
-
-    private Template getTemplateById(UUID templateId) {
-        return templates.getTemplates().stream()
-                .filter(t -> t.getId().equals(templateId))
-                .findFirst()
-                .orElseThrow();
-    }
-
-    public TemplateList getAllTemplates() {
-        if (templates == null) {
-            try {
-                templates = client.getAllTemplates("letter");
-            } catch (NotificationClientException e) {
-                return null;
-            }
-        }
-        return templates;
     }
 
     public void logFailedEventNotification(NotificationEventType notificationType, Exception e) {
