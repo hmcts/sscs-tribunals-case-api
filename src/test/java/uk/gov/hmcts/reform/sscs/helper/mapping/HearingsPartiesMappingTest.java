@@ -1186,7 +1186,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
     @DisplayName("Unavailability ranges must be set from the excluded dates. Each range must have an UnavailabilityType.")
     @ParameterizedTest
     @ValueSource(strings = {"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
-    void buildDwpOrgDetailsForHmrc(String benefitCode) {
+    void buildOrgDetailsForHmrc(String benefitCode) {
         SscsCaseData caseData = SscsCaseData.builder().benefitCode(benefitCode).build();
         OrganisationDetails orgDetails = HearingsPartiesMapping.getOrganisationDetails(caseData);
         assertThat(orgDetails.getOrganisationType()).isEqualTo("ORG");
@@ -1196,11 +1196,20 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
     @DisplayName("Unavailability ranges must be set from the excluded dates. Each range must have an UnavailabilityType.")
     @ParameterizedTest
     @ValueSource(strings = {"001", "002", "003", "011", "012", "067", "073", "079"})
-    void buildDwpOrgDetailsForDwp(String benefitCode) {
+    void buildOrgDetailsForDwp(String benefitCode) {
         SscsCaseData caseData = SscsCaseData.builder().benefitCode(benefitCode).build();
         OrganisationDetails orgDetails = HearingsPartiesMapping.getOrganisationDetails(caseData);
         assertThat(orgDetails.getOrganisationType()).isEqualTo("ORG");
         assertThat(orgDetails.getName()).isEqualTo("DWP");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"093"})
+    void buildOrgDetailsForIbca(String benefitCode) {
+        SscsCaseData caseData = SscsCaseData.builder().benefitCode(benefitCode).build();
+        OrganisationDetails orgDetails = HearingsPartiesMapping.getOrganisationDetails(caseData);
+        assertThat(orgDetails.getOrganisationType()).isEqualTo("ORG");
+        assertThat(orgDetails.getName()).isEqualTo("IBCA");
     }
 
     private static Stream<Arguments> getPartyReferenceArguments() {
