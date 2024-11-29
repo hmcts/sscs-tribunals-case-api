@@ -75,7 +75,7 @@ public class SscsPdfService {
                     LocalDateToWelshStringConverter.convert(sscsCaseData.getAppeal().getAppellant().getIdentity().getDob()));
 
             final Appointee appointee = sscsCaseData.getAppeal().getAppellant().getAppointee();
-            String appellantDob = isNotEmpty(appointee) && isNotEmpty(appointee.getIdentity())
+            String appellantDob = isNotEmpty(appointee) && isNotEmpty(appointee.getIdentity()) && isNotEmpty(appointee.getIdentity().getDob())
                     ? LocalDateToWelshStringConverter.convert(appointee.getIdentity().getDob()) : "";
             placeholders.put("appellant_appointee_identity_dob", appellantDob);
 
