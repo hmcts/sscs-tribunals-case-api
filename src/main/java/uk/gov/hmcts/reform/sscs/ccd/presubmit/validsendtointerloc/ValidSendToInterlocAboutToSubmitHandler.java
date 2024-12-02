@@ -75,12 +75,6 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
                 .filter(x -> x.getCcdDefinition().equals(sscsCaseData.getSelectWhoReviewsCase().getValue().getCode()))
                 .findFirst()
                 .orElse(null);
-            log.info("sscsCaseData.getSelectWhoReviewsCase {} interloc review state: {} , sscsCaseData {}, caseid {} )",
-                    sscsCaseData.getSelectWhoReviewsCase(),
-                    interlocState,
-                    System.identityHashCode(sscsCaseData),
-                    sscsCaseData.getCcdCaseId());
-
             sscsCaseData.setInterlocReviewState(interlocState);
         }
         sscsCaseData.setSelectWhoReviewsCase(null);
