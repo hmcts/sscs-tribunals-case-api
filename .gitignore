@@ -40,5 +40,12 @@ lib/applicationinsights.log
 definitions/**/*.xlsx
 definitions/**/*.xlsx#
 
-# aat env file
+# mirrord
+.mirrord/*
+
+# env files
 .aat-env
+.env.local
+
+# befta noise
+befta_recent_executions_info_PREVIEW.json
