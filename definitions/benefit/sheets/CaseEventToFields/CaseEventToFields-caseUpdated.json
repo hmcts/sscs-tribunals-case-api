@@ -1,26 +1,5 @@
 [
   {
-    "LiveFrom": "05/07/2022",
-    "CaseEventID": "caseUpdated",
-    "CaseFieldID": "caseOutcome",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 15,
-    "PageID": "1.0",
-    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=caseUpdated1.0"
-  },
-  {
-    "LiveFrom": "05/07/2022",
-    "CaseEventID": "caseUpdated",
-    "CaseFieldID": "didPoAttend",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 16,
-    "PageID": "1.0"
-  },
-  {
     "CaseEventID": "caseUpdated",
     "CaseFieldID": "caseReference",
     "CaseTypeID": "Benefit",

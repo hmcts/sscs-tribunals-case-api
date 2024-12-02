@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.functional.tyanotifications.sya.notifications;
 
 import static org.junit.Assert.*;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.FUNCTIONAL_RETRY_LIMIT;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
 
 import java.io.IOException;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import junitparams.Parameters;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReasonableAdjustmentStatus;
@@ -15,6 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.functional.tyanotifications.AbstractFunctionalTest;
+import uk.gov.hmcts.reform.sscs.functional.tyanotifications.Retry;
 import uk.gov.service.notify.Notification;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -158,6 +161,9 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     public NotificationsFunctionalTest() {
         super(30);
     }
+
+    @Rule
+    public Retry retry = new Retry(FUNCTIONAL_RETRY_LIMIT);
 
     @Test
     public void shouldSendEvidenceReceivedNotification() throws NotificationClientException, IOException {
