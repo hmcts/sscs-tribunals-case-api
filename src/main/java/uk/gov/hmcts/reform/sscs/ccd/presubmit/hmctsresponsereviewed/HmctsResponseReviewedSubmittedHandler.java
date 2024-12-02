@@ -67,7 +67,7 @@ public class HmctsResponseReviewedSubmittedHandler implements PreSubmitCallbackH
                         caseData.setSelectWhoReviewsCase(sscsCaseData.getSelectWhoReviewsCase());
                         caseData.setOriginalSender(sscsCaseData.getOriginalSender());
                     });
-        } else {
+        } else if (!sscsCaseData.isIbcCase()) {
             updateCase(
                     callback.getCaseDetails().getId(),
                     READY_TO_LIST,
