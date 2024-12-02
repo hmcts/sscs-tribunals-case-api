@@ -507,7 +507,7 @@ class SscsUtilTest {
 
     @Test
     void shouldPopulateIbcaFieldsOnHandleIbcaCase() {
-        final SscsCaseData caseData = SscsCaseData.builder()
+        final SscsCaseData sscsCaseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
                 .mrnDetails(MrnDetails.builder().build())
                 .hearingOptions(HearingOptions.builder().build())
@@ -516,11 +516,11 @@ class SscsUtilTest {
             .regionalProcessingCenter(RegionalProcessingCenter.builder().build())
             .build();
 
-        handleIbcaCase(caseData);
+        handleIbcaCase(sscsCaseData);
 
-        assertThat(caseData.getAppeal().getHearingOptions().getHearingRoute()).isEqualTo(LIST_ASSIST);
-        assertThat(caseData.getAppeal().getMrnDetails().getDwpIssuingOffice()).isEqualTo("IBCA");
-        assertThat(caseData.getRegionalProcessingCenter().getHearingRoute()).isEqualTo(LIST_ASSIST);
+        assertThat(sscsCaseData.getAppeal().getHearingOptions().getHearingRoute()).isEqualTo(LIST_ASSIST);
+        assertThat(sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice()).isEqualTo("IBCA");
+        assertThat(sscsCaseData.getRegionalProcessingCenter().getHearingRoute()).isEqualTo(LIST_ASSIST);
     }
 
     @Test
