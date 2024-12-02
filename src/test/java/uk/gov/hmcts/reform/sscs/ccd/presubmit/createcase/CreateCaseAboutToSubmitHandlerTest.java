@@ -46,6 +46,21 @@ public class CreateCaseAboutToSubmitHandlerTest {
     private CaseDetails<SscsCaseData> caseDetails;
 
     @Mock
+    private SscsCaseData mockedCaseData;
+
+    @Mock
+    private Appeal mockedAppeal;
+
+    @Mock
+    private Appellant mockedAppellant;
+
+    @Mock
+    private Name mockedName;
+
+    @Mock
+    private Identity mockedIdentity;
+
+    @Mock
     private VerbalLanguagesService verbalLanguagesService;
 
     private CreateCaseAboutToSubmitHandler createCaseAboutToSubmitHandler;
@@ -109,6 +124,46 @@ public class CreateCaseAboutToSubmitHandlerTest {
         createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(emailHelper).generateUniqueEmailId(eq(caseDetails.getCaseData().getAppeal().getAppellant()));
+        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), any(), eq("Test.pdf"));
+    }
+
+
+    @Test
+    void shouldCallPdfServiceWhenIbca() throws CcdException {
+        when(caseDetails.getCaseData()).thenReturn(mockedCaseData);
+        when(mockedCaseData.getCaseCreated()).thenReturn("");
+        when(mockedCaseData.getCcdCaseId()).thenReturn("1021");
+        when(mockedCaseData.getBenefitCode()).thenReturn(IBCA_BENEFIT_CODE);
+        when(mockedCaseData.getAppeal()).thenReturn(mockedAppeal);
+        when(mockedAppeal.getHearingOptions()).thenReturn(HearingOptions.builder().build());
+        when(mockedAppeal.getMrnDetails()).thenReturn(MrnDetails.builder().build());
+        when(mockedAppeal.getAppellant()).thenReturn(mockedAppellant);
+        when(mockedAppellant.getName()).thenReturn(mockedName);
+        when(mockedAppellant.getIdentity()).thenReturn(mockedIdentity);
+        when(mockedName.getLastName()).thenReturn("appellantLastName");
+        when(mockedIdentity.getIbcaReference()).thenReturn("ibcaRef");
+        when(mockedCaseData.getRegionalProcessingCenter()).thenReturn(RegionalProcessingCenter.builder().build());
+
+        createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(emailHelper, never()).generateUniqueEmailId(any());
+        String expectedFilename = String.format("%s_%s", "appellantLastName", "ibcaRef") + ".pdf";
+        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), any(), eq(expectedFilename));
+    }
+
+
+    @Test
+    void isIbaFalseIfNullBenefitType() throws CcdException {
+        when(caseDetails.getCaseData()).thenReturn(mockedCaseData);
+        when(mockedCaseData.getCaseCreated()).thenReturn("");
+        when(mockedCaseData.getCcdCaseId()).thenReturn("1021");
+        when(mockedCaseData.getBenefitCode()).thenReturn("");
+        when(mockedCaseData.getAppeal()).thenReturn(mockedAppeal);
+        when(mockedAppeal.getAppellant()).thenReturn(mockedAppellant);
+
+        createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(emailHelper, times(1)).generateUniqueEmailId(any());
         verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), any(), any());
     }
 
@@ -254,9 +309,11 @@ public class CreateCaseAboutToSubmitHandlerTest {
     @Test
     void shouldReturnErrorIfNullCreatedDate() throws CcdException {
         callback.getCaseDetails().getCaseData().setCaseCreated(null);
+        callback.getCaseDetails().getCaseData().setBenefitCode("015");
         PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
+        assertTrue(response.getErrors().contains("The Case Created Date must be set to generate the SSCS5"));
     }
 
     @Test
