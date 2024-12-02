@@ -3,7 +3,7 @@
 TYPE=${1}
 VERSION=${2}
 ENV=${3}
-CHANGE_ID=${4}
+PR_CHANGE_ID=${4}
 LIKE_PROD=${5:-${ENV}}
 SHUTTERED=${6:-false}
 
@@ -57,7 +57,10 @@ if [ ${ENV} == "local" ]; then
     BULK_SCAN_API_URL="http://localhost:8090"
     BULK_SCAN_ORCHESTRATOR_URL="http://localhost:8099"
 elif [ ${ENV} == "pr" ]; then
-    if [ -n "${CHANGE_ID}" ]; then UPPERCASE_ENV=${CHANGE_ID}; fi
+    if [ -n "${PR_CHANGE_ID}" ]; then
+      CHANGE_ID="${PR_CHANGE_ID}";
+      UPPERCASE_ENV="${PR_CHANGE_ID}";
+    fi
     EM_CCD_ORCHESTRATOR_URL="https://em-ccdorc-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     TRIBUNALS_API_URL="https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     TYA_NOTIFICATIONS_API_URL="http://sscs-tribunals-api-pr-${CHANGE_ID}-sscs-tya-notification"
