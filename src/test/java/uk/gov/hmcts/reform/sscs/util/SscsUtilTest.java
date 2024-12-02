@@ -1,9 +1,12 @@
 package uk.gov.hmcts.reform.sscs.util;
 
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.CORRECTION_GRANTED;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_CORRECTED_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
@@ -41,6 +44,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Correction;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
@@ -561,5 +565,51 @@ class SscsUtilTest {
         final String result = generateUniqueIbcaId(appellant);
 
         assertThat(result).isEqualTo("Test_IBCA12345");
+    }
+
+    @Test
+    void shouldReturnTrueWhenIsIbcaCase() {
+        final SscsCaseData caseData = SscsCaseData.builder()
+                .benefitCode("093")
+                .appeal(Appeal.builder()
+                        .benefitType(BenefitType.builder()
+                                .descriptionSelection(
+                                        new DynamicList(
+                                                new DynamicListItem(
+                                                        "infectedBloodAppeal",
+                                                        "infectedBloodAppeal"
+                                                ),
+                                                emptyList()
+                                        )
+                                )
+                                .build()
+                        )
+                        .build()
+                )
+                .build();
+        assertTrue(caseData.isIbcCase());
+    }
+
+    @Test
+    void shouldReturnFalseWhenNotIbcaCase() {
+        final SscsCaseData caseData = SscsCaseData.builder()
+                .benefitCode("037")
+                .appeal(Appeal.builder()
+                        .benefitType(BenefitType.builder()
+                                .descriptionSelection(
+                                        new DynamicList(
+                                                new DynamicListItem(
+                                                        "DLA",
+                                                        "DLA"
+                                                ),
+                                                emptyList()
+                                        )
+                                )
+                                .build()
+                        )
+                        .build()
+                )
+                .build();
+        assertFalse(caseData.isIbcCase());
     }
 }
