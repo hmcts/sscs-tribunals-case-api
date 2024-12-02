@@ -34,7 +34,7 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
 
     private final PostcodeValidator postcodeValidator = new PostcodeValidator();
 
-    public static final Pattern IBCA_REFERENCE_REGEX = Pattern.compile("^[A-Za-z]\\d{2}[A-HJKMNP-Z]\\d{2}$");
+    private static final Pattern IBCA_REFERENCE_REGEX = Pattern.compile("^[A-Za-z]\\d{2}[A-HJKMNP-Z]\\d{2}$");
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
