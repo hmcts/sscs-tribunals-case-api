@@ -170,7 +170,7 @@ withPipeline(type, product, component) {
         } else {
             env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
         }
-        generateDefinitions()
+        generateDefinitions(isHearingsPr)
     }
 
     afterSuccess('akschartsinstall') {
@@ -192,10 +192,9 @@ withPipeline(type, product, component) {
     }
 }
 
-def generateDefinitions() {
-    def isHearingsPrValue = isHearingsPr ? "true" : "false"
-    sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${isHearingsPrValue}"
-    sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT} ${isHearingsPrValue}"
+def generateDefinitions(isHearingsPr) {
+    sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${isHearingsPr}"
+    sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT} ${isHearingsPr}"
     steps.archiveArtifacts artifacts: "definitions/benefit/*.xlsx"
     steps.archiveArtifacts artifacts: "definitions/bulkscan/*.xlsx"
 }
