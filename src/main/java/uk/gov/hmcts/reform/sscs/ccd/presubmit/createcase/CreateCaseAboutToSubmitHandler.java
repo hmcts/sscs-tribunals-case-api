@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.generateUniqueIbcaId;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getSscsType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleBenefitType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleIbcaCase;
 
@@ -80,7 +81,7 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
         }
 
         if (caseData.getCaseCreated() == null) {
-            preSubmitCallbackResponse.addError("The Case Created Date must be set to generate the SSCS1");
+            preSubmitCallbackResponse.addError("The Case Created Date must be set to generate the " + getSscsType(caseData));
         } else {
             createAppealPdf(caseData);
         }
