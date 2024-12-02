@@ -148,7 +148,7 @@ withPipeline(type, product, component) {
         }
 
         def tests = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "test-suite")
-        env.TEST_SUITE = tests.size() > 0 ? tests.collect { it.replace("test-suite:", "@") }.join("|") : "@nightly-pipeline"
+        env.TEST_SUITE = tests.size() > 0 ? tests.collect { it.replace("test-suite:", "@") }.join("|") : "@preview-pipeline"
         echo "Tags added on case is  " + {env.TEST_SUITE}
     }
     onDemo {
