@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isSscs2Case;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.validateBenefitIssueCode;
 
@@ -50,6 +51,7 @@ public class DwpUploadResponseMidEventHandler implements PreSubmitCallbackHandle
         validateBenefitIssueCode(sscsCaseData, response, categoryMapService);
         validatePostponementRequests(sscsCaseData, response);
         forceToAddOtherPartyOnSscs2Case(sscsCaseData, response);
+        validateBenefitCode(sscsCaseData, response);
 
         return response;
     }
@@ -72,6 +74,15 @@ public class DwpUploadResponseMidEventHandler implements PreSubmitCallbackHandle
                 && sscsCaseData.getOtherParties() != null 
                 && sscsCaseData.getOtherParties().size() == 0) {
             preSubmitCallbackResponse.addError("Please provide other party details");
+        }
+    }
+
+    private void validateBenefitCode(SscsCaseData sscsCaseData,
+                                     PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+
+        Benefit benefit = Benefit.getBenefitByCodeOrThrowException(sscsCaseData.getAppeal().getBenefitType().getCode());
+        if (!IBCA_BENEFIT_CODE.equals(benefit.getBenefitCode()) && IBCA_BENEFIT_CODE.equals(sscsCaseData.getBenefitCode())) {
+            preSubmitCallbackResponse.addError("Please choose a valid benefit code");
         }
     }
 }
