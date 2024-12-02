@@ -1719,7 +1719,7 @@ smsSender:
     uc: 2811c776-2d38-4413-96c6-efa639eabc40
 
 reminder:
-    evidenceReminder.delay.seconds: 604800
+    evidenceReminder.delay.seconds: 600
     dwpResponseLateReminder.delay.seconds: 3024000
     paperCases.decisionDate.initialDelay.seconds: 7257600
     hearingContactDate.initialDelay.seconds: 4838400
