@@ -193,8 +193,9 @@ withPipeline(type, product, component) {
 }
 
 def generateDefinitions() {
-    sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${isHearingsPr}"
-    sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT} ${isHearingsPr}"
+    def isHearingsPrValue = isHearingsPr ? "true" : "false"
+    sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${isHearingsPrValue}"
+    sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT} ${isHearingsPrValue}"
     steps.archiveArtifacts artifacts: "definitions/benefit/*.xlsx"
     steps.archiveArtifacts artifacts: "definitions/bulkscan/*.xlsx"
 }
