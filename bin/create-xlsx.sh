@@ -1,54 +1,59 @@
 #!/usr/bin/env bash
 
-TYPE=${1}
-VERSION=${2}
-ENV=${3}
-PR_CHANGE_ID=${4}
-LIKE_PROD=${5:-${ENV}}
+TYPE=$1
+VERSION=$2
+ENV=$3
+CHANGE_ID=${4:-$CHANGE_ID}
+LIKE_PROD=${5:-$ENV}
 SHUTTERED=${6:-false}
 
-RUN_DIR=`pwd`
+RUN_DIR=$(pwd)
 
-
-if [ -z "${VERSION}" ] || [ -z "${TYPE}" ] || [ -z "${ENV}" ]; then
-    echo "Usage create-xlsx.sh [type] [version] [env]"
+if [ -z $TYPE ] || [ -z $VERSION ] || [ -z $ENV ]; then
+    echo "Usage: create-xlsx.sh [type] [version] [env] [change_id] [like_prod] [shuttered]"
     exit 1
 fi
 
-case ${TYPE} in
-    "benefit" )
-        CASE_TYPE_XLSX_NAME="SSCS" ;;
-    "bulkscan" )
-        CASE_TYPE_XLSX_NAME="BulkScanning" ;;
-    * )
-        echo "Type must be benefit or bulkscan"
+case $TYPE in
+    "benefit")
+        CASE_TYPE_XLSX_NAME="SSCS"
+        ;;
+    "bulkscan")
+        CASE_TYPE_XLSX_NAME="BulkScanning"
+        ;;
+    *)
+        echo "Type must be 'benefit' or 'bulkscan'"
         exit 1
+        ;;
 esac
 
-TAG_VERSION=$(cat ${RUN_DIR}/definitions/${TYPE}/VERSION.yaml | awk '{print $2}')
+TAG_VERSION=$(awk '{print $2}' $RUN_DIR/definitions/$TYPE/VERSION.yaml)
 
-if [ "${VERSION}" == "tag" ]; then
-    CCD_DEF_VERSION=${TAG_VERSION}
-    FILE_VERSION=${TAG_VERSION}
-elif [ "${VERSION}" == "dev" ]; then
-    CCD_DEF_VERSION="${TAG_VERSION}-dev"
-    FILE_VERSION=${VERSION}
+# Determine CCD definition version and file version
+if [ $VERSION = "tag" ]; then
+    CCD_DEF_VERSION=$TAG_VERSION
+    FILE_VERSION=$TAG_VERSION
+elif [ $VERSION = "dev" ]; then
+    CCD_DEF_VERSION="$TAG_VERSION-dev"
+    FILE_VERSION=$VERSION
 else
-    CCD_DEF_VERSION="${TAG_VERSION}"
-    FILE_VERSION=${VERSION}
+    CCD_DEF_VERSION=$TAG_VERSION
+    FILE_VERSION=$VERSION
 fi
 
-UPPERCASE_ENV=$(printf '%s\n' "${ENV}" | awk '{ print toupper($0) }')
+# Convert ENV to uppercase
+UPPERCASE_ENV=$(echo $ENV | awk '{print toupper($0)}')
 
-if [ ${SHUTTERED} == true ]; then
-  shutteredExclusion="*-nonshuttered.json"
-  ccdDefinitionFile="CCD_${CASE_TYPE_XLSX_NAME}Definition_${UPPERCASE_ENV}_SHUTTERED.xlsx"
+# Handle shuttered/non-shuttered configurations
+if [ $SHUTTERED = true ]; then
+    shutteredExclusion="*-nonshuttered.json"
+    ccdDefinitionFile="CCD_${CASE_TYPE_XLSX_NAME}Definition_${UPPERCASE_ENV}_SHUTTERED.xlsx"
 else
-  shutteredExclusion="*-shuttered.json"
-  ccdDefinitionFile="CCD_${CASE_TYPE_XLSX_NAME}Definition_${UPPERCASE_ENV}.xlsx"
+    shutteredExclusion="*-shuttered.json"
+    ccdDefinitionFile="CCD_${CASE_TYPE_XLSX_NAME}Definition_${UPPERCASE_ENV}.xlsx"
 fi
 
-echo "Tag version: ${TAG_VERSION}, CCD Definitions Version: ${CCD_DEF_VERSION}, File Name: ${ccdDefinitionFile}"
+echo "Tag version: $TAG_VERSION, CCD Definitions Version: $CCD_DEF_VERSION, File Name: $ccdDefinitionFile"
 
 if [ ${ENV} == "local" ]; then
     EM_CCD_ORCHESTRATOR_URL="http://localhost:4623"
@@ -56,9 +61,8 @@ if [ ${ENV} == "local" ]; then
     BULK_SCAN_API_URL="http://localhost:8090"
     BULK_SCAN_ORCHESTRATOR_URL="http://localhost:8099"
 elif [ ${ENV} == "pr" ]; then
-    if [ -n "${PR_CHANGE_ID}" ]; then
-      CHANGE_ID="${PR_CHANGE_ID}";
-      UPPERCASE_ENV="${PR_CHANGE_ID}";
+    if [ -n "${4}" ]; then
+      UPPERCASE_ENV="${CHANGE_ID}";
     fi
     EM_CCD_ORCHESTRATOR_URL="https://em-ccdorc-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     TRIBUNALS_API_URL="https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
