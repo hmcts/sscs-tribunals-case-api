@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.openMocks;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 
 import java.util.List;
@@ -65,6 +66,8 @@ public class SscsPdfServiceTest {
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
         caseData.setLanguagePreferenceWelsh("Yes");
         caseData.getAppeal().getAppellant().getIdentity().setDob("2000-12-31");
+        caseData.getAppeal().getAppellant().getAppointee().getIdentity().setDob("1995-12-31");
+        caseData.getAppeal().getAppellant().getAddress().setInMainlandUk(YES);
         caseData.setCaseCreated("2020-12-31");
         caseData.getAppeal().getBenefitType().setCode(benefitCode);
         service.generatePdf(caseData, 1L, "appellantEvidence", "fileName");
@@ -76,7 +79,7 @@ public class SscsPdfServiceTest {
         assertEquals("30 Mehefin 2018", ((List) argumentCaptor.getValue().get("welsh_exclude_dates")).get(0));
         assertEquals("30 Gorffennaf 2018", ((List) argumentCaptor.getValue().get("welsh_exclude_dates")).get(1));
         assertEquals("30 Awst 2018", ((List) argumentCaptor.getValue().get("welsh_exclude_dates")).get(2));
-        assertEquals("31 Rhagfyr 2000", argumentCaptor.getValue().get("appellant_appointee_identity_dob"));
+        assertEquals("31 Rhagfyr 1995", argumentCaptor.getValue().get("appellant_appointee_identity_dob"));
         assertEquals("31 Rhagfyr 2000", argumentCaptor.getValue().get("appellant_identity_dob"));
         assertEquals("29 Mehefin 2018", argumentCaptor.getValue().get("date_of_decision"));
         assertEquals("31 Rhagfyr 2020", argumentCaptor.getValue().get("welshCurrentDate"));
@@ -84,6 +87,7 @@ public class SscsPdfServiceTest {
         assertEquals(expectedEnglishBenefitName, ((PdfWrapper) argumentCaptor.getValue().get("PdfWrapper")).getEnglishBenefitName());
         assertEquals("nac ydw", argumentCaptor.getValue().get("welshEvidencePresent"));
         assertEquals("ydw", argumentCaptor.getValue().get("welshWantsToAttend"));
+        assertEquals("ydw", argumentCaptor.getValue().get("welshInMainlandUk"));
     }
 
 
