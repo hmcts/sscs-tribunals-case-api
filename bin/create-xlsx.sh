@@ -3,14 +3,15 @@
 TYPE=$1
 VERSION=$2
 ENV=$3
-CHANGE_ID=${4:-$CHANGE_ID}
-LIKE_PROD=${5:-$ENV}
-SHUTTERED=${6:-false}
+IS_HEARINGS_PR=${4:-false}
+CHANGE_ID=${5:-$CHANGE_ID}
+LIKE_PROD=${6:-$ENV}
+SHUTTERED=${7:-false}
 
 RUN_DIR=$(pwd)
 
-if [ -z $TYPE ] || [ -z $VERSION ] || [ -z $ENV ]; then
-    echo "Usage: create-xlsx.sh [type] [version] [env] [change_id] [like_prod] [shuttered]"
+if [ -z "$TYPE" ] || [ -z "$VERSION" ] || [ -z "$ENV" ]; then
+    echo "Usage: create-xlsx.sh [type] [version] [env] [is_hearings_pr] [change_id] [like_prod] [shuttered]"
     exit 1
 fi
 
@@ -27,25 +28,26 @@ case $TYPE in
         ;;
 esac
 
-TAG_VERSION=$(awk '{print $2}' $RUN_DIR/definitions/$TYPE/VERSION.yaml)
+TAG_VERSION=$(awk '{print $2}' "$RUN_DIR/definitions/$TYPE/VERSION.yaml")
 
-# Determine CCD definition version and file version
-if [ $VERSION = "tag" ]; then
+if [ "$VERSION" = "tag" ]; then
     CCD_DEF_VERSION=$TAG_VERSION
     FILE_VERSION=$TAG_VERSION
-elif [ $VERSION = "dev" ]; then
-    CCD_DEF_VERSION="$TAG_VERSION-dev"
+elif [ "$VERSION" = "dev" ]; then
+    CCD_DEF_VERSION="${TAG_VERSION}-dev"
     FILE_VERSION=$VERSION
 else
     CCD_DEF_VERSION=$TAG_VERSION
     FILE_VERSION=$VERSION
 fi
 
-# Convert ENV to uppercase
-UPPERCASE_ENV=$(echo $ENV | awk '{print toupper($0)}')
+UPPERCASE_ENV=$(echo "$ENV" | awk '{print toupper($0)}')
 
-# Handle shuttered/non-shuttered configurations
-if [ $SHUTTERED = true ]; then
+if [ "$IS_HEARINGS_PR" = true ] && [ -n "$CHANGE_ID" ]; then
+    UPPERCASE_ENV="$CHANGE_ID"
+fi
+
+if [ "$SHUTTERED" = true ]; then
     shutteredExclusion="*-nonshuttered.json"
     ccdDefinitionFile="CCD_${CASE_TYPE_XLSX_NAME}Definition_${UPPERCASE_ENV}_SHUTTERED.xlsx"
 else
@@ -55,20 +57,20 @@ fi
 
 echo "Tag version: $TAG_VERSION, CCD Definitions Version: $CCD_DEF_VERSION, File Name: $ccdDefinitionFile"
 
-if [ ${ENV} == "local" ]; then
+if [ "$ENV" = "local" ]; then
     EM_CCD_ORCHESTRATOR_URL="http://localhost:4623"
     TRIBUNALS_API_URL="http://localhost:8008"
     BULK_SCAN_API_URL="http://localhost:8090"
     BULK_SCAN_ORCHESTRATOR_URL="http://localhost:8099"
-elif [ ${ENV} == "pr" ]; then
-    if [ -n "${4}" ]; then
-      UPPERCASE_ENV="${CHANGE_ID}";
+elif [ "$ENV" = "pr" ]; then
+    if [ "$IS_HEARINGS_PR" = true ]; then
+        UPPERCASE_ENV="$CHANGE_ID"
     fi
     EM_CCD_ORCHESTRATOR_URL="https://em-ccdorc-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     TRIBUNALS_API_URL="https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     BULK_SCAN_API_URL="http://sscs-bulk-scan-aat.service.core-compute-aat.internal"
     BULK_SCAN_ORCHESTRATOR_URL="http://bulk-scan-orchestrator-aat.service.core-compute-aat.internal"
-elif [ ${ENV} == "aat" ] || [ ${ENV} == "demo" ] || [ ${ENV} == "prod" ] || [ ${ENV} == "perftest" ] || [ ${ENV} == "ithc" ]; then
+elif [ "$ENV" = "aat" ] || [ "$ENV" = "demo" ] || [ "$ENV" = "prod" ] || [ "$ENV" = "perftest" ] || [ "$ENV" = "ithc" ]; then
     EM_CCD_ORCHESTRATOR_URL="http://em-ccd-orchestrator-${ENV}.service.core-compute-${ENV}.internal"
     TRIBUNALS_API_URL="http://sscs-tribunals-api-${ENV}.service.core-compute-${ENV}.internal"
     BULK_SCAN_API_URL="http://sscs-bulk-scan-${ENV}.service.core-compute-${ENV}.internal"
@@ -77,7 +79,6 @@ else
     echo "${ENV} not recognised"
     exit 1
 fi
-
 
 case ${ENV} in
   local)
@@ -135,17 +136,17 @@ case ${ENV} in
     exit 1 ;;
 esac
 
-if [ ${ENV} == "prod" ] || [ ${LIKE_PROD} == "prod" ]; then
+if [ "$ENV" = "prod" ] || [ "$LIKE_PROD" = "prod" ]; then
   excludedFilenamePatterns="-e *-nonprod.json,${shutteredExclusion}"
 else
   excludedFilenamePatterns="-e *-prod.json,${shutteredExclusion}"
 fi
 
-echo ${excludedFilenamePatterns}
+echo "$excludedFilenamePatterns"
 
 docker run --rm --name json2xlsx \
-  -v ${RUN_DIR}/definitions/${TYPE}:/tmp/json \
-  -v ${RUN_DIR}/definitions/${TYPE}:/tmp/output \
+  -v "${RUN_DIR}/definitions/${TYPE}:/tmp/json" \
+  -v "${RUN_DIR}/definitions/${TYPE}:/tmp/output" \
   -e "CCD_DEF_EM_CCD_ORCHESTRATOR_URL=${EM_CCD_ORCHESTRATOR_URL}" \
   -e "CCD_DEF_TRIBUNALS_API_URL=${TRIBUNALS_API_URL}" \
   -e "CCD_DEF_BULK_SCAN_API_URL=${BULK_SCAN_API_URL}" \
@@ -158,4 +159,4 @@ docker run --rm --name json2xlsx \
   -e "CCD_DEF_ENV=${UPPERCASE_ENV}" \
   -e "CCD_DEF_VERSION=${CCD_DEF_VERSION}" \
   hmctspublic.azurecr.io/ccd/definition-processor:latest \
-  json2xlsx -D /tmp/json/sheets ${excludedFilenamePatterns} -o /tmp/output/${ccdDefinitionFile}
+  json2xlsx -D /tmp/json/sheets "$excludedFilenamePatterns" -o "/tmp/output/${ccdDefinitionFile}"
