@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase.CreateCaseMidEventHandler.IBCA_REFERENCE_VALIDATION_ERROR;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -222,7 +224,43 @@ public class CreateCaseMidEventHandlerTest {
         assertThat(response.getErrors()).contains("You must enter address line 1 for the appellant");
         assertThat(response.getErrors()).contains("You must enter a valid country for the appellant");
         assertThat(response.getErrors()).contains("You must enter Living in the UK for the representative");
+        assertThat(response.getWarnings()).contains(IBCA_REFERENCE_VALIDATION_ERROR);
+    }
 
+    @Test
+    void shouldReturnWarningsOnMidEventForInvalidIbcaReference() {
+        SscsCaseData caseData = SscsCaseData.builder()
+                .appeal(Appeal.builder()
+                        .appellant(Appellant.builder()
+                                .address(Address.builder()
+                                        .line1("Test line 1")
+                                        .country("Panama")
+                                        .ukPortOfEntryList(
+                                                new DynamicList(
+                                                        new DynamicListItem("GB000434", "Aberdeen"),
+                                                        new ArrayList<>()
+                                                )
+                                        )
+                                        .inMainlandUk(NO)
+                                        .build()
+                                )
+                                .identity(Identity.builder().ibcaReference("IBCA1234").build())
+                                .build()
+                        )
+                        .rep(Representative.builder().build())
+                        .build()
+                )
+                .benefitCode(IBCA_BENEFIT_CODE)
+                .build();
+
+
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = midEventHandler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getWarnings()).contains(IBCA_REFERENCE_VALIDATION_ERROR);
     }
 
     @Test
@@ -242,6 +280,7 @@ public class CreateCaseMidEventHandlerTest {
                                         .inMainlandUk(NO)
                                         .build()
                                 )
+                                .identity(Identity.builder().ibcaReference("E24A45").build())
                                 .build()
                         )
                         .rep(Representative.builder().build())
@@ -256,6 +295,7 @@ public class CreateCaseMidEventHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = midEventHandler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
+        assertThat(response.getWarnings()).isEmpty();
         assertThat(response.getErrors()).isEmpty();
     }
 }
