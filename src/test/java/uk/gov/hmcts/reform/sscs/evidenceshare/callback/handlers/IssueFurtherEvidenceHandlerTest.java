@@ -214,7 +214,7 @@ public class IssueFurtherEvidenceHandlerTest {
 
         captor.getValue().accept(sscsCaseDetails);
 
-        assertEquals("hmctsDwpState has incorrect value", "failedSendingFurtherEvidence", caseData.getHmctsDwpState());
+        assertEquals("hmctsDwpState has incorrect value", "failedSendingFurtherEvidence", sscsCaseDetails.getData().getHmctsDwpState());
     }
 
     @Test

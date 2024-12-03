@@ -185,7 +185,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
                 "Review document tab to see document(s) that haven't been issued, then use the"
                         + " \"Reissue further evidence\" within next step and select affected document(s) to re-send",
                 idamService.getIdamTokens(),
-                sscsCaseData -> caseData.setHmctsDwpState("failedSendingFurtherEvidence")
+                sscsCaseDetails -> sscsCaseDetails.getData().setHmctsDwpState("failedSendingFurtherEvidence")
         );
     }
 
