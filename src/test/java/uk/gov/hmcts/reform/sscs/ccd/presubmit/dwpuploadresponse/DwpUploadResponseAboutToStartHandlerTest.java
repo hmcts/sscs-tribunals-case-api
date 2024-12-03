@@ -96,6 +96,18 @@ public class DwpUploadResponseAboutToStartHandlerTest {
         containsErrorMessage(response);
     }
 
+    @Test
+    public void givenIbcaCaseSetIbcaOnlyBenefitAndIssueCodeFields_NoError() {
+        sscsCaseData.setBenefitCode("093");
+        sscsCaseData.setIssueCode("DD");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToStartHandler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+        assertEquals("093", sscsCaseData.getBenefitCodeIbcaOnly());
+        assertEquals("DD", sscsCaseData.getIssueCodeIbcaOnly());
+    }
+
     private void containsErrorMessage(PreSubmitCallbackResponse<SscsCaseData> response) {
         for (String error : response.getErrors()) {
             assertEquals("This case cannot be updated by DWP", error);
