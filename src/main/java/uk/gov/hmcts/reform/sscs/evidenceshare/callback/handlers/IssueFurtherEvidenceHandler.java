@@ -124,7 +124,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
             log.info("Issuing for {} for caseId {}", documentType.getValue(), caseData.getCcdCaseId());
             furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, documentType, allowedLetterTypes, otherPartyOriginalSenderId);
         } catch (Exception e) {
-            handleIssueFurtherEvidenceException(caseData);
+            handleIssueFurtherEvidenceException(caseData, e);
             String errorMsg = "Failed sending further evidence for case(%s)...";
             throw new IssueFurtherEvidenceException(String.format(errorMsg, caseData.getCcdCaseId()), e);
         }
@@ -178,7 +178,8 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         return !hasResizedDocs ? baseDescription : baseDescription + " and attached resized document(s)";
     }
 
-    private void handleIssueFurtherEvidenceException(SscsCaseData caseData) {
+    private void handleIssueFurtherEvidenceException(SscsCaseData caseData, Exception e) {
+        log.error("Failed to issue further evidence for case:{}, with exception:{}", caseData.getCcdCaseId(), e.getMessage());
         updateCcdCaseService.updateCaseV2(Long.valueOf(caseData.getCcdCaseId()),
                 EventType.SEND_FURTHER_EVIDENCE_ERROR.getCcdType(),
                 "Failed to issue further evidence",
