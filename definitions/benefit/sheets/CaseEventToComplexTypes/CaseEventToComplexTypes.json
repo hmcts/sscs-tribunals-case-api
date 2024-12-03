@@ -2529,5 +2529,32 @@
     "LiveFrom": "05/10/2022",
     "FieldDisplayOrder": 1,
     "PageID": "Po_Details"
+  },
+  {
+    "CaseEventID": "addHearingOutcome",
+    "CaseFieldID": "hearingOutcomeValue",
+    "ListElementCode": "hearingOutcomeId",
+    "ID": "hearingOutcomeValueHearingOutcomeId",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "30/10/2024",
+    "FieldDisplayOrder": 1
+  },
+  {
+    "CaseEventID": "addHearingOutcome",
+    "CaseFieldID": "hearingOutcomeValue",
+    "ListElementCode": "didPoAttendHearing",
+    "ID": "hearingOutcomeValueDidPoAttendHearing",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "30/10/2024",
+    "FieldDisplayOrder": 2
+  },
+  {
+    "CaseEventID": "addHearingOutcome",
+    "CaseFieldID": "hearingOutcomeValue",
+    "ListElementCode": "completedHearings",
+    "ID": "hearingOutcomeValueCompletedHearings",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "28/10/2024",
+    "FieldDisplayOrder": 3
   }
 ]
