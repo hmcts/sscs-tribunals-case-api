@@ -87,6 +87,17 @@ public class HmctsResponseReviewedAboutToStartTest {
     }
 
     @Test
+    public void givenIbcaCase_populateBenefitAndIssueCodes() {
+        sscsCaseData.setBenefitCode("093");
+        sscsCaseData.setIssueCode("RA");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertEquals("093", response.getData().getBenefitCodeIbcaOnly());
+        assertEquals("RA", response.getData().getIssueCodeIbcaOnly());
+    }
+
+    @Test
     public void givenOriginatingAndPresentingOfficeHavePreviouslyBeenSet_thenDefaultToTheseOfficesAndNotTheOneSetInMrn() {
         callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("PIP").build());
 

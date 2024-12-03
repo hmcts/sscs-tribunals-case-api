@@ -93,7 +93,8 @@ public class TribunalsHearingsEventTopicListenerItTest {
 
         ReflectionTestUtils.setField(hearingsService, "hearingsCaseUpdateV2Enabled", false);
 
-        tribunalsHearingsEventQueueListener = new TribunalsHearingsEventQueueListener(hearingsService, ccdCaseService);
+        tribunalsHearingsEventQueueListener = new TribunalsHearingsEventQueueListener(hearingsService, ccdCaseService,
+                updateCcdCaseService, idamService);
         ReflectionTestUtils.setField(tribunalsHearingsEventQueueListener, "isByPassHearingServiceEnabled", true);
 
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails();
