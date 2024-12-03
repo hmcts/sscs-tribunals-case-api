@@ -183,7 +183,7 @@ public class IssueFurtherEvidenceHandlerTest {
 
     @Test
     public void givenExceptionWhenIssuingFurtherEvidence_shouldHandleItAppropriately() {
-        doThrow(RuntimeException.class).when(furtherEvidenceService).issue(any(), any(), any(), any(), eq(null));
+        doThrow(new RuntimeException("some error occurred")).when(furtherEvidenceService).issue(any(), any(), any(), any(), eq(null));
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
 
         var caseDataMap = OBJECT_MAPPER.convertValue(caseData, new TypeReference<Map<String, Object>>() {
@@ -200,7 +200,7 @@ public class IssueFurtherEvidenceHandlerTest {
                 INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
             fail("no exception thrown");
         } catch (IssueFurtherEvidenceException e) {
-            assertEquals("Failed sending further evidence for case(1563382899630221)...", e.getMessage());
+            assertEquals("Failed sending further evidence for case(1563382899630221) with exception(some error occurred)", e.getMessage());
         }
 
         verify(updateCcdCaseService, times(1)).updateCaseV2(any(Long.class),

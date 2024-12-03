@@ -125,8 +125,8 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
             furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, documentType, allowedLetterTypes, otherPartyOriginalSenderId);
         } catch (Exception e) {
             handleIssueFurtherEvidenceException(caseData, e);
-            String errorMsg = "Failed sending further evidence for case(%s)...";
-            throw new IssueFurtherEvidenceException(String.format(errorMsg, caseData.getCcdCaseId()), e);
+            String errorMsg = "Failed sending further evidence for case(%s) with exception(%s)";
+            throw new IssueFurtherEvidenceException(String.format(errorMsg, caseData.getCcdCaseId(), e.getMessage()), e);
         }
         log.info("Issued for caseId {}", caseData.getCcdCaseId());
     }
