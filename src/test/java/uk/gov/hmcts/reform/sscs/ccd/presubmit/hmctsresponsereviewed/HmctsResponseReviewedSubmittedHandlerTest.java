@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_SEND_TO_INTERLOC;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 
 import feign.FeignException;
 import java.nio.ByteBuffer;
@@ -113,6 +114,20 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
         assertEquals(Collections.EMPTY_SET, response.getErrors());
         assertEquals(response.getData().getIgnoreCallbackWarnings(), YesNo.YES);
         verify(ccdService).updateCase(any(SscsCaseData.class), eq(123L), eq(READY_TO_LIST.getCcdType()), eq("Ready to list"), eq("Makes an appeal ready to list"), any(IdamTokens.class));
+    }
+
+    @Test
+    public void givenAHmctsResponseReviewedSubmittedEventAndInterlocIsNotRequiredAndIbcaCase_thenNoFurtherEventShouldTrigger() {
+        sscsCaseData = sscsCaseData.toBuilder()
+                .benefitCode(IBCA_BENEFIT_CODE)
+                .isInterlocRequired("No")
+                .build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        assertEquals(Collections.EMPTY_SET, response.getErrors());
+        verifyNoInteractions(ccdService);
     }
 
     @Test(expected = IllegalStateException.class)
