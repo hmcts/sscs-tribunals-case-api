@@ -4,7 +4,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
 import uk.gov.hmcts.reform.sscs.model.multi.hearing.CaseHearing;
 import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
 import uk.gov.hmcts.reform.sscs.service.HmcHearingsApiService;
+import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingUpdateService;
 
 
 @Component
@@ -30,9 +32,12 @@ import uk.gov.hmcts.reform.sscs.service.HmcHearingsApiService;
 public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final HmcHearingsApiService hmcHearingsApiService;
+    private final HearingUpdateService hearingUpdateService;
 
-    public AddHearingOutcomeAboutToStartHandler(HmcHearingsApiService hmcHearingsApiService) {
+    public AddHearingOutcomeAboutToStartHandler(HmcHearingsApiService hmcHearingsApiService,
+                                                HearingUpdateService hearingUpdateService) {
         this.hmcHearingsApiService = hmcHearingsApiService;
+        this.hearingUpdateService = hearingUpdateService;
     }
 
     @Override
@@ -56,15 +61,31 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
             HearingsGetResponse response = hmcHearingsApiService.getHearingsRequest(Long.toString(caseDetails.getId()), HmcStatus.COMPLETED);
             List<CaseHearing> hmcHearings = response.getCaseHearings();
             if (!hmcHearings.isEmpty()) {
+                Map<String, CaseHearing> hmcHearingsMap = hmcHearings.stream()
+                    .collect(Collectors.toMap(caseHearing -> caseHearing.getHearingId().toString(),
+                        caseHearing -> caseHearing));
+
+                // TODO: check the mappings
                 List<HearingDetails> selectedHearings = sscsCaseData.getHearings()
-                        .stream()
-                        .map(Hearing::getValue)
-                        .filter(value -> value.getStart() != null)
-                        .filter(value -> hmcHearings.stream()
-                                .anyMatch(hmcHearing -> Objects
-                                        .equals(hmcHearing.getHearingId().toString(), value.getHearingId())))
-                        .sorted(Comparator.comparing(HearingDetails::getStart).reversed())
-                        .toList();
+                    .stream()
+                    .map(Hearing::getValue)
+                    .filter(value -> value.getStart() != null)
+                    .filter(hearingDetails -> {
+                        CaseHearing hmcHearing = hmcHearingsMap.get(hearingDetails.getHearingId());
+                        if (hmcHearing != null) {
+                            hearingDetails.setStart(hearingUpdateService.convertUtcToUk(hmcHearing.getHearingDaySchedule().get(0).getHearingStartDateTime()));
+                            hearingDetails.setEnd(hearingUpdateService.convertUtcToUk(hmcHearing.getHearingDaySchedule().get(0).getHearingEndDateTime()));
+                            hearingDetails.setEpimsId(hmcHearing.getHearingDaySchedule().get(0).getHearingVenueEpimsId());
+                            hearingDetails.setHearingChannel(hmcHearing.getHearingChannels().get(0));
+                            return true;
+                        }
+                        return false;
+                    })
+                    .sorted(Comparator.comparing(HearingDetails::getStart).reversed())
+                    .toList();
+
+                // TODO: save completed hearings to case data
+                // sscsCaseData.setCompletedHearings(selectedHearings);
                 sscsCaseData.setHearingOutcomeValue(HearingOutcomeValue.builder().build());
                 sscsCaseData.getHearingOutcomeValue().setCompletedHearings(setHearingOutcomeCompletedHearings(selectedHearings));
             } else {
