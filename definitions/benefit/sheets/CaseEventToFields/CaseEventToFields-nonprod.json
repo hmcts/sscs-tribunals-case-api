@@ -1,13 +1,1 @@
-[
-  {
-    "LiveFrom": "30/10/2024",
-    "CaseEventID": "addHearingOutcome",
-    "CaseFieldID": "hearingOutcomeValue",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "COMPLEX",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 1,
-    "PageID": "1.0",
-    "ShowSummaryChangeOption": "Y"
-  }
-]
+[]
