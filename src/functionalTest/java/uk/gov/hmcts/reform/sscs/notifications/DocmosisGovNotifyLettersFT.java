@@ -26,7 +26,7 @@ public class DocmosisGovNotifyLettersFT extends AbstractNotificationsFT {
     }
 
     @ClassRule
-    public Timeout globalTimeout = Timeout.seconds(900);
+    public static Timeout globalTimeout = Timeout.seconds(900);
 
     @BeforeEach
     public void setup() {
