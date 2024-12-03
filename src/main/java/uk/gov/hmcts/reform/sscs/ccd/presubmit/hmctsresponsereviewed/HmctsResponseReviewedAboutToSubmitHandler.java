@@ -53,6 +53,17 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse =
             new PreSubmitCallbackResponse<>(sscsCaseData);
 
+        if (sscsCaseData.isIbcCase()) {
+            final String benefitCode = sscsCaseData.getBenefitCodeIbcaOnly();
+            sscsCaseData.setBenefitCode(benefitCode);
+
+            final String issueCode = sscsCaseData.getIssueCodeIbcaOnly();
+            sscsCaseData.setIssueCode(issueCode);
+
+            sscsCaseData.setBenefitCodeIbcaOnly(null);
+            sscsCaseData.setIssueCodeIbcaOnly(null);
+        }
+
         setCaseCode(preSubmitCallbackResponse, callback);
         checkMandatoryFields(preSubmitCallbackResponse, sscsCaseData);
         setDwpDocuments(sscsCaseData);
