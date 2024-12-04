@@ -840,13 +840,13 @@ notification:
                 docmosisId: TB-SCS-GNO-ENG-00795.docx
         issueAdjournmentNotice:
             appellant:
-                docmosisId: TB-SCS-GNO-ENG-00510.docx
+                docmosisId: ${ADJOURNMENT_COVER_LETTER_ENGLISH:TB-SCS-GNO-ENG-00510.docx}
             appointee:
-                docmosisId: TB-SCS-GNO-ENG-00510.docx
+                docmosisId: ${ADJOURNMENT_COVER_LETTER_ENGLISH:TB-SCS-GNO-ENG-00510.docx}
             representative:
                 docmosisId: TB-SCS-GNO-ENG-00512.docx
             joint_party:
-                docmosisId: TB-SCS-GNO-ENG-00510.docx
+                docmosisId: ${ADJOURNMENT_COVER_LETTER_ENGLISH:TB-SCS-GNO-ENG-00510.docx}
             other_party:
                 docmosisId: TB-SCS-GNO-ENG-00512.docx
         requestForInformation:
@@ -1448,15 +1448,15 @@ notification:
                 docmosisId: TB-SCS-GNO-WEL-00474.docx
         issueAdjournmentNoticeWelsh:
             appellant:
-                docmosisId: TB-SCS-GNO-WEL-00649.docx
+                docmosisId: ${ADJOURNMENT_COVER_LETTER_CY:TB-SCS-GNO-WEL-00649.docx}
             appointee:
-                docmosisId: TB-SCS-GNO-WEL-00649.docx
+                docmosisId: ${ADJOURNMENT_COVER_LETTER_CY:TB-SCS-GNO-WEL-00649.docx}
             representative:
-                docmosisId: TB-SCS-GNO-WEL-00649.docx
+                docmosisId: ${ADJOURNMENT_COVER_LETTER_CY:TB-SCS-GNO-WEL-00649.docx}
             joint_party:
-                docmosisId: TB-SCS-GNO-WEL-00649.docx
+                docmosisId: ${ADJOURNMENT_COVER_LETTER_CY:TB-SCS-GNO-WEL-00649.docx}
             other_party:
-                docmosisId: TB-SCS-GNO-WEL-00649.docx
+                docmosisId: ${ADJOURNMENT_COVER_LETTER_CY:TB-SCS-GNO-WEL-00649.docx}
         issueFinalDecisionWelsh:
             appellant:
                 docmosisId: TB-SCS-GNO-WEL-00681.docx
