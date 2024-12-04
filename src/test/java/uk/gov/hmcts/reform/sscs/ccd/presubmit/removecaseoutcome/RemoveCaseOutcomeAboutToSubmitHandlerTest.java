@@ -34,6 +34,12 @@ public class RemoveCaseOutcomeAboutToSubmitHandlerTest {
     private CaseDetails<SscsCaseData> caseDetails;
 
     @Test
+    public void givenAValidAboutToSubmitEvent_thenReturnTrue() {
+        when(callback.getEvent()).thenReturn(EventType.REMOVE_CASE_OUTCOME);
+        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isTrue();
+    }
+
+    @Test
     public void givenRemoveOutcomeAboutToSubmitIsTriggered_thenOldCaseOutcomeAndDidPoAttendedFieldsAreRemoved() {
         var  sscsCaseData = SscsCaseData.builder()
                 .ccdCaseId("ccdId")
