@@ -13,10 +13,12 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.exception.GetCaseException;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.exception.TribunalsEventProcessingException;
 import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
 import uk.gov.hmcts.reform.sscs.service.CcdCaseService;
 import uk.gov.hmcts.reform.sscs.service.HearingsService;
@@ -31,8 +33,15 @@ public class TribunalsHearingsEventQueueListener {
 
     private final CcdCaseService ccdCaseService;
 
+    private final UpdateCcdCaseService updateCcdCaseService;
+
+    private final IdamService idamService;
+
     @Value("${feature.bypass-hearing-api-service.enabled}")
     private boolean isByPassHearingServiceEnabled;
+
+    @Value("${feature.hearings-case-updateV2.enabled:false}")
+    private boolean hearingsCaseUpdateV2Enabled;
 
     @JmsListener(
             destination = "${azure.service-bus.tribunals-to-hearings-api.queueName}",
@@ -66,15 +75,25 @@ public class TribunalsHearingsEventQueueListener {
     private void handleException(Throwable throwable, String caseId) throws GetCaseException, UpdateCaseException, TribunalsEventProcessingException {
         if (throwable instanceof ListingException listingException) {
             log.error("Listing exception found, Summary: {}", listingException.getSummary(), listingException);
+            if (hearingsCaseUpdateV2Enabled) {
+                log.info("Pre calling trigger Case Event V2 for handling Listing Error for case id: {}", caseId);
+                updateCcdCaseService.triggerCaseEventV2(
+                        Long.parseLong(caseId),
+                        LISTING_ERROR.getCcdType(),
+                        listingException.getSummary(),
+                        listingException.getDescription(),
+                        idamService.getIdamTokens());
+                log.info("Triggered case event V2. Listing Error handled. State is now {}.", State.LISTING_ERROR);
+            } else {
+                SscsCaseData caseData = ccdCaseService.getCaseDetails(caseId).getData();
+                ccdCaseService.updateCaseData(
+                        caseData,
+                        LISTING_ERROR,
+                        listingException.getSummary(),
+                        listingException.getDescription());
 
-            SscsCaseData caseData = ccdCaseService.getCaseDetails(caseId).getData();
-            ccdCaseService.updateCaseData(
-                    caseData,
-                    LISTING_ERROR,
-                    listingException.getSummary(),
-                    listingException.getDescription());
-
-            log.info("Listing Error handled. State is now {}.", State.LISTING_ERROR);
+                log.info("Listing Error handled. State is now {}.", State.LISTING_ERROR);
+            }
         } else if (throwable instanceof Exception exception) {
             throw new TribunalsEventProcessingException("An exception occurred whilst processing hearing event", exception);
         }
