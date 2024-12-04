@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase.CreateCaseMidEventHandler.IBCA_REFERENCE_EMPTY_ERROR;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase.CreateCaseMidEventHandler.IBCA_REFERENCE_VALIDATION_ERROR;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 
@@ -224,7 +225,7 @@ public class CreateCaseMidEventHandlerTest {
         assertThat(response.getErrors()).contains("You must enter address line 1 for the appellant");
         assertThat(response.getErrors()).contains("You must enter a valid country for the appellant");
         assertThat(response.getErrors()).contains("You must enter Living in the UK for the representative");
-        assertThat(response.getWarnings()).contains(IBCA_REFERENCE_VALIDATION_ERROR);
+        assertThat(response.getWarnings()).contains(IBCA_REFERENCE_EMPTY_ERROR);
     }
 
     @Test

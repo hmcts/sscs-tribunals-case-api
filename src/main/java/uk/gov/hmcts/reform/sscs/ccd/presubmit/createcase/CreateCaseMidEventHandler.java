@@ -27,6 +27,9 @@ import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
 @Slf4j
 public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
+    public static final String IBCA_REFERENCE_EMPTY_ERROR =
+            "An IBCA reference is required to update this case. The IBCA Reference format is 1 letter, 2 digits, 1 letter, 2 digits e.g. E24A45.";
+
     public static final String IBCA_REFERENCE_VALIDATION_ERROR =
             "The IBCA reference must be 6 characters and match the format. The IBCA Reference format is 1 letter, 2 digits, 1 letter, 2 digits e.g. E24A45";
 
@@ -79,7 +82,7 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
         Set<String> validationWarnings = new HashSet<>();
 
         if (isEmpty(appellant.getIdentity()) || isEmpty(appellant.getIdentity().getIbcaReference())) {
-            validationWarnings.add(IBCA_REFERENCE_VALIDATION_ERROR);
+            validationWarnings.add(IBCA_REFERENCE_EMPTY_ERROR);
         } else if (!IBCA_REFERENCE_REGEX.matcher(appellant.getIdentity().getIbcaReference()).find()) {
             validationWarnings.add(IBCA_REFERENCE_VALIDATION_ERROR);
         }
