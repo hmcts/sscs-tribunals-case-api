@@ -1,12 +1,6 @@
 [
   {"LiveFrom": "01/01/2018", "ID": "FL_benefitCodes", "ListElementCode": "093", "ListElement": "093"},
-  {"LiveFrom": "01/01/2018", "ID": "FL_benefitCodesIbcaOnly", "ListElementCode": "093", "ListElement": "093"},
+  {"LiveFrom": "01/01/2018", "ID": "documentType", "ListElementCode": "sscs8", "ListElement": "SSCS8"},
   {"LiveFrom": "01/01/2018", "ID": "FL_dwpRegionalCentre", "ListElementCode": "IBCA", "ListElement": "IBCA"},
-  {"LiveFrom": "01/01/2018", "ID": "FL_issueCodes", "ListElementCode": "SP", "ListElement": "SP"},
-  {"LiveFrom": "01/01/2018", "ID": "FL_issueCodesIbcaOnly", "ListElementCode": "DD", "ListElement": "DD"},
-  {"LiveFrom": "01/01/2018", "ID": "FL_issueCodesIbcaOnly", "ListElementCode": "CE", "ListElement": "CE"},
-  {"LiveFrom": "01/01/2018", "ID": "FL_issueCodesIbcaOnly", "ListElementCode": "RA", "ListElement": "RA"},
-  {"LiveFrom": "01/01/2018", "ID": "FL_issueCodesIbcaOnly", "ListElementCode": "OS", "ListElement": "OS"},
-  {"LiveFrom": "01/01/2018", "ID": "FL_issueCodesIbcaOnly", "ListElementCode": "OX", "ListElement": "OX"},
-  {"LiveFrom": "01/01/2018", "ID": "FL_issueCodesIbcaOnly", "ListElementCode": "SP", "ListElement": "SP"}
+  {"LiveFrom": "01/01/2018", "ID": "FL_issueCodes", "ListElementCode": "SP", "ListElement": "SP"}
 ]

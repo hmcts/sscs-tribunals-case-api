@@ -242,154 +242,6 @@
     "PageID": "1.0"
   },
   {
-    "CaseEventID": "hmctsResponseReviewed",
-    "CaseFieldID": "elementsDisputedGeneral",
-    "ListElementCode": "issueCode",
-    "ID": "elementsDisputedGeneralCode",
-    "DisplayContext": "MANDATORY",
-    "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 1,
-    "PageID": "elementsDisputedId",
-    "ShowSummaryChangeOption": "Y"
-  },
-  {
-    "CaseEventID": "hmctsResponseReviewed",
-    "CaseFieldID": "elementsDisputedSanctions",
-    "ListElementCode": "issueCode",
-    "ID": "elementsDisputedSanctionsCode",
-    "DisplayContext": "MANDATORY",
-    "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 1,
-    "PageID": "elementsDisputedId",
-    "ShowSummaryChangeOption": "Y"
-  },
-  {
-    "CaseEventID": "hmctsResponseReviewed",
-    "CaseFieldID": "elementsDisputedHousing",
-    "ListElementCode": "issueCode",
-    "ID": "elementsDisputedHousingCode",
-    "DisplayContext": "MANDATORY",
-    "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 1,
-    "PageID": "elementsDisputedId",
-    "ShowSummaryChangeOption": "Y"
-  },
-  {
-    "CaseEventID": "hmctsResponseReviewed",
-    "CaseFieldID": "elementsDisputedChildCare",
-    "ListElementCode": "issueCode",
-    "ID": "elementsDisputedChildCareCode",
-    "DisplayContext": "MANDATORY",
-    "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 1,
-    "PageID": "elementsDisputedId",
-    "ShowSummaryChangeOption": "Y"
-  },
-  {
-    "CaseEventID": "hmctsResponseReviewed",
-    "CaseFieldID": "elementsDisputedCare",
-    "ListElementCode": "issueCode",
-    "ID": "elementsDisputedCareCode",
-    "DisplayContext": "MANDATORY",
-    "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 1,
-    "PageID": "elementsDisputedId",
-    "ShowSummaryChangeOption": "Y"
-  },
-  {
-    "CaseEventID": "hmctsResponseReviewed",
-    "CaseFieldID": "elementsDisputedChildElement",
-    "ListElementCode": "issueCode",
-    "ID": "elementsDisputedChildElementCode",
-    "DisplayContext": "MANDATORY",
-    "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 1,
-    "PageID": "elementsDisputedId",
-    "ShowSummaryChangeOption": "Y"
-  },
-  {
-    "CaseEventID": "hmctsResponseReviewed",
-    "CaseFieldID": "elementsDisputedChildDisabled",
-    "ListElementCode": "issueCode",
-    "ID": "elementsDisputedChildDisabledCode",
-    "DisplayContext": "MANDATORY",
-    "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 1,
-    "PageID": "elementsDisputedId",
-    "ShowSummaryChangeOption": "Y"
-  },
-  {
-    "CaseEventID": "hmctsResponseReviewed",
-    "CaseFieldID": "elementsDisputedLimitedWork",
-    "ListElementCode": "issueCode",
-    "ID": "elementsDisputedLimitedWorkCode",
-    "DisplayContext": "MANDATORY",
-    "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 1,
-    "PageID": "elementsDisputedId",
-    "ShowSummaryChangeOption": "Y"
-  },
-  {
-    "CaseEventID": "hmctsResponseReviewed",
-    "CaseFieldID": "dwpEditedResponseDocument",
-    "ListElementCode": "dwpResponseDocumentTitle",
-    "ID": "hmctsResponseReviewedDwpEditedResponseDocumentDwpTitle",
-    "DisplayContext": "READONLY",
-    "FieldShowCondition": "dwpEditedEvidenceReason!=\"\" AND appeal.benefitType.code!=\"infectedBloodCompensation\" AND appeal.benefitType.code!=\"guardiansAllowance\" AND appeal.benefitType.code!=\"childBenefit\" AND appeal.benefitType.code!=\"nationalInsuranceCredits\" AND appeal.benefitType.code!=\"guaranteedMinimumPension\" AND appeal.benefitType.code!=\"homeResponsibilitiesProtection\" AND appeal.benefitType.code!=\"taxCredit\" AND appeal.benefitType.code!=\"taxFreeChildcare\" AND appeal.benefitType.code!=\"thirtyHoursFreeChildcare\"",
-    "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 1,
-    "PageID": "1.0",
-    "ShowSummaryChangeOption": "N"
-  },
-  {
-    "CaseEventID": "hmctsResponseReviewed",
-    "CaseFieldID": "dwpEditedResponseDocument",
-    "ListElementCode": "hmrcResponseDocumentTitle",
-    "ID": "hmctsResponseReviewedDwpEditedResponseDocumentHmrcTitle",
-    "DisplayContext": "READONLY",
-    "FieldShowCondition": "appeal.benefitType.code=\"guardiansAllowance\" OR appeal.benefitType.code=\"childBenefit\" OR appeal.benefitType.code=\"nationalInsuranceCredits\" OR appeal.benefitType.code=\"guaranteedMinimumPension\" OR appeal.benefitType.code=\"homeResponsibilitiesProtection\" OR appeal.benefitType.code=\"taxCredit\" OR appeal.benefitType.code=\"taxFreeChildcare\" OR appeal.benefitType.code=\"thirtyHoursFreeChildcare\"",
-    "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 1,
-    "PageID": "1.0",
-    "ShowSummaryChangeOption": "N"
-  },
-  {
-    "CaseEventID": "hmctsResponseReviewed",
-    "CaseFieldID": "dwpEditedResponseDocument",
-    "ListElementCode": "ibcaResponseDocumentTitle",
-    "ID": "hmctsResponseReviewedDwpEditedResponseDocumentIbcaTitle",
-    "DisplayContext": "READONLY",
-    "FieldShowCondition": "dwpEditedEvidenceReason!=\"\" AND appeal.benefitType.code=\"infectedBloodCompensation\"",
-    "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 1,
-    "PageID": "1.0",
-    "ShowSummaryChangeOption": "N"
-  },
-  {
-    "CaseEventID": "hmctsResponseReviewed",
-    "CaseFieldID": "dwpEditedResponseDocument",
-    "ListElementCode": "documentFileName",
-    "ID": "hmctsResponseReviewedDwpEditedResponseDocumentDocumentFileName",
-    "DisplayContext": "READONLY",
-    "FieldShowCondition": "dwpEditedEvidenceReason!=\"\"",
-    "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 2,
-    "PageID": "1.0",
-    "ShowSummaryChangeOption": "Y"
-  },
-  {
-    "CaseEventID": "hmctsResponseReviewed",
-    "CaseFieldID": "dwpEditedResponseDocument",
-    "ListElementCode": "documentLink",
-    "ID": "hmctsResponseReviewedDwpEditedResponseDocumentDocumentLink",
-    "DisplayContext": "READONLY",
-    "FieldShowCondition": "dwpEditedEvidenceReason!=\"\"",
-    "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 3,
-    "PageID": "1.0",
-    "ShowSummaryChangeOption": "Y"
-  },
-  {
     "CaseEventID": "addRepresentative",
     "CaseFieldID": "appeal",
     "ListElementCode": "rep",
@@ -2677,5 +2529,32 @@
     "LiveFrom": "05/10/2022",
     "FieldDisplayOrder": 1,
     "PageID": "Po_Details"
+  },
+  {
+    "CaseEventID": "addHearingOutcome",
+    "CaseFieldID": "hearingOutcomeValue",
+    "ListElementCode": "hearingOutcomeId",
+    "ID": "hearingOutcomeValueHearingOutcomeId",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "30/10/2024",
+    "FieldDisplayOrder": 1
+  },
+  {
+    "CaseEventID": "addHearingOutcome",
+    "CaseFieldID": "hearingOutcomeValue",
+    "ListElementCode": "didPoAttendHearing",
+    "ID": "hearingOutcomeValueDidPoAttendHearing",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "30/10/2024",
+    "FieldDisplayOrder": 2
+  },
+  {
+    "CaseEventID": "addHearingOutcome",
+    "CaseFieldID": "hearingOutcomeValue",
+    "ListElementCode": "completedHearings",
+    "ID": "hearingOutcomeValueCompletedHearings",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "28/10/2024",
+    "FieldDisplayOrder": 3
   }
 ]
