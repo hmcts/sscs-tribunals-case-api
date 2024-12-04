@@ -900,6 +900,8 @@
   {"LiveFrom": "06/10/2022", "CaseTypeID": "Benefit", "CaseEventID": "setAsideRefused", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
   {"LiveFrom": "13/10/2022", "CaseTypeID": "Benefit", "CaseEventID": "setAsideRefusedSOR", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
   {"LiveFrom": "06/10/2022", "CaseTypeID": "Benefit", "CaseEventID": "setAsideRefusedSOR", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
+  {"LiveFrom": "23/11/2022", "CaseTypeID": "Benefit", "CaseEventID": "setHearingRoute", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
+  {"LiveFrom": "23/11/2022", "CaseTypeID": "Benefit", "CaseEventID": "setHearingRoute", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
   {"LiveFrom": "09/12/2022", "CaseTypeID": "Benefit", "CaseEventID": "postHearingRequest", "AccessProfile": "caseworker-sscs-dwpresponsewriter", "CRUD": "CRUD"},
   {"LiveFrom": "23/11/2022", "CaseTypeID": "Benefit", "CaseEventID": "postHearingRequest", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
   {"LiveFrom": "06/10/2022", "CaseTypeID": "Benefit", "CaseEventID": "postHearingRequest", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
@@ -963,5 +965,7 @@
   {"LiveFrom": "06/02/2024", "CaseTypeID": "Benefit", "CaseEventID": "dwpCaseMigration", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRU"},
   {"LiveFrom": "06/02/2024", "CaseTypeID": "Benefit", "CaseEventID": "caseManagementLocationMigration", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRU"},
   {"LiveFrom": "06/02/2024", "CaseTypeID": "Benefit", "CaseEventID": "caseManagementLocationMigration", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
-  {"LiveFrom": "06/02/2024", "CaseTypeID": "Benefit", "CaseEventID": "caseManagementLocationMigration", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRU"}
+  {"LiveFrom": "06/02/2024", "CaseTypeID": "Benefit", "CaseEventID": "caseManagementLocationMigration", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRU"},
+  {"LiveFrom": "30/10/2024", "CaseTypeID": "Benefit", "CaseEventID": "addHearingOutcome", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "30/10/2024", "CaseTypeID": "Benefit", "CaseEventID": "addHearingOutcome", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"}
 ]

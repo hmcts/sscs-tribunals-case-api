@@ -16,7 +16,7 @@
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "dwpResponseDocument",
     "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
+    "DisplayContext": "COMPLEX",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
@@ -60,7 +60,7 @@
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "dwpEditedResponseDocument",
     "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
+    "DisplayContext": "COMPLEX",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 5,
@@ -112,7 +112,19 @@
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 9,
     "PageID": "1.0",
-    "FieldShowCondition": "appeal.benefitType.code!=\"UC\"",
+    "FieldShowCondition": "appeal.benefitType.code!=\"UC\" AND appeal.benefitType.code!=\"infectedBloodCompensation\"",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "dwpUploadResponse",
+    "CaseFieldID": "benefitCodeIbcaOnly",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 9,
+    "PageID": "1.0",
+    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodCompensation\"",
     "ShowSummaryChangeOption": "Y"
   },
   {
@@ -124,7 +136,19 @@
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 10,
     "PageID": "1.0",
-    "FieldShowCondition": "appeal.benefitType.code!=\"UC\"",
+    "FieldShowCondition": "appeal.benefitType.code!=\"UC\" AND appeal.benefitType.code!=\"infectedBloodCompensation\"",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "dwpUploadResponse",
+    "CaseFieldID": "issueCodeIbcaOnly",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 10,
+    "PageID": "1.0",
+    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodCompensation\"",
     "ShowSummaryChangeOption": "Y"
   },
   {

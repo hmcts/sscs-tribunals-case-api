@@ -52,19 +52,16 @@ echo "Tag version: ${TAG_VERSION}, CCD Definitions Version: ${CCD_DEF_VERSION}, 
 if [ ${ENV} == "local" ]; then
     EM_CCD_ORCHESTRATOR_URL="http://localhost:4623"
     TRIBUNALS_API_URL="http://localhost:8008"
-    TYA_NOTIFICATIONS_API_URL="http://localhost:8081"
     BULK_SCAN_API_URL="http://localhost:8090"
     BULK_SCAN_ORCHESTRATOR_URL="http://localhost:8099"
 elif [ ${ENV} == "pr" ]; then
-    EM_CCD_ORCHESTRATOR_URL="https://em-ccdorc-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    TRIBUNALS_API_URL="https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    TYA_NOTIFICATIONS_API_URL="http://sscs-tribunals-api-pr-${CHANGE_ID}-sscs-tya-notification"
+    EM_CCD_ORCHESTRATOR_URL=${EM_CCD_ORCHESTRATOR_URL:="https://em-ccdorc-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"}
+    TRIBUNALS_API_URL=${TRIBUNALS_API_URL:="https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"}
     BULK_SCAN_API_URL="http://sscs-bulk-scan-aat.service.core-compute-aat.internal"
     BULK_SCAN_ORCHESTRATOR_URL="http://bulk-scan-orchestrator-aat.service.core-compute-aat.internal"
 elif [ ${ENV} == "aat" ] || [ ${ENV} == "demo" ] || [ ${ENV} == "prod" ] || [ ${ENV} == "perftest" ] || [ ${ENV} == "ithc" ]; then
     EM_CCD_ORCHESTRATOR_URL="http://em-ccd-orchestrator-${ENV}.service.core-compute-${ENV}.internal"
     TRIBUNALS_API_URL="http://sscs-tribunals-api-${ENV}.service.core-compute-${ENV}.internal"
-    TYA_NOTIFICATIONS_API_URL="http://sscs-tya-notif-${ENV}.service.core-compute-${ENV}.internal"
     BULK_SCAN_API_URL="http://sscs-bulk-scan-${ENV}.service.core-compute-${ENV}.internal"
     BULK_SCAN_ORCHESTRATOR_URL="http://bulk-scan-orchestrator-${ENV}.service.core-compute-${ENV}.internal"
 else
@@ -142,7 +139,6 @@ docker run --rm --name json2xlsx \
   -v ${RUN_DIR}/definitions/${TYPE}:/tmp/output \
   -e "CCD_DEF_EM_CCD_ORCHESTRATOR_URL=${EM_CCD_ORCHESTRATOR_URL}" \
   -e "CCD_DEF_TRIBUNALS_API_URL=${TRIBUNALS_API_URL}" \
-  -e "CCD_DEF_TYA_NOTIFICATIONS_API_URL=${TYA_NOTIFICATIONS_API_URL}" \
   -e "CCD_DEF_BULK_SCAN_API_URL=${BULK_SCAN_API_URL}" \
   -e "CCD_DEF_BULK_SCAN_ORCHESTRATOR_URL=${BULK_SCAN_ORCHESTRATOR_URL}" \
   -e "CCD_DEF_TYA_LINK=${TYA_LINK}" \
