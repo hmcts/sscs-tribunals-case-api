@@ -31,8 +31,6 @@ import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 @Slf4j
 public final class HearingsMapping {
 
-    public static final String DWP_ID = "DWP";
-
     private HearingsMapping() {
     }
 

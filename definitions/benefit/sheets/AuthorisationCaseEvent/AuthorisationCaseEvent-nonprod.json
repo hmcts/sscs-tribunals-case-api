@@ -4,5 +4,8 @@
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "createResponseReceivedTestCase", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "createResponseReceivedTestCase", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "createTestCase", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
-  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "createTestCase", "AccessProfile": "caseworker-sscs", "CRUD": "R"}
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "createTestCase", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
+  {"LiveFrom": "02/12/2024", "CaseTypeID": "Benefit", "CaseEventID": "caseOutcomeMigration", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRU"},
+  {"LiveFrom": "02/12/2024", "CaseTypeID": "Benefit", "CaseEventID": "caseOutcomeMigration", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
+  {"LiveFrom": "02/12/2024", "CaseTypeID": "Benefit", "CaseEventID": "caseOutcomeMigration", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRU"}
 ]
