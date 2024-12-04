@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.addhearingoutcome;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -16,7 +17,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOutcomeValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -65,29 +65,30 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
                     .collect(Collectors.toMap(caseHearing -> caseHearing.getHearingId().toString(),
                         caseHearing -> caseHearing));
 
-                // TODO: check the mappings
-                List<HearingDetails> selectedHearings = sscsCaseData.getHearings()
+                if (sscsCaseData.getCompletedHearingsList() == null) {
+                    sscsCaseData.setCompletedHearingsList(new ArrayList<>());
+                }
+
+                sscsCaseData.getCompletedHearingsList().addAll(sscsCaseData.getHearings()
                     .stream()
-                    .map(Hearing::getValue)
-                    .filter(value -> value.getStart() != null)
+                    .filter(value -> value.getValue().getStart() != null)
                     .filter(hearingDetails -> {
-                        CaseHearing hmcHearing = hmcHearingsMap.get(hearingDetails.getHearingId());
+                        CaseHearing hmcHearing = hmcHearingsMap.get(hearingDetails.getValue().getHearingId());
                         if (hmcHearing != null) {
-                            hearingDetails.setStart(hearingUpdateService.convertUtcToUk(hmcHearing.getHearingDaySchedule().get(0).getHearingStartDateTime()));
-                            hearingDetails.setEnd(hearingUpdateService.convertUtcToUk(hmcHearing.getHearingDaySchedule().get(0).getHearingEndDateTime()));
-                            hearingDetails.setEpimsId(hmcHearing.getHearingDaySchedule().get(0).getHearingVenueEpimsId());
-                            hearingDetails.setHearingChannel(hmcHearing.getHearingChannels().get(0));
+                            hearingDetails.getValue().setStart(hearingUpdateService.convertUtcToUk(hmcHearing.getHearingDaySchedule().get(0).getHearingStartDateTime()));
+                            hearingDetails.getValue().setEnd(hearingUpdateService.convertUtcToUk(hmcHearing.getHearingDaySchedule().get(0).getHearingEndDateTime()));
+                            hearingDetails.getValue().setEpimsId(hmcHearing.getHearingDaySchedule().get(0).getHearingVenueEpimsId());
+                            hearingDetails.getValue().setHearingChannel(hmcHearing.getHearingChannels().get(0));
                             return true;
                         }
                         return false;
                     })
-                    .sorted(Comparator.comparing(HearingDetails::getStart).reversed())
-                    .toList();
+                    .sorted(Comparator.reverseOrder())
+                    .toList());
 
-                // TODO: save completed hearings to case data
-                // sscsCaseData.setCompletedHearings(selectedHearings);
                 sscsCaseData.setHearingOutcomeValue(HearingOutcomeValue.builder().build());
-                sscsCaseData.getHearingOutcomeValue().setCompletedHearings(setHearingOutcomeCompletedHearings(selectedHearings));
+                sscsCaseData.getHearingOutcomeValue().setCompletedHearings(setHearingOutcomeCompletedHearings(sscsCaseData.getCompletedHearingsList()));
+
             } else {
                 preSubmitCallbackResponse.addError("There are no completed hearings on the case.");
             }
@@ -99,8 +100,9 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
         return preSubmitCallbackResponse;
     }
 
-    private DynamicList setHearingOutcomeCompletedHearings(List<HearingDetails> hearings) {
+    private DynamicList setHearingOutcomeCompletedHearings(List<Hearing> hearings) {
         return new DynamicList(new DynamicListItem("", ""), hearings.stream()
+            .map(Hearing::getValue)
                 .map(hearing -> {
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm", Locale.ENGLISH);
                     String hearingLabel = hearing.getStart().format(formatter)
