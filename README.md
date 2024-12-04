@@ -46,7 +46,7 @@ If you need to test Tribunals with HMC Hearings you must carry out the following
 3. Once this is done you then need to upload a CCD Definition file to AAT CCD. This definition file should have a unique CaseType ID in this format (4120 represents the Pull request number):
 
 ```bash
-./bin/create-xlsx.sh benefit dev pr 4120 true
+./bin/create-xlsx.sh benefit dev pr true 4120
 ```
 4. You must ensure the callbacks for the CaseEvents match the service ingress values within your PR's preview chart. Here is an example of a callback URL for a tribunals PR with an id of 4120:
 

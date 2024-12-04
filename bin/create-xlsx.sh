@@ -65,6 +65,13 @@ if [ "$ENV" = "local" ]; then
 elif [ "$ENV" = "pr" ]; then
     if [ "$IS_HEARINGS_PR" = true ]; then
         UPPERCASE_ENV="$CHANGE_ID"
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            # macOS
+            find ./definitions/benefit/sheets/ -type f -exec sed -i '' "s/Benefit/Benefit-$CHANGE_ID/g" {} +
+        else
+            # Linux and other Unix-like systems
+            find ./definitions/benefit/sheets/ -type f -exec sed -i "s/Benefit/Benefit-$CHANGE_ID/g" {} +
+        fi
     fi
     EM_CCD_ORCHESTRATOR_URL="https://em-ccdorc-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     TRIBUNALS_API_URL="https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
@@ -160,3 +167,5 @@ docker run --rm --name json2xlsx \
   -e "CCD_DEF_VERSION=${CCD_DEF_VERSION}" \
   hmctspublic.azurecr.io/ccd/definition-processor:latest \
   json2xlsx -D /tmp/json/sheets "$excludedFilenamePatterns" -o "/tmp/output/${ccdDefinitionFile}"
+
+git checkout definitions/benefit/sheets
