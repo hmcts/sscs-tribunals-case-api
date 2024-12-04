@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.removecaseoutcome;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -56,5 +58,13 @@ public class RemoveCaseOutcomeAboutToSubmitHandlerTest {
 
         assertThat(response.getData().getCaseOutcome()).hasAllNullFieldsOrProperties();
 
+    }
+
+    @DisplayName("Throws exception if it cannot handle the appeal")
+    @Test
+    public void givenCannotHandleAppeal_thenThrowsException() {
+        when(callback.getEvent()).thenReturn(EventType.ADD_HEARING_OUTCOME);
+        assertThatThrownBy(() -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION))
+                .isInstanceOf(IllegalStateException.class);
     }
 }
