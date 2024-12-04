@@ -60,7 +60,7 @@ If you need to test Tribunals with HMC Hearings you must carry out the following
     ```
 
 7. And on that subscription create a Correlation filters with these values:
-    ```
+    ```text
     hmctsServiceId:BBA3
     hmctsDeploymentId:deployment-sscs-tribunals-api-pr-xxxx
     ```
