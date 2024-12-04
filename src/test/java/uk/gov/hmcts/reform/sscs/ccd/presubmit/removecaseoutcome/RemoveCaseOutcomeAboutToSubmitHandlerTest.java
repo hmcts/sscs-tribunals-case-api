@@ -1,5 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.removecaseoutcome;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -7,12 +12,12 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseOutcome;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @RunWith(SpringRunner.class)
 public class RemoveCaseOutcomeAboutToSubmitHandlerTest {
@@ -29,7 +34,7 @@ public class RemoveCaseOutcomeAboutToSubmitHandlerTest {
     private CaseDetails<SscsCaseData> caseDetails;
 
     @Test
-    public void givenRemoveOutcomeAboutToSubmitIsTriggered_thenOldCaseOutcomeAndDidPOAttendedFieldsAreRemoved() {
+    public void givenRemoveOutcomeAboutToSubmitIsTriggered_thenOldCaseOutcomeAndDidPoAttendedFieldsAreRemoved() {
         var  sscsCaseData = SscsCaseData.builder()
                 .ccdCaseId("ccdId")
                 .appeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build())
