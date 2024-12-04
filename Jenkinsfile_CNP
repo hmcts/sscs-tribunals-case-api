@@ -186,8 +186,10 @@ withPipeline(type, product, component) {
 }
 
 def generateDefinitions(isHearingsPr) {
-    if (env.ENVIRONMENT != "pr" || isHearingsPr) {
+    if (env.ENVIRONMENT != "pr") {
         env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-api-${env.ENVIRONMENT}.service.core-compute-${env.ENVIRONMENT}.internal"
+    } else if (isHearingsPr) {
+        env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
     } else {
         env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     }
