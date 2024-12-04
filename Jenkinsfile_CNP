@@ -193,10 +193,13 @@ def generateDefinitions(isHearingsPr) {
     } else {
         env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     }
+
     sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${isHearingsPr}"
-    sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT} ${isHearingsPr}"
     steps.archiveArtifacts artifacts: "definitions/benefit/*.xlsx"
-    steps.archiveArtifacts artifacts: "definitions/bulkscan/*.xlsx"
+    if (!isHearingsPr) {
+        sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT} ${isHearingsPr}"
+        steps.archiveArtifacts artifacts: "definitions/bulkscan/*.xlsx"
+    }
 }
 
 def setAatEnvVars() {
