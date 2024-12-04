@@ -166,12 +166,7 @@ withPipeline(type, product, component) {
     }
 
     before('highleveldatasetup') {
-        if (env.ENVIRONMENT != "pr") {
-            env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-api-${env.ENVIRONMENT}.service.core-compute-${env.ENVIRONMENT}.internal"
-        } else {
-            env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-        }
-        generateDefinitions()
+        generateDefinitions(isHearingsPr)
     }
 
     afterSuccess('akschartsinstall') {
@@ -182,6 +177,10 @@ withPipeline(type, product, component) {
             ./bin/pull-camunda-bpmn-files.sh ${waStandaloneBranch}
             ./bin/import-camunda-files.sh . sscs sscs
             """
+        }
+        // Adding exclusively here as currently hearings PRs don't do high level data setup
+        if (isHearingsPr) {
+            generateDefinitions(isHearingsPr)
         }
     }
 
@@ -207,9 +206,14 @@ def runNotificationTests() {
     }
 }
 
-def generateDefinitions() {
-    sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT}"
-    sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT}"
+def generateDefinitions(isHearingsPr) {
+    if (env.ENVIRONMENT != "pr") {
+        env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-api-${env.ENVIRONMENT}.service.core-compute-${env.ENVIRONMENT}.internal"
+    } else {
+        env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    }
+    sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${isHearingsPr}"
+    sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT} ${isHearingsPr}"
     steps.archiveArtifacts artifacts: "definitions/benefit/*.xlsx"
     steps.archiveArtifacts artifacts: "definitions/bulkscan/*.xlsx"
 }
