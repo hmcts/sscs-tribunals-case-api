@@ -3244,5 +3244,18 @@
     "PostConditionState": "*",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "03/12/2024",
+    "CaseTypeID": "Benefit",
+    "ID": "removeCaseOutcome",
+    "Name": "Remove old case outcome",
+    "Description": "Remove old case outcome",
+    "DisplayOrder": 141,
+    "PreConditionState(s)": "*",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
+    "PostConditionState": "*",
+    "ShowEventNotes": "Y",
+    "SecurityClassification": "Public"
   }
 ]
