@@ -40,11 +40,15 @@ public abstract class AbstractNotificationsFT extends AbstractFunctionalTest {
     }
 
     protected void simulateCcdCallbackToSendLetter(NotificationEventType eventType) throws IOException {
+        log.info("Simulating CCD callback to send notificaiton of type {}", eventType);
         String callbackJsonName = BASE_PATH_TYAN + "appealCreatedAppointeeCallback.json";
         simulateCcdCallback(eventType, callbackJsonName);
+        log.info("{} notification successfully sent", eventType);
     }
 
-    public List<UUID> saveLetterPdfs(List<Notification> notifications) {
+    public List<UUID> saveLetterPdfs(List<Notification> notifications, NotificationEventType eventType) {
+        log.info("Saving notification pdfs for {} notifications triggered by {}",
+                notifications.size(), eventType);
         List<UUID> savedLetters = new ArrayList<>();
         LocalTime startTime = now();
         int maxMinutesToWaitForPdf = 10;
@@ -57,10 +61,8 @@ public abstract class AbstractNotificationsFT extends AbstractFunctionalTest {
                     .forEach(notification -> {
                         try {
                             final byte[] pdfForLetter = client.getPdfForLetter(String.valueOf(notification.getId()));
-                            FileUtils.writeByteArrayToFile(
-                                    new File("notification_pdfs/" + notification.getTemplateId() + ".pdf"),
-                                    pdfForLetter
-                            );
+                            var pdfName = "notification_pdfs/" + eventType + "_" + notification.getTemplateId() + ".pdf";
+                            FileUtils.writeByteArrayToFile(new File(pdfName), pdfForLetter);
                             savedLetters.add(notification.getId());
                         } catch (NotificationClientException | IOException e) {
                             log.error("Failed to save pdf for template {}", notification.getTemplateId());
@@ -68,7 +70,7 @@ public abstract class AbstractNotificationsFT extends AbstractFunctionalTest {
                     });
             delayInSeconds(60);
         }
-        log.error("No of letters failed to save: {}/{}",
+        log.info("Finished saving letter pdfs : {} out of {} successfully saved",
                 notifications.size() - savedLetters.size(), notifications.size());
         return savedLetters;
     }

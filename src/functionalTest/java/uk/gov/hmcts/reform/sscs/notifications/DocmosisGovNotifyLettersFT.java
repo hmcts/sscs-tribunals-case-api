@@ -42,7 +42,7 @@ public class DocmosisGovNotifyLettersFT extends AbstractNotificationsFT {
             try {
                 simulateCcdCallbackToSendLetter(notificationEventType);
                 List<Notification> notifications = fetchLetters();
-                saveLetterPdfs(notifications);
+                saveLetterPdfs(notifications, notificationEventType);
                 assertThat(notifications)
                         .extracting(Notification::getSubject)
                         .allSatisfy(subject -> assertThat(subject).isPresent());
