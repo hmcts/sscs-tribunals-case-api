@@ -967,5 +967,6 @@
   {"LiveFrom": "06/02/2024", "CaseTypeID": "Benefit", "CaseEventID": "caseManagementLocationMigration", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
   {"LiveFrom": "06/02/2024", "CaseTypeID": "Benefit", "CaseEventID": "caseManagementLocationMigration", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRU"},
   {"LiveFrom": "30/10/2024", "CaseTypeID": "Benefit", "CaseEventID": "addHearingOutcome", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
-  {"LiveFrom": "30/10/2024", "CaseTypeID": "Benefit", "CaseEventID": "addHearingOutcome", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"}
+  {"LiveFrom": "30/10/2024", "CaseTypeID": "Benefit", "CaseEventID": "addHearingOutcome", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
+  {"LiveFrom": "03/12/2024", "CaseTypeID": "Benefit", "CaseEventID": "removeCaseOutcome", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"}
 ]
