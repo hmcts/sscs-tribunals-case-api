@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.sscs.notifications;
 
+import static java.time.LocalTime.now;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -44,8 +46,11 @@ public abstract class AbstractNotificationsFT extends AbstractFunctionalTest {
 
     public List<UUID> saveLetterPdfs(List<Notification> notifications) {
         List<UUID> savedLetters = new ArrayList<>();
+        LocalTime startTime = now();
+        int maxMinutesToWaitForPdf = 10;
 
-        while (notifications.size() > savedLetters.size()) {
+        while (notifications.size() > savedLetters.size()
+                && now().isBefore(startTime.plusMinutes(maxMinutesToWaitForPdf))) {
             notifications.stream()
                     .filter(notification -> notification.getNotificationType().equals("letter"))
                     .filter(notification -> !savedLetters.contains(notification.getId()))
@@ -58,11 +63,13 @@ public abstract class AbstractNotificationsFT extends AbstractFunctionalTest {
                             );
                             savedLetters.add(notification.getId());
                         } catch (NotificationClientException | IOException e) {
-                            log.error("Failed to save all letter pdfs, {} remain unsaved", notifications.size());
+                            log.error("Failed to save pdf for template {}", notification.getTemplateId());
                         }
                     });
             delayInSeconds(60);
         }
+        log.error("No of letters failed to save: {}/{}",
+                notifications.size() - savedLetters.size(), notifications.size());
         return savedLetters;
     }
 
