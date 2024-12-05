@@ -71,7 +71,7 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
     @Override
     protected List<String> getAllDefinitionFilesToLoadAt(String definitionsPath) {
         boolean isPreview = environment.name().equalsIgnoreCase(CcdEnvironment.PREVIEW.name());
-        boolean isHearingsPr = "true".equalsIgnoreCase(System.getenv("IS_HEARINGS_PR"));
+        boolean isHearingsPr = "yes".equalsIgnoreCase(System.getenv("HEARINGS_ENABLED"));
 
         if (isPreview) {
             if (!isHearingsPr) {
