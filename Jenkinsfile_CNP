@@ -191,10 +191,8 @@ def generateDefinitions() {
     }
     sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${env.IS_HEARINGS_PR}"
     steps.archiveArtifacts artifacts: "definitions/benefit/*.xlsx"
-    if (!env.IS_HEARINGS_PR) {
-        sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT} ${env.IS_HEARINGS_PR}"
-        steps.archiveArtifacts artifacts: "definitions/bulkscan/*.xlsx"
-    }
+    sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT} ${env.IS_HEARINGS_PR}"
+    steps.archiveArtifacts artifacts: "definitions/bulkscan/*.xlsx"
 }
 
 def setAatEnvVars() {
