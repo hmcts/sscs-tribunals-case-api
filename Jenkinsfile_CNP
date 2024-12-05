@@ -118,9 +118,7 @@ withPipeline(type, product, component) {
     def githubApi = new GithubAPI(this)
     def isHearingsPr = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:hearings").size() > 0;
 
-    if (!isHearingsPr) {
-        enableHighLevelDataSetup()
-    }
+    enableHighLevelDataSetup()
 
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
@@ -177,10 +175,6 @@ withPipeline(type, product, component) {
             ./bin/import-camunda-files.sh . sscs sscs
             """
         }
-        // Adding exclusively here as currently hearings PRs don't do high level data setup
-        if (isHearingsPr) {
-            generateDefinitions(isHearingsPr)
-        }
     }
 
     afterSuccess('smoketest:preview') {
@@ -192,15 +186,15 @@ withPipeline(type, product, component) {
 }
 
 def generateDefinitions(isHearingsPr) {
-    if (env.ENVIRONMENT != "pr") {
-        env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-api-${env.ENVIRONMENT}.service.core-compute-${env.ENVIRONMENT}.internal"
-    } else {
+    if (env.ENVIRONMENT == "pr" && !isHearingsPr) {
         env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     }
     sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${isHearingsPr}"
-    sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT} ${isHearingsPr}"
     steps.archiveArtifacts artifacts: "definitions/benefit/*.xlsx"
-    steps.archiveArtifacts artifacts: "definitions/bulkscan/*.xlsx"
+    if (!isHearingsPr) {
+        sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT} ${isHearingsPr}"
+        steps.archiveArtifacts artifacts: "definitions/bulkscan/*.xlsx"
+    }
 }
 
 def setAatEnvVars() {

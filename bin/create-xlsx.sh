@@ -43,10 +43,6 @@ fi
 
 UPPERCASE_ENV=$(echo "$ENV" | awk '{print toupper($0)}')
 
-if [ "$IS_HEARINGS_PR" = true ] && [ -n "$CHANGE_ID" ]; then
-    UPPERCASE_ENV="$CHANGE_ID"
-fi
-
 if [ "$SHUTTERED" = true ]; then
     shutteredExclusion="*-nonshuttered.json"
     ccdDefinitionFile="CCD_${CASE_TYPE_XLSX_NAME}Definition_${UPPERCASE_ENV}_SHUTTERED.xlsx"
