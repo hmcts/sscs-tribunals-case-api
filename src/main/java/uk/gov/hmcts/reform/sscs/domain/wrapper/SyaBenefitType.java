@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.domain.wrapper;
 
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 
 public class SyaBenefitType {
 
