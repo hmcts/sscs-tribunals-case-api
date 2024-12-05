@@ -13,7 +13,7 @@ test.describe("Accessibility Tests", {tag: '@accessibility'}, async () => {
     });
 
     test("Test", async ({accessibilitySteps}) => {
-        test.setTimeout(300000)
+        test.setTimeout(180000)
         await accessibilitySteps.performAccessibilityTest(firstCaseId, secondCaseId)
     });
 
