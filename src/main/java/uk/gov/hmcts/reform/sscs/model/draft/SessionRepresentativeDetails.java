@@ -11,6 +11,7 @@ public class SessionRepresentativeDetails {
     private String addressLine2;
     private String townCity;
     private String county;
+    private String country;
     private String postCode;
     private String phoneNumber;
     private String emailAddress;

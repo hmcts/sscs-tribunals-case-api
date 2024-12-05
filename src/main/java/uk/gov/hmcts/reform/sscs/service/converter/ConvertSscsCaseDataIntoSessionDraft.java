@@ -45,19 +45,25 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService
             .dwpIssuingOfficeEsa(buildDwpIssuingOfficeEsa(appeal))
             .appointeeName(buildName(getAppointeeName(appeal)))
             .appointeeDob(buildDob(getAppointeeIdentity(appeal)))
-            .appointeeContactDetails(buildContactDetails(getAppointeeAddress(appeal), getAppointeeContact(appeal)))
+            .appointeeContactDetails(buildContactDetails(getAppointeeAddress(appeal), getAppointeeContact(appeal), YesNo.NO))
             .appointee(buildAppointee(appeal))
             .appellantName(buildName(getAppellantName(appeal)))
             .appellantDob(buildDob(getAppellantIdentity(appeal)))
             .appellantNino(buildAppellantNino(appeal))
-            .appellantContactDetails(buildContactDetails(getAppellantAddress(appeal), getAppellantContact(appeal)))
+            .appellantIbcaReference(getAppellantIbcaReference(appeal))
+            .appellantIbcRole(getAppellantIbcRole(appeal))
+            .appellantInMainlandUk(getAppellantInMainlandUk(appeal))
+            .appellantContactDetails(buildContactDetails(getAppellantAddress(appeal), getAppellantContact(appeal), YesNo.NO))
+            .appellantInternationalContactDetails(buildContactDetails(getAppellantAddress(appeal), getAppellantContact(appeal), YesNo.YES))
             .sameAddress(buildSameAddress(appeal))
             .textReminders(buildTextReminders(caseData.getSubscriptions()))
             .sendToNumber(buildSendToNumber(caseData))
             .enterMobile(buildEnterMobile(caseData))
             .smsConfirmation(buildSmsConfirmation(caseData))
             .representative(buildRepresentative(appeal))
-            .representativeDetails(buildRepresentativeDetails(appeal))
+            .representativeInMainlandUk(getRepresentativeInMainlandUk(appeal))
+            .representativeDetails(buildRepresentativeDetails(appeal, YesNo.NO))
+            .representativeInternationalDetails(buildRepresentativeDetails(appeal, YesNo.YES))
             .reasonForAppealing(buildReasonForAppealing(appeal))
             .otherReasonForAppealing(buildOtherReasonForAppealing(appeal))
             .evidenceProvide(buildEvidenceProvide(caseData.getEvidencePresent()))
@@ -287,7 +293,15 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService
         return new SessionRepresentative(StringUtils.lowerCase(appeal.getRep().getHasRepresentative()));
     }
 
-    private SessionRepresentativeDetails buildRepresentativeDetails(Appeal appeal) {
+    private SessionInMainlandUk getRepresentativeInMainlandUk(Appeal appeal) {
+        if (!hasRep(appeal) || appeal.getRep().getAddress() == null || appeal.getRep().getAddress().getInMainlandUk() == null) {
+            return null;
+        }
+
+        return new SessionInMainlandUk(appeal.getRep().getAddress().getInMainlandUk().getValue().toLowerCase());
+    }
+
+    private SessionRepresentativeDetails buildRepresentativeDetails(Appeal appeal, YesNo international) {
         SessionRepresentative sessionRepresentative = buildRepresentative(appeal);
         if (!hasRep(appeal)
             || sessionRepresentative == null
@@ -307,12 +321,16 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService
         boolean hasAddress = appeal.getRep().getAddress() != null;
         boolean hasContact = appeal.getRep().getContact() != null;
 
+        if (hasAddress && international.equals(appeal.getRep().getAddress().getInMainlandUk())) {
+            return null;
+        }
         return new SessionRepresentativeDetails(
             repName,
             hasAddress ? appeal.getRep().getAddress().getLine1() : null,
             hasAddress ? appeal.getRep().getAddress().getLine2() : null,
             hasAddress ? appeal.getRep().getAddress().getTown() : null,
             hasAddress ? appeal.getRep().getAddress().getCounty() : null,
+            hasAddress ? appeal.getRep().getAddress().getCountry() : null,
             hasAddress ? appeal.getRep().getAddress().getPostcode() : null,
             hasContact ? appeal.getRep().getContact().getMobile() : null,
             hasContact ? appeal.getRep().getContact().getEmail() : null,
@@ -512,6 +530,35 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService
         return new SessionAppellantNino(appeal.getAppellant().getIdentity().getNino());
     }
 
+    private SessionAppellantIbcaReference getAppellantIbcaReference(Appeal appeal) {
+        if (appeal.getAppellant() == null
+            || appeal.getAppellant().getIdentity() == null
+            || appeal.getAppellant().getIdentity().getIbcaReference() == null) {
+            return null;
+        }
+
+        return new SessionAppellantIbcaReference(appeal.getAppellant().getIdentity().getIbcaReference());
+    }
+
+    private SessionAppellantIbcRole getAppellantIbcRole(Appeal appeal) {
+        if (appeal.getAppellant() == null
+            || appeal.getAppellant().getIbcRole() == null) {
+            return null;
+        }
+
+        return new SessionAppellantIbcRole(appeal.getAppellant().getIbcRole());
+    }
+
+    private SessionInMainlandUk getAppellantInMainlandUk(Appeal appeal) {
+        if (appeal.getAppellant() == null
+            || appeal.getAppellant().getAddress() == null
+            || appeal.getAppellant().getAddress().getInMainlandUk() == null) {
+            return null;
+        }
+
+        return new SessionInMainlandUk(appeal.getAppellant().getAddress().getInMainlandUk().getValue().toLowerCase());
+    }
+
     private Address getAppellantAddress(Appeal appeal) {
         if (appeal.getAppellant() == null) {
             return null;
@@ -544,8 +591,8 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService
         return appeal.getAppellant().getAppointee().getContact();
     }
 
-    private SessionContactDetails buildContactDetails(Address address, Contact contact) {
-        if (address == null || address.getLine1() == null) {
+    private SessionContactDetails buildContactDetails(Address address, Contact contact, YesNo international) {
+        if (address == null || address.getLine1() == null || international.equals(address.getInMainlandUk())) {
             return null;
         }
         return new SessionContactDetails(
@@ -553,7 +600,9 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService
             address.getLine2(),
             address.getTown(),
             address.getCounty(),
+            address.getCountry(),
             address.getPostcode(),
+            address.getPortOfEntry(),
             contact.getMobile(),
             contact.getEmail(),
             StringUtils.isEmpty(address.getPostcodeLookup()) ? null : address.getPostcodeLookup(),

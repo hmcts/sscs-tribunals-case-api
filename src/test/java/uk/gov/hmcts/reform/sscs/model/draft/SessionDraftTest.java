@@ -3,6 +3,10 @@ package uk.gov.hmcts.reform.sscs.model.draft;
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE;
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE_ESA;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE_IBC;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE_IBC_INTERNATIONAL;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE_IBC_REP;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE_IBC_REP_INTERNATIONAL;
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE_WITH_APPOINTEE;
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE_WITH_APPOINTEE_AT_SAME_ADDRESS;
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE_WITH_DATES_CANT_ATTEND;
@@ -15,6 +19,7 @@ import net.javacrumbs.jsonunit.core.Option;
 import org.junit.Test;
 
 public class SessionDraftTest {
+
     @Test
     public void shouldSerializeSessionDraftAsExpected() {
         SessionDraft sessionDraft = SessionDraft.builder()
@@ -36,7 +41,9 @@ public class SessionDraftTest {
                     null,
                     "Appellant-town",
                     "Appellant-county",
+                    null,
                     "TS1 1ST",
+                    null,
                     "07911123456",
                     "appellant@gmail.com",
                     null,
@@ -98,7 +105,9 @@ public class SessionDraftTest {
                     null,
                     "Appellant-town",
                     "Appellant-county",
+                    null,
                     "TS1 1ST",
+                    null,
                     "07911123456",
                     "appellant@gmail.com",
                     null,
@@ -159,7 +168,9 @@ public class SessionDraftTest {
                     null,
                     "Appellant-town",
                     "Appellant-county",
+                    null,
                     "TS1 1ST",
+                    null,
                     "07911123456",
                     "appellant@gmail.com",
                     null,
@@ -181,6 +192,7 @@ public class SessionDraftTest {
                     "rep-line2",
                     "rep-town-city",
                     "rep-county",
+                    null,
                     "RE7 7ES",
                     "07222222222",
                     "representative@gmail.com",
@@ -216,7 +228,9 @@ public class SessionDraftTest {
                     "",
                     "Appointee-town",
                     "Appointee-county",
+                    null,
                     "TS2 2ST",
+                    null,
                     "07111111111",
                     "appointee@test.com",
                     null,
@@ -233,7 +247,9 @@ public class SessionDraftTest {
                     null,
                     "Appellant-town",
                     "Appellant-county",
+                    null,
                     "TS1 1ST",
+                    null,
                     "07911123456",
                     "appellant@gmail.com",
                     null,
@@ -285,7 +301,9 @@ public class SessionDraftTest {
                     "",
                     "Appointee-town",
                     "Appointee-county",
+                    null,
                     "TS2 2ST",
+                    null,
                     "07111111111",
                     "appointee@test.com",
                     null,
@@ -341,7 +359,9 @@ public class SessionDraftTest {
                     null,
                     "Appellant-town",
                     "Appellant-county",
+                    null,
                     "TS1 1ST",
+                    null,
                     "07911123456",
                     "appellant@gmail.com",
                     null,
@@ -392,7 +412,9 @@ public class SessionDraftTest {
                     null,
                     "Appellant-town",
                     "Appellant-county",
+                    null,
                     "TS1 1ST",
+                    null,
                     "07911123456",
                     "appellant@gmail.com",
                     null,
@@ -441,4 +463,193 @@ public class SessionDraftTest {
             .isEqualTo(sessionDraft);
     }
 
+    @Test
+    public void shouldSerializeIbcSessionDraftAsExpected() {
+        SessionDraft sessionDraft = SessionDraft.builder()
+            .benefitType(new SessionBenefitType("Infected Blood Compensation"))
+            .postcode(new SessionPostcodeChecker("n29ed"))
+            .createAccount(new SessionCreateAccount("yes"))
+            .haveAMrn(new SessionHaveAMrn("yes"))
+            .mrnDate(new SessionMrnDate(new SessionDate("10", "10", "1990")))
+            .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("aassas dasdsa dasdasda das"))
+            .appellantName(new SessionName("Mrs.", "Ap", "Pellant"))
+            .appellantDob(new SessionDob(new SessionDate("31", "12", "1998")))
+            .appellantIbcaReference(new SessionAppellantIbcaReference("12341234"))
+            .appellantInMainlandUk(new SessionInMainlandUk("yes"))
+            .appellantIbcRole(new SessionAppellantIbcRole("myself"))
+            .appellantContactDetails(
+                new SessionContactDetails(
+                    "1 Appellant Close",
+                    null,
+                    "Appellant-town",
+                    "Appellant-county",
+                    null,
+                    "TS1 1ST",
+                    null,
+                    "07911123456",
+                    "appellant@gmail.com",
+                    null,
+                    null,
+                    null
+                )
+            )
+            .representative(new SessionRepresentative("no"))
+            .build();
+
+        assertThatJson(SESSION_SAMPLE_IBC.getSerializedMessage())
+            .isEqualTo(sessionDraft);
+    }
+
+    @Test
+    public void shouldSerializeIbcInternationalSessionDraftAsExpected() {
+        SessionDraft sessionDraft = SessionDraft.builder()
+            .benefitType(new SessionBenefitType("Infected Blood Compensation"))
+            .postcode(new SessionPostcodeChecker("n29ed"))
+            .createAccount(new SessionCreateAccount("yes"))
+            .haveAMrn(new SessionHaveAMrn("yes"))
+            .mrnDate(new SessionMrnDate(new SessionDate("10", "10", "1990")))
+            .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("aassas dasdsa dasdasda das"))
+            .appellantName(new SessionName("Mrs.", "Ap", "Pellant"))
+            .appellantDob(new SessionDob(new SessionDate("31", "12", "1998")))
+            .appellantIbcaReference(new SessionAppellantIbcaReference("12341234"))
+            .appellantInMainlandUk(new SessionInMainlandUk("no"))
+            .appellantIbcRole(new SessionAppellantIbcRole("myself"))
+            .appellantInternationalContactDetails(
+                new SessionContactDetails(
+                    "1 Appellant Close",
+                    null,
+                    "Appellant-town",
+                    null,
+                    "Iceland",
+                    "TS1 1ST",
+                    "some-port-code",
+                    "07911123456",
+                    "appellant@gmail.com",
+                    null,
+                    null,
+                    null
+                )
+            )
+            .representative(new SessionRepresentative("no"))
+            .build();
+
+        assertThatJson(SESSION_SAMPLE_IBC_INTERNATIONAL.getSerializedMessage())
+            .isEqualTo(sessionDraft);
+    }
+
+    @Test
+    public void shouldSerializeIbcRepSessionDraftAsExpected() {
+        SessionDraft sessionDraft = SessionDraft.builder()
+            .benefitType(new SessionBenefitType("Infected Blood Compensation"))
+            .postcode(new SessionPostcodeChecker("n29ed"))
+            .createAccount(new SessionCreateAccount("yes"))
+            .haveAMrn(new SessionHaveAMrn("yes"))
+            .mrnDate(new SessionMrnDate(new SessionDate("10", "10", "1990")))
+            .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("aassas dasdsa dasdasda das"))
+            .appellantName(new SessionName("Mrs.", "Ap", "Pellant"))
+            .appellantDob(new SessionDob(new SessionDate("31", "12", "1998")))
+            .appellantIbcaReference(new SessionAppellantIbcaReference("12341234"))
+            .appellantInMainlandUk(new SessionInMainlandUk("yes"))
+            .appellantIbcRole(new SessionAppellantIbcRole("myself"))
+            .appellantContactDetails(
+                new SessionContactDetails(
+                    "1 Appellant Close",
+                    null,
+                    "Appellant-town",
+                    "Appellant-county",
+                    null,
+                    "TS1 1ST",
+                    null,
+                    "07911123456",
+                    "appellant@gmail.com",
+                    null,
+                    null,
+                    null
+                )
+            )
+            .representative(new SessionRepresentative("yes"))
+            .representativeInMainlandUk(new SessionInMainlandUk("yes"))
+            .representativeDetails(
+                new SessionRepresentativeDetails(
+                    new SessionRepName(
+                        "Mr.",
+                        "Re",
+                        "Presentative"
+                    ),
+                    "rep-line1",
+                    "rep-line2",
+                    "rep-town-city",
+                    "rep-county",
+                    null,
+                    "RE7 7ES",
+                    "07222222222",
+                    "representative@gmail.com",
+                    null,
+                    null,
+                    null
+                )
+            )
+            .build();
+
+        assertThatJson(SESSION_SAMPLE_IBC_REP.getSerializedMessage())
+            .isEqualTo(sessionDraft);
+    }
+
+    @Test
+    public void shouldSerializeIbcInternationalRepSessionDraftAsExpected() {
+        SessionDraft sessionDraft = SessionDraft.builder()
+            .benefitType(new SessionBenefitType("Infected Blood Compensation"))
+            .postcode(new SessionPostcodeChecker("n29ed"))
+            .createAccount(new SessionCreateAccount("yes"))
+            .haveAMrn(new SessionHaveAMrn("yes"))
+            .mrnDate(new SessionMrnDate(new SessionDate("10", "10", "1990")))
+            .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("aassas dasdsa dasdasda das"))
+            .appellantName(new SessionName("Mrs.", "Ap", "Pellant"))
+            .appellantDob(new SessionDob(new SessionDate("31", "12", "1998")))
+            .appellantIbcaReference(new SessionAppellantIbcaReference("12341234"))
+            .appellantInMainlandUk(new SessionInMainlandUk("yes"))
+            .appellantIbcRole(new SessionAppellantIbcRole("myself"))
+            .appellantContactDetails(
+                new SessionContactDetails(
+                    "1 Appellant Close",
+                    null,
+                    "Appellant-town",
+                    "Appellant-county",
+                    null,
+                    "TS1 1ST",
+                    null,
+                    "07911123456",
+                    "appellant@gmail.com",
+                    null,
+                    null,
+                    null
+                )
+            )
+            .representative(new SessionRepresentative("yes"))
+            .representativeInMainlandUk(new SessionInMainlandUk("no"))
+            .representativeInternationalDetails(
+                new SessionRepresentativeDetails(
+                    new SessionRepName(
+                        "Mr.",
+                        "Re",
+                        "Presentative"
+                    ),
+                    "rep-line1",
+                    "rep-line2",
+                    "rep-town-city",
+                    null,
+                    "Iceland",
+                    "RE7 7ES",
+                    "07222222222",
+                    "representative@gmail.com",
+                    null,
+                    null,
+                    null
+                )
+            )
+            .build();
+
+        assertThatJson(SESSION_SAMPLE_IBC_REP_INTERNATIONAL.getSerializedMessage())
+            .isEqualTo(sessionDraft);
+    }
 }
