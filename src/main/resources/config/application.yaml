@@ -1447,7 +1447,16 @@ notification:
             other_party:
                 docmosisId: TB-SCS-GNO-WEL-00474.docx
         issueAdjournmentNoticeWelsh:
-            docmosisId: TB-SCS-GNO-WEL-00649.docx
+            appellant:
+                docmosisId: TB-SCS-GNO-WEL-00649.docx
+            appointee:
+                docmosisId: TB-SCS-GNO-WEL-00649.docx
+            representative:
+                docmosisId: TB-SCS-GNO-WEL-00649.docx
+            joint_party:
+                docmosisId: TB-SCS-GNO-WEL-00649.docx
+            other_party:
+                docmosisId: TB-SCS-GNO-WEL-00649.docx
         issueFinalDecisionWelsh:
             appellant:
                 docmosisId: TB-SCS-GNO-WEL-00681.docx
