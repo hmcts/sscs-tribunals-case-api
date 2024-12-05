@@ -104,7 +104,8 @@ public class TribunalsHearingsEventTopicListenerV2ItTest {
     public void testHearingsUpdateCaseV2() throws UpdateCaseException, TribunalsEventProcessingException, GetCaseException {
         ReflectionTestUtils.setField(hearingsService, "hearingsCaseUpdateV2Enabled", true);
 
-        tribunalsHearingsEventQueueListener = new TribunalsHearingsEventQueueListener(hearingsService, ccdCaseService);
+        tribunalsHearingsEventQueueListener = new TribunalsHearingsEventQueueListener(hearingsService, ccdCaseService,
+                updateCcdCaseService, idamService);
         ReflectionTestUtils.setField(tribunalsHearingsEventQueueListener, "isByPassHearingServiceEnabled", true);
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);

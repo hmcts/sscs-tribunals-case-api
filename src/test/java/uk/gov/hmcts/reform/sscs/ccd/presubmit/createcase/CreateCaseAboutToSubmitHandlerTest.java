@@ -124,7 +124,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
         createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(emailHelper).generateUniqueEmailId(eq(caseDetails.getCaseData().getAppeal().getAppellant()));
-        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), any(), eq("Test.pdf"));
+        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), eq("sscs1"), any());
     }
 
 
@@ -179,7 +179,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
         assertNull(response.getData().getAppeal().getAppellant().getAppointee());
 
         verify(emailHelper).generateUniqueEmailId(eq(caseDetails.getCaseData().getAppeal().getAppellant()));
-        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), any(), any());
+        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), eq("sscs1"), any());
     }
 
     @Test
@@ -207,7 +207,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
         assertEquals("No", response.getData().getEvidencePresent());
 
         verify(emailHelper).generateUniqueEmailId(eq(caseDetails.getCaseData().getAppeal().getAppellant()));
-        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), any(), any());
+        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), eq("sscs1"), any());
     }
 
     @Test
@@ -223,7 +223,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
         assertEquals("Yes", response.getData().getEvidencePresent());
 
         verify(emailHelper).generateUniqueEmailId(eq(caseDetails.getCaseData().getAppeal().getAppellant()));
-        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), any(), any());
+        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), eq("sscs1"), any());
     }
 
     @Test
@@ -240,7 +240,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
 
         assertEquals("Yes", response.getData().getEvidencePresent());
 
-        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), any(), any());
+        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), eq("sscs8"), any());
     }
 
     @Test
@@ -257,7 +257,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
 
         assertEquals("No", response.getData().getEvidencePresent());
 
-        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), any(), any());
+        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), eq("sscs8"), any());
     }
 
     @Test
@@ -309,9 +309,11 @@ public class CreateCaseAboutToSubmitHandlerTest {
     @Test
     void shouldReturnErrorIfNullCreatedDate() throws CcdException {
         callback.getCaseDetails().getCaseData().setCaseCreated(null);
+        callback.getCaseDetails().getCaseData().setBenefitCode("015");
         PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
+        assertTrue(response.getErrors().contains("The Case Created Date must be set to generate the SSCS5"));
     }
 
     @Test

@@ -24,7 +24,6 @@ java:
     IDAM_S2S-AUTH_MICROSERVICE: ${IDAM_S2S_AUTH_MICROSERVICE}
     IDAM_SSCS_SYSTEMUPDATE_USER: ${IDAM_SSCS_SYSTEMUPDATE_USER}
     IDAM_SSCS_SYSTEMUPDATE_PASSWORD: ${IDAM_SSCS_SYSTEMUPDATE_PASSWORD}
-    TEST_URL: http://${SERVICE_NAME}
     CREATE_CCD_ENDPOINT: true
     SECURE_DOC_STORE_FEATURE: true
     CASE_DOCUMENT_AM_URL: ${CASE_DOCUMENT_AM_URL}
@@ -562,6 +561,7 @@ sscs-tribunals-frontend:
       SERVICES_IDAM_LOGIN_URL: https://idam-web-public.aat.platform.hmcts.net/login
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       UV_THREADPOOL_SIZE: 64
+      INFECTED_BLOOD_COMPENSATION_ENABLED: true
     keyVaults:
       sscs:
         secrets:

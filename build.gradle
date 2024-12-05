@@ -356,7 +356,7 @@ dependencies {
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
 
     implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'SSCSCI-1214-SNAPSHOT'
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.18'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.21'
 
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
