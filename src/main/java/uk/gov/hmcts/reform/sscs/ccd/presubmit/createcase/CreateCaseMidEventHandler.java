@@ -9,11 +9,13 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Entity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
@@ -24,9 +26,18 @@ import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
 @Component
 @Slf4j
 public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    public static final String IBCA_REFERENCE_EMPTY_ERROR =
+            "An IBCA reference is required to update this case. The IBCA Reference format is 1 letter, 2 digits, 1 letter, 2 digits e.g. E24A45.";
+
+    public static final String IBCA_REFERENCE_VALIDATION_ERROR =
+            "The IBCA reference must be 6 characters and match the format. The IBCA Reference format is 1 letter, 2 digits, 1 letter, 2 digits e.g. E24A45";
+
     private static final String HEARING_ROUTE_ERROR_MESSAGE = "Hearing route must be List Assist";
 
     private final PostcodeValidator postcodeValidator = new PostcodeValidator();
+
+    private static final Pattern IBCA_REFERENCE_REGEX = Pattern.compile("^[A-Za-z]\\d{2}[A-HJKMNP-Z]\\d{2}$");
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -62,7 +73,21 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
             errorResponse.addError("You must enter Living in the UK for the representative");
         }
 
+        errorResponse.addWarnings(validateIbcaReference(caseData.getAppeal().getAppellant()));
+
         return errorResponse;
+    }
+
+    private Collection<String> validateIbcaReference(Appellant appellant) {
+        Set<String> validationWarnings = new HashSet<>();
+
+        if (isEmpty(appellant.getIdentity()) || isEmpty(appellant.getIdentity().getIbcaReference())) {
+            validationWarnings.add(IBCA_REFERENCE_EMPTY_ERROR);
+        } else if (!IBCA_REFERENCE_REGEX.matcher(appellant.getIdentity().getIbcaReference()).find()) {
+            validationWarnings.add(IBCA_REFERENCE_VALIDATION_ERROR);
+        }
+
+        return validationWarnings;
     }
 
     private Collection<String> validateAddress(Entity party) {
