@@ -24,7 +24,7 @@ import uk.gov.service.notify.NotificationClientException;
 public class DocmosisGovNotifyLettersFT extends AbstractNotificationsFT {
 
     @Rule
-    public Timeout globalTimeout = Timeout.seconds(30*60);
+    public Timeout globalTimeout = Timeout.seconds(30 * 60);
 
     public DocmosisGovNotifyLettersFT() {
         super(30);
