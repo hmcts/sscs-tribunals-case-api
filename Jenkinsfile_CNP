@@ -116,7 +116,7 @@ def branchesToSync = ['demo', 'ithc', 'perftest']
 
 withPipeline(type, product, component) {
     def githubApi = new GithubAPI(this)
-    def isHearingsPr = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:hearings").size() > 0;
+    env.IS_HEARINGS_PR = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:hearings").size() > 0;
 
     enableHighLevelDataSetup()
 
@@ -135,8 +135,8 @@ withPipeline(type, product, component) {
     }
     onPR() {
         setPreviewEnvVars();
-        echo "isHearingsPr  " + isHearingsPr
-        if (isHearingsPr) {
+        echo "isHearingsPr  " + env.IS_HEARINGS_PR
+        if (env.IS_HEARINGS_PR) {
             env.CASE_TYPE = "Benefit-${CHANGE_ID}"
             setAatEnvVars();
             env.TEST_E2E_URL_WEB = "https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
@@ -163,7 +163,7 @@ withPipeline(type, product, component) {
     }
 
     before('highleveldatasetup') {
-        generateDefinitions(isHearingsPr)
+        generateDefinitions()
     }
 
     afterSuccess('akschartsinstall') {
@@ -185,14 +185,14 @@ withPipeline(type, product, component) {
     }
 }
 
-def generateDefinitions(isHearingsPr) {
-    if (env.ENVIRONMENT != "pr" && !isHearingsPr) {
+def generateDefinitions() {
+    if (env.ENVIRONMENT != "pr" && !env.IS_HEARINGS_PR) {
         env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     }
-    sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${isHearingsPr}"
+    sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${env.IS_HEARINGS_PR}"
     steps.archiveArtifacts artifacts: "definitions/benefit/*.xlsx"
-    if (!isHearingsPr) {
-        sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT} ${isHearingsPr}"
+    if (!env.IS_HEARINGS_PR) {
+        sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT} ${env.IS_HEARINGS_PR}"
         steps.archiveArtifacts artifacts: "definitions/bulkscan/*.xlsx"
     }
 }
