@@ -109,9 +109,13 @@ withNightlyPipeline(type, product, component) {
     enableFortifyScan()
     enableMutationTest()
     enableFullFunctionalTest()
-    
+
     afterAlways('fullFunctionalTest') {
         runE2eTestsNightly()
+    }
+
+    afterAlways('Playwright tests') {
+        runAccessibilityTestsNightly()
     }
 
     afterSuccess('fortify-scan') {
@@ -126,12 +130,30 @@ def runE2eTestsNightly() {
         }
     } finally {
         publishHTML([
-            allowMissing: true,
-            alwaysLinkToLastBuild: true,
-            keepAll: true,
-            reportDir: "playwright-report",
-            reportFiles: 'index.html',
-            reportName: 'SSCS E2E Test Report'
+                allowMissing: true,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: "playwright-report",
+                reportFiles: 'index.html',
+                reportName: 'SSCS E2E Test Report'
+        ])
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'definitions/test/playwright-report/**'
+    }
+}
+
+def runAccessibilityTestsNightly() {
+    try {
+        stage('Accessibility tests') {
+            sh './gradlew runAccessibilityTestsNightly'
+        }
+    } finally {
+        publishHTML([
+                allowMissing: true,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: "playwright-report",
+                reportFiles: 'index.html',
+                reportName: 'SSCS Accessibility Test Report'
         ])
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'definitions/test/playwright-report/**'
     }

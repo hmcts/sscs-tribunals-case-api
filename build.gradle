@@ -647,6 +647,12 @@ task runE2eTestsNightly(type: Exec) {
     commandLine 'yarn', 'test:nightly'
 }
 
+task runAccessibilityTestsNightly(type: Exec) {
+    dependsOn yarnInstall
+    workingDir = file("${project.projectDir}/definitions/test")
+    commandLine 'yarn', 'test:accessibility'
+}
+
 task highLevelDataSetup(type: JavaExec) {
     mainClass = "uk.gov.hmcts.reform.sscs.config.HighLevelDataSetupApp"
     classpath += sourceSets.main.runtimeClasspath
