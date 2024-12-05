@@ -115,7 +115,7 @@ tasks.register('functional', Test) {
     setClasspath(sourceSets.functionalTest.runtimeClasspath)
     include "uk/gov/hmcts/reform/sscs/functional/**"
     exclude "uk/gov/hmcts/reform/sscs/smoke/**"
-    maxParallelForks = Runtime.runtime.availableProcessors()
+    maxParallelForks = Runtime.runtime.availableProcessors() / 2 ?: 1
 }
 
 tasks.register('smoke', Test) {
