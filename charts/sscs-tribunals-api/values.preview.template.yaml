@@ -71,6 +71,8 @@ java:
     # START - SSCS-IB RELEASE VARIABLES
     BUNDLE_ENGLISH_CONFIG: sscs-ib-bundle-config.yaml
     BUNDLE_EDITED_CONFIG: sscs-ib-bundle-edited-config.yaml
+    DOCUMENTS_ENGLISH_SOR_WRITE: TB-SCS-GNO-ENG-sor-directions-notice-v2.docx
+    DOCUMENTS_WELSH_SOR_WRITE: TB-SCS-GNO-ENG-sor-directions-notice-v2.docx
     # END - SSCS-IB RELEASE VARIABLES
   secrets:
     JOB_SCHEDULER_DB_PASSWORD:
