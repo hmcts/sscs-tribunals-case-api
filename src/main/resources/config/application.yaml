@@ -535,7 +535,7 @@ notification:
                 emailId: 3d05393a-e593-400a-963f-a26893a0b672
                 smsId: 99bd4a56-256c-4de8-b187-d43a8dde466f
                 letterId: 77ea8a2f-06df-4279-9c1f-0f23cb2d9bbf
-                docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Representative.docx
+                docmosisId: ${NOTIFICATION_ENGLISH_APPEAL_RECEIVED_REPRESENTATIVE_DOCMOSIS_ID:TB-SCS-LET-ENG-Appeal-Lodged-Representative.docx}
             appointee:
                 emailId: 78cf9c9c-e2b8-44d7-bcf1-220311f114cb
                 smsId: ede384aa-0b6e-4311-9f01-ee547573a07b
@@ -700,7 +700,7 @@ notification:
             representative:
                 emailId: 652753bf-59b4-46eb-9c24-bd762338a098
                 smsId: a6c09fad-6265-4c7c-8b95-36245ffa5352
-                docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Representative.docx
+                docmosisId: ${NOTIFICATION_ENGLISH_APPEAL_RECEIVED_REPRESENTATIVE_DOCMOSIS_ID:TB-SCS-LET-ENG-Appeal-Lodged-Representative.docx}
             appointee:
                 emailId: 362d9a85-e0e4-412b-b874-020c0464e2b4
                 smsId: f41222ef-c05c-4682-9634-6b034a166368
@@ -1174,7 +1174,7 @@ notification:
                 emailId: e7993ed9-982a-44eb-8459-932d6d7653ea
                 smsId: 6970bdda-7293-46d6-8876-7e1a7c4295fc
                 letterId: 89cbb9d8-3b7d-4766-b481-585832e8bd90
-                docmosisId: TB-SCS-LET-WEL-Appeal-Lodged-Representative.docx
+                docmosisId: ${NOTIFICATION_WELSH_APPEAL_RECEIVED_REPRESENTATIVE_DOCMOSIS_ID:TB-SCS-LET-WEL-Appeal-Lodged-Representative.docx}
             appointee:
                 emailId: c77d9768-5343-42a5-9333-7b399e3d7199
                 smsId: 53369ca5-75a8-43a7-8e5e-4eda9df04001
@@ -1339,7 +1339,7 @@ notification:
             representative:
                 emailId: 364bccc5-ffa6-495d-8035-e642d15114bf
                 smsId: f8391d2b-4d80-480e-87a9-816710f5650b
-                docmosisId: TB-SCS-LET-WEL-Appeal-Lodged-Representative.docx
+                docmosisId: ${NOTIFICATION_WELSH_APPEAL_RECEIVED_REPRESENTATIVE_DOCMOSIS_ID:TB-SCS-LET-WEL-Appeal-Lodged-Representative.docx}
             appointee:
                 emailId: e0355abd-42a6-4f94-836b-ec7ee22631cc
                 smsId: 6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82
