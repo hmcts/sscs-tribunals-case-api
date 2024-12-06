@@ -115,11 +115,9 @@ withNightlyPipeline(type, product, component) {
 
     afterAlways('fullFunctionalTest') {
         runE2eTestsNightly()
-    }
-
-    afterAlways('Playwright tests') {
         runAccessibilityTestsNightly()
     }
+
 
     afterSuccess('fortify-scan') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
