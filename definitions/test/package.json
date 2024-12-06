@@ -9,9 +9,12 @@
     "start": "node index.js",
     "test:pr": "PLAYWRIGHT_HTML_REPORT=playwright-report PW_TEST_HTML_REPORT_OPEN=never npx playwright install && npx playwright test --config ./playwright.config.ts --project chromium --reporter=html --grep-invert @work-allocation --grep $TEST_SUITE",
     "test:aat": "PLAYWRIGHT_HTML_REPORT=playwright-report PW_TEST_HTML_REPORT_OPEN=never npx playwright install && npx playwright test --config ./playwright.config.ts --project chromium --reporter=html --grep-invert @work-allocation --grep @master-pipeline",
-    "test:nightly": "PLAYWRIGHT_HTML_REPORT=playwright-report PW_TEST_HTML_REPORT_OPEN=never npx playwright install && npx playwright test --config ./playwright.config.ts --project chromium --reporter=html --grep-invert @work-allocation --grep @nightly-pipeline"
+    "test:nightly": "PLAYWRIGHT_HTML_REPORT=playwright-report PW_TEST_HTML_REPORT_OPEN=never npx playwright install && npx playwright test --config ./playwright.config.ts --project chromium --reporter=html --grep-invert @work-allocation --grep @nightly-pipeline",
+    "test:accessibility": "yarn install --ignore-engines && npx playwright test --config ./playwright.config.ts --project chromium --reporter=html --grep @accessibility"
+
   },
   "dependencies": {
+    "@axe-core/playwright": "^4.9.1",
     "@cucumber/cucumber": "^9.5.0",
     "@hmcts/nodejs-healthcheck": "^1.8.0",
     "@hmcts/properties-volume": "^1.1.0",
