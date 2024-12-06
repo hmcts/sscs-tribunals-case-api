@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CASE_UPDATED;
@@ -130,7 +131,7 @@ public class RoboticsCallbackHandlerTest {
         Appeal appeal = Mockito.mock(Appeal.class);
         when(appeal.getAppellant()).thenReturn(Appellant.builder().address(Address.builder().postcode("PC1 1AA").build()).build());
         caseDetails.getCaseData().setAppeal(appeal);
-        when(regionalProcessingCenterService.getByPostcode(any())).thenReturn(RegionalProcessingCenter.builder().name("MyRPC").build());
+        when(regionalProcessingCenterService.getByPostcode(any(), anyBoolean())).thenReturn(RegionalProcessingCenter.builder().name("MyRPC").build());
 
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), eventType, false);
         handler.handle(SUBMITTED, callback);
@@ -264,7 +265,7 @@ public class RoboticsCallbackHandlerTest {
         Appeal appeal = Mockito.mock(Appeal.class);
         when(appeal.getAppellant()).thenReturn(Appellant.builder().address(Address.builder().postcode("PC1 1AA").build()).build());
         caseDetails.getCaseData().setAppeal(appeal);
-        when(regionalProcessingCenterService.getByPostcode(any())).thenReturn(RegionalProcessingCenter.builder().name("MyRPC").build());
+        when(regionalProcessingCenterService.getByPostcode(any(), anyBoolean())).thenReturn(RegionalProcessingCenter.builder().name("MyRPC").build());
 
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.DWP_RAISE_EXCEPTION, false);
 
