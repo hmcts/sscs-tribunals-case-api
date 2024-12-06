@@ -39,7 +39,6 @@ public class DocmosisGovNotifyLettersFT extends AbstractNotificationsFT {
     @Test
     public void shouldSendDocmosisLettersViaGovNotify() {
         getNotificationList()
-                .parallelStream()
                 .forEach(notificationEventType -> {
                     try {
                         simulateCcdCallbackToSendLetter(notificationEventType);
