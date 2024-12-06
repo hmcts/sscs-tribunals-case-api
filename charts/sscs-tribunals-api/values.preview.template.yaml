@@ -24,7 +24,6 @@ java:
     IDAM_S2S-AUTH_MICROSERVICE: ${IDAM_S2S_AUTH_MICROSERVICE}
     IDAM_SSCS_SYSTEMUPDATE_USER: ${IDAM_SSCS_SYSTEMUPDATE_USER}
     IDAM_SSCS_SYSTEMUPDATE_PASSWORD: ${IDAM_SSCS_SYSTEMUPDATE_PASSWORD}
-    TEST_URL: http://${SERVICE_NAME}
     CREATE_CCD_ENDPOINT: true
     SECURE_DOC_STORE_FEATURE: true
     CASE_DOCUMENT_AM_URL: ${CASE_DOCUMENT_AM_URL}
@@ -69,6 +68,10 @@ java:
     SUBMIT_APPEAL_SERVICE_V2_ENABLED: true
     PROCESS_EVENT_MESSAGE_V2_ENABLED: true
     UPDATE_CASE_ONLY_HEARING_V2_ENABLED: true
+    # START - SSCS-IB RELEASE VARIABLES
+    BUNDLE_ENGLISH_CONFIG: sscs-ib-bundle-config.yaml
+    BUNDLE_EDITED_CONFIG: sscs-ib-bundle-edited-config.yaml
+    # END - SSCS-IB RELEASE VARIABLES
   secrets:
     JOB_SCHEDULER_DB_PASSWORD:
       secretRef: postgres
@@ -558,6 +561,7 @@ sscs-tribunals-frontend:
       SERVICES_IDAM_LOGIN_URL: https://idam-web-public.aat.platform.hmcts.net/login
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       UV_THREADPOOL_SIZE: 64
+      INFECTED_BLOOD_COMPENSATION_ENABLED: true
     keyVaults:
       sscs:
         secrets:
@@ -609,3 +613,10 @@ postgresql:
       - name: "pr-${CHANGE_ID}-role-assignment"
       - name: "pr-${CHANGE_ID}-hmc-cft-hearing-service"
       - name: "pr-${CHANGE_ID}-sscs-job-scheduler"
+
+
+ccd-def-cleanup:
+  enabled: true
+  change_id: ${CHANGE_ID}
+  case_type_ids:
+    - Benefit

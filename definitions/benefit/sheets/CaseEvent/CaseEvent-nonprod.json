@@ -1,26 +1,12 @@
 [
   {
-    "LiveFrom": "23/11/2022",
+    "LiveFrom": "02/12/2024",
     "CaseTypeID": "Benefit",
-    "ID": "setHearingRoute",
-    "Name": "Set Hearing Route",
-    "Description": "Set Hearing Route",
-    "DisplayOrder": 9990,
+    "ID": "caseOutcomeMigration",
+    "Name": "Case migrated automatically",
+    "DisplayOrder": 10007,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
-    "SecurityClassification": "Public",
-    "EventEnablingCondition": "appeal.benefitType.code!=\"infectedBloodCompensation\""
-  },
-  {
-    "LiveFrom": "30/10/2024",
-    "CaseTypeID": "Benefit",
-    "ID": "addHearingOutcome",
-    "Name": "Add hearing outcome",
-    "Description": "Add a hearing outcome",
-    "DisplayOrder": 140,
-    "PreConditionState(s)": "dormantAppealState;postHearing;withUT;hearing;readyToList",
-    "PostConditionState": "*",
-    "ShowEventNotes": "Y",
     "SecurityClassification": "Public"
   }
 ]

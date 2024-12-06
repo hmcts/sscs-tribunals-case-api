@@ -1,29 +1,24 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
-import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
-import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Entity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
@@ -32,7 +27,17 @@ import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
 @Slf4j
 public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
+    public static final String IBCA_REFERENCE_EMPTY_ERROR =
+            "An IBCA reference is required to update this case. The IBCA Reference format is 1 letter, 2 digits, 1 letter, 2 digits e.g. E24A45.";
+
+    public static final String IBCA_REFERENCE_VALIDATION_ERROR =
+            "The IBCA reference must be 6 characters and match the format. The IBCA Reference format is 1 letter, 2 digits, 1 letter, 2 digits e.g. E24A45";
+
+    private static final String HEARING_ROUTE_ERROR_MESSAGE = "Hearing route must be List Assist";
+
     private final PostcodeValidator postcodeValidator = new PostcodeValidator();
+
+    private static final Pattern IBCA_REFERENCE_REGEX = Pattern.compile("^[A-Za-z]\\d{2}[A-HJKMNP-Z]\\d{2}$");
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -43,8 +48,7 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
                 || callback.getEvent() == EventType.CASE_UPDATED)
                 && Objects.nonNull(callback.getCaseDetails())
                 && Objects.nonNull(callback.getCaseDetails().getCaseData())
-                && isIbcaCase(callback.getCaseDetails().getCaseData()
-        );
+                && callback.getCaseDetails().getCaseData().isIbcCase();
     }
 
     @Override
@@ -57,6 +61,10 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
             caseData.getAppeal().getAppellant().getAddress().setPortOfEntry(selectedPortOfEntryLocationCode);
         }
 
+        if (callback.getEvent() == EventType.CASE_UPDATED && caseData.getRegionalProcessingCenter() != null && HearingRoute.GAPS.equals(caseData.getRegionalProcessingCenter().getHearingRoute())) {
+            errorResponse.addError(HEARING_ROUTE_ERROR_MESSAGE);
+        }
+
         errorResponse.addErrors(validateAddress(caseData.getAppeal().getAppellant()));
 
         if (isYes(caseData.getAppeal().getRep().getHasRepresentative())
@@ -65,7 +73,21 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
             errorResponse.addError("You must enter Living in the UK for the representative");
         }
 
+        errorResponse.addWarnings(validateIbcaReference(caseData.getAppeal().getAppellant()));
+
         return errorResponse;
+    }
+
+    private Collection<String> validateIbcaReference(Appellant appellant) {
+        Set<String> validationWarnings = new HashSet<>();
+
+        if (isEmpty(appellant.getIdentity()) || isEmpty(appellant.getIdentity().getIbcaReference())) {
+            validationWarnings.add(IBCA_REFERENCE_EMPTY_ERROR);
+        } else if (!IBCA_REFERENCE_REGEX.matcher(appellant.getIdentity().getIbcaReference()).find()) {
+            validationWarnings.add(IBCA_REFERENCE_VALIDATION_ERROR);
+        }
+
+        return validationWarnings;
     }
 
     private Collection<String> validateAddress(Entity party) {
@@ -89,18 +111,5 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
         }
 
         return validationErrors;
-    }
-
-    private boolean isIbcaCase(SscsCaseData caseData) {
-        final String selectedBenefitType = Optional.of(caseData)
-                .map(SscsCaseData::getAppeal)
-                .map(Appeal::getBenefitType)
-                .map(BenefitType::getDescriptionSelection)
-                .map(DynamicList::getValue)
-                .filter(ObjectUtils::isNotEmpty)
-                .map(DynamicListItem::getCode)
-                .orElse(null);
-
-        return IBCA_BENEFIT_CODE.equals(caseData.getBenefitCode()) || IBCA_BENEFIT_CODE.equals(selectedBenefitType);
     }
 }

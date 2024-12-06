@@ -193,6 +193,7 @@
     "Name": "Add case outcome",
     "Description": "Add a case outcome",
     "DisplayOrder": 141,
+    "EventEnablingCondition": "caseOutcome=\"DONOTSHOW\"",
     "PreConditionState(s)": "dormantAppealState;postHearing;withUT;hearing;readyToList",
     "PostConditionState": "*",
     "ShowEventNotes": "Y",
@@ -300,6 +301,7 @@
     "DisplayOrder": 230,
     "PreConditionState(s)": "appealCreated;dormantAppealState;postHearing;withUT;draft;draftArchived;hearing;incompleteApplication;incompleteApplicationInformationReqsted;interlocutoryReviewState;responseReceived;validAppeal;voidState;withDwp;handlingError",
     "PostConditionState": "readyToList",
+    "EventEnablingCondition": "appeal.benefitType.code!=\"infectedBloodCompensation\"",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public"
   },
@@ -1733,6 +1735,7 @@
     "DisplayOrder": 1250,
     "PreConditionState(s)": "*",
     "PostConditionState": "readyToList",
+    "EventEnablingCondition": "appeal.benefitType.code!=\"infectedBloodCompensation\"",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "RetriesTimeoutURLAboutToSubmitEvent": "5,5",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
@@ -2249,6 +2252,7 @@
     "DisplayOrder": 1640,
     "PreConditionState(s)": "notListable",
     "PostConditionState": "*",
+    "EventEnablingCondition": "appeal.benefitType.code!=\"infectedBloodCompensation\"",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "SecurityClassification": "Public",
     "ShowSummary": "Y",
@@ -2263,7 +2267,7 @@
     "DisplayOrder": 1650,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
-    "EventEnablingCondition": "appeal.benefitType.code=\"childSupport\" OR appeal.benefitType.code=\"taxCredit\" OR appeal.benefitType.code=\"guardiansAllowance\" OR appeal.benefitType.code=\"taxFreeChildcare\" OR appeal.benefitType.code=\"homeResponsibilitiesProtection\" OR appeal.benefitType.code=\"childBenefit\" OR appeal.benefitType.code=\"thirtyHoursFreeChildcare\" OR appeal.benefitType.code=\"guaranteedMinimumPension\" OR appeal.benefitType.code=\"nationalInsuranceCredits\"",
+    "EventEnablingCondition": "appeal.benefitType.code=\"childSupport\" OR appeal.benefitType.code=\"taxCredit\" OR appeal.benefitType.code=\"guardiansAllowance\" OR appeal.benefitType.code=\"taxFreeChildcare\" OR appeal.benefitType.code=\"homeResponsibilitiesProtection\" OR appeal.benefitType.code=\"childBenefit\" OR appeal.benefitType.code=\"thirtyHoursFreeChildcare\" OR appeal.benefitType.code=\"guaranteedMinimumPension\" OR appeal.benefitType.code=\"nationalInsuranceCredits\" OR appeal.benefitType.code=\"infectedBloodCompensation\"",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "ShowEventNotes": "Y",
@@ -2956,6 +2960,18 @@
   {
     "LiveFrom": "23/11/2022",
     "CaseTypeID": "Benefit",
+    "ID": "setHearingRoute",
+    "Name": "Set Hearing Route",
+    "Description": "Set Hearing Route",
+    "DisplayOrder": 500,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "EventEnablingCondition": "appeal.benefitType.code=\"infectedBloodCompensation\""
+  },
+  {
+    "LiveFrom": "23/11/2022",
+    "CaseTypeID": "Benefit",
     "ID": "correctionRequest",
     "Name": "Correction Request",
     "Description": "Correction Request",
@@ -3213,6 +3229,33 @@
     "DisplayOrder": 10006,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "30/10/2024",
+    "CaseTypeID": "Benefit",
+    "ID": "addHearingOutcome",
+    "Name": "Add hearing outcome",
+    "Description": "Add a hearing outcome",
+    "DisplayOrder": 140,
+    "PreConditionState(s)": "dormantAppealState;postHearing;withUT;hearing;readyToList",
+    "CallBackURLAboutToStartEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToStart",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
+    "PostConditionState": "*",
+    "ShowEventNotes": "Y",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "03/12/2024",
+    "CaseTypeID": "Benefit",
+    "ID": "removeCaseOutcome",
+    "Name": "Remove old case outcome",
+    "Description": "Remove old case outcome",
+    "DisplayOrder": 141,
+    "PreConditionState(s)": "*",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
+    "PostConditionState": "*",
+    "ShowEventNotes": "Y",
     "SecurityClassification": "Public"
   }
 ]
