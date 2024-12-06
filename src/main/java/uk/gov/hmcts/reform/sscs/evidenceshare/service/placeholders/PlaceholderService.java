@@ -44,7 +44,6 @@ public class PlaceholderService {
             description = Benefit.getBenefitOptionalByCode(appeal.getBenefitType().getCode()).map(Benefit::getDescription).orElse(StringUtils.EMPTY);
         }
         String shouldHideNino = appeal.getBenefitType() != null && Benefit.CHILD_SUPPORT.getShortName().equals(appeal.getBenefitType().getCode()) ? YesNo.YES.getValue() : YesNo.NO.getValue();
-
         if (description != null) {
             description = description.toUpperCase();
         } else {
@@ -55,8 +54,10 @@ public class PlaceholderService {
         placeholders.put(BENEFIT_TYPE_LITERAL, description);
         placeholders.put(APPELLANT_FULL_NAME_LITERAL, appeal.getAppellant().getName().getAbbreviatedFullName());
         placeholders.put(CASE_ID_LITERAL, caseData.getCcdCaseId());
-        placeholders.put(NINO_LITERAL, defaultToEmptyStringIfNull(appeal.getAppellant().getIdentity().getNino()));
-        placeholders.put(SSCS_URL_LITERAL, PlaceholderConstants.SSCS_URL);
+        String ninoLiteral = defaultToEmptyStringIfNull(caseData.isIbcCase() ? appeal.getAppellant().getIdentity().getIbcaReference() : appeal.getAppellant().getIdentity().getNino());
+        placeholders.put(NINO_LITERAL, ninoLiteral);
+        placeholders.put(LABEL, caseData.isIbcCase() ? IBCA_REFERENCE_LABEL : NINO_LABEL);
+        placeholders.put(SSCS_URL_LITERAL, caseData.isIbcCase() ? IBCA_URL : SSCS_URL);
         placeholders.put(GENERATED_DATE_LITERAL, LocalDateTime.now().toLocalDate().toString());
         placeholders.put(pdfDocumentConfig.getHmctsImgKey(), pdfDocumentConfig.getHmctsImgVal());
         if (caseData.isLanguagePreferenceWelsh()) {
