@@ -164,7 +164,10 @@ public class Personalisation<E extends NotificationWrapper> {
             if (hasBenefitType(ccdResponse)) {
                 benefit = getBenefitByCodeOrThrowException(ccdResponse.getAppeal().getBenefitType().getCode());
 
-                if (benefit.isHasAcronym()) {
+                if (ccdResponse.isIbcCase()) {
+                    personalisation.put(BENEFIT_NAME_ACRONYM_LITERAL, IBC_ACRONYM);
+                    personalisation.put(BENEFIT_NAME_ACRONYM_LITERAL_WELSH, IBC_ACRONYM_WELSH);
+                } else if (benefit.isHasAcronym()) {
                     personalisation.put(BENEFIT_NAME_ACRONYM_LITERAL, benefit.name());
                     personalisation.put(BENEFIT_NAME_ACRONYM_LITERAL_WELSH, benefit.name());
                 } else {
@@ -341,28 +344,56 @@ public class Personalisation<E extends NotificationWrapper> {
     }
 
     private void addFirstTierAgencyFields(Map<String, Object> personalisation, Benefit benefit, SscsCaseData ccdResponse) {
-        personalisation.put(FIRST_TIER_AGENCY_ACRONYM, isHmrcBenefit(benefit, ccdResponse.getFormType()) ? HMRC_ACRONYM : DWP_ACRONYM);
-        personalisation.put(FIRST_TIER_AGENCY_ACRONYM_WELSH, isHmrcBenefit(benefit, ccdResponse.getFormType()) ? HMRC_ACRONYM_WELSH : DWP_ACRONYM_WELSH);
-        personalisation.put(FIRST_TIER_AGENCY_FULL_NAME, isHmrcBenefit(benefit, ccdResponse.getFormType()) ? HMRC_FULL_NAME : DWP_FULL_NAME);
-        personalisation.put(FIRST_TIER_AGENCY_FULL_NAME_WELSH, isHmrcBenefit(benefit, ccdResponse.getFormType()) ? HMRC_FULL_NAME_WELSH : DWP_FULL_NAME_WELSH);
-        personalisation.put(FIRST_TIER_AGENCY_GROUP, isHmrcBenefit(benefit, ccdResponse.getFormType()) ? HMRC_ACRONYM : DWP_FIRST_TIER_AGENCY_GROUP);
-        personalisation.put(FIRST_TIER_AGENCY_GROUP_TITLE, isHmrcBenefit(benefit, ccdResponse.getFormType()) ? HMRC_ACRONYM : DWP_FIRST_TIER_AGENCY_GROUP_TITLE);
-        personalisation.put(FIRST_TIER_AGENCY_GROUP_WELSH, isHmrcBenefit(benefit, ccdResponse.getFormType()) ? HMRC_ACRONYM : DWP_FIRST_TIER_AGENCY_GROUP_WELSH);
-        personalisation.put(FIRST_TIER_AGENCY_OFFICE, ccdResponse.getDwpRegionalCentre());
-        personalisation.put(WITH_OPTIONAL_THE, isHmrcBenefit(benefit, ccdResponse.getFormType()) ? "" : THE_STRING);
-        personalisation.put(WITH_OPTIONAL_THE_WELSH, isHmrcBenefit(benefit, ccdResponse.getFormType()) ? "" : THE_STRING_WELSH);
-    }
+        final String type = benefit == null
+                ? String.valueOf(ccdResponse.getFormType())
+                : String.valueOf(benefit.getSscsType());
 
-    private boolean isHmrcBenefit(Benefit benefit, FormType formType) {
-        if (benefit == null) {
-            return FormType.SSCS5.equals(formType);
+        switch (type) {
+            case SSCS5 -> {
+                personalisation.put(FIRST_TIER_AGENCY_ACRONYM, HMRC_ACRONYM);
+                personalisation.put(FIRST_TIER_AGENCY_ACRONYM_WELSH, HMRC_ACRONYM_WELSH);
+                personalisation.put(FIRST_TIER_AGENCY_FULL_NAME, HMRC_FULL_NAME);
+                personalisation.put(FIRST_TIER_AGENCY_FULL_NAME_WELSH, HMRC_FULL_NAME_WELSH);
+                personalisation.put(FIRST_TIER_AGENCY_GROUP, HMRC_ACRONYM);
+                personalisation.put(FIRST_TIER_AGENCY_GROUP_TITLE, HMRC_ACRONYM);
+                personalisation.put(FIRST_TIER_AGENCY_GROUP_WELSH, HMRC_ACRONYM);
+                personalisation.put(FIRST_TIER_AGENCY_OFFICE, ccdResponse.getDwpRegionalCentre());
+                personalisation.put(WITH_OPTIONAL_THE, "");
+                personalisation.put(WITH_OPTIONAL_THE_WELSH, "");
+            }
+            case SSCS8 -> {
+                personalisation.put(FIRST_TIER_AGENCY_ACRONYM, IBCA_ACRONYM);
+                personalisation.put(FIRST_TIER_AGENCY_ACRONYM_WELSH, IBCA_ACRONYM_WELSH);
+                personalisation.put(FIRST_TIER_AGENCY_FULL_NAME, IBCA_FULL_NAME);
+                personalisation.put(FIRST_TIER_AGENCY_FULL_NAME_WELSH, IBCA_FULL_NAME_WELSH);
+                personalisation.put(FIRST_TIER_AGENCY_GROUP, IBCA_FULL_NAME);
+                personalisation.put(FIRST_TIER_AGENCY_GROUP_TITLE, IBCA_FULL_NAME);
+                personalisation.put(FIRST_TIER_AGENCY_GROUP_WELSH, IBCA_FULL_NAME_WELSH);
+                personalisation.put(FIRST_TIER_AGENCY_OFFICE, IBCA_ACRONYM);
+                personalisation.put(WITH_OPTIONAL_THE, "");
+                personalisation.put(WITH_OPTIONAL_THE_WELSH, "");
+            }
+            default -> {
+                personalisation.put(FIRST_TIER_AGENCY_ACRONYM, DWP_ACRONYM);
+                personalisation.put(FIRST_TIER_AGENCY_ACRONYM_WELSH, DWP_ACRONYM_WELSH);
+                personalisation.put(FIRST_TIER_AGENCY_FULL_NAME, DWP_FULL_NAME);
+                personalisation.put(FIRST_TIER_AGENCY_FULL_NAME_WELSH, DWP_FULL_NAME_WELSH);
+                personalisation.put(FIRST_TIER_AGENCY_GROUP, DWP_FIRST_TIER_AGENCY_GROUP);
+                personalisation.put(FIRST_TIER_AGENCY_GROUP_TITLE, DWP_FIRST_TIER_AGENCY_GROUP_TITLE);
+                personalisation.put(FIRST_TIER_AGENCY_GROUP_WELSH, DWP_FIRST_TIER_AGENCY_GROUP_WELSH);
+                personalisation.put(FIRST_TIER_AGENCY_OFFICE, ccdResponse.getDwpRegionalCentre());
+                personalisation.put(WITH_OPTIONAL_THE, THE_STRING);
+                personalisation.put(WITH_OPTIONAL_THE_WELSH, THE_STRING_WELSH);
+            }
         }
-        return SscsType.SSCS5.equals(benefit.getSscsType());
     }
 
     private void setHelplineTelephone(SscsCaseData ccdResponse, Map<String, Object> personalisation) {
+        final Benefit benefit = ccdResponse.getBenefitType().orElse(Benefit.PIP);
         if ("yes".equalsIgnoreCase(ccdResponse.getIsScottishCase())) {
             personalisation.put(HELPLINE_PHONE_NUMBER, config.getHelplineTelephoneScotland());
+        } else if (benefit.equals(Benefit.INFECTED_BLOOD_COMPENSATION)) {
+            personalisation.put(HELPLINE_PHONE_NUMBER, "01274267247");
         } else {
             personalisation.put(HELPLINE_PHONE_NUMBER, config.getHelplineTelephone());
         }
@@ -558,8 +589,18 @@ public class Personalisation<E extends NotificationWrapper> {
             personalisation.put(REGIONAL_OFFICE_POSTCODE_LITERAL, rpc.getPostcode());
         }
 
-        personalisation.put(PHONE_NUMBER_WELSH, evidenceProperties.getAddress().getTelephoneWelsh());
-        personalisation.put(PHONE_NUMBER, determinePhoneNumber(rpc));
+        if (ccdResponse.isIbcCase()) {
+            personalisation.put(PHONE_NUMBER_WELSH, "0300 303 5170");
+            personalisation.put(
+                    PHONE_NUMBER,
+                    Objects.equals(ccdResponse.getIsScottishCase(), "Yes")
+                            ? config.getHelplineTelephoneScotland()
+                            : "01274267247"
+            );
+        } else {
+            personalisation.put(PHONE_NUMBER_WELSH, evidenceProperties.getAddress().getTelephoneWelsh());
+            personalisation.put(PHONE_NUMBER, determinePhoneNumber(rpc));
+        }
 
         setHearingArrangementDetails(personalisation, ccdResponse);
 
