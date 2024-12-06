@@ -4,6 +4,8 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.IBCA_REFERENCE_LABEL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.NINO_LABEL;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -49,11 +51,13 @@ public class IssueDocumentHandler {
                                                      boolean isScottish, boolean isPostHearingsEnabled,
                                                      boolean isPostHearingsBEnabled,
                                                      String userAuthorisation) {
+        Identity identity = caseData.getAppeal().getAppellant().getIdentity();
         NoticeIssuedTemplateBody formPayload = NoticeIssuedTemplateBody.builder()
                 .appellantFullName(buildFullName(caseData))
                 .appointeeFullName(buildAppointeeName(caseData).orElse(null))
                 .caseId(caseData.getCcdCaseId())
-                .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
+                .nino(caseData.isIbcCase() ? identity.getIbcaReference() : identity.getNino())
+                .label(caseData.isIbcCase() ? IBCA_REFERENCE_LABEL : NINO_LABEL)
                 .shouldHideNino(isBenefitTypeValidToHideNino(caseData.getBenefitType()))
                 .respondents(getRespondents(caseData))
                 .noticeType(documentTypeLabel.toUpperCase())
