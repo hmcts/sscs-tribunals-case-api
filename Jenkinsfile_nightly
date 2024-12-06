@@ -109,13 +109,13 @@ withNightlyPipeline(type, product, component) {
 
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
-//    enableFortifyScan()
-//    enableMutationTest()
+    enableFortifyScan()
+    enableMutationTest()
     enableFullFunctionalTest()
 
     afterAlways('fullFunctionalTest') {
         runAccessibilityTestsNightly()
-        //runE2eTestsNightly()
+        runE2eTestsNightly()
     }
 
 
