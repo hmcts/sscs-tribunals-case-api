@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.functional.tyanotifications;
 
-import static helper.EnvironmentProfileValueSource.getEnvOrEmpty;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toSet;
 import static junit.framework.TestCase.fail;
@@ -9,7 +8,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.slf4j.LoggerFactory.getLogger;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SYA_APPEAL_CREATED;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.SscsCaseDataUtils.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.SscsCaseDataUtils.buildSscsCaseData;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.SscsCaseDataUtils.buildSscsCaseDataWelsh;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.SscsCaseDataUtils.subscribeRep;
 
 import helper.EnvironmentProfileValueSource;
 import io.restassured.RestAssured;
@@ -18,7 +19,15 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import junitparams.JUnitParamsRunner;
@@ -63,6 +72,9 @@ public abstract class AbstractFunctionalTest {
     // Below rules are needed to use the junitParamsRunner together with SpringRunner
     @ClassRule
     public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
+    protected static final String BASE_URL =
+            System.getenv("TEST_URL") != null ? System.getenv("TEST_URL") : "http://localhost:8008";
+
     protected static final String BASE_PATH_TYAN = "tyanotifications/";
     @Rule
     public final SpringMethodRule springMethodRule = new SpringMethodRule();
@@ -108,7 +120,6 @@ public abstract class AbstractFunctionalTest {
 
     protected void createCase() {
         this.createCase(false);
-
     }
 
     protected void createCase(boolean isWelsh) {
@@ -242,14 +253,14 @@ public abstract class AbstractFunctionalTest {
     }
 
     public List<Notification> fetchLetters() throws NotificationClientException {
-        List<Notification> allNotifications = new ArrayList<>();
+        List<Notification> allNotifications;
         allNotifications = client.getNotifications("", "letter", caseId.toString(), "").getNotifications();
         int secondsLeft = maxSecondsToWaitForNotification;
+
         while (allNotifications.size() == 0 && secondsLeft > 0) {
             delayInSeconds(5);
             secondsLeft -= 5;
             allNotifications = client.getNotifications("", "letter", caseId.toString(), "").getNotifications();
-
         }
         return allNotifications;
     }
@@ -265,8 +276,7 @@ public abstract class AbstractFunctionalTest {
     }
 
     public void simulateCcdCallback(NotificationEventType eventType, String resource) throws IOException {
-        final String callbackUrl = getEnvOrEmpty("TEST_URL") + "/sendNotification";
-
+        final String callbackUrl = BASE_URL + "/sendNotification";
         String json;
         try {
             log.info("Getting file {}", resource);
@@ -292,9 +302,8 @@ public abstract class AbstractFunctionalTest {
             .statusCode(HttpStatus.OK.value());
     }
 
-    private String updateJson(String json, NotificationEventType eventType) {
+    public String updateJson(String json, NotificationEventType eventType) {
         json = json.replace("12345656789", caseId.toString());
-        json = json.replace("SC022/14/12423", caseReference);
         json = json.replace("SC022/14/12423", caseReference);
         json = json.replace("EVENT_TYPE", eventType.getId());
 
