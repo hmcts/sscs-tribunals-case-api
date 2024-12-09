@@ -176,6 +176,7 @@ xui-webapp:
       REDISCLOUD_URL: http://dummyrediscloudurl
       UV_THREADPOOL_SIZE: 128
       PROTOCOL: http
+      LAUNCH_DARKLY_CLIENT_ID: 645baeea2787d812993d9d70
     keyVaults:
       rpx:
         resourceGroup: rpx
@@ -184,8 +185,7 @@ xui-webapp:
           - mc-idam-client-secret
           - system-user-name
           - system-user-password
-          - name : launch-darkly-client-id
-            alias: LAUNCH_DARKLY_CLIENT_ID
+          
 global:
   ccdApiGatewayIngress: http://${SERVICE_NAME}-ccd-api-gw
   ccdAdminWebIngress: ${SERVICE_NAME}-ccd-admin-web
