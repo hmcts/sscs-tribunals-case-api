@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -478,8 +479,8 @@ public class SubmitAppealServiceTestV1 extends AbstractSubmitAppealServiceTest {
     @Parameters(method = "generateDifferentRpcScenarios")
     public void givenAppellantPostCode_shouldSetRegionAndRpcCorrectly(String expectedRpc, String appellantPostCode) throws JsonProcessingException {
         RegionalProcessingCenter rpc = getRpcObjectForGivenJsonRpc(expectedRpc);
-        when(regionalProcessingCenterService.getByPostcode(RegionalProcessingCenterService.getFirstHalfOfPostcode(appellantPostCode)))
-                .thenReturn(getRpcObjectForGivenJsonRpc(expectedRpc));
+        when(regionalProcessingCenterService.getByPostcode(eq(RegionalProcessingCenterService.getFirstHalfOfPostcode(appellantPostCode)), anyBoolean()))
+            .thenReturn(getRpcObjectForGivenJsonRpc(expectedRpc));
         when(airLookupService.lookupAirVenueNameByPostCode(eq(appellantPostCode), any())).thenReturn(rpc.getCity());
         when(venueService.getEpimsIdForVenue(rpc.getCity())).thenReturn("1234");
         when(refDataService.getCourtVenueRefDataByEpimsId("1234")).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("1").build());
@@ -491,12 +492,12 @@ public class SubmitAppealServiceTestV1 extends AbstractSubmitAppealServiceTest {
         RegionalProcessingCenter actualRpc = caseData.getRegionalProcessingCenter();
         RegionalProcessingCenter expectedRpcObject = getRpcObjectForGivenJsonRpc(expectedRpc);
         assertThat(actualRpc)
-                .usingRecursiveComparison()
-                .ignoringFields("hearingRoute","epimsId")
-                .isEqualTo(expectedRpcObject);
+            .usingRecursiveComparison()
+            .ignoringFields("hearingRoute","epimsId")
+            .isEqualTo(expectedRpcObject);
         assertThat(actualRpc)
-                .extracting("hearingRoute","epimsId")
-                .doesNotContainNull();
+            .extracting("hearingRoute","epimsId")
+            .doesNotContainNull();
         assertEquals(expectedRpcObject.getName(), caseData.getRegion());
     }
 
@@ -504,8 +505,8 @@ public class SubmitAppealServiceTestV1 extends AbstractSubmitAppealServiceTest {
     @Parameters(method = "generateDifferentRpcScenariosIba")
     public void givenAppellantPostCode_shouldSetRegionAndRpcCorrectlyIba(String expectedRpc, String appellantLocationCode) throws JsonProcessingException {
         RegionalProcessingCenter rpc = getRpcObjectForGivenJsonRpc(expectedRpc);
-        when(regionalProcessingCenterService.getByPostcode(appellantLocationCode))
-                .thenReturn(getRpcObjectForGivenJsonRpc(expectedRpc));
+        when(regionalProcessingCenterService.getByPostcode(appellantLocationCode, true))
+            .thenReturn(getRpcObjectForGivenJsonRpc(expectedRpc));
         when(airLookupService.lookupAirVenueNameByPostCode(eq(appellantLocationCode), any())).thenReturn(rpc.getCity());
         when(venueService.getEpimsIdForVenue(rpc.getCity())).thenReturn("1234");
         when(refDataService.getCourtVenueRefDataByEpimsId("1234")).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("1").build());
@@ -517,18 +518,18 @@ public class SubmitAppealServiceTestV1 extends AbstractSubmitAppealServiceTest {
         RegionalProcessingCenter actualRpc = caseData.getRegionalProcessingCenter();
         RegionalProcessingCenter expectedRpcObject = getRpcObjectForGivenJsonRpc(expectedRpc);
         assertThat(actualRpc)
-                .usingRecursiveComparison()
-                .ignoringFields("hearingRoute","epimsId")
-                .isEqualTo(expectedRpcObject);
+            .usingRecursiveComparison()
+            .ignoringFields("hearingRoute","epimsId")
+            .isEqualTo(expectedRpcObject);
         assertThat(actualRpc)
-                .extracting("hearingRoute","epimsId")
-                .doesNotContainNull();
+            .extracting("hearingRoute","epimsId")
+            .doesNotContainNull();
         assertEquals(expectedRpcObject.getName(), caseData.getRegion());
     }
 
     @Test
     public void givenAppointeePostCode_shouldSetRegionAndRpcToAppointee() throws JsonProcessingException {
-        when(regionalProcessingCenterService.getByPostcode("B1")).thenReturn(getRpcObjectForGivenJsonRpc(BIRMINGHAM_RPC));
+        when(regionalProcessingCenterService.getByPostcode(eq("B1"), anyBoolean())).thenReturn(getRpcObjectForGivenJsonRpc(BIRMINGHAM_RPC));
         when(airLookupService.lookupAirVenueNameByPostCode(eq("B1 1AA"), any())).thenReturn("Birmingham");
 
         when(venueService.getEpimsIdForVenue("Birmingham")).thenReturn("1234");
@@ -559,7 +560,7 @@ public class SubmitAppealServiceTestV1 extends AbstractSubmitAppealServiceTest {
 
     @Test
     public void givenAppointeeWithNoContactData_shouldSetRegionAndRpcToAppellant() throws JsonProcessingException {
-        when(regionalProcessingCenterService.getByPostcode("TN32")).thenReturn(getRpcObjectForGivenJsonRpc(BRADFORD_RPC));
+        when(regionalProcessingCenterService.getByPostcode(eq("TN32"), anyBoolean())).thenReturn(getRpcObjectForGivenJsonRpc(BRADFORD_RPC));
         when(airLookupService.lookupAirVenueNameByPostCode(eq("TN32 6PL"), any())).thenReturn("Bradford");
         when(venueService.getEpimsIdForVenue("Bradford")).thenReturn("1234");
         when(refDataService.getCourtVenueRefDataByEpimsId("1234")).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("1").build());
@@ -690,7 +691,7 @@ public class SubmitAppealServiceTestV1 extends AbstractSubmitAppealServiceTest {
     })
     public void shouldSetProcessingVenueBasedOnBenefitTypeAndPostCode(String benefitCode, String postcode, String expectedVenue, String appellantOrAppointee, String epimsId, String regionId) {
         String firstHalfOfPostcode = RegionalProcessingCenterService.getFirstHalfOfPostcode(postcode);
-        when(regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode)).thenReturn(
+        when(regionalProcessingCenterService.getByPostcode(eq(firstHalfOfPostcode), anyBoolean())).thenReturn(
                 RegionalProcessingCenter.builder()
                         .name("rpcName")
                         .postcode("rpcPostcode")
