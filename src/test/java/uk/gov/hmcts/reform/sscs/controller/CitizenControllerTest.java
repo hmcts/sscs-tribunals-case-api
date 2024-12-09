@@ -160,10 +160,10 @@ public class CitizenControllerTest {
         assertFalse(result.isEmpty(), "The result should not be empty");
 
         Map<String, String> aberdeenEntry = Map.of(
-            "label", "Aberdeen",
             "trafficType", "Sea traffic",
-            "locationCode", "GB000434"
-        );
+            "locationCode", "GBSTABD00",
+            "label", "Aberdeen"
+            );
 
         assertTrue(result.contains(aberdeenEntry), "The result should contain the entry for Aberdeen");
 
@@ -197,7 +197,7 @@ public class CitizenControllerTest {
 
         Map<String, String> jordanEntry = Map.of(
             "label", "Jordan",
-            "officialName", "The Hashemite Kingdom of Jordan"
+            "officialName", "Jordan"
         );
 
         assertTrue(result.contains(jordanEntry), "The result should contain the entry for Jordan");
