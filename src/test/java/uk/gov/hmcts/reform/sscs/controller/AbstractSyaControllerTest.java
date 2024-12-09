@@ -505,7 +505,8 @@ public abstract class AbstractSyaControllerTest {
                     "representative@test.com",
                     null,
                     null,
-                    null
+                    null,
+                     "RepOrg"
                 )
             )
             .build();
@@ -554,6 +555,7 @@ public abstract class AbstractSyaControllerTest {
             .andExpect(jsonPath("$.RepresentativeDetails.postCode").value("RE7 7ES"))
             .andExpect(jsonPath("$.RepresentativeDetails.phoneNumber").value("07222222222"))
             .andExpect(jsonPath("$.RepresentativeDetails.emailAddress").value("representative@test.com"))
+            .andExpect(jsonPath("$.RepresentativeDetails.organisation").value("RepOrg"))
         ;
     }
 
