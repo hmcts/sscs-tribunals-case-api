@@ -78,7 +78,8 @@
     "county": "rep-county",
     "postCode": "RE7 7ES",
     "emailAddress": "representative@gmail.com",
-    "phoneNumber": "07222222222"
+    "phoneNumber": "07222222222",
+    "organisation": "RepOrg"
   },
   "ReasonForAppealing": {
     "items": [
