@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
+import static org.apache.commons.lang3.RandomStringUtils.secure;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -33,8 +35,8 @@ public class ServiceRequestExecutorTest {
 
     private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
     private static final String ENDPOINT = "http://endpoint";
-    private static final String SERVICE_TOKEN = randomAlphabetic(32);
-    private static final String ACCESS_TOKEN = randomAlphabetic(32);
+    private static final String SERVICE_TOKEN = secure().nextAlphabetic(32);
+    private static final String ACCESS_TOKEN = secure().nextAlphabetic(32);
     private static final String USER_ID = "123";
 
     @Mock private AuthTokenGenerator serviceAuthTokenGenerator;
