@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ASSOCIATE_CASE;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -23,11 +24,13 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @RunWith(JUnitParamsRunner.class)
 public class ReciprocalLinkHandlerTest {
 
+    public static final String YES = "Yes";
     @Mock
     private Callback<SscsCaseData> callback;
 
@@ -37,6 +40,9 @@ public class ReciprocalLinkHandlerTest {
     @Mock
     private IdamService idamService;
 
+    @Mock
+    private UpdateCcdCaseService updateCcdCaseService;
+
     private ReciprocalLinkHandler handler;
 
     @Mock
@@ -45,7 +51,7 @@ public class ReciprocalLinkHandlerTest {
     private SscsCaseData sscsCaseData;
 
     @Captor
-    private ArgumentCaptor<SscsCaseData> capture;
+    private ArgumentCaptor<Consumer<SscsCaseDetails>> capture;
 
     HashMap<String, String> map = new HashMap<String, String>();
 
@@ -54,7 +60,7 @@ public class ReciprocalLinkHandlerTest {
         openMocks(this);
         when(callback.getEvent()).thenReturn(EventType.VALID_APPEAL_CREATED);
 
-        handler = new ReciprocalLinkHandler(ccdService, idamService);
+        handler = new ReciprocalLinkHandler(ccdService, idamService, updateCcdCaseService);
 
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().appellant(
                 Appellant.builder().identity(Identity.builder().nino("AB00000Y").build()).build())
@@ -96,53 +102,67 @@ public class ReciprocalLinkHandlerTest {
     @Test
     public void givenAssociatedCase_thenAddReciprocalLinkToAssociatedCase() {
 
+        SscsCaseDetails associatedCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().build()).build();
+        SscsCaseDetails associatedCase2 = SscsCaseDetails.builder().id(7656765L).data(sscsCaseData).build();
         List<SscsCaseDetails> associatedCaseList = new ArrayList<>();
-        associatedCaseList.add(SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().build()).build());
-        associatedCaseList.add(SscsCaseDetails.builder().id(7656765L).data(sscsCaseData).build());
+        associatedCaseList.add(associatedCase1);
+        associatedCaseList.add(associatedCase2);
 
         given(ccdService.findCaseBy(anyString(), anyString(), any())).willReturn(associatedCaseList);
 
         handler.handle(SUBMITTED, callback);
 
-        verify(ccdService).updateCase(capture.capture(), eq(12345678L), eq(ASSOCIATE_CASE.getCcdType()), eq("Associate case"), eq("Associated case added"), any());
+        verify(updateCcdCaseService).updateCaseV2(eq(12345678L), eq(ASSOCIATE_CASE.getCcdType()), eq("Associate case"), eq("Associated case added"), any(), capture.capture());
 
-        assertEquals("7656765", capture.getValue().getAssociatedCase().get(0).getValue().getCaseReference());
+        capture.getValue().accept(associatedCase2);
+        assertEquals("7656765", associatedCase2.getData().getAssociatedCase().get(0).getValue().getCaseReference());
+        assertEquals(YES, associatedCase2.getData().getLinkedCasesBoolean());
     }
 
     @Test
     public void givenAssociatedCaseWithExistingAssociatedCase_thenAddReciprocalLinkToAssociatedCase() {
+
         List<CaseLink> caseLinks = new ArrayList<>();
         caseLinks.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("1").build()).build());
-
+        SscsCaseDetails associatedCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().associatedCase(caseLinks).build()).build();
+        SscsCaseDetails associatedCase2 = SscsCaseDetails.builder().id(7656765L).data(sscsCaseData).build();
         List<SscsCaseDetails> associatedCaseList = new ArrayList<>();
-        associatedCaseList.add(SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().associatedCase(caseLinks).build()).build());
-        associatedCaseList.add(SscsCaseDetails.builder().id(7656765L).data(sscsCaseData).build());
+        associatedCaseList.add(associatedCase1);
+        associatedCaseList.add(associatedCase2);
 
         given(ccdService.findCaseBy(anyString(), anyString(), any())).willReturn(associatedCaseList);
 
         handler.handle(SUBMITTED, callback);
 
-        verify(ccdService).updateCase(capture.capture(), eq(12345678L), eq(ASSOCIATE_CASE.getCcdType()), eq("Associate case"), eq("Associated case added"), any());
-        assertEquals("1", capture.getValue().getAssociatedCase().get(0).getValue().getCaseReference());
-        assertEquals("7656765", capture.getValue().getAssociatedCase().get(1).getValue().getCaseReference());
+        verify(updateCcdCaseService).updateCaseV2(eq(12345678L), eq(ASSOCIATE_CASE.getCcdType()), eq("Associate case"), eq("Associated case added"), any(), capture.capture());
+        capture.getValue().accept(associatedCase2);
+        assertEquals("1", associatedCase2.getData().getAssociatedCase().get(0).getValue().getCaseReference());
+        assertEquals("7656765", associatedCase2.getData().getAssociatedCase().get(1).getValue().getCaseReference());
+        assertEquals(YES, associatedCase2.getData().getLinkedCasesBoolean());
     }
 
     @Test
     public void givenMultipleAssociatedCases_thenAddReciprocalLinkToAllCases() {
         List<SscsCaseDetails> associatedCaseList = new ArrayList<>();
-        associatedCaseList.add(SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().build()).build());
-        associatedCaseList.add(SscsCaseDetails.builder().id(34343434L).data(SscsCaseData.builder().build()).build());
-        associatedCaseList.add(SscsCaseDetails.builder().id(7656765L).data(sscsCaseData).build());
+        SscsCaseDetails associatedCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().build()).build();
+        SscsCaseDetails associatedCase2 = SscsCaseDetails.builder().id(34343434L).data(SscsCaseData.builder().build()).build();
+        SscsCaseDetails associatedCase3 = SscsCaseDetails.builder().id(7656765L).data(sscsCaseData).build();
+
+        associatedCaseList.add(associatedCase1);
+        associatedCaseList.add(associatedCase2);
+        associatedCaseList.add(associatedCase3);
 
         given(ccdService.findCaseBy(anyString(), anyString(), any())).willReturn(associatedCaseList);
 
         handler.handle(SUBMITTED, callback);
 
-        verify(ccdService, times(2)).updateCase(any(), any(), eq(ASSOCIATE_CASE.getCcdType()), eq("Associate case"), eq("Associated case added"), any());
-        verify(ccdService).updateCase(capture.capture(), eq(12345678L), eq(ASSOCIATE_CASE.getCcdType()), eq("Associate case"), eq("Associated case added"), any());
-        verify(ccdService).updateCase(capture.capture(), eq(34343434L), eq(ASSOCIATE_CASE.getCcdType()), eq("Associate case"), eq("Associated case added"), any());
-        assertEquals("7656765", capture.getAllValues().get(0).getAssociatedCase().get(0).getValue().getCaseReference());
-        assertEquals("7656765", capture.getAllValues().get(1).getAssociatedCase().get(0).getValue().getCaseReference());
+        verify(updateCcdCaseService, times(2)).updateCaseV2(any(), eq(ASSOCIATE_CASE.getCcdType()), eq("Associate case"), eq("Associated case added"), any(), any());
+        verify(updateCcdCaseService).updateCaseV2(eq(12345678L), eq(ASSOCIATE_CASE.getCcdType()), eq("Associate case"), eq("Associated case added"), any(), capture.capture());
+        verify(updateCcdCaseService).updateCaseV2(eq(34343434L), eq(ASSOCIATE_CASE.getCcdType()), eq("Associate case"), eq("Associated case added"), any(), capture.capture());
+        capture.getValue().accept(associatedCase3);
+        assertEquals("7656765", associatedCase3.getData().getAssociatedCase().get(0).getValue().getCaseReference());
+        assertEquals("7656765", associatedCase3.getData().getAssociatedCase().get(0).getValue().getCaseReference());
+        assertEquals(YES, associatedCase3.getData().getLinkedCasesBoolean());
     }
 
     @Test
