@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -12,6 +13,7 @@ import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE;
 
 import java.time.LocalDate;
@@ -181,8 +183,12 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         given(ccdClient.startEvent(idamTokens, 123L, UPDATE_CASE_ONLY.getCcdType())).willReturn(startEventResponse);
 
+
+        DynamicList originalSender = new DynamicList(new DynamicListItem("appellant", "Appellant (or Appointee)"),null);
+
         Callback<SscsCaseData> callback = buildCallback(furtherEvidenceActionSelectedOption, ACTION_FURTHER_EVIDENCE);
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        sscsCaseData.setOriginalSender(originalSender);
         given(sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData())).willReturn(sscsCaseData);
 
         given(updateCcdCaseService.updateCaseV2(anyLong(), eq(eventType), anyString(), anyString(),
@@ -207,6 +213,13 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         if (furtherEvidenceActionSelectedOption.equals("informationReceivedForInterlocJudge")
             || furtherEvidenceActionSelectedOption.equals("informationReceivedForInterlocTcw")) {
             assertThat(sscsCaseData.getInterlocReferralDate(), is(LocalDate.now()));
+        }
+
+        if (eventType.equals("validSendToInterloc")) {
+            assertThat(sscsCaseData.getSelectWhoReviewsCase(),
+                    equalTo(new DynamicList(new DynamicListItem(interlocReviewState.getCcdDefinition(), null), null)));
+            assertThat(sscsCaseData.getOriginalSender(),
+                    equalTo(originalSender));
         }
     }
 
@@ -255,7 +268,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
         captor.getValue().accept(sscsCaseDetails);
 
-        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, sscsCaseData.getInterlocReviewState());
+        assertEquals(REVIEW_BY_JUDGE, sscsCaseData.getInterlocReviewState());
     }
 
     @Ignore("Re-enable once new post hearings B types are added to the enum")
@@ -569,7 +582,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
         captor.getValue().accept(sscsCaseDetails);
-        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, sscsCaseData.getInterlocReviewState());
+        assertEquals(REVIEW_BY_JUDGE, sscsCaseData.getInterlocReviewState());
     }
 
 
