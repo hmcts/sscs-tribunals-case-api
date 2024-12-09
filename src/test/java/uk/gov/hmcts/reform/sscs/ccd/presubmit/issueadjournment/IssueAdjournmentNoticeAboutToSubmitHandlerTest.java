@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -53,6 +55,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.PoDetails;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
@@ -518,7 +521,6 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
             .getPanelMemberExclusions().getExcludedPanelMembers()).hasSize(2);
     }
 
-    @DisplayName("")
     @Test
     void givenHearingTypeIsDataToBeFixedOrNull_thenHearingWindowShouldBeNull() {
         Adjournment adjournment = sscsCaseData.getAdjournment();
@@ -548,6 +550,16 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
     void givenAdjournmentIsIssued_thenClearAdjournmentFields() {
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrProperties();
+    }
+
+    @Test
+    void givenAdjournmentIsIssuedWelshAndIbc_thenTriggerWelshIssueEvent() {
+        sscsCaseData.setLanguagePreferenceWelsh("yes");
+        sscsCaseData.setBenefitCode("093");
+        IdamTokens idamTokens = IdamTokens.builder().build();
+        when(idamService.getIdamTokens()).thenReturn(idamTokens);
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        verify(updateCcdCaseService, times(1)).triggerCaseEventV2(anyLong(), eq("issueAdjournmentNoticeWelsh"), anyString(), anyString(), eq(idamTokens));
     }
 
 }
