@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.notifications;
 
 import static java.time.LocalTime.now;
+import static java.util.Objects.isNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
@@ -41,7 +42,11 @@ public abstract class AbstractNotificationsFT extends AbstractFunctionalTest {
 
     protected void simulateCcdCallbackToSendLetter(NotificationEventType eventType) throws IOException {
         log.info("Simulating CCD callback to send notificaiton of type {}", eventType);
-        String callbackJsonName = BASE_PATH_TYAN + "appealCreatedAppointeeCallback.json";
+        String callbackJsonName = BASE_PATH_TYAN + eventType.getId() + "Callback.json";
+        if (isNull(getClass().getClassLoader().getResource(callbackJsonName))) {
+            callbackJsonName = BASE_PATH_TYAN + "missingFileFallbackCallback.json";
+            log.info("No callback json found for {}, using fallback file", eventType);
+        }
         simulateCcdCallback(eventType, callbackJsonName);
         log.info("{} notification successfully sent", eventType);
     }
