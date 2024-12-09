@@ -42,8 +42,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
-import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.service.*;
 
@@ -78,12 +76,6 @@ abstract class IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
     @Mock
     protected VenueService venueService;
 
-    @Mock
-    protected UpdateCcdCaseService updateCcdCaseService;
-
-    @Mock
-    protected IdamService idamService;
-
     protected SscsCaseData sscsCaseData;
 
     protected static Validator validator = Validation
@@ -95,7 +87,7 @@ abstract class IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
 
     @BeforeEach
     protected void setUp() {
-        handler = new IssueAdjournmentNoticeAboutToSubmitHandler(footerService, validator, hearingMessageHelper, airLookupService, regionalProcessingCenterService, hearingDurationsService, venueService, updateCcdCaseService, idamService);
+        handler = new IssueAdjournmentNoticeAboutToSubmitHandler(footerService, validator, hearingMessageHelper, airLookupService, regionalProcessingCenterService, hearingDurationsService, venueService);
 
         List<SscsDocument> documentList = new ArrayList<>();
 
