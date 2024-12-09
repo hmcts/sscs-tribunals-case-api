@@ -120,7 +120,7 @@ export class AccessibilitySteps extends BaseStep {
         await this.createBundlePage.confirmSubmission();
         await expect(this.homePage.summaryTab).toBeVisible();
 
-        await this.homePage.delay(10000);
+        await this.homePage.delay(5000);
         await this.homePage.reloadPage();
         await expect(this.homePage.summaryTab).toBeVisible();
         await this.homePage.navigateToTab("Bundles");
