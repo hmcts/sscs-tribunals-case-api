@@ -111,34 +111,34 @@ export class AccessibilitySteps extends BaseStep {
         await this.homePage.navigateToTab("CAM Fields")
         await axeTest(this.page)
 
-        // let bundleDate = new Date();
-        // let formattedDate = bundleDate.toISOString().split('T')[0].split('-').reverse().join('-');
-        //
-        // await this.homePage.chooseEvent("Create a bundle");
-        // await this.createBundlePage.verifyPageContent();
-        // await axeTest(this.page);
-        // await this.createBundlePage.confirmSubmission();
-        // await expect(this.homePage.summaryTab).toBeVisible();
-        //
-        // await this.homePage.delay(10000);
-        // await this.homePage.reloadPage();
-        // await expect(this.homePage.summaryTab).toBeVisible();
-        // await this.homePage.navigateToTab("Bundles");
-        //
-        // await this.bundlesTab.verifyBundlesTabContentByKeyValueForASpan(`${bundleTestData.stitchStatusLabel}`, `${bundleTestData.stitchStatusDone}`);
-        // await this.bundlesTab.verifyBundlesTabContentByKeyValueForASpanRegEx(`${bundleTestData.stitchDocLabel}`, `\\d+-${bundleTestData.stitchVal}\\.pdf`);
-        //
-        // await this.bundlesTab.verifyTableElementByIndex(bundleTestData.folderName, `${bundleTestData.folderNameVal}`, 0);
-        // await this.bundlesTab.verifyTableElementByIndex(bundleTestData.docName, `${bundleTestData.folderOneDocVal} ${formattedDate}`, 0);
-        // await this.bundlesTab.verifyTableElementByIndex(bundleTestData.sourceDoc, `${bundleTestData.folderOneSourceVal} ${formattedDate}.pdf`, 0);
-        // await this.bundlesTab.verifyTableElementByIndex(bundleTestData.docName, `${bundleTestData.folderTwoDocVal} ${formattedDate}`, 1);
-        // await this.bundlesTab.verifyTableElementByIndex(bundleTestData.sourceDoc, `${bundleTestData.folderTwoSourceVal} ${formattedDate}.pdf`, 1);
-        // await this.bundlesTab.verifyTableElementByIndex(bundleTestData.sourceDoc, `${bundleTestData.folderTwoSourceVal} ${formattedDate}.pdf`, 1);
-        // await this.bundlesTab.verifyTableElementByIndex(bundleTestData.folderName, `${bundleTestData.bundleFolderTwoVal}`, 0);
-        //
-        // await this.bundlesTab.verifyBundlesTabContentByKeyValueForASpan(`${bundleTestData.configUsed}`, `${bundleTestData.configUsedDefaultVal}`);
-        // await this.bundlesTab.verifyBundlesTabContentByKeyValueForASpan(`${bundleTestData.amendBundle}`, `${bundleTestData.amendBundleDefaultVal}`);
-        // await axeTest(this.page);
+        let bundleDate = new Date();
+        let formattedDate = bundleDate.toISOString().split('T')[0].split('-').reverse().join('-');
+
+        await this.homePage.chooseEvent("Create a bundle");
+        await this.createBundlePage.verifyPageContent();
+        await axeTest(this.page);
+        await this.createBundlePage.confirmSubmission();
+        await expect(this.homePage.summaryTab).toBeVisible();
+
+        await this.homePage.delay(10000);
+        await this.homePage.reloadPage();
+        await expect(this.homePage.summaryTab).toBeVisible();
+        await this.homePage.navigateToTab("Bundles");
+
+        await this.bundlesTab.verifyBundlesTabContentByKeyValueForASpan(`${bundleTestData.stitchStatusLabel}`, `${bundleTestData.stitchStatusDone}`);
+        await this.bundlesTab.verifyBundlesTabContentByKeyValueForASpanRegEx(`${bundleTestData.stitchDocLabel}`, `\\d+-${bundleTestData.stitchVal}\\.pdf`);
+
+        await this.bundlesTab.verifyTableElementByIndex(bundleTestData.folderName, `${bundleTestData.folderNameVal}`, 0);
+        await this.bundlesTab.verifyTableElementByIndex(bundleTestData.docName, `${bundleTestData.folderOneDocVal} ${formattedDate}`, 0);
+        await this.bundlesTab.verifyTableElementByIndex(bundleTestData.sourceDoc, `${bundleTestData.folderOneSourceVal} ${formattedDate}.pdf`, 0);
+        await this.bundlesTab.verifyTableElementByIndex(bundleTestData.docName, `${bundleTestData.folderTwoDocVal} ${formattedDate}`, 1);
+        await this.bundlesTab.verifyTableElementByIndex(bundleTestData.sourceDoc, `${bundleTestData.folderTwoSourceVal} ${formattedDate}.pdf`, 1);
+        await this.bundlesTab.verifyTableElementByIndex(bundleTestData.sourceDoc, `${bundleTestData.folderTwoSourceVal} ${formattedDate}.pdf`, 1);
+        await this.bundlesTab.verifyTableElementByIndex(bundleTestData.folderName, `${bundleTestData.bundleFolderTwoVal}`, 0);
+
+        await this.bundlesTab.verifyBundlesTabContentByKeyValueForASpan(`${bundleTestData.configUsed}`, `${bundleTestData.configUsedDefaultVal}`);
+        await this.bundlesTab.verifyBundlesTabContentByKeyValueForASpan(`${bundleTestData.amendBundle}`, `${bundleTestData.amendBundleDefaultVal}`);
+        await axeTest(this.page);
 
 
     }
