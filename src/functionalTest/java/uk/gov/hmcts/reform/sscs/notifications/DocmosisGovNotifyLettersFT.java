@@ -16,15 +16,24 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.service.notify.Notification;
 import uk.gov.service.notify.NotificationClientException;
 
 @RunWith(JUnitParamsRunner.class)
+@TestPropertySource(locations = "classpath:config/application_functional.properties")
 public class DocmosisGovNotifyLettersFT extends AbstractNotificationsFT {
 
     @Rule
     public Timeout globalTimeout = Timeout.seconds(30 * 60);
+
+    @Value("${generate-all-notifications}")
+    private boolean generateAllNotifications;
+
+    @Value("${notifications-list}")
+    private Set<NotificationEventType> notificationsList;
 
     public DocmosisGovNotifyLettersFT() {
         super(30);
@@ -54,10 +63,14 @@ public class DocmosisGovNotifyLettersFT extends AbstractNotificationsFT {
                 });
     }
 
-    private static Set<NotificationEventType> getNotificationList() {
-        return DOCMOSIS_LETTERS.stream()
-                .filter(notificationEventType ->
-                        !List.of(ACTION_HEARING_RECORDING_REQUEST, HEARING_BOOKED).contains(notificationEventType))
-                .collect(Collectors.toSet());
+    private Set<NotificationEventType> getNotificationList() {
+        if (generateAllNotifications) {
+            return DOCMOSIS_LETTERS.stream()
+                    .filter(notificationEventType ->
+                            !List.of(ACTION_HEARING_RECORDING_REQUEST, HEARING_BOOKED).contains(notificationEventType))
+                    .collect(Collectors.toSet());
+        } else {
+            return notificationsList;
+        }
     }
 }
