@@ -23,7 +23,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLinkDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseManagementLocation;
@@ -206,9 +205,9 @@ public abstract class SubmitAppealServiceBase {
         }
     }
 
-    protected String resolvePostCode(SyaCaseWrapper appeal, boolean isIba) {
+    protected String resolvePostCode(SyaCaseWrapper appeal, boolean isIbc) {
         Boolean inMainlandUk = appeal.getContactDetails().getInMainlandUk();
-        if (isIba && inMainlandUk != null && inMainlandUk.equals(Boolean.FALSE)) {
+        if (isIbc && inMainlandUk != null && inMainlandUk.equals(Boolean.FALSE)) {
             return appeal.getAppellant().getContactDetails().getPortOfEntry();
         } else if (Boolean.TRUE.equals(appeal.getIsAppointee())) {
             return Optional.ofNullable(appeal.getAppointee())

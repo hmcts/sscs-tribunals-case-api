@@ -436,7 +436,6 @@ public abstract class AbstractSubmitAppealServiceTest {
         submitAppealService.getDraftAppeals("authorisation");
     }
 
-
     protected SyaCaseWrapper getSyaWrapperWithAppointee(SyaContactDetails appointeeContact) {
         SyaAppointee appointee = new SyaAppointee();
         appointee.setContactDetails(appointeeContact);
@@ -480,8 +479,6 @@ public abstract class AbstractSubmitAppealServiceTest {
 
         assertEquals(1, matchedCases.size());
     }
-
-
 
     protected void assertRpc(SscsCaseData caseData, String expectedRpc) throws JsonProcessingException {
         RegionalProcessingCenter actualRpc = caseData.getRegionalProcessingCenter();
