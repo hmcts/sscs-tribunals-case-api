@@ -25,10 +25,10 @@ java:
     IDAM_SSCS_SYSTEMUPDATE_USER: ${IDAM_SSCS_SYSTEMUPDATE_USER}
     IDAM_SSCS_SYSTEMUPDATE_PASSWORD: ${IDAM_SSCS_SYSTEMUPDATE_PASSWORD}
     CREATE_CCD_ENDPOINT: true
-    SECURE_DOC_STORE_FEATURE: false
+    SECURE_DOC_STORE_FEATURE: true
     CASE_DOCUMENT_AM_URL: ${CASE_DOCUMENT_AM_URL}
     WORK_ALLOCATION_FEATURE: false
-    CASE_ACCESS_MANAGEMENT_FEATURE: false
+    CASE_ACCESS_MANAGEMENT_FEATURE: true
     SCHEDULE_LISTING_FEATURE: true
     POST_HEARINGS_FEATURE: true
     POST_HEARINGS_B_FEATURE: true
@@ -163,7 +163,6 @@ xui-webapp:
       SERVICES_DOCUMENTS_API_V2: http://${SERVICE_NAME}-ccd-case-document-am-api
       GLOBAL_SEARCH_SERVICES: IA,CIVIL,PRIVATELAW,PUBLICLAW,SSCS
       JURISDICTIONS: SSCS
-      LAUNCH_DARKLY_CLIENT_ID: 5de6610b23ce5408280f2268
       FEATURE_REDIS_ENABLED: false
       FEATURE_APP_INSIGHTS_ENABLED: false
       FEATURE_SECURE_COOKIE_ENABLED: false
@@ -171,7 +170,7 @@ xui-webapp:
       FEATURE_TERMS_AND_CONDITIONS_ENABLED: false
       FEATURE_HELMET_ENABLED: false
       FEATURE_OIDC_ENABLED: false
-      FEATURE_ACCESS_MANAGEMENT_ENABLED: false
+      FEATURE_ACCESS_MANAGEMENT_ENABLED: true
       FEATURE_JRD_E_LINKS_V2_ENABLED: true
       ALLOW_CONFIG_MUTATIONS: true
       NOW: false
@@ -186,6 +185,8 @@ xui-webapp:
           - mc-idam-client-secret
           - system-user-name
           - system-user-password
+          - name : launch-darkly-client-id
+            alias: LAUNCH_DARKLY_CLIENT_ID
 global:
   ccdApiGatewayIngress: http://${SERVICE_NAME}-ccd-api-gw
   ccdAdminWebIngress: ${SERVICE_NAME}-ccd-admin-web
