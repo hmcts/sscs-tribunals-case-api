@@ -144,7 +144,7 @@ public class NotificationSender {
 
         NotificationClient client = getLetterNotificationClient(address.getPostcode());
 
-        final SendLetterResponse sendLetterResponse = getSendLetterResponse(templateId, personalisation, ccdCaseId, client);
+        final SendLetterResponse sendLetterResponse = sendLetterViaGovNotify(templateId, personalisation, ccdCaseId, client);
 
         if (saveCorrespondence) {
             final Correspondence correspondence = getLetterCorrespondence(notificationEventType, name);
@@ -155,7 +155,7 @@ public class NotificationSender {
     }
 
     @Retryable
-    private SendLetterResponse getSendLetterResponse(String templateId, Map<String, Object> personalisation, String ccdCaseId, NotificationClient client) throws NotificationClientException {
+    private SendLetterResponse sendLetterViaGovNotify(String templateId, Map<String, Object> personalisation, String ccdCaseId, NotificationClient client) throws NotificationClientException {
         final SendLetterResponse sendLetterResponse;
         try {
             sendLetterResponse = client.sendLetter(templateId, personalisation, ccdCaseId);
@@ -173,7 +173,7 @@ public class NotificationSender {
 
             ByteArrayInputStream bis = new ByteArrayInputStream(directionText);
 
-            final LetterResponse sendLetterResponse = getBundledLetterResponse(ccdCaseId, client, bis);
+            final LetterResponse sendLetterResponse = sendBundledLetter(ccdCaseId, client, bis);
 
             if (saveCorrespondence) {
                 final Correspondence correspondence = getLetterCorrespondence(notificationEventType, name);
@@ -185,7 +185,7 @@ public class NotificationSender {
     }
 
     @Retryable
-    private LetterResponse getBundledLetterResponse(String ccdCaseId, NotificationClient client, ByteArrayInputStream bis) throws NotificationClientException {
+    private LetterResponse sendBundledLetter(String ccdCaseId, NotificationClient client, ByteArrayInputStream bis) throws NotificationClientException {
         final LetterResponse sendLetterResponse;
         try {
             sendLetterResponse = client.sendPrecompiledLetterWithInputStream(ccdCaseId, bis);
