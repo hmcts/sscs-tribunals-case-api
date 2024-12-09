@@ -5,9 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -50,7 +48,6 @@ import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
-import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
@@ -439,6 +436,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         submitAppealService.getDraftAppeals("authorisation");
     }
 
+
     protected SyaCaseWrapper getSyaWrapperWithAppointee(SyaContactDetails appointeeContact) {
         SyaAppointee appointee = new SyaAppointee();
         appointee.setContactDetails(appointeeContact);
@@ -482,6 +480,8 @@ public abstract class AbstractSubmitAppealServiceTest {
 
         assertEquals(1, matchedCases.size());
     }
+
+
 
     protected void assertRpc(SscsCaseData caseData, String expectedRpc) throws JsonProcessingException {
         RegionalProcessingCenter actualRpc = caseData.getRegionalProcessingCenter();

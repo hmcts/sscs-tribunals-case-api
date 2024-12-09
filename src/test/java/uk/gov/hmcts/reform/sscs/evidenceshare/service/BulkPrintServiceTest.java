@@ -273,7 +273,7 @@ public class BulkPrintServiceTest {
                 .appeal(Appeal.builder().appellant(
                                 Appellant.builder()
                                         .name(Name.builder().firstName("Appellant").lastName("LastName").build())
-                                        .address(Address.builder().line1("line1").postcode("PH17-26").country("Australia").portOfEntry(UkPortOfEntry.LONDON_LUTON_AIRPORT.getLabel()).inMainlandUk(NO).build())
+                                        .address(Address.builder().line1("line1").postcode("PH17-26").country("Australia").portOfEntry(UkPortOfEntry.LONDON_GATEWAY_PORT.getLabel()).inMainlandUk(NO).build())
                                         .build())
                         .build())
                 .build();

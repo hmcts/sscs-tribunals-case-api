@@ -159,7 +159,7 @@ public class RestoreCasesService2 {
 
         String postCode = sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
         String firstHalfOfPostcode = getFirstHalfOfPostcode(postCode);
-        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode, sscsCaseData.isIbcCase());
+        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode);
 
         if (rpc != null) {
             sscsCaseData.setRegion(rpc.getName());

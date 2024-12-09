@@ -230,7 +230,7 @@ class SscsUtilTest {
     @Test
     void givenPostHearingsEnabledFalse_clearPostHearingsFieldClearsDocumentFields_butDoesNotAlterPostHearing() {
         postHearing.setRequestType(PostHearingRequestType.SET_ASIDE);
-        SscsCaseData sscsCaseData = SscsCaseData.builder()
+        SscsCaseData caseData = SscsCaseData.builder()
             .postHearing(postHearing)
             .documentGeneration(DocumentGeneration.builder()
                 .generateNotice(YesNo.YES)
@@ -240,17 +240,17 @@ class SscsUtilTest {
                 .build())
             .build();
 
-        SscsUtil.clearPostHearingFields(sscsCaseData, false);
+        SscsUtil.clearPostHearingFields(caseData, false);
 
-        assertThat(sscsCaseData.getPostHearing().getRequestType()).isNotNull();
-        assertThat(sscsCaseData.getDocumentGeneration().getGenerateNotice()).isNull();
-        assertThat(sscsCaseData.getDocumentStaging().getDateAdded()).isNull();
+        assertThat(caseData.getPostHearing().getRequestType()).isNotNull();
+        assertThat(caseData.getDocumentGeneration().getGenerateNotice()).isNull();
+        assertThat(caseData.getDocumentStaging().getDateAdded()).isNull();
     }
 
     @Test
     void givenPostHearingsEnabledTrue_clearPostHearingsFieldClearsDocumentFields_andClearsPostHearing() {
         postHearing.setRequestType(PostHearingRequestType.SET_ASIDE);
-        SscsCaseData sscsCaseData = SscsCaseData.builder()
+        SscsCaseData caseData = SscsCaseData.builder()
             .postHearing(postHearing)
             .documentGeneration(DocumentGeneration.builder()
                 .generateNotice(YesNo.YES)
@@ -260,16 +260,16 @@ class SscsUtilTest {
                 .build())
             .build();
 
-        SscsUtil.clearPostHearingFields(sscsCaseData, true);
+        SscsUtil.clearPostHearingFields(caseData, true);
 
-        assertThat(sscsCaseData.getPostHearing().getRequestType()).isNull();
-        assertThat(sscsCaseData.getDocumentGeneration().getGenerateNotice()).isNull();
-        assertThat(sscsCaseData.getDocumentStaging().getDateAdded()).isNull();
+        assertThat(caseData.getPostHearing().getRequestType()).isNull();
+        assertThat(caseData.getDocumentGeneration().getGenerateNotice()).isNull();
+        assertThat(caseData.getDocumentStaging().getDateAdded()).isNull();
     }
 
     @Test
     void givenPostponement_thenClearPostponementFieldsOn() {
-        SscsCaseData sscsCaseData = SscsCaseData.builder()
+        SscsCaseData caseData = SscsCaseData.builder()
             .postponement(Postponement.builder()
                 .postponementEvent(READY_TO_LIST)
                 .unprocessedPostponement(YesNo.YES)
@@ -280,39 +280,39 @@ class SscsUtilTest {
                 .build())
             .build();
 
-        clearPostponementTransientFields(sscsCaseData);
-        assertNull(sscsCaseData.getPostponement().getPostponementEvent());
-        assertNull(sscsCaseData.getPostponement().getUnprocessedPostponement());
-        assertNull(sscsCaseData.getPostponementRequest().getUnprocessedPostponementRequest());
-        assertNull(sscsCaseData.getPostponementRequest().getActionPostponementRequestSelected());
+        clearPostponementTransientFields(caseData);
+        assertNull(caseData.getPostponement().getPostponementEvent());
+        assertNull(caseData.getPostponement().getUnprocessedPostponement());
+        assertNull(caseData.getPostponementRequest().getUnprocessedPostponementRequest());
+        assertNull(caseData.getPostponementRequest().getActionPostponementRequestSelected());
     }
 
     @Test
     void givenCorrectIssueAndBenefitCode_dontAddErrorToResponse() {
-        SscsCaseData sscsCaseData = SscsCaseData.builder().benefitCode("002").issueCode("DD").build();
-        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
-        validateBenefitIssueCode(sscsCaseData, response, categoryMapService);
+        SscsCaseData caseData = SscsCaseData.builder().benefitCode("002").issueCode("DD").build();
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+        validateBenefitIssueCode(caseData, response, categoryMapService);
 
         assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
     void givenWrongIssueAndBenefitCode_addErrorToResponse() {
-        SscsCaseData sscsCaseData = SscsCaseData.builder().benefitCode("002").issueCode("XA").build();
-        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
-        validateBenefitIssueCode(sscsCaseData, response, categoryMapService);
+        SscsCaseData caseData = SscsCaseData.builder().benefitCode("002").issueCode("XA").build();
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+        validateBenefitIssueCode(caseData, response, categoryMapService);
 
-        assertThat(response.getErrors()).hasSize(1);
+        assertThat(response.getErrors().size()).isEqualTo(1);
         assertThat(response.getErrors()).contains(INVALID_BENEFIT_ISSUE_CODE);
     }
 
     @Test
     void givenLegacyBenefitCode_addErrorToResponse() {
-        SscsCaseData sscsCaseData = SscsCaseData.builder().benefitCode("032").issueCode("CR").build();
-        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
-        validateBenefitIssueCode(sscsCaseData, response, categoryMapService);
+        SscsCaseData caseData = SscsCaseData.builder().benefitCode("032").issueCode("CR").build();
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+        validateBenefitIssueCode(caseData, response, categoryMapService);
 
-        assertThat(response.getErrors()).hasSize(1);
+        assertThat(response.getErrors().size()).isEqualTo(1);
         assertThat(response.getErrors()).contains(BENEFIT_CODE_NOT_IN_USE);
     }
 
@@ -512,7 +512,7 @@ class SscsUtilTest {
         final DynamicList portsOfEntry = getPortsOfEntry();
 
         assertThat(portsOfEntry.getValue()).isNull();
-        assertThat(portsOfEntry.getListItems()).hasSize(269);
+        assertThat(portsOfEntry.getListItems()).hasSize(90);
     }
 
 
@@ -533,7 +533,7 @@ class SscsUtilTest {
 
     @Test
     void shouldPopulateIbcaFieldsOnHandleIbcaCase() {
-        final SscsCaseData sscsCaseData = SscsCaseData.builder()
+        final SscsCaseData caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
                 .mrnDetails(MrnDetails.builder().build())
                 .hearingOptions(HearingOptions.builder().build())
@@ -542,11 +542,11 @@ class SscsUtilTest {
             .regionalProcessingCenter(RegionalProcessingCenter.builder().build())
             .build();
 
-        handleIbcaCase(sscsCaseData);
+        handleIbcaCase(caseData);
 
-        assertThat(sscsCaseData.getAppeal().getHearingOptions().getHearingRoute()).isEqualTo(LIST_ASSIST);
-        assertThat(sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice()).isEqualTo("IBCA");
-        assertThat(sscsCaseData.getRegionalProcessingCenter().getHearingRoute()).isEqualTo(LIST_ASSIST);
+        assertThat(caseData.getAppeal().getHearingOptions().getHearingRoute()).isEqualTo(LIST_ASSIST);
+        assertThat(caseData.getAppeal().getMrnDetails().getDwpIssuingOffice()).isEqualTo("IBCA");
+        assertThat(caseData.getRegionalProcessingCenter().getHearingRoute()).isEqualTo(LIST_ASSIST);
     }
 
     @Test
@@ -569,15 +569,15 @@ class SscsUtilTest {
 
     @Test
     void shouldReturnTrueWhenIsIbcaCase() {
-        final SscsCaseData sscsCaseData = SscsCaseData.builder()
+        final SscsCaseData caseData = SscsCaseData.builder()
                 .benefitCode("093")
                 .appeal(Appeal.builder()
                         .benefitType(BenefitType.builder()
                                 .descriptionSelection(
                                         new DynamicList(
                                                 new DynamicListItem(
-                                                        "infectedBloodCompensation",
-                                                        "infectedBloodCompensation"
+                                                        "infectedBloodAppeal",
+                                                        "infectedBloodAppeal"
                                                 ),
                                                 emptyList()
                                         )
@@ -587,12 +587,12 @@ class SscsUtilTest {
                         .build()
                 )
                 .build();
-        assertTrue(sscsCaseData.isIbcCase());
+        assertTrue(caseData.isIbcCase());
     }
 
     @Test
     void shouldReturnFalseWhenNotIbcaCase() {
-        final SscsCaseData sscsCaseData = SscsCaseData.builder()
+        final SscsCaseData caseData = SscsCaseData.builder()
                 .benefitCode("037")
                 .appeal(Appeal.builder()
                         .benefitType(BenefitType.builder()
@@ -610,6 +610,6 @@ class SscsUtilTest {
                         .build()
                 )
                 .build();
-        assertFalse(sscsCaseData.isIbcCase());
+        assertFalse(caseData.isIbcCase());
     }
 }

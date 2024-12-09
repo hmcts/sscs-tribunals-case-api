@@ -10,8 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingVenue.SAME_VENUE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingVenue.SOMEWHERE_ELSE;
@@ -330,7 +328,7 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
         given(venueService.getActiveRegionalEpimsIdsForRpc(caseData.getRegionalProcessingCenter().getEpimsId()))
             .willReturn(EPIMS_ID_LIST);
         given(refData.getVenueService()).willReturn(venueService);
-        given(regionalProcessingCenterService.getByPostcode(eq("LS1 2ED"), anyBoolean())).willReturn(rpc);
+        given(regionalProcessingCenterService.getByPostcode("LS1 2ED")).willReturn(rpc);
 
         List<HearingLocation> result = HearingsLocationMapping.getHearingLocations(caseData, refData);
 

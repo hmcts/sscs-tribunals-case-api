@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.sscs.domain.wrapper;
 
-import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
-
 public class SyaBenefitType {
 
     private String description;
@@ -39,9 +37,5 @@ public class SyaBenefitType {
                 + "description='" + description + '\''
                 + ", code='" + code + '\''
                 + '}';
-    }
-
-    public boolean isIbc() {
-        return code.equals(Benefit.INFECTED_BLOOD_COMPENSATION.getShortName());
     }
 }
