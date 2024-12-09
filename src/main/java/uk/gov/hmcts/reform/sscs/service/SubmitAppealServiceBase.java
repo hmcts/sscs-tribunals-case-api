@@ -24,7 +24,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLinkDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseManagementLocation;
@@ -150,9 +149,9 @@ public abstract class SubmitAppealServiceBase {
     }
 
     SscsCaseData convertAppealToSscsCaseData(SyaCaseWrapper appeal) {
-        boolean isIba = appeal.getBenefitType().getCode().equals(Benefit.INFECTED_BLOOD_COMPENSATION.getShortName());
-        String postCode = resolvePostCode(appeal, isIba);
-        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(isIba ? postCode : getFirstHalfOfPostcode(postCode));
+        boolean isIbc = appeal.getBenefitType().isIbc();
+        String postCode = resolvePostCode(appeal, isIbc);
+        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(isIbc ? postCode : getFirstHalfOfPostcode(postCode), isIbc);
 
         SscsCaseData sscsCaseData = rpc == null
             ? convertSyaToCcdCaseDataV1(appeal, caseAccessManagementFeature)
@@ -177,7 +176,7 @@ public abstract class SubmitAppealServiceBase {
         }
 
         log.info("{} - setting venue name to {}",
-            isIba
+            isIbc
                 ? sscsCaseData.getAppeal().getAppellant().getIdentity().getIbcaReference()
                 : maskNino(sscsCaseData.getAppeal().getAppellant().getIdentity().getNino()),
             sscsCaseData.getProcessingVenue());
@@ -308,9 +307,9 @@ public abstract class SubmitAppealServiceBase {
         }
     }
 
-    private String resolvePostCode(SyaCaseWrapper appeal, boolean isIba) {
+    private String resolvePostCode(SyaCaseWrapper appeal, boolean isIbc) {
         Boolean inMainlandUk = appeal.getContactDetails().getInMainlandUk();
-        if (isIba && inMainlandUk != null && inMainlandUk.equals(Boolean.FALSE)) {
+        if (isIbc && inMainlandUk != null && inMainlandUk.equals(Boolean.FALSE)) {
             return appeal.getAppellant().getContactDetails().getPortOfEntry();
         } else if (Boolean.TRUE.equals(appeal.getIsAppointee())) {
             return Optional.ofNullable(appeal.getAppointee())
