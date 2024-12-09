@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.generateUniqueIbcaId;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getSscsType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleBenefitType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleIbcaCase;
 
@@ -80,7 +81,7 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
         }
 
         if (caseData.getCaseCreated() == null) {
-            preSubmitCallbackResponse.addError("The Case Created Date must be set to generate the SSCS1");
+            preSubmitCallbackResponse.addError("The Case Created Date must be set to generate the " + getSscsType(caseData));
         } else {
             createAppealPdf(caseData);
         }
@@ -105,23 +106,23 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
     }
 
     private void createAppealPdf(SscsCaseData caseData) {
-        String fileName = IBCA_BENEFIT_CODE.equals(caseData.getBenefitCode())
+        final String fileName = IBCA_BENEFIT_CODE.equals(caseData.getBenefitCode())
                 ? generateUniqueIbcaId(caseData.getAppeal().getAppellant()) + ".pdf"
                 : emailHelper.generateUniqueEmailId(caseData.getAppeal().getAppellant()) + ".pdf";
+        final String documentType = IBCA_BENEFIT_CODE.equals(caseData.getBenefitCode()) ? "sscs8" : "sscs1";
+        final boolean hasPdf = hasPdfDocument(caseData, fileName);
 
-        boolean hasPdf = hasPdfDocument(caseData, fileName);
-
-        log.info("Does case have sscs1 pdf {} for caseId {}", hasPdf, caseData.getCcdCaseId());
+        log.info("Does case have {} pdf {} for caseId {}", documentType, hasPdf, caseData.getCcdCaseId());
         if (!hasPdf) {
             log.info("Existing pdf document not found, start generating pdf for caseId {}", caseData.getCcdCaseId());
 
             try {
                 updateAppointeeNullIfNotPresent(caseData);
                 caseData.setEvidencePresent(hasEvidence(caseData, fileName));
-                sscsPdfService.generatePdf(caseData, Long.parseLong(caseData.getCcdCaseId()), "sscs1", fileName);
+                sscsPdfService.generatePdf(caseData, Long.parseLong(caseData.getCcdCaseId()), documentType, fileName);
 
             } catch (PDFServiceClientException pdfServiceClientException) {
-                log.error("Sscs1 form could not be generated for caseId {} for exception ", caseData.getCcdCaseId(), pdfServiceClientException);
+                log.error("{} form could not be generated for caseId {} for exception ", documentType, caseData.getCcdCaseId(), pdfServiceClientException);
             }
         }
     }
