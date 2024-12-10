@@ -70,6 +70,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists;
@@ -302,7 +303,7 @@ public class SendNotificationService {
     private static boolean isValidLetterAddress(Address addressToUse) {
         return null != addressToUse
             && isNotBlank(addressToUse.getLine1())
-            && isNotBlank(addressToUse.getPostcode());
+            && (YesNo.NO.equals(addressToUse.getInMainlandUk()) || isNotBlank(addressToUse.getPostcode()));
     }
 
     private boolean sendBundledAndDocmosisLetterNotification(NotificationWrapper wrapper, Notification notification, String nameToUse, SubscriptionWithType subscriptionWithType) {
