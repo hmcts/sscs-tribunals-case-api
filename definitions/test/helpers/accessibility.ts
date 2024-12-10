@@ -1,7 +1,7 @@
 import {expect, Page} from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-async function axeTest(page: Page): Promise<void> {
+async function axeTest(page: Page, testInfo): Promise<void> {
     // accessibility testing function
     const accessibilityScanResults = await new AxeBuilder({page})
         .withTags([
@@ -13,7 +13,14 @@ async function axeTest(page: Page): Promise<void> {
             "wcag22aa",
         ])
         .analyze();
-    expect(accessibilityScanResults.violations).not.toEqual([]);
+
+    await testInfo.attach('accessibility-scan-results', {
+        body: JSON.stringify(accessibilityScanResults, null, 2),
+        contentType: 'application/json'
+    });
+
+
+    expect(accessibilityScanResults.violations).toEqual([]);
 }
 
 export default axeTest;
