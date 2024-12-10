@@ -1,7 +1,7 @@
 import {expect, Page} from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-async function axeTest(page: Page, testInfo): Promise<void> {
+async function axeTest(page: Page): Promise<void> {
     // accessibility testing function
     const accessibilityScanResults = await new AxeBuilder({page})
         .withTags([
