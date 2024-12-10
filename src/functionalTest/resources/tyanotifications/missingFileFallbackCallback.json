@@ -778,5 +778,5 @@
     },
     "state": "appealCreated"
   },
-  "event_id": "hearingBooked"
+  "event_id": "EVENT_TYPE"
 }
