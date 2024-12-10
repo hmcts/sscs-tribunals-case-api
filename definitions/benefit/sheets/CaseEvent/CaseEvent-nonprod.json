@@ -3,7 +3,7 @@
     "LiveFrom": "02/12/2024",
     "CaseTypeID": "Benefit",
     "ID": "caseOutcomeMigration",
-    "Name": "Migrate case outcome",
+    "Name": "Case migrated automatically",
     "DisplayOrder": 10007,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",

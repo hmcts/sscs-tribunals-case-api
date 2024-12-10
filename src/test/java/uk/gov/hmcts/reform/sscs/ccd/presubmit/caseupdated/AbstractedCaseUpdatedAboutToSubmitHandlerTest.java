@@ -617,7 +617,7 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
 
     @Test
     void givenAnAppealWithPostcode_updateRpc() {
-        when(regionalProcessingCenterService.getByPostcode("CM120NS")).thenReturn(RegionalProcessingCenter.builder().name("Region1").address1("Line1").build());
+        when(regionalProcessingCenterService.getByPostcode(eq("CM120NS"), anyBoolean())).thenReturn(RegionalProcessingCenter.builder().name("Region1").address1("Line1").build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -706,7 +706,7 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
     @ParameterizedTest
     @CsvSource({"Birmingham,No", "Glasgow,Yes"})
     void givenAnAppealWithPostcode_updateRpcToScottish(String newRpcName, String expectedIsScottish) {
-        when(regionalProcessingCenterService.getByPostcode("CM120NS")).thenReturn(RegionalProcessingCenter.builder().name(newRpcName).build());
+        when(regionalProcessingCenterService.getByPostcode(eq("CM120NS"), anyBoolean())).thenReturn(RegionalProcessingCenter.builder().name(newRpcName).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -718,7 +718,7 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
     void givenAnAppealWithNewAppellantPostcodeAndNoAppointee_thenUpdateProcessingVenue() {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("No");
 
-        when(regionalProcessingCenterService.getByPostcode("AB12 00B")).thenReturn(
+        when(regionalProcessingCenterService.getByPostcode(eq("AB12 00B"), anyBoolean())).thenReturn(
             RegionalProcessingCenter.builder()
                 .name("rpcName")
             .postcode("rpcPostcode")
@@ -744,7 +744,7 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
 
     @Test
     void givenAnAppealWithNewAppointeePostcode_thenUpdateProcessingVenueWithAppointeeVenue() {
-        when(regionalProcessingCenterService.getByPostcode("AB12 00B")).thenReturn(
+        when(regionalProcessingCenterService.getByPostcode(eq("AB12 00B"), anyBoolean())).thenReturn(
             RegionalProcessingCenter.builder()
                 .name("rpcName")
                 .postcode("rpcPostcode")
@@ -797,7 +797,7 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
     @NullSource
     @ValueSource(strings = {"", " "})
     void givenAnAppealWithNewAppointeeButEmptyPostcode_thenUpdateProcessingVenueWithAppellantVenue(String postCode) {
-        when(regionalProcessingCenterService.getByPostcode("AB12 00B")).thenReturn(
+        when(regionalProcessingCenterService.getByPostcode(eq("AB12 00B"), anyBoolean())).thenReturn(
             RegionalProcessingCenter.builder()
                 .name("rpcName")
                 .postcode("rpcPostcode")
@@ -841,7 +841,7 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
                 .address(Address.builder().line1("Line 1").line2("Line 2").postcode("APP EEE").build())
                 .build());
 
-        when(regionalProcessingCenterService.getByPostcode("APP EEE")).thenReturn(RegionalProcessingCenter.builder()
+        when(regionalProcessingCenterService.getByPostcode(eq("APP EEE"), anyBoolean())).thenReturn(RegionalProcessingCenter.builder()
             .name("AppointeeVenue")
             .address1("Line1")
             .build());
@@ -861,7 +861,7 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
                 .address(Address.builder().line1("Line 1").line2("Line 2").postcode("APP_EEE").build())
             .build());
 
-        when(regionalProcessingCenterService.getByPostcode("AB1200B")).thenReturn(RegionalProcessingCenter.builder()
+        when(regionalProcessingCenterService.getByPostcode(eq("AB1200B"), anyBoolean())).thenReturn(RegionalProcessingCenter.builder()
             .name("AppellantVenue")
             .address1("Line1")
             .build());

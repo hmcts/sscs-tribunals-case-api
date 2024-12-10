@@ -13,7 +13,13 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
@@ -97,15 +103,18 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
     }
 
     private void setupUkPortsOfEntry(SscsCaseData sscsCaseData) {
-        final DynamicList ukPortOfEntries = SscsUtil.getPortsOfEntry();
-        String portOfEntryCode = sscsCaseData.getAppeal().getAppellant().getAddress().getPortOfEntry();
+        DynamicList portOfEntryDynamicList = sscsCaseData.getAppeal().getAppellant().getAddress().getUkPortOfEntryList();
+        if (portOfEntryDynamicList == null || portOfEntryDynamicList.getValue() == null) {
+            final DynamicList ukPortOfEntries = SscsUtil.getPortsOfEntry();
+            String portOfEntryCode = sscsCaseData.getAppeal().getAppellant().getAddress().getPortOfEntry();
 
-        if (isNotEmpty(portOfEntryCode)) {
-            DynamicListItem selectedPortOfEntry = getSelectedDynamicListItem(ukPortOfEntries.getListItems(), portOfEntryCode);
-            ukPortOfEntries.setValue(selectedPortOfEntry);
+            if (isNotEmpty(portOfEntryCode)) {
+                DynamicListItem selectedPortOfEntry = getSelectedDynamicListItem(ukPortOfEntries.getListItems(), portOfEntryCode);
+                ukPortOfEntries.setValue(selectedPortOfEntry);
+            }
+
+            sscsCaseData.getAppeal().getAppellant().getAddress().setUkPortOfEntryList(ukPortOfEntries);
         }
-
-        sscsCaseData.getAppeal().getAppellant().getAddress().setUkPortOfEntryList(ukPortOfEntries);
     }
 
     private DynamicListItem getSelectedDynamicListItem(List<DynamicListItem> listItems, String code) {
