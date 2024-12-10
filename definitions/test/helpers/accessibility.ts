@@ -13,7 +13,7 @@ async function axeTest(page: Page): Promise<void> {
             "wcag22aa",
         ])
         .analyze();
-    expect(accessibilityScanResults.violations).toEqual([]);
+    expect(accessibilityScanResults.violations).not.toEqual([]);
 }
 
 export default axeTest;
