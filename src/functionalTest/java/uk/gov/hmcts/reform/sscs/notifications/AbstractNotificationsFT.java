@@ -71,9 +71,9 @@ public abstract class AbstractNotificationsFT extends AbstractFunctionalTest {
                             savedLetters.add(notification.getId());
                         } catch (NotificationClientException | IOException e) {
                             log.error("Failed to save pdf for template {}", notification.getTemplateId());
+                            delayInSeconds(60);
                         }
                     });
-            delayInSeconds(60);
         }
         log.info("Finished saving letter pdfs : {} out of {} successfully saved",
                 notifications.size() - savedLetters.size(), notifications.size());
@@ -82,15 +82,5 @@ public abstract class AbstractNotificationsFT extends AbstractFunctionalTest {
 
     public void logFailedEventNotification(NotificationEventType notificationType, Exception e) {
         log.error("Failed testing notification type {} with the following", notificationType, e);
-    }
-
-    @Override
-    public String updateJson(String json, NotificationEventType eventType) {
-        json = super.updateJson(json, eventType);
-        json = json.replace("event_id_value", eventType.getEvent().getCcdType());
-
-        log.info("Functional test: updating case [{}]", caseId);
-
-        return json;
     }
 }

@@ -64,13 +64,6 @@ public class DocmosisGovNotifyLettersFT extends AbstractNotificationsFT {
     }
 
     private Set<NotificationEventType> getNotificationList() {
-        if (generateAllNotifications) {
-            return DOCMOSIS_LETTERS.stream()
-                    .filter(notificationEventType ->
-                            !List.of(ACTION_HEARING_RECORDING_REQUEST, HEARING_BOOKED).contains(notificationEventType))
-                    .collect(Collectors.toSet());
-        } else {
-            return notificationsList;
-        }
+        return generateAllNotifications ? DOCMOSIS_LETTERS : notificationsList;
     }
 }
