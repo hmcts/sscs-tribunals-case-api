@@ -323,7 +323,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         return addressBuilder.build();
     }
 
-     private static Appellant getAppellant(SyaCaseWrapper syaCaseWrapper, boolean isIbc) {
+    private static Appellant getAppellant(SyaCaseWrapper syaCaseWrapper, boolean isIbc) {
 
         SyaAppellant syaAppellant = syaCaseWrapper.getAppellant();
 

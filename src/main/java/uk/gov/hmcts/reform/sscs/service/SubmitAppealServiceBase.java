@@ -293,9 +293,9 @@ public abstract class SubmitAppealServiceBase {
 
     protected SscsCaseData convertAppealToSscsCaseData(SyaCaseWrapper appeal,
                                                        Function<RegionalProcessingCenter, SscsCaseData> getCaseData) {
-        boolean isIba = appeal.getBenefitType().getCode().equals(Benefit.INFECTED_BLOOD_COMPENSATION.getShortName());
-        String postCode = resolvePostCode(appeal, isIba);
-        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(isIba ? postCode : getFirstHalfOfPostcode(postCode));
+        boolean isIbc = appeal.getBenefitType().isIbc();
+        String postCode = resolvePostCode(appeal, isIbc);
+        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(isIbc ? postCode : getFirstHalfOfPostcode(postCode), isIbc);
 
 
         SscsCaseData sscsCaseData = getCaseData.apply(rpc);
@@ -305,24 +305,24 @@ public abstract class SubmitAppealServiceBase {
         sscsCaseData.setProcessingVenue(processingVenue);
 
         if (caseAccessManagementFeature
-                && StringUtils.isNotEmpty(processingVenue)
-                && rpc != null) {
+            && StringUtils.isNotEmpty(processingVenue)
+            && rpc != null) {
             String venueEpimsId = venueService.getEpimsIdForVenue(processingVenue);
             CourtVenue courtVenue = refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId);
 
             sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
-                    .baseLocation(rpc.getEpimsId())
-                    .region(courtVenue.getRegionId()).build());
+                .baseLocation(rpc.getEpimsId())
+                .region(courtVenue.getRegionId()).build());
 
             log.info("Successfully updated case management location details for case {}. Processing venue {}, epimsId {}",
-                    appeal.getCcdCaseId(), processingVenue, venueEpimsId);
+                appeal.getCcdCaseId(), processingVenue, venueEpimsId);
         }
 
         log.info("{} - setting venue name to {}",
-                isIba
-                        ? sscsCaseData.getAppeal().getAppellant().getIdentity().getIbcaReference()
-                        : maskNino(sscsCaseData.getAppeal().getAppellant().getIdentity().getNino()),
-                sscsCaseData.getProcessingVenue());
+            isIbc
+                ? sscsCaseData.getAppeal().getAppellant().getIdentity().getIbcaReference()
+                : maskNino(sscsCaseData.getAppeal().getAppellant().getIdentity().getNino()),
+            sscsCaseData.getProcessingVenue());
 
         return sscsCaseData;
     }
