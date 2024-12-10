@@ -123,6 +123,7 @@ export class AccessibilitySteps extends BaseStep {
         await this.homePage.delay(5000);
         await this.homePage.reloadPage();
         await expect(this.homePage.summaryTab).toBeVisible();
+        await this.homePage.clickBeforeTabBtn();
         await this.homePage.navigateToTab("Bundles");
 
         await this.bundlesTab.verifyBundlesTabContentByKeyValueForASpan(`${bundleTestData.stitchStatusLabel}`, `${bundleTestData.stitchStatusDone}`);
