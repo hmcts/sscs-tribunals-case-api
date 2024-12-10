@@ -14,12 +14,6 @@ async function axeTest(page: Page, testInfo): Promise<void> {
         ])
         .analyze();
 
-    await testInfo.attach('accessibility-scan-results', {
-        body: JSON.stringify(accessibilityScanResults, null, 2),
-        contentType: 'application/json'
-    });
-
-
     expect(accessibilityScanResults.violations).toEqual([]);
 }
 
