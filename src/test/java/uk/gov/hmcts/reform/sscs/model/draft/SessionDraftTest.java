@@ -186,8 +186,7 @@ public class SessionDraftTest {
                     "representative@gmail.com",
                     null,
                     null,
-                    null,
-                    "RepOrg"
+                    null
                 )
             )
             .build();

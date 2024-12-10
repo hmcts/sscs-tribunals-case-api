@@ -318,8 +318,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService
             hasContact ? appeal.getRep().getContact().getEmail() : null,
             getPostcodeLookup(appeal.getRep().getAddress()),
             getPostcodeAddress(appeal.getRep().getAddress()),
-            getType(appeal.getRep().getAddress()),
-            appeal.getRep().getOrganisation()
+            getType(appeal.getRep().getAddress())
         );
     }
 

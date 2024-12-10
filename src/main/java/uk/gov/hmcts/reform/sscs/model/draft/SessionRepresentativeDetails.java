@@ -17,5 +17,4 @@ public class SessionRepresentativeDetails {
     private String postcodeLookup;
     private String postcodeAddress;
     private String type;
-    private String organisation;
 }
