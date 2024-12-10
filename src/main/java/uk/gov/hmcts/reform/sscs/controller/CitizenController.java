@@ -148,12 +148,8 @@ public class CitizenController {
         @Parameter(description = "email address of the appellant", example = "foo@bar.com")
         @RequestBody() AssociateCaseDetails associateCaseDetails
     ) {
-        Optional<OnlineHearing> onlineHearing = citizenLoginService.associateCaseToCitizen(
-            getUserTokens(authorisation),
-            tya,
-            associateCaseDetails.getEmail(),
-            associateCaseDetails.getPostcode()
-        );
+        Optional<OnlineHearing> onlineHearing =
+                citizenLoginService.associateCaseToCitizen(getUserTokens(authorisation), tya, associateCaseDetails);
 
         return onlineHearing
             .map(ResponseEntity::ok)
