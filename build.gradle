@@ -118,8 +118,8 @@ tasks.register('functional', Test) {
     maxParallelForks = Runtime.runtime.availableProcessors()
 }
 
-tasks.register('notifications', Test) {
-    group = 'Notification Tests'
+tasks.register('verifyNotifications', Test) {
+    group = 'Notifications verification Tests'
     description = 'Simulates CCD callbacks to generate notifications, then retrieves pdfs from Gov.Notify'
     setTestClassesDirs(sourceSets.functionalTest.output.classesDirs)
     setClasspath(sourceSets.functionalTest.runtimeClasspath)
