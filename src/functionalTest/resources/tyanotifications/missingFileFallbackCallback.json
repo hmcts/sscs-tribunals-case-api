@@ -94,7 +94,7 @@
           }
         },
         "benefitType": {
-          "code": "IBC"
+          "code": "infectedBloodCompensation"
         },
         "hearingOptions": {
           "languageInterpreter": "Yes",
