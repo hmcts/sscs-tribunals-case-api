@@ -152,10 +152,10 @@ def runAccessibilityTestsNightly() {
                 allowMissing: true,
                 alwaysLinkToLastBuild: true,
                 keepAll: true,
-                reportDir: "accessibility-report",
+                reportDir: "playwright-report",
                 reportFiles: 'index.html',
                 reportName: 'SSCS Accessibility Test Report'
         ])
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'definitions/test/accessibility-report/**'
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'definitions/test/playwright-report/accessibility/**'
     }
 }
