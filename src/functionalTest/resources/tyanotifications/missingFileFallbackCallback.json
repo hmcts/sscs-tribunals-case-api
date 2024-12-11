@@ -123,6 +123,22 @@
         "hearingRoute": "oral"
       },
       "caseReference": "SC022/14/12423",
+      "originalSender": {
+        "value": {
+          "code": "appellant",
+          "label": "Appellant (or Appointee)"
+        },
+        "list_items": [
+          {
+            "code": "appellant",
+            "label": "Appellant (or Appointee)"
+          },
+          {
+            "code": "representative",
+            "label": "Representative"
+          }
+        ]
+      },
       "events": [
         {
           "id": "4beb1c7e-96c4-4020-9b1a-e8fdd70016b6",
