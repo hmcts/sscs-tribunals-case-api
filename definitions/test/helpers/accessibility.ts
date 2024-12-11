@@ -1,4 +1,6 @@
 import {expect, Page} from "@playwright/test";
+import { createHtmlReport } from "axe-html-reporter";
+import fs from 'fs';
 import AxeBuilder from "@axe-core/playwright";
 
 async function axeTest(page: Page): Promise<void> {
@@ -14,6 +16,14 @@ async function axeTest(page: Page): Promise<void> {
         ])
         .analyze();
 
+    const reportHTML =  createHtmlReport({
+        results: accessibilityScanResults,
+        options: {
+            projectkey: "PlaywrightHomepage"
+        }
+    });
+
+    fs.writeFileSync("accessibility-report/report.html", reportHTML);
     expect(accessibilityScanResults.violations).toEqual([]);
 }
 
