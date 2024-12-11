@@ -118,9 +118,19 @@ tasks.register('functional', Test) {
     maxParallelForks = Runtime.runtime.availableProcessors()
 }
 
+tasks.register('verifyNotifications', Test) {
+    group = 'Notifications verification Tests'
+    description = 'Simulates CCD callbacks to generate notifications, then retrieves pdfs from Gov.Notify'
+    setTestClassesDirs(sourceSets.functionalTest.output.classesDirs)
+    setClasspath(sourceSets.functionalTest.runtimeClasspath)
+    include "uk/gov/hmcts/reform/sscs/notifications/**"
+    exclude "uk/gov/hmcts/reform/sscs/smoke/**"
+    maxParallelForks = Runtime.runtime.availableProcessors()
+}
+
 tasks.register('smoke', Test) {
     group = 'verification'
-    description = 'Executes non-destructive smoke tests against a running Tribual Case API'
+    description = 'Executes non-destructive smoke tests against a running Tribunal Case API'
     setTestClassesDirs(sourceSets.functionalTest.output.classesDirs)
     setClasspath(sourceSets.functionalTest.runtimeClasspath)
     include "uk/gov/hmcts/reform/sscs/smoke/**"
@@ -355,7 +365,7 @@ dependencies {
     implementation group: 'com.mchange', name: 'c3p0', version: '0.10.1'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.12.21'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.12.22'
     implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.21'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
@@ -535,7 +545,6 @@ tasks.register('runAndPublishConsumerPactTests', Test) {
     logger.lifecycle("Runs pact Tests")
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
-
 }
 
 tasks.register('getSscsCommonVersion') {

@@ -1,7 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
-import static java.util.Objects.*;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -10,14 +11,18 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.validateHearingOptionsAndExcludeDates;
-import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.SYSTEM_USER;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isConfidential;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleBenefitType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleIbcaCase;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.validation.ConstraintValidatorContext;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +32,27 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseManagementLocation;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Entity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.AssociatedCaseLinkHelper;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
@@ -141,7 +166,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                 || isNotBlank(appellant.getAddress().getPortOfEntry()))) {
 
             String postCode = resolvePostCode(sscsCaseData);
-            RegionalProcessingCenter newRpc = regionalProcessingCenterService.getByPostcode(postCode);
+            RegionalProcessingCenter newRpc = regionalProcessingCenterService.getByPostcode(postCode, sscsCaseData.isIbcCase());
 
             maybeChangeIsScottish(sscsCaseData.getRegionalProcessingCenter(), newRpc, sscsCaseData);
 
