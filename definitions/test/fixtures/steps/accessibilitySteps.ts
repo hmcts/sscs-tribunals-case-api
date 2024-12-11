@@ -95,7 +95,8 @@ export class AccessibilitySteps extends BaseStep {
         await expect(this.page.getByText(hyphenatedSecondCaseId)).toBeVisible();
         await axeTest(this.page)
 
-        await this.homePage.goToHomePage(firstCaseId);
+        // await this.homePage.goToHomePage(firstCaseId);
+        await this.homePage.clickBeforeTabBtn();
         await this.homePage.delay(1000);
         await this.homePage.navigateToTab("History");
         await this.historyTab.verifyPageContentByKeyValue('Event', 'Link a case');
