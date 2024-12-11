@@ -189,6 +189,36 @@ public abstract class AbstractSubmitYourAppealToCcdCaseDataDeserializerTest {
     }
 
     @Test
+    public void givenAIbaNonMainlandUkCaseFromSyaNoPostcode_thenAddressBuildsCorrectly() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+        SyaBenefitType benefitType = new SyaBenefitType("Infected Blood Compensation", "infectedBloodCompensation");
+        syaCaseWrapper.setBenefitType(benefitType);
+        syaCaseWrapper.getContactDetails().setInMainlandUk(Boolean.FALSE);
+        syaCaseWrapper.getContactDetails().setAddressLine1("line1");
+        syaCaseWrapper.getContactDetails().setAddressLine2("line2");
+        syaCaseWrapper.getContactDetails().setTownCity("townCity");
+        syaCaseWrapper.getContactDetails().setCountry("country");
+        syaCaseWrapper.getContactDetails().setPostCode(null);
+        syaCaseWrapper.getContactDetails().setPortOfEntry("GB000434");
+
+        SscsCaseData caseData = callConvertSyaToCcdCaseDataRelevantVersion(syaCaseWrapper,
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
+        DynamicList expectedPortsOfEntry = getPortsOfEntry();
+        expectedPortsOfEntry.setValue(SscsUtil.getPortOfEntryFromCode("GB000434"));
+        Address expectedAddress = Address.builder()
+            .line1("line1")
+            .line2("line2")
+            .town("townCity")
+            .country("country")
+            .portOfEntry("GB000434")
+            .ukPortOfEntryList(expectedPortsOfEntry)
+            .postcode(null)
+            .inMainlandUk(YesNo.NO)
+            .build();
+        assertEquals(expectedAddress, caseData.getAppeal().getAppellant().getAddress());
+    }
+
+    @Test
     public void givenAIbaCaseWithIbcRoleFromSya_thenAppellantBuildsWithIbcRole() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
         SyaBenefitType benefitType = new SyaBenefitType("Infected Blood Compensation", "infectedBloodCompensation");
