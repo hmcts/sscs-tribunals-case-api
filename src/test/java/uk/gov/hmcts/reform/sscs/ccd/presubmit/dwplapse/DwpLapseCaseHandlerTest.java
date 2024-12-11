@@ -11,6 +11,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.LAPSED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -73,6 +74,43 @@ public class DwpLapseCaseHandlerTest {
     public void givenAHandleDwpLapseEvent_thenReturnTrue() {
         when(callback.getEvent()).thenReturn(EventType.DWP_LAPSE_CASE);
         assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
+    }
+
+    @Test
+    public void givenIbcLapseCaseEvent_thenSetInterlocReviewByJudge() {
+        sscsCaseData = sscsCaseData.toBuilder().state(State.WITH_DWP)
+            .benefitCode("093")
+            .dwpLT203(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("lt203Link").build()).build())
+            .dwpLapseLetter(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("lapseLink").build()).build()).build();
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getDwpLT203());
+        assertNull(response.getData().getDwpLapseLetter());
+
+        assertEquals(2, response.getData().getDwpDocuments().size());
+
+        assertThat(response.getData().getDwpDocuments(), hasItem(
+            hasProperty("value", allOf(
+                hasProperty("documentLink", allOf(
+                    hasProperty("documentUrl", is("lt203Link"))
+                )),
+                hasProperty("documentType", is(DwpDocumentType.DWP_LT_203.getValue()))
+            ))
+        ));
+
+        assertThat(response.getData().getDwpDocuments(), hasItem(
+            hasProperty("value", allOf(
+                hasProperty("documentLink", allOf(
+                    hasProperty("documentUrl", is("lapseLink"))
+                )),
+                hasProperty("documentType", is(DwpDocumentType.DWP_LAPSE_LETTER.getValue()))
+            ))
+        ));
+
+        assertEquals(REVIEW_BY_JUDGE, response.getData().getInterlocReviewState());
+        assertEquals(LAPSED, response.getData().getDwpState());
     }
 
     @Test

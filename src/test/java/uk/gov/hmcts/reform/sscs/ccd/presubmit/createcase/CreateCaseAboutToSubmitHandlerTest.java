@@ -153,7 +153,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
 
 
     @Test
-    void isIbaFalseIfNullBenefitType() throws CcdException {
+    void isIbcFalseIfNullBenefitType() throws CcdException {
         when(caseDetails.getCaseData()).thenReturn(mockedCaseData);
         when(mockedCaseData.getCaseCreated()).thenReturn("");
         when(mockedCaseData.getCcdCaseId()).thenReturn("1021");
