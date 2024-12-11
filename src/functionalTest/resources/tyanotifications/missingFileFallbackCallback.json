@@ -103,22 +103,6 @@
           "wantsToAttend": "Yes"
         },
         "mrnDetails": {},
-        "rep": {
-          "hasRepresentative": "Yes",
-          "name": {
-            "title": "Mr",
-            "firstName": "Harry",
-            "lastName": "Potter"
-          },
-          "address": {
-            "line1": "1 Representative Close",
-            "town": "Repton",
-            "county": "Repy",
-            "postcode": "TS3 3ST"
-          },
-          "contact": {},
-          "organisation": "HP Ltd"
-        },
         "signer": null,
         "hearingRoute": "oral"
       },
