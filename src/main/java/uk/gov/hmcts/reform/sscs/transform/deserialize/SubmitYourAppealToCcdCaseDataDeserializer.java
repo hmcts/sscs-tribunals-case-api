@@ -9,7 +9,10 @@ import static uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil.cleanPhoneNumber
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -290,6 +293,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         Address.AddressBuilder addressBuilder = Address.builder()
             .line1(contactDetails.getAddressLine1())
             .line2(contactDetails.getAddressLine2())
+            .postcode(contactDetails.getPostCode())
             .town(contactDetails.getTownCity());
         if (isIbc && contactDetails.getInMainlandUk() != null) {
             YesNo inMainlandUkYesNo = contactDetails.getInMainlandUk().equals(Boolean.TRUE) ? YesNo.YES : YesNo.NO;
@@ -309,7 +313,6 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         }
         addressBuilder
             .county(contactDetails.getCounty())
-            .postcode(contactDetails.getPostCode())
             .postcodeLookup(contactDetails.getPostcodeLookup())
             .postcodeAddress(contactDetails.getPostcodeAddress());
         return addressBuilder.build();

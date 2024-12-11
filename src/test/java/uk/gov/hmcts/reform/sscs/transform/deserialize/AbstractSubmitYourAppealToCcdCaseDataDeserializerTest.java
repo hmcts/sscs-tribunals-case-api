@@ -168,6 +168,7 @@ public abstract class AbstractSubmitYourAppealToCcdCaseDataDeserializerTest {
         syaCaseWrapper.getContactDetails().setAddressLine2("line2");
         syaCaseWrapper.getContactDetails().setTownCity("townCity");
         syaCaseWrapper.getContactDetails().setCountry("country");
+        syaCaseWrapper.getContactDetails().setPostCode("some international-postcode");
         syaCaseWrapper.getContactDetails().setPortOfEntry("GB000434");
 
         SscsCaseData caseData = callConvertSyaToCcdCaseDataRelevantVersion(syaCaseWrapper,
@@ -181,6 +182,7 @@ public abstract class AbstractSubmitYourAppealToCcdCaseDataDeserializerTest {
             .country("country")
             .portOfEntry("GB000434")
             .ukPortOfEntryList(expectedPortsOfEntry)
+            .postcode("some international-postcode")
             .inMainlandUk(YesNo.NO)
             .build();
         assertEquals(expectedAddress, caseData.getAppeal().getAppellant().getAddress());
