@@ -94,7 +94,7 @@
           }
         },
         "benefitType": {
-          "code": "ESA"
+          "code": "IBC"
         },
         "hearingOptions": {
           "languageInterpreter": "Yes",
