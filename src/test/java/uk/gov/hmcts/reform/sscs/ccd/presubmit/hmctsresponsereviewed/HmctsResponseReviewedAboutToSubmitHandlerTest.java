@@ -52,7 +52,9 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
         when(callback.getEvent()).thenReturn(EventType.HMCTS_RESPONSE_REVIEWED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
-        sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build())
+        sscsCaseData = SscsCaseData.builder()
+                .ccdCaseId("ccdId")
+                .appeal(Appeal.builder().build())
                 .selectWhoReviewsCase(new DynamicList(
                     new DynamicListItem("reviewByTcw", "Review by TCW"), null))
                 .benefitCode("002")
@@ -213,6 +215,22 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
         assertThat(sscsCaseData.getDwpUcb(), is(YES.getValue()));
         assertThat(sscsCaseData.getDwpUcbEvidenceDocument(), is(nullValue()));
         assertThat(sscsCaseData.getDwpDocuments().size(), is(1));
+    }
+
+    @Test
+    public void givenIbcaCase_thenTheIbcaOnlyFieldsAreCleared() {
+        sscsCaseData.setBenefitCode("093");
+        sscsCaseData.setBenefitCodeIbcaOnly("093");
+        sscsCaseData.setIssueCodeIbcaOnly("SP");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+                ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(sscsCaseData.getBenefitCode(), is("093"));
+        assertThat(sscsCaseData.getIssueCode(), is("SP"));
+        assertNull(sscsCaseData.getBenefitCodeIbcaOnly());
+        assertNull(sscsCaseData.getIssueCodeIbcaOnly());
     }
 
     @Test(expected = IllegalStateException.class)

@@ -56,8 +56,10 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
             HearingsGetResponse response = hmcHearingsApiService.getHearingsRequest(Long.toString(caseDetails.getId()), HmcStatus.COMPLETED);
             List<CaseHearing> hmcHearings = response.getCaseHearings();
             if (!hmcHearings.isEmpty()) {
-                List<HearingDetails> selectedHearings = sscsCaseData.getHearings().stream()
+                List<HearingDetails> selectedHearings = sscsCaseData.getHearings()
+                        .stream()
                         .map(Hearing::getValue)
+                        .filter(value -> value.getStart() != null)
                         .filter(value -> hmcHearings.stream()
                                 .anyMatch(hmcHearing -> Objects
                                         .equals(hmcHearing.getHearingId().toString(), value.getHearingId())))
@@ -69,6 +71,8 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
                 preSubmitCallbackResponse.addError("There are no completed hearings on the case.");
             }
         } catch (Exception e) {
+            log.info("AddHearingOutcome failed for caseId {} with error {}", callback.getCaseDetails().getId(), e.getMessage());
+
             preSubmitCallbackResponse.addError("There was an error while retrieving hearing details; please try again after some time.");
         }
         return preSubmitCallbackResponse;

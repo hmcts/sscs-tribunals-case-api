@@ -7,6 +7,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
@@ -78,7 +79,6 @@ public class DwpUploadResponseMidEventHandlerTest {
         when(caseDetails.getId()).thenReturn(Long.valueOf(sscsCaseData.getCcdCaseId()));
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
-
     }
 
     @Test
@@ -140,5 +140,16 @@ public class DwpUploadResponseMidEventHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
         assertEquals(1, response.getErrors().size());
         assertEquals("Please provide other party details", response.getErrors().toArray()[0]);
+    }
+
+    @Test
+    public void shouldReturnErrorIfIbcaBenefitCodeSelectedByNonIbcaCase() {
+        callback.getCaseDetails().getCaseData().setIssueCode("CE");
+        callback.getCaseDetails().getCaseData().setBenefitCode(IBCA_BENEFIT_CODE);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+        assertTrue(response.getErrors().contains("Please choose a valid benefit code"));
     }
 }

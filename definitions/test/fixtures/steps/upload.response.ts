@@ -10,6 +10,7 @@ import { WebAction } from '../../common/web.action';
 const responseReviewedTestData = require('../../pages/content/response.reviewed_en.json');
 const uploadResponseTestdata = require('../../pages/content/upload.response_en.json');
 const ucbTestData = require('../../pages/content/update.ucb_en.json');
+import { environment } from "../../config/config";
 
 export class UploadResponse extends BaseStep {
 
@@ -30,8 +31,9 @@ export class UploadResponse extends BaseStep {
 
         let pipCaseId = await createCaseBasedOnCaseType("PIP");
         await this.uploadResponseWithFurtherInfoAsDwpCaseWorker(pipCaseId);
+        await this.homePage.clickSignOut();
 
-        await this.loginUserWithCaseId(credentials.amCaseWorker, true, pipCaseId);
+        await this.loginUserWithCaseId(credentials.amCaseWorker, false, pipCaseId);
         await this.homePage.navigateToTab("Summary");
         await this.summaryTab.verifyPresenceOfText("Response received");
 
@@ -86,8 +88,9 @@ export class UploadResponse extends BaseStep {
 
         await this.homePage.navigateToTab("Summary");
         await this.summaryTab.verifyPresenceOfText("Ready to list");
-        
-        await this.page.locator('button.mat-tab-header-pagination-after').click();
+        if (environment.name == 'aat') {
+            await this.page.locator('button.mat-tab-header-pagination-after').click();
+        }
         await this.homePage.navigateToTab("Listing Requirements");
         await this.listingRequirementsTab.verifyContentByKeyValueForASpan(ucbTestData.ucbFieldLabel, ucbTestData.ucbFieldValue_Yes);
     }

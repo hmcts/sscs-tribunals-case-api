@@ -1,8 +1,12 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_SEND_TO_INTERLOC;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import feign.FeignException;
+import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,22 +16,21 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @Component
 @Slf4j
-public class HmctsResponseReviewedSubmittedHandler extends ResponseEventsAboutToSubmit implements PreSubmitCallbackHandler<SscsCaseData> {
+public class HmctsResponseReviewedSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final CcdService ccdService;
+    private final UpdateCcdCaseService updateCcdCaseService;
     private final IdamService idamService;
 
     @Autowired
-    public HmctsResponseReviewedSubmittedHandler(CcdService ccdService, IdamService idamService) {
-        this.ccdService = ccdService;
+    public HmctsResponseReviewedSubmittedHandler(UpdateCcdCaseService updateCcdCaseService, IdamService idamService) {
+        this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;
     }
 
@@ -52,19 +55,39 @@ public class HmctsResponseReviewedSubmittedHandler extends ResponseEventsAboutTo
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         if (sscsCaseData.getIsInterlocRequired() != null && sscsCaseData.getIsInterlocRequired().equals("Yes")) {
-            String whoToReview = sscsCaseData.getSelectWhoReviewsCase().getValue().getCode().equals("reviewByJudge") ? "Judge" : "TCW";
-            updateCase(sscsCaseData, callback.getCaseDetails().getId(), EventType.VALID_SEND_TO_INTERLOC, "Send to interloc", "Send a case to a " + whoToReview + " for review");
-        } else {
-            sscsCaseData.setIgnoreCallbackWarnings(YesNo.YES);
-            updateCase(sscsCaseData, callback.getCaseDetails().getId(), EventType.READY_TO_LIST, "Ready to list", "Makes an appeal ready to list");
+            updateCase(
+                    callback.getCaseDetails().getId(),
+                    VALID_SEND_TO_INTERLOC,
+                    "Send to interloc",
+                    String.join(" ", "Send a case to a",
+                            sscsCaseData.getSelectWhoReviewsCase().getValue().getCode().equals("reviewByJudge") ? "Judge" : "TCW",
+                            "for review"),
+                    sscsCaseDetails -> {
+                        SscsCaseData caseData = sscsCaseDetails.getData();
+                        caseData.setSelectWhoReviewsCase(sscsCaseData.getSelectWhoReviewsCase());
+                        caseData.setOriginalSender(sscsCaseData.getOriginalSender());
+                    });
+        } else if (!sscsCaseData.isIbcCase()) {
+            updateCase(
+                    callback.getCaseDetails().getId(),
+                    READY_TO_LIST,
+                    "Ready to list",
+                    "Makes an appeal ready to list",
+                     sscsCaseDetails -> sscsCaseDetails.getData().setIgnoreCallbackWarnings(YES));
         }
 
         return preSubmitCallbackResponse;
     }
 
-    private void updateCase(SscsCaseData caseData, Long caseId, EventType eventType, String summary, String description) {
+    private void updateCase(Long caseId, EventType eventType, String summary, String description, Consumer<SscsCaseDetails> mutator) {
         try {
-            ccdService.updateCase(caseData, caseId, eventType.getCcdType(), summary, description, idamService.getIdamTokens());
+            updateCcdCaseService.updateCaseV2(
+                    caseId,
+                    eventType.getCcdType(),
+                    summary,
+                    description,
+                    idamService.getIdamTokens(),
+                    mutator);
         } catch (FeignException e) {
             log.error(
                     "{}. CCD response: {}",
