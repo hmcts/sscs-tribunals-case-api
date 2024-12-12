@@ -250,6 +250,41 @@
     "ShowSummaryChangeOption": "Y"
   },
   {
+    "LiveFrom": "06/10/2022",
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "isFqpmRequired",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 6,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "LiveFrom": "06/10/2022",
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "appeal",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "FieldShowCondition": "isFqpmRequired = \"DONOTSHOW\"",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 6,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "LiveFrom": "06/10/2022",
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "isMedicalMemberRequired",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 7,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "appeal.benefitType.code = \"infectedBloodCompensation\""
+  },
+  {
     "CaseEventID": "adminUpdateEvent",
     "CaseFieldID": "urgentCase",
     "CaseTypeID": "Benefit",
@@ -3605,6 +3640,30 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "1.0",
     "PageLabel": "Confirm panel composition"
+  },
+  {
+    "CaseEventID": "confirmPanelComposition",
+    "CaseFieldID": "appeal",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "FieldShowCondition": "isFqpmRequired = \"DONOTSHOW\"",
+    "LiveFrom": "01/11/2021",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "1.0",
+    "PageLabel": "Confirm panel composition"
+  },
+  {
+    "CaseEventID": "confirmPanelComposition",
+    "CaseFieldID": "isMedicalMemberRequired",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "01/11/2021",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "1.0",
+    "PageLabel": "Confirm panel composition",
+    "FieldShowCondition": "appeal.benefitType.code = \"infectedBloodCompensation\""
   },
   {
     "CaseEventID": "panelDoctorSpecialismAmend",
