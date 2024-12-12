@@ -221,4 +221,37 @@ public class CitizenControllerTest {
             assertTrue(result.contains(expectedEntry), "Result should contain the expected entry for " + entry.getLabel());
         }
     }
+
+    @Test
+    public void shouldReturnAllPortsOfEntryAndCountriesOfResidenceWithExpectedFields() {
+        Map<String, List<Map<String, String>>> result = underTest.getPortsAndCountries();
+
+        assertNotNull(result);
+        assertFalse(result.isEmpty(), "The result should not be empty");
+
+        Map<String, String> jordanEntry = Map.of(
+            "label", "Jordan",
+            "officialName", "Jordan"
+        );
+
+        Map<String, String> aberdeenEntry = Map.of(
+            "trafficType", "Sea traffic",
+            "locationCode", "GBSTABD00",
+            "label", "Aberdeen"
+        );
+
+        assertTrue(result.get("countriesOfResidence").contains(jordanEntry), "The result should contain the entry for Jordan");
+        assertTrue(result.get("portsOfEntry").contains(aberdeenEntry), "The result should contain the entry for Jordan");
+
+        result.get("countriesOfResidence").forEach(entry -> {
+            assertTrue(entry.containsKey("label"), "Each entry should have a 'label' field");
+            assertTrue(entry.containsKey("officialName"), "Each entry should have a 'officialName' field");
+        });
+
+        result.get("portsOfEntry").forEach(entry -> {
+            assertTrue(entry.containsKey("label"), "Each entry should have a 'label' field");
+            assertTrue(entry.containsKey("trafficType"), "Each entry should have a 'trafficType' field");
+            assertTrue(entry.containsKey("locationCode"), "Each entry should have a 'locationCode' field");
+        });
+    }
 }

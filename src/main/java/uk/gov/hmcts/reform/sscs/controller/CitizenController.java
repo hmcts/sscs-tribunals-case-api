@@ -210,4 +210,14 @@ public class CitizenController {
                 "officialName", enumVal.getOfficialName()))
             .collect(Collectors.toList());
     }
+
+    @GetMapping(value = "/ports-and-countries", produces = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Loads ports of entry and countries of residence",
+        description = "Loads JSON list of ports of entry and countries of residence pulled from Enum in sscs-common.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "A list of the ports of entry and countries of residence.")
+    })
+    public Map<String, List<Map<String, String>>> getPortsAndCountries() {
+        return Map.of("portsOfEntry", getPortsOfEntry(), "countriesOfResidence", getCountriesOfResidence());
+    }
 }
