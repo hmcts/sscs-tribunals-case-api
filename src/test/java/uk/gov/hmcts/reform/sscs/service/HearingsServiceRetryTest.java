@@ -131,7 +131,7 @@ class HearingsServiceRetryTest {
             .eventToken(EVENT_TOKEN)
             .build();
 
-        when(hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(any(), any())).thenReturn(
+        when(hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(any(), any(), anyBoolean())).thenReturn(
             sscsCaseDetailsConsumer);
         when(hearingServiceConsumer.getCreateHearingCaseDataConsumer(any(), any())).thenReturn(sscsCaseDataConsumer);
 

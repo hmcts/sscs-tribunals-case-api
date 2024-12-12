@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.*;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.BENEFIT_CODES_FOR_ISSUE_AND_SEND_TO_ADMIN;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +65,10 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
 
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
         listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
+
+        if (sscsCaseData.getBenefitCode() != null && BENEFIT_CODES_FOR_ISSUE_AND_SEND_TO_ADMIN.contains(sscsCaseData.getBenefitCode())) {
+            listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
+        }
 
         if (isYes(sscsCaseData.getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding())) {
             listOptions.add(new DynamicListItem(REFUSE_HEARING_RECORDING_REQUEST.toString(), REFUSE_HEARING_RECORDING_REQUEST.getLabel()));

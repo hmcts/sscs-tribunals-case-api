@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.*;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.BENEFIT_CODES_FOR_ISSUE_AND_SEND_TO_ADMIN;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -81,7 +82,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
         listOptions.add(new DynamicListItem(NO_FURTHER_ACTION.getCode(), NO_FURTHER_ACTION.getLabel()));
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getExtensionNextEventDl());
-        assertEquals(2, listOptions.size());
+        assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
     }
 
     @Test
@@ -99,7 +100,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         DynamicList expected = new DynamicList(new DynamicListItem(NO_FURTHER_ACTION.getCode(), NO_FURTHER_ACTION.getCode()), listOptions);
         assertEquals(expected, response.getData().getExtensionNextEventDl());
-        assertEquals(2, listOptions.size());
+        assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
     }
 
     @Test
@@ -117,7 +118,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getExtensionNextEventDl());
-        assertEquals(3, listOptions.size());
+        assertEquals(3, response.getData().getExtensionNextEventDl().getListItems().size());
     }
 
     @Test
@@ -136,7 +137,42 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(4, listOptions.size());
+        assertEquals(4, response.getData().getDirectionTypeDl().getListItems().size());
+    }
+
+    @Test
+    public void givenSpecificBenefitCodeAppeal_populateDirectionTypeDropdown() {
+        for (String benefitCode : BENEFIT_CODES_FOR_ISSUE_AND_SEND_TO_ADMIN) {
+            when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
+            sscsCaseData.setBenefitCode(benefitCode);
+
+            List<DynamicListItem> listOptions = new ArrayList<>();
+            listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
+            listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
+            listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
+
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+            DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
+            assertEquals(expected, response.getData().getDirectionTypeDl());
+            assertEquals(3, response.getData().getDirectionTypeDl().getListItems().size());
+        }
+    }
+
+    @Test
+    public void givenNonSpecificBenefitCodeAppeal_doNotPopulateIssueAndSendToAdmin() {
+        when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
+        sscsCaseData.setBenefitCode("001");
+
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
+        listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
+        assertEquals(expected, response.getData().getDirectionTypeDl());
+        assertEquals(2, response.getData().getDirectionTypeDl().getListItems().size());
     }
 
     @Test
@@ -157,7 +193,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(4, listOptions.size());
+        assertEquals(4, response.getData().getDirectionTypeDl().getListItems().size());
     }
 
     @Test
@@ -177,7 +213,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(4, listOptions.size());
+        assertEquals(4, response.getData().getDirectionTypeDl().getListItems().size());
     }
 
     @Test
@@ -195,7 +231,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(2, listOptions.size());
+        assertEquals(2, response.getData().getDirectionTypeDl().getListItems().size());
     }
 
     @Test
@@ -216,7 +252,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         DynamicList expected = new DynamicList(new DynamicListItem(GRANT_EXTENSION.toString(), GRANT_EXTENSION.toString()), listOptions);
         assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(4, listOptions.size());
+        assertEquals(4, response.getData().getDirectionTypeDl().getListItems().size());
     }
 
     @Test
@@ -232,7 +268,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(2, listOptions.size());
+        assertEquals(2, response.getData().getDirectionTypeDl().getListItems().size());
     }
 
     @Test
@@ -251,7 +287,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
-        assertEquals(3, listOptions.size());
+        assertEquals(3, response.getData().getDirectionTypeDl().getListItems().size());
         assertEquals(expected, response.getData().getDirectionTypeDl());
     }
 
@@ -270,7 +306,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
-        assertEquals(2, listOptions.size());
+        assertEquals(2, response.getData().getDirectionTypeDl().getListItems().size());
         assertEquals(expected, response.getData().getDirectionTypeDl());
     }
 

@@ -356,7 +356,6 @@ public class SscsUtil {
             response.addError(BENEFIT_CODE_NOT_IN_USE);
         }
 
-
         if (isNull(categoryMapService.getSessionCategory(caseData.getBenefitCode(), caseData.getIssueCode(),
                 isSecondDoctorPresent, fqpmRequired))) {
             response.addError(INVALID_BENEFIT_ISSUE_CODE);
@@ -623,6 +622,12 @@ public class SscsUtil {
             default -> {
             }
         }
+    }
+
+    public static String getSscsType(SscsCaseData caseData) {
+        return !isNull(caseData.getBenefitCode())
+                ? Benefit.getBenefitFromBenefitCode(caseData.getBenefitCode()).getSscsType().getId().toUpperCase()
+                : null;
     }
 }
 

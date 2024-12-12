@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
@@ -28,12 +29,16 @@ public class ReciprocalLinkHandler implements CallbackHandler<SscsCaseData> {
 
     private final IdamService idamService;
 
+    private final UpdateCcdCaseService updateCcdCaseService;
+
     @Autowired
     public ReciprocalLinkHandler(CcdService ccdService,
-                                 IdamService idamService) {
+                                 IdamService idamService,
+                                 UpdateCcdCaseService updateCcdCaseService) {
         this.dispatchPriority = DispatchPriority.LATEST;
         this.ccdService = ccdService;
         this.idamService = idamService;
+        this.updateCcdCaseService = updateCcdCaseService;
     }
 
     @Override
@@ -93,12 +98,13 @@ public class ReciprocalLinkHandler implements CallbackHandler<SscsCaseData> {
                     List<CaseLink> caseLinks = matchedCase.getData().getAssociatedCase() != null ? matchedCase.getData().getAssociatedCase() : new ArrayList<>();
 
                     caseLinks.add(caseLink);
-                    matchedCase.getData().setAssociatedCase(caseLinks);
-                    matchedCase.getData().setLinkedCasesBoolean("Yes");
 
                     log.info("Back linking case id {} to case id {}", caseId, matchedCase.getId().toString());
 
-                    ccdService.updateCase(matchedCase.getData(), matchedCase.getId(), ASSOCIATE_CASE.getCcdType(), "Associate case", "Associated case added", idamTokens);
+                    updateCcdCaseService.updateCaseV2(matchedCase.getId(), ASSOCIATE_CASE.getCcdType(), "Associate case", "Associated case added", idamTokens, sscsCaseDetails -> {
+                        sscsCaseDetails.getData().setAssociatedCase(caseLinks);
+                        sscsCaseDetails.getData().setLinkedCasesBoolean("Yes");
+                    });
                 }
             }
         }

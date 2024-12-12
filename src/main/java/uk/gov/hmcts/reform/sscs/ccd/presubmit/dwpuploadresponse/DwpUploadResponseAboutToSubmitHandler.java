@@ -97,6 +97,17 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             return preSubmitCallbackResponse;
         }
 
+        if (sscsCaseData.isIbcCase()) {
+            final String benefitCode = sscsCaseData.getBenefitCodeIbcaOnly();
+            sscsCaseData.setBenefitCode(benefitCode);
+
+            final String issueCode = sscsCaseData.getIssueCodeIbcaOnly();
+            sscsCaseData.setIssueCode(issueCode);
+
+            sscsCaseData.setBenefitCodeIbcaOnly(null);
+            sscsCaseData.setIssueCodeIbcaOnly(null);
+        }
+
         updateDwpState(sscsCaseData);
 
         addedDocumentsUtil.clearAddedDocumentsBeforeEventSubmit(sscsCaseData);
@@ -125,6 +136,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         }
         sscsCaseData.setDirectionDueDate(getUpdatedDirectionDueDate(sscsCaseData));
         updateBenefitType(sscsCaseData);
+
         return preSubmitCallbackResponse;
     }
 

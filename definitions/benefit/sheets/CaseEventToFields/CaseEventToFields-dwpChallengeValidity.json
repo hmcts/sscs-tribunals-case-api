@@ -1,0 +1,38 @@
+[
+  {
+    "CaseEventID": "dwpChallengeValidity",
+    "CaseFieldID": "appeal",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "19/11/2019",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 0,
+    "PageID": "1.0",
+    "FieldShowCondition": "[STATE]=\"DoNotUse\"",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseEventID": "dwpChallengeValidity",
+    "CaseFieldID": "dwpChallengeValidityDocument",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "COMPLEX",
+    "LiveFrom": "10/10/2019",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "PageLabel": "Challenge validity",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "dwpChallengeValidity",
+    "CaseFieldID": "dwpState",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "10/10/2019",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "1.0",
+    "PageLabel": "Challenge validity",
+    "ShowSummaryChangeOption": "Y"
+  }
+]

@@ -1,12 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updateotherparty;
 
-import static java.util.Collections.*;
+import static java.util.Collections.emptyList;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
@@ -30,7 +33,22 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DateRange;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Role;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.idam.UserRole;
@@ -368,6 +386,22 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(0, response.getWarnings().size());
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    public void givenSscsIbaCaseOtherPartyWithRoleEntered_thenNoRoleCheck() {
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+            .appeal(
+                Appeal.builder().benefitType(BenefitType.builder().code(Benefit.INFECTED_BLOOD_COMPENSATION.getShortName()).build())
+                    .build())
+            .otherParties(Arrays.asList(buildSscs5OtherParty(ID_2, null), buildSscs5OtherParty(ID_1, null)))
+            .build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
         assertEquals(0, response.getErrors().size());
     }
 

@@ -104,7 +104,7 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
             return response;
         }
         //Check if role is not entered for a Child support case
-        if (roleAbsentForOtherParties(sscsCaseData.getOtherParties())) {
+        if (!sscsCaseData.isIbcCase() && roleAbsentForOtherParties(sscsCaseData.getOtherParties())) {
             response.addError(ERR_ROLE_REQUIRED);
         }
         return response;
