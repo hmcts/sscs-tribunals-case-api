@@ -1,0 +1,73 @@
+{
+  "BenefitType": {
+    "benefitType": "Infected Blood Compensation"
+  },
+  "PostcodeChecker": {
+    "postcode": "n29ed"
+  },
+  "CreateAccount": {
+    "createAccount": "yes"
+  },
+  "HaveAMRN": {
+    "haveAMRN": "yes"
+  },
+  "MRNDate": {
+    "mrnDate": {
+      "day": "10",
+      "month": "10",
+      "year": "1990"
+    }
+  },
+  "MRNOverThirteenMonthsLate": {
+    "reasonForBeingLate": "aassas dasdsa dasdasda das"
+  },
+  "AppellantName": {
+    "title": "Mrs.",
+    "firstName": "Ap",
+    "lastName": "Pellant"
+  },
+  "AppellantDOB": {
+    "date": {
+      "day": "31",
+      "month": "12",
+      "year": "1998"
+    }
+  },
+  "AppellantIBCAReference": {
+    "ibcaReference": "12341234"
+  },
+  "AppellantContactDetails": {
+    "addressLine1": "1 Appellant Close",
+    "townCity": "Appellant-town",
+    "county": "Appellant-county",
+    "postCode": "TS1 1ST",
+    "phoneNumber": "07911123456",
+    "emailAddress": "appellant@gmail.com"
+  },
+  "AppellantRole": {
+    "ibcRole": "myself"
+  },
+  "AppellantInMainlandUk": {
+    "inMainlandUk": "yes"
+  },
+  "Representative": {
+    "hasRepresentative": "yes"
+  },
+  "RepresentativeInMainlandUk": {
+    "inMainlandUk": "yes"
+  },
+  "RepresentativeDetails": {
+    "name": {
+      "title": "Mr.",
+      "first": "Re",
+      "last": "Presentative"
+    },
+    "addressLine1": "rep-line1",
+    "addressLine2": "rep-line2",
+    "townCity": "rep-town-city",
+    "county": "rep-county",
+    "postCode": "RE7 7ES",
+    "emailAddress": "representative@gmail.com",
+    "phoneNumber": "07222222222"
+  }
+}
