@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -355,11 +356,11 @@ public class LetterUtils {
         if (isYes(address.getInMainlandUk()) || address.getInMainlandUk() == null) {
             return Stream.of(address.getLine1(), address.getLine2(), address.getTown(), address.getCounty(), address.getPostcode())
                     .filter(Objects::nonNull)
-                    .toList();
+                    .collect(Collectors.toList());
         } else {
             return Stream.of(address.getLine1(), address.getLine2(), address.getTown(), address.getPostcode(), address.getCountry())
                     .filter(Objects::nonNull)
-                    .toList();
+                    .collect(Collectors.toList());
         }
     }
 

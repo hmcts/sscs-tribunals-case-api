@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notification;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationClientRuntimeException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils;
 
 @Service
 @Slf4j
@@ -75,15 +76,22 @@ public class PdfLetterService {
 
     private byte[] generateCoversheet(NotificationWrapper wrapper, SubscriptionWithType subscriptionWithType) {
         Address addressToUse = getAddressToUseForLetter(wrapper, subscriptionWithType);
+        var lines = LetterUtils.lines(addressToUse);
+        for (int i = lines.size(); i < 5; i++) {
+            lines.add("");
+        }
+
         String name = getNameToUseForLetter(wrapper, subscriptionWithType);
+        int lineNum = 0;
+
         PdfCoverSheet pdfCoverSheet = new PdfCoverSheet(
             wrapper.getCaseId(),
             name,
-            addressToUse.getLine1(),
-            addressToUse.getLine2(),
-            addressToUse.getTown(),
-            addressToUse.getCounty(),
-            addressToUse.getPostcode(),
+            lines.get(lineNum++),
+            lines.get(lineNum++),
+            lines.get(lineNum++),
+            lines.get(lineNum++),
+            lines.get(lineNum),
             evidenceProperties.getAddress().getLine2(),
             evidenceProperties.getAddress().getLine3(wrapper.getNewSscsCaseData()),
             evidenceProperties.getAddress().getTown(),
