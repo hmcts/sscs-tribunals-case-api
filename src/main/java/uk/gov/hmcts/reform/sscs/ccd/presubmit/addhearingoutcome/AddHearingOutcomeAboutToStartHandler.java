@@ -72,13 +72,13 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
                 sscsCaseData.getCompletedHearingsList().addAll(sscsCaseData.getHearings()
                     .stream()
                     .filter(value -> value.getValue().getStart() != null)
-                    .filter(hearingDetails -> {
-                        CaseHearing hmcHearing = hmcHearingsMap.get(hearingDetails.getValue().getHearingId());
+                    .filter(hearing -> {
+                        CaseHearing hmcHearing = hmcHearingsMap.get(hearing.getValue().getHearingId());
                         if (hmcHearing != null) {
-                            hearingDetails.getValue().setStart(hearingUpdateService.convertUtcToUk(hmcHearing.getHearingDaySchedule().get(0).getHearingStartDateTime()));
-                            hearingDetails.getValue().setEnd(hearingUpdateService.convertUtcToUk(hmcHearing.getHearingDaySchedule().get(0).getHearingEndDateTime()));
-                            hearingDetails.getValue().setEpimsId(hmcHearing.getHearingDaySchedule().get(0).getHearingVenueEpimsId());
-                            hearingDetails.getValue().setHearingChannel(hmcHearing.getHearingChannels().get(0));
+                            hearing.getValue().setStart(hearingUpdateService.convertUtcToUk(hmcHearing.getHearingDaySchedule().get(0).getHearingStartDateTime()));
+                            hearing.getValue().setEnd(hearingUpdateService.convertUtcToUk(hmcHearing.getHearingDaySchedule().get(0).getHearingEndDateTime()));
+                            hearing.getValue().setEpimsId(hmcHearing.getHearingDaySchedule().get(0).getHearingVenueEpimsId());
+                            hearing.getValue().setHearingChannel(hmcHearing.getHearingChannels().get(0));
                             return true;
                         }
                         return false;
