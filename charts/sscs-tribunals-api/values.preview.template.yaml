@@ -8,6 +8,7 @@ java:
   devmemoryRequests: 1Gi
   devmemoryLimits: 2Gi
   environment:
+    MYA_LINK: https://sscs-cor-frontend-pr-1139.preview.platform.hmcts.net/sign-in?tya=appeal_id
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
     CORE_CASE_DATA_API_URL: ${CORE_CASE_DATA_API_URL}
     DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
