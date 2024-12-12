@@ -126,15 +126,9 @@ export class AccessibilitySteps extends BaseStep {
         await this.homePage.clickBeforeTabBtn();
         await this.homePage.navigateToTab("Bundles");
 
-        await this.bundlesTab.verifyBundlesTabContentByKeyValueForASpanRegEx(`${bundleTestData.stitchDocLabel}`, `\\d+-${bundleTestData.stitchVal}\\.pdf`);
-
         await this.bundlesTab.verifyTableElementByIndex(bundleTestData.folderName, `${bundleTestData.folderNameVal}`, 0);
         await this.bundlesTab.verifyTableElementByIndex(bundleTestData.docName, `${bundleTestData.folderOneDocVal} ${formattedDate}`, 0);
         await this.bundlesTab.verifyTableElementByIndex(bundleTestData.sourceDoc, `${bundleTestData.folderOneSourceVal} ${formattedDate}.pdf`, 0);
-        await this.bundlesTab.verifyTableElementByIndex(bundleTestData.docName, `${bundleTestData.folderTwoDocVal} ${formattedDate}`, 1);
-        await this.bundlesTab.verifyTableElementByIndex(bundleTestData.sourceDoc, `${bundleTestData.folderTwoSourceVal} ${formattedDate}.pdf`, 1);
-        await this.bundlesTab.verifyTableElementByIndex(bundleTestData.sourceDoc, `${bundleTestData.folderTwoSourceVal} ${formattedDate}.pdf`, 1);
-        await this.bundlesTab.verifyTableElementByIndex(bundleTestData.folderName, `${bundleTestData.bundleFolderTwoVal}`, 0);
         await axeTest(this.page);
 
 

@@ -111,8 +111,8 @@ withNightlyPipeline(type, product, component) {
     enableFullFunctionalTest()
 
     afterAlways('fullFunctionalTest') {
-        runAccessibilityTestsNightly()
         runE2eTestsNightly()
+        runAccessibilityTestsNightly()
     }
 
 
