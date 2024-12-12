@@ -118,9 +118,19 @@ tasks.register('functional', Test) {
     maxParallelForks = Runtime.runtime.availableProcessors()
 }
 
+tasks.register('verifyNotifications', Test) {
+    group = 'Notifications verification Tests'
+    description = 'Simulates CCD callbacks to generate notifications, then retrieves pdfs from Gov.Notify'
+    setTestClassesDirs(sourceSets.functionalTest.output.classesDirs)
+    setClasspath(sourceSets.functionalTest.runtimeClasspath)
+    include "uk/gov/hmcts/reform/sscs/notifications/**"
+    exclude "uk/gov/hmcts/reform/sscs/smoke/**"
+    maxParallelForks = Runtime.runtime.availableProcessors()
+}
+
 tasks.register('smoke', Test) {
     group = 'verification'
-    description = 'Executes non-destructive smoke tests against a running Tribual Case API'
+    description = 'Executes non-destructive smoke tests against a running Tribunal Case API'
     setTestClassesDirs(sourceSets.functionalTest.output.classesDirs)
     setClasspath(sourceSets.functionalTest.runtimeClasspath)
     include "uk/gov/hmcts/reform/sscs/smoke/**"
@@ -379,9 +389,7 @@ dependencies {
     implementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: pitest.pitestVersion.get()
     implementation group:'org.codehaus.sonar-plugins', name:'sonar-pitest-plugin', version: '0.5'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-job-scheduler', version: '1.6.1', {
-        exclude group: "uk.gov.hmcts.reform", module:"properties-volume-spring-boot-starter"
-    }
+    implementation group: 'com.github.hmcts', name: 'sscs-job-scheduler', version: '2.0.0'
     implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.3.2'
     implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '4.1.0-RELEASE'
     implementation group: 'com.atlassian.commonmark', name: 'commonmark', version: '0.17.0'
@@ -535,7 +543,6 @@ tasks.register('runAndPublishConsumerPactTests', Test) {
     logger.lifecycle("Runs pact Tests")
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
-
 }
 
 tasks.register('getSscsCommonVersion') {
@@ -641,6 +648,12 @@ task runE2eTestsNightly(type: Exec) {
     dependsOn yarnInstall
     workingDir = file("${project.projectDir}/definitions/test")
     commandLine 'yarn', 'test:nightly'
+}
+
+task runAccessibilityTestsNightly(type: Exec) {
+    dependsOn yarnInstall
+    workingDir = file("${project.projectDir}/definitions/test")
+    commandLine 'yarn', 'test:accessibility'
 }
 
 task highLevelDataSetup(type: JavaExec) {

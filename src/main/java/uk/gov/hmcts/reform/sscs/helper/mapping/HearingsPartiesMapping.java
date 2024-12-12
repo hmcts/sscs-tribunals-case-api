@@ -10,7 +10,6 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
-import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsMapping.DWP_ID;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsMapping.getEntityRoleCode;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.DayOfWeekUnavailabilityType.ALL_DAY;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.EntityRoleCode.INTERPRETER;
@@ -18,6 +17,9 @@ import static uk.gov.hmcts.reform.sscs.model.hmc.reference.EntityRoleCode.REPRES
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.EntityRoleCode.RESPONDENT;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.PartyType.INDIVIDUAL;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.PartyType.ORGANISATION;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DWP_ACRONYM;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.HMRC_ACRONYM;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBCA_ACRONYM;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -74,7 +76,7 @@ public final class HearingsPartiesMapping {
 
         List<PartyDetails> partiesDetails = new ArrayList<>();
 
-        partiesDetails.add(createDwpPartyDetails(caseData));
+        partiesDetails.add(createPartyDetails(caseData));
 
         if (isYes(caseData.getJointParty().getHasJointParty())) {
             partiesDetails.addAll(
@@ -187,12 +189,12 @@ public final class HearingsPartiesMapping {
         return partyDetails.build();
     }
 
-    public static PartyDetails createDwpPartyDetails(SscsCaseData caseData) throws ListingException {
+    public static PartyDetails createPartyDetails(SscsCaseData caseData) throws ListingException {
         return PartyDetails.builder()
-                .partyID(DWP_ID)
+                .partyID(getOrganisationName(caseData.getBenefitCode()))
                 .partyType(ORGANISATION)
                 .partyRole(RESPONDENT.getHmcReference())
-                .organisationDetails(getDwpOrganisationDetails(caseData))
+                .organisationDetails(getOrganisationDetails(caseData))
                 .unavailabilityDayOfWeek(getDwpUnavailabilityDayOfWeek())
                 .unavailabilityRanges(getPartyUnavailabilityRange(null))
                 .build();
@@ -411,15 +413,19 @@ public final class HearingsPartiesMapping {
         return null;
     }
 
-    public static OrganisationDetails getDwpOrganisationDetails(SscsCaseData caseData) {
+    public static OrganisationDetails getOrganisationDetails(SscsCaseData caseData) {
         return OrganisationDetails.builder()
                 .name(getOrganisationName(caseData.getBenefitCode()))
                 .organisationType("ORG")
                 .build();
     }
 
-    private static String getOrganisationName(String benefitCode) {
-        return List.of("015", "016", "030", "034", "050", "053", "054", "055", "057", "058").contains(benefitCode) ? "HMRC" : "DWP";
+    public static String getOrganisationName(String benefitCode) {
+        return switch (benefitCode) {
+            case "015", "016", "030", "034", "050", "053", "054", "055", "057", "058" -> HMRC_ACRONYM;
+            case "093" -> IBCA_ACRONYM;
+            default -> DWP_ACRONYM;
+        };
     }
 
     public static List<UnavailabilityDayOfWeek> getPartyUnavailabilityDayOfWeek() {

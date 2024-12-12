@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwplapse;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
@@ -40,10 +42,10 @@ public class DwpLapseCaseHandler implements PreSubmitCallbackHandler<SscsCaseDat
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        InterlocReviewState interlocReviewState = caseData.isIbcCase() ? REVIEW_BY_JUDGE : AWAITING_ADMIN_ACTION;
+        log.info("Setting interloc review field to " + interlocReviewState + " for case id " + caseData.getCcdCaseId());
 
-        log.info("Setting interloc review field to " + AWAITING_ADMIN_ACTION + " for case id " + caseData.getCcdCaseId());
-
-        caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
+        caseData.setInterlocReviewState(interlocReviewState);
         caseData.setDwpState(DwpState.LAPSED);
 
         if (caseData.getDwpLapseLetter() != null) {
