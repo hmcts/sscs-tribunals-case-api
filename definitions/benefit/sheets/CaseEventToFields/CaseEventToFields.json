@@ -4553,6 +4553,6 @@
     "PageID": "1.0",
     "ShowSummaryChangeOption": "N",
     "RetainHiddenValue": "Yes",
-    "FieldShowCondition": "hearingOutcomeValue=\"DoNotShow\""
+    "FieldShowCondition": "hearingOutcomeValue.hearingOutcomeId=\"DoNotShow\""
   }
 ]
