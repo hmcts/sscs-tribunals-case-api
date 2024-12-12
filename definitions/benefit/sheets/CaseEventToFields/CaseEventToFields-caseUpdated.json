@@ -9,7 +9,8 @@
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
     "PageID": "1.0",
-    "PageLabel": "Update case data"
+    "PageLabel": "Update case data",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=caseUpdated1.0"
   },
   {
     "CaseEventID": "caseUpdated",

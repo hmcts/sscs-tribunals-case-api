@@ -541,4 +541,48 @@ public class DwpUploadResponseHandlerTest {
         consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
         assertEquals(RESPONSE_SUBMITTED_DWP, sscsCaseData.getDwpState());
     }
+
+    @Test
+    public void givenADwpUploadResponseEventWithIbcaCase_runResponseReceivedEvent() {
+        handler = new DwpUploadResponseHandler(updateCcdCaseService, idamService);
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+                .ccdCaseId("1")
+                .createdInGapsFrom(READY_TO_LIST.getId())
+                .elementsDisputedIsDecisionDisputedByOthers("No")
+                .appeal(Appeal.builder()
+                        .benefitType(BenefitType.builder()
+                                .code("infectedBloodCompensation")
+                                .build()
+                        )
+                        .build()
+                )
+                .build();
+        final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
+                sscsCaseData, NOT_LISTABLE, DWP_UPLOAD_RESPONSE);
+
+        final IdamTokens tokens = IdamTokens.builder().build();
+
+        when(idamService.getIdamTokens()).thenReturn(tokens);
+        when(updateCcdCaseService.updateCaseV2(any(), any(), any(), any(), any(), any()))
+                .thenReturn(SscsCaseDetails.builder()
+                        .id(1L)
+                        .data(callback.getCaseDetails().getCaseData())
+                        .build());
+
+        handler.handle(CallbackType.SUBMITTED, callback);
+
+        verify(idamService).getIdamTokens();
+        verify(updateCcdCaseService).updateCaseV2(
+                eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+                eq(EventType.DWP_RESPOND.getCcdType()),
+                eq("Response received."),
+                eq("IBC case must move to responseReceived."),
+                eq(tokens),
+                consumerArgumentCaptor.capture()
+        );
+
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+        assertEquals(RESPONSE_SUBMITTED_DWP, sscsCaseData.getDwpState());
+    }
 }

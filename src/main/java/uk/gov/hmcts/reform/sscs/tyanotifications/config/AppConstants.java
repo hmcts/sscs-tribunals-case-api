@@ -19,6 +19,7 @@ public final class AppConstants {
     public static final String HMRC_ACRONYM_WELSH = "CThEM";
     public static final String HMRC_FULL_NAME = "Her Majesty's Revenue and Customs";
     public static final String HMRC_FULL_NAME_WELSH = "Cyllid a Thollau Ei Mawrhydi";
+    public static final String IBCA_ACRONYM = "IBCA";
     public static final String JOINT_TEXT_WITH_A_SPACE = "joint ";
     public static final String JOINT_TEXT_WITH_A_SPACE_WELSH = "ar y cyd ";
     public static final String MAC_ALGO = "HmacSHA256";
