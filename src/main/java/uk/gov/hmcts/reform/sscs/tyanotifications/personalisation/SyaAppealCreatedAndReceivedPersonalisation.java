@@ -52,36 +52,13 @@ public class SyaAppealCreatedAndReceivedPersonalisation extends WithRepresentati
     }
 
     public Map<String, Object> setMrnDetails(Map<String, Object> personalisation, SscsCaseData ccdResponse) {
-        personalisation.put(MRN_DETAILS_LITERAL, ccdResponse.isIbcCase()
-            ? buildMrnDetails(ccdResponse.getAppeal().getMrnDetails(), syaAppealCreatedPersonalisationConfiguration.getPersonalisation().get(LanguagePreference.ENGLISH), UnaryOperator.identity(), true)
-            : buildMrnDetails(ccdResponse.getAppeal().getMrnDetails(), syaAppealCreatedPersonalisationConfiguration.getPersonalisation().get(LanguagePreference.ENGLISH), UnaryOperator.identity()));
+        personalisation.put(MRN_DETAILS_LITERAL, buildMrnDetails(ccdResponse.getAppeal().getMrnDetails(), syaAppealCreatedPersonalisationConfiguration.getPersonalisation().get(LanguagePreference.ENGLISH), UnaryOperator.identity(), ccdResponse.isIbcCase()));
 
         if (ccdResponse.isLanguagePreferenceWelsh()) {
             personalisation.put(MRN_DETAILS_LITERAL_WELSH,
-                buildMrnDetails(ccdResponse.getAppeal().getMrnDetails(), syaAppealCreatedPersonalisationConfiguration.getPersonalisation().get(LanguagePreference.WELSH), this::convertLocalDateToWelshDateWithDefaultNotProvided));
+                buildMrnDetails(ccdResponse.getAppeal().getMrnDetails(), syaAppealCreatedPersonalisationConfiguration.getPersonalisation().get(LanguagePreference.WELSH), this::convertLocalDateToWelshDateWithDefaultNotProvided, ccdResponse.isIbcCase()));
         }
         return personalisation;
-    }
-
-    private String buildMrnDetails(MrnDetails mrnDetails, Map<String, String> titleText, UnaryOperator<String> mrnDate) {
-
-        List<String> details = new ArrayList<>();
-
-        if (mrnDetails != null) {
-            if (mrnDetails.getMrnDate() != null) {
-                details.add(titleText.get(DATE_OF_MRN.name()) + mrnDate.apply(mrnDetails.getMrnDate()));
-            }
-
-            if (mrnDetails.getMrnLateReason() != null) {
-                details.add(titleText.get(REASON_FOR_LATE_APPEAL.name()) + mrnDetails.getMrnLateReason());
-            }
-
-            if (mrnDetails.getMrnMissingReason() != null) {
-                details.add(titleText.get(REASON_FOR_NO_MRN.name()) + mrnDetails.getMrnMissingReason());
-            }
-        }
-
-        return StringUtils.join(details.toArray(), TWO_NEW_LINES);
     }
 
     private String buildMrnDetails(MrnDetails mrnDetails, Map<String, String> titleText, UnaryOperator<String> mrnDate, boolean isIbcCase) {
