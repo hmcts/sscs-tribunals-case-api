@@ -3607,6 +3607,30 @@
     "PageLabel": "Confirm panel composition"
   },
   {
+    "CaseEventID": "confirmPanelComposition",
+    "CaseFieldID": "appeal",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "FieldShowCondition": "isFqpmRequired = \"DONOTSHOW\"",
+    "LiveFrom": "01/11/2021",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "1.0",
+    "PageLabel": "Confirm panel composition"
+  },
+  {
+    "CaseEventID": "confirmPanelComposition",
+    "CaseFieldID": "isMedicalMemberRequired",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "01/11/2021",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "1.0",
+    "PageLabel": "Confirm panel composition",
+    "FieldShowCondition": "appeal.benefitType.code = \"infectedBloodCompensation\""
+  },
+  {
     "CaseEventID": "panelDoctorSpecialismAmend",
     "CaseFieldID": "panelDoctorSpecialism",
     "CaseTypeID": "Benefit",

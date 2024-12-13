@@ -1,9 +1,18 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis;
 
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.*;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.IBCA_URL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ADDRESS_NAME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.LETTER_ADDRESS_LINE_1;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.LETTER_ADDRESS_LINE_2;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.LETTER_ADDRESS_LINE_3;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.LETTER_ADDRESS_LINE_4;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.LETTER_ADDRESS_POSTCODE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.personalisation.Personalisation.translateToWelshDate;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.addBlankPageAtTheEndIfOddPage;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.buildBundledLetter;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getAddressToUseForLetter;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getNameToUseForLetter;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -106,7 +115,7 @@ public class PdfLetterService {
         if (StringUtils.isNotBlank(notification.getDocmosisLetterTemplate())) {
 
             Map<String, Object> placeholders = new HashMap<>(notification.getPlaceholders());
-            placeholders.put(SSCS_URL_LITERAL, SSCS_URL);
+            placeholders.put(SSCS_URL_LITERAL, wrapper.getNewSscsCaseData().isIbcCase() ? IBCA_URL : SSCS_URL);
             placeholders.put(GENERATED_DATE_LITERAL, LocalDateTime.now().toLocalDate().toString());
 
             translateToWelshDate(LocalDateTime.now().toLocalDate(), wrapper.getNewSscsCaseData(), value -> placeholders.put(WELSH_GENERATED_DATE_LITERAL, value));

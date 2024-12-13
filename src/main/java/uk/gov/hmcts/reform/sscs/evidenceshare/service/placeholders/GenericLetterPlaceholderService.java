@@ -48,7 +48,7 @@ public class GenericLetterPlaceholderService {
 
         placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, getBenefitAcronym(caseData));
 
-        placeholders.put(SSCS_URL_LITERAL, SSCS_URL);
+        placeholders.put(SSCS_URL_LITERAL, caseData.isIbcCase() ? IBCA_URL : SSCS_URL);
         placeholders.put(GENERATED_DATE_LITERAL, LocalDateTime.now().toLocalDate().toString());
         placeholders.put(IS_REPRESENTATIVE, "No");
 
