@@ -1,24 +1,14 @@
 [
   {
-    "LiveFrom": "02/12/2024",
-    "CaseTypeID": "Benefit",
-    "ID": "caseOutcomeMigration",
-    "Name": "Case migrated automatically",
-    "DisplayOrder": 10007,
-    "PreConditionState(s)": "*",
-    "PostConditionState": "*",
-    "SecurityClassification": "Public"
-  },
-  {
-    "LiveFrom": "04/07/2024",
-    "CaseTypeID": "Benefit",
-    "ID": "amendHearingOutcome",
-    "Name": "Amend Hearing Outcome",
-    "Description": "Amend a Hearing Outcome",
-    "DisplayOrder": 141,
-    "PreConditionState(s)": "*",
-    "CallBackURLAboutToStartEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToStart",
-    "PostConditionState": "*",
-    "SecurityClassification": "Public"
+  "LiveFrom": "04/07/2024",
+  "CaseTypeID": "Benefit",
+  "ID": "amendHearingOutcome",
+  "Name": "Amend Hearing Outcome",
+  "Description": "Amend a Hearing Outcome",
+  "DisplayOrder": 141,
+  "PreConditionState(s)": "*",
+  "CallBackURLAboutToStartEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToStart",
+  "PostConditionState": "*",
+  "SecurityClassification": "Public"
   }
 ]
