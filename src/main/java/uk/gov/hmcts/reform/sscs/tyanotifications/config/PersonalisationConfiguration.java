@@ -28,6 +28,7 @@ public class PersonalisationConfiguration {
         NAME,
         DATE_OF_BIRTH,
         NINO,
+        IBCA_REFERENCE,
         ADDRESS,
         EMAIL,
         PHONE,
