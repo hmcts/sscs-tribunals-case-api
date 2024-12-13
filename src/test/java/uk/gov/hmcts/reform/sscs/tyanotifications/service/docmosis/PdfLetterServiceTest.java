@@ -110,10 +110,10 @@ public class PdfLetterServiceTest {
         PdfCoverSheet pdfCoverSheet = new PdfCoverSheet(wrapper.getCaseId(),
             name.getFullNameNoTitle(),
             address.getLine1(),
-            address.getLine2(),
             address.getTown(),
             address.getCounty(),
             address.getPostcode(),
+            "",
             EVIDENCE_ADDRESS.getLine2(),
             expectedLine3,
             EVIDENCE_ADDRESS.getTown(),
@@ -269,6 +269,7 @@ public class PdfLetterServiceTest {
         ArgumentCaptor<Map<String, Object>> placeholderCaptor = ArgumentCaptor.forClass(Map.class);
 
         verify(docmosisPdfService).createPdfFromMap(placeholderCaptor.capture(), eq(notification.getDocmosisLetterTemplate()));
+        
         assertEquals("My Company", placeholderCaptor.getValue().get(ADDRESS_NAME));
         assertEquals("FirstLine", placeholderCaptor.getValue().get(LETTER_ADDRESS_LINE_1));
         assertEquals("SecondLine", placeholderCaptor.getValue().get(LETTER_ADDRESS_LINE_2));
