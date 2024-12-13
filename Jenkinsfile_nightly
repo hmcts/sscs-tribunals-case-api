@@ -109,10 +109,12 @@ withNightlyPipeline(type, product, component) {
     enableFortifyScan()
     enableMutationTest()
     enableFullFunctionalTest()
-    
+
     afterAlways('fullFunctionalTest') {
         runE2eTestsNightly()
+        runAccessibilityTestsNightly()
     }
+
 
     afterSuccess('fortify-scan') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
@@ -134,5 +136,15 @@ def runE2eTestsNightly() {
             reportName: 'SSCS E2E Test Report'
         ])
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'definitions/test/playwright-report/**'
+    }
+}
+
+def runAccessibilityTestsNightly() {
+    try {
+        stage('Accessibility tests') {
+            sh './gradlew runAccessibilityTestsNightly'
+        }
+    } finally {
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'definitions/test/accessibility-report/**'
     }
 }

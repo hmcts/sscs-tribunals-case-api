@@ -367,7 +367,7 @@ dependencies {
     
     //implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.12.21'
     implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'SSCSCI-1401-SNAPSHOT'
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.21'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.22'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.1'
@@ -390,9 +390,7 @@ dependencies {
     implementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: pitest.pitestVersion.get()
     implementation group:'org.codehaus.sonar-plugins', name:'sonar-pitest-plugin', version: '0.5'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-job-scheduler', version: '1.6.1', {
-        exclude group: "uk.gov.hmcts.reform", module:"properties-volume-spring-boot-starter"
-    }
+    implementation group: 'com.github.hmcts', name: 'sscs-job-scheduler', version: '2.0.0'
     implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.3.2'
     implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '4.1.0-RELEASE'
     implementation group: 'com.atlassian.commonmark', name: 'commonmark', version: '0.17.0'
@@ -651,6 +649,12 @@ task runE2eTestsNightly(type: Exec) {
     dependsOn yarnInstall
     workingDir = file("${project.projectDir}/definitions/test")
     commandLine 'yarn', 'test:nightly'
+}
+
+task runAccessibilityTestsNightly(type: Exec) {
+    dependsOn yarnInstall
+    workingDir = file("${project.projectDir}/definitions/test")
+    commandLine 'yarn', 'test:accessibility'
 }
 
 task highLevelDataSetup(type: JavaExec) {

@@ -66,8 +66,20 @@ public class SessionDraft {
     @JsonProperty("AppellantNINO")
     SessionAppellantNino appellantNino;
 
+    @JsonProperty("AppellantIBCAReference")
+    SessionAppellantIbcaReference appellantIbcaReference;
+
+    @JsonProperty("AppellantRole")
+    SessionAppellantIbcRole appellantIbcRole;
+
+    @JsonProperty("AppellantInMainlandUk")
+    SessionInMainlandUk appellantInMainlandUk;
+
     @JsonProperty("AppellantContactDetails")
     SessionContactDetails appellantContactDetails;
+
+    @JsonProperty("AppellantInternationalContactDetails")
+    SessionContactDetails appellantInternationalContactDetails;
 
     @JsonProperty("SameAddress")
     SessionSameAddress sameAddress;
@@ -86,6 +98,12 @@ public class SessionDraft {
 
     @JsonProperty("Representative")
     SessionRepresentative representative;
+
+    @JsonProperty("RepresentativeInMainlandUk")
+    SessionInMainlandUk representativeInMainlandUk;
+
+    @JsonProperty("RepresentativeInternationalDetails")
+    SessionRepresentativeDetails representativeInternationalDetails;
 
     @JsonProperty("RepresentativeDetails")
     SessionRepresentativeDetails representativeDetails;
