@@ -293,7 +293,6 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         Address.AddressBuilder addressBuilder = Address.builder()
             .line1(contactDetails.getAddressLine1())
             .line2(contactDetails.getAddressLine2())
-            .postcode(contactDetails.getPostCode())
             .town(contactDetails.getTownCity());
         if (isIbc && contactDetails.getInMainlandUk() != null) {
             YesNo inMainlandUkYesNo = contactDetails.getInMainlandUk().equals(Boolean.TRUE) ? YesNo.YES : YesNo.NO;
@@ -313,6 +312,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         }
         addressBuilder
             .county(contactDetails.getCounty())
+            .postcode(contactDetails.getPostCode())
             .postcodeLookup(contactDetails.getPostcodeLookup())
             .postcodeAddress(contactDetails.getPostcodeAddress());
         return addressBuilder.build();
