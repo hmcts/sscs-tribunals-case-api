@@ -428,10 +428,15 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private boolean isAddressInvalid(Address address) {
-        return null == address
-            || address.isAddressEmpty()
+        if (null == address) {
+            return true;
+        }
+
+        var isMainlandUkAndMissingPostcode = !YesNo.NO.equals(address.getInMainlandUk()) && isBlank(address.getPostcode());
+
+        return address.isAddressEmpty()
             || isBlank(address.getLine1())
-            || isBlank(address.getPostcode());
+            || isMainlandUkAndMissingPostcode;
     }
 
     private String buildErrorMessage(String party, String caseId) {
