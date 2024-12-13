@@ -3,7 +3,7 @@ import {urls} from "./config/config";
 import path from 'path';
 
 
-module.exports = defineConfig({
+export default defineConfig({
   testDir: "./e2e/",
   /* Run tests in files in parallel */
   fullyParallel: true,
