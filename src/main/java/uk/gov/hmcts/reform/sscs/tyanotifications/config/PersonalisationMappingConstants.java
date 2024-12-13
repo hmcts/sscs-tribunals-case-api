@@ -69,6 +69,8 @@ public final class PersonalisationMappingConstants {
     public static final String HELPLINE_PHONE_NUMBER = "helpline_phone_number";
     public static final String INFO_REQUEST_DETAIL = "info_request_detail";
     public static final String IS_GRANTED = "isGranted";
+    public static final String IS_IBC_CASE = "is_ibc_case";
+    public static final String IS_NOT_IBC_CASE = "is_not_ibc_case";
     public static final String IS_OTHER_PARTY = "is_other_party";
     public static final String JOINT = "joint";
     public static final String JOINT_PARTY = "joint_party";
