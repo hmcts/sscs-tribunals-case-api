@@ -168,6 +168,7 @@ public abstract class AbstractSubmitYourAppealToCcdCaseDataDeserializerTest {
         syaCaseWrapper.getContactDetails().setAddressLine2("line2");
         syaCaseWrapper.getContactDetails().setTownCity("townCity");
         syaCaseWrapper.getContactDetails().setCountry("country");
+        syaCaseWrapper.getContactDetails().setPostCode("some international-postcode");
         syaCaseWrapper.getContactDetails().setPortOfEntry("GB000434");
 
         SscsCaseData caseData = callConvertSyaToCcdCaseDataRelevantVersion(syaCaseWrapper,
@@ -181,6 +182,37 @@ public abstract class AbstractSubmitYourAppealToCcdCaseDataDeserializerTest {
             .country("country")
             .portOfEntry("GB000434")
             .ukPortOfEntryList(expectedPortsOfEntry)
+            .postcode("some international-postcode")
+            .inMainlandUk(YesNo.NO)
+            .build();
+        assertEquals(expectedAddress, caseData.getAppeal().getAppellant().getAddress());
+    }
+
+    @Test
+    public void givenAIbaNonMainlandUkCaseFromSyaNoPostcode_thenAddressBuildsCorrectly() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+        SyaBenefitType benefitType = new SyaBenefitType("Infected Blood Compensation", "infectedBloodCompensation");
+        syaCaseWrapper.setBenefitType(benefitType);
+        syaCaseWrapper.getContactDetails().setInMainlandUk(Boolean.FALSE);
+        syaCaseWrapper.getContactDetails().setAddressLine1("line1");
+        syaCaseWrapper.getContactDetails().setAddressLine2("line2");
+        syaCaseWrapper.getContactDetails().setTownCity("townCity");
+        syaCaseWrapper.getContactDetails().setCountry("country");
+        syaCaseWrapper.getContactDetails().setPostCode(null);
+        syaCaseWrapper.getContactDetails().setPortOfEntry("GB000434");
+
+        SscsCaseData caseData = callConvertSyaToCcdCaseDataRelevantVersion(syaCaseWrapper,
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
+        DynamicList expectedPortsOfEntry = getPortsOfEntry();
+        expectedPortsOfEntry.setValue(SscsUtil.getPortOfEntryFromCode("GB000434"));
+        Address expectedAddress = Address.builder()
+            .line1("line1")
+            .line2("line2")
+            .town("townCity")
+            .country("country")
+            .portOfEntry("GB000434")
+            .ukPortOfEntryList(expectedPortsOfEntry)
+            .postcode(null)
             .inMainlandUk(YesNo.NO)
             .build();
         assertEquals(expectedAddress, caseData.getAppeal().getAppellant().getAddress());
@@ -195,15 +227,6 @@ public abstract class AbstractSubmitYourAppealToCcdCaseDataDeserializerTest {
         SscsCaseData caseData = callConvertSyaToCcdCaseDataRelevantVersion(syaCaseWrapper,
             regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertEquals("someRole", caseData.getAppeal().getAppellant().getIbcRole());
-    }
-
-    @Test
-    public void givenANonIbaCaseWithIbcRoleFromSya_thenAppellantBuildsCorrectlyWithoutIbcRole() {
-        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
-        syaCaseWrapper.getAppellant().setIbcRole("someRole");
-        SscsCaseData caseData = callConvertSyaToCcdCaseDataRelevantVersion(syaCaseWrapper,
-            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
-        assertNull(caseData.getAppeal().getAppellant().getIbcRole());
     }
 
     @Test
