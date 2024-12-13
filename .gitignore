@@ -49,3 +49,4 @@ definitions/**/*.xlsx#
 
 # befta noise
 befta_recent_executions_info_PREVIEW.json
+/notification_pdfs/*
