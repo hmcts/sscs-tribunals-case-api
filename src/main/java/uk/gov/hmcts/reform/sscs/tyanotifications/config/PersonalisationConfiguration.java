@@ -22,6 +22,7 @@ public class PersonalisationConfiguration {
         NOSTRING,
         DATES_NOT_ATTENDING,
         DATE_OF_MRN,
+        DATE_OF_RDN,
         REASON_FOR_LATE_APPEAL,
         REASON_FOR_NO_MRN,
         NAME,
