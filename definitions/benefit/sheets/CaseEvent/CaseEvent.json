@@ -3259,5 +3259,15 @@
     "PostConditionState": "*",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "02/12/2024",
+    "CaseTypeID": "Benefit",
+    "ID": "caseOutcomeMigration",
+    "Name": "Case migrated automatically",
+    "DisplayOrder": 142,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public"
   }
 ]
