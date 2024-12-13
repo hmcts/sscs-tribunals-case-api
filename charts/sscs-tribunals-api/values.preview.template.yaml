@@ -8,6 +8,7 @@ java:
   devmemoryRequests: 1Gi
   devmemoryLimits: 2Gi
   environment:
+    MYA_LINK: http://sscs-cor-frontend-aat.service.core-compute-aat.internal/sign-in?tya=appeal_id
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
     CORE_CASE_DATA_API_URL: ${CORE_CASE_DATA_API_URL}
     DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
@@ -68,6 +69,7 @@ java:
     SUBMIT_APPEAL_SERVICE_V2_ENABLED: true
     PROCESS_EVENT_MESSAGE_V2_ENABLED: true
     UPDATE_CASE_ONLY_HEARING_V2_ENABLED: true
+    TRIGGER_EVENT_V2_ENABLED: true
     # START - SSCS-IB RELEASE VARIABLES
     DOCUMENTS_ENGLISH_DIRECTION_ISSUED: TB-SCS-GNO-ENG-directions-notice-v2.docx
     DOCUMENTS_WELSH_DIRECTION_ISSUED: TB-SCS-GNO-ENG-directions-notice-v2.docx
