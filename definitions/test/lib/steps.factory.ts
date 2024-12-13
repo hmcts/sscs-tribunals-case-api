@@ -37,14 +37,15 @@ import {WriteFinalDecision} from "../fixtures/steps/write.final.decision";
 import {UpdateNotListable} from "../fixtures/steps/update.not.listable";
 import {ReissueFurtherEvidence} from '../fixtures/steps/reissue.further.evidence';
 import {Postponement} from "../fixtures/steps/postponement";
-import { SearchFilter } from '../fixtures/steps/search.filter';
-import { Hearing } from '../fixtures/steps/hearing';
-import { PrepareCaseForHearing } from '../fixtures/steps/prepare.case.for.hearing';
-import { EnhancedConfidentiality } from '../fixtures/steps/enhanced.confidentiality';
-import { SendToInterloc } from '../fixtures/steps/send.to.interloc';
-import { ReferredByAdmin } from '../fixtures/steps/referred.by.admin';
-import { SendCaseToTcw } from '../fixtures/steps/send.case.to.tcw';
-import { ReferredByJudge } from '../fixtures/steps/referred.by.judge';
+import {SearchFilter} from '../fixtures/steps/search.filter';
+import {Hearing} from '../fixtures/steps/hearing';
+import {PrepareCaseForHearing} from '../fixtures/steps/prepare.case.for.hearing';
+import {EnhancedConfidentiality} from '../fixtures/steps/enhanced.confidentiality';
+import {SendToInterloc} from '../fixtures/steps/send.to.interloc';
+import {ReferredByAdmin} from '../fixtures/steps/referred.by.admin';
+import {SendCaseToTcw} from '../fixtures/steps/send.case.to.tcw';
+import {ReferredByJudge} from '../fixtures/steps/referred.by.judge';
+import {AccessibilitySteps} from "../fixtures/steps/accessibilitySteps";
 
 type MyStepsFixtures = {
     addNoteSteps: Note
@@ -93,6 +94,7 @@ type MyStepsFixtures = {
     referredByAdminSteps: ReferredByAdmin
     sendCaseToTcwSteps: SendCaseToTcw
     referredByJudgeSteps: ReferredByJudge
+    accessibilitySteps: AccessibilitySteps
 };
 
 export const test = stepsFactory.extend<MyStepsFixtures>({
@@ -124,7 +126,7 @@ export const test = stepsFactory.extend<MyStepsFixtures>({
         const readyToListSteps = new ReadyToList(page);
         await use(readyToListSteps);
     },
-    sendToJudgeSteps:async ({page}, use) => {
+    sendToJudgeSteps: async ({page}, use) => {
         const sendToJudgeSteps = new SendToJudge(page);
         await use(sendToJudgeSteps);
     },
@@ -252,32 +254,36 @@ export const test = stepsFactory.extend<MyStepsFixtures>({
         const postponementSteps = new Postponement(page);
         await use(postponementSteps);
     },
-    hearingSteps: async ({ page }, use) => {
+    hearingSteps: async ({page}, use) => {
         const hearingSteps = new Hearing(page);
         await use(hearingSteps);
     },
-    prepareCaseForHearingSteps: async ({ page }, use) => {
+    prepareCaseForHearingSteps: async ({page}, use) => {
         const prepareCaseForHearingSteps = new PrepareCaseForHearing(page);
         await use(prepareCaseForHearingSteps);
     },
-    enhancedConfidentialitySteps: async ({ page }, use) => {
+    enhancedConfidentialitySteps: async ({page}, use) => {
         const enhancedConfidentialitySteps = new EnhancedConfidentiality(page);
         await use(enhancedConfidentialitySteps);
     },
-    sendToInterlocSteps:async ({page}, use) => {
+    sendToInterlocSteps: async ({page}, use) => {
         const sendToInterlocSteps = new SendToInterloc(page);
         await use(sendToInterlocSteps);
     },
-    referredByAdminSteps:async ({page}, use) => {
+    referredByAdminSteps: async ({page}, use) => {
         const ReferredByAdminSteps = new ReferredByAdmin(page);
         await use(ReferredByAdminSteps);
     },
-    sendCaseToTcwSteps:async ({page}, use) => {
+    sendCaseToTcwSteps: async ({page}, use) => {
         const sendCaseToTcwSteps = new SendCaseToTcw(page);
         await use(sendCaseToTcwSteps);
     },
-    referredByJudgeSteps:async ({page}, use) => {
+    referredByJudgeSteps: async ({page}, use) => {
         const ReferredByJudgeSteps = new ReferredByJudge(page);
         await use(ReferredByJudgeSteps);
+    },
+    accessibilitySteps: async ({page}, use) => {
+        const accessibilitySteps = new AccessibilitySteps(page);
+        await use(accessibilitySteps);
     }
 })
