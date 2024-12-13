@@ -230,15 +230,6 @@ public abstract class AbstractSubmitYourAppealToCcdCaseDataDeserializerTest {
     }
 
     @Test
-    public void givenANonIbaCaseWithIbcRoleFromSya_thenAppellantBuildsCorrectlyWithoutIbcRole() {
-        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
-        syaCaseWrapper.getAppellant().setIbcRole("someRole");
-        SscsCaseData caseData = callConvertSyaToCcdCaseDataRelevantVersion(syaCaseWrapper,
-            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
-        assertNull(caseData.getAppeal().getAppellant().getIbcRole());
-    }
-
-    @Test
     public void givenAIbaCaseWithNoIbcRoleFromSya_thenAppellantBuildsCorrectlyWithoutIbcRole() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
         SyaBenefitType benefitType = new SyaBenefitType("Infected Blood Compensation", "infectedBloodCompensation");

@@ -197,10 +197,10 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static Appeal getAppeal(SyaCaseWrapper syaCaseWrapper) {
-        boolean isIbc = syaCaseWrapper.getBenefitType().isIbc();
-        MrnDetails mrnDetails = getMrnDetails(syaCaseWrapper, isIbc);
 
-        Appellant appellant = getAppellant(syaCaseWrapper, isIbc);
+        MrnDetails mrnDetails = getMrnDetails(syaCaseWrapper);
+
+        Appellant appellant = getAppellant(syaCaseWrapper);
 
         BenefitType benefitType = BenefitType.builder()
                 .code(syaCaseWrapper.getBenefitType().getCode())
@@ -211,7 +211,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
         AppealReasons appealReasons = getReasonsForAppealing(syaCaseWrapper.getReasonsForAppealing());
 
-        Representative representative = getRepresentative(syaCaseWrapper, isIbc);
+        Representative representative = getRepresentative(syaCaseWrapper);
 
         HearingSubtype hearingSubtype = getHearingSubType(syaCaseWrapper.getSyaHearingOptions());
 
@@ -237,7 +237,8 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 HearingType.PAPER.getValue();
     }
 
-    private static MrnDetails getMrnDetails(SyaCaseWrapper syaCaseWrapper, boolean isIbc) {
+    private static MrnDetails getMrnDetails(SyaCaseWrapper syaCaseWrapper) {
+        boolean isIbc = syaCaseWrapper.getBenefitType().isIbc();
         MrnDetails.MrnDetailsBuilder builder = MrnDetails.builder()
             .mrnDate(getMrnDate(syaCaseWrapper))
             .mrnLateReason(getReasonForBeingLate(syaCaseWrapper));
@@ -297,12 +298,13 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 null;
     }
 
-    private static Address handleAddress(SyaContactDetails contactDetails, boolean isIbc, String party) {
+    private static Address handleAddress(SyaContactDetails contactDetails, String party) {
         Address.AddressBuilder addressBuilder = Address.builder()
             .line1(contactDetails.getAddressLine1())
             .line2(contactDetails.getAddressLine2())
-            .town(contactDetails.getTownCity());
-        if (isIbc && contactDetails.getInMainlandUk() != null) {
+            .town(contactDetails.getTownCity())
+            .postcode(contactDetails.getPostCode());
+        if (contactDetails.getInMainlandUk() != null) {
             YesNo inMainlandUkYesNo = contactDetails.getInMainlandUk().equals(Boolean.TRUE) ? YesNo.YES : YesNo.NO;
             addressBuilder.inMainlandUk(inMainlandUkYesNo);
             if (inMainlandUkYesNo.equals(YesNo.NO)) {
@@ -320,13 +322,12 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         }
         addressBuilder
                 .county(contactDetails.getCounty())
-                .postcode(contactDetails.getPostCode())
                 .postcodeLookup(contactDetails.getPostcodeLookup())
                 .postcodeAddress(contactDetails.getPostcodeAddress());
         return addressBuilder.build();
     }
 
-    private static Appellant getAppellant(SyaCaseWrapper syaCaseWrapper, boolean isIbc) {
+    private static Appellant getAppellant(SyaCaseWrapper syaCaseWrapper) {
 
         SyaAppellant syaAppellant = syaCaseWrapper.getAppellant();
 
@@ -334,7 +335,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         Address address = null;
         Contact contact;
         if (null != contactDetails) {
-            address = handleAddress(contactDetails, isIbc, "appellant");
+            address = handleAddress(contactDetails, "appellant");
             contact = Contact.builder()
                     .email(contactDetails.getEmailAddress())
                     .mobile(getPhoneNumberWithOutSpaces(contactDetails.getPhoneNumber()))
@@ -342,7 +343,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         } else {
             contact = Contact.builder().build();
         }
-        Identity identity = buildAppellantIdentity(syaAppellant, isIbc);
+        Identity identity = buildAppellantIdentity(syaAppellant);
 
         String isAppointee = buildAppellantIsAppointee(syaCaseWrapper);
 
@@ -377,22 +378,19 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             .isAppointee(isAppointee)
             .appointee(appointee)
             .isAddressSameAsAppointee(useSameAddress);
-        if (syaAppellant != null && syaAppellant.getIbcRole() != null && isIbc) {
+        if (syaAppellant != null && syaAppellant.getIbcRole() != null) {
             builder.ibcRole(syaAppellant.getIbcRole());
         }
         return builder.build();
     }
 
-    private static Identity buildAppellantIdentity(SyaAppellant syaAppellant, boolean isIbc) {
+    private static Identity buildAppellantIdentity(SyaAppellant syaAppellant) {
         Identity identity = Identity.builder().build();
         if (null != syaAppellant) {
             Identity.IdentityBuilder builder = identity.toBuilder()
                 .dob(syaAppellant.getDob() == null ? null : syaAppellant.getDob().toString());
-            if (isIbc) {
-                builder.ibcaReference(syaAppellant.getIbcaReference());
-            } else {
-                builder.nino(syaAppellant.getNino());
-            }
+            builder.ibcaReference(syaAppellant.getIbcaReference());
+            builder.nino(syaAppellant.getNino());
             identity = builder.build();
         }
 
@@ -731,7 +729,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 : contactDetails.getPhoneNumber();
     }
 
-    private static Representative getRepresentative(SyaCaseWrapper syaCaseWrapper, boolean isIbc) {
+    private static Representative getRepresentative(SyaCaseWrapper syaCaseWrapper) {
         if (syaCaseWrapper.getHasRepresentative() != null) {
 
             if (syaCaseWrapper.getHasRepresentative()) {
@@ -753,7 +751,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                         .build();
 
                 SyaContactDetails contactDetails = syaRepresentative.getContactDetails();
-                Address address = handleAddress(contactDetails, isIbc, "representative");
+                Address address = handleAddress(contactDetails, "representative");
 
                 Contact contact = Contact.builder()
                         .email(syaRepresentative.getContactDetails().getEmailAddress())
