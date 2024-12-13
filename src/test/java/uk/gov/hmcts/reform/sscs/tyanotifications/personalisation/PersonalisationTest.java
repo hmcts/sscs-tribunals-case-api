@@ -466,7 +466,7 @@ public class PersonalisationTest {
         "attendanceAllowance,judge\\, doctor and disability expert, Attendance Allowance, Lwfans Gweini, barnwr\\, meddyg ac arbenigwr anableddau, Attendance Allowance, Lwfans Gweini",
         "bereavementBenefit,judge, Bereavement Benefit, Budd-dal Profedigaeth, barnwr, Bereavement Benefit, Budd-dal Profedigaeth",
         "taxCredit, judge and Financially Qualified Panel Member (if applicable), Tax Credit, Credyd Treth, Barnwr ac Aelod Panel sydd â chymhwyster i ddelio gyda materion Ariannol (os yw’n berthnasol), Tax Credit, Credyd Treth",
-        "infectedBloodCompensation,judge and if applicable a medical member and/or a qualified tribunal member, Infected Blood Compensation, Iawndal Gwaed Heintiedig, barnwr ac os yw’n berthnasol\\, aelod meddygol ac/neu aelod tribiwnlys cymwys, IBC, IGH"
+        "infectedBloodCompensation,judge and if applicable a medical member and/or a financially qualified tribunal member, Infected Blood Compensation, Iawndal Gwaed Heintiedig, barnwr ac os yw’n berthnasol aelod meddygol a/neu aelod o’r tribiwnlys sy’n gymwys mewn materion ariannol, IBC, IGH"
     })
     public void customisePersonalisation(String benefitType,
                                          String expectedPanelComposition,

@@ -482,7 +482,11 @@ public class SscsUtil {
     }
 
     public static void handleIbcaCase(SscsCaseData caseData) {
-        caseData.getAppeal().getHearingOptions().setHearingRoute(LIST_ASSIST);
+        if (caseData.getAppeal().getHearingOptions() != null) {
+            caseData.getAppeal().getHearingOptions().setHearingRoute(LIST_ASSIST);
+        } else {
+            caseData.getAppeal().setHearingOptions(HearingOptions.builder().hearingRoute(LIST_ASSIST).build());
+        }
         caseData.getAppeal().getMrnDetails().setDwpIssuingOffice("IBCA");
         if (caseData.getRegionalProcessingCenter() != null) {
             RegionalProcessingCenter listAssistRegionalProcessingCenter = caseData.getRegionalProcessingCenter()

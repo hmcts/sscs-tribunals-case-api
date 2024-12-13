@@ -647,10 +647,11 @@
     "ShowSummaryChangeOption": "Y"
   },
   {
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
     "CaseEventID": "dwpLapseCase",
     "CaseFieldID": "dwpLT203",
     "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
+    "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
@@ -3604,6 +3605,30 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "1.0",
     "PageLabel": "Confirm panel composition"
+  },
+  {
+    "CaseEventID": "confirmPanelComposition",
+    "CaseFieldID": "appeal",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "FieldShowCondition": "isFqpmRequired = \"DONOTSHOW\"",
+    "LiveFrom": "01/11/2021",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "1.0",
+    "PageLabel": "Confirm panel composition"
+  },
+  {
+    "CaseEventID": "confirmPanelComposition",
+    "CaseFieldID": "isMedicalMemberRequired",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "01/11/2021",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "1.0",
+    "PageLabel": "Confirm panel composition",
+    "FieldShowCondition": "appeal.benefitType.code = \"infectedBloodCompensation\""
   },
   {
     "CaseEventID": "panelDoctorSpecialismAmend",

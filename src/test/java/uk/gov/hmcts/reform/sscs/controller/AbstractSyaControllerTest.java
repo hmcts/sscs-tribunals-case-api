@@ -387,7 +387,9 @@ public abstract class AbstractSyaControllerTest {
                     "line2",
                     "town-city",
                     "county",
+                    null,
                     "AP1 4NT",
+                    null,
                     "07000000000",
                     "appellant@test.com",
                     null,
@@ -478,7 +480,9 @@ public abstract class AbstractSyaControllerTest {
                     "line2",
                     "town-city",
                     "county",
+                    null,
                     "AP1 4NT",
+                    null,
                     "07000000000",
                     "appellant@test.com",
                     null,
@@ -500,6 +504,7 @@ public abstract class AbstractSyaControllerTest {
                     "rep-line2",
                     "rep-town-city",
                     "rep-county",
+                    null,
                     "RE7 7ES",
                     "07222222222",
                     "representative@test.com",
@@ -553,8 +558,7 @@ public abstract class AbstractSyaControllerTest {
             .andExpect(jsonPath("$.RepresentativeDetails.county").value("rep-county"))
             .andExpect(jsonPath("$.RepresentativeDetails.postCode").value("RE7 7ES"))
             .andExpect(jsonPath("$.RepresentativeDetails.phoneNumber").value("07222222222"))
-            .andExpect(jsonPath("$.RepresentativeDetails.emailAddress").value("representative@test.com"))
-        ;
+            .andExpect(jsonPath("$.RepresentativeDetails.emailAddress").value("representative@test.com"));
     }
 
     @Test
@@ -577,7 +581,9 @@ public abstract class AbstractSyaControllerTest {
                     "tee-line2",
                     "tee-town-city",
                     "tee-county",
+                    null,
                     "AP1 33T",
+                    null,
                     "07111111111",
                     "appointee@test.com",
                     null,

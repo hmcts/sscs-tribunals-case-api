@@ -1,1 +1,37 @@
-[]
+[
+  {
+    "LiveFrom": "06/10/2022",
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "isFqpmRequired",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 6,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "LiveFrom": "06/10/2022",
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "appeal",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "FieldShowCondition": "isFqpmRequired = \"DONOTSHOW\"",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 6,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "LiveFrom": "06/10/2022",
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "isMedicalMemberRequired",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 7,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "appeal.benefitType.code = \"infectedBloodCompensation\""
+  }
+]
