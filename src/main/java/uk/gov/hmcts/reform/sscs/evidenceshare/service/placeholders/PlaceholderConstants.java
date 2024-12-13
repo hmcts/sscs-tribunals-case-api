@@ -46,7 +46,6 @@ public final class PlaceholderConstants {
     public static final String LETTER_ADDRESS_LINE_3 = "letter_address_line_3";
     public static final String LETTER_ADDRESS_LINE_4 = "letter_address_line_4";
     public static final String LETTER_ADDRESS_POSTCODE = "letter_address_postcode";
-
     public static final String BENEFIT_NAME_ACRONYM_LITERAL = "benefit_name_acronym";
     public static final String IS_REPRESENTATIVE = "representative";
     public static final String IS_OTHER_PARTY = "is_other_party";
