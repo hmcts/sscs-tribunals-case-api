@@ -46,6 +46,7 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
         englishMap.put(NOSTRING.name(), "no");
         englishMap.put(DATES_NOT_ATTENDING.name(), "Dates you can't attend: ");
         englishMap.put(DATE_OF_MRN.name(), "Date of MRN: ");
+        englishMap.put(DATE_OF_RDN.name(), "Date of Review Decision Notice: ");
         englishMap.put(REASON_FOR_LATE_APPEAL.name(), "Reason for late appeal: ");
         englishMap.put(REASON_FOR_NO_MRN.name(), "Reason for no MRN: ");
         englishMap.put(PersonalisationConfiguration.PersonalisationKey.NAME.name(), "Name: ");
@@ -79,6 +80,7 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
         welshMap.put(NOSTRING.name(), "nac ydw");
         welshMap.put(DATES_NOT_ATTENDING.name(), "Dyddiadau na allwch fynychu: ");
         welshMap.put(DATE_OF_MRN.name(), "Dyddiad yr MRN: ");
+        welshMap.put(DATE_OF_RDN.name(), "Dyddiad yr Hysbysiad o Benderfyniad Adolygiad: ");
         welshMap.put(REASON_FOR_LATE_APPEAL.name(), "Rheswm dros apêl hwyr: ");
         welshMap.put(REASON_FOR_NO_MRN.name(), "Rheswm dros ddim MRN: ");
         welshMap.put(PersonalisationConfiguration.PersonalisationKey.NAME.name(), "Enw: ");
@@ -170,6 +172,28 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
         assertEquals("Dyddiad yr MRN: 3 Mai 2018\n"
                 + "\nRheswm dros apêl hwyr: My train was cancelled.",
             result.get(MRN_DETAILS_LITERAL_WELSH));
+    }
+
+    @Test
+    public void givenAnIbcAppeal_setMrnDetailsForTemplate() {
+        response = SscsCaseData.builder()
+            .benefitCode("093")
+            .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code("infectedBloodAppeal").build())
+                .mrnDetails(MrnDetails.builder()
+                    .mrnDate("3 May 2018")
+                    .mrnLateReason("My train was cancelled.")
+                    .mrnMissingReason("My dog ate my homework.")
+                    .build())
+                .build())
+            .build();
+
+        Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setMrnDetails(new HashMap<>(), response);
+
+        assertEquals("Date of Review Decision Notice: 3 May 2018\n"
+                + "\nReason for late appeal: My train was cancelled.\n"
+                + "\nReason for no MRN: My dog ate my homework.",
+            result.get(MRN_DETAILS_LITERAL));
     }
 
     @Test

@@ -52,8 +52,9 @@ public class SyaAppealCreatedAndReceivedPersonalisation extends WithRepresentati
     }
 
     public Map<String, Object> setMrnDetails(Map<String, Object> personalisation, SscsCaseData ccdResponse) {
-        personalisation.put(MRN_DETAILS_LITERAL,
-            buildMrnDetails(ccdResponse.getAppeal().getMrnDetails(), syaAppealCreatedPersonalisationConfiguration.getPersonalisation().get(LanguagePreference.ENGLISH), UnaryOperator.identity()));
+        personalisation.put(MRN_DETAILS_LITERAL, ccdResponse.isIbcCase()
+            ? buildMrnDetails(ccdResponse.getAppeal().getMrnDetails(), syaAppealCreatedPersonalisationConfiguration.getPersonalisation().get(LanguagePreference.ENGLISH), UnaryOperator.identity(), true)
+            : buildMrnDetails(ccdResponse.getAppeal().getMrnDetails(), syaAppealCreatedPersonalisationConfiguration.getPersonalisation().get(LanguagePreference.ENGLISH), UnaryOperator.identity()));
 
         if (ccdResponse.isLanguagePreferenceWelsh()) {
             personalisation.put(MRN_DETAILS_LITERAL_WELSH,
@@ -69,6 +70,31 @@ public class SyaAppealCreatedAndReceivedPersonalisation extends WithRepresentati
         if (mrnDetails != null) {
             if (mrnDetails.getMrnDate() != null) {
                 details.add(titleText.get(DATE_OF_MRN.name()) + mrnDate.apply(mrnDetails.getMrnDate()));
+            }
+
+            if (mrnDetails.getMrnLateReason() != null) {
+                details.add(titleText.get(REASON_FOR_LATE_APPEAL.name()) + mrnDetails.getMrnLateReason());
+            }
+
+            if (mrnDetails.getMrnMissingReason() != null) {
+                details.add(titleText.get(REASON_FOR_NO_MRN.name()) + mrnDetails.getMrnMissingReason());
+            }
+        }
+
+        return StringUtils.join(details.toArray(), TWO_NEW_LINES);
+    }
+
+    private String buildMrnDetails(MrnDetails mrnDetails, Map<String, String> titleText, UnaryOperator<String> mrnDate, boolean isIbcCase) {
+
+        List<String> details = new ArrayList<>();
+
+        if (mrnDetails != null) {
+            if (mrnDetails.getMrnDate() != null) {
+                if (isIbcCase) {
+                    details.add(titleText.get(DATE_OF_RDN.name()) + mrnDate.apply(mrnDetails.getMrnDate()));
+                } else {
+                    details.add(titleText.get(DATE_OF_MRN.name()) + mrnDate.apply(mrnDetails.getMrnDate()));
+                }
             }
 
             if (mrnDetails.getMrnLateReason() != null) {
