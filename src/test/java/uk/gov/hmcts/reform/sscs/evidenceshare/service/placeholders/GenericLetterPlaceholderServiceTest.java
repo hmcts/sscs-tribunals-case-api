@@ -50,6 +50,7 @@ class GenericLetterPlaceholderServiceTest {
         assertEquals(appellantName, placeholders.get(ADDRESS_NAME));
         assertEquals(GENERIC_LETTER_TEXT, placeholders.get(INFO_REQUEST_DETAIL));
         assertEquals("No", placeholders.get(IS_REPRESENTATIVE));
+        assertEquals(SSCS_URL, placeholders.get(SSCS_URL_LITERAL));
     }
 
     @Test
@@ -154,13 +155,22 @@ class GenericLetterPlaceholderServiceTest {
 
         Map<String, Object> placeholders = genericLetterPlaceholderService.populatePlaceholders(caseData, APPELLANT_LETTER,
             null);
-
         assertNotNull(placeholders);
         assertFalse(placeholders.containsKey(LETTER_ADDRESS_LINE_1));
         assertFalse(placeholders.containsKey(LETTER_ADDRESS_LINE_2));
         assertFalse(placeholders.containsKey(LETTER_ADDRESS_LINE_3));
         assertFalse(placeholders.containsKey(LETTER_ADDRESS_LINE_4));
         assertFalse(placeholders.containsKey(LETTER_ADDRESS_POSTCODE));
+    }
+
+    @Test
+    void shouldReturnIbcaUrlForIbcCase() {
+        caseData.setBenefitCode("093");
+        Map<String, Object> placeholders = genericLetterPlaceholderService.populatePlaceholders(caseData, APPELLANT_LETTER,
+            null);
+
+        assertNotNull(placeholders);
+        assertEquals(IBCA_URL, placeholders.get(SSCS_URL_LITERAL));
     }
 
     private static String getApellantName(SscsCaseData caseData) {

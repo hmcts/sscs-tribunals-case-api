@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_CORRECTED
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.NOT_ATTENDING;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
@@ -532,11 +533,29 @@ class SscsUtilTest {
     }
 
     @Test
-    void shouldPopulateIbcaFieldsOnHandleIbcaCase() {
+    void shouldPopulateIbcaFieldsOnHandleIbcaCaseWithNoHearingOptions() {
         final SscsCaseData sscsCaseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
                 .mrnDetails(MrnDetails.builder().build())
-                .hearingOptions(HearingOptions.builder().build())
+                .build()
+            )
+            .regionalProcessingCenter(RegionalProcessingCenter.builder().build())
+            .build();
+
+        handleIbcaCase(sscsCaseData);
+
+        assertThat(sscsCaseData.getAppeal().getHearingOptions().getHearingRoute()).isEqualTo(LIST_ASSIST);
+        assertThat(sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice()).isEqualTo("IBCA");
+        assertThat(sscsCaseData.getRegionalProcessingCenter().getHearingRoute()).isEqualTo(LIST_ASSIST);
+    }
+
+
+    @Test
+    void shouldPopulateIbcaFieldsOnHandleIbcaCaseWithHearingOptions() {
+        final SscsCaseData sscsCaseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .mrnDetails(MrnDetails.builder().build())
+                .hearingOptions(HearingOptions.builder().hearingRoute(GAPS).build())
                 .build()
             )
             .regionalProcessingCenter(RegionalProcessingCenter.builder().build())
