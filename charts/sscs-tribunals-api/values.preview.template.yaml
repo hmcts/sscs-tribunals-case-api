@@ -104,7 +104,7 @@ idam-pr:
       - http://${SERVICE_NAME}-ccd-data-store-api/oauth2redirect
 
 em-ccdorc:
-  enabled: true
+  enabled: ${PREVIEW_CCD_ENABLED}
   java:
     image: hmctspublic.azurecr.io/em/ccdorc:latest
     releaseNameOverride: ${SERVICE_NAME}-em-ccdorc
@@ -120,7 +120,7 @@ em-ccdorc:
       CALLBACK_DOMAIN: em-ccdorc-${SERVICE_FQDN}
 
 ccd-case-document-am-api:
-  enabled: true
+  enabled: ${PREVIEW_CCD_ENABLED}
   java:
     image: hmctspublic.azurecr.io/ccd/case-document-am-api:latest
     releaseNameOverride: ${SERVICE_NAME}-ccd-case-document-am-api
@@ -134,7 +134,7 @@ ccd-case-document-am-api:
       DM_STORE_BASE_URL: http://dm-store-aat.service.core-compute-aat.internal
 
 xui-webapp:
-  enabled: true
+  enabled: ${PREVIEW_CCD_ENABLED}
   nodejs:
     devmemoryRequests: "512Mi"
     devmemoryLimits: "1Gi"
