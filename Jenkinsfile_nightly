@@ -31,7 +31,7 @@ def secrets = [
         secret('s2s-micro', 'IDAM_S2S_AUTH_MICROSERVICE'),
         secret('docmosis-endpoint', 'PDF_SERVICE_CONVERT_URL'),
         secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY'),
-        secret('playwright-service-url', 'PLAYWRIGHT_SERVICE_URL')
+        secret('playwright-service-url', 'PLAYWRIGHT_SERVICE_URL'),
 
         // tya notifications
         secret('notification-key', 'NOTIFICATION_API_KEY'),
