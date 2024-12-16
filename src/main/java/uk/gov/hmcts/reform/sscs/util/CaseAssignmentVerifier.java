@@ -4,6 +4,7 @@ import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.lang3.RegExUtils.replaceAll;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.lowerCase;
 
 import java.util.List;
@@ -14,19 +15,35 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 
 @Component
-public class PostcodeUtil {
-    public boolean hasAppellantOrOtherPartyPostcode(SscsCaseDetails sscsCaseDetails, String postcode, String email) {
-        String normalisedPostcode = normalise((postcode));
+public class CaseAssignmentVerifier {
+
+    public boolean verifyPostcodeOrIbcaReference(SscsCaseDetails sscsCaseDetails,
+                                                 String postcode, String ibcaReference, String email) {
+        if (isNotBlank(postcode)) {
+            return verifyAppellantOrOtherPartyPostcode(sscsCaseDetails, postcode, email);
+        } else {
+            return verifyAppellantIbcaReference(sscsCaseDetails, ibcaReference);
+        }
+    }
+
+    private boolean verifyAppellantOrOtherPartyPostcode(SscsCaseDetails sscsCaseDetails,
+                                                        String postcode, String email) {
         final List<String> otherPartyPostcodes = emptyIfNull(sscsCaseDetails.getData().getOtherParties()).stream()
                 .map(CcdValue::getValue)
-                .filter(op -> hasOtherPartyGotEmailSubscription(op, email))
-                .map(op -> normalise(op.getAddress().getPostcode()))
+                .filter(otherParty -> hasOtherPartyGotEmailSubscription(otherParty, email))
+                .map(otherParty -> normalise(otherParty.getAddress().getPostcode()))
                 .toList();
 
-        String appealPostcode = sscsCaseDetails.getData().getAppeal().getAppellant().getAddress().getPostcode();
-        String normalisedAppealPostcode = normalise(appealPostcode);
+        String appellantPostcode = sscsCaseDetails.getData().getAppeal().getAppellant().getAddress().getPostcode();
 
-        return normalisedPostcode.equals(normalisedAppealPostcode) || otherPartyPostcodes.contains(normalisedPostcode);
+        return normalise(appellantPostcode).equals(normalise(postcode))
+                || otherPartyPostcodes.contains(normalise(postcode));
+    }
+
+    private boolean verifyAppellantIbcaReference(SscsCaseDetails sscsCaseDetails, String ibcaReference) {
+        String appellantIbcaReference =
+                sscsCaseDetails.getData().getAppeal().getAppellant().getIdentity().getIbcaReference();
+        return equalsIgnoreCase(appellantIbcaReference, ibcaReference);
     }
 
     private boolean hasOtherPartyGotEmailSubscription(OtherParty otherParty, String email) {
