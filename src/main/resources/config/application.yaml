@@ -716,15 +716,15 @@ notification:
         directionIssued:
             appealToProceed:
                 appellant:
-                    docmosisId: TB-SCS-GNO-ENG-00551.docx
+                    docmosisId: ${APPEAL_TO_PROCEED_ENGLISH:TB-SCS-GNO-ENG-00551.docx}
                 appointee:
-                    docmosisId: TB-SCS-GNO-ENG-00551.docx
+                    docmosisId: ${APPEAL_TO_PROCEED_ENGLISH:TB-SCS-GNO-ENG-00551.docx}
                 representative:
-                    docmosisId: TB-SCS-GNO-ENG-00551.docx
+                    docmosisId: ${APPEAL_TO_PROCEED_ENGLISH:TB-SCS-GNO-ENG-00551.docx}
                 joint_party:
-                    docmosisId: TB-SCS-GNO-ENG-00551.docx
+                    docmosisId: ${APPEAL_TO_PROCEED_ENGLISH:TB-SCS-GNO-ENG-00551.docx}
                 other_party:
-                    docmosisId: TB-SCS-GNO-ENG-00551.docx
+                    docmosisId: ${APPEAL_TO_PROCEED_ENGLISH:TB-SCS-GNO-ENG-00551.docx}
             provideInformation:
                 appellant:
                     docmosisId: TB-SCS-GNO-ENG-00067.docx
@@ -1355,15 +1355,15 @@ notification:
         directionIssuedWelsh:
             appealToProceed:
                 appellant:
-                    docmosisId: TB-SCS-GNO-WEL-00590.docx
+                    docmosisId: ${APPEAL_TO_PROCEED_WELSH:TB-SCS-GNO-WEL-00590.docx}
                 appointee:
-                    docmosisId: TB-SCS-GNO-WEL-00590.docx
+                    docmosisId: ${APPEAL_TO_PROCEED_WELSH:TB-SCS-GNO-WEL-00590.docx}
                 representative:
-                    docmosisId: TB-SCS-GNO-WEL-00590.docx
+                    docmosisId: ${APPEAL_TO_PROCEED_WELSH:TB-SCS-GNO-WEL-00590.docx}
                 joint_party:
-                    docmosisId: TB-SCS-GNO-WEL-00590.docx
+                    docmosisId: ${APPEAL_TO_PROCEED_WELSH:TB-SCS-GNO-WEL-00590.docx}
                 other_party:
-                    docmosisId: TB-SCS-GNO-WEL-00590.docx
+                    docmosisId: ${APPEAL_TO_PROCEED_WELSH:TB-SCS-GNO-WEL-00590.docx}
             provideInformation:
                 appellant:
                     docmosisId: TB-SCS-GNO-WEL-00468.docx
