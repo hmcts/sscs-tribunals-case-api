@@ -108,8 +108,6 @@ export class HomePage {
         if(environment.name == 'pr') {
             
             if(environment.hearingsEnabled == 'Yes') {
-                // let matches = expUrl.match(/(\d+)/);
-                // let PrNo = matches[0];
                 let PrNo = environment.prNo;
                 console.log(`PR number on url is ###### ${PrNo}`);
 
