@@ -15,6 +15,7 @@ const versionFilePath = path.resolve(__dirname, '../../benefit/VERSION.yaml');
 export const environment = {
   name: process.env.ENVIRONMENT ?? '',
   hearingsEnabled: process.env.HEARINGS_ENABLED,
+  prNo: process.env.PR_NO,
   aatDefVersion: yaml.load(fs.readFileSync(versionFilePath, 'utf8'))
 }
 
