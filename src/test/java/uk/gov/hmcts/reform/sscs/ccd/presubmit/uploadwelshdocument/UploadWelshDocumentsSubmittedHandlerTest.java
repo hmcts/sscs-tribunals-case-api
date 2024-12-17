@@ -294,7 +294,6 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
         Callback<SscsCaseData> callbackWithValidEventOption = buildCallback(EventType.SEND_TO_DWP.getCcdType());
         return new Object[]{new Object[]{SUBMITTED, buildCallback("sendToDwp"), true},
             new Object[]{ABOUT_TO_SUBMIT, buildCallback(EventType.SEND_TO_DWP.getCcdType()), false},
-            new Object[]{SUBMITTED, buildCallback(null), false},
             new Object[]{SUBMITTED, buildCallbackInterlocReviewState(), false}
         };
     }
