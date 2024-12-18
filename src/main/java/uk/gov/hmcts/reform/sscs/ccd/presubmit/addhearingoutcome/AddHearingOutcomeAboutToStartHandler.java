@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.addhearingoutcome;
 
+import static uk.gov.hmcts.reform.sscs.helper.service.CaseHearingLocationHelper.mapVenueDetailsToVenue;
+
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -17,13 +17,17 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOutcomeValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
 import uk.gov.hmcts.reform.sscs.model.multi.hearing.CaseHearing;
 import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
 import uk.gov.hmcts.reform.sscs.service.HmcHearingsApiService;
+import uk.gov.hmcts.reform.sscs.service.VenueService;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingUpdateService;
 
 
@@ -33,11 +37,13 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
 
     private final HmcHearingsApiService hmcHearingsApiService;
     private final HearingUpdateService hearingUpdateService;
+    private final VenueService venueService;
 
     public AddHearingOutcomeAboutToStartHandler(HmcHearingsApiService hmcHearingsApiService,
-                                                HearingUpdateService hearingUpdateService) {
+                                                HearingUpdateService hearingUpdateService, VenueService venueService) {
         this.hmcHearingsApiService = hmcHearingsApiService;
         this.hearingUpdateService = hearingUpdateService;
+        this.venueService = venueService;
     }
 
     @Override
@@ -61,28 +67,14 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
             HearingsGetResponse response = hmcHearingsApiService.getHearingsRequest(Long.toString(caseDetails.getId()), HmcStatus.COMPLETED);
             List<CaseHearing> hmcHearings = response.getCaseHearings();
             if (!hmcHearings.isEmpty()) {
-                Map<String, CaseHearing> hmcHearingsMap = hmcHearings.stream()
-                    .collect(Collectors.toMap(caseHearing -> caseHearing.getHearingId().toString(),
-                        caseHearing -> caseHearing));
 
                 if (sscsCaseData.getCompletedHearingsList() == null) {
                     sscsCaseData.setCompletedHearingsList(new ArrayList<>());
                 }
 
-                sscsCaseData.getCompletedHearingsList().addAll(sscsCaseData.getHearings()
-                    .stream()
+                sscsCaseData.getCompletedHearingsList().addAll(hmcHearings.stream()
+                    .map(this::mapCaseHearingToHearing)
                     .filter(value -> value.getValue().getStart() != null)
-                    .filter(hearing -> {
-                        CaseHearing hmcHearing = hmcHearingsMap.get(hearing.getValue().getHearingId());
-                        if (hmcHearing != null) {
-                            hearing.getValue().setStart(hearingUpdateService.convertUtcToUk(hmcHearing.getHearingDaySchedule().get(0).getHearingStartDateTime()));
-                            hearing.getValue().setEnd(hearingUpdateService.convertUtcToUk(hmcHearing.getHearingDaySchedule().get(0).getHearingEndDateTime()));
-                            hearing.getValue().setEpimsId(hmcHearing.getHearingDaySchedule().get(0).getHearingVenueEpimsId());
-                            hearing.getValue().setHearingChannel(hmcHearing.getHearingChannels().get(0));
-                            return true;
-                        }
-                        return false;
-                    })
                     .sorted(Comparator.reverseOrder())
                     .toList());
 
@@ -109,5 +101,23 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
                     + ", " + hearing.getVenue().getName();
                 return new DynamicListItem(hearing.getHearingId(), hearingLabel);
             }).toList());
+    }
+
+    private Hearing mapCaseHearingToHearing(CaseHearing caseHearing) {
+        VenueDetails venueDetails = venueService.getVenueDetailsForActiveVenueByEpimsId(caseHearing.getHearingDaySchedule().get(0).getHearingVenueEpimsId());
+        Venue venue = mapVenueDetailsToVenue(venueDetails);
+
+        HearingDetails hearingDetails = HearingDetails.builder()
+            .hearingId(caseHearing.getHearingId().toString())
+            .start(hearingUpdateService.convertUtcToUk(caseHearing.getHearingDaySchedule().get(0).getHearingStartDateTime()))
+            .end(hearingUpdateService.convertUtcToUk(caseHearing.getHearingDaySchedule().get(0).getHearingEndDateTime()))
+            .hearingChannel(caseHearing.getHearingChannels().get(0))
+            .venue(venue)
+            .epimsId(caseHearing.getHearingDaySchedule().get(0).getHearingVenueEpimsId())
+            .build();
+
+        return Hearing.builder()
+            .value(hearingDetails)
+            .build();
     }
 }
