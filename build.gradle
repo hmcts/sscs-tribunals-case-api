@@ -454,10 +454,10 @@ dependencies {
     testImplementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
     testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.1'
 
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
-    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.37.0'
-    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
-    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.37.0'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.14.2'
+    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '4.1.0'
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.14.2'
+    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '4.1.0'
 
     testImplementation group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
 
@@ -487,7 +487,7 @@ dependencies {
     testImplementation group: 'org.apache.qpid', name: 'qpid-broker-core', version: '8.0.6'
     testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-amqp-1-0-protocol', version: '8.0.6'
     testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-memory-store', version: '8.0.6'
-    testImplementation group: 'com.github.tomakehurst', name: 'wiremock', version: '2.27.2'
+    testImplementation group: 'com.github.tomakehurst', name: 'wiremock', version: '3.0.1'
     //pact contract testing
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.16'
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.7'
