@@ -118,24 +118,19 @@
         "appealReasons": {
         },
         "rep": {
-          "hasRepresentative": "Yes",
+          "hasRepresentative": "No",
+          "organisation": null,
           "name": {
-            "title": "Mr",
-            "firstName": "Harry",
-            "lastName": "Potter"
+            "title": null,
+            "firstName": null,
+            "lastName": null
           },
-          "address": {
-            "line1": "123 Hairy Lane",
-            "line2": "Off Hairy Park",
-            "town": "Town",
-            "county": "County",
-            "postcode": "TS3 3ST"
-          },
+          "address": {},
           "contact": {
-            "email": "harry.potter@wizards.com",
-            "mobile": "07411999999"
-          },
-          "organisation": "HP Ltd"
+            "email": null,
+            "phone": null,
+            "mobile": null
+          }
         },
         "signer": null,
         "hearingType": "paper"
