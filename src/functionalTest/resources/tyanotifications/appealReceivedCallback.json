@@ -86,7 +86,7 @@
         "appellantSubscription": {
           "email": "sscstest+notify2@greencroftconsulting.com",
           "mobile": "07398785050",
-          "subscribeEmail": "Yes",
+          "subscribeEmail": "No",
           "subscribeSms": "No",
           "tya": "abc123xyz"
         }
