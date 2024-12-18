@@ -71,8 +71,12 @@ java:
     UPDATE_CASE_ONLY_HEARING_V2_ENABLED: true
     TRIGGER_EVENT_V2_ENABLED: true
     # START - SSCS-IB RELEASE VARIABLES
+    DOCUMENTS_ENGLISH_DIRECTION_ISSUED: TB-SCS-GNO-ENG-directions-notice-v2.docx
+    DOCUMENTS_WELSH_DIRECTION_ISSUED: TB-SCS-GNO-ENG-directions-notice-v2.docx
     BUNDLE_ENGLISH_CONFIG: sscs-ib-bundle-config.yaml
     BUNDLE_EDITED_CONFIG: sscs-ib-bundle-edited-config.yaml
+    DOCUMENTS_ENGLISH_SOR_WRITE: TB-SCS-GNO-ENG-sor-directions-notice-v2.docx
+    DOCUMENTS_WELSH_SOR_WRITE: TB-SCS-GNO-ENG-sor-directions-notice-v2.docx
     NOTIFICATION_ENGLISH_APPEALRECEIVED_REPRESENTATIVE_DOCMOSISID: TB-SCS-LET-ENG-Appeal-Lodged-Representative-v2.docx
     NOTIFICATION_ENGLISH_RESENDAPPEALCREATED_REPRESENTATIVE_DOCMOSISID: TB-SCS-LET-ENG-Appeal-Lodged-Representative-v2.docx
     NOTIFICATION_WELSH_APPEALRECEIVED_REPRESENTATIVE_DOCMOSISID: TB-SCS-LET-WEL-Appeal-Lodged-Representative-v2.docx
@@ -179,7 +183,6 @@ xui-webapp:
       SERVICES_DOCUMENTS_API_V2: http://${SERVICE_NAME}-ccd-case-document-am-api
       GLOBAL_SEARCH_SERVICES: IA,CIVIL,PRIVATELAW,PUBLICLAW,SSCS
       JURISDICTIONS: SSCS
-      LAUNCH_DARKLY_CLIENT_ID: 5de6610b23ce5408280f2268
       FEATURE_REDIS_ENABLED: false
       FEATURE_APP_INSIGHTS_ENABLED: false
       FEATURE_SECURE_COOKIE_ENABLED: false
@@ -187,12 +190,13 @@ xui-webapp:
       FEATURE_TERMS_AND_CONDITIONS_ENABLED: false
       FEATURE_HELMET_ENABLED: false
       FEATURE_OIDC_ENABLED: false
-      ALLOW_CONFIG_MUTATIONS: true
       FEATURE_JRD_E_LINKS_V2_ENABLED: true
+      ALLOW_CONFIG_MUTATIONS: true
       NOW: false
       REDISCLOUD_URL: http://dummyrediscloudurl
       UV_THREADPOOL_SIZE: 128
       PROTOCOL: http
+      LAUNCH_DARKLY_CLIENT_ID: 645baeea2787d812993d9d70
     keyVaults:
       rpx:
         resourceGroup: rpx
@@ -201,6 +205,7 @@ xui-webapp:
           - mc-idam-client-secret
           - system-user-name
           - system-user-password
+          
 global:
   ccdApiGatewayIngress: http://${SERVICE_NAME}-ccd-api-gw
   ccdAdminWebIngress: ${SERVICE_NAME}-ccd-admin-web
