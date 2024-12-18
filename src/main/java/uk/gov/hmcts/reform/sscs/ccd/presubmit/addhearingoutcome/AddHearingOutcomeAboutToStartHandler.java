@@ -66,6 +66,7 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
         try {
             HearingsGetResponse response = hmcHearingsApiService.getHearingsRequest(Long.toString(caseDetails.getId()), HmcStatus.COMPLETED);
             List<CaseHearing> hmcHearings = response.getCaseHearings();
+            log.info("Retrieved {} completed hearings for caseId {}", hmcHearings.size(), callback.getCaseDetails().getId());
             if (!hmcHearings.isEmpty()) {
 
                 if (sscsCaseData.getCompletedHearingsList() == null) {
@@ -104,6 +105,7 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
     }
 
     private Hearing mapCaseHearingToHearing(CaseHearing caseHearing) {
+        log.info("Processing completed hearing with hearingID {} for AddHearingOutcome", caseHearing.getHearingId().toString());
         VenueDetails venueDetails = venueService.getVenueDetailsForActiveVenueByEpimsId(caseHearing.getHearingDaySchedule().get(0).getHearingVenueEpimsId());
         Venue venue = mapVenueDetailsToVenue(venueDetails);
 
