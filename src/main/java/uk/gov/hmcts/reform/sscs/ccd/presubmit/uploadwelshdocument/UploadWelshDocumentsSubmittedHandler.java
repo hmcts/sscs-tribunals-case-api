@@ -3,6 +3,9 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadwelshdocument;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REINSTATEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.URGENT_HEARING_REQUEST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.MAKE_CASE_URGENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 
 import java.time.LocalDate;
@@ -16,7 +19,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -43,7 +45,7 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
 
         return callbackType.equals(CallbackType.SUBMITTED)
                 && callback.getEvent().equals(EventType.UPLOAD_WELSH_DOCUMENT)
-                && !callback.getCaseDetails().getState().equals(State.INTERLOCUTORY_REVIEW_STATE);
+                && !callback.getCaseDetails().getState().equals(INTERLOCUTORY_REVIEW_STATE);
     }
 
     @Override
@@ -60,21 +62,23 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
         if (isValidUrgentHearingDocument(sscsCaseData)) {
             sscsCaseData = updateCcdCaseService.updateCaseV2(
                     callback.getCaseDetails().getId(),
-                    EventType.MAKE_CASE_URGENT.getCcdType(),
+                    MAKE_CASE_URGENT.getCcdType(),
                     "Send a case to urgent hearing",
                     OTHER_DOCUMENT_MANUAL.getLabel(),
                     idamService.getIdamTokens(),
                     mutator
             ).getData();
         } else if (StringUtils.isNotEmpty(nextEvent)) {
+            Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = isReinstatementRequest(sscsCaseData) ?
+                    setReinstatementRequest(mutator) : mutator;
+
             sscsCaseData = updateCcdCaseService.updateCaseV2(
                     callback.getCaseDetails().getId(),
                     nextEvent,
                     "Upload Welsh document",
                     "Upload Welsh document",
                     idamService.getIdamTokens(),
-                    isReinstatementRequest(sscsCaseData) ?
-                            setReinstatementRequest(mutator) : mutator
+                    sscsCaseDetailsConsumer
             ).getData();
         }
         return new PreSubmitCallbackResponse<>(sscsCaseData);
@@ -109,12 +113,12 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
             State previousState = data.getPreviousState();
 
             if (previousState != null
-                    && (previousState.equals(State.DORMANT_APPEAL_STATE) || previousState.equals(State.VOID_STATE))) {
-                data.setPreviousState(State.INTERLOCUTORY_REVIEW_STATE);
+                    && (previousState.equals(DORMANT_APPEAL_STATE) || previousState.equals(VOID_STATE))) {
+                data.setPreviousState(INTERLOCUTORY_REVIEW_STATE);
                 log.info("{} setting previousState from {} to interlocutoryReviewState", data.getCcdCaseId(), previousState.getId());
             }
 
-            data.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE);
+            data.setInterlocReviewState(REVIEW_BY_JUDGE);
         };
     }
 }
