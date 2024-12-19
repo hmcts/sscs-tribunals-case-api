@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.addhearingoutcome;
 
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.helper.service.CaseHearingLocationHelper.mapVenueDetailsToVenue;
 
 import java.time.format.DateTimeFormatter;
@@ -26,6 +27,7 @@ import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
 import uk.gov.hmcts.reform.sscs.model.multi.hearing.CaseHearing;
 import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
+import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.sscs.service.HmcHearingsApiService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingUpdateService;
@@ -75,7 +77,8 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
 
                 sscsCaseData.getCompletedHearingsList().addAll(hmcHearings.stream()
                     .map(this::mapCaseHearingToHearing)
-                    .filter(value -> value.getValue().getStart() != null)
+                    .filter(hearing -> hearing.getValue().getStart() != null)
+                    .filter(hearing -> hearing.getValue().getVenue().getName() != null)
                     .sorted(Comparator.reverseOrder())
                     .toList());
 
@@ -106,20 +109,40 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
 
     private Hearing mapCaseHearingToHearing(CaseHearing caseHearing) {
         log.info("Processing completed hearing with hearingID {} for AddHearingOutcome", caseHearing.getHearingId().toString());
-        VenueDetails venueDetails = venueService.getVenueDetailsForActiveVenueByEpimsId(caseHearing.getHearingDaySchedule().get(0).getHearingVenueEpimsId());
-        Venue venue = mapVenueDetailsToVenue(venueDetails);
-
         HearingDetails hearingDetails = HearingDetails.builder()
             .hearingId(caseHearing.getHearingId().toString())
-            .start(hearingUpdateService.convertUtcToUk(caseHearing.getHearingDaySchedule().get(0).getHearingStartDateTime()))
-            .end(hearingUpdateService.convertUtcToUk(caseHearing.getHearingDaySchedule().get(0).getHearingEndDateTime()))
-            .hearingChannel(caseHearing.getHearingChannels().get(0))
-            .venue(venue)
-            .epimsId(caseHearing.getHearingDaySchedule().get(0).getHearingVenueEpimsId())
+            .venue(Venue.builder().build())
             .build();
+        HearingDaySchedule hearingDaySchedule = caseHearing.getHearingDaySchedule().stream().findFirst().orElse(
+            HearingDaySchedule.builder().build());
+
+        if (!isNull(hearingDaySchedule.getHearingVenueEpimsId())) {
+            hearingDetails.setEpimsId(hearingDaySchedule.getHearingVenueEpimsId());
+            hearingDetails.setVenue(mapEpimsIdToVenue(hearingDaySchedule.getHearingVenueEpimsId()));
+        }
+
+        if (!isNull(hearingDaySchedule.getHearingStartDateTime())) {
+            hearingDetails.setStart(hearingUpdateService.convertUtcToUk(hearingDaySchedule.getHearingStartDateTime()));
+        }
+
+        if (!isNull(hearingDaySchedule.getHearingEndDateTime())) {
+            hearingDetails.setEnd(hearingUpdateService.convertUtcToUk(hearingDaySchedule.getHearingEndDateTime()));
+        }
+
+        if (!isNull(caseHearing.getHearingChannels())) {
+            hearingDetails.setHearingChannel(caseHearing.getHearingChannels().stream().findFirst().orElse(null));
+        }
 
         return Hearing.builder()
             .value(hearingDetails)
             .build();
+    }
+
+    private Venue mapEpimsIdToVenue(String epimsId) {
+        VenueDetails venueDetails = venueService.getVenueDetailsForActiveVenueByEpimsId(epimsId);
+        if (isNull(venueDetails)) {
+            log.info("EpimsId {} was not found", epimsId);
+        }
+        return (isNull(venueDetails)) ? Venue.builder().build() : mapVenueDetailsToVenue(venueDetails);
     }
 }
