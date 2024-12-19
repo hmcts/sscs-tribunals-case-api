@@ -33,8 +33,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @ExtendWith(MockitoExtension.class)
+
 public class UploadWelshDocumentsSubmittedHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
@@ -60,7 +62,7 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
     void setUp() {
         handler = new UploadWelshDocumentsSubmittedHandler(
                 idamService, updateCcdCaseService);
-
+        lenient().when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build())
                 .sscsWelshPreviewNextEvent("sendToDwp")
                 .build();
@@ -82,9 +84,12 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
+        when(updateCcdCaseService.updateCaseV2(anyLong(), anyString(), anyString(), anyString(), any(), any()))
+                .thenReturn(SscsCaseDetails.builder().data(caseData).build());
+
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        verifyEventTrigger(EventType.SEND_TO_DWP, "Upload welsh document", "Upload welsh document", caseData);
+        verifyEventTrigger(EventType.SEND_TO_DWP, "Upload Welsh document", "Upload Welsh document", caseData);
     }
 
     @Test
@@ -133,9 +138,12 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
         SscsCaseData caseData = buildDataWithUrgentRequestDocument();
         caseData.setUrgentCase("Yes");
 
+        when(updateCcdCaseService.updateCaseV2(anyLong(), anyString(), anyString(), anyString(), any(), any()))
+                .thenReturn(SscsCaseDetails.builder().data(caseData).build());
+
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        verifyEventTrigger(EventType.SEND_TO_DWP, "Upload welsh document", "Upload welsh document", caseData);
+        verifyEventTrigger(EventType.SEND_TO_DWP, "Upload Welsh document", "Upload Welsh document", caseData);
     }
 
     @Test
@@ -157,9 +165,11 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
         caseData.setSscsDocument(sscsDocuments);
         caseData.setPreviousState(State.APPEAL_CREATED);
 
+        when(updateCcdCaseService.updateCaseV2(anyLong(), anyString(), anyString(), anyString(), any(), any()))
+                .thenReturn(SscsCaseDetails.builder().data(caseData).build());
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        verifyEventTrigger(EventType.SEND_TO_DWP, "Upload Welsh Document", "Upload Welsh Document", caseData);
+        verifyEventTrigger(EventType.SEND_TO_DWP, "Upload Welsh document", "Upload Welsh document", caseData);
         assertEquals(RequestOutcome.IN_PROGRESS, caseData.getReinstatementOutcome());
         assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, caseData.getInterlocReviewState());
         assertEquals(State.APPEAL_CREATED, caseData.getPreviousState());
@@ -185,9 +195,12 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
         caseData.setSscsDocument(sscsDocuments);
         caseData.setPreviousState(state);
 
+        when(updateCcdCaseService.updateCaseV2(anyLong(), anyString(), anyString(), anyString(), any(), any()))
+                .thenReturn(SscsCaseDetails.builder().data(caseData).build());
+
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        verifyEventTrigger(EventType.SEND_TO_DWP, "Upload Welsh Document", "Upload Welsh Document", caseData);
+        verifyEventTrigger(EventType.SEND_TO_DWP, "Upload Welsh document", "Upload Welsh document", caseData);
         assertEquals(RequestOutcome.IN_PROGRESS, caseData.getReinstatementOutcome());
         assertEquals(State.INTERLOCUTORY_REVIEW_STATE, caseData.getPreviousState());
         assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, caseData.getInterlocReviewState());
@@ -213,9 +226,12 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
         caseData.setPreviousState(State.APPEAL_CREATED);
         caseData.setState(State.INTERLOCUTORY_REVIEW_STATE);
 
+        when(updateCcdCaseService.updateCaseV2(anyLong(), anyString(), anyString(), anyString(), any(), any()))
+                .thenReturn(SscsCaseDetails.builder().data(caseData).build());
+
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        verifyEventTrigger(EventType.SEND_TO_DWP, "Upload Welsh Document", "Upload Welsh Document", caseData);
+        verifyEventTrigger(EventType.SEND_TO_DWP, "Upload Welsh document", "Upload Welsh document", caseData);
         assertEquals(RequestOutcome.IN_PROGRESS, caseData.getReinstatementOutcome());
         assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, caseData.getInterlocReviewState());
         assertEquals(State.APPEAL_CREATED, caseData.getPreviousState());
@@ -241,11 +257,15 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
         caseData.setPreviousState(State.APPEAL_CREATED);
         caseData.setState(State.INTERLOCUTORY_REVIEW_STATE);
 
-
+        when(updateCcdCaseService.updateCaseV2(anyLong(), anyString(), anyString(), anyString(), any(), any()))
+                .thenReturn(SscsCaseDetails.builder().data(caseData).build());
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        verifyEventTrigger(EventType.SEND_TO_DWP, "Upload Welsh Document", "Upload Welsh Document", caseData);
+        verifyEventTrigger(EventType.SEND_TO_DWP, "Upload Welsh document", "Upload Welsh document", caseData);
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+        assertNull(caseData.getSscsWelshPreviewNextEvent());
         assertEquals(RequestOutcome.IN_PROGRESS, caseData.getReinstatementOutcome());
         assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, caseData.getInterlocReviewState());
         assertEquals(State.APPEAL_CREATED, caseData.getPreviousState());
@@ -271,9 +291,12 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
         caseData.setPreviousState(State.APPEAL_CREATED);
         caseData.setState(State.INTERLOCUTORY_REVIEW_STATE);
 
+        when(updateCcdCaseService.updateCaseV2(anyLong(), anyString(), anyString(), anyString(), any(), any()))
+                .thenReturn(SscsCaseDetails.builder().data(caseData).build());
+
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        verifyEventTrigger(EventType.SEND_TO_DWP, "Upload welsh document", "Upload welsh document", caseData);
+        verifyEventTrigger(EventType.SEND_TO_DWP, "Upload Welsh document", "Upload Welsh document", caseData);
         assertNull(caseData.getReinstatementOutcome());
         assertNull(caseData.getInterlocReviewState());
         assertEquals(State.APPEAL_CREATED, caseData.getPreviousState());
@@ -286,10 +309,13 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         sscsCaseData.setSscsWelshPreviewNextEvent("sendToDwp");
 
+        when(updateCcdCaseService.updateCaseV2(anyLong(), anyString(), anyString(), anyString(), any(), any()))
+                .thenReturn(SscsCaseDetails.builder().data(sscsCaseData).build());
+
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         verify(updateCcdCaseService).updateCaseV2(eq(callback.getCaseDetails().getId()), eq("sendToDwp"),
-                eq("Upload welsh document"), eq("Upload welsh document"), any(), any());
+                eq("Upload Welsh document"), eq("Upload Welsh document"), any(), any());
     }
 
     @Test
@@ -316,7 +342,7 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
 
     private void verifyEventTrigger(EventType makeCaseUrgent, String summary, String description, SscsCaseData caseData) {
         verify(updateCcdCaseService).updateCaseV2(eq(callback.getCaseDetails().getId()), eq(makeCaseUrgent.getCcdType()),
-                eq(summary), eq(description), any(), consumerArgumentCaptor.capture());
+                eq(summary), eq(description), isA(IdamTokens.class), consumerArgumentCaptor.capture());
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
         consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
         assertNull(caseData.getSscsWelshPreviewNextEvent());

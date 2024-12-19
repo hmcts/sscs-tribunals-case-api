@@ -58,20 +58,24 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
         log.info("Next event to submit {} for case reference {}", nextEvent, sscsCaseData.getCcdCaseId());
 
         if (isValidUrgentHearingDocument(sscsCaseData)) {
-            sscsCaseData = setMakeCaseUrgentTriggerEvent(callback.getCaseDetails().getId(), mutator).getData();
-        } else if (isReinstatementRequest(sscsCaseData)) {
-            sscsCaseData = setReinstatementRequest(sscsCaseData, callback.getCaseDetails().getId(), nextEvent, mutator);
-        } else {
-            if (StringUtils.isNotEmpty(nextEvent)) {
-                updateCcdCaseService.updateCaseV2(
-                        callback.getCaseDetails().getId(),
-                        nextEvent,
-                        "Upload welsh document",
-                        "Upload welsh document",
-                        idamService.getIdamTokens(),
-                        mutator
-                );
-            }
+            sscsCaseData = updateCcdCaseService.updateCaseV2(
+                    callback.getCaseDetails().getId(),
+                    EventType.MAKE_CASE_URGENT.getCcdType(),
+                    "Send a case to urgent hearing",
+                    OTHER_DOCUMENT_MANUAL.getLabel(),
+                    idamService.getIdamTokens(),
+                    mutator
+            ).getData();
+        } else if (StringUtils.isNotEmpty(nextEvent)) {
+            sscsCaseData = updateCcdCaseService.updateCaseV2(
+                    callback.getCaseDetails().getId(),
+                    nextEvent,
+                    "Upload Welsh document",
+                    "Upload Welsh document",
+                    idamService.getIdamTokens(),
+                    isReinstatementRequest(sscsCaseData) ?
+                            setReinstatementRequest(mutator) : mutator
+            ).getData();
         }
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
@@ -93,38 +97,24 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
         return (isTranslationsOutstanding && (isDocReinstatement || isWelshReinstatement));
     }
 
-    private SscsCaseDetails setMakeCaseUrgentTriggerEvent(Long caseId, Consumer<SscsCaseDetails> caseDataConsumer) {
-        return updateCcdCaseService.updateCaseV2(
-                caseId,
-                EventType.MAKE_CASE_URGENT.getCcdType(),
-                "Send a case to urgent hearing",
-                OTHER_DOCUMENT_MANUAL.getLabel(),
-                idamService.getIdamTokens(),
-                caseDataConsumer
-        );
-    }
+    private Consumer<SscsCaseDetails> setReinstatementRequest(Consumer<SscsCaseDetails> mutator) {
 
-    private SscsCaseData setReinstatementRequest(SscsCaseData sscsCaseData, Long caseId, String nextEvent, Consumer<SscsCaseDetails> mutator) {
-        Consumer<SscsCaseDetails> caseDataConsumer = sscsCaseDetails -> {
+        return sscsCaseDetails -> {
             mutator.accept(sscsCaseDetails);
             SscsCaseData data = sscsCaseDetails.getData();
+
             data.setReinstatementRegistered(LocalDate.now());
             data.setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
 
-            State previousState = sscsCaseData.getPreviousState();
+            State previousState = data.getPreviousState();
 
             if (previousState != null
                     && (previousState.equals(State.DORMANT_APPEAL_STATE) || previousState.equals(State.VOID_STATE))) {
                 data.setPreviousState(State.INTERLOCUTORY_REVIEW_STATE);
-                log.info("{} setting previousState from {} to interlocutoryReviewState", sscsCaseData.getCcdCaseId(), previousState.getId());
+                log.info("{} setting previousState from {} to interlocutoryReviewState", data.getCcdCaseId(), previousState.getId());
             }
 
             data.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE);
         };
-
-        updateCcdCaseService.updateCaseV2(caseId, nextEvent, "Upload Welsh Document",
-                "Upload Welsh Document", idamService.getIdamTokens(), caseDataConsumer);
-
-        return sscsCaseData;
     }
 }

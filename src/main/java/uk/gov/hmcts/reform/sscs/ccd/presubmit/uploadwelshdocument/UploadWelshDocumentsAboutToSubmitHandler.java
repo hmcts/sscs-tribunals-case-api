@@ -71,9 +71,6 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
         log.info("Set up welsh document for caseId:  {}", caseData.getCcdCaseId());
 
         for (SscsWelshDocument sscsWelshPreviewDocument : caseData.getSscsWelshPreviewDocuments()) {
-            log.info("Remove this log name {} and type {}",
-                    sscsWelshPreviewDocument.getValue().getDocumentLink().getDocumentFilename(),
-                    sscsWelshPreviewDocument.getValue().getDocumentType());
             sscsWelshPreviewDocument.getValue().setOriginalDocumentFileName(caseData.getOriginalDocuments().getValue().getCode());
             if (sscsWelshPreviewDocument.getValue().getDocumentDateAdded() == null) {
                 sscsWelshPreviewDocument.getValue().setDocumentDateAdded(
