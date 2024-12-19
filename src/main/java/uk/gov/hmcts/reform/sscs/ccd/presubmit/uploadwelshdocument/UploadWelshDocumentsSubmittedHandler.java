@@ -69,8 +69,8 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
                     mutator
             ).getData();
         } else if (StringUtils.isNotEmpty(nextEvent)) {
-            Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = isReinstatementRequest(sscsCaseData) ?
-                    setReinstatementRequest(mutator) : mutator;
+            Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = isReinstatementRequest(sscsCaseData)
+                    ? setReinstatementRequest(mutator) : mutator;
 
             sscsCaseData = updateCcdCaseService.updateCaseV2(
                     callback.getCaseDetails().getId(),
