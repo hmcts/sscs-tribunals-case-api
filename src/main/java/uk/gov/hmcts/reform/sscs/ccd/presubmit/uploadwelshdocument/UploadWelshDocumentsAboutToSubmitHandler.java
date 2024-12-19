@@ -69,7 +69,11 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
         updateTranslationStatusOfDwpDocument(caseData);
 
         log.info("Set up welsh document for caseId:  {}", caseData.getCcdCaseId());
+
         for (SscsWelshDocument sscsWelshPreviewDocument : caseData.getSscsWelshPreviewDocuments()) {
+            log.info("Remove this log name {} and type {}",
+                    sscsWelshPreviewDocument.getValue().getDocumentLink().getDocumentFilename(),
+                    sscsWelshPreviewDocument.getValue().getDocumentType());
             sscsWelshPreviewDocument.getValue().setOriginalDocumentFileName(caseData.getOriginalDocuments().getValue().getCode());
             if (sscsWelshPreviewDocument.getValue().getDocumentDateAdded() == null) {
                 sscsWelshPreviewDocument.getValue().setDocumentDateAdded(
@@ -91,8 +95,11 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
                 caseData.setSscsWelshDocuments(sscsWelshDocumentsList);
             }
             if (!callback.getCaseDetails().getState().equals(State.INTERLOCUTORY_REVIEW_STATE)) {
-                String nextEvent = getNextEvent(sscsWelshPreviewDocument.getValue().getDocumentType());
-                log.info("Setting next event to {}", nextEvent);
+                String documentType = sscsDocumentByTypeAndName
+                        .map(doc -> doc.getValue().getDocumentType())
+                        .orElse(null);
+                String nextEvent = getNextEvent(documentType);
+                log.info("On case id {} setting next event to {} for documentType {}", caseData.getCcdCaseId(), nextEvent, documentType);
                 caseData.setSscsWelshPreviewNextEvent(nextEvent);
             } else if (!caseData.isTranslationWorkOutstanding()) {
                 InterlocReviewState interlocState = Arrays.stream(InterlocReviewState.values())
