@@ -226,7 +226,7 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
             new Object[]{
                 APPEAL_RECEIVED,
                 "oral",
-                Arrays.asList("d5fd9f65-1283-4533-a1be-10043dae7af6", "3d05393a-e593-400a-963f-a26893a0b672"),
+                Arrays.asList("d5fd9f65-1283-4533-a1be-10043dae7af6", "8003606e-3d80-4e17-b846-18698f8d681e"),
                 Arrays.asList("ede384aa-0b6e-4311-9f01-ee547573a07b", "99bd4a56-256c-4de8-b187-d43a8dde466f"),
                 Arrays.asList("TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx", "TB-SCS-LET-ENG-Appeal-Lodged-Representative.docx"),
                 "yes",
@@ -240,7 +240,7 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
             new Object[]{
                 APPEAL_RECEIVED,
                 "paper",
-                Collections.singletonList("3d05393a-e593-400a-963f-a26893a0b672"),
+                Collections.singletonList("8003606e-3d80-4e17-b846-18698f8d681e"),
                 Arrays.asList("ede384aa-0b6e-4311-9f01-ee547573a07b", "99bd4a56-256c-4de8-b187-d43a8dde466f"),
                 Arrays.asList("TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx", "TB-SCS-LET-ENG-Appeal-Lodged-Representative.docx"),
                 "no",
