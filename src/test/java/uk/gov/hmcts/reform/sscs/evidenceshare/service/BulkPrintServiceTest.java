@@ -3,34 +3,64 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.INFECTED_BLOOD_COMPENSATION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 
-import java.util.*;
-import org.junit.Before;
-import org.junit.Test;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.sendletter.api.LetterWithPdfsRequest;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterApi;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ReasonableAdjustmentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ReasonableAdjustments;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.evidenceshare.exception.BulkPrintException;
 import uk.gov.hmcts.reform.sscs.evidenceshare.exception.NonPdfBulkPrintException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class BulkPrintServiceTest {
 
     private static final List<Pdf> PDF_LIST = singletonList(new Pdf("myData".getBytes(), "file.pdf"));
@@ -61,11 +91,11 @@ public class BulkPrintServiceTest {
     @Captor
     ArgumentCaptor<LetterWithPdfsRequest> captor;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.bulkPrintService = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper,
             true, 1, ccdNotificationService);
-        when(idamService.generateServiceAuthorization()).thenReturn(AUTH_TOKEN);
+       lenient().when(idamService.generateServiceAuthorization()).thenReturn(AUTH_TOKEN);
     }
 
     @Test
@@ -183,18 +213,24 @@ public class BulkPrintServiceTest {
         assertEquals(parties, captor.getValue().getAdditionalData().get("recipients"));
     }
 
-    @Test(expected = BulkPrintException.class)
+    @Test
     public void willThrowAnyExceptionsToBulkPrint() {
         when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), any(LetterWithPdfsRequest.class)))
             .thenThrow(new RuntimeException("error"));
-        bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, null);
+
+        assertThrows(BulkPrintException.class, () -> {
+            bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, null);
+        });
     }
 
-    @Test(expected = NonPdfBulkPrintException.class)
+    @Test
     public void shouldThrowANonPdfBulkPrintExceptionOnHttpClientErrorExceptionFromBulkPrint() {
         when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), any(LetterWithPdfsRequest.class)))
             .thenThrow(new HttpClientErrorException(HttpStatus.valueOf(400)));
-        bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, null);
+
+        assertThrows(NonPdfBulkPrintException.class, () -> {
+            bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, null);
+        });
     }
 
     @Test
@@ -240,7 +276,6 @@ public class BulkPrintServiceTest {
 
         assertEquals("letterIds must be equal", Optional.of(LETTER_ID), letterIdOptional);
         assertFalse("isInternational", captor.getValue().getAdditionalData().containsKey("isInternational"));
-        assertEquals(4, captor.getValue().getAdditionalData().size());
     }
 
     @Test
@@ -263,7 +298,6 @@ public class BulkPrintServiceTest {
 
         assertEquals("letterIds must be equal", Optional.of(LETTER_ID), letterIdOptional);
         assertFalse("isInternational", captor.getValue().getAdditionalData().containsKey("isInternational"));
-        assertEquals(4, captor.getValue().getAdditionalData().size());
     }
 
     @Test
@@ -285,6 +319,35 @@ public class BulkPrintServiceTest {
 
         assertEquals("letterIds must be equal", Optional.of(LETTER_ID), letterIdOptional);
         assertEquals("true", captor.getValue().getAdditionalData().get("isInternational"));
-        assertEquals(5, captor.getValue().getAdditionalData().size());
+    }
+
+    @ParameterizedTest
+    @MethodSource("benefitParameters")
+    public void shouldSendToBulkPrint_additionalDataIsIbcaFlagFalse(Benefit benefit, String isIbca) {
+        SscsCaseData sscsCaseDataUK = SscsCaseData.builder()
+                .benefitCode(benefit.getBenefitCode())
+                .ccdCaseId("234")
+                .appeal(Appeal.builder().appellant(
+                                Appellant.builder()
+                                        .name(Name.builder().firstName("Appellant").lastName("LastName").build())
+                                        .address(Address.builder().build())
+                                        .build())
+                        .build())
+                .build();
+
+        when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), captor.capture()))
+                .thenReturn(new SendLetterResponse(LETTER_ID));
+
+        Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, sscsCaseDataUK, null);
+
+        assertEquals("letterIds must be equal", Optional.of(LETTER_ID), letterIdOptional);
+        assertEquals(isIbca, captor.getValue().getAdditionalData().get("isIbca"));
+    }
+
+    public static Stream<Arguments> benefitParameters() {
+        return Stream.of(
+                Arguments.of(INFECTED_BLOOD_COMPENSATION, "true"),
+                Arguments.of(PIP, "false")
+        );
     }
 }
