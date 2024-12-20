@@ -31,6 +31,8 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
         nextEventMap.put(DocumentType.DECISION_NOTICE.getValue(), EventType.DECISION_ISSUED_WELSH.getCcdType());
         nextEventMap.put(DocumentType.DIRECTION_NOTICE.getValue(), EventType.DIRECTION_ISSUED_WELSH.getCcdType());
         nextEventMap.put(DocumentType.FINAL_DECISION_NOTICE.getValue(), EventType.ISSUE_FINAL_DECISION_WELSH.getCcdType());
+        nextEventMap.put(DocumentType.URGENT_HEARING_REQUEST.getValue(), EventType.UPDATE_CASE_ONLY.getCcdType());
+        nextEventMap.put(DocumentType.REINSTATEMENT_REQUEST.getValue(), EventType.UPDATE_CASE_ONLY.getCcdType());
     }
 
     @Autowired
@@ -69,6 +71,7 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
         updateTranslationStatusOfDwpDocument(caseData);
 
         log.info("Set up welsh document for caseId:  {}", caseData.getCcdCaseId());
+
         for (SscsWelshDocument sscsWelshPreviewDocument : caseData.getSscsWelshPreviewDocuments()) {
             sscsWelshPreviewDocument.getValue().setOriginalDocumentFileName(caseData.getOriginalDocuments().getValue().getCode());
             if (sscsWelshPreviewDocument.getValue().getDocumentDateAdded() == null) {
@@ -91,8 +94,11 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
                 caseData.setSscsWelshDocuments(sscsWelshDocumentsList);
             }
             if (!callback.getCaseDetails().getState().equals(State.INTERLOCUTORY_REVIEW_STATE)) {
-                String nextEvent = getNextEvent(sscsWelshPreviewDocument.getValue().getDocumentType());
-                log.info("Setting next event to {}", nextEvent);
+                String documentType = sscsDocumentByTypeAndName
+                        .map(doc -> doc.getValue().getDocumentType())
+                        .orElse(null);
+                String nextEvent = getNextEvent(documentType);
+                log.info("On case id {} setting next event to {} for documentType {}", caseData.getCcdCaseId(), nextEvent, documentType);
                 caseData.setSscsWelshPreviewNextEvent(nextEvent);
             } else if (!caseData.isTranslationWorkOutstanding()) {
                 InterlocReviewState interlocState = Arrays.stream(InterlocReviewState.values())
