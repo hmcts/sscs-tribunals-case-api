@@ -45,7 +45,8 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
 
         return callbackType.equals(CallbackType.SUBMITTED)
                 && callback.getEvent().equals(EventType.UPLOAD_WELSH_DOCUMENT)
-                && !callback.getCaseDetails().getState().equals(INTERLOCUTORY_REVIEW_STATE);
+                && !callback.getCaseDetails().getState().equals(INTERLOCUTORY_REVIEW_STATE)
+                && StringUtils.isNotEmpty(callback.getCaseDetails().getCaseData().getSscsWelshPreviewNextEvent());
     }
 
     @Override
@@ -68,17 +69,23 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
                     idamService.getIdamTokens(),
                     mutator
             ).getData();
-        } else if (StringUtils.isNotEmpty(nextEvent)) {
-            Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = isReinstatementRequest(sscsCaseData)
-                    ? setReinstatementRequest(mutator) : mutator;
-
+        } else if (isReinstatementRequest(sscsCaseData)) {
+            sscsCaseData = updateCcdCaseService.updateCaseV2(
+                    callback.getCaseDetails().getId(),
+                    nextEvent,
+                    "Set Reinstatement Request",
+                    "Set Reinstatement Request",
+                    idamService.getIdamTokens(),
+                    setReinstatementRequest(mutator)
+            ).getData();
+        } else {
             sscsCaseData = updateCcdCaseService.updateCaseV2(
                     callback.getCaseDetails().getId(),
                     nextEvent,
                     "Upload Welsh document",
                     "Upload Welsh document",
                     idamService.getIdamTokens(),
-                    sscsCaseDetailsConsumer
+                    mutator
             ).getData();
         }
         return new PreSubmitCallbackResponse<>(sscsCaseData);

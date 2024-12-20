@@ -31,6 +31,8 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
         nextEventMap.put(DocumentType.DECISION_NOTICE.getValue(), EventType.DECISION_ISSUED_WELSH.getCcdType());
         nextEventMap.put(DocumentType.DIRECTION_NOTICE.getValue(), EventType.DIRECTION_ISSUED_WELSH.getCcdType());
         nextEventMap.put(DocumentType.FINAL_DECISION_NOTICE.getValue(), EventType.ISSUE_FINAL_DECISION_WELSH.getCcdType());
+        nextEventMap.put(DocumentType.URGENT_HEARING_REQUEST.getValue(), EventType.UPDATE_CASE_ONLY.getCcdType());
+        nextEventMap.put(DocumentType.REINSTATEMENT_REQUEST.getValue(), EventType.UPDATE_CASE_ONLY.getCcdType());
     }
 
     @Autowired
