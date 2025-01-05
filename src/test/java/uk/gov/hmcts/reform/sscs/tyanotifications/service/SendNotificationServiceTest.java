@@ -503,7 +503,6 @@ public class SendNotificationServiceTest {
         verifyNoInteractions(notificationHandler);
     }
 
-
     private void verifyNotificationIsSaved(NotificationHandler.SendNotification sender, NotificationEventType eventType, String ccdCaseId, SubscriptionType subscriptionType) {
         try {
             sender.send();

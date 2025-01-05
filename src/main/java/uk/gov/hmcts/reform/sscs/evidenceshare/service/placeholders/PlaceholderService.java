@@ -102,11 +102,10 @@ public class PlaceholderService {
             placeholders.put(CASE_CREATED_DATE_LITERAL, caseCreatedDate);
         }
 
-
+        placeholders.put(POSTPONEMENT_REQUEST, caseData.getPostponementRequest().getActionPostponementRequestSelected());
 
         buildExcelaAddress(caseData.getIsScottishCase(), placeholders);
         populateRpcPlaceHolders(caseData, placeholders);
-        populatePostponementPlaceholder(caseData, placeholders);
 
         placeholders.putAll(getAddressPlaceholders(address, true, PLACEHOLDER_SERVICE));
     }
@@ -136,11 +135,6 @@ public class PlaceholderService {
             placeholders.put(REGIONAL_OFFICE_FAX_LITERAL, defaultToEmptyStringIfNull(rpc.getFaxNumber()));
             placeholders.put(REGIONAL_OFFICE_POSTCODE_LITERAL, defaultToEmptyStringIfNull(rpc.getPostcode()));
         }
-    }
-
-    public void populatePostponementPlaceholder(SscsCaseData caseData, Map<String, Object> placeholders) {
-        String postponementRequest = caseData.getPostponementRequest().getActionPostponementRequestSelected();
-        placeholders.put(POSTPONEMENT_REQUEST, postponementRequest);
     }
 
     public boolean hasRegionalProcessingCenter(SscsCaseData ccdResponse) {

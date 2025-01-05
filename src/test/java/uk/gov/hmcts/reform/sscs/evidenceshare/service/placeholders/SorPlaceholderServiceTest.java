@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.GRANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.REFUSE;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.*;
@@ -137,5 +140,33 @@ public class SorPlaceholderServiceTest {
 
         var appellantName = caseData.getAppeal().getAppellant().getName().getFullNameNoTitle();
         assertEquals(appellantName, placeholders.get(APPELLANT_NAME));
+    }
+
+    @Test
+    public void whenNotAHearingPostponementRequest_thenPlaceholderIsNull() {
+        Map<String, Object> placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER,
+                Appointee.class.getSimpleName(), null);
+
+        assertNull(placeholders.get(POSTPONEMENT_REQUEST));
+    }
+
+    @Test
+    public void givenAGrantedHearingPostponementRequest_thenSetPlaceholderAccordingly() {
+        caseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected(GRANT.getValue()).build());
+
+        Map<String, Object> placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER,
+                Appointee.class.getSimpleName(), null);
+
+        assertEquals("grant", placeholders.get(POSTPONEMENT_REQUEST));
+    }
+
+    @Test
+    public void givenARefusedHearingPostponementRequest_thenSetPlaceholderAccordingly() {
+        caseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected(REFUSE.getValue()).build());
+
+        Map<String, Object> placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER,
+                Appointee.class.getSimpleName(), null);
+
+        assertEquals("refuse", placeholders.get(POSTPONEMENT_REQUEST));
     }
 }

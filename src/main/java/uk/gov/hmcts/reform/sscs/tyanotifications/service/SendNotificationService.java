@@ -18,6 +18,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMa
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ENTITY_TYPE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.NAME;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.PARTY_TYPE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.POSTPONEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.REPRESENTATIVE_NAME;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ACTION_POSTPONEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ACTION_POSTPONEMENT_REQUEST_WELSH;
@@ -285,6 +286,8 @@ public class SendNotificationService {
                 ZonedDateTime appealReceivedDate = ZonedDateTime.now().plusSeconds(delay);
                 placeholders.put(APPEAL_RESPOND_DATE, appealReceivedDate.format(DateTimeFormatter.ofPattern(AppConstants.RESPONSE_DATE_FORMAT)));
             }
+
+            placeholders.put(POSTPONEMENT_REQUEST, wrapper.getNewSscsCaseData().getPostponementRequest().getActionPostponementRequestSelected());
 
             log.info("In sendLetterNotificationToAddress method notificationSender is available {} ", notificationSender != null);
             notificationLog(notification, "GovNotify letter", address.getPostcode(), wrapper);

@@ -16,6 +16,7 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.IS_REPRESENTATIVE;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.JOINT;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.NAME;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.POSTPONEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_PHONE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.REPRESENTATIVE_NAME;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.SSCS_URL;
@@ -89,6 +90,8 @@ public class GenericLetterPlaceholderService {
         placeholders.put(INFO_REQUEST_DETAIL, caseData.getGenericLetterText());
         placeholders.put(HMCTS2, HMCTS_IMG);
         placeholders.put(CASE_ID_LITERAL, caseData.getCcdCaseId());
+
+        placeholders.put(POSTPONEMENT_REQUEST, caseData.getPostponementRequest().getActionPostponementRequestSelected());
 
         placeholderService.buildExcelaAddress(caseData.getIsScottishCase(), placeholders);
 

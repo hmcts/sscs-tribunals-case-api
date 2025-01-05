@@ -1,9 +1,12 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.GRANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.REFUSE;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.*;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.*;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.POSTPONEMENT_REQUEST;
 
 import java.util.List;
 import java.util.Map;
@@ -171,6 +174,34 @@ class GenericLetterPlaceholderServiceTest {
 
         assertNotNull(placeholders);
         assertEquals(IBCA_URL, placeholders.get(SSCS_URL_LITERAL));
+    }
+
+    @Test
+    public void whenNotAHearingPostponementRequest_thenPlaceholderIsNull() {
+        Map<String, Object> placeholders = genericLetterPlaceholderService.populatePlaceholders(caseData, APPELLANT_LETTER,
+                null);
+
+        assertNull(placeholders.get(POSTPONEMENT_REQUEST));
+    }
+
+    @Test
+    public void givenAGrantedHearingPostponementRequest_thenSetPlaceholderAccordingly() {
+        caseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected(GRANT.getValue()).build());
+
+        Map<String, Object> placeholders = genericLetterPlaceholderService.populatePlaceholders(caseData, APPELLANT_LETTER,
+                null);
+
+        assertEquals("grant", placeholders.get(POSTPONEMENT_REQUEST));
+    }
+
+    @Test
+    public void givenARefusedHearingPostponementRequest_thenSetPlaceholderAccordingly() {
+        caseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected(REFUSE.getValue()).build());
+
+        Map<String, Object> placeholders = genericLetterPlaceholderService.populatePlaceholders(caseData, APPELLANT_LETTER,
+                null);
+
+        assertEquals("refuse", placeholders.get(POSTPONEMENT_REQUEST));
     }
 
     private static String getApellantName(SscsCaseData caseData) {

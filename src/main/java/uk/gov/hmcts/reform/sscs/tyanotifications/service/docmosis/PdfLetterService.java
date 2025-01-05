@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis;
 
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.IBCA_URL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ADDRESS_NAME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.POSTPONEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.personalisation.Personalisation.translateToWelshDate;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.LetterType.DOCMOSIS;
@@ -137,6 +138,9 @@ public class PdfLetterService {
                     docmosisTemplatesConfig.getHmctsWelshImgVal());
                 placeholders.put(WELSH_GENERATED_DATE_LITERAL, LocalDateToWelshStringConverter.convert(LocalDate.now()));
             }
+
+            placeholders.put(POSTPONEMENT_REQUEST, wrapper.getNewSscsCaseData().getPostponementRequest().getActionPostponementRequestSelected());
+
             return docmosisPdfService.createPdfFromMap(placeholders, notification.getDocmosisLetterTemplate());
         }
         return new byte[0];
