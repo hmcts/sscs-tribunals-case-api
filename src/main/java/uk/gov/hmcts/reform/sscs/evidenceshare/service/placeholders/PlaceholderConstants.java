@@ -13,6 +13,7 @@ public final class PlaceholderConstants {
     public static final String NINO_LABEL = "NI No";
     public static final String IBCA_REFERENCE_LABEL = "IBCA Reference";
     public static final String GENERATED_DATE_LITERAL = "generated_date";
+
     public static final String WELSH_GENERATED_DATE_LITERAL = "welsh_generated_date";
     public static final String SSCS_URL_LITERAL = "sscs_url";
     public static final String SSCS_URL = "https://www.gov.uk/appeal-benefit-decision";
@@ -62,6 +63,8 @@ public final class PlaceholderConstants {
     public static final String ENTITY_TYPE = "entityType";
 
     public static final String PHONE_NUMBER = "phone_number";
+
+    public static final String POSTPONEMENT_REQUEST = "postponement_request";
 
     private PlaceholderConstants() {
         //

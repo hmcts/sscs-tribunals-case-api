@@ -15,6 +15,7 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LABEL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.NINO_LABEL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.NINO_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.POSTPONEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE2_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE3_LITERAL;
@@ -101,8 +102,11 @@ public class PlaceholderService {
             placeholders.put(CASE_CREATED_DATE_LITERAL, caseCreatedDate);
         }
 
+
+
         buildExcelaAddress(caseData.getIsScottishCase(), placeholders);
         populateRpcPlaceHolders(caseData, placeholders);
+        populatePostponementPlaceholder(caseData, placeholders);
 
         placeholders.putAll(getAddressPlaceholders(address, true, PLACEHOLDER_SERVICE));
     }
@@ -132,6 +136,11 @@ public class PlaceholderService {
             placeholders.put(REGIONAL_OFFICE_FAX_LITERAL, defaultToEmptyStringIfNull(rpc.getFaxNumber()));
             placeholders.put(REGIONAL_OFFICE_POSTCODE_LITERAL, defaultToEmptyStringIfNull(rpc.getPostcode()));
         }
+    }
+
+    public void populatePostponementPlaceholder(SscsCaseData caseData, Map<String, Object> placeholders) {
+        String postponementRequest = caseData.getPostponementRequest().getActionPostponementRequestSelected();
+        placeholders.put(POSTPONEMENT_REQUEST, postponementRequest);
     }
 
     public boolean hasRegionalProcessingCenter(SscsCaseData ccdResponse) {
