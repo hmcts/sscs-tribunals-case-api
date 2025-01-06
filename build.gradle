@@ -7,10 +7,10 @@ plugins {
     id 'uk.gov.hmcts.java' version '0.12.63'
     id 'com.gorylenko.gradle-git-properties' version '2.4.2'
     id 'com.github.ben-manes.versions' version '0.46.0'
-    id "info.solidsoft.pitest" version '1.9.11'
-    id 'org.owasp.dependencycheck' version '10.0.3'
+    id "info.solidsoft.pitest" version '1.15.0'
+    id 'org.owasp.dependencycheck' version '10.0.4'
     id 'au.com.dius.pact' version '4.3.15'
-    id 'com.github.hmcts.rse-cft-lib' version '0.19.1425'
+    id 'com.github.hmcts.rse-cft-lib' version '0.19.1514'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -152,7 +152,7 @@ tasks.register('fortifyScan', JavaExec) {
 }
 
 jacoco {
-    toolVersion = "0.8.10"
+    toolVersion = "0.8.12"
 }
 
 jacocoTestReport {
@@ -366,7 +366,7 @@ dependencies {
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
 
     implementation group: 'com.github.hmcts', name: 'sscs-common', version: '18d1869'
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.20'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.23'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.1'
@@ -385,7 +385,7 @@ dependencies {
     implementation group: 'org.springframework', name: 'spring-jms'
     implementation group: 'org.apache.qpid', name: 'qpid-jms-client', version: '1.10.0'
 
-    implementation group: 'org.pitest', name: 'pitest', version:  '1.14.2'
+    implementation group: 'org.pitest', name: 'pitest', version:  '1.17.3'
     implementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: pitest.pitestVersion.get()
     implementation group:'org.codehaus.sonar-plugins', name:'sonar-pitest-plugin', version: '0.5'
 
@@ -397,7 +397,7 @@ dependencies {
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.3.1'
     testImplementation group: 'io.rest-assured', name: 'xml-path', version: '5.3.1'
     testImplementation group: 'io.rest-assured', name: 'json-path', version: '5.3.1'
-    testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.5', classifier: 'all', {
+    testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.6', classifier: 'all', {
         exclude group: 'commons-io', module: 'commons-io'
     }
     testImplementation group: 'com.github.hmcts', name: 'sscs-job-scheduler', version: '1.6.1', {

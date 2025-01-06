@@ -196,7 +196,7 @@ def runNotificationTests() {
             sh './gradlew verifyNotifications'
         }
     } finally {
-        steps.archiveArtifacts artifacts: "notification_pdfs/**"
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: "**/notification_pdfs/*.pdf"
     }
 }
 
