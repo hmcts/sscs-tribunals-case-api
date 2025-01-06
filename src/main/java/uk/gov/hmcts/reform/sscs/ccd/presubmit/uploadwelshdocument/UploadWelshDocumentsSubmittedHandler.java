@@ -69,15 +69,6 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
                     idamService.getIdamTokens(),
                     mutator
             ).getData();
-        } else if (isReinstatementRequest(sscsCaseData)) {
-            sscsCaseData = updateCcdCaseService.updateCaseV2(
-                    callback.getCaseDetails().getId(),
-                    nextEvent,
-                    "Set Reinstatement Request",
-                    "Set Reinstatement Request",
-                    idamService.getIdamTokens(),
-                    setReinstatementRequest(mutator)
-            ).getData();
         } else {
             sscsCaseData = updateCcdCaseService.updateCaseV2(
                     callback.getCaseDetails().getId(),
@@ -85,7 +76,8 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
                     "Upload Welsh document",
                     "Upload Welsh document",
                     idamService.getIdamTokens(),
-                    mutator
+                    isReinstatementRequest(sscsCaseData)
+                            ? setReinstatementRequest(mutator) : mutator
             ).getData();
         }
         return new PreSubmitCallbackResponse<>(sscsCaseData);

@@ -15,7 +15,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -147,7 +146,6 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
         verifyEventTrigger(EventType.SEND_TO_DWP, "Upload Welsh document", "Upload Welsh document", caseData);
     }
 
-    @Disabled
     @Test
     void shouldSetReinstatementRequestWithWelshAndNonWelshReinstatementDocumentsWhenNonVoidOrDormant() {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -208,7 +206,7 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
         assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, caseData.getInterlocReviewState());
     }
 
-    @Disabled
+
     @Test
     void shouldSetReinstatementRequestWithWelshButNoNonWelshReinstatementDocuments() {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -240,7 +238,6 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
         assertEquals(State.APPEAL_CREATED, caseData.getPreviousState());
     }
 
-    @Disabled
     @Test
     void shouldSetReinstatementRequestWithNoWelshButNonWelshReinstatementDocuments() {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
