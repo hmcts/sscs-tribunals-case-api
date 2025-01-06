@@ -9,10 +9,14 @@ public final class PlaceholderConstants {
     public static final String APPELLANT_FULL_NAME_LITERAL = "appellant_full_name";
     public static final String CASE_ID_LITERAL = "case_id";
     public static final String NINO_LITERAL = "nino";
+    public static final String LABEL = "label";
+    public static final String NINO_LABEL = "NI No";
+    public static final String IBCA_REFERENCE_LABEL = "IBCA Reference";
     public static final String GENERATED_DATE_LITERAL = "generated_date";
     public static final String WELSH_GENERATED_DATE_LITERAL = "welsh_generated_date";
     public static final String SSCS_URL_LITERAL = "sscs_url";
     public static final String SSCS_URL = "https://www.gov.uk/appeal-benefit-decision";
+    public static final String IBCA_URL = "https://www.gov.uk/guidance/appeal-an-infected-blood-compensation-decision";
     public static final String SC_NUMBER_LITERAL = "sc_number";
 
     public static final String REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL = "rpc_address_line1";
@@ -42,7 +46,6 @@ public final class PlaceholderConstants {
     public static final String LETTER_ADDRESS_LINE_3 = "letter_address_line_3";
     public static final String LETTER_ADDRESS_LINE_4 = "letter_address_line_4";
     public static final String LETTER_ADDRESS_POSTCODE = "letter_address_postcode";
-
     public static final String BENEFIT_NAME_ACRONYM_LITERAL = "benefit_name_acronym";
     public static final String IS_REPRESENTATIVE = "representative";
     public static final String IS_OTHER_PARTY = "is_other_party";

@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
@@ -55,8 +58,6 @@ public class SscsPdfService {
             throw new PdfGenerationException("Error getting template", e);
         }
 
-
-
         PdfWrapper pdfWrapper = PdfWrapper.builder()
                 .sscsCaseData(sscsCaseData)
                 .ccdCaseId(caseDetailsId)
@@ -72,8 +73,12 @@ public class SscsPdfService {
         if (sscsCaseData.isLanguagePreferenceWelsh()) {
             placeholders.put("appellant_identity_dob",
                     LocalDateToWelshStringConverter.convert(sscsCaseData.getAppeal().getAppellant().getIdentity().getDob()));
-            placeholders.put("appellant_appointee_identity_dob",
-                    LocalDateToWelshStringConverter.convert(sscsCaseData.getAppeal().getAppellant().getIdentity().getDob()));
+
+            final Appointee appointee = sscsCaseData.getAppeal().getAppellant().getAppointee();
+            String appellantDob = isNotEmpty(appointee) && isNotEmpty(appointee.getIdentity()) && isNotEmpty(appointee.getIdentity().getDob())
+                    ? LocalDateToWelshStringConverter.convert(appointee.getIdentity().getDob()) : "";
+            placeholders.put("appellant_appointee_identity_dob", appellantDob);
+
             if (sscsCaseData.getAppeal().getMrnDetails() != null && sscsCaseData.getAppeal().getMrnDetails().getMrnDate() != null) {
                 placeholders.put("date_of_decision",
                         LocalDateToWelshStringConverter.convert(sscsCaseData.getAppeal().getMrnDetails().getMrnDate()));
@@ -94,6 +99,8 @@ public class SscsPdfService {
                             "Yes") ? "ydw" : "nac ydw");
             placeholders.put("welshWantsToAttend", sscsCaseData.getAppeal().getHearingOptions().getWantsToAttend().equalsIgnoreCase(
                     "Yes") ? "ydw" : "nac ydw");
+            placeholders.put("welshInMainlandUk",
+                    YES.equals(sscsCaseData.getAppeal().getAppellant().getAddress().getInMainlandUk()) ? "ydw" : "nac ydw");
         }
         return pdfServiceClient.generateFromHtml(template, placeholders);
     }

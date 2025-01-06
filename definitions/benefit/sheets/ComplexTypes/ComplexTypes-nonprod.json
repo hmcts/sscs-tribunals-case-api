@@ -12,3 +12,4 @@
   {"LiveFrom": "18/10/2024", "ID": "hearingOutcomeValue", "ListElementCode": "didPoAttendHearing", "FieldType": "YesOrNo", "ElementLabel": "Did PO Attend?", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/10/2024", "ID": "hearingOutcomeValue", "ListElementCode": "completedHearings", "FieldType": "DynamicList", "ElementLabel": "Hearing", "SecurityClassification": "PUBLIC"}
 ]
+

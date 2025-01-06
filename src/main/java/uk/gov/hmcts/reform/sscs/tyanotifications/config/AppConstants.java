@@ -31,6 +31,18 @@ public final class AppConstants {
     public static final String ZONE_ID = "Europe/London";
     public static final int MAX_DWP_RESPONSE_DAYS = 28;
     public static final int MAX_DWP_RESPONSE_DAYS_CHILD_SUPPORT = 42;
+    public static final String IBC_ACRONYM = "IBC";
+    public static final String IBC_ACRONYM_WELSH = "IGH";
+    public static final String IBCA_ACRONYM = "IBCA";
+    public static final String IBCA_ACRONYM_WELSH = "AIGH";
+    public static final String IBCA_FULL_NAME = "Infected Blood Compensation Authority";
+    public static final String IBCA_FULL_NAME_WELSH = "Awdurdod Iawndal Gwaed Heintiedig";
+    public static final String IBCA_FIRST_TIER_AGENCY_GROUP = "Infected Blood Compensation Authority";
+    public static final String IBCA_FIRST_TIER_AGENCY_GROUP_WELSH = "Awdurdod Iawndal Gwaed Heintiedig";
+
+
+    public static final String SSCS5 = "sscs5";
+    public static final String SSCS8 = "sscs8";
 
     private AppConstants() {
         //
