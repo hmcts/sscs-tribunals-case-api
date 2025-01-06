@@ -52,34 +52,34 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         String nextEvent = callback.getCaseDetails().getCaseData().getSscsWelshPreviewNextEvent();
-        Consumer<SscsCaseDetails> mutator = (SscsCaseDetails sscsCaseDetails) -> {
-            SscsCaseData caseData = sscsCaseDetails.getData();
-            caseData.setSscsWelshPreviewNextEvent(null);
-        };
+        Consumer<SscsCaseDetails> mutator = sscsCaseDetails -> sscsCaseDetails.getData().setSscsWelshPreviewNextEvent(null);
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-        log.info("Next event to submit {} for case reference {}", nextEvent, sscsCaseData.getCcdCaseId());
+
+        String eventType = nextEvent;
+        String description = "Upload Welsh document";
+        String summary = "Upload Welsh document";
+        Consumer<SscsCaseDetails> finalMutator = mutator;
 
         if (isValidUrgentHearingDocument(sscsCaseData)) {
-            sscsCaseData = updateCcdCaseService.updateCaseV2(
-                    callback.getCaseDetails().getId(),
-                    MAKE_CASE_URGENT.getCcdType(),
-                    "Send a case to urgent hearing",
-                    OTHER_DOCUMENT_MANUAL.getLabel(),
-                    idamService.getIdamTokens(),
-                    mutator
-            ).getData();
-        } else {
-            sscsCaseData = updateCcdCaseService.updateCaseV2(
-                    callback.getCaseDetails().getId(),
-                    nextEvent,
-                    "Upload Welsh document",
-                    "Upload Welsh document",
-                    idamService.getIdamTokens(),
-                    isReinstatementRequest(sscsCaseData)
-                            ? setReinstatementRequest(mutator) : mutator
-            ).getData();
+            eventType = MAKE_CASE_URGENT.getCcdType();
+            description = "Send a case to urgent hearing";
+            summary = OTHER_DOCUMENT_MANUAL.getLabel();
+        } else if (isReinstatementRequest(sscsCaseData)) {
+            finalMutator = setReinstatementRequest(mutator);
         }
+
+        log.info("For case reference {} next event to submit {} ", sscsCaseData.getCcdCaseId(), eventType);
+
+        sscsCaseData = updateCcdCaseService.updateCaseV2(
+                callback.getCaseDetails().getId(),
+                eventType,
+                description,
+                summary,
+                idamService.getIdamTokens(),
+                finalMutator
+        ).getData();
+
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
@@ -111,12 +111,10 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
 
             State previousState = data.getPreviousState();
 
-            if (previousState != null
-                    && (previousState.equals(DORMANT_APPEAL_STATE) || previousState.equals(VOID_STATE))) {
+            if (previousState != null && (previousState == DORMANT_APPEAL_STATE || previousState == VOID_STATE)) {
                 data.setPreviousState(INTERLOCUTORY_REVIEW_STATE);
                 log.info("{} setting previousState from {} to interlocutoryReviewState", data.getCcdCaseId(), previousState.getId());
             }
-
             data.setInterlocReviewState(REVIEW_BY_JUDGE);
         };
     }
