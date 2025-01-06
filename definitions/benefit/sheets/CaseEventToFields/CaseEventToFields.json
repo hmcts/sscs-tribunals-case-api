@@ -3622,7 +3622,7 @@
     "CaseEventID": "confirmPanelComposition",
     "CaseFieldID": "isMedicalMemberRequired",
     "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
+    "DisplayContext": "MANDATORY",
     "LiveFrom": "01/11/2021",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 2,
