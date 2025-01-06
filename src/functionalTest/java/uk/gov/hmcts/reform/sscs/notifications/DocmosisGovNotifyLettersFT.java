@@ -34,6 +34,9 @@ public class DocmosisGovNotifyLettersFT extends AbstractNotificationsFT {
     @Value("${notifications-list}")
     private Set<NotificationEventType> notificationsList;
 
+    @Value("${isWelsh}")
+    private boolean isWelsh;
+
     public DocmosisGovNotifyLettersFT() {
         super(30);
     }
@@ -49,7 +52,7 @@ public class DocmosisGovNotifyLettersFT extends AbstractNotificationsFT {
         getNotificationList()
                 .forEach(notificationEventType -> {
                     try {
-                        simulateCcdCallbackToSendLetter(notificationEventType);
+                        simulateCcdCallbackToSendLetter(notificationEventType, isWelsh);
                         List<Notification> notifications = fetchLetters();
                         saveLetterPdfs(notifications, notificationEventType);
                         assertThat(notifications)
