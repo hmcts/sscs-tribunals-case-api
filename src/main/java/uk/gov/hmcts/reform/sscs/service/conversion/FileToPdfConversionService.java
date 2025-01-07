@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -97,7 +98,7 @@ public class FileToPdfConversionService {
 
     private File transferToFile(MultipartFile f) throws IOException {
         String suffix = String.format(".%s", FilenameUtils.getExtension(f.getOriginalFilename()));
-        File tempFile = File.createTempFile("tempConversion", suffix);
+        File tempFile = Files.createTempFile("tempConversion", suffix).toFile();
         tempFile.deleteOnExit();
         f.transferTo(tempFile);
         return tempFile;
