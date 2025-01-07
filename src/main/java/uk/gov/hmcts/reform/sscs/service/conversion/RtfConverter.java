@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
@@ -47,7 +48,7 @@ public class RtfConverter extends WordDocumentConverter implements FileToPdfConv
             parser.parse(stream, handler, metadata);
             String content = handler.toString();
 
-            File textFile = Files.createTempFile(FilenameUtils.getBaseName(file.getName()), ".txt").toFile();
+            File textFile = Files.createTempFile(Paths.get("").toAbsolutePath(), FilenameUtils.getBaseName(file.getName()), ".txt").toFile();
             textFile.deleteOnExit();
 
             FileWriter writer = new FileWriter(textFile);

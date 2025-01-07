@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -72,7 +73,7 @@ public class ImageConverter implements FileToPdfConverter {
                          new PDPageContentStream(doc, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
                 contentStream.drawImage(pdImage, MARGIN, ypos, imageWidth * scale, imageHeight * scale);
             }
-            File outputFile = Files.createTempFile(file.getName(), ".pdf").toFile();
+            File outputFile = Files.createTempFile(Paths.get("").toAbsolutePath(), file.getName(), ".pdf").toFile();
             outputFile.deleteOnExit();
 
             doc.save(outputFile);
