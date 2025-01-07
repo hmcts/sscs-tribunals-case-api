@@ -25,6 +25,8 @@ import uk.gov.hmcts.reform.sscs.exception.UnsupportedDocumentTypeException;
 public class EvidenceManagementService {
 
     public static final String S2S_TOKEN = "oauth2Token";
+    private static final String CASEWORKER_ROLE = "caseworker";
+    private static final String CITIZEN_ROLE = "citizen";
 
     private final AuthTokenGenerator authTokenGenerator;
     private final DocumentUploadClientApi documentUploadClientApi;
@@ -50,7 +52,7 @@ public class EvidenceManagementService {
 
         try {
             return documentUploadClientApi
-                .upload(S2S_TOKEN, serviceAuthorization, userId, Arrays.asList("caseworker", "citizen"),
+                .upload(S2S_TOKEN, serviceAuthorization, userId, Arrays.asList(CASEWORKER_ROLE, CITIZEN_ROLE),
                     Classification.RESTRICTED, files);
         } catch (HttpClientErrorException httpClientErrorException) {
             log.error("Doc Store service failed to upload documents...", httpClientErrorException);
@@ -69,7 +71,7 @@ public class EvidenceManagementService {
                 S2S_TOKEN,
                 serviceAuthorization,
                 userId,
-                "caseworker",
+                    CASEWORKER_ROLE,
                 documentSelf.getPath().replaceFirst("/", "")
             );
 
@@ -77,7 +79,7 @@ public class EvidenceManagementService {
                 S2S_TOKEN,
                 serviceAuthorization,
                 userId,
-                "caseworker",
+                    CASEWORKER_ROLE,
                 URI.create(documentMetadata.links.binary.href).getPath().replaceFirst("/", "")
             );
 

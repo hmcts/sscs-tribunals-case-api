@@ -35,6 +35,7 @@ public class CcdPdfService {
     private static final String REPRESENTATIVE_STATEMENT = "Representative statement ";
     private static final String OTHER_PARTY_STATEMENT = "Other party statement ";
     private static final String OTHER_PARTY_REPRESENTATIVE_STATEMENT = "Other party representative statement ";
+    private static final String UPLOADED_DOCUMENT_INTO_SSCS = "Uploaded document into SSCS";
     public static final String YES = "Yes";
 
     @Autowired
@@ -46,18 +47,18 @@ public class CcdPdfService {
     // can be removed once COR team decide what to pass into the documentType field
     public SscsCaseData mergeDocIntoCcd(String fileName, byte[] pdf, Long caseId, SscsCaseData caseData,
                                         IdamTokens idamTokens) {
-        return updateAndMerge(fileName, pdf, caseId, caseData, idamTokens, "Uploaded document into SSCS",
+        return updateAndMerge(fileName, pdf, caseId, caseData, idamTokens, UPLOADED_DOCUMENT_INTO_SSCS,
                 null);
     }
 
     public SscsCaseData mergeDocIntoCcd(UpdateDocParams updateDocParams, IdamTokens idamTokens) {
         updateDoc(updateDocParams);
-        return updateCaseInCcd(updateDocParams.getCaseData(), updateDocParams.getCaseId(), UPLOAD_DOCUMENT.getCcdType(), idamTokens, "Uploaded document into SSCS").getData();
+        return updateCaseInCcd(updateDocParams.getCaseData(), updateDocParams.getCaseId(), UPLOAD_DOCUMENT.getCcdType(), idamTokens, UPLOADED_DOCUMENT_INTO_SSCS).getData();
     }
 
     public SscsCaseData mergeDocIntoCcd(String fileName, byte[] pdf, Long caseId, SscsCaseData caseData,
                                         IdamTokens idamTokens, String documentType) {
-        return updateAndMerge(fileName, pdf, caseId, caseData, idamTokens, "Uploaded document into SSCS",
+        return updateAndMerge(fileName, pdf, caseId, caseData, idamTokens, UPLOADED_DOCUMENT_INTO_SSCS,
                 documentType);
     }
 

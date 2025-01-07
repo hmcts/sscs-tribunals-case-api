@@ -42,6 +42,8 @@ import uk.gov.hmcts.reform.sscs.model.LetterType;
 @Slf4j
 public class CcdNotificationsPdfService {
 
+    private static final String NOTIFICATION_SENT = "Notification sent";
+
     @Autowired
     private PdfStoreService pdfStoreService;
 
@@ -92,7 +94,7 @@ public class CcdNotificationsPdfService {
         };
 
         try {
-            updateCcdCaseService.updateCaseV2(caseId, EventType.NOTIFICATION_SENT.getCcdType(), "Notification sent", "Notification sent via Gov Notify", idamService.getIdamTokens(), caseDataConsumer);
+            updateCcdCaseService.updateCaseV2(caseId, EventType.NOTIFICATION_SENT.getCcdType(), NOTIFICATION_SENT, "Notification sent via Gov Notify", idamService.getIdamTokens(), caseDataConsumer);
         } catch (CcdException ccdEx) {
             log.error("Failed to update ccd case using v2 but carrying on [" + caseId + "] ["
                     + caseId + "] with event [" + EventType.NOTIFICATION_SENT.getCcdType() + "]", ccdEx);
@@ -144,7 +146,7 @@ public class CcdNotificationsPdfService {
         try {
             updateCcdCaseService.updateCaseV2(ccdCaseId,
                     EventType.NOTIFICATION_SENT.getCcdType(),
-                    "Notification sent",
+                    NOTIFICATION_SENT,
                     description,
                     idamService.getIdamTokens(),
                     caseDataConsumer);
@@ -261,7 +263,7 @@ public class CcdNotificationsPdfService {
 
     private SscsCaseDetails updateCaseInCcd(SscsCaseData caseData, Long caseId, String eventId, IdamTokens idamTokens, String description) {
         try {
-            return ccdService.updateCaseWithoutRetry(caseData, caseId, eventId, "Notification sent", description, idamTokens);
+            return ccdService.updateCaseWithoutRetry(caseData, caseId, eventId, NOTIFICATION_SENT, description, idamTokens);
         } catch (CcdException ccdEx) {
             log.error("Failed to update ccd case but carrying on [" + caseId + "] ["
                     + caseData.getCaseReference() + "] with event [" + eventId + "]", ccdEx);
@@ -271,7 +273,7 @@ public class CcdNotificationsPdfService {
 
     private SscsCaseDetails updateCaseV2InCcd(Consumer<SscsCaseDetails> caseDetailsConsumer, Long caseId, String eventId, IdamTokens idamTokens, String description) {
         try {
-            return updateCcdCaseService.updateCaseV2WithoutRetry(caseId, eventId, "Notification sent", description, idamTokens, caseDetailsConsumer);
+            return updateCcdCaseService.updateCaseV2WithoutRetry(caseId, eventId, NOTIFICATION_SENT, description, idamTokens, caseDetailsConsumer);
         } catch (CcdException ccdEx) {
             log.error("Failed to update ccd case using v2 but carrying on [" + caseId + "] ["
                     + caseId + "] with event [" + eventId + "]", ccdEx);

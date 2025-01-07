@@ -20,6 +20,7 @@ import org.apache.tika.Tika;
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.detect.Detector;
 import org.apache.tika.io.TikaInputStream;
+import org.apache.tika.metadata.HttpHeaders;
 import org.apache.tika.metadata.Metadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,7 +54,7 @@ public class FileToPdfConversionService {
         TikaConfig config = TikaConfig.getDefaultConfig();
         Detector detector = config.getDetector();
         Metadata metadata = new Metadata();
-        metadata.set(Metadata.CONTENT_TYPE, f.getOriginalFilename());
+        metadata.set(HttpHeaders.CONTENT_TYPE, f.getOriginalFilename());
         try (InputStream is = f.getInputStream()) {
             TikaInputStream stream = TikaInputStream.get(is);
             String mimeType = detector.detect(stream, metadata).getBaseType().toString();
@@ -71,7 +72,7 @@ public class FileToPdfConversionService {
         TikaConfig config = TikaConfig.getDefaultConfig();
         Detector detector = config.getDetector();
         Metadata metadata = new Metadata();
-        metadata.set(Metadata.CONTENT_TYPE, f.getOriginalFilename());
+        metadata.set(HttpHeaders.CONTENT_TYPE, f.getOriginalFilename());
         String newMimeType = detector.detect(TikaInputStream.get(file), metadata).getBaseType().toString();
 
         String extension =  FilenameUtils.getExtension(file.getName());
