@@ -254,9 +254,11 @@ public class CcdNotificationsPdfService {
                 reasonableAdjustmentsLetters.setJointParty(buildCorrespondenceList(correspondences, correspondenceList));
                 break;
             case OTHER_PARTY:
-                correspondenceList= sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getOtherParty() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getOtherParty() : new ArrayList<>();
+                correspondenceList = sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getOtherParty() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getOtherParty() : new ArrayList<>();
                 reasonableAdjustmentsLetters.setOtherParty(buildCorrespondenceList(correspondences, correspondenceList));
                 break;
+            default:
+                // do nothing
         }
         return reasonableAdjustmentsLetters;
     }

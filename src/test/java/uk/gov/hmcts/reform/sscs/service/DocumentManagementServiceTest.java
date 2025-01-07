@@ -3,13 +3,14 @@ package uk.gov.hmcts.reform.sscs.service;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.docmosis.service.PdfGenerationService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
+@RunWith(MockitoJUnitRunner.class)
 public class DocumentManagementServiceTest {
 
     @Mock
@@ -34,7 +36,6 @@ public class DocumentManagementServiceTest {
 
     @Before
     public void setup() {
-        initMocks(this);
         documentManagementService = new DocumentManagementService(pdfGenerationService, ccdPdfService, idamService);
     }
 

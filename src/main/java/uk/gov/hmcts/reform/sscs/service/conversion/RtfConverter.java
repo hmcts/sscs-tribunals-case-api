@@ -55,7 +55,7 @@ public class RtfConverter extends WordDocumentConverter implements FileToPdfConv
             writer.write(content);
 
             return super.convert(textFile);
-        } catch (TikaException | SAXException e ) {
+        } catch (TikaException | SAXException e) {
             throw new IOException(e);
         }
     }
