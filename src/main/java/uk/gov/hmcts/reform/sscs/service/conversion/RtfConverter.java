@@ -44,6 +44,7 @@ public class RtfConverter extends WordDocumentConverter implements FileToPdfConv
         BodyContentHandler handler = new BodyContentHandler();
         AutoDetectParser parser = new AutoDetectParser();
         Metadata metadata = new Metadata();
+        FileWriter writer = null;
         try (InputStream stream = new FileInputStream(file)) {
             parser.parse(stream, handler, metadata);
             String content = handler.toString();
@@ -51,15 +52,18 @@ public class RtfConverter extends WordDocumentConverter implements FileToPdfConv
             File textFile = Files.createTempFile(Paths.get("").toAbsolutePath(), FilenameUtils.getBaseName(file.getName()), ".txt").toFile();
             textFile.deleteOnExit();
 
-            FileWriter writer = new FileWriter(textFile);
+            writer = new FileWriter(textFile);
             writer.write(content);
-            writer.close();
 
             return super.convert(textFile);
         } catch (TikaException e) {
             throw new IOException(e);
         } catch (SAXException e) {
             throw new IOException(e);
+        } finally {
+            if (writer != null) {
+                writer.close();
+            }
         }
     }
 }

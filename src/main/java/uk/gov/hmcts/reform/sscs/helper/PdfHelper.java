@@ -125,7 +125,7 @@ public class PdfHelper {
     private BigDecimal maxScaleFactor(float overage, float pageAxisDimension) {
         BigDecimal maxScaleFactor = NO_CHANGE;
         if (overage > 0) {
-            BigDecimal scaleFactor = new BigDecimal(overage / pageAxisDimension);
+            BigDecimal scaleFactor = BigDecimal.valueOf(overage / pageAxisDimension);
             maxScaleFactor = scaleFactor.compareTo(maxScaleFactor) > 0 ? scaleFactor : maxScaleFactor;
         } else if (overage < 0) {
             maxScaleFactor = SCALE_UP;
