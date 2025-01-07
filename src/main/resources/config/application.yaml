@@ -291,8 +291,6 @@ feature:
         enabled: ${HANDLE_CCD_CALLBACKMAP_V2:false}
     submit-appeal-service-v2:
         enabled: ${SUBMIT_APPEAL_SERVICE_V2_ENABLED:false}
-    process-event-message-v2:
-        enabled: ${PROCESS_EVENT_MESSAGE_V2_ENABLED:false}
     bypass-hearing-api-service:
         enabled: ${BYPASS_HEARING_API_SERVICE:false}
     update-case-only-hearing-v2:
