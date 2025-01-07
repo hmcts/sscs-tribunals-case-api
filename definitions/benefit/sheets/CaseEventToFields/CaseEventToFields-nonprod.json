@@ -28,7 +28,7 @@
     "CaseEventID": "updateListingRequirements",
     "CaseFieldID": "isMedicalMemberRequired",
     "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
+    "DisplayContext": "OPTIONAL",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 7,
     "PageID": "1.0",
