@@ -4,12 +4,9 @@ import com.google.common.collect.Lists;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.attribute.FileAttribute;
-import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.PosixFilePermissions;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -18,7 +15,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.tika.utils.SystemUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -76,17 +72,7 @@ public class WordDocumentConverter implements FileToPdfConverter {
             throw new IOException(String.format("Docmosis error (%s) converting: %s", response.code(), file.getName()));
         }
 
-        final File convertedFile;
-
-        if (SystemUtils.IS_OS_UNIX) {
-            FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------"));
-            convertedFile = Files.createTempFile("stitch-conversion", ".pdf", attr).toFile();
-        } else {
-            convertedFile = Files.createTempFile("stitch-conversion", ".pdf").toFile();
-            convertedFile.setReadable(true, true);
-            convertedFile.setWritable(true, true);
-            convertedFile.setExecutable(true, true);
-        }
+        final File convertedFile = Files.createTempFile(Paths.get("").toAbsolutePath(), "stitch-conversion", ".pdf").toFile();
 
         Files.write(convertedFile.toPath(), Objects.requireNonNull(response.body()).bytes());
 
