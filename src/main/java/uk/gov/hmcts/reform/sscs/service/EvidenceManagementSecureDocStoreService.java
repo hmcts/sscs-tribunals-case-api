@@ -12,7 +12,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClient;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
-import uk.gov.hmcts.reform.sscs.document.EvidenceDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.exception.UnsupportedDocumentTypeException;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
@@ -21,13 +20,10 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 public class EvidenceManagementSecureDocStoreService {
 
     private final CaseDocumentClient caseDocumentClient;
-    private final EvidenceDownloadClientApi evidenceDownloadClientApi;
 
     @Autowired
-    public EvidenceManagementSecureDocStoreService(CaseDocumentClient caseDocumentClient,
-                                                   EvidenceDownloadClientApi evidenceDownloadClientApi) {
+    public EvidenceManagementSecureDocStoreService(CaseDocumentClient caseDocumentClient) {
         this.caseDocumentClient = caseDocumentClient;
-        this.evidenceDownloadClientApi = evidenceDownloadClientApi;
     }
 
     public UploadResponse upload(List<MultipartFile> files, IdamTokens idamTokens) {

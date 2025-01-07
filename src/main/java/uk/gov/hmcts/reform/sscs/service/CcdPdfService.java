@@ -44,6 +44,11 @@ public class CcdPdfService {
     @Autowired
     private CcdService ccdService;
 
+    public CcdPdfService(PdfStoreService pdfStoreService, CcdService ccdService) {
+        this.pdfStoreService = pdfStoreService;
+        this.ccdService = ccdService;
+    }
+
     // can be removed once COR team decide what to pass into the documentType field
     public SscsCaseData mergeDocIntoCcd(String fileName, byte[] pdf, Long caseId, SscsCaseData caseData,
                                         IdamTokens idamTokens) {

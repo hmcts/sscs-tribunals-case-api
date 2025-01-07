@@ -61,6 +61,17 @@ public class CcdNotificationsPdfService {
 
     private static final String DEFAULT_SENDER_TYPE = "Gov Notify";
 
+    public CcdNotificationsPdfService(PdfStoreService pdfStoreService,
+                                      PDFServiceClient pdfServiceClient,
+                                      CcdService ccdService,
+                                      UpdateCcdCaseService updateCcdCaseService,
+                                      IdamService idamService) {
+        this.pdfStoreService = pdfStoreService;
+        this.pdfServiceClient = pdfServiceClient;
+        this.ccdService = ccdService;
+        this.updateCcdCaseService = updateCcdCaseService;
+        this.idamService = idamService;
+    }
 
     public SscsCaseData mergeCorrespondenceIntoCcd(SscsCaseData sscsCaseData, Correspondence correspondence) {
         List<Correspondence> existingCorrespondence = sscsCaseData.getCorrespondence() == null ? new ArrayList<>() : sscsCaseData.getCorrespondence();
@@ -224,32 +235,29 @@ public class CcdNotificationsPdfService {
 
     private ReasonableAdjustmentsLetters buildCorrespondenceByParty(SscsCaseData sscsCaseData, List<Correspondence> correspondences, LetterType letterType) {
         ReasonableAdjustmentsLetters reasonableAdjustmentsLetters = sscsCaseData.getReasonableAdjustmentsLetters() == null ? ReasonableAdjustmentsLetters.builder().build() : sscsCaseData.getReasonableAdjustmentsLetters();
-
-        if (APPELLANT.equals(letterType)) {
-            List<Correspondence> correspondenceList = sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getAppellant() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getAppellant() : new ArrayList<>();
-            reasonableAdjustmentsLetters.setAppellant(buildCorrespondenceList(correspondences, correspondenceList));
+        List<Correspondence> correspondenceList;
+        switch (letterType) {
+            case APPELLANT:
+                correspondenceList = sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getAppellant() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getAppellant() : new ArrayList<>();
+                reasonableAdjustmentsLetters.setAppellant(buildCorrespondenceList(correspondences, correspondenceList));
+                break;
+            case APPOINTEE:
+                correspondenceList = sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getAppointee() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getAppointee() : new ArrayList<>();
+                reasonableAdjustmentsLetters.setAppointee(buildCorrespondenceList(correspondences, correspondenceList));
+                break;
+            case REPRESENTATIVE:
+                correspondenceList = sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getRepresentative() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getRepresentative() : new ArrayList<>();
+                reasonableAdjustmentsLetters.setRepresentative(buildCorrespondenceList(correspondences, correspondenceList));
+                break;
+            case JOINT_PARTY:
+                correspondenceList = sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getJointParty() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getJointParty() : new ArrayList<>();
+                reasonableAdjustmentsLetters.setJointParty(buildCorrespondenceList(correspondences, correspondenceList));
+                break;
+            case OTHER_PARTY:
+                correspondenceList= sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getOtherParty() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getOtherParty() : new ArrayList<>();
+                reasonableAdjustmentsLetters.setOtherParty(buildCorrespondenceList(correspondences, correspondenceList));
+                break;
         }
-
-        if (APPOINTEE.equals(letterType)) {
-            List<Correspondence> correspondenceList = sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getAppointee() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getAppointee() : new ArrayList<>();
-            reasonableAdjustmentsLetters.setAppointee(buildCorrespondenceList(correspondences, correspondenceList));
-        }
-
-        if (REPRESENTATIVE.equals(letterType)) {
-            List<Correspondence> correspondenceList = sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getRepresentative() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getRepresentative() : new ArrayList<>();
-            reasonableAdjustmentsLetters.setRepresentative(buildCorrespondenceList(correspondences, correspondenceList));
-        }
-
-        if (JOINT_PARTY.equals(letterType)) {
-            List<Correspondence> correspondenceList = sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getJointParty() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getJointParty() : new ArrayList<>();
-            reasonableAdjustmentsLetters.setJointParty(buildCorrespondenceList(correspondences, correspondenceList));
-        }
-
-        if (OTHER_PARTY.equals(letterType)) {
-            List<Correspondence> correspondenceList = sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getOtherParty() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getOtherParty() : new ArrayList<>();
-            reasonableAdjustmentsLetters.setOtherParty(buildCorrespondenceList(correspondences, correspondenceList));
-        }
-
         return reasonableAdjustmentsLetters;
     }
 
@@ -332,11 +340,10 @@ public class CcdNotificationsPdfService {
         byte[] pdf = pdfServiceClient.generateFromHtml(template, placeholders);
         String filename = String.format("%s %s.pdf", correspondence.getValue().getEventType(), correspondence.getValue().getSentOn());
         List<SscsDocument> pdfDocuments = pdfStoreService.store(pdf, filename, correspondence.getValue().getCorrespondenceType().name());
-        final List<Correspondence> correspondences = pdfDocuments.stream().map(doc ->
+        return pdfDocuments.stream().map(doc ->
                 correspondence.toBuilder().value(correspondence.getValue().toBuilder()
                         .documentLink(doc.getValue().getDocumentLink())
                         .build()).build()
         ).toList();
-        return correspondences;
     }
 }

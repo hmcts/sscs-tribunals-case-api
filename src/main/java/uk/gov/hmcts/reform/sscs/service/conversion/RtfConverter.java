@@ -32,6 +32,7 @@ public class RtfConverter extends WordDocumentConverter implements FileToPdfConv
         super(httpClient, endpoint, accessKey);
     }
 
+    @Override
     public List<String> accepts() {
         return Lists.newArrayList(
                 "text/rtf",
@@ -54,9 +55,7 @@ public class RtfConverter extends WordDocumentConverter implements FileToPdfConv
             writer.write(content);
 
             return super.convert(textFile);
-        } catch (TikaException e) {
-            throw new IOException(e);
-        } catch (SAXException e) {
+        } catch (TikaException | SAXException e ) {
             throw new IOException(e);
         }
     }

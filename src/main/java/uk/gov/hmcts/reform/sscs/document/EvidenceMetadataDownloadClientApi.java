@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.document;
 
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.codec.Decoder;
@@ -10,10 +10,9 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpHeaders;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.healthcheck.InternalHealth;
 
@@ -22,7 +21,7 @@ import uk.gov.hmcts.reform.document.healthcheck.InternalHealth;
 public interface EvidenceMetadataDownloadClientApi {
     static final String USER_ID = "user-id";
 
-    @RequestMapping(method = RequestMethod.GET, value = "{document_metadata_uri}")
+    @GetMapping(value = "{document_metadata_uri}")
     Document getDocumentMetadata(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
         @RequestHeader("ServiceAuthorization") String serviceAuth,
@@ -32,10 +31,9 @@ public interface EvidenceMetadataDownloadClientApi {
     );
 
 
-    @RequestMapping(
-        method = RequestMethod.GET,
+    @GetMapping(
         value = "/health",
-        headers = CONTENT_TYPE + "=" + APPLICATION_JSON_UTF8_VALUE
+        headers = CONTENT_TYPE + "=" + APPLICATION_JSON_VALUE
     )
     InternalHealth health();
 
