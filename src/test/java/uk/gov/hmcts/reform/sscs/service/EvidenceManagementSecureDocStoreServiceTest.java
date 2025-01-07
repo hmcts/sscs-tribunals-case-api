@@ -36,15 +36,13 @@ public class EvidenceManagementSecureDocStoreServiceTest {
 
     @Mock
     private CaseDocumentClient caseDocumentClient;
-    @Mock
-    private EvidenceDownloadClientApi evidenceDownloadClientApi;
 
     private EvidenceManagementSecureDocStoreService evidenceManagementSecureDocStoreService;
 
     @Before
     public void setUp() {
         openMocks(this);
-        evidenceManagementSecureDocStoreService = new EvidenceManagementSecureDocStoreService(caseDocumentClient, evidenceDownloadClientApi);
+        evidenceManagementSecureDocStoreService = new EvidenceManagementSecureDocStoreService(caseDocumentClient);
     }
 
     @Test
