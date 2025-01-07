@@ -3,6 +3,9 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.addhearingoutcome;
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.helper.service.CaseHearingLocationHelper.mapVenueDetailsToVenue;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -30,7 +33,6 @@ import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.sscs.service.HmcHearingsApiService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
-import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingUpdateService;
 
 
 @Component
@@ -38,13 +40,11 @@ import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingUpdateService;
 public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final HmcHearingsApiService hmcHearingsApiService;
-    private final HearingUpdateService hearingUpdateService;
     private final VenueService venueService;
 
     public AddHearingOutcomeAboutToStartHandler(HmcHearingsApiService hmcHearingsApiService,
-                                                HearingUpdateService hearingUpdateService, VenueService venueService) {
+                                                VenueService venueService) {
         this.hmcHearingsApiService = hmcHearingsApiService;
-        this.hearingUpdateService = hearingUpdateService;
         this.venueService = venueService;
     }
 
@@ -122,11 +122,11 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
         }
 
         if (!isNull(hearingDaySchedule.getHearingStartDateTime())) {
-            hearingDetails.setStart(hearingUpdateService.convertUtcToUk(hearingDaySchedule.getHearingStartDateTime()));
+            hearingDetails.setStart(convertUtcToUk(hearingDaySchedule.getHearingStartDateTime()));
         }
 
         if (!isNull(hearingDaySchedule.getHearingEndDateTime())) {
-            hearingDetails.setEnd(hearingUpdateService.convertUtcToUk(hearingDaySchedule.getHearingEndDateTime()));
+            hearingDetails.setEnd(convertUtcToUk(hearingDaySchedule.getHearingEndDateTime()));
         }
 
         if (!isNull(caseHearing.getHearingChannels())) {
@@ -144,5 +144,10 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
             log.info("EpimsId {} was not found", epimsId);
         }
         return (isNull(venueDetails)) ? Venue.builder().build() : mapVenueDetailsToVenue(venueDetails);
+    }
+
+    private LocalDateTime convertUtcToUk(LocalDateTime utcLocalDateTime) {
+        ZonedDateTime utcZone = utcLocalDateTime.atZone(ZoneId.of("UTC"));
+        return utcZone.withZoneSameInstant(ZoneId.of("Europe/London")).toLocalDateTime();
     }
 }

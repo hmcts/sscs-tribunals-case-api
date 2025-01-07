@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.HmcHearingsApiService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
-import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingUpdateService;
 
 
 @RunWith(JUnitParamsRunner.class)
@@ -46,15 +45,13 @@ public class AddHearingOutcomeAboutToStartHandlerTest {
     @Mock
     private HmcHearingsApiService hmcHearingsApiService;
     @Mock
-    private HearingUpdateService hearingUpdateService;
-    @Mock
     private VenueService venueService;
     private SscsCaseData sscsCaseData;
 
     @BeforeEach
     void setup() {
         openMocks(this);
-        handler = new AddHearingOutcomeAboutToStartHandler(hmcHearingsApiService, hearingUpdateService, venueService);
+        handler = new AddHearingOutcomeAboutToStartHandler(hmcHearingsApiService, venueService);
         when(callback.getEvent()).thenReturn(EventType.ADD_HEARING_OUTCOME);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build()).hearingOutcomeValue(HearingOutcomeValue.builder().build()).build();
@@ -72,8 +69,6 @@ public class AddHearingOutcomeAboutToStartHandlerTest {
             .epimsId(EPIMS_ID_1)
             .venName("venueName")
             .build());
-        when(hearingUpdateService.convertUtcToUk(HEARING_START_DATE_TIME)).thenReturn(HEARING_START_DATE_TIME);
-        when(hearingUpdateService.convertUtcToUk(HEARING_END_DATE_TIME)).thenReturn(HEARING_END_DATE_TIME);
         when(hmcHearingsApiService.getHearingsRequest(any(),any())).thenReturn(
             HearingsGetResponse.builder().caseHearings(List.of(CaseHearing.builder()
                     .hearingId(1L)
@@ -100,12 +95,6 @@ public class AddHearingOutcomeAboutToStartHandlerTest {
             .epimsId(EPIMS_ID_2)
             .venName("secondVenueName")
             .build());
-        when(hearingUpdateService.convertUtcToUk(HEARING_START_DATE_TIME)).thenReturn(HEARING_START_DATE_TIME);
-        when(hearingUpdateService.convertUtcToUk(HEARING_END_DATE_TIME)).thenReturn(HEARING_END_DATE_TIME);
-        when(hearingUpdateService.convertUtcToUk(HEARING_START_DATE_TIME.minusMonths(1)))
-            .thenReturn(HEARING_START_DATE_TIME.minusMonths(1));
-        when(hearingUpdateService.convertUtcToUk(HEARING_END_DATE_TIME.minusMonths(1)))
-            .thenReturn(HEARING_END_DATE_TIME.minusMonths(1));
         when(hmcHearingsApiService.getHearingsRequest(any(),any())).thenReturn(
                 HearingsGetResponse.builder().caseHearings(
                         List.of(CaseHearing.builder()
