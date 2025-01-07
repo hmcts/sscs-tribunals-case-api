@@ -532,7 +532,7 @@ notification:
                 letterId: 91143b85-dd9d-430c-ba23-e42ec90f44f8
                 docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx
             representative:
-                emailId: 3d05393a-e593-400a-963f-a26893a0b672
+                emailId: 8003606e-3d80-4e17-b846-18698f8d681e
                 smsId: 99bd4a56-256c-4de8-b187-d43a8dde466f
                 letterId: 77ea8a2f-06df-4279-9c1f-0f23cb2d9bbf
                 docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Representative.docx
@@ -1171,7 +1171,7 @@ notification:
                 letterId: 830ba7f1-9757-4833-8520-2f872de7be44
                 docmosisId: TB-SCS-LET-WEL-Appeal-Lodged-Appellant.docx
             representative:
-                emailId: e7993ed9-982a-44eb-8459-932d6d7653ea
+                emailId: a4a85f03-c23c-4099-ab45-7a3ba9eee63a
                 smsId: 6970bdda-7293-46d6-8876-7e1a7c4295fc
                 letterId: 89cbb9d8-3b7d-4766-b481-585832e8bd90
                 docmosisId: TB-SCS-LET-WEL-Appeal-Lodged-Representative.docx
