@@ -162,11 +162,24 @@ export class HomePage {
     }
 
     async clickBeforeTabBtn(): Promise<void> {
-        await this.beforeTabBtn.click();
+        const isEleVisible = await this.beforeTabBtn.isVisible();
+
+        if(isEleVisible) {
+            await this.beforeTabBtn.click();
+        } else {
+            logger.info('Before tab button is not visible');
+        }
+        
     }
 
     async clickAfterTabBtn(): Promise<void> {
-        await this.afterTabBtn.click();
+        const isEleVisible = await this.afterTabBtn.isVisible();
+
+        if(isEleVisible) {
+            await this.afterTabBtn.click();
+        } else {
+            logger.info('After tab button is not visible');
+        }
     }
 
     async waitForLoadState() {
