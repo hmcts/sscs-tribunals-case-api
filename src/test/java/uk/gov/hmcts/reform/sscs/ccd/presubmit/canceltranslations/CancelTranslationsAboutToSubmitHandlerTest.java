@@ -8,7 +8,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CANCEL_TRANSLATIONS;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_TCW;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,6 +29,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
@@ -60,8 +60,10 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
         "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE",
         "ABOUT_TO_START,CANCEL_TRANSLATIONS"
     })
-    public void givenCanHandleIsCalledWithInvalidCallBack_shouldReturnCorrectFalse(@Nullable CallbackType callbackType, @Nullable EventType eventType) {
-        Callback<SscsCaseData> callback = buildCallback(eventType, State.VALID_APPEAL, 1);
+    public void givenCanHandleIsCalledWithInvalidCallBack_shouldReturnCorrectFalse(CallbackType callbackType,
+                                                                                   EventType eventType) {
+        Callback<SscsCaseData> callback = buildCallback(eventType, State.VALID_APPEAL,
+            SscsDocumentTranslationStatus.TRANSLATION_REQUIRED, DocumentType.SSCS1, 1);
         boolean actualResult = handler.canHandle(callbackType, callback);
         assertFalse(actualResult);
     }
@@ -86,8 +88,10 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
         "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE",
         "ABOUT_TO_START,CANCEL_TRANSLATIONS"
     })
-    public void givenHandleIsCalledWithInvalidCallBack_shouldThrowIllegalStateException(CallbackType callbackType, EventType eventType) {
-        Callback<SscsCaseData> callback = buildCallback(eventType, State.VALID_APPEAL, 1);
+    public void givenHandleIsCalledWithInvalidCallBack_shouldThrowIllegalStateException(CallbackType callbackType,
+                                                                                        EventType eventType) {
+        Callback<SscsCaseData> callback = buildCallback(eventType, State.VALID_APPEAL,
+            SscsDocumentTranslationStatus.TRANSLATION_REQUIRED, DocumentType.SSCS1, 1);
         IllegalStateException exception = assertThrows(IllegalStateException.class,
             () -> handler.handle(callbackType, callback, USER_AUTHORISATION));
         assertEquals("Cannot handle callback", exception.getMessage());
@@ -95,20 +99,25 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({
-        "0,null",
-        "1,SEND_TO_DWP",
-        "2,DECISION_ISSUED_WELSH",
-        "3,null",
-        "4,null",
-        "5,DIRECTION_ISSUED_WELSH",
-        "6,UPDATE_CASE_ONLY",
-        "8,SEND_TO_DWP"
+        "null,TRANSLATION_REQUIRED,APPELLANT_EVIDENCE,0",
+        "SEND_TO_DWP,TRANSLATION_REQUIRED,SSCS1,1",
+        "DECISION_ISSUED_WELSH,TRANSLATION_REQUIRED,DECISION_NOTICE,3",
+        "null,TRANSLATION_COMPLETE,DIRECTION_NOTICE,2",
+        "null,null,DECISION_NOTICE,2",
+        "DIRECTION_ISSUED_WELSH,TRANSLATION_REQUESTED,DIRECTION_NOTICE,2",
+        "UPDATE_CASE_ONLY,TRANSLATION_REQUIRED,REINSTATEMENT_REQUEST,2",
+        "SEND_TO_DWP,TRANSLATION_REQUIRED,SSCS8,4",
+        "UPDATE_CASE_ONLY,TRANSLATION_REQUESTED,URGENT_HEARING_REQUEST,1"
     })
-    public void shouldSetTranslationStatusOfDocumentsAndNextWelshEventCorrectly(int sscsDocumentNumber, @Nullable EventType eventType) {
-        Callback<SscsCaseData> callback = buildCallback(CANCEL_TRANSLATIONS, State.VALID_APPEAL, sscsDocumentNumber);
+    public void shouldSetTranslationStatusOfDocumentsAndNextWelshEventCorrectly(@Nullable EventType eventType,
+                                                                                @Nullable SscsDocumentTranslationStatus translationStatus,
+                                                                                DocumentType documentType,
+                                                                                int daysToSubtract) {
+        Callback<SscsCaseData> callback = buildCallback(CANCEL_TRANSLATIONS, State.VALID_APPEAL,
+            translationStatus, documentType, daysToSubtract);
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        if (sscsDocumentNumber == 3) {
+        if (SscsDocumentTranslationStatus.TRANSLATION_COMPLETE.equals(translationStatus)) {
             assertEquals(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE,
                 response.getData().getSscsDocument().get(0).getValue().getDocumentTranslationStatus());
         } else {
@@ -119,13 +128,26 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"0", "1", "2", "3", "4", "5", "6", "8"})
-    public void shouldSetInterlocReviewStateIfInterlocReview(int sscsDocumentNumber) {
-        Callback<SscsCaseData> callback = buildCallback(CANCEL_TRANSLATIONS, State.INTERLOCUTORY_REVIEW_STATE, sscsDocumentNumber);
+    @Parameters({
+        "TRANSLATION_REQUIRED,APPELLANT_EVIDENCE,0",
+        "TRANSLATION_REQUIRED,SSCS1,1",
+        "TRANSLATION_REQUIRED,DECISION_NOTICE,3",
+        "TRANSLATION_COMPLETE,DIRECTION_NOTICE,2",
+        "null,DECISION_NOTICE,2",
+        "TRANSLATION_REQUESTED,DIRECTION_NOTICE,2",
+        "TRANSLATION_REQUIRED,REINSTATEMENT_REQUEST,2",
+        "TRANSLATION_REQUIRED,SSCS8,4",
+        "TRANSLATION_REQUESTED,URGENT_HEARING_REQUEST,1"
+    })
+    public void shouldSetInterlocReviewStateIfInterlocReview(@Nullable SscsDocumentTranslationStatus translationStatus,
+                                                             DocumentType documentType,
+                                                             int daysToSubtract) {
+        Callback<SscsCaseData> callback = buildCallback(CANCEL_TRANSLATIONS, State.INTERLOCUTORY_REVIEW_STATE,
+            translationStatus, documentType, daysToSubtract);
         callback.getCaseDetails().getCaseData().setWelshInterlocNextReviewState("reviewByTcw");
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        if (sscsDocumentNumber == 3) {
+        if (SscsDocumentTranslationStatus.TRANSLATION_COMPLETE.equals(translationStatus)) {
             assertEquals(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE,
                 response.getData().getSscsDocument().get(0).getValue().getDocumentTranslationStatus());
         } else {
@@ -133,34 +155,15 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
         }
         assertEquals("No", response.getData().getTranslationWorkOutstanding());
 
-        assertEquals(REVIEW_BY_TCW, response.getData().getInterlocReviewState());
+        assertEquals(InterlocReviewState.REVIEW_BY_TCW, response.getData().getInterlocReviewState());
     }
 
-    private Callback<SscsCaseData> buildCallback(EventType eventType, State state, int sscsDocumentNumber) {
-        SscsDocument sscsDocument = switch (sscsDocumentNumber) {
-            case 0 -> buildSscsDocument("english.pdf", SscsDocumentTranslationStatus.TRANSLATION_REQUIRED,
-                DocumentType.APPELLANT_EVIDENCE.getValue(), LocalDate.now());
-            case 1 -> buildSscsDocument("english.pdf", SscsDocumentTranslationStatus.TRANSLATION_REQUIRED,
-                DocumentType.SSCS1.getValue(), LocalDate.now().minusDays(1));
-            case 2 -> buildSscsDocument("anything.pdf", SscsDocumentTranslationStatus.TRANSLATION_REQUIRED,
-                DocumentType.DECISION_NOTICE
-                    .getValue(), LocalDate.now().minusDays(3));
-            case 3 -> buildSscsDocument("anything.pdf", SscsDocumentTranslationStatus.TRANSLATION_COMPLETE,
-                DocumentType.DIRECTION_NOTICE
-                    .getValue(), LocalDate.now().minusDays(2));
-            case 4 -> buildSscsDocument("anything.pdf", null, DocumentType.DECISION_NOTICE
-                .getValue(), LocalDate.now().minusDays(2));
-            case 5 -> buildSscsDocument("anything.pdf", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED,
-                DocumentType.DIRECTION_NOTICE
-                    .getValue(), LocalDate.now().minusDays(2));
-            case 6 -> buildSscsDocument("anything.pdf", SscsDocumentTranslationStatus.TRANSLATION_REQUIRED,
-                DocumentType.REINSTATEMENT_REQUEST
-                    .getValue(), LocalDate.now().minusDays(2));
-            case 8 -> buildSscsDocument("ibc.pdf", SscsDocumentTranslationStatus.TRANSLATION_REQUIRED,
-                DocumentType.SSCS8.getValue(), LocalDate.now().minusDays(4));
-            default -> null;
-        };
-
+    private Callback<SscsCaseData> buildCallback(EventType eventType, State state,
+                                                 SscsDocumentTranslationStatus translationStatus,
+                                                 DocumentType documentType,
+                                                 int daysToSubtract) {
+        SscsDocument sscsDocument = buildSscsDocument(translationStatus, documentType.getValue(),
+            LocalDate.now().minusDays(daysToSubtract));
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .sscsDocument(Collections.singletonList(sscsDocument))
             .state(State.VALID_APPEAL)
@@ -171,13 +174,13 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
         return new Callback<>(caseDetails, Optional.empty(), eventType, false);
     }
 
-    private SscsDocument buildSscsDocument(String s, SscsDocumentTranslationStatus translationRequired, String docType,
+    private SscsDocument buildSscsDocument(SscsDocumentTranslationStatus translationRequired, String docType,
                                            LocalDate dateAdded) {
         return SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
                 .documentLink(DocumentLink.builder()
                     .documentUrl("/anotherUrl")
-                    .documentFilename(s)
+                    .documentFilename("document.pdf")
                     .build())
                 .documentTranslationStatus(translationRequired)
                 .documentType(docType)
