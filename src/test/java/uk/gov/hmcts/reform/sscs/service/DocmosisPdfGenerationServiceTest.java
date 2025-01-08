@@ -1,14 +1,14 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +40,7 @@ public class DocmosisPdfGenerationServiceTest {
 
     @Before
     public void setup() {
-        initMocks(this);
+        openMocks(this);
         pdfGenerationService = new DocmosisPdfGenerationService("bla", "bla2", restTemplate);
     }
 

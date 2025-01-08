@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 import com.google.common.collect.Lists;
 import java.io.File;
@@ -30,7 +30,7 @@ public class FileToPdfConversionServiceTest {
 
     @Before
     public void setup() {
-        initMocks(this);
+        openMocks(this);
 
         conversionService = new FileToPdfConversionService(
                 Lists.newArrayList(pdfConverter)
