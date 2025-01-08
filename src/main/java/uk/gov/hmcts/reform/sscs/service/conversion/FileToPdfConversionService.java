@@ -11,7 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.FilenameUtils;
@@ -43,7 +42,7 @@ public class FileToPdfConversionService {
 
     public List<MultipartFile> convert(List<MultipartFile> files) {
         try {
-            return files.stream().parallel().map(unchecked(this::convert)).collect(Collectors.toList());
+            return files.stream().parallel().map(unchecked(this::convert)).toList();
         } catch (Exception e) {
             log.error("cannot convert files to PDF.", e);
             throw new FileToPdfConversionException("Cannot convert files to PDF.", e);

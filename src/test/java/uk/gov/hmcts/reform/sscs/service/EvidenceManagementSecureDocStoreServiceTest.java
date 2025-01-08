@@ -104,7 +104,6 @@ public class EvidenceManagementSecureDocStoreServiceTest {
         stubbedLink.href = "http://localhost:4506/documents/eb8cbfaa-37c3-4644-aa77-b9a2e2c72332";
         Document.Links stubbedLinks = new Document.Links();
         stubbedLinks.binary = stubbedLink;
-        Document stubbedDocument = Document.builder().links(stubbedLinks).build();
 
         String documentHref = URI.create(stubbedLink.href).getPath().replaceFirst("/", "");
         when(caseDocumentClient.getDocumentBinary(eq(IDAM_TOKENS.getIdamOauth2Token()), eq(SERVICE_AUTHORIZATION), eq(documentHref))).thenReturn(mockResponseEntity);
@@ -123,7 +122,6 @@ public class EvidenceManagementSecureDocStoreServiceTest {
         stubbedLink.href = "http://localhost:4506/documents/eb8cbfaa-37c3-4644-aa77-b9a2e2c72332";
         Document.Links stubbedLinks = new Document.Links();
         stubbedLinks.binary = stubbedLink;
-        Document stubbedDocument = Document.builder().links(stubbedLinks).build();
 
         String documentHref = URI.create(stubbedLink.href).getPath().replaceFirst("/", "");
         when(caseDocumentClient.getDocumentBinary(eq(IDAM_TOKENS.getIdamOauth2Token()), eq(SERVICE_AUTHORIZATION), eq(documentHref))).thenReturn(mockResponseEntity);
@@ -143,7 +141,6 @@ public class EvidenceManagementSecureDocStoreServiceTest {
         stubbedLink.href = "http://localhost:4506/documents/eb8cbfaa-37c3-4644-aa77-b9a2e2c72332";
         Document.Links stubbedLinks = new Document.Links();
         stubbedLinks.binary = stubbedLink;
-        Document stubbedDocument = Document.builder().links(stubbedLinks).build();
 
         String documentHref = URI.create(stubbedLink.href).getPath().replaceFirst("/", "");
         when(caseDocumentClient.getDocumentBinary(eq(IDAM_TOKENS.getIdamOauth2Token()), eq(IDAM_TOKENS.getServiceAuthorization()), eq(documentHref))).thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
@@ -157,7 +154,6 @@ public class EvidenceManagementSecureDocStoreServiceTest {
         stubbedLink.href = "http://localhost:4506/documents/eb8cbfaa-37c3-4644-aa77-b9a2e2c72332";
         Document.Links stubbedLinks = new Document.Links();
         stubbedLinks.binary = stubbedLink;
-        Document stubbedDocument = Document.builder().links(stubbedLinks).build();
 
         when(caseDocumentClient.getDocumentBinary(eq(IDAM_TOKENS.getIdamOauth2Token()), eq(IDAM_TOKENS.getServiceAuthorization()), eq(stubbedLink.href))).thenThrow(new Exception("AppealNumber"));
 

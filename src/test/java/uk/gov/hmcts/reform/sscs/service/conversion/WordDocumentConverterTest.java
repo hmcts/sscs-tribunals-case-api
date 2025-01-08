@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNotEquals;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import okhttp3.Call;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -21,12 +20,6 @@ import org.junit.Test;
 public class WordDocumentConverterTest {
 
     private OkHttpClient httpClient;
-
-    private Call call;
-
-    private Response response;
-
-    private ResponseBody responseBody;
 
     private WordDocumentConverter converter;
 

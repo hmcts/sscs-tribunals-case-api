@@ -171,7 +171,6 @@ public class EvidenceManagementServiceTest {
 
     @Test(expected = Exception.class)
     public void downloadDocumentShouldRethrowAnyExceptionIfItsNotHttpClientErrorException() {
-        List<MultipartFile> files = Collections.emptyList();
 
         Document stubbedDocument = new Document();
         Document.Link stubbedLink = new Document.Link();

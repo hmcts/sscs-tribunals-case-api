@@ -6,10 +6,7 @@ import static uk.gov.hmcts.reform.sscs.service.conversion.WordDocumentConverterT
 
 import java.io.File;
 import java.io.IOException;
-import okhttp3.Call;
 import okhttp3.OkHttpClient;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,12 +16,6 @@ public class RtfConverterTest {
     private RtfConverter rtfConverter;
 
     private OkHttpClient httpClient;
-
-    private Call call;
-
-    private Response response;
-
-    private ResponseBody responseBody;
 
     @Before
     public void setup() {
