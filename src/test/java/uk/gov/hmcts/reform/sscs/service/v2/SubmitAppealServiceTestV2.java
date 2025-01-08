@@ -96,8 +96,8 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
     }
 
     @Override
-    public Optional<SaveCaseResult> callSubmitDraftAppeal(uk.gov.hmcts.reform.sscs.service.SubmitAppealService submitAppealService, SubmitAppealService submitAppealServiceV2, String auth2Token, SyaCaseWrapper appealData, boolean forceCreate) {
-        return submitAppealServiceV2.submitDraftAppeal(auth2Token, appealData, forceCreate);
+    public Optional<SaveCaseResult> callSubmitDraftAppeal(SubmitAppealService submitAppealService, String auth2Token, SyaCaseWrapper appealData, boolean forceCreate) {
+        return submitAppealService.submitDraftAppeal(auth2Token, appealData, forceCreate);
     }
 
     @Override
@@ -113,8 +113,8 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
     }
 
     @Override
-    public Optional<SaveCaseResult> callUpdateDraftAppeal(uk.gov.hmcts.reform.sscs.service.SubmitAppealService submitAppealService, SubmitAppealService submitAppealServiceV2, String auth2Token, SyaCaseWrapper appealData) {
-        return submitAppealServiceV2.updateDraftAppeal(auth2Token, appealData);
+    public Optional<SaveCaseResult> callUpdateDraftAppeal(SubmitAppealService submitAppealService, String auth2Token, SyaCaseWrapper appealData) {
+        return submitAppealService.updateDraftAppeal(auth2Token, appealData);
     }
 
     @Override
@@ -123,8 +123,8 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
     }
 
     @Override
-    public Optional<SaveCaseResult> callArchiveDraftAppeal(uk.gov.hmcts.reform.sscs.service.SubmitAppealService submitAppealService, SubmitAppealService submitAppealServiceV2, String auth2Token, SyaCaseWrapper appealData, Long caseId) {
-        return submitAppealServiceV2.archiveDraftAppeal(auth2Token, appealData, caseId);
+    public Optional<SaveCaseResult> callArchiveDraftAppeal(SubmitAppealService submitAppealService, String auth2Token, SyaCaseWrapper appealData, Long caseId) {
+        return submitAppealService.archiveDraftAppeal(auth2Token, appealData, caseId);
     }
 
     @Override
@@ -156,7 +156,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
 
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
 
-        submitAppealServiceV2.submitAppeal(appealData, userToken);
+        submitAppealService.submitAppeal(appealData, userToken);
 
         verify(ccdService).createCase(capture.capture(), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
         assertEquals("No", capture.getValue().getIsSaveAndReturn());
@@ -169,7 +169,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
 
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
         appealData.setBenefitType(new SyaBenefitType("Infected Blood Compensation", "infectedBloodCompensation"));
-        submitAppealServiceV2.submitAppeal(appealData, userToken);
+        submitAppealService.submitAppeal(appealData, userToken);
         appealData.setBenefitType(null);
         verify(ccdService).createCase(capture.capture(), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
         assertEquals("No", capture.getValue().getIsSaveAndReturn());
@@ -208,7 +208,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
         long submittedCaseId = 999L;
         appealData.setCcdCaseId(String.valueOf(submittedCaseId));
         appealData.setIsSaveAndReturn("Yes");
-        submitAppealServiceV2.submitAppeal(appealData, userToken);
+        submitAppealService.submitAppeal(appealData, userToken);
 
         verify(updateCcdCaseService).updateCaseV2WithUnaryFunction(
                 eq(submittedCaseId),
@@ -260,7 +260,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
         long submittedCaseId = 999L;
         appealData.setCcdCaseId(String.valueOf(submittedCaseId));
         appealData.setIsSaveAndReturn("Yes");
-        submitAppealServiceV2.submitAppeal(appealData, userToken);
+        submitAppealService.submitAppeal(appealData, userToken);
 
         verify(updateCcdCaseService).updateCaseV2WithUnaryFunction(
                 eq(submittedCaseId),
@@ -318,7 +318,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
         long submittedCaseId = 999L;
         appealData.setCcdCaseId(String.valueOf(submittedCaseId));
         appealData.setIsSaveAndReturn("Yes");
-        submitAppealServiceV2.submitAppeal(appealData, userToken);
+        submitAppealService.submitAppeal(appealData, userToken);
 
         verify(updateCcdCaseService).updateCaseV2WithUnaryFunction(
                 eq(submittedCaseId),
@@ -352,7 +352,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
                                                         .build()).build()).build()).build()
                 ));
 
-        submitAppealServiceV2.submitAppeal(appealData, userToken);
+        submitAppealService.submitAppeal(appealData, userToken);
 
         verify(ccdService).createCase(capture.capture(), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
         assertEquals(1, capture.getValue().getAssociatedCase().size());
@@ -376,7 +376,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
                                                 .build()).build()).build()
                 ));
 
-        submitAppealServiceV2.submitAppeal(appealData, userToken);
+        submitAppealService.submitAppeal(appealData, userToken);
 
         verify(ccdService).createCase(capture.capture(), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
         assertEquals(1, capture.getValue().getAssociatedCase().size());
@@ -392,7 +392,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
 
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
 
-        submitAppealServiceV2.submitAppeal(appealData, userToken);
+        submitAppealService.submitAppeal(appealData, userToken);
 
         verify(ccdService).createCase(capture.capture(), eq(INCOMPLETE_APPLICATION_RECEIVED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
         verify(ccdService, times(0)).updateCase(any(SscsCaseData.class), eq(123L), eq(SEND_TO_DWP.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
@@ -408,7 +408,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
 
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
         appealData.setBenefitType(new SyaBenefitType("Infected Blood Compensation", "infectedBloodCompensation"));
-        submitAppealServiceV2.submitAppeal(appealData, userToken);
+        submitAppealService.submitAppeal(appealData, userToken);
 
         verify(ccdService).createCase(capture.capture(), eq(INCOMPLETE_APPLICATION_RECEIVED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
         verify(ccdService, times(0)).updateCase(any(SscsCaseData.class), eq(123L), eq(SEND_TO_DWP.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
@@ -447,7 +447,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
         long submittedCaseId = 999L;
         appealData.setCcdCaseId(String.valueOf(submittedCaseId));
         appealData.setIsSaveAndReturn("Yes");
-        submitAppealServiceV2.submitAppeal(appealData, userToken);
+        submitAppealService.submitAppeal(appealData, userToken);
 
         verify(updateCcdCaseService).updateCaseV2WithUnaryFunction(
                 eq(submittedCaseId),
@@ -472,7 +472,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
 
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
 
-        submitAppealServiceV2.submitAppeal(appealData, userToken);
+        submitAppealService.submitAppeal(appealData, userToken);
 
         verify(ccdService).createCase(capture.capture(), eq(INCOMPLETE_APPLICATION_RECEIVED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
         verify(ccdService, times(0)).updateCase(any(SscsCaseData.class), eq(123L), eq(SEND_TO_DWP.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
@@ -488,7 +488,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
 
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
         appealData.setBenefitType(new SyaBenefitType("Infected Blood Compensation", "infectedBloodCompensation"));
-        submitAppealServiceV2.submitAppeal(appealData, userToken);
+        submitAppealService.submitAppeal(appealData, userToken);
 
         verify(ccdService).createCase(capture.capture(), eq(INCOMPLETE_APPLICATION_RECEIVED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
         verify(ccdService, times(0)).updateCase(any(SscsCaseData.class), eq(123L), eq(SEND_TO_DWP.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
@@ -504,7 +504,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
 
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
 
-        submitAppealServiceV2.submitAppeal(appealData, userToken);
+        submitAppealService.submitAppeal(appealData, userToken);
 
         verify(ccdService).createCase(capture.capture(), eq(NON_COMPLIANT.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
         assertEquals("No", capture.getValue().getIsSaveAndReturn());
@@ -539,7 +539,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
                 unaryOperatorArgumentCaptor.capture()))
                 .willReturn(sscsCaseDetails);
 
-        submitAppealServiceV2.submitAppeal(appealData, userToken);
+        submitAppealService.submitAppeal(appealData, userToken);
 
         verify(updateCcdCaseService).updateCaseV2WithUnaryFunction(
                 eq(Long.valueOf(appealData.getCcdCaseId())),
@@ -586,7 +586,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
         appealData.setCcdCaseId(String.valueOf(submittedCaseId));
         appealData.setIsSaveAndReturn("Yes");
 
-        submitAppealServiceV2.submitAppeal(appealData, userToken);
+        submitAppealService.submitAppeal(appealData, userToken);
 
         verify(updateCcdCaseService).updateCaseV2WithUnaryFunction(
                 eq(submittedCaseId),
@@ -607,7 +607,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
         given(ccdService.findCaseBy(eq("data.appeal.appellant.identity.nino"), eq(appealData.getAppellant().getNino()), any(IdamTokens.class)))
                 .willThrow(RuntimeException.class);
 
-        submitAppealServiceV2.submitAppeal(appealData, userToken);
+        submitAppealService.submitAppeal(appealData, userToken);
     }
 
     @Test(expected = CcdException.class)
@@ -618,7 +618,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
                 .willThrow(RuntimeException.class);
 
-        submitAppealServiceV2.submitAppeal(appealData, userToken);
+        submitAppealService.submitAppeal(appealData, userToken);
     }
 
     @Test(expected = DuplicateCaseException.class)
@@ -635,7 +635,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
                                                         .build()).build()).build()).build()
                 ));
 
-        submitAppealServiceV2.submitAppeal(appealData, userToken);
+        submitAppealService.submitAppeal(appealData, userToken);
 
         then(pdfServiceClient).should(never()).generateFromHtml(any(byte[].class), anyMap());
     }
@@ -667,7 +667,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
                                                         .build()).build()).build()).build()
                 ));
 
-        submitAppealServiceV2.submitAppeal(appealData, userToken);
+        submitAppealService.submitAppeal(appealData, userToken);
 
         verify(ccdService, never()).createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class));
     }
@@ -684,7 +684,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
 
         appealData.getAppellant().getContactDetails().setPostCode(appellantPostCode);
 
-        SscsCaseData caseData = submitAppealServiceV2.convertAppealToSscsCaseData(appealData, SscsCaseData.builder().build());
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData, SscsCaseData.builder().build());
 
         RegionalProcessingCenter actualRpc = caseData.getRegionalProcessingCenter();
         RegionalProcessingCenter expectedRpcObject = getRpcObjectForGivenJsonRpc(expectedRpc);
@@ -711,7 +711,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
         appealData.setBenefitType(syaBenefitType);
         appealData.getAppellant().getContactDetails().setPortOfEntry(appellantLocationCode);
         appealData.getAppellant().getContactDetails().setInMainlandUk(Boolean.FALSE);
-        SscsCaseData caseData = submitAppealServiceV2.convertAppealToSscsCaseData(appealData, SscsCaseData.builder().build());
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData, SscsCaseData.builder().build());
         RegionalProcessingCenter actualRpc = caseData.getRegionalProcessingCenter();
         RegionalProcessingCenter expectedRpcObject = getRpcObjectForGivenJsonRpc(expectedRpc);
         assertThat(actualRpc)
@@ -737,7 +737,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
 
         SyaCaseWrapper appealData = getSyaWrapperWithAppointee(appointeeContactDetails);
 
-        SscsCaseData caseData = submitAppealServiceV2.convertAppealToSscsCaseData(appealData, SscsCaseData.builder().build());
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData, SscsCaseData.builder().build());
 
         assertRpc(caseData, BIRMINGHAM_RPC);
     }
@@ -750,7 +750,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
 
         SyaCaseWrapper appealData = getSyaWrapperWithAppointee(appointeeContactDetails);
 
-        SscsCaseData caseData = submitAppealServiceV2.convertAppealToSscsCaseData(appealData, SscsCaseData.builder().build());
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData, SscsCaseData.builder().build());
 
         assertNull(caseData.getRegionalProcessingCenter());
     }
@@ -765,7 +765,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
         SyaCaseWrapper appealData = getSyaWrapperWithAppointee(null);
         appealData.setIsAppointee(false);
 
-        SscsCaseData caseData = submitAppealServiceV2.convertAppealToSscsCaseData(appealData, SscsCaseData.builder().build());
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData, SscsCaseData.builder().build());
 
         assertRpc(caseData, BRADFORD_RPC);
     }
@@ -780,7 +780,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
         mrn.setDwpIssuingOffice("2");
         appealData.setMrn(mrn);
 
-        SscsCaseData caseData = submitAppealServiceV2.convertAppealToSscsCaseData(appealData, SscsCaseData.builder().build());
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData, SscsCaseData.builder().build());
         assertEquals(READY_TO_LIST.getId(), caseData.getCreatedInGapsFrom());
     }
 
@@ -793,7 +793,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
         mrn.setDwpIssuingOffice("Chesterfield DRT");
         appealData.setMrn(mrn);
 
-        SscsCaseData caseData = submitAppealServiceV2.convertAppealToSscsCaseData(appealData, SscsCaseData.builder().build());
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData, SscsCaseData.builder().build());
         assertEquals(READY_TO_LIST.getId(), caseData.getCreatedInGapsFrom());
     }
 
@@ -806,7 +806,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
         mrn.setDwpIssuingOffice("Recovery from Estates");
         appealData.setMrn(mrn);
 
-        SscsCaseData caseData = submitAppealServiceV2.convertAppealToSscsCaseData(appealData, SscsCaseData.builder().build());
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData, SscsCaseData.builder().build());
         assertEquals(READY_TO_LIST.getId(), caseData.getCreatedInGapsFrom());
         assertEquals("RfE", caseData.getDwpRegionalCentre());
         assertEquals("UC Recovery from Estates", caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
@@ -819,7 +819,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
         given(ccdService.createCase(any(SscsCaseData.class), anyString(), anyString(), anyString(), any(IdamTokens.class)))
                 .willThrow(RuntimeException.class);
 
-        submitAppealServiceV2.submitAppeal(appealData, userToken);
+        submitAppealService.submitAppeal(appealData, userToken);
     }
 
     @Test
@@ -829,7 +829,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
         matchedByNinoCases.add(matchingCase);
 
         SscsCaseData caseData = SscsCaseData.builder().ccdCaseId("00000000").build();
-        submitAppealServiceV2.addAssociatedCases(
+        submitAppealService.addAssociatedCases(
                 caseData,
                 matchedByNinoCases);
 
@@ -847,7 +847,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
         matchedByNinoCases.add(matchingCase2);
 
         SscsCaseData caseData = SscsCaseData.builder().ccdCaseId("00000000").build();
-        submitAppealServiceV2.addAssociatedCases(
+        submitAppealService.addAssociatedCases(
                 caseData,
                 matchedByNinoCases);
 
@@ -862,7 +862,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
         List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
 
         SscsCaseData caseData = SscsCaseData.builder().ccdCaseId("00000000").build();
-        submitAppealServiceV2.addAssociatedCases(
+        submitAppealService.addAssociatedCases(
                 caseData,
                 matchedByNinoCases);
 
@@ -909,7 +909,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
             appealData.getAppointee().getContactDetails().setPostCode(postcode);
         }
 
-        SscsCaseData caseData = submitAppealServiceV2.convertAppealToSscsCaseData(appealData, SscsCaseData.builder().build());
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData, SscsCaseData.builder().build());
 
         assertEquals(expectedVenue, caseData.getProcessingVenue());
         assertNotNull(caseData.getCaseManagementLocation());

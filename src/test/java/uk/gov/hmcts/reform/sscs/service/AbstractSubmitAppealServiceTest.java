@@ -93,8 +93,7 @@ public abstract class AbstractSubmitAppealServiceTest {
     @Mock
     protected UpdateCcdCaseService updateCcdCaseService;
 
-    protected uk.gov.hmcts.reform.sscs.service.SubmitAppealService submitAppealService;
-    protected SubmitAppealService submitAppealServiceV2;
+    protected SubmitAppealService submitAppealService;
 
     protected final SyaCaseWrapper appealData = getSyaCaseWrapper();
 
@@ -156,18 +155,7 @@ public abstract class AbstractSubmitAppealServiceTest {
     public void setup() {
         appealData.getMrn().setDate(LocalDate.now().minusMonths(1));
 
-        submitAppealService = new uk.gov.hmcts.reform.sscs.service.SubmitAppealService(
-                ccdService,
-                citizenCcdService,
-                regionalProcessingCenterService,
-                idamService,
-                convertAIntoBService,
-                airLookupService,
-                refDataService,
-                venueService,
-                true);
-
-        submitAppealServiceV2 = new SubmitAppealService(
+        submitAppealService = new SubmitAppealService(
                 ccdService,
                 citizenCcdService,
                 regionalProcessingCenterService,
@@ -201,14 +189,12 @@ public abstract class AbstractSubmitAppealServiceTest {
 
     public abstract void verifyCitizenCcdService(CitizenCcdService citizenCcdService);
 
-    public abstract Optional<SaveCaseResult> callSubmitDraftAppeal(uk.gov.hmcts.reform.sscs.service.SubmitAppealService submitAppealService,
-                                                                   SubmitAppealService submitAppealServiceV2,
+    public abstract Optional<SaveCaseResult> callSubmitDraftAppeal(SubmitAppealService submitAppealService,
                                                                    String auth2Token,
                                                                    SyaCaseWrapper appealData,
                                                                    boolean forceCreate);
 
-    public abstract Optional<SaveCaseResult> callArchiveDraftAppeal(uk.gov.hmcts.reform.sscs.service.SubmitAppealService submitAppealService,
-                                                                    SubmitAppealService submitAppealServiceV2,
+    public abstract Optional<SaveCaseResult> callArchiveDraftAppeal(SubmitAppealService submitAppealService,
                                                                     String auth2Token,
                                                                     SyaCaseWrapper appealData,
                                                                     Long caseId);
@@ -225,7 +211,7 @@ public abstract class AbstractSubmitAppealServiceTest {
     public void shouldCreateDraftCaseWithAppealDetailsWithDraftEventNotForcedCreate() {
         givenSaveCaseWillReturnSaveCaseOperation(citizenCcdService, 123L, SaveCaseOperation.CREATE);
 
-        Optional<SaveCaseResult> result = callSubmitDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData, false);
+        Optional<SaveCaseResult> result = callSubmitDraftAppeal(submitAppealService, "authorisation", appealData, false);
 
         verifyCitizenCcdService(citizenCcdService);
         assertTrue(result.isPresent());
@@ -236,7 +222,7 @@ public abstract class AbstractSubmitAppealServiceTest {
 
     public abstract void givenUpdateCaseWillThrowException(CitizenCcdService citizenCcdService, FeignException feignException);
 
-    public abstract Optional<SaveCaseResult> callUpdateDraftAppeal(uk.gov.hmcts.reform.sscs.service.SubmitAppealService submitAppealService, SubmitAppealService submitAppealServiceV2, String auth2Token, SyaCaseWrapper appealData);
+    public abstract Optional<SaveCaseResult> callUpdateDraftAppeal(SubmitAppealService submitAppealService, String auth2Token, SyaCaseWrapper appealData);
 
     public abstract void verifyUpdateCaseCalledByUpdateDraftAppeal(CitizenCcdService citizenCcdService);
 
@@ -249,7 +235,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         givenUpdateCaseWillReturnCaseDetails(citizenCcdService, caseDetails);
 
         SyaCaseWrapper caseWrapper = getSyaCaseWrapper("json/sya_with_ccdId.json");
-        Optional<SaveCaseResult> result = callUpdateDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", caseWrapper);
+        Optional<SaveCaseResult> result = callUpdateDraftAppeal(submitAppealService, "authorisation", caseWrapper);
 
         verifyUpdateCaseCalledByUpdateDraftAppeal(citizenCcdService);
         assertTrue(result.isPresent());
@@ -261,7 +247,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         given(feignException.status()).willReturn(404);
         givenUpdateCaseWillThrowException(citizenCcdService, feignException);
 
-        Optional<SaveCaseResult> result = callUpdateDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData);
+        Optional<SaveCaseResult> result = callUpdateDraftAppeal(submitAppealService, "authorisation", appealData);
 
         verifyArchiveDraftAppeal(citizenCcdService);
         assertFalse(result.isPresent());
@@ -273,7 +259,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         given(feignException.status()).willReturn(409);
         givenUpdateCaseWillThrowException(citizenCcdService, feignException);
 
-        Optional<SaveCaseResult> result = callUpdateDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData);
+        Optional<SaveCaseResult> result = callUpdateDraftAppeal(submitAppealService, "authorisation", appealData);
 
         verifyUpdateCaseCalledByUpdateDraftAppeal(citizenCcdService);
         assertFalse(result.isPresent());
@@ -282,7 +268,7 @@ public abstract class AbstractSubmitAppealServiceTest {
     @Test(expected = ApplicationErrorException.class)
     public void shouldRaisedExceptionOnUpdateDraftWhenCitizenRoleIsNotPresent() {
         given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
-        Optional<SaveCaseResult> result = callUpdateDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData);
+        Optional<SaveCaseResult> result = callUpdateDraftAppeal(submitAppealService, "authorisation", appealData);
 
         assertFalse(result.isPresent());
     }
@@ -291,7 +277,7 @@ public abstract class AbstractSubmitAppealServiceTest {
     public void shouldArchiveDraftCase() {
         givenArchiveDraftAppealWillReturnCaseDetails(citizenCcdService, CaseDetails.builder().build());
 
-        Optional<SaveCaseResult> result = callArchiveDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData, 112L);
+        Optional<SaveCaseResult> result = callArchiveDraftAppeal(submitAppealService, "authorisation", appealData, 112L);
 
         verifyArchiveDraft(citizenCcdService);
         assertTrue(result.isPresent());
@@ -303,7 +289,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         given(feignException.status()).willReturn(404);
         givenArchiveDraftAppealWillThrow(citizenCcdService, feignException);
 
-        Optional<SaveCaseResult> result = callArchiveDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData, 112L);
+        Optional<SaveCaseResult> result = callArchiveDraftAppeal(submitAppealService, "authorisation", appealData, 112L);
 
         verifyArchiveDraftAppeal(citizenCcdService);
         assertFalse(result.isPresent());
@@ -312,7 +298,7 @@ public abstract class AbstractSubmitAppealServiceTest {
     @Test(expected = ApplicationErrorException.class)
     public void shouldRaisedExceptionOnArchiveDraftWhenCitizenRoleIsNotPresent() {
         given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
-        Optional<SaveCaseResult> result = callArchiveDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData, 121L);
+        Optional<SaveCaseResult> result = callArchiveDraftAppeal(submitAppealService, "authorisation", appealData, 121L);
 
         assertFalse(result.isPresent());
     }
@@ -325,7 +311,7 @@ public abstract class AbstractSubmitAppealServiceTest {
                         .saveCaseOperation(SaveCaseOperation.CREATE)
                         .build());
 
-        Optional<SaveCaseResult> result = callSubmitDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData, true);
+        Optional<SaveCaseResult> result = callSubmitDraftAppeal(submitAppealService, "authorisation", appealData, true);
 
         verify(citizenCcdService).createDraft(any(SscsCaseData.class), any(IdamTokens.class));
         assertTrue(result.isPresent());
@@ -338,7 +324,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         given(feignException.status()).willReturn(404);
         givenSaveCaseWillThrow(citizenCcdService, feignException);
 
-        Optional<SaveCaseResult> result = callSubmitDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData, false);
+        Optional<SaveCaseResult> result = callSubmitDraftAppeal(submitAppealService, "authorisation", appealData, false);
 
         verifyCitizenCcdService(citizenCcdService);
         assertFalse(result.isPresent());
@@ -352,7 +338,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         appealData.getAppellant().setNino(null);
 
 
-        Optional<SaveCaseResult> result = callSubmitDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData, false);
+        Optional<SaveCaseResult> result = callSubmitDraftAppeal(submitAppealService, "authorisation", appealData, false);
 
         verifyCitizenCcdService(citizenCcdService);
         assertEquals(result, Optional.empty());
@@ -365,7 +351,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         givenUpdateCaseWillThrowException(citizenCcdService, feignException);
         appealData.getAppellant().setNino(null);
 
-        Optional<SaveCaseResult> result = callUpdateDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData);
+        Optional<SaveCaseResult> result = callUpdateDraftAppeal(submitAppealService, "authorisation", appealData);
 
         verifyUpdateCaseCalledByUpdateDraftAppeal(citizenCcdService);
         assertEquals(result, Optional.empty());
@@ -374,7 +360,7 @@ public abstract class AbstractSubmitAppealServiceTest {
     @Test(expected = ApplicationErrorException.class)
     public void shouldRaisedExceptionOnCreateDraftWhenCitizenRoleIsNotPresent() {
         given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
-        Optional<SaveCaseResult> result = callSubmitDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData, false);
+        Optional<SaveCaseResult> result = callSubmitDraftAppeal(submitAppealService, "authorisation", appealData, false);
 
         assertFalse(result.isPresent());
     }
@@ -385,7 +371,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         given(feignException.status()).willReturn(409);
         givenSaveCaseWillThrow(citizenCcdService, feignException);
 
-        Optional<SaveCaseResult> result = callSubmitDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData, false);
+        Optional<SaveCaseResult> result = callSubmitDraftAppeal(submitAppealService, "authorisation", appealData, false);
 
         verifyCitizenCcdService(citizenCcdService);
         assertFalse(result.isPresent());
