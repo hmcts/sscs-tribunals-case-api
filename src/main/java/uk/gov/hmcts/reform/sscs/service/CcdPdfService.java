@@ -38,12 +38,11 @@ public class CcdPdfService {
     private static final String UPLOADED_DOCUMENT_INTO_SSCS = "Uploaded document into SSCS";
     public static final String YES = "Yes";
 
-    @Autowired
     private PdfStoreService pdfStoreService;
 
-    @Autowired
     private CcdService ccdService;
 
+    @Autowired
     public CcdPdfService(PdfStoreService pdfStoreService, CcdService ccdService) {
         this.pdfStoreService = pdfStoreService;
         this.ccdService = ccdService;

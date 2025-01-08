@@ -44,23 +44,19 @@ public class CcdNotificationsPdfService {
 
     private static final String NOTIFICATION_SENT = "Notification sent";
 
-    @Autowired
     private PdfStoreService pdfStoreService;
 
-    @Autowired
     private PDFServiceClient pdfServiceClient;
 
-    @Autowired
     private CcdService ccdService;
 
-    @Autowired
     private UpdateCcdCaseService updateCcdCaseService;
 
-    @Autowired
     private IdamService idamService;
 
     private static final String DEFAULT_SENDER_TYPE = "Gov Notify";
 
+    @Autowired
     public CcdNotificationsPdfService(PdfStoreService pdfStoreService,
                                       PDFServiceClient pdfServiceClient,
                                       CcdService ccdService,
