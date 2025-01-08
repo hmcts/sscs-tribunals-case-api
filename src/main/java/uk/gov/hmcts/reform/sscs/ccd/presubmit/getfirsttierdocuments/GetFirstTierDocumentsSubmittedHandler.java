@@ -27,6 +27,9 @@ public class GetFirstTierDocumentsSubmittedHandler implements PreSubmitCallbackH
     @Value("${feature.postHearingsB.enabled}")
     private final boolean isPostHearingsBEnabled;
 
+    @Value("${feature.handle-ccd-callbackMap-v2.enabled}")
+    private boolean isHandleCcdCallbackMapV2Enabled;
+
     private final CcdCallbackMapService ccdCallbackMapService;
 
     @Override
@@ -50,11 +53,14 @@ public class GetFirstTierDocumentsSubmittedHandler implements PreSubmitCallbackH
 
         log.info("Get first tier documents: handling action {} for case {}", callbackMap, caseId);
 
-        caseData = ccdCallbackMapService.handleCcdCallbackMapV2(
-                callbackMap,
-                caseId
-        );
-
+        if (isHandleCcdCallbackMapV2Enabled) {
+            caseData = ccdCallbackMapService.handleCcdCallbackMapV2(
+                    callbackMap,
+                    caseId
+            );
+        } else {
+            caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
+        }
         return new PreSubmitCallbackResponse<>(caseData);
     }
 }

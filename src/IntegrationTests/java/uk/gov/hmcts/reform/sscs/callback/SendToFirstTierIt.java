@@ -44,7 +44,8 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @SpringBootTest(properties = {
-    "feature.postHearingsB.enabled=true"
+    "feature.postHearingsB.enabled=true",
+    "feature.handle-ccd-callbackMap-v2.enabled=true"
 })
 @AutoConfigureMockMvc
 public class SendToFirstTierIt extends AbstractEventIt {

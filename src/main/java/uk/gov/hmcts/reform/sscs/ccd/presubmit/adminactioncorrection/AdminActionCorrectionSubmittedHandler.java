@@ -27,6 +27,9 @@ public class AdminActionCorrectionSubmittedHandler implements PreSubmitCallbackH
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
 
+    @Value("${feature.handle-ccd-callbackMap-v2.enabled}")
+    private boolean isHandleCcdCallbackMapV2Enabled;
+
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
@@ -57,12 +60,16 @@ public class AdminActionCorrectionSubmittedHandler implements PreSubmitCallbackH
         log.info("Admin Action Correction: handling adminActionCorrection {} for case {}", adminCorrectionType, caseId);
         Consumer<SscsCaseData> sscsCaseDataConsumer = sscsCaseData -> SscsUtil.clearPostHearingFields(sscsCaseData, isPostHearingsEnabled);
 
-        caseData = ccdCallbackMapService.handleCcdCallbackMapV2(
-                adminCorrectionType,
-                caseId,
-                sscsCaseDataConsumer
-        );
-
+        if (isHandleCcdCallbackMapV2Enabled) {
+            caseData = ccdCallbackMapService.handleCcdCallbackMapV2(
+                    adminCorrectionType,
+                    caseId,
+                    sscsCaseDataConsumer
+            );
+        } else {
+            sscsCaseDataConsumer.accept(caseData);
+            caseData = ccdCallbackMapService.handleCcdCallbackMap(adminCorrectionType, caseData);
+        }
         return new PreSubmitCallbackResponse<>(caseData);
     }
 }
