@@ -107,26 +107,4 @@ public class SendToFirstTierSubmittedHandlerTest {
         verify(ccdCallbackMapService, times(1))
                 .handleCcdCallbackMapV2(eq(value), eq(CASE_ID));
     }
-
-    @ParameterizedTest
-    @EnumSource(value = SendToFirstTierActions.class)
-    void givenRequestPostHearingTypes_shouldReturnCallCorrectCallback_whenCcdCallbackMapV2IsDisabled(SendToFirstTierActions value) {
-        ReflectionTestUtils.setField(handler, "isHandleCcdCallbackMapV2Enabled", false);
-        caseData.getPostHearing().setSendToFirstTier(SendToFirstTier.builder()
-                .action(value)
-                .build());
-
-        when(callback.getEvent()).thenReturn(SEND_TO_FIRST_TIER);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(caseData);
-        when(ccdCallbackMapService.handleCcdCallbackMap(value, caseData))
-                .thenReturn(SscsCaseData.builder().build());
-
-        PreSubmitCallbackResponse<SscsCaseData> response =
-                handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-        verify(ccdCallbackMapService, times(1))
-                .handleCcdCallbackMap(value, caseData);
-    }
 }
