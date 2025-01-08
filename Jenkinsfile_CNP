@@ -145,6 +145,10 @@ withPipeline(type, product, component) {
             env.HEARINGS_ENABLED = "Yes"
             env.ENVIRONMENT = "pr"
         }
+        
+        if(githubApi.getLabelsbyPattern(env.BRANCH_NAME, "dependencies").size() > 0){
+            enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
+        }
 
         def tests = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "test-suite")
         env.TEST_SUITE = tests.size() > 0 ? tests.collect { it.replace("test-suite:", "@") }.join("|") : "@preview-pipeline"
@@ -196,7 +200,7 @@ def runNotificationTests() {
             sh './gradlew verifyNotifications'
         }
     } finally {
-        steps.archiveArtifacts artifacts: "notification_pdfs/**"
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: "**/notification_pdfs/*.pdf"
     }
 }
 
