@@ -60,6 +60,10 @@ export class WebAction {
             });
     }
 
+    async verifyWaitForElementToHide(elementlocator: string) {
+        await this.page.waitForSelector(elementlocator,{state: 'hidden'});
+    }
+
     async typeField(elementLocator: string, inputValue: string) {
         await this.page
             .type(elementLocator, inputValue)

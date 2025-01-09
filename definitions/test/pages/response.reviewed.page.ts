@@ -29,6 +29,7 @@ export class ResponseReviewedPage {
     }
 
     async confirmSubmission(): Promise<void> {
+        await this.page.waitForTimeout(3000);
         await webActions.clickButton('Submit');
     }
 
