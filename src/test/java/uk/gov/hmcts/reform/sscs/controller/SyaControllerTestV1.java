@@ -68,6 +68,10 @@ public class SyaControllerTestV1 {
 
     private SyaController controller;
 
+    boolean v2SubmitAppealIsEnable() {
+        return false;
+    }
+
     @Before
     public void setUp() {
         controller = new SyaController(submitAppealServiceV2);
