@@ -31,6 +31,7 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.WELSH_CASE_CREATED_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.WELSH_GENERATED_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.defaultToEmptyStringIfNull;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.getPostponementRequestStatus;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.LetterType.PLACEHOLDER_SERVICE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getAddressPlaceholders;
 
@@ -102,7 +103,7 @@ public class PlaceholderService {
             placeholders.put(CASE_CREATED_DATE_LITERAL, caseCreatedDate);
         }
 
-        placeholders.put(POSTPONEMENT_REQUEST, caseData.getPostponementRequest().getActionPostponementRequestSelected());
+        placeholders.put(POSTPONEMENT_REQUEST,  getPostponementRequestStatus(caseData));
 
         buildExcelaAddress(caseData.getIsScottishCase(), placeholders);
         populateRpcPlaceHolders(caseData, placeholders);

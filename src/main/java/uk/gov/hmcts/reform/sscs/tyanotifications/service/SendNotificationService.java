@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST_DIRECTION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.STATEMENT_OF_REASONS_GRANTED;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.STATEMENT_OF_REASONS_REFUSED;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.getPostponementRequestStatus;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ADDRESS_LINE_1;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPEAL_RESPOND_DATE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPELLANT_NAME;
@@ -287,7 +288,7 @@ public class SendNotificationService {
                 placeholders.put(APPEAL_RESPOND_DATE, appealReceivedDate.format(DateTimeFormatter.ofPattern(AppConstants.RESPONSE_DATE_FORMAT)));
             }
 
-            placeholders.put(POSTPONEMENT_REQUEST, wrapper.getNewSscsCaseData().getPostponementRequest().getActionPostponementRequestSelected());
+            placeholders.put(POSTPONEMENT_REQUEST,  getPostponementRequestStatus(wrapper.getNewSscsCaseData()));
 
             log.info("In sendLetterNotificationToAddress method notificationSender is available {} ", notificationSender != null);
             notificationLog(notification, "GovNotify letter", address.getPostcode(), wrapper);

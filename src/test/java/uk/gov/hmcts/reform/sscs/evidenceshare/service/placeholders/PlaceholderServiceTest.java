@@ -283,7 +283,7 @@ public class PlaceholderServiceTest {
     }
 
     @Test
-    public void whenNotAHearingPostponementRequest_thenPlaceholderIsNull() {
+    public void whenNotAHearingPostponementRequest_thenPlaceholderIsEmptyString() {
         Address address = Address.builder()
                 .line1("Unit 2")
                 .line2("156 The Road")
@@ -293,7 +293,7 @@ public class PlaceholderServiceTest {
 
         service.build(caseData, placeholders, address, now);
 
-        assertNull(placeholders.get(POSTPONEMENT_REQUEST));
+        assertEquals("", placeholders.get(POSTPONEMENT_REQUEST));
     }
     
     @Test

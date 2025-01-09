@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.GRANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.REFUSE;
@@ -143,11 +142,11 @@ public class SorPlaceholderServiceTest {
     }
 
     @Test
-    public void whenNotAHearingPostponementRequest_thenPlaceholderIsNull() {
+    public void whenNotAHearingPostponementRequest_thenPlaceholderIsEmptyString() {
         Map<String, Object> placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER,
                 Appointee.class.getSimpleName(), null);
 
-        assertNull(placeholders.get(POSTPONEMENT_REQUEST));
+        assertEquals("", placeholders.get(POSTPONEMENT_REQUEST));
     }
 
     @Test

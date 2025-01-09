@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.NAME;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.PHONE_NUMBER;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.POSTPONEMENT_REQUEST;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.getPostponementRequestStatus;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.LetterType.DOCMOSIS;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getAddressPlaceholders;
 
@@ -70,7 +71,7 @@ public class SorPlaceholderService {
             placeholders.put(PHONE_NUMBER, determinePhoneNumber(rpc));
         }
 
-        placeholders.put(POSTPONEMENT_REQUEST, caseData.getPostponementRequest().getActionPostponementRequestSelected());
+        placeholders.put(POSTPONEMENT_REQUEST,  getPostponementRequestStatus(caseData));
 
         return placeholders;
     }

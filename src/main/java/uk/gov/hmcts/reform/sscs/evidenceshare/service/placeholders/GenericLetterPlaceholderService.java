@@ -21,8 +21,7 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.REPRESENTATIVE_NAME;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.SSCS_URL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.SSCS_URL_LITERAL;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.defaultToEmptyStringIfNull;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.truncateAddressLine;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.LetterType.DOCMOSIS;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getAddressPlaceholders;
 
@@ -91,7 +90,7 @@ public class GenericLetterPlaceholderService {
         placeholders.put(HMCTS2, HMCTS_IMG);
         placeholders.put(CASE_ID_LITERAL, caseData.getCcdCaseId());
 
-        placeholders.put(POSTPONEMENT_REQUEST, caseData.getPostponementRequest().getActionPostponementRequestSelected());
+        placeholders.put(POSTPONEMENT_REQUEST,  getPostponementRequestStatus(caseData));
 
         placeholderService.buildExcelaAddress(caseData.getIsScottishCase(), placeholders);
 
