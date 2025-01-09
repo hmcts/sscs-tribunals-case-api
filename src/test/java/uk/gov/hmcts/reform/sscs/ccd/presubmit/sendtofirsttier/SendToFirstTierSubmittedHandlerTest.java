@@ -88,7 +88,6 @@ public class SendToFirstTierSubmittedHandlerTest {
     @ParameterizedTest
     @EnumSource(value = SendToFirstTierActions.class)
     void givenRequestPostHearingTypes_shouldReturnCallCorrectCallback_whenCcdCallbackMapV2IsEnabled(SendToFirstTierActions value) {
-        ReflectionTestUtils.setField(handler, "isHandleCcdCallbackMapV2Enabled", true);
         caseData.getPostHearing().setSendToFirstTier(SendToFirstTier.builder()
                 .action(value)
                 .build());
