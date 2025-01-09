@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOutcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -63,6 +64,11 @@ public class AmendHearingOutcomeAboutToStartHandler implements PreSubmitCallback
                 .toList());
         DynamicList hearingList = hearingOutcomeService.setHearingOutcomeCompletedHearings(sscsCaseData.getCompletedHearingsList());
         for (HearingOutcome hearingOutcome: sscsCaseData.getHearingOutcomes()) {
+            DynamicListItem selectedHearing = hearingList.getListItems().stream()
+                    .filter(item -> item.getCode().equals(hearingOutcome.getValue().getCompletedHearingId()))
+                    .findFirst()
+                    .orElse(new DynamicListItem("", ""));
+            hearingList.setValue(selectedHearing);
             hearingOutcome.getValue().setCompletedHearings(hearingList);
         }
 
