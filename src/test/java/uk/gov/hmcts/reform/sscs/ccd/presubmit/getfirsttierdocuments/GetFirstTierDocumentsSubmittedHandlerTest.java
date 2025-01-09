@@ -63,6 +63,7 @@ public class GetFirstTierDocumentsSubmittedHandlerTest {
 
     @Test
     public void shouldUpdateEventWhenCcdCallbackMapV2IsEnabled() {
+        ReflectionTestUtils.setField(handler, "isHandleCcdCallbackMapV2Enabled", true);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(ccdCallbackMapService.handleCcdCallbackMapV2(

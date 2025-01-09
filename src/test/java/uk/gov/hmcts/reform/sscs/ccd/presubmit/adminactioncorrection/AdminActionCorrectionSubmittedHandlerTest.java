@@ -111,6 +111,7 @@ class AdminActionCorrectionSubmittedHandlerTest {
     @EnumSource(value = AdminCorrectionType.class)
     void givenAdminCorrectionTypes_shouldReturnCallCorrectCallback_WhenCcdCallbackMapV2IsEnabled(AdminCorrectionType value) {
         caseData.getPostHearing().getCorrection().setAdminCorrectionType(value);
+        ReflectionTestUtils.setField(handler, "isHandleCcdCallbackMapV2Enabled", true);
         caseData.getPostHearing().setRequestType(PostHearingRequestType.STATEMENT_OF_REASONS);
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
