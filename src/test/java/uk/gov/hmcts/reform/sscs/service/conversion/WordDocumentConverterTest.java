@@ -36,7 +36,7 @@ public class WordDocumentConverterTest {
         InputStream file = ClassLoader.getSystemResourceAsStream("wordDocument.doc");
 
         return new Response.Builder()
-                .body(ResponseBody.create(MediaType.get("application/pdf"), IOUtils.toByteArray(file)))
+                .body(ResponseBody.create(IOUtils.toByteArray(file), MediaType.get("application/pdf")))
                 .request(chain.request())
                 .message("")
                 .code(response)

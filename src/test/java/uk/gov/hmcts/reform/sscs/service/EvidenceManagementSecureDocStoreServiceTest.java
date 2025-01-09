@@ -106,7 +106,7 @@ public class EvidenceManagementSecureDocStoreServiceTest {
         stubbedLinks.binary = stubbedLink;
 
         String documentHref = URI.create(stubbedLink.href).getPath().replaceFirst("/", "");
-        when(caseDocumentClient.getDocumentBinary(eq(IDAM_TOKENS.getIdamOauth2Token()), eq(SERVICE_AUTHORIZATION), eq(documentHref))).thenReturn(mockResponseEntity);
+        when(caseDocumentClient.getDocumentBinary(IDAM_TOKENS.getIdamOauth2Token(), SERVICE_AUTHORIZATION, documentHref)).thenReturn(mockResponseEntity);
 
         evidenceManagementSecureDocStoreService.download(stubbedLink.href, IDAM_TOKENS);
 
@@ -124,7 +124,7 @@ public class EvidenceManagementSecureDocStoreServiceTest {
         stubbedLinks.binary = stubbedLink;
 
         String documentHref = URI.create(stubbedLink.href).getPath().replaceFirst("/", "");
-        when(caseDocumentClient.getDocumentBinary(eq(IDAM_TOKENS.getIdamOauth2Token()), eq(SERVICE_AUTHORIZATION), eq(documentHref))).thenReturn(mockResponseEntity);
+        when(caseDocumentClient.getDocumentBinary(IDAM_TOKENS.getIdamOauth2Token(), SERVICE_AUTHORIZATION, documentHref)).thenReturn(mockResponseEntity);
 
         evidenceManagementSecureDocStoreService.download(stubbedLink.href, IDAM_TOKENS);
 
@@ -143,7 +143,7 @@ public class EvidenceManagementSecureDocStoreServiceTest {
         stubbedLinks.binary = stubbedLink;
 
         String documentHref = URI.create(stubbedLink.href).getPath().replaceFirst("/", "");
-        when(caseDocumentClient.getDocumentBinary(eq(IDAM_TOKENS.getIdamOauth2Token()), eq(IDAM_TOKENS.getServiceAuthorization()), eq(documentHref))).thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
+        when(caseDocumentClient.getDocumentBinary(IDAM_TOKENS.getIdamOauth2Token(), IDAM_TOKENS.getServiceAuthorization(), documentHref)).thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
         evidenceManagementSecureDocStoreService.download(stubbedLink.href, IDAM_TOKENS);
     }
@@ -155,7 +155,7 @@ public class EvidenceManagementSecureDocStoreServiceTest {
         Document.Links stubbedLinks = new Document.Links();
         stubbedLinks.binary = stubbedLink;
 
-        when(caseDocumentClient.getDocumentBinary(eq(IDAM_TOKENS.getIdamOauth2Token()), eq(IDAM_TOKENS.getServiceAuthorization()), eq(stubbedLink.href))).thenThrow(new Exception("AppealNumber"));
+        when(caseDocumentClient.getDocumentBinary(IDAM_TOKENS.getIdamOauth2Token(), IDAM_TOKENS.getServiceAuthorization(), stubbedLink.href)).thenThrow(new Exception("AppealNumber"));
 
         evidenceManagementSecureDocStoreService.download(stubbedLink.href, IDAM_TOKENS);
     }

@@ -69,14 +69,14 @@ public class CcdPdfServiceTest {
         byte[] pdf = {};
         UpdateDocParams params = UpdateDocParams.builder().fileName("Myfile.pdf").pdf(pdf).caseId(1L).caseData(caseData).documentType("dl6").build();
 
-        when(pdfStoreService.storeDocument(eq(params))).thenReturn(sscsDocument);
+        when(pdfStoreService.storeDocument(params)).thenReturn(sscsDocument);
         when(ccdService.updateCase(any(), any(), any(), any(), any(), any()))
             .thenReturn(SscsCaseDetails.builder().data(caseData).build());
 
         service.mergeDocIntoCcd("Myfile.pdf", pdf, 1L, caseData, IdamTokens.builder().build(),
             "dl6");
 
-        verify(pdfStoreService).storeDocument(eq(params));
+        verify(pdfStoreService).storeDocument(params);
         verify(ccdService).updateCase(any(), any(), any(), eq("SSCS - upload document event"),
             eq("Uploaded document into SSCS"), any());
         assertEquals("Test.jpg", caseData.getSscsDocument().get(0).getValue().getDocumentFileName());
@@ -99,7 +99,7 @@ public class CcdPdfServiceTest {
                 .documentType("Other evidence")
                 .build();
 
-        when(pdfStoreService.storeDocument(eq(expectedParams))).thenReturn(newStoredSscsDocuments.size() == 1 ? newStoredSscsDocuments.get(0) : null);
+        when(pdfStoreService.storeDocument(expectedParams)).thenReturn(newStoredSscsDocuments.size() == 1 ? newStoredSscsDocuments.get(0) : null);
         when(ccdService.updateCase(any(), any(), any(), any(), any(), any()))
             .thenReturn(SscsCaseDetails.builder().data(caseData).build());
 
@@ -110,7 +110,7 @@ public class CcdPdfServiceTest {
             "Other evidence");
 
 
-        verify(pdfStoreService, times(1)).storeDocument(eq(expectedParams));
+        verify(pdfStoreService, times(1)).storeDocument(expectedParams);
 
         ArgumentCaptor<SscsCaseData> caseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
         verify(ccdService, times(1))
@@ -211,7 +211,7 @@ public class CcdPdfServiceTest {
         service.mergeDocIntoCcd("Myfile.pdf", pdf, 1L, caseData, IdamTokens.builder().build(), "My description", "dl6");
 
         UpdateDocParams params = UpdateDocParams.builder().fileName("Myfile.pdf").pdf(pdf).caseId(1L).caseData(caseData).documentType("dl6").build();
-        verify(pdfStoreService).storeDocument(eq(params));
+        verify(pdfStoreService).storeDocument(params);
         verify(ccdService).updateCase(any(), any(), any(), eq("SSCS - upload document event"), eq("My description"), any());
     }
 }
