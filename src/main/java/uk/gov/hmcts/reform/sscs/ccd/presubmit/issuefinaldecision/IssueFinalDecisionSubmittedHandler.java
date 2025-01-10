@@ -29,10 +29,6 @@ public class IssueFinalDecisionSubmittedHandler implements PreSubmitCallbackHand
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
 
-    @Value("${feature.handle-ccd-callbackMap-v2.enabled}")
-    private boolean isHandleCcdCallbackMapV2Enabled;
-
-
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
@@ -57,16 +53,10 @@ public class IssueFinalDecisionSubmittedHandler implements PreSubmitCallbackHand
                     sscsCaseData.getPostHearing().getCorrection().setIsCorrectionFinalDecisionInProgress(NO);
 
             if (isYes(correction.getIsCorrectionFinalDecisionInProgress())) {
-                if (isHandleCcdCallbackMapV2Enabled) {
-                    caseData = ccdCallbackMapService.handleCcdCallbackMapV2(
-                            CorrectionActions.GRANT,
-                            callback.getCaseDetails().getId(),
-                            sscsCaseDataConsumer);
-                } else {
-                    sscsCaseDataConsumer.accept(caseData);
-                    caseData = ccdCallbackMapService.handleCcdCallbackMap(CorrectionActions.GRANT, caseData);
-
-                }
+                caseData = ccdCallbackMapService.handleCcdCallbackMapV2(
+                        CorrectionActions.GRANT,
+                        callback.getCaseDetails().getId(),
+                        sscsCaseDataConsumer);
                 return new PreSubmitCallbackResponse<>(caseData);
             }
         }

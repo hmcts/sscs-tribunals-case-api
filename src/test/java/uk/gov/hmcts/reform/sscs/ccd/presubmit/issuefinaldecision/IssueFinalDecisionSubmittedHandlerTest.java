@@ -30,10 +30,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Correction;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
@@ -67,7 +65,7 @@ public class IssueFinalDecisionSubmittedHandlerTest {
     public void setUp() {
         openMocks(this);
 
-        handler = new IssueFinalDecisionSubmittedHandler(ccdCallbackMapService, eventPublisher, true, false);
+        handler = new IssueFinalDecisionSubmittedHandler(ccdCallbackMapService, eventPublisher, true);
 
         when(callback.getEvent()).thenReturn(EventType.ISSUE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -95,7 +93,7 @@ public class IssueFinalDecisionSubmittedHandlerTest {
 
     @Test
     public void givenPostHearingsFlagIsFalse_thenOnlyCallCallback() {
-        handler = new IssueFinalDecisionSubmittedHandler(ccdCallbackMapService, eventPublisher, false, false);
+        handler = new IssueFinalDecisionSubmittedHandler(ccdCallbackMapService, eventPublisher, false);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
@@ -104,31 +102,8 @@ public class IssueFinalDecisionSubmittedHandlerTest {
     }
 
     @Test
-    public void givenPostHearingsFlagIsTrueAndCorrectionInProgress_thenHandleCallbackMap() {
-        sscsCaseData.getPostHearing().getCorrection().setIsCorrectionFinalDecisionInProgress(YES);
-
-        SscsCaseData newCaseData = SscsCaseData.builder()
-            .ccdCaseId("ccdId")
-            .postHearing(PostHearing.builder()
-                .correction(Correction.builder()
-                    .isCorrectionFinalDecisionInProgress(NO)
-                    .build())
-                .build())
-            .build();
-
-        when(ccdCallbackMapService.handleCcdCallbackMap(CorrectionActions.GRANT, sscsCaseData)).thenReturn(newCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
-
-        verify(eventPublisher, times(0)).publishEvent(callback);
-        verify(ccdCallbackMapService, times(1)).handleCcdCallbackMap(CorrectionActions.GRANT, sscsCaseData);
-        assertThat(response.getErrors()).isEmpty();
-        assertThat(response.getData().getPostHearing().getCorrection().getIsCorrectionFinalDecisionInProgress()).isEqualTo(NO);
-    }
-
-    @Test
     public void givenCcdCallbackMapV2EnabledAndCorrectionInProgress_thenHandleCallbackMap() {
-        handler = new IssueFinalDecisionSubmittedHandler(ccdCallbackMapService, eventPublisher, true, true);
+        handler = new IssueFinalDecisionSubmittedHandler(ccdCallbackMapService, eventPublisher, true);
         sscsCaseData.getPostHearing().getCorrection().setIsCorrectionFinalDecisionInProgress(YES);
 
         when(ccdCallbackMapService.handleCcdCallbackMapV2(eq(CorrectionActions.GRANT), anyLong(), any()))
@@ -145,14 +120,5 @@ public class IssueFinalDecisionSubmittedHandlerTest {
                 .isEqualTo(NO);
         assertThat(response.getErrors())
                 .isEmpty();
-    }
-
-    @Test
-    public void givenPostHearingsFlagIsTrueAndCorrectionNotInProgress_thenOnlyCallCallback() {
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
-
-        verify(eventPublisher, times(1)).publishEvent(callback);
-        verify(ccdCallbackMapService, times(0)).handleCcdCallbackMap(CorrectionActions.GRANT, sscsCaseData);
-        assertThat(response.getErrors()).isEmpty();
     }
 }

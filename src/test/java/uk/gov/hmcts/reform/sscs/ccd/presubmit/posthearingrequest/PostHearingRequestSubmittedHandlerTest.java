@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingrequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
@@ -110,9 +109,6 @@ class PostHearingRequestSubmittedHandlerTest {
 
         verify(ccdCallbackMapService)
             .handleCcdCallbackMapV2(eq(value), eq(caseId), consumerArgumentCaptor.capture());
-
-        verify(ccdCallbackMapService, never())
-                .handleCcdCallbackMap(value, caseData);
 
         consumerArgumentCaptor.getValue().accept(caseData);
 
