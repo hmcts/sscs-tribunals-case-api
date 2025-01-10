@@ -283,8 +283,6 @@ feature:
         enabled: ${SCOTTISH_PO_BOX_ENABLED:false}
     urgent-hearing:
         enabled: ${URGENT_HEARING_ENABLED:false}
-    trigger-eventV2:
-        enabled: ${TRIGGER_EVENT_V2_ENABLED:false}
     bypass-notifications-service:
         enabled: ${BYPASS_NOTIFICATIONS_SERVICE:false}
     handle-ccd-callbackMap-v2:
