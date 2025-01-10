@@ -66,8 +66,6 @@ public class SetHearingRouteAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
-        when(callback.getEvent()).thenReturn(EventType.SET_HEARING_ROUTE);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
         assertFalse(handler.canHandle(CallbackType.ABOUT_TO_SUBMIT, callback));
     }
 
