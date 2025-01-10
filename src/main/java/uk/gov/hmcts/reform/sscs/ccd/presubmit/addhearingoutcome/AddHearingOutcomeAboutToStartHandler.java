@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -64,7 +65,6 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-        log.info("Add hearing outcome started");
 
         try {
             HearingsGetResponse response = hmcHearingsApiService.getHearingsRequest(Long.toString(caseDetails.getId()), HmcStatus.COMPLETED);
@@ -72,7 +72,7 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
             log.info("Retrieved {} completed hearings for caseId {}", hmcHearings.size(), callback.getCaseDetails().getId());
             if (!hmcHearings.isEmpty()) {
 
-                if (sscsCaseData.getCompletedHearingsList() == null) {
+                if (CollectionUtils.isEmpty(sscsCaseData.getCompletedHearingsList())) {
                     sscsCaseData.setCompletedHearingsList(new ArrayList<>());
                 }
 
