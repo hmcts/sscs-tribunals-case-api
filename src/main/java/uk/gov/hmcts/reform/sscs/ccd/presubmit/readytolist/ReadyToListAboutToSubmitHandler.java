@@ -59,6 +59,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
                 String gapsProceedWarning = "This is a GAPS case, If you do want to proceed, "
                     + "then please change the hearing route to List Assist";
                 response.addWarning(gapsProceedWarning);
+                log.warn("Warning: {}", gapsProceedWarning);
                 return response;
             }
 
@@ -72,6 +73,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
             String listAssistExistsWarning = "There is already a hearing request in List assist, "
                 + "are you sure you want to send another request? If you do proceed, then please cancel the existing hearing request first";
             response.addWarning(listAssistExistsWarning);
+            log.warn("Warning: {}", listAssistExistsWarning);
             return response;
         }
         
