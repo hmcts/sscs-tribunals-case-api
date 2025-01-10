@@ -128,7 +128,6 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     EMAIL_SMTP_TLS_ENABLED: "true"
     EMAIL_SMTP_SSL_TRUST: "*"
     HEARING_RECORDING_REQUEST_CASE_UPDATE_V2_ENABLED: false
-    SUBMIT_APPEAL_SERVICE_V2_ENABLED: false
     HANDLE_CCD_CALLBACKMAP_V2: false
     CALLBACK_MAX_RETRY_ATTEMPTS: 3
     SSCS_TRACK_YOUR_APPEAL_LINK: https://track-appeal.nonprod.platform.hmcts.net/trackyourappeal/appeal_id

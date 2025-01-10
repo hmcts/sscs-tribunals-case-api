@@ -62,8 +62,6 @@ public class SyaControllerTestV2 {
     private MockMvc mockMvc;
 
     @MockBean
-    private uk.gov.hmcts.reform.sscs.service.SubmitAppealService submitAppealServiceV1;
-    @MockBean
     private SubmitAppealService submitAppealServiceV2;
 
     private SubmitAppealServiceBase submitAppealServiceBase;
@@ -77,13 +75,8 @@ public class SyaControllerTestV2 {
 
     @Before
     public void setUp() {
-        if (v2SubmitAppealIsEnable()) {
-            controller = new SyaController(submitAppealServiceV2);
-            submitAppealServiceBase = submitAppealServiceV2;
-        } else {
-            controller = new SyaController(submitAppealServiceV1);
-            submitAppealServiceBase = submitAppealServiceV1;
-        }
+        controller = new SyaController(submitAppealServiceV2);
+        submitAppealServiceBase = submitAppealServiceV2;
         mockMvc = standaloneSetup(controller).build();
     }
 
