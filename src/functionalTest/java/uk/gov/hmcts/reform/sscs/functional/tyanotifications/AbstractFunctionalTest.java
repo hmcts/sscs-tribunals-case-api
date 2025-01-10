@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.functional.tyanotifications;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toSet;
-import static junit.framework.TestCase.fail;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -34,6 +33,7 @@ import junitparams.JUnitParamsRunner;
 import lombok.Getter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -217,7 +217,7 @@ public abstract class AbstractFunctionalTest {
                 if (notificationNotFoundFlag) {
                     return Collections.emptyList();
                 } else {
-                    fail();
+                    Assert.fail("Delivered templates:\n" + allTemplateIds + "\nExpected templates:\n" + expected);
                 }
             } else {
 
