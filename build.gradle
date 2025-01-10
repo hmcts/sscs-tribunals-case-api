@@ -295,7 +295,7 @@ dependencyManagement {
         }
 
         //CVE-2023-6378, CVE-2023-6481
-        dependencySet(group: 'ch.qos.logback', version: '1.2.13') {
+        dependencySet(group: 'ch.qos.logback', version: '1.5.16') {
             entry 'logback-core'
             entry 'logback-classic'
         }
@@ -354,7 +354,7 @@ dependencies {
 
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.0'
 
-    implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.0.1'
+    implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.1.7'
     implementation group: 'com.github.hmcts', name: 'doc-assembly-client', version: '1.07'
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.8.1'
     //remove when secure doc store is live
