@@ -39,10 +39,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
-import uk.gov.hmcts.reform.sscs.service.AirLookupService;
-import uk.gov.hmcts.reform.sscs.service.JudicialRefDataService;
-import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
-import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
+import uk.gov.hmcts.reform.sscs.service.*;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
 @Component
@@ -53,6 +50,8 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     private static final String DOCUMENT_DATE_PATTERN = "dd/MM/yyyy";
     private final SignLanguagesService signLanguagesService;
     private final AirLookupService airLookupService;
+    private final HmcHearingsApiService hmcHearingsApiService;
+    private final VenueService venueService;
 
     @Autowired
     public AdjournCasePreviewService(GenerateFile generateFile,
@@ -62,12 +61,16 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                                      AirLookupService airLookupService,
                                      SignLanguagesService signLanguagesService,
                                      JudicialRefDataService judicialRefDataService,
+                                     HmcHearingsApiService hmcHearingsApiService,
+                                     VenueService venueService,
                                      DocumentConfiguration documentConfiguration) {
         super(generateFile, userDetailsService, languagePreference -> templateId, documentConfiguration);
         this.venueDataLoader = venueDataLoader;
         this.airLookupService = airLookupService;
         this.signLanguagesService = signLanguagesService;
         this.judicialRefDataService = judicialRefDataService;
+        this.hmcHearingsApiService = hmcHearingsApiService;
+        this.venueService = venueService;
     }
 
     @Override
@@ -320,7 +323,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     }
 
     protected void setHearings(AdjournCaseTemplateBodyBuilder adjournCaseBuilder, SscsCaseData caseData) {
-        HearingDetails finalHearing = getLastValidHearing(caseData);
+        HearingDetails finalHearing = getLastValidHearing(caseData, hmcHearingsApiService, venueService);
         if (finalHearing != null) {
             if (finalHearing.getHearingDate() != null) {
                 adjournCaseBuilder.heldOn(LocalDate.parse(finalHearing.getHearingDate()));
