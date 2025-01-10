@@ -67,7 +67,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
         }
 
         if (SscsHelper.hasHearingScheduledInTheFuture(sscsCaseData)
-                && !callback.isIgnoreWarnings()) {
+                && !callback.isIgnoreWarnings() && !YesNo.YES.equals(sscsCaseData.getIgnoreCallbackWarnings())) {
             PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
             String listAssistExistsWarning = "There is already a hearing request in List assist, "
                 + "are you sure you want to send another request? If you do proceed, then please cancel the existing hearing request first";
