@@ -149,7 +149,7 @@ create_ccd_endpoint: ${CREATE_CCD_ENDPOINT:true}
 dm_gateway:
     url: ${DM_GATEWAY_URL:http://localhost:3455}
 doc_assembly:
-    adjourn_case: TB-SCS-GNO-ENG-adjournment-notice.docx
+    adjourn_case: TB-SCS-GNO-ENG-adjournment-notice-v2.docx
     posthearingrequest: TB-SCS-GNO-ENG-00754.docx
     postponementrequest: TB-SCS-GNO-ENG-00754.docx
     url: ${DOC_ASSEMBLY_URL:http://localhost:4631}
