@@ -93,7 +93,7 @@ public class PdfLetterService {
             lines.get(lineNum++),
             lines.get(lineNum++),
             lines.get(lineNum),
-            evidenceProperties.getAddress().getLine2(),
+            evidenceProperties.getAddress().getLine2(wrapper.getNewSscsCaseData()),
             evidenceProperties.getAddress().getLine3(wrapper.getNewSscsCaseData()),
             evidenceProperties.getAddress().getTown(),
             evidenceProperties.getAddress().getPostcode(wrapper.getNewSscsCaseData()),
