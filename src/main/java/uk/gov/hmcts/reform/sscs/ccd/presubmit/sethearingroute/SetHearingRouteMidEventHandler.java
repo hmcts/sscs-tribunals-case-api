@@ -14,17 +14,16 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
 @Slf4j
-public class SetHearingRouteAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class SetHearingRouteMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private static final String ERROR_MESSAGE = "The hearing route must be set to List assist on an IBC case";
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbackType must not be null");
 
-        return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
+        return callbackType.equals(CallbackType.MID_EVENT)
             && callback.getEvent() == EventType.SET_HEARING_ROUTE
             && callback.getCaseDetails().getCaseData().isIbcCase();
     }

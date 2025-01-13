@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @RunWith(JUnitParamsRunner.class)
-public class SetHearingRouteAboutToSubmitHandlerTest {
+public class SetHearingRouteMidEventHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
@@ -35,12 +35,12 @@ public class SetHearingRouteAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
-    private SetHearingRouteAboutToSubmitHandler handler;
+    private SetHearingRouteMidEventHandler handler;
 
     @Before
     public void setUp() throws Exception {
         openMocks(this);
-        handler = new SetHearingRouteAboutToSubmitHandler();
+        handler = new SetHearingRouteMidEventHandler();
     }
 
     @Test
@@ -53,7 +53,7 @@ public class SetHearingRouteAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
-        assertTrue(handler.canHandle(CallbackType.ABOUT_TO_SUBMIT, callback));
+        assertTrue(handler.canHandle(CallbackType.MID_EVENT, callback));
     }
 
     @Test
@@ -66,7 +66,7 @@ public class SetHearingRouteAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
-        assertFalse(handler.canHandle(CallbackType.ABOUT_TO_SUBMIT, callback));
+        assertFalse(handler.canHandle(CallbackType.MID_EVENT, callback));
     }
 
     @Test
@@ -85,13 +85,13 @@ public class SetHearingRouteAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
-        assertFalse(handler.canHandle(CallbackType.ABOUT_TO_SUBMIT, callback));
+        assertFalse(handler.canHandle(CallbackType.MID_EVENT, callback));
     }
 
     @Test
     @Parameters({
         "ABOUT_TO_START",
-        "MID_EVENT",
+        "ABOUT_TO_SUBMIT",
         "SUBMITTED",
     })
     public void shouldReturnFalseForCanHandleWhenNotAboutToSubmit(CallbackType callbackType) {
@@ -118,7 +118,7 @@ public class SetHearingRouteAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
         assertTrue(response.getErrors().contains(ERROR_MESSAGE));
@@ -136,7 +136,7 @@ public class SetHearingRouteAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
         assertTrue(response.getErrors().isEmpty());

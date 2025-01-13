@@ -2969,8 +2969,7 @@
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
     "SecurityClassification": "Public",
-    "EventEnablingCondition": "appeal.benefitType.code=\"infectedBloodCompensation\"",
-    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit"
+    "EventEnablingCondition": "appeal.benefitType.code=\"infectedBloodCompensation\""
   },
   {
     "LiveFrom": "23/11/2022",
