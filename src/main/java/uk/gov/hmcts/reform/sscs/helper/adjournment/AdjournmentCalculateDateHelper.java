@@ -29,7 +29,7 @@ public final class AdjournmentCalculateDateHelper {
             return handleFirstAvailableDate(caseData);
         } else if (FIRST_AVAILABLE_DATE_AFTER.equals(dateType)) {
             return handleFirstAvailableDateAfter(caseData);
-        } else if (DATE_TO_BE_FIXED.equals(dateType)) {
+        } else if (DATE_TO_BE_FIXED.equals(dateType) || dateType.equals("null")) {
             return null;
         } else {
             throw new IllegalArgumentException(String.format(
