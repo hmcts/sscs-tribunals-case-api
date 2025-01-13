@@ -45,6 +45,17 @@ class AdjournmentCalculateDateHelperTest {
         // TODO assert Other field contains "Date to be fixed" when implemented SSCS-11224
     }
 
+    @DisplayName("When case is adjourned with date type null, "
+            + "returns null date and saves null to 'Other' field")
+    @Test
+    void whenCaseIsAdjournedWithDateTypeNull_returnsNullDate_andSavesDateToBeFixedInOtherField() {
+        caseData.getAdjournment().setNextHearingDateType(null);
+
+        LocalDate result = AdjournmentCalculateDateHelper.getHearingWindowStart(caseData);
+
+        assertThat(result).isNull();
+    }
+
     @DisplayName("When case is adjourned with date type 'first available date' "
         + "returns correct date and saves time in 'Other' field")
     @Test
