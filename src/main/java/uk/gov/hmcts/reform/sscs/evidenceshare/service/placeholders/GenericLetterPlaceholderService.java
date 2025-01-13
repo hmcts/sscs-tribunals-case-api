@@ -90,7 +90,7 @@ public class GenericLetterPlaceholderService {
         placeholders.put(HMCTS2, HMCTS_IMG);
         placeholders.put(CASE_ID_LITERAL, caseData.getCcdCaseId());
 
-        placeholderService.buildExcelaAddress(caseData.getIsScottishCase(), placeholders);
+        placeholderService.buildExcelaAddress(caseData.isIbcCase(), caseData.getIsScottishCase(), placeholders);
 
         return placeholders;
     }
