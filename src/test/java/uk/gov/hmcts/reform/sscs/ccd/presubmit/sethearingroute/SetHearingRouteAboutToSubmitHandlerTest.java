@@ -125,7 +125,7 @@ public class SetHearingRouteAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void shouldNotReturnErrorWhenHearingRouteIsNotGaps() {
+    public void shouldNotReturnErrorWhenHearingRouteIsListAssist() {
         SscsCaseData caseData = SscsCaseData.builder()
             .benefitCode(IBCA_BENEFIT_CODE)
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
