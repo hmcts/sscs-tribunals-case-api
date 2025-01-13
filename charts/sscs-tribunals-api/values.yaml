@@ -109,7 +109,6 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     DELETED_REDACTED_DOC_ENABLED: false
     UPLOAD_HEARING_FILTER_ENABLED: false
     CITIZEN_LOGIN_SERVICE_V2: false
-    ADD_LINK_TO_OTHER_ASSOCIATED_CASES_V2: false
     IDAM_OAUTH2_CLIENT_ID: "sscs"
     CORE_CASE_DATA_JURISDICTION_ID: SSCS
     CORE_CASE_DATA_CASE_TYPE_ID: Benefit

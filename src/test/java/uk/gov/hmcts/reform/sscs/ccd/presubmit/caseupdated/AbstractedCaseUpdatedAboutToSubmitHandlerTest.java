@@ -87,6 +87,8 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
     @Mock
     private SessionCategoryMapService categoryMapService;
 
+    private AssociatedCaseLinkHelper associatedCaseLinkHelper;
+
     private CaseUpdatedAboutToSubmitHandler handler;
 
     private SscsCaseData sscsCaseData;
@@ -95,13 +97,9 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
 
     private Appeal appeal;
 
-    abstract boolean getAddLinkToOtherAssociatedCasesV2();
-
     @BeforeEach
     void setUp() {
-        Boolean addLinkToOtherAssociatedCasesV2Boolean = getAddLinkToOtherAssociatedCasesV2();
-        AssociatedCaseLinkHelper associatedCaseLinkHelper = new AssociatedCaseLinkHelper(ccdService, idamService, updateCcdCaseService);
-        ReflectionTestUtils.setField(associatedCaseLinkHelper, "addLinkToOtherAssociatedCasesV2Enabled", addLinkToOtherAssociatedCasesV2Boolean);
+        associatedCaseLinkHelper = new AssociatedCaseLinkHelper(ccdService, idamService, updateCcdCaseService);
 
         handler = new CaseUpdatedAboutToSubmitHandler(
             regionalProcessingCenterService,
