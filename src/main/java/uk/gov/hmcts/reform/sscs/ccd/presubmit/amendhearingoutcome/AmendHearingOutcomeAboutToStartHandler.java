@@ -64,12 +64,12 @@ public class AmendHearingOutcomeAboutToStartHandler implements PreSubmitCallback
                 .toList());
         DynamicList hearingList = hearingOutcomeService.setHearingOutcomeCompletedHearings(sscsCaseData.getCompletedHearingsList());
         for (HearingOutcome hearingOutcome: sscsCaseData.getHearingOutcomes()) {
-            DynamicListItem selectedHearing = hearingList.getListItems().stream()
+            List<DynamicListItem> listItems = hearingList.getListItems();
+            DynamicListItem selectedHearing = listItems.stream()
                     .filter(item -> item.getCode().equals(hearingOutcome.getValue().getCompletedHearingId()))
                     .findFirst()
                     .orElse(new DynamicListItem("", ""));
-            hearingList.setValue(selectedHearing);
-            hearingOutcome.getValue().setCompletedHearings(hearingList);
+            hearingOutcome.getValue().setCompletedHearings(new DynamicList(selectedHearing, listItems));
         }
 
         return preSubmitCallbackResponse;
