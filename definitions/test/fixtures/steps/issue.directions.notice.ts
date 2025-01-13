@@ -117,6 +117,8 @@ export class IssueDirectionsNotice extends BaseStep {
             actionFurtherEvidenceTestdata.other,
             actionFurtherEvidenceTestdata.testfileone
         );
+        await this.eventNameAndDescriptionPage.verifyPageContent(actionFurtherEvidenceTestdata.eventName);
+        await this.eventNameAndDescriptionPage.confirmSubmission();
         await new Promise(f => setTimeout(f, 20000)); //Delay required for the Case to be ready
         await this.homePage.signOut();
         await new Promise(f => setTimeout(f, 2000)); //Delay required for the Case to be ready
@@ -174,6 +176,8 @@ export class IssueDirectionsNotice extends BaseStep {
             actionFurtherEvidenceTestdata.other,
             actionFurtherEvidenceTestdata.testfileone
         );
+        await this.eventNameAndDescriptionPage.verifyPageContent(actionFurtherEvidenceTestdata.eventName);
+        await this.eventNameAndDescriptionPage.confirmSubmission();
         await new Promise(f => setTimeout(f, 20000)); //Delay required for the Case to be ready
         await this.homePage.signOut();
         await new Promise(f => setTimeout(f, 2000)); //Delay required for the Case to be ready
@@ -229,6 +233,8 @@ export class IssueDirectionsNotice extends BaseStep {
             actionFurtherEvidenceTestdata.other,
             actionFurtherEvidenceTestdata.testfileone
         );
+        await this.eventNameAndDescriptionPage.verifyPageContent(actionFurtherEvidenceTestdata.eventName);
+        await this.eventNameAndDescriptionPage.confirmSubmission();
         await new Promise(f => setTimeout(f, 20000)); //Delay required for the Case to be ready
         await this.homePage.signOut();
         await new Promise(f => setTimeout(f, 2000)); //Delay required for the Case to be ready
@@ -283,6 +289,8 @@ export class IssueDirectionsNotice extends BaseStep {
             actionFurtherEvidenceTestdata.other,
             actionFurtherEvidenceTestdata.testfileone
         );
+        await this.eventNameAndDescriptionPage.verifyPageContent(actionFurtherEvidenceTestdata.eventName);
+        await this.eventNameAndDescriptionPage.confirmSubmission();
         await new Promise(f => setTimeout(f, 20000)); //Delay required for the Case to be ready
         await this.homePage.signOut();
         await new Promise(f => setTimeout(f, 2000)); //Delay required for the Case to be ready

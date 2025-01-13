@@ -63,7 +63,7 @@ export class ActionFurtherEvidencePage {
     }
 
     async confirmSubmission(): Promise<void> {
-        await this.page.waitForTimeout(3000);
+        // await this.page.waitForTimeout(3000);
         await webActions.clickButton('Submit');
     }
 
@@ -82,7 +82,6 @@ export class ActionFurtherEvidencePage {
         await this.enterFileName();
         await this.enterScannedDate();
         await this.selectbundle();
-        await this.confirmSubmission();
         await this.confirmSubmission();
     }
 
