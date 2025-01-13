@@ -226,15 +226,6 @@
   {
     "CaseEventID": "caseUpdated",
     "CaseFieldID": "appeal",
-    "ListElementCode": "appellant.address.line3",
-    "ID": "appealAppellantAddressLine3",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "19/11/2020",
-    "FieldDisplayOrder": 11
-  },
-  {
-    "CaseEventID": "caseUpdated",
-    "CaseFieldID": "appeal",
     "ListElementCode": "appellant.address.town",
     "ID": "appealAppellantAddressTown",
     "DisplayContext": "OPTIONAL",
