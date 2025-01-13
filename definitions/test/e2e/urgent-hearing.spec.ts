@@ -11,12 +11,12 @@ test.describe("Urgent hearing test",  async() => {
         caseId = await createCaseBasedOnCaseType('PIP');
     });
     
-    test("Grant - Urgent hearing request", {tag: ['@preview-pipeline-100', '@nightly-pipeline']}, async ({ urgentHearingSteps }) => {
+    test("Grant - Urgent hearing request", {tag: ['@preview-regression', '@nightly-pipeline']}, async ({ urgentHearingSteps }) => {
         test.slow();
         await urgentHearingSteps.requestAndGrantAnUrgentHearing(caseId);
     });
     
-    test("Refuse - Urgent hearing request", {tag: ['@preview-pipeline-100', '@nightly-pipeline']},async ({ urgentHearingSteps }) => {
+    test("Refuse - Urgent hearing request", {tag: ['@preview-regression', '@nightly-pipeline']},async ({ urgentHearingSteps }) => {
         test.slow();
         await urgentHearingSteps.requestAndRefuseAnUrgentHearing(caseId);
     });
@@ -26,7 +26,7 @@ test.describe("Urgent hearing test",  async() => {
         await urgentHearingSteps.requestAnUrgentHearingForAWelshCase();
     });
     
-    test("Error scenario - Upload encrypted file in Action further evidence event", {tag: ['@preview-pipeline-100', '@nightly-pipeline']}, async({ urgentHearingSteps }) => {
+    test("Error scenario - Upload encrypted file in Action further evidence event", {tag: ['@preview-regression', '@nightly-pipeline']}, async({ urgentHearingSteps }) => {
         test.slow();
         await urgentHearingSteps.uploadEncryptedFiles(caseId);
     });
