@@ -426,7 +426,7 @@ gov:
                         - "TS3 3ST"
                         - "TS4 4ST"
                         - "SC1 1CS"
-
+                        - "CF24 0AD"
 
 
 subscription.hmac.secret.text: ${EMAIL_MAC_SECRET_TEXT:our-big-secret}
