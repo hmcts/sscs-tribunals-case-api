@@ -23,7 +23,6 @@
   "PageID": "1.0",
   "ShowSummaryChangeOption": "N"
   },
-  ,
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "dwpResponseDocument",
