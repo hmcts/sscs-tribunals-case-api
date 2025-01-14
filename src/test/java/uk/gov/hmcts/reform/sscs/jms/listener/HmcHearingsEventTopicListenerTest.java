@@ -27,7 +27,7 @@ import uk.gov.hmcts.reform.sscs.exception.MessageProcessingException;
 import uk.gov.hmcts.reform.sscs.model.hmc.message.HearingUpdate;
 import uk.gov.hmcts.reform.sscs.model.hmc.message.HmcMessage;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageService;
-import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageServiceV1;
+import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageServiceV2;
 
 @ExtendWith(MockitoExtension.class)
 class HmcHearingsEventTopicListenerTest {
@@ -39,7 +39,7 @@ class HmcHearingsEventTopicListenerTest {
     private ProcessHmcMessageService processHmcMessageService;
 
     @Mock
-    private ProcessHmcMessageServiceV1 processHmcMessageServiceV1;
+    private ProcessHmcMessageServiceV2 processHmcMessageServiceV2;
 
     @Mock
     private JmsBytesMessage bytesMessage;
@@ -51,7 +51,7 @@ class HmcHearingsEventTopicListenerTest {
 
     @BeforeEach
     void setup() throws JMSException {
-        processHmcMessageService = processHmcMessageServiceV1;
+        processHmcMessageService = processHmcMessageServiceV2;
         hmcHearingsEventTopicListener = new HmcHearingsEventTopicListener(SERVICE_CODE, processHmcMessageService);
         ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "objectMapper", mockObjectMapper);
         ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "sscsServiceCode", SERVICE_CODE);

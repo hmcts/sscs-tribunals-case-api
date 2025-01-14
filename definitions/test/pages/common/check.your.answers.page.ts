@@ -49,6 +49,8 @@ export class CheckYourAnswersPage {
     }
 
     async confirmSubmission(): Promise<void> {
+        // await webActions.verifyWaitForElementToHide('.spinner-container');
+        await this.page.waitForTimeout(3000);
         await webActions.clickButton('Submit');
     }
 
