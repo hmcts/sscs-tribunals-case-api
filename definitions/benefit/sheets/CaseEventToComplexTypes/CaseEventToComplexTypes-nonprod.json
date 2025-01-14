@@ -1,1 +1,123 @@
-[]
+[
+  {
+    "CaseEventID": "dwpChallengeValidity",
+    "CaseFieldID": "dwpChallengeValidityDocument",
+    "ListElementCode": "hmrcResponseDocumentTitle",
+    "ID": "dwpChallengeValidityDocumentHmrcTitle",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.code=\"guardiansAllowance\" OR appeal.benefitType.code=\"childBenefit\" OR appeal.benefitType.code=\"nationalInsuranceCredits\" OR appeal.benefitType.code=\"guaranteedMinimumPension\" OR appeal.benefitType.code=\"homeResponsibilitiesProtection\" OR appeal.benefitType.code=\"taxCredit\" OR appeal.benefitType.code=\"taxFreeChildcare\" OR appeal.benefitType.code=\"thirtyHoursFreeChildcare\"",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+  "CaseEventID": "dwpChallengeValidity",
+  "CaseFieldID": "dwpChallengeValidityDocument",
+  "ListElementCode": "ibcaResponseDocumentTitle",
+  "ID": "dwpChallengeValidityDocumentIbcaTitle",
+  "DisplayContext": "OPTIONAL",
+  "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodCompensation\"",
+  "LiveFrom": "19/11/2019",
+  "FieldDisplayOrder": 1,
+  "PageID": "1.0",
+  "ShowSummaryChangeOption": "N"
+  },
+  ,
+  {
+    "CaseEventID": "dwpUploadResponse",
+    "CaseFieldID": "dwpResponseDocument",
+    "ListElementCode": "hmrcResponseDocumentTitle",
+    "ID": "dwpResponseDocumentHmrcTitle",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.code=\"guardiansAllowance\" OR appeal.benefitType.code=\"childBenefit\" OR appeal.benefitType.code=\"nationalInsuranceCredits\" OR appeal.benefitType.code=\"guaranteedMinimumPension\" OR appeal.benefitType.code=\"homeResponsibilitiesProtection\" OR appeal.benefitType.code=\"taxCredit\" OR appeal.benefitType.code=\"taxFreeChildcare\" OR appeal.benefitType.code=\"thirtyHoursFreeChildcare\"",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseEventID": "dwpUploadResponse",
+    "CaseFieldID": "dwpResponseDocument",
+    "ListElementCode": "ibcaResponseDocumentTitle",
+    "ID": "dwpResponseDocumentIbcaTitle",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodCompensation\"",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseEventID": "hmctsResponseReviewed",
+    "CaseFieldID": "dwpResponseDocument",
+    "ListElementCode": "hmrcResponseDocumentTitle",
+    "ID": "hmctsResponseReviewedDwpResponseDocumentHmrcTitle",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.code=\"guardiansAllowance\" OR appeal.benefitType.code=\"childBenefit\" OR appeal.benefitType.code=\"nationalInsuranceCredits\" OR appeal.benefitType.code=\"guaranteedMinimumPension\" OR appeal.benefitType.code=\"homeResponsibilitiesProtection\" OR appeal.benefitType.code=\"taxCredit\" OR appeal.benefitType.code=\"taxFreeChildcare\" OR appeal.benefitType.code=\"thirtyHoursFreeChildcare\"",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseEventID": "hmctsResponseReviewed",
+    "CaseFieldID": "dwpResponseDocument",
+    "ListElementCode": "ibcaResponseDocumentTitle",
+    "ID": "hmctsResponseReviewedDwpResponseDocumentIbcaTitle",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodCompensation\"",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseEventID": "dwpUploadResponse",
+    "CaseFieldID": "dwpEditedResponseDocument",
+    "ListElementCode": "hmrcResponseDocumentTitle",
+    "ID": "dwpEditedResponseDocumentHmrcTitle",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "(dwpEditedEvidenceReason=\"phme\" OR dwpEditedEvidenceReason=\"childSupportConfidentiality\") AND appeal.benefitType.code=\"guardiansAllowance\" OR appeal.benefitType.code=\"childBenefit\" OR appeal.benefitType.code=\"nationalInsuranceCredits\" OR appeal.benefitType.code=\"guaranteedMinimumPension\" OR appeal.benefitType.code=\"homeResponsibilitiesProtection\" OR appeal.benefitType.code=\"taxCredit\" OR appeal.benefitType.code=\"taxFreeChildcare\" OR appeal.benefitType.code=\"thirtyHoursFreeChildcare\"",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseEventID": "dwpUploadResponse",
+    "CaseFieldID": "dwpEditedResponseDocument",
+    "ListElementCode": "ibcaResponseDocumentTitle",
+    "ID": "dwpEditedResponseDocumentIbcaTitle",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "(dwpEditedEvidenceReason=\"phme\" OR dwpEditedEvidenceReason=\"childSupportConfidentiality\") AND appeal.benefitType.code=\"infectedBloodCompensation\"",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseEventID": "hmctsResponseReviewed",
+    "CaseFieldID": "dwpEditedResponseDocument",
+    "ListElementCode": "hmrcResponseDocumentTitle",
+    "ID": "hmctsResponseReviewedDwpEditedResponseDocumentHmrcTitle",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "dwpEditedEvidenceReason!=\"\" AND appeal.benefitType.code=\"guardiansAllowance\" OR appeal.benefitType.code=\"childBenefit\" OR appeal.benefitType.code=\"nationalInsuranceCredits\" OR appeal.benefitType.code=\"guaranteedMinimumPension\" OR appeal.benefitType.code=\"homeResponsibilitiesProtection\" OR appeal.benefitType.code=\"taxCredit\" OR appeal.benefitType.code=\"taxFreeChildcare\" OR appeal.benefitType.code=\"thirtyHoursFreeChildcare\"",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseEventID": "hmctsResponseReviewed",
+    "CaseFieldID": "dwpEditedResponseDocument",
+    "ListElementCode": "ibcaResponseDocumentTitle",
+    "ID": "hmctsResponseReviewedDwpEditedResponseDocumentIbcaTitle",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "dwpEditedEvidenceReason!=\"\" AND appeal.benefitType.code=\"infectedBloodCompensation\"",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "N"
+  }
+]
