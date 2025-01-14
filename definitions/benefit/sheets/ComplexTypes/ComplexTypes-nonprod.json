@@ -1,1 +1,4 @@
-[]
+[
+  {"LiveFrom": "18/06/2019", "ID": "dwpResponseDocumentCT", "ListElementCode": "hmrcResponseDocumentTitle", "FieldType": "Label", "ElementLabel": "HM Revenue and Customs", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "18/06/2019", "ID": "dwpResponseDocumentCT", "ListElementCode": "ibcaResponseDocumentTitle", "FieldType": "Label", "ElementLabel": "Infected Blood Compensation Authority's response", "SecurityClassification": "PUBLIC"}
+]
