@@ -33,7 +33,8 @@ export class LoginPage {
         if(clearCacheFlag) await this.page.context().clearCookies();
         await webActions.inputField('#username', user.email);
         await webActions.inputField('#password', user.password);
-        await webActions.clickButton('Sign in');
+        // await webActions.clickButton('Sign in');
+        await webActions.clickSubmitButton();
         await expect(this.page.locator('//li/a[normalize-space()=\'Sign out\']')).toBeVisible();
     }
 }
