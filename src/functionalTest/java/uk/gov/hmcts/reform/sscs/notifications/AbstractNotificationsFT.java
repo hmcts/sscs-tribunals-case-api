@@ -40,9 +40,10 @@ public abstract class AbstractNotificationsFT extends AbstractFunctionalTest {
         super(maxSecondsToWaitForNotification);
     }
 
-    protected void simulateCcdCallbackToSendLetter(NotificationEventType eventType) throws IOException {
+    protected void simulateCcdCallbackToSendLetter(NotificationEventType eventType, boolean isWelsh) throws IOException {
         log.info("Simulating CCD callback to send notificaiton of type {}", eventType);
-        String callbackJsonName = BASE_PATH_TYAN + eventType.getId() + "Callback.json";
+        String fileSuffix = isWelsh ? "CallbackWelsh.json" : "Callback.json";
+        String callbackJsonName = BASE_PATH_TYAN + eventType.getId() + fileSuffix;
         if (isNull(getClass().getClassLoader().getResource(callbackJsonName))) {
             callbackJsonName = BASE_PATH_TYAN + "missingFileFallbackCallback.json";
             log.info("No callback json found for {}, using fallback file", eventType);
