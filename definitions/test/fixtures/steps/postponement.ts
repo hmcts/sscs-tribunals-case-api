@@ -31,7 +31,7 @@ export class Postponement extends BaseStep {
 
         await this.homePage.delay(2000);
         await this.loginUserWithCaseId(credentials.caseWorker, false, pipCaseId);
-        await this.homePage.reloadPage();
+        // await this.homePage.reloadPage();
         await this.homePage.chooseEvent('Add a hearing');
         await this.addHearingPage.submitHearing('Hearing has been Listed');
         await this.eventNameAndDescriptionPage.confirmSubmission();

@@ -25,6 +25,7 @@ export class CreateBundle extends BaseStep {
         await this.loginUserWithCaseId(credentials.amSuperUser, false, caseId);
         await this.stepsHelper.uploadResponseHelper(uploadResponseTestdata.pipIssueCode, 'Yes');
         await this.checkYourAnswersPage.confirmSubmission();
+        await this.homePage.delay(2000);
         await this.homePage.chooseEvent("Create a bundle");
         await this.createBundlePage.verifyPageContent();
         await this.createBundlePage.confirmSubmission();
