@@ -67,7 +67,6 @@ java:
     TEST_RECIPIENTS_POSTCODE: "*"
     INFECTED_BLOOD_COMPENSATION_ENABLED: true
     PROCESS_EVENT_MESSAGE_V2_ENABLED: true
-    UPDATE_CASE_ONLY_HEARING_V2_ENABLED: true
     # START - SSCS-IB RELEASE VARIABLES
     DOCUMENTS_ENGLISH_DIRECTION_ISSUED: TB-SCS-GNO-ENG-directions-notice-v2.docx
     DOCUMENTS_WELSH_DIRECTION_ISSUED: TB-SCS-GNO-ENG-directions-notice-v2.docx
@@ -203,7 +202,7 @@ xui-webapp:
           - mc-idam-client-secret
           - system-user-name
           - system-user-password
-
+          
 global:
   ccdApiGatewayIngress: http://${SERVICE_NAME}-ccd-api-gw
   ccdAdminWebIngress: ${SERVICE_NAME}-ccd-admin-web
