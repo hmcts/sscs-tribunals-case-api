@@ -1,4 +1,4 @@
 [
-  {"LiveFrom": "18/10/2024", "ID": "hearingOutcomeDetails", "ListElementCode": "completedHearings",  "FieldType": "DynamicList", "ElementLabel": "Hearings", "SecurityClassification": "PUBLIC"}
+  {"LiveFrom": "13/01/2025", "ID": "hearingOutcomeDetails", "ListElementCode": "completedHearings",  "FieldType": "DynamicList", "ElementLabel": "Hearings", "SecurityClassification": "PUBLIC"}
 ]
 
