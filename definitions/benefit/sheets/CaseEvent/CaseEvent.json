@@ -3268,6 +3268,7 @@
     "DisplayOrder": 142,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "EventEnablingCondition": "caseOutcome=\"DONOTSHOW\""
   }
 ]
