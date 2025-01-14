@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -44,7 +43,6 @@ import uk.gov.hmcts.reform.sscs.service.converter.ConvertAIntoBService;
 
 @Service
 @Slf4j
-@ConditionalOnProperty(name = "feature.submit-appeal-service-v2.enabled", havingValue = "true")
 public class SubmitAppealService extends SubmitAppealServiceBase {
 
     @SuppressWarnings("squid:S107")
