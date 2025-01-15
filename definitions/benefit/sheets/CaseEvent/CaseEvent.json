@@ -193,7 +193,6 @@
     "Name": "Add case outcome",
     "Description": "Add a case outcome",
     "DisplayOrder": 141,
-    "EventEnablingCondition": "caseOutcome=\"DONOTSHOW\"",
     "PreConditionState(s)": "dormantAppealState;postHearing;withUT;hearing;readyToList",
     "PostConditionState": "*",
     "ShowEventNotes": "Y",
@@ -3265,9 +3264,10 @@
     "CaseTypeID": "Benefit",
     "ID": "caseOutcomeMigration",
     "Name": "Case migrated automatically",
-    "DisplayOrder": 142,
+    "DisplayOrder": 143,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "EventEnablingCondition": "caseOutcome=\"DONOTSHOW\""
   }
 ]
