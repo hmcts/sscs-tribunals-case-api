@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NOT_LISTABLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 
 import lombok.RequiredArgsConstructor;
@@ -99,6 +100,7 @@ public class PostponeHearingHandler implements PreSubmitCallbackHandler<SscsCase
                 sscsCaseDetails -> {
                     SscsCaseData sscsCaseData = sscsCaseDetails.getData();
                     sscsCaseData.setDwpState(DwpState.HEARING_POSTPONED);
+                    sscsCaseData.setIgnoreCallbackWarnings(YES);
                     sscsCaseData.setPostponement(Postponement.builder()
                             .unprocessedPostponement(NO)
                             .build());

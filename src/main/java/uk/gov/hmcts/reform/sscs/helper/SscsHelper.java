@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.helper;
 import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus.CANCELLED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INCOMPLETE_APPLICATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INCOMPLETE_APPLICATION_INFORMATION_REQUESTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
@@ -104,7 +105,7 @@ public class SscsHelper {
             && StringUtils.isNotBlank(hearingDetails.getVenue().getName());
     }
 
-    private static boolean getValidHearing(Hearing hearing) {
+    private static boolean isFutureHearing(Hearing hearing) {
         HearingDetails hearingDetails = hearing.getValue();
         if (isValidHearing(hearingDetails)) {
             LocalDateTime hearingDateTime = getLocalDateTime(hearingDetails.getHearingDate(), hearingDetails.getTime());
@@ -116,7 +117,10 @@ public class SscsHelper {
     public static boolean hasHearingScheduledInTheFuture(SscsCaseData caseData) {
         Optional<Hearing> futureHearing = Optional.ofNullable(caseData.getHearings())
             .orElse(Collections.emptyList())
-            .stream().filter(SscsHelper::getValidHearing).findFirst();
+            .stream()
+                .filter(SscsHelper::isFutureHearing)
+                .filter(hearing -> !CANCELLED.equals(hearing.getValue().getHearingStatus()))
+                .findFirst();
         return futureHearing.isPresent();
     }
 }
