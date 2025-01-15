@@ -68,10 +68,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
-import uk.gov.hmcts.reform.sscs.service.AirLookupService;
-import uk.gov.hmcts.reform.sscs.service.JudicialRefDataService;
-import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
-import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
+import uk.gov.hmcts.reform.sscs.service.*;
 
 @ExtendWith(MockitoExtension.class)
 class AdjournCasePreviewServiceTest {
@@ -129,12 +126,19 @@ class AdjournCasePreviewServiceTest {
     private SignLanguagesService signLanguagesService;
 
     @Mock
+    private HmcHearingsApiService hmcHearingsApiService;
+
+    @Mock
+    private VenueService venueService;
+
+    @Mock
     private DocumentConfiguration documentConfiguration;
 
     @BeforeEach
     void setUp() {
         service = new AdjournCasePreviewService(generateFile, userDetailsService, venueDataLoader, TEMPLATE_ID,
-                airLookupService, signLanguagesService, judicialRefDataService, documentConfiguration);
+                airLookupService, signLanguagesService, judicialRefDataService, hmcHearingsApiService,
+                venueService, documentConfiguration);
 
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -248,6 +252,7 @@ class AdjournCasePreviewServiceTest {
         return Hearing.builder()
             .value(HearingDetails.builder()
                 .hearingDate(date)
+                .hearingRequested(date != null ? LocalDate.parse(date).atTime(0, 0) : null)
                 .venue(Venue.builder()
                     .name(venueName)
                     .build())

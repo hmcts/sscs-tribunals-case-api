@@ -11,6 +11,13 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus.AWAITING_ACTUALS;
+import static uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus.AWAITING_LISTING;
+import static uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus.COMPLETED;
+import static uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus.HEARING_REQUESTED;
+import static uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus.LISTED;
+import static uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus.UPDATE_REQUESTED;
+import static uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus.UPDATE_SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.FACE_TO_FACE;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.NOT_ATTENDING;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
@@ -19,62 +26,25 @@ import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.VIDEO
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCasePanelMembersExcluded;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.JudicialUserPanel;
-import uk.gov.hmcts.reform.sscs.ccd.domain.LibertyToApplyActions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PermissionToAppealActions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFinalDecisionCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
+import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
+import uk.gov.hmcts.reform.sscs.model.multi.hearing.CaseHearing;
+import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
+import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
+import uk.gov.hmcts.reform.sscs.service.HmcHearingsApiService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
+import uk.gov.hmcts.reform.sscs.service.VenueService;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
 @Slf4j
@@ -96,9 +66,9 @@ public class SscsUtil {
 
     public static boolean isSAndLCase(SscsCaseData sscsCaseData) {
         return LIST_ASSIST == Optional.of(sscsCaseData)
-            .map(SscsCaseData::getSchedulingAndListingFields)
-            .map(SchedulingAndListingFields::getHearingRoute)
-            .orElse(null);
+                .map(SscsCaseData::getSchedulingAndListingFields)
+                .map(SchedulingAndListingFields::getHearingRoute)
+                .orElse(null);
     }
 
     public static boolean isValidCaseState(State state, List<State> allowedStates) {
@@ -143,8 +113,8 @@ public class SscsUtil {
     }
 
     public static void setAdjournmentPanelMembersExclusions(PanelMemberExclusions exclusions,
-                                           List<JudicialUserBase> adjournmentPanelMembers,
-                                           AdjournCasePanelMembersExcluded panelMemberExcluded) {
+                                                            List<JudicialUserBase> adjournmentPanelMembers,
+                                                            AdjournCasePanelMembersExcluded panelMemberExcluded) {
         if (nonNull(adjournmentPanelMembers)) {
             List<CollectionItem<JudicialUserBase>> panelMembersList = getPanelMembersList(exclusions, panelMemberExcluded);
 
@@ -154,27 +124,27 @@ public class SscsUtil {
             }
 
             panelMembersList.addAll(adjournmentPanelMembers.stream()
-                .filter(Objects::nonNull)
-                .distinct()
-                .map(panelMember -> new CollectionItem<>(panelMember.getIdamId(), panelMember))
-                .filter(not(panelMembersList::contains))
-                .toList());
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .map(panelMember -> new CollectionItem<>(panelMember.getIdamId(), panelMember))
+                    .filter(not(panelMembersList::contains))
+                    .toList());
 
             if (panelMemberExcluded.equals(AdjournCasePanelMembersExcluded.YES)) {
                 log.info("Excluding {} panel members with Personal Codes {}", adjournmentPanelMembers.size(),
-                    adjournmentPanelMembers.stream()
-                            .filter(Objects::nonNull)
-                            .map(JudicialUserBase::getPersonalCode)
-                            .toList());
+                        adjournmentPanelMembers.stream()
+                                .filter(Objects::nonNull)
+                                .map(JudicialUserBase::getPersonalCode)
+                                .toList());
 
                 exclusions.setExcludedPanelMembers(panelMembersList);
                 exclusions.setArePanelMembersExcluded(YES);
             } else if (panelMemberExcluded.equals(AdjournCasePanelMembersExcluded.RESERVED)) {
                 log.info("Reserving {} panel members with Personal Codes {}", adjournmentPanelMembers.size(),
-                    adjournmentPanelMembers.stream()
-                            .filter(Objects::nonNull)
-                            .map(JudicialUserBase::getPersonalCode)
-                            .toList());
+                        adjournmentPanelMembers.stream()
+                                .filter(Objects::nonNull)
+                                .map(JudicialUserBase::getPersonalCode)
+                                .toList());
 
                 exclusions.setReservedPanelMembers(panelMembersList);
                 exclusions.setArePanelMembersReserved(YES);
@@ -183,7 +153,7 @@ public class SscsUtil {
     }
 
     private static List<CollectionItem<JudicialUserBase>> getPanelMembersList(PanelMemberExclusions exclusions,
-                                                                        AdjournCasePanelMembersExcluded panelMemberExcluded) {
+                                                                              AdjournCasePanelMembersExcluded panelMemberExcluded) {
         if (panelMemberExcluded.equals(AdjournCasePanelMembersExcluded.YES)) {
             return exclusions.getExcludedPanelMembers();
         }
@@ -212,7 +182,7 @@ public class SscsUtil {
             SscsDocumentTranslationStatus documentTranslationStatus = getDocumentTranslationStatus(caseData);
 
             footerService.createFooterAndAddDocToCase(documentLink, caseData, documentType, now,
-                null, null, documentTranslationStatus, eventType);
+                    null, null, documentTranslationStatus, eventType);
 
             updateTranslationStatus(caseData, documentTranslationStatus);
         }
@@ -340,7 +310,7 @@ public class SscsUtil {
     public static boolean isOriginalDecisionNoticeUploaded(SscsCaseData sscsCaseData) {
         return isNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecision());
     }
-      
+
     public static boolean isGapsCase(SscsCaseData sscsCaseData) {
         return GAPS.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute());
     }
@@ -361,7 +331,7 @@ public class SscsUtil {
             response.addError(INVALID_BENEFIT_ISSUE_CODE);
         }
     }
-  
+
     public static String buildWriteFinalDecisionHeldBefore(SscsCaseData caseData, @NonNull String signedInJudgeName) {
         List<String> names = new ArrayList<>();
         names.add(signedInJudgeName);
@@ -406,6 +376,78 @@ public class SscsUtil {
         return null;
     }
 
+    public static HearingDetails getLastValidHearing(SscsCaseData caseData, HmcHearingsApiService hmcHearingsApiService, VenueService venueService) {
+        CaseHearing latestListAssist = getLatestListAssistHearing(caseData, hmcHearingsApiService);
+        Hearing latestNonListAssist = getLatestNonListAssistHearing(caseData);
+
+        if (latestListAssist == null) {
+            return latestNonListAssist != null ? latestNonListAssist.getValue() : null;
+        }
+        if (latestNonListAssist == null) {
+            return getDetailsFromCaseHearing(latestListAssist, venueService);
+        }
+
+        return latestListAssist.getHearingRequestDateTime().isBefore(latestNonListAssist.getValue().getHearingRequested())
+                ? latestNonListAssist.getValue() : getDetailsFromCaseHearing(latestListAssist, venueService);
+    }
+
+    private static CaseHearing getLatestListAssistHearing(SscsCaseData caseData, HmcHearingsApiService hmcHearingsApiService) {
+        List<HmcStatus> statuses = Arrays.asList(
+                HEARING_REQUESTED, AWAITING_LISTING, LISTED,
+                UPDATE_REQUESTED, UPDATE_SUBMITTED, AWAITING_ACTUALS, COMPLETED
+        );
+        List<CaseHearing> allListAssistHearings = new ArrayList<>();
+        for (HmcStatus status : statuses) {
+            HearingsGetResponse response = hmcHearingsApiService.getHearingsRequest(caseData.getCcdCaseId(), status);
+            if (response != null) {
+                allListAssistHearings.addAll(response.getCaseHearings());
+            }
+        }
+        return allListAssistHearings.stream().max(Comparator.comparing(CaseHearing::getHearingRequestDateTime)).orElse(null);
+    }
+
+    private static Hearing getLatestNonListAssistHearing(SscsCaseData caseData) {
+        if (caseData.getHearings() == null || caseData.getHearings().isEmpty()) {
+            return null;
+        }
+        return caseData.getHearings().stream()
+                .filter(SscsUtil::isHearingValid)
+                .max(Comparator.comparing(hearing -> hearing.getValue().getHearingRequested()))
+                .orElse(null);
+    }
+
+    private static HearingDetails getDetailsFromCaseHearing(CaseHearing caseHearing, VenueService venueService) {
+        Venue venue = null;
+        String venueId = null;
+        String epimsId = null;
+        if (caseHearing.getHearingDaySchedule() != null) {
+            HearingDaySchedule hearingDaySchedule = caseHearing.getHearingDaySchedule().get(0);
+            epimsId = hearingDaySchedule.getHearingVenueEpimsId();
+            VenueDetails venueDetails = venueService.getVenueDetailsForActiveVenueByEpimsId(epimsId);
+            venueId = venueDetails.getVenueId();
+            venue = Venue.builder()
+                    .name(venueDetails.getVenName())
+                    .address(Address.builder()
+                            .line1(venueDetails.getVenAddressLine1())
+                            .line2(venueDetails.getVenAddressLine2())
+                            .county(venueDetails.getVenAddressCounty())
+                            .town(venueDetails.getVenAddressTown())
+                            .postcode(venueDetails.getVenAddressPostcode())
+                            .build())
+                    .googleMapLink(venueDetails.getUrl())
+                    .build();
+        }
+
+        return HearingDetails.builder()
+                .hearingId(caseHearing.getHearingId().toString())
+                .venue(venue)
+                .venueId(venueId)
+                .hearingRequested(caseHearing.getHearingRequestDateTime())
+                .versionNumber(caseHearing.getRequestVersion())
+                .epimsId(epimsId)
+                .build();
+    }
+
     private static boolean isHearingValid(Hearing hearing) {
         if (nonNull(hearing)) {
             HearingDetails hearingDetails = hearing.getValue();
@@ -429,10 +471,10 @@ public class SscsUtil {
 
     public static DynamicListItem getPortOfEntryFromCode(String locationCode) {
         return Arrays.stream(UkPortOfEntry.values())
-            .filter(ukPortOfEntry -> ukPortOfEntry.getLocationCode().equals(locationCode))
-            .findFirst()
-            .map(ukPortOfEntry -> new DynamicListItem(ukPortOfEntry.getLocationCode(), ukPortOfEntry.getLabel()))
-            .orElseGet(() -> new DynamicListItem(null, null));
+                .filter(ukPortOfEntry -> ukPortOfEntry.getLocationCode().equals(locationCode))
+                .findFirst()
+                .map(ukPortOfEntry -> new DynamicListItem(ukPortOfEntry.getLocationCode(), ukPortOfEntry.getLabel()))
+                .orElseGet(() -> new DynamicListItem(null, null));
     }
 
     public static DynamicList getBenefitDescriptions(boolean isInfectedBloodCompensationEnabled) {
@@ -490,9 +532,9 @@ public class SscsUtil {
         caseData.getAppeal().getMrnDetails().setDwpIssuingOffice("IBCA");
         if (caseData.getRegionalProcessingCenter() != null) {
             RegionalProcessingCenter listAssistRegionalProcessingCenter = caseData.getRegionalProcessingCenter()
-                .toBuilder()
-                .hearingRoute(LIST_ASSIST)
-                .build();
+                    .toBuilder()
+                    .hearingRoute(LIST_ASSIST)
+                    .build();
             caseData.setRegionalProcessingCenter(listAssistRegionalProcessingCenter);
         }
     }
@@ -572,7 +614,7 @@ public class SscsUtil {
     private static String hearingChannelToYesNoString(HearingChannel expectedHearingChannel, HearingChannel hearingChannel) {
         return expectedHearingChannel.equals(hearingChannel) ? YES.toString() : NO.toString();
     }
-  
+
     public static void createFinalDecisionNoticeFromPreviewDraft(Callback<SscsCaseData> callback,
                                                                  FooterService footerService,
                                                                  boolean isPostHearingsEnabled) {
