@@ -14,7 +14,6 @@ import static uk.gov.hmcts.reform.sscs.model.AppConstants.BENEFIT_CODES_FOR_ISSU
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -39,12 +38,6 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
-
-    @Mock
-    private CaseDetails<SscsCaseData> caseDetailsBefore;
-
-    @Mock
-    private SscsCaseData sscsCaseDataBefore;
 
     private SscsCaseData sscsCaseData;
 
@@ -80,8 +73,6 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
     @Test
     public void givenValidAppeal_populateExtensionNextEventDropdown() {
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-        when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
         when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -408,11 +399,9 @@ public class DirectionIssuedAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenSelectTypeOfHearingNo_shouldNotSetTypeOfHearing() {
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-        when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
+    public void givenNotDefaultSelectTypeOfHearingNo_whenValue() {
         when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
-        when(sscsCaseDataBefore.getSelectNextTypeOfHearing()).thenReturn(NO);
+        sscsCaseData.setSelectNextTypeOfHearing(YES);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(SEND_TO_LISTING.getCode(), SEND_TO_LISTING.getLabel()));
@@ -420,61 +409,6 @@ public class DirectionIssuedAboutToStartHandlerTest {
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getExtensionNextEventDl());
         assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
-        assertNull(response.getData().getTypeOfHearing());
-        assertEquals(NO, response.getData().getSelectNextTypeOfHearing());
-    }
-
-    @Test
-    public void givenSelectTypeOfHearingYesAndNullTypeOfHearing_shouldNotSetTypeOfHearing() {
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-        when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
-        when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
-        when(sscsCaseDataBefore.getSelectNextTypeOfHearing()).thenReturn(YES);
-        when(sscsCaseDataBefore.getTypeOfHearing()).thenReturn(null);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        List<DynamicListItem> listOptions = new ArrayList<>();
-        listOptions.add(new DynamicListItem(SEND_TO_LISTING.getCode(), SEND_TO_LISTING.getLabel()));
-        listOptions.add(new DynamicListItem(NO_FURTHER_ACTION.getCode(), NO_FURTHER_ACTION.getLabel()));
-        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
-        assertEquals(expected, response.getData().getExtensionNextEventDl());
-        assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
-        assertNull(response.getData().getTypeOfHearing());
-        assertEquals(YES, response.getData().getSelectNextTypeOfHearing());
-    }
-
-    @Test
-    public void givenSelectTypeOfHearingYesAndSubstantiveTypeOfHearing_shouldSetTypeOfHearing() {
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-        when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
-        when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
-        when(sscsCaseDataBefore.getSelectNextTypeOfHearing()).thenReturn(YES);
-        when(sscsCaseDataBefore.getTypeOfHearing()).thenReturn(TypeOfHearing.SUBSTANTIVE);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        List<DynamicListItem> listOptions = new ArrayList<>();
-        listOptions.add(new DynamicListItem(SEND_TO_LISTING.getCode(), SEND_TO_LISTING.getLabel()));
-        listOptions.add(new DynamicListItem(NO_FURTHER_ACTION.getCode(), NO_FURTHER_ACTION.getLabel()));
-        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
-        assertEquals(expected, response.getData().getExtensionNextEventDl());
-        assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
-        assertEquals(TypeOfHearing.SUBSTANTIVE, response.getData().getTypeOfHearing());
-        assertEquals(YES, response.getData().getSelectNextTypeOfHearing());
-    }
-
-    @Test
-    public void givenSelectTypeOfHearingYesAndDirectionTypeOfHearing_shouldSetTypeOfHearing() {
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-        when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
-        when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
-        when(sscsCaseDataBefore.getSelectNextTypeOfHearing()).thenReturn(YES);
-        when(sscsCaseDataBefore.getTypeOfHearing()).thenReturn(TypeOfHearing.DIRECTION_HEARINGS);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        List<DynamicListItem> listOptions = new ArrayList<>();
-        listOptions.add(new DynamicListItem(SEND_TO_LISTING.getCode(), SEND_TO_LISTING.getLabel()));
-        listOptions.add(new DynamicListItem(NO_FURTHER_ACTION.getCode(), NO_FURTHER_ACTION.getLabel()));
-        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
-        assertEquals(expected, response.getData().getExtensionNextEventDl());
-        assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
-        assertEquals(TypeOfHearing.DIRECTION_HEARINGS, response.getData().getTypeOfHearing());
         assertEquals(YES, response.getData().getSelectNextTypeOfHearing());
     }
 }

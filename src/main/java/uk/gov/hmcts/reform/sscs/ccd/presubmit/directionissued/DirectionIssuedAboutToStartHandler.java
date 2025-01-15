@@ -45,9 +45,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
         }
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
-        final CaseDetails<SscsCaseData> caseDetailsBefore = callback.getCaseDetailsBefore().orElse(null);
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
-        final SscsCaseData sscsCaseDataBefore = caseDetailsBefore != null ? caseDetailsBefore.getCaseData() : null;
         setDirectionTypeDropDown(sscsCaseData);
         setExtensionNextEventDropdown(callback.getCaseDetails().getState(), sscsCaseData);
         if (isPostHearingsEnabled) {
@@ -56,16 +54,8 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
 
         clearFields(sscsCaseData);
         setPartiesToSendLetter(sscsCaseData);
-        if (sscsCaseDataBefore != null) {
-            YesNo selectNextTypeOfHearing = sscsCaseDataBefore.getSelectNextTypeOfHearing();
-            sscsCaseData.setSelectNextTypeOfHearing(sscsCaseDataBefore.getSelectNextTypeOfHearing() != null
-                ? sscsCaseDataBefore.getSelectNextTypeOfHearing() : NO);
-            if (isYes(selectNextTypeOfHearing)) {
-                TypeOfHearing typeOfHearing = sscsCaseDataBefore.getTypeOfHearing();
-                if (typeOfHearing != null) {
-                    sscsCaseData.setTypeOfHearing(typeOfHearing);
-                }
-            }
+        if (sscsCaseData.getSelectNextTypeOfHearing() == null) {
+            sscsCaseData.setSelectNextTypeOfHearing(NO);
         }
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
