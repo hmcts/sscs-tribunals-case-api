@@ -4,7 +4,6 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
-import static uk.gov.hmcts.reform.sscs.model.hmc.reference.HearingType.SUBSTANTIVE;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingPriority.STANDARD;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingPriority.URGENT;
 
@@ -79,8 +78,8 @@ public final class HearingsDetailsMapping {
     }
 
     public static HearingType getHearingType(SscsCaseData sscsCaseData) {
-        TypeOfHearing typeOfHearing = sscsCaseData.getTypeOfHearing() != null ?
-            sscsCaseData.getTypeOfHearing() : TypeOfHearing.SUBSTANTIVE;
+        TypeOfHearing typeOfHearing = sscsCaseData.getTypeOfHearing() != null
+            ? sscsCaseData.getTypeOfHearing() : TypeOfHearing.SUBSTANTIVE;
         return HearingType.getFromTypeOfHearing(typeOfHearing);
     }
 
