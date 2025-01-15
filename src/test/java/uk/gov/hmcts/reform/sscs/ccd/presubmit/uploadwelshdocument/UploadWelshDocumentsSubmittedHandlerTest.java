@@ -329,6 +329,7 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
 
     private static Stream<Arguments> generateCanHandleScenarios() {
         return Stream.of(
+                Arguments.of(SUBMITTED, buildCallback("sendToDwp", EventType.UPLOAD_HEARING_RECORDING), false),
                 Arguments.of(SUBMITTED, buildCallback("sendToDwp"), true),
                 Arguments.of(ABOUT_TO_SUBMIT, buildCallback(EventType.SEND_TO_DWP.getCcdType()), false),
                 Arguments.of(SUBMITTED, buildCallback(null), false),
@@ -337,13 +338,17 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
     }
 
     private static Callback<SscsCaseData> buildCallback(String sscsWelshPreviewNextEvent) {
+        return buildCallback(sscsWelshPreviewNextEvent, UPLOAD_WELSH_DOCUMENT);
+    }
+
+    private static Callback<SscsCaseData> buildCallback(String sscsWelshPreviewNextEvent, EventType eventType) {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
                 .sscsWelshPreviewNextEvent(sscsWelshPreviewNextEvent)
                 .state(State.VALID_APPEAL)
                 .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
                 State.VALID_APPEAL, sscsCaseData, LocalDateTime.now(), "Benefit");
-        return new Callback<>(caseDetails, Optional.empty(), UPLOAD_WELSH_DOCUMENT, false);
+        return new Callback<>(caseDetails, Optional.empty(), eventType, false);
     }
 
     private static Callback<SscsCaseData> buildCallbackInterlocReviewState() {

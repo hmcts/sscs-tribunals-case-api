@@ -1115,9 +1115,9 @@ public class SubmitAppealServiceV2Test {
         SyaContactDetails appointeeContactDetails = new SyaContactDetails();
         appointeeContactDetails.setPostCode("B1 1AA");
 
-        SyaCaseWrapper appealData = getSyaWrapperWithAppointee(appointeeContactDetails);
+        SyaCaseWrapper syaCaseWrapper = getSyaWrapperWithAppointee(appointeeContactDetails);
 
-        SscsCaseData caseData = submitAppealServiceV2.convertAppealToSscsCaseData(appealData, SscsCaseData.builder().build());
+        SscsCaseData caseData = submitAppealServiceV2.convertAppealToSscsCaseData(syaCaseWrapper, SscsCaseData.builder().build());
 
         assertRpc(caseData, BIRMINGHAM_RPC);
     }
@@ -1128,9 +1128,9 @@ public class SubmitAppealServiceV2Test {
         SyaContactDetails appointeeContactDetails = new SyaContactDetails();
         appointeeContactDetails.setPostCode(postCode);
 
-        SyaCaseWrapper appealData = getSyaWrapperWithAppointee(appointeeContactDetails);
+        SyaCaseWrapper syaCaseWrapper = getSyaWrapperWithAppointee(appointeeContactDetails);
 
-        SscsCaseData caseData = submitAppealServiceV2.convertAppealToSscsCaseData(appealData, SscsCaseData.builder().build());
+        SscsCaseData caseData = submitAppealServiceV2.convertAppealToSscsCaseData(syaCaseWrapper, SscsCaseData.builder().build());
 
         assertNull(caseData.getRegionalProcessingCenter());
     }
@@ -1142,10 +1142,10 @@ public class SubmitAppealServiceV2Test {
         when(venueService.getEpimsIdForVenue("Bradford")).thenReturn("1234");
         when(refDataService.getCourtVenueRefDataByEpimsId("1234")).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("1").build());
 
-        SyaCaseWrapper appealData = getSyaWrapperWithAppointee(null);
-        appealData.setIsAppointee(false);
+        SyaCaseWrapper syaCaseWrapper = getSyaWrapperWithAppointee(null);
+        syaCaseWrapper.setIsAppointee(false);
 
-        SscsCaseData caseData = submitAppealServiceV2.convertAppealToSscsCaseData(appealData, SscsCaseData.builder().build());
+        SscsCaseData caseData = submitAppealServiceV2.convertAppealToSscsCaseData(syaCaseWrapper, SscsCaseData.builder().build());
 
         assertRpc(caseData, BRADFORD_RPC);
     }
@@ -1280,16 +1280,16 @@ public class SubmitAppealServiceV2Test {
         when(refDataService.getCourtVenueRefDataByEpimsId(epimsId)).thenReturn(CourtVenue.builder().courtStatus("Open").regionId(regionId).build());
 
         boolean isAppellant = appellantOrAppointee.equals("appellant");
-        SyaCaseWrapper appealData = getSyaCaseWrapper(isAppellant ? "json/sya.json" : "sya/allDetailsWithAppointeeWithDifferentAddress.json");
+        SyaCaseWrapper syaCaseWrapper = getSyaCaseWrapper(isAppellant ? "json/sya.json" : "sya/allDetailsWithAppointeeWithDifferentAddress.json");
         SyaBenefitType syaBenefitType = new SyaBenefitType(benefitCode, benefitCode);
-        appealData.setBenefitType(syaBenefitType);
+        syaCaseWrapper.setBenefitType(syaBenefitType);
         if (isAppellant) {
-            appealData.getAppellant().getContactDetails().setPostCode(postcode);
+            syaCaseWrapper.getAppellant().getContactDetails().setPostCode(postcode);
         } else {
-            appealData.getAppointee().getContactDetails().setPostCode(postcode);
+            syaCaseWrapper.getAppointee().getContactDetails().setPostCode(postcode);
         }
 
-        SscsCaseData caseData = submitAppealServiceV2.convertAppealToSscsCaseData(appealData, SscsCaseData.builder().build());
+        SscsCaseData caseData = submitAppealServiceV2.convertAppealToSscsCaseData(syaCaseWrapper, SscsCaseData.builder().build());
 
         assertEquals(expectedVenue, caseData.getProcessingVenue());
         assertNotNull(caseData.getCaseManagementLocation());
