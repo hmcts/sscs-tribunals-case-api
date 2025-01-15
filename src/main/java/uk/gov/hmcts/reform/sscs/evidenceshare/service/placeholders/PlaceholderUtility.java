@@ -177,13 +177,8 @@ public final class PlaceholderUtility {
     }
 
     public static String getPostponementRequestStatus(SscsCaseData caseData) {
-        String postponementStatus = "";
-
-        if (caseData.getPostponementRequest() == null || caseData.getPostponementRequest().getActionPostponementRequestSelected() == null) {
-            postponementStatus = "";
-        } else {
-            postponementStatus = caseData.getPostponementRequest().getActionPostponementRequestSelected();
-        }
-        return postponementStatus;
+        return (caseData.getPostponementRequest() == null
+                || caseData.getPostponementRequest().getActionPostponementRequestSelected() == null)
+                ? "" : caseData.getPostponementRequest().getActionPostponementRequestSelected();
     }
 }
