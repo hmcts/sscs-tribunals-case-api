@@ -49,13 +49,21 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
 
         setDirectionTypeDropDown(sscsCaseData);
         setExtensionNextEventDropdown(callback.getCaseDetails().getState(), sscsCaseData);
-
         if (isPostHearingsEnabled) {
             sscsCaseData.setPrePostHearing(null);
         }
 
         clearFields(sscsCaseData);
         setPartiesToSendLetter(sscsCaseData);
+        YesNo selectNextTypeOfHearing = sscsCaseData.getSelectNextTypeOfHearing();
+        sscsCaseData.setSelectNextTypeOfHearing(sscsCaseData.getSelectNextTypeOfHearing() != null
+            ? sscsCaseData.getSelectNextTypeOfHearing() : NO);
+        if (isYes(selectNextTypeOfHearing)) {
+            TypeOfHearing typeOfHearing = sscsCaseData.getTypeOfHearing();
+            if (typeOfHearing != null) {
+                sscsCaseData.setTypeOfHearing(typeOfHearing);
+            }
+        }
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 

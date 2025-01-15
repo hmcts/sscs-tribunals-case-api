@@ -359,13 +359,36 @@
   },
   {
     "CaseEventID": "directionIssued",
+    "CaseFieldID": "selectNextTypeOfHearing",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 23,
+    "PageID": "1.0",
+    "PageLabel": "Issue direction"
+  },
+  {
+    "CaseEventID": "directionIssued",
+    "CaseFieldID": "typeOfHearing",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 24,
+    "PageID": "2.0",
+    "PageLabel": "Issue direction",
+    "PageShowCondition": "selectNextTypeOfHearing=\"Yes\""
+  },
+  {
+    "CaseEventID": "directionIssued",
     "CaseFieldID": "previewDocument",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder": 23,
-    "PageID": "2.0",
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 25,
+    "PageID": "3.0",
     "PageLabel": "Issue direction",
     "PageShowCondition": "generateNotice=\"Yes\""
   }
