@@ -15,6 +15,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingVenue.SAME_VENUE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingVenue.SOMEWHERE_ELSE;
+import static uk.gov.hmcts.reform.sscs.model.hmc.reference.HearingType.DIRECTION_HEARINGS;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.HearingType.SUBSTANTIVE;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.LocationType.COURT;
 
@@ -223,12 +224,30 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
         assertThat(result).isFalse();
     }
 
-    @DisplayName("Hearing type should be substantive.")
+    @DisplayName("Hearing type should be substantive if typeOfHearing is null.")
     @Test
-    void getHearingType() {
-        HearingType result = HearingsDetailsMapping.getHearingType();
+    void getHearingTypeNull() {
+        HearingType result = HearingsDetailsMapping.getHearingType(caseData);
 
         assertThat(result).isEqualTo(SUBSTANTIVE);
+    }
+
+    @DisplayName("Hearing type should be substantive if typeOfHearing is substantive.")
+    @Test
+    void getHearingTypeSubstantive() {
+        caseData.setTypeOfHearing(TypeOfHearing.SUBSTANTIVE);
+        HearingType result = HearingsDetailsMapping.getHearingType(caseData);
+
+        assertThat(result).isEqualTo(SUBSTANTIVE);
+    }
+
+    @DisplayName("Hearing type should be direction if typeOfHearing is direction.")
+    @Test
+    void getHearingTypeDirection() {
+        caseData.setTypeOfHearing(TypeOfHearing.DIRECTION_HEARINGS);
+        HearingType result = HearingsDetailsMapping.getHearingType(caseData);
+
+        assertThat(result).isEqualTo(DIRECTION_HEARINGS);
     }
 
     @DisplayName("When urgentCase is yes, isCaseUrgent return True")

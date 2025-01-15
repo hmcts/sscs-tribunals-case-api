@@ -4,7 +4,6 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
-import static uk.gov.hmcts.reform.sscs.model.hmc.reference.HearingType.SUBSTANTIVE;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingPriority.STANDARD;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingPriority.URGENT;
 
@@ -22,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Entity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Party;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.TypeOfHearing;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.HearingLocation;
 import uk.gov.hmcts.reform.sscs.model.HearingWrapper;
@@ -57,7 +57,7 @@ public final class HearingsDetailsMapping {
         // build hearing details to be used in payload for hmc create / update hearing requests
         return HearingDetails.builder()
                 .autolistFlag(autoListed)
-                .hearingType(getHearingType())
+                .hearingType(getHearingType(caseData))
                 .hearingWindow(window)
                 .duration(duration)
                 .nonStandardHearingDurationReasons(nonStandardDurationReasons)
@@ -77,8 +77,10 @@ public final class HearingsDetailsMapping {
                 .build();
     }
 
-    public static HearingType getHearingType() {
-        return SUBSTANTIVE;
+    public static HearingType getHearingType(SscsCaseData sscsCaseData) {
+        TypeOfHearing typeOfHearing = sscsCaseData.getTypeOfHearing() != null
+            ? sscsCaseData.getTypeOfHearing() : TypeOfHearing.SUBSTANTIVE;
+        return HearingType.getFromTypeOfHearing(typeOfHearing);
     }
 
     public static boolean isCaseUrgent(@Valid SscsCaseData caseData) {

@@ -115,6 +115,8 @@
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "caseInfo_sscs", "TabLabel": "Appeal Details", "TabDisplayOrder": 4, "CaseFieldID": "isMedicalMemberRequired", "TabFieldDisplayOrder": 42, "FieldShowCondition": "isMedicalMemberRequired!=\"\""},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "caseInfo_sscs", "TabLabel": "Appeal Details", "TabDisplayOrder": 4, "CaseFieldID": "SearchCriteria", "TabFieldDisplayOrder": 43},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "caseInfo_sscs", "TabLabel": "Appeal Details", "TabDisplayOrder": 4, "CaseFieldID": "caseManagementLocation", "TabFieldDisplayOrder": 44},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "caseInfo_sscs", "TabLabel": "Appeal Details", "TabDisplayOrder": 4, "CaseFieldID": "appealHearingOptions", "TabFieldDisplayOrder": 45, "FieldShowCondition": "appealHearingOptions=\"*\""},
+
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "events_sscs", "TabLabel": "Case Progression", "TabDisplayOrder": 5, "CaseFieldID": "isConfidentialCaseLabel", "TabShowCondition": "events=\"*\"", "TabFieldDisplayOrder": 1, "FieldShowCondition": "isConfidentialCase =\"Yes\""},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs", "TabID": "events_sscs", "TabLabel": "Case Progression", "TabDisplayOrder": 5, "CaseFieldID": "events", "TabFieldDisplayOrder": 2},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs", "TabID": "evidence_sscs", "TabLabel": "GAPS 2 Evidence", "TabDisplayOrder": 6, "CaseFieldID": "evidence", "TabFieldDisplayOrder": 2},
@@ -286,6 +288,7 @@
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_judge", "TabLabel": "Listing Requirements", "TabDisplayOrder": 24, "CaseFieldID": "hearingState", "TabFieldDisplayOrder": 13},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_judge", "TabLabel": "Listing Requirements", "TabDisplayOrder": 24, "CaseFieldID": "panelMemberExclusions", "TabFieldDisplayOrder": 14},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_judge", "TabLabel": "Listing Requirements", "TabDisplayOrder": 24, "CaseFieldID": "panel", "TabFieldDisplayOrder": 15, "FieldShowCondition": "panelMemberExclusions.arePanelMembersReserved=\"Yes\""},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_judge", "TabLabel": "Listing Requirements", "TabDisplayOrder": 24, "CaseFieldID": "typeOfHearing", "TabFieldDisplayOrder": 16, "FieldShowCondition": "typeOfHearing=\"*\""},
 
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_clerk", "TabLabel": "Listing Requirements", "TabDisplayOrder": 24, "CaseFieldID": "isConfidentialCaseLabel", "TabFieldDisplayOrder": 1, "TabShowCondition": "regionalProcessingCenter.hearingRoute=\"listAssist\" OR regionalProcessingCenter.hearingRoute=\"gaps\"", "FieldShowCondition": "isConfidentialCase =\"Yes\""},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-clerk", "TabID": "listing_requirements_clerk", "TabLabel": "Listing Requirements", "TabDisplayOrder": 24, "CaseFieldID": "defaultListingValues", "TabFieldDisplayOrder": 1},
@@ -304,6 +307,7 @@
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_clerk", "TabLabel": "Listing Requirements", "TabDisplayOrder": 24, "CaseFieldID": "hearingState", "TabFieldDisplayOrder": 14},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_clerk", "TabLabel": "Listing Requirements", "TabDisplayOrder": 24, "CaseFieldID": "panelMemberExclusions", "TabFieldDisplayOrder": 15},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_clerk", "TabLabel": "Listing Requirements", "TabDisplayOrder": 24, "CaseFieldID": "panel", "TabFieldDisplayOrder": 16, "FieldShowCondition": "panelMemberExclusions.arePanelMembersReserved=\"Yes\""},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_clerk", "TabLabel": "Listing Requirements", "TabDisplayOrder": 24, "CaseFieldID": "typeOfHearing", "TabFieldDisplayOrder": 17, "FieldShowCondition": "typeOfHearing=\"*\""},
 
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_registrar", "TabLabel": "Listing Requirements", "TabDisplayOrder": 24, "CaseFieldID": "isConfidentialCaseLabel", "TabFieldDisplayOrder": 1, "TabShowCondition": "regionalProcessingCenter.hearingRoute=\"listAssist\" OR regionalProcessingCenter.hearingRoute=\"gaps\"", "FieldShowCondition": "isConfidentialCase =\"Yes\""},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-registrar", "TabID": "listing_requirements_registrar", "TabLabel": "Listing Requirements", "TabDisplayOrder": 24, "CaseFieldID": "defaultListingValues", "TabFieldDisplayOrder": 1},
@@ -321,6 +325,7 @@
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_registrar", "TabLabel": "Listing Requirements", "TabDisplayOrder": 24, "CaseFieldID": "hearingState", "TabFieldDisplayOrder": 13},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_registrar", "TabLabel": "Listing Requirements", "TabDisplayOrder": 24, "CaseFieldID": "panelMemberExclusions", "TabFieldDisplayOrder": 14},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_registrar", "TabLabel": "Listing Requirements", "TabDisplayOrder": 24, "CaseFieldID": "panel", "TabFieldDisplayOrder": 15, "FieldShowCondition": "panelMemberExclusions.arePanelMembersReserved=\"Yes\""},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_registrar", "TabLabel": "Listing Requirements", "TabDisplayOrder": 24, "CaseFieldID": "typeOfHearing", "TabFieldDisplayOrder": 16, "FieldShowCondition": "typeOfHearing=\"*\""},
 
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_superuser", "TabLabel": "Listing Requirements", "TabDisplayOrder": 24, "CaseFieldID": "isConfidentialCaseLabel", "TabFieldDisplayOrder": 1, "TabShowCondition": "regionalProcessingCenter.hearingRoute=\"listAssist\" OR regionalProcessingCenter.hearingRoute=\"gaps\"", "FieldShowCondition": "isConfidentialCase =\"Yes\""},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "TabID": "listing_requirements_superuser", "TabLabel": "Listing Requirements", "TabDisplayOrder": 24, "CaseFieldID": "defaultListingValues", "TabFieldDisplayOrder": 2},
@@ -339,6 +344,7 @@
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_superuser", "TabLabel": "Listing Requirements", "TabDisplayOrder": 24, "CaseFieldID": "hearingState", "TabFieldDisplayOrder": 15},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_superuser", "TabLabel": "Listing Requirements", "TabDisplayOrder": 24, "CaseFieldID": "panelMemberExclusions", "TabFieldDisplayOrder": 16},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_superuser", "TabLabel": "Listing Requirements", "TabDisplayOrder": 24, "CaseFieldID": "panel", "TabFieldDisplayOrder": 17, "FieldShowCondition": "panelMemberExclusions.arePanelMembersReserved=\"Yes\""},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_superuser", "TabLabel": "Listing Requirements", "TabDisplayOrder": 24, "CaseFieldID": "typeOfHearing", "TabFieldDisplayOrder": 18, "FieldShowCondition": "typeOfHearing=\"*\""},
 
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "language_sscs", "TabLabel": "Welsh", "TabDisplayOrder": 25, "CaseFieldID": "isConfidentialCaseLabel", "TabFieldDisplayOrder": 1, "FieldShowCondition": "isConfidentialCase =\"Yes\""},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "language_sscs", "TabLabel": "Welsh", "TabDisplayOrder": 25, "CaseFieldID": "languagePreferenceWelsh", "TabFieldDisplayOrder": 1, "TabShowCondition": "languagePreferenceWelsh=\"Yes\""},

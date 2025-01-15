@@ -83,6 +83,8 @@ public class DirectionIssuedAboutToStartHandlerTest {
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getExtensionNextEventDl());
         assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
+        assertNull(response.getData().getTypeOfHearing());
+        assertEquals(NO, response.getData().getSelectNextTypeOfHearing());
     }
 
     @Test
@@ -394,5 +396,19 @@ public class DirectionIssuedAboutToStartHandlerTest {
         assertEquals(NO, sscsCaseData.getHasOtherPartyAppointee());
         assertEquals(YES, sscsCaseData.getHasOtherParties());
         assertEquals(NO, sscsCaseData.getHasJointParty());
+    }
+
+    @Test
+    public void givenNotDefaultSelectTypeOfHearingNo_whenValue() {
+        when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
+        sscsCaseData.setSelectNextTypeOfHearing(YES);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(SEND_TO_LISTING.getCode(), SEND_TO_LISTING.getLabel()));
+        listOptions.add(new DynamicListItem(NO_FURTHER_ACTION.getCode(), NO_FURTHER_ACTION.getLabel()));
+        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
+        assertEquals(expected, response.getData().getExtensionNextEventDl());
+        assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
+        assertEquals(YES, response.getData().getSelectNextTypeOfHearing());
     }
 }
