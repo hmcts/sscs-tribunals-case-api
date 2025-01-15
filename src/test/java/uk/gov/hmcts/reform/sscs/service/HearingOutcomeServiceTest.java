@@ -104,4 +104,36 @@ public class HearingOutcomeServiceTest {
         assertEquals(hearingLabel, result.getListItems().get(0).getLabel());
     }
 
+    @Test
+    public void emptyVenueInHearingOutcomeCompletedHearings_ShouldReturnCorrectDynamicList() {
+        List<Hearing> hearings = List.of(Hearing.builder()
+                        .value(HearingDetails.builder()
+                                .hearingId("1")
+                                .start(HEARING_START_DATE_TIME)
+                                .end(HEARING_END_DATE_TIME)
+                                .venue(Venue.builder().name(VENUE_NAME).build())
+                                .build())
+                        .build(),
+                Hearing.builder()
+                        .value(HearingDetails.builder()
+                                .hearingId("2")
+                                .start(HEARING_START_DATE_TIME)
+                                .end(HEARING_END_DATE_TIME)
+                                .venue(Venue.builder().build())
+                                .build())
+                        .build());
+        DynamicList result = hearingOutcomeService.setHearingOutcomeCompletedHearings(hearings);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm", Locale.ENGLISH);
+        final String hearingLabel = HEARING_START_DATE_TIME.format(formatter)
+                + "-" + HEARING_END_DATE_TIME.toLocalTime()
+                + ", " + VENUE_NAME;
+        final String hearingLabelNoVenue = HEARING_START_DATE_TIME.format(formatter)
+                + "-" + HEARING_END_DATE_TIME.toLocalTime();
+        assertEquals(2, result.getListItems().size());
+        assertEquals("1", result.getListItems().get(0).getCode());
+        assertEquals("2", result.getListItems().get(1).getCode());
+        assertEquals(hearingLabel, result.getListItems().get(0).getLabel());
+        assertEquals(hearingLabelNoVenue, result.getListItems().get(1).getLabel());
+    }
+
 }

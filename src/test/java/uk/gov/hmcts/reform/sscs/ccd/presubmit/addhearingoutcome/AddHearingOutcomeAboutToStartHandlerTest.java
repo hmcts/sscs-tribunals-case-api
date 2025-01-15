@@ -135,6 +135,46 @@ public class AddHearingOutcomeAboutToStartHandlerTest {
     }
 
     @Test
+    void givenOneHearingHasIncorrectVenue_ThenShowInCompletedHearings() {
+        CaseHearing caseHearing1 = CaseHearing.builder()
+                .hearingId(1L)
+                .hearingChannels(List.of(HearingChannel.FACE_TO_FACE))
+                .hearingDaySchedule(List.of(HearingDaySchedule.builder()
+                        .hearingVenueEpimsId(EPIMS_ID_1)
+                        .hearingStartDateTime(HEARING_START_DATE_TIME.minusMonths(1))
+                        .hearingEndDateTime(HEARING_END_DATE_TIME.minusMonths(1))
+                        .build()))
+                .build();
+
+        CaseHearing caseHearing2 = CaseHearing.builder()
+                .hearingId(2L)
+                .hearingChannels(List.of(HearingChannel.FACE_TO_FACE))
+                .hearingDaySchedule(List.of(HearingDaySchedule.builder()
+                        .hearingVenueEpimsId(EPIMS_ID_2)
+                        .hearingStartDateTime(HEARING_START_DATE_TIME)
+                        .hearingEndDateTime(HEARING_END_DATE_TIME)
+                        .build()))
+                .build();
+
+        when(hmcHearingsApiService.getHearingsRequest(any(),any())).thenReturn(
+                HearingsGetResponse.builder().caseHearings(
+                        List.of(caseHearing1,caseHearing2)).build());
+        when(hearingOutcomeService.mapCaseHearingToHearing(caseHearing1)).thenReturn(
+                Hearing.builder().value(HearingDetails.builder()
+                        .start(HEARING_START_DATE_TIME).venue(Venue.builder().name(VENUE_NAME).build()).build()).build()
+        );
+        when(hearingOutcomeService.mapCaseHearingToHearing(caseHearing2)).thenReturn(
+                Hearing.builder().value(HearingDetails.builder()
+                        .start(HEARING_START_DATE_TIME).venue(Venue.builder().build()).build()).build()
+        );
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_START,callback,USER_AUTHORISATION);
+        List<Hearing> hearings = response.getData().getCompletedHearingsList();
+        assertThat(hearings).isNotEmpty();
+        assertThat(hearings.size()).isEqualTo(2);
+    }
+
+    @Test
     void givenNoCompletedHearingOnCase_ThenReturnError() {
         when(hmcHearingsApiService.getHearingsRequest(any(),any())).thenReturn(
                 HearingsGetResponse.builder().caseHearings(List.of()).build());
