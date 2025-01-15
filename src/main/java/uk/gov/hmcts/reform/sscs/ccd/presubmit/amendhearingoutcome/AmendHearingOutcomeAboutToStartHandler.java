@@ -59,7 +59,6 @@ public class AmendHearingOutcomeAboutToStartHandler implements PreSubmitCallback
         sscsCaseData.setCompletedHearingsList(hmcHearings.stream()
                 .map(hearingOutcomeService::mapCaseHearingToHearing)
                 .filter(hearing -> hearing.getValue().getStart() != null)
-                .filter(hearing -> hearing.getValue().getVenue().getName() != null)
                 .sorted(Comparator.reverseOrder())
                 .toList());
         DynamicList hearingList = hearingOutcomeService.setHearingOutcomeCompletedHearings(sscsCaseData.getCompletedHearingsList());

@@ -36,9 +36,10 @@ public class HearingOutcomeService {
                 .map(Hearing::getValue)
                 .map(hearing -> {
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm", Locale.ENGLISH);
-                    String hearingLabel = hearing.getStart().format(formatter)
-                            + "-" + hearing.getEnd().toLocalTime()
-                            + ", " + hearing.getVenue().getName();
+                    String hearingLabel = hearing.getStart().format(formatter) + "-" + hearing.getEnd().toLocalTime();
+                    if (hearing.getVenue().getName() != null) {
+                        hearingLabel += ", " + hearing.getVenue().getName();
+                    }
                     return new DynamicListItem(hearing.getHearingId(), hearingLabel);
                 }).toList());
     }
