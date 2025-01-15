@@ -42,7 +42,6 @@ java:
     ELINKS_V2_FEATURE_ENABLED: true
     DELETED_REDACTED_DOC_ENABLED: true
     DUMMY: true
-    CITIZEN_LOGIN_SERVICE_V2: true
     TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
     SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
     AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"

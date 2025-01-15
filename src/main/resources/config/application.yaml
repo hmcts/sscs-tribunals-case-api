@@ -241,8 +241,6 @@ evidenceDescription:
 feature:
     case-access-management:
         enabled: ${CASE_ACCESS_MANAGEMENT_FEATURE:false}
-    citizen-login-service-v2:
-        enabled: ${CITIZEN_LOGIN_SERVICE_V2:false}
     deleted-redacted-doc:
         enabled: ${DELETED_REDACTED_DOC_ENABLED:false}
     elasticsearch:
