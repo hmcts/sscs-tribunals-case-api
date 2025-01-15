@@ -69,8 +69,8 @@ elif [ "$ENV" = "pr" ]; then
             find ./definitions/benefit/sheets/ -type f -exec sed -i "s/Benefit/Benefit-$CHANGE_ID/g" {} +
         fi
     fi
-    EM_CCD_ORCHESTRATOR_URL="https://em-ccdorc-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    TRIBUNALS_API_URL="https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    EM_CCD_ORCHESTRATOR_URL=${EM_CCD_ORCHESTRATOR_URL:="https://em-ccdorc-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"}
+    TRIBUNALS_API_URL=${TRIBUNALS_API_URL:="https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"}
     BULK_SCAN_API_URL="http://sscs-bulk-scan-aat.service.core-compute-aat.internal"
     BULK_SCAN_ORCHESTRATOR_URL="http://bulk-scan-orchestrator-aat.service.core-compute-aat.internal"
 elif [ "$ENV" = "aat" ] || [ "$ENV" = "demo" ] || [ "$ENV" = "prod" ] || [ "$ENV" = "perftest" ] || [ "$ENV" = "ithc" ]; then
@@ -163,5 +163,3 @@ docker run --rm --name json2xlsx \
   -e "CCD_DEF_VERSION=${CCD_DEF_VERSION}" \
   hmctspublic.azurecr.io/ccd/definition-processor:latest \
   json2xlsx -D /tmp/json/sheets "$excludedFilenamePatterns" -o "/tmp/output/${ccdDefinitionFile}"
-
-git checkout definitions/benefit/sheets
