@@ -7,7 +7,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.MockitoAnnotations.openMocks;
-import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseDataV1;
+import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseDataV2;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getPortsOfEntry;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.*;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS;
@@ -37,7 +37,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaMrn;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @RunWith(JUnitParamsRunner.class)
-public class SubmitYourAppealToCcdCaseDataDeserializerTestV1 {
+public class SubmitYourAppealToCcdCaseDataDeserializerV2Test {
 
     private static final String NO = "No";
     public static final String[] IGNORED_PATHS = {
@@ -58,11 +58,11 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTestV1 {
     }
 
     public SscsCaseData callConvertSyaToCcdCaseDataRelevantVersion(SyaCaseWrapper syaCaseWrapper, String region, RegionalProcessingCenter rpc, boolean caseAccessManagementEnabled) {
-        return convertSyaToCcdCaseDataV1(syaCaseWrapper, region, rpc, caseAccessManagementEnabled);
+        return convertSyaToCcdCaseDataV2(syaCaseWrapper, region, rpc, caseAccessManagementEnabled, new SscsCaseData());
     }
 
     public SscsCaseData callConvertSyaToCcdCaseDataRelevantVersion(SyaCaseWrapper syaCaseWrapper, boolean caseAccessManagementEnabled) {
-        return convertSyaToCcdCaseDataV1(syaCaseWrapper, caseAccessManagementEnabled);
+        return convertSyaToCcdCaseDataV2(syaCaseWrapper, caseAccessManagementEnabled, new SscsCaseData());
     }
 
     @Test

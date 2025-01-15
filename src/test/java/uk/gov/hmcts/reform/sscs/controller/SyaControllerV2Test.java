@@ -48,7 +48,7 @@ import uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceBase;
 import uk.gov.hmcts.reform.sscs.service.v2.SubmitAppealService;
 
 @RunWith(JUnitParamsRunner.class)
-public class SyaControllerTestV2 {
+public class SyaControllerV2Test {
 
     // being: it needed to run springRunner and junitParamsRunner
     @ClassRule
@@ -93,38 +93,14 @@ public class SyaControllerTestV2 {
     }
 
     @Test
-    public void shouldReturnHttpStatusCode201ForTheSubmittedDraft() throws Exception {
+    @Parameters({"empty", "true", "notTrue"})
+    public void shouldReturnHttpStatusCode201ForTheSubmittedDraft(String forceCreateParm) throws Exception {
         mockSubmitAppealService(submitAppealServiceBase,  1L, SaveCaseOperation.CREATE);
 
         String json = getSyaCaseWrapperJson("json/sya.json");
 
-        mockMvc.perform(put("/drafts")
-                        .header("Authorization", "Bearer myToken")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().isCreated());
-    }
-
-    @Test
-    public void shouldReturnHttpStatusCode201ForTheSubmittedDraftWhenForceCreateTrue() throws Exception {
-        mockSubmitAppealService(submitAppealServiceBase,  1L, SaveCaseOperation.CREATE);
-
-        String json = getSyaCaseWrapperJson("json/sya.json");
-
-        mockMvc.perform(put("/drafts?forceCreate=true")
-                        .header("Authorization", "Bearer myToken")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().isCreated());
-    }
-
-    @Test
-    public void shouldReturnHttpStatusCode201ForTheSubmittedDraftWhenForceCreateNotTrue() throws Exception {
-        mockSubmitAppealService(submitAppealServiceBase,  1L, SaveCaseOperation.CREATE);
-
-        String json = getSyaCaseWrapperJson("json/sya.json");
-
-        mockMvc.perform(put("/drafts?forceCreate=notTrue")
+        String url = "/drafts" + (forceCreateParm.equalsIgnoreCase("empty") ? "" : "?forceCreate=" + forceCreateParm);
+        mockMvc.perform(put(url)
                         .header("Authorization", "Bearer myToken")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
@@ -245,16 +221,8 @@ public class SyaControllerTestV2 {
         String validPayload = getSyaCaseWrapperJson("json/sya.json");
 
         String emptyPayload = "{}";
-        String noBenefitCode = "{\n"
-                + "  \"benefitType\": {\n"
-                + "    \"description\": \"Personal Independence Payment\"\n"
-                + "  }\n"
-                + "}";
-        String emptyBenefitCode = "{\n"
-                + "  \"benefitType\": {\n"
-                + "    \"code\": \"\"\n"
-                + "  }\n"
-                + "}";
+        String noBenefitCode = "{\n  \"benefitType\": {\n    \"description\": \"Personal Independence Payment\"\n  }\n}";
+        String emptyBenefitCode = "{\n  \"benefitType\": {\n    \"code\": \"\"\n  }\n}";
 
         String validUserToken = "Bearer myToken";
         String invalidUserToken = "";
@@ -272,24 +240,10 @@ public class SyaControllerTestV2 {
         String validPayload = getSyaCaseWrapperJson("json/sya_with_ccdId.json");
 
         String emptyPayload = "{}";
-        String noBenefitCode = "{\n"
-                + "  \"benefitType\": {\n"
-                + "    \"description\": \"Personal Independence Payment\"\n"
-                + "  },\n"
-                + "  \"ccdId\": 1234 \n"
-                + "}";
-        String emptyBenefitCode = "{\n"
-                + "  \"benefitType\": {\n"
-                + "    \"code\": \"\"\n"
-                + "  },\n"
-                + "  \"ccdId\": 1234 \n"
-                + "}";
+        String noBenefitCode = "{\n  \"benefitType\": {\n    \"description\": \"Personal Independence Payment\"\n  },\n  \"ccdId\": 1234 \n}";
+        String emptyBenefitCode = "{\n  \"benefitType\": {\n    \"code\": \"\"\n  },\n  \"ccdId\": 1234 \n}";
 
-        String emptyCcdId = "{\n"
-                + "  \"benefitType\": {\n"
-                + "    \"code\": \"ESA\"\n"
-                + "  }\n"
-                + "}";
+        String emptyCcdId = "{\n  \"benefitType\": {\n    \"code\": \"ESA\"\n  }\n}";
 
         String validUserToken = "Bearer myToken";
         String invalidUserToken = "";
@@ -308,11 +262,7 @@ public class SyaControllerTestV2 {
         String validPayload = getSyaCaseWrapperJson("json/sya_with_ccdId.json");
 
         String emptyPayload = "{}";
-        String emptyCcdId = "{\n"
-                + "  \"benefitType\": {\n"
-                + "    \"code\": \"ESA\"\n"
-                + "  }\n"
-                + "}";
+        String emptyCcdId = "{\n  \"benefitType\": {\n    \"code\": \"ESA\"\n  }\n}";
 
         String validUserToken = "Bearer myToken";
         String invalidUserToken = "";
@@ -651,7 +601,7 @@ public class SyaControllerTestV2 {
     }
 
     @Test(expected = NullPointerException.class)
-    public void testLoggingMethodNullBenefitType() throws Exception {
+    public void testLoggingMethodNullBenefitType() {
         SyaAppellant appellant = new SyaAppellant();
         appellant.setTitle("Mr");
         appellant.setLastName("Lastname");
@@ -676,7 +626,7 @@ public class SyaControllerTestV2 {
     }
 
     @Test(expected = NullPointerException.class)
-    public void testLoggingMethodNullNino() throws Exception {
+    public void testLoggingMethodNullNino() {
         SyaCaseWrapper caseWithNullNino = new SyaCaseWrapper();
         caseWithNullNino.setBenefitType(new SyaBenefitType("Universal Credit", "UC"));
         caseWithNullNino.setCcdCaseId("123456");

@@ -6,6 +6,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -95,7 +96,7 @@ import uk.gov.hmcts.reform.sscs.service.VenueService;
 import uk.gov.hmcts.reform.sscs.service.converter.ConvertAIntoBService;
 
 @RunWith(JUnitParamsRunner.class)
-public class SubmitAppealServiceTestV2 {
+public class SubmitAppealServiceV2Test {
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.LENIENT);
@@ -310,16 +311,13 @@ public class SubmitAppealServiceTestV2 {
         assertTrue(result.isPresent());
     }
 
-    @Test(expected = FeignException.class)
+    @Test
     public void shouldRaiseExceptionOnUpdateDraftEvent() {
         FeignException feignException = mock(FeignException.class);
         given(feignException.status()).willReturn(404);
         givenUpdateCaseWillThrowException(citizenCcdService, feignException);
 
-        Optional<SaveCaseResult> result = callUpdateDraftAppeal(submitAppealServiceV2, "authorisation", appealData);
-
-        verifyArchiveDraftAppeal(citizenCcdService);
-        assertFalse(result.isPresent());
+        assertThrows(FeignException.class, () -> callUpdateDraftAppeal(submitAppealServiceV2, "authorisation", appealData));
     }
 
     @Test
@@ -334,12 +332,10 @@ public class SubmitAppealServiceTestV2 {
         assertFalse(result.isPresent());
     }
 
-    @Test(expected = ApplicationErrorException.class)
+    @Test
     public void shouldRaisedExceptionOnUpdateDraftWhenCitizenRoleIsNotPresent() {
         given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
-        Optional<SaveCaseResult> result = callUpdateDraftAppeal(submitAppealServiceV2, "authorisation", appealData);
-
-        assertFalse(result.isPresent());
+        assertThrows(ApplicationErrorException.class, () -> callUpdateDraftAppeal(submitAppealServiceV2, "authorisation", appealData));
     }
 
     @Test
@@ -352,24 +348,19 @@ public class SubmitAppealServiceTestV2 {
         assertTrue(result.isPresent());
     }
 
-    @Test(expected = FeignException.class)
+    @Test
     public void shouldRaiseExceptionOnArchiveDraftEvent() {
         FeignException feignException = mock(FeignException.class);
         given(feignException.status()).willReturn(404);
         givenArchiveDraftAppealWillThrow(citizenCcdService, feignException);
 
-        Optional<SaveCaseResult> result = callArchiveDraftAppeal(submitAppealServiceV2, "authorisation", appealData, 112L);
-
-        verifyArchiveDraftAppeal(citizenCcdService);
-        assertFalse(result.isPresent());
+        assertThrows(FeignException.class, () -> callArchiveDraftAppeal(submitAppealServiceV2, "authorisation", appealData, 112L));
     }
 
-    @Test(expected = ApplicationErrorException.class)
+    @Test
     public void shouldRaisedExceptionOnArchiveDraftWhenCitizenRoleIsNotPresent() {
         given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
-        Optional<SaveCaseResult> result = callArchiveDraftAppeal(submitAppealServiceV2, "authorisation", appealData, 121L);
-
-        assertFalse(result.isPresent());
+        assertThrows(ApplicationErrorException.class, () -> callArchiveDraftAppeal(submitAppealServiceV2, "authorisation", appealData, 121L));
     }
 
     @Test
@@ -387,16 +378,15 @@ public class SubmitAppealServiceTestV2 {
 
     }
 
-    @Test(expected = FeignException.class)
+    @Test
     public void shouldRaisedExceptionOnCreateDraftCaseWithAppealDetailsWithDraftEvent() {
         FeignException feignException = mock(FeignException.class);
         given(feignException.status()).willReturn(404);
         givenSaveCaseWillThrow(citizenCcdService, feignException);
 
-        Optional<SaveCaseResult> result = callSubmitDraftAppeal(submitAppealServiceV2, "authorisation", appealData, false);
+        assertThrows(FeignException.class, () -> callSubmitDraftAppeal(submitAppealServiceV2, "authorisation", appealData, false));
 
         verifyCitizenCcdService(citizenCcdService);
-        assertFalse(result.isPresent());
     }
 
     @Test
@@ -426,12 +416,10 @@ public class SubmitAppealServiceTestV2 {
         assertEquals(result, Optional.empty());
     }
 
-    @Test(expected = ApplicationErrorException.class)
+    @Test
     public void shouldRaisedExceptionOnCreateDraftWhenCitizenRoleIsNotPresent() {
         given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
-        Optional<SaveCaseResult> result = callSubmitDraftAppeal(submitAppealServiceV2, "authorisation", appealData, false);
-
-        assertFalse(result.isPresent());
+        assertThrows(ApplicationErrorException.class, () -> callSubmitDraftAppeal(submitAppealServiceV2, "authorisation", appealData, false));
     }
 
     @Test
@@ -461,10 +449,11 @@ public class SubmitAppealServiceTestV2 {
         assertFalse(optionalSessionDraft.isPresent());
     }
 
-    @Test(expected = ApplicationErrorException.class)
+    @Test
     public void shouldThrowExceptionOnGetDraftWhenCitizenRoleNotPresent() {
         given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
-        submitAppealServiceV2.getDraftAppeal("authorisation");
+
+        assertThrows(ApplicationErrorException.class, () -> submitAppealServiceV2.getDraftAppeal("authorisation"));
     }
 
     @Test
@@ -485,10 +474,11 @@ public class SubmitAppealServiceTestV2 {
         assertEquals(0, sessionDrafts.size());
     }
 
-    @Test(expected = ApplicationErrorException.class)
+    @Test
     public void shouldThrowExceptionOnGetDraftsWhenCitizenRoleNotPresent() {
         given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
-        submitAppealServiceV2.getDraftAppeals("authorisation");
+
+        assertThrows(ApplicationErrorException.class, () -> submitAppealServiceV2.getDraftAppeals("authorisation"));
     }
 
     protected SyaCaseWrapper getSyaWrapperWithAppointee(SyaContactDetails appointeeContact) {
@@ -992,15 +982,15 @@ public class SubmitAppealServiceTestV2 {
                 .isEqualTo("Yes");
     }
 
-    @Test(expected = CcdException.class)
+    @Test
     public void givenExceptionWhenSearchingForCaseInCcd_shouldThrowException() {
         given(ccdService.findCaseBy(eq("data.appeal.appellant.identity.nino"), eq(appealData.getAppellant().getNino()), any(IdamTokens.class)))
                 .willThrow(RuntimeException.class);
 
-        submitAppealServiceV2.submitAppeal(appealData, userToken);
+        assertThrows(CcdException.class, () -> submitAppealServiceV2.submitAppeal(appealData, userToken));
     }
 
-    @Test(expected = CcdException.class)
+    @Test
     public void givenCaseDoesNotExistInCcdAndGivenExceptionWhenCreatingCaseInCcd_shouldThrowException() {
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any(IdamTokens.class)))
                 .willReturn(null);
@@ -1008,10 +998,10 @@ public class SubmitAppealServiceTestV2 {
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
                 .willThrow(RuntimeException.class);
 
-        submitAppealServiceV2.submitAppeal(appealData, userToken);
+        assertThrows(CcdException.class, () -> submitAppealServiceV2.submitAppeal(appealData, userToken));
     }
 
-    @Test(expected = DuplicateCaseException.class)
+    @Test
     public void givenCaseIsADuplicate_shouldNotResendEmails() {
         given(ccdService.findCaseBy(eq("data.appeal.appellant.identity.nino"), eq(appealData.getAppellant().getNino()), any()))
                 .willReturn(Collections.singletonList(
@@ -1025,12 +1015,12 @@ public class SubmitAppealServiceTestV2 {
                                                         .build()).build()).build()).build()
                 ));
 
-        submitAppealServiceV2.submitAppeal(appealData, userToken);
+        assertThrows(DuplicateCaseException.class, () -> submitAppealServiceV2.submitAppeal(appealData, userToken));
 
         then(pdfServiceClient).should(never()).generateFromHtml(any(byte[].class), anyMap());
     }
 
-    @Test(expected = DuplicateCaseException.class)
+    @Test
     public void givenCaseAlreadyExistsInCcd_shouldNotCreateCaseWithAppealDetails() {
         given(ccdService.findCaseBy(eq("data.appeal.appellant.identity.nino"), eq(appealData.getAppellant().getNino()), any()))
                 .willReturn(Arrays.asList(
@@ -1057,7 +1047,7 @@ public class SubmitAppealServiceTestV2 {
                                                         .build()).build()).build()).build()
                 ));
 
-        submitAppealServiceV2.submitAppeal(appealData, userToken);
+        assertThrows(DuplicateCaseException.class, () -> submitAppealServiceV2.submitAppeal(appealData, userToken));
 
         verify(ccdService, never()).createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class));
     }
@@ -1202,14 +1192,14 @@ public class SubmitAppealServiceTestV2 {
         assertEquals("UC Recovery from Estates", caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
     }
 
-    @Test(expected = CcdException.class)
+    @Test
     public void givenExceptionWhenCreatingOrUpdatingIbaCase_shouldThrowException() {
         SyaBenefitType syaBenefitType = new SyaBenefitType("Infected Blood Compensation", "infectedBloodCompensation");
         appealData.setBenefitType(syaBenefitType);
         given(ccdService.createCase(any(SscsCaseData.class), anyString(), anyString(), anyString(), any(IdamTokens.class)))
                 .willThrow(RuntimeException.class);
 
-        submitAppealServiceV2.submitAppeal(appealData, userToken);
+        assertThrows(CcdException.class, () -> submitAppealServiceV2.submitAppeal(appealData, userToken));
     }
 
     @Test

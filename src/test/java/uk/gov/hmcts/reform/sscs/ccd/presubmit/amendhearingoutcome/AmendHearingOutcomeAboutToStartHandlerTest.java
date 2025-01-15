@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 
 @RunWith(JUnitParamsRunner.class)
-public class AmendHearingOutcomeAboutToStartHandlerTest {
+class AmendHearingOutcomeAboutToStartHandlerTest {
     private AmendHearingOutcomeAboutToStartHandler handler;
     private static final String USER_AUTHORISATION = "Bearer token";
     @Mock
