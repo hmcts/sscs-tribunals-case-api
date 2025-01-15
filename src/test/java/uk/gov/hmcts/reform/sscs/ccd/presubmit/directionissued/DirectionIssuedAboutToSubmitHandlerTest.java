@@ -781,4 +781,24 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
         assertNull(response.getData().getSscsInterlocDirectionDocument());
     }
+
+    @Test
+    public void willWipeTypeOfHearingIfSelectNextTypeOfHearingIsNull() {
+        when(caseDetails.getState()).thenReturn(State.READY_TO_LIST);
+        sscsCaseData.setSelectNextTypeOfHearing(null);
+        sscsCaseData.setTypeOfHearing(TypeOfHearing.SUBSTANTIVE);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertNull(response.getData().getSelectNextTypeOfHearing());
+        assertNull(response.getData().getTypeOfHearing());
+    }
+
+    @Test
+    public void willWipeTypeOfHearingIfSelectNextTypeOfHearingIsNo() {
+        when(caseDetails.getState()).thenReturn(State.READY_TO_LIST);
+        sscsCaseData.setSelectNextTypeOfHearing(NO);
+        sscsCaseData.setTypeOfHearing(TypeOfHearing.SUBSTANTIVE);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(NO, response.getData().getSelectNextTypeOfHearing());
+        assertNull(response.getData().getTypeOfHearing());
+    }
 }
