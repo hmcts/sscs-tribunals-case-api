@@ -97,7 +97,7 @@ public class AddHearingOutcomeAboutToSubmitHandlerTest {
         sscsCaseData = SscsCaseData.builder()
                 .ccdCaseId("ccdId")
                 .appeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build())
-                .hearings(hearings)
+                .completedHearingsList(hearings)
                 .hearingOutcomeValue(HearingOutcomeValue.builder()
                         .hearingOutcomeId(hearingOutcomeId1)
                         .completedHearings(completedHearings)
