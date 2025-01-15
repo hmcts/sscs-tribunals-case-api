@@ -172,13 +172,24 @@ public class PostponementRequestAboutToSubmitHandlerTest {
     public void givenAPostponementRequestByDwp_setUploadPartyToDwp() {
         UserDetails dwpUserDetails = UserDetails.builder().roles(new ArrayList<>(asList("dwp", UserRole.DWP.getValue()))).build();
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(dwpUserDetails);
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(sscsCaseData.getSscsDocument().size(), is(1));
         final SscsDocument document = sscsCaseData.getSscsDocument().get(0);
         assertThat(document.getValue().getDocumentType(), is(POSTPONEMENT_REQUEST.getValue()));
         assertThat(document.getValue().getOriginalPartySender(), is(UploadParty.DWP.getValue()));
         assertThat(document.getValue().getPartyUploaded(), is(UploadParty.DWP));
+    }
+
+    @Test
+    public void givenAPostponementRequesForIbc_setOriginalSenderToFta() {
+        sscsCaseData.setBenefitCode("093");
+         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getSscsDocument().size(), is(1));
+        final SscsDocument document = sscsCaseData.getSscsDocument().get(0);
+        assertThat(document.getValue().getDocumentType(), is(POSTPONEMENT_REQUEST.getValue()));
+        assertEquals(UploadParty.FTA.getValue(), document.getValue().getOriginalPartySender());
     }
 
     @Test
