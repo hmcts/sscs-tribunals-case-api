@@ -55,7 +55,7 @@ public class HearingOutcomeService {
 
         if (!isNull(hearingDaySchedule.getHearingVenueEpimsId())) {
             hearingDetails.setEpimsId(hearingDaySchedule.getHearingVenueEpimsId());
-            hearingDetails.setVenue(mapEpimsIdToVenue("500000"));
+            hearingDetails.setVenue(mapEpimsIdToVenue(hearingDaySchedule.getHearingVenueEpimsId()));
         }
 
         if (!isNull(hearingDaySchedule.getHearingStartDateTime())) {
