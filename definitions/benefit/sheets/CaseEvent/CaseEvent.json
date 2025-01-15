@@ -3265,10 +3265,9 @@
     "CaseTypeID": "Benefit",
     "ID": "caseOutcomeMigration",
     "Name": "Case migrated automatically",
-    "DisplayOrder": 142,
+    "DisplayOrder": 143,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
     "SecurityClassification": "Public",
-    "EventEnablingCondition": "caseOutcome=\"DONOTSHOW\""
   }
 ]
