@@ -107,7 +107,6 @@ public class TribunalsHearingsEventTopicListenerItTest {
 
         tribunalsHearingsEventQueueListener = new TribunalsHearingsEventQueueListener(hearingsService, ccdCaseService,
                 updateCcdCaseService, idamService);
-        ReflectionTestUtils.setField(tribunalsHearingsEventQueueListener, "isByPassHearingServiceEnabled", true);
 
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails();
         IdamTokens idamTokens = IdamTokens.builder().build();

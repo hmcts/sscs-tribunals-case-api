@@ -55,7 +55,6 @@ class HmcHearingsEventTopicListenerTest {
         hmcHearingsEventTopicListener = new HmcHearingsEventTopicListener(SERVICE_CODE, processHmcMessageService);
         ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "objectMapper", mockObjectMapper);
         ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "sscsServiceCode", SERVICE_CODE);
-        ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "isByPassHearingServiceEnabled", true);
         given(bytesMessage.getStringProperty("hmctsDeploymentId")).willReturn("test");
         ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "hmctsDeploymentId", "test");
 

@@ -50,7 +50,7 @@ public class HearingsJmsConfig {
     }
 
     @Bean
-    @ConditionalOnProperty({"feature.bypass-hearing-api-service.enabled", "flags.hmc-to-hearings-api.enabled"})
+    @ConditionalOnProperty("flags.hmc-to-hearings-api.enabled")
     public JmsListenerContainerFactory<DefaultMessageListenerContainer> hmcHearingsEventTopicContainerFactory(
         DefaultJmsListenerContainerFactoryConfigurer configurer) {
         ConnectionFactory hmcHearingJmsConnectionFactory = hmcHearingJmsConnectionFactory();

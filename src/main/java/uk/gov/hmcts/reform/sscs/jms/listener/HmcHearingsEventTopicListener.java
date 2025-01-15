@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageService;
 
 @Slf4j
 @Component
-@ConditionalOnProperty({"feature.bypass-hearing-api-service.enabled", "flags.hmc-to-hearings-api.enabled"})
+@ConditionalOnProperty("flags.hmc-to-hearings-api.enabled")
 public class HmcHearingsEventTopicListener {
 
     private final ObjectMapper objectMapper;
@@ -35,8 +35,7 @@ public class HmcHearingsEventTopicListener {
 
     @Value("${flags.deployment-filter.enabled}")
     private boolean isDeploymentFilterEnabled;
-    @Value("${feature.bypass-hearing-api-service.enabled}")
-    private boolean isByPassHearingServiceEnabled;
+
 
     private static final String HMCTS_DEPLOYMENT_ID = "hmctsDeploymentId";
 
@@ -55,7 +54,7 @@ public class HmcHearingsEventTopicListener {
     )
     public void onMessage(JmsBytesMessage message) throws JMSException, HmcEventProcessingException {
 
-        log.info("isByPassHearingServiceEnabled && isDeploymentFilterEnabled && deploymentId ------------------------> {}, {}, {}", isByPassHearingServiceEnabled,
+        log.info("isDeploymentFilterEnabled && deploymentId ------------------------> , {}, {}",
                 isDeploymentFilterEnabled, message.getStringProperty(HMCTS_DEPLOYMENT_ID));
 
         if (isDeploymentFilterEnabled && !isMessageReleventForDeployment(message)) {
