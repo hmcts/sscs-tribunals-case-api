@@ -31,7 +31,6 @@ export class UploadResponse extends BaseStep {
 
         let pipCaseId = await createCaseBasedOnCaseType("PIP");
         await this.uploadResponseWithFurtherInfoAsDwpCaseWorker(pipCaseId);
-        await this.uploadResponsePage.delay(5000);
         await this.homePage.clickSignOut();
 
         await this.loginUserWithCaseId(credentials.amCaseWorker, false, pipCaseId);
@@ -126,7 +125,6 @@ export class UploadResponse extends BaseStep {
 
         await this.checkYourAnswersPage.verifyCYAPageContent("Upload response", uploadResponseTestdata.taxBenefitCode, uploadResponseTestdata.taxIssueCode);
         await this.checkYourAnswersPage.confirmSubmission();
-        await this.uploadResponsePage.delay(3000);
         await this.homePage.clickSignOut();
 
         await this.homePage.delay(3000);
@@ -170,7 +168,6 @@ export class UploadResponse extends BaseStep {
 
         await this.checkYourAnswersPage.verifyCYAPageContent("Upload response", null, null, "UC");
         await this.checkYourAnswersPage.confirmSubmission();
-        await this.uploadResponsePage.delay(3000);
         await this.homePage.clickSignOut();
 
         await this.loginUserWithCaseId(credentials.amCaseWorker, false, ucCaseId);
