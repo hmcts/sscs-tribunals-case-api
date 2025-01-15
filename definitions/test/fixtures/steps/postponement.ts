@@ -43,8 +43,8 @@ export class Postponement extends BaseStep {
         /*await this.homePage.delay(2000);
         await this.eventNameAndDescriptionPage.confirmSubmission();*/
 
-        await this.homePage.delay(2000);
-        await this.homePage.reloadPage();
+        await this.homePage.delay(10000);
+        // await this.homePage.reloadPage();
         await this.homePage.chooseEvent('Postponement request');
         await this.postponementPage.verifyPageContentPostponementDetailsPage();
         await this.postponementPage.inputPostponementDetailsOfPageData();

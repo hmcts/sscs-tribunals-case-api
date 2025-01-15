@@ -74,7 +74,7 @@ export class HomePage {
     }
 
     async reloadPage() {
-        await this.page.reload({timeout:13000, waitUntil:'load'});
+        await this.page.reload({timeout:20000, waitUntil:'load'});
     }
 
     async signOut(): Promise<void> {

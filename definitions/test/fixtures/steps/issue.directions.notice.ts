@@ -109,13 +109,16 @@ export class IssueDirectionsNotice extends BaseStep {
             taxCreditCaseId.trim(), 'uploadDocumentFurtherEvidence');*/
 
         await this.loginUserWithCaseId(credentials.amCaseWorker, false, taxCreditCaseId);
-        await this.homePage.reloadPage();
+        await new Promise(f => setTimeout(f, 10000)); //Delay required for the Case to be ready
+        // await this.homePage.reloadPage();
         await this.homePage.chooseEvent(actionFurtherEvidenceTestdata.eventNameCaptor);
         await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
             actionFurtherEvidenceTestdata.sender,
             actionFurtherEvidenceTestdata.other,
             actionFurtherEvidenceTestdata.testfileone
         );
+        await this.eventNameAndDescriptionPage.verifyPageContent(actionFurtherEvidenceTestdata.eventName);
+        await this.eventNameAndDescriptionPage.confirmSubmission();
         await new Promise(f => setTimeout(f, 2000)); //Delay required for the Case to be ready
         await this.homePage.signOut();
         await new Promise(f => setTimeout(f, 2000)); //Delay required for the Case to be ready
@@ -123,7 +126,7 @@ export class IssueDirectionsNotice extends BaseStep {
 
         await this.loginUserWithCaseId(credentials.judge, false, taxCreditCaseId);
         await new Promise(f => setTimeout(f, 12000)); //Delay required for the Case to be ready
-        await this.homePage.reloadPage();
+        // await this.homePage.reloadPage();
         await this.homePage.chooseEvent("Issue directions notice");
 
         await this.issueDirectionPage.verifyPageContent();
@@ -166,19 +169,23 @@ export class IssueDirectionsNotice extends BaseStep {
             taxCreditCaseId.trim(), 'uploadDocumentFurtherEvidence');*/
 
         await this.loginUserWithCaseId(credentials.amCaseWorker, false, esaCaseId);
-        await this.homePage.reloadPage();
+        await new Promise(f => setTimeout(f, 12000)); //Delay required for the Case to be ready
+        // await this.homePage.reloadPage();
         await this.homePage.chooseEvent(actionFurtherEvidenceTestdata.eventNameCaptor);
         await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
             actionFurtherEvidenceTestdata.sender,
             actionFurtherEvidenceTestdata.other,
             actionFurtherEvidenceTestdata.testfileone
         );
+        await this.eventNameAndDescriptionPage.verifyPageContent(actionFurtherEvidenceTestdata.eventName);
+        await this.eventNameAndDescriptionPage.confirmSubmission();
+        await new Promise(f => setTimeout(f, 2000)); //Delay required for the Case to be ready
         await this.homePage.signOut();
         await new Promise(f => setTimeout(f, 2000)); //Delay required for the Case to be ready
 
         await this.loginUserWithCaseId(credentials.judge, false, esaCaseId);
         await new Promise(f => setTimeout(f, 12000)); //Delay required for the Case to be ready
-        await this.homePage.reloadPage();
+        // await this.homePage.reloadPage();
         await this.homePage.chooseEvent("Issue directions notice");
 
         await this.issueDirectionPage.verifyPageContent();
@@ -227,6 +234,9 @@ export class IssueDirectionsNotice extends BaseStep {
             actionFurtherEvidenceTestdata.other,
             actionFurtherEvidenceTestdata.testfileone
         );
+        await this.eventNameAndDescriptionPage.verifyPageContent(actionFurtherEvidenceTestdata.eventName);
+        await this.eventNameAndDescriptionPage.confirmSubmission();
+        await new Promise(f => setTimeout(f, 2000)); //Delay required for the Case to be ready
         await this.homePage.signOut();
         await new Promise(f => setTimeout(f, 2000)); //Delay required for the Case to be ready
 
@@ -272,19 +282,23 @@ export class IssueDirectionsNotice extends BaseStep {
             taxCreditCaseId.trim(), 'uploadDocumentFurtherEvidence');*/
 
         await this.loginUserWithCaseId(credentials.amCaseWorker, false, pipCaseId);
-        await this.homePage.reloadPage();
+        await new Promise(f => setTimeout(f, 10000)); //Delay required for the Case to be ready
+        // await this.homePage.reloadPage();
         await this.homePage.chooseEvent(actionFurtherEvidenceTestdata.eventNameCaptor);
         await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
             actionFurtherEvidenceTestdata.sender,
             actionFurtherEvidenceTestdata.other,
             actionFurtherEvidenceTestdata.testfileone
         );
+        await this.eventNameAndDescriptionPage.verifyPageContent(actionFurtherEvidenceTestdata.eventName);
+        await this.eventNameAndDescriptionPage.confirmSubmission();
+        await new Promise(f => setTimeout(f, 2000)); //Delay required for the Case to be ready
         await this.homePage.signOut();
         await new Promise(f => setTimeout(f, 2000)); //Delay required for the Case to be ready
 
         await this.loginUserWithCaseId(credentials.judge, false, pipCaseId);
         await new Promise(f => setTimeout(f, 12000)); //Delay required for the Case to be ready
-        await this.homePage.reloadPage();
+        // await this.homePage.reloadPage();
         await this.homePage.chooseEvent("Issue directions notice");
         await this.issueDirectionPage.verifyPageContent();
         await this.issueDirectionPage.confirmSubmission();
