@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.amendhearingoutcome;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
@@ -22,7 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 
 @RunWith(JUnitParamsRunner.class)
-public class AmendHearingOutcomeAboutToStartHandlerTest {
+class AmendHearingOutcomeAboutToStartHandlerTest {
     private AmendHearingOutcomeAboutToStartHandler handler;
     private static final String USER_AUTHORISATION = "Bearer token";
     @Mock
@@ -47,6 +48,18 @@ public class AmendHearingOutcomeAboutToStartHandlerTest {
     @Test
     void givenAmendHearingOutcomeEventShouldHandle() {
         assertThat(handler.canHandle(CallbackType.ABOUT_TO_START,callback)).isTrue();
+    }
+
+    @Test
+    void givenNonAmendHearingOutcomeEventShouldNotHandle() {
+        when(callback.getEvent()).thenReturn(EventType.REMOVE_CASE_OUTCOME);
+        assertThat(handler.canHandle(CallbackType.ABOUT_TO_START,callback)).isFalse();
+    }
+
+    @Test
+    void givenWrongEventShouldThrowIllegalStateException() {
+        when(callback.getEvent()).thenReturn(EventType.REMOVE_CASE_OUTCOME);
+        assertThrows(IllegalStateException.class, () -> handler.handle(CallbackType.ABOUT_TO_START,callback,USER_AUTHORISATION));
     }
 
     @Test
