@@ -39,8 +39,8 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType,
-        Callback<SscsCaseData> callback,
-        String userAuthorisation) {
+                                                          Callback<SscsCaseData> callback,
+                                                          String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
@@ -99,6 +99,13 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             } else {
                 callbackResponse.addError("An error occurred during message publish. Please try again.");
             }
+        }
+        if (sscsCaseData.getTypeOfHearing() != null) {
+            HearingOptions.HearingOptionsBuilder builder = sscsCaseData.getAppeal().getHearingOptions() != null
+                ? sscsCaseData.getAppeal().getHearingOptions().toBuilder() : HearingOptions.builder();
+            sscsCaseData.getAppeal()
+                .setHearingOptions(builder.typeOfHearing(sscsCaseData.getTypeOfHearing())
+                    .build());
         }
         return callbackResponse;
     }
