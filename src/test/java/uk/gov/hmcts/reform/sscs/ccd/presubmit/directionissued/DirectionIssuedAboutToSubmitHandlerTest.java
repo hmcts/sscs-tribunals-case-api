@@ -4,9 +4,14 @@ import static java.util.Collections.emptySet;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.DIRECTION_ACTION_REQUIRED;
@@ -22,15 +27,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -43,15 +47,11 @@ import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
-@RunWith(JUnitParamsRunner.class)
 public class DirectionIssuedAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String DOCUMENT_URL = "dm-store/documents/123";
     private static final String DOCUMENT_URL2 = "dm-store/documents/456";
     private static final String DUMMY_REGIONAL_CENTER = "dummyRegionalCenter";
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
 
     @Mock
     private FooterService footerService;
@@ -82,8 +82,9 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     @Mock
     private PreSubmitCallbackResponse<SscsCaseData> mockedResponse;
 
-    @Before
+    @BeforeEach
     public void setUp() {
+        openMocks(this);
         handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, false);
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
@@ -135,22 +136,22 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         when(dwpAddressLookupService.getDefaultDwpMappingByBenefitType(anyString())).thenReturn(Optional.of(OfficeMapping.builder().isDefault(true).mapping(Mapping.builder().ccd("DWP PIP (1)").build()).build()));
     }
 
-    @Test
-    @Parameters({"APPEAL_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
+    @ParameterizedTest
+    @EnumSource(value = EventType.class, names = {"APPEAL_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
     public void givenANonHandleEvidenceEvent_thenReturnFalse(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
         assertFalse(handler.canHandle(MID_EVENT, callback));
     }
 
-    @Test
-    @Parameters({"DIRECTION_ISSUED", "DIRECTION_ISSUED_WELSH"})
+    @ParameterizedTest
+    @EnumSource(value = EventType.class, names = {"DIRECTION_ISSUED", "DIRECTION_ISSUED_WELSH"})
     public void givenAValidHandleAndEventType_thenReturnTrue(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
         assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
-    @Test
-    @Parameters({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
+    @ParameterizedTest
+    @EnumSource(value = CallbackType.class, names = {"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
     }
@@ -220,7 +221,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @SuppressWarnings({"Indentation", "unused"})
-    private Object[] getDirectionNoticeConfidentialMembers() {
+    private static Object[] getDirectionNoticeConfidentialMembers() {
         return new Object[]{
             new Object[]{ConfidentialityType.GENERAL.getCode(), false, DIRECTION_ACTION_REQUIRED},
             new Object[]{ConfidentialityType.CONFIDENTIAL.getCode(), true, DIRECTION_ACTION_REQUIRED},
@@ -231,8 +232,8 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         };
     }
 
-    @Test
-    @Parameters(method = "getDirectionNoticeConfidentialMembers")
+    @ParameterizedTest
+    @MethodSource("getDirectionNoticeConfidentialMembers")
     public void givenDirectionNoticeCheckFtaStateBasedOnConfidentiality(String confidentialityType, boolean isFtaChosen, DwpState newFtaState) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setConfidentialityType(confidentialityType);
@@ -288,8 +289,8 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED));
     }
 
-    @Test
-    @Parameters({"pip, 35", "childSupport, 42"})
+    @ParameterizedTest
+    @CsvSource({"pip, 35", "childSupport, 42"})
     public void givenDirectionTypeOfAppealToProceed_shouldSetDwpRegionalCentre(String benefitType, int expectedResponseDays) {
         Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
         appeal.setBenefitType(BenefitType.builder().code(benefitType).build());
@@ -307,8 +308,8 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals(DUMMY_REGIONAL_CENTER, response.getData().getDwpRegionalCentre());
     }
 
-    @Test
-    @Parameters({"pip, 35", "childSupport, 42"})
+    @ParameterizedTest
+    @CsvSource({"pip, 35", "childSupport, 42"})
     public void givenDirectionTypeOfAppealToProceedWhenDwpIssuingOfficeIsNull_shouldSetDefaultDwpRegionalCentre(String benefitType, int expectedResponseDays) {
         Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
         appeal.setBenefitType(BenefitType.builder().code(benefitType).build());
@@ -316,8 +317,8 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertDefaultRegionalCentre(expectedResponseDays);
     }
 
-    @Test
-    @Parameters({"pip, 35", "childSupport, 42"})
+    @ParameterizedTest
+    @CsvSource({"pip, 35", "childSupport, 42"})
     public void givenDirectionTypeOfAppealToProceedWhenDwpIssuingOfficeIsEmpty_shouldSetDefaultDwpRegionalCentre(String benefitType, int expectedResponseDays) {
         Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
         appeal.setBenefitType(BenefitType.builder().code(benefitType).build());
@@ -325,8 +326,8 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertDefaultRegionalCentre(expectedResponseDays);
     }
 
-    @Test
-    @Parameters({"pip, 35", "childSupport, 42"})
+    @ParameterizedTest
+    @CsvSource({"pip, 35", "childSupport, 42"})
     public void givenDirectionTypeOfAppealToProceedWhenNoMrnDetails_shouldSetDefaultDwpRegionalCentre(String benefitType, int expectedResponseDays) {
         Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
         appeal.setBenefitType(BenefitType.builder().code(benefitType).build());
@@ -357,8 +358,8 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED));
     }
 
-    @Test
-    @Parameters({"pip, 35", "childSupport, 42"})
+    @ParameterizedTest
+    @CsvSource({"pip, 35", "childSupport, 42"})
     public void givenDirectionTypeOfRefuseExtensionAndExtensionNextEventIsSendToListing_setResponseReceivedStateAndInterlocStateToAwaitingAdminAction(String benefitType, int expectedResponseDays) {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_EXTENSION.toString()));
 
@@ -371,8 +372,8 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertValues(response, AWAITING_ADMIN_ACTION, DIRECTION_ACTION_REQUIRED, State.RESPONSE_RECEIVED, expectedResponseDays);
     }
 
-    @Test
-    @Parameters({"pip, 35", "childSupport, 42"})
+    @ParameterizedTest
+    @CsvSource({"pip, 35", "childSupport, 42"})
     public void givenDirectionTypeOfRefuseExtensionAndExtensionNextEventIsSendToValidAppeal_setWithDwpStateAndDoNotSetInterlocState(String benefitType, int expectedResponseDays) {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_EXTENSION.toString()));
         callback.getCaseDetails().getCaseData().setExtensionNextEventDl(new DynamicList(ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString()));
@@ -549,8 +550,8 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals(DIRECTION_ACTION_REQUIRED, res.getData().getDwpState());
     }
 
-    @Test
-    @Parameters({"file.png", "file.jpg", "file.doc"})
+    @ParameterizedTest
+    @ValueSource(strings = {"file.png", "file.jpg", "file.doc"})
     public void givenManuallyUploadedFileIsNotAPdf_thenAddAnErrorToResponse(String filename) {
         sscsCaseData.getDocumentStaging().setPreviewDocument(null);
 
@@ -642,8 +643,8 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         verifyNoInteractions(footerService);
     }
 
-    @Test
-    @Parameters({"pip, 35", "childSupport, 42"})
+    @ParameterizedTest
+    @CsvSource({"pip, 35", "childSupport, 42"})
     public void givenWelshDirectionTypeOfRefuseExtensionAndExtensionNextEventIsSendToListing_setResponseReceivedStateAndInterlocStateToAwaitingAdminAction(String benefitType, int expectedResponseDays) {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_EXTENSION.toString()));
         callback.getCaseDetails().getCaseData().setExtensionNextEventDl(new DynamicList(ExtensionNextEvent.SEND_TO_LISTING.toString()));
@@ -657,8 +658,8 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertValues(response, AWAITING_ADMIN_ACTION, DIRECTION_ACTION_REQUIRED, State.RESPONSE_RECEIVED, expectedResponseDays);
     }
 
-    @Test
-    @Parameters({"pip, 35", "childSupport, 42"})
+    @ParameterizedTest
+    @CsvSource({"pip, 35", "childSupport, 42"})
     public void givenWelshDirectionTypeOfRefuseExtensionAndExtensionNextEventIsSendToValidAppeal_setWithDwpStateAndDoNotSetInterlocState(String benefitType, int expectedResponseDays) {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_EXTENSION.toString()));
         callback.getCaseDetails().getCaseData().setExtensionNextEventDl(new DynamicList(ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString()));
@@ -763,6 +764,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals(interlocDoc.getDocumentLink(), response.getData().getSscsInterlocDirectionDocument().getDocumentLink());
     }
 
+    @Test
     public void givenGenerateNoticeIsSetToYesAndInterlocDocIsNotNull_thenReturnNull() {
         assertTrue(sscsCaseData.getDocumentGeneration().getGenerateNotice().toBoolean());
 
@@ -800,5 +802,34 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(NO, response.getData().getSelectNextTypeOfHearing());
         assertNull(response.getData().getTypeOfHearing());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = TypeOfHearing.class, names = {"SUBSTANTIVE", "DIRECTION_HEARINGS"})
+    public void willSetTypeOfHearingInHearingOptionsNullIfSelectNextTypeOfHearingIsYes(TypeOfHearing typeOfHearing) {
+        when(caseDetails.getState()).thenReturn(State.READY_TO_LIST);
+        sscsCaseData.setSelectNextTypeOfHearing(YES);
+        sscsCaseData.setTypeOfHearing(typeOfHearing);
+        sscsCaseData.getAppeal().setHearingOptions(null);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(YES, response.getData().getSelectNextTypeOfHearing());
+        assertEquals(typeOfHearing, response.getData().getTypeOfHearing());
+        assertEquals(typeOfHearing, response.getData().getAppeal().getHearingOptions().getTypeOfHearing());
+        assertEquals(HearingOptions.builder().typeOfHearing(typeOfHearing).build(), response.getData().getAppeal().getHearingOptions());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = TypeOfHearing.class, names = {"SUBSTANTIVE", "DIRECTION_HEARINGS"})
+    public void willSetTypeOfHearingInHearingOptionsNotNullIfSelectNextTypeOfHearingIsYes(TypeOfHearing typeOfHearing) {
+        when(caseDetails.getState()).thenReturn(State.READY_TO_LIST);
+        sscsCaseData.setSelectNextTypeOfHearing(YES);
+        sscsCaseData.setTypeOfHearing(typeOfHearing);
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().agreeLessNotice("string").build());
+        HearingOptions expectedHearingOptions = HearingOptions.builder().agreeLessNotice("string").typeOfHearing(typeOfHearing).build();
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(YES, response.getData().getSelectNextTypeOfHearing());
+        assertEquals(typeOfHearing, response.getData().getTypeOfHearing());
+        assertEquals(typeOfHearing, response.getData().getAppeal().getHearingOptions().getTypeOfHearing());
+        assertEquals(expectedHearingOptions, response.getData().getAppeal().getHearingOptions());
     }
 }

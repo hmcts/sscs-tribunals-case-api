@@ -115,8 +115,6 @@
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "caseInfo_sscs", "TabLabel": "Appeal Details", "TabDisplayOrder": 4, "CaseFieldID": "isMedicalMemberRequired", "TabFieldDisplayOrder": 42, "FieldShowCondition": "isMedicalMemberRequired!=\"\""},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "caseInfo_sscs", "TabLabel": "Appeal Details", "TabDisplayOrder": 4, "CaseFieldID": "SearchCriteria", "TabFieldDisplayOrder": 43},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "caseInfo_sscs", "TabLabel": "Appeal Details", "TabDisplayOrder": 4, "CaseFieldID": "caseManagementLocation", "TabFieldDisplayOrder": 44},
-  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "caseInfo_sscs", "TabLabel": "Appeal Details", "TabDisplayOrder": 4, "CaseFieldID": "appealHearingOptions", "TabFieldDisplayOrder": 45, "FieldShowCondition": "appealHearingOptions=\"*\""},
-
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "events_sscs", "TabLabel": "Case Progression", "TabDisplayOrder": 5, "CaseFieldID": "isConfidentialCaseLabel", "TabShowCondition": "events=\"*\"", "TabFieldDisplayOrder": 1, "FieldShowCondition": "isConfidentialCase =\"Yes\""},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs", "TabID": "events_sscs", "TabLabel": "Case Progression", "TabDisplayOrder": 5, "CaseFieldID": "events", "TabFieldDisplayOrder": 2},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs", "TabID": "evidence_sscs", "TabLabel": "GAPS 2 Evidence", "TabDisplayOrder": 6, "CaseFieldID": "evidence", "TabFieldDisplayOrder": 2},

@@ -77,6 +77,12 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         YesNo selectNextTypeOfHearing = caseData.getSelectNextTypeOfHearing();
         if (isNoOrNull(selectNextTypeOfHearing)) {
             caseData.setTypeOfHearing(null);
+        } else {
+            HearingOptions.HearingOptionsBuilder builder = caseData.getAppeal().getHearingOptions() != null
+                ? caseData.getAppeal().getHearingOptions().toBuilder() : HearingOptions.builder();
+            caseData.getAppeal()
+                .setHearingOptions(builder.typeOfHearing(caseData.getTypeOfHearing())
+                .build());
         }
         return validateDirectionType(caseData)
                 .or(()        -> validateDirectionDueDate(caseData))

@@ -366,7 +366,8 @@
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 23,
     "PageID": "1.0",
-    "PageLabel": "Issue direction"
+    "PageLabel": "Issue direction",
+    "ShowSummaryChangeOption": "Y"
   },
   {
     "CaseEventID": "directionIssued",
@@ -378,7 +379,8 @@
     "PageFieldDisplayOrder": 24,
     "PageID": "2.0",
     "PageLabel": "Issue direction",
-    "PageShowCondition": "selectNextTypeOfHearing=\"Yes\""
+    "PageShowCondition": "selectNextTypeOfHearing=\"Yes\"",
+    "ShowSummaryChangeOption": "Y"
   },
   {
     "CaseEventID": "directionIssued",
