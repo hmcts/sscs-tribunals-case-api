@@ -116,7 +116,8 @@ public class SscsHelper {
     public static boolean hasHearingScheduledInTheFuture(SscsCaseData caseData) {
         Optional<Hearing> futureHearing = Optional.ofNullable(caseData.getHearings())
             .orElse(Collections.emptyList())
-            .stream().filter(SscsHelper::getValidHearing).findFirst();
+            .stream().filter(SscsHelper::getValidHearing)
+                .filter(hearing -> hearing.getValue().getHearingStatus() != HearingStatus.CANCELLED).findFirst();
         return futureHearing.isPresent();
     }
 }
