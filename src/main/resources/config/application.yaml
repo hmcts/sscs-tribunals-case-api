@@ -283,8 +283,6 @@ feature:
         enabled: ${URGENT_HEARING_ENABLED:false}
     bypass-notifications-service:
         enabled: ${BYPASS_NOTIFICATIONS_SERVICE:false}
-    handle-ccd-callbackMap-v2:
-        enabled: ${HANDLE_CCD_CALLBACKMAP_V2:false}
     bypass-hearing-api-service:
         enabled: ${BYPASS_HEARING_API_SERVICE:false}
     hearings-case-updateV2:

@@ -41,7 +41,6 @@ java:
     DELETED_REDACTED_DOC_ENABLED: true
     CITIZEN_LOGIN_SERVICE_V2: true
     BYPASS_NOTIFICATIONS_SERVICE: true
-    HANDLE_CCD_CALLBACKMAP_V2: true
     TESTING_SUPPORT_ENABLED: true
     SEND_LETTER_SERVICE_ENABLED: "true"
     SEND_LETTER_SERVICE_BASEURL: "http://rpe-send-letter-service-aat.service.core-compute-aat.internal"
