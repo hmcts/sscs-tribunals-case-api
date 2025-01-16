@@ -105,7 +105,6 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 ? sscsCaseData.getAppeal().getHearingOptions().toBuilder() : HearingOptions.builder();
             TypeOfHearing typeOfHearing = sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getTypeOfHearing();
             sscsCaseData.getAppeal().setHearingOptions(builder.typeOfHearing(typeOfHearing).build());
-            sscsCaseData.setTypeOfHearing(typeOfHearing);
         }
         return callbackResponse;
     }

@@ -4,6 +4,7 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.model.hmc.reference.HearingType.getFromTypeOfHearing;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingPriority.STANDARD;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingPriority.URGENT;
 
@@ -78,9 +79,14 @@ public final class HearingsDetailsMapping {
     }
 
     public static HearingType getHearingType(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getSchedulingAndListingFields() != null
+            && sscsCaseData.getSchedulingAndListingFields().getOverrideFields() != null
+            && sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getTypeOfHearing() != null) {
+            return getFromTypeOfHearing(sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getTypeOfHearing());
+        }
         TypeOfHearing typeOfHearing = sscsCaseData.getTypeOfHearing() != null
             ? sscsCaseData.getTypeOfHearing() : TypeOfHearing.SUBSTANTIVE;
-        return HearingType.getFromTypeOfHearing(typeOfHearing);
+        return getFromTypeOfHearing(typeOfHearing);
     }
 
     public static boolean isCaseUrgent(@Valid SscsCaseData caseData) {

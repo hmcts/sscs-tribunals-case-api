@@ -235,6 +235,9 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
     @DisplayName("Hearing type should be substantive if typeOfHearing is substantive.")
     @Test
     void getHearingTypeSubstantive() {
+        caseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
+                                                   .overrideFields(null)
+                                                   .build());
         caseData.setTypeOfHearing(TypeOfHearing.SUBSTANTIVE);
         HearingType result = HearingsDetailsMapping.getHearingType(caseData);
 
@@ -244,7 +247,26 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
     @DisplayName("Hearing type should be direction if typeOfHearing is direction.")
     @Test
     void getHearingTypeDirection() {
+        caseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
+            .overrideFields(OverrideFields.builder()
+                .typeOfHearing(null)
+                .build())
+            .build());
         caseData.setTypeOfHearing(TypeOfHearing.DIRECTION_HEARINGS);
+        HearingType result = HearingsDetailsMapping.getHearingType(caseData);
+
+        assertThat(result).isEqualTo(DIRECTION_HEARINGS);
+    }
+
+    @DisplayName("Hearing type should be direction if typeOfHearing is substantive but override is direction.")
+    @Test
+    void getHearingTypeOverride() {
+        caseData.setTypeOfHearing(TypeOfHearing.SUBSTANTIVE);
+        caseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
+            .overrideFields(OverrideFields.builder()
+                .typeOfHearing(TypeOfHearing.DIRECTION_HEARINGS)
+                .build())
+            .build());
         HearingType result = HearingsDetailsMapping.getHearingType(caseData);
 
         assertThat(result).isEqualTo(DIRECTION_HEARINGS);
