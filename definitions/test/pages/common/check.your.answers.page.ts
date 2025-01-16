@@ -18,14 +18,14 @@ export class CheckYourAnswersPage {
 
         await webActions.verifyPageLabel('.govuk-heading-l', headingValue); //Heading Text
         await webActions.verifyPageLabel('form.check-your-answers h2.heading-h2', eventTestData.eventSummarycheckYourAnswersHeading);//Check your answers Text.
-        await webActions.verifyPageLabel('//self::ccd-read-document-field/a', 
+        await webActions.verifyPageLabel('//self::ccd-read-document-field/a',
             [uploadResponseTestdata.testfileone, uploadResponseTestdata.testfiletwo, uploadResponseTestdata.testfilethree]);
         if(caseType === 'UC'){
-            await webActions.verifyPageLabel('//self::ccd-read-yes-no-field/span', 
+            await webActions.verifyPageLabel('//self::ccd-read-yes-no-field/span',
                [uploadResponseTestdata.poAttendOption, uploadResponseTestdata.ucDisputeOption, uploadResponseTestdata.ucJointPartyOnCase]);
         } else {
             await webActions.verifyPageLabel('//self::ccd-read-fixed-list-field/span',
-            [benefitCode, issueCode]);   
+            [benefitCode, issueCode]);
             await webActions.verifyPageLabel('//self::ccd-read-yes-no-field/span', [uploadResponseTestdata.poAttendOption]);
         }
     }
@@ -35,7 +35,7 @@ export class CheckYourAnswersPage {
         await webActions.verifyPageLabel('.govuk-heading-l', headingValue); //Heading Text
         await webActions.verifyPageLabel('form.check-your-answers h2.heading-h2', eventTestData.eventSummarycheckYourAnswersHeading);//Check your answers Text.
         await webActions.verifyPageLabel('//self::ccd-read-fixed-list-field/span',
-            ["Potentially harmful evidence", benefitCode, issueCode]);   
+            ["Potentially harmful evidence", benefitCode, issueCode]);
         await webActions.verifyPageLabel('//self::ccd-read-yes-no-field/span', [uploadResponseTestdata.poAttendOption]);
     }
 
@@ -44,13 +44,11 @@ export class CheckYourAnswersPage {
         await webActions.verifyPageLabel('.govuk-heading-l', headingValue); //Heading Text
         await webActions.verifyPageLabel('form.check-your-answers h2.heading-h2', eventTestData.eventSummarycheckYourAnswersHeading);//Check your answers Text.
         await webActions.verifyPageLabel('//self::ccd-read-fixed-list-field/span',
-            [benefitCode, issueCode]);   
+            [benefitCode, issueCode]);
         await webActions.verifyPageLabel('//self::ccd-read-yes-no-field/span', ["Yes", uploadResponseTestdata.poAttendOption]);
     }
 
     async confirmSubmission(): Promise<void> {
-        // await webActions.verifyWaitForElementToHide('.spinner-container');
-        await this.page.waitForTimeout(3000);
         await webActions.clickButton('Submit');
     }
 

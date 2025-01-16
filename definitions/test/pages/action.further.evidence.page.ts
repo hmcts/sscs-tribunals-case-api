@@ -13,7 +13,7 @@ export class ActionFurtherEvidencePage {
     }
 
     async verifyPageContent() {
-        await webActions.verifyPageLabel('h1.govuk-heading-l', 'Handle Further Evidence'); 
+        await webActions.verifyPageLabel('h1.govuk-heading-l', 'Handle Further Evidence');
     }
 
     async selectFEOption() {
@@ -63,7 +63,6 @@ export class ActionFurtherEvidencePage {
     }
 
     async confirmSubmission(): Promise<void> {
-        await this.page.waitForTimeout(3000);
         await webActions.clickButton('Submit');
     }
 
@@ -78,12 +77,10 @@ export class ActionFurtherEvidencePage {
 
         await this.clickAddNewButton();
         await this.selectDocType(docType);
-        await this.page.waitForTimeout(3000);
         await this.uploadDocs(fileName);
         await this.enterFileName();
         await this.enterScannedDate();
         await this.selectbundle();
-        await this.confirmSubmission();
         await this.confirmSubmission();
     }
 

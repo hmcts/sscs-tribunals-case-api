@@ -60,10 +60,6 @@ export class WebAction {
             });
     }
 
-    async verifyWaitForElementToHide(elementlocator: string) {
-        await this.page.waitForSelector(elementlocator,{state: 'hidden'});
-    }
-
     async typeField(elementLocator: string, inputValue: string) {
         await this.page
             .type(elementLocator, inputValue)
@@ -215,7 +211,7 @@ export class WebAction {
         const fileChooser = await fileChooserPromise;
         await fileChooser.setFiles(path.join(__dirname, `../data/file/${fileName}`));
     }
-    
+
     async screenshot() {
         await this.page.screenshot({ path: 'playwright-report/screenshot.png', fullPage: true });
     }
