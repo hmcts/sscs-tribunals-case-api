@@ -799,9 +799,11 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         when(caseDetails.getState()).thenReturn(State.READY_TO_LIST);
         sscsCaseData.setSelectNextTypeOfHearing(NO);
         sscsCaseData.setTypeOfHearing(TypeOfHearing.SUBSTANTIVE);
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().typeOfHearing(TypeOfHearing.SUBSTANTIVE).build());
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(NO, response.getData().getSelectNextTypeOfHearing());
         assertNull(response.getData().getTypeOfHearing());
+        assertNull(response.getData().getAppeal().getHearingOptions().getTypeOfHearing());
     }
 
     @ParameterizedTest

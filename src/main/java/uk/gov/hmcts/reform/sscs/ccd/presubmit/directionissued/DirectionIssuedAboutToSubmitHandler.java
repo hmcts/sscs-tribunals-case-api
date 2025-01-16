@@ -77,6 +77,9 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         YesNo selectNextTypeOfHearing = caseData.getSelectNextTypeOfHearing();
         if (isNoOrNull(selectNextTypeOfHearing)) {
             caseData.setTypeOfHearing(null);
+            if (caseData.getAppeal().getHearingOptions() != null) {
+                caseData.getAppeal().getHearingOptions().setTypeOfHearing(null);
+            }
         } else {
             HearingOptions.HearingOptionsBuilder builder = caseData.getAppeal().getHearingOptions() != null
                 ? caseData.getAppeal().getHearingOptions().toBuilder() : HearingOptions.builder();
