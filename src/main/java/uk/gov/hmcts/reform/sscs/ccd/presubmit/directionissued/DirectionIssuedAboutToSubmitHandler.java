@@ -87,6 +87,9 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                 .setHearingOptions(builder.typeOfHearing(caseData.getTypeOfHearing())
                 .build());
         }
+        if (caseData.getSchedulingAndListingFields() != null && caseData.getSchedulingAndListingFields().getOverrideFields() != null) {
+            caseData.getSchedulingAndListingFields().getOverrideFields().setTypeOfHearing(null);
+        }
         return validateDirectionType(caseData)
                 .or(()        -> validateDirectionDueDate(caseData))
                 .orElseGet(() -> validateForPdfAndCreateCallbackResponse(callback, caseDetails, caseData, documentTranslationStatus));
