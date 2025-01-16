@@ -353,6 +353,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
             .appellantInterpreter(null)
+                .typeOfHearing(typeOfHearing)
             .build());
 
         sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder()
@@ -360,7 +361,6 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
             .languages("Welsh")
             .build());
 
-        sscsCaseData.setTypeOfHearing(typeOfHearing);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
             ABOUT_TO_SUBMIT,
             callback,
@@ -382,9 +382,9 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
             .appellantInterpreter(null)
+                .typeOfHearing(typeOfHearing)
             .build());
 
-        sscsCaseData.setTypeOfHearing(typeOfHearing);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
             ABOUT_TO_SUBMIT,
             callback,
