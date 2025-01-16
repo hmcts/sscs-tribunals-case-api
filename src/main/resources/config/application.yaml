@@ -281,8 +281,6 @@ feature:
         enabled: ${SCOTTISH_PO_BOX_ENABLED:false}
     urgent-hearing:
         enabled: ${URGENT_HEARING_ENABLED:false}
-    handle-ccd-callbackMap-v2:
-        enabled: ${HANDLE_CCD_CALLBACKMAP_V2:false}
     process-event-message-v2:
         enabled: ${PROCESS_EVENT_MESSAGE_V2_ENABLED:false}
     bypass-hearing-api-service:
