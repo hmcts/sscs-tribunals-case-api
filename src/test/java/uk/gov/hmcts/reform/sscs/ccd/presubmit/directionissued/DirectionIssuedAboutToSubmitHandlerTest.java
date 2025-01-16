@@ -825,11 +825,11 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         sscsCaseData.setSelectNextTypeOfHearing(YES);
         sscsCaseData.setTypeOfHearing(typeOfHearing);
         sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().agreeLessNotice("string").build());
-        HearingOptions expectedHearingOptions = HearingOptions.builder().agreeLessNotice("string").typeOfHearing(typeOfHearing).build();
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(YES, response.getData().getSelectNextTypeOfHearing());
         assertEquals(typeOfHearing, response.getData().getTypeOfHearing());
         assertEquals(typeOfHearing, response.getData().getAppeal().getHearingOptions().getTypeOfHearing());
+        HearingOptions expectedHearingOptions = HearingOptions.builder().agreeLessNotice("string").typeOfHearing(typeOfHearing).build();
         assertEquals(expectedHearingOptions, response.getData().getAppeal().getHearingOptions());
     }
 }
