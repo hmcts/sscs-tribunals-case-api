@@ -35,6 +35,10 @@ public final class HearingsAutoListMapping {
         throws ListingException {
         OverrideFields overrideFields = OverridesMapping.getOverrideFields(caseData);
 
+        if (caseData.isIbcCase()) {
+            return false;
+        }
+
         if (nonNull(overrideFields.getAutoList())) {
             return isYes(overrideFields.getAutoList());
         }

@@ -378,4 +378,13 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
 
         assertThat(result).isFalse();
     }
+
+    @DisplayName("When isIbcCase True autolist is false")
+    @Test
+    void testIfIbcCaseNotAutolisted() throws ListingException {
+        caseData.setBenefitCode("093");
+        boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
+
+        assertThat(result).isFalse();
+    }
 }
