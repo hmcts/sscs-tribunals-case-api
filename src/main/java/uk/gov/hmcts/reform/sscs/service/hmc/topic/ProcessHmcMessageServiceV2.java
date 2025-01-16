@@ -27,7 +27,7 @@ import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ProcessHmcMessageServiceV2 implements ProcessHmcMessageService {
+public class ProcessHmcMessageServiceV2 {
 
     private final HmcHearingApiService hmcHearingApiService;
     private final HearingUpdateService hearingUpdateService;
@@ -35,7 +35,6 @@ public class ProcessHmcMessageServiceV2 implements ProcessHmcMessageService {
     private final IdamService idamService;
     private final ProcessHmcMessageHelper processHmcMessageHelper;
 
-    @Override
     public void processEventMessage(HmcMessage hmcMessage) throws MessageProcessingException {
 
         Long caseId = hmcMessage.getCaseId();

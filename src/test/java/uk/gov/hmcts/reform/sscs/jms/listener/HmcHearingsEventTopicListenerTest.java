@@ -26,7 +26,6 @@ import uk.gov.hmcts.reform.sscs.exception.HmcEventProcessingException;
 import uk.gov.hmcts.reform.sscs.exception.MessageProcessingException;
 import uk.gov.hmcts.reform.sscs.model.hmc.message.HearingUpdate;
 import uk.gov.hmcts.reform.sscs.model.hmc.message.HmcMessage;
-import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageService;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageServiceV2;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,8 +34,6 @@ class HmcHearingsEventTopicListenerTest {
     public static final String SERVICE_CODE = "BBA3";
 
     private HmcHearingsEventTopicListener hmcHearingsEventTopicListener;
-
-    private ProcessHmcMessageService processHmcMessageService;
 
     @Mock
     private ProcessHmcMessageServiceV2 processHmcMessageServiceV2;
@@ -51,8 +48,7 @@ class HmcHearingsEventTopicListenerTest {
 
     @BeforeEach
     void setup() throws JMSException {
-        processHmcMessageService = processHmcMessageServiceV2;
-        hmcHearingsEventTopicListener = new HmcHearingsEventTopicListener(SERVICE_CODE, processHmcMessageService);
+        hmcHearingsEventTopicListener = new HmcHearingsEventTopicListener(SERVICE_CODE, processHmcMessageServiceV2);
         ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "objectMapper", mockObjectMapper);
         ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "sscsServiceCode", SERVICE_CODE);
         ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "isByPassHearingServiceEnabled", true);
@@ -60,8 +56,6 @@ class HmcHearingsEventTopicListenerTest {
         ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "hmctsDeploymentId", "test");
 
         ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "isDeploymentFilterEnabled", true);
-        processHmcMessageService = (ProcessHmcMessageService) ReflectionTestUtils.getField(hmcHearingsEventTopicListener, "processHmcMessageService");
-
     }
 
     @Test
@@ -103,7 +97,7 @@ class HmcHearingsEventTopicListenerTest {
 
         hmcHearingsEventTopicListener.onMessage(bytesMessage);
 
-        verifyProcessEventMessageCall(processHmcMessageService);
+        verifyProcessEventMessageCall(processHmcMessageServiceV2);
     }
 
 
@@ -119,7 +113,7 @@ class HmcHearingsEventTopicListenerTest {
 
         hmcHearingsEventTopicListener.onMessage(bytesMessage);
 
-        verifyProcessEventMessageCall(processHmcMessageService);
+        verifyProcessEventMessageCall(processHmcMessageServiceV2);
     }
 
     @Test
@@ -147,7 +141,7 @@ class HmcHearingsEventTopicListenerTest {
 
         hmcHearingsEventTopicListener.onMessage(bytesMessage);
 
-        verifyProcessEventMessageCall(processHmcMessageService);
+        verifyProcessEventMessageCall(processHmcMessageServiceV2);
     }
 
     @Test
@@ -176,7 +170,7 @@ class HmcHearingsEventTopicListenerTest {
         given(bytesMessage.getBodyLength()).willReturn((long) messageBytes.length);
         given(mockObjectMapper.readValue(any(String.class), eq(HmcMessage.class))).willReturn(hmcMessage);
 
-        throwMessageProcessingException(processHmcMessageService, hmcMessage);
+        throwMessageProcessingException(processHmcMessageServiceV2, hmcMessage);
 
         assertThatExceptionOfType(HmcEventProcessingException.class)
             .isThrownBy(() -> hmcHearingsEventTopicListener.onMessage(bytesMessage))
@@ -184,14 +178,14 @@ class HmcHearingsEventTopicListenerTest {
     }
 
     private void verifyNoProcessEventMessageCall() throws CaseException, MessageProcessingException {
-        verify(processHmcMessageService, never()).processEventMessage((any(HmcMessage.class)));
+        verify(processHmcMessageServiceV2, never()).processEventMessage((any(HmcMessage.class)));
     }
 
-    private void verifyProcessEventMessageCall(ProcessHmcMessageService processHmcMessageService) throws CaseException, MessageProcessingException {
+    private void verifyProcessEventMessageCall(ProcessHmcMessageServiceV2 processHmcMessageService) throws CaseException, MessageProcessingException {
         verify(processHmcMessageService).processEventMessage((any(HmcMessage.class)));
     }
 
-    private void throwMessageProcessingException(ProcessHmcMessageService processHmcMessageService, HmcMessage hmcMessage) throws MessageProcessingException, CaseException {
+    private void throwMessageProcessingException(ProcessHmcMessageServiceV2 processHmcMessageService, HmcMessage hmcMessage) throws MessageProcessingException, CaseException {
         doThrow(MessageProcessingException.class)
                 .when(processHmcMessageService)
                 .processEventMessage(hmcMessage);

@@ -36,7 +36,7 @@ class ProcessHmcMessageServiceTestV2 extends AbstractProcessHmcMessageServiceTes
     @BeforeEach
     void setUp() {
         super.setUp();
-        processHmcMessageService = new ProcessHmcMessageServiceV2(hmcHearingApiService, hearingUpdateService, updateCcdCaseService, idamService, processHmcMessageHelper);
+        processHmcMessageServiceV2 = new ProcessHmcMessageServiceV2(hmcHearingApiService, hearingUpdateService, updateCcdCaseService, idamService, processHmcMessageHelper);
     }
 
     @Override
@@ -46,7 +46,7 @@ class ProcessHmcMessageServiceTestV2 extends AbstractProcessHmcMessageServiceTes
     }
 
     @Override
-    void callProcessEventMessage(ProcessHmcMessageService processHmcMessageService, HmcMessage hmcMessage) throws CaseException, MessageProcessingException {
+    void callProcessEventMessage(ProcessHmcMessageServiceV2 processHmcMessageService, HmcMessage hmcMessage) throws CaseException, MessageProcessingException {
         processHmcMessageService.processEventMessage(hmcMessage);
     }
 
