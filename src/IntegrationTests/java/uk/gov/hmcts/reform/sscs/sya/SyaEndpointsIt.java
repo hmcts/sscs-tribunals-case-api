@@ -201,6 +201,7 @@ public class SyaEndpointsIt extends AbstractEventIt {
 
         Map<String, Object> data = new HashMap<>();
         data.put("appeal", appeal);
+        given(ccdClient.startEvent(any(), any(), any())).willReturn(StartEventResponse.builder().caseDetails(CaseDetails.builder().id(1234567890L).data(data).build()).build());
 
         given(ccdClient.readForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(1234567890L).data(data).build());
 
@@ -217,6 +218,7 @@ public class SyaEndpointsIt extends AbstractEventIt {
 
     @Test
     public void givenAValidAppealWithNoMrnDate_createIncompleteCase() throws Exception {
+
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
 
         given(ccdClient.searchCases(any(), any())).willReturn(SearchResult.builder().cases(Collections.emptyList()).build());
@@ -240,6 +242,7 @@ public class SyaEndpointsIt extends AbstractEventIt {
 
         Map<String, Object> data = new HashMap<>();
         data.put("appeal", appeal);
+        given(ccdClient.startEvent(any(), any(), any())).willReturn(StartEventResponse.builder().caseDetails(CaseDetails.builder().id(1234567890L).data(data).build()).build());
 
         given(ccdClient.readForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(1234567890L).data(data).build());
 
@@ -279,6 +282,7 @@ public class SyaEndpointsIt extends AbstractEventIt {
 
         Map<String, Object> data = new HashMap<>();
         data.put("appeal", appeal);
+        given(ccdClient.startEvent(any(), any(), any())).willReturn(StartEventResponse.builder().caseDetails(CaseDetails.builder().id(1234567890L).data(data).build()).build());
 
         given(ccdClient.readForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(1234567890L).data(data).build());
 
