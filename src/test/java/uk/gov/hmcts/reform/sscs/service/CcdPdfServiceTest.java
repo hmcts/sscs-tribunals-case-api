@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.samePropertyValuesAs;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -16,6 +17,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 
 import java.time.LocalDateTime;
@@ -38,12 +40,16 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
+import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.UpdateDocParams;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @RunWith(JUnitParamsRunner.class)
 public class CcdPdfServiceTest {
+
+    private static final String UPLOADED_DOCUMENT_INTO_SSCS = "Uploaded document into SSCS";
 
     @InjectMocks
     private CcdPdfService service;
@@ -213,5 +219,65 @@ public class CcdPdfServiceTest {
         UpdateDocParams params = UpdateDocParams.builder().fileName("Myfile.pdf").pdf(pdf).caseId(1L).caseData(caseData).documentType("dl6").build();
         verify(pdfStoreService).storeDocument(params);
         verify(ccdService).updateCase(any(), any(), any(), eq("SSCS - upload document event"), eq("My description"), any());
+    }
+
+    @Test
+    public void mergeValidPdfAndStoreInDocumentStoreWithoutDescription() {
+        byte[] pdf = {};
+        when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().data(caseData).build());
+
+        service.mergeDocIntoCcd("Myfile.pdf", pdf, 1L, caseData, IdamTokens.builder().build());
+
+        UpdateDocParams params = UpdateDocParams.builder().fileName("Myfile.pdf").pdf(pdf).caseId(1L).caseData(caseData).build();
+        verify(pdfStoreService).storeDocument(params);
+        verify(ccdService).updateCase(any(), any(), any(), eq("SSCS - upload document event"), eq(UPLOADED_DOCUMENT_INTO_SSCS), any());
+    }
+
+    @Test
+    public void mergeValidPdfAndStoreInDocumentStoreWithoutDescriptionAndUsingUpdateDocParams() {
+        byte[] pdf = {};
+        UpdateDocParams params = UpdateDocParams.builder().fileName("Myfile.pdf").pdf(pdf).caseId(1L).caseData(caseData).build();
+        when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().data(caseData).build());
+
+        service.mergeDocIntoCcd(params, IdamTokens.builder().build());
+
+        verify(pdfStoreService).storeDocument(params);
+        verify(ccdService).updateCase(any(), any(), any(), eq("SSCS - upload document event"), eq(UPLOADED_DOCUMENT_INTO_SSCS), any());
+    }
+
+    @Test
+    public void mergeValidPdfAndNotStoreWhenException() {
+        byte[] pdf = {};
+        UpdateDocParams params = UpdateDocParams.builder().fileName("Myfile.pdf").pdf(pdf).caseId(1L).caseData(caseData).build();
+        when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenThrow(CcdException.class);
+
+        SscsCaseData expectedCaseData = service.mergeDocIntoCcd(params, IdamTokens.builder().build());
+
+        assertNull(expectedCaseData);
+        verify(pdfStoreService).storeDocument(params);
+        verify(ccdService).updateCase(any(), any(), any(), eq("SSCS - upload document event"), eq(UPLOADED_DOCUMENT_INTO_SSCS), any());
+    }
+
+    @Test
+    public void updateDocWhenUpdateDocParamsCaseIdIsNull() {
+        byte[] pdf = {};
+        UpdateDocParams params = UpdateDocParams.builder().fileName("Myfile.pdf").pdf(pdf).caseData(caseData).build();
+
+        SscsCaseData expectedCaseData = service.updateDoc(params);
+
+        assertThat(expectedCaseData, is(caseData));
+        verify(pdfStoreService).storeDocument(params);
+    }
+
+    @Test
+    public void updateDocWhenUpdateDocParamsTranslationStatusIsRequired() {
+        byte[] pdf = {};
+        UpdateDocParams params = UpdateDocParams.builder().fileName("Myfile.pdf").caseId(1L).documentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED).pdf(pdf).caseData(caseData).build();
+
+        SscsCaseData expectedCaseData = service.updateDoc(params);
+
+        assertThat(expectedCaseData.getTranslationWorkOutstanding(), is(YES));
+        assertThat(expectedCaseData, is(caseData));
+        verify(pdfStoreService).storeDocument(params);
     }
 }
