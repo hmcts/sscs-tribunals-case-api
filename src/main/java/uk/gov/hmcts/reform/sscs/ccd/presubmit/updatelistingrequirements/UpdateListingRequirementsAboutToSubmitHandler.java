@@ -5,7 +5,9 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getTypeOfHearing;
 
+import java.lang.reflect.Type;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -100,12 +102,10 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 callbackResponse.addError("An error occurred during message publish. Please try again.");
             }
         }
-        if (sscsCaseData.getSchedulingAndListingFields() != null && sscsCaseData.getSchedulingAndListingFields().getOverrideFields() != null) {
-            HearingOptions.HearingOptionsBuilder builder = sscsCaseData.getAppeal().getHearingOptions() != null
-                ? sscsCaseData.getAppeal().getHearingOptions().toBuilder() : HearingOptions.builder();
-            TypeOfHearing typeOfHearing = sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getTypeOfHearing();
-            sscsCaseData.getAppeal().setHearingOptions(builder.typeOfHearing(typeOfHearing).build());
-        }
+        TypeOfHearing typeOfHearing = getTypeOfHearing(sscsCaseData);
+        HearingOptions.HearingOptionsBuilder builder = sscsCaseData.getAppeal().getHearingOptions() != null
+            ? sscsCaseData.getAppeal().getHearingOptions().toBuilder() : HearingOptions.builder();
+        sscsCaseData.getAppeal().setHearingOptions(builder.typeOfHearing(typeOfHearing).build());
         return callbackResponse;
     }
 }
