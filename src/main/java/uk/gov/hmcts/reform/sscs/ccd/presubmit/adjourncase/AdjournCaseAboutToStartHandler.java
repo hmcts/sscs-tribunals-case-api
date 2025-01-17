@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 
 import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -10,8 +11,12 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.TypeOfHearing;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -61,12 +66,16 @@ public class AdjournCaseAboutToStartHandler implements PreSubmitCallbackHandler<
     }
 
     private boolean isDirectionHearing(SscsCaseData sscsCaseData) {
-        TypeOfHearing appealTypeOfHearing = sscsCaseData.getAppeal() != null
-            && sscsCaseData.getAppeal().getHearingOptions() != null
-            ? sscsCaseData.getAppeal().getHearingOptions().getTypeOfHearing()
-            : null;
+        TypeOfHearing appealTypeOfHearing = Optional.ofNullable(sscsCaseData)
+            .map(SscsCaseData::getAppeal)
+            .map(Appeal::getHearingOptions)
+            .map(HearingOptions::getTypeOfHearing)
+            .orElse(null);
+        TypeOfHearing caseTypeOfHearing = Optional.ofNullable(sscsCaseData)
+                .map(SscsCaseData::getTypeOfHearing)
+                .orElse(null);
 
-        return TypeOfHearing.DIRECTION_HEARINGS.equals(sscsCaseData.getTypeOfHearing())
+        return TypeOfHearing.DIRECTION_HEARINGS.equals(caseTypeOfHearing)
             || TypeOfHearing.DIRECTION_HEARINGS.equals(appealTypeOfHearing);
     }
 }
