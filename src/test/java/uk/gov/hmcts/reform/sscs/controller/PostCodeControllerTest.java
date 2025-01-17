@@ -23,7 +23,7 @@ public class PostCodeControllerTest {
     }
 
     @Test
-    void shouldReturnRegionalCentre() {
+    public void shouldReturnRegionalCentre() {
         when(airLookupServiceMock.lookupRegionalCentre("postCode")).thenReturn("regionalCentre");
 
         ResponseEntity<String> response = postCodeController.getRegionalCentre("postCode");
@@ -31,7 +31,7 @@ public class PostCodeControllerTest {
     }
 
     @Test
-    void shouldNotReturnRegionalCentre() {
+    public void shouldNotReturnRegionalCentre() {
         when(airLookupServiceMock.lookupRegionalCentre("postCode")).thenReturn(null);
 
         ResponseEntity<String> response = postCodeController.getRegionalCentre("postCode");
