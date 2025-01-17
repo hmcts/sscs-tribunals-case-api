@@ -103,12 +103,12 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 callbackResponse.addError("An error occurred during message publish. Please try again.");
             }
         }
-        TypeOfHearing typeOfHearing = getTypeOfHearing(sscsCaseData);
-        Optional.ofNullable(sscsCaseData.getAppeal().getHearingOptions())
-            .map(HearingOptions::toBuilder)
-            .orElseGet(HearingOptions::builder)
-            .typeOfHearing(typeOfHearing)
-            .build();
+        sscsCaseData.getAppeal()
+            .setHearingOptions(Optional.ofNullable(sscsCaseData.getAppeal().getHearingOptions())
+                .map(HearingOptions::toBuilder)
+                .orElseGet(HearingOptions::builder)
+                .typeOfHearing(getTypeOfHearing(sscsCaseData))
+                .build());
         return callbackResponse;
     }
 }

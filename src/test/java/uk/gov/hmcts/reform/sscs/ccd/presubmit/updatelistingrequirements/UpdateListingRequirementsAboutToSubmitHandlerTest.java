@@ -122,7 +122,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
 
         given(listAssistHearingMessageHelper.sendHearingMessage(
-            anyString(),any(HearingRoute.class),any(HearingState.class),eq(null)))
+            anyString(), any(HearingRoute.class), any(HearingState.class), eq(null)))
             .willReturn(true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
@@ -152,7 +152,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
 
         given(listAssistHearingMessageHelper.sendHearingMessage(
-            anyString(),any(HearingRoute.class),any(HearingState.class),eq(null)))
+            anyString(), any(HearingRoute.class), any(HearingState.class), eq(null)))
             .willReturn(false);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
@@ -253,9 +253,9 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().appellantHearingChannel(VIDEO).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-                ABOUT_TO_SUBMIT,
-                callback,
-                USER_AUTHORISATION);
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
 
         assertTrue(response.getErrors().isEmpty());
         assertNotNull(response.getData().getAppeal().getHearingSubtype());
@@ -265,9 +265,9 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     @Test
     void givenHearingChannelIsNull_thenReturnCaseDataHearingSubtype() {
         HearingSubtype hearingSubType = HearingSubtype.builder()
-                .hearingTelephoneNumber("09038920")
-                .wantsHearingTypeTelephone(YES.getValue())
-                .build();
+            .hearingTelephoneNumber("09038920")
+            .wantsHearingTypeTelephone(YES.getValue())
+            .build();
 
         sscsCaseData.getAppeal().setHearingSubtype(hearingSubType);
 
@@ -279,9 +279,9 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().appellantHearingChannel(null).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-                ABOUT_TO_SUBMIT,
-                callback,
-                USER_AUTHORISATION);
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
 
         assertTrue(response.getErrors().isEmpty());
         assertNotNull(response.getData().getAppeal().getHearingSubtype());
@@ -299,16 +299,16 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         DynamicList interpreterLanguage = new DynamicList(interpreterLanguageItem, List.of());
 
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
-                .appellantInterpreter(HearingInterpreter.builder()
-                        .isInterpreterWanted(YES)
-                        .interpreterLanguage(interpreterLanguage)
-                        .build())
-                .build());
+            .appellantInterpreter(HearingInterpreter.builder()
+                .isInterpreterWanted(YES)
+                .interpreterLanguage(interpreterLanguage)
+                .build())
+            .build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-                ABOUT_TO_SUBMIT,
-                callback,
-                USER_AUTHORISATION);
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
 
         assertTrue(response.getErrors().isEmpty());
         assertEquals("Yes", response.getData().getAppeal().getHearingOptions().getLanguageInterpreter());
@@ -325,18 +325,18 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
 
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
-                .appellantInterpreter(null)
-                .build());
+            .appellantInterpreter(null)
+            .build());
 
         sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder()
-                .languageInterpreter("Yes")
-                .languages("Welsh")
-                .build());
+            .languageInterpreter("Yes")
+            .languages("Welsh")
+            .build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-                ABOUT_TO_SUBMIT,
-                callback,
-                USER_AUTHORISATION);
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
 
         assertTrue(response.getErrors().isEmpty());
         assertEquals("Yes", response.getData().getAppeal().getHearingOptions().getLanguageInterpreter());
@@ -353,7 +353,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
             .appellantInterpreter(null)
-                .typeOfHearing(typeOfHearing)
+            .typeOfHearing(typeOfHearing)
             .build());
 
         sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder()
@@ -381,8 +381,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
 
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
-            .appellantInterpreter(null)
-                .typeOfHearing(typeOfHearing)
+            .typeOfHearing(typeOfHearing)
             .build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
