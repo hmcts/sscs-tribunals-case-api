@@ -77,16 +77,22 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         YesNo selectNextTypeOfHearing = caseData.getSelectNextTypeOfHearing();
         if (isNoOrNull(selectNextTypeOfHearing)) {
             caseData.setTypeOfHearing(null);
-            if (caseData.getAppeal().getHearingOptions() != null) {
-                caseData.getAppeal().getHearingOptions().setTypeOfHearing(null);
-            }
+            Optional.of(caseData.getAppeal())
+                .map(Appeal::getHearingOptions)
+                .ifPresent(hearingOptions -> hearingOptions.setTypeOfHearing(null));
         } else {
-            HearingOptions.HearingOptionsBuilder builder = caseData.getAppeal().getHearingOptions() != null
-                ? caseData.getAppeal().getHearingOptions().toBuilder() : HearingOptions.builder();
             caseData.getAppeal()
-                .setHearingOptions(builder.typeOfHearing(caseData.getTypeOfHearing())
+                .setHearingOptions(Optional.of(caseData.getAppeal())
+                    .map(Appeal::getHearingOptions)
+                    .map(HearingOptions::toBuilder)
+                    .orElse(HearingOptions.builder())
+                    .typeOfHearing(caseData.getTypeOfHearing())
                 .build());
         }
+        Optional.of(caseData)
+            .map(SscsCaseData::getSchedulingAndListingFields)
+            .map(SchedulingAndListingFields::getOverrideFields)
+            .ifPresent(overrideFields -> caseData.getSchedulingAndListingFields().setOverrideFields(null));
         return validateDirectionType(caseData)
                 .or(()        -> validateDirectionDueDate(caseData))
                 .orElseGet(() -> validateForPdfAndCreateCallbackResponse(callback, caseDetails, caseData, documentTranslationStatus));
