@@ -61,13 +61,11 @@ public class AdjournCaseAboutToStartHandler implements PreSubmitCallbackHandler<
     }
 
     private boolean isDirectionHearing(SscsCaseData sscsCaseData) {
-        TypeOfHearing appealTypeOfHearing = sscsCaseData.getAppeal() != null
-            && sscsCaseData.getAppeal().getHearingOptions() != null
-            ? sscsCaseData.getAppeal().getHearingOptions().getTypeOfHearing()
-            : null;
-
-        return TypeOfHearing.DIRECTION_HEARINGS.equals(sscsCaseData.getTypeOfHearing())
-            || TypeOfHearing.DIRECTION_HEARINGS.equals(appealTypeOfHearing);
+        return TypeOfHearing.DIRECTION_HEARINGS.equals(sscsCaseData.getSchedulingAndListingFields() != null
+            && sscsCaseData.getSchedulingAndListingFields().getOverrideFields() != null
+            && sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getTypeOfHearing() != null
+            ? sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getTypeOfHearing()
+            : sscsCaseData.getTypeOfHearing());
     }
 }
 
