@@ -3275,7 +3275,7 @@
     "CaseTypeID": "Benefit",
     "ID": "clearExpiredFilters",
     "Name": "Cleared expired filters",
-    "DisplayOrder": 142,
+    "DisplayOrder": 1302,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
     "SecurityClassification": "Public"
