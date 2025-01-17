@@ -53,7 +53,7 @@ public class AddHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbackH
         log.info("Add hearing outcome for selected item {} with hearing ID:{} for case ID:{}",
                 selectedHearing, selectedHearingId, callback.getCaseDetails().getId());
 
-        HearingDetails selectedHearingDetails = sscsCaseData.getHearings().stream()
+        HearingDetails selectedHearingDetails = sscsCaseData.getCompletedHearingsList().stream()
                 .filter(hearing -> hearing.getValue().getHearingId().equalsIgnoreCase(selectedHearingId))
                 .findFirst().orElse(Hearing.builder().build()).getValue();
 
@@ -99,6 +99,7 @@ public class AddHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbackH
         sscsCaseData.getHearingOutcomeValue().setHearingOutcomeId(null);
         sscsCaseData.getHearingOutcomeValue().setCompletedHearings(null);
         sscsCaseData.getHearingOutcomeValue().setDidPoAttendHearing(null);
+        sscsCaseData.setCompletedHearingsList(null);
 
         return preSubmitCallbackResponse;
     }
