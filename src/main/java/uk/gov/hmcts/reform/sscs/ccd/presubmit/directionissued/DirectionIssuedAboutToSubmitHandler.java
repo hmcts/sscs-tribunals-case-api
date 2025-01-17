@@ -60,10 +60,10 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.ABOUT_TO_SUBMIT
-                && (callback.getEvent() == EventType.DIRECTION_ISSUED
-                || callback.getEvent() == EventType.DIRECTION_ISSUED_WELSH)
-                && nonNull(callback.getCaseDetails())
-                && nonNull(callback.getCaseDetails().getCaseData());
+            && (callback.getEvent() == EventType.DIRECTION_ISSUED
+            || callback.getEvent() == EventType.DIRECTION_ISSUED_WELSH)
+            && nonNull(callback.getCaseDetails())
+            && nonNull(callback.getCaseDetails().getCaseData());
     }
 
     @Override
@@ -81,19 +81,21 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                 .map(Appeal::getHearingOptions)
                 .ifPresent(hearingOptions -> hearingOptions.setTypeOfHearing(null));
         } else {
-            Optional.ofNullable(caseData.getAppeal().getHearingOptions())
-                .map(HearingOptions::toBuilder)
-                .orElseGet(HearingOptions::builder)
-                .typeOfHearing(caseData.getTypeOfHearing())
-                .build();
+            caseData.getAppeal()
+                .setHearingOptions(Optional.ofNullable(caseData.getAppeal().getHearingOptions())
+                    .map(HearingOptions::toBuilder)
+                    .orElseGet(HearingOptions::builder)
+                    .typeOfHearing(caseData.getTypeOfHearing())
+                    .build());
+
         }
         Optional.ofNullable(caseData.getSchedulingAndListingFields())
             .map(SchedulingAndListingFields::getOverrideFields)
             .ifPresent(overrideFields -> overrideFields.setTypeOfHearing(null));
 
         return validateDirectionType(caseData)
-                .or(()        -> validateDirectionDueDate(caseData))
-                .orElseGet(() -> validateForPdfAndCreateCallbackResponse(callback, caseDetails, caseData, documentTranslationStatus));
+            .or(() -> validateDirectionDueDate(caseData))
+            .orElseGet(() -> validateForPdfAndCreateCallbackResponse(callback, caseDetails, caseData, documentTranslationStatus));
     }
 
     private void updateDwpRegionalCentre(SscsCaseData caseData) {
@@ -115,7 +117,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         if (appeal != null && appeal.getBenefitType() != null && appeal.getMrnDetails() != null && appeal.getMrnDetails().getDwpIssuingOffice() != null) {
 
             caseData.setDwpRegionalCentre(dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(appeal.getBenefitType().getCode(),
-                    appeal.getMrnDetails().getDwpIssuingOffice()));
+                appeal.getMrnDetails().getDwpIssuingOffice()));
 
         }
     }
@@ -131,7 +133,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
     private Optional<PreSubmitCallbackResponse<SscsCaseData>> validateDirectionDueDate(SscsCaseData caseData) {
         if (DirectionType.PROVIDE_INFORMATION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
-                && isBlank(caseData.getDirectionDueDate())) {
+            && isBlank(caseData.getDirectionDueDate())) {
             PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
             errorResponse.addError("Please populate the direction due date");
             return Optional.of(errorResponse);
@@ -155,7 +157,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         if (DirectionType.PROVIDE_INFORMATION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData.setInterlocReviewState(AWAITING_INFORMATION);
         } else if (getPreValidStates().contains(caseDetails.getState())
-                && DirectionType.APPEAL_TO_PROCEED.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
+            && DirectionType.APPEAL_TO_PROCEED.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData.setDateSentToDwp(LocalDate.now().toString());
             caseData.setDwpDueDate(DateTimeUtils.generateDwpResponseDueDate(getResponseDueDays(caseData)));
             caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
@@ -166,10 +168,10 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                 caseData.setCreatedInGapsFrom(READY_TO_LIST.getId());
             }
         } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
-                && ExtensionNextEvent.SEND_TO_LISTING.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
+            && ExtensionNextEvent.SEND_TO_LISTING.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
             caseData = updateCaseAfterExtensionRefused(caseData, AWAITING_ADMIN_ACTION, State.RESPONSE_RECEIVED);
         } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
-                && ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
+            && ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
             caseData = updateCaseAfterExtensionRefused(caseData, null, State.WITH_DWP);
         } else if (DirectionType.GRANT_REINSTATEMENT.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData = updateCaseAfterReinstatementGranted(caseData, documentTranslationStatus);
@@ -194,8 +196,8 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
     private int getResponseDueDays(SscsCaseData caseData) {
         return caseData.getAppeal().getBenefitType() != null
-                && Benefit.CHILD_SUPPORT.getShortName().equalsIgnoreCase(caseData.getAppeal().getBenefitType().getCode())
-                ? dwpResponseDueDaysChildSupport : dwpResponseDueDays;
+            && Benefit.CHILD_SUPPORT.getShortName().equalsIgnoreCase(caseData.getAppeal().getBenefitType().getCode())
+            ? dwpResponseDueDaysChildSupport : dwpResponseDueDays;
     }
 
     private SscsCaseData updateCaseAfterReinstatementGranted(SscsCaseData caseData, SscsDocumentTranslationStatus documentTranslationStatus) {
@@ -261,14 +263,14 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
     @NotNull
     private PreSubmitCallbackResponse<SscsCaseData> validateForPdfAndCreateCallbackResponse(
-            Callback<SscsCaseData> callback, CaseDetails<SscsCaseData> caseDetails, SscsCaseData caseData, SscsDocumentTranslationStatus documentTranslationStatus) {
+        Callback<SscsCaseData> callback, CaseDetails<SscsCaseData> caseDetails, SscsCaseData caseData, SscsDocumentTranslationStatus documentTranslationStatus) {
         final PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse =
-                new PreSubmitCallbackResponse<>(caseData);
+            new PreSubmitCallbackResponse<>(caseData);
 
         DocumentLink url = null;
         if (isYes(callback.getCaseDetails().getCaseData().getDocumentGeneration().getGenerateNotice())
-                && nonNull(caseData.getDocumentStaging().getPreviewDocument())
-                && callback.getEvent() == EventType.DIRECTION_ISSUED) {
+            && nonNull(caseData.getDocumentStaging().getPreviewDocument())
+            && callback.getEvent() == EventType.DIRECTION_ISSUED) {
             url = caseData.getDocumentStaging().getPreviewDocument();
         } else if (caseData.getSscsInterlocDirectionDocument() != null && callback.getEvent() == EventType.DIRECTION_ISSUED) {
 
@@ -304,9 +306,9 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         if (callback.getEvent() == EventType.DIRECTION_ISSUED) {
             footerService.createFooterAndAddDocToCase(url, caseData, DocumentType.DIRECTION_NOTICE,
-                    Optional.ofNullable(caseData.getDocumentStaging().getDateAdded()).orElse(LocalDate.now())
-                            .format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
-                    caseData.getDocumentStaging().getDateAdded(), null, documentTranslationStatus);
+                Optional.ofNullable(caseData.getDocumentStaging().getDateAdded()).orElse(LocalDate.now())
+                    .format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+                caseData.getDocumentStaging().getDateAdded(), null, documentTranslationStatus);
         }
 
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
@@ -331,8 +333,8 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
     private boolean shouldSetDwpState(SscsCaseData caseData) {
         return isNull(caseData.getReinstatementOutcome())
-                || (!caseData.getReinstatementOutcome().equals(RequestOutcome.GRANTED)
-                && !caseData.getReinstatementOutcome().equals(RequestOutcome.REFUSED));
+            || (!caseData.getReinstatementOutcome().equals(RequestOutcome.GRANTED)
+            && !caseData.getReinstatementOutcome().equals(RequestOutcome.REFUSED));
     }
 
     // SSCS-11486 AC3
