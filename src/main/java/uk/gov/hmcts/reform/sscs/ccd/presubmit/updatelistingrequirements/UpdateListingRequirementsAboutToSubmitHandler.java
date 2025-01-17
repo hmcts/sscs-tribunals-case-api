@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getTypeOfHearing;
 
 import java.lang.reflect.Type;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -103,9 +104,11 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             }
         }
         TypeOfHearing typeOfHearing = getTypeOfHearing(sscsCaseData);
-        HearingOptions.HearingOptionsBuilder builder = sscsCaseData.getAppeal().getHearingOptions() != null
-            ? sscsCaseData.getAppeal().getHearingOptions().toBuilder() : HearingOptions.builder();
-        sscsCaseData.getAppeal().setHearingOptions(builder.typeOfHearing(typeOfHearing).build());
+        Optional.ofNullable(sscsCaseData.getAppeal().getHearingOptions())
+            .map(HearingOptions::toBuilder)
+            .orElseGet(HearingOptions::builder)
+            .typeOfHearing(typeOfHearing)
+            .build();
         return callbackResponse;
     }
 }
