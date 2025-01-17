@@ -121,6 +121,22 @@ public class SscsHelperTest {
     }
 
     @Test
+    public void givenHearingIsInTheFutureButCancelled_ThenReturnFalse() {
+        HearingDetails hearingDetails = HearingDetails.builder()
+            .hearingDate(LocalDate.now().plusDays(5).toString())
+            .start(LocalDateTime.now().plusDays(5))
+            .hearingId(String.valueOf(1))
+            .venue(Venue.builder().name("Venue 1").build())
+            .time("12:00")
+            .hearingStatus(HearingStatus.CANCELLED)
+            .build();
+        Hearing hearing = Hearing.builder().value(hearingDetails).build();
+
+        sscsCaseData.setHearings(List.of(hearing));
+        assertFalse(hasHearingScheduledInTheFuture(sscsCaseData));
+    }
+
+    @Test
     public void givenAnyCaseWhenExcludeDatesAreNotProvided_thenThrowError() {
         CcdValue<OtherParty> otherParty = buildOtherParty();
 
