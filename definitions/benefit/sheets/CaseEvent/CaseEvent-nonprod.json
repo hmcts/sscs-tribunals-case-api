@@ -5,7 +5,7 @@
   "ID": "amendHearingOutcome",
   "Name": "Amend Hearing Outcome",
   "Description": "Amend a Hearing Outcome",
-  "DisplayOrder": 141,
+  "DisplayOrder": 361,
   "PreConditionState(s)": "*",
   "CallBackURLAboutToStartEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToStart",
   "PostConditionState": "*",
