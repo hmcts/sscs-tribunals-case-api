@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.HearingType.getFromTypeOfHearing;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingPriority.STANDARD;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingPriority.URGENT;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getTypeOfHearing;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -79,13 +80,8 @@ public final class HearingsDetailsMapping {
     }
 
     public static HearingType getHearingType(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getSchedulingAndListingFields() != null
-            && sscsCaseData.getSchedulingAndListingFields().getOverrideFields() != null
-            && sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getTypeOfHearing() != null) {
-            return getFromTypeOfHearing(sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getTypeOfHearing());
-        }
-        TypeOfHearing typeOfHearing = sscsCaseData.getTypeOfHearing() != null
-            ? sscsCaseData.getTypeOfHearing() : TypeOfHearing.SUBSTANTIVE;
+        TypeOfHearing typeOfHearing = getTypeOfHearing(sscsCaseData) != null
+            ? getTypeOfHearing(sscsCaseData) : TypeOfHearing.SUBSTANTIVE;
         return getFromTypeOfHearing(typeOfHearing);
     }
 

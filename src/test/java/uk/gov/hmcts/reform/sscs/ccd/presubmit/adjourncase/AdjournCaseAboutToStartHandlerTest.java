@@ -42,6 +42,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
@@ -205,12 +207,16 @@ class AdjournCaseAboutToStartHandlerTest {
     }
 
     @Test
-    void givenSubstantiveHearingSetInAppeal_thenDoNotError() {
+    void givenSubstantiveHearingSetInOverride_thenDoNotError() {
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        sscsCaseData.getAppeal()
-            .setHearingOptions(HearingOptions.builder().typeOfHearing(TypeOfHearing.SUBSTANTIVE).build());
+        sscsCaseData.setTypeOfHearing(TypeOfHearing.DIRECTION_HEARINGS);
+        sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
+            .overrideFields(OverrideFields.builder()
+                .typeOfHearing(TypeOfHearing.SUBSTANTIVE)
+                .build())
+            .build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
     }
@@ -228,12 +234,16 @@ class AdjournCaseAboutToStartHandlerTest {
     }
 
     @Test
-    void givenDirectionHearingSetInAppeal_thenError() {
+    void givenDirectionHearingSetInOverride_thenError() {
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        sscsCaseData.getAppeal()
-            .setHearingOptions(HearingOptions.builder().typeOfHearing(TypeOfHearing.DIRECTION_HEARINGS).build());
+        sscsCaseData.setTypeOfHearing(TypeOfHearing.SUBSTANTIVE);
+        sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
+            .overrideFields(OverrideFields.builder()
+                .typeOfHearing(TypeOfHearing.DIRECTION_HEARINGS)
+                .build())
+            .build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertThat(response.getErrors())
             .hasSize(1)

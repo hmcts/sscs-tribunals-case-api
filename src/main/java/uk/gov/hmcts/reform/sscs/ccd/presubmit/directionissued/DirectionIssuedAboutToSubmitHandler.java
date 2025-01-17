@@ -77,19 +77,20 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         YesNo selectNextTypeOfHearing = caseData.getSelectNextTypeOfHearing();
         if (isNoOrNull(selectNextTypeOfHearing)) {
             caseData.setTypeOfHearing(null);
-            if (caseData.getAppeal().getHearingOptions() != null) {
-                caseData.getAppeal().getHearingOptions().setTypeOfHearing(null);
-            }
+            Optional.ofNullable(caseData.getAppeal())
+                .map(Appeal::getHearingOptions)
+                .ifPresent(hearingOptions -> hearingOptions.setTypeOfHearing(null));
         } else {
-            HearingOptions.HearingOptionsBuilder builder = caseData.getAppeal().getHearingOptions() != null
-                ? caseData.getAppeal().getHearingOptions().toBuilder() : HearingOptions.builder();
-            caseData.getAppeal()
-                .setHearingOptions(builder.typeOfHearing(caseData.getTypeOfHearing())
-                .build());
+            Optional.ofNullable(caseData.getAppeal().getHearingOptions())
+                .map(HearingOptions::toBuilder)
+                .orElseGet(HearingOptions::builder)
+                .typeOfHearing(caseData.getTypeOfHearing())
+                .build();
         }
-        if (caseData.getSchedulingAndListingFields() != null && caseData.getSchedulingAndListingFields().getOverrideFields() != null) {
-            caseData.getSchedulingAndListingFields().getOverrideFields().setTypeOfHearing(null);
-        }
+        Optional.ofNullable(caseData.getSchedulingAndListingFields())
+            .map(SchedulingAndListingFields::getOverrideFields)
+            .ifPresent(overrideFields -> overrideFields.setTypeOfHearing(null));
+
         return validateDirectionType(caseData)
                 .or(()        -> validateDirectionDueDate(caseData))
                 .orElseGet(() -> validateForPdfAndCreateCallbackResponse(callback, caseDetails, caseData, documentTranslationStatus));
