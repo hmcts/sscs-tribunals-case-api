@@ -74,8 +74,8 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         SscsDocumentTranslationStatus documentTranslationStatus = caseData.isLanguagePreferenceWelsh() && callback.getEvent() == EventType.DIRECTION_ISSUED ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
         log.info("DocumentTranslationStatus is {},  for case id : {}", documentTranslationStatus, caseData.getCcdCaseId());
-        YesNo selectNextTypeOfHearing = caseData.getSelectNextHmcHearingType();
-        if (isNoOrNull(selectNextTypeOfHearing)) {
+        YesNo selectNextHmcHearingType = caseData.getSelectNextHmcHearingType();
+        if (isNoOrNull(selectNextHmcHearingType)) {
             caseData.setHmcHearingType(null);
             if (caseData.getAppeal().getHearingOptions() != null) {
                 caseData.getAppeal().getHearingOptions().setHmcHearingType(null);
