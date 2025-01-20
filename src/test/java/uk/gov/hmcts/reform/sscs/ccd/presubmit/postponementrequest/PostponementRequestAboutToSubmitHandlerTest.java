@@ -182,9 +182,9 @@ public class PostponementRequestAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAPostponementRequesForIbc_setOriginalSenderToFta() {
+    public void givenAPostponementRequestForIbc_setOriginalSenderToFta() {
         sscsCaseData.setBenefitCode("093");
-         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(sscsCaseData.getSscsDocument().size(), is(1));
         final SscsDocument document = sscsCaseData.getSscsDocument().get(0);
