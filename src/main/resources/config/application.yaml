@@ -241,8 +241,6 @@ evidenceDescription:
 feature:
     case-access-management:
         enabled: ${CASE_ACCESS_MANAGEMENT_FEATURE:false}
-    citizen-login-service-v2:
-        enabled: ${CITIZEN_LOGIN_SERVICE_V2:false}
     deleted-redacted-doc:
         enabled: ${DELETED_REDACTED_DOC_ENABLED:false}
     elasticsearch:
@@ -283,8 +281,6 @@ feature:
         enabled: ${URGENT_HEARING_ENABLED:false}
     bypass-notifications-service:
         enabled: ${BYPASS_NOTIFICATIONS_SERVICE:false}
-    handle-ccd-callbackMap-v2:
-        enabled: ${HANDLE_CCD_CALLBACKMAP_V2:false}
     process-event-message-v2:
         enabled: ${PROCESS_EVENT_MESSAGE_V2_ENABLED:false}
     bypass-hearing-api-service:
