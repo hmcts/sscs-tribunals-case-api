@@ -87,7 +87,6 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                     .orElseGet(HearingOptions::builder)
                     .hmcHearingType(caseData.getHmcHearingType())
                     .build());
-
         }
         Optional.ofNullable(caseData.getSchedulingAndListingFields())
             .map(SchedulingAndListingFields::getOverrideFields)

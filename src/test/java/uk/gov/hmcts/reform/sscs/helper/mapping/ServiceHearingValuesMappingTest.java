@@ -188,7 +188,7 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
         //then
         assertFalse(serviceHearingValues.isAutoListFlag());
         assertEquals(60, serviceHearingValues.getDuration());
-        assertEquals(SUBSTANTIVE, serviceHearingValues.getHearingType());
+        assertEquals(HmcHearingType.SUBSTANTIVE, serviceHearingValues.getHearingType());
         assertEquals(BENEFIT, serviceHearingValues.getCaseType());
         assertThat(serviceHearingValues.getCaseCategories())
             .extracting("categoryType","categoryValue")

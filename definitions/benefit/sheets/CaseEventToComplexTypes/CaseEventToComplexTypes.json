@@ -2157,7 +2157,7 @@
     "DisplayContext": "READONLY",
     "PageDisplayOrder": 3,
     "PageFieldDisplayOrder": 4,
-    "PageID": "typeOfHearing",
+    "PageID": "hmcHearingType",
     "PageLabel": "Type of hearing",
     "ShowSummaryChangeOption": "Y",
     "FieldShowCondition": "appeal.benefitType.code=\"childSupport\" OR appeal.benefitType.code=\"taxCredit\" OR appeal.benefitType.code=\"guardiansAllowance\" OR appeal.benefitType.code=\"taxFreeChildcare\" OR appeal.benefitType.code=\"homeResponsibilitiesProtection\" OR appeal.benefitType.code=\"childBenefit\" OR appeal.benefitType.code=\"thirtyHoursFreeChildcare\" OR appeal.benefitType.code=\"guaranteedMinimumPension\" OR appeal.benefitType.code=\"nationalInsuranceCredits\""
@@ -2170,7 +2170,7 @@
     "DisplayContext": "MANDATORY",
     "PageDisplayOrder": 3,
     "PageFieldDisplayOrder": 5,
-    "PageID": "typeOfHearing",
+    "PageID": "hmcHearingType",
     "PageLabel": "Type of hearing",
     "ShowSummaryChangeOption": "Y",
     "FieldShowCondition": "appeal.benefitType.code=\"childSupport\" OR appeal.benefitType.code=\"taxCredit\" OR appeal.benefitType.code=\"guardiansAllowance\" OR appeal.benefitType.code=\"taxFreeChildcare\" OR appeal.benefitType.code=\"homeResponsibilitiesProtection\" OR appeal.benefitType.code=\"childBenefit\" OR appeal.benefitType.code=\"thirtyHoursFreeChildcare\" OR appeal.benefitType.code=\"guaranteedMinimumPension\" OR appeal.benefitType.code=\"nationalInsuranceCredits\""
