@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -18,17 +19,24 @@ import uk.gov.hmcts.reform.sscs.model.multi.hearing.CaseHearing;
 import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
 import uk.gov.hmcts.reform.sscs.service.HearingOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.HmcHearingsApiService;
+import uk.gov.hmcts.reform.sscs.service.VenueService;
+import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingUpdateService;
 
 @Component
 @Slf4j
 public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final HmcHearingsApiService hmcHearingsApiService;
+    private final HearingUpdateService hearingUpdateService;
+    private final VenueService venueService;
     private final HearingOutcomeService hearingOutcomeService;
 
     public AddHearingOutcomeAboutToStartHandler(HmcHearingsApiService hmcHearingsApiService,
+                                                HearingUpdateService hearingUpdateService, VenueService venueService,
                                                 HearingOutcomeService hearingOutcomeService) {
         this.hmcHearingsApiService = hmcHearingsApiService;
+        this.hearingUpdateService = hearingUpdateService;
+        this.venueService = venueService;
         this.hearingOutcomeService = hearingOutcomeService;
     }
 
@@ -56,7 +64,7 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
             log.info("Retrieved {} completed hearings for caseId {}", hmcHearings.size(), callback.getCaseDetails().getId());
             if (!hmcHearings.isEmpty()) {
 
-                if (sscsCaseData.getCompletedHearingsList() == null) {
+                if (CollectionUtils.isEmpty(sscsCaseData.getCompletedHearingsList())) {
                     sscsCaseData.setCompletedHearingsList(new ArrayList<>());
                 }
 
