@@ -149,7 +149,6 @@ em-stitching:
       SPRING_DATASOURCE_HOST: '{{ tpl .Values.global.postgresHostname $}}'
       SPRING_DATASOURCE_USERNAME: hmcts
       SPRING_DATASOURCE_NAME: "pr-${CHANGE_ID}-emstitch"
-      SPRING_DATASOURCE_PASSWORD: ${GENERIC_VALUES_PREVIEW_YAML_PASS}
       SPRING_DATASOURCE_OPTIONS: "?ssl=disable"
       ENABLE_DB_MIGRATE: true
       RUN_DB_MIGRATION_ON_STARTUP: true
@@ -551,7 +550,7 @@ ccd:
         CASE_DOCUMENT_AM_URL: ${CASE_DOCUMENT_AM_URL}
         UPLOAD_TIMESTAMP_FEATURED_CASE_TYPES: CARE_SUPERVISION_EPO
       secrets:
-        DATA_STORE_DB_PASSWORD:
+        DATA_STORE_DB:
           secretRef: postgres
           key: PASSWORD
           disabled: false
