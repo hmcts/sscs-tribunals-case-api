@@ -39,11 +39,11 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReserveTo;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.domain.TypeOfHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
@@ -344,8 +344,8 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = TypeOfHearing.class, names = {"SUBSTANTIVE", "DIRECTION_HEARINGS"})
-    void givenTypeOfHearingIsNotNull_thenUpdateToNonNullHearingOptions(TypeOfHearing typeOfHearing) {
+    @EnumSource(value = HmcHearingType.class, names = {"SUBSTANTIVE", "DIRECTION_HEARINGS"})
+    void givenTypeOfHearingIsNotNull_thenUpdateToNonNullHearingOptions(HmcHearingType hmcHearingType) {
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
@@ -353,7 +353,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
             .appellantInterpreter(null)
-            .typeOfHearing(typeOfHearing)
+            .hmcHearingType(hmcHearingType)
             .build());
 
         sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder()
@@ -369,19 +369,19 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         assertTrue(response.getErrors().isEmpty());
         assertEquals("Yes", response.getData().getAppeal().getHearingOptions().getLanguageInterpreter());
         assertNotNull(response.getData().getAppeal().getHearingOptions().getLanguages());
-        assertEquals(typeOfHearing, response.getData().getAppeal().getHearingOptions().getTypeOfHearing());
+        assertEquals(hmcHearingType, response.getData().getAppeal().getHearingOptions().getHmcHearingType());
     }
 
     @ParameterizedTest
-    @EnumSource(value = TypeOfHearing.class, names = {"SUBSTANTIVE", "DIRECTION_HEARINGS"})
-    void givenTypeOfHearingIsNotNull_thenUpdateToNullHearingOptions(TypeOfHearing typeOfHearing) {
+    @EnumSource(value = HmcHearingType.class, names = {"SUBSTANTIVE", "DIRECTION_HEARINGS"})
+    void givenTypeOfHearingIsNotNull_thenUpdateToNullHearingOptions(HmcHearingType hmcHearingType) {
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
         given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
 
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
-            .typeOfHearing(typeOfHearing)
+            .hmcHearingType(hmcHearingType)
             .build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
@@ -390,6 +390,6 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
             USER_AUTHORISATION);
 
         assertTrue(response.getErrors().isEmpty());
-        assertEquals(typeOfHearing, response.getData().getAppeal().getHearingOptions().getTypeOfHearing());
+        assertEquals(hmcHearingType, response.getData().getAppeal().getHearingOptions().getHmcHearingType());
     }
 }

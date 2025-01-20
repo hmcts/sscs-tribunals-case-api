@@ -41,12 +41,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.TypeOfHearing;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 
@@ -179,7 +179,7 @@ class AdjournCaseAboutToStartHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         sscsCaseData.setAppeal(null);
-        sscsCaseData.setTypeOfHearing(null);
+        sscsCaseData.setHmcHearingType(null);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
     }
@@ -190,7 +190,7 @@ class AdjournCaseAboutToStartHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         sscsCaseData.getAppeal().setHearingOptions(null);
-        sscsCaseData.setTypeOfHearing(null);
+        sscsCaseData.setHmcHearingType(null);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
     }
@@ -200,7 +200,7 @@ class AdjournCaseAboutToStartHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        sscsCaseData.setTypeOfHearing(TypeOfHearing.SUBSTANTIVE);
+        sscsCaseData.setHmcHearingType(HmcHearingType.SUBSTANTIVE);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
     }
@@ -210,10 +210,10 @@ class AdjournCaseAboutToStartHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        sscsCaseData.setTypeOfHearing(TypeOfHearing.DIRECTION_HEARINGS);
+        sscsCaseData.setHmcHearingType(HmcHearingType.DIRECTION_HEARINGS);
         sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
             .overrideFields(OverrideFields.builder()
-                .typeOfHearing(TypeOfHearing.SUBSTANTIVE)
+                .hmcHearingType(HmcHearingType.SUBSTANTIVE)
                 .build())
             .build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -225,7 +225,7 @@ class AdjournCaseAboutToStartHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        sscsCaseData.setTypeOfHearing(TypeOfHearing.DIRECTION_HEARINGS);
+        sscsCaseData.setHmcHearingType(HmcHearingType.DIRECTION_HEARINGS);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertThat(response.getErrors())
             .hasSize(1)
@@ -237,10 +237,10 @@ class AdjournCaseAboutToStartHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        sscsCaseData.setTypeOfHearing(TypeOfHearing.SUBSTANTIVE);
+        sscsCaseData.setHmcHearingType(HmcHearingType.SUBSTANTIVE);
         sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
             .overrideFields(OverrideFields.builder()
-                .typeOfHearing(TypeOfHearing.DIRECTION_HEARINGS)
+                .hmcHearingType(HmcHearingType.DIRECTION_HEARINGS)
                 .build())
             .build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);

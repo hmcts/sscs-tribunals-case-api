@@ -15,8 +15,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingVenue.SAME_VENUE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingVenue.SOMEWHERE_ELSE;
-import static uk.gov.hmcts.reform.sscs.model.hmc.reference.HearingType.DIRECTION_HEARINGS;
-import static uk.gov.hmcts.reform.sscs.model.hmc.reference.HearingType.SUBSTANTIVE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType.DIRECTION_HEARINGS;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType.SUBSTANTIVE;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.LocationType.COURT;
 
 import java.util.ArrayList;
@@ -38,7 +38,6 @@ import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.HearingLocation;
 import uk.gov.hmcts.reform.sscs.model.HearingWrapper;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
-import uk.gov.hmcts.reform.sscs.model.hmc.reference.HearingType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDetails;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
@@ -227,7 +226,7 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
     @DisplayName("Hearing type should be substantive if typeOfHearing is null.")
     @Test
     void getHearingTypeNull() {
-        HearingType result = HearingsDetailsMapping.getHearingType(caseData);
+        HmcHearingType result = HearingsDetailsMapping.getHearingType(caseData);
 
         assertThat(result).isEqualTo(SUBSTANTIVE);
     }
@@ -238,8 +237,8 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
         caseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
             .overrideFields(null)
             .build());
-        caseData.setTypeOfHearing(TypeOfHearing.SUBSTANTIVE);
-        HearingType result = HearingsDetailsMapping.getHearingType(caseData);
+        caseData.setHmcHearingType(HmcHearingType.SUBSTANTIVE);
+        HmcHearingType result = HearingsDetailsMapping.getHearingType(caseData);
 
         assertThat(result).isEqualTo(SUBSTANTIVE);
     }
@@ -249,11 +248,11 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
     void getHearingTypeDirection() {
         caseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
             .overrideFields(OverrideFields.builder()
-                .typeOfHearing(null)
+                .hmcHearingType(null)
                 .build())
             .build());
-        caseData.setTypeOfHearing(TypeOfHearing.DIRECTION_HEARINGS);
-        HearingType result = HearingsDetailsMapping.getHearingType(caseData);
+        caseData.setHmcHearingType(DIRECTION_HEARINGS);
+        HmcHearingType result = HearingsDetailsMapping.getHearingType(caseData);
 
         assertThat(result).isEqualTo(DIRECTION_HEARINGS);
     }
@@ -261,13 +260,13 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
     @DisplayName("Hearing type should be direction if typeOfHearing is substantive but override is direction.")
     @Test
     void getHearingTypeOverride() {
-        caseData.setTypeOfHearing(TypeOfHearing.SUBSTANTIVE);
+        caseData.setHmcHearingType(SUBSTANTIVE);
         caseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
             .overrideFields(OverrideFields.builder()
-                .typeOfHearing(TypeOfHearing.DIRECTION_HEARINGS)
+                .hmcHearingType(DIRECTION_HEARINGS)
                 .build())
             .build());
-        HearingType result = HearingsDetailsMapping.getHearingType(caseData);
+        HmcHearingType result = HearingsDetailsMapping.getHearingType(caseData);
 
         assertThat(result).isEqualTo(DIRECTION_HEARINGS);
     }

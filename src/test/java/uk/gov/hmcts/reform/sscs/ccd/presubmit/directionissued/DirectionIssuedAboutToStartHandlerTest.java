@@ -83,8 +83,8 @@ public class DirectionIssuedAboutToStartHandlerTest {
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getExtensionNextEventDl());
         assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
-        assertNull(response.getData().getTypeOfHearing());
-        assertEquals(NO, response.getData().getSelectNextTypeOfHearing());
+        assertNull(response.getData().getHmcHearingType());
+        assertEquals(NO, response.getData().getSelectNextHmcHearingType());
     }
 
     @Test
@@ -399,9 +399,9 @@ public class DirectionIssuedAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenNotDefaultSelectTypeOfHearingNo_whenValue() {
+    public void givenNotDefaultSelectHmcHearingTypeNo_whenValue() {
         when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
-        sscsCaseData.setSelectNextTypeOfHearing(YES);
+        sscsCaseData.setSelectNextHmcHearingType(YES);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(SEND_TO_LISTING.getCode(), SEND_TO_LISTING.getLabel()));
@@ -409,6 +409,6 @@ public class DirectionIssuedAboutToStartHandlerTest {
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getExtensionNextEventDl());
         assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
-        assertEquals(YES, response.getData().getSelectNextTypeOfHearing());
+        assertEquals(YES, response.getData().getSelectNextHmcHearingType());
     }
 }

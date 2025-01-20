@@ -54,8 +54,8 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
 
         clearFields(sscsCaseData);
         setPartiesToSendLetter(sscsCaseData);
-        if (sscsCaseData.getSelectNextTypeOfHearing() == null) {
-            sscsCaseData.setSelectNextTypeOfHearing(NO);
+        if (sscsCaseData.getSelectNextHmcHearingType() == null) {
+            sscsCaseData.setSelectNextHmcHearingType(NO);
         }
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }

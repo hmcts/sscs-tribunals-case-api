@@ -5,7 +5,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getTypeOfHearing;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getHmcHearingType;
 
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -106,7 +106,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             .setHearingOptions(Optional.ofNullable(sscsCaseData.getAppeal().getHearingOptions())
                 .map(HearingOptions::toBuilder)
                 .orElseGet(HearingOptions::builder)
-                .typeOfHearing(getTypeOfHearing(sscsCaseData))
+                .hmcHearingType(getHmcHearingType(sscsCaseData))
                 .build());
         return callbackResponse;
     }

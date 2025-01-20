@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getTypeOfHearing;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getHmcHearingType;
 
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +13,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.TypeOfHearing;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 
@@ -62,7 +62,7 @@ public class AdjournCaseAboutToStartHandler implements PreSubmitCallbackHandler<
     }
 
     private boolean isDirectionHearing(SscsCaseData sscsCaseData) {
-        return TypeOfHearing.DIRECTION_HEARINGS.equals(getTypeOfHearing(sscsCaseData));
+        return HmcHearingType.DIRECTION_HEARINGS.equals(getHmcHearingType(sscsCaseData));
     }
 }
 

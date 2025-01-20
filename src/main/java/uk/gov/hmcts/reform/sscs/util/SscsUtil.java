@@ -51,6 +51,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.JudicialUserPanel;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LibertyToApplyActions;
@@ -68,7 +69,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFinalDecisionCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.TypeOfHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
@@ -635,12 +635,12 @@ public class SscsUtil {
             : null;
     }
 
-    public static TypeOfHearing getTypeOfHearing(SscsCaseData sscsCaseData) {
+    public static HmcHearingType getHmcHearingType(SscsCaseData sscsCaseData) {
         return sscsCaseData.getSchedulingAndListingFields() != null
             && sscsCaseData.getSchedulingAndListingFields().getOverrideFields() != null
-            && sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getTypeOfHearing() != null
-            ? sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getTypeOfHearing()
-            : sscsCaseData.getTypeOfHearing();
+            && sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getHmcHearingType() != null
+            ? sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getHmcHearingType()
+            : sscsCaseData.getHmcHearingType();
     }
 }
 

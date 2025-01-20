@@ -56,6 +56,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LibertyToApplyActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
@@ -72,7 +73,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.TypeOfHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
@@ -635,69 +635,69 @@ class SscsUtilTest {
     }
 
     @Test
-    void testGetTypeOfHearing_WithOverrideFields() {
-        TypeOfHearing expectedTypeOfHearing = TypeOfHearing.SUBSTANTIVE;
-        OverrideFields overrideFields = OverrideFields.builder().typeOfHearing(expectedTypeOfHearing).build();
+    void testGetHmcHearingType_WithOverrideFields() {
+        HmcHearingType expectedHmcHearingType = HmcHearingType.SUBSTANTIVE;
+        OverrideFields overrideFields = OverrideFields.builder().hmcHearingType(expectedHmcHearingType).build();
         SchedulingAndListingFields schedulingAndListingFields = SchedulingAndListingFields.builder().overrideFields(overrideFields).build();
         caseData.setSchedulingAndListingFields(schedulingAndListingFields);
 
-        TypeOfHearing result = SscsUtil.getTypeOfHearing(caseData);
+        HmcHearingType result = SscsUtil.getHmcHearingType(caseData);
 
-        assertEquals(expectedTypeOfHearing, result);
+        assertEquals(expectedHmcHearingType, result);
     }
 
     @Test
-    void testGetTypeOfHearing_WithoutOverrideFields() {
-        TypeOfHearing expectedTypeOfHearing = TypeOfHearing.DIRECTION_HEARINGS;
-        caseData.setTypeOfHearing(expectedTypeOfHearing);
+    void testGetHmcHearingType_WithoutOverrideFields() {
+        HmcHearingType expectedHmcHearingType = HmcHearingType.DIRECTION_HEARINGS;
+        caseData.setHmcHearingType(expectedHmcHearingType);
 
-        TypeOfHearing result = SscsUtil.getTypeOfHearing(caseData);
+        HmcHearingType result = SscsUtil.getHmcHearingType(caseData);
 
-        assertEquals(expectedTypeOfHearing, result);
+        assertEquals(expectedHmcHearingType, result);
     }
 
     @Test
-    void testGetTypeOfHearing_WithNullSchedulingAndListingFields() {
-        TypeOfHearing expectedTypeOfHearing = TypeOfHearing.SUBSTANTIVE;
-        caseData.setTypeOfHearing(expectedTypeOfHearing);
+    void testGetHmcHearingType_WithNullSchedulingAndListingFields() {
+        HmcHearingType expectedHmcHearingType = HmcHearingType.SUBSTANTIVE;
+        caseData.setHmcHearingType(expectedHmcHearingType);
 
-        TypeOfHearing result = SscsUtil.getTypeOfHearing(caseData);
+        HmcHearingType result = SscsUtil.getHmcHearingType(caseData);
 
-        assertEquals(expectedTypeOfHearing, result);
+        assertEquals(expectedHmcHearingType, result);
     }
 
     @Test
-    void testGetTypeOfHearing_WithNullOverrideFields() {
+    void testGetHmcHearingType_WithNullOverrideFields() {
         SchedulingAndListingFields schedulingAndListingFields = SchedulingAndListingFields.builder().overrideFields(null).build();
         caseData.setSchedulingAndListingFields(schedulingAndListingFields);
-        TypeOfHearing expectedTypeOfHearing = TypeOfHearing.DIRECTION_HEARINGS;
-        caseData.setTypeOfHearing(expectedTypeOfHearing);
+        HmcHearingType expectedHmcHearingType = HmcHearingType.DIRECTION_HEARINGS;
+        caseData.setHmcHearingType(expectedHmcHearingType);
 
-        TypeOfHearing result = SscsUtil.getTypeOfHearing(caseData);
+        HmcHearingType result = SscsUtil.getHmcHearingType(caseData);
 
-        assertEquals(expectedTypeOfHearing, result);
+        assertEquals(expectedHmcHearingType, result);
     }
 
     @Test
-    void testGetTypeOfHearing_WithNullTypeOfHearing() {
-        OverrideFields overrideFields = OverrideFields.builder().typeOfHearing(null).build();
+    void testGetHmcHearingType_WithNullHmcHearingType() {
+        OverrideFields overrideFields = OverrideFields.builder().hmcHearingType(null).build();
         SchedulingAndListingFields schedulingAndListingFields = SchedulingAndListingFields.builder().overrideFields(overrideFields).build();
         caseData.setSchedulingAndListingFields(schedulingAndListingFields);
 
-        TypeOfHearing result = SscsUtil.getTypeOfHearing(caseData);
+        HmcHearingType result = SscsUtil.getHmcHearingType(caseData);
 
         assertNull(result);
     }
 
     @Test
-    void testGetTypeOfHearing_WithNullOverriddenTypeOfHearing() {
-        OverrideFields overrideFields = OverrideFields.builder().typeOfHearing(null).build();
+    void testGetHmcHearingType_WithNullOverriddenHmcHearingType() {
+        OverrideFields overrideFields = OverrideFields.builder().hmcHearingType(null).build();
         SchedulingAndListingFields schedulingAndListingFields = SchedulingAndListingFields.builder().overrideFields(overrideFields).build();
         caseData.setSchedulingAndListingFields(schedulingAndListingFields);
-        TypeOfHearing expectedTypeOfHearing = TypeOfHearing.DIRECTION_HEARINGS;
-        caseData.setTypeOfHearing(expectedTypeOfHearing);
-        TypeOfHearing result = SscsUtil.getTypeOfHearing(caseData);
+        HmcHearingType expectedHmcHearingType = HmcHearingType.DIRECTION_HEARINGS;
+        caseData.setHmcHearingType(expectedHmcHearingType);
+        HmcHearingType result = SscsUtil.getHmcHearingType(caseData);
 
-        assertEquals(expectedTypeOfHearing, result);
+        assertEquals(expectedHmcHearingType, result);
     }
 }

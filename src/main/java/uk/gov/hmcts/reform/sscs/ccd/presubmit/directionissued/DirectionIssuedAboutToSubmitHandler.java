@@ -74,24 +74,24 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         SscsDocumentTranslationStatus documentTranslationStatus = caseData.isLanguagePreferenceWelsh() && callback.getEvent() == EventType.DIRECTION_ISSUED ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
         log.info("DocumentTranslationStatus is {},  for case id : {}", documentTranslationStatus, caseData.getCcdCaseId());
-        YesNo selectNextTypeOfHearing = caseData.getSelectNextTypeOfHearing();
-        if (isNoOrNull(selectNextTypeOfHearing)) {
-            caseData.setTypeOfHearing(null);
+        YesNo selectNextHmcHearingType = caseData.getSelectNextHmcHearingType();
+        if (isNoOrNull(selectNextHmcHearingType)) {
+            caseData.setHmcHearingType(null);
             Optional.ofNullable(caseData.getAppeal())
                 .map(Appeal::getHearingOptions)
-                .ifPresent(hearingOptions -> hearingOptions.setTypeOfHearing(null));
+                .ifPresent(hearingOptions -> hearingOptions.setHmcHearingType(null));
         } else {
             caseData.getAppeal()
                 .setHearingOptions(Optional.ofNullable(caseData.getAppeal().getHearingOptions())
                     .map(HearingOptions::toBuilder)
                     .orElseGet(HearingOptions::builder)
-                    .typeOfHearing(caseData.getTypeOfHearing())
+                    .hmcHearingType(caseData.getHmcHearingType())
                     .build());
 
         }
         Optional.ofNullable(caseData.getSchedulingAndListingFields())
             .map(SchedulingAndListingFields::getOverrideFields)
-            .ifPresent(overrideFields -> overrideFields.setTypeOfHearing(null));
+            .ifPresent(overrideFields -> overrideFields.setHmcHearingType(null));
 
         return validateDirectionType(caseData)
             .or(() -> validateDirectionDueDate(caseData))
