@@ -359,7 +359,7 @@
   },
   {
     "CaseEventID": "directionIssued",
-    "CaseFieldID": "selectNextTypeOfHearing",
+    "CaseFieldID": "selectNextHmcHearingType",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "01/01/2018",
@@ -371,7 +371,7 @@
   },
   {
     "CaseEventID": "directionIssued",
-    "CaseFieldID": "typeOfHearing",
+    "CaseFieldID": "hmcHearingType",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "01/01/2018",

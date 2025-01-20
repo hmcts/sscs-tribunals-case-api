@@ -783,53 +783,53 @@ class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
-    void willWipeTypeOfHearingIfSelectNextTypeOfHearingIsNull() {
+    void willWipeHmcHearingTypeIfSelectNextHmcHearingTypeIsNull() {
         when(caseDetails.getState()).thenReturn(State.READY_TO_LIST);
-        sscsCaseData.setSelectNextTypeOfHearing(null);
-        sscsCaseData.setTypeOfHearing(TypeOfHearing.SUBSTANTIVE);
+        sscsCaseData.setSelectNextHmcHearingType(null);
+        sscsCaseData.setHmcHearingType(HmcHearingType.SUBSTANTIVE);
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNull(response.getData().getSelectNextTypeOfHearing());
-        assertNull(response.getData().getTypeOfHearing());
+        assertNull(response.getData().getSelectNextHmcHearingType());
+        assertNull(response.getData().getHmcHearingType());
     }
 
     @Test
-    void willWipeTypeOfHearingIfSelectNextTypeOfHearingIsNo() {
+    void willWipeHmcHearingTypeIfSelectNextHmcHearingTypeIsNo() {
         when(caseDetails.getState()).thenReturn(State.READY_TO_LIST);
-        sscsCaseData.setSelectNextTypeOfHearing(NO);
-        sscsCaseData.setTypeOfHearing(TypeOfHearing.SUBSTANTIVE);
-        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().typeOfHearing(TypeOfHearing.SUBSTANTIVE).build());
+        sscsCaseData.setSelectNextHmcHearingType(NO);
+        sscsCaseData.setHmcHearingType(HmcHearingType.SUBSTANTIVE);
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().hmcHearingType(HmcHearingType.SUBSTANTIVE).build());
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(NO, response.getData().getSelectNextTypeOfHearing());
-        assertNull(response.getData().getTypeOfHearing());
-        assertNull(response.getData().getAppeal().getHearingOptions().getTypeOfHearing());
+        assertEquals(NO, response.getData().getSelectNextHmcHearingType());
+        assertNull(response.getData().getHmcHearingType());
+        assertNull(response.getData().getAppeal().getHearingOptions().getHmcHearingType());
     }
 
     @ParameterizedTest
-    @EnumSource(value = TypeOfHearing.class, names = {"SUBSTANTIVE", "DIRECTION_HEARINGS"})
-    void willSetTypeOfHearingInHearingOptionsNullIfSelectNextTypeOfHearingIsYes(TypeOfHearing typeOfHearing) {
+    @EnumSource(value = HmcHearingType.class, names = {"SUBSTANTIVE", "DIRECTION_HEARINGS"})
+    void willSetTypeOfHearingInHearingOptionsNullIfSelectNextTypeOfHearingIsYes(HmcHearingType hmcHearingType) {
         when(caseDetails.getState()).thenReturn(State.READY_TO_LIST);
-        sscsCaseData.setSelectNextTypeOfHearing(YES);
-        sscsCaseData.setTypeOfHearing(typeOfHearing);
+        sscsCaseData.setSelectNextHmcHearingType(YES);
+        sscsCaseData.setHmcHearingType(hmcHearingType);
         sscsCaseData.getAppeal().setHearingOptions(null);
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(YES, response.getData().getSelectNextTypeOfHearing());
-        assertEquals(typeOfHearing, response.getData().getTypeOfHearing());
-        assertEquals(typeOfHearing, response.getData().getAppeal().getHearingOptions().getTypeOfHearing());
-        assertEquals(HearingOptions.builder().typeOfHearing(typeOfHearing).build(), response.getData().getAppeal().getHearingOptions());
+        assertEquals(YES, response.getData().getSelectNextHmcHearingType());
+        assertEquals(hmcHearingType, response.getData().getHmcHearingType());
+        assertEquals(hmcHearingType, response.getData().getAppeal().getHearingOptions().getHmcHearingType());
+        assertEquals(HearingOptions.builder().hmcHearingType(hmcHearingType).build(), response.getData().getAppeal().getHearingOptions());
     }
 
     @ParameterizedTest
-    @EnumSource(value = TypeOfHearing.class, names = {"SUBSTANTIVE", "DIRECTION_HEARINGS"})
-    void willSetTypeOfHearingInHearingOptionsNotNullIfSelectNextTypeOfHearingIsYes(TypeOfHearing typeOfHearing) {
+    @EnumSource(value = HmcHearingType.class, names = {"SUBSTANTIVE", "DIRECTION_HEARINGS"})
+    void willSetTypeOfHearingInHearingOptionsNotNullIfSelectNextTypeOfHearingIsYes(HmcHearingType hmcHearingType) {
         when(caseDetails.getState()).thenReturn(State.READY_TO_LIST);
-        sscsCaseData.setSelectNextTypeOfHearing(YES);
-        sscsCaseData.setTypeOfHearing(typeOfHearing);
+        sscsCaseData.setSelectNextHmcHearingType(YES);
+        sscsCaseData.setHmcHearingType(hmcHearingType);
         sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().agreeLessNotice("string").build());
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(YES, response.getData().getSelectNextTypeOfHearing());
-        assertEquals(typeOfHearing, response.getData().getTypeOfHearing());
-        assertEquals(typeOfHearing, response.getData().getAppeal().getHearingOptions().getTypeOfHearing());
-        HearingOptions expectedHearingOptions = HearingOptions.builder().agreeLessNotice("string").typeOfHearing(typeOfHearing).build();
+        assertEquals(YES, response.getData().getSelectNextHmcHearingType());
+        assertEquals(hmcHearingType, response.getData().getHmcHearingType());
+        assertEquals(hmcHearingType, response.getData().getAppeal().getHearingOptions().getHmcHearingType());
+        HearingOptions expectedHearingOptions = HearingOptions.builder().agreeLessNotice("string").hmcHearingType(hmcHearingType).build();
         assertEquals(expectedHearingOptions, response.getData().getAppeal().getHearingOptions());
     }
 }
