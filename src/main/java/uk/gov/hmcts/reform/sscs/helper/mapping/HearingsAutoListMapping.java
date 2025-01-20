@@ -12,14 +12,10 @@ import static uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil.isInterpreterR
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Optional;
 import javax.validation.Valid;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMember;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
@@ -37,6 +33,14 @@ public final class HearingsAutoListMapping {
 
         if (nonNull(overrideFields.getAutoList())) {
             return isYes(overrideFields.getAutoList());
+        }
+
+        if (Objects.equals(caseData.getBenefitCode(), "022")) {
+            return false;
+        }
+
+        if (Objects.equals(caseData.getBenefitCode(), "067")) {
+            return false;
         }
 
         if (caseData.isIbcCase()) {

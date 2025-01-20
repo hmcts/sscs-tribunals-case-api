@@ -7,6 +7,7 @@ import static org.junit.jupiter.params.provider.EnumSource.Mode.INCLUDE;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -150,6 +151,21 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
 
         assertThat(result).isTrue();
     }
+
+    @DisplayName("When appellant has a org as a representative, autoList is false")
+    @Test
+    void testHasOrgRepresentativeAndAustoListFalse() throws ListingException {
+        caseData.getAppeal()
+                .setRep(Representative.builder()
+                        .hasRepresentative("Yes")
+                        .organisation("test")
+                        .build());
+
+        boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData,refData);
+
+        assertThat(result).isFalse();
+    }
+
 
     @DisplayName("When appellant and other parties dont have a org as a representative hasOrgRepresentative should return false")
     @Test
@@ -387,6 +403,24 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
         assertThat(result).isFalse();
     }
 
+    @DisplayName("When Child Support Appeal(022) autolist is false")
+    @Test
+    void testIfChildSupportAppealNotAutolisted() throws ListingException {
+        caseData.setBenefitCode("022");
+        boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
+
+        assertThat(result).isFalse();
+    }
+
+    @DisplayName("When Industrial Injuries Case autolist is false")
+    @Test
+    void testIfIndustrialInjuriesAppealNotAutolisted() throws ListingException {
+        caseData.setBenefitCode("067");
+        boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
+
+        assertThat(result).isFalse();
+    }
+
     @DisplayName("When isIbcCase True but is overridden then autolist is true")
     @Test
     void testIfIbcCaseAutolistedIfOverridden() throws ListingException {
@@ -404,6 +438,36 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
         caseData.setBenefitCode("093");
         OverrideFields overrideFields = OverrideFields.builder().autoList(NO).build();
         caseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
+        boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
+
+        assertThat(result).isFalse();
+    }
+
+    @DisplayName("When interpreterRequired Yes, Autolist is false")
+    @Test
+    void testIfInterpreterRequiredAutlistIsFalse() throws ListingException {
+        Adjournment adjournment = caseData.getAdjournment();
+        adjournment.setInterpreterRequired(YES);
+        boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
+
+        assertThat(result).isFalse();
+    }
+
+    @DisplayName("If UCB autolist is false")
+    @Test
+    void testIfCaseUcbAutolistIsFalse() throws ListingException {
+        caseData.setDwpUcb(YES.getValue());
+        boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
+
+        assertThat(result).isFalse();
+    }
+
+    @DisplayName("When case has a linked case Autolist is false")
+    @Test
+    void testIfIsLinkedCaseAutolistIsFalse() throws ListingException {
+        List<CaseLink> linkedCase = new ArrayList<>();
+        linkedCase.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("2").build()).build());
+        caseData.setLinkedCase(linkedCase);
         boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
 
         assertThat(result).isFalse();
