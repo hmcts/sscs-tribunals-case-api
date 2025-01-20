@@ -399,7 +399,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenNotDefaultSelectHmcHearingTypeNo_whenValue() {
+    public void givenNonDefaultSelectHmcHearingTypeNo_whenValue() {
         when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
         sscsCaseData.setSelectNextHmcHearingType(YES);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -409,6 +409,22 @@ public class DirectionIssuedAboutToStartHandlerTest {
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getExtensionNextEventDl());
         assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
-        assertEquals(YES, response.getData().getSelectNextHmcHearingType());
+        assertEquals(NO, response.getData().getSelectNextHmcHearingType());
+        assertNull(response.getData().getHmcHearingType());
+    }
+
+    @Test
+    public void givenNullSelectHmcHearingTypeNo_whenNull() {
+        when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
+        sscsCaseData.setSelectNextHmcHearingType(null);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(SEND_TO_LISTING.getCode(), SEND_TO_LISTING.getLabel()));
+        listOptions.add(new DynamicListItem(NO_FURTHER_ACTION.getCode(), NO_FURTHER_ACTION.getLabel()));
+        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
+        assertEquals(expected, response.getData().getExtensionNextEventDl());
+        assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
+        assertEquals(NO, response.getData().getSelectNextHmcHearingType());
+        assertNull(response.getData().getHmcHearingType());
     }
 }

@@ -76,7 +76,6 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         log.info("DocumentTranslationStatus is {},  for case id : {}", documentTranslationStatus, caseData.getCcdCaseId());
         YesNo selectNextHmcHearingType = caseData.getSelectNextHmcHearingType();
         if (isNoOrNull(selectNextHmcHearingType)) {
-            caseData.setHmcHearingType(null);
             if (caseData.getAppeal().getHearingOptions() != null) {
                 caseData.getAppeal().getHearingOptions().setHmcHearingType(null);
             }
