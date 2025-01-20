@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,36 +19,45 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOutcomeValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
+import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.model.multi.hearing.CaseHearing;
 import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
+import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDaySchedule;
+import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.HmcHearingsApiService;
+import uk.gov.hmcts.reform.sscs.service.VenueService;
+import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingUpdateService;
 
 
 @RunWith(JUnitParamsRunner.class)
 public class AddHearingOutcomeAboutToStartHandlerTest {
     private AddHearingOutcomeAboutToStartHandler handler;
     private static final String USER_AUTHORISATION = "Bearer token";
+    public static final LocalDateTime HEARING_START_DATE_TIME = LocalDateTime.now();
+    public static final LocalDateTime HEARING_END_DATE_TIME = HEARING_START_DATE_TIME.plusHours(2);
+    public static final String EPIMS_ID_1 = "12";
+    public static final String EPIMS_ID_2 = "34";
     @Mock
     private Callback<SscsCaseData> callback;
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
     @Mock
     private HmcHearingsApiService hmcHearingsApiService;
+    @Mock
+    private HearingUpdateService hearingUpdateService;
+    @Mock
+    private VenueService venueService;
     private SscsCaseData sscsCaseData;
 
     @BeforeEach
     void setup() {
         openMocks(this);
-        handler = new AddHearingOutcomeAboutToStartHandler(hmcHearingsApiService);
+        handler = new AddHearingOutcomeAboutToStartHandler(hmcHearingsApiService, hearingUpdateService, venueService);
         when(callback.getEvent()).thenReturn(EventType.ADD_HEARING_OUTCOME);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build()).hearingOutcomeValue(HearingOutcomeValue.builder().build()).build();
-        sscsCaseData.setHearings(buildHearings());
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
 
@@ -60,8 +68,23 @@ public class AddHearingOutcomeAboutToStartHandlerTest {
 
     @Test
     void givenCompletedHearingOnCase_ThenPopulateDropdown() {
+        when(venueService.getVenueDetailsForActiveVenueByEpimsId(EPIMS_ID_1)).thenReturn(VenueDetails.builder()
+            .epimsId(EPIMS_ID_1)
+            .venName("venueName")
+            .build());
+        when(hearingUpdateService.convertUtcToUk(HEARING_START_DATE_TIME)).thenReturn(HEARING_START_DATE_TIME);
+        when(hearingUpdateService.convertUtcToUk(HEARING_END_DATE_TIME)).thenReturn(HEARING_END_DATE_TIME);
         when(hmcHearingsApiService.getHearingsRequest(any(),any())).thenReturn(
-                HearingsGetResponse.builder().caseHearings(List.of(CaseHearing.builder().hearingId(1L).build())).build());
+            HearingsGetResponse.builder().caseHearings(List.of(CaseHearing.builder()
+                    .hearingId(1L)
+                    .hearingChannels(List.of(HearingChannel.FACE_TO_FACE))
+                    .hearingDaySchedule(List.of(HearingDaySchedule.builder()
+                        .hearingVenueEpimsId(EPIMS_ID_1)
+                        .hearingStartDateTime(HEARING_START_DATE_TIME)
+                        .hearingEndDateTime(HEARING_END_DATE_TIME)
+                        .build()))
+                    .build()))
+                .build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_START,callback,USER_AUTHORISATION);
         assertThat(response.getData().getHearingOutcomeValue().getCompletedHearings().getListItems()).isNotEmpty();
         assertThat(response.getData().getHearingOutcomeValue().getCompletedHearings().getListItems().size()).isEqualTo(1);
@@ -69,24 +92,41 @@ public class AddHearingOutcomeAboutToStartHandlerTest {
 
     @Test
     void givenMultipleCompletedHearingOnCase_ThenPopulateDropdownInDescendingOrderByDate() {
+        when(venueService.getVenueDetailsForActiveVenueByEpimsId(EPIMS_ID_1)).thenReturn(VenueDetails.builder()
+            .epimsId(EPIMS_ID_1)
+            .venName("firstVenueName")
+            .build());
+        when(venueService.getVenueDetailsForActiveVenueByEpimsId(EPIMS_ID_2)).thenReturn(VenueDetails.builder()
+            .epimsId(EPIMS_ID_2)
+            .venName("secondVenueName")
+            .build());
+        when(hearingUpdateService.convertUtcToUk(HEARING_START_DATE_TIME)).thenReturn(HEARING_START_DATE_TIME);
+        when(hearingUpdateService.convertUtcToUk(HEARING_END_DATE_TIME)).thenReturn(HEARING_END_DATE_TIME);
+        when(hearingUpdateService.convertUtcToUk(HEARING_START_DATE_TIME.minusMonths(1)))
+            .thenReturn(HEARING_START_DATE_TIME.minusMonths(1));
+        when(hearingUpdateService.convertUtcToUk(HEARING_END_DATE_TIME.minusMonths(1)))
+            .thenReturn(HEARING_END_DATE_TIME.minusMonths(1));
         when(hmcHearingsApiService.getHearingsRequest(any(),any())).thenReturn(
                 HearingsGetResponse.builder().caseHearings(
-                        List.of(CaseHearing.builder().hearingId(1L).build(),
-                                CaseHearing.builder().hearingId(2L).build())).build());
-
-        List<Hearing> updatedHearings = new ArrayList<>();
-
-        Hearing earliestHearing = Hearing.builder().value(
-                HearingDetails.builder().hearingId("1").start(LocalDateTime.now().minusMonths(1).minusHours(1))
-                        .end(LocalDateTime.now().minusMonths(1)).venue(Venue.builder().name("Cardiff").build()).build()).build();
-
-        Hearing latestHearing = Hearing.builder().value(
-                HearingDetails.builder().hearingId("2").start(LocalDateTime.now().minusHours(1))
-                        .end(LocalDateTime.now()).venue(Venue.builder().name("Cardiff").build()).build()).build();
-
-        updatedHearings.add(earliestHearing);
-        updatedHearings.add(latestHearing);
-        sscsCaseData.setHearings(updatedHearings);
+                        List.of(CaseHearing.builder()
+                                .hearingId(1L)
+                                .hearingChannels(List.of(HearingChannel.FACE_TO_FACE))
+                                .hearingDaySchedule(List.of(HearingDaySchedule.builder()
+                                    .hearingVenueEpimsId(EPIMS_ID_1)
+                                    .hearingStartDateTime(HEARING_START_DATE_TIME.minusMonths(1))
+                                    .hearingEndDateTime(HEARING_END_DATE_TIME.minusMonths(1))
+                                    .build()))
+                                .build(),
+                            CaseHearing.builder()
+                                .hearingId(2L)
+                                .hearingChannels(List.of(HearingChannel.FACE_TO_FACE))
+                                .hearingDaySchedule(List.of(HearingDaySchedule.builder()
+                                    .hearingVenueEpimsId(EPIMS_ID_2)
+                                    .hearingStartDateTime(HEARING_START_DATE_TIME)
+                                    .hearingEndDateTime(HEARING_END_DATE_TIME)
+                                    .build()))
+                                .build()))
+                    .build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_START,callback,USER_AUTHORISATION);
         List<DynamicListItem> hearings = response.getData().getHearingOutcomeValue().getCompletedHearings().getListItems();
@@ -114,16 +154,4 @@ public class AddHearingOutcomeAboutToStartHandlerTest {
         assertThat(response.getErrors()).isNotEmpty();
         assertThat(response.getErrors()).contains("There was an error while retrieving hearing details; please try again after some time.");
     }
-
-    private List<Hearing> buildHearings() {
-        return List.of(
-                Hearing.builder().value(
-                        HearingDetails.builder().hearingId("1").start(LocalDateTime.now().minusHours(2))
-                                .end(LocalDateTime.now()).venue(Venue.builder().name("Cardiff").build()).build()).build(),
-                Hearing.builder().value(
-                        HearingDetails.builder().hearingId("2").start(LocalDateTime.now().minusDays(1).minusHours(2))
-                                .end(LocalDateTime.now().minusDays(1)).venue(Venue.builder().name("Newport").build()).build()).build()
-        );
-    }
-
 }
