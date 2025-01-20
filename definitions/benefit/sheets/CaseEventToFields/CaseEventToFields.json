@@ -4577,5 +4577,18 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "1.0",
     "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "LiveFrom": "30/10/2024",
+    "CaseEventID": "addHearingOutcome",
+    "CaseFieldID": "completedHearingsList",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "N",
+    "RetainHiddenValue": "Yes",
+    "FieldShowCondition": "hearingOutcomeValue.hearingOutcomeId=\"DoNotShow\""
   }
 ]
