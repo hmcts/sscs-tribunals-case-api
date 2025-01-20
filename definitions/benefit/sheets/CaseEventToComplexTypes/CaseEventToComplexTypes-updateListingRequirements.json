@@ -106,7 +106,7 @@
   {
     "CaseEventID": "updateListingRequirements",
     "CaseFieldID": "overrideFields",
-    "ListElementCode": "typeOfHearing",
+    "ListElementCode": "hmcHearingType",
     "ID": "updateListingRequirementsOverrideFieldsTypeOfHearing",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/07/2022",

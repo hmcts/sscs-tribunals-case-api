@@ -806,7 +806,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @EnumSource(value = HmcHearingType.class, names = {"SUBSTANTIVE", "DIRECTION_HEARINGS"})
-    void willSetTypeOfHearingInHearingOptionsNullIfSelectNextTypeOfHearingIsYes(HmcHearingType hmcHearingType) {
+    void willSetTypeOfHearingInHearingOptionsNullIfselectNextHmcHearingTypeIsYes(HmcHearingType hmcHearingType) {
         when(caseDetails.getState()).thenReturn(State.READY_TO_LIST);
         sscsCaseData.setSelectNextHmcHearingType(YES);
         sscsCaseData.setHmcHearingType(hmcHearingType);
@@ -820,7 +820,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @EnumSource(value = HmcHearingType.class, names = {"SUBSTANTIVE", "DIRECTION_HEARINGS"})
-    void willSetTypeOfHearingInHearingOptionsNotNullIfSelectNextTypeOfHearingIsYes(HmcHearingType hmcHearingType) {
+    void willSetTypeOfHearingInHearingOptionsNotNullIfselectNextHmcHearingTypeIsYes(HmcHearingType hmcHearingType) {
         when(caseDetails.getState()).thenReturn(State.READY_TO_LIST);
         sscsCaseData.setSelectNextHmcHearingType(YES);
         sscsCaseData.setHmcHearingType(hmcHearingType);
