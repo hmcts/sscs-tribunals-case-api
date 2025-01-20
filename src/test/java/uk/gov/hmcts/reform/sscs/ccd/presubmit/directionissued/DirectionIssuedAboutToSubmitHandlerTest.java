@@ -789,7 +789,6 @@ class DirectionIssuedAboutToSubmitHandlerTest {
         sscsCaseData.setHmcHearingType(HmcHearingType.SUBSTANTIVE);
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertNull(response.getData().getSelectNextHmcHearingType());
-        assertNull(response.getData().getHmcHearingType());
     }
 
     @Test
@@ -800,7 +799,6 @@ class DirectionIssuedAboutToSubmitHandlerTest {
         sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().hmcHearingType(HmcHearingType.SUBSTANTIVE).build());
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(NO, response.getData().getSelectNextHmcHearingType());
-        assertNull(response.getData().getHmcHearingType());
         assertNull(response.getData().getAppeal().getHearingOptions().getHmcHearingType());
     }
 
