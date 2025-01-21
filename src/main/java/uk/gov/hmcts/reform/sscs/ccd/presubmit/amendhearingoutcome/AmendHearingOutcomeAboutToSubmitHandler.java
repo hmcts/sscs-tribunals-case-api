@@ -33,6 +33,10 @@ public class AmendHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbac
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
+        if (sscsCaseData.getHearings().isEmpty()) {
+            sscsCaseData.setHearingOutcomes(null);
+        }
+
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 }
