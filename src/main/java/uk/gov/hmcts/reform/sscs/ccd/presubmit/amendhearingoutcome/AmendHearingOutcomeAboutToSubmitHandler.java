@@ -8,8 +8,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
@@ -55,11 +53,12 @@ public class AmendHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbac
 
         List<Hearing> hearingList = sscsCaseData.getCompletedHearingsList();
 
-        List hearingsSelected = null;
+        List<String> hearingsSelected = null;
 
         for (HearingOutcome checkHearingOutcomes : sscsCaseData.getHearingOutcomes()) {
             String checkHearingId = checkHearingOutcomes.getValue().getCompletedHearingId();
-            if( hearingsSelected.contains(checkHearingId)) {
+            log.info("Checking hearing ID for Amend Hearing Outcome Event: {}", checkHearingId);
+            if (hearingsSelected.contains(checkHearingId)) {
                 preSubmitCallbackResponse.addError("This hearing already has an outcome recorded.");
                 return preSubmitCallbackResponse;
             } else {
