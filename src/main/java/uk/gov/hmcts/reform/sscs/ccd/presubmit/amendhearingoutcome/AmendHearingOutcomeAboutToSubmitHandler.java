@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
@@ -53,12 +55,25 @@ public class AmendHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbac
 
         List<Hearing> hearingList = sscsCaseData.getCompletedHearingsList();
 
+        List hearingsSelected = null;
+
+        for (HearingOutcome checkHearingOutcomes : sscsCaseData.getHearingOutcomes()) {
+            String checkHearingId = checkHearingOutcomes.getValue().getCompletedHearingId();
+            if( hearingsSelected.contains(checkHearingId)) {
+                preSubmitCallbackResponse.addError("This hearing already has an outcome recorded.");
+                return preSubmitCallbackResponse;
+            } else {
+                hearingsSelected.add(checkHearingId);
+            }
+        }
+
         for (int i = 0; i < hearingList.size(); i++) {
             HearingOutcome hearingOutcome = sscsCaseData.getHearingOutcomes().get(i);
 
             String selectedHearingId =  hearingOutcome.getValue().getCompletedHearings().getValue().getCode();
 
             if (selectedHearingId != hearingOutcome.getValue().getCompletedHearingId()) {
+
                 HearingDetails selectedHearingDetails = sscsCaseData.getCompletedHearingsList().stream()
                     .filter(hearing -> hearing.getValue().getHearingId().equalsIgnoreCase(selectedHearingId))
                     .findFirst().orElse(Hearing.builder().build()).getValue();
