@@ -95,10 +95,10 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
         BeftaUtils.defaultLog("Will NOT create role assignments!");
     }
 
-   @Override
+    @Override
     protected boolean shouldTolerateDataSetupFailure() {
-        return BeftaMain.getConfig().getDefinitionStoreUrl().contains("demo") ||
-                BeftaMain.getConfig().getDefinitionStoreUrl().contains("prod");
+        return BeftaMain.getConfig().getDefinitionStoreUrl().contains("demo")
+                || BeftaMain.getConfig().getDefinitionStoreUrl().contains("prod");
     }
 
     @Override
