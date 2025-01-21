@@ -51,8 +51,6 @@ public class AmendHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbac
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        List<Hearing> hearingList = sscsCaseData.getCompletedHearingsList();
-
         List<String> hearingsSelected = null;
 
         for (HearingOutcome checkHearingOutcomes : sscsCaseData.getHearingOutcomes()) {
@@ -66,10 +64,17 @@ public class AmendHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbac
             }
         }
 
+        List<Hearing> hearingList = sscsCaseData.getCompletedHearingsList();
+
         for (int i = 0; i < hearingList.size(); i++) {
+
+            log.info("Beginning to set hearing outcome details for hearing ID: {}", hearingList.get(i).getValue().getHearingId());
+
             HearingOutcome hearingOutcome = sscsCaseData.getHearingOutcomes().get(i);
 
             String selectedHearingId =  hearingOutcome.getValue().getCompletedHearings().getValue().getCode();
+
+            log.info("Amend Hearing Outcome {} vs {}", selectedHearingId, hearingOutcome.getValue().getCompletedHearingId());
 
             if (selectedHearingId != hearingOutcome.getValue().getCompletedHearingId()) {
 
