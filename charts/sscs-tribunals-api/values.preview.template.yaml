@@ -143,7 +143,7 @@ em-stitching:
     image: hmctspublic.azurecr.io/em/stitching:latest
     ingressHost: em-stitching-${SERVICE_FQDN}
     environment:
-      SPRING_DATASOURCE_HOST: '{{ tpl .Values.global.postgresHostname $}}'
+      SPRING_DATASOURCE_HOST: '{{ .Values.global.postgresHostname }}'
       SPRING_DATASOURCE_NAME: "pr-${CHANGE_ID}-emstitch"
       SPRING_DATASOURCE_OPTIONS: "?ssl=disable"
       SPRING_DATASOURCE_PORT: 5432
