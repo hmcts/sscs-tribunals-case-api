@@ -24,7 +24,7 @@ java:
     IDAM_S2S-AUTH_TOTP_SECRET: ${IDAM_S2S_AUTH_TOTP_SECRET}
     IDAM_S2S-AUTH_MICROSERVICE: ${IDAM_S2S_AUTH_MICROSERVICE}
     IDAM_SSCS_SYSTEMUPDATE_USER: ${IDAM_SSCS_SYSTEMUPDATE_USER}
-    IDAM_SSCS_SYSTEMUPDATE_PASSWORD: ${IDAM_SSCS_SYSTEMUPDATE_PASSWORD}go
+    IDAM_SSCS_SYSTEMUPDATE_PASSWORD: ${IDAM_SSCS_SYSTEMUPDATE_PASSWORD}
     CREATE_CCD_ENDPOINT: true
     SECURE_DOC_STORE_FEATURE: true
     CASE_DOCUMENT_AM_URL: ${CASE_DOCUMENT_AM_URL}
@@ -134,17 +134,15 @@ em-ccdorc:
       CALLBACK_DOMAIN: em-ccdorc-${SERVICE_FQDN}
       LOGGING_LEVEL_UK_GOV_HMCTS_REFORM_EM: DEBUG
 
-
 em-stitching:
   enabled: true
   java:
-    imagePullPolicy: Always
-    releaseNameOverride: ${SERVICE_NAME}-em-stitching
     image: hmctspublic.azurecr.io/em/stitching:latest
+    releaseNameOverride: ${SERVICE_NAME}-em-stitching
     ingressHost: em-stitching-${SERVICE_FQDN}
     environment:
-      SPRING_DATASOURCE_HOST: '{{ .Values.global.postgresHostname }}'
-      SPRING_DATASOURCE_NAME: "{{ .Values.global.databaseNamePrefix }}emstitch"
+      SPRING_DATASOURCE_HOST: '{{ tpl .Values.global.postgresHostname $}}'
+      SPRING_DATASOURCE_NAME: "{{ tpl .Values.global.databaseNamePrefix $}}emstitch"
       SPRING_DATASOURCE_OPTIONS: "?ssl=disable"
       SPRING_DATASOURCE_PORT: 5432
       SPRING_DATASOURCE_USERNAME: "{{ tpl .Values.global.postgresUsername $}}"
