@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.amendhearingoutcome;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -16,7 +17,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.HearingOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.HmcHearingsApiService;
 
-import java.util.List;
 
 @Component
 @Slf4j
@@ -53,7 +53,7 @@ public class AmendHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbac
 
         List<Hearing> hearingList = sscsCaseData.getCompletedHearingsList();
 
-        for (int i=0; i<hearingList.size(); i++) {
+        for (int i = 0; i < hearingList.size(); i++) {
             HearingOutcome hearingOutcome = sscsCaseData.getHearingOutcomes().get(i);
 
             String selectedHearingId =  hearingOutcome.getValue().getCompletedHearings().getValue().getCode();
@@ -71,22 +71,6 @@ public class AmendHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbac
                 hearingOutcome.getValue().setEpimsId(selectedHearingDetails.getEpimsId());
             }
         }
-
-
-
-
-
-
-//        callback.getCaseDetails().getCaseData().getHearingOutcomes().get(0).getValue();
-
-
-
-//        get hearing outcome -> get hearing id -> overwrite hearing outcome
-
-//        loop through hearing outcome ->hearing 1: set did po attend to did po attend, set case outcome
-//        to case outcome, set hearing outcome to hearing outcome;
-
-
 
         sscsCaseData.setCompletedHearingsList(null);
 
