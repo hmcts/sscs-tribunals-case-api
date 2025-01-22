@@ -279,8 +279,6 @@ feature:
         enabled: ${SCOTTISH_PO_BOX_ENABLED:false}
     urgent-hearing:
         enabled: ${URGENT_HEARING_ENABLED:false}
-    bypass-notifications-service:
-        enabled: ${BYPASS_NOTIFICATIONS_SERVICE:false}
     hearings-case-updateV2:
         enabled: ${HEARINGS_CASE_UPDATE_V2_ENABLED:false}
 
@@ -2019,14 +2017,12 @@ spring:
             accept-case-insensitive-enums: true
             accept-case-insensitive-properties: true
 job.scheduler:
-    autoStart: ${BYPASS_NOTIFICATIONS_SERVICE:false}
     retryPolicy:
         maxNumberOfJobExecutions: 2
         delayBetweenAttemptsInMs: 1000
     quartzProperties:
         org.quartz:
             scheduler:
-                autoStartup: ${BYPASS_NOTIFICATIONS_SERVICE:false}
                 instanceId: AUTO
                 idleWaitTime: ${JOB_SCHEDULER_POLL_INTERVAL:10000}
             dataSource:

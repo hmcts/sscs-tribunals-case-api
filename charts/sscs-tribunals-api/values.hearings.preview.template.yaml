@@ -39,7 +39,6 @@ java:
     ELASTIC_SEARCH_FEATURE: true
     ELINKS_V2_FEATURE_ENABLED: true
     DELETED_REDACTED_DOC_ENABLED: true
-    BYPASS_NOTIFICATIONS_SERVICE: true
     TESTING_SUPPORT_ENABLED: true
     SEND_LETTER_SERVICE_ENABLED: "true"
     SEND_LETTER_SERVICE_BASEURL: "http://rpe-send-letter-service-aat.service.core-compute-aat.internal"
