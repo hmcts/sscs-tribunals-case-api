@@ -26,7 +26,7 @@ import uk.gov.hmcts.reform.sscs.service.HearingsService;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty({"feature.bypass-hearing-api-service.enabled", "flags.tribunals-to-hearings-api.enabled"})
+@ConditionalOnProperty("flags.tribunals-to-hearings-api.enabled")
 public class TribunalsHearingsEventQueueListener {
 
     private final HearingsService hearingsService;
@@ -37,9 +37,6 @@ public class TribunalsHearingsEventQueueListener {
 
     private final IdamService idamService;
 
-    @Value("${feature.bypass-hearing-api-service.enabled}")
-    private boolean isByPassHearingServiceEnabled;
-
     @Value("${feature.hearings-case-updateV2.enabled:false}")
     private boolean hearingsCaseUpdateV2Enabled;
 
@@ -48,12 +45,6 @@ public class TribunalsHearingsEventQueueListener {
             containerFactory = "tribunalsHearingsEventQueueContainerFactory"
     )
     public void handleIncomingMessage(HearingRequest message) throws TribunalsEventProcessingException, GetCaseException, UpdateCaseException {
-
-        log.info("isByPassHearingServiceEnabled ------------------------> {}", isByPassHearingServiceEnabled);
-        if (!isByPassHearingServiceEnabled) {
-            return;
-        }
-
         if (isNull(message)) {
             throw new TribunalsEventProcessingException("An exception occurred as message did not match format");
         }
