@@ -53,8 +53,9 @@ public class AmendHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbac
 
         List<String> hearingsSelected = null;
 
-        for (HearingOutcome checkHearingOutcomes : sscsCaseData.getHearingOutcomes()) {
-            String checkHearingId = checkHearingOutcomes.getValue().getCompletedHearingId();
+        for (HearingOutcome checkHearingOutcomes :  callback.getCaseDetails().getCaseData().getHearingOutcomes()) {
+            String checkHearingId =
+                    checkHearingOutcomes.getValue().getCompletedHearings().getValue().getCode();
             log.info("Checking hearing ID for Amend Hearing Outcome Event: {}", checkHearingId);
             if (hearingsSelected.contains(checkHearingId)) {
                 preSubmitCallbackResponse.addError("This hearing already has an outcome recorded.");
@@ -70,7 +71,7 @@ public class AmendHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbac
 
             log.info("Beginning to set hearing outcome details for hearing ID: {}", hearingList.get(i).getValue().getHearingId());
 
-            HearingOutcome hearingOutcome = sscsCaseData.getHearingOutcomes().get(i);
+            HearingOutcome hearingOutcome = callback.getCaseDetails().getCaseData().getHearingOutcomes().get(i);
 
             String selectedHearingId =  hearingOutcome.getValue().getCompletedHearings().getValue().getCode();
 
