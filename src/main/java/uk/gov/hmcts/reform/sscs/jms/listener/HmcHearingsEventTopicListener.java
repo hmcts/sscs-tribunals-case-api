@@ -12,12 +12,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.retry.ExhaustedRetryException;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.exception.CaseException;
 import uk.gov.hmcts.reform.sscs.exception.HearingUpdateException;
 import uk.gov.hmcts.reform.sscs.exception.HmcEventProcessingException;
 import uk.gov.hmcts.reform.sscs.exception.MessageProcessingException;
 import uk.gov.hmcts.reform.sscs.model.hmc.message.HmcMessage;
-import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageService;
+import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageServiceV2;
 
 @Slf4j
 @Component
@@ -28,7 +27,7 @@ public class HmcHearingsEventTopicListener {
 
     private final String sscsServiceCode;
 
-    private final ProcessHmcMessageService processHmcMessageService;
+    private final ProcessHmcMessageServiceV2 processHmcMessageServiceV2;
 
     @Value("${hmc.deployment-id}")
     private String hmctsDeploymentId;
@@ -40,9 +39,9 @@ public class HmcHearingsEventTopicListener {
     private static final String HMCTS_DEPLOYMENT_ID = "hmctsDeploymentId";
 
     public HmcHearingsEventTopicListener(@Value("${sscs.serviceCode}") String sscsServiceCode,
-                                         ProcessHmcMessageService processHmcMessageService) {
+                                         ProcessHmcMessageServiceV2 processHmcMessageServiceV2) {
         this.sscsServiceCode = sscsServiceCode;
-        this.processHmcMessageService = processHmcMessageService;
+        this.processHmcMessageServiceV2 = processHmcMessageServiceV2;
         this.objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
     }
@@ -79,10 +78,10 @@ public class HmcHearingsEventTopicListener {
                     hearingId
                 );
 
-                processHmcMessageService.processEventMessage(hmcMessage);
+                processHmcMessageServiceV2.processEventMessage(hmcMessage);
 
             }
-        } catch (JsonProcessingException | CaseException | MessageProcessingException
+        } catch (JsonProcessingException | MessageProcessingException
                  | HearingUpdateException | ExhaustedRetryException ex) {
             log.error("Unable to successfully deliver HMC message: {}", convertedMessage, ex);
             throw new HmcEventProcessingException(String.format(
