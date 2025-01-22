@@ -53,10 +53,10 @@ java:
     HEARING_RECORDING_REQUEST_CASE_UPDATE_V2_ENABLED: true
     COH_URL: "http://coh-cor-aat.service.core-compute-aat.internal"
     ONLINE_HEARING_LINK: "https://sscs-cor-frontend-aat.service.core-compute-aat.internal"
-    JOB_SCHEDULER_DB_NAME: "pr-${CHANGE_ID}-sscs-job-scheduler"
+    JOB_SCHEDULER_DB_NAME: "{{ tpl .Values.global.databaseNamePrefix $}}sscs-job-scheduler"
     JOB_SCHEDULER_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
     JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
-    JOB_SCHEDULER_DB_USERNAME: hmcts
+    JOB_SCHEDULER_DB_USERNAME: "{{ tpl .Values.global.postgresUsername $}}"
     HOURS_START_TIME: 0
     HOURS_END_TIME: 23
     RUN_DB_MIGRATION_ON_STARTUP: true
