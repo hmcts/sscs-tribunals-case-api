@@ -65,7 +65,7 @@ amqp:
     clientId: sscs-evidence-share
     amqp-connection-string-template: ${JMS_AMQP_CONNECTION_TEMPLATE:amqps://%1s?amqp.idleTimeout=%2d}
     idleTimeout: ${JMS_IDLE_TIMEOUT:3600000}
-    reconnectOnException: ${AMQP_RECONNECT_ON_EXCEPTION:true}
+    reconnectOnException: ${AMQP_RECONNECT_ON_EXCEPTION:false}
     prefetch:
         override: ${AMQP_PREFETCH_OVERRIDE:false}
         topicPrefetch: ${AMQP_TOPIC_PREFETCH:1}
@@ -281,8 +281,6 @@ feature:
         enabled: ${URGENT_HEARING_ENABLED:false}
     bypass-notifications-service:
         enabled: ${BYPASS_NOTIFICATIONS_SERVICE:false}
-    bypass-hearing-api-service:
-        enabled: ${BYPASS_HEARING_API_SERVICE:false}
     hearings-case-updateV2:
         enabled: ${HEARINGS_CASE_UPDATE_V2_ENABLED:false}
 
