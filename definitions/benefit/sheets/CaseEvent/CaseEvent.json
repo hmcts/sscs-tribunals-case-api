@@ -193,6 +193,7 @@
     "Name": "Add case outcome",
     "Description": "Add a case outcome",
     "DisplayOrder": 141,
+    "EventEnablingCondition": "caseOutcome=\"DONOTSHOW\"",
     "PreConditionState(s)": "dormantAppealState;postHearing;withUT;hearing;readyToList",
     "PostConditionState": "*",
     "ShowEventNotes": "Y",
@@ -3284,7 +3285,7 @@
     "CaseTypeID": "Benefit",
     "ID": "removeGapsOutcomeTab",
     "Name": "Outcome tab removed as it is Gaps case",
-    "DisplayOrder": 1302,
+    "DisplayOrder": 1303,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
     "SecurityClassification": "Public"
