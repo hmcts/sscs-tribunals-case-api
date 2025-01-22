@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.sscs.config.JsonMessageConverter;
 
 @Slf4j
 @Configuration
-@ConditionalOnProperty({"feature.bypass-hearing-api-service.enabled", "flags.tribunals-to-hearings-api.enabled"})
+@ConditionalOnProperty("flags.tribunals-to-hearings-api.enabled")
 public class TribunalsHearingsJmsConfig {
 
     @Value("${azure.service-bus.tribunals-to-hearings-api.namespace}")
