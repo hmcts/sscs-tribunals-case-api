@@ -49,7 +49,6 @@ java:
     ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
     ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
     ISSUE_GENERIC_LETTER: true
-    HEARING_RECORDING_REQUEST_CASE_UPDATE_V2_ENABLED: true
     COH_URL: "http://coh-cor-aat.service.core-compute-aat.internal"
     ONLINE_HEARING_LINK: "https://sscs-cor-frontend-aat.service.core-compute-aat.internal"
     JOB_SCHEDULER_DB_NAME: "pr-${CHANGE_ID}-sscs-job-scheduler"
@@ -196,7 +195,7 @@ xui-webapp:
           - mc-idam-client-secret
           - system-user-name
           - system-user-password
-          
+
 global:
   ccdApiGatewayIngress: http://${SERVICE_NAME}-ccd-api-gw
   ccdAdminWebIngress: ${SERVICE_NAME}-ccd-admin-web
