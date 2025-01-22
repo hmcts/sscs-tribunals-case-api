@@ -751,13 +751,13 @@ notification:
                     docmosisId: TB-SCS-GNO-ENG-00584.docx
             refuseReinstatement:
                 appellant:
-                    docmosisId: TB-SCS-GNO-ENG-00585.docx
+                    docmosisId: TB-SCS-GNO-ENG-00585-v2.docx
                 appointee:
-                    docmosisId: TB-SCS-GNO-ENG-00585.docx
+                    docmosisId: TB-SCS-GNO-ENG-00585-v2.docx
                 representative:
-                    docmosisId: TB-SCS-GNO-ENG-00585.docx
+                    docmosisId: TB-SCS-GNO-ENG-00585-v2.docx
                 other_party:
-                    docmosisId: TB-SCS-GNO-ENG-00585.docx
+                    docmosisId: TB-SCS-GNO-ENG-00585-v2.docx
             grantUrgentHearing:
                 appellant:
                     docmosisId: TB-SCS-GNO-ENG-00635.docx
@@ -1390,13 +1390,13 @@ notification:
                     docmosisId: TB-SCS-GNO-WEL-00586.docx
             refuseReinstatement:
                 appellant:
-                    docmosisId: TB-SCS-GNO-WEL-00587.docx
+                    docmosisId: TB-SCS-GNO-WEL-00587-v2.docx
                 appointee:
-                    docmosisId: TB-SCS-GNO-WEL-00587.docx
+                    docmosisId: TB-SCS-GNO-WEL-00587-v2.docx
                 representative:
-                    docmosisId: TB-SCS-GNO-WEL-00587.docx
+                    docmosisId: TB-SCS-GNO-WEL-00587-v2.docx
                 other_party:
-                    docmosisId: TB-SCS-GNO-WEL-00587.docx
+                    docmosisId: TB-SCS-GNO-WEL-00587-v2.docx
             refuseHearingRecordingRequest:
                 appellant:
                     docmosisId: TB-SCS-GNO-WEL-00468.docx
