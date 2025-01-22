@@ -3268,5 +3268,15 @@
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
     "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "17/01/2025",
+    "CaseTypeID": "Benefit",
+    "ID": "clearExpiredFilters",
+    "Name": "Cleared expired filters",
+    "DisplayOrder": 1302,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public"
   }
 ]
