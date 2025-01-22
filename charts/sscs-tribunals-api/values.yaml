@@ -153,7 +153,6 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     SSCS_SERVICE_CODE: BBA3
     HMC_DEPLOYMENT_FILTER_ENABLED: false
     HEARINGS_CASE_UPDATE_V2_ENABLED: true
-    BYPASS_HEARING_API_SERVICE: true
 
 postgresql:
   enabled: false
