@@ -18,7 +18,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
@@ -57,8 +56,6 @@ class TribunalsHearingsEventTopicListenerTest {
     @Test
     @DisplayName("When a valid request comes in make sure processHearingRequest is hit")
     void whenAValidRequestComesIn_makeSureProcessHearingRequestIsHit() throws Exception {
-
-        ReflectionTestUtils.setField(tribunalsHearingsEventQueueListener, "isByPassHearingServiceEnabled", true);
         HearingRequest hearingRequest = createHearingRequest();
 
         tribunalsHearingsEventQueueListener.handleIncomingMessage(hearingRequest);
@@ -70,7 +67,6 @@ class TribunalsHearingsEventTopicListenerTest {
     @DisplayName("When an invalid request comes in make sure exception is thrown")
     @MethodSource("throwableParameters")
     void whenAnInvalidRequestComesIn_makeSureExceptionIsThrown(Class<? extends Throwable> throwable) throws Exception {
-        ReflectionTestUtils.setField(tribunalsHearingsEventQueueListener, "isByPassHearingServiceEnabled", true);
         HearingRequest hearingRequest = new HearingRequest();
 
         doThrow(throwable).when(hearingsService).processHearingRequest(hearingRequest);
@@ -88,7 +84,6 @@ class TribunalsHearingsEventTopicListenerTest {
     @Test
     @DisplayName("When an null request comes in make sure exception is thrown")
     void whenAnNullRequestComesIn_makeSureExceptionIsThrown() {
-        ReflectionTestUtils.setField(tribunalsHearingsEventQueueListener, "isByPassHearingServiceEnabled", true);
         assertThrows(TribunalsEventProcessingException.class, () -> tribunalsHearingsEventQueueListener.handleIncomingMessage(null));
     }
 
@@ -102,7 +97,6 @@ class TribunalsHearingsEventTopicListenerTest {
     @Test
     @DisplayName("When a listing exception is thrown, with hearingsCaseUpdateV2Enabled, catch the error and update the state")
     void whenListingExceptionThrownWithV2Enabled_UpdateCaseDataState() throws Exception {
-        ReflectionTestUtils.setField(tribunalsHearingsEventQueueListener, "isByPassHearingServiceEnabled", true);
         SscsCaseData caseData = SscsCaseData.builder().build();
         SscsCaseDetails caseDetails = SscsCaseDetails.builder().data(caseData).build();
         HearingRequest hearingRequest = createHearingRequest();
