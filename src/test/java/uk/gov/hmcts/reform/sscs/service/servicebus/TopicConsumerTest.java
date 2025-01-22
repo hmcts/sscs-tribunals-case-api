@@ -42,7 +42,7 @@ public class TopicConsumerTest {
 
     @Before
     public void setup() {
-        topicConsumer = new TopicConsumer(RETRY_THREE_TIMES, dispatcher, deserializer, notificationsMessageProcessor, false);
+        topicConsumer = new TopicConsumer(RETRY_THREE_TIMES, dispatcher, deserializer, notificationsMessageProcessor);
     }
 
     @Test
@@ -134,7 +134,7 @@ public class TopicConsumerTest {
 
     @Test
     public void shouldProcessMessageForNotifications() {
-        topicConsumer = new TopicConsumer(RETRY_THREE_TIMES, dispatcher, deserializer, notificationsMessageProcessor, true);
+        topicConsumer = new TopicConsumer(RETRY_THREE_TIMES, dispatcher, deserializer, notificationsMessageProcessor);
         topicConsumer.onMessage(MESSAGE, "1");
         verify(notificationsMessageProcessor).processMessage(MESSAGE, "1");
     }
