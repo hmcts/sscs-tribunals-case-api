@@ -106,15 +106,6 @@ public class PdfStoreService {
         }
     }
 
-    public SscsDocument storeSecureDocStore(byte[] content, String fileName, String documentType, SscsDocumentTranslationStatus documentTranslationStatus) {
-        return storeSecureDocStore(UpdateDocParams.builder()
-                .pdf(content)
-                .fileName(fileName)
-                .documentType(documentType)
-                .documentTranslationStatus(documentTranslationStatus)
-                .build());
-    }
-
     public SscsDocument storeSecureDocStore(UpdateDocParams updateDocParams) {
         ByteArrayMultipartFile file = ByteArrayMultipartFile.builder().content(updateDocParams.getPdf()).name(updateDocParams.getFileName())
                 .contentType(APPLICATION_PDF).build();
