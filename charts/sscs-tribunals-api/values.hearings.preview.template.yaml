@@ -39,7 +39,6 @@ java:
     ELASTIC_SEARCH_FEATURE: true
     ELINKS_V2_FEATURE_ENABLED: true
     DELETED_REDACTED_DOC_ENABLED: true
-    BYPASS_NOTIFICATIONS_SERVICE: true
     TESTING_SUPPORT_ENABLED: true
     SEND_LETTER_SERVICE_ENABLED: "true"
     SEND_LETTER_SERVICE_BASEURL: "http://rpe-send-letter-service-aat.service.core-compute-aat.internal"
@@ -81,9 +80,7 @@ java:
     HMC_HEARINGS_TOPIC_NAMESPACE: "hmc-servicebus-aat"
     HMC_DEPLOYMENT_ID: "deployment-${SERVICE_NAME}"
     HMC_DEPLOYMENT_FILTER_ENABLED: true
-    HEARINGS_CASE_UPDATE_V2_ENABLED: true
     ADJOURNMENT_ENABLED: true
-    BYPASS_HEARING_API_SERVICE: true
   secrets:
     JOB_SCHEDULER_DB_PASSWORD:
       secretRef: postgres
