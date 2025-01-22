@@ -67,7 +67,7 @@ public class DocumentConfigurationTest {
 
     @Test
     @Parameters(method = "documentParameters")
-    public void testDocumnetConfig(LanguagePreference languagePreference, EventType eventType, Optional<String> benefitType, String documentName) {
+    public void testDocumentConfig(LanguagePreference languagePreference, EventType eventType, Optional<String> benefitType, String documentName) {
         if (benefitType.isPresent()) {
             assertThat(config.getBenefitSpecificDocuments().get(benefitType.get()).get(languagePreference).get(eventType)).isEqualTo(documentName);
         } else {
@@ -86,6 +86,4 @@ public class DocumentConfigurationTest {
     public void testCoverPage(LanguagePreference languagePreference, String documentName) {
         assertThat(config.getCover().get(languagePreference)).isEqualTo(documentName);
     }
-
-
 }
