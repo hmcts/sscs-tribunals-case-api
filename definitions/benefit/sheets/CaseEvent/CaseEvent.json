@@ -3284,7 +3284,7 @@
     "LiveFrom": "22/01/2025",
     "CaseTypeID": "Benefit",
     "ID": "removeGapsOutcomeTab",
-    "Name": "Outcome tab removed as it is Gaps case",
+    "Name": "Outcome Tab Removed",
     "DisplayOrder": 1303,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
