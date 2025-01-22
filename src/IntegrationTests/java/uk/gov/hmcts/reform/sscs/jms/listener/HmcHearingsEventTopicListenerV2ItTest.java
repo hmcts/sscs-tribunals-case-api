@@ -56,7 +56,7 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.RequestDetails;
 import uk.gov.hmcts.reform.sscs.service.CcdCaseService;
 import uk.gov.hmcts.reform.sscs.service.HmcHearingApi;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
-import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageService;
+import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageServiceV2;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -74,7 +74,7 @@ public class HmcHearingsEventTopicListenerV2ItTest {
     private ObjectMapper mapper;
 
     @Autowired
-    private ProcessHmcMessageService processHmcMessageService;
+    private ProcessHmcMessageServiceV2 processHmcMessageServiceV2;
 
     @MockBean
     private JmsBytesMessage bytesMessage;
@@ -97,7 +97,7 @@ public class HmcHearingsEventTopicListenerV2ItTest {
     @Test
     public void testHearingsUpdateV2() throws JMSException, HmcEventProcessingException, JsonProcessingException, CaseException, MessageProcessingException {
 
-        hmcHearingsEventTopicListener = new HmcHearingsEventTopicListener("BBA3", processHmcMessageService);
+        hmcHearingsEventTopicListener = new HmcHearingsEventTopicListener("BBA3", processHmcMessageServiceV2);
         ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "objectMapper", mapper);
 
         HmcMessage hmcMessage = createHmcMessage("BBA3");
