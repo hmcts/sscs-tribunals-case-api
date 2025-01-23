@@ -125,7 +125,6 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     EMAIL_SERVER_PORT: "25"
     EMAIL_SMTP_TLS_ENABLED: "true"
     EMAIL_SMTP_SSL_TRUST: "*"
-    HEARING_RECORDING_REQUEST_CASE_UPDATE_V2_ENABLED: false
     CALLBACK_MAX_RETRY_ATTEMPTS: 3
     SSCS_TRACK_YOUR_APPEAL_LINK: https://track-appeal.nonprod.platform.hmcts.net/trackyourappeal/appeal_id
     JOB_SCHEDULER_DB_USERNAME: pgadmin
