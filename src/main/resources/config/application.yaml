@@ -666,7 +666,7 @@ notification:
                 letterId: 747d026e-1bec-4e96-8a34-28f36e30bba5
         validAppealCreated:
             appellant:
-                emailId: 9b5a6ac7-a1ad-4fc2-8e83-b0f32af9ff32
+                emailId: 4917669f-d1b4-4748-851f-f10b90f27da3
                 smsId: f41222ef-c05c-4682-9634-6b034a166368
             representative:
                 emailId: 652753bf-59b4-46eb-9c24-bd762338a098
@@ -1305,7 +1305,7 @@ notification:
                 letterId: 95b0b0f8-fdf6-450f-b805-6aab46d63bf7
         validAppealCreated:
             appellant:
-                emailId: e3fa02fd-87b2-471c-9a99-7020b367eca9
+                emailId: 8910e2d2-4332-4ef6-a4b5-025ffad4f17d
                 smsId: 6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82
             representative:
                 emailId: 364bccc5-ffa6-495d-8035-e642d15114bf
