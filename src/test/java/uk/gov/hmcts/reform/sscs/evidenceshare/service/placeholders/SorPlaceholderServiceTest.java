@@ -138,4 +138,31 @@ public class SorPlaceholderServiceTest {
         var appellantName = caseData.getAppeal().getAppellant().getName().getFullNameNoTitle();
         assertEquals(appellantName, placeholders.get(APPELLANT_NAME));
     }
+
+    @Test
+    void shouldReturnDirectionHearingPlaceholder() {
+        caseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder().overrideFields(OverrideFields.builder().hmcHearingType(HmcHearingType.DIRECTION_HEARINGS).build()).build());
+        var placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER,
+            Appointee.class.getSimpleName(), null);
+
+        assertEquals("BBA3-DIR", placeholders.get(HMC_HEARING_TYPE_LITERAL));
+    }
+
+    @Test
+    void shouldReturnSubstantiveHearingPlaceholder() {
+        caseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder().overrideFields(OverrideFields.builder().hmcHearingType(HmcHearingType.SUBSTANTIVE).build()).build());
+        var placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER,
+            Appointee.class.getSimpleName(), null);
+
+        assertEquals("BBA3-SUB", placeholders.get(HMC_HEARING_TYPE_LITERAL));
+    }
+
+    @Test
+    void shouldReturnSubstantiveDueToNullHearingPlaceholder() {
+        caseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder().overrideFields(OverrideFields.builder().hmcHearingType(null).build()).build());
+        var placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER,
+            Appointee.class.getSimpleName(), null);
+
+        assertEquals("BBA3-SUB", placeholders.get(HMC_HEARING_TYPE_LITERAL));
+    }
 }
