@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+  <title>Sent Notification</title>
+</head>
+<body>
+Sent on: {{sentOn}}<br/>
+From: {{from}}<br/>
+To: {{to}}<br/>
+Subject: {{subject}}<br/>
+<hr/>
+{{body | raw}}
+</body>
+</html>
