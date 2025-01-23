@@ -35,9 +35,6 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
 
     private final VerbalLanguagesService verbalLanguagesService;
 
-    @Value("${feature.infected-blood-compensation.enabled}")
-    private boolean isInfectedBloodCompensationEnabled;
-
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
@@ -95,7 +92,7 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
         BenefitType benefitType = sscsCaseData.getAppeal().getBenefitType();
 
         if (!isNull(benefitType)) {
-            DynamicList benefitDescriptions = SscsUtil.getBenefitDescriptions(isInfectedBloodCompensationEnabled);
+            DynamicList benefitDescriptions = SscsUtil.getBenefitDescriptions();
             DynamicListItem selectedBenefit = getSelectedDynamicListItem(benefitDescriptions.getListItems(), sscsCaseData.getBenefitCode());
             benefitDescriptions.setValue(selectedBenefit);
             benefitType.setDescriptionSelection(benefitDescriptions);

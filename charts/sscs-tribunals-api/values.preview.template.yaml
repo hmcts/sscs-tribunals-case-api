@@ -59,7 +59,6 @@ java:
     HOURS_END_TIME: 23
     RUN_DB_MIGRATION_ON_STARTUP: true
     TEST_RECIPIENTS_POSTCODE: "*"
-    INFECTED_BLOOD_COMPENSATION_ENABLED: true
     # START - SSCS-IB RELEASE VARIABLES
     DOCUMENTS_ENGLISH_DIRECTION_ISSUED: TB-SCS-GNO-ENG-directions-notice-v2.docx
     DOCUMENTS_WELSH_DIRECTION_ISSUED: TB-SCS-GNO-ENG-directions-notice-v2.docx
@@ -574,7 +573,6 @@ sscs-tribunals-frontend:
       SERVICES_IDAM_LOGIN_URL: https://idam-web-public.aat.platform.hmcts.net/login
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       UV_THREADPOOL_SIZE: 64
-      INFECTED_BLOOD_COMPENSATION_ENABLED: true
     keyVaults:
       sscs:
         secrets:
