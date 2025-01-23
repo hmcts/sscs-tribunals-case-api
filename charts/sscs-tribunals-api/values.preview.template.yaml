@@ -570,7 +570,7 @@ sscs-tribunals-frontend:
       MULTIPLE_DRAFTS_ENABLED: true
       ALLOW_CONFIG_MUTATIONS: true
       TRIBUNALS_CASE_API_URL: http://${SERVICE_NAME}-java
-      UPLOAD_EVIDENCE_URL: http://${SERVICE_NAME}/evidence/upload
+      UPLOAD_EVIDENCE_URL: http://${SERVICE_NAME}-java/evidence/upload
       SERVICES_IDAM_LOGIN_URL: https://idam-web-public.aat.platform.hmcts.net/login
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       UV_THREADPOOL_SIZE: 64
