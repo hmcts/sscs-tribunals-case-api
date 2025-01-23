@@ -146,6 +146,26 @@ public class ReadyToListAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenAnIbcCase_shouldSuccessfullySendAHearingRequestMessageWithListAssist() {
+        buildRegionalProcessingCentreMap(HearingRoute.LIST_ASSIST);
+        when(sessionAwareServiceBusMessagingService.sendMessage(any())).thenReturn(true);
+
+        handler = new ReadyToListAboutToSubmitHandler(true, regionalProcessingCenterService,
+            hearingMessagingServiceFactory);
+
+        sscsCaseData = sscsCaseData.toBuilder().benefitCode("093").region("TEST").build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getData().getSchedulingAndListingFields().getHearingRoute()).isEqualTo(HearingRoute.LIST_ASSIST);
+        assertThat(response.getData().getSchedulingAndListingFields().getHearingState()).isEqualTo(HearingState.CREATE_HEARING);
+
+        assertThat(response.getErrors())
+            .as("A successfully sent message should not result in any errors.").isEmpty();
+    }
+
+    @Test
     public void givenAnRpcUsingListAssistAndAnExistingGapsCase_shouldResolveToGaps() {
         buildRegionalProcessingCentreMap(HearingRoute.LIST_ASSIST);
         when(sessionAwareServiceBusMessagingService.sendMessage(any())).thenReturn(true);
