@@ -821,13 +821,13 @@ notification:
                 docmosisId: TB-SCS-GNO-ENG-00795.docx
         issueAdjournmentNotice:
             appellant:
-                docmosisId: TB-SCS-GNO-ENG-00510.docx
+                docmosisId: TB-SCS-GNO-ENG-00510-v2.docx
             appointee:
-                docmosisId: TB-SCS-GNO-ENG-00510.docx
+                docmosisId: TB-SCS-GNO-ENG-00510-v2.docx
             representative:
                 docmosisId: TB-SCS-GNO-ENG-00512.docx
             joint_party:
-                docmosisId: TB-SCS-GNO-ENG-00510.docx
+                docmosisId: TB-SCS-GNO-ENG-00510-v2.docx
             other_party:
                 docmosisId: TB-SCS-GNO-ENG-00512.docx
         requestForInformation:
