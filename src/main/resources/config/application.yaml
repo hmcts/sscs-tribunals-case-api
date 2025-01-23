@@ -113,9 +113,15 @@ azure:
 
 bundle:
     english:
-        config: ${BUNDLE_ENGLISH_CONFIG:sscs-bundle-config.yaml}
+        config: sscs-bundle-config.yaml
         edited:
-            config: ${BUNDLE_EDITED_CONFIG:sscs-bundle-edited-config.yaml}
+            config: sscs-bundle-edited-config.yaml
+    welsh:
+        config: sscs-bundle-welsh-config.yaml
+        edited:
+            config: sscs-bundle-welsh-edited-config.yaml
+    url: ${BUNDLE_URL:http://localhost:4623}
+    # Below may be redundant
     new:
         edited:
             config: ${BUNDLE_EDITED_CONFIG:sscs-new-bundle-edited-config.yaml}
@@ -129,11 +135,6 @@ bundle:
                 config: ${BUNDLE_WELSH_EDITED_CONFIG:sscs-new-bundle-welsh-edited-config.yaml}
             unedited:
                 config: ${BUNDLE_WELSH_UNEDITED_CONFIG:sscs-new-bundle-welsh-unedited-config.yaml}
-    url: ${BUNDLE_URL:http://localhost:4623}
-    welsh:
-        config: ${BUNDLE_WELSH_CONFIG:sscs-bundle-welsh-config.yaml}
-        edited:
-            config: ${BUNDLE_WELSH_EDITED_CONFIG:sscs-bundle-welsh-edited-config.yaml}
 case_document_am:
     url: ${CASE_DOCUMENT_AM_URL:http://localhost:4455}
 
