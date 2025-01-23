@@ -77,7 +77,7 @@ public class CcdNotificationsPdfService {
         sscsCaseData.setCorrespondence(allCorrespondence);
 
         SscsCaseDetails caseDetails = updateCaseInCcd(sscsCaseData, Long.parseLong(sscsCaseData.getCcdCaseId()), EventType.NOTIFICATION_SENT.getCcdType(),
-                idamService.getIdamTokens(), "Notification sent via Gov Notify");
+            idamService.getIdamTokens(), "Notification sent via Gov Notify");
 
         return caseDetails.getData();
     }
@@ -104,7 +104,7 @@ public class CcdNotificationsPdfService {
             updateCcdCaseService.updateCaseV2(caseId, EventType.NOTIFICATION_SENT.getCcdType(), NOTIFICATION_SENT, "Notification sent via Gov Notify", idamService.getIdamTokens(), caseDataConsumer);
         } catch (CcdException ccdEx) {
             log.error("Failed to update ccd case using v2 but carrying on [" + caseId + "] ["
-                    + caseId + "] with event [" + EventType.NOTIFICATION_SENT.getCcdType() + "]", ccdEx);
+                + caseId + "] with event [" + EventType.NOTIFICATION_SENT.getCcdType() + "]", ccdEx);
         }
     }
 
@@ -127,7 +127,7 @@ public class CcdNotificationsPdfService {
 
         String description = String.format("Notification sent via %s", senderType);
         SscsCaseDetails caseDetails = updateCaseInCcd(sscsCaseData, Long.parseLong(sscsCaseData.getCcdCaseId()), EventType.NOTIFICATION_SENT.getCcdType(),
-                idamTokens, description);
+            idamTokens, description);
 
         return caseDetails.getData();
     }
@@ -152,14 +152,14 @@ public class CcdNotificationsPdfService {
         log.info("Updating ccd case using v2 for {} with event {}", ccdCaseId, EventType.NOTIFICATION_SENT.getCcdType());
         try {
             updateCcdCaseService.updateCaseV2(ccdCaseId,
-                    EventType.NOTIFICATION_SENT.getCcdType(),
-                    NOTIFICATION_SENT,
-                    description,
-                    idamService.getIdamTokens(),
-                    caseDataConsumer);
+                EventType.NOTIFICATION_SENT.getCcdType(),
+                NOTIFICATION_SENT,
+                description,
+                idamService.getIdamTokens(),
+                caseDataConsumer);
         } catch (CcdException ccdEx) {
             log.error("Failed to update ccd case using v2 but carrying on [" + ccdCaseId + "] ["
-                    + ccdCaseId + "] with event [" + EventType.NOTIFICATION_SENT.getCcdType() + "]", ccdEx);
+                + ccdCaseId + "] with event [" + EventType.NOTIFICATION_SENT.getCcdType() + "]", ccdEx);
         }
     }
 
@@ -193,7 +193,7 @@ public class CcdNotificationsPdfService {
         log.info("Creating a reasonable adjustment for {}", ccdCaseId);
 
         SscsCaseDetails caseDetails = updateCaseV2InCcd(caseDetailsConsumer, ccdCaseId, EventType.STOP_BULK_PRINT_FOR_REASONABLE_ADJUSTMENT.getCcdType(),
-                idamTokens, "Stopped for reasonable adjustment to be sent");
+            idamTokens, "Stopped for reasonable adjustment to be sent");
 
         return caseDetails.getData();
     }
@@ -210,22 +210,22 @@ public class CcdNotificationsPdfService {
         Consumer<SscsCaseDetails> caseDataConsumer = sscsCaseDetails -> {
             SscsCaseData sscsCaseData = sscsCaseDetails.getData();
             sscsCaseData.setReasonableAdjustmentsLetters(
-                    buildCorrespondenceByParty(sscsCaseData, correspondenceList, letterType));
+                buildCorrespondenceByParty(sscsCaseData, correspondenceList, letterType));
             sscsCaseData.updateReasonableAdjustmentsOutstanding();
         };
 
         log.info("Creating a reasonable adjustment using v2 for {} with event {}", ccdCaseId, EventType.STOP_BULK_PRINT_FOR_REASONABLE_ADJUSTMENT.getCcdType());
         try {
             updateCcdCaseService.updateCaseV2(
-                    ccdCaseId,
-                    EventType.STOP_BULK_PRINT_FOR_REASONABLE_ADJUSTMENT.getCcdType(),
-                    "Stop bulk print",
-                    "Stopped for reasonable adjustment to be sent",
-                    idamService.getIdamTokens(),
-                    caseDataConsumer);
+                ccdCaseId,
+                EventType.STOP_BULK_PRINT_FOR_REASONABLE_ADJUSTMENT.getCcdType(),
+                "Stop bulk print",
+                "Stopped for reasonable adjustment to be sent",
+                idamService.getIdamTokens(),
+                caseDataConsumer);
         } catch (CcdException ccdEx) {
             log.error("Failed to update ccd case using v2 but carrying on [" + ccdCaseId + "] ["
-                    + ccdCaseId + "] with event [" + EventType.NOTIFICATION_SENT.getCcdType() + "]", ccdEx);
+                + ccdCaseId + "] with event [" + EventType.NOTIFICATION_SENT.getCcdType() + "]", ccdEx);
         }
     }
 
@@ -272,7 +272,7 @@ public class CcdNotificationsPdfService {
             return ccdService.updateCaseWithoutRetry(caseData, caseId, eventId, NOTIFICATION_SENT, description, idamTokens);
         } catch (CcdException ccdEx) {
             log.error("Failed to update ccd case but carrying on [" + caseId + "] ["
-                    + caseData.getCaseReference() + "] with event [" + eventId + "]", ccdEx);
+                + caseData.getCaseReference() + "] with event [" + eventId + "]", ccdEx);
             return SscsCaseDetails.builder().build();
         }
     }
@@ -282,7 +282,7 @@ public class CcdNotificationsPdfService {
             return updateCcdCaseService.updateCaseV2WithoutRetry(caseId, eventId, NOTIFICATION_SENT, description, idamTokens, caseDetailsConsumer);
         } catch (CcdException ccdEx) {
             log.error("Failed to update ccd case using v2 but carrying on [" + caseId + "] ["
-                    + caseId + "] with event [" + eventId + "]", ccdEx);
+                + caseId + "] with event [" + eventId + "]", ccdEx);
             return SscsCaseDetails.builder().build();
         }
     }
@@ -311,12 +311,12 @@ public class CcdNotificationsPdfService {
     @NotNull
     private List<Correspondence> getCorrespondences(byte[] pdf, Correspondence correspondence) {
         String filename = String.format("%s %s.pdf",
-        removeDwpFromStartOfEventName(correspondence.getValue().getEventType()), correspondence.getValue().getSentOn());
+            removeDwpFromStartOfEventName(correspondence.getValue().getEventType()), correspondence.getValue().getSentOn());
         List<SscsDocument> pdfDocuments = pdfStoreService.store(pdf, filename, correspondence.getValue().getCorrespondenceType().name());
         return pdfDocuments.stream().map(doc ->
-                correspondence.toBuilder().value(correspondence.getValue().toBuilder()
-                        .documentLink(doc.getValue().getDocumentLink())
-                        .build()).build()
+            correspondence.toBuilder().value(correspondence.getValue().toBuilder()
+                .documentLink(doc.getValue().getDocumentLink())
+                .build()).build()
         ).toList();
     }
 
@@ -341,9 +341,9 @@ public class CcdNotificationsPdfService {
             removeDwpFromStartOfEventName(correspondence.getValue().getEventType()), correspondence.getValue().getSentOn());
         List<SscsDocument> pdfDocuments = pdfStoreService.store(pdf, filename, correspondence.getValue().getCorrespondenceType().name());
         return pdfDocuments.stream().map(doc ->
-                correspondence.toBuilder().value(correspondence.getValue().toBuilder()
-                        .documentLink(doc.getValue().getDocumentLink())
-                        .build()).build()
+            correspondence.toBuilder().value(correspondence.getValue().toBuilder()
+                .documentLink(doc.getValue().getDocumentLink())
+                .build()).build()
         ).toList();
     }
 
