@@ -310,7 +310,8 @@ public class CcdNotificationsPdfService {
 
     @NotNull
     private List<Correspondence> getCorrespondences(byte[] pdf, Correspondence correspondence) {
-        String filename = String.format("%s %s.pdf", correspondence.getValue().getEventType(), correspondence.getValue().getSentOn());
+        String filename = String.format("%s %s.pdf",
+        removeDwpFromStartOfEventName(correspondence.getValue().getEventType()), correspondence.getValue().getSentOn());
         List<SscsDocument> pdfDocuments = pdfStoreService.store(pdf, filename, correspondence.getValue().getCorrespondenceType().name());
         return pdfDocuments.stream().map(doc ->
                 correspondence.toBuilder().value(correspondence.getValue().toBuilder()
@@ -336,12 +337,19 @@ public class CcdNotificationsPdfService {
         }
 
         byte[] pdf = pdfServiceClient.generateFromHtml(template, placeholders);
-        String filename = String.format("%s %s.pdf", correspondence.getValue().getEventType(), correspondence.getValue().getSentOn());
+        String filename = String.format("%s %s.pdf",
+            removeDwpFromStartOfEventName(correspondence.getValue().getEventType()), correspondence.getValue().getSentOn());
         List<SscsDocument> pdfDocuments = pdfStoreService.store(pdf, filename, correspondence.getValue().getCorrespondenceType().name());
         return pdfDocuments.stream().map(doc ->
                 correspondence.toBuilder().value(correspondence.getValue().toBuilder()
                         .documentLink(doc.getValue().getDocumentLink())
                         .build()).build()
         ).toList();
+    }
+
+    private String removeDwpFromStartOfEventName(String eventType) {
+        return eventType.startsWith("dwp")
+            ? eventType.substring(3, 4).toLowerCase() + eventType.substring(4)
+            : eventType;
     }
 }
