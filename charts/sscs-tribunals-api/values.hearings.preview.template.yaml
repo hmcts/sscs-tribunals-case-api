@@ -39,8 +39,6 @@ java:
     ELASTIC_SEARCH_FEATURE: true
     ELINKS_V2_FEATURE_ENABLED: true
     DELETED_REDACTED_DOC_ENABLED: true
-    CITIZEN_LOGIN_SERVICE_V2: true
-    BYPASS_NOTIFICATIONS_SERVICE: true
     TESTING_SUPPORT_ENABLED: true
     SEND_LETTER_SERVICE_ENABLED: "true"
     SEND_LETTER_SERVICE_BASEURL: "http://rpe-send-letter-service-aat.service.core-compute-aat.internal"
@@ -54,7 +52,6 @@ java:
     ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
     ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
     ISSUE_GENERIC_LETTER: true
-    HEARING_RECORDING_REQUEST_CASE_UPDATE_V2_ENABLED: true
     COH_URL: "http://coh-cor-aat.service.core-compute-aat.internal"
     ONLINE_HEARING_LINK: "https://sscs-cor-frontend-aat.service.core-compute-aat.internal"
     JOB_SCHEDULER_DB_NAME: "pr-${CHANGE_ID}-sscs-job-scheduler"
@@ -82,9 +79,7 @@ java:
     HMC_HEARINGS_TOPIC_NAMESPACE: "hmc-servicebus-aat"
     HMC_DEPLOYMENT_ID: "deployment-${SERVICE_NAME}"
     HMC_DEPLOYMENT_FILTER_ENABLED: true
-    HEARINGS_CASE_UPDATE_V2_ENABLED: true
     ADJOURNMENT_ENABLED: true
-    BYPASS_HEARING_API_SERVICE: true
   secrets:
     JOB_SCHEDULER_DB_PASSWORD:
       secretRef: postgres
