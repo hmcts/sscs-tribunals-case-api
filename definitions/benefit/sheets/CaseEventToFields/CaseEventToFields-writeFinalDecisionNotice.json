@@ -60,7 +60,7 @@
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 3,
     "PageFieldDisplayOrder": 1,
-    "PageID": "hmcHearingType",
+    "PageID": "typeOfHearing",
     "PageLabel": "Type of hearing",
     "PageShowCondition": "writeFinalDecisionGenerateNotice = \"Yes\"",
     "ShowSummaryChangeOption": "Y"
@@ -74,7 +74,7 @@
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 3,
     "PageFieldDisplayOrder": 2,
-    "PageID": "hmcHearingType",
+    "PageID": "typeOfHearing",
     "PageLabel": "Type of hearing",
     "ShowSummaryChangeOption": "Y",
     "RetainHiddenValue": "Yes"
@@ -88,7 +88,7 @@
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 3,
     "PageFieldDisplayOrder": 3,
-    "PageID": "hmcHearingType",
+    "PageID": "typeOfHearing",
     "PageLabel": "Type of hearing",
     "ShowSummaryChangeOption": "Y",
     "RetainHiddenValue": "Yes"
@@ -102,7 +102,7 @@
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 3,
     "PageFieldDisplayOrder": 3,
-    "PageID": "hmcHearingType",
+    "PageID": "typeOfHearing",
     "PageLabel": "Type of hearing",
     "ShowSummaryChangeOption": "Y",
     "RetainHiddenValue": "Yes"
@@ -116,7 +116,7 @@
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 3,
     "PageFieldDisplayOrder": 4,
-    "PageID": "hmcHearingType",
+    "PageID": "typeOfHearing",
     "PageLabel": "Type of hearing",
     "ShowSummaryChangeOption": "Y",
     "RetainHiddenValue": "Yes"
