@@ -64,6 +64,7 @@ public final class PersonalisationMappingConstants {
     public static final String HEARING_DATE_WELSH = "welsh_hearing_date";
     public static final String HEARING_DETAILS_LITERAL = "hearing_details";
     public static final String HEARING_DETAILS_LITERAL_WELSH = "welsh_hearing_details";
+    public static final String HEARING_DIRECTIONS_LITERAL = "hearing_directions";
     public static final String HEARING_INFO_LINK_LITERAL = "hearing_info_link";
     public static final String HEARING_TIME = "hearing_time";
     public static final String HEARING_TYPE = "hearing_type";
