@@ -1059,23 +1059,23 @@ notification:
                     appellant:
                         # SSCS-11586 emailId: aa0930a3-e1bd-4b50-ac6b-34df73ec8378
                         # SSCS-11586 smsId: 8aa77a9c-9bc6-424d-8716-1c948681270e
-                        docmosisId: TB-SCS-LET-ENG-Hearing-Booked.docx
+                        docmosisId: TB-SCS-LET-ENG-Hearing-Booked-v2.docx.docx
                     representative:
                         # SSCS-11586 emailId: a56e67cb-6b4b-41e3-8f4c-cd1cdb6809c1
                         # SSCS-11586 smsId: e04c548d-1ba9-40b5-bf9b-ea5e7bbadbac
-                        docmosisId: TB-SCS-LET-ENG-Hearing-Booked.docx
+                        docmosisId: TB-SCS-LET-ENG-Hearing-Booked-v2.docx.docx
                     appointee:
                         # SSCS-11586 emailId: aa0930a3-e1bd-4b50-ac6b-34df73ec8378
                         # SSCS-11586 smsId: 8aa77a9c-9bc6-424d-8716-1c948681270e
-                        docmosisId: TB-SCS-LET-ENG-Hearing-Booked.docx
+                        docmosisId: TB-SCS-LET-ENG-Hearing-Booked-v2.docx.docx
                     joint_party:
                         # SSCS-11586 emailId: aa0930a3-e1bd-4b50-ac6b-34df73ec8378
                         # SSCS-11586 smsId: 8aa77a9c-9bc6-424d-8716-1c948681270e
-                        docmosisId: TB-SCS-LET-ENG-Hearing-Booked.docx
+                        docmosisId: TB-SCS-LET-ENG-Hearing-Booked-v2.docx.docx
                     other_party:
                         # SSCS-11586 emailId: a56e67cb-6b4b-41e3-8f4c-cd1cdb6809c1
                         # SSCS-11586 smsId: e04c548d-1ba9-40b5-bf9b-ea5e7bbadbac
-                        docmosisId: TB-SCS-LET-ENG-Hearing-Booked.docx
+                        docmosisId: TB-SCS-LET-ENG-Hearing-Booked-v2.docx.docx
                         # SSCS-11586 hearingReminder:
                         # SSCS-11586 appellant:
                         # SSCS-11586 emailId: 07bebee4-f07a-4a0d-9c50-65be30dc72a5
