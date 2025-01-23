@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.model;
 
 import java.util.List;
-import java.util.Objects;
 
 public class AppConstants {
 
