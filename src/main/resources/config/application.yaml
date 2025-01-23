@@ -1292,7 +1292,7 @@ notification:
             smsId: 093c010c-bc22-4b8a-bd22-c9c55bb40a80
         appealCreated:
             appellant:
-                emailId: e3fa02fd-87b2-471c-9a99-7020b367eca9
+                emailId: 8910e2d2-4332-4ef6-a4b5-025ffad4f17d
                 smsId: 6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82
                 letterId: 830ba7f1-9757-4833-8520-2f872de7be44
             representative:
@@ -1315,7 +1315,7 @@ notification:
                 smsId: 6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82
         resendAppealCreated:
             appellant:
-                emailId: e3fa02fd-87b2-471c-9a99-7020b367eca9
+                emailId: 8910e2d2-4332-4ef6-a4b5-025ffad4f17d
                 smsId: 6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82
                 docmosisId: TB-SCS-LET-WEL-Appeal-Lodged-Appellant.docx
             representative:
