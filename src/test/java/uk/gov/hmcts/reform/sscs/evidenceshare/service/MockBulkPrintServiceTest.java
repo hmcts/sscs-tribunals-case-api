@@ -9,15 +9,36 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.CcdNotificationsPdfService;
+import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 
 
 @RunWith(MockitoJUnitRunner.class)
 public class MockBulkPrintServiceTest {
+
+    @Mock
+    private PdfStoreService pdfStoreService;
+
+    @Mock
+    private PDFServiceClient pdfServiceClient;
+
+    @Mock
+    private CcdService ccdService;
+
+    @Mock
+    private UpdateCcdCaseService updateCcdCaseService;
+
+    @Mock
+    private IdamService idamService;
 
     private MockBulkPrintService mockBulkPrintService;
 
@@ -27,7 +48,7 @@ public class MockBulkPrintServiceTest {
 
     @Before
     public void setUp() {
-        ccdNotificationsPdfService = new CcdNotificationsPdfService();
+        ccdNotificationsPdfService = new CcdNotificationsPdfService(pdfStoreService, pdfServiceClient, ccdService, updateCcdCaseService, idamService);
         bulkPrintServiceHelper = new BulkPrintServiceHelper(ccdNotificationsPdfService);
         this.mockBulkPrintService = new MockBulkPrintService(ccdNotificationsPdfService, bulkPrintServiceHelper);
 
