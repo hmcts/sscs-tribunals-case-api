@@ -28,18 +28,15 @@ public class TopicConsumer {
     private final CallbackDispatcher<SscsCaseData> dispatcher;
     private final SscsCaseCallbackDeserializer sscsDeserializer;
     private final NotificationsMessageProcessor notificationsMessageProcessor;
-    private final boolean isNotificationServiceBypassed;
 
     public TopicConsumer(@Value("${callback.maxRetryAttempts}") Integer maxRetryAttempts,
                          CallbackDispatcher<SscsCaseData> dispatcher,
-                         SscsCaseCallbackDeserializer sscsDeserializer, NotificationsMessageProcessor notificationsMessageProcessor,
-                         @Value("${feature.bypass-notifications-service.enabled:false}") boolean isNotificationServiceBypassed) {
+                         SscsCaseCallbackDeserializer sscsDeserializer, NotificationsMessageProcessor notificationsMessageProcessor) {
         this.maxRetryAttempts = maxRetryAttempts;
         //noinspection unchecked
         this.dispatcher = dispatcher;
         this.sscsDeserializer = sscsDeserializer;
         this.notificationsMessageProcessor = notificationsMessageProcessor;
-        this.isNotificationServiceBypassed = isNotificationServiceBypassed;
     }
 
 
@@ -52,12 +49,7 @@ public class TopicConsumer {
     public void onMessage(String message, @Header(JmsHeaders.MESSAGE_ID) String messageId) {
         log.info("Message Id {} received from the service bus", messageId);
         processEvidenceShareMessageWithRetry(message, 1, messageId);
-
-        log.info("Determining if notification service should be bypassed {} ", isNotificationServiceBypassed ? "Yes" : "No");
-        if (isNotificationServiceBypassed) {
-            log.info("Bypassing notification service for message id {}", messageId);
-            notificationsMessageProcessor.processMessage(message, messageId);
-        }
+        notificationsMessageProcessor.processMessage(message, messageId);
     }
 
     private void processEvidenceShareMessageWithRetry(String message, int retry, String messageId) {
