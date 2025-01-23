@@ -13,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -70,22 +69,7 @@ class CaseUpdatedAboutToStartHandlerTest {
     }
 
     @Test
-    void givenBenefitType_shouldHaveCorrectBenefitSelectionWithInfectedBloodCompensationDisabled() {
-        ReflectionTestUtils.setField(handler, "isInfectedBloodCompensationEnabled", false);
-
-        var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        var benefitSelection = result.getData().getAppeal().getBenefitType().getDescriptionSelection();
-
-        assertThat(benefitSelection).isNotNull();
-        assertThat(benefitSelection.getValue()).isNotNull();
-        assertThat(benefitSelection.getValue().getCode()).isEqualTo("002");
-        assertThat(benefitSelection.getListItems()).hasSize(34);
-    }
-
-    @Test
-    void givenBenefitType_shouldHaveCorrectBenefitSelectionWithInfectedBloodCompensationEnabled() {
-        ReflectionTestUtils.setField(handler, "isInfectedBloodCompensationEnabled", true);
-
+    void givenBenefitType_shouldHaveCorrectBenefitSelection() {
         var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         var benefitSelection = result.getData().getAppeal().getBenefitType().getDescriptionSelection();
 
