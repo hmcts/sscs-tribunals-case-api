@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -15,7 +14,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.FurtherEvidenceService;
@@ -25,20 +23,14 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData> {
 
     private final FurtherEvidenceService furtherEvidenceService;
-    private final CcdService ccdService;
     private final IdamService idamService;
     private final UpdateCcdCaseService updateCcdCaseService;
 
-    @Value("${feature.update-case-only-hearing-v2.enabled}")
-    private boolean updateCaseOnlyHearingV2Enabled;
-
     @Autowired
     public ReissueFurtherEvidenceHandler(FurtherEvidenceService furtherEvidenceService,
-                                         CcdService ccdService,
                                          IdamService idamService,
                                          UpdateCcdCaseService updateCcdCaseService) {
         this.furtherEvidenceService = furtherEvidenceService;
-        this.ccdService = ccdService;
         this.idamService = idamService;
         this.updateCcdCaseService = updateCcdCaseService;
     }
@@ -65,7 +57,7 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
             allowedLetterTypes, getOtherPartyToResendOriginalSenderId(reissueArtifactUi, selectedDocument));
 
         if (CollectionUtils.isNotEmpty(allowedLetterTypes)) {
-            udateCaseForReasonableAdjustments(caseData, selectedDocument);
+            updateCaseV2(caseData, selectedDocument);
         }
     }
 
@@ -119,21 +111,6 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
         return String.format("Cannot find the selected document to reissue with url %s for caseId %s.",
             caseData.getReissueArtifactUi().getReissueFurtherEvidenceDocument().getValue().getCode(),
             caseData.getCcdCaseId());
-    }
-
-    private void udateCaseForReasonableAdjustments(SscsCaseData caseData, AbstractDocument selectedDocument) {
-        if (caseData.getReasonableAdjustmentsLetters() != null) {
-            final SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(Long.valueOf(caseData.getCcdCaseId()), idamService.getIdamTokens());
-            caseData = sscsCaseDetails.getData();
-        }
-
-        if (updateCaseOnlyHearingV2Enabled) {
-            updateCaseV2(caseData, selectedDocument);
-        } else {
-            setEvidenceIssuedFlagToYes(selectedDocument);
-            setReissueFlagsToNull(caseData);
-            updateCase(caseData, selectedDocument);
-        }
     }
 
     private List<FurtherEvidenceLetterType> getAllowedFurtherEvidenceLetterTypes(SscsCaseData caseData) {
@@ -222,17 +199,6 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
                     setEvidenceIssuedFlagToYes(documentIssuedFlagToYes);
                     setReissueFlagsToNull(sscsCaseDetails.getData());
                 });
-    }
-
-    private void updateCase(SscsCaseData caseData, AbstractDocument selectedDocument) {
-
-        ccdService.updateCase(
-            caseData,
-            Long.valueOf(caseData.getCcdCaseId()),
-            EventType.UPDATE_CASE_ONLY.getCcdType(),
-            "Update case data only",
-            determineDescription(selectedDocument),
-            idamService.getIdamTokens());
     }
 
     public String determineDescription(AbstractDocument document) {
