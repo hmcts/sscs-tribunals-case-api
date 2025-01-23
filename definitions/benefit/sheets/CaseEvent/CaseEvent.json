@@ -1737,7 +1737,6 @@
     "DisplayOrder": 1250,
     "PreConditionState(s)": "*",
     "PostConditionState": "readyToList",
-    "EventEnablingCondition": "appeal.benefitType.code!=\"infectedBloodCompensation\"",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "RetriesTimeoutURLAboutToSubmitEvent": "5,5",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
@@ -2254,7 +2253,6 @@
     "DisplayOrder": 1640,
     "PreConditionState(s)": "notListable",
     "PostConditionState": "*",
-    "EventEnablingCondition": "appeal.benefitType.code!=\"infectedBloodCompensation\"",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "SecurityClassification": "Public",
     "ShowSummary": "Y",
@@ -3266,6 +3264,16 @@
     "ID": "caseOutcomeMigration",
     "Name": "Case migrated automatically",
     "DisplayOrder": 142,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "17/01/2025",
+    "CaseTypeID": "Benefit",
+    "ID": "clearExpiredFilters",
+    "Name": "Cleared expired filters",
+    "DisplayOrder": 1302,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
     "SecurityClassification": "Public"
