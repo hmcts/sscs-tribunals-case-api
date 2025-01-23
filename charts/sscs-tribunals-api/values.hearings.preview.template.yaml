@@ -106,5 +106,5 @@ ccd-case-document-am-api:
   enabled: false
 
 ccd:
-  ccd-data-store-api:
+  dataStore:
     enabled: false
