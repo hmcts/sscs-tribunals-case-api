@@ -113,3 +113,5 @@ ccd:
       enabled: false
     adminWeb:
       enabled: false
+    elastic:
+      enabled: false
