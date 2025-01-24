@@ -13,7 +13,7 @@ export class ActionFurtherEvidencePage {
     }
 
     async verifyPageContent() {
-        await webActions.verifyPageLabel('h1.govuk-heading-l', 'Handle Further Evidence'); 
+        await webActions.verifyPageLabel('h1.govuk-heading-l', 'Handle Further Evidence');
     }
 
     async selectFEOption() {
