@@ -288,8 +288,8 @@ public class CcdNotificationsPdfServiceTest {
     @Test
     @Parameters({"APPELLANT", "REPRESENTATIVE", "APPOINTEE", "JOINT_PARTY", "OTHER_PARTY"})
     public void givenReasonableAdjustmentPdfForALetterType_thenCreateEmptyReasonableAdjustmentsCorrespondenceIntoCcdForRelevantParty(LetterType letterType) {
-        byte[] bytes = "String".getBytes();
-        Long caseId = Long.valueOf(caseData.getCcdCaseId());
+        final byte[] bytes = "String".getBytes();
+        final Long caseId = Long.valueOf(caseData.getCcdCaseId());
         DocumentLink documentLink = DocumentLink.builder().documentUrl("Http://document").documentFilename("evidence-document.pdf").build();
 
         Correspondence correspondence = Correspondence.builder().value(
@@ -328,8 +328,8 @@ public class CcdNotificationsPdfServiceTest {
     @Test
     @Parameters({"APPELLANT", "REPRESENTATIVE", "APPOINTEE", "JOINT_PARTY", "OTHER_PARTY"})
     public void givenReasonableAdjustmentPdfForALetterType_thenCreateEmptyReasonableAdjustmentsCorrespondenceIntoCcdForRelevantParty2(LetterType letterType) {
-        byte[] bytes = "String".getBytes();
-        Long caseId = Long.valueOf(caseData.getCcdCaseId());
+        final byte[] bytes = "String".getBytes();
+        final Long caseId = Long.valueOf(caseData.getCcdCaseId());
 
         DocumentLink documentLink = DocumentLink.builder().documentUrl("Http://document").documentFilename("evidence-document.pdf").build();
 
