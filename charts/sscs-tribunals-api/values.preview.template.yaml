@@ -131,7 +131,7 @@ em-ccdorc:
       LOGGING_LEVEL_UK_GOV_HMCTS_REFORM_EM: DEBUG
 
 em-stitching:
-  enabled: {{- if eq .Values.ENVIRONMENT "pr" }}
+  enabled: {{- if eq .Values.HEARINGS_ENABLED "No" }}
     true
     {{- else }}
     false
