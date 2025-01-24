@@ -119,3 +119,5 @@ ccd:
       enabled: false
     ras:
       enabled: false
+    userProfile:
+      enabled: false
