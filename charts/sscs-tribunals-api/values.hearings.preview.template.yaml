@@ -106,18 +106,4 @@ ccd-case-document-am-api:
   enabled: false
 
 ccd:
-  ccd:
-    dataStore:
-      enabled: false
-    definitionStore:
-      enabled: false
-    adminWeb:
-      enabled: false
-    elastic:
-      enabled: false
-    apiGatewayWeb:
-      enabled: false
-    ras:
-      enabled: false
-    userProfile:
-      enabled: false
+  enabled: false
