@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.amendhearingoutcome;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -51,7 +52,7 @@ public class AmendHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbac
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        List<String> hearingsSelected = null;
+        List<String> hearingsSelected = new ArrayList<String>();
 
         for (HearingOutcome checkHearingOutcomes :  callback.getCaseDetails().getCaseData().getHearingOutcomes()) {
             String checkHearingId =
