@@ -131,11 +131,7 @@ em-ccdorc:
       LOGGING_LEVEL_UK_GOV_HMCTS_REFORM_EM: DEBUG
 
 em-stitching:
-  {{- if eq `${HEARINGS_ENABLED}` "No" }}
   enabled: true
-  {{- else }}
-  enabled: false
-  {{- end }}
   java:
     image: hmctspublic.azurecr.io/em/stitching:latest
     releaseNameOverride: ${SERVICE_NAME}-em-stitching

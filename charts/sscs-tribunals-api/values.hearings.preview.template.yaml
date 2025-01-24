@@ -101,3 +101,6 @@ ccd-def-cleanup:
   change_id: ${CHANGE_ID}
   case_type_ids:
     - Benefit
+
+em-stitching:
+  enabled: false
