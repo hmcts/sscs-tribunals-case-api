@@ -73,7 +73,7 @@ public class WordDocumentConverter implements FileToPdfConverter {
         }
 
         final File convertedFile = Files.createTempFile(Paths.get("").toAbsolutePath(), "stitch-conversion", ".pdf").toFile();
-
+        convertedFile.deleteOnExit();
         Files.write(convertedFile.toPath(), Objects.requireNonNull(response.body()).bytes());
 
         return convertedFile;

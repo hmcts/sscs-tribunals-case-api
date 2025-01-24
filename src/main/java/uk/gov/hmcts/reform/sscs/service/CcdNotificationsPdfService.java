@@ -237,29 +237,49 @@ public class CcdNotificationsPdfService {
         List<Correspondence> correspondenceList;
         switch (letterType) {
             case APPELLANT:
-                correspondenceList = sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getAppellant() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getAppellant() : new ArrayList<>();
+                correspondenceList = getAppellantCorrespondenceList(sscsCaseData);
                 reasonableAdjustmentsLetters.setAppellant(buildCorrespondenceList(correspondences, correspondenceList));
                 break;
             case APPOINTEE:
-                correspondenceList = sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getAppointee() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getAppointee() : new ArrayList<>();
+                correspondenceList = getAppointeeCorrespondenceList(sscsCaseData);
                 reasonableAdjustmentsLetters.setAppointee(buildCorrespondenceList(correspondences, correspondenceList));
                 break;
             case REPRESENTATIVE:
-                correspondenceList = sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getRepresentative() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getRepresentative() : new ArrayList<>();
+                correspondenceList = getReprestativeCorrespondenceList(sscsCaseData);
                 reasonableAdjustmentsLetters.setRepresentative(buildCorrespondenceList(correspondences, correspondenceList));
                 break;
             case JOINT_PARTY:
-                correspondenceList = sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getJointParty() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getJointParty() : new ArrayList<>();
+                correspondenceList = getJointPartyCorrespondenceList(sscsCaseData);
                 reasonableAdjustmentsLetters.setJointParty(buildCorrespondenceList(correspondences, correspondenceList));
                 break;
             case OTHER_PARTY:
-                correspondenceList = sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getOtherParty() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getOtherParty() : new ArrayList<>();
+                correspondenceList = getOtherPartyCorrespondenceList(sscsCaseData);
                 reasonableAdjustmentsLetters.setOtherParty(buildCorrespondenceList(correspondences, correspondenceList));
                 break;
             default:
                 // do nothing
         }
         return reasonableAdjustmentsLetters;
+    }
+
+    private List<Correspondence> getAppellantCorrespondenceList(SscsCaseData sscsCaseData) {
+        return sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getAppellant() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getAppellant() : new ArrayList<>();
+    }
+
+    private List<Correspondence> getAppointeeCorrespondenceList(SscsCaseData sscsCaseData) {
+        return sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getAppointee() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getAppointee() : new ArrayList<>();
+    }
+
+    private List<Correspondence> getReprestativeCorrespondenceList(SscsCaseData sscsCaseData) {
+        return sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getRepresentative() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getRepresentative() : new ArrayList<>();
+    }
+
+    private List<Correspondence> getJointPartyCorrespondenceList(SscsCaseData sscsCaseData) {
+        return sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getJointParty() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getJointParty() : new ArrayList<>();
+    }
+
+    private List<Correspondence> getOtherPartyCorrespondenceList(SscsCaseData sscsCaseData) {
+        return sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getOtherParty() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getOtherParty() : new ArrayList<>();
     }
 
     private List<Correspondence> buildCorrespondenceList(List<Correspondence> correspondences, List<Correspondence> existingCorrespondence) {
