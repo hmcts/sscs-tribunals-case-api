@@ -70,7 +70,7 @@ public class AmendHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbac
 
         List<Hearing> hearingList = sscsCaseData.getCompletedHearingsList();
 
-        log.info("size: {}, list: {}, id: {}", hearingList.size(), hearingList, callback.getCaseDetails().getId());
+        log.info("list: {}, id: {}, callbacklist: {}", hearingList, callback.getCaseDetails().getId(), callback.getCaseDetails().getCaseData().getCompletedHearingsList());
 
         for (int i = 0; i < hearingList.size(); i++) {
 
