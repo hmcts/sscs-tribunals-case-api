@@ -325,6 +325,61 @@ public class CcdNotificationsPdfServiceTest {
 
     }
 
+    @Test
+    @Parameters({"APPELLANT", "REPRESENTATIVE", "APPOINTEE", "JOINT_PARTY", "OTHER_PARTY"})
+    public void givenReasonableAdjustmentPdfForALetterType_thenCreateEmptyReasonableAdjustmentsCorrespondenceIntoCcdForRelevantParty2(LetterType letterType) {
+        byte[] bytes = "String".getBytes();
+        Long caseId = Long.valueOf(caseData.getCcdCaseId());
+
+        DocumentLink documentLink = DocumentLink.builder().documentUrl("Http://document").documentFilename("evidence-document.pdf").build();
+
+        Correspondence correspondence = Correspondence.builder().value(
+                CorrespondenceDetails.builder()
+                        .sentOn("22 Jan 2021 11:33")
+                        .from("from")
+                        .to("to")
+                        .subject("a subject")
+                        .eventType("event")
+                        .documentLink(documentLink)
+                        .correspondenceType(CorrespondenceType.Letter)
+                        .reasonableAdjustmentStatus(ReasonableAdjustmentStatus.REQUIRED)
+                        .build()).build();
+
+        if (letterType == LetterType.APPELLANT) {
+            caseData.setReasonableAdjustmentsLetters(ReasonableAdjustmentsLetters.builder().appellant(Lists.newArrayList(correspondence)).build());
+        } else if (letterType == LetterType.REPRESENTATIVE) {
+            caseData.setReasonableAdjustmentsLetters(ReasonableAdjustmentsLetters.builder().representative(Lists.newArrayList(correspondence)).build());
+        } else if (letterType == LetterType.APPOINTEE) {
+            caseData.setReasonableAdjustmentsLetters(ReasonableAdjustmentsLetters.builder().appointee(Lists.newArrayList(correspondence)).build());
+        } else if (letterType == LetterType.JOINT_PARTY) {
+            caseData.setReasonableAdjustmentsLetters(ReasonableAdjustmentsLetters.builder().jointParty(Lists.newArrayList(correspondence)).build());
+        } else if (letterType == LetterType.OTHER_PARTY) {
+            caseData.setReasonableAdjustmentsLetters(ReasonableAdjustmentsLetters.builder().otherParty(Lists.newArrayList(correspondence)).build());
+        }
+
+        when(pdfStoreService.store(any(), any(), eq(CorrespondenceType.Letter.name()))).thenReturn(new ArrayList<>());
+        when(updateCcdCaseService.updateCaseV2WithoutRetry(any(), any(), eq("Notification sent"), any(), any(), any(Consumer.class)))
+                .thenReturn(SscsCaseDetails.builder().data(caseData).build());
+        service.mergeReasonableAdjustmentsCorrespondenceIntoCcd(bytes, caseId, correspondence, letterType);
+        verify(pdfStoreService).store(any(), eq("event 22 Jan 2021 11:33.pdf"), eq(CorrespondenceType.Letter.name()));
+        verify(updateCcdCaseService).updateCaseV2WithoutRetry(
+                any(),
+                any(),
+                eq("Notification sent"),
+                eq("Stopped for reasonable adjustment to be sent"),
+                any(),
+                caseDetailsConsumerArgumentCaptor.capture()
+        );
+
+        var sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
+        caseDetailsConsumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+
+        Correspondence result = findLettersToCaptureByParty(sscsCaseDetails.getData().getReasonableAdjustmentsLetters(), letterType).get(0);
+        assertEquals(correspondence.getValue().getDocumentLink(), result.getValue().getDocumentLink());
+        assertEquals(ReasonableAdjustmentStatus.REQUIRED, result.getValue().getReasonableAdjustmentStatus());
+
+    }
+
 
     @Test
     @Parameters({"APPELLANT", "REPRESENTATIVE", "APPOINTEE", "JOINT_PARTY", "OTHER_PARTY"})
