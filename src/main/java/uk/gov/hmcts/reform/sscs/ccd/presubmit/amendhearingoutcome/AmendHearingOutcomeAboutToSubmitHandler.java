@@ -57,7 +57,10 @@ public class AmendHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbac
             String checkHearingId =
                     checkHearingOutcomes.getValue().getCompletedHearings().getValue().getCode();
             log.info("Checking hearing ID for Amend Hearing Outcome Event: {}", checkHearingId);
-            if (hearingsSelected != null && hearingsSelected.contains(checkHearingId)) {
+            if (hearingsSelected == null ){
+                hearingsSelected.add(checkHearingId);
+            }
+            else if ( hearingsSelected.contains(checkHearingId)) {
                 preSubmitCallbackResponse.addError("This hearing already has an outcome recorded.");
                 return preSubmitCallbackResponse;
             } else {
