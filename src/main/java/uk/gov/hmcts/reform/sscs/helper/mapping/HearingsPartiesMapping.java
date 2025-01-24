@@ -306,17 +306,12 @@ public final class HearingsPartiesMapping {
         if (isTrue(hearingOptions.wantsSignLanguageInterpreter())) {
             String signLanguage = hearingOptions.getSignLanguageType();
             language = refData.getSignLanguages().getSignLanguage(signLanguage);
-            if (isNull(language)) {
-                throw new InvalidMappingException(String.format("The language %s cannot be mapped", signLanguage));
-            }
         }
 
         if (isYes(hearingOptions.getLanguageInterpreter())) {
             String verbalLanguage = hearingOptions.getLanguages();
             language = refData.getVerbalLanguages().getVerbalLanguage(verbalLanguage);
-            if (isNull(language)) {
-                throw new InvalidMappingException(String.format("The language %s cannot be mapped", verbalLanguage));
-            }
+
         }
         return language;
     }
