@@ -368,7 +368,6 @@ dependencies {
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
 
     implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'spring-boot-3-SNAPSHOT'
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.18'
 
     // sscs-pdf-email-common
     implementation group: 'com.github.sps.junidecode', name: 'junidecode', version: '0.3'
