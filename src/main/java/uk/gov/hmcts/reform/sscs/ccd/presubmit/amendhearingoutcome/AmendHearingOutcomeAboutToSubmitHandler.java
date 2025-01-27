@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
@@ -46,15 +47,16 @@ public class AmendHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbac
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
+        final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        log.info("Amending Hearing Outcome for case ID:{}", callback.getCaseDetails().getId());
+        log.info("Amending Hearing Outcome for case ID:{}", caseDetails.getId());
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         List<String> hearingsSelected = new ArrayList<String>();
 
-        for (HearingOutcome checkHearingOutcomes :  callback.getCaseDetails().getCaseData().getHearingOutcomes()) {
+        for (HearingOutcome checkHearingOutcomes :  sscsCaseData.getHearingOutcomes()) {
             String checkHearingId =
                     checkHearingOutcomes.getValue().getCompletedHearings().getValue().getCode();
             log.info("Checking hearing ID for Amend Hearing Outcome Event: {}", checkHearingId);
@@ -70,7 +72,8 @@ public class AmendHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbac
 
         List<Hearing> hearingList = sscsCaseData.getCompletedHearingsList();
 
-        log.info("list: {}, id: {}, callbacklist: {}", hearingList, callback.getCaseDetails().getId(), callback.getCaseDetails().getCaseData().getCompletedHearingsList());
+        log.info("**** list: {}, id: {}, callbacklist: {}", sscsCaseData.getCompletedHearingsList(),
+                callback.getCaseDetails().getId(), callback.getCaseDetails().getCaseData().getCompletedHearingsList());
 
         for (int i = 0; i < hearingList.size(); i++) {
 
