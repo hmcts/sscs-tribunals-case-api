@@ -16,21 +16,11 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOutcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.service.HearingOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.HmcHearingsApiService;
 
 
 @Component
 @Slf4j
 public class AmendHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-
-    private final HmcHearingsApiService hmcHearingsApiService;
-    private final HearingOutcomeService hearingOutcomeService;
-
-    public AmendHearingOutcomeAboutToSubmitHandler(HmcHearingsApiService hmcHearingsApiService, HearingOutcomeService hearingOutcomeService) {
-        this.hmcHearingsApiService = hmcHearingsApiService;
-        this.hearingOutcomeService = hearingOutcomeService;
-    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -54,7 +44,7 @@ public class AmendHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbac
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        List<String> hearingsSelected = new ArrayList<String>();
+        List<String> hearingsSelected = new ArrayList<>();
 
         for (HearingOutcome checkHearingOutcomes :  sscsCaseData.getHearingOutcomes()) {
             String checkHearingId =

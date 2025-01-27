@@ -65,8 +65,6 @@ public class AmendHearingOutcomeAboutToSubmitHandlerTest {
     @Test
     public void givenDifferentHearingOutcomeSelectedMoreThanOnce_thenAlterHearingOutcome() {
 
-        List<String> hearingsSelected = new ArrayList<String>();
-
         sscsCaseData = SscsCaseData.builder()
                 .hearingOutcomes(new ArrayList<>())
                 .completedHearingsList(new ArrayList<>())
@@ -105,4 +103,5 @@ public class AmendHearingOutcomeAboutToSubmitHandlerTest {
         assertThat(response.getData().getHearingOutcomes().get(0).getValue().getHearingChannelId()).isEqualTo(HearingChannel.FACE_TO_FACE);
 
     }
+
 }
