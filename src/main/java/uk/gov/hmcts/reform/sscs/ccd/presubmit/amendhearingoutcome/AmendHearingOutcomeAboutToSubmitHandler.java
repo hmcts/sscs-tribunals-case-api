@@ -84,7 +84,7 @@ public class AmendHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbac
 
             log.info("Amend Hearing Outcome {} vs {}", selectedHearingId, hearingOutcome.getValue().getCompletedHearingId());
 
-            if (selectedHearingId != hearingOutcome.getValue().getCompletedHearingId()) {
+            if (!selectedHearingId.equalsIgnoreCase(hearingOutcome.getValue().getCompletedHearingId())) {
 
                 HearingDetails selectedHearingDetails = sscsCaseData.getCompletedHearingsList().stream()
                     .filter(hearing -> hearing.getValue().getHearingId().equalsIgnoreCase(selectedHearingId))
