@@ -56,7 +56,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        if (HearingRoute.GAPS == sscsCaseData.getSchedulingAndListingFields().getHearingRoute()) {
+        if (!sscsCaseData.isIbcCase() && HearingRoute.GAPS == sscsCaseData.getSchedulingAndListingFields().getHearingRoute()) {
 
             if (!callback.isIgnoreWarnings() && !YesNo.YES.equals(sscsCaseData.getIgnoreCallbackWarnings())) {
                 PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());

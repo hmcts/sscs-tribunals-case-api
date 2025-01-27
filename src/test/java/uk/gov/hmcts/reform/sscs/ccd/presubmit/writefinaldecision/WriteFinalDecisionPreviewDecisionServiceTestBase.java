@@ -707,7 +707,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
 
-        assertEquals("Tribunal Judge Test, Mr Panel Member 1, Ms Panel Member 2 and Miss other", body.getHeldBefore());
+        assertEquals("Tribunal Judge Test, Mr Panel Member 1, Miss other and Ms Panel Member 2", body.getHeldBefore());
     }
 
     @Test
