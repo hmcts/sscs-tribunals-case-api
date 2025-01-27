@@ -67,17 +67,16 @@ public class AmendHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbac
                 return preSubmitCallbackResponse;
             } else {
                 hearingsSelected.add(checkHearingId);
+                log.info((hearingsSelected.toString()));
             }
         }
 
-        List<Hearing> hearingList = sscsCaseData.getCompletedHearingsList();
+        int hearingOutcomesSize = sscsCaseData.getHearingOutcomes().size();
 
-        log.info("**** list: {}, id: {}, callbacklist: {}", sscsCaseData.getCompletedHearingsList(),
-                callback.getCaseDetails().getId(), callback.getCaseDetails().getCaseData().getCompletedHearingsList());
+        for (int i = 0; i < hearingOutcomesSize; i++) {
 
-        for (int i = 0; i < hearingList.size(); i++) {
-
-            log.info("Beginning to set hearing outcome details for hearing ID: {}", hearingList.get(i).getValue().getHearingId());
+            log.info("Beginning to set hearing outcome details for hearing ID: {}", sscsCaseData.getHearingOutcomes()
+                    .get(i).getValue().getCompletedHearingId());
 
             HearingOutcome hearingOutcome = callback.getCaseDetails().getCaseData().getHearingOutcomes().get(i);
 
