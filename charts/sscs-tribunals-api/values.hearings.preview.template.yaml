@@ -117,5 +117,3 @@ ccd:
       enabled: false
     apiGatewayWeb:
       enabled: false
-    ras:
-      enabled: false
