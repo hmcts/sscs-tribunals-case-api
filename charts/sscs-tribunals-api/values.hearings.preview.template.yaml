@@ -115,5 +115,3 @@ ccd:
       enabled: false
     elastic:
       enabled: false
-    apiGatewayWeb:
-      enabled: false
