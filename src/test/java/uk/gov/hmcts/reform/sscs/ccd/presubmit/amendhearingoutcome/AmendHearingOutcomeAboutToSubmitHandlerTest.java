@@ -88,7 +88,7 @@ public class AmendHearingOutcomeAboutToSubmitHandlerTest {
         sscsCaseData.getHearingOutcomes().add(HearingOutcome.builder()
                 .value(
                         HearingOutcomeDetails.builder()
-                                .completedHearingId("2")
+                                .completedHearingId("1")
                                 .completedHearings(dynamicList)
                                 .build()
                 ).build());
@@ -98,7 +98,11 @@ public class AmendHearingOutcomeAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT,callback,USER_AUTHORISATION);
 
         assertThat(response.getData().getHearingOutcomes().get(0).getValue().getCompletedHearingId()).isEqualTo("2");
+        assertThat(response.getData().getHearingOutcomes().get(0).getValue().getHearingStartDateTime()).isEqualTo(LocalDateTime.of(2024,6,30,10,00));
+        assertThat(response.getData().getHearingOutcomes().get(0).getValue().getHearingEndDateTime()).isEqualTo(LocalDateTime.of(2024,6,30,13,00));
+        assertThat(response.getData().getHearingOutcomes().get(0).getValue().getVenue().getName()).isEqualTo("venue 1 name");
+        assertThat(response.getData().getHearingOutcomes().get(0).getValue().getEpimsId()).isEqualTo("123456");
+        assertThat(response.getData().getHearingOutcomes().get(0).getValue().getHearingChannelId()).isEqualTo(HearingChannel.FACE_TO_FACE);
 
     }
-
 }
