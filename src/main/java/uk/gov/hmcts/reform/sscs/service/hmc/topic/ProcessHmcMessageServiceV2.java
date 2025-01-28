@@ -6,7 +6,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -14,7 +13,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService.DynamicEventUpdateResult;
-import uk.gov.hmcts.reform.sscs.exception.CaseException;
 import uk.gov.hmcts.reform.sscs.exception.HearingUpdateException;
 import uk.gov.hmcts.reform.sscs.exception.InvalidMappingException;
 import uk.gov.hmcts.reform.sscs.exception.MessageProcessingException;
@@ -24,25 +22,20 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.hmc.message.HmcMessage;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingGetResponse;
-import uk.gov.hmcts.reform.sscs.service.CcdCaseService;
 import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "feature.process-event-message-v2.enabled", havingValue = "true")
-public class ProcessHmcMessageServiceV2 implements ProcessHmcMessageService {
+public class ProcessHmcMessageServiceV2 {
 
     private final HmcHearingApiService hmcHearingApiService;
     private final HearingUpdateService hearingUpdateService;
     private final UpdateCcdCaseService updateCcdCaseService;
     private final IdamService idamService;
     private final ProcessHmcMessageHelper processHmcMessageHelper;
-    private final CcdCaseService ccdCaseService;
 
-    @Override
-    public void processEventMessage(HmcMessage hmcMessage)
-        throws CaseException, MessageProcessingException, InvalidMappingException {
+    public void processEventMessage(HmcMessage hmcMessage) throws MessageProcessingException {
 
         Long caseId = hmcMessage.getCaseId();
         String hearingId = hmcMessage.getHearingId();

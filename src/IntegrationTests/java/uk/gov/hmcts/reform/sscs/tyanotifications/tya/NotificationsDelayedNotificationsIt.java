@@ -226,7 +226,7 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
             new Object[]{
                 APPEAL_RECEIVED,
                 "oral",
-                Arrays.asList("d5fd9f65-1283-4533-a1be-10043dae7af6", "3d05393a-e593-400a-963f-a26893a0b672"),
+                Arrays.asList("d5fd9f65-1283-4533-a1be-10043dae7af6", "8003606e-3d80-4e17-b846-18698f8d681e"),
                 Arrays.asList("ede384aa-0b6e-4311-9f01-ee547573a07b", "99bd4a56-256c-4de8-b187-d43a8dde466f"),
                 Arrays.asList("TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx", "TB-SCS-LET-ENG-Appeal-Lodged-Representative.docx"),
                 "yes",
@@ -240,7 +240,7 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
             new Object[]{
                 APPEAL_RECEIVED,
                 "paper",
-                Collections.singletonList("3d05393a-e593-400a-963f-a26893a0b672"),
+                Collections.singletonList("8003606e-3d80-4e17-b846-18698f8d681e"),
                 Arrays.asList("ede384aa-0b6e-4311-9f01-ee547573a07b", "99bd4a56-256c-4de8-b187-d43a8dde466f"),
                 Arrays.asList("TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx", "TB-SCS-LET-ENG-Appeal-Lodged-Representative.docx"),
                 "no",
@@ -268,7 +268,7 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
             new Object[]{
                 VALID_APPEAL_CREATED,
                 "paper",
-                Arrays.asList("9b5a6ac7-a1ad-4fc2-8e83-b0f32af9ff32", "652753bf-59b4-46eb-9c24-bd762338a098"),
+                Arrays.asList("4917669f-d1b4-4748-851f-f10b90f27da3", "652753bf-59b4-46eb-9c24-bd762338a098"),
                 Arrays.asList("f41222ef-c05c-4682-9634-6b034a166368", "a6c09fad-6265-4c7c-8b95-36245ffa5352"),
                 Collections.emptyList(),
                 "yes",
@@ -282,7 +282,7 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
             new Object[]{
                 VALID_APPEAL_CREATED,
                 "oral",
-                Arrays.asList("9b5a6ac7-a1ad-4fc2-8e83-b0f32af9ff32", "652753bf-59b4-46eb-9c24-bd762338a098"),
+                Arrays.asList("4917669f-d1b4-4748-851f-f10b90f27da3", "652753bf-59b4-46eb-9c24-bd762338a098"),
                 Arrays.asList("f41222ef-c05c-4682-9634-6b034a166368", "a6c09fad-6265-4c7c-8b95-36245ffa5352"),
                 Collections.emptyList(),
                 "yes",
@@ -324,7 +324,7 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
             new Object[]{
                 DRAFT_TO_VALID_APPEAL_CREATED,
                 "paper",
-                Arrays.asList("9b5a6ac7-a1ad-4fc2-8e83-b0f32af9ff32", "652753bf-59b4-46eb-9c24-bd762338a098"),
+                Arrays.asList("4917669f-d1b4-4748-851f-f10b90f27da3", "652753bf-59b4-46eb-9c24-bd762338a098"),
                 Arrays.asList("f41222ef-c05c-4682-9634-6b034a166368", "a6c09fad-6265-4c7c-8b95-36245ffa5352"),
                 Collections.emptyList(),
                 "yes",
@@ -338,7 +338,7 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
             new Object[]{
                 DRAFT_TO_VALID_APPEAL_CREATED,
                 "oral",
-                Arrays.asList("9b5a6ac7-a1ad-4fc2-8e83-b0f32af9ff32", "652753bf-59b4-46eb-9c24-bd762338a098"),
+                Arrays.asList("4917669f-d1b4-4748-851f-f10b90f27da3", "652753bf-59b4-46eb-9c24-bd762338a098"),
                 Arrays.asList("f41222ef-c05c-4682-9634-6b034a166368", "a6c09fad-6265-4c7c-8b95-36245ffa5352"),
                 Collections.emptyList(),
                 "yes",
