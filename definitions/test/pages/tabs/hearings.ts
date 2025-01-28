@@ -78,8 +78,8 @@ export class Hearings {
         const today = new Date();
         const resultDate = dateUtilsComponent.addWeekdays(today, 21);
         
-        await webActions.clearInputField('#earliestHearingDate');
-        await webActions.typeField('#earliestHearingDate', `${resultDate.getDate()}`);
+        await webActions.clearInputField('#earliestHearingDate-day');
+        await webActions.typeField('#earliestHearingDate-day', `${resultDate.getDate()}`);
 
         await webActions.clickButton('Continue');
     }
