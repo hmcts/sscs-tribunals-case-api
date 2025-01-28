@@ -626,6 +626,41 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
         assertThat(result).isEqualTo(expected);
     }
 
+    @DisplayName("When a invalid verbal language is given getIndividualInterpreterLanguage should not throw an exception")
+    @ParameterizedTest
+    @ValueSource(strings = {"Test"})
+    @NullAndEmptySource
+    void testGetIndividualInterpreterLanguage(String value) {
+        given(verbalLanguages.getVerbalLanguage(value))
+                .willReturn(null);
+
+        given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
+
+        HearingOptions hearingOptions = HearingOptions.builder()
+                .languageInterpreter("Yes")
+                .languages(value)
+                .build();
+
+        assertThat(HearingsPartiesMapping.getIndividualInterpreterLanguage(hearingOptions, null, refData, null)).isNull();
+    }
+
+    @DisplayName("When a invalid sign language is given getIndividualInterpreterLanguage should not throw an exception")
+    @ParameterizedTest
+    @ValueSource(strings = {"Test"})
+    @NullAndEmptySource
+    void testGetIndividualInterpreterSignLanguage(String value) {
+        given(signLanguages.getSignLanguage(value))
+                .willReturn(null);
+
+        given(refData.getSignLanguages()).willReturn(signLanguages);
+
+        HearingOptions hearingOptions = HearingOptions.builder()
+                .arrangements(List.of("signLanguageInterpreter"))
+                .signLanguageType(value)
+                .build();
+
+        assertThat(HearingsPartiesMapping.getIndividualInterpreterLanguage(hearingOptions, null, refData, null)).isNull();
+    }
 
     @DisplayName("When a valid sign language is given getIndividualInterpreterLanguage should return correct hmcReference")
     @ParameterizedTest

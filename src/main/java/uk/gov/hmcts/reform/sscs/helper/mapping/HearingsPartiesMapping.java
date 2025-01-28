@@ -32,7 +32,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.lang.NonNull;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.exception.InvalidMappingException;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.HearingWrapper;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.EntityRoleCode;
@@ -275,8 +274,7 @@ public final class HearingsPartiesMapping {
     public static String getIndividualInterpreterLanguage(HearingOptions hearingOptions,
                                                           OverrideFields overrideFields,
                                                           ReferenceDataServiceHolder refData,
-                                                          String adjournLanguage)
-            throws InvalidMappingException {
+                                                          String adjournLanguage) {
 
         if (nonNull(adjournLanguage)) {
             return adjournLanguage;
@@ -298,8 +296,7 @@ public final class HearingsPartiesMapping {
     }
 
     @Nullable
-    public static Language getLanguage(HearingOptions hearingOptions, ReferenceDataServiceHolder refData)
-            throws InvalidMappingException {
+    public static Language getLanguage(HearingOptions hearingOptions, ReferenceDataServiceHolder refData) {
 
         Language language = null;
 
