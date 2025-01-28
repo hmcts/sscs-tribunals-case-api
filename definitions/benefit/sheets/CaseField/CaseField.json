@@ -96,7 +96,7 @@
   {"LiveFrom": "18/06/2019", "CaseTypeID": "Benefit", "ID": "dynamicDwpState", "Label": "FTA State", "FieldType": "DynamicList", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/06/2019", "CaseTypeID": "Benefit", "ID": "dwpFurtherEvidenceStates", "Label": "FTA Further Evidence State", "FieldType": "FixedList", "FieldTypeParameter": "FL_dwpFurtherEvidenceStates", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/06/2019", "CaseTypeID": "Benefit", "ID": "dwpLT203", "Label": "LT203 or OM1", "FieldType": "dwpLT203DocumentCT", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "18/06/2019", "CaseTypeID": "Benefit", "ID": "dwpLapseLetter", "Label": "Lapse letter", "FieldType": "dwpLapseLetterDocumentCT", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "18/06/2019", "CaseTypeID": "Benefit", "ID": "dwpLapseLetter", "Label": "Lapse letter/Review decision notice", "FieldType": "dwpLapseLetterDocumentCT", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/06/2019", "CaseTypeID": "Benefit", "ID": "dwpSupplementaryResponseDoc", "Label": "Supplementary response", "FieldType": "dwpSupplementaryResponseDocumentCT", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/06/2019", "CaseTypeID": "Benefit", "ID": "dwpNoActionDoc", "Label": "No action", "FieldType": "dwpNoActionDocumentCT", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/06/2019", "CaseTypeID": "Benefit", "ID": "dwpOtherDoc", "Label": "Other document(s)", "FieldType": "dwpOtherDocumentCT", "SecurityClassification": "PUBLIC"},
@@ -192,10 +192,10 @@
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "writeFinalDecisionAppellantAttendedQuestion", "Label": "Did the appellant attend the hearing?", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "writeFinalDecisionAppointeeAttendedQuestion", "Label": "Did the appointee attend the hearing?", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "otherPartyAttendedQuestions", "Label": "Other party", "FieldType": "Collection", "FieldTypeParameter": "otherPartyAttendedQuestion", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "writeFinalDecisionDisabilityQualifiedPanelMemberName", "Label": "Name of the Disability Qualified Panel Member (DQPM)", "FieldType": "Text", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "writeFinalDecisionMedicallyQualifiedPanelMemberName", "Label": "Name of the Medically Qualified Panel Member (MQPM)", "FieldType": "Text", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "writeFinalDecisionFinanciallyQualifiedPanelMemberName", "Label": "Name of the Financially Qualified Panel Member (FQPM)", "FieldType": "Text", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "writeFinalDecisionOtherPanelMemberName", "Label": "Other", "FieldType": "Text", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "writeFinalDecisionDisabilityQualifiedPanelMemberName", "Label": "Name of Tribunal Member 1", "FieldType": "Text", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "writeFinalDecisionMedicallyQualifiedPanelMemberName", "Label": "Name of Tribunal Member 2", "FieldType": "Text", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "writeFinalDecisionFinanciallyQualifiedPanelMemberName", "Label": "Name of Tribunal Member 2", "FieldType": "Text", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "writeFinalDecisionOtherPanelMemberName", "Label": "Name of Tribunal Member 1", "FieldType": "Text", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "pipWriteFinalDecisionDailyLivingQuestion", "Label": "What are you considering awarding for daily living?", "FieldType": "FixedRadioList", "FieldTypeParameter": "FL_rateAwarded", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "pipWriteFinalDecisionComparedToDWPDailyLivingQuestion", "Label": "How would this new award compare to the original FTA award for daily living?", "FieldType": "FixedRadioList", "FieldTypeParameter": "FL_comparedToDWP", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "pipWriteFinalDecisionMobilityQuestion", "Label": "What are you considering awarding for mobility?", "FieldType": "FixedRadioList", "FieldTypeParameter": "FL_rateAwarded", "SecurityClassification": "PUBLIC"},
@@ -521,5 +521,6 @@
   {"LiveFrom": "06/02/2024", "CaseTypeID": "Benefit", "ID": "preWorkAllocation", "Label": "Case created before WA went Live", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "07/08/2024", "CaseTypeID": "Benefit", "ID": "ignoreCallbackWarnings", "Label": "Ignore callback warnings", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/10/2024", "CaseTypeID": "Benefit", "ID": "hearingOutcomes", "Label": "Hearing Outcomes", "FieldType": "Collection", "FieldTypeParameter": "hearingOutcomeDetails", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "18/10/2024", "CaseTypeID": "Benefit", "ID": "hearingOutcomeValue", "Label": "Hearing Outcome", "FieldType": "hearingOutcomeValue", "SecurityClassification": "PUBLIC"}
+  {"LiveFrom": "18/10/2024", "CaseTypeID": "Benefit", "ID": "hearingOutcomeValue", "Label": "Hearing Outcome", "FieldType": "hearingOutcomeValue", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "18/10/2024", "CaseTypeID": "Benefit", "ID": "completedHearingsList", "Label": "Completed Hearings", "FieldType": "Collection", "FieldTypeParameter": "hearingDetails", "SecurityClassification": "PUBLIC"}
 ]

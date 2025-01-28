@@ -37,11 +37,6 @@ java:
     ELASTIC_SEARCH_FEATURE: true
     ELINKS_V2_FEATURE_ENABLED: true
     DELETED_REDACTED_DOC_ENABLED: true
-    CITIZEN_LOGIN_SERVICE_V2: true
-    ADD_LINK_TO_OTHER_ASSOCIATED_CASES_V2: true
-    BYPASS_NOTIFICATIONS_SERVICE: true
-    BYPASS_HEARING_API_SERVICE: true
-    HANDLE_CCD_CALLBACKMAP_V2: true
     TESTING_SUPPORT_ENABLED: true
     EXUI_API_URL: "https://${SERVICE_NAME}-xui"
     TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
@@ -54,7 +49,6 @@ java:
     ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
     ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
     ISSUE_GENERIC_LETTER: true
-    HEARING_RECORDING_REQUEST_CASE_UPDATE_V2_ENABLED: true
     COH_URL: "http://coh-cor-aat.service.core-compute-aat.internal"
     ONLINE_HEARING_LINK: "https://sscs-cor-frontend-aat.service.core-compute-aat.internal"
     JOB_SCHEDULER_DB_NAME: "pr-${CHANGE_ID}-sscs-job-scheduler"
@@ -66,9 +60,6 @@ java:
     RUN_DB_MIGRATION_ON_STARTUP: true
     TEST_RECIPIENTS_POSTCODE: "*"
     INFECTED_BLOOD_COMPENSATION_ENABLED: true
-    SUBMIT_APPEAL_SERVICE_V2_ENABLED: true
-    PROCESS_EVENT_MESSAGE_V2_ENABLED: true
-    UPDATE_CASE_ONLY_HEARING_V2_ENABLED: true
     # START - SSCS-IB RELEASE VARIABLES
     DOCUMENTS_ENGLISH_DIRECTION_ISSUED: TB-SCS-GNO-ENG-directions-notice-v2.docx
     DOCUMENTS_WELSH_DIRECTION_ISSUED: TB-SCS-GNO-ENG-directions-notice-v2.docx
@@ -591,7 +582,7 @@ sscs-tribunals-frontend:
       MULTIPLE_DRAFTS_ENABLED: true
       ALLOW_CONFIG_MUTATIONS: true
       TRIBUNALS_CASE_API_URL: http://${SERVICE_NAME}-java
-      UPLOAD_EVIDENCE_URL: http://${SERVICE_NAME}/evidence/upload
+      UPLOAD_EVIDENCE_URL: http://${SERVICE_NAME}-java/evidence/upload
       SERVICES_IDAM_LOGIN_URL: https://idam-web-public.aat.platform.hmcts.net/login
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       UV_THREADPOOL_SIZE: 64
