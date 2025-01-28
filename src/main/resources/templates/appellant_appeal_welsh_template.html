@@ -162,8 +162,19 @@
                 {% endif %}
 
                 {{ PdfWrapper.sscsCaseData.appeal.appellant.address.town }}<br/>
-                {{ PdfWrapper.sscsCaseData.appeal.appellant.address.county }}<br/>
+                {% if isIbcCase and PdfWrapper.sscsCaseData.appeal.appellant.address.inMainlandUk == "No" %}
+                <!-- This field is optional, only add it if it exists. -->
+                {% if PdfWrapper.sscsCaseData.appeal.appellant.address.postcode is not empty %}
                 {{ PdfWrapper.sscsCaseData.appeal.appellant.address.postcode }}<br/>
+                {% endif %}
+                {{ PdfWrapper.sscsCaseData.appeal.appellant.address.country }}<br/>
+                {% else %}
+                <!-- This field is optional, only add it if it exists. -->
+                {% if PdfWrapper.sscsCaseData.appeal.appellant.address.county is not empty %}
+                {{ PdfWrapper.sscsCaseData.appeal.appellant.address.county }}<br/>
+                {% endif %}
+                {{ PdfWrapper.sscsCaseData.appeal.appellant.address.postcode }}<br/>
+                {% endif %}
             </dd>
         </div>
 
@@ -259,7 +270,7 @@
         <div>
             <dt class="cya-question">Enw</dt>
             <dd class="cya-answer">
-                {% if PdfWrapper.repFullName is defined and PdfWrapper.repFullName != "null null null" %}
+                {% if PdfWrapper.repFullName is not empty and PdfWrapper.repFullName != "null null null" %}
                 {{ PdfWrapper.repFullName }}
                 {% else %}
                 Nis ddarparwyd
@@ -287,14 +298,19 @@
                 {% endif %}
 
                 {{ PdfWrapper.sscsCaseData.appeal.rep.address.town }}<br/>
-
+                {% if isIbcCase and PdfWrapper.sscsCaseData.appeal.rep.address.inMainlandUk == "No" %}
+                <!-- This field is optional, only add it if it exists. -->
+                {% if PdfWrapper.sscsCaseData.appeal.rep.address.postcode is not empty %}
+                {{ PdfWrapper.sscsCaseData.appeal.rep.address.postcode }}<br/>
+                {% endif %}
+                {{ PdfWrapper.sscsCaseData.appeal.rep.address.country }}<br/>
+                {% else %}
                 <!-- This field is optional, only add it if it exists. -->
                 {% if PdfWrapper.sscsCaseData.appeal.rep.address.county is not empty %}
                 {{ PdfWrapper.sscsCaseData.appeal.rep.address.county }}<br/>
                 {% endif %}
-
                 {{ PdfWrapper.sscsCaseData.appeal.rep.address.postcode }}<br/>
-
+                {% endif %}
                 {% else %}
                 Nis ddarparwyd
                 {% endif %}
@@ -315,7 +331,7 @@
         </div>
     </dl>
 
-    <!-- MRN -->
+    <!-- MRN / Review Decision Notice -->
 
     <h2 class="heading-medium">{% if isIbcCase %}Hysbysiad o Adolygu Penderfyniad a chyflwyno{% else %}Cyflwyno’r MRN a’r{% endif %} apêl</h2>
     <dl class="govuk-check-your-answers">
@@ -357,18 +373,18 @@
         {% endif %}
     </dl>
 
-    <!-- Rhesymau dros apelio -->
+    <!-- Reasons for appealing -->
 
     <h2 class="heading-medium">Rhesymau dros apelio</h2>
     <dl class="govuk-check-your-answers">
         {% for reason in PdfWrapper.sscsCaseData.appeal.appealReasons.reasons %}
         <div>
             <dt class="cya-question">Beth ydych chi’n anghytuno ag o?</dt>
-            <dd class="cya-answer">{{ reason.value.description }}</dd>
+            <dd class="cya-answer">{{ reason.value.reason }}</dd>
         </div>
         <div>
             <dt class="cya-question">Pam ydych chi’n anghytuno ag o?</dt>
-            <dd class="cya-answer">{{ reason.value.reason }}</dd>
+            <dd class="cya-answer">{{ reason.value.description }}</dd>
         </div>
         {% endfor %}
         <div>
@@ -379,7 +395,7 @@
         </div>
     </dl>
 
-    <!-- Y gwrandawiad -->
+    <!-- The hearing -->
 
     <h2 class="heading-medium">Y gwrandawiad</h2>
     <dl class="govuk-check-your-answers">
@@ -522,10 +538,15 @@
         <div>
             <dt class="cya-question">Cael negeseuon testun atgoffa</dt>
             <dd class="cya-answer">
-                {% if PdfWrapper.sscsCaseData.subscriptions.appointeeSubscription is defined %}
-                {{ PdfWrapper.sscsCaseData.subscriptions.appointeeSubscription.wantSmsNotifications }}
+                {% if PdfWrapper.sscsCaseData.subscriptions.appointeeSubscription is defined and PdfWrapper.sscsCaseData.subscriptions.appointeeSubscription.wantSmsNotifications is not empty %}
+                {% set wantSms = PdfWrapper.sscsCaseData.subscriptions.appointeeSubscription.wantSmsNotifications %}
                 {% else %}
-                {{ PdfWrapper.sscsCaseData.subscriptions.appellantSubscription.wantSmsNotifications }}
+                {% set wantSms = PdfWrapper.sscsCaseData.subscriptions.appellantSubscription.wantSmsNotifications %}
+                {% endif %}
+                {% if wantSms == 'Yes' %}
+                ydw
+                {% else %}
+                nac ydw
                 {% endif %}
             </dd>
         </div>
@@ -533,7 +554,7 @@
         <div>
             <dt class="cya-question">Rhif ffôn symudol</dt>
             <dd class="cya-answer">
-                {% if PdfWrapper.sscsCaseData.subscriptions.appointeeSubscription is defined %}
+                {% if PdfWrapper.sscsCaseData.subscriptions.appointeeSubscription is defined and PdfWrapper.sscsCaseData.subscriptions.appointeeSubscription.wantSmsNotifications is not empty %}
                 {% if PdfWrapper.sscsCaseData.subscriptions.appointeeSubscription.wantSmsNotifications == 'Yes' %}
                 {{ PdfWrapper.sscsCaseData.subscriptions.appointeeSubscription.mobile }}
                 {% else %}
@@ -638,9 +659,7 @@
 
         <div>
             <dt class="cya-question">Date of birth</dt>
-            <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.appellant.identity.dob |
-                date(existingFormat="yyyy-MM-dd", format="dd MMMM yyyy") }}
-            </dd>
+            <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.appellant.identity.dob | date(existingFormat="yyyy-MM-dd", format="dd MMMM yyyy") }}</dd>
         </div>
 
         <div>
@@ -654,8 +673,19 @@
                 {% endif %}
 
                 {{ PdfWrapper.sscsCaseData.appeal.appellant.address.town }}<br/>
-                {{ PdfWrapper.sscsCaseData.appeal.appellant.address.county }}<br/>
+                {% if isIbcCase and PdfWrapper.sscsCaseData.appeal.appellant.address.inMainlandUk == "No" %}
+                <!-- This field is optional, only add it if it exists. -->
+                {% if PdfWrapper.sscsCaseData.appeal.appellant.address.postcode is not empty %}
                 {{ PdfWrapper.sscsCaseData.appeal.appellant.address.postcode }}<br/>
+                {% endif %}
+                {{ PdfWrapper.sscsCaseData.appeal.appellant.address.country }}<br/>
+                {% else %}
+                <!-- This field is optional, only add it if it exists. -->
+                {% if PdfWrapper.sscsCaseData.appeal.appellant.address.county is not empty %}
+                {{ PdfWrapper.sscsCaseData.appeal.appellant.address.county }}<br/>
+                {% endif %}
+                {{ PdfWrapper.sscsCaseData.appeal.appellant.address.postcode }}<br/>
+                {% endif %}
             </dd>
         </div>
 
@@ -674,16 +704,12 @@
 
         <div>
             <dt class="cya-question">Phone number</dt>
-            <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.appellant.contact.mobile | default('Not provided')
-                }}
-            </dd>
+            <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.appellant.contact.mobile | default('Not provided') }}</dd>
         </div>
 
         <div>
             <dt class="cya-question">Email</dt>
-            <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.appellant.contact.email | default('Not provided')
-                }}
-            </dd>
+            <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.appellant.contact.email | default('Not provided') }}</dd>
         </div>
     </dl>
 
@@ -709,9 +735,7 @@
 
         <div>
             <dt class="cya-question">Date of birth</dt>
-            <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.appellant.appointee.identity.dob |
-                date(existingFormat="yyyy-MM-dd", format="dd MMMM yyyy") }}
-            </dd>
+            <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.appellant.appointee.identity.dob | date(existingFormat="yyyy-MM-dd", format="dd MMMM yyyy") }}</dd>
         </div>
 
         <div>
@@ -732,16 +756,12 @@
 
         <div>
             <dt class="cya-question">Phone number</dt>
-            <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.appellant.appointee.contact.mobile | default('Not
-                provided') }}
-            </dd>
+            <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.appellant.appointee.contact.mobile | default('Not provided') }}</dd>
         </div>
 
         <div>
             <dt class="cya-question">Email</dt>
-            <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.appellant.appointee.contact.email | default('Not
-                provided') }}
-            </dd>
+            <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.appellant.appointee.contact.email | default('Not provided') }}</dd>
         </div>
     </dl>
     {% endif %}
@@ -753,7 +773,7 @@
         <div>
             <dt class="cya-question">Name</dt>
             <dd class="cya-answer">
-                {% if PdfWrapper.repFullName is defined and PdfWrapper.repFullName != "null null null" %}
+                {% if PdfWrapper.repFullName is not empty and PdfWrapper.repFullName != "null null null" %}
                 {{ PdfWrapper.repFullName }}
                 {% else %}
                 Not provided
@@ -781,12 +801,20 @@
 
                 {{ PdfWrapper.sscsCaseData.appeal.rep.address.town }}<br/>
 
+                {% if isIbcCase and PdfWrapper.sscsCaseData.appeal.rep.address.inMainlandUk == "No" %}
+                <!-- This field is optional, only add it if it exists. -->
+                {% if PdfWrapper.sscsCaseData.appeal.rep.address.postcode is not empty %}
+                {{ PdfWrapper.sscsCaseData.appeal.rep.address.postcode }}<br/>
+                {% endif %}
+                {{ PdfWrapper.sscsCaseData.appeal.rep.address.country }}<br/>
+                {% else %}
                 <!-- This field is optional, only add it if it exists. -->
                 {% if PdfWrapper.sscsCaseData.appeal.rep.address.county is not empty %}
                 {{ PdfWrapper.sscsCaseData.appeal.rep.address.county }}<br/>
                 {% endif %}
-
                 {{ PdfWrapper.sscsCaseData.appeal.rep.address.postcode }}<br/>
+                {% endif %}
+
 
                 {% else %}
                 Not provided
@@ -797,8 +825,7 @@
 
         <div>
             <dt class="cya-question">Phone number</dt>
-            <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.rep.contact.mobile | default('Not provided') }}
-            </dd>
+            <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.rep.contact.mobile | default('Not provided') }}</dd>
         </div>
 
         <div>
@@ -813,32 +840,26 @@
     <dl class="govuk-check-your-answers">
         <div>
             <dt class="cya-question">{% if isIbcCase %}Review Decision Notice{% else %}MRN{% endif %} originating office</dt>
-            <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.mrnDetails.dwpIssuingOffice | default('Not
-                applicable') }}
-            </dd>
+            <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.mrnDetails.dwpIssuingOffice | default('Not applicable') }}</dd>
         </div>
 
         <div>
             <dt class="cya-question">Date of decision</dt>
             <dd class="cya-answer">
-                {{ PdfWrapper.sscsCaseData.appeal.mrnDetails.mrnDate | date(existingFormat="yyyy-MM-dd", format="dd MMMM
-                yyyy") | default('Not applicable') }}
+                {{ PdfWrapper.sscsCaseData.appeal.mrnDetails.mrnDate | date(existingFormat="yyyy-MM-dd", format="dd MMMM yyyy") | default('Not applicable') }}
             </dd>
         </div>
 
         <div>
             <dt class="cya-question">Date appeal submitted</dt>
             <dd class="cya-answer">
-                {{ PdfWrapper.currentDate | date(existingFormat="yyyy-MM-dd", format="dd MMMM yyyy") | default('Not
-                applicable') }}
+                {{ PdfWrapper.currentDate | date(existingFormat="yyyy-MM-dd", format="dd MMMM yyyy") | default('Not applicable') }}
             </dd>
         </div>
 
         <div>
             <dt class="cya-question">Why appeal is late</dt>
-            <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.mrnDetails.mrnLateReason | default('Not
-                applicable') }}
-            </dd>
+            <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.mrnDetails.mrnLateReason | default('Not applicable') }}</dd>
         </div>
 
         {% if PdfWrapper.sscsCaseData.appeal.benefitType.code != "infectedBloodCompensation" %}
@@ -856,18 +877,16 @@
         {% for reason in PdfWrapper.sscsCaseData.appeal.appealReasons.reasons %}
         <div>
             <dt class="cya-question">What you disagree with</dt>
-            <dd class="cya-answer">{{ reason.value.description }}</dd>
+            <dd class="cya-answer">{{ reason.value.reason }}</dd>
         </div>
         <div>
             <dt class="cya-question">Why you disagree with it</dt>
-            <dd class="cya-answer">{{ reason.value.reason }}</dd>
+            <dd class="cya-answer">{{ reason.value.description }}</dd>
         </div>
         {% endfor %}
         <div>
             <dt class="cya-question">Anything else you want to tell the tribunal</dt>
-            <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.appealReasons.otherReasons | default('Not
-                provided') }}
-            </dd>
+            <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.appealReasons.otherReasons | default('Not provided') }}</dd>
         </div>
     </dl>
 
@@ -932,10 +951,8 @@
         <div>
             <dt class="cya-question">Language interpreter</dt>
             <dd class="cya-answer">
-                {% if PdfWrapper.sscsCaseData.appeal.hearingOptions.languageInterpreter is defined and
-                PdfWrapper.sscsCaseData.appeal.hearingOptions.languageInterpreter == 'Yes' %}
-                {% if PdfWrapper.sscsCaseData.appeal.hearingOptions.languages is defined and
-                PdfWrapper.sscsCaseData.appeal.hearingOptions.languages != '' %}
+                {% if PdfWrapper.sscsCaseData.appeal.hearingOptions.languageInterpreter is defined and PdfWrapper.sscsCaseData.appeal.hearingOptions.languageInterpreter == 'Yes' %}
+                {% if PdfWrapper.sscsCaseData.appeal.hearingOptions.languages is defined and PdfWrapper.sscsCaseData.appeal.hearingOptions.languages != '' %}
                 {{ PdfWrapper.sscsCaseData.appeal.hearingOptions.languages }}
                 {% else %}
                 Required
@@ -949,10 +966,8 @@
         <div>
             <dt class="cya-question">Sign language interpreter</dt>
             <dd class="cya-answer">
-                {% if PdfWrapper.sscsCaseData.appeal.hearingOptions.arrangements is defined and
-                PdfWrapper.isSignLanguageInterpreterRequired %}
-                {% if PdfWrapper.sscsCaseData.appeal.hearingOptions.signLanguageType is defined and
-                PdfWrapper.sscsCaseData.appeal.hearingOptions.signLanguageType != '' %}
+                {% if PdfWrapper.sscsCaseData.appeal.hearingOptions.arrangements is defined and PdfWrapper.isSignLanguageInterpreterRequired %}
+                {% if PdfWrapper.sscsCaseData.appeal.hearingOptions.signLanguageType is defined and PdfWrapper.sscsCaseData.appeal.hearingOptions.signLanguageType != '' %}
                 {{ PdfWrapper.sscsCaseData.appeal.hearingOptions.signLanguageType }}
                 {% else %}
                 Required
@@ -966,24 +981,21 @@
         <div>
             <dt class="cya-question">Hearing loop</dt>
             <dd class="cya-answer">
-                {{ PdfWrapper.sscsCaseData.appeal.hearingOptions.arrangements is defined and
-                PdfWrapper.isHearingLoopRequired ? "Required" : "Not required" }}
+                {{ PdfWrapper.sscsCaseData.appeal.hearingOptions.arrangements is defined and PdfWrapper.isHearingLoopRequired ? "Required" : "Not required" }}
             </dd>
         </div>
 
         <div>
             <dt class="cya-question">Accessible hearing room</dt>
             <dd class="cya-answer">
-                {{ PdfWrapper.sscsCaseData.appeal.hearingOptions.arrangements is defined and
-                PdfWrapper.isAccessibleHearingRoomRequired ? "Required" : "Not required" }}
+                {{ PdfWrapper.sscsCaseData.appeal.hearingOptions.arrangements is defined and PdfWrapper.isAccessibleHearingRoomRequired ? "Required" : "Not required" }}
             </dd>
         </div>
 
         <div>
             <dt class="cya-question">Any other arrangements</dt>
             <dd class="cya-answer">
-                {% if PdfWrapper.sscsCaseData.appeal.hearingOptions.other is defined and
-                PdfWrapper.sscsCaseData.appeal.hearingOptions.other != '' %}
+                {% if PdfWrapper.sscsCaseData.appeal.hearingOptions.other is defined and PdfWrapper.sscsCaseData.appeal.hearingOptions.other != '' %}
                 {{ PdfWrapper.sscsCaseData.appeal.hearingOptions.other }}
                 {% else %}
                 Not required
@@ -999,7 +1011,7 @@
         <div>
             <dt class="cya-question">Receive text message reminders</dt>
             <dd class="cya-answer">
-                {% if PdfWrapper.sscsCaseData.subscriptions.appointeeSubscription is defined %}
+                {% if PdfWrapper.sscsCaseData.subscriptions.appointeeSubscription is defined and PdfWrapper.sscsCaseData.subscriptions.appointeeSubscription.wantSmsNotifications is not empty %}
                 {{ PdfWrapper.sscsCaseData.subscriptions.appointeeSubscription.wantSmsNotifications }}
                 {% else %}
                 {{ PdfWrapper.sscsCaseData.subscriptions.appellantSubscription.wantSmsNotifications }}
@@ -1010,14 +1022,14 @@
         <div>
             <dt class="cya-question">Mobile number</dt>
             <dd class="cya-answer">
-                {% if PdfWrapper.sscsCaseData.subscriptions.appointeeSubscription is defined %}
-                {% if PdfWrapper.sscsCaseData.subscriptions.appointeeSubscription.wantSmsNotifications == 'Yes' %}
+                {% if PdfWrapper.sscsCaseData.subscriptions.appointeeSubscription is defined and PdfWrapper.sscsCaseData.subscriptions.appointeeSubscription.wantSmsNotifications is not empty %}
+                {% if PdfWrapper.sscsCaseData.subscriptions.appointeeSubscription.wantSmsNotifications == 'Yes'  %}
                 {{ PdfWrapper.sscsCaseData.subscriptions.appointeeSubscription.mobile }}
                 {% else %}
                 Not Applicable
                 {% endif %}
                 {% else %}
-                {% if PdfWrapper.sscsCaseData.subscriptions.appellantSubscription.wantSmsNotifications == 'Yes' %}
+                {% if PdfWrapper.sscsCaseData.subscriptions.appellantSubscription.wantSmsNotifications == 'Yes'  %}
                 {{ PdfWrapper.sscsCaseData.subscriptions.appellantSubscription.mobile }}
                 {% else %}
                 Not Applicable
