@@ -25,5 +25,16 @@
     "DisplayContext": "MANDATORY",
     "LiveFrom": "13/01/2025",
     "FieldDisplayOrder": 3
+  },
+  {
+    "CaseEventID": "amendHearingOutcome",
+    "CaseFieldID": "hearingOutcomes",
+    "ListElementCode": "completedHearingsList",
+    "FieldShowCondition": "\"DONOTSHOW\"",
+    "ID": "hearingOutcomeCompletedHearingsList",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "28/01/2025",
+    "FieldDisplayOrder": 4
   }
+
 ]
