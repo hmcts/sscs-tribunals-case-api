@@ -21,6 +21,6 @@
     "PageID": "1.0",
     "ShowSummaryChangeOption": "N",
     "RetainHiddenValue": "Yes",
-    "FieldShowCondition": "hearingOutcomeId=\"DoNotShow\""
+    "FieldShowCondition": "hearingOutcomes.hearingOutcomeId=\"DoNotShow\""
   }
 ]
