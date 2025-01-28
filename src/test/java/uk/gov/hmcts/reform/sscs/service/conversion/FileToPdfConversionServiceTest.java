@@ -87,5 +87,9 @@ public class FileToPdfConversionServiceTest {
         assertFalse(convert.get(0).isEmpty());
         assertEquals(33401, convert.get(0).getSize());
         assertEquals(33401, convert.get(0).getBytes().length);
+
+        File tempFile = File.createTempFile("tempConversion", ".jpg");
+        tempFile.deleteOnExit();
+        mpf.transferTo(tempFile);
     }
 }
