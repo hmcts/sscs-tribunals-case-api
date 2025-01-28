@@ -120,4 +120,4 @@ ccd:
     ras:
       enabled: true
     userProfile:
-      enabled: false
+      enabled: true
