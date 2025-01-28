@@ -117,7 +117,7 @@ ccd:
       enabled: false
     apiGatewayWeb:
       enabled: false
-    ras:
-      enabled: true
-    userProfile:
-      enabled: true
+
+postgresql:
+  enabled: disabled
+  flexibleserver: sscs-preview
