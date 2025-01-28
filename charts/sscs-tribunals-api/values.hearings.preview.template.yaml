@@ -102,28 +102,6 @@ ccd-def-cleanup:
   case_type_ids:
     - Benefit
 
-ccd-case-document-am-api:
-  enabled: false
-
-ccd:
-  ccd:
-    dataStore:
-      enabled: false
-    definitionStore:
-      enabled: false
-    adminWeb:
-      enabled: false
-    elastic:
-      enabled: false
-    apiGatewayWeb:
-      enabled: false
-    userProfile:
-      enabled: false
-    userProfileImporter:
-      enabled: false
-    ras:
-      enabled: false
-
 postgresql:
   enabled: true
   flexibleserver: sscs-preview

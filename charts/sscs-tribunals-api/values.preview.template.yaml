@@ -130,7 +130,7 @@ em-ccdorc:
       CALLBACK_DOMAIN: em-ccdorc-${SERVICE_FQDN}
 
 ccd-case-document-am-api:
-  enabled: true
+  enabled: ${PREVIEW_BRANCH_WITH_LOCAL_CCD}
   java:
     image: hmctspublic.azurecr.io/ccd/case-document-am-api:latest
     releaseNameOverride: ${SERVICE_NAME}-ccd-case-document-am-api
@@ -211,7 +211,7 @@ global:
   databaseNamePrefix: "pr-${CHANGE_ID}-"
 
 ccd:
-  enabled: ${PREVIEW_CCD_ENABLED}
+  enabled: ${PREVIEW_BRANCH_WITH_LOCAL_CCD}
   ccd:
     adminWeb:
       enabled: ${PREVIEW_CCD_ENABLED}
