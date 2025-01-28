@@ -169,7 +169,7 @@ public class PostponementRequestAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAPostponementRequestByDwp_setUploadPartyToFTA() {
+    public void givenAPostponementRequestByDwp_setUploadPartyToFta() {
         UserDetails dwpUserDetails = UserDetails.builder().roles(new ArrayList<>(asList("dwp", UserRole.DWP.getValue()))).build();
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(dwpUserDetails);
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
