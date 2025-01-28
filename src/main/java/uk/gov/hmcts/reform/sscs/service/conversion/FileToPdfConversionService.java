@@ -105,7 +105,7 @@ public class FileToPdfConversionService {
         return tempFile;
     }
 
-    private class FileMultipartFile implements MultipartFile{
+    private class FileMultipartFile implements MultipartFile {
         private DiskFileItem file;
 
         public FileMultipartFile(DiskFileItem file) {
