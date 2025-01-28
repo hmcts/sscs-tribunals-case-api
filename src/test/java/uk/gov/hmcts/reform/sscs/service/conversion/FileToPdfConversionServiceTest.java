@@ -90,6 +90,6 @@ public class FileToPdfConversionServiceTest {
 
         File tempFile = File.createTempFile("tempConversion", ".jpg");
         tempFile.deleteOnExit();
-        mpf.transferTo(tempFile);
+        convert.get(0).transferTo(tempFile);
     }
 }
