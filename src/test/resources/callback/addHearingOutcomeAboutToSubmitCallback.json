@@ -144,6 +144,34 @@
           }
         }
       ],
+      "completedHearingsList": [
+        {
+          "value": {
+            "hearingId": "2030011049",
+            "hearingDate": "2024-02-21",
+            "time": "11:00:00.000",
+            "venue": {
+              "name": "Eastgate House",
+              "address": {
+                "line1": "City Road Entrance",
+                "line2": "Newport Road",
+                "town": "Cardiff",
+                "county": "",
+                "postcode": "CF24 0AB",
+                "postcodeLookup": "CF24 0AB",
+                "postcodeAddress": "CF24 0AB"
+              },
+              "googleMapLink": "https://www.google.com/maps/place/Eastgate+House,+35-43+Newport+Rd,+Cardiff+CF24+0AB,+UK/@51.4850547,-3.1680269,17z/data=!3m1!4b1!4m5!3m4!1s0x486e1cc65a7b76a7:0x44ee35803c574bf7!8m2!3d51.4850514!4d-3.1658382"
+            },
+            "hearingStatus": "LISTED",
+            "start": "2024-02-21T11:00:00.000",
+            "end": "2024-02-21T12:00:00.000",
+            "epimsId": "372653",
+            "hearingChannel": "INTER"
+          },
+          "id": "635c41af-2dc9-432b-a814-04c21ed5768d"
+        }
+      ],
       "reissueFurtherEvidenceDocument": {},
       "resendToAppellant": "NO",
       "resendToRepresentative": "NO",
