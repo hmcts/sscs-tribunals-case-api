@@ -613,7 +613,7 @@ servicebus:
       - name: tribunals-to-hearing-api
 
 postgresql:
-  enabled: true
+  enabled: ${PREVIEW_BRANCH_WITH_LOCAL_CCD}
   flexibleserver: sscs-preview
   setup:
     databases:

@@ -121,3 +121,12 @@ ccd:
       enabled: false
     userProfileImporter:
       enabled: false
+    ras:
+      enabled: false
+
+postgresql:
+  enabled: true
+  flexibleserver: sscs-preview
+  setup:
+    databases:
+      - name: "pr-${CHANGE_ID}-sscs-job-scheduler"
