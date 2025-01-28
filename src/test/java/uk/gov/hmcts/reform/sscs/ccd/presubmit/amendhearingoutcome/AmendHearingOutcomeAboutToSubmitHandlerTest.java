@@ -48,6 +48,12 @@ public class AmendHearingOutcomeAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenAnInvalidAboutToSubmitEvent_thenReturnTrue() {
+        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+        assertThat(handler.canHandle(CallbackType.ABOUT_TO_SUBMIT, callback)).isFalse();
+    }
+
+    @Test
     public void givenAnEmptyOutcomeList_thenSetHearingOutcomesToNull() {
         sscsCaseData.setHearingOutcomes(List.of());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, "userAuthorisation");
