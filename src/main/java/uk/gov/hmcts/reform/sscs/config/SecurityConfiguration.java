@@ -38,28 +38,29 @@ public class SecurityConfiguration {
         // @formatter:off
         http
             .addFilter(authCheckerUserOnlyFilter)
-            .sessionManagement().sessionCreationPolicy(STATELESS)
-            .and()
-            .csrf().disable()
-            .formLogin().disable()
-            .logout().disable()
-            .authorizeHttpRequests()
-            .requestMatchers("/health").permitAll()
-            .requestMatchers("/health/liveness").permitAll()
-            .requestMatchers("/loggers/**").permitAll()
-            .requestMatchers("/swagger-ui.html").permitAll()
-            .requestMatchers("/swagger-ui/index.html").permitAll()
-            .requestMatchers("/swagger-resources/**").permitAll()
-            .requestMatchers("/v3/api-docs/**").permitAll()
-            .requestMatchers("/regionalcentre/**").permitAll()
-            .requestMatchers("/tokens/**").permitAll()
-            .requestMatchers("/appeals").permitAll()
-            .requestMatchers("/appeals/**").permitAll()
-            .requestMatchers("/evidence/upload").permitAll()
-            .requestMatchers("/drafts").authenticated()
-            .requestMatchers("/api/citizen").authenticated()
-            .requestMatchers("/api/request").authenticated();
+            .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
+            .csrf(csrf -> csrf.disable())
+            .formLogin(formLogin -> formLogin.disable())
+            .logout(logout -> logout.disable())
+            .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers("/health").permitAll()
+                .requestMatchers("/health/liveness").permitAll()
+                .requestMatchers("/loggers/**").permitAll()
+                .requestMatchers("/swagger-ui.html").permitAll()
+                .requestMatchers("/swagger-ui/index.html").permitAll()
+                .requestMatchers("/swagger-resources/**").permitAll()
+                .requestMatchers("/v3/api-docs/**").permitAll()
+                .requestMatchers("/regionalcentre/**").permitAll()
+                .requestMatchers("/tokens/**").permitAll()
+                .requestMatchers("/appeals").permitAll()
+                .requestMatchers("/appeals/**").permitAll()
+                .requestMatchers("/evidence/upload").permitAll()
+                .requestMatchers("/drafts").authenticated()
+                .requestMatchers("/api/citizen").authenticated()
+                .requestMatchers("/api/request").authenticated()
+            );
         // @formatter:on
+
 
         return http.build();
     }
