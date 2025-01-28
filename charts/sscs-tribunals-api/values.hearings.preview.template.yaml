@@ -117,3 +117,5 @@ ccd:
       enabled: false
     apiGatewayWeb:
       enabled: false
+    userProfile:
+      enabled: false
