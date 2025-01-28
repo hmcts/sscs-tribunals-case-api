@@ -105,12 +105,7 @@ public class FileToPdfConversionService {
         return tempFile;
     }
 
-    private class FileMultipartFile implements MultipartFile {
-        private DiskFileItem file;
-
-        public FileMultipartFile(DiskFileItem file) {
-            this.file = file;
-        }
+    private record FileMultipartFile(DiskFileItem file) implements MultipartFile {
 
         @Override
         public String getName() {
@@ -119,7 +114,7 @@ public class FileToPdfConversionService {
 
         @Override
         public String getOriginalFilename() {
-            return file.getStoreLocation().getName();
+            return file.getFieldName();
         }
 
         @Override
