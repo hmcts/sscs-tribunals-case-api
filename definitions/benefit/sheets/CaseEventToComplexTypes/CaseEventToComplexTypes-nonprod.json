@@ -32,7 +32,7 @@
     "ListElementCode": "completedHearingsList",
     "ShowSummaryChangeOption": "N",
     "RetainHiddenValue": "Yes",
-    "FieldShowCondition": "hearingOutcomeValue.hearingOutcomeId=\"DoNotShow\"",
+    "FieldShowCondition": "hearingOutcomeId=\"DoNotShow\"",
     "ID": "hearingOutcomeCompletedHearingsList",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "28/01/2025",
