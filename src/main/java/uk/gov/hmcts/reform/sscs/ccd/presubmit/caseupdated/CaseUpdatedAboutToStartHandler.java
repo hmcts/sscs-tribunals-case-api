@@ -86,7 +86,9 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
                     interpreterLanguages.getListItems().size(), caseId);
         }
         setupBenefitSelection(sscsCaseData);
-        setupUkPortsOfEntry(sscsCaseData);
+        if (sscsCaseData.isIbcCase()) {
+            setupUkPortsOfEntry(sscsCaseData);
+        }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
