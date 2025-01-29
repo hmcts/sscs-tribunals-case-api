@@ -38,11 +38,4 @@ public abstract class IdamConsumerTestBase {
         Thread.sleep(SLEEP_TIME);
     }
 
-
-    //    TODO: SB3
-    //    @AfterEach
-    //    void teardown() {
-    //        Executor.closeIdleConnections();
-    //    }
-
 }
