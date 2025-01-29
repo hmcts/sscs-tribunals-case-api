@@ -6,7 +6,6 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
@@ -26,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOutcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOutcomeDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 
 @RunWith(JUnitParamsRunner.class)
@@ -41,6 +41,8 @@ public class AmendHearingOutcomeAboutToSubmitHandlerTest {
             .value(
                     HearingOutcomeDetails.builder()
                             .completedHearingId("1")
+                            .didPoAttendHearing(YesNo.NO)
+                            .hearingOutcomeId("1")
                             .completedHearings(completedHearings)
                             .venue(Venue.builder().name("venue 1 name").build())
                             .hearingStartDateTime(LocalDateTime.of(2024,1,30,10,00))
@@ -54,6 +56,8 @@ public class AmendHearingOutcomeAboutToSubmitHandlerTest {
             .value(
                     HearingOutcomeDetails.builder()
                             .completedHearingId("2")
+                            .didPoAttendHearing(YesNo.YES)
+                            .hearingOutcomeId("2")
                             .completedHearings(completedHearings)
                             .venue(Venue.builder().name("venue 2 name").build())
                             .hearingStartDateTime(LocalDateTime.of(2024,6,30,10,00))
@@ -97,17 +101,12 @@ public class AmendHearingOutcomeAboutToSubmitHandlerTest {
     @Test
     public void givenAnEmptyOutcomeList_thenSetHearingOutcomesToNull() {
         sscsCaseData.setHearingOutcomes(List.of());
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "userAuthorisation");
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getData().getHearingOutcomes()).isEqualTo(null);
     }
 
     @Test
-    public void givenDifferentHearingOutcomeSelectedMoreThanOnce_thenAlterHearingOutcome() {
-
-        sscsCaseData = SscsCaseData.builder()
-                .hearingOutcomes(new ArrayList<>())
-                .completedHearingsList(new ArrayList<>())
-                .build();
+    public void givenDifferentHearingForOutcomeSelected_thenAlterHearingOutcome() {
 
         Hearing hearing1 = Hearing.builder()
                 .value(HearingDetails.builder()
@@ -131,38 +130,25 @@ public class AmendHearingOutcomeAboutToSubmitHandlerTest {
                         .build())
                 .build();
 
-        List<Hearing> completedHearingList = new ArrayList<>();
-        completedHearingList.add(hearing1);
-        completedHearingList.add(hearing2);
-
-        sscsCaseData.setCompletedHearingsList(completedHearingList);
-        sscsCaseData.getHearingOutcomes().add(hearingOutcome1);
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        sscsCaseData.setCompletedHearingsList(List.of(hearing1, hearing2));
+        sscsCaseData.setHearingOutcomes(List.of(hearingOutcome1));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT,callback,USER_AUTHORISATION);
 
         assertThat(response.getData().getHearingOutcomes().get(0).getValue().getCompletedHearingId()).isEqualTo("2");
+        assertThat(response.getData().getHearingOutcomes().get(0).getValue().getDidPoAttendHearing()).isEqualTo(YesNo.NO);
+        assertThat(response.getData().getHearingOutcomes().get(0).getValue().getHearingOutcomeId()).isEqualTo("1");
         assertThat(response.getData().getHearingOutcomes().get(0).getValue().getHearingStartDateTime()).isEqualTo(LocalDateTime.of(2024,6,30,10,00));
         assertThat(response.getData().getHearingOutcomes().get(0).getValue().getHearingEndDateTime()).isEqualTo(LocalDateTime.of(2024,6,30,13,00));
         assertThat(response.getData().getHearingOutcomes().get(0).getValue().getVenue().getName()).isEqualTo("venue 2 name");
         assertThat(response.getData().getHearingOutcomes().get(0).getValue().getEpimsId()).isEqualTo("123456");
         assertThat(response.getData().getHearingOutcomes().get(0).getValue().getHearingChannelId()).isEqualTo(HearingChannel.FACE_TO_FACE);
-
+        assertThat(response.getData().getCompletedHearingsList()).isNull();
     }
 
     @Test
     public void givenHearingOutcomeSelectedMoreThanOnce_thenThrowError() {
-
-        sscsCaseData = SscsCaseData.builder()
-                .hearingOutcomes(new ArrayList<>())
-                .build();
-
-        sscsCaseData.getHearingOutcomes().add(hearingOutcome1);
-
-        sscsCaseData.getHearingOutcomes().add(hearingOutcome2);
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        sscsCaseData.setHearingOutcomes(List.of(hearingOutcome1, hearingOutcome2));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT,callback,USER_AUTHORISATION);
 
