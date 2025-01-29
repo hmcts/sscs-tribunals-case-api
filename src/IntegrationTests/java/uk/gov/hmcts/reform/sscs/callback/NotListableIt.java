@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
@@ -44,6 +47,8 @@ public class NotListableIt extends AbstractEventIt {
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
         assertEquals(tomorrowDate, result.getData().getDirectionDueDate());
+        assertNull(result.getData().getNotListableDueDate());
+        assertEquals("My reasons", result.getData().getNotListableProvideReasons());
     }
 
 }
