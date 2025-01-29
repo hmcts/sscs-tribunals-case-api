@@ -24,12 +24,10 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.RequiredFieldMissingException;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.FurtherEvidenceService;
@@ -47,8 +45,7 @@ public class ReissueFurtherEvidenceHandlerTest {
 
     @Mock
     private IdamService idamService;
-    @Mock
-    private CcdService ccdService;
+
     @Mock
     private UpdateCcdCaseService updateCcdCaseService;
 
@@ -146,96 +143,6 @@ public class ReissueFurtherEvidenceHandlerTest {
         assertEquals("Update document evidence reissued flags after re-issuing further evidence to DWP", result);
     }
 
-
-    @Test
-    @Parameters({"APPELLANT_EVIDENCE, true, true, true",
-        "REPRESENTATIVE_EVIDENCE, false, false, true",
-        "DWP_EVIDENCE, true, true, true",
-        "APPELLANT_EVIDENCE, true, false, true",
-        "APPELLANT_EVIDENCE, false, true, true",
-        "APPELLANT_EVIDENCE, true, true, false",
-        "APPELLANT_EVIDENCE, true, false, false",
-        "APPELLANT_EVIDENCE, false, true, false"
-    })
-    public void givenIssueFurtherEvidenceCallback_shouldReissueEvidenceForAppellantAndRepAndDwp(DocumentType documentType,
-                                                                                                boolean resendToAppellant,
-                                                                                                boolean resendToRepresentative,
-                                                                                                boolean isEnglish) {
-        if (resendToAppellant || resendToRepresentative) {
-            when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
-        }
-
-        given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(true);
-
-        AbstractDocument sscsDocumentNotIssued = null;
-        if (isEnglish) {
-            sscsDocumentNotIssued = SscsDocument.builder()
-                .value(SscsDocumentDetails.builder()
-                    .documentLink(DocumentLink.builder().documentUrl("www.acme.co.uk").build())
-                    .documentType(documentType.getValue())
-                    .evidenceIssued("No")
-                    .build())
-                .build();
-        } else {
-            sscsDocumentNotIssued = SscsWelshDocument.builder()
-                .value(SscsWelshDocumentDetails.builder()
-                    .documentLink(DocumentLink.builder().documentUrl("www.acme.co.uk").build())
-                    .documentType(documentType.getValue())
-                    .evidenceIssued("No")
-                    .build())
-                .build();
-        }
-
-
-        DynamicListItem dynamicListItem = new DynamicListItem(
-            sscsDocumentNotIssued.getValue().getDocumentLink().getDocumentUrl(), "a label");
-        DynamicList dynamicList = new DynamicList(dynamicListItem, Collections.singletonList(dynamicListItem));
-        SscsCaseData caseData = SscsCaseData.builder()
-            .ccdCaseId("1563382899630221")
-            .appeal(Appeal.builder().rep(Representative.builder().hasRepresentative("YES").build()).build())
-            .reissueArtifactUi(ReissueArtifactUi.builder()
-                .reissueFurtherEvidenceDocument(dynamicList)
-                .resendToAppellant(resendToAppellant ? YesNo.YES : YesNo.NO)
-                .resendToRepresentative(resendToRepresentative ? YesNo.YES : YesNo.NO)
-                .build())
-            .build();
-        if (isEnglish) {
-            caseData.setSscsDocument(Collections.singletonList((SscsDocument) sscsDocumentNotIssued));
-        } else {
-            caseData.setSscsWelshDocuments(Collections.singletonList((SscsWelshDocument) sscsDocumentNotIssued));
-        }
-
-        handler.handle(CallbackType.SUBMITTED,
-            HandlerHelper.buildTestCallbackForGivenData(caseData, INTERLOCUTORY_REVIEW_STATE, REISSUE_FURTHER_EVIDENCE));
-
-        verify(furtherEvidenceService).canHandleAnyDocument(eq(caseData.getSscsDocument()));
-
-        List<FurtherEvidenceLetterType> allowedLetterTypes = new ArrayList<>();
-        if (resendToAppellant) {
-            allowedLetterTypes.add(FurtherEvidenceLetterType.APPELLANT_LETTER);
-        }
-        if (resendToRepresentative) {
-            allowedLetterTypes.add(FurtherEvidenceLetterType.REPRESENTATIVE_LETTER);
-        }
-
-        verify(furtherEvidenceService).issue(eq(Collections.singletonList(sscsDocumentNotIssued)), eq(caseData), eq(documentType), eq(allowedLetterTypes), eq(null));
-
-        verifyNoMoreInteractions(furtherEvidenceService);
-
-        if (resendToAppellant || resendToRepresentative) {
-            verify(ccdService).updateCase(captor.capture(), any(Long.class), eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
-                any(), any(), any(IdamTokens.class));
-            if (isEnglish) {
-                assertEquals("Yes", captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
-            } else {
-                assertEquals("Yes", captor.getValue().getSscsWelshDocuments().get(0).getValue().getEvidenceIssued());
-            }
-        } else {
-            verifyNoInteractions(ccdService);
-        }
-
-    }
-
     @Test
     @Parameters({"APPELLANT_EVIDENCE, true, true, true",
         "REPRESENTATIVE_EVIDENCE, false, false, true",
@@ -250,8 +157,6 @@ public class ReissueFurtherEvidenceHandlerTest {
                                                                                                 boolean resendToAppellant,
                                                                                                 boolean resendToRepresentative,
                                                                                                 boolean isEnglish) {
-        ReflectionTestUtils.setField(handler, "updateCaseOnlyHearingV2Enabled", true);
-
         if (resendToAppellant || resendToRepresentative) {
             when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
         }
@@ -360,133 +265,12 @@ public class ReissueFurtherEvidenceHandlerTest {
         "OTHER_PARTY_REPRESENTATIVE_EVIDENCE, true, false, false, true, false",
         "OTHER_PARTY_REPRESENTATIVE_EVIDENCE, false, true, false, true, false",
     })
-    public void givenIssueFurtherEvidenceCallback_shouldReissueEvidenceForAppellantAndRepAndDwpAndOtherParty(DocumentType documentType,
-                                                                                                             boolean resendToAppellant,
-                                                                                                             boolean resendToRepresentative,
-                                                                                                             boolean isEnglish,
-                                                                                                             boolean resendToOtherParty,
-                                                                                                             boolean resendToOtherPartyRep) {
-        if (resendToAppellant || resendToRepresentative || resendToOtherParty || resendToOtherPartyRep) {
-            when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
-        }
-
-        given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(true);
-
-        AbstractDocument sscsDocumentNotIssued = null;
-        if (isEnglish) {
-            sscsDocumentNotIssued = SscsDocument.builder()
-                .value(SscsDocumentDetails.builder()
-                    .documentLink(DocumentLink.builder().documentUrl("www.acme.co.uk").build())
-                    .documentType(documentType.getValue())
-                    .evidenceIssued("No").originalSenderOtherPartyId("3")
-                    .build())
-                .build();
-        } else {
-            sscsDocumentNotIssued = SscsWelshDocument.builder()
-                .value(SscsWelshDocumentDetails.builder()
-                    .documentLink(DocumentLink.builder().documentUrl("www.acme.co.uk").build())
-                    .documentType(documentType.getValue())
-                    .evidenceIssued("No")
-                    .build())
-                .build();
-        }
-
-
-        DynamicListItem dynamicListItem = new DynamicListItem(
-            sscsDocumentNotIssued.getValue().getDocumentLink().getDocumentUrl(), "a label");
-        DynamicList dynamicList = new DynamicList(dynamicListItem, Collections.singletonList(dynamicListItem));
-        SscsCaseData caseData = SscsCaseData.builder()
-            .ccdCaseId("1563382899630221")
-            .appeal(Appeal.builder().rep(Representative.builder().hasRepresentative("YES").build()).build())
-            .reissueArtifactUi(ReissueArtifactUi.builder()
-                .reissueFurtherEvidenceDocument(dynamicList)
-                .resendToAppellant(resendToAppellant ? YesNo.YES : YesNo.NO)
-                .resendToRepresentative(resendToRepresentative ? YesNo.YES : YesNo.NO)
-                .otherPartyOptions(getOtherPartyOptions(resendToOtherParty ? YesNo.YES : YesNo.NO,
-                    resendToOtherPartyRep ? YesNo.YES : YesNo.NO))
-                .build())
-            .build();
-        if (isEnglish) {
-            caseData.setSscsDocument(Collections.singletonList((SscsDocument) sscsDocumentNotIssued));
-        } else {
-            caseData.setSscsWelshDocuments(Collections.singletonList((SscsWelshDocument) sscsDocumentNotIssued));
-        }
-
-        handler.handle(CallbackType.SUBMITTED,
-            HandlerHelper.buildTestCallbackForGivenData(caseData, INTERLOCUTORY_REVIEW_STATE, REISSUE_FURTHER_EVIDENCE));
-
-        verify(furtherEvidenceService).canHandleAnyDocument(eq(caseData.getSscsDocument()));
-
-        List<FurtherEvidenceLetterType> allowedLetterTypes = new ArrayList<>();
-        if (resendToAppellant) {
-            allowedLetterTypes.add(FurtherEvidenceLetterType.APPELLANT_LETTER);
-        }
-        if (resendToRepresentative) {
-            allowedLetterTypes.add(FurtherEvidenceLetterType.REPRESENTATIVE_LETTER);
-        }
-        if (resendToOtherParty) {
-            allowedLetterTypes.add(FurtherEvidenceLetterType.OTHER_PARTY_LETTER);
-        }
-        if (resendToOtherPartyRep) {
-            allowedLetterTypes.add(FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER);
-        }
-
-        verify(furtherEvidenceService).issue(eq(Collections.singletonList(sscsDocumentNotIssued)), eq(caseData), eq(documentType), eq(allowedLetterTypes), eq(resendToOtherParty && isEnglish ? "3" : null));
-
-        verifyNoMoreInteractions(furtherEvidenceService);
-
-        if (resendToAppellant || resendToRepresentative || resendToOtherParty || resendToOtherPartyRep) {
-            verify(ccdService).updateCase(captor.capture(), any(Long.class), eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
-                any(), any(), any(IdamTokens.class));
-            if (isEnglish) {
-                assertEquals("Yes", captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
-            } else {
-                assertEquals("Yes", captor.getValue().getSscsWelshDocuments().get(0).getValue().getEvidenceIssued());
-            }
-        } else {
-            verifyNoInteractions(ccdService);
-        }
-
-    }
-
-    @Test
-    @Parameters({"APPELLANT_EVIDENCE, true, true, true, false, false",
-        "REPRESENTATIVE_EVIDENCE, false, false, true, false, false",
-        "DWP_EVIDENCE, true, true, true, false, false",
-        "APPELLANT_EVIDENCE, true, false, true, false, false",
-        "APPELLANT_EVIDENCE, false, true, true, false, false",
-        "APPELLANT_EVIDENCE, true, true, false, false, true",
-        "APPELLANT_EVIDENCE, true, false, false, false, false",
-        "APPELLANT_EVIDENCE, false, true, false, false, false",
-        "APPELLANT_EVIDENCE, true, true, true, true, false",
-        "REPRESENTATIVE_EVIDENCE, false, false, true, true, true",
-        "REPRESENTATIVE_EVIDENCE, false, false, true, false, true",
-        "REPRESENTATIVE_EVIDENCE, false, false, true, true, false",
-        "DWP_EVIDENCE, true, true, true, true, false",
-        "APPELLANT_EVIDENCE, true, false, true, true, true",
-        "APPELLANT_EVIDENCE, false, true, true, true, false",
-        "APPELLANT_EVIDENCE, true, true, false, true, false",
-        "APPELLANT_EVIDENCE, true, false, false, true, false",
-        "APPELLANT_EVIDENCE, false, true, false, true, false",
-        "OTHER_PARTY_EVIDENCE, true, true, true, true, false",
-        "OTHER_PARTY_EVIDENCE, false, false, true, true, true",
-        "OTHER_PARTY_EVIDENCE, false, false, true, false, true",
-        "OTHER_PARTY_EVIDENCE, false, false, true, true, false",
-        "OTHER_PARTY_EVIDENCE, true, true, true, true, false",
-        "OTHER_PARTY_REPRESENTATIVE_EVIDENCE, true, false, true, true, true",
-        "OTHER_PARTY_REPRESENTATIVE_EVIDENCE, false, true, true, true, false",
-        "OTHER_PARTY_REPRESENTATIVE_EVIDENCE, true, true, false, true, false",
-        "OTHER_PARTY_REPRESENTATIVE_EVIDENCE, true, false, false, true, false",
-        "OTHER_PARTY_REPRESENTATIVE_EVIDENCE, false, true, false, true, false",
-    })
     public void givenIssueFurtherEvidenceCallback_shouldReissueEvidenceForAppellantAndRepAndDwpAndOtherPartyAndV2Enabled(DocumentType documentType,
                                                                                                              boolean resendToAppellant,
                                                                                                              boolean resendToRepresentative,
                                                                                                              boolean isEnglish,
                                                                                                              boolean resendToOtherParty,
                                                                                                              boolean resendToOtherPartyRep) {
-        ReflectionTestUtils.setField(handler, "updateCaseOnlyHearingV2Enabled", true);
-
         if (resendToAppellant || resendToRepresentative || resendToOtherParty || resendToOtherPartyRep) {
             when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
         }
