@@ -5,7 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
 import static org.junit.jupiter.params.provider.EnumSource.Mode.INCLUDE;
 import static org.mockito.BDDMockito.given;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +22,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
@@ -27,25 +33,26 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
 
     @BeforeEach
     void setUp() {
+        ReflectionTestUtils.setField(HearingsAutoListMapping.class, "isDirectionHearingsEnabled", true);
         caseData = SscsCaseData.builder()
-                .benefitCode(BENEFIT_CODE)
-                .issueCode(ISSUE_CODE)
-                .dwpResponseDate("2022-07-07")
-                .appeal(Appeal.builder()
-                        .appellant(Appellant.builder()
-                                .name(Name.builder()
-                                        .firstName("Appel")
-                                        .lastName("Lant")
-                                        .build())
-                                .build())
-                        .hearingOptions(HearingOptions.builder()
-                                .wantsToAttend("Yes")
-                                .build())
-                        .hearingSubtype(HearingSubtype.builder()
-                                .wantsHearingTypeFaceToFace("Yes")
-                                .build())
+            .benefitCode(BENEFIT_CODE)
+            .issueCode(ISSUE_CODE)
+            .dwpResponseDate("2022-07-07")
+            .appeal(Appeal.builder()
+                .appellant(Appellant.builder()
+                    .name(Name.builder()
+                        .firstName("Appel")
+                        .lastName("Lant")
                         .build())
-                .build();
+                    .build())
+                .hearingOptions(HearingOptions.builder()
+                    .wantsToAttend("Yes")
+                    .build())
+                .hearingSubtype(HearingSubtype.builder()
+                    .wantsHearingTypeFaceToFace("Yes")
+                    .build())
+                .build())
+            .build();
     }
 
 
@@ -53,8 +60,8 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
     @Test
     void testShouldBeAutoListed() throws ListingException {
         given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE, ISSUE_CODE, false, false))
-                .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                        false, false, SessionCategory.CATEGORY_01, null));
+            .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
+                false, false, SessionCategory.CATEGORY_01, null));
 
         given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
 
@@ -67,8 +74,8 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
     @Test
     void testShouldBeAutoListedFalseWhenNullDwpResponseDate() throws ListingException {
         given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE, ISSUE_CODE, false, false))
-                .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                        false, false, SessionCategory.CATEGORY_01, null));
+            .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
+                false, false, SessionCategory.CATEGORY_01, null));
 
         given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
         caseData.setDwpResponseDate(null);
@@ -80,10 +87,10 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
     @Test
     void testShouldBeAutoListedFalse() throws ListingException {
         caseData.setLinkedCase(List.of(CaseLink.builder()
-                .value(CaseLinkDetails.builder()
-                        .caseReference("123456")
-                        .build())
-                .build()));
+            .value(CaseLinkDetails.builder()
+                .caseReference("123456")
+                .build())
+            .build()));
 
         boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
 
@@ -95,17 +102,17 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
     void testShouldBeNotAutoListed() throws ListingException {
         Adjournment adjournment = caseData.getAdjournment();
         AdjournCaseTime adjournCaseTime = AdjournCaseTime
-                .builder()
-                .adjournCaseNextHearingSpecificTime("pm")
-                .adjournCaseNextHearingFirstOnSession(List.of("firstOnSession"))
-                .build();
+            .builder()
+            .adjournCaseNextHearingSpecificTime("pm")
+            .adjournCaseNextHearingFirstOnSession(List.of("firstOnSession"))
+            .build();
 
         adjournment.setNextHearingDateType(AdjournCaseNextHearingDateType.DATE_TO_BE_FIXED);
         adjournment.setTime(adjournCaseTime);
 
         given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE, ISSUE_CODE, false, false))
-                .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                        false, false, SessionCategory.CATEGORY_01, null));
+            .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
+                false, false, SessionCategory.CATEGORY_01, null));
 
         given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
 
@@ -118,8 +125,8 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
     @Test
     void testShouldBeAutoListedOverride() throws ListingException {
         caseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
-                .autoList(YES)
-                .build());
+            .autoList(YES)
+            .build());
 
         boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
 
@@ -130,8 +137,8 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
     @Test
     void testShouldBeAutoListedOverrideNo() throws ListingException {
         caseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
-                .autoList(NO)
-                .build());
+            .autoList(NO)
+            .build());
 
         boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
 
@@ -142,10 +149,10 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
     @Test
     void testHasOrgRepresentative() {
         caseData.getAppeal()
-                .setRep(Representative.builder()
-                        .hasRepresentative("Yes")
-                        .organisation("test")
-                        .build());
+            .setRep(Representative.builder()
+                .hasRepresentative("Yes")
+                .organisation("test")
+                .build());
 
         boolean result = HearingsAutoListMapping.hasOrgRepresentative(caseData);
 
@@ -154,18 +161,17 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
 
     @DisplayName("When appellant has a org as a representative, autoList is false")
     @Test
-    void testHasOrgRepresentativeAndAustoListFalse() throws ListingException {
+    void testHasOrgRepresentativeAndAutoListFalse() throws ListingException {
         caseData.getAppeal()
-                .setRep(Representative.builder()
-                        .hasRepresentative("Yes")
-                        .organisation("test")
-                        .build());
+            .setRep(Representative.builder()
+                .hasRepresentative("Yes")
+                .organisation("test")
+                .build());
 
-        boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData,refData);
+        boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
 
         assertThat(result).isFalse();
     }
-
 
     @DisplayName("When appellant and other parties dont have a org as a representative hasOrgRepresentative should return false")
     @Test
@@ -179,17 +185,17 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
     @Test
     void testHasOrgOtherParties() {
         List<CcdValue<OtherParty>> otherParties = List.of(
-                new CcdValue<OtherParty>(OtherParty.builder()
-                        .rep(Representative.builder()
-                                .hasRepresentative("Yes")
-                                .organisation("Test")
-                                .build())
-                        .build()),
-                new CcdValue<OtherParty>(OtherParty.builder()
-                        .rep(Representative.builder()
-                                .hasRepresentative("Yes")
-                                .build())
-                        .build()));
+            new CcdValue<OtherParty>(OtherParty.builder()
+                .rep(Representative.builder()
+                    .hasRepresentative("Yes")
+                    .organisation("Test")
+                    .build())
+                .build()),
+            new CcdValue<OtherParty>(OtherParty.builder()
+                .rep(Representative.builder()
+                    .hasRepresentative("Yes")
+                    .build())
+                .build()));
 
         boolean result = HearingsAutoListMapping.hasOrgOtherParties(otherParties);
 
@@ -200,17 +206,17 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
     @Test
     void testHasOrgOtherPartiesNone() {
         List<CcdValue<OtherParty>> otherParties = List.of(
-                new CcdValue<OtherParty>(OtherParty.builder()
-                        .rep(Representative.builder()
-                                .hasRepresentative("Yes")
-                                .organisation("")
-                                .build())
-                        .build()),
-                new CcdValue<OtherParty>(OtherParty.builder()
-                        .rep(Representative.builder()
-                                .hasRepresentative("Yes")
-                                .build())
-                        .build()));
+            new CcdValue<OtherParty>(OtherParty.builder()
+                .rep(Representative.builder()
+                    .hasRepresentative("Yes")
+                    .organisation("")
+                    .build())
+                .build()),
+            new CcdValue<OtherParty>(OtherParty.builder()
+                .rep(Representative.builder()
+                    .hasRepresentative("Yes")
+                    .build())
+                .build()));
 
         boolean result = HearingsAutoListMapping.hasOrgOtherParties(otherParties);
 
@@ -229,9 +235,9 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
     @Test
     void testIsRepresentativeOrg() {
         Representative rep = Representative.builder()
-                .hasRepresentative("Yes")
-                .organisation("Test")
-                .build();
+            .hasRepresentative("Yes")
+            .organisation("Test")
+            .build();
 
         boolean result = HearingsAutoListMapping.isRepresentativeOrg(rep);
 
@@ -244,9 +250,9 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
     @NullAndEmptySource
     void testIsRepresentativeOrgNull(String value) {
         Representative rep = Representative.builder()
-                .hasRepresentative(value)
-                .organisation("Test")
-                .build();
+            .hasRepresentative(value)
+            .organisation("Test")
+            .build();
 
         boolean result = HearingsAutoListMapping.isRepresentativeOrg(rep);
 
@@ -258,9 +264,9 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
     @NullAndEmptySource
     void testIsRepresentativeOrgBlankOrg(String value) {
         Representative rep = Representative.builder()
-                .hasRepresentative("Yes")
-                .organisation(value)
-                .build();
+            .hasRepresentative("Yes")
+            .organisation(value)
+            .build();
 
         boolean result = HearingsAutoListMapping.isRepresentativeOrg(rep);
 
@@ -342,8 +348,8 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
     void testHasDqpmOrFqpm() throws ListingException {
 
         given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE, ISSUE_CODE, false, false))
-                .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                        false, false, SessionCategory.CATEGORY_06, null));
+            .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
+                false, false, SessionCategory.CATEGORY_06, null));
 
         given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
 
@@ -359,8 +365,8 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
     void testHasDqpmOrFqpmNone() throws ListingException {
 
         given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE, ISSUE_CODE, false, false))
-                .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                        false, false, SessionCategory.CATEGORY_01, null));
+            .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
+                false, false, SessionCategory.CATEGORY_01, null));
 
         given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
 
@@ -372,9 +378,9 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
     @DisplayName("When dwpIsOfficerAttending is yes, isPoOfficerAttending return True")
     @ParameterizedTest
     @EnumSource(
-            value = PanelMember.class,
-            names = {"FQPM", "MQPM1", "MQPM2"},
-            mode = INCLUDE)
+        value = PanelMember.class,
+        names = {"FQPM", "MQPM1", "MQPM2"},
+        mode = INCLUDE)
     void testIsMqpmOrFqpm(PanelMember value) {
         boolean result = HearingsAutoListMapping.isMqpmOrFqpm(value);
 
@@ -384,14 +390,25 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
     @DisplayName("When dwpIsOfficerAttending is No or blank, isPoOfficerAttending return False")
     @ParameterizedTest
     @EnumSource(
-            value = PanelMember.class,
-            names = {"FQPM", "MQPM1", "MQPM2"},
-            mode = EXCLUDE)
+        value = PanelMember.class,
+        names = {"FQPM", "MQPM1", "MQPM2"},
+        mode = EXCLUDE)
     @NullSource
     void testIsMqpmOrFqpmNot(PanelMember value) {
         boolean result = HearingsAutoListMapping.isMqpmOrFqpm(value);
 
         assertThat(result).isFalse();
+    }
+
+
+    @DisplayName("When Direction Hearings Flag Off does not check ibc case")
+    @Test
+    void testIfDirectionHearingsFlagOff() throws ListingException {
+        ReflectionTestUtils.setField(HearingsAutoListMapping.class, "isDirectionHearingsEnabled", false);
+        SscsCaseData mockedCaseData = mock(SscsCaseData.class);
+        when(mockedCaseData.getUrgentCase()).thenReturn("Yes");
+        HearingsAutoListMapping.shouldBeAutoListed(mockedCaseData, refData);
+        verify(mockedCaseData, never()).isIbcCase();
     }
 
     @DisplayName("When isIbcCase True autolist is false")
