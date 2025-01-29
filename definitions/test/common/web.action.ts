@@ -211,7 +211,7 @@ export class WebAction {
         const fileChooser = await fileChooserPromise;
         await fileChooser.setFiles(path.join(__dirname, `../data/file/${fileName}`));
     }
-    
+
     async screenshot() {
         await this.page.screenshot({ path: 'playwright-report/screenshot.png', fullPage: true });
     }
