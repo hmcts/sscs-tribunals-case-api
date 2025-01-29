@@ -43,6 +43,8 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private final int dwpResponseDueDaysChildSupport;
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
+    @Value("${feature.direction-hearings.enabled}")
+    private boolean isDirectionHearingsEnabled;
 
     @Autowired
     public DirectionIssuedAboutToSubmitHandler(FooterService footerService,
@@ -74,17 +76,19 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         SscsDocumentTranslationStatus documentTranslationStatus = caseData.isLanguagePreferenceWelsh() && callback.getEvent() == EventType.DIRECTION_ISSUED ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
         log.info("DocumentTranslationStatus is {},  for case id : {}", documentTranslationStatus, caseData.getCcdCaseId());
-        YesNo selectNextHmcHearingType = caseData.getSelectNextHmcHearingType();
-        if (isNoOrNull(selectNextHmcHearingType)) {
-            if (caseData.getAppeal().getHearingOptions() != null) {
-                caseData.getAppeal().getHearingOptions().setHmcHearingType(null);
+        if (isDirectionHearingsEnabled) {
+            YesNo selectNextHmcHearingType = caseData.getSelectNextHmcHearingType();
+            if (isNoOrNull(selectNextHmcHearingType)) {
+                if (caseData.getAppeal().getHearingOptions() != null) {
+                    caseData.getAppeal().getHearingOptions().setHmcHearingType(null);
+                }
+            } else {
+                HearingOptions.HearingOptionsBuilder builder = caseData.getAppeal().getHearingOptions() != null
+                    ? caseData.getAppeal().getHearingOptions().toBuilder() : HearingOptions.builder();
+                caseData.getAppeal()
+                    .setHearingOptions(builder.hmcHearingType(caseData.getHmcHearingType())
+                        .build());
             }
-        } else {
-            HearingOptions.HearingOptionsBuilder builder = caseData.getAppeal().getHearingOptions() != null
-                ? caseData.getAppeal().getHearingOptions().toBuilder() : HearingOptions.builder();
-            caseData.getAppeal()
-                .setHearingOptions(builder.hmcHearingType(caseData.getHmcHearingType())
-                .build());
         }
         return validateDirectionType(caseData)
                 .or(()        -> validateDirectionDueDate(caseData))
