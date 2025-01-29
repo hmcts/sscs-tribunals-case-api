@@ -97,7 +97,8 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
 
     @Override
     protected boolean shouldTolerateDataSetupFailure() {
-        return BeftaMain.getConfig().getDefinitionStoreUrl().contains("demo");
+        return BeftaMain.getConfig().getDefinitionStoreUrl().contains("demo")
+                || BeftaMain.getConfig().getDefinitionStoreUrl().contains("prod");
     }
 
     @Override

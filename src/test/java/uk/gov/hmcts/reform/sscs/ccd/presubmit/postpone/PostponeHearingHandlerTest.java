@@ -118,14 +118,14 @@ public class PostponeHearingHandlerTest {
         assertThat(handler.canHandle(SUBMITTED, callback)).isFalse();
     }
 
-    @DisplayName("When given an valid event canHandle returns false")
+    @DisplayName("When given a valid event canHandle returns false")
     @Test
     public void canHandleScheduleListingDisabled() {
         ReflectionTestUtils.setField(handler, "isScheduleListingEnabled", false);
         assertThat(handler.canHandle(SUBMITTED, callback)).isFalse();
     }
 
-    @DisplayName("When given Ready To List event is given and postponement hearing has not been already handled "
+    @DisplayName("When Ready To List event is chosen and postponement hearing has not been already handled "
         + "handle sets the fields correctly and sends the correct ccd update event")
     @Test
     public void handleReadyToListPostponementRelistEventType() {
@@ -162,9 +162,10 @@ public class PostponeHearingHandlerTest {
         assertThat(sscsCaseData.getPostponement().getPostponementEvent()).isNull();
         assertThat(sscsCaseData.getPostponement().getUnprocessedPostponement()).isEqualTo(NO);
         assertThat(sscsCaseData.getDwpState()).isEqualTo(DwpState.HEARING_POSTPONED);
+        assertThat(sscsCaseData.getIgnoreCallbackWarnings()).isEqualTo(YES);
     }
 
-    @DisplayName("When given Not Listable event is given and postponement hearing has not been already handled "
+    @DisplayName("When Not Listable event is chosen and postponement hearing has not been already handled "
         + "handle sets the fields correctly and sends the correct ccd update event")
     @Test
     public void handleNotListablePostponementRelistEventType() {
