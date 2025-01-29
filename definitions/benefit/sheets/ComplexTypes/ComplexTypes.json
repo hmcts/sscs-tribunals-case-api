@@ -495,7 +495,6 @@
   {"LiveFrom": "01/07/2022", "ID": "overrideFields", "ListElementCode": "duration", "FieldType": "Number", "ElementLabel": "Duration of the hearing", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/07/2022", "ID": "overrideFields", "ListElementCode": "appellantInterpreter", "FieldType": "hearingInterpreter", "ElementLabel": "Hearing Interpreter", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/07/2022", "ID": "overrideFields", "ListElementCode": "appellantHearingChannel", "FieldType": "FixedList", "FieldTypeParameter": "FL_hearingChannel", "ElementLabel": "Appellant's Hearing Channel", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "01/07/2022", "ID": "overrideFields", "ListElementCode": "hmcHearingType", "FieldType": "FixedRadioList", "FieldTypeParameter": "FL_hmcHearingType", "ElementLabel": "Next hearing Type", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/07/2022", "ID": "overrideFields", "ListElementCode": "hearingWindow", "FieldType": "hearingWindow", "ElementLabel": "Hearing Window", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/07/2022", "ID": "overrideFields", "ListElementCode": "autoList", "FieldType": "YesOrNo", "ElementLabel": "Should be Auto-listed", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/07/2022", "ID": "overrideFields", "ListElementCode": "hearingVenueEpimsIds", "FieldType": "Collection", "FieldTypeParameter": "hearingVenueEpimsId", "ElementLabel": "Hearing Venue Choices", "SecurityClassification": "PUBLIC"},
