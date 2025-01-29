@@ -34,8 +34,8 @@ public class AmendHearingOutcomeAboutToSubmitHandlerTest {
     private AmendHearingOutcomeAboutToSubmitHandler handler;
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    private static final DynamicList completedHearings = new DynamicList(new DynamicListItem("2", "test"),
-            List.of(new DynamicListItem("1", "test"), new DynamicListItem("2", "test2")));
+    private static final DynamicList completedHearings = new DynamicList(new DynamicListItem("2", "test2"),
+            List.of(new DynamicListItem("1", "test1"), new DynamicListItem("2", "test2")));
 
     private static final HearingOutcome hearingOutcome1 = HearingOutcome.builder()
             .value(
@@ -153,6 +153,6 @@ public class AmendHearingOutcomeAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT,callback,USER_AUTHORISATION);
 
         assertThat(response.getErrors())
-                .contains("This hearing already has an outcome recorded.");
+                .contains("This hearing already has an outcome recorded: test2");
     }
 }
