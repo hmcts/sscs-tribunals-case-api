@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCasePanelMembersExcluded;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTime;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AmendReason;
@@ -34,6 +35,9 @@ import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @Slf4j
 public final class HearingsDetailsMapping {
+
+    @Value("${feature.direction-hearings.enabled}")
+    private static boolean isDirectionHearingsEnabled;
 
     private HearingsDetailsMapping() {
 
@@ -78,7 +82,7 @@ public final class HearingsDetailsMapping {
     }
 
     public static HmcHearingType getHearingType(SscsCaseData sscsCaseData) {
-        return getHmcHearingType(sscsCaseData) != null
+        return isDirectionHearingsEnabled && getHmcHearingType(sscsCaseData) != null
             ? getHmcHearingType(sscsCaseData) : HmcHearingType.SUBSTANTIVE;
     }
 

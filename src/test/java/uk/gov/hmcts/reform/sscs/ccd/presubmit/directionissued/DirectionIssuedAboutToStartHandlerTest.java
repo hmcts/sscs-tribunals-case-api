@@ -2,6 +2,10 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
@@ -21,6 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -46,7 +51,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
     public void setUp() {
         openMocks(this);
         handler = new DirectionIssuedAboutToStartHandler(false);
-
+        ReflectionTestUtils.setField(handler, "isDirectionHearingsEnabled", true);
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -443,5 +448,17 @@ public class DirectionIssuedAboutToStartHandlerTest {
         assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
         assertEquals(YES, response.getData().getSelectNextHmcHearingType());
         assertEquals(HmcHearingType.DIRECTION_HEARINGS, response.getData().getHmcHearingType());
+    }
+
+    @Test
+    public void givenDirectionsDisabled_ThenDoesNotWipeHmcHearingTypeOrSelect() {
+        ReflectionTestUtils.setField(handler, "isDirectionHearingsEnabled", false);
+        when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
+        SscsCaseData mockedSscsCaseData = mock(SscsCaseData.class);
+        when(caseDetails.getCaseData()).thenReturn(mockedSscsCaseData);
+        when(mockedSscsCaseData.getSscsHearingRecordingCaseData()).thenReturn(SscsHearingRecordingCaseData.builder().build());
+        handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        verify(mockedSscsCaseData, never()).setSelectNextHmcHearingType(any());
+        verify(mockedSscsCaseData, never()).setHmcHearingType(any());
     }
 }

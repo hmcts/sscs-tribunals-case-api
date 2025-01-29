@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.CORRECTION_GRANTED;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_CORRECTED_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
@@ -40,6 +41,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -56,7 +58,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LibertyToApplyActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
@@ -69,9 +70,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Postponement;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFinalDecisionCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
@@ -84,6 +85,12 @@ class SscsUtilTest {
     private SessionCategoryMapService categoryMapService = new SessionCategoryMapService();
     private PostHearing postHearing;
     private SscsCaseData caseData;
+
+    @Mock
+    private SscsFinalDecisionCaseData finalDecisionCaseData;
+
+    @Mock
+    private SscsCaseData mockedCaseData;
 
     @BeforeEach
     void setUp() {
@@ -635,69 +642,41 @@ class SscsUtilTest {
     }
 
     @Test
-    void testGetHmcHearingType_WithOverrideFields() {
-        HmcHearingType expectedHmcHearingType = HmcHearingType.SUBSTANTIVE;
-        OverrideFields overrideFields = OverrideFields.builder().hmcHearingType(expectedHmcHearingType).build();
-        SchedulingAndListingFields schedulingAndListingFields = SchedulingAndListingFields.builder().overrideFields(overrideFields).build();
-        caseData.setSchedulingAndListingFields(schedulingAndListingFields);
+    void testBuildWriteFinalDecisionHeldBefore_WithAllPanelMembers() {
+        when(mockedCaseData.getSscsFinalDecisionCaseData()).thenReturn(finalDecisionCaseData);
+        when(finalDecisionCaseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName()).thenReturn("Disability Member");
+        when(finalDecisionCaseData.getWriteFinalDecisionOtherPanelMemberName()).thenReturn("Other Member");
+        when(finalDecisionCaseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName()).thenReturn("Medical Member");
+        when(finalDecisionCaseData.getWriteFinalDecisionFinanciallyQualifiedPanelMemberName()).thenReturn("Financial Member");
 
-        HmcHearingType result = SscsUtil.getHmcHearingType(caseData);
+        String result = SscsUtil.buildWriteFinalDecisionHeldBefore(mockedCaseData, "Judge Name");
 
-        assertEquals(expectedHmcHearingType, result);
+        assertEquals("Judge Name, Disability Member, Other Member, Medical Member and Financial Member", result);
     }
 
     @Test
-    void testGetHmcHearingType_WithoutOverrideFields() {
-        HmcHearingType expectedHmcHearingType = HmcHearingType.DIRECTION_HEARINGS;
-        caseData.setHmcHearingType(expectedHmcHearingType);
+    void testBuildWriteFinalDecisionHeldBefore_WithNoPanelMembers() {
+        when(mockedCaseData.getSscsFinalDecisionCaseData()).thenReturn(finalDecisionCaseData);
+        when(finalDecisionCaseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName()).thenReturn(null);
+        when(finalDecisionCaseData.getWriteFinalDecisionOtherPanelMemberName()).thenReturn(null);
+        when(finalDecisionCaseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName()).thenReturn(null);
+        when(finalDecisionCaseData.getWriteFinalDecisionFinanciallyQualifiedPanelMemberName()).thenReturn(null);
 
-        HmcHearingType result = SscsUtil.getHmcHearingType(caseData);
+        String result = SscsUtil.buildWriteFinalDecisionHeldBefore(mockedCaseData, "Judge Name");
 
-        assertEquals(expectedHmcHearingType, result);
+        assertEquals("Judge Name", result);
     }
 
     @Test
-    void testGetHmcHearingType_WithNullSchedulingAndListingFields() {
-        HmcHearingType expectedHmcHearingType = HmcHearingType.SUBSTANTIVE;
-        caseData.setHmcHearingType(expectedHmcHearingType);
+    void testBuildWriteFinalDecisionHeldBefore_WithSomePanelMembers() {
+        when(mockedCaseData.getSscsFinalDecisionCaseData()).thenReturn(finalDecisionCaseData);
+        when(finalDecisionCaseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName()).thenReturn("Disability Member");
+        when(finalDecisionCaseData.getWriteFinalDecisionOtherPanelMemberName()).thenReturn(null);
+        when(finalDecisionCaseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName()).thenReturn("Medical Member");
+        when(finalDecisionCaseData.getWriteFinalDecisionFinanciallyQualifiedPanelMemberName()).thenReturn(null);
 
-        HmcHearingType result = SscsUtil.getHmcHearingType(caseData);
+        String result = SscsUtil.buildWriteFinalDecisionHeldBefore(mockedCaseData, "Judge Name");
 
-        assertEquals(expectedHmcHearingType, result);
-    }
-
-    @Test
-    void testGetHmcHearingType_WithNullOverrideFields() {
-        SchedulingAndListingFields schedulingAndListingFields = SchedulingAndListingFields.builder().overrideFields(null).build();
-        caseData.setSchedulingAndListingFields(schedulingAndListingFields);
-        HmcHearingType expectedHmcHearingType = HmcHearingType.DIRECTION_HEARINGS;
-        caseData.setHmcHearingType(expectedHmcHearingType);
-
-        HmcHearingType result = SscsUtil.getHmcHearingType(caseData);
-
-        assertEquals(expectedHmcHearingType, result);
-    }
-
-    @Test
-    void testGetHmcHearingType_WithNullHmcHearingType() {
-        OverrideFields overrideFields = OverrideFields.builder().hmcHearingType(null).build();
-        SchedulingAndListingFields schedulingAndListingFields = SchedulingAndListingFields.builder().overrideFields(overrideFields).build();
-        caseData.setSchedulingAndListingFields(schedulingAndListingFields);
-
-        HmcHearingType result = SscsUtil.getHmcHearingType(caseData);
-
-        assertNull(result);
-    }
-
-    @Test
-    void testGetHmcHearingType_WithNullOverriddenHmcHearingType() {
-        OverrideFields overrideFields = OverrideFields.builder().hmcHearingType(null).build();
-        SchedulingAndListingFields schedulingAndListingFields = SchedulingAndListingFields.builder().overrideFields(overrideFields).build();
-        caseData.setSchedulingAndListingFields(schedulingAndListingFields);
-        HmcHearingType expectedHmcHearingType = HmcHearingType.DIRECTION_HEARINGS;
-        caseData.setHmcHearingType(expectedHmcHearingType);
-        HmcHearingType result = SscsUtil.getHmcHearingType(caseData);
-
-        assertEquals(expectedHmcHearingType, result);
+        assertEquals("Judge Name, Disability Member and Medical Member", result);
     }
 }

@@ -32,6 +32,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -83,6 +84,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
     public void setUp() {
         openMocks(this);
         handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, false);
+        ReflectionTestUtils.setField(handler, "isDirectionHearingsEnabled", true);
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
 
@@ -107,19 +109,19 @@ class DirectionIssuedAboutToSubmitHandlerTest {
                 .build())
             .sscsDocument(docs)
             .appeal(Appeal.builder()
-                    .appellant(Appellant.builder()
-                            .name(Name.builder().build())
-                            .identity(Identity.builder().build())
-                            .build())
-                    .build()).build();
+                .appellant(Appellant.builder()
+                    .name(Name.builder().build())
+                    .identity(Identity.builder().build())
+                    .build())
+                .build()).build();
 
         expectedDocument = SscsDocument.builder()
-                .value(SscsDocumentDetails.builder()
-                        .documentFileName(sscsCaseData.getDocumentStaging().getPreviewDocument().getDocumentFilename())
-                        .documentLink(sscsCaseData.getDocumentStaging().getPreviewDocument())
-                        .documentDateAdded(LocalDate.now().minusDays(1).toString())
-                        .documentType(DocumentType.DIRECTION_NOTICE.getValue())
-                        .build()).build();
+            .value(SscsDocumentDetails.builder()
+                .documentFileName(sscsCaseData.getDocumentStaging().getPreviewDocument().getDocumentFilename())
+                .documentLink(sscsCaseData.getDocumentStaging().getPreviewDocument())
+                .documentDateAdded(LocalDate.now().minusDays(1).toString())
+                .documentType(DocumentType.DIRECTION_NOTICE.getValue())
+                .build()).build();
 
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -184,13 +186,13 @@ class DirectionIssuedAboutToSubmitHandlerTest {
                 .documentType(DocumentType.DIRECTION_NOTICE.getValue())
                 .documentFileName("file.pdf")
                 .documentLink(DocumentLink.builder().documentFilename("file.pdf").documentUrl(DOCUMENT_URL).build()).build())
-                .build();
+            .build();
 
         SscsInterlocDirectionDocument theDocument = SscsInterlocDirectionDocument.builder()
-                .documentType(DocumentType.DIRECTION_NOTICE.getValue())
-                .documentFileName("file.pdf")
-                .documentLink(DocumentLink.builder().documentFilename("file.pdf").documentUrl(DOCUMENT_URL2).build())
-                .documentDateAdded(LocalDate.now()).build();
+            .documentType(DocumentType.DIRECTION_NOTICE.getValue())
+            .documentFileName("file.pdf")
+            .documentLink(DocumentLink.builder().documentFilename("file.pdf").documentUrl(DOCUMENT_URL2).build())
+            .documentDateAdded(LocalDate.now()).build();
 
         sscsCaseData.setSscsInterlocDirectionDocument(theDocument);
 
@@ -554,9 +556,9 @@ class DirectionIssuedAboutToSubmitHandlerTest {
         sscsCaseData.getDocumentStaging().setPreviewDocument(null);
 
         SscsInterlocDirectionDocument theDocument = SscsInterlocDirectionDocument.builder()
-                .documentType(DocumentType.DECISION_NOTICE.getValue())
-                .documentLink(DocumentLink.builder().documentFilename(filename).documentUrl(DOCUMENT_URL).build())
-                .documentDateAdded(LocalDate.now()).build();
+            .documentType(DocumentType.DECISION_NOTICE.getValue())
+            .documentLink(DocumentLink.builder().documentFilename(filename).documentUrl(DOCUMENT_URL).build())
+            .documentDateAdded(LocalDate.now()).build();
 
         sscsCaseData.setSscsInterlocDirectionDocument(theDocument);
 
@@ -609,7 +611,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
         assertNotNull(response.getData().getExtensionNextEventDl());
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()),
-                any(), eq(DocumentType.DIRECTION_NOTICE), any(), any(), eq(null), eq(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED));
+            any(), eq(DocumentType.DIRECTION_NOTICE), any(), any(), eq(null), eq(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED));
 
         verifyNoInteractions(serviceRequestExecutor);
     }
@@ -618,12 +620,12 @@ class DirectionIssuedAboutToSubmitHandlerTest {
     void givenDecisionIssuedWelshEvent_SetFieldsAndCallServicesCorrectly() {
 
         expectedWelshDocument = SscsWelshDocument.builder()
-                .value(SscsWelshDocumentDetails.builder()
-                        .documentFileName("welshDirectionDocFilename")
-                        .documentLink(DocumentLink.builder().documentUrl("welshUrl").documentBinaryUrl("welshBinaryUrl").build())
-                        .documentDateAdded(LocalDate.now().minusDays(1).toString())
-                        .documentType(DocumentType.DIRECTION_NOTICE.getValue())
-                        .build()).build();
+            .value(SscsWelshDocumentDetails.builder()
+                .documentFileName("welshDirectionDocFilename")
+                .documentLink(DocumentLink.builder().documentUrl("welshUrl").documentBinaryUrl("welshBinaryUrl").build())
+                .documentDateAdded(LocalDate.now().minusDays(1).toString())
+                .documentType(DocumentType.DIRECTION_NOTICE.getValue())
+                .build()).build();
         sscsCaseData.setSscsWelshDocuments(new ArrayList<>());
         sscsCaseData.getSscsWelshDocuments().add(expectedWelshDocument);
 
@@ -747,13 +749,13 @@ class DirectionIssuedAboutToSubmitHandlerTest {
         assertFalse(sscsCaseData.getDocumentGeneration().getGenerateNotice().toBoolean());
 
         SscsInterlocDirectionDocument interlocDoc = SscsInterlocDirectionDocument.builder()
-                .documentType("Doc type")
-                .documentFileName("Doc filename")
-                .documentLink(DocumentLink.builder()
-                        .documentFilename("testingDoc")
-                        .documentBinaryUrl(DOCUMENT_URL)
-                        .documentUrl(DOCUMENT_URL)
-                        .build()).build();
+            .documentType("Doc type")
+            .documentFileName("Doc filename")
+            .documentLink(DocumentLink.builder()
+                .documentFilename("testingDoc")
+                .documentBinaryUrl(DOCUMENT_URL)
+                .documentUrl(DOCUMENT_URL)
+                .build()).build();
 
         sscsCaseData.setSscsInterlocDirectionDocument(interlocDoc);
 
@@ -767,13 +769,13 @@ class DirectionIssuedAboutToSubmitHandlerTest {
         assertTrue(sscsCaseData.getDocumentGeneration().getGenerateNotice().toBoolean());
 
         SscsInterlocDirectionDocument interlocDoc = SscsInterlocDirectionDocument.builder()
-                .documentType("Doc type")
-                .documentFileName("Doc filename")
-                .documentLink(DocumentLink.builder()
-                        .documentFilename("testingDoc")
-                        .documentBinaryUrl(DOCUMENT_URL)
-                        .documentUrl(DOCUMENT_URL)
-                        .build()).build();
+            .documentType("Doc type")
+            .documentFileName("Doc filename")
+            .documentLink(DocumentLink.builder()
+                .documentFilename("testingDoc")
+                .documentBinaryUrl(DOCUMENT_URL)
+                .documentUrl(DOCUMENT_URL)
+                .build()).build();
 
         sscsCaseData.setSscsInterlocDirectionDocument(interlocDoc);
 
@@ -818,7 +820,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @EnumSource(value = HmcHearingType.class, names = {"SUBSTANTIVE", "DIRECTION_HEARINGS"})
-    void willSetTypeOfHearingInHearingOptionsNotNullIfselectNextHmcHearingTypeIsYes(HmcHearingType hmcHearingType) {
+    void willSetTypeOfHearingInHearingOptionsNotNullIfSelectNextTypeOfHearingIsYes(HmcHearingType hmcHearingType) {
         when(caseDetails.getState()).thenReturn(State.READY_TO_LIST);
         sscsCaseData.setSelectNextHmcHearingType(YES);
         sscsCaseData.setHmcHearingType(hmcHearingType);
@@ -829,5 +831,22 @@ class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals(hmcHearingType, response.getData().getAppeal().getHearingOptions().getHmcHearingType());
         HearingOptions expectedHearingOptions = HearingOptions.builder().agreeLessNotice("string").hmcHearingType(hmcHearingType).build();
         assertEquals(expectedHearingOptions, response.getData().getAppeal().getHearingOptions());
+    }
+
+    @Test
+    void willNotAffectHmcHearingTypeIfFlagIsOff() {
+        ReflectionTestUtils.setField(handler, "isDirectionHearingsEnabled", false);
+        when(caseDetails.getState()).thenReturn(State.READY_TO_LIST);
+        SscsCaseData mockedSscsCaseData = mock(SscsCaseData.class);
+        Appeal mockedAppeal = mock(Appeal.class);
+        when(caseDetails.getCaseData()).thenReturn(mockedSscsCaseData);
+        when(mockedSscsCaseData.getAppeal()).thenReturn(mockedAppeal);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        verify(mockedSscsCaseData, never()).getHmcHearingType();
+        verify(mockedAppeal, never()).getHearingOptions();
+        verify(mockedAppeal, never()).setHearingOptions(any());
+        verify(mockedSscsCaseData, never()).getSchedulingAndListingFields();
+        assertNull(response.getData().getSelectNextHmcHearingType());
+        assertNull(response.getData().getAppeal().getHearingOptions());
     }
 }
