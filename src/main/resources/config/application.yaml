@@ -857,13 +857,13 @@ notification:
                 docmosisId: TB-SCS-GNO-ENG-00582.docx
         actionHearingRecordingRequest:
             appellant:
-                docmosisId: TB-SCS-GNO-ENG-00760.docx
+                docmosisId: TB-SCS-GNO-ENG-00760-v2.docx
             representative:
-                docmosisId: TB-SCS-GNO-ENG-00760.docx
+                docmosisId: TB-SCS-GNO-ENG-00760-v2.docx
             appointee:
-                docmosisId: TB-SCS-GNO-ENG-00760.docx
+                docmosisId: TB-SCS-GNO-ENG-00760-v2.docx
             joint_party:
-                docmosisId: TB-SCS-GNO-ENG-00760.docx
+                docmosisId: TB-SCS-GNO-ENG-00760-v2.docx
         deathOfAppellant:
             representative:
                 docmosisId: TB-SCS-GNO-ENG-00773.docx
@@ -876,7 +876,7 @@ notification:
                 docmosisId: TB-SCS-GNO-ENG-00773.docx
         updateOtherPartyData:
             other_party:
-                docmosisId: TB-SCS-GNO-ENG-00784.docx
+                docmosisId: TB-SCS-GNO-ENG-00784-v2.docx
         libertyToApplyGranted:
             docmosisId: TB-SCS-LET-ENG-Liberty-to-Apply-Granted-Refused.docx
         libertyToApplyRefused:
