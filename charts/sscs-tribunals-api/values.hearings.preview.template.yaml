@@ -108,6 +108,3 @@ postgresql:
   setup:
     databases:
       - name: "pr-${CHANGE_ID}-sscs-job-scheduler"
-      
-em-stitching:
-  enabled: false

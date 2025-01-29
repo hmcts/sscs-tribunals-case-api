@@ -131,7 +131,7 @@ em-ccdorc:
       LOGGING_LEVEL_UK_GOV_HMCTS_REFORM_EM: DEBUG
 
 em-stitching:
-  enabled: true
+  enabled: ${PREVIEW_BRANCH_WITH_LOCAL_CCD}
   java:
     image: hmctspublic.azurecr.io/em/stitching:latest
     releaseNameOverride: ${SERVICE_NAME}-em-stitching
