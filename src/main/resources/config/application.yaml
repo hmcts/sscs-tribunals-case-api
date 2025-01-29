@@ -2059,7 +2059,6 @@ job.scheduler:
 judicial-ref:
     api:
         url: ${JUDICIAL_REF_API_URL:http://localhost:5555}
-
 ---
 # tya-integration profile
 spring:
