@@ -30,6 +30,9 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
     private final ListAssistHearingMessageHelper listAssistHearingMessageHelper;
 
+    @Value("${feature.direction-hearings.enabled}")
+    private boolean isDirectionHearingsEnabled;
+
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
@@ -102,12 +105,14 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 callbackResponse.addError("An error occurred during message publish. Please try again.");
             }
         }
-        sscsCaseData.getAppeal()
-            .setHearingOptions(Optional.ofNullable(sscsCaseData.getAppeal().getHearingOptions())
-                .map(HearingOptions::toBuilder)
-                .orElseGet(HearingOptions::builder)
-                .hmcHearingType(getHmcHearingType(sscsCaseData))
-                .build());
+        if (isDirectionHearingsEnabled) {
+            sscsCaseData.getAppeal()
+                .setHearingOptions(Optional.ofNullable(sscsCaseData.getAppeal().getHearingOptions())
+                    .map(HearingOptions::toBuilder)
+                    .orElseGet(HearingOptions::builder)
+                    .hmcHearingType(getHmcHearingType(sscsCaseData))
+                    .build());
+        }
         return callbackResponse;
     }
 }

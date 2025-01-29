@@ -33,6 +33,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.HearingLocation;
@@ -85,6 +86,7 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
 
     @BeforeEach
     void setUp() {
+        ReflectionTestUtils.setField(HearingsDetailsMapping.class, "isDirectionHearingsEnabled", true);
         OverrideFields defaultListingValues = OverrideFields.builder()
             .duration(60)
             .build();
@@ -221,6 +223,15 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
         boolean result = HearingsDetailsMapping.isCaseLinked(caseData);
 
         assertThat(result).isFalse();
+    }
+
+    @DisplayName("Hearing type should be substantive if directions hearing flag is off.")
+    @Test
+    void getHearingTypeDirectionHearingsFlagOff() {
+        ReflectionTestUtils.setField(HearingsDetailsMapping.class, "isDirectionHearingsEnabled", false);
+        HmcHearingType result = HearingsDetailsMapping.getHearingType(caseData);
+
+        assertThat(result).isEqualTo(HmcHearingType.SUBSTANTIVE);
     }
 
     @DisplayName("Hearing type should be substantive if hmcHearingType is null.")

@@ -1,4 +1,5 @@
 [
-  {"LiveFrom": "13/01/2025", "ID": "hearingOutcomeDetails", "ListElementCode": "completedHearings",  "FieldType": "DynamicList", "ElementLabel": "Hearings", "SecurityClassification": "PUBLIC"}
+  {"LiveFrom": "13/01/2025", "ID": "hearingOutcomeDetails", "ListElementCode": "completedHearings",  "FieldType": "DynamicList", "ElementLabel": "Hearings", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "ID": "hearingOptions", "ListElementCode": "hmcHearingType", "FieldType": "FixedRadioList", "FieldTypeParameter": "FL_hmcHearingType", "ElementLabel": "Next hearing Type", "FieldShowCondition": "hmcHearingType=\"*\"", "SecurityClassification": "PUBLIC"}
 ]
 

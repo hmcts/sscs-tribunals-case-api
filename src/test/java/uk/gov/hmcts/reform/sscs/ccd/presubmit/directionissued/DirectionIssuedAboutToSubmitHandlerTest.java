@@ -32,6 +32,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -818,7 +819,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @EnumSource(value = HmcHearingType.class, names = {"SUBSTANTIVE", "DIRECTION_HEARINGS"})
-    void willSetTypeOfHearingInHearingOptionsNotNullIfselectNextHmcHearingTypeIsYes(HmcHearingType hmcHearingType) {
+    void willSetTypeOfHearingInHearingOptionsNotNullIfSelectNextTypeOfHearingIsYes(HmcHearingType hmcHearingType) {
         when(caseDetails.getState()).thenReturn(State.READY_TO_LIST);
         sscsCaseData.setSelectNextHmcHearingType(YES);
         sscsCaseData.setHmcHearingType(hmcHearingType);
@@ -829,5 +830,22 @@ class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals(hmcHearingType, response.getData().getAppeal().getHearingOptions().getHmcHearingType());
         HearingOptions expectedHearingOptions = HearingOptions.builder().agreeLessNotice("string").hmcHearingType(hmcHearingType).build();
         assertEquals(expectedHearingOptions, response.getData().getAppeal().getHearingOptions());
+    }
+
+    @Test
+    void willNotAffectHmcHearingTypeIfFlagIsOff() {
+        ReflectionTestUtils.setField(handler, "isDirectionHearingsEnabled", false);
+        when(caseDetails.getState()).thenReturn(State.READY_TO_LIST);
+        SscsCaseData mockedSscsCaseData = mock(SscsCaseData.class);
+        Appeal mockedAppeal = mock(Appeal.class);
+        when(caseDetails.getCaseData()).thenReturn(mockedSscsCaseData);
+        when(mockedSscsCaseData.getAppeal()).thenReturn(mockedAppeal);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        verify(mockedSscsCaseData, never()).getHmcHearingType();
+        verify(mockedAppeal, never()).getHearingOptions();
+        verify(mockedAppeal, never()).setHearingOptions(any());
+        verify(mockedSscsCaseData, never()).getSchedulingAndListingFields();
+        assertNull(response.getData().getSelectNextHmcHearingType());
+        assertNull(response.getData().getAppeal().getHearingOptions());
     }
 }
