@@ -2059,13 +2059,6 @@ job.scheduler:
 judicial-ref:
     api:
         url: ${JUDICIAL_REF_API_URL:http://localhost:5555}
-# TODO: SB3
-caseworker-ref:
-    api:
-        url: dummy:8080
-common-ref:
-    api:
-        url: dummy:8080
 
 ---
 # tya-integration profile

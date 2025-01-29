@@ -288,18 +288,6 @@ dependencyManagement {
         dependencySet(group: 'org.yaml', version: '2.0') {
             entry 'snakeyaml'
         }
-// TODO: SB3
-//        //CVE-2023-33202
-//        dependencySet(group: 'org.springframework.security', version: '1.1.5') {
-//            entry 'spring-security-rsa'
-//        }
-
-// TODO: SB3
-//        //CVE-2023-6378, CVE-2023-6481
-//        dependencySet(group: 'ch.qos.logback', version: '1.2.13') {
-//            entry 'logback-core'
-//            entry 'logback-classic'
-//        }
 
         imports {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:2024.0.0"

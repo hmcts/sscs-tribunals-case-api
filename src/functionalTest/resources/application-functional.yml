@@ -1,8 +1,0 @@
-
-# TODO: SB3
-caseworker-ref:
-  api:
-    url: dummy:8080
-common-ref:
-  api:
-    url: dummy:8080
