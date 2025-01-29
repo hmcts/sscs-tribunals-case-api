@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.CORRECTION_GRANTED;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_CORRECTED_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
@@ -40,6 +41,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -72,6 +74,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFinalDecisionCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
@@ -84,6 +87,12 @@ class SscsUtilTest {
     private SessionCategoryMapService categoryMapService = new SessionCategoryMapService();
     private PostHearing postHearing;
     private SscsCaseData caseData;
+
+    @Mock
+    private SscsFinalDecisionCaseData finalDecisionCaseData;
+
+    @Mock
+    private SscsCaseData mockedCaseData;
 
     @BeforeEach
     void setUp() {
@@ -632,6 +641,45 @@ class SscsUtilTest {
                 )
                 .build();
         assertFalse(sscsCaseData.isIbcCase());
+    }
+
+    @Test
+    void testBuildWriteFinalDecisionHeldBefore_WithAllPanelMembers() {
+        when(mockedCaseData.getSscsFinalDecisionCaseData()).thenReturn(finalDecisionCaseData);
+        when(finalDecisionCaseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName()).thenReturn("Disability Member");
+        when(finalDecisionCaseData.getWriteFinalDecisionOtherPanelMemberName()).thenReturn("Other Member");
+        when(finalDecisionCaseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName()).thenReturn("Medical Member");
+        when(finalDecisionCaseData.getWriteFinalDecisionFinanciallyQualifiedPanelMemberName()).thenReturn("Financial Member");
+
+        String result = SscsUtil.buildWriteFinalDecisionHeldBefore(mockedCaseData, "Judge Name");
+
+        assertEquals("Judge Name, Disability Member, Other Member, Medical Member and Financial Member", result);
+    }
+
+    @Test
+    void testBuildWriteFinalDecisionHeldBefore_WithNoPanelMembers() {
+        when(mockedCaseData.getSscsFinalDecisionCaseData()).thenReturn(finalDecisionCaseData);
+        when(finalDecisionCaseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName()).thenReturn(null);
+        when(finalDecisionCaseData.getWriteFinalDecisionOtherPanelMemberName()).thenReturn(null);
+        when(finalDecisionCaseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName()).thenReturn(null);
+        when(finalDecisionCaseData.getWriteFinalDecisionFinanciallyQualifiedPanelMemberName()).thenReturn(null);
+
+        String result = SscsUtil.buildWriteFinalDecisionHeldBefore(mockedCaseData, "Judge Name");
+
+        assertEquals("Judge Name", result);
+    }
+
+    @Test
+    void testBuildWriteFinalDecisionHeldBefore_WithSomePanelMembers() {
+        when(mockedCaseData.getSscsFinalDecisionCaseData()).thenReturn(finalDecisionCaseData);
+        when(finalDecisionCaseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName()).thenReturn("Disability Member");
+        when(finalDecisionCaseData.getWriteFinalDecisionOtherPanelMemberName()).thenReturn(null);
+        when(finalDecisionCaseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName()).thenReturn("Medical Member");
+        when(finalDecisionCaseData.getWriteFinalDecisionFinanciallyQualifiedPanelMemberName()).thenReturn(null);
+
+        String result = SscsUtil.buildWriteFinalDecisionHeldBefore(mockedCaseData, "Judge Name");
+
+        assertEquals("Judge Name, Disability Member and Medical Member", result);
     }
 
     @Test

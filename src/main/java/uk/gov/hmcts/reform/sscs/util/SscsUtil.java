@@ -370,11 +370,14 @@ public class SscsUtil {
         if (isNotBlank(finalDecisionCaseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName())) {
             names.add(finalDecisionCaseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName());
         }
+        if (isNotBlank(finalDecisionCaseData.getWriteFinalDecisionOtherPanelMemberName())) {
+            names.add(finalDecisionCaseData.getWriteFinalDecisionOtherPanelMemberName());
+        }
         if (isNotBlank(finalDecisionCaseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName())) {
             names.add(finalDecisionCaseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
         }
-        if (isNotBlank(finalDecisionCaseData.getWriteFinalDecisionOtherPanelMemberName())) {
-            names.add(finalDecisionCaseData.getWriteFinalDecisionOtherPanelMemberName());
+        if (isNotBlank(finalDecisionCaseData.getWriteFinalDecisionFinanciallyQualifiedPanelMemberName())) {
+            names.add(finalDecisionCaseData.getWriteFinalDecisionFinanciallyQualifiedPanelMemberName());
         }
         return StringUtils.getGramaticallyJoinedStrings(names);
     }

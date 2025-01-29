@@ -4088,7 +4088,8 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "setHearingRoute",
     "PageLabel": "Set Hearing Route",
-    "ShowSummaryChangeOption": "Y"
+    "ShowSummaryChangeOption": "Y",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent"
   },
   {
     "LiveFrom": "30/10/2024",
