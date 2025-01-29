@@ -177,6 +177,8 @@ aac-manage-case-assignment:
   enabled: false
 am-org-role-mapping-service:
   enabled: false
+em-stitching:
+  enabled: false
 wa:
   enabled: false
   taskBatchCron:
