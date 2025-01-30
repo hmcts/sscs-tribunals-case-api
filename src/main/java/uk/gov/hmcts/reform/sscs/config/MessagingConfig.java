@@ -21,7 +21,7 @@ import org.springframework.jms.core.JmsTemplate;
 @EnableJms
 public class MessagingConfig {
 
-    @Bean
+    @Bean("evidenceShareJmsUrl")
     public String jmsUrlString(@Value("${amqp.amqp-connection-string-template}") final String amqpConnectionStringTemplate,
                                @Value("${amqp.idleTimeout}") final Long idleTimeout,
                                @Value("${amqp.host}") final String host) {
@@ -32,7 +32,7 @@ public class MessagingConfig {
     public ConnectionFactory jmsConnectionFactory(@Value("${spring.application.name}") final String clientId,
                                                   @Value("${amqp.username}") final String username,
                                                   @Value("${amqp.password}") final String password,
-                                                  @Autowired final String jmsUrlString,
+                                                  @Autowired @Qualifier("evidenceShareJmsUrl") final String jmsUrlString,
                                                   @Autowired(required = false) final SSLContext jmsSslContext,
                                                   @Value("${amqp.prefetch.override}") final boolean prefetchOverride,
                                                   @Value("${amqp.prefetch.topicPrefetch}") final int topicPrefetch,

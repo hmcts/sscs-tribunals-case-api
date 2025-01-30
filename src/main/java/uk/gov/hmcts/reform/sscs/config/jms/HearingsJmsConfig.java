@@ -41,13 +41,13 @@ public class HearingsJmsConfig {
     @Value("${spring.application.name}")
     private String clientId;
 
-    @Bean
+    @Bean("hmcHearingsJmsUrl")
     public String jmsUrlString(@Value("${azure.service-bus.hmc-to-hearings-api.namespace}${azure.service-bus.connection-postfix}") final String host) {
         return String.format(AMQP_CONNECTION_STRING_TEMPLATE, host, idleTimeout);
     }
 
     @Bean("hmcHearingsJmsConnectionFactory")
-    public ConnectionFactory jmsConnectionFactory(@Autowired final String jmsUrlString,
+    public ConnectionFactory jmsConnectionFactory(@Autowired @Qualifier("hmcHearingsJmsUrl") final String jmsUrlString,
                                                   @Autowired(required = false) final SSLContext jmsSslContext
     ) {
         JmsConnectionFactory jmsConnectionFactory = new JmsConnectionFactory(jmsUrlString);
