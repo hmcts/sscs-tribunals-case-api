@@ -187,22 +187,6 @@ public class TribunalsCaseApiApplication implements CommandLineRunner {
     @Value("${gov.uk.notification.api.testKey}")
     private String testApiKey;
 
-    //    @Bean
-    //    public ServletListenerRegistrationBean<ServletContextListener> appInsightsServletContextListenerRegistrationBean(
-    //        ApplicationInsightsServletContextListener applicationInsightsServletContextListener) {
-    //        ServletListenerRegistrationBean<ServletContextListener> srb =
-    //            new ServletListenerRegistrationBean<>();
-    //        srb.setListener(applicationInsightsServletContextListener);
-    //        return srb;
-    //    }
-    //
-    //    @Bean
-    //    @ConditionalOnMissingBean
-    //    public ApplicationInsightsServletContextListener applicationInsightsServletContextListener() {
-    //        return new ApplicationInsightsServletContextListener();
-    //    }
-
-
     @Bean
     @Primary
     public NotificationClient notificationClient() {
