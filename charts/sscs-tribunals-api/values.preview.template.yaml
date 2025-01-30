@@ -131,7 +131,7 @@ em-ccdorc:
       LOGGING_LEVEL_UK_GOV_HMCTS_REFORM_EM: DEBUG
 
 em-stitching:
-  enabled: true
+  enabled: ${PREVIEW_BRANCH_WITH_LOCAL_CCD}
   java:
     image: hmctspublic.azurecr.io/em/stitching:latest
     releaseNameOverride: ${SERVICE_NAME}-em-stitching
@@ -158,7 +158,7 @@ em-stitching:
         disabled: false
 
 ccd-case-document-am-api:
-  enabled: true
+  enabled: ${PREVIEW_BRANCH_WITH_LOCAL_CCD}
   java:
     image: hmctspublic.azurecr.io/ccd/case-document-am-api:latest
     releaseNameOverride: ${SERVICE_NAME}-ccd-case-document-am-api
@@ -240,7 +240,7 @@ global:
   postgresUsername: hmcts
 
 ccd:
-  enabled: ${PREVIEW_CCD_ENABLED}
+  enabled: ${PREVIEW_BRANCH_WITH_LOCAL_CCD}
   ccd:
     adminWeb:
       enabled: ${PREVIEW_CCD_ENABLED}
@@ -642,7 +642,7 @@ servicebus:
       - name: tribunals-to-hearing-api
 
 postgresql:
-  enabled: true
+  enabled: ${PREVIEW_BRANCH_WITH_LOCAL_CCD}
   flexibleserver: sscs-preview
   setup:
     databases:
