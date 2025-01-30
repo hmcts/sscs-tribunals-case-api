@@ -5,6 +5,7 @@ import javax.net.ssl.SSLContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.qpid.jms.JmsConnectionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -45,7 +46,7 @@ public class HearingsJmsConfig {
         return String.format(AMQP_CONNECTION_STRING_TEMPLATE, host, idleTimeout);
     }
 
-    @Bean
+    @Bean("hmcHearingsJmsConnectionFactory")
     public ConnectionFactory jmsConnectionFactory(@Autowired final String jmsUrlString,
                                                   @Autowired(required = false) final SSLContext jmsSslContext
     ) {
@@ -61,7 +62,7 @@ public class HearingsJmsConfig {
     }
 
     @Bean
-    public JmsTemplate jmsTemplate(ConnectionFactory jmsConnectionFactory) {
+    public JmsTemplate jmsTemplate(@Qualifier("hmcHearingsJmsConnectionFactory") ConnectionFactory jmsConnectionFactory) {
         JmsTemplate returnValue = new JmsTemplate();
         returnValue.setConnectionFactory(jmsConnectionFactory);
         return returnValue;
@@ -69,7 +70,7 @@ public class HearingsJmsConfig {
 
     @Bean
     @ConditionalOnProperty("flags.hmc-to-hearings-api.enabled")
-    public JmsListenerContainerFactory hmcHearingsEventTopicContainerFactory(ConnectionFactory connectionFactory) {
+    public JmsListenerContainerFactory hmcHearingsEventTopicContainerFactory(@Qualifier("hmcHearingsJmsConnectionFactory") ConnectionFactory connectionFactory) {
         log.info("Creating JMSListenerContainer bean for topics..");
         DefaultJmsListenerContainerFactory returnValue = new DefaultJmsListenerContainerFactory();
         returnValue.setConnectionFactory(connectionFactory);
