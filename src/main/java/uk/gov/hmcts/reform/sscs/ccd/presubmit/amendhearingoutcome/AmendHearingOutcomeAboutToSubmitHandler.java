@@ -34,15 +34,17 @@ public class AmendHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbac
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (sscsCaseData.getHearingOutcomes().isEmpty()) {
-            sscsCaseData.setHearingOutcomes(null);
-        }
-
         Boolean hasNewOutcomeBeenAdded = sscsCaseData.getHearingOutcomes().stream()
                 .anyMatch(hearingOutcome -> hearingOutcome.getValue().getCompletedHearingId() == null);
         if (hasNewOutcomeBeenAdded) {
             preSubmitCallbackResponse.addError("New hearing outcome cannot be added in amend hearing.");
         }
+
+        if (sscsCaseData.getHearingOutcomes().isEmpty()) {
+            sscsCaseData.setHearingOutcomes(null);
+        }
+
+
 
         return preSubmitCallbackResponse;
     }
