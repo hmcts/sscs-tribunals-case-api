@@ -356,7 +356,7 @@ dependencies {
     implementation group: 'com.mchange', name: 'c3p0', version: '0.10.1'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'spring-boot-3-SNAPSHOT'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6.0.0'
 
     // sscs-pdf-email-common
     implementation group: 'com.github.sps.junidecode', name: 'junidecode', version: '0.3'
@@ -537,12 +537,6 @@ tasks.register('runAndPublishConsumerPactTests', Test) {
     logger.lifecycle("Runs pact Tests")
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
-}
-
-tasks.register('getSscsCommonVersion') {
-    doLast {
-        print '4.18.0'
-    }
 }
 
 runAndPublishConsumerPactTests.dependsOn contract
