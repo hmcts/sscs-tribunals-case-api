@@ -25,5 +25,15 @@
     "DisplayContext": "MANDATORY",
     "LiveFrom": "13/01/2025",
     "FieldDisplayOrder": 3
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "overrideFields",
+    "ListElementCode": "hmcHearingType",
+    "ID": "updateListingRequirementsOverrideFieldsTypeOfHearing",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/07/2022",
+    "FieldDisplayOrder": 7,
+    "PageID": "1.0"
   }
 ]

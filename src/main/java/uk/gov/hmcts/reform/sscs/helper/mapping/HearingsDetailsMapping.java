@@ -6,6 +6,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingPriority.STANDARD;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingPriority.URGENT;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getHmcHearingType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -81,8 +82,8 @@ public final class HearingsDetailsMapping {
     }
 
     public static HmcHearingType getHearingType(SscsCaseData sscsCaseData) {
-        return isDirectionHearingsEnabled && sscsCaseData.getHmcHearingType() != null
-            ? sscsCaseData.getHmcHearingType() : HmcHearingType.SUBSTANTIVE;
+        return isDirectionHearingsEnabled && getHmcHearingType(sscsCaseData) != null
+            ? getHmcHearingType(sscsCaseData) : HmcHearingType.SUBSTANTIVE;
     }
 
     public static boolean isCaseUrgent(@Valid SscsCaseData caseData) {
