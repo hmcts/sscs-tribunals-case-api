@@ -306,6 +306,14 @@ public class Personalisation<E extends NotificationWrapper> {
             setDecisionDate(personalisation, ccdResponse);
         }
 
+        if (ccdResponse.isIbcCase()) {
+            personalisation.put(IS_IBC_CASE, "Yes");
+            personalisation.put(IS_NOT_IBC_CASE, "No");
+        } else {
+            personalisation.put(IS_IBC_CASE, "No");
+            personalisation.put(IS_NOT_IBC_CASE, "Yes");
+        }
+
         personalisation.put(IS_GRANTED, isGranted);
         personalisation.put(SENDER_NAME, LetterUtils.getNameForSender(ccdResponse));
 
