@@ -3263,7 +3263,7 @@
     "CaseTypeID": "Benefit",
     "ID": "caseOutcomeMigration",
     "Name": "Case migrated automatically",
-    "DisplayOrder": 142,
+    "DisplayOrder": 10007,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
     "SecurityClassification": "Public"
