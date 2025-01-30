@@ -80,7 +80,7 @@ public class DocmosisPdfGenerationIt {
             pdfGenerationService.generatePdf(DocumentHolder.builder().template(new Template("dl6-template.doc", "dl6")).placeholders(PLACEHOLDERS).build());
             fail("should have thrown bad-request exception");
         } catch (PdfGenerationException e) {
-            HttpStatus httpStatus = ((HttpClientErrorException) e.getCause()).getStatusCode();
+            var httpStatus = ((HttpClientErrorException) e.getCause()).getStatusCode();
             assertEquals(HttpStatus.BAD_REQUEST, httpStatus);
         }
     }
