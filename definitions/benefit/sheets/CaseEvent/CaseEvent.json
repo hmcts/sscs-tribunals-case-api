@@ -3277,5 +3277,15 @@
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
     "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "22/01/2025",
+    "CaseTypeID": "Benefit",
+    "ID": "removeGapsOutcomeTab",
+    "Name": "Case migrated",
+    "DisplayOrder": 1303,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public"
   }
 ]
