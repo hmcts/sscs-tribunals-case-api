@@ -15,6 +15,7 @@ import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
 @Configuration
 @Slf4j
@@ -67,7 +68,7 @@ public class MessagingConfig {
     }
 
     @Bean("evidenceShareJmsListenerContainerFactory")
-    public JmsListenerContainerFactory topicJmsListenerContainerFactory(@Qualifier("evidenceShareJmsConnectionFactory") ConnectionFactory connectionFactory) {
+    public JmsListenerContainerFactory<DefaultMessageListenerContainer> topicJmsListenerContainerFactory(@Qualifier("evidenceShareJmsConnectionFactory") ConnectionFactory connectionFactory) {
         log.info("Creating JMSListenerContainer bean for topics..");
         DefaultJmsListenerContainerFactory returnValue = new DefaultJmsListenerContainerFactory();
         returnValue.setConnectionFactory(connectionFactory);

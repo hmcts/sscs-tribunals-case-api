@@ -14,6 +14,7 @@ import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
 @Slf4j
 @Configuration
@@ -70,7 +71,7 @@ public class HearingsJmsConfig {
 
     @Bean("hmcHearingsEventTopicContainerFactory")
     @ConditionalOnProperty("flags.hmc-to-hearings-api.enabled")
-    public JmsListenerContainerFactory hmcHearingsEventTopicContainerFactory(@Qualifier("hmcHearingsJmsConnectionFactory") ConnectionFactory connectionFactory) {
+    public JmsListenerContainerFactory<DefaultMessageListenerContainer> hmcHearingsEventTopicContainerFactory(@Qualifier("hmcHearingsJmsConnectionFactory") ConnectionFactory connectionFactory) {
         log.info("Creating JMSListenerContainer bean for topics..");
         DefaultJmsListenerContainerFactory returnValue = new DefaultJmsListenerContainerFactory();
         returnValue.setConnectionFactory(connectionFactory);
