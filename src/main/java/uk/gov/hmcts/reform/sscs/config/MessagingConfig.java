@@ -59,14 +59,14 @@ public class MessagingConfig {
         return cachingConnectionFactory;
     }
 
-    @Bean
+    @Bean("evidenceShareJmsTemplate")
     public JmsTemplate jmsTemplate(@Qualifier("evidenceShareJmsConnectionFactory") ConnectionFactory jmsConnectionFactory) {
         JmsTemplate returnValue = new JmsTemplate();
         returnValue.setConnectionFactory(jmsConnectionFactory);
         return returnValue;
     }
 
-    @Bean
+    @Bean("evidenceShareJmsListenerContainerFactory")
     public JmsListenerContainerFactory topicJmsListenerContainerFactory(@Qualifier("evidenceShareJmsConnectionFactory") ConnectionFactory connectionFactory) {
         log.info("Creating JMSListenerContainer bean for topics..");
         DefaultJmsListenerContainerFactory returnValue = new DefaultJmsListenerContainerFactory();

@@ -28,7 +28,7 @@ public class TopicPublisher {
     private final ConnectionFactory connectionFactory;
 
     @Autowired
-    public TopicPublisher(JmsTemplate jmsTemplate,
+    public TopicPublisher(@Qualifier("evidenceShareJmsTemplate") JmsTemplate jmsTemplate,
                           @Value("${amqp.topic}") final String destination,
                           @Qualifier("evidenceShareJmsConnectionFactory") ConnectionFactory connectionFactory) {
         this.jmsTemplate = jmsTemplate;

@@ -61,14 +61,14 @@ public class HearingsJmsConfig {
         return new CachingConnectionFactory(jmsConnectionFactory);
     }
 
-    @Bean
+    @Bean("hmcHearingsJmsTemplate")
     public JmsTemplate jmsTemplate(@Qualifier("hmcHearingsJmsConnectionFactory") ConnectionFactory jmsConnectionFactory) {
         JmsTemplate returnValue = new JmsTemplate();
         returnValue.setConnectionFactory(jmsConnectionFactory);
         return returnValue;
     }
 
-    @Bean
+    @Bean("hmcHearingsEventTopicContainerFactory")
     @ConditionalOnProperty("flags.hmc-to-hearings-api.enabled")
     public JmsListenerContainerFactory hmcHearingsEventTopicContainerFactory(@Qualifier("hmcHearingsJmsConnectionFactory") ConnectionFactory connectionFactory) {
         log.info("Creating JMSListenerContainer bean for topics..");
