@@ -83,6 +83,7 @@ class CaseUpdatedAboutToStartHandlerTest {
     void givenPortOfEntryValueNotNull_shouldNotSetListUp() {
         DynamicList ukPortOfEntries = SscsUtil.getPortsOfEntry();
         ukPortOfEntries.setValue(new DynamicListItem("GBSTTRT00", "Althorpe"));
+        sscsCaseData.setBenefitCode("093");
         sscsCaseData.getAppeal().getAppellant().getAddress().setUkPortOfEntryList(ukPortOfEntries);
         var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         var portOfEntryList = result.getData().getAppeal().getAppellant().getAddress().getUkPortOfEntryList();
@@ -100,6 +101,7 @@ class CaseUpdatedAboutToStartHandlerTest {
     @Test
     void givenPortOfEntryValueNull_shouldSetListUpWithNullValue() {
         DynamicList ukPortOfEntries = SscsUtil.getPortsOfEntry();
+        sscsCaseData.setBenefitCode("093");
         sscsCaseData.getAppeal().getAppellant().getAddress().setUkPortOfEntryList(ukPortOfEntries);
         var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         var portOfEntryList = result.getData().getAppeal().getAppellant().getAddress().getUkPortOfEntryList();
@@ -115,6 +117,7 @@ class CaseUpdatedAboutToStartHandlerTest {
 
     @Test
     void givenPortOfEntryCode_shouldSetListUpWithValueFromCode() {
+        sscsCaseData.setBenefitCode("093");
         sscsCaseData.getAppeal().getAppellant().getAddress().setPortOfEntry("GBSTTRT00");
         var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         var portOfEntryList = result.getData().getAppeal().getAppellant().getAddress().getUkPortOfEntryList();
@@ -132,6 +135,7 @@ class CaseUpdatedAboutToStartHandlerTest {
 
     @Test
     void givenNoPortOfEntryCode_shouldSetListUpWithNullValue() {
+        sscsCaseData.setBenefitCode("093");
         var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         var portOfEntryList = result.getData().getAppeal().getAppellant().getAddress().getUkPortOfEntryList();
         var portOfEntry = result.getData().getAppeal().getAppellant().getAddress().getUkPortOfEntry();
@@ -142,6 +146,18 @@ class CaseUpdatedAboutToStartHandlerTest {
         assertThat(portOfEntryList).isNotNull();
         assertThat(portOfEntryList.getValue()).isNull();
         assertThat(portOfEntryList.getListItems()).hasSize(UkPortOfEntry.values().length);
+    }
+
+    @Test
+    void givenNonIbcCase_shouldNotSetListUp() {
+        var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        var portOfEntryList = result.getData().getAppeal().getAppellant().getAddress().getUkPortOfEntryList();
+        var portOfEntry = result.getData().getAppeal().getAppellant().getAddress().getUkPortOfEntry();
+        var portOfEntryCode = result.getData().getAppeal().getAppellant().getAddress().getPortOfEntry();
+
+        assertThat(portOfEntry).isNull();
+        assertThat(portOfEntryCode).isNull();
+        assertThat(portOfEntryList).isNull();
     }
 
     @Test
