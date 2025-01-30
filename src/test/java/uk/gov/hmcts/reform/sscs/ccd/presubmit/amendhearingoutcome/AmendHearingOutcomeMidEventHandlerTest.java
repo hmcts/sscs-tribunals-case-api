@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,7 +16,11 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOutcome;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOutcomeDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
+
 
 @RunWith(JUnitParamsRunner.class)
 public class AmendHearingOutcomeMidEventHandlerTest {
@@ -49,6 +55,37 @@ public class AmendHearingOutcomeMidEventHandlerTest {
     public void givenAnInvalidAboutToSubmitEvent_thenReturnTrue() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
         assertThat(handler.canHandle(CallbackType.MID_EVENT, callback)).isFalse();
+    }
+
+    @Test
+    public void givenAHearingWasAdded_ThenReturnError() {
+        sscsCaseData.setHearingOutcomes(List.of(
+            HearingOutcome.builder().value(HearingOutcomeDetails.builder().completedHearingId(null).build()).build(),
+            HearingOutcome.builder().value(
+                    HearingOutcomeDetails.builder()
+                            .hearingOutcomeId("17")
+                            .hearingChannelId(HearingChannel.FACE_TO_FACE)
+                            .hearingStartDateTime(LocalDateTime.now().minusHours(1))
+                            .hearingEndDateTime(LocalDateTime.now())
+                            .completedHearingId("123").build()).build()
+        ));
+        var response = handler.handle(CallbackType.MID_EVENT, callback, "userAuthorisation");
+        assertThat(response.getErrors()).contains("Hearing outcomes cannot be added in amend hearing.");
+    }
+
+    @Test
+    public void givenNoHearingAdded_ThenReturnResponse() {
+        sscsCaseData.setHearingOutcomes(List.of(
+            HearingOutcome.builder().value(
+                    HearingOutcomeDetails.builder()
+                            .hearingOutcomeId("17")
+                            .hearingChannelId(HearingChannel.FACE_TO_FACE)
+                            .hearingStartDateTime(LocalDateTime.now().minusHours(1))
+                            .hearingEndDateTime(LocalDateTime.now())
+                            .completedHearingId("123").build()).build()
+        ));
+        var response = handler.handle(CallbackType.MID_EVENT, callback, "userAuthorisation");
+        assertThat(response.getErrors()).isEmpty();
     }
 
 }
