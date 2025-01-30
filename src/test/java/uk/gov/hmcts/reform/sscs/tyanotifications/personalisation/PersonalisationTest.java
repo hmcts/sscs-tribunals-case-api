@@ -236,7 +236,7 @@ public class PersonalisationTest {
 
         NotificationWrapper notificationWrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(SscsCaseData.builder()
-                .directionTypeDl(new DynamicList("grantUrgentHearing"))
+                .directionTypeDl(new DynamicList(directionTypeString))
                 .appeal(Appeal.builder()
                     .hearingType(ONLINE.getValue())
                     .build())
@@ -249,7 +249,39 @@ public class PersonalisationTest {
         verify(config).getTemplate(eq(DIRECTION_ISSUED.getId()),
             eq(DIRECTION_ISSUED.getId()),
             eq(DIRECTION_ISSUED.getId()),
-            eq("directionIssued.grantUrgentHearing" + "." + lowerCase(subscriptionType.toString())),
+            eq(templateConfig + "." + lowerCase(subscriptionType.toString())),
+            any(Benefit.class), any(NotificationWrapper.class), eq(null)
+        );
+    }
+
+
+    @Test
+    @Parameters({"APPELLANT, grantUrgentHearing, directionIssuedWelsh.grantUrgentHearing",
+        "JOINT_PARTY, grantUrgentHearing, directionIssuedWelsh.grantUrgentHearing",
+        "REPRESENTATIVE, grantUrgentHearing, directionIssuedWelsh.grantUrgentHearing",
+        "APPOINTEE, grantUrgentHearing, directionIssuedWelsh.grantUrgentHearing",
+        "APPELLANT, refuseUrgentHearing, directionIssuedWelsh.refuseUrgentHearing",
+        "JOINT_PARTY, refuseUrgentHearing, directionIssuedWelsh.refuseUrgentHearing",
+        "REPRESENTATIVE, refuseUrgentHearing, directionIssuedWelsh.refuseUrgentHearing",
+        "APPOINTEE, refuseUrgentHearing, directionIssuedWelsh.refuseUrgentHearing"})
+    public void whenDirectionIssuedWelshAndGrantOrRefuseUrgentHearingShouldGenerateCorrectTemplate(SubscriptionType subscriptionType, String directionTypeString, String templateConfig) {
+
+        NotificationWrapper notificationWrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
+            .newSscsCaseData(SscsCaseData.builder()
+                .directionTypeDl(new DynamicList(directionTypeString))
+                .appeal(Appeal.builder()
+                    .hearingType(ONLINE.getValue())
+                    .build())
+                .build())
+            .notificationEventType(DIRECTION_ISSUED_WELSH)
+            .build());
+
+        personalisation.getTemplate(notificationWrapper, PIP, subscriptionType);
+
+        verify(config).getTemplate(eq(DIRECTION_ISSUED_WELSH.getId()),
+            eq(DIRECTION_ISSUED_WELSH.getId()),
+            eq(DIRECTION_ISSUED_WELSH.getId()),
+            eq(templateConfig + "." + lowerCase(subscriptionType.toString())),
             any(Benefit.class), any(NotificationWrapper.class), eq(null)
         );
     }
