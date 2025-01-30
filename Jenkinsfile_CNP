@@ -224,6 +224,7 @@ def setAatEnvVars() {
     env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
     env.CCD_GW_API = "https://gateway-ccd.aat.platform.hmcts.net"
     env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
+    env.EM_STITCHING_API_URL = "http://em-stitching-aat.service.core-compute-aat.internal"
     env.ENVIRONMENT="aat"
 }
 
@@ -235,6 +236,7 @@ def setPreviewEnvVars() {
     env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.CCD_GW_API = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-api-gw"
     env.CASE_DOCUMENT_AM_URL = "https://ccd-case-document-am-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.EM_STITCHING_API_URL = "https://em-stitching-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.ENVIRONMENT = "pr"
     env.HEARINGS_ENABLED = 'No'
 }
