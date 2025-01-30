@@ -279,12 +279,6 @@ feature:
         enabled: ${SCOTTISH_PO_BOX_ENABLED:false}
     urgent-hearing:
         enabled: ${URGENT_HEARING_ENABLED:false}
-    bypass-notifications-service:
-        enabled: ${BYPASS_NOTIFICATIONS_SERVICE:false}
-    process-event-message-v2:
-        enabled: ${PROCESS_EVENT_MESSAGE_V2_ENABLED:false}
-    bypass-hearing-api-service:
-        enabled: ${BYPASS_HEARING_API_SERVICE:false}
     hearings-case-updateV2:
         enabled: ${HEARINGS_CASE_UPDATE_V2_ENABLED:false}
 
@@ -520,7 +514,7 @@ notification:
                 letterId: 91143b85-dd9d-430c-ba23-e42ec90f44f8
                 docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx
             representative:
-                emailId: 3d05393a-e593-400a-963f-a26893a0b672
+                emailId: 8003606e-3d80-4e17-b846-18698f8d681e
                 smsId: 99bd4a56-256c-4de8-b187-d43a8dde466f
                 letterId: 77ea8a2f-06df-4279-9c1f-0f23cb2d9bbf
                 docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Representative.docx
@@ -672,7 +666,7 @@ notification:
                 letterId: 747d026e-1bec-4e96-8a34-28f36e30bba5
         validAppealCreated:
             appellant:
-                emailId: 9b5a6ac7-a1ad-4fc2-8e83-b0f32af9ff32
+                emailId: 4917669f-d1b4-4748-851f-f10b90f27da3
                 smsId: f41222ef-c05c-4682-9634-6b034a166368
             representative:
                 emailId: 652753bf-59b4-46eb-9c24-bd762338a098
@@ -1159,7 +1153,7 @@ notification:
                 letterId: 830ba7f1-9757-4833-8520-2f872de7be44
                 docmosisId: TB-SCS-LET-WEL-Appeal-Lodged-Appellant.docx
             representative:
-                emailId: e7993ed9-982a-44eb-8459-932d6d7653ea
+                emailId: a4a85f03-c23c-4099-ab45-7a3ba9eee63a
                 smsId: 6970bdda-7293-46d6-8876-7e1a7c4295fc
                 letterId: 89cbb9d8-3b7d-4766-b481-585832e8bd90
                 docmosisId: TB-SCS-LET-WEL-Appeal-Lodged-Representative.docx
@@ -1298,7 +1292,7 @@ notification:
             smsId: 093c010c-bc22-4b8a-bd22-c9c55bb40a80
         appealCreated:
             appellant:
-                emailId: e3fa02fd-87b2-471c-9a99-7020b367eca9
+                emailId: 8910e2d2-4332-4ef6-a4b5-025ffad4f17d
                 smsId: 6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82
                 letterId: 830ba7f1-9757-4833-8520-2f872de7be44
             representative:
@@ -1311,7 +1305,7 @@ notification:
                 letterId: 95b0b0f8-fdf6-450f-b805-6aab46d63bf7
         validAppealCreated:
             appellant:
-                emailId: e3fa02fd-87b2-471c-9a99-7020b367eca9
+                emailId: 8910e2d2-4332-4ef6-a4b5-025ffad4f17d
                 smsId: 6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82
             representative:
                 emailId: 364bccc5-ffa6-495d-8035-e642d15114bf
@@ -1321,7 +1315,7 @@ notification:
                 smsId: 6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82
         resendAppealCreated:
             appellant:
-                emailId: e3fa02fd-87b2-471c-9a99-7020b367eca9
+                emailId: 8910e2d2-4332-4ef6-a4b5-025ffad4f17d
                 smsId: 6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82
                 docmosisId: TB-SCS-LET-WEL-Appeal-Lodged-Appellant.docx
             representative:
@@ -1859,11 +1853,13 @@ text:
             NOSTRING: "no"
             DATES_NOT_ATTENDING: "Dates you can't attend: "
             DATE_OF_MRN: "Date of MRN: "
+            DATE_OF_RDN: "Date of Review Decision Notice: "
             REASON_FOR_LATE_APPEAL: "Reason for late appeal: "
             REASON_FOR_NO_MRN: "Reason for no MRN: "
             NAME: "Name: "
             DATE_OF_BIRTH: "Date of birth: "
             NINO: "National Insurance number: "
+            IBCA_REFERENCE: "IBCA reference: "
             ADDRESS: "Address: "
             EMAIL: "Email: "
             PHONE: "Phone: "
@@ -1891,11 +1887,13 @@ text:
             NOSTRING: "nac ydw"
             DATES_NOT_ATTENDING: "Dyddiadau na allwch fynychu: "
             DATE_OF_MRN: "Dyddiad yr MRN: "
+            DATE_OF_RDN: "Dyddiad yr Hysbysiad o Benderfyniad Adolygiad: "
             REASON_FOR_LATE_APPEAL: "Rheswm dros apêl hwyr: "
             REASON_FOR_NO_MRN: "Rheswm dros ddim MRN: "
             NAME: "Enw: "
             DATE_OF_BIRTH: "Dyddiad geni: "
             NINO: "Rhif Yswiriant Gwladol: "
+            IBCA_REFERENCE: "Cyfeirnod IBCA: "
             ADDRESS: "Cyfeiriad: "
             EMAIL: "E-bost: "
             PHONE: "Rhif ffôn: "
@@ -2023,14 +2021,12 @@ spring:
             accept-case-insensitive-enums: true
             accept-case-insensitive-properties: true
 job.scheduler:
-    autoStart: ${BYPASS_NOTIFICATIONS_SERVICE:false}
     retryPolicy:
         maxNumberOfJobExecutions: 2
         delayBetweenAttemptsInMs: 1000
     quartzProperties:
         org.quartz:
             scheduler:
-                autoStartup: ${BYPASS_NOTIFICATIONS_SERVICE:false}
                 instanceId: AUTO
                 idleWaitTime: ${JOB_SCHEDULER_POLL_INTERVAL:10000}
             dataSource:
