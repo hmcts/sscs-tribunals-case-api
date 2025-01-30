@@ -70,7 +70,7 @@ public class AmendHearingOutcomeMidEventHandlerTest {
                             .completedHearingId("123").build()).build()
         ));
         var response = handler.handle(CallbackType.MID_EVENT, callback, "userAuthorisation");
-        assertThat(response.getErrors()).contains("Hearing outcomes cannot be added in amend hearing.");
+        assertThat(response.getErrors()).contains("You cannot create a new hearing outcome in Amend Hearing Outcome.");
     }
 
     @Test
