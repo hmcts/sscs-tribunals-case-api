@@ -268,7 +268,7 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
         assertThat(result).isEqualTo(DIRECTION_HEARINGS);
     }
 
-    @DisplayName("Hearing type should be direction if typeOfHearing is substantive but override is direction.")
+    @DisplayName("Hearing type should be direction if hmcHearingType is substantive but override is direction.")
     @Test
     void getHearingTypeOverride() {
         caseData.setHmcHearingType(SUBSTANTIVE);
