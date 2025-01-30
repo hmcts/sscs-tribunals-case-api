@@ -750,7 +750,6 @@ public class PersonalisationTest {
 
     @Test
     public void appealRefWillReturnCcdCaseIdWhenCaseReferenceIsNotSet() {
-        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByScReferenceCode("SC/1234/5");
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference(null)
             .regionalProcessingCenter(rpc)
@@ -803,7 +802,6 @@ public class PersonalisationTest {
 
     @Test
     public void appealRefWillReturnCcdCaseIdWhenCreatedInGapsFromReadyToList() {
-        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByScReferenceCode("SC/1234/5");
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -823,7 +821,6 @@ public class PersonalisationTest {
 
     @Test
     public void appealRefWillReturnCaseReferenceWhenCreatedInGapsFromValidAppeal() {
-        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByScReferenceCode("SC/1234/5");
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -1024,7 +1021,7 @@ public class PersonalisationTest {
 
         Map<String, Object> result = personalisation.setEventData(new HashMap<>(), response, APPEAL_RECEIVED);
 
-        assertNull( result.get(APPEAL_RESPOND_DATE_WELSH), "Welsh date is not set ");
+        assertNull(result.get(APPEAL_RESPOND_DATE_WELSH), "Welsh date is not set ");
         assertEquals("12 August 2018", result.get(APPEAL_RESPOND_DATE));
     }
 
@@ -1765,7 +1762,6 @@ public class PersonalisationTest {
 
     @Test
     public void trackYourAppealWillReturnMyaLinkWhenCreatedInGapsFromReadyToList() {
-        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByScReferenceCode("SC/1234/5");
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -1788,7 +1784,6 @@ public class PersonalisationTest {
 
     @Test
     public void trackYourAppealWillReturnTyaLinkWhenCreatedInGapsFromIsNotReadyToList() {
-        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByScReferenceCode("SC/1234/5");
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -2176,7 +2171,6 @@ public class PersonalisationTest {
 
     @Test
     public void whenDwpStateIsLtaGranted_setIsGrantedToTrue() {
-        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByScReferenceCode("SC/1234/5");
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -2196,7 +2190,6 @@ public class PersonalisationTest {
 
     @Test
     public void whenDwpStateIsLtaRefused_setIsGrantedToFalse() {
-        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByScReferenceCode("SC/1234/5");
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -2216,7 +2209,6 @@ public class PersonalisationTest {
 
     @Test
     public void whenDwpStateIsCorrectionIssued_setIsGrantedToTrue() {
-        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByScReferenceCode("SC/1234/5");
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -2237,7 +2229,6 @@ public class PersonalisationTest {
     @Test
     public void whenPostHearingsIsTrueAndFinalDecisionIsSet_setFinalDecision() {
         ReflectionTestUtils.setField(personalisation, "isPostHearingsEnabled", true);
-        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByScReferenceCode("SC/1234/5");
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -2260,7 +2251,6 @@ public class PersonalisationTest {
     @Test
     public void whenPostHearingsIsTrueAndFinalDecisionIsNotSet_dontSetFinalDecision() {
         ReflectionTestUtils.setField(personalisation, "isPostHearingsEnabled", true);
-        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByScReferenceCode("SC/1234/5");
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
