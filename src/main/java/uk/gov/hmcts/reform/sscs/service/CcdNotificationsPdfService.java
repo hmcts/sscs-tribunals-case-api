@@ -43,6 +43,7 @@ import uk.gov.hmcts.reform.sscs.model.LetterType;
 public class CcdNotificationsPdfService {
 
     private static final String NOTIFICATION_SENT = "Notification sent";
+    private static final String FAILED_TO_UPDATE_CCD_CASE_USING_V_2_BUT_CARRYING_ON_WITH_EVENT = "Failed to update ccd case using v2 but carrying on [{}] with event [{}]";
 
     private PdfStoreService pdfStoreService;
 
@@ -103,8 +104,8 @@ public class CcdNotificationsPdfService {
         try {
             updateCcdCaseService.updateCaseV2(caseId, EventType.NOTIFICATION_SENT.getCcdType(), NOTIFICATION_SENT, "Notification sent via Gov Notify", idamService.getIdamTokens(), caseDataConsumer);
         } catch (CcdException ccdEx) {
-            log.error("Failed to update ccd case using v2 but carrying on [" + caseId + "] ["
-                + caseId + "] with event [" + EventType.NOTIFICATION_SENT.getCcdType() + "]", ccdEx);
+            log.error(FAILED_TO_UPDATE_CCD_CASE_USING_V_2_BUT_CARRYING_ON_WITH_EVENT,
+                    caseId, EventType.NOTIFICATION_SENT.getCcdType(), ccdEx);
         }
     }
 
@@ -158,8 +159,9 @@ public class CcdNotificationsPdfService {
                 idamService.getIdamTokens(),
                 caseDataConsumer);
         } catch (CcdException ccdEx) {
-            log.error("Failed to update ccd case using v2 but carrying on [" + ccdCaseId + "] ["
-                + ccdCaseId + "] with event [" + EventType.NOTIFICATION_SENT.getCcdType() + "]", ccdEx);
+            log.error(FAILED_TO_UPDATE_CCD_CASE_USING_V_2_BUT_CARRYING_ON_WITH_EVENT,
+                    ccdCaseId, EventType.NOTIFICATION_SENT.getCcdType(), ccdEx);
+
         }
     }
 
@@ -224,8 +226,9 @@ public class CcdNotificationsPdfService {
                 idamService.getIdamTokens(),
                 caseDataConsumer);
         } catch (CcdException ccdEx) {
-            log.error("Failed to update ccd case using v2 but carrying on [" + ccdCaseId + "] ["
-                + ccdCaseId + "] with event [" + EventType.NOTIFICATION_SENT.getCcdType() + "]", ccdEx);
+            log.error(FAILED_TO_UPDATE_CCD_CASE_USING_V_2_BUT_CARRYING_ON_WITH_EVENT,
+                    ccdCaseId, EventType.NOTIFICATION_SENT.getCcdType(), ccdEx);
+
         }
     }
 
@@ -234,29 +237,49 @@ public class CcdNotificationsPdfService {
         List<Correspondence> correspondenceList;
         switch (letterType) {
             case APPELLANT:
-                correspondenceList = sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getAppellant() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getAppellant() : new ArrayList<>();
+                correspondenceList = getAppellantCorrespondenceList(sscsCaseData);
                 reasonableAdjustmentsLetters.setAppellant(buildCorrespondenceList(correspondences, correspondenceList));
                 break;
             case APPOINTEE:
-                correspondenceList = sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getAppointee() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getAppointee() : new ArrayList<>();
+                correspondenceList = getAppointeeCorrespondenceList(sscsCaseData);
                 reasonableAdjustmentsLetters.setAppointee(buildCorrespondenceList(correspondences, correspondenceList));
                 break;
             case REPRESENTATIVE:
-                correspondenceList = sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getRepresentative() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getRepresentative() : new ArrayList<>();
+                correspondenceList = getReprestativeCorrespondenceList(sscsCaseData);
                 reasonableAdjustmentsLetters.setRepresentative(buildCorrespondenceList(correspondences, correspondenceList));
                 break;
             case JOINT_PARTY:
-                correspondenceList = sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getJointParty() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getJointParty() : new ArrayList<>();
+                correspondenceList = getJointPartyCorrespondenceList(sscsCaseData);
                 reasonableAdjustmentsLetters.setJointParty(buildCorrespondenceList(correspondences, correspondenceList));
                 break;
             case OTHER_PARTY:
-                correspondenceList = sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getOtherParty() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getOtherParty() : new ArrayList<>();
+                correspondenceList = getOtherPartyCorrespondenceList(sscsCaseData);
                 reasonableAdjustmentsLetters.setOtherParty(buildCorrespondenceList(correspondences, correspondenceList));
                 break;
             default:
                 // do nothing
         }
         return reasonableAdjustmentsLetters;
+    }
+
+    private List<Correspondence> getAppellantCorrespondenceList(SscsCaseData sscsCaseData) {
+        return sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getAppellant() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getAppellant() : new ArrayList<>();
+    }
+
+    private List<Correspondence> getAppointeeCorrespondenceList(SscsCaseData sscsCaseData) {
+        return sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getAppointee() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getAppointee() : new ArrayList<>();
+    }
+
+    private List<Correspondence> getReprestativeCorrespondenceList(SscsCaseData sscsCaseData) {
+        return sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getRepresentative() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getRepresentative() : new ArrayList<>();
+    }
+
+    private List<Correspondence> getJointPartyCorrespondenceList(SscsCaseData sscsCaseData) {
+        return sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getJointParty() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getJointParty() : new ArrayList<>();
+    }
+
+    private List<Correspondence> getOtherPartyCorrespondenceList(SscsCaseData sscsCaseData) {
+        return sscsCaseData.getReasonableAdjustmentsLetters() != null && sscsCaseData.getReasonableAdjustmentsLetters().getOtherParty() != null ? sscsCaseData.getReasonableAdjustmentsLetters().getOtherParty() : new ArrayList<>();
     }
 
     private List<Correspondence> buildCorrespondenceList(List<Correspondence> correspondences, List<Correspondence> existingCorrespondence) {
@@ -271,8 +294,8 @@ public class CcdNotificationsPdfService {
         try {
             return ccdService.updateCaseWithoutRetry(caseData, caseId, eventId, NOTIFICATION_SENT, description, idamTokens);
         } catch (CcdException ccdEx) {
-            log.error("Failed to update ccd case but carrying on [" + caseId + "] ["
-                + caseData.getCaseReference() + "] with event [" + eventId + "]", ccdEx);
+            log.error(FAILED_TO_UPDATE_CCD_CASE_USING_V_2_BUT_CARRYING_ON_WITH_EVENT,
+                    caseId, eventId, ccdEx);
             return SscsCaseDetails.builder().build();
         }
     }
@@ -281,8 +304,8 @@ public class CcdNotificationsPdfService {
         try {
             return updateCcdCaseService.updateCaseV2WithoutRetry(caseId, eventId, NOTIFICATION_SENT, description, idamTokens, caseDetailsConsumer);
         } catch (CcdException ccdEx) {
-            log.error("Failed to update ccd case using v2 but carrying on [" + caseId + "] ["
-                + caseId + "] with event [" + eventId + "]", ccdEx);
+            log.error(FAILED_TO_UPDATE_CCD_CASE_USING_V_2_BUT_CARRYING_ON_WITH_EVENT,
+                    caseId, eventId, ccdEx);
             return SscsCaseDetails.builder().build();
         }
     }

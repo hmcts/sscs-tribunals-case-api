@@ -51,10 +51,10 @@ java:
     ISSUE_GENERIC_LETTER: true
     COH_URL: "http://coh-cor-aat.service.core-compute-aat.internal"
     ONLINE_HEARING_LINK: "https://sscs-cor-frontend-aat.service.core-compute-aat.internal"
-    JOB_SCHEDULER_DB_NAME: "pr-${CHANGE_ID}-sscs-job-scheduler"
+    JOB_SCHEDULER_DB_NAME: "{{ tpl .Values.global.databaseNamePrefix $}}sscs-job-scheduler"
     JOB_SCHEDULER_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
     JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
-    JOB_SCHEDULER_DB_USERNAME: hmcts
+    JOB_SCHEDULER_DB_USERNAME: "{{ tpl .Values.global.postgresUsername $}}"
     HOURS_START_TIME: 0
     HOURS_END_TIME: 23
     RUN_DB_MIGRATION_ON_STARTUP: true
@@ -123,11 +123,39 @@ em-ccdorc:
       IDAM_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
       OPEN_ID_API_BASE_URI: https://idam-web-public.aat.platform.hmcts.net/o
       S2S_BASE_URI: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-      EM_STITCHING_API_URL: http://em-stitching-aat.service.core-compute-aat.internal
+      EM_STITCHING_API_URL: ${EM_STITCHING_API_URL}
       DM_STORE_APP_URL: http://dm-store-aat.service.core-compute-aat.internal
       CCD_DATA_API_URL: ${CORE_CASE_DATA_API_URL}
       CALLBACK_HTTP_SCHEME: https
       CALLBACK_DOMAIN: em-ccdorc-${SERVICE_FQDN}
+      LOGGING_LEVEL_UK_GOV_HMCTS_REFORM_EM: DEBUG
+
+em-stitching:
+  enabled: true
+  java:
+    image: hmctspublic.azurecr.io/em/stitching:latest
+    releaseNameOverride: ${SERVICE_NAME}-em-stitching
+    ingressHost: em-stitching-${SERVICE_FQDN}
+    environment:
+      SPRING_DATASOURCE_HOST: '{{ tpl .Values.global.postgresHostname $}}'
+      SPRING_DATASOURCE_NAME: "{{ tpl .Values.global.databaseNamePrefix $}}emstitch"
+      SPRING_DATASOURCE_OPTIONS: "?ssl=disable"
+      SPRING_DATASOURCE_PORT: 5432
+      SPRING_DATASOURCE_USERNAME: "{{ tpl .Values.global.postgresUsername $}}"
+      IDAM_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
+      OPEN_ID_API_BASE_URI: https://idam-web-public.aat.platform.hmcts.net/o
+      S2S_BASE_URI: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+      DM_STORE_APP_URL: http://dm-store-aat.service.core-compute-aat.internal
+      CDAM_URL: http://${SERVICE_NAME}-ccd-case-document-am-api
+      ENABLE_DB_MIGRATE: true
+      RUN_DB_MIGRATION_ON_STARTUP: true
+      FLYWAY_POSTGRESQL_TRANSACTIONAL_LOCK: false
+      LOGGING_LEVEL_UK_GOV_HMCTS_REFORM_EM: DEBUG
+    secrets:
+      SPRING_DATASOURCE_PASSWORD:
+        secretRef: postgres
+        key: PASSWORD
+        disabled: false
 
 ccd-case-document-am-api:
   enabled: true
@@ -209,6 +237,7 @@ global:
   postgresHostname: "sscs-preview.postgres.database.azure.com"
   postgresSecret: postgres
   databaseNamePrefix: "pr-${CHANGE_ID}-"
+  postgresUsername: hmcts
 
 ccd:
   enabled: ${PREVIEW_CCD_ENABLED}
@@ -626,6 +655,7 @@ postgresql:
       - name: "pr-${CHANGE_ID}-role-assignment"
       - name: "pr-${CHANGE_ID}-hmc-cft-hearing-service"
       - name: "pr-${CHANGE_ID}-sscs-job-scheduler"
+      - name: "pr-${CHANGE_ID}-emstitch"
 
 
 ccd-def-cleanup:
