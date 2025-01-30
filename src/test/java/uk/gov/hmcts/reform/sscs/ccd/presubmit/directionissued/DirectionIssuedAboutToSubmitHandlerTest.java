@@ -806,7 +806,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @EnumSource(value = HmcHearingType.class, names = {"SUBSTANTIVE", "DIRECTION_HEARINGS"})
-    void willSetTypeOfHearingInHearingOptionsNullIfSelectNextTypeOfHearingIsYes(HmcHearingType hmcHearingType) {
+    void willSetTypeOfHearingInHearingOptionsNullIfselectNextHmcHearingTypeIsYes(HmcHearingType hmcHearingType) {
         when(caseDetails.getState()).thenReturn(State.READY_TO_LIST);
         sscsCaseData.setSelectNextHmcHearingType(YES);
         sscsCaseData.setHmcHearingType(hmcHearingType);
@@ -845,6 +845,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
         verify(mockedSscsCaseData, never()).getHmcHearingType();
         verify(mockedAppeal, never()).getHearingOptions();
         verify(mockedAppeal, never()).setHearingOptions(any());
+        verify(mockedSscsCaseData, never()).getSchedulingAndListingFields();
         assertNull(response.getData().getSelectNextHmcHearingType());
         assertNull(response.getData().getAppeal().getHearingOptions());
     }
