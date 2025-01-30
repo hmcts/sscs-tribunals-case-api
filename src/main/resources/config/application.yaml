@@ -105,6 +105,11 @@ auth:
         service:
             client:
                 baseUrl: ${IDAM_S2S_AUTH:http://localhost:4502}
+azure:
+    servicebus:
+        hearings:
+            connection-string: ${HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING}
+            destination: ${HEARINGS_EVENT_QUEUE_NAME}
 
 bundle:
     english:
@@ -1964,11 +1969,8 @@ wlu:
 ---
 
 # Hearing-api
+
 azure:
-    servicebus:
-        hearings:
-            connection-string: ${HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING}
-            destination: ${HEARINGS_EVENT_QUEUE_NAME}
     service-bus:
         amqp-connection-string-template : ${AMQP_CONNECTION_STRING:amqps://%1s?amqp.idleTimeout=%2d}
         connection-postfix: ${HMC_HEARINGS_TOPIC_CONNECTION_POSTFIX:.servicebus.windows.net}
