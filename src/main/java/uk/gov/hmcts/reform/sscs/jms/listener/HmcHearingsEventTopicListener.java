@@ -47,9 +47,10 @@ public class HmcHearingsEventTopicListener {
     }
 
     @JmsListener(
-            destination = "${azure.service-bus.hmc-to-hearings-api.topicName}",
-            subscription = "${azure.service-bus.hmc-to-hearings-api.subscriptionName}",
-            containerFactory = "hmcHearingsEventTopicContainerFactory"
+        destination = "${azure.service-bus.hmc-to-hearings-api.topicName}",
+        subscription = "${azure.service-bus.hmc-to-hearings-api.subscriptionName}",
+        containerFactory = "hmcHearingsEventTopicContainerFactory",
+        selector = "hmctsDeploymentId = '${hmc.deployment-id}'" // TODO: remove this selector when deployment ID not set
     )
     public void onMessage(JmsBytesMessage message) throws JMSException, HmcEventProcessingException {
 
