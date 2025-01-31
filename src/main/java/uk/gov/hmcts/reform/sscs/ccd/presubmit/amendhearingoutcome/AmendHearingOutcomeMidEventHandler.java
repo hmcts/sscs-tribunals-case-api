@@ -29,7 +29,7 @@ public class AmendHearingOutcomeMidEventHandler implements PreSubmitCallbackHand
         boolean hasNewOutcomeBeenAdded = sscsCaseData.getHearingOutcomes().stream()
                 .anyMatch(hearingOutcome -> hearingOutcome.getValue().getCompletedHearingId() == null);
         if (hasNewOutcomeBeenAdded) {
-            preSubmitCallbackResponse.addError("You cannot create a new hearing outcome in Amend Hearing Outcome.");
+            preSubmitCallbackResponse.addError("You cannot create a new hearing outcome in Amend Hearing Outcome, select  ‘Add New hearing outcome’ event to add another outcome.");
         }
 
         return preSubmitCallbackResponse;
