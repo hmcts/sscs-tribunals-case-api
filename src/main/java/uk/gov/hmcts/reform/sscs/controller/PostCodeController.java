@@ -25,8 +25,12 @@ import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 @Slf4j
 public class PostCodeController {
 
-    @Autowired
     private AirLookupService airLookupService;
+
+    @Autowired
+    public PostCodeController(AirLookupService airLookupService) {
+        this.airLookupService = airLookupService;
+    }
 
     @Operation(summary = "getRegionalCentre",
             description = "Returns the regional centre given the appellants full post code or out code")

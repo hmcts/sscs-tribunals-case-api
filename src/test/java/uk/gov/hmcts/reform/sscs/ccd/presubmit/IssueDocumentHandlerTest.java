@@ -105,7 +105,12 @@ class IssueDocumentHandlerTest {
     }
 
     private SscsCaseData buildCaseData() {
+        return buildCaseData(false);
+    }
+
+    private SscsCaseData buildCaseData(boolean isIbcaCase) {
         return SscsCaseData.builder()
+            .benefitCode(isIbcaCase ? "093" : "002")
             .documentGeneration(DocumentGeneration.builder()
                 .bodyContent("Hello World")
                 .signedBy("Barry Allen")
@@ -120,6 +125,7 @@ class IssueDocumentHandlerTest {
                         .lastName("Lloris")
                         .build())
                     .identity(Identity.builder()
+                        .ibcaReference(isIbcaCase ? "ibcaRef1" : null)
                         .nino("BB 22 55 66 B")
                         .build())
                     .build())
@@ -144,6 +150,30 @@ class IssueDocumentHandlerTest {
         assertThat(payload.getAppointeeFullName()).isNull();
         assertThat(payload.getCaseId()).isEqualTo("1");
         assertThat(payload.getNino()).isEqualTo("BB 22 55 66 B");
+        assertThat(payload.getLabel()).isEqualTo("NI No");
+        assertThat(payload.isShouldHideNino()).isFalse();
+        assertThat(payload.getRespondents()).hasSize(1);
+        assertThat(payload.getNoticeBody()).isEqualTo("Hello World");
+        assertThat(payload.getUserName()).isEqualTo("Barry Allen");
+        assertThat(payload.getNoticeType()).isEqualTo("DIRECTIONS NOTICE");
+        assertThat(payload.getUserRole()).isEqualTo("Judge");
+        assertThat(payload.getDateAdded()).isEqualTo(localDate);
+        assertThat(payload.getGeneratedDate()).isEqualTo(localDate);
+        assertThat(payload.getIdamSurname()).isEqualTo("Barry Allen");
+    }
+
+    @Test
+    void testIbcaDocumentPayloadValues() {
+        SscsCaseData sscsCaseData = buildCaseData(true);
+
+        String documentTypeLabel = "directions notice";
+        LocalDate localDate = LocalDate.now();
+        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, documentTypeLabel, localDate, localDate, false, false, false, USER_AUTHORISATION);
+        assertThat(payload.getAppellantFullName()).isEqualTo("User Lloris");
+        assertThat(payload.getAppointeeFullName()).isNull();
+        assertThat(payload.getCaseId()).isEqualTo("1");
+        assertThat(payload.getNino()).isEqualTo("ibcaRef1");
+        assertThat(payload.getLabel()).isEqualTo("IBCA Reference");
         assertThat(payload.isShouldHideNino()).isFalse();
         assertThat(payload.getRespondents()).hasSize(1);
         assertThat(payload.getNoticeBody()).isEqualTo("Hello World");
