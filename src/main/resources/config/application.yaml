@@ -149,7 +149,7 @@ create_ccd_endpoint: ${CREATE_CCD_ENDPOINT:true}
 dm_gateway:
     url: ${DM_GATEWAY_URL:http://localhost:3455}
 doc_assembly:
-    adjourn_case: TB-SCS-GNO-ENG-adjournment-notice.docx
+    adjourn_case: TB-SCS-GNO-ENG-adjournment-notice-v2.docx
     posthearingrequest: TB-SCS-GNO-ENG-00754.docx
     postponementrequest: TB-SCS-GNO-ENG-00754.docx
     url: ${DOC_ASSEMBLY_URL:http://localhost:4631}
@@ -709,13 +709,13 @@ notification:
                     docmosisId: TB-SCS-GNO-ENG-00551.docx
             provideInformation:
                 appellant:
-                    docmosisId: TB-SCS-GNO-ENG-00067.docx
+                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
                 appointee:
-                    docmosisId: TB-SCS-GNO-ENG-00067.docx
+                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
                 representative:
                     docmosisId: TB-SCS-GNO-ENG-00089.docx
                 joint_party:
-                    docmosisId: TB-SCS-GNO-ENG-00067.docx
+                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
                 other_party:
                     docmosisId: TB-SCS-GNO-ENG-00089.docx
             grantExtension:
@@ -782,13 +782,13 @@ notification:
                     docmosisId: TB-SCS-GNO-ENG-00639.docx
             refuseHearingRecordingRequest:
                 appellant:
-                    docmosisId: TB-SCS-GNO-ENG-00067.docx
+                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
                 appointee:
-                    docmosisId: TB-SCS-GNO-ENG-00067.docx
+                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
                 representative:
                     docmosisId: TB-SCS-GNO-ENG-00089.docx
                 joint_party:
-                    docmosisId: TB-SCS-GNO-ENG-00067.docx
+                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
                 other_party:
                     docmosisId: TB-SCS-GNO-ENG-00089.docx
         actionPostponementRequest:
@@ -1348,13 +1348,13 @@ notification:
                     docmosisId: TB-SCS-GNO-WEL-00590.docx
             provideInformation:
                 appellant:
-                    docmosisId: TB-SCS-GNO-WEL-00468.docx
+                    docmosisId: TB-SCS-GNO-WEL-00468-v2.docx
                 appointee:
-                    docmosisId: TB-SCS-GNO-WEL-00468.docx
+                    docmosisId: TB-SCS-GNO-WEL-00468-v2.docx
                 representative:
                     docmosisId: TB-SCS-GNO-WEL-00472.docx
                 joint_party:
-                    docmosisId: TB-SCS-GNO-WEL-00468.docx
+                    docmosisId: TB-SCS-GNO-WEL-00468-v2.docx
                 other_party:
                     docmosisId: TB-SCS-GNO-WEL-00472.docx
             grantExtension:
@@ -1399,13 +1399,13 @@ notification:
                     docmosisId: TB-SCS-GNO-WEL-00587.docx
             refuseHearingRecordingRequest:
                 appellant:
-                    docmosisId: TB-SCS-GNO-WEL-00468.docx
+                    docmosisId: TB-SCS-GNO-WEL-00468-v2.docx
                 appointee:
-                    docmosisId: TB-SCS-GNO-WEL-00468.docx
+                    docmosisId: TB-SCS-GNO-WEL-00468-v2.docx
                 representative:
                     docmosisId: TB-SCS-GNO-WEL-00472.docx
                 joint_party:
-                    docmosisId: TB-SCS-GNO-WEL-00468.docx
+                    docmosisId: TB-SCS-GNO-WEL-00468-v2.docx
                 other_party:
                     docmosisId: TB-SCS-GNO-WEL-00472.docx
         actionPostponementRequestWelsh:
