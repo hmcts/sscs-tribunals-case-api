@@ -10,10 +10,11 @@ import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsMapping.getSession
 import static uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper.checkBenefitIssueCode;
 import static uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil.isInterpreterRequired;
 
-import jakarta.validation.Valid;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
+import javax.validation.Valid;
+import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
@@ -27,6 +28,9 @@ import uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil;
 
 public final class HearingsAutoListMapping {
 
+    @Value("${feature.direction-hearings.enabled}")
+    private static boolean isDirectionHearingsEnabled;
+
     private HearingsAutoListMapping() {
 
     }
@@ -37,6 +41,13 @@ public final class HearingsAutoListMapping {
 
         if (nonNull(overrideFields.getAutoList())) {
             return isYes(overrideFields.getAutoList());
+        }
+        if (isDirectionHearingsEnabled) {
+            if ("022".equals(caseData.getBenefitCode())
+                || "067".equals(caseData.getBenefitCode())
+                || caseData.isIbcCase()) {
+                return false;
+            }
         }
 
         return !(HearingsDetailsMapping.isCaseUrgent(caseData)
