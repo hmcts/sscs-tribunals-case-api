@@ -112,7 +112,7 @@ withNightlyPipeline(type, product, component) {
     enableFullFunctionalTest()
 
     afterAlways('fullFunctionalTest') {
-        runE2eTestsNightly()
+        runE2eTests()
         runAccessibilityTestsNightly()
     }
 
@@ -122,10 +122,10 @@ withNightlyPipeline(type, product, component) {
     }
 }
 
-def runE2eTestsNightly() {
+def runE2eTests() {
     try {
         stage('Playwright tests') {
-            sh './gradlew runE2eTestsNightly'
+            sh './gradlew runE2eTests'
         }
     } finally {
         publishHTML([
