@@ -18,7 +18,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
@@ -96,32 +95,8 @@ class TribunalsHearingsEventTopicListenerTest {
     }
 
     @Test
-    @DisplayName("When a listing exception is thrown, catch the error and update the state")
-    void whenListingExceptionThrown_UpdateCaseDataState() throws Exception {
-        ReflectionTestUtils.setField(tribunalsHearingsEventQueueListener, "hearingsCaseUpdateV2Enabled", false);
-        SscsCaseData caseData = SscsCaseData.builder().build();
-        SscsCaseDetails caseDetails = SscsCaseDetails.builder().data(caseData).build();
-        HearingRequest hearingRequest = createHearingRequest();
-
-        doThrow(ListingException.class)
-            .when(hearingsService)
-            .processHearingRequest(hearingRequest);
-
-        when(ccdCaseService.getCaseDetails(CASE_ID)).thenReturn(caseDetails);
-        when(ccdCaseService.updateCaseData(caseData,
-                                           EventType.LISTING_ERROR,
-                                           null,
-                                           null)).thenReturn(caseDetails);
-
-        assertDoesNotThrow(() -> tribunalsHearingsEventQueueListener.handleIncomingMessage(hearingRequest));
-
-        verifyNoInteractions(updateCcdCaseService);
-    }
-
-    @Test
     @DisplayName("When a listing exception is thrown, with hearingsCaseUpdateV2Enabled, catch the error and update the state")
     void whenListingExceptionThrownWithV2Enabled_UpdateCaseDataState() throws Exception {
-        ReflectionTestUtils.setField(tribunalsHearingsEventQueueListener, "hearingsCaseUpdateV2Enabled", true);
         SscsCaseData caseData = SscsCaseData.builder().build();
         SscsCaseDetails caseDetails = SscsCaseDetails.builder().data(caseData).build();
         HearingRequest hearingRequest = createHearingRequest();
