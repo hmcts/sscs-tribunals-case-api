@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.helper.adjournment;
 
+import jakarta.validation.Valid;
 import java.time.LocalDate;
-import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
