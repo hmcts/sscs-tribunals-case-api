@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.sscs.config;
 
 import com.fasterxml.jackson.databind.ObjectWriter;
+import jakarta.jms.BytesMessage;
+import jakarta.jms.JMSException;
+import jakarta.jms.Session;
 import java.io.IOException;
-import javax.jms.BytesMessage;
-import javax.jms.JMSException;
-import javax.jms.Session;
 import org.apache.qpid.jms.message.JmsBytesMessage;
 import org.apache.qpid.jms.provider.amqp.message.AmqpJmsMessageFacade;
 import org.apache.qpid.proton.amqp.Symbol;
