@@ -151,7 +151,6 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     EXUI_API_URL: "https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net"
     HMC_API_URL: "http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     SSCS_SERVICE_CODE: BBA3
-    HMC_DEPLOYMENT_FILTER_ENABLED: false
     HEARINGS_CASE_UPDATE_V2_ENABLED: true
 
 postgresql:
