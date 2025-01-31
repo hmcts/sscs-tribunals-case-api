@@ -57,31 +57,23 @@ public class HmcHearingsEventTopicListener {
         log.info("isDeploymentFilterEnabled && deploymentId ------------------------> , {}, {}",
                 isDeploymentFilterEnabled, message.getStringProperty(HMCTS_DEPLOYMENT_ID));
 
-        if (isDeploymentFilterEnabled && !isMessageReleventForDeployment(message)) {
-            return;
-        }
-
         byte[] messageBytes = new byte[(int) message.getBodyLength()];
         message.readBytes(messageBytes);
         String convertedMessage = new String(messageBytes, StandardCharsets.UTF_8);
 
         try {
             HmcMessage hmcMessage = objectMapper.readValue(convertedMessage, HmcMessage.class);
+            Long caseId = hmcMessage.getCaseId();
+            String hearingId = hmcMessage.getHearingId();
 
-            if (isMessageRelevantForService(hmcMessage)) {
-                Long caseId = hmcMessage.getCaseId();
-                String hearingId = hmcMessage.getHearingId();
+            log.info(
+                "Attempting to process message from HMC hearings topic for event {}, Case ID {}, and Hearing ID {}.",
+                hmcMessage.getHearingUpdate().getHmcStatus(),
+                caseId,
+                hearingId
+            );
 
-                log.info(
-                    "Attempting to process message from HMC hearings topic for event {}, Case ID {}, and Hearing ID {}.",
-                    hmcMessage.getHearingUpdate().getHmcStatus(),
-                    caseId,
-                    hearingId
-                );
-
-                processHmcMessageServiceV2.processEventMessage(hmcMessage);
-
-            }
+            processHmcMessageServiceV2.processEventMessage(hmcMessage);
         } catch (JsonProcessingException | MessageProcessingException
                  | HearingUpdateException | ExhaustedRetryException ex) {
             log.error("Unable to successfully deliver HMC message: {}", convertedMessage, ex);
@@ -90,17 +82,6 @@ public class HmcHearingsEventTopicListener {
                 convertedMessage
             ), ex);
         }
-
     }
 
-    private boolean isMessageRelevantForService(HmcMessage hmcMessage) {
-        return sscsServiceCode.equals(hmcMessage.getHmctsServiceCode());
-    }
-
-    private boolean isMessageReleventForDeployment(JmsBytesMessage message) throws JMSException {
-        return hmctsDeploymentId.isEmpty()
-            && message.getStringProperty(HMCTS_DEPLOYMENT_ID) == null
-            || message.getStringProperty(HMCTS_DEPLOYMENT_ID) != null
-            && message.getStringProperty(HMCTS_DEPLOYMENT_ID).equals(hmctsDeploymentId);
-    }
 }
