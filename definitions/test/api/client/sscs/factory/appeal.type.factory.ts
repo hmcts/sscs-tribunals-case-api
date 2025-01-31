@@ -27,34 +27,24 @@ async function createCaseBasedOnCaseType(caseType: string) {
         baseURL: urls.tribunalsApiUri,
     });
 
-    dataPayload =
-        caseType == "PIP"
-            ? pipPayload
-            : caseType == "UC"
-                ? ucPayload
-                : caseType == "ESA"
-                    ? esaPayload
-                    : caseType == "CHILDSUPPORT"
-                        ? childSupportPayload
-                        : caseType == "TAX CREDIT"
-                            ? taxCreditPayload
-                            : caseType == "PIPSANDL"
-                                ? pipSandLPayload
-                                : caseType == "DLASANDL"
-                                    ? dlaSandLPayload
-                                    : caseType == "UCSANDL"
-                                        ? ucSandLVideoPayload
-                                        : caseType == "PIPREPINTERSANDL"
-                                            ? piprepFtoFSandLPayload
-                                            : caseType == "PIPREPSANDL"
-                                                ? piprepSandLPayload
-                                                : caseType == "PIPINCOMPLETE"
-                                                    ? pipIncompleteAppealPayload
-                                                    : caseType == "PIPNONCOMPLIANT"
-                                                        ? pipNonCompliantAppealPayload
-                                                        : caseType == "WELSHPIP"
-                                                            ? pipPayloadWelsh
-                                                            : new Error("Unsupported case type");
+    const payloadMap: { [key: string]: any } = {
+        "PIP": pipPayload,
+        "UC": ucPayload,
+        "ESA": esaPayload,
+        "CHILDSUPPORT": childSupportPayload,
+        "TAX CREDIT": taxCreditPayload,
+        "PIPSANDL": pipSandLPayload,
+        "DLASANDL": dlaSandLPayload,
+        "UCSANDL": ucSandLVideoPayload,
+        "PIPREPINTERSANDL": piprepFtoFSandLPayload,
+        "PIPREPSANDL": piprepSandLPayload,
+        "PIPINCOMPLETE": pipIncompleteAppealPayload,
+        "PIPNONCOMPLIANT": pipNonCompliantAppealPayload,
+        "WELSHPIP": pipPayloadWelsh
+    };
+
+    dataPayload = payloadMap[caseType] || new Error("Unsupported case type");
+
 
     let caseTypeLower = caseType.toLowerCase();
     let apiUrl = (caseTypeLower.includes('incomplete') || caseTypeLower.includes('noncompliant'))
