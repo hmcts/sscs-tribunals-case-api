@@ -32,10 +32,6 @@ public class HmcHearingsEventTopicListener {
     @Value("${hmc.deployment-id}")
     private String hmctsDeploymentId;
 
-    @Value("${flags.deployment-filter.enabled}")
-    private boolean isDeploymentFilterEnabled;
-
-
     private static final String HMCTS_DEPLOYMENT_ID = "hmctsDeploymentId";
 
     public HmcHearingsEventTopicListener(@Value("${sscs.serviceCode}") String sscsServiceCode,
@@ -53,9 +49,8 @@ public class HmcHearingsEventTopicListener {
         selector = "hmctsDeploymentId = '${hmc.deployment-id}'" // TODO: remove this selector when deployment ID not set
     )
     public void onMessage(JmsBytesMessage message) throws JMSException, HmcEventProcessingException {
-
-        log.info("isDeploymentFilterEnabled && deploymentId ------------------------> , {}, {}",
-                isDeploymentFilterEnabled, message.getStringProperty(HMCTS_DEPLOYMENT_ID));
+        log.info("message deploymentId , {}", message.getStringProperty(HMCTS_DEPLOYMENT_ID));
+        log.info("application deploymentId , {}", hmctsDeploymentId);
 
         byte[] messageBytes = new byte[(int) message.getBodyLength()];
         message.readBytes(messageBytes);
