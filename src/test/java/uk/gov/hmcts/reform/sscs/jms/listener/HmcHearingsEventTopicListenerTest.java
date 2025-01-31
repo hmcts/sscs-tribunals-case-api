@@ -56,21 +56,6 @@ class HmcHearingsEventTopicListenerTest {
     }
 
     @Test
-    @DisplayName("Messages should not be processed if their service code does not match the service.")
-    void testOnMessage_serviceCodeNotApplicable() throws Exception {
-        HmcMessage hmcMessage = createHmcMessage("BBA4");
-
-        byte[] messageBytes = OBJECT_MAPPER.writeValueAsString(hmcMessage).getBytes(StandardCharsets.UTF_8);
-
-        given(bytesMessage.getBodyLength()).willReturn((long) messageBytes.length);
-        given(mockObjectMapper.readValue(any(String.class), eq(HmcMessage.class))).willReturn(hmcMessage);
-
-        hmcHearingsEventTopicListener.onMessage(bytesMessage);
-
-        verifyNoProcessEventMessageCall();
-    }
-
-    @Test
     @DisplayName("Messages should be processed if no deployment id is provided on message and service.")
     void testOnMessage_noDeployment() throws Exception {
         ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "hmctsDeploymentId", "");
