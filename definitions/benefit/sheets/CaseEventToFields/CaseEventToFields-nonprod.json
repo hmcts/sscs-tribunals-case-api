@@ -5,6 +5,7 @@
     "CaseFieldID": "hearingOutcomes",
     "CaseTypeID": "Benefit",
     "DisplayContext": "COMPLEX",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
     "PageID": "1.0",
