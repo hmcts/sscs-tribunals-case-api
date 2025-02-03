@@ -42,22 +42,22 @@ public class AdjournCaseIt extends AbstractEventIt {
 
     public static final String DIRECTIONS_DUE_DATE_PLACEHOLDER = "2020-01-01";
     public static final String GENERATED_VIDEO_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITH_DIRECTIONS_MADE_JSON =
-        "callback/adjournCaseGeneratedVideoWhenCaseNotListedStraightAwayWithDirectionsMade.json";
+            "callback/adjournCaseGeneratedVideoWhenCaseNotListedStraightAwayWithDirectionsMade.json";
     public static final String GENERATED_PAPER_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITHOUT_DIRECTIONS_MADE_JSON =
-        "callback/adjournCaseGeneratedPaperWhenCaseNotListedStraightAwayWithoutDirectionsMade.json";
+            "callback/adjournCaseGeneratedPaperWhenCaseNotListedStraightAwayWithoutDirectionsMade.json";
     public static final String GENERATED_FACE_TO_FACE_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITHOUT_DIRECTIONS_MADE_JSON =
-        "callback/adjournCaseGeneratedFaceToFaceWhenCaseNotListedStraightAwayWithoutDirectionsMade.json";
+            "callback/adjournCaseGeneratedFaceToFaceWhenCaseNotListedStraightAwayWithoutDirectionsMade.json";
     public static final String MANUALLY_GENERATED_JSON = "callback/adjournCaseManuallyGenerated.json";
     public static final String GENERATED_FACE_TO_FACE_WITH_INTERPRETER_REQUIRED_AND_LANGUAGE_SET_JSON =
-        "callback/adjournCaseGeneratedFaceToFaceWithInterpreterRequiredAndLanguageSet.json";
+            "callback/adjournCaseGeneratedFaceToFaceWithInterpreterRequiredAndLanguageSet.json";
     public static final String GENERATED_FACE_TO_FACE_WITH_INTERPRETER_REQUIRED_AND_LANGUAGE_NOT_SET_JSON =
-        "callback/adjournCaseGeneratedFaceToFaceWithInterpreterRequiredAndLanguageNotSet.json";
+            "callback/adjournCaseGeneratedFaceToFaceWithInterpreterRequiredAndLanguageNotSet.json";
     public static final String GENERATED_FACE_TO_FACE_WITH_INTERPRETER_NOT_REQUIRED_AND_LANGUAGE_SET_JSON =
-        "callback/adjournCaseGeneratedFaceToFaceWithInterpreterNotRequiredAndLanguageSet.json";
+            "callback/adjournCaseGeneratedFaceToFaceWithInterpreterNotRequiredAndLanguageSet.json";
     public static final String GENERATED_TELEPHONE_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITHOUT_DIRECTIONS_MADE_JSON =
-        "callback/adjournCaseGeneratedTelephoneWhenCaseNotListedStraightAwayWithoutDirectionsMade.json";
+            "callback/adjournCaseGeneratedTelephoneWhenCaseNotListedStraightAwayWithoutDirectionsMade.json";
     public static final String GENERATED_VIDEO_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITHOUT_DIRECTIONS_MADE_JSON =
-        "callback/adjournCaseGeneratedVideoWhenCaseNotListedStraightAwayWithoutDirectionsMade.json";
+            "callback/adjournCaseGeneratedVideoWhenCaseNotListedStraightAwayWithoutDirectionsMade.json";
     public static final String CCD_ABOUT_TO_SUBMIT = "/ccdAboutToSubmit";
     public static final String CCD_MID_EVENT_PREVIEW_ADJOURN_CASE = "/ccdMidEventPreviewAdjournCase";
     public static final String CCD_ABOUT_TO_START = "/ccdAboutToStart";
