@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.docmosis.config;
 
-import org.apache.hc.client5.http.config.RequestConfig;
-import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
-import org.apache.hc.core5.util.Timeout;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -41,11 +41,12 @@ public class HttpConnectionConfiguration {
 
     private ClientHttpRequestFactory getClientHttpRequestFactory() {
         RequestConfig config = RequestConfig.custom()
-                .setConnectTimeout(Timeout.ofMilliseconds(httpConnectTimeout))
-                .setConnectionRequestTimeout(Timeout.ofMilliseconds(httpConnectRequestTimeout))
+                .setConnectTimeout(httpConnectTimeout)
+                .setConnectionRequestTimeout(httpConnectRequestTimeout)
+                .setSocketTimeout(httpConnectReadTimeout) // read time out
                 .build();
 
-        var client = HttpClientBuilder
+        CloseableHttpClient client = HttpClientBuilder
                 .create()
                 .useSystemProperties()
                 .setDefaultRequestConfig(config)
