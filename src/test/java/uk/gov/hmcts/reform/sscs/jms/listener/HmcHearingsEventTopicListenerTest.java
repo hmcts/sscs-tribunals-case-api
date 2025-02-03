@@ -53,52 +53,7 @@ class HmcHearingsEventTopicListenerTest {
         ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "sscsServiceCode", SERVICE_CODE);
         given(bytesMessage.getStringProperty("hmctsDeploymentId")).willReturn("test");
         ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "hmctsDeploymentId", "test");
-
-        ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "isDeploymentFilterEnabled", true);
     }
-
-    @Test
-    @DisplayName("Messages should not be processed if their service code does not match the service.")
-    void testOnMessage_serviceCodeNotApplicable() throws Exception {
-        HmcMessage hmcMessage = createHmcMessage("BBA4");
-
-        byte[] messageBytes = OBJECT_MAPPER.writeValueAsString(hmcMessage).getBytes(StandardCharsets.UTF_8);
-
-        given(bytesMessage.getBodyLength()).willReturn((long) messageBytes.length);
-        given(mockObjectMapper.readValue(any(String.class), eq(HmcMessage.class))).willReturn(hmcMessage);
-
-        hmcHearingsEventTopicListener.onMessage(bytesMessage);
-
-        verifyNoProcessEventMessageCall();
-    }
-
-    @Test
-    @DisplayName("Messages should not be processed if their deployment ID does not match ours.")
-    void testOnMessage_deploymentNotApplicable() throws Exception {
-        ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "hmctsDeploymentId", "test2");
-        HmcMessage hmcMessage = createHmcMessage("BBA3");
-
-        byte[] messageBytes = OBJECT_MAPPER.writeValueAsString(hmcMessage).getBytes(StandardCharsets.UTF_8);
-
-        hmcHearingsEventTopicListener.onMessage(bytesMessage);
-
-        verifyNoProcessEventMessageCall();
-    }
-
-    @Test
-    @DisplayName("Message should be processed if message deployment ID matches ours.")
-    void testOnMessage_deploymentApplicable() throws Exception {
-        ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "hmctsDeploymentId", "test");
-        HmcMessage hmcMessage = createHmcMessage("BBA3");
-
-        byte[] messageBytes = OBJECT_MAPPER.writeValueAsString(hmcMessage).getBytes(StandardCharsets.UTF_8);
-        given(mockObjectMapper.readValue(any(String.class), eq(HmcMessage.class))).willReturn(hmcMessage);
-
-        hmcHearingsEventTopicListener.onMessage(bytesMessage);
-
-        verifyProcessEventMessageCall(processHmcMessageServiceV2);
-    }
-
 
     @Test
     @DisplayName("Messages should be processed if no deployment id is provided on message and service.")
@@ -108,34 +63,6 @@ class HmcHearingsEventTopicListenerTest {
         HmcMessage hmcMessage = createHmcMessage("BBA3");
 
         byte[] messageBytes = OBJECT_MAPPER.writeValueAsString(hmcMessage).getBytes(StandardCharsets.UTF_8);
-        given(mockObjectMapper.readValue(any(String.class), eq(HmcMessage.class))).willReturn(hmcMessage);
-
-        hmcHearingsEventTopicListener.onMessage(bytesMessage);
-
-        verifyProcessEventMessageCall(processHmcMessageServiceV2);
-    }
-
-    @Test
-    @DisplayName("Messages should not be processed if deployment id is provided on message but not on service.")
-    void testOnMessage_noDeploymentInService() throws Exception {
-        ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "hmctsDeploymentId", "");
-        HmcMessage hmcMessage = createHmcMessage("BBA3");
-
-        byte[] messageBytes = OBJECT_MAPPER.writeValueAsString(hmcMessage).getBytes(StandardCharsets.UTF_8);
-
-        hmcHearingsEventTopicListener.onMessage(bytesMessage);
-
-        verifyNoProcessEventMessageCall();
-    }
-
-    @Test
-    @DisplayName("Messages should be processed if their service code matches the service.")
-    void testOnMessage_serviceCodeApplicable() throws Exception {
-        HmcMessage hmcMessage = createHmcMessage(SERVICE_CODE);
-
-        byte[] messageBytes = OBJECT_MAPPER.writeValueAsString(hmcMessage).getBytes(StandardCharsets.UTF_8);
-
-        given(bytesMessage.getBodyLength()).willReturn((long) messageBytes.length);
         given(mockObjectMapper.readValue(any(String.class), eq(HmcMessage.class))).willReturn(hmcMessage);
 
         hmcHearingsEventTopicListener.onMessage(bytesMessage);

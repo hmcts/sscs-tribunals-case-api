@@ -11,6 +11,7 @@ java:
     MYA_LINK: http://sscs-cor-frontend-aat.service.core-compute-aat.internal/sign-in?tya=appeal_id
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
     CORE_CASE_DATA_API_URL: ${CORE_CASE_DATA_API_URL}
+    ROLE_ASSIGNMENT_API_URL: http://${SERVICE_NAME}-am-role-assignment-service
     DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
     BUNDLE_URL: http://${SERVICE_NAME}-em-ccdorc
     CCD_UI_BASE_URL: https://${SERVICE_NAME}-case-management-web
@@ -31,6 +32,7 @@ java:
     WORK_ALLOCATION_FEATURE: false
     CASE_ACCESS_MANAGEMENT_FEATURE: true
     SCHEDULE_LISTING_FEATURE: true
+    HMC_HEARINGS_LISTENING_ENABLED: true
     POST_HEARINGS_FEATURE: true
     POST_HEARINGS_B_FEATURE: true
     GAPS_SWITCHOVER_FEATURE: true
@@ -43,6 +45,7 @@ java:
     SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
     AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
     AMQP_USERNAME: "RootManageSharedAccessKey"
+    HMC_DEPLOYMENT_ID: "deployment-${SERVICE_NAME}"
     HEARINGS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
     ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
     ROBOTICS_EMAIL_TO: "fake"
