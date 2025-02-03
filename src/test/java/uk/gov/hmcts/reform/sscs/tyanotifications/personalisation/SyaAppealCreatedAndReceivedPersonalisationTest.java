@@ -1,8 +1,9 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.personalisation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.ADDRESS;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.ANYTHING;
@@ -63,8 +64,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
@@ -108,9 +109,23 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
     @Spy
     private PersonalisationConfiguration syaAppealCreatedPersonalisationConfiguration;
 
-    @Before
+    @BeforeEach
     public void setup() {
         openMocks(this);
+        Map<String, String> englishMap = getEnglishMap();
+
+        Map<String, String> welshMap = getWelshMap();
+
+        Map<LanguagePreference, Map<String, String>> personalisations = new HashMap<>();
+        personalisations.put(LanguagePreference.ENGLISH, englishMap);
+        personalisations.put(LanguagePreference.WELSH, welshMap);
+
+        super.setup();
+
+        syaAppealCreatedPersonalisationConfiguration.setPersonalisation(personalisations);
+    }
+
+    private static Map<String, String> getEnglishMap() {
         Map<String, String> englishMap = new HashMap<>();
         englishMap.put(ATTENDING_HEARING.name(), "Attending the hearing: ");
         englishMap.put(YESSTRING.name(), "yes");
@@ -145,7 +160,10 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
         englishMap.put(NOT_REQUIRED.name(), "Not required");
         englishMap.put(OTHER.name(), "Other");
         englishMap.put(CHILD_MAINTENANCE_NUMBER.name(), "Child maintenance number: ");
+        return englishMap;
+    }
 
+    private static Map<String, String> getWelshMap() {
         Map<String, String> welshMap = new HashMap<>();
         welshMap.put(ATTENDING_HEARING.name(), "Ydych chi'n bwriadu mynychu'r gwrandawiad: ");
         welshMap.put(YESSTRING.name(), "ydw");
@@ -180,14 +198,7 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
         welshMap.put(NOT_REQUIRED.name(), "Dim yn ofynnol");
         welshMap.put(OTHER.name(), "Arall");
         welshMap.put(CHILD_MAINTENANCE_NUMBER.name(), "Child maintenance number placeholder: ");
-
-        Map<LanguagePreference, Map<String, String>> personalisations = new HashMap<>();
-        personalisations.put(LanguagePreference.ENGLISH, englishMap);
-        personalisations.put(LanguagePreference.WELSH, welshMap);
-
-        super.setup();
-
-        syaAppealCreatedPersonalisationConfiguration.setPersonalisation(personalisations);
+        return welshMap;
     }
 
     @Test
@@ -224,7 +235,7 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
         assertEquals("Date of MRN: 3 May 2018\n"
                 + "\nReason for late appeal: My train was cancelled.",
             result.get(MRN_DETAILS_LITERAL));
-        assertNull("Welsh mrn details should be set", result.get(HEARING_DETAILS_LITERAL_WELSH));
+        assertNull(result.get(HEARING_DETAILS_LITERAL_WELSH), "Welsh mrn details should be set");
     }
 
     @Test
@@ -694,7 +705,7 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
         assertEquals("No", result.get(SHOW_OTHER_PARTY_DETAILS));
         assertEquals("", result.get(OTHER_PARTY_DETAILS));
         assertEquals("", result.get(OTHER_PARTY_DETAILS_WELSH));
-        assertThat(result.get(YOUR_DETAILS_LITERAL).toString()).doesNotContain("Child maintenance number:");
+        assertFalse(result.get(YOUR_DETAILS_LITERAL).toString().contains("Child maintenance number:"));
     }
 
     @Test
@@ -736,7 +747,7 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
                 + "\nAddress: First Floor, My Building, 222 Corporation Street, Glasgow, GL11 6TF\n\n",
             result.get(OTHER_PARTY_DETAILS));
         assertNull(result.get(OTHER_PARTY_DETAILS_WELSH));
-        assertThat(result.get(YOUR_DETAILS_LITERAL).toString()).contains("Child maintenance number: 123456");
+        assertTrue(result.get(YOUR_DETAILS_LITERAL).toString().contains("Child maintenance number: 123456"));
     }
 
     @Test
@@ -785,7 +796,7 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
                 + "\nAddress: Second Floor, My House, 333 Corporation Street, London, EC1 6TF\n\n",
             result.get(OTHER_PARTY_DETAILS));
         assertNull(result.get(OTHER_PARTY_DETAILS_WELSH));
-        assertThat(result.get(YOUR_DETAILS_LITERAL).toString()).contains("Child maintenance number: 123456");
+        assertTrue(result.get(YOUR_DETAILS_LITERAL).toString().contains("Child maintenance number: 123456"));
     }
 
     @Test
@@ -827,7 +838,7 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
                 + "\nAddress: Not provided\n\n",
             result.get(OTHER_PARTY_DETAILS));
         assertNull(result.get(OTHER_PARTY_DETAILS_WELSH));
-        assertThat(result.get(YOUR_DETAILS_LITERAL).toString()).contains("Child maintenance number: 123456");
+        assertTrue(result.get(YOUR_DETAILS_LITERAL).toString().contains("Child maintenance number: 123456"));
     }
 
     @Test
@@ -1094,7 +1105,7 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
         assertEquals("Attending the hearing: yes\n"
                 + "\nDates you can't attend: 3 January 2018, 5 January 2018",
             result.get(HEARING_DETAILS_LITERAL));
-        assertNull("Welsh details not be set ", result.get(HEARING_DETAILS_LITERAL_WELSH));
+        assertNull(result.get(HEARING_DETAILS_LITERAL_WELSH), "Welsh details not be set ");
     }
 
     @Test
