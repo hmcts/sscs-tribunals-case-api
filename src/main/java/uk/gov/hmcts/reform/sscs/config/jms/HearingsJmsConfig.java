@@ -60,6 +60,7 @@ public class HearingsJmsConfig {
             jmsConnectionFactory.setSslContext(jmsSslContext);
         }
         var factory = new CachingConnectionFactory(jmsConnectionFactory);
+        factory.setCacheConsumers(false);
         factory.setCacheProducers(false);
         return factory;
     }
