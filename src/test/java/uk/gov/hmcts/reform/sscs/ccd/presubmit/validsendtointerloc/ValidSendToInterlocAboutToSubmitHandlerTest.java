@@ -133,7 +133,7 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
         final SscsDocument document = sscsCaseData.getSscsDocument().get(0);
         assertEquals(DocumentType.POSTPONEMENT_REQUEST.getValue(), document.getValue().getDocumentType());
         assertEquals("example.pdf", document.getValue().getDocumentLink().getDocumentFilename());
-        assertEquals(uploadParty.getValue(), document.getValue().getOriginalPartySender());
+        assertEquals(uploadParty.getLabel(), document.getValue().getOriginalPartySender());
     }
 
     private void setupDataForPostponementRequestInterlocSendToTcw(PartyItemList originalSenderParty) {
