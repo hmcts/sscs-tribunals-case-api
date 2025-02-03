@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.config;
 
 import java.util.List;
+import java.util.stream.Stream;
 import javax.crypto.AEADBadTagException;
 import javax.net.ssl.SSLException;
 import org.slf4j.Logger;
@@ -97,9 +98,10 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
 
     @Override
     protected boolean shouldTolerateDataSetupFailure() {
-        return BeftaMain.getConfig().getDefinitionStoreUrl().contains("demo")
-                || BeftaMain.getConfig().getDefinitionStoreUrl().contains("prod");
+        return Stream.of("demo", "prod", "aat", "ithc", "perftest")
+                .anyMatch(env -> BeftaMain.getConfig().getDefinitionStoreUrl().contains(env));
     }
+
 
     @Override
     protected boolean shouldTolerateDataSetupFailure(Throwable e) {
