@@ -10,7 +10,6 @@ import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsWindowMapping.DAYS_TO_ADD_HEARING_WINDOW_TODAY;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.CaseCategoryType.CASE_SUBTYPE;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.CaseCategoryType.CASE_TYPE;
-import static uk.gov.hmcts.reform.sscs.model.hmc.reference.HearingType.SUBSTANTIVE;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.PartyType.INDIVIDUAL;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.FACE_TO_FACE;
 
@@ -188,7 +187,7 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
         //then
         assertFalse(serviceHearingValues.isAutoListFlag());
         assertEquals(60, serviceHearingValues.getDuration());
-        assertEquals(SUBSTANTIVE, serviceHearingValues.getHearingType());
+        assertEquals(HmcHearingType.SUBSTANTIVE, serviceHearingValues.getHearingType());
         assertEquals(BENEFIT, serviceHearingValues.getCaseType());
         assertThat(serviceHearingValues.getCaseCategories())
             .extracting("categoryType","categoryValue")

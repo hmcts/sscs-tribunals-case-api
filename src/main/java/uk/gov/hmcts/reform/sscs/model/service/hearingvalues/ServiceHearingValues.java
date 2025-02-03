@@ -7,8 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.model.HearingLocation;
-import uk.gov.hmcts.reform.sscs.model.hmc.reference.HearingType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.CaseCategory;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingWindow;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
@@ -42,7 +42,7 @@ public class ServiceHearingValues {
 
     private boolean autoListFlag;
 
-    private HearingType hearingType;
+    private HmcHearingType hearingType;
 
     private String caseType;
 
