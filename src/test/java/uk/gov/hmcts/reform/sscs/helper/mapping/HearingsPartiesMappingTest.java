@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.helper.mapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.groups.Tuple.tuple;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -627,7 +626,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
         assertThat(result).isEqualTo(expected);
     }
 
-    @DisplayName("When a invalid verbal language is given getIndividualInterpreterLanguage should throw the correct error and message")
+    @DisplayName("When a invalid verbal language is given getIndividualInterpreterLanguage should not throw an exception")
     @ParameterizedTest
     @ValueSource(strings = {"Test"})
     @NullAndEmptySource
@@ -642,9 +641,25 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
                 .languages(value)
                 .build();
 
-        assertThatExceptionOfType(InvalidMappingException.class)
-                .isThrownBy(() -> HearingsPartiesMapping.getIndividualInterpreterLanguage(hearingOptions, null, refData, null))
-                .withMessageContaining("The language %s cannot be mapped", value);
+        assertThat(HearingsPartiesMapping.getIndividualInterpreterLanguage(hearingOptions, null, refData, null)).isNull();
+    }
+
+    @DisplayName("When a invalid sign language is given getIndividualInterpreterLanguage should not throw an exception")
+    @ParameterizedTest
+    @ValueSource(strings = {"Test"})
+    @NullAndEmptySource
+    void testGetIndividualInterpreterSignLanguage(String value) {
+        given(signLanguages.getSignLanguage(value))
+                .willReturn(null);
+
+        given(refData.getSignLanguages()).willReturn(signLanguages);
+
+        HearingOptions hearingOptions = HearingOptions.builder()
+                .arrangements(List.of("signLanguageInterpreter"))
+                .signLanguageType(value)
+                .build();
+
+        assertThat(HearingsPartiesMapping.getIndividualInterpreterLanguage(hearingOptions, null, refData, null)).isNull();
     }
 
     @DisplayName("When a valid sign language is given getIndividualInterpreterLanguage should return correct hmcReference")
@@ -669,25 +684,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
         assertThat(result).isEqualTo(expected);
     }
 
-    @DisplayName("When a invalid sign language is given getIndividualInterpreterLanguage should throw the correct error and message")
-    @ParameterizedTest
-    @ValueSource(strings = {"Test"})
-    @NullAndEmptySource
-    void testGetIndividualInterpreterSignLanguage(String value) {
-        given(signLanguages.getSignLanguage(value))
-                .willReturn(null);
 
-        given(refData.getSignLanguages()).willReturn(signLanguages);
-
-        HearingOptions hearingOptions = HearingOptions.builder()
-                .arrangements(List.of("signLanguageInterpreter"))
-                .signLanguageType(value)
-                .build();
-
-        assertThatExceptionOfType(InvalidMappingException.class)
-                .isThrownBy(() -> HearingsPartiesMapping.getIndividualInterpreterLanguage(hearingOptions, null, refData, null))
-                .withMessageContaining("The language %s cannot be mapped", value);
-    }
 
     @DisplayName("When override is Interpreter Wanted is Yes and a override language passed in getIndividualInterpreterLanguage should return the override reference")
     @Test
