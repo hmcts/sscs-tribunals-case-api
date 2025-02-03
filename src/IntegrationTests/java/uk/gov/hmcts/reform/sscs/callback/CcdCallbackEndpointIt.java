@@ -17,9 +17,9 @@ import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpSt
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.createUploadResponse;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
-import javax.servlet.http.HttpServletResponse;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.apache.commons.collections4.CollectionUtils;

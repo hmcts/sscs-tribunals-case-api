@@ -54,7 +54,6 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
         }
 
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-        String caseId = sscsCaseData.getCcdCaseId();
         Appeal appeal = sscsCaseData.getAppeal();
         HearingOptions hearingOptions = appeal.getHearingOptions();
 
@@ -63,27 +62,16 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
 
             String existingLanguage = hearingOptions.getLanguages();
 
-            log.info("Existing language {}", existingLanguage);
-
             if (!StringUtils.isEmpty(existingLanguage)) {
                 Language language = verbalLanguagesService.getVerbalLanguage(existingLanguage);
 
                 if (null != language) {
-                    log.info("Verbal language dialect {}, dialect reference {} ", language.getDialectEn(), language.getDialectReference());
-                    log.info("Verbal language full reference {}, mrd reference {} ", language.getReference(), language.getMrdReference());
-
                     DynamicListItem dynamicListItem = utils.getLanguageDynamicListItem(language);
-
-                    log.info("Dynamic List item code {} , label {} ", dynamicListItem.getCode(), dynamicListItem.getLabel());
-
                     interpreterLanguages.setValue(dynamicListItem);
                 }
             }
 
-            interpreterLanguages.getListItems().forEach(li -> log.info("interpreter language list item code {}, list item label {}", li.getCode(), li.getLabel()));
             hearingOptions.setLanguagesList(interpreterLanguages);
-            log.info("Populated {} Languages in DynamicList for caseId {} for update to case data event",
-                    interpreterLanguages.getListItems().size(), caseId);
         }
         setupBenefitSelection(sscsCaseData);
         if (sscsCaseData.isIbcCase()) {

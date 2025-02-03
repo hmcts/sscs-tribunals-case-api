@@ -15,10 +15,10 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import java.util.Optional;
 import java.util.function.Consumer;
-import javax.validation.Validation;
-import javax.validation.Validator;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.junit.Before;
 import org.junit.Test;

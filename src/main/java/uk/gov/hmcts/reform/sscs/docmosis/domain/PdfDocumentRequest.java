@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.docmosis.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
 import java.util.Map;
-import javax.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Value;
 

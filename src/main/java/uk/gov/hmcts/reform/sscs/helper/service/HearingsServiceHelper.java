@@ -3,12 +3,12 @@ package uk.gov.hmcts.reform.sscs.helper.service;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
+import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;

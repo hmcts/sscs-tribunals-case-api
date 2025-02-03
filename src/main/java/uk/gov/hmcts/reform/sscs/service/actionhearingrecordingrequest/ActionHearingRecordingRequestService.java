@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.model.RequestStatus.GRANTED;
 import static uk.gov.hmcts.reform.sscs.model.RequestStatus.REFUSED;
 import static uk.gov.hmcts.reform.sscs.model.RequestStatus.REQUESTED;
 
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -13,7 +14,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import javax.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
