@@ -59,7 +59,9 @@ public class HearingsJmsConfig {
         if (jmsSslContext != null) {
             jmsConnectionFactory.setSslContext(jmsSslContext);
         }
-        return new CachingConnectionFactory(jmsConnectionFactory);
+        var factory = new CachingConnectionFactory(jmsConnectionFactory);
+        factory.setCacheProducers(false);
+        return factory;
     }
 
     @Bean("hmcHearingsJmsTemplate")

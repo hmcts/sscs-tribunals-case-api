@@ -15,6 +15,7 @@ import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
+import uk.gov.hmcts.reform.sscs.config.JsonMessageConverter;
 
 @Slf4j
 @Configuration
@@ -51,7 +52,9 @@ public class TribunalsHearingsJmsConfig {
         if (jmsSslContext != null) {
             jmsConnectionFactory.setSslContext(jmsSslContext);
         }
-        return new CachingConnectionFactory(jmsConnectionFactory);
+        var factory = new CachingConnectionFactory(jmsConnectionFactory);
+        factory.setCacheProducers(false);
+        return factory;
     }
 
     @Bean("hearingsToHmcJmsTemplate")
@@ -68,6 +71,7 @@ public class TribunalsHearingsJmsConfig {
         DefaultJmsListenerContainerFactory returnValue = new DefaultJmsListenerContainerFactory();
         returnValue.setConnectionFactory(connectionFactory);
         returnValue.setSubscriptionDurable(Boolean.TRUE);
+        returnValue.setMessageConverter(new JsonMessageConverter());
         returnValue.setErrorHandler(t -> log.error("Error while processing JMS message", t));
         returnValue.setExceptionListener(t -> log.error("Exception while processing JMS message", t));
         return returnValue;
