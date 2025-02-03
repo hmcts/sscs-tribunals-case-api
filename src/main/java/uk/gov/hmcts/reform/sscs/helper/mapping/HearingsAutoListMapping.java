@@ -14,12 +14,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 import javax.validation.Valid;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMember;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
@@ -37,6 +32,12 @@ public final class HearingsAutoListMapping {
 
         if (nonNull(overrideFields.getAutoList())) {
             return isYes(overrideFields.getAutoList());
+        }
+
+        if ("022".equals(caseData.getBenefitCode())
+                || "067".equals(caseData.getBenefitCode())
+                || caseData.isIbcCase()) {
+            return false;
         }
 
         return !(HearingsDetailsMapping.isCaseUrgent(caseData)

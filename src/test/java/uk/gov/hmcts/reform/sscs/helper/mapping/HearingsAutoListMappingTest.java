@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
 import static org.junit.jupiter.params.provider.EnumSource.Mode.INCLUDE;
 import static org.mockito.BDDMockito.given;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,33 +28,33 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
     @BeforeEach
     void setUp() {
         caseData = SscsCaseData.builder()
-            .benefitCode(BENEFIT_CODE)
-            .issueCode(ISSUE_CODE)
-            .dwpResponseDate("2022-07-07")
-            .appeal(Appeal.builder()
-                .appellant(Appellant.builder()
-                    .name(Name.builder()
-                        .firstName("Appel")
-                        .lastName("Lant")
+                .benefitCode(BENEFIT_CODE)
+                .issueCode(ISSUE_CODE)
+                .dwpResponseDate("2022-07-07")
+                .appeal(Appeal.builder()
+                        .appellant(Appellant.builder()
+                                .name(Name.builder()
+                                        .firstName("Appel")
+                                        .lastName("Lant")
+                                        .build())
+                                .build())
+                        .hearingOptions(HearingOptions.builder()
+                                .wantsToAttend("Yes")
+                                .build())
+                        .hearingSubtype(HearingSubtype.builder()
+                                .wantsHearingTypeFaceToFace("Yes")
+                                .build())
                         .build())
-                    .build())
-                .hearingOptions(HearingOptions.builder()
-                    .wantsToAttend("Yes")
-                    .build())
-                .hearingSubtype(HearingSubtype.builder()
-                    .wantsHearingTypeFaceToFace("Yes")
-                    .build())
-                .build())
-            .build();
+                .build();
     }
 
 
     @DisplayName("When there are no conditions that affect autolisting, shouldBeAutoListed returns true")
     @Test
     void testShouldBeAutoListed() throws ListingException {
-        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE,ISSUE_CODE,false,false))
+        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE, ISSUE_CODE, false, false))
                 .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                        false,false,SessionCategory.CATEGORY_01,null));
+                        false, false, SessionCategory.CATEGORY_01, null));
 
         given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
 
@@ -66,9 +66,9 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
     @DisplayName("When there are no conditions that affect autolisting, shouldBeAutoListed returns true")
     @Test
     void testShouldBeAutoListedFalseWhenNullDwpResponseDate() throws ListingException {
-        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE,ISSUE_CODE,false,false))
-            .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                                               false,false,SessionCategory.CATEGORY_01,null));
+        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE, ISSUE_CODE, false, false))
+                .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
+                        false, false, SessionCategory.CATEGORY_01, null));
 
         given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
         caseData.setDwpResponseDate(null);
@@ -95,17 +95,17 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
     void testShouldBeNotAutoListed() throws ListingException {
         Adjournment adjournment = caseData.getAdjournment();
         AdjournCaseTime adjournCaseTime = AdjournCaseTime
-            .builder()
-            .adjournCaseNextHearingSpecificTime("pm")
-            .adjournCaseNextHearingFirstOnSession(List.of("firstOnSession"))
-            .build();
+                .builder()
+                .adjournCaseNextHearingSpecificTime("pm")
+                .adjournCaseNextHearingFirstOnSession(List.of("firstOnSession"))
+                .build();
 
         adjournment.setNextHearingDateType(AdjournCaseNextHearingDateType.DATE_TO_BE_FIXED);
         adjournment.setTime(adjournCaseTime);
 
-        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE,ISSUE_CODE,false,false))
-            .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                                               false,false,SessionCategory.CATEGORY_01,null));
+        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE, ISSUE_CODE, false, false))
+                .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
+                        false, false, SessionCategory.CATEGORY_01, null));
 
         given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
 
@@ -118,8 +118,8 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
     @Test
     void testShouldBeAutoListedOverride() throws ListingException {
         caseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
-            .autoList(YES)
-            .build());
+                .autoList(YES)
+                .build());
 
         boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
 
@@ -130,8 +130,8 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
     @Test
     void testShouldBeAutoListedOverrideNo() throws ListingException {
         caseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
-            .autoList(NO)
-            .build());
+                .autoList(NO)
+                .build());
 
         boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
 
@@ -151,6 +151,21 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
 
         assertThat(result).isTrue();
     }
+
+    @DisplayName("When appellant has a org as a representative, autoList is false")
+    @Test
+    void testHasOrgRepresentativeAndAustoListFalse() throws ListingException {
+        caseData.getAppeal()
+                .setRep(Representative.builder()
+                        .hasRepresentative("Yes")
+                        .organisation("test")
+                        .build());
+
+        boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData,refData);
+
+        assertThat(result).isFalse();
+    }
+
 
     @DisplayName("When appellant and other parties dont have a org as a representative hasOrgRepresentative should return false")
     @Test
@@ -326,9 +341,9 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
     @Test
     void testHasDqpmOrFqpm() throws ListingException {
 
-        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE,ISSUE_CODE,false,false))
+        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE, ISSUE_CODE, false, false))
                 .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                        false,false,SessionCategory.CATEGORY_06,null));
+                        false, false, SessionCategory.CATEGORY_06, null));
 
         given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
 
@@ -343,9 +358,9 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
     @Test
     void testHasDqpmOrFqpmNone() throws ListingException {
 
-        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE,ISSUE_CODE,false,false))
+        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE, ISSUE_CODE, false, false))
                 .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                        false,false,SessionCategory.CATEGORY_01,null));
+                        false, false, SessionCategory.CATEGORY_01, null));
 
         given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
 
@@ -375,6 +390,85 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
     @NullSource
     void testIsMqpmOrFqpmNot(PanelMember value) {
         boolean result = HearingsAutoListMapping.isMqpmOrFqpm(value);
+
+        assertThat(result).isFalse();
+    }
+
+    @DisplayName("When isIbcCase True autolist is false")
+    @Test
+    void testIfIbcCaseNotAutolisted() throws ListingException {
+        caseData.setBenefitCode("093");
+        boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
+
+        assertThat(result).isFalse();
+    }
+
+    @DisplayName("When Child Support Appeal(022) autolist is false")
+    @Test
+    void testIfChildSupportAppealNotAutolisted() throws ListingException {
+        caseData.setBenefitCode("022");
+        boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
+
+        assertThat(result).isFalse();
+    }
+
+    @DisplayName("When Industrial Injuries Case autolist is false")
+    @Test
+    void testIfIndustrialInjuriesAppealNotAutolisted() throws ListingException {
+        caseData.setBenefitCode("067");
+        boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
+
+        assertThat(result).isFalse();
+    }
+
+    @DisplayName("When isIbcCase True but is overridden then autolist is true")
+    @Test
+    void testIfIbcCaseAutolistedIfOverridden() throws ListingException {
+        caseData.setBenefitCode("093");
+        OverrideFields overrideFields = OverrideFields.builder().autoList(YES).build();
+        caseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
+        boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
+
+        assertThat(result).isTrue();
+    }
+
+    @DisplayName("When isIbcCase True and is overridden then autolist is false")
+    @Test
+    void testIfIbcCaseNotAutolistedIfOverriddenToNo() throws ListingException {
+        caseData.setBenefitCode("093");
+        OverrideFields overrideFields = OverrideFields.builder().autoList(NO).build();
+        caseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
+        boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
+
+        assertThat(result).isFalse();
+    }
+
+    @DisplayName("When interpreterRequired Yes, Autolist is false")
+    @Test
+    void testIfInterpreterRequiredAutlistIsFalse() throws ListingException {
+        Adjournment adjournment = caseData.getAdjournment();
+        adjournment.setInterpreterRequired(YES);
+        boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
+
+        assertThat(result).isFalse();
+    }
+
+    @DisplayName("If UCB autolist is false")
+    @Test
+    void testIfCaseUcbAutolistIsFalse() throws ListingException {
+        caseData.setDwpUcb(YES.getValue());
+        boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
+
+        assertThat(result).isFalse();
+    }
+
+    @DisplayName("When case has a linked case Autolist is false")
+    @Test
+    void testIfIsLinkedCaseAutolistIsFalse() throws ListingException {
+        List<CaseLink> linkedCase = new ArrayList<>();
+        linkedCase.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("2").build()).build());
+        caseData.setLinkedCase(linkedCase);
+        boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
 
         assertThat(result).isFalse();
     }
