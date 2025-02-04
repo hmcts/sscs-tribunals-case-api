@@ -70,11 +70,6 @@ public class FurtherEvidenceService {
                 if (doc.getValue().getClass().isAssignableFrom(SscsDocumentDetails.class)) {
                     sscsCaseDocuments
                             .stream()
-                            /**
-                              As part of ticket SSCSCI-1480, after investigation found that there was a Null pointer exception on "SscsDocumentDetails.getDocumentLink()"
-                              The reason is video documents doesn't have getDocumentLink() but they have getAvDocumentLink(), hence it is throwing an exception.
-                              Also, this logic is for pdf documents for send to bulk-print, so fix is to filter out video documents
-                             */
                             .filter(d -> !VIDEO_DOCUMENT.getValue().equals(d.getValue().getDocumentType()))
                             .filter(d -> d.getValue().getDocumentLink().getDocumentBinaryUrl().equals(doc.getValue().getDocumentLink().getDocumentBinaryUrl()))
                             .map(d -> {
