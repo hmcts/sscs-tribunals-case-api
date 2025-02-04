@@ -706,9 +706,18 @@ public class FurtherEvidenceServiceTest {
                     .documentLink(DocumentLink.builder().documentBinaryUrl("not-original2.com").build())
                     .build()).build();
 
+        SscsDocument videoLinkDoc = SscsDocument
+                .builder()
+                .value(
+                        SscsDocumentDetails
+                                .builder()
+                                .documentType(VIDEO_DOCUMENT.getValue())
+                                .avDocumentLink(DocumentLink.builder().documentBinaryUrl("not-original2.com").build())
+                                .build()).build();
+
         SscsCaseData caseData = SscsCaseData
             .builder()
-            .sscsDocument(Arrays.asList(originalDoc, differentTypeDoc, differentLinkDoc))
+            .sscsDocument(Arrays.asList(originalDoc, differentTypeDoc, differentLinkDoc, videoLinkDoc))
             .sscsWelshDocuments(Collections.singletonList(originalWelshDoc))
             .build();
 
