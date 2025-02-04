@@ -181,7 +181,7 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
     }
 
     @Test
-    public void givenAHmctsResponseReviewedSubmittedEventAndInterlocIsNotRequiredAndIbcaCase_thenNoFurtherEventShouldTrigger() {
+    public void givenAHmctsResponseReviewedSubmittedEventAndInterlocIsNotRequiredAndIbcaCase_thenTriggerReadyToListEvent() {
         sscsCaseData = sscsCaseData.toBuilder()
                 .benefitCode(IBCA_BENEFIT_CODE)
                 .isInterlocRequired("No")
@@ -191,7 +191,19 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
-        verifyNoInteractions(updateCcdCaseService);
+
+        verify(updateCcdCaseService).updateCaseV2(
+            eq(123L),
+            eq(READY_TO_LIST.getCcdType()),
+            eq("Ready to list"),
+            eq("Makes an appeal ready to list"),
+            any(IdamTokens.class),
+            consumerArgumentCaptor.capture());
+
+        Consumer<SscsCaseDetails> mutator = consumerArgumentCaptor.getValue();
+        mutator.accept(SscsCaseDetails.builder().data(sscsCaseData).build());
+
+        assertEquals(YesNo.YES, sscsCaseData.getIgnoreCallbackWarnings());
     }
 
     @Test(expected = IllegalStateException.class)
