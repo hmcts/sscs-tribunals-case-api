@@ -255,8 +255,6 @@ feature:
         enabled: ${UPLOAD_HEARING_FILTER_ENABLED:false}
     infected-blood-compensation:
         enabled: ${INFECTED_BLOOD_COMPENSATION_ENABLED:false}
-    direction-hearings:
-        enabled: ${DIRECTION_HEARINGS_ENABLED:false}
     postHearings:
         enabled: ${POST_HEARINGS_FEATURE:false}
     postHearingsB:

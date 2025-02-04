@@ -5,10 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
 import static org.junit.jupiter.params.provider.EnumSource.Mode.INCLUDE;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
@@ -22,7 +18,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
@@ -33,7 +28,6 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(HearingsAutoListMapping.class, "isDirectionHearingsEnabled", true);
         caseData = SscsCaseData.builder()
             .benefitCode(BENEFIT_CODE)
             .issueCode(ISSUE_CODE)
@@ -398,17 +392,6 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
         boolean result = HearingsAutoListMapping.isMqpmOrFqpm(value);
 
         assertThat(result).isFalse();
-    }
-
-
-    @DisplayName("When Direction Hearings Flag Off does not check ibc case")
-    @Test
-    void testIfDirectionHearingsFlagOff() throws ListingException {
-        ReflectionTestUtils.setField(HearingsAutoListMapping.class, "isDirectionHearingsEnabled", false);
-        SscsCaseData mockedCaseData = mock(SscsCaseData.class);
-        when(mockedCaseData.getUrgentCase()).thenReturn("Yes");
-        HearingsAutoListMapping.shouldBeAutoListed(mockedCaseData, refData);
-        verify(mockedCaseData, never()).isIbcCase();
     }
 
     @DisplayName("When isIbcCase True autolist is false")
