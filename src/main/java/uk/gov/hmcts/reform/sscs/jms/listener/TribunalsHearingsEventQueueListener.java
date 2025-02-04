@@ -34,7 +34,7 @@ public class TribunalsHearingsEventQueueListener {
 
     @JmsListener(
             destination = "${azure.service-bus.tribunals-to-hearings-api.queueName}",
-            containerFactory = "tribunalsHearingsEventQueueContainerFactory"
+            containerFactory = "hearingsToHmcEventTopicContainerFactory"
     )
     public void handleIncomingMessage(HearingRequest message) throws TribunalsEventProcessingException, GetCaseException, UpdateCaseException {
         if (isNull(message)) {
