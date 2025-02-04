@@ -17,6 +17,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,8 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import javax.validation.Validation;
-import javax.validation.Validator;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
