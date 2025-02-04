@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.FilenameUtils;
@@ -24,7 +25,6 @@ import org.apache.tika.metadata.Metadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import uk.gov.hmcts.reform.sscs.exception.FileToPdfConversionException;
 
 @Slf4j
@@ -87,7 +87,7 @@ public class FileToPdfConversionService {
             }
         }
 
-        return new CommonsMultipartFile(diskFileItem);
+        return new FileMultipartFile(diskFileItem);
     }
 
     private Optional<File> convertFile(String mimeType, MultipartFile f) {
@@ -103,5 +103,49 @@ public class FileToPdfConversionService {
         tempFile.deleteOnExit();
         f.transferTo(tempFile);
         return tempFile;
+    }
+
+    private record FileMultipartFile(DiskFileItem file) implements MultipartFile {
+
+        @Override
+        public String getName() {
+            return file.getName();
+        }
+
+        @Override
+        public String getOriginalFilename() {
+            return file.getFieldName();
+        }
+
+        @Override
+        public String getContentType() {
+            return file.getContentType();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return getSize() == 0;
+        }
+
+        @Override
+        public long getSize() {
+            return file.getSize();
+        }
+
+        @Override
+        public byte[] getBytes() throws IOException {
+            return file.get();
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            return file.getInputStream();
+        }
+
+        @SneakyThrows
+        @Override
+        public void transferTo(File dest) throws IOException, IllegalStateException {
+            file.write(dest);
+        }
     }
 }
