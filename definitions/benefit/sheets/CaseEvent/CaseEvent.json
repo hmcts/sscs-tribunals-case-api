@@ -700,6 +700,18 @@
     "ShowSummary": "Y"
   },
   {
+    "LiveFrom": "22/01/2025",
+    "CaseTypeID": "Benefit",
+    "ID": "clearFailedFeFilter",
+    "Name": "Clear failed sending FE filter",
+    "DisplayOrder": 531,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "EventEnablingCondition": "hmctsDwpState=\"failedSendingFurtherEvidence\"",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
+    "SecurityClassification": "Public"
+  },
+  {
     "LiveFrom": "10/10/2019",
     "CaseTypeID": "Benefit",
     "ID": "cloneBundle",
