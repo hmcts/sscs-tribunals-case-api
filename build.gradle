@@ -285,7 +285,7 @@ tasks.register('runGitPreCommitTasks') {
 dependencyManagement {
     dependencies {
         //CVE-2022-25857
-        dependencySet(group: 'org.yaml', version: '2.0') {
+        dependencySet(group: 'org.yaml', version: '2.3') {
             entry 'snakeyaml'
         }
 
@@ -298,8 +298,8 @@ dependencyManagement {
 def versions = [
         springsecurity : '6.4.2',
         jackson        : '2.17.2',
-        lombok         : '1.18.28',
-        commonsio      : '2.13.0'
+        lombok         : '1.18.36',
+        commonsio      : '2.18.0'
 ]
 
 dependencies {
@@ -324,7 +324,7 @@ dependencies {
     implementation group: 'javax.annotation', name: 'javax.annotation-api', version: '1.3.2'
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.3'
 
-    implementation group: 'com.google.guava', name: 'guava', version: '32.1.1-jre'
+    implementation group: 'com.google.guava', name: 'guava', version: '32.1.3-jre'
     implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.19'
 
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.0'
@@ -420,7 +420,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '3.0.23'
     // Remove this dependency once the secure doc-store is in use
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
-    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.2.1'
+    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
     implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.1.0', {
         exclude group: 'org.apache.commons', module: 'commons-compress'
         exclude group: 'com.google.guava', module: 'guava'
@@ -452,7 +452,7 @@ dependencies {
     testImplementation group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
 
     // https://mvnrepository.com/artifact/net.bytebuddy/byte-buddy-dep
-    testImplementation group: 'net.bytebuddy', name: 'byte-buddy-dep', version: '1.14.5'
+    testImplementation group: 'net.bytebuddy', name: 'byte-buddy-dep', version: '1.17.0'
 
 
     testImplementation group: 'pl.pragmatists', name: 'JUnitParams', version: '1.1.1'
