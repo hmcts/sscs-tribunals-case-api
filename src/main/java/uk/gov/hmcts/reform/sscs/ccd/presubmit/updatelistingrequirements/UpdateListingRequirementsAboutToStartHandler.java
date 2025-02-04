@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +27,9 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
 
     @Value("${feature.snl.enabled}")
     private boolean isScheduleListingEnabled;
+
+    @Value("${feature.direction-hearings.enabled}")
+    private boolean isDirectionHearingsEnabled;
 
     private final DynamicListLanguageUtil utils;
 
@@ -66,6 +70,9 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
             appellantInterpreter.setInterpreterLanguage(interpreterLanguages);
 
             log.info("{} Languages in DynamicList for caseId {}", interpreterLanguages.getListItems().size(), caseId);
+            if (isDirectionHearingsEnabled) {
+                overrideFields.setHmcHearingType(sscsCaseData.getHmcHearingType());
+            }
         }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
