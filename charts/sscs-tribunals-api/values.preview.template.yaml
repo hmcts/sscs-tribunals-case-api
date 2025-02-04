@@ -218,6 +218,7 @@ xui-webapp:
       UV_THREADPOOL_SIZE: 128
       PROTOCOL: http
       LAUNCH_DARKLY_CLIENT_ID: 645baeea2787d812993d9d70
+      PREVIEW_DEPLOYMENT_ID: "deployment-${SERVICE_NAME}"
     keyVaults:
       rpx:
         resourceGroup: rpx
