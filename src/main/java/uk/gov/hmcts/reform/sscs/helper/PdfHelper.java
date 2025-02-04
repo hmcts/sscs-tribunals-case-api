@@ -59,15 +59,15 @@ public class PdfHelper {
         log.debug("Pdf width {}, limit {}, lower limit {}", pageWidth, upperLimitWidth, lowerLimitWidth);
 
         if (pageHeight > pageWidth) {
-            return !(pageHeight > upperLimitHeight)
-                    && !(pageHeight < lowerLimitHeight)
-                    && !(pageWidth > upperLimitWidth)
-                    && !(pageWidth < lowerLimitWidth);
+            return (pageHeight <= upperLimitHeight)
+                    && (pageHeight >= lowerLimitHeight)
+                    && (pageWidth <= upperLimitWidth)
+                    && (pageWidth >= lowerLimitWidth);
         }
-        return !(pageWidth > upperLimitHeight)
-                && !(pageWidth < lowerLimitHeight)
-                && !(pageHeight > upperLimitWidth)
-                && !(pageHeight < lowerLimitWidth);
+        return (pageWidth <= upperLimitHeight)
+                && (pageWidth >= lowerLimitHeight)
+                && (pageHeight <= upperLimitWidth)
+                && (pageHeight >= lowerLimitWidth);
 
     }
 
