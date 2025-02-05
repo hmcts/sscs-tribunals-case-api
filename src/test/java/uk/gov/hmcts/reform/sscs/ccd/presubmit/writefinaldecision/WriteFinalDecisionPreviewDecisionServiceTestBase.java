@@ -88,7 +88,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         openMocks(this);
         final Map<EventType, String> englishEventTypeDocs = new HashMap<>();
         englishEventTypeDocs.put(EventType.CORRECTION_GRANTED, "TB-SCS-GNO-ENG-corrected-decision-notice.docx");
-        englishEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-ENG-directions-notice.docx");
+        englishEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-ENG-directions-notice-v2.docx");
         englishEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-ENG-draft-decision-notice.docx");
         Map<EventType, String> welshEventTypeDocs = new HashMap<>();
         welshEventTypeDocs.put(EventType.CORRECTION_GRANTED, "TB-SCS-GNO-ENG-corrected-decision-notice.docx");
