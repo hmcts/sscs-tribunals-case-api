@@ -57,5 +57,5 @@
     "tar": "^6.2.1",
     "micromatch": "^4.0.8"
   },
-  "packageManager": "yarn@4.6.0"
+  "packageManager": "yarn@1.22.22"
 }
