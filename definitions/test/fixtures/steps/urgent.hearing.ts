@@ -240,6 +240,7 @@ export class UrgentHearing extends BaseStep {
     await this.actionFurtherEvidencePage.uploadDocs(
       actionFurtherEvidenceTestdata.corruptedFile
     );
+    await this.actionFurtherEvidencePage.confirmSubmission();
     await this.actionFurtherEvidencePage.verifyCorruptedFileErrorMsg();
   }
 

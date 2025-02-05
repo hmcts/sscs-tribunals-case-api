@@ -51,6 +51,10 @@ export class WebAction {
     await expect(this.page.locator(elementlocator).first()).toBeVisible();
   }
 
+  async verifyElementHidden(elementlocator: string) {
+    await expect(this.page.locator(elementlocator).first()).toBeHidden();
+  }
+
   async inputField(elementLocator: string, inputValue: string) {
     await this.verifyElementVisibility(elementLocator);
     await expect(this.page.locator(elementLocator).first()).toBeEnabled();
@@ -151,13 +155,9 @@ export class WebAction {
     elementId: string,
     fileName: string
   ): Promise<void> {
-    const fileChooserPromise = this.page.waitForEvent('filechooser');
     await this.verifyElementVisibility(elementId);
-    await this.page.locator(elementId).first().click();
-    const fileChooser = await fileChooserPromise;
-    await fileChooser.setFiles(
-      path.join(__dirname, `../data/file/${fileName}`)
-    );
+    await this.page.locator(elementId).first()
+      .setInputFiles(path.join(__dirname, `../data/file/${fileName}`));
   }
 
   async screenshot() {

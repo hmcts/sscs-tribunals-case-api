@@ -324,6 +324,7 @@ export class WriteFinalDecisionPages {
       '#writeFinalDecisionDateOfDecision-year',
       '2024'
     );
+    await webActions.verifyElementHidden('span.error-message')
   }
 
   async verifyPageContentForBundleSectionReferencePage() {
