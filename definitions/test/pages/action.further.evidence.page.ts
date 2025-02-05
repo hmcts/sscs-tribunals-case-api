@@ -141,7 +141,7 @@ export class ActionFurtherEvidencePage {
   }
 
   async verifyCorruptedFileErrorMsg(): Promise<void> {
-    await webActions.verifyElementVisibility('#error-summary-title');
+    await webActions.verifyElementVisibility('#errors');
     await webActions.verifyTextVisibility(
       'The below PDF document(s) are not readable, please correct this'
     );

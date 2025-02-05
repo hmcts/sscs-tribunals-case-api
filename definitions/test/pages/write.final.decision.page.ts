@@ -316,7 +316,7 @@ export class WriteFinalDecisionPages {
 
   async inputTypePageContentForDecisionPageData() {
     await webActions.inputField('#writeFinalDecisionDateOfDecision-day', '11');
-    await webActions.inputField(
+    await webActions.inputField(j
       '#writeFinalDecisionDateOfDecision-month',
       '07'
     );
@@ -324,6 +324,7 @@ export class WriteFinalDecisionPages {
       '#writeFinalDecisionDateOfDecision-year',
       '2024'
     );
+    await this.page.locator('#writeFinalDecisionDateOfDecision-day').first().click()
     await webActions.verifyElementHidden('span.error-message')
   }
 
