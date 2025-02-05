@@ -67,6 +67,28 @@ public class AmendHearingOutcomeAboutToSubmitHandlerTest {
                             .build()
             ).build();
 
+    private static final Hearing hearing1 = Hearing.builder()
+            .value(HearingDetails.builder()
+                    .hearingId("1")
+                    .venue(Venue.builder().name("venue 1 name").build())
+                    .start(LocalDateTime.of(2024,1,30,10,00))
+                    .end(LocalDateTime.of(2024,1,30,13,00))
+                    .epimsId("654321")
+                    .hearingChannel(HearingChannel.FACE_TO_FACE)
+                    .build())
+            .build();
+
+    private static final Hearing hearing2 = Hearing.builder()
+            .value(HearingDetails.builder()
+                    .hearingId("2")
+                    .venue(Venue.builder().name("venue 2 name").build())
+                    .start(LocalDateTime.of(2024,6,30,10,00))
+                    .end(LocalDateTime.of(2024,6,30,13,00))
+                    .epimsId("123456")
+                    .hearingChannel(HearingChannel.FACE_TO_FACE)
+                    .build())
+            .build();
+
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -107,29 +129,6 @@ public class AmendHearingOutcomeAboutToSubmitHandlerTest {
 
     @Test
     public void givenDifferentHearingForOutcomeSelected_thenAlterHearingOutcome() {
-
-        Hearing hearing1 = Hearing.builder()
-                .value(HearingDetails.builder()
-                        .hearingId("1")
-                        .venue(Venue.builder().name("venue 1 name").build())
-                        .start(LocalDateTime.of(2024,1,30,10,00))
-                        .end(LocalDateTime.of(2024,1,30,13,00))
-                        .epimsId("654321")
-                        .hearingChannel(HearingChannel.FACE_TO_FACE)
-                        .build())
-                .build();
-
-        Hearing hearing2 = Hearing.builder()
-                .value(HearingDetails.builder()
-                        .hearingId("2")
-                        .venue(Venue.builder().name("venue 2 name").build())
-                        .start(LocalDateTime.of(2024,6,30,10,00))
-                        .end(LocalDateTime.of(2024,6,30,13,00))
-                        .epimsId("123456")
-                        .hearingChannel(HearingChannel.FACE_TO_FACE)
-                        .build())
-                .build();
-
         sscsCaseData.setCompletedHearingsList(List.of(hearing1, hearing2));
         sscsCaseData.setHearingOutcomes(List.of(hearingOutcome1));
 
@@ -149,6 +148,8 @@ public class AmendHearingOutcomeAboutToSubmitHandlerTest {
     @Test
     public void givenHearingOutcomeSelectedMoreThanOnce_thenThrowError() {
         sscsCaseData.setHearingOutcomes(List.of(hearingOutcome1, hearingOutcome2));
+
+        sscsCaseData.setCompletedHearingsList(List.of(hearing1, hearing2));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT,callback,USER_AUTHORISATION);
 

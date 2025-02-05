@@ -27,7 +27,7 @@ public class AmendHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbac
         requireNonNull(callbackType, "callbackType must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent().equals(EventType.AMEND_HEARING_OUTCOME);
+                && callback.getEvent().equals(EventType.AMEND_HEARING_OUTCOME);
     }
 
     @Override
@@ -39,54 +39,41 @@ public class AmendHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbac
 
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
-
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-
-        List<String> hearingsSelected = new ArrayList<>();
 
         if (sscsCaseData.getHearingOutcomes().isEmpty()) {
             sscsCaseData.setHearingOutcomes(null);
             return new PreSubmitCallbackResponse<>(sscsCaseData);
-        } else {
-            for (HearingOutcome selectedHearingOutcome :  sscsCaseData.getHearingOutcomes()) {
-                String selectedHearingId =
-                        selectedHearingOutcome.getValue().getCompletedHearings().getValue().getCode();
-                if (hearingsSelected == null) {
-                    hearingsSelected.add(selectedHearingId);
-                } else if (hearingsSelected.contains(selectedHearingId)) {
-                    log.info("Hearing outcome {} selected more than once for case {}",
-                            selectedHearingOutcome.getValue().getCompletedHearings().getValue(),
-                            caseDetails.getId());
-                    preSubmitCallbackResponse.addError("This hearing already has an outcome recorded: "
-                            + selectedHearingOutcome.getValue().getCompletedHearings().getValue().getLabel());
-                    return preSubmitCallbackResponse;
-                } else {
-                    hearingsSelected.add(selectedHearingId);
-                }
-            }
         }
+        List<String> hearingsSelected = new ArrayList<>();
+        for (HearingOutcome selectedHearingOutcome : sscsCaseData.getHearingOutcomes()) {
+            String selectedHearingId =
+                    selectedHearingOutcome.getValue().getCompletedHearings().getValue().getCode();
+            if (hearingsSelected.contains(selectedHearingId)) {
+                log.info("Hearing outcome {} selected more than once for case {}",
+                        selectedHearingOutcome.getValue().getCompletedHearings().getValue(),
+                        caseDetails.getId());
+                preSubmitCallbackResponse.addError("This hearing already has an outcome recorded: "
+                        + selectedHearingOutcome.getValue().getCompletedHearings().getValue().getLabel());
+                return preSubmitCallbackResponse;
+            } else {
+                hearingsSelected.add(selectedHearingId);
+            }
 
-        int hearingOutcomesSize = sscsCaseData.getHearingOutcomes().size();
-
-        for (HearingOutcome hearingOutcome : sscsCaseData.getHearingOutcomes()) {
-
-            String selectedHearingId =  hearingOutcome.getValue().getCompletedHearings().getValue().getCode();
-
-            if (!selectedHearingId.equalsIgnoreCase(hearingOutcome.getValue().getCompletedHearingId())) {
-
+            if (!selectedHearingId.equalsIgnoreCase(selectedHearingOutcome.getValue().getCompletedHearingId())) {
                 log.info("Amending hearing outcome on case {} from hearing id: {} to be for hearing id: {}",
-                        caseDetails.getId(), hearingOutcome.getValue().getCompletedHearingId(), selectedHearingId);
+                        caseDetails.getId(), selectedHearingOutcome.getValue().getCompletedHearingId(), selectedHearingId);
 
                 HearingDetails selectedHearingDetails = sscsCaseData.getCompletedHearingsList().stream()
                         .filter(hearing -> hearing.getValue().getHearingId().equalsIgnoreCase(selectedHearingId))
                         .findFirst().orElse(Hearing.builder().build()).getValue();
 
-                hearingOutcome.getValue().setCompletedHearingId(selectedHearingDetails.getHearingId());
-                hearingOutcome.getValue().setHearingStartDateTime(selectedHearingDetails.getStart());
-                hearingOutcome.getValue().setHearingEndDateTime(selectedHearingDetails.getEnd());
-                hearingOutcome.getValue().setHearingChannelId(selectedHearingDetails.getHearingChannel());
-                hearingOutcome.getValue().setVenue(selectedHearingDetails.getVenue());
-                hearingOutcome.getValue().setEpimsId(selectedHearingDetails.getEpimsId());
+                selectedHearingOutcome.getValue().setCompletedHearingId(selectedHearingDetails.getHearingId());
+                selectedHearingOutcome.getValue().setHearingStartDateTime(selectedHearingDetails.getStart());
+                selectedHearingOutcome.getValue().setHearingEndDateTime(selectedHearingDetails.getEnd());
+                selectedHearingOutcome.getValue().setHearingChannelId(selectedHearingDetails.getHearingChannel());
+                selectedHearingOutcome.getValue().setVenue(selectedHearingDetails.getVenue());
+                selectedHearingOutcome.getValue().setEpimsId(selectedHearingDetails.getEpimsId());
             }
 
         }
