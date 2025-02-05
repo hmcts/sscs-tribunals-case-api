@@ -7,12 +7,12 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMa
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper.*;
 
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
-import javax.servlet.http.HttpServletResponse;
 import junitparams.NamedParameters;
 import junitparams.Parameters;
 import org.apache.commons.io.FileUtils;
@@ -733,7 +733,7 @@ public class NotificationsIt extends NotificationsItBase {
                 GAPS_ROUTE,
                 Collections.emptyList(),
                 Collections.emptyList(),
-                Arrays.asList("TB-SCS-GNO-ENG-00510.docx", "TB-SCS-GNO-ENG-00510.docx"),
+                Arrays.asList("TB-SCS-GNO-ENG-00510-v2.docx", "TB-SCS-GNO-ENG-00510-v2.docx"),
                 "yes",
                 "yes",
                 "0",
@@ -746,7 +746,7 @@ public class NotificationsIt extends NotificationsItBase {
                 GAPS_ROUTE,
                 Collections.emptyList(),
                 Collections.emptyList(),
-                Arrays.asList("TB-SCS-GNO-WEL-00649.docx", "TB-SCS-GNO-WEL-00649.docx"),
+                Arrays.asList("TB-SCS-GNO-WEL-00649-v2.docx", "TB-SCS-GNO-WEL-00649-v2.docx"),
                 "yes",
                 "yes",
                 "0",
@@ -1137,7 +1137,7 @@ public class NotificationsIt extends NotificationsItBase {
                 LIST_ASSIST_ROUTE,
                 Collections.emptyList(),
                 Collections.emptyList(),
-                Arrays.asList("TB-SCS-GNO-ENG-00510.docx", "TB-SCS-GNO-ENG-00510.docx"),
+                Arrays.asList("TB-SCS-GNO-ENG-00510-v2.docx", "TB-SCS-GNO-ENG-00510-v2.docx"),
                 "yes",
                 "yes",
                 "0",
@@ -1150,7 +1150,7 @@ public class NotificationsIt extends NotificationsItBase {
                 LIST_ASSIST_ROUTE,
                 Collections.emptyList(),
                 Collections.emptyList(),
-                Arrays.asList("TB-SCS-GNO-WEL-00649.docx", "TB-SCS-GNO-WEL-00649.docx"),
+                Arrays.asList("TB-SCS-GNO-WEL-00649-v2.docx", "TB-SCS-GNO-WEL-00649-v2.docx"),
                 "yes",
                 "yes",
                 "0",
