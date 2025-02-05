@@ -227,8 +227,7 @@ export class WriteFinalDecisionPages {
       writeFinalDecisionData.panelMembersPageHeading
     );
     switch (appealType) {
-      case 'PIP':
-      case 'ESA': {
+      case 'PIP': {
         await webActions.verifyPageLabel(
           "[for='writeFinalDecisionDisabilityQualifiedPanelMemberName'] > .form-label",
           writeFinalDecisionData.nameOfDisabilityQualifiedPanelMemberDQPMLabel
@@ -239,7 +238,8 @@ export class WriteFinalDecisionPages {
         );
         break;
       }
-      case 'UNIVERSAL CREDIT': {
+      case 'UNIVERSAL CREDIT':
+      case 'ESA': {
         await webActions.verifyPageLabel(
           "[for='writeFinalDecisionMedicallyQualifiedPanelMemberName'] > .form-label",
           writeFinalDecisionData.nameOfMedicallyQualifiedPanelMemberMQPMLabel
@@ -258,8 +258,7 @@ export class WriteFinalDecisionPages {
 
   async inputPageContentForPanelMembersPageData(appealType = 'PIP') {
     switch (appealType) {
-      case 'PIP':
-      case 'ESA': {
+      case 'PIP': {
         await webActions.inputField(
           '#writeFinalDecisionDisabilityQualifiedPanelMemberName',
           writeFinalDecisionData.nameOfDisabilityQualifiedPanelMemberInput
@@ -270,14 +269,15 @@ export class WriteFinalDecisionPages {
         );
         break;
       }
-      case 'UNIVERSAL CREDIT': {
-        await webActions.inputField(
-          '#writeFinalDecisionMedicallyQualifiedPanelMemberName',
-          writeFinalDecisionData.nameOfMedicallyQualifiedPanelMemberInput
-        );
+      case 'UNIVERSAL CREDIT':
+      case 'ESA': {
         await webActions.inputField(
           '#writeFinalDecisionOtherPanelMemberName',
           writeFinalDecisionData.otherPanelMemberInput
+        );
+        await webActions.inputField(
+          '#writeFinalDecisionMedicallyQualifiedPanelMemberName',
+          writeFinalDecisionData.nameOfMedicallyQualifiedPanelMemberInput
         );
         break;
       }
@@ -464,7 +464,7 @@ export class WriteFinalDecisionPages {
       writeFinalDecisionData.checkYourAnswersSectionHeading
     );
     await webActions.verifyPageLabel(
-      '.check-your-answers > [_ngcontent-ng-c645309043] > .text-16',
+      'form.check-your-answers > div.ng-star-inserted > span.text-16',
       writeFinalDecisionData.checkYourInformationCarefullyLabel
     );
 
@@ -881,7 +881,7 @@ export class WriteFinalDecisionPages {
       writeFinalDecisionData.checkYourAnswersSectionHeading
     );
     await webActions.verifyPageLabel(
-      '.check-your-answers > [_ngcontent-ng-c645309043] > .text-16',
+      'form.check-your-answers > div.ng-star-inserted > span.text-16',
       writeFinalDecisionData.checkYourInformationCarefullyLabel
     );
 
@@ -1059,7 +1059,7 @@ export class WriteFinalDecisionPages {
       writeFinalDecisionData.anythingElsePageHeading
     );
     await webActions.verifyPageLabel(
-      'tr:nth-of-type(24) [_ngcontent-ng-c142448239]',
+      'tr:nth-of-type(24) ccd-read-text-area-field > span',
       writeFinalDecisionData.anythingElseInput
     );
 
@@ -1079,7 +1079,7 @@ export class WriteFinalDecisionPages {
       writeFinalDecisionData.checkYourAnswersSectionHeading
     );
     await webActions.verifyPageLabel(
-      '.check-your-answers > [_ngcontent-ng-c645309043] > .text-16',
+      'form.check-your-answers > div.ng-star-inserted > span.text-16',
       writeFinalDecisionData.checkYourInformationCarefullyLabel
     );
 
@@ -1118,7 +1118,7 @@ export class WriteFinalDecisionPages {
       writeFinalDecisionData.checkYourAnswersSectionHeading
     );
     await webActions.verifyPageLabel(
-      '.check-your-answers > [_ngcontent-ng-c645309043] > .text-16',
+      'form.check-your-answers > div.ng-star-inserted > span.text-16',
       writeFinalDecisionData.checkYourInformationCarefullyLabel
     );
 
@@ -1168,20 +1168,20 @@ export class WriteFinalDecisionPages {
     );
 
     await webActions.verifyPageLabel(
-      '.form-table tr:nth-of-type(8) > .valign-top > .text-16',
+      '.form-table tr:nth-of-type(9) > .valign-top > .text-16',
       writeFinalDecisionData.nameOfMedicallyQualifiedPanelMemberMQPMWithoutOptionalLabel
     );
     await webActions.verifyPageLabel(
-      '.form-table tr:nth-of-type(8) > .form-cell .text-16',
+      '.form-table tr:nth-of-type(9) > .form-cell .text-16',
       writeFinalDecisionData.nameOfMedicallyQualifiedPanelMemberInput
     );
 
     await webActions.verifyPageLabel(
-      '.form-table tr:nth-of-type(9) > .valign-top > .text-16',
+      '.form-table tr:nth-of-type(8) > .valign-top > .text-16',
       writeFinalDecisionData.otherWithoutOptionalLabel
     );
     await webActions.verifyPageLabel(
-      '.form-table tr:nth-of-type(9) > .form-cell .text-16',
+      '.form-table tr:nth-of-type(8) > .form-cell .text-16',
       writeFinalDecisionData.otherPanelMemberInput
     );
 
@@ -1600,7 +1600,7 @@ export class WriteFinalDecisionPages {
       writeFinalDecisionData.checkYourAnswersSectionHeading
     );
     await webActions.verifyPageLabel(
-      '.check-your-answers > [_ngcontent-ng-c645309043] > .text-16',
+      'form.check-your-answers > div.ng-star-inserted > span.text-16',
       writeFinalDecisionData.checkYourInformationCarefullyLabel
     );
 

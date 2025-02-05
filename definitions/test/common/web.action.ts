@@ -53,6 +53,7 @@ export class WebAction {
 
   async inputField(elementLocator: string, inputValue: string) {
     await this.verifyElementVisibility(elementLocator);
+    await expect(this.page.locator(elementLocator).first()).toBeEnabled();
     await this.page.locator(elementLocator).first().fill(inputValue);
   }
 
@@ -79,6 +80,8 @@ export class WebAction {
     await this.page.waitForLoadState('domcontentloaded');
     await expect(this.page.getByRole('button', { name: elementLocator }).first())
       .toBeVisible();
+    await expect(this.page.getByRole('button', { name: elementLocator }).first())
+      .toBeEnabled();
     await this.page
       .getByRole('button', { name: elementLocator, exact: true })
       .first()
