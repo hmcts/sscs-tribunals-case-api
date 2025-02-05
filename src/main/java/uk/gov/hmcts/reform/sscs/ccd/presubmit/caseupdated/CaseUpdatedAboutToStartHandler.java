@@ -8,7 +8,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -34,9 +33,6 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
     private final DynamicListLanguageUtil utils;
 
     private final VerbalLanguagesService verbalLanguagesService;
-
-    @Value("${feature.infected-blood-compensation.enabled}")
-    private boolean isInfectedBloodCompensationEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -85,7 +81,7 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
         BenefitType benefitType = sscsCaseData.getAppeal().getBenefitType();
 
         if (!isNull(benefitType)) {
-            DynamicList benefitDescriptions = SscsUtil.getBenefitDescriptions(isInfectedBloodCompensationEnabled);
+            DynamicList benefitDescriptions = SscsUtil.getBenefitDescriptions();
             DynamicListItem selectedBenefit = getSelectedDynamicListItem(benefitDescriptions.getListItems(), sscsCaseData.getBenefitCode());
             benefitDescriptions.setValue(selectedBenefit);
             benefitType.setDescriptionSelection(benefitDescriptions);
