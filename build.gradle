@@ -353,7 +353,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '8.0.1'
 
 
-    implementation group: 'com.mchange', name: 'c3p0', version: '0.10.1'
+    implementation group: 'com.mchange', name: 'c3p0', version: '0.10.2'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
 
     implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6.0.1'
@@ -389,7 +389,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'sscs-job-scheduler', version: '2.0.0'
     implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.5.0'
     implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.2.1-RELEASE'
-    implementation group: 'com.atlassian.commonmark', name: 'commonmark', version: '0.17.0'
+    implementation group: 'org.commonmark', name: 'commonmark', version: '0.24.0'
 
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.3.1'
     testImplementation group: 'io.rest-assured', name: 'xml-path', version: '5.3.1'
@@ -416,8 +416,8 @@ dependencies {
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '10.1.26'
 
     //evidence-share depenedencies
-    implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
-    implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '3.0.23'
+    implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '8.0.1'
+    implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '5.0.1'
     // Remove this dependency once the secure doc-store is in use
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.7.0'
