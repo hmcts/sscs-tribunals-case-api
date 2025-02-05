@@ -383,13 +383,6 @@ dependencies {
     implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.2.1-RELEASE'
     implementation group: 'org.commonmark', name: 'commonmark', version: '0.24.0'
 
-    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.3.1'
-    testImplementation group: 'io.rest-assured', name: 'xml-path', version: '5.3.1'
-    testImplementation group: 'io.rest-assured', name: 'json-path', version: '5.3.1'
-    testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.7', classifier: 'all', {
-        exclude group: 'commons-io', module: 'commons-io'
-    }
-
     implementation group: 'commons-io', name: 'commons-io', version:  versions.commonsio
 
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
@@ -422,16 +415,18 @@ dependencies {
         exclude group: 'org.codehaus.groovy', module: 'groovy-xml'
     }
 
-
-    integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  versions.commonsio
-
-    functionalTestImplementation group: 'commons-io', name: 'commons-io', version:  versions.commonsio
-
     implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
+    }
+
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.3.1'
+    testImplementation group: 'io.rest-assured', name: 'xml-path', version: '5.3.1'
+    testImplementation group: 'io.rest-assured', name: 'json-path', version: '5.3.1'
+    testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.7', classifier: 'all', {
+        exclude group: 'commons-io', module: 'commons-io'
     }
 
     testImplementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5-fluent', version: '5.4.2'
@@ -442,10 +437,6 @@ dependencies {
     testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.37.0'
 
     testImplementation group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
-
-    // https://mvnrepository.com/artifact/net.bytebuddy/byte-buddy-dep
-    testImplementation group: 'net.bytebuddy', name: 'byte-buddy-dep', version: '1.17.0'
-
 
     testImplementation group: 'pl.pragmatists', name: 'JUnitParams', version: '1.1.1'
 
@@ -615,17 +606,6 @@ task highLevelDataSetup(type: JavaExec) {
     mainClass = "uk.gov.hmcts.reform.sscs.config.HighLevelDataSetupApp"
     classpath += sourceSets.main.runtimeClasspath
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
-}
-
-// this is required to force Java running on the Azure Windows Server OS into using
-// UTF-8 as the default character set instead of windows-1252 which causes issues
-applicationDefaultJvmArgs = ["-Dfile.encoding=UTF-8"]
-
-run {
-    def debug = System.getProperty("debug")
-    if (debug == 'true') {
-        jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
-    }
 }
 
 def dbHost = System.env.JOB_SCHEDULER_DB_HOST ?: "localhost"
