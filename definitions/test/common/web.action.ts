@@ -78,14 +78,14 @@ export class WebAction {
 
   async clickButton(elementLocator: string): Promise<void> {
     await this.page.waitForLoadState('domcontentloaded');
-    await expect(this.page.getByRole('button', { name: elementLocator }).first())
+    await expect(this.page.getByRole('button', { name: elementLocator, exact: true }).first())
       .toBeVisible();
-    await expect(this.page.getByRole('button', { name: elementLocator }).first())
+    await expect(this.page.getByRole('button', { name: elementLocator, exact: true }).first())
       .toBeEnabled();
     await this.page
       .getByRole('button', { name: elementLocator, exact: true })
       .first()
-      .click({ force: true });
+      .click();
   }
 
   async clickGoButton(elementLocator: string): Promise<void> {

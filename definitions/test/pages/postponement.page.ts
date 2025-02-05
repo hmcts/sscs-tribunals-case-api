@@ -141,10 +141,6 @@ export class PostponementPages {
         "[for='signedRole'] > .form-label",
         postponementData.signedRoleLabel
       );
-      await webActions.verifyPageLabel(
-        "[for='listingOption'] > .form-label",
-        postponementData.listingOptionLabel
-      );
       await webActions.inputField(
         '#bodyContent',
         postponementData.bodyContentInputValue

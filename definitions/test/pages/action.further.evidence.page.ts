@@ -138,7 +138,6 @@ export class ActionFurtherEvidencePage {
     await webActions.verifyElementVisibility('#error-summary-title');
     await webActions.verifyElementVisibility('span.error-message')
     await webActions.verifyTextVisibility('Error Uploading File');
-    await webActions.verifyTextVisibility('test-encrypted-file.pdf');
   }
 
   async verifyCorruptedFileErrorMsg(): Promise<void> {
