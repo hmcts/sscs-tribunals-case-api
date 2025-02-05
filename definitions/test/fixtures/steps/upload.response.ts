@@ -11,364 +11,523 @@ const uploadResponseTestdata = require('../../pages/content/upload.response_en.j
 const ucbTestData = require('../../pages/content/update.ucb_en.json');
 
 export class UploadResponse extends BaseStep {
+  private static caseId: string;
+  readonly page: Page;
+  protected stepsHelper: StepsHelper;
 
-    private static caseId: string;
-    readonly page: Page;
-    protected stepsHelper: StepsHelper;
+  private presetLinks: string[] = [
+    'Upload response',
+    'Ready to list',
+    'Update to case data',
+    'Add a hearing'
+  ];
 
-    private presetLinks: string[] = ['Upload response', 'Ready to list', 'Update to case data', 'Add a hearing'];
+  constructor(page: Page) {
+    super(page);
+    this.page = page;
+    this.stepsHelper = new StepsHelper(this.page);
+  }
 
-    constructor(page: Page) {
-        super(page);
-        this.page = page;
-        this.stepsHelper = new StepsHelper(this.page);
+  async performUploadResponseWithFurtherInfoOnAPIPAndReviewResponse() {
+    let pipCaseId = await createCaseBasedOnCaseType('PIP');
+    await this.uploadResponseWithFurtherInfoAsDwpCaseWorker(pipCaseId);
+    await this.homePage.clickSignOut();
+
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, pipCaseId);
+    await this.homePage.navigateToTab('Summary');
+    await this.summaryTab.verifyPresenceOfText('Response received');
+
+    await this.homePage.chooseEvent('Response reviewed');
+    await this.responseReviewedPage.verifyPageContent(
+      responseReviewedTestData.captionValue,
+      responseReviewedTestData.headingValue
+    );
+    await this.responseReviewedPage.chooseInterlocOption('No');
+    await this.responseReviewedPage.confirmSubmission();
+
+    await this.homePage.delay(1000);
+    await this.homePage.navigateToTab('History');
+
+    for (const linkName of this.presetLinks) {
+      await this.verifyHistoryTabLink(linkName);
     }
 
+    await this.homePage.delay(3000);
+    await this.homePage.navigateToTab('Summary');
+    await this.summaryTab.verifyPresenceOfText('Ready to list');
+    // await performAppealDormantOnCase(pipCaseId);
+  }
 
-    async performUploadResponseWithFurtherInfoOnAPIPAndReviewResponse() {
+  async performUploadResponseWithPHEOnAPIPAndReviewResponse(caseId: string) {
+    await this.loginUserWithCaseId(
+      credentials.dwpResponseWriter,
+      false,
+      caseId
+    );
+    await this.stepsHelper.uploadResponseHelper(
+      uploadResponseTestdata.pipIssueCode,
+      'No',
+      true
+    );
 
-        let pipCaseId = await createCaseBasedOnCaseType("PIP");
-        await this.uploadResponseWithFurtherInfoAsDwpCaseWorker(pipCaseId);
-        await this.homePage.clickSignOut();
+    await this.checkYourAnswersPage.verifyCYAPageContentWithPHE(
+      'Upload response',
+      uploadResponseTestdata.pipBenefitCode,
+      uploadResponseTestdata.pipIssueCode
+    );
+    await this.checkYourAnswersPage.confirmSubmission();
+    await this.homePage.clickSignOut();
 
-        await this.loginUserWithCaseId(credentials.amCaseWorker, false, pipCaseId);
-        await this.homePage.navigateToTab("Summary");
-        await this.summaryTab.verifyPresenceOfText("Response received");
+    await this.homePage.delay(3000);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
 
-        await this.homePage.chooseEvent('Response reviewed');
-        await this.responseReviewedPage.verifyPageContent(responseReviewedTestData.captionValue, responseReviewedTestData.headingValue);
-        await this.responseReviewedPage.chooseInterlocOption('No');
-        await this.responseReviewedPage.confirmSubmission();
+    await this.homePage.navigateToTab('Summary');
+    await this.summaryTab.verifyPresenceOfText('Ready to list');
+    await this.summaryTab.verifyPresenceOfTitle(
+      'PHE on this case: Under Review'
+    );
+    await this.homePage.clickSignOut();
+  }
 
-        await this.homePage.delay(1000);
-        await this.homePage.navigateToTab("History");
+  async performUploadResponseWithUCBOnAPIP(caseId: string) {
+    await this.loginUserWithCaseId(
+      credentials.dwpResponseWriter,
+      false,
+      caseId
+    );
+    await this.stepsHelper.uploadResponseHelper(
+      uploadResponseTestdata.pipIssueCode,
+      'No',
+      undefined,
+      true
+    );
 
-        for (const linkName of this.presetLinks) {
-            await this.verifyHistoryTabLink(linkName);
-        }
+    await this.checkYourAnswersPage.verifyCYAPageContentWithUCB(
+      'Upload response',
+      uploadResponseTestdata.pipBenefitCode,
+      uploadResponseTestdata.pipIssueCode
+    );
+    await this.checkYourAnswersPage.confirmSubmission();
+    await this.homePage.clickSignOut();
 
-        await this.homePage.delay(3000);
-        await this.homePage.navigateToTab("Summary");
-        await this.summaryTab.verifyPresenceOfText("Ready to list");
-        // await performAppealDormantOnCase(pipCaseId);
-   }
+    await this.homePage.delay(3000);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
 
-   async performUploadResponseWithPHEOnAPIPAndReviewResponse(caseId: string) {
+    await this.homePage.navigateToTab('Summary');
+    await this.summaryTab.verifyPresenceOfText('Ready to list');
+    if (environment.name == 'aat') {
+      await this.page.locator('button.mat-tab-header-pagination-after').click();
+    }
+    await this.homePage.navigateToTab('Listing Requirements');
+    await this.listingRequirementsTab.verifyContentByKeyValueForASpan(
+      ucbTestData.ucbFieldLabel,
+      ucbTestData.ucbFieldValue_Yes
+    );
+  }
 
-        await this.loginUserWithCaseId(credentials.dwpResponseWriter, false, caseId);
-        await this.stepsHelper.uploadResponseHelper(uploadResponseTestdata.pipIssueCode, 'No', true);
+  async performUploadResponseWithAVEvidenceOnAPIP(caseId: string) {
+    await this.loginUserWithCaseId(
+      credentials.dwpResponseWriter,
+      false,
+      caseId
+    );
+    await this.stepsHelper.uploadResponseHelper(
+      uploadResponseTestdata.pipIssueCode,
+      'No',
+      undefined,
+      undefined,
+      true
+    );
+    await this.checkYourAnswersPage.confirmSubmission();
+    await this.homePage.delay(3000);
+    await this.homePage.clickSignOut();
+  }
 
-        await this.checkYourAnswersPage.verifyCYAPageContentWithPHE("Upload response", uploadResponseTestdata.pipBenefitCode, uploadResponseTestdata.pipIssueCode);
-        await this.checkYourAnswersPage.confirmSubmission();
-        await this.homePage.clickSignOut();
+  async performUploadResponse(caseId: string, caseType: string) {
+    await this.loginUserWithCaseId(
+      credentials.dwpResponseWriter,
+      false,
+      caseId
+    );
+    if (caseType === 'dla')
+      await this.stepsHelper.uploadResponseHelper(
+        uploadResponseTestdata.dlaIssueCode,
+        'No',
+        undefined,
+        undefined,
+        undefined
+      );
+    if (caseType === 'pip')
+      await this.stepsHelper.uploadResponseHelper(
+        uploadResponseTestdata.pipIssueCode,
+        'No',
+        undefined,
+        undefined,
+        undefined
+      );
+    await this.checkYourAnswersPage.confirmSubmission();
+    await this.homePage.delay(3000);
+    await this.homePage.clickSignOut();
+    await this.homePage.delay(3000);
+  }
 
-        await this.homePage.delay(3000);
-        await this.loginUserWithCaseId(credentials.amCaseWorker,false, caseId);
-    
-        await this.homePage.navigateToTab("Summary");
-        await this.summaryTab.verifyPresenceOfText("Ready to list");
-        await this.summaryTab.verifyPresenceOfTitle("PHE on this case: Under Review");
-        await this.homePage.clickSignOut();
-   }
+  async performUploadResponseWithoutFurtherInfoOnATaxCredit() {
+    let taxCaseId = await createCaseBasedOnCaseType('TAX CREDIT');
+    await this.loginUserWithCaseId(credentials.hmrcUser, false, taxCaseId);
+    await this.stepsHelper.uploadResponseHelper(
+      uploadResponseTestdata.taxIssueCode,
+      'No'
+    );
 
+    await this.checkYourAnswersPage.verifyCYAPageContent(
+      'Upload response',
+      uploadResponseTestdata.taxBenefitCode,
+      uploadResponseTestdata.taxIssueCode
+    );
+    await this.checkYourAnswersPage.confirmSubmission();
+    await this.homePage.clickSignOut();
 
-   async performUploadResponseWithUCBOnAPIP(caseId: string) {
+    await this.homePage.delay(3000);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, taxCaseId);
+    await this.homePage.navigateToTab('History');
 
-        await this.loginUserWithCaseId(credentials.dwpResponseWriter, false, caseId);
-        await this.stepsHelper.uploadResponseHelper(uploadResponseTestdata.pipIssueCode, 'No', undefined, true);
+    for (const linkName of this.presetLinks) {
+      await this.verifyHistoryTabLink(linkName);
+    }
+    await this.homePage.navigateToTab('Summary');
+    await this.summaryTab.verifyPresenceOfText('Ready to list');
+    // await performAppealDormantOnCase(taxCaseId);
+  }
 
-        await this.checkYourAnswersPage.verifyCYAPageContentWithUCB("Upload response", uploadResponseTestdata.pipBenefitCode, uploadResponseTestdata.pipIssueCode);
-        await this.checkYourAnswersPage.confirmSubmission();
-        await this.homePage.clickSignOut();
+  async performUploadResponseOnAUniversalCredit(ucCaseId: string) {
+    // let ucCaseId = await createCaseBasedOnCaseType("UC");
+    await this.loginUserWithCaseId(
+      credentials.dwpResponseWriter,
+      false,
+      ucCaseId
+    );
 
-        await this.homePage.delay(3000);
-        await this.loginUserWithCaseId(credentials.amCaseWorker,false, caseId);
+    await this.homePage.chooseEvent('Upload response');
+    await this.homePage.delay(4000);
+    await this.uploadResponsePage.verifyPageContent();
+    await this.uploadResponsePage.uploadDocs();
+    await this.uploadResponsePage.chooseAssistOption('No');
+    await this.uploadResponsePage.continueSubmission();
 
-        await this.homePage.navigateToTab("Summary");
-        await this.summaryTab.verifyPresenceOfText("Ready to list");
-        if (environment.name == 'aat') {
-            await this.page.locator('button.mat-tab-header-pagination-after').click();
-        }
-        await this.homePage.navigateToTab("Listing Requirements");
-        await this.listingRequirementsTab.verifyContentByKeyValueForASpan(ucbTestData.ucbFieldLabel, ucbTestData.ucbFieldValue_Yes);
+    await this.uploadResponsePage.selectElementDisputed('childElement');
+    await this.uploadResponsePage.continueSubmission();
+
+    await this.uploadResponsePage.clickAddNewButton();
+    await this.uploadResponsePage.selectUcIssueCode(
+      uploadResponseTestdata.ucIssueCode
+    );
+    await this.homePage.delay(2000);
+    await this.uploadResponsePage.continueSubmission();
+
+    await this.uploadResponsePage.chooseDisputeOption(
+      uploadResponseTestdata.ucDisputeOption
+    );
+    await this.homePage.delay(2000);
+    await this.uploadResponsePage.continueSubmission();
+
+    await this.uploadResponsePage.isJPOnTheCase(
+      uploadResponseTestdata.ucJointPartyOnCase
+    );
+    await this.uploadResponsePage.continueSubmission();
+
+    await this.checkYourAnswersPage.verifyCYAPageContent(
+      'Upload response',
+      null,
+      null,
+      'UC'
+    );
+    await this.checkYourAnswersPage.confirmSubmission();
+    await this.homePage.clickSignOut();
+
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, ucCaseId);
+    await this.homePage.delay(1000);
+    await this.homePage.navigateToTab('History');
+
+    for (const linkName of this.presetLinks) {
+      await this.verifyHistoryTabLink(linkName);
+    }
+    await this.homePage.navigateToTab('Summary');
+    await this.summaryTab.verifyPresenceOfText('Ready to list');
+    // await performAppealDormantOnCase(ucCaseId);
+  }
+
+  async performUploadResponseOnAUniversalCreditWithJP(ucCaseId: string) {
+    // let ucCaseId = await createCaseBasedOnCaseType("UC");
+    await this.loginUserWithCaseId(
+      credentials.dwpResponseWriter,
+      false,
+      ucCaseId
+    );
+
+    await this.homePage.chooseEvent('Upload response');
+    await this.homePage.delay(4000);
+    await this.uploadResponsePage.verifyPageContent();
+    await this.uploadResponsePage.uploadDocs();
+    await this.uploadResponsePage.chooseAssistOption('No');
+    await this.uploadResponsePage.continueSubmission();
+
+    await this.uploadResponsePage.selectElementDisputed('childElement');
+    await this.uploadResponsePage.continueSubmission();
+
+    await this.uploadResponsePage.clickAddNewButton();
+    await this.uploadResponsePage.selectUcIssueCode(
+      uploadResponseTestdata.ucIssueCode
+    );
+    await this.homePage.delay(2000);
+    await this.uploadResponsePage.continueSubmission();
+
+    await this.uploadResponsePage.chooseDisputeOption(
+      uploadResponseTestdata.ucDisputeOption
+    );
+    await this.homePage.delay(2000);
+    await this.uploadResponsePage.continueSubmission();
+
+    await this.uploadResponsePage.isJPOnTheCase(
+      uploadResponseTestdata.ucJointPartyOnCase_Yes
+    );
+    await this.uploadResponsePage.continueSubmission();
+    await this.uploadResponsePage.enterJPDetails();
+    await this.checkYourAnswersPage.confirmSubmission();
+
+    await this.homePage.signOut();
+    await new Promise((f) => setTimeout(f, 3000)); //Delay required for the Case to be ready
+
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, ucCaseId);
+    await this.homePage.reloadPage();
+    await this.homePage.delay(1000);
+    await this.homePage.navigateToTab('History');
+
+    for (const linkName of this.presetLinks) {
+      await this.verifyHistoryTabLink(linkName);
     }
 
-    async performUploadResponseWithAVEvidenceOnAPIP(caseId: string) {
+    await this.homePage.clickBeforeTabBtn();
+    await this.homePage.navigateToTab('Summary');
+    await this.summaryTab.verifyPresenceOfText('Ready to list');
+    // await performAppealDormantOnCase(ucCaseId);
+  }
 
-        await this.loginUserWithCaseId(credentials.dwpResponseWriter, false, caseId);
-        await this.stepsHelper.uploadResponseHelper(uploadResponseTestdata.pipIssueCode, 'No', undefined, undefined, true);
-        await this.checkYourAnswersPage.confirmSubmission();
-        await this.homePage.delay(3000);
-        await this.homePage.clickSignOut();
-    }
+  async verifyErrorsScenariosInUploadResponse() {
+    UploadResponse.caseId = await createCaseBasedOnCaseType('PIP');
+    await this.loginUserWithCaseId(
+      credentials.dwpResponseWriter,
+      false,
+      UploadResponse.caseId
+    );
 
+    await this.homePage.chooseEvent('Upload response');
+    await this.homePage.delay(2000);
+    await this.uploadResponsePage.verifyPageContent();
+    await this.uploadResponsePage.uploadPartialDocs();
+    await this.uploadResponsePage.selectIssueCode(
+      uploadResponseTestdata.pipIssueCode
+    );
+    await this.uploadResponsePage.chooseAssistOption('Yes');
+    await this.uploadResponsePage.continueSubmission();
+    await this.uploadResponsePage.delay(1000);
+    await this.uploadResponsePage.verifyDocMissingErrorMsg();
+    // await performAppealDormantOnCase(pipErrorCaseId);
+  }
 
-    async performUploadResponse(caseId: string, caseType: string) {
+  async verifyPHMEErrorsScenariosInUploadResponse() {
+    await this.loginUserWithCaseId(
+      credentials.dwpResponseWriter,
+      false,
+      UploadResponse.caseId
+    );
+    await this.homePage.goToHomePage(UploadResponse.caseId);
 
-        await this.loginUserWithCaseId(credentials.dwpResponseWriter, false, caseId);
-        if(caseType === 'dla') await this.stepsHelper.uploadResponseHelper(uploadResponseTestdata.dlaIssueCode, 'No', undefined, undefined, undefined);
-        if(caseType === 'pip') await this.stepsHelper.uploadResponseHelper(uploadResponseTestdata.pipIssueCode, 'No', undefined, undefined, undefined);
-        await this.checkYourAnswersPage.confirmSubmission();
-        await this.homePage.delay(3000);
-        await this.homePage.clickSignOut();
-        await this.homePage.delay(3000);
-    }
+    await this.homePage.chooseEvent('Upload response');
+    await this.uploadResponsePage.verifyPageContent();
+    await this.uploadResponsePage.uploadDocs();
+    await this.uploadResponsePage.selectEvidenceReason(
+      'Potentially harmful evidence'
+    );
+    await this.uploadResponsePage.selectIssueCode(
+      uploadResponseTestdata.pipIssueCode
+    );
+    await this.uploadResponsePage.chooseAssistOption('Yes');
+    await this.uploadResponsePage.continueSubmission();
 
+    await this.checkYourAnswersPage.confirmSubmission();
+    await this.checkYourAnswersPage.verifyPHMEErrorMsg();
+  }
 
-    async performUploadResponseWithoutFurtherInfoOnATaxCredit() {
+  async verifyIssueCodeErrorsScenariosInUploadResponse() {
+    await this.loginUserWithCaseId(
+      credentials.dwpResponseWriter,
+      false,
+      UploadResponse.caseId
+    );
+    await this.homePage.goToHomePage(UploadResponse.caseId);
 
-        let taxCaseId = await createCaseBasedOnCaseType("TAX CREDIT");
-        await this.loginUserWithCaseId(credentials.hmrcUser, false, taxCaseId);
-        await this.stepsHelper.uploadResponseHelper(uploadResponseTestdata.taxIssueCode, 'No');
+    await this.homePage.chooseEvent('Upload response');
+    await this.uploadResponsePage.verifyPageContent();
+    await this.uploadResponsePage.uploadDocs();
+    await this.uploadResponsePage.selectIssueCode('DD');
+    await this.uploadResponsePage.chooseAssistOption('Yes');
+    await this.uploadResponsePage.continueSubmission();
 
-        await this.checkYourAnswersPage.verifyCYAPageContent("Upload response", uploadResponseTestdata.taxBenefitCode, uploadResponseTestdata.taxIssueCode);
-        await this.checkYourAnswersPage.confirmSubmission();
-        await this.homePage.clickSignOut();
+    await this.checkYourAnswersPage.confirmSubmission();
+    await this.checkYourAnswersPage.verifyIssueCodeErrorMsg();
+    // await performAppealDormantOnCase(UploadResponse.caseId);
+  }
 
-        await this.homePage.delay(3000);
-        await this.loginUserWithCaseId(credentials.amCaseWorker, false, taxCaseId);
-        await this.homePage.navigateToTab("History");
+  async verifyCtscAdminWithCaseAllocatorRoleCanViewReviewFTAResponseTask(
+    caseId: string
+  ) {
+    await this.uploadResponseWithFurtherInfoAsDwpCaseWorker(caseId);
 
-        for (const linkName of this.presetLinks) {
-            await this.verifyHistoryTabLink(linkName);
-        }
-        await this.homePage.navigateToTab("Summary");
-        await this.summaryTab.verifyPresenceOfText("Ready to list");
-        // await performAppealDormantOnCase(taxCaseId);
-    }
-
-    async performUploadResponseOnAUniversalCredit(ucCaseId: string) {
-
-        // let ucCaseId = await createCaseBasedOnCaseType("UC");
-        await this.loginUserWithCaseId(credentials.dwpResponseWriter, false, ucCaseId);
-
-        await this.homePage.chooseEvent('Upload response');
-        await this.homePage.delay(4000);
-        await this.uploadResponsePage.verifyPageContent();
-        await this.uploadResponsePage.uploadDocs();
-        await this.uploadResponsePage.chooseAssistOption('No');
-        await this.uploadResponsePage.continueSubmission();
-
-        await this.uploadResponsePage.selectElementDisputed('childElement');
-        await this.uploadResponsePage.continueSubmission();
-
-        await this.uploadResponsePage.clickAddNewButton();
-        await this.uploadResponsePage.selectUcIssueCode(uploadResponseTestdata.ucIssueCode);
-        await this.homePage.delay(2000);
-        await this.uploadResponsePage.continueSubmission();
-
-        await this.uploadResponsePage.chooseDisputeOption(uploadResponseTestdata.ucDisputeOption);
-        await this.homePage.delay(2000);
-        await this.uploadResponsePage.continueSubmission();
-
-        await this.uploadResponsePage.isJPOnTheCase(uploadResponseTestdata.ucJointPartyOnCase);
-        await this.uploadResponsePage.continueSubmission();
-
-        await this.checkYourAnswersPage.verifyCYAPageContent("Upload response", null, null, "UC");
-        await this.checkYourAnswersPage.confirmSubmission();
-        await this.homePage.clickSignOut();
-
-        await this.loginUserWithCaseId(credentials.amCaseWorker, false, ucCaseId);
-        await this.homePage.delay(1000);
-        await this.homePage.navigateToTab("History");
-
-        for (const linkName of this.presetLinks) {
-            await this.verifyHistoryTabLink(linkName);
-        }
-        await this.homePage.navigateToTab("Summary");
-        await this.summaryTab.verifyPresenceOfText("Ready to list");
-        // await performAppealDormantOnCase(ucCaseId);
-
-    }
-
-
-    async performUploadResponseOnAUniversalCreditWithJP(ucCaseId: string) {
-
-        // let ucCaseId = await createCaseBasedOnCaseType("UC");
-        await this.loginUserWithCaseId(credentials.dwpResponseWriter, false, ucCaseId);
-
-        await this.homePage.chooseEvent('Upload response');
-        await this.homePage.delay(4000);
-        await this.uploadResponsePage.verifyPageContent();
-        await this.uploadResponsePage.uploadDocs();
-        await this.uploadResponsePage.chooseAssistOption('No');
-        await this.uploadResponsePage.continueSubmission();
-
-        await this.uploadResponsePage.selectElementDisputed('childElement');
-        await this.uploadResponsePage.continueSubmission();
-
-        await this.uploadResponsePage.clickAddNewButton();
-        await this.uploadResponsePage.selectUcIssueCode(uploadResponseTestdata.ucIssueCode);
-        await this.homePage.delay(2000);
-        await this.uploadResponsePage.continueSubmission();
-
-        await this.uploadResponsePage.chooseDisputeOption(uploadResponseTestdata.ucDisputeOption);
-        await this.homePage.delay(2000);
-        await this.uploadResponsePage.continueSubmission();
-
-        await this.uploadResponsePage.isJPOnTheCase(uploadResponseTestdata.ucJointPartyOnCase_Yes);
-        await this.uploadResponsePage.continueSubmission();
-        await this.uploadResponsePage.enterJPDetails();
-        await this.checkYourAnswersPage.confirmSubmission();
-
-        await this.homePage.signOut();
-        await new Promise(f => setTimeout(f, 3000)); //Delay required for the Case to be ready
-
-        await this.loginUserWithCaseId(credentials.amCaseWorker, false, ucCaseId);
-        await this.homePage.reloadPage();
-        await this.homePage.delay(1000);
-        await this.homePage.navigateToTab("History");
-
-        for (const linkName of this.presetLinks) {
-            await this.verifyHistoryTabLink(linkName);
-        }
-
-        await this.homePage.clickBeforeTabBtn();
-        await this.homePage.navigateToTab("Summary");
-        await this.summaryTab.verifyPresenceOfText("Ready to list");
-        // await performAppealDormantOnCase(ucCaseId);
-
-    }
-
-    async verifyErrorsScenariosInUploadResponse() {
-
-      UploadResponse.caseId = await createCaseBasedOnCaseType("PIP");
-        await this.loginUserWithCaseId(credentials.dwpResponseWriter, false, UploadResponse.caseId);
-
-        await this.homePage.chooseEvent('Upload response');
-        await this.homePage.delay(2000);
-        await this.uploadResponsePage.verifyPageContent();
-        await this.uploadResponsePage.uploadPartialDocs();
-        await this.uploadResponsePage.selectIssueCode(uploadResponseTestdata.pipIssueCode);
-        await this.uploadResponsePage.chooseAssistOption('Yes');
-        await this.uploadResponsePage.continueSubmission();
-        await this.uploadResponsePage.delay(1000);
-        await this.uploadResponsePage.verifyDocMissingErrorMsg();
-        // await performAppealDormantOnCase(pipErrorCaseId);
-    }
-
-    async verifyPHMEErrorsScenariosInUploadResponse() {
-
-        await this.loginUserWithCaseId(credentials.dwpResponseWriter, false, UploadResponse.caseId);
-        await this.homePage.goToHomePage(UploadResponse.caseId);
-
-        await this.homePage.chooseEvent('Upload response');
-        await this.uploadResponsePage.verifyPageContent();
-        await this.uploadResponsePage.uploadDocs();
-        await this.uploadResponsePage.selectEvidenceReason('Potentially harmful evidence');
-        await this.uploadResponsePage.selectIssueCode(uploadResponseTestdata.pipIssueCode);
-        await this.uploadResponsePage.chooseAssistOption('Yes');
-        await this.uploadResponsePage.continueSubmission();
-
-        await this.checkYourAnswersPage.confirmSubmission();
-        await this.checkYourAnswersPage.verifyPHMEErrorMsg();
-    }
-
-    async verifyIssueCodeErrorsScenariosInUploadResponse() {
-
-        await this.loginUserWithCaseId(credentials.dwpResponseWriter, false, UploadResponse.caseId);
-        await this.homePage.goToHomePage(UploadResponse.caseId);
-
-        await this.homePage.chooseEvent('Upload response');
-        await this.uploadResponsePage.verifyPageContent();
-        await this.uploadResponsePage.uploadDocs();
-        await this.uploadResponsePage.selectIssueCode('DD');
-        await this.uploadResponsePage.chooseAssistOption('Yes');
-        await this.uploadResponsePage.continueSubmission();
-
-        await this.checkYourAnswersPage.confirmSubmission();
-        await this.checkYourAnswersPage.verifyIssueCodeErrorMsg();
-        // await performAppealDormantOnCase(UploadResponse.caseId);
-    }
-
-    async verifyCtscAdminWithCaseAllocatorRoleCanViewReviewFTAResponseTask(caseId: string) {
-
-        await this.uploadResponseWithFurtherInfoAsDwpCaseWorker(caseId);
-
-        /* Login as CTSC Administrator with case allocator role and view the 
+    /* Login as CTSC Administrator with case allocator role and view the 
            unassigned Review FTA Response task */
-        await this.loginUserWithCaseId(credentials.amCaseWorkerWithCaseAllocatorRole, true, caseId);
-        await this.homePage.navigateToTab("Summary");
-        await this.summaryTab.verifyPresenceOfText("Response received");
-        await this.homePage.navigateToTab('Tasks')
-        await this.tasksTab.verifyTaskIsDisplayed(task.name);
-        await this.tasksTab.verifyPriortiy(task.name, task.priority);
-        await this.tasksTab.verifyPageContentByKeyValue(task.name, 'Assigned to', task.assignedToWhenNotAssigned);
-        await this.tasksTab.verifyManageOptions(task.name, task.unassignedManageOptionsForCaseAllocator);
-    }
+    await this.loginUserWithCaseId(
+      credentials.amCaseWorkerWithCaseAllocatorRole,
+      true,
+      caseId
+    );
+    await this.homePage.navigateToTab('Summary');
+    await this.summaryTab.verifyPresenceOfText('Response received');
+    await this.homePage.navigateToTab('Tasks');
+    await this.tasksTab.verifyTaskIsDisplayed(task.name);
+    await this.tasksTab.verifyPriortiy(task.name, task.priority);
+    await this.tasksTab.verifyPageContentByKeyValue(
+      task.name,
+      'Assigned to',
+      task.assignedToWhenNotAssigned
+    );
+    await this.tasksTab.verifyManageOptions(
+      task.name,
+      task.unassignedManageOptionsForCaseAllocator
+    );
+  }
 
-    async verifyCtscAdminWithoutCaseAllocatorRoleCanCompleteReviewFTAResponseTask(caseId: string) {
+  async verifyCtscAdminWithoutCaseAllocatorRoleCanCompleteReviewFTAResponseTask(
+    caseId: string
+  ) {
+    // Login as CTSC Administrator and view the unassigned Review FTA Response task
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+    await this.homePage.navigateToTab('Tasks');
+    await this.tasksTab.verifyTaskIsDisplayed(task.name);
+    await this.tasksTab.verifyPriortiy(task.name, task.priority);
+    await this.tasksTab.verifyPageContentByKeyValue(
+      task.name,
+      'Assigned to',
+      task.assignedToWhenNotAssigned
+    );
 
-        // Login as CTSC Administrator and view the unassigned Review FTA Response task
-        await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
-        await this.homePage.navigateToTab('Tasks');
-        await this.tasksTab.verifyTaskIsDisplayed(task.name);
-        await this.tasksTab.verifyPriortiy(task.name, task.priority);
-        await this.tasksTab.verifyPageContentByKeyValue(task.name, 'Assigned to', task.assignedToWhenNotAssigned);
+    // CTSC Administrator self assigns task and verifies assigned task details
+    await this.tasksTab.selfAssignTask(task.name);
+    await this.tasksTab.verifyPageContentByKeyValue(
+      task.name,
+      'Assigned to',
+      task.assignedTo
+    );
+    await this.tasksTab.verifyManageOptions(
+      task.name,
+      task.assignedManageOptions
+    );
+    await this.tasksTab.verifyNextStepsOptions(
+      task.name,
+      task.nextStepsOptions
+    );
 
-        // CTSC Administrator self assigns task and verifies assigned task details
-        await this.tasksTab.selfAssignTask(task.name);
-        await this.tasksTab.verifyPageContentByKeyValue(task.name, 'Assigned to', task.assignedTo);
-        await this.tasksTab.verifyManageOptions(task.name, task.assignedManageOptions);
-        await this.tasksTab.verifyNextStepsOptions(task.name, task.nextStepsOptions);
+    // Select Response reviewed next step and complete the event
+    await this.tasksTab.clickNextStepLink(task.responseReviewed.link);
+    await this.responseReviewedPage.verifyPageContent(
+      responseReviewedTestData.captionValue,
+      responseReviewedTestData.headingValue
+    );
+    await this.responseReviewedPage.chooseInterlocOption('No');
+    await this.responseReviewedPage.confirmSubmission();
 
-        // Select Response reviewed next step and complete the event
-        await this.tasksTab.clickNextStepLink(task.responseReviewed.link);
-        await this.responseReviewedPage.verifyPageContent(responseReviewedTestData.captionValue, responseReviewedTestData.headingValue);
-        await this.responseReviewedPage.chooseInterlocOption('No');
-        await this.responseReviewedPage.confirmSubmission();
+    await expect(this.homePage.summaryTab).toBeVisible();
 
-        await expect(this.homePage.summaryTab).toBeVisible();
+    // Verify task is removed from the tasks list within Tasks tab
+    await this.homePage.navigateToTab('Tasks');
+    await this.tasksTab.verifyTaskIsHidden(task.name);
+  }
 
-        // Verify task is removed from the tasks list within Tasks tab
-        await this.homePage.navigateToTab('Tasks');
-        await this.tasksTab.verifyTaskIsHidden(task.name);
-    }
+  async verifyReviewFTAResponseTaskIsCancelledAutomaticallyWhenTheCaseIsVoid(
+    caseId: string
+  ) {
+    await this.uploadResponseWithFurtherInfoAsDwpCaseWorker(caseId);
 
-    async verifyReviewFTAResponseTaskIsCancelledAutomaticallyWhenTheCaseIsVoid(caseId: string) {
+    // Verify CTSC Admin can view the unassigned Review FTA Response task
+    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+    await this.homePage.navigateToTab('Tasks');
+    await this.tasksTab.verifyTaskIsDisplayed(task.name);
+    await this.tasksTab.verifyManageOptions(
+      task.name,
+      task.unassignedManageOptions
+    );
 
-        await this.uploadResponseWithFurtherInfoAsDwpCaseWorker(caseId);
+    // CTSC Administrator self assigns task and verifies assigned task details
+    await this.tasksTab.selfAssignTask(task.name);
+    await this.tasksTab.verifyPageContentByKeyValue(
+      task.name,
+      'Assigned to',
+      task.assignedTo
+    );
+    await this.tasksTab.verifyManageOptions(
+      task.name,
+      task.assignedManageOptions
+    );
+    await this.tasksTab.verifyNextStepsOptions(
+      task.name,
+      task.nextStepsOptions
+    );
 
-        // Verify CTSC Admin can view the unassigned Review FTA Response task
-        await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
-        await this.homePage.navigateToTab('Tasks')
-        await this.tasksTab.verifyTaskIsDisplayed(task.name);
-        await this.tasksTab.verifyManageOptions(task.name, task.unassignedManageOptions);
+    // CTSC Administrator voids the case
+    let voidCase = new VoidCase(this.page);
+    await voidCase.performVoidCase(caseId, false);
 
-        // CTSC Administrator self assigns task and verifies assigned task details
-        await this.tasksTab.selfAssignTask(task.name);
-        await this.tasksTab.verifyPageContentByKeyValue(task.name, 'Assigned to', task.assignedTo);
-        await this.tasksTab.verifyManageOptions(task.name, task.assignedManageOptions);
-        await this.tasksTab.verifyNextStepsOptions(task.name, task.nextStepsOptions);
+    // Verify task is removed from the tasks list within Tasks tab
+    await this.homePage.navigateToTab('Tasks');
+    await this.tasksTab.verifyTaskIsHidden(task.name);
+  }
 
-        // CTSC Administrator voids the case
-        let voidCase = new VoidCase(this.page);
-        await voidCase.performVoidCase(caseId, false);
+  async uploadResponseWithFurtherInfoAsDwpCaseWorker(caseId: string) {
+    // As DWP caseworker upload response with further info
+    await this.loginUserWithCaseId(
+      credentials.dwpResponseWriter,
+      false,
+      caseId
+    );
+    await this.stepsHelper.uploadResponseHelper(
+      uploadResponseTestdata.pipIssueCode,
+      'Yes'
+    );
 
-        // Verify task is removed from the tasks list within Tasks tab
-        await this.homePage.navigateToTab('Tasks');
-        await this.tasksTab.verifyTaskIsHidden(task.name);
-    }
+    await this.checkYourAnswersPage.verifyCYAPageContent(
+      'Upload response',
+      uploadResponseTestdata.pipBenefitCode,
+      uploadResponseTestdata.pipIssueCode
+    );
+    await this.checkYourAnswersPage.confirmSubmission();
+  }
 
-    async uploadResponseWithFurtherInfoAsDwpCaseWorker(caseId: string) {
+  async uploadResponseWithoutFurtherInfoAsDwpCaseWorker(caseId: string) {
+    // As DWP caseworker upload response with further info
+    await this.loginUserWithCaseId(
+      credentials.dwpResponseWriter,
+      false,
+      caseId
+    );
+    await this.stepsHelper.uploadResponseHelper(
+      uploadResponseTestdata.pipIssueCode,
+      'No'
+    );
 
-        // As DWP caseworker upload response with further info
-        await this.loginUserWithCaseId(credentials.dwpResponseWriter, false, caseId);
-        await this.stepsHelper.uploadResponseHelper(uploadResponseTestdata.pipIssueCode, 'Yes');
-
-        await this.checkYourAnswersPage.verifyCYAPageContent("Upload response",
-            uploadResponseTestdata.pipBenefitCode, uploadResponseTestdata.pipIssueCode);
-        await this.checkYourAnswersPage.confirmSubmission();
-    }
-
-    async uploadResponseWithoutFurtherInfoAsDwpCaseWorker(caseId: string) {
-
-        // As DWP caseworker upload response with further info
-        await this.loginUserWithCaseId(credentials.dwpResponseWriter, false, caseId);
-        await this.stepsHelper.uploadResponseHelper(uploadResponseTestdata.pipIssueCode, 'No');
-
-        await this.checkYourAnswersPage.verifyCYAPageContent("Upload response",
-            uploadResponseTestdata.pipBenefitCode, uploadResponseTestdata.pipIssueCode);
-        await this.checkYourAnswersPage.confirmSubmission();
-    }
+    await this.checkYourAnswersPage.verifyCYAPageContent(
+      'Upload response',
+      uploadResponseTestdata.pipBenefitCode,
+      uploadResponseTestdata.pipIssueCode
+    );
+    await this.checkYourAnswersPage.confirmSubmission();
+  }
 }
