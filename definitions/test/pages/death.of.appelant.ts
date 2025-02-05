@@ -31,9 +31,9 @@ export class DeathOfAppellantPage {
 
         //The Appointee is selected first as there is an issue with the date.
         await webAction.clickElementById(`#appeal_appellant_isAppointee_${yesNoOption}`);
-        await webAction.typeField('#dateOfAppellantDeath-day', '01');
-        await webAction.typeField('#dateOfAppellantDeath-month', '06');
-        await webAction.typeField('#dateOfAppellantDeath-year', '2003');
+        await webAction.inputField('#dateOfAppellantDeath-day', '01');
+        await webAction.inputField('#dateOfAppellantDeath-month', '06');
+        await webAction.inputField('#dateOfAppellantDeath-year', '2003');
 
         if (yesNoOption === 'Yes') {
 
@@ -43,22 +43,22 @@ export class DeathOfAppellantPage {
             await webAction.verifyPageLabel('//h2[.=\'Address Details\']', deathOfAnAppellant.addressDetailsSectionHeading);
             await webAction.verifyPageLabel('//h2[.=\'Contact Details\']', deathOfAnAppellant.contactDetailsSectionHeading);
 
-            this.provideAppointeeDetails.verifyAndPopulateAppointeeDetailsPage(appointeeDetails);
+            await this.provideAppointeeDetails.verifyAndPopulateAppointeeDetailsPage(appointeeDetails);
         }
     }
 
     async populateDeathOfAppellantDateInvalidFormat(yesNoOption: string) {
         await webAction.clickElementById(`#appeal_appellant_isAppointee_${yesNoOption}`);
-        await webAction.typeField('#dateOfAppellantDeath-day', '01');
-        await webAction.typeField('#dateOfAppellantDeath-month', 'AUG');
-        await webAction.typeField('#dateOfAppellantDeath-year', '2028');
+        await webAction.inputField('#dateOfAppellantDeath-day', '01');
+        await webAction.inputField('#dateOfAppellantDeath-month', 'AUG');
+        await webAction.inputField('#dateOfAppellantDeath-year', '2028');
     }
 
     async populateDeathOfAppellantDateInTheFuture(yesNoOption: string) {
         await webAction.clickElementById(`#appeal_appellant_isAppointee_${yesNoOption}`);
-        await webAction.typeField('#dateOfAppellantDeath-day', '01');
-        await webAction.typeField('#dateOfAppellantDeath-month', '08');
-        await webAction.typeField('#dateOfAppellantDeath-year', '2028');
+        await webAction.inputField('#dateOfAppellantDeath-day', '01');
+        await webAction.inputField('#dateOfAppellantDeath-month', '08');
+        await webAction.inputField('#dateOfAppellantDeath-year', '2028');
     }
 
     async confirmSubmission(): Promise<void> {

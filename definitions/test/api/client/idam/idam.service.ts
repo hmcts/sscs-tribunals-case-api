@@ -1,8 +1,8 @@
 /* eslint-disable complexity */
 import {request} from '@playwright/test';
-import {urls, credentials, resources} from '../../../config/config';
+import {urls, resources} from '../../../config/config';
 import logger from '../../../utils/loggerUtil';
-const NodeCache = require('node-cache');
+import NodeCache from 'node-cache';
 //Idam access token expires for every 8 hrs
 const tokenIDCache = new NodeCache({ stdTTL: 25200, checkperiod: 1800, maxKeys: 12, deleteOnExpire: true});
 

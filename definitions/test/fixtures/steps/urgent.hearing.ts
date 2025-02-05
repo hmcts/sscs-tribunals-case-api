@@ -8,9 +8,6 @@ import dateUtilsComponent from '../../utils/DateUtilsComponent';
 import { SendToAdmin } from "./send.to.admin";
 import { VoidCase } from "./void.case";
 import createCaseBasedOnCaseType from "../../api/client/sscs/factory/appeal.type.factory";
-import logger from "../../utils/loggerUtil";
-import {accessId, accessToken, getSSCSServiceToken} from "../../api/client/idam/idam.service";
-import {performEventOnCaseWithUploadResponse} from "../../api/client/sscs/factory/appeal.update.factory";
 import eventTestData from "../../pages/content/event.name.event.description_en.json";
 
 const actionFurtherEvidenceTestdata = require('../../pages/content/action.further.evidence_en.json');

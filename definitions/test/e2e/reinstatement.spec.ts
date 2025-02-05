@@ -20,7 +20,7 @@ test.describe('Reinstatement request tests', {tag: ['@preview-regression', '@nig
     test.afterAll("Case has to be set to Dormant",async () => {
         // await performAppealDormantOnCase(caseId);
     });
-}),
+})
 
 
 

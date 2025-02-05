@@ -1,5 +1,5 @@
 import { BaseStep } from "./base";
-import { expect, Page } from '@playwright/test';
+import { Page } from '@playwright/test';
 import { credentials } from "../../config/config";
 
 const actionFurtherEvidenceTestdata = require('../../pages/content/action.further.evidence_en.json');

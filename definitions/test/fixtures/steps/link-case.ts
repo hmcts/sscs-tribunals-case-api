@@ -17,9 +17,9 @@ export class LinkCase extends BaseStep {
 
     async linkCaseSuccessfully() {
         // Start by creating cases to be linked
-        var firstPipCaseId = await createCaseBasedOnCaseType("PIP");
-        var secondPipCaseId = await createCaseBasedOnCaseType("PIP");
-        let hyphenatedSecondCaseId = StringUtilsComponent.formatClaimReferenceToAUIDisplayFormat(secondPipCaseId).replace(/\s/g, '-');
+      const firstPipCaseId = await createCaseBasedOnCaseType('PIP');
+      const secondPipCaseId = await createCaseBasedOnCaseType('PIP');
+      let hyphenatedSecondCaseId = StringUtilsComponent.formatClaimReferenceToAUIDisplayFormat(secondPipCaseId).replace(/\s/g, '-');
 
         // Event starts and content is verified
         await this.goToLinkACasePage(this.page, firstPipCaseId);
@@ -73,9 +73,9 @@ export class LinkCase extends BaseStep {
 
     async removeLinkedCase(){
         // Similar to linkCaseSuccessfully event we start by linking 2 cases.
-        var firstPipCaseId = await createCaseBasedOnCaseType("PIP");
-        var secondPipCaseId = await createCaseBasedOnCaseType("PIP");
-        let hyphenatedSecondCaseId = StringUtilsComponent.formatClaimReferenceToAUIDisplayFormat(secondPipCaseId).replace(/\s/g, '-');
+      const firstPipCaseId = await createCaseBasedOnCaseType('PIP');
+      const secondPipCaseId = await createCaseBasedOnCaseType('PIP');
+      let hyphenatedSecondCaseId = StringUtilsComponent.formatClaimReferenceToAUIDisplayFormat(secondPipCaseId).replace(/\s/g, '-');
 
         await this.goToLinkACasePage(this.page, firstPipCaseId);
         await this.linkACasePage.verifyPageContent(firstPipCaseId);

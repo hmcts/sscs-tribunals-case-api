@@ -1,14 +1,12 @@
 import {test} from "../lib/steps.factory";
 import {credentials} from "../config/config"
-import {accessToken, getSSCSServiceToken, accessId, getIDAMUserID} from "../api/client/idam/idam.service";
+import {accessToken, getSSCSServiceToken, accessId} from "../api/client/idam/idam.service";
 import createCaseBasedOnCaseType from "../api/client/sscs/factory/appeal.type.factory";
 import {
-    performEventOnCaseWithEmptyBody,
     performEventOnCaseWithUploadResponse
 } from "../api/client/sscs/factory/appeal.update.factory";
 import logger from "../utils/loggerUtil";
 //var event_token: string = JSON.parse(response_document).push({hello: 'value'});
-import fs from 'fs';
 
 test("Test to Test API Working....", async () => {
 

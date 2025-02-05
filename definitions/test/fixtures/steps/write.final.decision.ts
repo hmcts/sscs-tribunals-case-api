@@ -2,16 +2,6 @@ import {Page} from '@playwright/test';
 import {BaseStep} from './base';
 import {credentials} from "../../config/config";
 import writeFinalDecisionData from "../../pages/content/write.final.decision_en.json";
-import createCaseBasedOnCaseType from "../../api/client/sscs/factory/appeal.type.factory";
-import {accessId, accessToken, getSSCSServiceToken} from "../../api/client/idam/idam.service";
-import {
-    performEventOnCaseForActionFurtherEvidence,
-    performEventOnCaseWithUploadResponse
-} from "../../api/client/sscs/factory/appeal.update.factory";
-import issueDirectionTestdata from "../../pages/content/issue.direction_en.json";
-import actionFurtherEvidenceTestdata from '../../pages/content/action.further.evidence_en.json';
-import logger from "../../utils/loggerUtil";
-import performAppealDormantOnCase from "../../api/client/sscs/appeal.event";
 
 export class WriteFinalDecision extends BaseStep {
 

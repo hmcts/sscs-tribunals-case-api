@@ -1,10 +1,8 @@
 import { expect, Page } from '@playwright/test';
 import { BaseStep } from './base';
 import { credentials } from "../../config/config";
-import UpdateSubscriptionTestData from "../../pages/content/update.subscription.data_en.json"
 import createCaseBasedOnCaseType from "../../api/client/sscs/factory/appeal.type.factory";
-import { StringUtilsComponent } from "../../utils/StringUtilsComponent";
-import { time } from 'console';
+
 const eventTestData = require("../../pages/content/event.name.event.description_en.json");
 
 export class UpdateSubscription extends BaseStep {  //updated class
@@ -19,9 +17,9 @@ export class UpdateSubscription extends BaseStep {  //updated class
 
     async performUpdateSubscription(caseId: string) {   // added new method regarding subscription event
         // Creating case - PIP
-        var PipCaseId = await createCaseBasedOnCaseType("PIP");
+      const PipCaseId = await createCaseBasedOnCaseType('PIP');
 
-        // Starting event
+      // Starting event
         await this.goToUpdateSubscriptionPage(this.page, PipCaseId);
         await this.updateSubscriptionPage.verifyPageContent();
 

@@ -1,7 +1,6 @@
 import {expect, Page} from '@playwright/test';
 import {WebAction} from '../../common/web.action'
 import { HomePage } from '../common/homePage';
-import { threadId } from 'worker_threads';
 
 
 let webActions: WebAction;
@@ -18,7 +17,7 @@ export class Bundles {
     }
 
     async verifyBundleSubmit(){
-        webActions.clickSubmitButton()
+        await webActions.clickSubmitButton()
     }
 
     async verifyBundlesTabContentByKeyValueForASpan(fieldLabel: string, fieldValue: string): Promise<void> {

@@ -72,14 +72,14 @@ export class Hearings {
     async updateHearingDuration() {
         await webActions.clickElementById('#hearingLength');
         await webActions.clearInputField('#durationhours');
-        await webActions.typeField('#durationhours', '2');
+        await webActions.inputField('#durationhours', '2');
 
         //To always choose weekdays for hearing dates
         const today = new Date();
         const resultDate = dateUtilsComponent.addWeekdays(today, 21);
         
         await webActions.clearInputField('#earliestHearingDate-day');
-        await webActions.typeField('#earliestHearingDate-day', `${resultDate.getDate()}`);
+        await webActions.inputField('#earliestHearingDate-day', `${resultDate.getDate()}`);
 
         await webActions.clickButton('Continue');
     }

@@ -6,7 +6,6 @@ import {CheckYourAnswersPage} from '../../pages/common/check.your.answers.page';
 import {ResponseReviewedPage} from '../../pages/response.reviewed.page';
 import {AssociateCasePage} from '../../pages/associate.case.page';
 import {TextAreaPage} from "../../pages/common/text.area.page";
-import createCaseBasedOnCaseType from "../../api/client/sscs/factory/appeal.type.factory";
 import { History } from "../../pages/tabs/history";
 import { AppealDetails } from "../../pages/tabs/appealDetails";
 import { AddNote } from '../../pages/add.note';
@@ -124,7 +123,7 @@ export abstract class BaseStep {
   protected prepareCaseForHearingPage: PrepareCaseForHearingPage;
   protected reviewConfidentialityPage: ReviewConfidentialityPage;
 
-   constructor(page: Page) {
+   protected constructor(page: Page) {
         this.page = page;
         this.loginPage = new LoginPage(this.page);
         this.homePage = new HomePage(this.page);

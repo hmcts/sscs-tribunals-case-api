@@ -1,6 +1,5 @@
 import {expect, Page} from '@playwright/test';
-import logger from '../utils/loggerUtil';
-import path from 'path';
+import * as path from 'path';
 
 export class WebAction {
 
@@ -25,8 +24,7 @@ export class WebAction {
     }
 
     async verifyPageLabel(elementLocator: string, labelText: string | string[]) {
-        await expect(this.page.locator(elementLocator))
-            .first()
+        await expect(this.page.locator(elementLocator).first())
             .toHaveText(labelText)
     }
 
@@ -36,25 +34,17 @@ export class WebAction {
     }
 
     async verifyTextVisibility(labelText: string) {
-        await expect(this.page.getByText(labelText))
-            .first()
+        await expect(this.page.getByText(labelText).first())
             .toBeVisible()
     }
 
     async verifyElementVisibility(elementlocator: string) {
-        await expect(this.page.locator(elementlocator))
-            .first()
+        await expect(this.page.locator(elementlocator).first())
             .toBeVisible()
     }
 
-    async typeField(elementLocator: string, inputValue: string) {
-        await this.page
-            .type(elementLocator, inputValue)
-    }
-
     async inputField(elementLocator: string, inputValue: string) {
-        await this.page
-            .fill(elementLocator, inputValue)
+        await this.page.locator(elementLocator).first().fill(inputValue)
     }
 
     async clearInputField(elementLocator: string) {
@@ -147,8 +137,9 @@ export class WebAction {
 
     async clickNextStepButton(elementId: string): Promise<void> {
         await this.page
+            .locator(elementId)
             .first()
-            .click(elementId)
+            .click()
     }
 
     async uploadFile(elementId: string, fileName: string): Promise<void> {

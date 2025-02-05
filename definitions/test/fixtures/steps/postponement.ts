@@ -3,7 +3,6 @@ import createCaseBasedOnCaseType from "../../api/client/sscs/factory/appeal.type
 import {BaseStep} from './base';
 import {credentials} from "../../config/config";
 import eventTestData from "../../pages/content/event.name.event.description_en.json";
-import performAppealDormantOnCase from "../../api/client/sscs/appeal.event";
 
 
 export class Postponement extends BaseStep {

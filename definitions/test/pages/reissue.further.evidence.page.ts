@@ -1,4 +1,4 @@
-import { expect, Page } from '@playwright/test';
+import { Page } from '@playwright/test';
 import { WebAction } from '../common/web.action';
 import reissueFurtherEvidenceData from "./content/reissue.further.evidence_en.json";
 

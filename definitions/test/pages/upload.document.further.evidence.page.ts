@@ -14,7 +14,7 @@ export class UploadDocumentFurtherEvidencePage {
     }
 
     async clickAddNew() {
-        await webActions.clickButton('Add new');;
+        await webActions.clickButton('Add new');
     }
 
     async verifyPageContent() {

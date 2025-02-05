@@ -134,9 +134,7 @@ export class HomePage {
         await webActions.verifyElementVisibility(`#search-result > table > tbody > tr > td:nth-child(1) > a[href='/cases/case-details/${caseId}']`);
         await webActions.clickElementById(`#search-result > table > tbody > tr > td:nth-child(1) > a[href='/cases/case-details/${caseId}']`);
 
-        await expect(this.summaryTab)
-            .first()
-            .toBeVisible()
+        await expect(this.summaryTab.first()).toBeVisible()
     }
 
     async goToCaseList(): Promise<void> {
@@ -203,9 +201,10 @@ export class HomePage {
                 break;
             }
             case "Summary": {
-                if (expect(this.summaryTab).toBeVisible()){
+                try {
+                    await expect(this.summaryTab).toBeVisible()
                     await this.summaryTab.click();
-                } else {
+                } catch {
                     await this.clickBeforeTabBtn();
                     await this.summaryTab.click();
                 }

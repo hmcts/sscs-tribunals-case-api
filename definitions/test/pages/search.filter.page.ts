@@ -1,7 +1,5 @@
 import { Locator, expect, Page } from '@playwright/test';
 import { WebAction } from '../common/web.action';
-import { listenerCount } from 'process';
-import { Browser } from 'puppeteer';
 //import addUpdateSubscriptionData from "./content/update.subscription.data_en.json";
 
 
@@ -29,7 +27,7 @@ export class SearchFilterPage {
     }
 
     async validateSearchResults(caseId: number) {
-        const locator: Locator = this.page.locator('ccd - search - result: nth - child(1) > table: nth - child(1) > tbody: nth - child(3) > tr');
+        const locator: Locator = this.page.locator('ccd-search-result:nth-child(1) > table:nth-child(1) > tbody:nth-child(3) > tr');
         const tot: number = await locator.count();
         expect(tot).toBe(caseId);
     }

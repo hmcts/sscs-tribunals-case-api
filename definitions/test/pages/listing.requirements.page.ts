@@ -1,4 +1,4 @@
-import {expect, Page} from "@playwright/test";
+import {Page} from "@playwright/test";
 import {WebAction} from "../common/web.action";
 
 let webAction: WebAction;
@@ -13,7 +13,7 @@ export class ListingRequirementPage {
     }
 
     async updateHearingValues() {
-        await webAction.typeField('#overrideFields_duration', '120');
+        await webAction.inputField('#overrideFields_duration', '120');
         await webAction.clickElementById('#overrideFields_appellantInterpreter_isInterpreterWanted_Yes');
         await webAction.chooseOptionByLabel('#overrideFields_appellantInterpreter_interpreterLanguage', 'Dutch');
         await webAction.clickButton('Continue');

@@ -1,8 +1,6 @@
 class DateUtilsComponent {
-
   static getDate() {
-    let currentTime = new Date();
-    return currentTime;
+    return new Date();
   }
 
   static formatClaimReferenceToAUIDisplayFormat(claimReference) {
@@ -32,19 +30,19 @@ class DateUtilsComponent {
       month: 'long',
       year: 'numeric',
       hour: 'numeric',
-      minute : 'numeric',
+      minute: 'numeric'
     });
   }
 
-  static formatDateToYYYYMMDD (date) {
-    return date.toISOString().substring(0,10);
+  static formatDateToYYYYMMDD(date) {
+    return date.toISOString().substring(0, 10);
   }
 
   static formatDateToSpecifiedDateFormat(date) {
     return date.toLocaleString('en-GB', {
       day: 'numeric',
       month: 'long',
-      year: 'numeric',
+      year: 'numeric'
     });
   }
 
@@ -52,7 +50,7 @@ class DateUtilsComponent {
     return date.toLocaleString('en-GB', {
       day: 'numeric',
       month: 'short',
-      year: 'numeric',
+      year: 'numeric'
     });
   }
 
@@ -76,20 +74,17 @@ class DateUtilsComponent {
   static async getCurrentMonth() {
     const tomorrow = new Date();
     tomorrow.setDate(new Date().getDate() + 1);
-    let currentMonth = tomorrow.getMonth() + 1;
-    return currentMonth;
+    return tomorrow.getMonth() + 1;
   }
 
   static async getCurrentYear() {
     let currentTime = new Date();
-    let year = currentTime.getFullYear();
-    return year;
+    return currentTime.getFullYear();
   }
 
   static async getCurrentDay() {
     let currentTime = new Date();
-    let day = currentTime.getDay();
-    return day;
+    return currentTime.getDay();
   }
 
   static async getCurrentDayDateTime() {
@@ -99,8 +94,7 @@ class DateUtilsComponent {
     let year = currentTime.getFullYear();
     let hour = currentTime.getHours();
     let minutes = currentTime.getMinutes();
-    let presentDay = year + '-' + month + '-' + day + '-' + hour + '-' + minutes;
-    return presentDay;
+    return year + '-' + month + '-' + day + '-' + hour + '-' + minutes;
   }
 
   static async isWeekend() {
@@ -165,17 +159,15 @@ class DateUtilsComponent {
     let currentDate = new Date(startDate);
 
     while (count < days) {
-        currentDate.setDate(currentDate.getDate() + 1);
-        const dayOfWeek = currentDate.getDay();
-        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-            count++;
-        }
+      currentDate.setDate(currentDate.getDate() + 1);
+      const dayOfWeek = currentDate.getDay();
+      if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+        count++;
+      }
     }
 
     return currentDate;
-}
-
-
+  }
 }
 
 const fourWeeksFroToday = DateUtilsComponent.rollDateToCertainWeeks(4);

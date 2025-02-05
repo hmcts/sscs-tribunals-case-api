@@ -1,6 +1,5 @@
 import {Page} from '@playwright/test';
 import {WebAction} from '../../common/web.action'
-import {isUndefined} from "node:util";
 const eventTestData = require("../content/event.name.event.description_en.json");
 
 let webActions: WebAction;

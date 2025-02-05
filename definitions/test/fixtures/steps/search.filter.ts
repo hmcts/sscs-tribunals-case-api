@@ -1,4 +1,4 @@
-import { Page, expect } from '@playwright/test';
+import { Page } from '@playwright/test';
 import { BaseStep } from './base';
 import { credentials } from "../../config/config";
 import createCaseBasedOnCaseType from "../../api/client/sscs/factory/appeal.type.factory";

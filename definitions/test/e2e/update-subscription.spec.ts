@@ -1,5 +1,4 @@
 import { test } from "../lib/steps.factory";
-import createCaseBasedOnCaseType from "../api/client/sscs/factory/appeal.type.factory";
 
 let caseId: string;
 

@@ -1,6 +1,5 @@
 import {Page} from '@playwright/test';
 import {WebAction} from '../common/web.action';
-import addNoteTestData from "./content/add.note_en.json";
 
 
 let webActions: WebAction;

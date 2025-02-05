@@ -16,9 +16,9 @@ export class AssociateCase extends BaseStep {
 
     async associateCaseSuccessfully() {
 
-        var firstPipCaseId = await createCaseBasedOnCaseType("PIP");
-        var secondPipCaseId = await createCaseBasedOnCaseType("PIP");
-        let hyphenatedSecondCaseId = StringUtilsComponent.formatClaimReferenceToAUIDisplayFormat(secondPipCaseId).replace(/\s/g, '-');
+      const firstPipCaseId = await createCaseBasedOnCaseType('PIP');
+      const secondPipCaseId = await createCaseBasedOnCaseType('PIP');
+      let hyphenatedSecondCaseId = StringUtilsComponent.formatClaimReferenceToAUIDisplayFormat(secondPipCaseId).replace(/\s/g, '-');
         await this.goToAssociateCasePage(firstPipCaseId);
 
         await this.associateCasePage.associateCase(secondPipCaseId);
@@ -31,8 +31,8 @@ export class AssociateCase extends BaseStep {
 
     async associateNonExistentCase() {
 
-        var pipCaseId = await createCaseBasedOnCaseType("PIP");
-        await this.goToAssociateCasePage(pipCaseId);
+      const pipCaseId = await createCaseBasedOnCaseType('PIP');
+      await this.goToAssociateCasePage(pipCaseId);
 
         await this.associateCasePage.associateCase(associateCaseTestData.associateCaseNonExistentCase);
         await this.associateCasePage.verifyInputErrorMessage(associateCaseTestData.associateCaseNonExistentCase);
@@ -45,8 +45,8 @@ export class AssociateCase extends BaseStep {
 
     async selfAssociateACase() {
 
-        var pipCaseId = await createCaseBasedOnCaseType("PIP");
-        await this.goToAssociateCasePage(pipCaseId);
+      const pipCaseId = await createCaseBasedOnCaseType('PIP');
+      await this.goToAssociateCasePage(pipCaseId);
 
         await this.associateCasePage.associateCase(pipCaseId);
         /* TODO: user is able to continue next page when same caseId is used to associate

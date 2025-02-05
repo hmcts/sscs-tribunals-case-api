@@ -1,6 +1,6 @@
 import { expect, Page } from '@playwright/test';
 import { WebAction } from '../../common/web.action'
-import { HomePage } from '../../pages/common/homePage';
+import { HomePage } from '../common/homePage';
 import { timeouts } from '../../config/config';
 import tasksTestData from '../content/tasks_en.json';
 

@@ -2,17 +2,11 @@ import {Page} from '@playwright/test';
 import {BaseStep} from './base';
 import {credentials} from "../../config/config";
 import createCaseBasedOnCaseType from "../../api/client/sscs/factory/appeal.type.factory";
-import {accessId, accessToken, getSSCSServiceToken} from "../../api/client/idam/idam.service";
-import {
-    performEventOnCaseForActionFurtherEvidence,
-    performEventOnCaseWithUploadResponse
-} from "../../api/client/sscs/factory/appeal.update.factory";
 import issueDirectionTestdata from "../../pages/content/issue.direction_en.json";
 import eventTestData from "../../pages/content/event.name.event.description_en.json";
 import actionFurtherEvidenceTestdata from '../../pages/content/action.further.evidence_en.json';
 import sendToInterLocPreValidData from '../../pages/content/send.to.interloc_en.json';
 import logger from "../../utils/loggerUtil";
-import performAppealDormantOnCase from "../../api/client/sscs/appeal.event";
 
 export class IssueDirectionsNotice extends BaseStep {
 

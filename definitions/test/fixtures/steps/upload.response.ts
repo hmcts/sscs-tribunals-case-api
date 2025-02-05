@@ -1,16 +1,14 @@
 import { expect, Page } from '@playwright/test';
 import { BaseStep } from './base';
-import { credentials } from "../../config/config";
-import createCaseBasedOnCaseType from "../../api/client/sscs/factory/appeal.type.factory";
-import { StepsHelper } from "../../helpers/stepsHelper";
+import { credentials, environment } from '../../config/config';
+import createCaseBasedOnCaseType from '../../api/client/sscs/factory/appeal.type.factory';
+import { StepsHelper } from '../../helpers/stepsHelper';
 import task from '../../pages/content/review.fta.response.task_en.json';
 import { VoidCase } from './void.case';
-import { WebAction } from '../../common/web.action';
 
 const responseReviewedTestData = require('../../pages/content/response.reviewed_en.json');
 const uploadResponseTestdata = require('../../pages/content/upload.response_en.json');
 const ucbTestData = require('../../pages/content/update.ucb_en.json');
-import { environment } from "../../config/config";
 
 export class UploadResponse extends BaseStep {
 
@@ -234,8 +232,7 @@ export class UploadResponse extends BaseStep {
 
     async verifyErrorsScenariosInUploadResponse() {
 
-        let pipErrorCaseId = await createCaseBasedOnCaseType("PIP");
-        UploadResponse.caseId = pipErrorCaseId;
+      UploadResponse.caseId = await createCaseBasedOnCaseType("PIP");
         await this.loginUserWithCaseId(credentials.dwpResponseWriter, false, UploadResponse.caseId);
 
         await this.homePage.chooseEvent('Upload response');

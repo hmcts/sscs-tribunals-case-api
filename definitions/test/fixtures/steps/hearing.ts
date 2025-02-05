@@ -2,7 +2,6 @@ import { Page } from '@playwright/test';
 import { BaseStep } from './base';
 import {credentials} from "../../config/config";
 import logger from '../../utils/loggerUtil';
-import { throws } from 'assert/strict';
 
 const hearingTestData = require("../../pages/content/hearing.details_en.json");
 

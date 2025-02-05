@@ -1,4 +1,4 @@
-import { expect, Page } from '@playwright/test';
+import { Page } from '@playwright/test';
 import { WebAction } from '../common/web.action';
 import addUpdateOtherPartyData from "./content/update.other.party.data_en.json";
 import addUpdateSubscriptionData from "./content/update.subscription.data_en.json"

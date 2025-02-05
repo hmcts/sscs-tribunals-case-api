@@ -1,16 +1,8 @@
 import { BaseStep } from "./base";
 import { expect, Page } from '@playwright/test';
 import { credentials } from "../../config/config";
-import { timingSafeEqual } from "crypto";
-import createCaseBasedOnCaseType from "../../api/client/sscs/factory/appeal.type.factory";
-import {accessId, accessToken, getSSCSServiceToken} from "../../api/client/idam/idam.service";
-import {
-    performEventOnCaseWithUploadResponse
-} from "../../api/client/sscs/factory/appeal.update.factory";
-import logger from "../../utils/loggerUtil";
 import task from '../../pages/content/process.audio.video.evidence_en.json';
 import { VoidCase } from './void.case';
-import { UploadDocumentFurtherEvidence } from "./upload.document.further.evidence";
 
 const actionFurtherEvidenceTestdata = require('../../pages/content/action.further.evidence_en.json');
 const issueDirectionTestdata = require('../../pages/content/issue.direction_en.json');

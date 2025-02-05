@@ -4,8 +4,7 @@ import { credentials } from "../../config/config";
 import addUpdateOtherPartyData from "../../pages/content/update.other.party.data_en.json"
 import addUpdateSubscriptionData from "../../pages/content/update.subscription.data_en.json"
 import createCaseBasedOnCaseType from "../../api/client/sscs/factory/appeal.type.factory";
-import { StringUtilsComponent } from "../../utils/StringUtilsComponent";
-import { time } from 'console';
+
 const eventTestData = require("../../pages/content/event.name.event.description_en.json");
 
 export class UpdateOtherPartyData extends BaseStep {
@@ -20,7 +19,7 @@ export class UpdateOtherPartyData extends BaseStep {
 
     async performUpdateOtherPartyData(caseId: string) {
         // Creating case - CHILDSUPPORT
-        var ChildSupportCaseId = await createCaseBasedOnCaseType("CHILDSUPPORT");
+        const ChildSupportCaseId = await createCaseBasedOnCaseType("CHILDSUPPORT");
 
         // Starting event
         await this.goToUpdateOtherPartyData(this.page, ChildSupportCaseId);
@@ -65,7 +64,7 @@ export class UpdateOtherPartyData extends BaseStep {
 
     async performUpdateOtherPartyDataTaxCredit(caseId: string) {
         // Creating case - TAX CREDIT
-        var TaxCreditCaseId = await createCaseBasedOnCaseType("TAX CREDIT");
+        const TaxCreditCaseId = await createCaseBasedOnCaseType("TAX CREDIT");
 
         // Starting event
         await this.goToUpdateOtherPartyData(this.page, TaxCreditCaseId);

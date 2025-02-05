@@ -53,9 +53,9 @@ export class ProvideAppointeeDetailsPage {
         await webAction.inputField('#appeal_appellant_appointee_name_title', appointeeData.nameTitleValue);
         await webAction.inputField('#appeal_appellant_appointee_name_firstName', appointeeData.firstNameValue);
         await webAction.inputField('#appeal_appellant_appointee_name_lastName', appointeeData.lastNameValue);
-        await webAction.typeField('#appeal_appellant_appointee_identity_identity #dob-day', appointeeData.dobDayValue);
-        await webAction.typeField('#appeal_appellant_appointee_identity_identity #dob-month', appointeeData.dobMonthValue);
-        await webAction.typeField('#appeal_appellant_appointee_identity_identity #dob-year', appointeeData.dobYearValue);
+        await webAction.inputField('#appeal_appellant_appointee_identity_identity #dob-day', appointeeData.dobDayValue);
+        await webAction.inputField('#appeal_appellant_appointee_identity_identity #dob-month', appointeeData.dobMonthValue);
+        await webAction.inputField('#appeal_appellant_appointee_identity_identity #dob-year', appointeeData.dobYearValue);
         await webAction.inputField('#appeal_appellant_appointee_identity_nino', appointeeData.ninoValue);
 
         await webAction.inputField('#appeal_appellant_appointee_address_address ccd-field-write:nth-of-type(1) .form-control', appointeeData.streetAddressValue1);

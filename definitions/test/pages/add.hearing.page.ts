@@ -1,8 +1,5 @@
 import { Page } from '@playwright/test';
 import { WebAction } from '../common/web.action';
-// import { faker } from '@faker-js/faker';
-
-const faker = require('@faker-js/faker');
 
 let webActions: WebAction;
 

@@ -1,4 +1,4 @@
-import { expect, Locator, Page } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 import { WebAction } from '../common/web.action';
 const associateCaseTestData = require("../pages/content/associate.case_en.json");
 
@@ -13,7 +13,7 @@ export class AssociateCasePage {
         webAction = new WebAction(this.page);
     }
 
-    async verifyPageContent(casereference : string) {
+    async verifyPageContent() {
         await webAction.verifyPageLabel('.govuk-caption-l', associateCaseTestData.associateCaseCaption); //Captor Text
         await webAction.verifyPageLabel('.govuk-heading-l', associateCaseTestData.associateCaseHeading); //Heading Text
         await webAction.verifyPageLabel('#linkedCasesBoolean legend span', associateCaseTestData.associateCaseRelatedAppealsLabel); //Field Label

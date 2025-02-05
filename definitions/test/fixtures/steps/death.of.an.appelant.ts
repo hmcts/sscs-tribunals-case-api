@@ -1,7 +1,6 @@
 import { Page } from '@playwright/test';
 import eventTestData from "../../pages/content/event.name.event.description_en.json";
 import appointeeDetailsData from "../../pages/content/appointee.details_en.json";
-import { SendToJudgePage } from '../../pages/send.to.judge.page';
 import { BaseStep } from './base';
 import {credentials} from "../../config/config";
 import {DeathOfAppellantPage} from "../../pages/death.of.appelant";

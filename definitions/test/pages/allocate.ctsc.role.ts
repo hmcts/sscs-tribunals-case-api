@@ -1,4 +1,4 @@
-import { expect, Locator, Page } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 import { WebAction } from '../common/web.action';
 import allocateCtscRole from "../pages/content/allocate.ctsc.role_en.json";
 

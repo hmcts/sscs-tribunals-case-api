@@ -1,5 +1,4 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { credentials } from '../../config/config';
 import { WebAction } from '../../common/web.action'
 
 let webActions: WebAction;

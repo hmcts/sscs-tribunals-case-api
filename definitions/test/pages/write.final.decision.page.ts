@@ -1,8 +1,6 @@
 import {Page} from '@playwright/test';
 import {WebAction} from '../common/web.action';
 import writeFinalDecisionData from "./content/write.final.decision_en.json";
-import DateUtilsComponent from "../utils/DateUtilsComponent";
-import { triggerAsyncId } from 'async_hooks';
 
 let webActions: WebAction;
 
@@ -120,10 +118,12 @@ export class WriteFinalDecisionPages {
             case 'PIP': case 'ESA': {
                 await webActions.verifyPageLabel('[for=\'writeFinalDecisionDisabilityQualifiedPanelMemberName\'] > .form-label', writeFinalDecisionData.nameOfDisabilityQualifiedPanelMemberDQPMLabel);
                 await webActions.verifyPageLabel('[for=\'writeFinalDecisionMedicallyQualifiedPanelMemberName\'] > .form-label', writeFinalDecisionData.nameOfMedicallyQualifiedPanelMemberMQPMLabel);
+                break;
 
             } case 'UNIVERSAL CREDIT' : {
                 await webActions.verifyPageLabel('[for=\'writeFinalDecisionMedicallyQualifiedPanelMemberName\'] > .form-label', writeFinalDecisionData.nameOfMedicallyQualifiedPanelMemberMQPMLabel);
                 await webActions.verifyPageLabel('[for=\'writeFinalDecisionOtherPanelMemberName\'] > .form-label', writeFinalDecisionData.otherLabel);
+                break;
             }
             default : {
                 break;
@@ -134,12 +134,14 @@ export class WriteFinalDecisionPages {
     async inputPageContentForPanelMembersPageData(appealType = 'PIP') {
         switch (appealType) {
             case 'PIP': case 'ESA': {
-                await webActions.typeField("#writeFinalDecisionDisabilityQualifiedPanelMemberName", writeFinalDecisionData.nameOfDisabilityQualifiedPanelMemberInput);
-                await webActions.typeField("#writeFinalDecisionMedicallyQualifiedPanelMemberName", writeFinalDecisionData.nameOfMedicallyQualifiedPanelMemberInput);
+                await webActions.inputField("#writeFinalDecisionDisabilityQualifiedPanelMemberName", writeFinalDecisionData.nameOfDisabilityQualifiedPanelMemberInput);
+                await webActions.inputField("#writeFinalDecisionMedicallyQualifiedPanelMemberName", writeFinalDecisionData.nameOfMedicallyQualifiedPanelMemberInput);
+                break;
             }
             case 'UNIVERSAL CREDIT' : {
-                await webActions.typeField("#writeFinalDecisionMedicallyQualifiedPanelMemberName", writeFinalDecisionData.nameOfMedicallyQualifiedPanelMemberInput);
-                await webActions.typeField("#writeFinalDecisionOtherPanelMemberName", writeFinalDecisionData.otherPanelMemberInput);
+                await webActions.inputField("#writeFinalDecisionMedicallyQualifiedPanelMemberName", writeFinalDecisionData.nameOfMedicallyQualifiedPanelMemberInput);
+                await webActions.inputField("#writeFinalDecisionOtherPanelMemberName", writeFinalDecisionData.otherPanelMemberInput);
+                break;
             }
             default : {
                 break;
@@ -157,9 +159,9 @@ export class WriteFinalDecisionPages {
     }
 
     async inputTypePageContentForDecisionPageData() {
-        await webActions.typeField("#writeFinalDecisionDateOfDecision-day", "11");
-        await webActions.typeField("#writeFinalDecisionDateOfDecision-month", "07");
-        await webActions.typeField("#writeFinalDecisionDateOfDecision-year", "2024");
+        await webActions.inputField("#writeFinalDecisionDateOfDecision-day", "11");
+        await webActions.inputField("#writeFinalDecisionDateOfDecision-month", "07");
+        await webActions.inputField("#writeFinalDecisionDateOfDecision-year", "2024");
     }
 
     async verifyPageContentForBundleSectionReferencePage() {
@@ -303,13 +305,13 @@ export class WriteFinalDecisionPages {
     }
 
     async inputPageContentForAwardDatesPageData() {
-        await webActions.typeField("#writeFinalDecisionStartDate-day", '01');
-        await webActions.typeField("#writeFinalDecisionStartDate-month", '07');
-        await webActions.typeField("#writeFinalDecisionStartDate-year", '2024');
+        await webActions.inputField("#writeFinalDecisionStartDate-day", '01');
+        await webActions.inputField("#writeFinalDecisionStartDate-month", '07');
+        await webActions.inputField("#writeFinalDecisionStartDate-year", '2024');
 
-        await webActions.typeField("#writeFinalDecisionEndDate-day", '30');
-        await webActions.typeField("#writeFinalDecisionEndDate-month", '07');
-        await webActions.typeField("#writeFinalDecisionEndDate-year", '2024');
+        await webActions.inputField("#writeFinalDecisionEndDate-day", '30');
+        await webActions.inputField("#writeFinalDecisionEndDate-month", '07');
+        await webActions.inputField("#writeFinalDecisionEndDate-year", '2024');
     }
 
     async verifyPageContentForSelectActivitiesPage() {

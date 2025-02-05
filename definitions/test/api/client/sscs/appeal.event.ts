@@ -1,5 +1,4 @@
 /* eslint-disable complexity */
-import logger from '../../../utils/loggerUtil';
 import {accessId, accessToken, getSSCSServiceToken} from "../idam/idam.service";
 import {credentials} from "../../../config/config";
 import {performEventOnCaseWithEmptyBody} from "./factory/appeal.update.factory";

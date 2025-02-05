@@ -3,7 +3,6 @@ import { BaseStep } from './base';
 import { credentials } from "../../config/config";
 import task from '../../pages/content/review.fta.time.extension.request.task_en.json';
 import { VoidCase } from './void.case';
-import { IssueDirectionsNotice } from './issue.directions.notice';
 import issueDirectionTestdata from '../../pages/content/issue.direction_en.json';
 
 const reqTimeExtData = require("../../pages/content/request.time.extension_en.json");

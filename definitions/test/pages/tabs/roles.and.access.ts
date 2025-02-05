@@ -1,5 +1,5 @@
 import { expect, Page } from '@playwright/test';
-import { HomePage } from '../../pages/common/homePage';
+import { HomePage } from '../common/homePage';
 import allocateRole from '../content/allocate.role_en.json';
 
 export class RolesAndAccess {
@@ -16,7 +16,7 @@ export class RolesAndAccess {
 
     async allocateCtscRole(userEmail: string) {
         let homePage = new HomePage(this.page);
-        homePage.navigateToTab('Roles and acesss')
+        await homePage.navigateToTab('Roles and acesss')
 
         await this.page.getByRole('link', { name: allocateRole.ctscRole.link }).click();
         await this.verifyPageTitle(allocateRole.ctscRole.heading);
@@ -48,7 +48,7 @@ export class RolesAndAccess {
 
     async allocateInterlocutoryJudge(userEmail: string) : Promise<void> {
         let homePage = new HomePage(this.page);
-        homePage.navigateToTab('Roles and acesss')
+        await homePage.navigateToTab('Roles and acesss')
 
         await this.page.getByRole('link', { name: allocateRole.judicialRole.link }).click();
         await this.verifyPageTitle(allocateRole.judicialRole.heading);
@@ -80,7 +80,7 @@ export class RolesAndAccess {
 
     async allocateHearingJudge(userEmail: string): Promise<void> {
         let homePage = new HomePage(this.page);
-        homePage.navigateToTab('Roles and acesss')
+        await homePage.navigateToTab('Roles and acesss')
 
         await this.page.getByRole('link', { name: allocateRole.judicialRoleHearingJudge.link }).click();
         await this.verifyPageTitle(allocateRole.judicialRoleHearingJudge.heading);
@@ -112,7 +112,7 @@ export class RolesAndAccess {
 
     async allocateAdminRole(userEmail: string) {
         let homePage = new HomePage(this.page);
-        homePage.navigateToTab('Roles and acesss')
+        await homePage.navigateToTab('Roles and acesss')
 
         await this.page.getByRole('link', { name: allocateRole.adminRole.link }).click();
         await this.verifyPageTitle(allocateRole.ctscRole.heading);
@@ -144,7 +144,7 @@ export class RolesAndAccess {
 
     async allocateLegalOpsRole(userEmail: string) : Promise<void> {
         let homePage = new HomePage(this.page);
-        homePage.navigateToTab('Roles and acesss')
+        await homePage.navigateToTab('Roles and acesss')
 
         await this.page.getByRole('link', { name: allocateRole.legalOpsRole.link }).click();
         await this.verifyPageTitle(allocateRole.legalOpsRole.heading);

@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 import { WebAction } from '../common/web.action';
-import { timingSafeEqual } from 'crypto';
+
 const uploadResponseTestdata = require('../pages/content/upload.response_en.json');
 
 let webActions: WebAction;
@@ -109,13 +109,13 @@ export class UploadResponsePage {
 
     async enterJPDetails() {
         await webActions.chooseOptionByLabel('#jointPartyName_title', 'Mr');
-        await webActions.typeField('#jointPartyName_firstName', "fname");
-        await webActions.typeField('#jointPartyName_lastName', "lname");
+        await webActions.inputField('#jointPartyName_firstName', "fname");
+        await webActions.inputField('#jointPartyName_lastName', "lname");
         await webActions.clickButton('Continue');
-        await webActions.typeField('#dob-day', '20');
-        await webActions.typeField('#dob-month', '5');
-        await webActions.typeField('#dob-year', '2004');
-        await webActions.typeField('#jointPartyIdentity_nino', 'SK112233A');
+        await webActions.inputField('#dob-day', '20');
+        await webActions.inputField('#dob-month', '5');
+        await webActions.inputField('#dob-year', '2004');
+        await webActions.inputField('#jointPartyIdentity_nino', 'SK112233A');
         await webActions.clickButton('Continue');
         await webActions.clickElementById('#jointPartyAddressSameAsAppellant_Yes');
         await webActions.clickButton('Continue');
