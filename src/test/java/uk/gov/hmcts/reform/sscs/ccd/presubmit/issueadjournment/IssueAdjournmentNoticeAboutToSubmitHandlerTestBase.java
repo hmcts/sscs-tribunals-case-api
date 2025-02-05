@@ -8,11 +8,11 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.Validation;
-import javax.validation.Validator;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
