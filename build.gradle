@@ -7,7 +7,6 @@ plugins {
     id 'uk.gov.hmcts.java' version '0.12.64'
     id 'com.gorylenko.gradle-git-properties' version '2.4.2'
     id 'com.github.ben-manes.versions' version '0.46.0'
-    id "info.solidsoft.pitest" version '1.15.0'
     id 'org.owasp.dependencycheck' version '12.0.2'
     id 'au.com.dius.pact' version '4.3.15'
     id 'com.github.hmcts.rse-cft-lib' version '0.19.1563'
@@ -15,7 +14,6 @@ plugins {
 
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
-apply plugin: "info.solidsoft.pitest"
 
 gitProperties {
     gitPropertiesDir = new File("${project.rootDir}/src/main/resources/uk/gov/hmcts/reform/sscs")
@@ -251,8 +249,6 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/sscs/EnvironmentPropertiesPrinter.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/controller/FunctionalTestController.java,"
         property "sonar.host.url", "https://sonar.reform.hmcts.net/"
-        property "sonar.pitest.mode", "reuseReport"
-        property "sonar.pitest.reportsDirectory", "build/reports/pitest"
     }
 }
 
@@ -382,10 +378,6 @@ dependencies {
     implementation group: 'org.springframework', name: 'spring-jms'
     implementation group: 'org.apache.qpid', name: 'qpid-jms-client', version: '2.6.1'
 
-    implementation group: 'org.pitest', name: 'pitest', version:  '1.17.4'
-    implementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: pitest.pitestVersion.get()
-    implementation group:'org.codehaus.sonar-plugins', name:'sonar-pitest-plugin', version: '0.5'
-
     implementation group: 'com.github.hmcts', name: 'sscs-job-scheduler', version: '2.0.0'
     implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.5.0'
     implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.2.1-RELEASE'
@@ -501,28 +493,6 @@ bootJar {
         attributes 'Implementation-Title': project.name,
                 'Implementation-Version': project.version
     }
-}
-
-pitest {
-    targetClasses = ['uk.gov.hmcts.reform.sscs.service.*']
-    excludedClasses = ['uk.gov.hmcts.reform.sscs.config.*',
-                       'uk.gov.hmcts.reform.sscs.builder.*',
-                       'uk.gov.hmcts.reform.sscs.domain.*',
-                       'uk.gov.hmcts.reform.sscs.exception.*',
-                       'uk.gov.hmcts.reform.sscs.healthcheck.*',
-                       'uk.gov.hmcts.reform.sscs.model.*',
-                       'uk.gov.hmcts.reform.sscs.transform.*',
-                       'uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication']
-    excludedMethods = ['equals', 'hashcode']
-    jvmArgs = ['-Xms1G','-Xmx3G']
-    enableDefaultIncrementalAnalysis = true
-    historyInputLocation = 'build/reports/pitest/fastermutationtesting'
-    historyOutputLocation = 'build/reports/pitest/fastermutationtestingoutput'
-    threads = 20
-    verbose = true
-    outputFormats = ['XML', 'HTML']
-    timestampedReports = false
-    mutationThreshold = 50
 }
 
 project.ext {
