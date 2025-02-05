@@ -316,7 +316,7 @@ export class WriteFinalDecisionPages {
 
   async inputTypePageContentForDecisionPageData() {
     await webActions.inputField('#writeFinalDecisionDateOfDecision-day', '11');
-    await webActions.inputField(j
+    await webActions.inputField(
       '#writeFinalDecisionDateOfDecision-month',
       '07'
     );
