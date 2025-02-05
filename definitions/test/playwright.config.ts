@@ -11,7 +11,7 @@ export default defineConfig({
   retries: 2, // Set the number of retries for all projects
   timeout: 6 * 30 * 1000,
   expect: {
-    timeout: 60 * 1000
+    timeout: 30 * 1000
   },
 
   /* Opt out of parallel tests on CI. */
@@ -31,6 +31,8 @@ export default defineConfig({
     ]
   ],
   use: {
+    actionTimeout: 30000,
+    navigationTimeout: 30000,
     baseURL: urls.xuiUrl,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',

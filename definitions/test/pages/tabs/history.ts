@@ -45,7 +45,7 @@ export class History {
       `//*[normalize-space()="${fieldLabel}"]/../td[normalize-space()="${fieldValue}"]`
     );
 
-    for (let i = 0; i >= 30; i++) {
+    for (let i = 0; i <= 5; i++) {
       try {
         await expect(eleLink).toBeVisible();
         await eleLink.click();
@@ -53,7 +53,6 @@ export class History {
         break;
       } catch (error) {
         await this.homePage.navigateToTab('History');
-        await this.homePage.delay(1000);
         console.log(`I am inside a loop ${i}`);
       }
     }
@@ -63,14 +62,12 @@ export class History {
     let linkElement = this.page.locator(
       `//a[normalize-space()="${fieldLabel}"]`
     );
-    for (let i = 0; i <= 30; i++) {
+    for (let i = 0; i <= 5; i++) {
       try {
         await expect(linkElement).toBeVisible();
         break;
       } catch (error) {
-        await this.homePage.delay(1000);
         await this.homePage.reloadPage();
-        await this.homePage.delay(3000);
         console.log(`I am inside a loop ${i}`);
       }
     }
