@@ -52,7 +52,7 @@ application {
 }
 
 pmd {
-    toolVersion = "7.6.0"
+    toolVersion = "7.10.0"
     ignoreFailures = true
     sourceSets = [sourceSets.main, sourceSets.test]
     reportsDir = layout.buildDirectory.dir("reports/pmd").get().asFile
@@ -421,7 +421,7 @@ dependencies {
     // Remove this dependency once the secure doc-store is in use
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.7.0'
-    implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.1.0', {
+    implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.1', {
         exclude group: 'org.apache.commons', module: 'commons-compress'
         exclude group: 'com.google.guava', module: 'guava'
         exclude group: 'org.apache.poi', module: 'poi-ooxml'
@@ -442,7 +442,7 @@ dependencies {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
     }
 
-    testImplementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5-fluent', version: '5.4'
+    testImplementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5-fluent', version: '5.4.2'
 
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
     testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.37.0'
