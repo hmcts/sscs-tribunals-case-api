@@ -135,15 +135,14 @@ export class ActionFurtherEvidencePage {
   }
 
   async verifyEncryptedFileErrorMsg(): Promise<void> {
-    await webActions.verifyElementVisibility('#errors');
-    await webActions.verifyTextVisibility(
-      'The below PDF document(s) cannot be password protected, please correct this'
-    );
+    await webActions.verifyElementVisibility('#error-summary-title');
+    await webActions.verifyElementVisibility('span.error-message')
+    await webActions.verifyTextVisibility('Error Uploading File');
     await webActions.verifyTextVisibility('test-encrypted-file.pdf');
   }
 
   async verifyCorruptedFileErrorMsg(): Promise<void> {
-    await webActions.verifyElementVisibility('#errors');
+    await webActions.verifyElementVisibility('#error-summary-title');
     await webActions.verifyTextVisibility(
       'The below PDF document(s) are not readable, please correct this'
     );
