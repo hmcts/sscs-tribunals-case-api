@@ -6,7 +6,6 @@ import issueDirectionTestdata from '../../pages/content/issue.direction_en.json'
 import eventTestData from '../../pages/content/event.name.event.description_en.json';
 import actionFurtherEvidenceTestdata from '../../pages/content/action.further.evidence_en.json';
 import sendToInterLocPreValidData from '../../pages/content/send.to.interloc_en.json';
-import logger from '../../utils/loggerUtil';
 
 export class IssueDirectionsNotice extends BaseStep {
   readonly page: Page;
@@ -19,10 +18,6 @@ export class IssueDirectionsNotice extends BaseStep {
   async performIssueDirectionNoticeIncompleteApplicationPreHearingAppealToProceed() {
     let pipCaseId = await createCaseBasedOnCaseType('PIPINCOMPLETE');
     await new Promise((f) => setTimeout(f, 10000)); //Delay required for the Case to be ready
-    logger.info(
-      'The value of the response writer : ' +
-        credentials.dwpResponseWriter.email
-    );
     /*let responseWriterToken: string = await accessToken(credentials.dwpResponseWriter);
         let serviceToken: string = await getSSCSServiceToken();
         let responseWriterId: string = await accessId(credentials.dwpResponseWriter);
@@ -98,9 +93,6 @@ export class IssueDirectionsNotice extends BaseStep {
   async performIssueDirectionNoticePreHearingAppealToProceed() {
     let taxCreditCaseId = await createCaseBasedOnCaseType('TAX CREDIT');
     await new Promise((f) => setTimeout(f, 30000)); //Delay required for the Case to be ready
-    logger.info(
-      'The value of the response writer : ' + credentials.hmrcUser.email
-    );
     /* let responseWriterToken: string = await accessToken(credentials.hmrcUser);
         let serviceToken: string = await getSSCSServiceToken();
         let responseWriterId: string = await accessId(credentials.hmrcUser);
@@ -166,10 +158,6 @@ export class IssueDirectionsNotice extends BaseStep {
     //let esaCaseId = await createCaseBasedOnCaseType('ESA');
     let esaCaseId = await createCaseBasedOnCaseType('PIP');
     await new Promise((f) => setTimeout(f, 30000)); //Delay required for the Case to be ready
-    logger.info(
-      'The value of the response writer : ' +
-        credentials.dwpResponseWriter.email
-    );
     /*let responseWriterToken: string = await accessToken(credentials.dwpResponseWriter);
         let serviceToken: string = await getSSCSServiceToken();
         let responseWriterId: string = await accessId(credentials.dwpResponseWriter);
@@ -230,10 +218,6 @@ export class IssueDirectionsNotice extends BaseStep {
     //let pipCaseId = await createCaseBasedOnCaseType('DLASANDL');
     let pipCaseId = await createCaseBasedOnCaseType('PIP');
     await new Promise((f) => setTimeout(f, 30000)); //Delay required for the Case to be ready
-    logger.info(
-      'The value of the response writer : ' +
-        credentials.dwpResponseWriter.email
-    );
     /*let responseWriterToken: string = await accessToken(credentials.dwpResponseWriter);
         let serviceToken: string = await getSSCSServiceToken();
         let responseWriterId: string = await accessId(credentials.dwpResponseWriter);
@@ -292,10 +276,6 @@ export class IssueDirectionsNotice extends BaseStep {
     //let pipCaseId = await createCaseBasedOnCaseType('DLASANDL');
     let pipCaseId = await createCaseBasedOnCaseType('PIP');
     await new Promise((f) => setTimeout(f, 30000)); //Delay required for the Case to be ready
-    logger.info(
-      'The value of the response writer : ' +
-        credentials.dwpResponseWriter.email
-    );
     /*let responseWriterToken: string = await accessToken(credentials.dwpResponseWriter);
         let serviceToken: string = await getSSCSServiceToken();
         let responseWriterId: string = await accessId(credentials.dwpResponseWriter);

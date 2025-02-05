@@ -1,7 +1,6 @@
 /* eslint-disable complexity */
 import { request } from '@playwright/test';
 import { urls } from '../../../../config/config';
-import logger from '../../../../utils/loggerUtil';
 import pipPayload from '../../../data/payload/create-appeal/pip_sya.json';
 import pipPayloadWelsh from '../../../data/payload/create-appeal/pip_sya_welsh.json';
 import ucPayload from '../../../data/payload/create-appeal/uc_sya.json';
@@ -59,12 +58,9 @@ async function createCaseBasedOnCaseType(caseType: string) {
   const response = await apiContext.post(apiUrl, {
     data: dataPayload
   });
-  logger.info('The value of the Response Status : ' + response.statusText());
   const respHeaders = response.headers();
   const locationUrl: string = respHeaders.location;
-  let caseId = locationUrl.substring(locationUrl.lastIndexOf('/') + 1);
-  logger.info(`Case was successfully created and id is ${caseId}`);
-  return caseId;
+  return locationUrl.substring(locationUrl.lastIndexOf('/') + 1);
 }
 
 export default createCaseBasedOnCaseType;

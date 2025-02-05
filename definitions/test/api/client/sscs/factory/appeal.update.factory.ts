@@ -23,7 +23,7 @@ async function getStartEventTokenOnCase(
     // All requests we send go to this API Endpoint.
     baseURL: urls.ccdApiUrl
   });
-  logger.info(
+  logger.debug(
     `The value the CCD URL : ${urls.ccdApiUrl}/caseworkers/${userId}/jurisdictions/${jurisdiction}/case-types/${caseType}/cases/${caseId}/event-triggers/${eventId}/token`
   );
   const responseForStartAnEvent = await apiContext.get(
@@ -36,11 +36,11 @@ async function getStartEventTokenOnCase(
       }
     }
   );
-  logger.info(
+  logger.debug(
     'The value of the status for the start event :' +
       responseForStartAnEvent.status()
   );
-  logger.info(
+  logger.debug(
     'The value of the status text for the start event:' +
       responseForStartAnEvent.statusText()
   );
@@ -58,7 +58,7 @@ async function performEventOnCaseWithEmptyBody(
   caseId: string,
   eventId: string
 ) {
-  //logger.info('The logger value for the body : ' + body);
+  //logger.debug('The logger value for the body : ' + body);
   let body: string = await getStartEventTokenOnCase(
     idamToken,
     serviceToken,
@@ -69,7 +69,7 @@ async function performEventOnCaseWithEmptyBody(
     eventId
   );
   let event_token: string = JSON.parse(body).token;
-  logger.info('Retrieved the token : ' + event_token);
+  logger.debug('Retrieved the token : ' + event_token);
 
   let dataPayload = {
     event: {
@@ -82,10 +82,10 @@ async function performEventOnCaseWithEmptyBody(
     ignore_warning: true
   };
 
-  logger.info('The payload : ' + JSON.stringify(dataPayload));
+  logger.debug('The payload : ' + JSON.stringify(dataPayload));
 
   let endURL: string = `${urls.ccdApiUrl}/caseworkers/${userId}/jurisdictions/${jurisdiction}/case-types/${caseType}/cases/${caseId}/events`;
-  logger.info('The end URL : ' + endURL);
+  logger.debug('The end URL : ' + endURL);
 
   const responseForSubmitAnEvent = await apiContext.post(`${endURL}`, {
     headers: {
@@ -95,11 +95,11 @@ async function performEventOnCaseWithEmptyBody(
     },
     data: dataPayload
   });
-  logger.info(
+  logger.debug(
     'The value of the status for the submit event :' +
       responseForSubmitAnEvent.status()
   );
-  logger.info(
+  logger.debug(
     'The value of the status text for the submit event :' +
       responseForSubmitAnEvent.statusText()
   );
@@ -143,7 +143,7 @@ async function performEventOnCaseWithUploadResponse(
     upload_response_payload = upload_response_payload_hmrc_053_DQ;
   }
 
-  //logger.info("The value of the case Details " + JSON.stringify(case_details));
+  //logger.debug("The value of the case Details " + JSON.stringify(case_details));
   let dataPayload = {
     event: {
       id: `${eventId}`,
@@ -188,7 +188,7 @@ async function performEventOnCaseForActionFurtherEvidence(
   );
   let event_token: string = JSON.parse(body).token;
 
-  //logger.info("The value of the case Details " + JSON.stringify(case_details));
+  //logger.debug("The value of the case Details " + JSON.stringify(case_details));
   let dataPayload = {
     event: {
       id: `${eventId}`,
@@ -233,11 +233,11 @@ async function performEventSubmission(
     },
     data: dataPayload
   });
-  logger.info(
+  logger.debug(
     'The value of the status for the submit event :' +
       responseForSubmitAnEvent.status()
   );
-  logger.info(
+  logger.debug(
     'The value of the status text for the submit event :' +
       responseForSubmitAnEvent.statusText()
   );

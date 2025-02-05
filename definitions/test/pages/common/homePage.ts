@@ -3,9 +3,6 @@ import { WebAction } from '../../common/web.action';
 import logger from '../../utils/loggerUtil';
 import { environment } from '../../config/config';
 
-const fs = require('fs');
-const yaml = require('js-yaml');
-
 let webActions: WebAction;
 
 export class HomePage {

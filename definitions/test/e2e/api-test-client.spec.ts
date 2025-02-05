@@ -7,15 +7,11 @@ import {
 } from '../api/client/idam/idam.service';
 import createCaseBasedOnCaseType from '../api/client/sscs/factory/appeal.type.factory';
 import { performEventOnCaseWithUploadResponse } from '../api/client/sscs/factory/appeal.update.factory';
-import logger from '../utils/loggerUtil';
 //var event_token: string = JSON.parse(response_document).push({hello: 'value'});
 
 test('Test to Test API Working....', async () => {
   let pipCaseId = await createCaseBasedOnCaseType('PIP');
   await new Promise((f) => setTimeout(f, 10000)); //Delay required for the Case to be ready
-  logger.info(
-    'The value of the response writer : ' + credentials.dwpResponseWriter.email
-  );
   let responseWriterToken: string = await accessToken(
     credentials.dwpResponseWriter
   );

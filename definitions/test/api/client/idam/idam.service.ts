@@ -12,15 +12,12 @@ const tokenIDCache = new NodeCache({
 });
 
 export async function accessToken(user) {
-  logger.info('User logged in', user.email);
   if (tokenIDCache.get(user.email) != null) {
-    logger.info('User access token coming from cache', user.email);
     return tokenIDCache.get(user.email);
   } else {
     if (user.email && user.password) {
       const accessToken = await getIDAMUserToken(user);
       tokenIDCache.set(user.email, accessToken);
-      logger.info('user access token coming from idam', user.email);
       return accessToken;
     } else {
       logger.error(
@@ -32,16 +29,13 @@ export async function accessToken(user) {
 
 export async function accessId(user) {
   let user_id_key = user.email + '_id';
-  logger.info('The user email for getting the user id', user.email);
   if (tokenIDCache.get(user_id_key) != null) {
-    logger.info('User id token coming from cache', user_id_key);
     return tokenIDCache.get(user_id_key);
   } else {
     if (user.email && user.password) {
       const idamToken = await accessToken(user);
       const userId = await getIDAMUserID(idamToken);
       tokenIDCache.set(user_id_key, userId);
-      logger.info('user id coming from idam', user_id_key);
       return userId;
     } else {
       logger.error(
@@ -82,8 +76,6 @@ async function getIDAMUserToken(user) {
       password: `${user.password}`
     }
   });
-  logger.info('The value of the status :' + response.status());
-  let token = response.statusText();
   const body: string = await response.body();
   await response.dispose();
   return JSON.parse(body).access_token;
@@ -107,11 +99,7 @@ export async function getSSCSServiceToken() {
     },
     data: { microservice: `${resources.idamClientId}` }
   });
-  logger.info('The value of the status :' + response.status());
-  let statusText = response.statusText();
-  logger.info('The value of the status :' + statusText);
   const body = await response.body();
-  logger.info('The value of the service token :' + body);
   await response.dispose();
   return body.toString();
 }
@@ -133,11 +121,7 @@ export async function getIDAMUserID(idamToken) {
       'content-type': 'application/json'
     }
   });
-  logger.info('The value of the status :' + response.status());
-  let statusText = response.statusText();
   const body = await response.body();
-  // @ts-ignore
-  logger.info('The value of the id :' + JSON.parse(body).id);
   // @ts-ignore
   return JSON.parse(body).id;
 }
