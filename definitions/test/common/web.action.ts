@@ -13,211 +13,164 @@ export class WebAction {
     async chooseOptionByLabel(elementLocator: string, labelText: string) {
         await this.page
             .locator(elementLocator)
+            .first()
             .selectOption({label: labelText})
-            .catch((error) => {
-                logger.error(`Select box field is not present: ${error}`);
-            });
     }
 
     async chooseOptionByIndex(elementLocator: string, indexNum: number) {
         await this.page
             .locator(elementLocator)
+            .first()
             .selectOption({index: indexNum})
-            .catch((error) => {
-                logger.error(`Select box field is not present: ${error}`);
-            });
     }
 
     async verifyPageLabel(elementLocator: string, labelText: string | string[]) {
         await expect(this.page.locator(elementLocator))
+            .first()
             .toHaveText(labelText)
-            .catch((error) => {
-                logger.error(`Assertion failed due to: ${error}`);
-            });
     }
 
     async verifyTotalElements(elementLocator: string, eleCount: number) {
         await expect(this.page.locator(elementLocator))
             .toHaveCount(eleCount)
-            .catch((error) => {
-                logger.error(`Assertion failed due to: ${error}`);
-            });
     }
 
     async verifyTextVisibility(labelText: string) {
         await expect(this.page.getByText(labelText))
+            .first()
             .toBeVisible()
-            .catch((error) => {
-                logger.error(`Text not visible due to: ${error}`);
-            });
     }
 
     async verifyElementVisibility(elementlocator: string) {
         await expect(this.page.locator(elementlocator))
+            .first()
             .toBeVisible()
-            .catch((error) => {
-                logger.error(`Element not visible due to: ${error}`);
-            });
     }
 
     async typeField(elementLocator: string, inputValue: string) {
         await this.page
             .type(elementLocator, inputValue)
-            .catch((error) => {
-                logger.error(`Input field is not present: ${error}`);
-            });
     }
 
     async inputField(elementLocator: string, inputValue: string) {
         await this.page
             .fill(elementLocator, inputValue)
-            .catch((error) => {
-                logger.error(`Input field is not present: ${error}`);
-            });
     }
 
     async clearInputField(elementLocator: string) {
         await this.page
-            .locator(elementLocator).clear()
-            .catch((error) => {
-                logger.error(`Input field is not present: ${error}`);
-            });
+            .locator(elementLocator)
+            .first()
+            .clear()
     }
 
     async clickFindButton(): Promise<void> {
         await this.page.waitForLoadState('domcontentloaded');
         await this.page
-         .locator("//exui-case-reference-search-box/div/form/button")
-         .click()
-         .catch((error) => {
-            logger.error(`Button element is not present: ${error}`);
-         });
+            .locator("//exui-case-reference-search-box/div/form/button")
+            .first()
+            .click()
     }
 
     async clickApplyFilterButton(): Promise<void> {
         await this.page.waitForLoadState('domcontentloaded');
         await this.page
-         .locator("//button[@title='Apply filter']")
-         .click()
-         .catch((error) => {
-            logger.error(`Button element is not present: ${error}`);
-         });
+            .locator("//button[@title='Apply filter']")
+            .first()
+            .click()
     }
 
     async clickButton(elementLocator: string): Promise<void> {
         await this.page.waitForLoadState('domcontentloaded');
-        await this.page.getByRole('button', { name: elementLocator}).waitFor();
+        await this.page.getByRole('button', {name: elementLocator}).first().waitFor();
         await this.page
-         .getByRole('button', { name: elementLocator, exact : true})
-         .click({force: true})
-         .catch((error) => {
-            logger.error(`Button element is not present: ${error}`);
-         });
+            .getByRole('button', {name: elementLocator, exact: true})
+            .first()
+            .click({force: true})
     }
 
     async clickGoButton(elementLocator: string): Promise<void> {
         await this.page
-            .getByRole('button', { name: elementLocator})
+            .getByRole('button', {name: elementLocator})
+            .first()
             .dispatchEvent('click')
-            .catch((error) => {
-                logger.error(`Button element is not present: ${error}`);
-            });
     }
 
     async clickSubmitButton(): Promise<void> {
         await this.page
-         .locator("//*[@class='button']")
-         .click()
-         .catch((error) => {
-            logger.error(`Button element is not present: ${error}`);
-         });
+            .locator("//*[@class='button']")
+            .first()
+            .click()
     }
 
     async clickRadioButton(elementLocator: string): Promise<void> {
         await this.page
-         .getByRole('radio', { name: elementLocator})
-         .click()
-         .catch((error) => {
-            logger.error(`Radio button element is not present: ${error}`);
-         });
+            .getByRole('radio', {name: elementLocator})
+            .first()
+            .click()
     }
 
     async checkAnCheckBox(elementValue: string): Promise<void> {
         await this.page
-         .getByLabel(elementValue)
-         .check()
-         .catch((error) => {
-            logger.error(`Button element is not present: ${error}`);
-         });
+            .getByLabel(elementValue)
+            .first()
+            .check()
     }
 
     async clickElementById(elementLocator: string): Promise<void> {
         await this.page
-         .locator(elementLocator)
-         .click()
-         .catch((error) => {
-            logger.error(`Radio button element is not present: ${error}`);
-         });
+            .locator(elementLocator)
+            .first()
+            .click()
     }
 
     async clickElementWithForce(elementLocator: string): Promise<void> {
         await this.page
-         .locator(elementLocator)
-         .click({force: true})
-         .catch((error) => {
-            logger.error(`Radio button element is not present: ${error}`);
-         });
+            .locator(elementLocator)
+            .first()
+            .click({force: true})
     }
 
     async clickLink(elementLocator: string): Promise<void> {
         await this.page
-            .getByRole('link', { name: elementLocator})
+            .getByRole('link', {name: elementLocator})
+            .first()
             .click()
-            .catch((error) => {
-                logger.error(`Link element is not present: ${error}`);
-            });
     }
 
     async isLinkClickable(elementLocator: string): Promise<void> {
         await this.page
-            .getByRole('link', { name: elementLocator})
+            .getByRole('link', {name: elementLocator})
+            .first()
             .isEnabled()
-            .catch((error) => {
-                logger.error(`Link element is not present: ${error}`);
-            });
     }
 
     async clickNextStepButton(elementId: string): Promise<void> {
         await this.page
-         .click(elementId)
-         .catch((error) => {
-            logger.error(`Next step submit button is not present: ${error}`);
-         });
+            .first()
+            .click(elementId)
     }
 
     async uploadFile(elementId: string, fileName: string): Promise<void> {
         await this.page
-           .locator(elementId)
-           .setInputFiles(`functional-test/data/file/${fileName}`)
-           .catch((error) => {
-            logger.error(`File upload element is not present: ${error}`);
-         });
+            .locator(elementId)
+            .first()
+            .setInputFiles(`functional-test/data/file/${fileName}`)
     }
 
     async uploadFileUsingAFileChooser(elementId: string, fileName: string): Promise<void> {
         const fileChooserPromise = this.page.waitForEvent('filechooser');
-        await this.page
-            .locator(elementId).click();
+        await this.page.locator(elementId).first().click();
         const fileChooser = await fileChooserPromise;
         await fileChooser.setFiles(path.join(__dirname, `../data/file/${fileName}`));
     }
 
     async screenshot() {
-        await this.page.screenshot({ path: 'playwright-report/screenshot.png', fullPage: true });
+        await this.page.screenshot({path: 'playwright-report/screenshot.png', fullPage: true});
     }
 
     async delay(ms: number) {
-        return new Promise( resolve => setTimeout(resolve, ms) );
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     async pause() {

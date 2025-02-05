@@ -134,12 +134,9 @@ export class HomePage {
         await webActions.verifyElementVisibility(`#search-result > table > tbody > tr > td:nth-child(1) > a[href='/cases/case-details/${caseId}']`);
         await webActions.clickElementById(`#search-result > table > tbody > tr > td:nth-child(1) > a[href='/cases/case-details/${caseId}']`);
 
-        await this.delay(3000);
         await expect(this.summaryTab)
+            .first()
             .toBeVisible()
-            .catch((error) => {
-                logger.error(`Element to verify assertion is not present: ${error}`);
-            });
     }
 
     async goToCaseList(): Promise<void> {
