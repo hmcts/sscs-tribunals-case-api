@@ -382,7 +382,7 @@ dependencies {
     implementation group: 'org.springframework', name: 'spring-jms'
     implementation group: 'org.apache.qpid', name: 'qpid-jms-client', version: '2.6.1'
 
-    implementation group: 'org.pitest', name: 'pitest', version:  '1.17.4'
+    implementation group: 'org.pitest', name: 'pitest', version:  '1.18.0'
     implementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: pitest.pitestVersion.get()
     implementation group:'org.codehaus.sonar-plugins', name:'sonar-pitest-plugin', version: '0.5'
 
