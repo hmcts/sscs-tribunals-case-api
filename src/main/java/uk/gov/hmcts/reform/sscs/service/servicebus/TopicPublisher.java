@@ -7,6 +7,7 @@ import jakarta.jms.Session;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.IllegalStateException;
 import org.springframework.jms.connection.CachingConnectionFactory;
@@ -27,9 +28,9 @@ public class TopicPublisher {
     private final ConnectionFactory connectionFactory;
 
     @Autowired
-    public TopicPublisher(JmsTemplate jmsTemplate,
+    public TopicPublisher(@Qualifier("evidenceShareJmsTemplate") JmsTemplate jmsTemplate,
                           @Value("${amqp.topic}") final String destination,
-                          ConnectionFactory connectionFactory) {
+                          @Qualifier("evidenceShareJmsConnectionFactory") ConnectionFactory connectionFactory) {
         this.jmsTemplate = jmsTemplate;
         this.destination = destination;
         this.connectionFactory = connectionFactory;

@@ -101,6 +101,10 @@ ccd-def-cleanup:
   change_id: ${CHANGE_ID}
   case_type_ids:
     - Benefit
-
-em-stitching:
-  enabled: false
+    
+postgresql:
+  enabled: true
+  flexibleserver: sscs-preview
+  setup:
+    databases:
+      - name: "pr-${CHANGE_ID}-sscs-job-scheduler"
