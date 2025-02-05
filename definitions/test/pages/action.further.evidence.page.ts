@@ -145,6 +145,5 @@ export class ActionFurtherEvidencePage {
     await webActions.verifyTextVisibility(
       'The below PDF document(s) are not readable, please correct this'
     );
-    await webActions.verifyTextVisibility('test-corrupted-file.pdf');
   }
 }

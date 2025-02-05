@@ -128,10 +128,10 @@ export class HomePage {
   }
 
   async findAndNavigateToCase(caseId: string): Promise<void> {
-    await this.page.getByRole('link', { name: 'Find case' }).waitFor();
-    await this.page.getByRole('link', { name: 'Find case' }).click();
+    await this.page.getByRole('link', { name: 'Find case' }).first().waitFor();
+    await this.page.getByRole('link', { name: 'Find case' }).first().click();
     await this.delay(3000);
-    await expect(this.page.getByText('Filters')).toBeVisible();
+    await expect(this.page.getByText('Filters').first()).toBeVisible();
     console.log(`url of the page is ######## ${this.page.url()}`);
     const expUrl = this.page.url();
 
@@ -179,10 +179,10 @@ export class HomePage {
   async goToCaseList(): Promise<void> {
     //await this.page.goto(`/cases`);
     await this.selectToViewTasksAndCasesIfRequired();
-    await this.page.getByRole('link', { name: 'Case list' }).waitFor();
-    await this.page.getByRole('link', { name: 'Case list' }).click();
+    await this.page.getByRole('link', { name: 'Case list' }).first().waitFor();
+    await this.page.getByRole('link', { name: 'Case list' }).first().click();
     await this.delay(3000);
-    await expect(this.page.getByText('Filters')).toBeVisible();
+    await expect(this.page.getByText('Filters').first()).toBeVisible();
   }
 
   async chooseEvent(eventName: string): Promise<void> {

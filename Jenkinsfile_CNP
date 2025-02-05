@@ -187,10 +187,26 @@ withPipeline(type, product, component) {
             runNotificationTests()
         }
         runE2eTests()
+        publishHTML([
+                allowMissing         : true,
+                alwaysLinkToLastBuild: true,
+                keepAll              : true,
+                reportDir            : "playwright-report",
+                reportFiles          : 'index.html',
+                reportName           : 'SSCS E2E Test Report'
+        ])
     }
 
     afterSuccess('smoketest:aat') {
         runE2eTests()
+        publishHTML([
+                allowMissing         : true,
+                alwaysLinkToLastBuild: true,
+                keepAll              : true,
+                reportDir            : "playwright-report",
+                reportFiles          : 'index.html',
+                reportName           : 'SSCS E2E Test Report'
+        ])
     }
 }
 
@@ -246,14 +262,6 @@ def runE2eTests() {
         try {
             sh './gradlew runE2eTests'
         } finally {
-            publishHTML([
-                    allowMissing         : true,
-                    alwaysLinkToLastBuild: true,
-                    keepAll              : true,
-                    reportDir            : "playwright-report",
-                    reportFiles          : 'index.html',
-                    reportName           : 'SSCS E2E Test Report'
-            ])
             steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'definitions/test/playwright-report/**'
         }
     }
