@@ -9,6 +9,7 @@ export class WebAction {
   }
 
   async chooseOptionByLabel(elementLocator: string, labelText: string) {
+    await this.verifyElementVisibility(elementLocator);
     await this.page
       .locator(elementLocator)
       .first()
@@ -16,6 +17,7 @@ export class WebAction {
   }
 
   async chooseOptionByIndex(elementLocator: string, indexNum: number) {
+    await this.verifyElementVisibility(elementLocator);
     await this.page
       .locator(elementLocator)
       .first()
@@ -23,9 +25,18 @@ export class WebAction {
   }
 
   async verifyPageLabel(elementLocator: string, labelText: string | string[]) {
-    await expect(this.page.locator(elementLocator).first()).toHaveText(
-      labelText
-    );
+    if (labelText instanceof Array) {
+      await Promise.all(
+        labelText.map(async (text, i) => {
+          await expect(this.page.locator(elementLocator).nth(i)).toBeVisible();
+          await expect(this.page.locator(elementLocator).nth(i)).toHaveText(text);
+        })
+      );
+    } else {
+      await this.verifyElementVisibility(elementLocator);
+      await expect(this.page.locator(elementLocator).first())
+        .toHaveText(labelText);
+    }
   }
 
   async verifyTotalElements(elementLocator: string, eleCount: number) {
@@ -41,10 +52,12 @@ export class WebAction {
   }
 
   async inputField(elementLocator: string, inputValue: string) {
+    await this.verifyElementVisibility(elementLocator);
     await this.page.locator(elementLocator).first().fill(inputValue);
   }
 
   async clearInputField(elementLocator: string) {
+    await this.verifyElementVisibility(elementLocator);
     await this.page.locator(elementLocator).first().clear();
   }
 
@@ -58,15 +71,14 @@ export class WebAction {
 
   async clickApplyFilterButton(): Promise<void> {
     await this.page.waitForLoadState('domcontentloaded');
-    await this.page.locator("//button[@title='Apply filter']").first().click();
+    await this.verifyElementVisibility('//button[@title=\'Apply filter\']');
+    await this.page.locator('//button[@title=\'Apply filter\']').first().click();
   }
 
   async clickButton(elementLocator: string): Promise<void> {
     await this.page.waitForLoadState('domcontentloaded');
-    await this.page
-      .getByRole('button', { name: elementLocator })
-      .first()
-      .waitFor();
+    await expect(this.page.getByRole('button', { name: elementLocator }).first())
+      .toBeVisible();
     await this.page
       .getByRole('button', { name: elementLocator, exact: true })
       .first()
@@ -81,10 +93,14 @@ export class WebAction {
   }
 
   async clickSubmitButton(): Promise<void> {
-    await this.page.locator("//*[@class='button']").first().click();
+    await this.verifyElementVisibility('//*[@class=\'button\']');
+    await this.page.locator('//*[@class=\'button\']').first().click();
   }
 
   async clickRadioButton(elementLocator: string): Promise<void> {
+    await expect(this.page
+      .getByRole('radio', { name: elementLocator })
+      .first()).toBeVisible();
     await this.page
       .getByRole('radio', { name: elementLocator })
       .first()
@@ -96,6 +112,7 @@ export class WebAction {
   }
 
   async clickElementById(elementLocator: string): Promise<void> {
+    await this.verifyElementVisibility(elementLocator);
     await this.page.locator(elementLocator).first().click();
   }
 
@@ -104,14 +121,16 @@ export class WebAction {
   }
 
   async clickLink(elementLocator: string): Promise<void> {
+    await expect(this.page.getByRole('link', { name: elementLocator }).first()).toBeVisible();
     await this.page.getByRole('link', { name: elementLocator }).first().click();
   }
 
   async isLinkClickable(elementLocator: string): Promise<void> {
-    await this.page
+    await expect(this.page.getByRole('link', { name: elementLocator }).first()).toBeVisible();
+    await expect(this.page
       .getByRole('link', { name: elementLocator })
       .first()
-      .isEnabled();
+    ).toBeEnabled();
   }
 
   async clickNextStepButton(elementId: string): Promise<void> {
@@ -130,6 +149,7 @@ export class WebAction {
     fileName: string
   ): Promise<void> {
     const fileChooserPromise = this.page.waitForEvent('filechooser');
+    await this.verifyElementVisibility(elementId);
     await this.page.locator(elementId).first().click();
     const fileChooser = await fileChooserPromise;
     await fileChooser.setFiles(
