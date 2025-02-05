@@ -64,7 +64,7 @@ amqp:
     username: ${AMQP_USERNAME:guest}
     clientId: sscs-evidence-share
     amqp-connection-string-template: ${JMS_AMQP_CONNECTION_TEMPLATE:amqps://%1s?amqp.idleTimeout=%2d}
-    idleTimeout: ${JMS_IDLE_TIMEOUT:3600000}
+    idleTimeout: ${JMS_IDLE_TIMEOUT:30000}
     reconnectOnException: ${AMQP_RECONNECT_ON_EXCEPTION:false}
     prefetch:
         override: ${AMQP_PREFETCH_OVERRIDE:false}
@@ -149,7 +149,7 @@ create_ccd_endpoint: ${CREATE_CCD_ENDPOINT:true}
 dm_gateway:
     url: ${DM_GATEWAY_URL:http://localhost:3455}
 doc_assembly:
-    adjourn_case: TB-SCS-GNO-ENG-adjournment-notice.docx
+    adjourn_case: TB-SCS-GNO-ENG-adjournment-notice-v2.docx
     posthearingrequest: TB-SCS-GNO-ENG-00754.docx
     postponementrequest: TB-SCS-GNO-ENG-00754.docx
     url: ${DOC_ASSEMBLY_URL:http://localhost:4631}
@@ -698,15 +698,15 @@ notification:
         directionIssued:
             appealToProceed:
                 appellant:
-                    docmosisId: TB-SCS-GNO-ENG-00551.docx
+                    docmosisId: TB-SCS-GNO-ENG-00551-v2.docx
                 appointee:
-                    docmosisId: TB-SCS-GNO-ENG-00551.docx
+                    docmosisId: TB-SCS-GNO-ENG-00551-v2.docx
                 representative:
-                    docmosisId: TB-SCS-GNO-ENG-00551.docx
+                    docmosisId: TB-SCS-GNO-ENG-00551-v2.docx
                 joint_party:
-                    docmosisId: TB-SCS-GNO-ENG-00551.docx
+                    docmosisId: TB-SCS-GNO-ENG-00551-v2.docx
                 other_party:
-                    docmosisId: TB-SCS-GNO-ENG-00551.docx
+                    docmosisId: TB-SCS-GNO-ENG-00551-v2.docx
             provideInformation:
                 appellant:
                     docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
@@ -1337,15 +1337,15 @@ notification:
         directionIssuedWelsh:
             appealToProceed:
                 appellant:
-                    docmosisId: TB-SCS-GNO-WEL-00590.docx
+                    docmosisId: TB-SCS-GNO-WEL-00590-v2.docx
                 appointee:
-                    docmosisId: TB-SCS-GNO-WEL-00590.docx
+                    docmosisId: TB-SCS-GNO-WEL-00590-v2.docx
                 representative:
-                    docmosisId: TB-SCS-GNO-WEL-00590.docx
+                    docmosisId: TB-SCS-GNO-WEL-00590-v2.docx
                 joint_party:
-                    docmosisId: TB-SCS-GNO-WEL-00590.docx
+                    docmosisId: TB-SCS-GNO-WEL-00590-v2.docx
                 other_party:
-                    docmosisId: TB-SCS-GNO-WEL-00590.docx
+                    docmosisId: TB-SCS-GNO-WEL-00590-v2.docx
             provideInformation:
                 appellant:
                     docmosisId: TB-SCS-GNO-WEL-00468-v2.docx
@@ -1979,14 +1979,14 @@ azure:
             topicName: ${HMC_HEARINGS_TOPIC_NAME:}
             subscriptionName: ${HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME:}
             receiveTimeout: ${HMC_HEARINGS_TOPIC_RECEIVE_TIMEOUT:1}
-            idleTimeout: ${HMC_HEARINGS_TOPIC_IDLE_TIMEOUT:3600000}
+            idleTimeout: ${HMC_HEARINGS_TOPIC_IDLE_TIMEOUT:30000}
             username: ${HMC_HEARINGS_TOPIC_POLICY_NAME:}
             password: ${HMC_HEARINGS_TOPIC_ACCESS_KEY:}
         tribunals-to-hearings-api:
             namespace: ${TRIBUNALS_EVENT_QUEUE_NAMESPACE:}
             queueName: ${TRIBUNALS_EVENT_QUEUE_NAME:}
             receiveTimeout: ${TRIBUNALS_EVENT_QUEUE_RECEIVE_TIMEOUT:1}
-            idleTimeout: ${TRIBUNALS_EVENT_QUEUE_IDLE_TIMEOUT:3600000}
+            idleTimeout: ${TRIBUNALS_EVENT_QUEUE_IDLE_TIMEOUT:30000}
             username: ${TRIBUNALS_EVENT_QUEUE_POLICY_NAME:}
             password: ${TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:}
 
