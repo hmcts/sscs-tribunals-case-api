@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Statement {
-    @Schema(example = "this is the text of a personal statement", required = true)
+    @Schema(example = "this is the text of a personal statement", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "body")
     private String body;
     @JsonProperty(value = "tya")
