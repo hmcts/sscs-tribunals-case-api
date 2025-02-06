@@ -117,6 +117,7 @@ export class IssueDirectionPage {
     await webActions.inputField('#directionDueDate-day', '21');
     await webActions.inputField('#directionDueDate-month', '10');
     await webActions.inputField('#directionDueDate-year', '2025');
+    await this.page.locator('#directionDueDate-day').click();
   }
 
   async chooseNoticeType(optionVal: string) {

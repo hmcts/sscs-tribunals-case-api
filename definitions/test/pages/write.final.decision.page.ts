@@ -704,6 +704,7 @@ export class WriteFinalDecisionPages {
     await webActions.inputField('#writeFinalDecisionEndDate-day', '30');
     await webActions.inputField('#writeFinalDecisionEndDate-month', '07');
     await webActions.inputField('#writeFinalDecisionEndDate-year', '2024');
+    await this.page.locator('#writeFinalDecisionEndDate').click();
   }
 
   async verifyPageContentForSelectActivitiesPage() {
