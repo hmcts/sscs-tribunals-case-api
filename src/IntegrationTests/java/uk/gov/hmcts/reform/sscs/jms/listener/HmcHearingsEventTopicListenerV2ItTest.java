@@ -23,9 +23,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
@@ -70,28 +70,28 @@ public class HmcHearingsEventTopicListenerV2ItTest {
 
     private HmcHearingsEventTopicListener hmcHearingsEventTopicListener;
 
-    @MockBean
+    @MockitoBean
     private ObjectMapper mapper;
 
     @Autowired
     private ProcessHmcMessageServiceV2 processHmcMessageServiceV2;
 
-    @MockBean
+    @MockitoBean
     private JmsBytesMessage bytesMessage;
 
-    @MockBean
+    @MockitoBean
     private IdamService idamService;
 
-    @MockBean
+    @MockitoBean
     private CcdCaseService ccdCaseService;
 
-    @MockBean
+    @MockitoBean
     private VenueService venueService;
 
-    @MockBean
+    @MockitoBean
     private HmcHearingApi hearingApi;
 
-    @MockBean
+    @MockitoBean
     private UpdateCcdCaseService updateCcdCaseService;
 
     @Test
