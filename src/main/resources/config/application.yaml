@@ -64,7 +64,7 @@ amqp:
     username: ${AMQP_USERNAME:guest}
     clientId: sscs-evidence-share
     amqp-connection-string-template: ${JMS_AMQP_CONNECTION_TEMPLATE:amqps://%1s?amqp.idleTimeout=%2d}
-    idleTimeout: ${JMS_IDLE_TIMEOUT:3600000}
+    idleTimeout: ${JMS_IDLE_TIMEOUT:30000}
     reconnectOnException: ${AMQP_RECONNECT_ON_EXCEPTION:false}
     prefetch:
         override: ${AMQP_PREFETCH_OVERRIDE:false}
@@ -113,9 +113,15 @@ azure:
 
 bundle:
     english:
-        config: ${BUNDLE_ENGLISH_CONFIG:sscs-bundle-config.yaml}
+        config: sscs-bundle-config.yaml
         edited:
-            config: ${BUNDLE_EDITED_CONFIG:sscs-bundle-edited-config.yaml}
+            config: sscs-bundle-edited-config.yaml
+    welsh:
+        config: sscs-bundle-welsh-config.yaml
+        edited:
+            config: sscs-bundle-welsh-edited-config.yaml
+    url: ${BUNDLE_URL:http://localhost:4623}
+    # Below may be redundant
     new:
         edited:
             config: ${BUNDLE_EDITED_CONFIG:sscs-new-bundle-edited-config.yaml}
@@ -129,11 +135,6 @@ bundle:
                 config: ${BUNDLE_WELSH_EDITED_CONFIG:sscs-new-bundle-welsh-edited-config.yaml}
             unedited:
                 config: ${BUNDLE_WELSH_UNEDITED_CONFIG:sscs-new-bundle-welsh-unedited-config.yaml}
-    url: ${BUNDLE_URL:http://localhost:4623}
-    welsh:
-        config: ${BUNDLE_WELSH_CONFIG:sscs-bundle-welsh-config.yaml}
-        edited:
-            config: ${BUNDLE_WELSH_EDITED_CONFIG:sscs-bundle-welsh-edited-config.yaml}
 case_document_am:
     url: ${CASE_DOCUMENT_AM_URL:http://localhost:4455}
 
@@ -149,7 +150,7 @@ create_ccd_endpoint: ${CREATE_CCD_ENDPOINT:true}
 dm_gateway:
     url: ${DM_GATEWAY_URL:http://localhost:3455}
 doc_assembly:
-    adjourn_case: TB-SCS-GNO-ENG-adjournment-notice.docx
+    adjourn_case: TB-SCS-GNO-ENG-adjournment-notice-v2.docx
     posthearingrequest: TB-SCS-GNO-ENG-00754.docx
     postponementrequest: TB-SCS-GNO-ENG-00754.docx
     url: ${DOC_ASSEMBLY_URL:http://localhost:4631}
@@ -209,15 +210,15 @@ documents:
     english:
         CORRECTION_GRANTED: TB-SCS-GNO-ENG-corrected-decision-notice.docx
         DECISION_ISSUED: TB-SCS-GNO-ENG-draft-decision-notice.docx
-        DIRECTION_ISSUED: TB-SCS-GNO-ENG-directions-notice.docx
+        DIRECTION_ISSUED: TB-SCS-GNO-ENG-directions-notice-v2.docx
         ISSUE_FINAL_DECISION: TB-SCS-GNO-ENG-final-decision-notice.docx
-        SOR_WRITE: TB-SCS-GNO-ENG-sor-directions-notice.docx
+        SOR_WRITE: TB-SCS-GNO-ENG-sor-directions-notice-v2.docx
     welsh:
         CORRECTION_GRANTED: TB-SCS-GNO-ENG-corrected-decision-notice.docx
         DECISION_ISSUED: TB-SCS-GNO-ENG-draft-decision-notice.docx
-        DIRECTION_ISSUED: TB-SCS-GNO-ENG-directions-notice.docx
+        DIRECTION_ISSUED: TB-SCS-GNO-ENG-directions-notice-v2.docx
         ISSUE_FINAL_DECISION: TB-SCS-GNO-ENG-final-decision-notice.docx
-        SOR_WRITE: TB-SCS-GNO-ENG-sor-directions-notice.docx
+        SOR_WRITE: TB-SCS-GNO-ENG-sor-directions-notice-v2.docx
 dwp:
     response:
         due:
@@ -253,8 +254,6 @@ feature:
         enabled: ${GAPS_SWITCHOVER_FEATURE:false}
     hearing-recording-filter:
         enabled: ${UPLOAD_HEARING_FILTER_ENABLED:false}
-    infected-blood-compensation:
-        enabled: ${INFECTED_BLOOD_COMPENSATION_ENABLED:false}
     postHearings:
         enabled: ${POST_HEARINGS_FEATURE:false}
     postHearingsB:
@@ -512,17 +511,17 @@ notification:
                 emailId: d5fd9f65-1283-4533-a1be-10043dae7af6
                 smsId: ede384aa-0b6e-4311-9f01-ee547573a07b
                 letterId: 91143b85-dd9d-430c-ba23-e42ec90f44f8
-                docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx
+                docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx
             representative:
                 emailId: 8003606e-3d80-4e17-b846-18698f8d681e
                 smsId: 99bd4a56-256c-4de8-b187-d43a8dde466f
                 letterId: 77ea8a2f-06df-4279-9c1f-0f23cb2d9bbf
-                docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Representative.docx
+                docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Representative-v2.docx
             appointee:
                 emailId: 78cf9c9c-e2b8-44d7-bcf1-220311f114cb
                 smsId: ede384aa-0b6e-4311-9f01-ee547573a07b
                 letterId: 747d026e-1bec-4e96-8a34-28f36e30bba5
-                docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx
+                docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx
         hearingAdjourned:
             appellant:
                 emailId: 77ea995b-9744-4167-9250-e627c85e5eda
@@ -678,15 +677,15 @@ notification:
             appellant:
                 emailId: 01293b93-b23e-40a3-ad78-2c6cd01cd21c
                 smsId: f41222ef-c05c-4682-9634-6b034a166368
-                docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx
+                docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx
             representative:
                 emailId: 652753bf-59b4-46eb-9c24-bd762338a098
                 smsId: a6c09fad-6265-4c7c-8b95-36245ffa5352
-                docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Representative.docx
+                docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Representative-v2.docx
             appointee:
                 emailId: 362d9a85-e0e4-412b-b874-020c0464e2b4
                 smsId: f41222ef-c05c-4682-9634-6b034a166368
-                docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx
+                docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx
         struckOut:
             docmosisId: TB-SCS-GNO-ENG-00466.docx
         processAudioVideo:
@@ -698,15 +697,15 @@ notification:
         directionIssued:
             appealToProceed:
                 appellant:
-                    docmosisId: TB-SCS-GNO-ENG-00551.docx
+                    docmosisId: TB-SCS-GNO-ENG-00551-v2.docx
                 appointee:
-                    docmosisId: TB-SCS-GNO-ENG-00551.docx
+                    docmosisId: TB-SCS-GNO-ENG-00551-v2.docx
                 representative:
-                    docmosisId: TB-SCS-GNO-ENG-00551.docx
+                    docmosisId: TB-SCS-GNO-ENG-00551-v2.docx
                 joint_party:
-                    docmosisId: TB-SCS-GNO-ENG-00551.docx
+                    docmosisId: TB-SCS-GNO-ENG-00551-v2.docx
                 other_party:
-                    docmosisId: TB-SCS-GNO-ENG-00551.docx
+                    docmosisId: TB-SCS-GNO-ENG-00551-v2.docx
             provideInformation:
                 appellant:
                     docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
@@ -822,13 +821,13 @@ notification:
                 docmosisId: TB-SCS-GNO-ENG-00795.docx
         issueAdjournmentNotice:
             appellant:
-                docmosisId: TB-SCS-GNO-ENG-00510.docx
+                docmosisId: TB-SCS-GNO-ENG-00510-v2.docx
             appointee:
-                docmosisId: TB-SCS-GNO-ENG-00510.docx
+                docmosisId: TB-SCS-GNO-ENG-00510-v2.docx
             representative:
                 docmosisId: TB-SCS-GNO-ENG-00512.docx
             joint_party:
-                docmosisId: TB-SCS-GNO-ENG-00510.docx
+                docmosisId: TB-SCS-GNO-ENG-00510-v2.docx
             other_party:
                 docmosisId: TB-SCS-GNO-ENG-00512.docx
         requestForInformation:
@@ -1151,17 +1150,17 @@ notification:
                 emailId: ba2654d8-3e76-43df-bf7d-f457d4d6819a
                 smsId: 53369ca5-75a8-43a7-8e5e-4eda9df04001
                 letterId: 830ba7f1-9757-4833-8520-2f872de7be44
-                docmosisId: TB-SCS-LET-WEL-Appeal-Lodged-Appellant.docx
+                docmosisId: TB-SCS-LET-WEL-Appeal-Lodged-Appellant-v2.docx
             representative:
                 emailId: a4a85f03-c23c-4099-ab45-7a3ba9eee63a
                 smsId: 6970bdda-7293-46d6-8876-7e1a7c4295fc
                 letterId: 89cbb9d8-3b7d-4766-b481-585832e8bd90
-                docmosisId: TB-SCS-LET-WEL-Appeal-Lodged-Representative.docx
+                docmosisId: TB-SCS-LET-WEL-Appeal-Lodged-Representative-v2.docx
             appointee:
                 emailId: c77d9768-5343-42a5-9333-7b399e3d7199
                 smsId: 53369ca5-75a8-43a7-8e5e-4eda9df04001
                 letterId: 95b0b0f8-fdf6-450f-b805-6aab46d63bf7
-                docmosisId: TB-SCS-LET-WEL-Appeal-Lodged-Appellant.docx
+                docmosisId: TB-SCS-LET-WEL-Appeal-Lodged-Appellant-v2.docx
         hearingAdjourned:
             appellant:
                 emailId: 06c91850-a81f-44bb-9577-1bc528913850
@@ -1317,15 +1316,15 @@ notification:
             appellant:
                 emailId: 8910e2d2-4332-4ef6-a4b5-025ffad4f17d
                 smsId: 6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82
-                docmosisId: TB-SCS-LET-WEL-Appeal-Lodged-Appellant.docx
+                docmosisId: TB-SCS-LET-WEL-Appeal-Lodged-Appellant-v2.docx
             representative:
                 emailId: 364bccc5-ffa6-495d-8035-e642d15114bf
                 smsId: f8391d2b-4d80-480e-87a9-816710f5650b
-                docmosisId: TB-SCS-LET-WEL-Appeal-Lodged-Representative.docx
+                docmosisId: TB-SCS-LET-WEL-Appeal-Lodged-Representative-v2.docx
             appointee:
                 emailId: e0355abd-42a6-4f94-836b-ec7ee22631cc
                 smsId: 6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82
-                docmosisId: TB-SCS-LET-WEL-Appeal-Lodged-Appellant.docx
+                docmosisId: TB-SCS-LET-WEL-Appeal-Lodged-Appellant-v2.docx
         struckOut:
             docmosisId: TB-SCS-GNO-WEL-00593.docx
         processAudioVideoWelsh:
@@ -1337,15 +1336,15 @@ notification:
         directionIssuedWelsh:
             appealToProceed:
                 appellant:
-                    docmosisId: TB-SCS-GNO-WEL-00590.docx
+                    docmosisId: TB-SCS-GNO-WEL-00590-v2.docx
                 appointee:
-                    docmosisId: TB-SCS-GNO-WEL-00590.docx
+                    docmosisId: TB-SCS-GNO-WEL-00590-v2.docx
                 representative:
-                    docmosisId: TB-SCS-GNO-WEL-00590.docx
+                    docmosisId: TB-SCS-GNO-WEL-00590-v2.docx
                 joint_party:
-                    docmosisId: TB-SCS-GNO-WEL-00590.docx
+                    docmosisId: TB-SCS-GNO-WEL-00590-v2.docx
                 other_party:
-                    docmosisId: TB-SCS-GNO-WEL-00590.docx
+                    docmosisId: TB-SCS-GNO-WEL-00590-v2.docx
             provideInformation:
                 appellant:
                     docmosisId: TB-SCS-GNO-WEL-00468-v2.docx
@@ -1430,15 +1429,15 @@ notification:
                 docmosisId: TB-SCS-GNO-WEL-00474.docx
         issueAdjournmentNoticeWelsh:
             appellant:
-                docmosisId: TB-SCS-GNO-WEL-00649.docx
+                docmosisId: TB-SCS-GNO-WEL-00649-v2.docx
             appointee:
-                docmosisId: TB-SCS-GNO-WEL-00649.docx
+                docmosisId: TB-SCS-GNO-WEL-00649-v2.docx
             representative:
-                docmosisId: TB-SCS-GNO-WEL-00649.docx
+                docmosisId: TB-SCS-GNO-WEL-00649-v2.docx
             joint_party:
-                docmosisId: TB-SCS-GNO-WEL-00649.docx
+                docmosisId: TB-SCS-GNO-WEL-00649-v2.docx
             other_party:
-                docmosisId: TB-SCS-GNO-WEL-00649.docx
+                docmosisId: TB-SCS-GNO-WEL-00649-v2.docx
         issueFinalDecisionWelsh:
             appellant:
                 docmosisId: TB-SCS-GNO-WEL-00681.docx
@@ -1979,14 +1978,14 @@ azure:
             topicName: ${HMC_HEARINGS_TOPIC_NAME:}
             subscriptionName: ${HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME:}
             receiveTimeout: ${HMC_HEARINGS_TOPIC_RECEIVE_TIMEOUT:1}
-            idleTimeout: ${HMC_HEARINGS_TOPIC_IDLE_TIMEOUT:3600000}
+            idleTimeout: ${HMC_HEARINGS_TOPIC_IDLE_TIMEOUT:30000}
             username: ${HMC_HEARINGS_TOPIC_POLICY_NAME:}
             password: ${HMC_HEARINGS_TOPIC_ACCESS_KEY:}
         tribunals-to-hearings-api:
             namespace: ${TRIBUNALS_EVENT_QUEUE_NAMESPACE:}
             queueName: ${TRIBUNALS_EVENT_QUEUE_NAME:}
             receiveTimeout: ${TRIBUNALS_EVENT_QUEUE_RECEIVE_TIMEOUT:1}
-            idleTimeout: ${TRIBUNALS_EVENT_QUEUE_IDLE_TIMEOUT:3600000}
+            idleTimeout: ${TRIBUNALS_EVENT_QUEUE_IDLE_TIMEOUT:30000}
             username: ${TRIBUNALS_EVENT_QUEUE_POLICY_NAME:}
             password: ${TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:}
 
