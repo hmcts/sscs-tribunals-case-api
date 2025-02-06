@@ -110,13 +110,6 @@ To run all unit tests execute the following command:
 ```
 ./gradlew test
 ```
-### Mutation tests
-
-To run all mutation tests execute the following command:
-
-```
-./gradlew pitest
-```
 
 ### Running contract or pact tests:
 
