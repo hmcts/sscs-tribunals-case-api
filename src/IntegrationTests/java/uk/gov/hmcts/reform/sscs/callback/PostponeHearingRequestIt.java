@@ -24,7 +24,7 @@ import org.mockito.Captor;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -46,7 +46,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 @AutoConfigureMockMvc
 public class PostponeHearingRequestIt extends AbstractEventIt {
 
-    @SpyBean
+    @MockitoSpyBean
     private SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer;
 
     @MockitoBean
