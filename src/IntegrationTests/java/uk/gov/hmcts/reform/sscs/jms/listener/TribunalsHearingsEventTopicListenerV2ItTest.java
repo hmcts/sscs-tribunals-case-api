@@ -125,7 +125,7 @@ public class TribunalsHearingsEventTopicListenerV2ItTest {
         when(refData.getVerbalLanguages()).thenReturn(verbalLanguages);
         when(verbalLanguages.getVerbalLanguage(any())).thenReturn(Language.builder().reference("LANG").build());
         HmcUpdateResponse response = HmcUpdateResponse.builder().hearingRequestId(22L).build();
-        when(hearingApi.createHearingRequest(any(), any(), any(), any())).thenReturn(response);
+        when(hearingApi.createHearingRequest(any(), any(), any(), any(), any(), any())).thenReturn(response);
 
         String message = "{\n"
             + "  \"ccdCaseId\": \"" + CASE_ID + "\",\n"

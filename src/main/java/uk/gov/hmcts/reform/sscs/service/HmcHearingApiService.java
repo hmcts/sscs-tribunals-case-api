@@ -23,13 +23,20 @@ public class HmcHearingApiService {
     private final IdamService idamService;
     @Value("${hmc.deployment-id}")
     private String hmctsDeploymentId;
+    @Value("${hmc.role-assignment-url:#{null}}")
+    private String roleAssignmentUrl;
+    @Value("${core_case_data.api.url:#{null}")
+    private String dataStoreUrl;
 
     public HearingGetResponse getHearingRequest(String hearingId) throws GetHearingException {
         log.debug("Sending Get Hearing Request for Hearing ID {}", hearingId);
+        log.info("HMC Headers {}, {}", roleAssignmentUrl, dataStoreUrl);
         HearingGetResponse hearingResponse = hmcHearingApi.getHearingRequest(
                 getIdamTokens().getIdamOauth2Token(),
                 getIdamTokens().getServiceAuthorization(),
                 hmctsDeploymentId,
+                dataStoreUrl,
+                roleAssignmentUrl,
                 hearingId,
                 null);
         if (isNull(hearingResponse)) {
@@ -42,10 +49,13 @@ public class HmcHearingApiService {
         log.debug("Sending Create Hearing Request for Case ID {} and request:\n{}",
                 hearingPayload.getCaseDetails().getCaseId(),
                 hearingPayload);
+        log.info("HMC Headers {}, {}", roleAssignmentUrl, dataStoreUrl);
         return hmcHearingApi.createHearingRequest(
                 getIdamTokens().getIdamOauth2Token(),
                 getIdamTokens().getServiceAuthorization(),
                 hmctsDeploymentId,
+                dataStoreUrl,
+                roleAssignmentUrl,
                 hearingPayload);
     }
 
@@ -54,10 +64,13 @@ public class HmcHearingApiService {
                 hearingPayload.getCaseDetails().getCaseId(),
                 hearingId,
                 hearingPayload);
+        log.info("HMC Headers {}, {}", roleAssignmentUrl, dataStoreUrl);
         return hmcHearingApi.updateHearingRequest(
                 getIdamTokens().getIdamOauth2Token(),
                 getIdamTokens().getServiceAuthorization(),
                 hmctsDeploymentId,
+                dataStoreUrl,
+                roleAssignmentUrl,
                 hearingId,
                 hearingPayload);
     }
@@ -66,10 +79,13 @@ public class HmcHearingApiService {
         log.debug("Sending Cancel Hearing Request for Hearing ID {} and request:\n{}",
                 hearingId,
                 hearingPayload);
+        log.info("HMC Headers {}, {}", roleAssignmentUrl, dataStoreUrl);
         return hmcHearingApi.cancelHearingRequest(
                 getIdamTokens().getIdamOauth2Token(),
                 getIdamTokens().getServiceAuthorization(),
                 hmctsDeploymentId,
+                dataStoreUrl,
+                roleAssignmentUrl,
                 hearingId,
                 hearingPayload);
     }
