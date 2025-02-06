@@ -170,7 +170,7 @@ export class WebAction {
     await this.verifyElementVisibility(elementId);
     const rateLimitMessage =
       'Your request was rate limited. Please wait a few seconds before retrying your document upload';
-    const rateLimitLocator = `span.error-message:has-text("${rateLimitMessage}")'`;
+    const rateLimitLocator = `span.error-message:has-text("${rateLimitMessage}")`;
     const uploadingMessageLocator =
       'span.error-message:has-text("Uploading...")';
     const rateLimitError = this.page.locator(rateLimitLocator).first();

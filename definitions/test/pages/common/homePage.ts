@@ -183,7 +183,7 @@ export class HomePage {
   }
 
   async chooseEvent(eventName: string): Promise<void> {
-    await webActions.verifyElementVisibility('#next-step');
+    await webActions.verifyElementVisibility(this.nextStepDropDown);
     await webActions.chooseOptionByLabel(this.nextStepDropDown, eventName);
     await expect(
       this.page.getByRole('button', { name: 'Go', exact: true })
