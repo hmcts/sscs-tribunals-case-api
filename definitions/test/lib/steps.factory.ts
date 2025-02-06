@@ -98,192 +98,239 @@ type MyStepsFixtures = {
 };
 
 export const test = stepsFactory.extend<MyStepsFixtures>({
-  addNoteSteps: async ({ page }, use) => {
+  addNoteSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const addNoteSteps = new Note(page);
     await use(addNoteSteps);
   },
-  associateCaseSteps: async ({ page }, use) => {
+  associateCaseSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const associateCaseSteps = new AssociateCase(page);
     await use(associateCaseSteps);
   },
-  confirmCaseLapsedSteps: async ({ page }, use) => {
+  confirmCaseLapsedSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const confirmCaseLapsedSteps = new ConfirmCaseLapsed(page);
     await use(confirmCaseLapsedSteps);
   },
-  evidenceReminderSteps: async ({ page }, use) => {
+  evidenceReminderSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const evidenceReminderSteps = new EvidenceReminder(page);
     await use(evidenceReminderSteps);
   },
-  informationReceivedSteps: async ({ page }, use) => {
+  informationReceivedSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const informationReceivedSteps = new InformationReceived(page);
     await use(informationReceivedSteps);
   },
-  sendToAdminSteps: async ({ page }, use) => {
+  sendToAdminSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const sendToAdminSteps = new SendToAdmin(page);
     await use(sendToAdminSteps);
   },
-  readyToListSteps: async ({ page }, use) => {
+  readyToListSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const readyToListSteps = new ReadyToList(page);
     await use(readyToListSteps);
   },
-  sendToJudgeSteps: async ({ page }, use) => {
+  sendToJudgeSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const sendToJudgeSteps = new SendToJudge(page);
     await use(sendToJudgeSteps);
   },
-  uploadResponseSteps: async ({ page }, use) => {
+  uploadResponseSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const uploadResponseSteps = new UploadResponse(page);
     await use(uploadResponseSteps);
   },
-  sendToFTASteps: async ({ page }, use) => {
+  sendToFTASteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const sendToFTASteps = new SendToFTA(page);
     await use(sendToFTASteps);
   },
-  sendToDormantSteps: async ({ page }, use) => {
+  sendToDormantSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const sendToDormantSteps = new SendToDormant(page);
     await use(sendToDormantSteps);
   },
-  voidCaseSteps: async ({ page }, use) => {
+  voidCaseSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const voidCaseSteps = new VoidCase(page);
     await use(voidCaseSteps);
   },
-  strikeOutCaseSteps: async ({ page }, use) => {
+  strikeOutCaseSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const strikeOutCaseSteps = new StrikeOutCase(page);
     await use(strikeOutCaseSteps);
   },
-  listingErrorSteps: async ({ page }, use) => {
+  listingErrorSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const listingErrorSteps = new ListingError(page);
     await use(listingErrorSteps);
   },
-  appealWithdrawnSteps: async ({ page }, use) => {
+  appealWithdrawnSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const appealWithdrawnSteps = new AppealWithdrawn(page);
     await use(appealWithdrawnSteps);
   },
-  requestTimeExtensionSteps: async ({ page }, use) => {
+  requestTimeExtensionSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const requestTimeExtensionSteps = new RequestTimeExtension(page);
     await use(requestTimeExtensionSteps);
   },
-  createBundleSteps: async ({ page }, use) => {
+  createBundleSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const createBundleSteps = new CreateBundle(page);
     await use(createBundleSteps);
   },
-  urgentHearingSteps: async ({ page }, use) => {
+  urgentHearingSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const urgentHearingSteps = new UrgentHearing(page);
     await use(urgentHearingSteps);
   },
-  issueDirectionsNoticeSteps: async ({ page }, use) => {
+  issueDirectionsNoticeSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const issueDirectionsNoticeSteps = new IssueDirectionsNotice(page);
     await use(issueDirectionsNoticeSteps);
   },
-  reinstatementSteps: async ({ page }, use) => {
+  reinstatementSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const reinstatementSteps = new Reinstatement(page);
     await use(reinstatementSteps);
   },
-  appealDormantSteps: async ({ page }, use) => {
+  appealDormantSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const appealDormantSteps = new AppealDormant(page);
     await use(appealDormantSteps);
   },
-  deathOfAppellant: async ({ page }, use) => {
+  deathOfAppellant: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const deathOfAppellantSteps = new DeathOfAnAppelant(page);
     await use(deathOfAppellantSteps);
   },
-  linkACaseSteps: async ({ page }, use) => {
+  linkACaseSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const linkACaseSteps = new LinkCase(page);
     await use(linkACaseSteps);
   },
-  provideAppointeeDetailsSteps: async ({ page }, use) => {
+  provideAppointeeDetailsSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const provideAppointeeDetailsSteps = new ProvideAppointeeDetails(page);
     await use(provideAppointeeDetailsSteps);
   },
-  uploadHearingSteps: async ({ page }, use) => {
+  uploadHearingSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const uploadHearingSteps = new UploadHearing(page);
     await use(uploadHearingSteps);
   },
-  requestInfoFromPartySteps: async ({ page }, use) => {
+  requestInfoFromPartySteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const requestInfoFromPartySteps = new RequestInfoFromParty(page);
     await use(requestInfoFromPartySteps);
   },
-  supplementaryResponseSteps: async ({ page }, use) => {
+  supplementaryResponseSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const supplementaryResponseSteps = new SupplementaryResponse(page);
     await use(supplementaryResponseSteps);
   },
-  uploadDocumentFurtherEvidenceSteps: async ({ page }, use) => {
+  uploadDocumentFurtherEvidenceSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const uploadDocumentFurtherEvidenceSteps =
       new UploadDocumentFurtherEvidence(page);
     await use(uploadDocumentFurtherEvidenceSteps);
   },
-  updateLanguagePreferenceSteps: async ({ page }, use) => {
+  updateLanguagePreferenceSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const updateLanguagePreferenceSteps = new UpdateLanguagePreference(page);
     await use(updateLanguagePreferenceSteps);
   },
-  reviewPHESteps: async ({ page }, use) => {
+  reviewPHESteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const reviewPHESteps = new ReviewPHE(page);
     await use(reviewPHESteps);
   },
-  updateUCBSteps: async ({ page }, use) => {
+  updateUCBSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const updateUCBSteps = new UpdateUCB(page);
     await use(updateUCBSteps);
   },
-  updateSubscriptionSteps: async ({ page }, use) => {
+  updateSubscriptionSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const updateSubscriptionSteps = new UpdateSubscription(page);
     await use(updateSubscriptionSteps);
   },
-  issueFinalDecisionSteps: async ({ page }, use) => {
+  issueFinalDecisionSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const issueFinalDecisionSteps = new WriteFinalDecision(page);
     await use(issueFinalDecisionSteps);
   },
-  processAVEvidenceSteps: async ({ page }, use) => {
+  processAVEvidenceSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const processAVEvidenceSteps = new ProcessAVEvidence(page);
     await use(processAVEvidenceSteps);
   },
-  updateOtherPartyDataSteps: async ({ page }, use) => {
+  updateOtherPartyDataSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const updateOtherPartyDataSteps = new UpdateOtherPartyData(page);
     await use(updateOtherPartyDataSteps);
   },
-  updateNotListableSteps: async ({ page }, use) => {
+  updateNotListableSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const updateNotListableSteps = new UpdateNotListable(page);
     await use(updateNotListableSteps);
   },
-  searchFilterSteps: async ({ page }, use) => {
+  searchFilterSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const searchFilterSteps = new SearchFilter(page);
     await use(searchFilterSteps);
   },
-  reissueFurtherEvidenceSteps: async ({ page }, use) => {
+  reissueFurtherEvidenceSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const reissueFurtherEvidenceSteps = new ReissueFurtherEvidence(page);
     await use(reissueFurtherEvidenceSteps);
   },
-  postponementSteps: async ({ page }, use) => {
+  postponementSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const postponementSteps = new Postponement(page);
     await use(postponementSteps);
   },
-  hearingSteps: async ({ page }, use) => {
+  hearingSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const hearingSteps = new Hearing(page);
     await use(hearingSteps);
   },
-  prepareCaseForHearingSteps: async ({ page }, use) => {
+  prepareCaseForHearingSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const prepareCaseForHearingSteps = new PrepareCaseForHearing(page);
     await use(prepareCaseForHearingSteps);
   },
-  enhancedConfidentialitySteps: async ({ page }, use) => {
+  enhancedConfidentialitySteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const enhancedConfidentialitySteps = new EnhancedConfidentiality(page);
     await use(enhancedConfidentialitySteps);
   },
-  sendToInterlocSteps: async ({ page }, use) => {
+  sendToInterlocSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const sendToInterlocSteps = new SendToInterloc(page);
     await use(sendToInterlocSteps);
   },
-  referredByAdminSteps: async ({ page }, use) => {
+  referredByAdminSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const ReferredByAdminSteps = new ReferredByAdmin(page);
     await use(ReferredByAdminSteps);
   },
-  sendCaseToTcwSteps: async ({ page }, use) => {
+  sendCaseToTcwSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const sendCaseToTcwSteps = new SendCaseToTcw(page);
     await use(sendCaseToTcwSteps);
   },
-  referredByJudgeSteps: async ({ page }, use) => {
+  referredByJudgeSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const ReferredByJudgeSteps = new ReferredByJudge(page);
     await use(ReferredByJudgeSteps);
   },
-  accessibilitySteps: async ({ page }, use) => {
+  accessibilitySteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
     const accessibilitySteps = new AccessibilitySteps(page);
     await use(accessibilitySteps);
   }
