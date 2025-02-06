@@ -23,9 +23,9 @@ public class HmcHearingApiService {
     private final IdamService idamService;
     @Value("${hmc.deployment-id}")
     private String hmctsDeploymentId;
-    @Value("${hmc.role-assignment-url:#{null}}")
+    @Value("${role-assignment.api.url:#{null}}")
     private String roleAssignmentUrl;
-    @Value("${core_case_data.api.url:#{null}")
+    @Value("${core_case_data.api.url:#{null}}")
     private String dataStoreUrl;
 
     public HearingGetResponse getHearingRequest(String hearingId) throws GetHearingException {
