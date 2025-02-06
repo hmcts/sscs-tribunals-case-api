@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.utils;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 import uk.gov.service.notify.Template;
