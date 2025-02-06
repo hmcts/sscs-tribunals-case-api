@@ -181,6 +181,7 @@ export class WebAction {
     try {
       await expect(rateLimitError).toBeHidden({ timeout: 5500 });
     } catch (error) {
+      console.log('Rate limited, trying upload again.');
       await input.setInputFiles(
         path.join(__dirname, `../data/file/${fileName}`)
       );

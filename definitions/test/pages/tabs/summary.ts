@@ -1,7 +1,6 @@
 import { expect, Page } from '@playwright/test';
 import { WebAction } from '../../common/web.action';
 import dateUtilsComponent from '../../utils/DateUtilsComponent';
-import logger from '../../utils/loggerUtil';
 
 let webAction: WebAction;
 const currentDate: Date = new Date();
@@ -51,6 +50,7 @@ export class Summary {
   }
 
   async verifyPresenceOfText(fieldValue: string) {
+    await webAction.screenshot({ fullPage: true });
     let text = await this.page
       .locator(`//div/markdown/p[contains(text(),"${fieldValue}")]`)
       .textContent();
@@ -95,7 +95,7 @@ export class Summary {
       formattedDueDate = formattedDueDate.replace(/\bSept\b/, 'Sep');
     }
 
-    logger.debug(`New formatted date is ####### ${formattedDueDate}`);
+    console.log(`New formatted date is ####### ${formattedDueDate}`);
     await this.verifyPageContentByKeyValue(reqField, formattedDueDate);
   }
 

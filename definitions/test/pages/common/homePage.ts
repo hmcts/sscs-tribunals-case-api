@@ -113,7 +113,7 @@ export class HomePage {
         hasText: `SSCS Case ${environment.aatDefVersion.TAG} AAT`
       })
       .textContent();
-    logger.debug(`case type dropdown value is ###### ${optionToSelect}`);
+    console.log(`case type dropdown value is ###### ${optionToSelect}`);
     await webActions.chooseOptionByLabel(this.caseTypeDropdown, optionToSelect);
   }
 
@@ -123,7 +123,7 @@ export class HomePage {
         hasText: `SSCS Case ${environment.aatDefVersion.TAG} PR`
       })
       .textContent();
-    logger.debug(`case type dropdown value is ###### ${optionToSelect}`);
+    console.log(`case type dropdown value is ###### ${optionToSelect}`);
     await webActions.chooseOptionByLabel(this.caseTypeDropdown, optionToSelect);
   }
 
@@ -131,19 +131,19 @@ export class HomePage {
     await this.page.getByRole('link', { name: 'Find case' }).first().waitFor();
     await this.page.getByRole('link', { name: 'Find case' }).first().click();
     await expect(this.page.getByText('Filters').first()).toBeVisible();
-    logger.debug(`url of the page is ######## ${this.page.url()}`);
+    console.log(`url of the page is ######## ${this.page.url()}`);
     const expUrl = this.page.url();
 
     if (environment.name == 'pr') {
       if (environment.hearingsEnabled == 'Yes') {
         let matches = expUrl.match(/(\d+)/);
         let PrNo = matches[0];
-        logger.debug(`PR number on url is ###### ${PrNo}`);
+        console.log(`PR number on url is ###### ${PrNo}`);
 
         const optionToSelect = await this.page
           .locator('option', { hasText: PrNo })
           .textContent();
-        logger.debug(`case type dropdown value is ###### ${optionToSelect}`);
+        console.log(`case type dropdown value is ###### ${optionToSelect}`);
         await webActions.chooseOptionByLabel(
           this.caseTypeDropdown,
           optionToSelect
