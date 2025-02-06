@@ -80,6 +80,6 @@ public class AmendHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbac
 
         sscsCaseData.setCompletedHearingsList(null);
 
-        return new PreSubmitCallbackResponse<>(sscsCaseData);
+        return preSubmitCallbackResponse;
     }
 }
