@@ -122,7 +122,7 @@ export class EnhancedConfidentiality extends BaseStep {
     await this.eventNameAndDescriptionPage.verifyPageContent(
       actionFurtherEvidenceTestdata.eventName
     );
-    await this.eventNameAndDescriptionPage.submit();
+    await this.eventNameAndDescriptionPage.confirmSubmission();
     await this.eventNameAndDescriptionPage.confirmSubmission();
   }
 

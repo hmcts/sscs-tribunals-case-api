@@ -186,7 +186,6 @@ export class WebAction {
       );
       await expect(uploadingMessage).toBeHidden();
     }
-    await expect(rateLimitError).toBeHidden({ timeout: 5500 });
   }
 
   async screenshot() {

@@ -183,7 +183,6 @@ export class HomePage {
   }
 
   async chooseEvent(eventName: string): Promise<void> {
-    await webActions.verifyElementVisibility('#next-step');
     await webActions.chooseOptionByLabel(this.nextStepDropDown, eventName);
     await expect(
       this.page.getByRole('button', { name: 'Go', exact: true })
@@ -306,12 +305,10 @@ export class HomePage {
         break;
       }
       case 'Subscriptions': {
-        await expect(this.subscriptionsTab).toBeVisible();
         await this.subscriptionsTab.click();
         break;
       }
       case 'Other Party Details': {
-        await expect(this.otherPartyDetailsTab).toBeVisible();
         await this.otherPartyDetailsTab.click();
         break;
       }

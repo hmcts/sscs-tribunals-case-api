@@ -100,6 +100,7 @@ export class DeathOfAppellantPage {
   }
 
   async confirmSubmission(): Promise<void> {
+    await this.page.waitForTimeout(3000);
     await webAction.clickSubmitButton();
   }
 
