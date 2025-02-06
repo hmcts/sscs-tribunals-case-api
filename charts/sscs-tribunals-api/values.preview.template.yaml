@@ -11,7 +11,7 @@ java:
     MYA_LINK: http://sscs-cor-frontend-aat.service.core-compute-aat.internal/sign-in?tya=appeal_id
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
     CORE_CASE_DATA_API_URL: ${CORE_CASE_DATA_API_URL}
-    ROLE_ASSIGNMENT_API_URL: http://${SERVICE_NAME}-am-role-assignment-service
+    ROLE_ASSIGNMENT_API_URL: https://am-role-assignment-service-${SERVICE_FQDN}
     DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
     BUNDLE_URL: http://${SERVICE_NAME}-em-ccdorc
     CCD_UI_BASE_URL: https://${SERVICE_NAME}-case-management-web
@@ -238,6 +238,7 @@ ccd:
 
   am-role-assignment-service:
     java:
+      ingressHost: am-role-assignment-service-${SERVICE_FQDN}
       autoscaling:
         enabled: false
         minReplicas: 1
