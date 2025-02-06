@@ -1,3 +1,5 @@
+import logger from './loggerUtil';
+
 class DateUtilsComponent {
   static getDate() {
     return new Date();
@@ -147,7 +149,7 @@ class DateUtilsComponent {
         break;
 
       default:
-        console.log('please enter the correct date');
+        logger.debug('please enter the correct date');
         break;
     }
 
@@ -171,5 +173,5 @@ class DateUtilsComponent {
 }
 
 const fourWeeksFroToday = DateUtilsComponent.rollDateToCertainWeeks(4);
-// console.log('There are 4 weeks fro Today : ' + DateUtilsComponent.formatDateToYYYYMMDD(fourWeeksFroToday));
+// logger.debug('There are 4 weeks fro Today : ' + DateUtilsComponent.formatDateToYYYYMMDD(fourWeeksFroToday));
 export default DateUtilsComponent;

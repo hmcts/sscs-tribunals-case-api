@@ -1,6 +1,7 @@
 import { expect, Page } from '@playwright/test';
 import { WebAction } from '../../common/web.action';
 import { HomePage } from '../common/homePage';
+import logger from '../../utils/loggerUtil';
 
 let webActions: WebAction;
 
@@ -53,7 +54,7 @@ export class History {
         break;
       } catch (error) {
         await this.homePage.navigateToTab('History');
-        console.log(`I am inside a loop ${i}`);
+        logger.debug(`I am inside a loop ${i}`);
       }
     }
   }
@@ -68,7 +69,7 @@ export class History {
         break;
       } catch (error) {
         await this.homePage.reloadPage();
-        console.log(`I am inside a loop ${i}`);
+        logger.debug(`I am inside a loop ${i}`);
       }
     }
   }
