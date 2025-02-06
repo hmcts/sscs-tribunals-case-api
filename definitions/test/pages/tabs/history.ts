@@ -1,7 +1,6 @@
 import { expect, Page } from '@playwright/test';
 import { WebAction } from '../../common/web.action';
 import { HomePage } from '../common/homePage';
-import logger from '../../utils/loggerUtil';
 
 let webActions: WebAction;
 
@@ -54,7 +53,6 @@ export class History {
         break;
       } catch (error) {
         await this.homePage.navigateToTab('History');
-        logger.debug(`I am inside a loop ${i}`);
       }
     }
   }
@@ -63,13 +61,17 @@ export class History {
     let linkElement = this.page.locator(
       `//a[normalize-space()="${fieldLabel}"]`
     );
-    for (let i = 0; i <= 5; i++) {
+    const max = 5;
+    for (let i = 0; i <= max; i++) {
       try {
         await expect(linkElement).toBeVisible();
         break;
       } catch (error) {
         await this.homePage.reloadPage();
-        logger.debug(`I am inside a loop ${i}`);
+        await this.homePage.navigateToTab('History');
+        if (i == max) {
+          throw error;
+        }
       }
     }
   }

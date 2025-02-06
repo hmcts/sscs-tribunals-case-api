@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 import { WebAction } from '../../common/web.action';
 const uploadResponseTestdata = require('../content/upload.response_en.json');
 const eventTestData = require('../content/event.name.event.description_en.json');
@@ -88,6 +88,13 @@ export class CheckYourAnswersPage {
 
   async confirmSubmission(): Promise<void> {
     await webActions.clickButton('Submit');
+  }
+
+  async confirmAndSignOut(): Promise<void> {
+    const pageUrl = this.page.url();
+    await webActions.clickButton('Submit');
+    await expect(this.page).not.toHaveURL(pageUrl);
+    await webActions.clickElementById('li a.hmcts-header__navigation-link');
   }
 
   async verifyPHMEErrorMsg(): Promise<void> {

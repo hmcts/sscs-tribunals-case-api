@@ -22,13 +22,18 @@ export class Bundles {
     fieldLabel: string,
     fieldValue: string
   ): Promise<void> {
-    await expect(
-      this.page
-        .locator(
-          `//*[normalize-space()="${fieldLabel}"]/..//span//span[normalize-space()="${fieldValue}"]`
-        )
-        .first()
-    ).toBeVisible();
+    const locator = this.page
+      .locator(
+        `//*[normalize-space()="${fieldLabel}"]/..//span//span[normalize-space()="${fieldValue}"]`
+      )
+      .first();
+    try {
+      await expect(locator).toBeVisible();
+    } catch (error) {
+      await this.page.reload();
+      await this.homePage.navigateToTab('Bundles');
+    }
+    await expect(locator).toBeVisible();
   }
 
   async verifyEditedBundlesTabContentByKeyValueForASpan(
@@ -36,13 +41,18 @@ export class Bundles {
     fieldValue: string,
     index: number
   ): Promise<void> {
-    await expect(
-      this.page
-        .locator(
-          `//*[normalize-space()="${fieldLabel}"]/..//span//span[normalize-space()="${fieldValue}"]`
-        )
-        .nth(index)
-    ).toBeVisible();
+    const locator = this.page
+      .locator(
+        `//*[normalize-space()="${fieldLabel}"]/..//span//span[normalize-space()="${fieldValue}"]`
+      )
+      .nth(index);
+    try {
+      await expect(locator).toBeVisible();
+    } catch (error) {
+      await this.page.reload();
+      await this.homePage.navigateToTab('Bundles');
+    }
+    await expect(locator).toBeVisible();
   }
 
   async verifyTableElementByIndex(

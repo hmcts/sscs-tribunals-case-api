@@ -15,5 +15,6 @@ export class HearingBookedPage {
     await webActions.delay(5000);
     await webActions.verifyPageLabel('h1.govuk-heading-l', 'Hearing booked');
     await webActions.clickButton('Submit');
+    await webActions.verifyElementVisibility('#next-step');
   }
 }

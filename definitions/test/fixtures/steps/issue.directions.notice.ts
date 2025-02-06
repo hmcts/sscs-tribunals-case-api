@@ -317,6 +317,7 @@ export class IssueDirectionsNotice extends BaseStep {
     await this.issueDirectionPage.chooseRecipients(
       '#confidentialityType-confidential'
     );
+    await this.issueDirectionPage.waitForSpecificRecipientOptions();
     await this.issueDirectionPage.confirmSubmission();
     await this.issueDirectionPage.verifyErrorMsg(false, true, false);
 
