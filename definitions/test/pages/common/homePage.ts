@@ -101,7 +101,7 @@ export class HomePage {
         await this.page.getByRole('link', { name: 'Find case' }).waitFor();
         await this.page.getByRole('link', { name: 'Find case' }).click();
         await this.delay(3000);
-        await expect(this.page.getByText('Filters')).toBeVisible();
+        await expect(this.page.getByText('Filters').first()).toBeVisible();
         console.log(`url of the page is ######## ${this.page.url()}`);
         const expUrl = this.page.url();
         
@@ -282,5 +282,15 @@ export class HomePage {
                 break;
             }
         }
+    }
+
+    async startCaseCreate(jurisdiction, caseType, event): Promise<void> {
+      await this.page.getByRole('link', { name: 'Create case' }).waitFor();
+      await this.page.getByRole('link', { name: 'Create case' }).click();
+      await this.delay(3000);
+      await this.page.getByLabel('Jurisdiction').selectOption(jurisdiction);
+      await this.page.getByLabel('Case type').selectOption(caseType);
+      await this.page.getByLabel('Event').selectOption(event);
+      await this.page.getByRole('button', { name: 'Start' }).click();
     }
 }

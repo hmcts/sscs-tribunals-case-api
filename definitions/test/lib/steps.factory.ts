@@ -46,6 +46,8 @@ import {ReferredByAdmin} from '../fixtures/steps/referred.by.admin';
 import {SendCaseToTcw} from '../fixtures/steps/send.case.to.tcw';
 import {ReferredByJudge} from '../fixtures/steps/referred.by.judge';
 import {AccessibilitySteps} from "../fixtures/steps/accessibilitySteps";
+import { CreateUpdateToCaseDataSteps } from '../fixtures/steps/update.to.case.data';
+import { GenerateAppealPdfSteps } from '../fixtures/steps/generate.appeal.pdf';
 
 type MyStepsFixtures = {
     addNoteSteps: Note
@@ -95,6 +97,8 @@ type MyStepsFixtures = {
     sendCaseToTcwSteps: SendCaseToTcw
     referredByJudgeSteps: ReferredByJudge
     accessibilitySteps: AccessibilitySteps
+    createUpdateToCaseDataSteps: CreateUpdateToCaseDataSteps
+    generateAppealPdfSteps: GenerateAppealPdfSteps
 };
 
 export const test = stepsFactory.extend<MyStepsFixtures>({
@@ -285,5 +289,13 @@ export const test = stepsFactory.extend<MyStepsFixtures>({
     accessibilitySteps: async ({page}, use) => {
         const accessibilitySteps = new AccessibilitySteps(page);
         await use(accessibilitySteps);
-    }
+    },
+    createUpdateToCaseDataSteps: async ({ page }, use) => {
+      const createUpdateToCaseDataSteps = new CreateUpdateToCaseDataSteps(page);
+      await use(createUpdateToCaseDataSteps);
+    },
+    generateAppealPdfSteps: async ({ page }, use) => {
+      const generateAppealPdfSteps = new GenerateAppealPdfSteps(page);
+      await use(generateAppealPdfSteps);
+    },
 })

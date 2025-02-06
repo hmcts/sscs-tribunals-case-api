@@ -25,6 +25,11 @@ export class Summary {
             .locator(`//*[normalize-space()="${fieldLabel}"]/../..//td[normalize-space()="${fieldValue}"]`)).toHaveCount(0);
     }
 
+    async verifyPageSectionByKeyValue(fieldLabel: string, fieldValue: string) {
+      let text = await this.page.locator(`//*[normalize-space()="${fieldLabel}"]/..`).textContent();
+      await expect(text).toContain(fieldValue);
+    }
+
     async verifyFieldHiddenInPageContent(fieldLabel: string) {
         await expect(this.page
             .locator(`//*[normalize-space()="${fieldLabel}"]`)).toBeHidden();
