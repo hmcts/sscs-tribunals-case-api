@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.sscs.model.LetterType.REPRESENTATIVE;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -310,7 +311,12 @@ public class CcdNotificationsPdfService {
     }
 
     private byte[] getSentEmailTemplate() throws IOException {
-        return IOUtils.toByteArray(getClass().getResourceAsStream("/templates/sent_notification.html"));
+        try (InputStream in = getClass().getResourceAsStream("/templates/sent_notification.html")) {
+            return IOUtils.toByteArray(in);
+        } catch (IOException e) {
+            log.info("Failed to get resource with exception {}", e.getMessage());
+            return new byte[0];
+        }
     }
 
     private byte[] getMergedDocument(List<Pdf> pdfs, Long ccdCaseId) {
