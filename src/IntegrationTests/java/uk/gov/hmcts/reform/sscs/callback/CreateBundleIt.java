@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
@@ -20,13 +22,13 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -34,7 +36,8 @@ import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.controller.CcdCallbackController;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -47,25 +50,25 @@ import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.DocmosisPdfService;
 @RunWith(JUnitParamsRunner.class)
 public class CreateBundleIt extends AbstractEventIt {
 
-    @MockBean
+    @MockitoBean
     private CcdService ccdService;
 
-    @MockBean
+    @MockitoBean
     private IdamService idamService;
 
-    @MockBean
+    @MockitoBean
     private RestTemplate restTemplate;
 
     @Mock
     private ResponseEntity responseEntity;
 
-    @MockBean
+    @MockitoBean
     private EvidenceManagementService evidenceManagementService;
 
-    @MockBean
+    @MockitoBean
     private DocmosisPdfService docmosisPdfService;
 
-    @MockBean
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
 
     @Captor

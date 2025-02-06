@@ -21,25 +21,25 @@ public class AppealDetails {
         this.state = state;
     }
 
-    @Schema(example = "some date format to do", required = true)
+    @Schema(example = "some date format to do", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "submitted_date")
     public String getSubmittedDate() {
         return submittedDate;
     }
 
-    @Schema(example = "some date format to do", required = true)
+    @Schema(example = "some date format to do", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "mrn_date")
     public String getMrnDate() {
         return mrnDate;
     }
 
-    @Schema(example = "PIP", required = true)
+    @Schema(example = "PIP", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "benefit_type")
     public String getBenefitType() {
         return benefitType;
     }
 
-    @Schema(example = "withDwp", required = true)
+    @Schema(example = "withDwp", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "state")
     public String getState() {
         return state;
