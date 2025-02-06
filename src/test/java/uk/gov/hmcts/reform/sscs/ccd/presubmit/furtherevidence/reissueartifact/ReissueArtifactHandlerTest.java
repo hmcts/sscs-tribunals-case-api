@@ -3,7 +3,12 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.reissueartifact;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import org.apache.commons.lang3.StringUtils;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 public abstract class ReissueArtifactHandlerTest {
     public CcdValue<OtherParty> buildOtherPartyWithAppointeeAndRep(String id, String appointeeId, String repId) {

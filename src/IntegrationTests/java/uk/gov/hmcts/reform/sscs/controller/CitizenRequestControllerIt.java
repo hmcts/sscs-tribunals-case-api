@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -24,8 +24,8 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -44,19 +44,19 @@ import uk.gov.hmcts.reform.sscs.service.OnlineHearingService;
 @TestPropertySource(locations = "classpath:config/application_it.properties")
 class CitizenRequestControllerIt {
 
-    @MockBean
+    @MockitoBean
     protected AirLookupService airLookupService;
     private static final String CASE_ID = "1625080769409918";
     private static final String AUTHORIZATION = "Bearer 1203912-39012-=391231";
     private static final String E_MAIL = "sscs-citizen2@hmcts.net";
 
-    @MockBean
+    @MockitoBean
     private OnlineHearingService onlineHearingService;
-    @MockBean
+    @MockitoBean
     private CcdService ccdService;
-    @MockBean
+    @MockitoBean
     private UpdateCcdCaseService updateCcdCaseService;
-    @MockBean
+    @MockitoBean
     private IdamService idamService;
     @Autowired
     private MockMvc mockMvc;
