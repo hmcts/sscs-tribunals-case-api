@@ -159,10 +159,6 @@ export class IssueDirectionPage {
     await webActions.clickSubmitButton();
   }
 
-  async waitForSpecificRecipientOptions(): Promise<void> {
-    await webActions.verifyElementVisibility('#sendDirectionNoticeToFTA_Yes');
-  }
-
   async verifyErrorMsg(
     pageLevelErrorMessages,
     specificRecipientsErrorMessages,
