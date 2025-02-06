@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
@@ -85,7 +85,7 @@ public class OutOfHoursIt {
     @Autowired
     NotificationValidService notificationValidService;
 
-    @MockBean
+    @MockitoBean
     private AuthorisationService authorisationService;
 
     @Mock
@@ -100,7 +100,7 @@ public class OutOfHoursIt {
     @Autowired
     private SscsCaseCallbackDeserializer deserializer;
 
-    @MockBean
+    @MockitoBean
     private IdamService idamService;
 
     String json;
@@ -108,7 +108,7 @@ public class OutOfHoursIt {
     @Autowired
     private NotificationHandler notificationHandler;
 
-    @MockBean
+    @MockitoBean
     private OutOfHoursCalculator outOfHoursCalculator;
 
     @Autowired

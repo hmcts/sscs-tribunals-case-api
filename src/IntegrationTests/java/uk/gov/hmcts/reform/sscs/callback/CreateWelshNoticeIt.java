@@ -26,7 +26,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -54,22 +54,22 @@ public class CreateWelshNoticeIt extends AbstractEventIt {
     @Autowired
     private WelshFooterService welshFooterService;
 
-    @MockBean
+    @MockitoBean
     private DocmosisPdfService docmosisPdfService;
 
-    @MockBean
+    @MockitoBean
     private CoreCaseDataApi coreCaseDataApi;
 
-    @MockBean
+    @MockitoBean
     private IdamClient idamClient;
 
-    @MockBean
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
 
-    @MockBean
+    @MockitoBean
     private EvidenceManagementService evidenceManagementService;
 
-    @MockBean
+    @MockitoBean
     UploadResponse uploadResponse;
 
     @Before

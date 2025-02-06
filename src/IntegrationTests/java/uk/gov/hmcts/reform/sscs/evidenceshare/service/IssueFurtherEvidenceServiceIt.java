@@ -30,7 +30,7 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
@@ -69,33 +69,33 @@ public class IssueFurtherEvidenceServiceIt {
     public final SpringMethodRule springMethodRule = new SpringMethodRule();
     //end of rules needed for junitParamsRunner
 
-    @MockBean
+    @MockitoBean
     @SuppressWarnings({"PMD.UnusedPrivateField"})
     private IdamService idamService;
 
-    @MockBean
+    @MockitoBean
     @SuppressWarnings({"PMD.UnusedPrivateField"})
     private CcdClient ccdClient;
 
-    @MockBean
+    @MockitoBean
     private EvidenceManagementSecureDocStoreService evidenceManagementSecureDocStoreService;
 
-    @MockBean
+    @MockitoBean
     private CcdService ccdService;
 
-    @MockBean
+    @MockitoBean
     private SscsCcdConvertService sscsCcdConvertService;
 
-    @MockBean
+    @MockitoBean
     private UpdateCcdCaseService updateCcdCaseService;
 
-    @MockBean
+    @MockitoBean
     private RestTemplate restTemplate;
 
-    @MockBean
+    @MockitoBean
     private BulkPrintService bulkPrintService;
 
-    @MockBean
+    @MockitoBean
     private DocmosisTemplateConfig docmosisTemplateConfig;
 
     @Autowired
@@ -105,7 +105,7 @@ public class IssueFurtherEvidenceServiceIt {
     @Autowired
     private TopicConsumer topicConsumer;
 
-    @MockBean
+    @MockitoBean
     protected AirLookupService airLookupService;
 
     @Captor

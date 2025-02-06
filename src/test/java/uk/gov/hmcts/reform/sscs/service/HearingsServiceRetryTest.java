@@ -25,7 +25,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.retry.ExhaustedRetryException;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.test.context.TestPropertySource;
@@ -60,34 +60,34 @@ class HearingsServiceRetryTest {
     private static final String EVENT_ID = "EVENT_ID";
     private static final String EVENT_TOKEN = "EVENT_TOKEN";
 
-    @MockBean
+    @MockitoBean
     private HmcHearingApiService hmcHearingApiService;
 
-    @MockBean
+    @MockitoBean
     private HmcHearingsApiService hmcHearingsApiService;
 
-    @MockBean
+    @MockitoBean
     private CcdCaseService ccdCaseService;
 
-    @MockBean
+    @MockitoBean
     private ReferenceDataServiceHolder refData;
 
-    @MockBean
+    @MockitoBean
     private HearingDurationsService hearingDurations;
 
     @Mock
     private SessionCategoryMapService sessionCategoryMaps;
 
-    @MockBean
+    @MockitoBean
     private IdamService idamService;
 
-    @MockBean
+    @MockitoBean
     private UpdateCcdCaseService updateCcdCaseService;
 
-    @MockBean
+    @MockitoBean
     private HearingServiceConsumer hearingServiceConsumer;
 
-    @MockBean
+    @MockitoBean
     private Consumer<SscsCaseDetails> sscsCaseDetailsConsumer;
 
     @Mock

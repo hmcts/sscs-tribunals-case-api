@@ -28,7 +28,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.ResourceHttpMessageConverter;
@@ -77,25 +77,25 @@ public class CcdMideventCallbackControllerTest {
     private MockMvc mockMvc;
 
     @SuppressWarnings("PMD.UnusedPrivateField")
-    @MockBean
+    @MockitoBean
     private AuthorisationService authorisationService;
 
-    @MockBean
+    @MockitoBean
     private SscsCaseCallbackDeserializer deserializer;
 
-    @MockBean
+    @MockitoBean
     private PipWriteFinalDecisionPreviewDecisionService writeFinalDecisionPreviewDecisionService;
 
-    @MockBean
+    @MockitoBean
     private AdjournCasePreviewService adjournCasePreviewService;
 
     @Mock
     private AdjournCaseCcdService adjournCaseCcdService;
 
-    @MockBean
+    @MockitoBean
     private RestoreCasesService2 restoreCasesService2;
 
-    @MockBean
+    @MockitoBean
     private AdjournCaseMidEventValidationService adjournCaseMidEventValidationService;
 
     @Before

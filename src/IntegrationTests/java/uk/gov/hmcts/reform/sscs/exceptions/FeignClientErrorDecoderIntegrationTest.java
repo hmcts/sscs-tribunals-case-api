@@ -25,7 +25,7 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
@@ -56,7 +56,7 @@ public class FeignClientErrorDecoderIntegrationTest {
 
     private static WireMockServer wireMockServer;
 
-    @MockBean
+    @MockitoBean
     private AppInsightsService appInsightsService;
 
     private ArgumentCaptor<HmcFailureMessage> argument;

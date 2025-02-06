@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
@@ -77,7 +77,7 @@ public class NotificationsItBase {
     @Mock
     private ReminderService reminderService;
 
-    @MockBean
+    @MockitoBean
     protected AuthorisationService authorisationService;
 
     @Mock
@@ -95,7 +95,7 @@ public class NotificationsItBase {
     @Autowired
     private SscsCaseCallbackDeserializer deserializer;
 
-    @MockBean
+    @MockitoBean
     private IdamService idamService;
 
     protected String json;
@@ -103,7 +103,7 @@ public class NotificationsItBase {
     @Autowired
     private NotificationHandler notificationHandler;
 
-    @MockBean
+    @MockitoBean
     private OutOfHoursCalculator outOfHoursCalculator;
 
     @Autowired
@@ -115,7 +115,7 @@ public class NotificationsItBase {
     @Autowired
     private DocmosisPdfService docmosisPdfService;
 
-    @MockBean
+    @MockitoBean
     private DocmosisPdfGenerationService docmosisPdfGenerationService;
 
     @Mock

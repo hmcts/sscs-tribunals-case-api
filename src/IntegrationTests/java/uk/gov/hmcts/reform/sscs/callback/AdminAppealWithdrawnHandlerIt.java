@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.mock.web.MockHttpServletResponse;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -24,7 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 @AutoConfigureMockMvc
 public class AdminAppealWithdrawnHandlerIt extends AbstractEventIt {
 
-    @MockBean
+    @MockitoBean
     private IdamClient idamClient;
 
     @Before

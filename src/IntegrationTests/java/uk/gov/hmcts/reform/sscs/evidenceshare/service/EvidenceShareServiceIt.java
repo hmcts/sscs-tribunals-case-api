@@ -25,7 +25,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -71,44 +71,44 @@ public class EvidenceShareServiceIt {
     public final SpringMethodRule springMethodRule = new SpringMethodRule();
     //end of rules needed for junitParamsRunner
 
-    @MockBean
+    @MockitoBean
     @SuppressWarnings({"PMD.UnusedPrivateField"})
     private IdamService idamService;
 
-    @MockBean
+    @MockitoBean
     @SuppressWarnings({"PMD.UnusedPrivateField"})
     private CcdClient ccdClient;
 
-    @MockBean
+    @MockitoBean
     @SuppressWarnings({"PMD.UnusedPrivateField"})
     private EvidenceDownloadClientApi evidenceDownloadClientApi;
 
-    @MockBean
+    @MockitoBean
     @SuppressWarnings({"PMD.UnusedPrivateField"})
     private EvidenceMetadataDownloadClientApi evidenceMetadataDownloadClientApi;
 
-    @MockBean
+    @MockitoBean
     private EvidenceManagementService evidenceManagementService;
 
-    @MockBean
+    @MockitoBean
     private EvidenceManagementSecureDocStoreService evidenceManagementSecureDocStoreService;
 
-    @MockBean
+    @MockitoBean
     private CcdService ccdService;
 
-    @MockBean
+    @MockitoBean
     private UpdateCcdCaseService updateCcdCaseService;
 
-    @MockBean
+    @MockitoBean
     private RestTemplate restTemplate;
 
-    @MockBean
+    @MockitoBean
     private BulkPrintService bulkPrintService;
 
     @Autowired
     private RoboticsService roboticsService;
 
-    @MockBean
+    @MockitoBean
     private EmailService emailService;
 
     @Autowired
@@ -132,7 +132,7 @@ public class EvidenceShareServiceIt {
     @Captor
     private ArgumentCaptor<Consumer<SscsCaseDetails>> consumerArgumentCaptor;
 
-    @MockBean
+    @MockitoBean
     protected AirLookupService airLookupService;
 
     private static final String FILE_CONTENT = "Welcome to PDF document service";
@@ -141,7 +141,7 @@ public class EvidenceShareServiceIt {
 
     protected MimeMessage message;
 
-    @MockBean(name = "sendGridMailSender")
+    @MockitoBean(name = "sendGridMailSender")
     protected JavaMailSender mailSender;
 
     Optional<UUID> expectedOptionalUuid = Optional.of(UUID.fromString("0f14d0ab-9605-4a62-a9e4-5ed26688389b"));

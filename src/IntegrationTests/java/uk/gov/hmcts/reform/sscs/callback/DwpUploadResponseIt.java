@@ -18,7 +18,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -32,10 +32,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 @RunWith(JUnitParamsRunner.class)
 public class DwpUploadResponseIt extends AbstractEventIt {
 
-    @MockBean
+    @MockitoBean
     private IdamClient idamClient;
 
-    @MockBean
+    @MockitoBean
     private UserInfo userInfo;
 
     @Before

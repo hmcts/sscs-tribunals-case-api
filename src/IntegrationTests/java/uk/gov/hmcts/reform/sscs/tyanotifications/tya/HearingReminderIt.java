@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
@@ -55,10 +55,10 @@ public class HearingReminderIt {
     @Autowired
     NotificationService notificationService;
 
-    @MockBean
+    @MockitoBean
     private AuthorisationService authorisationService;
 
-    @MockBean(name = "notificationClient")
+    @MockitoBean(name = "notificationClient")
     NotificationClient client;
 
     @Mock
@@ -70,13 +70,13 @@ public class HearingReminderIt {
     @Mock
     private SendLetterResponse sendLetterResponse;
 
-    @MockBean
+    @MockitoBean
     private JobExecutor<String> jobExecutor;
 
-    @MockBean
+    @MockitoBean
     private OutOfHoursCalculator outOfHoursCalculator;
 
-    @MockBean
+    @MockitoBean
     private PdfLetterService pdfLetterService;
 
     @Autowired
@@ -89,7 +89,7 @@ public class HearingReminderIt {
     @Autowired
     private SscsCaseCallbackDeserializer deserializer;
 
-    @MockBean
+    @MockitoBean
     private IdamService idamService;
 
     @Before

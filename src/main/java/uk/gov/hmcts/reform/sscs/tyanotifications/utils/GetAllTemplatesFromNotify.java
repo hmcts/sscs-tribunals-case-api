@@ -36,7 +36,7 @@ public final class GetAllTemplatesFromNotify {
             for (Template template : templates.getTemplates()) {
                 Map<String, Object> personalisation = template.getPersonalisation().orElse(new HashMap<String, Object>());
 
-                if (personalisation.keySet().contains(var)) {
+                if (personalisation.containsKey(var)) {
                     if (template.getName().contains("COR") || template.getName().contains("NOT USED")
                         || template.getName().contains("OLD")) {
                         System.out.println("Excluding: " + template.getName());
@@ -45,7 +45,7 @@ public final class GetAllTemplatesFromNotify {
                     System.out.println("Name: " + template.getName());
                     System.out.println("ID: " + template.getId());
                     System.out.println("Type: " + template.getTemplateType());
-                    Optional subject = template.getSubject();
+                    var subject = template.getSubject();
                     subject.ifPresent(s -> System.out.println("Subject: " + s));
                     System.out.println("Body is: " + template.getBody());
                     count++;

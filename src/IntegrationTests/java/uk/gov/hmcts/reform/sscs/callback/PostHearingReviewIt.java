@@ -20,7 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -56,13 +56,13 @@ public class PostHearingReviewIt extends AbstractEventIt {
     @SpyBean
     private SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer;
 
-    @MockBean
+    @MockitoBean
     private IdamService idamService;
 
-    @MockBean
+    @MockitoBean
     private CcdClient ccdClient;
 
-    @MockBean
+    @MockitoBean
     private SscsCcdConvertService sscsCcdConvertService;
 
     @BeforeEach

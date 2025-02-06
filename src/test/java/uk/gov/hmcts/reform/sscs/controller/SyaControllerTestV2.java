@@ -29,7 +29,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
@@ -61,7 +61,7 @@ public class SyaControllerTestV2 {
 
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private SubmitAppealService submitAppealServiceV2;
 
     private SubmitAppealServiceBase submitAppealServiceBase;

@@ -20,7 +20,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -47,25 +47,25 @@ import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.DocmosisPdfService;
 @RunWith(JUnitParamsRunner.class)
 public class CreateBundleIt extends AbstractEventIt {
 
-    @MockBean
+    @MockitoBean
     private CcdService ccdService;
 
-    @MockBean
+    @MockitoBean
     private IdamService idamService;
 
-    @MockBean
+    @MockitoBean
     private RestTemplate restTemplate;
 
     @Mock
     private ResponseEntity responseEntity;
 
-    @MockBean
+    @MockitoBean
     private EvidenceManagementService evidenceManagementService;
 
-    @MockBean
+    @MockitoBean
     private DocmosisPdfService docmosisPdfService;
 
-    @MockBean
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
 
     @Captor

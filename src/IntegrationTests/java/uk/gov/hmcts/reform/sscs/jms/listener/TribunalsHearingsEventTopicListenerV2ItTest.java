@@ -20,7 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -75,28 +75,28 @@ public class TribunalsHearingsEventTopicListenerV2ItTest {
     @Autowired
     private HearingsService hearingsService;
 
-    @MockBean
+    @MockitoBean
     private IdamService idamService;
-    @MockBean
+    @MockitoBean
     private CcdCaseService ccdCaseService;
-    @MockBean
+    @MockitoBean
     public SessionCategoryMapService sessionCategoryMaps;
-    @MockBean
+    @MockitoBean
     private ReferenceDataServiceHolder refData;
-    @MockBean
+    @MockitoBean
     private HearingDurationsService hearingDurationsService;
-    @MockBean
+    @MockitoBean
     private RegionalProcessingCenterService regionalProcessingCenterService;
-    @MockBean
+    @MockitoBean
     private VenueService venueService;
-    @MockBean
+    @MockitoBean
     private VerbalLanguagesService verbalLanguages;
 
-    @MockBean
+    @MockitoBean
     private HmcHearingApi hearingApi;
-    @MockBean
+    @MockitoBean
     private HmcHearingsApi hmcHearingsApi;
-    @MockBean
+    @MockitoBean
     private UpdateCcdCaseService updateCcdCaseService;
 
     @Test

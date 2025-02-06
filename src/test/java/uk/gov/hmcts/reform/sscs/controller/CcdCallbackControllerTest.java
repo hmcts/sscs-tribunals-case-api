@@ -22,7 +22,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.ResourceHttpMessageConverter;
@@ -69,22 +69,22 @@ public class CcdCallbackControllerTest {
     private MockMvc mockMvc;
 
     @SuppressWarnings("PMD.UnusedPrivateField")
-    @MockBean
+    @MockitoBean
     private AuthorisationService authorisationService;
 
-    @MockBean
+    @MockitoBean
     private SscsCaseCallbackDeserializer deserializer;
 
-    @MockBean
+    @MockitoBean
     private Callback<SscsCaseData> caseDataCallback;
 
-    @MockBean
+    @MockitoBean
     private PreSubmitCallbackDispatcher dispatcher;
 
-    @MockBean
+    @MockitoBean
     private CcdService ccdService;
 
-    @MockBean
+    @MockitoBean
     private IdamService idamService;
 
     private CcdCallbackController controller;

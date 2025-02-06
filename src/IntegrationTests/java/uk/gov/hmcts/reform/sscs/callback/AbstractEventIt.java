@@ -18,7 +18,7 @@ import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Rule;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
@@ -50,7 +50,7 @@ public abstract class AbstractEventIt {
 
     protected MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     protected AuthorisationService authorisationService;
 
     @Autowired
