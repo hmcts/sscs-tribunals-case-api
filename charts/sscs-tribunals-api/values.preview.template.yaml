@@ -46,7 +46,7 @@ java:
     AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
     AMQP_USERNAME: "RootManageSharedAccessKey"
     HMC_DEPLOYMENT_ID: "deployment-${SERVICE_NAME}"
-    HMC_HEARINGS_TOPIC_NAME: "hmc-to-sscs-subscription-pr-${CHANGE_ID}"
+    HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-pr-${CHANGE_ID}"
     HEARINGS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
     ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
     ROBOTICS_EMAIL_TO: "fake"
