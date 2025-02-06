@@ -45,7 +45,6 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/ucRefusedNonSupportGroupOnlyCallback.json");
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
-            System.out.println(document);
             String pdfText = new PDFTextStripper().getText(document);
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
