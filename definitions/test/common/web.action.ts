@@ -156,8 +156,21 @@ export class WebAction {
     fileName: string
   ): Promise<void> {
     await this.verifyElementVisibility(elementId);
-    await this.page.locator(elementId).first()
-      .setInputFiles(path.join(__dirname, `../data/file/${fileName}`));
+    const rateLimitMessage = "Your request was rate limited. Please wait a few seconds before retrying your document upload";
+    const rateLimitLocator = `span.error-message:has-text("${rateLimitMessage}")'`;
+    const uploadingMessageLocator = 'span.error-message:has-text("Uploading...")';
+    const rateLimitError = this.page.locator(rateLimitLocator).first();
+    const uploadingMessage = this.page.locator(uploadingMessageLocator).first();
+    const input = this.page.locator(elementId).first();
+    await input.setInputFiles(path.join(__dirname, `../data/file/${fileName}`));
+    await expect(uploadingMessage).toBeHidden();
+    try {
+      await expect(rateLimitError).toBeHidden({ timeout: 5500 })
+    } catch (error) {
+      console.log('Rate limited, trying upload again.')
+      await input.setInputFiles(path.join(__dirname, `../data/file/${fileName}`));
+      await expect(uploadingMessage).toBeHidden();
+    }
   }
 
   async screenshot() {
