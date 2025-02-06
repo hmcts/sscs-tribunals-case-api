@@ -18,14 +18,19 @@ export class UploadResponse extends BaseStep {
   private presetLinks: string[] = [
     'Upload response',
     'Ready to list',
-    'Update to case data',
-    'Add a hearing'
+    'Update to case data'
   ];
 
   constructor(page: Page) {
     super(page);
     this.page = page;
     this.stepsHelper = new StepsHelper(this.page);
+  }
+
+  setHearings() {
+    if (process.env.HEARINGS_ENABLED == "Yes") {
+      this.presetLinks.push('Add a hearing');
+    }
   }
 
   async performUploadResponseWithFurtherInfoOnAPIPAndReviewResponse() {
@@ -47,7 +52,7 @@ export class UploadResponse extends BaseStep {
 
     await this.homePage.delay(1000);
     await this.homePage.navigateToTab('History');
-
+    this.setHearings()
     for (const linkName of this.presetLinks) {
       await this.verifyHistoryTabLink(linkName);
     }
@@ -182,7 +187,7 @@ export class UploadResponse extends BaseStep {
     await this.homePage.delay(3000);
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, taxCaseId);
     await this.homePage.navigateToTab('History');
-
+    this.setHearings()
     for (const linkName of this.presetLinks) {
       await this.verifyHistoryTabLink(linkName);
     }
@@ -239,7 +244,7 @@ export class UploadResponse extends BaseStep {
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, ucCaseId);
     await this.homePage.delay(1000);
     await this.homePage.navigateToTab('History');
-
+    this.setHearings()
     for (const linkName of this.presetLinks) {
       await this.verifyHistoryTabLink(linkName);
     }
@@ -293,7 +298,7 @@ export class UploadResponse extends BaseStep {
     await this.homePage.reloadPage();
     await this.homePage.delay(1000);
     await this.homePage.navigateToTab('History');
-
+    this.setHearings()
     for (const linkName of this.presetLinks) {
       await this.verifyHistoryTabLink(linkName);
     }
