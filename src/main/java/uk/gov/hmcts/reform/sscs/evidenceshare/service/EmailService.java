@@ -22,7 +22,7 @@ public class EmailService {
 
     private final EmailSenderProvider emailSenderProvider;
 
-    @Retryable(value = EmailSendFailedException.class,
+    @Retryable(retryFor = EmailSendFailedException.class,
         backoff = @Backoff(delay = 100, maxDelay = 500))
     public void sendEmail(long caseId, final Email email) {
         try {

@@ -1,7 +1,8 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
@@ -14,7 +15,15 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRecordingRequest;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRecordingRequestDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsHearingRecording;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsHearingRecordingDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 
 @RunWith(JUnitParamsRunner.class)
