@@ -43,7 +43,6 @@ export class ActionFurtherEvidencePage {
       '#scannedDocuments_0_url',
       fileName
     );
-    await this.page.waitForTimeout(7000);
   }
 
   async uploadEditedDocs(fileName: string): Promise<void> {
@@ -51,7 +50,6 @@ export class ActionFurtherEvidencePage {
       '#scannedDocuments_0_editedUrl',
       fileName
     );
-    await this.page.waitForTimeout(7000);
   }
 
   async enterFileName() {

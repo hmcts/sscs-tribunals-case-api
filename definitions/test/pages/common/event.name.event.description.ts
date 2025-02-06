@@ -58,10 +58,15 @@ export class EventNameEventDescriptionPage {
 
   async confirmSubmission(): Promise<void> {
     await webActions.clickSubmitButton();
+    await webActions.verifyElementVisibility('#next-step');
   }
 
   async submitBtn(): Promise<void> {
     await webActions.clickButton('Submit');
+  }
+
+  async submit(): Promise<void> {
+    await webActions.clickSubmitButton();
   }
 
   async delay(ms: number) {

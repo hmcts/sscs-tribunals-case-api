@@ -73,8 +73,7 @@ export class UploadResponse extends BaseStep {
       uploadResponseTestdata.pipBenefitCode,
       uploadResponseTestdata.pipIssueCode
     );
-    await this.checkYourAnswersPage.confirmSubmission();
-    await this.homePage.clickSignOut();
+    await this.checkYourAnswersPage.confirmAndSignOut();
 
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
 
@@ -104,8 +103,7 @@ export class UploadResponse extends BaseStep {
       uploadResponseTestdata.pipBenefitCode,
       uploadResponseTestdata.pipIssueCode
     );
-    await this.checkYourAnswersPage.confirmSubmission();
-    await this.homePage.clickSignOut();
+    await this.checkYourAnswersPage.confirmAndSignOut();
 
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
 
@@ -134,8 +132,7 @@ export class UploadResponse extends BaseStep {
       undefined,
       true
     );
-    await this.checkYourAnswersPage.confirmSubmission();
-    await this.homePage.clickSignOut();
+    await this.checkYourAnswersPage.confirmAndSignOut();
   }
 
   async performUploadResponse(caseId: string, caseType: string) {
@@ -160,8 +157,7 @@ export class UploadResponse extends BaseStep {
         undefined,
         undefined
       );
-    await this.checkYourAnswersPage.confirmSubmission();
-    await this.homePage.clickSignOut();
+    await this.checkYourAnswersPage.confirmAndSignOut();
   }
 
   async performUploadResponseWithoutFurtherInfoOnATaxCredit() {
@@ -177,8 +173,7 @@ export class UploadResponse extends BaseStep {
       uploadResponseTestdata.taxBenefitCode,
       uploadResponseTestdata.taxIssueCode
     );
-    await this.checkYourAnswersPage.confirmSubmission();
-    await this.homePage.clickSignOut();
+    await this.checkYourAnswersPage.confirmAndSignOut();
 
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, taxCaseId);
     await this.homePage.navigateToTab('History');
@@ -230,8 +225,7 @@ export class UploadResponse extends BaseStep {
       null,
       'UC'
     );
-    await this.checkYourAnswersPage.confirmSubmission();
-    await this.homePage.clickSignOut();
+    await this.checkYourAnswersPage.confirmAndSignOut();
 
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, ucCaseId);
     await this.homePage.navigateToTab('History');

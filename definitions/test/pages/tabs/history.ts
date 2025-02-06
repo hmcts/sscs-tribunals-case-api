@@ -61,12 +61,17 @@ export class History {
     let linkElement = this.page.locator(
       `//a[normalize-space()="${fieldLabel}"]`
     );
-    for (let i = 0; i <= 5; i++) {
+    const max = 5;
+    for (let i = 0; i <= max; i++) {
       try {
         await expect(linkElement).toBeVisible();
         break;
       } catch (error) {
         await this.homePage.reloadPage();
+        await this.homePage.navigateToTab('History');
+        if (i == max) {
+          throw error;
+        }
       }
     }
   }

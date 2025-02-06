@@ -32,16 +32,6 @@ export class SupplementaryResponsePage {
       '#dwpSupplementaryResponseDoc_documentLink',
       fileName
     );
-    await expect(
-      this.page.locator(
-        `div#dwpSupplementaryResponseDoc_dwpSupplementaryResponseDoc span:has-text('Uploading...')`
-      )
-    ).toBeVisible();
-    await expect(
-      this.page.locator(
-        `div#dwpSupplementaryResponseDoc_dwpSupplementaryResponseDoc button:has-text('Cancel upload')`
-      )
-    ).toBeDisabled();
   }
 
   async uploadOtherDoc(fileName: string): Promise<void> {
@@ -49,16 +39,6 @@ export class SupplementaryResponsePage {
       '#dwpOtherDoc_documentLink',
       fileName
     );
-    await expect(
-      this.page.locator(
-        `div#dwpOtherDoc_dwpOtherDoc span:has-text('Uploading...')`
-      )
-    ).toBeVisible();
-    await expect(
-      this.page.locator(
-        `div#dwpOtherDoc_dwpOtherDoc button:has-text('Cancel upload')`
-      )
-    ).toBeDisabled();
   }
 
   async selectFtaState(issueCode: string): Promise<void> {

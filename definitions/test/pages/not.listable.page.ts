@@ -75,13 +75,11 @@ export class NotListablePage {
   }
 
   async confirmSubmission(): Promise<void> {
-    await this.page.waitForTimeout(3000);
     await this.page.getByText('Submit').dblclick();
     await this.page.waitForLoadState('domcontentloaded');
   }
 
   async continueEvent(): Promise<void> {
-    await this.page.waitForTimeout(3000);
     await this.page.getByText('Continue').click();
   }
 }

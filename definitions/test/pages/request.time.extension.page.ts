@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 import { WebAction } from '../common/web.action';
 const uploadResponseTestdata = require('../pages/content/upload.response_en.json');
 
@@ -24,11 +24,10 @@ export class RequestTimeExtensionPage {
       '#tl1Form_documentLink',
       uploadResponseTestdata.testfileone
     );
-    await this.page.waitForTimeout(7000);
   }
 
   async confirmSubmission(): Promise<void> {
     await webActions.clickButton('Submit');
-    await this.page.waitForTimeout(2000);
+    await expect(this.page.locator('#next-step')).toBeVisible();
   }
 }
