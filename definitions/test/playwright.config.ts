@@ -15,7 +15,7 @@ export default defineConfig({
   },
 
   /* Opt out of parallel tests on CI. */
-  workers: 3,
+  workers: 6,
   // workers: 20,
   reporter: [
     ['list'],
