@@ -9,7 +9,6 @@ import static uk.gov.hmcts.reform.sscs.model.LetterType.REPRESENTATIVE;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
