@@ -1,7 +1,13 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.tya;
 
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DRAFT_TO_VALID_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.HEARING_BOOKED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.REQUEST_FOR_INFORMATION;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.VALID_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper.assertHttpStatus;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper.getRequestWithAuthHeader;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper.updateEmbeddedJson;
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -106,7 +112,7 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
                 "paper",
                 Collections.singletonList("78cf9c9c-e2b8-44d7-bcf1-220311f114cb"),
                 Collections.singletonList("ede384aa-0b6e-4311-9f01-ee547573a07b"),
-                Collections.singletonList("TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx"),
+                Collections.singletonList("TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx"),
                 "yes",
                 "yes",
                 "1",
@@ -119,7 +125,7 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
                 "oral",
                 Collections.singletonList("78cf9c9c-e2b8-44d7-bcf1-220311f114cb"),
                 Collections.singletonList("ede384aa-0b6e-4311-9f01-ee547573a07b"),
-                Collections.singletonList("TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx"),
+                Collections.singletonList("TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx"),
                 "yes",
                 "yes",
                 "1",
@@ -132,7 +138,7 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
                 "paper",
                 Collections.emptyList(),
                 Collections.emptyList(),
-                Collections.singletonList("TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx"),
+                Collections.singletonList("TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx"),
                 "no",
                 "no",
                 "0",
@@ -228,7 +234,7 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
                 "oral",
                 Arrays.asList("d5fd9f65-1283-4533-a1be-10043dae7af6", "8003606e-3d80-4e17-b846-18698f8d681e"),
                 Arrays.asList("ede384aa-0b6e-4311-9f01-ee547573a07b", "99bd4a56-256c-4de8-b187-d43a8dde466f"),
-                Arrays.asList("TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx", "TB-SCS-LET-ENG-Appeal-Lodged-Representative.docx"),
+                Arrays.asList("TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx", "TB-SCS-LET-ENG-Appeal-Lodged-Representative-v2.docx"),
                 "yes",
                 "yes",
                 "yes",
@@ -242,7 +248,7 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
                 "paper",
                 Collections.singletonList("8003606e-3d80-4e17-b846-18698f8d681e"),
                 Arrays.asList("ede384aa-0b6e-4311-9f01-ee547573a07b", "99bd4a56-256c-4de8-b187-d43a8dde466f"),
-                Arrays.asList("TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx", "TB-SCS-LET-ENG-Appeal-Lodged-Representative.docx"),
+                Arrays.asList("TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx", "TB-SCS-LET-ENG-Appeal-Lodged-Representative-v2.docx"),
                 "no",
                 "yes",
                 "yes",
@@ -256,7 +262,7 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
                 "paper",
                 Collections.emptyList(),
                 Collections.emptyList(),
-                Arrays.asList("TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx", "TB-SCS-LET-ENG-Appeal-Lodged-Representative.docx"),
+                Arrays.asList("TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx", "TB-SCS-LET-ENG-Appeal-Lodged-Representative-v2.docx"),
                 "no",
                 "no",
                 "no",
