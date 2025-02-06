@@ -714,6 +714,13 @@ servicebus:
     topics:
       - name: main-topic
         subscriptionNeeded: yes
+      - name: crd-topic
+        subscriptionNeeded: yes
+      - name: jrd-topic
+        subscriptionNeeded: yes
+      - name: ccd-events
+        subscriptionNeeded: yes
+        requiresSession: true
     queues:
       - name: tribunals-to-hearing-api
 
@@ -732,6 +739,7 @@ postgresql:
       - name: "pr-${CHANGE_ID}-hmc-cft-hearing-service"
       - name: "pr-${CHANGE_ID}-sscs-job-scheduler"
       - name: "pr-${CHANGE_ID}-emstitch"
+      - name: "pr-${CHANGE_ID}-org_role_mapping"
 
 
 ccd-def-cleanup:
