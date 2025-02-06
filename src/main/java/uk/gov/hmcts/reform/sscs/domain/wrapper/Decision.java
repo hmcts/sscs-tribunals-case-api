@@ -31,19 +31,19 @@ public class Decision {
         this.activities = activities;
     }
 
-    @Schema(example = "decision_issued", required = true)
+    @Schema(example = "decision_issued", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "decision_state")
     public String getDecisionState() {
         return decisionState;
     }
 
-    @Schema(example = "2018-10-05T09:36:33Z", required = true)
+    @Schema(example = "2018-10-05T09:36:33Z", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "decision_state_datetime")
     public String getDecisionStateDateTime() {
         return decisionStateDateTime;
     }
 
-    @Schema(example = "2018-10-05", required = true)
+    @Schema(example = "2018-10-05", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "start_date")
     public String getStartDate() {
         return startDate;
@@ -60,7 +60,7 @@ public class Decision {
         return decisionRates;
     }
 
-    @Schema(example = "Some reason for the decision", required = true)
+    @Schema(example = "Some reason for the decision", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "reason")
     public String getReason() {
         return reason;
