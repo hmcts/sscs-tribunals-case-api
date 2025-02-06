@@ -1,6 +1,7 @@
 import { expect, Page } from '@playwright/test';
 import { WebAction } from '../../common/web.action';
 import dateUtilsComponent from '../../utils/DateUtilsComponent';
+import logger from '../../utils/loggerUtil';
 
 let webActions: WebAction;
 const currentDate: Date = new Date();
@@ -60,7 +61,7 @@ export class AudioVideoEvidence {
       formattedDueDate = formattedDueDate.replace(/\bSept\b/, 'Sep');
     }
 
-    console.log(`New formatted date is ####### ${formattedDueDate}`);
+    logger.debug(`New formatted date is ####### ${formattedDueDate}`);
     await this.verifyPageContentByKeyValue(reqField, formattedDueDate);
   }
 }

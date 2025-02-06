@@ -6,10 +6,11 @@ import {
 } from '../idam/idam.service';
 import { credentials } from '../../../config/config';
 import { performEventOnCaseWithEmptyBody } from './factory/appeal.update.factory';
+import logger from '../../../utils/loggerUtil';
 
 export default async function performAppealDormantOnCase(caseId: string) {
   let token: string = await accessToken(credentials.amSuperUser);
-  console.log('The value of the IDAM Token : ' + token);
+  logger.debug('The value of the IDAM Token : ' + token);
   let serviceToken: string = await getSSCSServiceToken();
   let userId: string = await accessId(credentials.amSuperUser);
 

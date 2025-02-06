@@ -53,7 +53,6 @@ export class History {
         break;
       } catch (error) {
         await this.homePage.navigateToTab('History');
-        console.log(`I am inside a loop ${i}`);
       }
     }
   }
@@ -68,7 +67,6 @@ export class History {
         break;
       } catch (error) {
         await this.homePage.reloadPage();
-        console.log(`I am inside a loop ${i}`);
       }
     }
   }

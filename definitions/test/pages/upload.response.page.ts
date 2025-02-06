@@ -101,7 +101,6 @@ export class UploadResponsePage {
   }
 
   async verifyDocMissingErrorMsg(): Promise<void> {
-    //await webActions.screenshot();
     await webActions.verifyElementVisibility('#errors');
     await webActions.verifyTextVisibility('AT38 document is missing');
   }

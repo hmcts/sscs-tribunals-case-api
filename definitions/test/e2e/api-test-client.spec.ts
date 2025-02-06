@@ -57,7 +57,7 @@ test('Test to Test API Working....', async () => {
         const content = data;
 
         // Invoke the next step here however you like
-        console.log(content.toString());   // Put all of the code here (not the best solution)
+        logger.debug(content.toString());   // Put all of the code here (not the best solution)
     });
 
     /!*var response_document = {
@@ -69,6 +69,6 @@ test('Test to Test API Working....', async () => {
         documentFilename: "Bloggs_IEF.pdf"
     };
     //var event_token: string = JSON.parse(response_document).push({hello: 'value'});
-    console.log("The value of the event Token : "+response_document)*!/
+    logger.debug("The value of the event Token : "+response_document)*!/
 
 });*/
