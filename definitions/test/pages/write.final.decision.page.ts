@@ -324,8 +324,11 @@ export class WriteFinalDecisionPages {
       '#writeFinalDecisionDateOfDecision-year',
       '2024'
     );
-    await this.page.locator('#writeFinalDecisionDateOfDecision-day').first().click()
-    await webActions.verifyElementHidden('span.error-message')
+    await this.page
+      .locator('#writeFinalDecisionDateOfDecision-day')
+      .first()
+      .click();
+    await webActions.verifyElementHidden('span.error-message');
   }
 
   async verifyPageContentForBundleSectionReferencePage() {
@@ -386,7 +389,6 @@ export class WriteFinalDecisionPages {
       writeFinalDecisionData.reasonsForDecisionPageHeading
     );
     await webActions.clickButton('Add new');
-    await webActions.delay(1000);
   }
 
   async inputPageContentForReasonForDecisionPageData() {
@@ -394,7 +396,6 @@ export class WriteFinalDecisionPages {
       '#writeFinalDecisionReasons_value',
       writeFinalDecisionData.reasonsForDecisionInput
     );
-    await webActions.delay(3000);
   }
 
   async verifyPageContentForAnythingElseDecisionPage() {
@@ -452,7 +453,6 @@ export class WriteFinalDecisionPages {
       '#writeFinalDecisionPreviewDocument',
       'testfile1.pdf'
     );
-    await new Promise((f) => setTimeout(f, 5000));
   }
 
   async verifyPageContentForCheckYourAnswersPage() {

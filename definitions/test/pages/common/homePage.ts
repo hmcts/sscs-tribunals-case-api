@@ -130,7 +130,6 @@ export class HomePage {
   async findAndNavigateToCase(caseId: string): Promise<void> {
     await this.page.getByRole('link', { name: 'Find case' }).first().waitFor();
     await this.page.getByRole('link', { name: 'Find case' }).first().click();
-    await this.delay(3000);
     await expect(this.page.getByText('Filters').first()).toBeVisible();
     console.log(`url of the page is ######## ${this.page.url()}`);
     const expUrl = this.page.url();
@@ -161,7 +160,6 @@ export class HomePage {
     await webActions.inputField(this.caseRefInputField, caseId);
     await webActions.clickApplyFilterButton();
 
-    await this.delay(3000);
     await webActions.verifyTotalElements(
       `#search-result > table > tbody > tr > td:nth-child(1) > a[href='/cases/case-details/${caseId}']`,
       1
@@ -181,17 +179,14 @@ export class HomePage {
     await this.selectToViewTasksAndCasesIfRequired();
     await this.page.getByRole('link', { name: 'Case list' }).first().waitFor();
     await this.page.getByRole('link', { name: 'Case list' }).first().click();
-    await this.delay(3000);
     await expect(this.page.getByText('Filters').first()).toBeVisible();
   }
 
   async chooseEvent(eventName: string): Promise<void> {
-    await this.delay(3000);
     await webActions.chooseOptionByLabel(this.nextStepDropDown, eventName);
     await expect(
       this.page.getByRole('button', { name: 'Go', exact: true })
     ).toBeEnabled();
-    await this.delay(5000);
     await webActions.clickSubmitButton();
     // await webActions.clickNextStepButton(this.submitNextStepButton);
     // await webActions.clickGoButton('Go');

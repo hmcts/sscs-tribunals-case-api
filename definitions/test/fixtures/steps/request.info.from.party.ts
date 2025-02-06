@@ -57,7 +57,6 @@ export class RequestInfoFromParty extends BaseStep {
     await this.eventNameAndDescriptionPage.confirmSubmission();
 
     await expect(this.homePage.summaryTab).toBeVisible();
-    await this.homePage.delay(3000);
     await this.verifyHistoryTabDetails(
       'Information requested',
       requestInfo.requestInfoCaption,

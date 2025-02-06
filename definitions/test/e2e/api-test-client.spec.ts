@@ -11,7 +11,7 @@ import { performEventOnCaseWithUploadResponse } from '../api/client/sscs/factory
 
 test('Test to Test API Working....', async () => {
   let pipCaseId = await createCaseBasedOnCaseType('PIP');
-  await new Promise((f) => setTimeout(f, 10000)); //Delay required for the Case to be ready
+
   let responseWriterToken: string = await accessToken(
     credentials.dwpResponseWriter
   );
@@ -32,7 +32,7 @@ test('Test to Test API Working....', async () => {
        let caseWorkerToken: string = await accessToken(credentials.amCaseWorker);
        let serviceTokenForCaseWorker: string = await getSSCSServiceToken();
        let caseWorkerId: string = await accessId(credentials.amCaseWorker);
-       await new Promise(f => setTimeout(f, 20000)); //Delay required for the Case to be ready
+       await new Promise(f => setTimeout(f, 20000));
        await performEventOnCaseForActionFurtherEvidence(caseWorkerToken.trim(),
            serviceTokenForCaseWorker.trim(),caseWorkerId.trim(),'SSCS','Benefit',
            childSupportCaseId.trim(), 'uploadDocumentFurtherEvidence');*/
@@ -40,7 +40,7 @@ test('Test to Test API Working....', async () => {
   /* let token: string = await accessToken(credentials.amSuperUser);
     let serviceToken: string = await getSSCSServiceToken();
     let userId: string = await accessId(credentials.amSuperUser);
-    await new Promise(f => setTimeout(f, 3000)); //Delay required for the Case to be ready
+    await new Promise(f => setTimeout(f, 3000));
      await performEventOnCaseWithEmptyBody(token.trim(),
          serviceToken.trim(), userId.trim(),
          'SSCS','Benefit',

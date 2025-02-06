@@ -52,9 +52,8 @@ export class EnhancedConfidentiality extends BaseStep {
   }
 
   async grantConfidentialityForAppellant(caseId: string) {
-    await new Promise((f) => setTimeout(f, 2000)); //Delay required for the Case to be ready
     await this.homePage.signOut();
-    await new Promise((f) => setTimeout(f, 3000)); //Delay required for the Case to be ready
+
     await this.loginUserWithCaseId(credentials.judge, false, caseId);
     await this.homePage.chooseEvent(
       reviewConfidentialityTestdata.eventNameCaptor
@@ -65,9 +64,8 @@ export class EnhancedConfidentiality extends BaseStep {
   }
 
   async confidentialityDecisionForParties(caseId: string) {
-    await new Promise((f) => setTimeout(f, 2000)); //Delay required for the Case to be ready
     await this.homePage.signOut();
-    await new Promise((f) => setTimeout(f, 3000)); //Delay required for the Case to be ready
+
     await this.loginUserWithCaseId(credentials.judge, false, caseId);
     await this.homePage.chooseEvent(
       reviewConfidentialityTestdata.eventNameCaptor
@@ -85,9 +83,8 @@ export class EnhancedConfidentiality extends BaseStep {
       'Granted'
     );
     await this.summaryTab.verifydueDates('Request date');
-    await new Promise((f) => setTimeout(f, 2000)); //Delay required for the Case to be ready
+
     await this.homePage.signOut();
-    await new Promise((f) => setTimeout(f, 3000)); //Delay required for the Case to be ready
   }
 
   async verifyConfidentialityFlagForMultipleParties() {
@@ -100,15 +97,13 @@ export class EnhancedConfidentiality extends BaseStep {
       'Request outcome',
       'Refused'
     );
-    await new Promise((f) => setTimeout(f, 2000)); //Delay required for the Case to be ready
+
     await this.homePage.signOut();
-    await new Promise((f) => setTimeout(f, 3000)); //Delay required for the Case to be ready
   }
 
   async uploadSupplementaryCorrespondence(caseId: string) {
     await this.loginUserWithCaseId(credentials.superUser, false, caseId);
     await this.homePage.reloadPage();
-    await this.homePage.delay(3000);
     await this.homePage.chooseEvent('Supplementary response');
     await this.supplementaryResponsePage.verifyPageContent();
     await this.supplementaryResponsePage.uploadSupplementaryResponseDoc(

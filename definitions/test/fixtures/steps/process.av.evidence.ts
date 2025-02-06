@@ -20,7 +20,7 @@ export class ProcessAVEvidence extends BaseStep {
 
   async acceptEvidenceUploadedByDWP(caseId: string) {
     // let caseId = await createCaseBasedOnCaseType('PIP');
-    // await new Promise(f => setTimeout(f, 10000)); //Delay required for the Case to be ready
+    // await new Promise(f => setTimeout(f, 10000));
     // logger.info('The value of the response writer : ' + credentials.dwpResponseWriter.email)
     // let responseWriterToken: string = await accessToken(credentials.dwpResponseWriter);
     // let serviceToken: string = await getSSCSServiceToken();
@@ -30,8 +30,7 @@ export class ProcessAVEvidence extends BaseStep {
     //     'SSCS', 'Benefit',
     //     caseId.trim(), 'dwpUploadResponse', 'av');
 
-    // await this.homePage.delay(5000);
-
+    //
     await this.loginUserWithCaseId(credentials.judge, false, caseId);
     await this.homePage.navigateToTab(avEvidenceTestdata.avTab);
 
@@ -84,7 +83,7 @@ export class ProcessAVEvidence extends BaseStep {
 
   async excludeEvidenceUploadedByDWP(caseId: string) {
     // let caseId = await createCaseBasedOnCaseType('PIP');
-    // await new Promise(f => setTimeout(f, 10000)); //Delay required for the Case to be ready
+    // await new Promise(f => setTimeout(f, 10000));
     // logger.info('The value of the response writer : ' + credentials.dwpResponseWriter.email)
     // let responseWriterToken: string = await accessToken(credentials.dwpResponseWriter);
     // let serviceToken: string = await getSSCSServiceToken();
@@ -94,8 +93,7 @@ export class ProcessAVEvidence extends BaseStep {
     //     'SSCS', 'Benefit',
     //     caseId.trim(), 'dwpUploadResponse', 'av');
 
-    // await this.homePage.delay(5000);
-
+    //
     await this.loginUserWithCaseId(credentials.judge, false, caseId);
     await this.homePage.navigateToTab('Audio/Video Evidence');
 
@@ -146,7 +144,6 @@ export class ProcessAVEvidence extends BaseStep {
   }
 
   async acceptEvidenceUploadedByCTSC(caseId: string) {
-    await this.homePage.delay(3000);
     await this.loginUserWithCaseId(credentials.judge, false, caseId);
     await this.homePage.navigateToTab('Audio/Video Evidence');
 
@@ -204,7 +201,6 @@ export class ProcessAVEvidence extends BaseStep {
   }
 
   async excludeEvidenceUploadedByCTSC(caseId: string) {
-    await this.homePage.delay(3000);
     await this.loginUserWithCaseId(credentials.judge, false, caseId);
     await this.homePage.navigateToTab('Audio/Video Evidence');
 
@@ -267,7 +263,6 @@ export class ProcessAVEvidence extends BaseStep {
     await this.processAVPage.continueOnPreviewDoc();
 
     await expect(this.homePage.summaryTab).toBeVisible();
-    await this.homePage.delay(3000);
     await this.homePage.navigateToTab(avEvidenceTestdata.docTab);
     await this.documentsTab.verifyPageContentByKeyValue(
       avEvidenceTestdata.docTypeField,

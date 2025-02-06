@@ -29,13 +29,16 @@ export class WebAction {
       await Promise.all(
         labelText.map(async (text, i) => {
           await expect(this.page.locator(elementLocator).nth(i)).toBeVisible();
-          await expect(this.page.locator(elementLocator).nth(i)).toHaveText(text);
+          await expect(this.page.locator(elementLocator).nth(i)).toHaveText(
+            text
+          );
         })
       );
     } else {
       await this.verifyElementVisibility(elementLocator);
-      await expect(this.page.locator(elementLocator).first())
-        .toHaveText(labelText);
+      await expect(this.page.locator(elementLocator).first()).toHaveText(
+        labelText
+      );
     }
   }
 
@@ -76,16 +79,22 @@ export class WebAction {
 
   async clickApplyFilterButton(): Promise<void> {
     await this.page.waitForLoadState('domcontentloaded');
-    await this.verifyElementVisibility('//button[@title=\'Apply filter\']');
-    await this.page.locator('//button[@title=\'Apply filter\']').first().click();
+    await this.verifyElementVisibility("//button[@title='Apply filter']");
+    await this.page.locator("//button[@title='Apply filter']").first().click();
   }
 
   async clickButton(elementLocator: string): Promise<void> {
     await this.page.waitForLoadState('domcontentloaded');
-    await expect(this.page.getByRole('button', { name: elementLocator, exact: true }).first())
-      .toBeVisible();
-    await expect(this.page.getByRole('button', { name: elementLocator, exact: true }).first())
-      .toBeEnabled();
+    await expect(
+      this.page
+        .getByRole('button', { name: elementLocator, exact: true })
+        .first()
+    ).toBeVisible();
+    await expect(
+      this.page
+        .getByRole('button', { name: elementLocator, exact: true })
+        .first()
+    ).toBeEnabled();
     await this.page
       .getByRole('button', { name: elementLocator, exact: true })
       .first()
@@ -100,14 +109,14 @@ export class WebAction {
   }
 
   async clickSubmitButton(): Promise<void> {
-    await this.verifyElementVisibility('//*[@class=\'button\']');
-    await this.page.locator('//*[@class=\'button\']').first().click();
+    await this.verifyElementVisibility("//*[@class='button']");
+    await this.page.locator("//*[@class='button']").first().click();
   }
 
   async clickRadioButton(elementLocator: string): Promise<void> {
-    await expect(this.page
-      .getByRole('radio', { name: elementLocator })
-      .first()).toBeVisible();
+    await expect(
+      this.page.getByRole('radio', { name: elementLocator }).first()
+    ).toBeVisible();
     await this.page
       .getByRole('radio', { name: elementLocator })
       .first()
@@ -128,15 +137,18 @@ export class WebAction {
   }
 
   async clickLink(elementLocator: string): Promise<void> {
-    await expect(this.page.getByRole('link', { name: elementLocator }).first()).toBeVisible();
+    await expect(
+      this.page.getByRole('link', { name: elementLocator }).first()
+    ).toBeVisible();
     await this.page.getByRole('link', { name: elementLocator }).first().click();
   }
 
   async isLinkClickable(elementLocator: string): Promise<void> {
-    await expect(this.page.getByRole('link', { name: elementLocator }).first()).toBeVisible();
-    await expect(this.page
-      .getByRole('link', { name: elementLocator })
-      .first()
+    await expect(
+      this.page.getByRole('link', { name: elementLocator }).first()
+    ).toBeVisible();
+    await expect(
+      this.page.getByRole('link', { name: elementLocator }).first()
     ).toBeEnabled();
   }
 
@@ -156,19 +168,23 @@ export class WebAction {
     fileName: string
   ): Promise<void> {
     await this.verifyElementVisibility(elementId);
-    const rateLimitMessage = "Your request was rate limited. Please wait a few seconds before retrying your document upload";
+    const rateLimitMessage =
+      'Your request was rate limited. Please wait a few seconds before retrying your document upload';
     const rateLimitLocator = `span.error-message:has-text("${rateLimitMessage}")'`;
-    const uploadingMessageLocator = 'span.error-message:has-text("Uploading...")';
+    const uploadingMessageLocator =
+      'span.error-message:has-text("Uploading...")';
     const rateLimitError = this.page.locator(rateLimitLocator).first();
     const uploadingMessage = this.page.locator(uploadingMessageLocator).first();
     const input = this.page.locator(elementId).first();
     await input.setInputFiles(path.join(__dirname, `../data/file/${fileName}`));
     await expect(uploadingMessage).toBeHidden();
     try {
-      await expect(rateLimitError).toBeHidden({ timeout: 5500 })
+      await expect(rateLimitError).toBeHidden({ timeout: 5500 });
     } catch (error) {
-      console.log('Rate limited, trying upload again.')
-      await input.setInputFiles(path.join(__dirname, `../data/file/${fileName}`));
+      console.log('Rate limited, trying upload again.');
+      await input.setInputFiles(
+        path.join(__dirname, `../data/file/${fileName}`)
+      );
       await expect(uploadingMessage).toBeHidden();
     }
   }

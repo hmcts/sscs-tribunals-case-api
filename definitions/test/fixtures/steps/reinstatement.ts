@@ -32,7 +32,6 @@ export class Reinstatement extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
-    await this.homePage.delay(3000);
 
     await this.homePage.navigateToTab('Appeal Details');
     await this.appealDetailsTab.verifydueDates('Reinstatement Registered');
@@ -59,7 +58,6 @@ export class Reinstatement extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
-    await this.homePage.delay(3000);
 
     await this.homePage.navigateToTab('Appeal Details');
     await this.appealDetailsTab.verifydueDates('Reinstatement Registered');
@@ -90,7 +88,6 @@ export class Reinstatement extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
-    await this.homePage.delay(3000);
 
     await this.homePage.navigateToTab('Appeal Details');
     await this.appealDetailsTab.verifydueDates('Reinstatement Registered');
@@ -117,7 +114,6 @@ export class Reinstatement extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
-    await this.homePage.delay(3000);
 
     await this.homePage.navigateToTab('Appeal Details');
     await this.appealDetailsTab.verifydueDates('Reinstatement Registered');

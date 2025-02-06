@@ -42,7 +42,6 @@ export class SupplementaryResponsePage {
         `div#dwpSupplementaryResponseDoc_dwpSupplementaryResponseDoc button:has-text('Cancel upload')`
       )
     ).toBeDisabled();
-    await this.delay(5000);
   }
 
   async uploadOtherDoc(fileName: string): Promise<void> {
@@ -60,7 +59,6 @@ export class SupplementaryResponsePage {
         `div#dwpOtherDoc_dwpOtherDoc button:has-text('Cancel upload')`
       )
     ).toBeDisabled();
-    await this.delay(5000);
   }
 
   async selectFtaState(issueCode: string): Promise<void> {

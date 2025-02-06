@@ -133,7 +133,6 @@ export class IssueDirectionPage {
         '#sscsInterlocDirectionDocument_documentLink',
         'testfile1.pdf'
       );
-      await webActions.delay(3000);
       await webActions.inputField('#documentDateAdded-day', '01');
       await webActions.inputField('#documentDateAdded-month', '01');
       await webActions.inputField('#documentDateAdded-year', '2024');

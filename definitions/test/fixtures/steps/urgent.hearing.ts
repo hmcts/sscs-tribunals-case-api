@@ -151,8 +151,6 @@ export class UrgentHearing extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
 
-    await new Promise((f) => setTimeout(f, 10000)); //Delay required for the Case to be ready
-
     /*logger.info('The value of the response writer : ' + credentials.dwpResponseWriter.email)
         let responseWriterToken: string = await accessToken(credentials.dwpResponseWriter);
         let serviceToken: string = await getSSCSServiceToken();
@@ -177,27 +175,23 @@ export class UrgentHearing extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
 
-    await new Promise((f) => setTimeout(f, 1000)); //Delay required for the Case to be ready
     await this.summaryTab.verifyPageContentByKeyValueDoesNotExist(
       'Urgent case',
       'No'
     );
 
-    await new Promise((f) => setTimeout(f, 1000)); //Delay required for the Case to be ready
     await this.homePage.navigateToTab('Appeal Details');
     await this.appealDetailsTab.verifyAppealDetailsPageContentDoesNotExistByKeyValue(
       'Urgent hearing outcome',
       'Refused'
     );
 
-    await new Promise((f) => setTimeout(f, 1000)); //Delay required for the Case to be ready
     await this.homePage.navigateToTab('History');
     await this.historyTab.verifyPageContentDoesNotExistByKeyValue(
       'Interlocutory review state',
       'N/A'
     );
 
-    await new Promise((f) => setTimeout(f, 1000)); //Delay required for the Case to be ready
     await this.homePage.navigateToTab('Documents');
     await this.documentsTab.verifyFieldVisible('Evidence issued');
     await this.documentsTab.verifyFieldVisible('Yes');
@@ -215,7 +209,6 @@ export class UrgentHearing extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
 
-    await new Promise((f) => setTimeout(f, 5000)); //Delay required for the Case to be ready
     await this.homePage.navigateToTab('Documents');
     await this.documentsTab.verifyFieldVisible('Evidence issued');
     await this.documentsTab.verifyFieldVisible('Yes');
@@ -252,7 +245,6 @@ export class UrgentHearing extends BaseStep {
       caseId
     );
     await expect(this.homePage.summaryTab).toBeVisible();
-    await this.homePage.delay(3000);
     await this.homePage.navigateToTab('Roles and access');
     await this.rolesAndAccessTab.allocateInterlocutoryJudge(
       credentials.salariedJudge.email

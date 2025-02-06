@@ -29,7 +29,6 @@ export class Tasks {
         break;
       }
       await homePage.navigateToTab('Summary');
-      await homePage.delay(10000);
       await homePage.navigateToTab('Tasks');
       await homePage.delay(timeouts.shortTimeout);
     }
@@ -58,7 +57,6 @@ export class Tasks {
         break;
       }
       await homePage.navigateToTab('Summary');
-      await homePage.delay(1000);
       await homePage.navigateToTab('Tasks');
       await homePage.delay(timeouts.shortTimeout);
     }

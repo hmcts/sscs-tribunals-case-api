@@ -17,7 +17,6 @@ export class ReferredByJudge extends BaseStep {
     // Super user with case allocator role allocates case to Tcw
     await this.loginUserWithCaseId(credentials.amSuperUser, false, caseId);
     await expect(this.homePage.summaryTab).toBeVisible();
-    await this.homePage.delay(3000);
     await this.homePage.navigateToTab('Roles and access');
     await this.rolesAndAccessTab.allocateLegalOpsRole(
       credentials.amTribunalCaseWorker.email

@@ -45,14 +45,12 @@ export class UploadResponse extends BaseStep {
     await this.responseReviewedPage.chooseInterlocOption('No');
     await this.responseReviewedPage.confirmSubmission();
 
-    await this.homePage.delay(1000);
     await this.homePage.navigateToTab('History');
 
     for (const linkName of this.presetLinks) {
       await this.verifyHistoryTabLink(linkName);
     }
 
-    await this.homePage.delay(3000);
     await this.homePage.navigateToTab('Summary');
     await this.summaryTab.verifyPresenceOfText('Ready to list');
     // await performAppealDormantOnCase(pipCaseId);
@@ -78,7 +76,6 @@ export class UploadResponse extends BaseStep {
     await this.checkYourAnswersPage.confirmSubmission();
     await this.homePage.clickSignOut();
 
-    await this.homePage.delay(3000);
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
 
     await this.homePage.navigateToTab('Summary');
@@ -110,7 +107,6 @@ export class UploadResponse extends BaseStep {
     await this.checkYourAnswersPage.confirmSubmission();
     await this.homePage.clickSignOut();
 
-    await this.homePage.delay(3000);
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
 
     await this.homePage.navigateToTab('Summary');
@@ -139,7 +135,6 @@ export class UploadResponse extends BaseStep {
       true
     );
     await this.checkYourAnswersPage.confirmSubmission();
-    await this.homePage.delay(3000);
     await this.homePage.clickSignOut();
   }
 
@@ -166,9 +161,7 @@ export class UploadResponse extends BaseStep {
         undefined
       );
     await this.checkYourAnswersPage.confirmSubmission();
-    await this.homePage.delay(3000);
     await this.homePage.clickSignOut();
-    await this.homePage.delay(3000);
   }
 
   async performUploadResponseWithoutFurtherInfoOnATaxCredit() {
@@ -187,7 +180,6 @@ export class UploadResponse extends BaseStep {
     await this.checkYourAnswersPage.confirmSubmission();
     await this.homePage.clickSignOut();
 
-    await this.homePage.delay(3000);
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, taxCaseId);
     await this.homePage.navigateToTab('History');
 
@@ -208,7 +200,6 @@ export class UploadResponse extends BaseStep {
     );
 
     await this.homePage.chooseEvent('Upload response');
-    await this.homePage.delay(4000);
     await this.uploadResponsePage.verifyPageContent();
     await this.uploadResponsePage.uploadDocs();
     await this.uploadResponsePage.chooseAssistOption('No');
@@ -221,13 +212,11 @@ export class UploadResponse extends BaseStep {
     await this.uploadResponsePage.selectUcIssueCode(
       uploadResponseTestdata.ucIssueCode
     );
-    await this.homePage.delay(2000);
     await this.uploadResponsePage.continueSubmission();
 
     await this.uploadResponsePage.chooseDisputeOption(
       uploadResponseTestdata.ucDisputeOption
     );
-    await this.homePage.delay(2000);
     await this.uploadResponsePage.continueSubmission();
 
     await this.uploadResponsePage.isJPOnTheCase(
@@ -245,7 +234,6 @@ export class UploadResponse extends BaseStep {
     await this.homePage.clickSignOut();
 
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, ucCaseId);
-    await this.homePage.delay(1000);
     await this.homePage.navigateToTab('History');
 
     for (const linkName of this.presetLinks) {
@@ -265,7 +253,6 @@ export class UploadResponse extends BaseStep {
     );
 
     await this.homePage.chooseEvent('Upload response');
-    await this.homePage.delay(4000);
     await this.uploadResponsePage.verifyPageContent();
     await this.uploadResponsePage.uploadDocs();
     await this.uploadResponsePage.chooseAssistOption('No');
@@ -278,13 +265,11 @@ export class UploadResponse extends BaseStep {
     await this.uploadResponsePage.selectUcIssueCode(
       uploadResponseTestdata.ucIssueCode
     );
-    await this.homePage.delay(2000);
     await this.uploadResponsePage.continueSubmission();
 
     await this.uploadResponsePage.chooseDisputeOption(
       uploadResponseTestdata.ucDisputeOption
     );
-    await this.homePage.delay(2000);
     await this.uploadResponsePage.continueSubmission();
 
     await this.uploadResponsePage.isJPOnTheCase(
@@ -295,11 +280,9 @@ export class UploadResponse extends BaseStep {
     await this.checkYourAnswersPage.confirmSubmission();
 
     await this.homePage.signOut();
-    await new Promise((f) => setTimeout(f, 3000)); //Delay required for the Case to be ready
 
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, ucCaseId);
     await this.homePage.reloadPage();
-    await this.homePage.delay(1000);
     await this.homePage.navigateToTab('History');
 
     for (const linkName of this.presetLinks) {
@@ -321,7 +304,6 @@ export class UploadResponse extends BaseStep {
     );
 
     await this.homePage.chooseEvent('Upload response');
-    await this.homePage.delay(2000);
     await this.uploadResponsePage.verifyPageContent();
     await this.uploadResponsePage.uploadPartialDocs();
     await this.uploadResponsePage.selectIssueCode(
@@ -329,7 +311,6 @@ export class UploadResponse extends BaseStep {
     );
     await this.uploadResponsePage.chooseAssistOption('Yes');
     await this.uploadResponsePage.continueSubmission();
-    await this.uploadResponsePage.delay(1000);
     await this.uploadResponsePage.verifyDocMissingErrorMsg();
     // await performAppealDormantOnCase(pipErrorCaseId);
   }

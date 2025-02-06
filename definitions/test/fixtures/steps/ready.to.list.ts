@@ -33,7 +33,6 @@ export class ReadyToList extends BaseStep {
     await this.eventNameAndDescriptionPage.confirmSubmission();
 
     await expect(this.homePage.summaryTab).toBeVisible();
-    await this.homePage.delay(3000);
     await this.verifyHistoryTabDetails(
       'With FTA',
       'Ready to list',

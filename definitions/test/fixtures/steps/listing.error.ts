@@ -30,7 +30,6 @@ export class ListingError extends BaseStep {
     await this.eventNameAndDescriptionPage.confirmSubmission();
 
     await expect(this.homePage.summaryTab).toBeVisible();
-    await this.homePage.delay(3000);
 
     // Navigate to History Tab and Verify event is listed
     await this.verifyHistoryTabDetails(

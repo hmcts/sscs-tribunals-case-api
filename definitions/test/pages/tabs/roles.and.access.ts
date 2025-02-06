@@ -163,15 +163,12 @@ export class RolesAndAccess {
     );
     await this.page
       .getByRole('radio', {
-        name: allocateRole.judicialRole
-          .allocateToAnotherPersonRadioButtonLabel
+        name: allocateRole.judicialRole.allocateToAnotherPersonRadioButtonLabel
       })
       .click();
     await this.clickContinue();
 
-    await this.verifyPageTitle(
-      allocateRole.judicialRole.findPersonHeading
-    );
+    await this.verifyPageTitle(allocateRole.judicialRole.findPersonHeading);
     await this.page
       .locator('#inputSelectPerson')
       .fill(allocateRole.judicialRole.allocateToName.salariedJudge);
@@ -186,13 +183,10 @@ export class RolesAndAccess {
     await expect(this.page.locator('//mat-option')).toBeHidden();
     await this.clickContinue();
 
-    await this.verifyPageTitle(
-      allocateRole.judicialRole.durationOfRoleHeading
-    );
+    await this.verifyPageTitle(allocateRole.judicialRole.durationOfRoleHeading);
     await this.page
       .getByRole('radio', {
-        name: allocateRole.judicialRole
-          .numberOfDaysRadioButtonLabel,
+        name: allocateRole.judicialRole.numberOfDaysRadioButtonLabel,
         exact: true
       })
       .click();

@@ -37,7 +37,6 @@ export class UpdateLanguagePreference extends BaseStep {
     await this.eventNameAndDescriptionPage.confirmSubmission();
 
     await expect(this.homePage.summaryTab).toBeVisible();
-    await this.homePage.delay(3000);
 
     await this.homePage.navigateToTab('History');
     await this.historyTab.verifyEventCompleted(

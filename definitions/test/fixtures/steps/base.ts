@@ -215,7 +215,6 @@ export abstract class BaseStep {
     comment?: string
   ) {
     await this.homePage.navigateToTab('History');
-    await this.homePage.delay(1000);
     /*if(state) await this.historyTab.verifyHistoryPageContentByKeyValue('End state', state);
         if(event) await this.historyTab.verifyHistoryPageContentByKeyValue('Event', event);
         if(comment) await this.historyTab.verifyHistoryPageContentByKeyValue('Comment', comment);*/
@@ -231,6 +230,5 @@ export abstract class BaseStep {
     comment?: string
   ) {
     await this.homePage.navigateToTab('Other Party Details');
-    await this.homePage.delay(1000);
   }
 }

@@ -37,7 +37,6 @@ export class CreateBundle extends BaseStep {
     await this.createBundlePage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
 
-    await this.homePage.delay(15000);
     await this.homePage.reloadPage();
     await this.homePage.navigateToTab('Bundles');
     await this.bundlesTab.verifyBundlesTabContentByKeyValueForASpan(
@@ -117,7 +116,6 @@ export class CreateBundle extends BaseStep {
     await this.createBundlePage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
 
-    await this.homePage.delay(15000);
     await this.homePage.reloadPage();
     await this.homePage.navigateToTab('Bundles');
     await this.bundlesTab.verifyBundlesTabContentByKeyValueForASpan(

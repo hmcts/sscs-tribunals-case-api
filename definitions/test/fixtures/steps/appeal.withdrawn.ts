@@ -29,7 +29,6 @@ export class AppealWithdrawn extends BaseStep {
     await this.eventNameAndDescriptionPage.confirmSubmission();
 
     await expect(this.homePage.summaryTab).toBeVisible();
-    await this.homePage.delay(3000);
 
     await this.verifyHistoryTabDetails('Dormant');
   }

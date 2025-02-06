@@ -45,7 +45,6 @@ export class SendToAdmin extends BaseStep {
     await this.eventNameAndDescriptionPage.confirmSubmission();
 
     await expect(this.homePage.summaryTab).toBeVisible();
-    await this.homePage.delay(3000);
     await this.verifyHistoryTabDetails(
       'With FTA',
       'Send to admin',
