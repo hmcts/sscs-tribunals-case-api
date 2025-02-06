@@ -155,8 +155,6 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
 
 postgresql:
   enabled: false
-idam-pr:
-  enabled: false
 xui-webapp:
   enabled: false
 elastic:
