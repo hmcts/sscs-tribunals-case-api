@@ -61,6 +61,7 @@ export class UploadDocumentFurtherEvidencePage {
         `div#draftSscsFurtherEvidenceDocument button:has-text('Cancel upload')`
       )
     ).toBeDisabled();
+    await this.delay(5000);
   }
 
   async confirmSubmission(): Promise<void> {

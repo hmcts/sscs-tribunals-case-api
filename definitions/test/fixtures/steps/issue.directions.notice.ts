@@ -17,7 +17,7 @@ export class IssueDirectionsNotice extends BaseStep {
 
   async performIssueDirectionNoticeIncompleteApplicationPreHearingAppealToProceed() {
     let pipCaseId = await createCaseBasedOnCaseType('PIPINCOMPLETE');
-
+    await new Promise((f) => setTimeout(f, 10000)); //Delay required for the Case to be ready
     /*let responseWriterToken: string = await accessToken(credentials.dwpResponseWriter);
         let serviceToken: string = await getSSCSServiceToken();
         let responseWriterId: string = await accessId(credentials.dwpResponseWriter);
@@ -30,7 +30,7 @@ export class IssueDirectionsNotice extends BaseStep {
         let caseWorkerToken: string = await accessToken(credentials.amCaseWorker);
         let serviceTokenForCaseWorker: string = await getSSCSServiceToken();
         let caseWorkerId: string = await accessId(credentials.amCaseWorker);
-        await new Promise(f => setTimeout(f, 20000));
+        await new Promise(f => setTimeout(f, 20000)); //Delay required for the Case to be ready
         await performEventOnCaseForActionFurtherEvidence(caseWorkerToken.trim(),
             serviceTokenForCaseWorker.trim(),caseWorkerId.trim(),'SSCS','Benefit',
             taxCreditCaseId.trim(), 'uploadDocumentFurtherEvidence');*/
@@ -62,9 +62,10 @@ export class IssueDirectionsNotice extends BaseStep {
     await this.eventNameAndDescriptionPage.confirmSubmission();
     await this.verifyHistoryTabDetails('Send to interloc - pre-valid');
     await this.homePage.signOut();
+    await new Promise((f) => setTimeout(f, 2000)); //Delay required for the Case to be ready
 
     await this.loginUserWithCaseId(credentials.judge, false, pipCaseId);
-
+    await new Promise((f) => setTimeout(f, 12000)); //Delay required for the Case to be ready
     await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Issue directions notice');
 
@@ -91,7 +92,7 @@ export class IssueDirectionsNotice extends BaseStep {
 
   async performIssueDirectionNoticePreHearingAppealToProceed() {
     let taxCreditCaseId = await createCaseBasedOnCaseType('TAX CREDIT');
-
+    await new Promise((f) => setTimeout(f, 30000)); //Delay required for the Case to be ready
     /* let responseWriterToken: string = await accessToken(credentials.hmrcUser);
         let serviceToken: string = await getSSCSServiceToken();
         let responseWriterId: string = await accessId(credentials.hmrcUser);
@@ -104,7 +105,7 @@ export class IssueDirectionsNotice extends BaseStep {
         let caseWorkerToken: string = await accessToken(credentials.amCaseWorker);
         let serviceTokenForCaseWorker: string = await getSSCSServiceToken();
         let caseWorkerId: string = await accessId(credentials.amCaseWorker);
-        await new Promise(f => setTimeout(f, 20000));
+        await new Promise(f => setTimeout(f, 20000)); //Delay required for the Case to be ready
         await performEventOnCaseForActionFurtherEvidence(caseWorkerToken.trim(),
             serviceTokenForCaseWorker.trim(),caseWorkerId.trim(),'SSCS','Benefit',
             taxCreditCaseId.trim(), 'uploadDocumentFurtherEvidence');*/
@@ -123,11 +124,12 @@ export class IssueDirectionsNotice extends BaseStep {
       actionFurtherEvidenceTestdata.other,
       actionFurtherEvidenceTestdata.testfileone
     );
-
+    await new Promise((f) => setTimeout(f, 2000)); //Delay required for the Case to be ready
     await this.homePage.signOut();
+    await new Promise((f) => setTimeout(f, 2000)); //Delay required for the Case to be ready
 
     await this.loginUserWithCaseId(credentials.judge, false, taxCreditCaseId);
-
+    await new Promise((f) => setTimeout(f, 12000)); //Delay required for the Case to be ready
     await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Issue directions notice');
 
@@ -155,7 +157,7 @@ export class IssueDirectionsNotice extends BaseStep {
   async performIssueDirectionNoticePostHearingESAAppealToProceed() {
     //let esaCaseId = await createCaseBasedOnCaseType('ESA');
     let esaCaseId = await createCaseBasedOnCaseType('PIP');
-
+    await new Promise((f) => setTimeout(f, 30000)); //Delay required for the Case to be ready
     /*let responseWriterToken: string = await accessToken(credentials.dwpResponseWriter);
         let serviceToken: string = await getSSCSServiceToken();
         let responseWriterId: string = await accessId(credentials.dwpResponseWriter);
@@ -168,7 +170,7 @@ export class IssueDirectionsNotice extends BaseStep {
         let caseWorkerToken: string = await accessToken(credentials.amCaseWorker);
         let serviceTokenForCaseWorker: string = await getSSCSServiceToken();
         let caseWorkerId: string = await accessId(credentials.amCaseWorker);
-        await new Promise(f => setTimeout(f, 20000));
+        await new Promise(f => setTimeout(f, 20000)); //Delay required for the Case to be ready
         await performEventOnCaseForActionFurtherEvidence(caseWorkerToken.trim(),
             serviceTokenForCaseWorker.trim(),caseWorkerId.trim(),'SSCS','Benefit',
             taxCreditCaseId.trim(), 'uploadDocumentFurtherEvidence');*/
@@ -184,9 +186,10 @@ export class IssueDirectionsNotice extends BaseStep {
       actionFurtherEvidenceTestdata.testfileone
     );
     await this.homePage.signOut();
+    await new Promise((f) => setTimeout(f, 2000)); //Delay required for the Case to be ready
 
     await this.loginUserWithCaseId(credentials.judge, false, esaCaseId);
-
+    await new Promise((f) => setTimeout(f, 12000)); //Delay required for the Case to be ready
     await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Issue directions notice');
 
@@ -214,7 +217,7 @@ export class IssueDirectionsNotice extends BaseStep {
   async performIssueDirectionNoticePostHearingDLAAppealToProceed() {
     //let pipCaseId = await createCaseBasedOnCaseType('DLASANDL');
     let pipCaseId = await createCaseBasedOnCaseType('PIP');
-
+    await new Promise((f) => setTimeout(f, 30000)); //Delay required for the Case to be ready
     /*let responseWriterToken: string = await accessToken(credentials.dwpResponseWriter);
         let serviceToken: string = await getSSCSServiceToken();
         let responseWriterId: string = await accessId(credentials.dwpResponseWriter);
@@ -227,7 +230,7 @@ export class IssueDirectionsNotice extends BaseStep {
         let caseWorkerToken: string = await accessToken(credentials.amCaseWorker);
         let serviceTokenForCaseWorker: string = await getSSCSServiceToken();
         let caseWorkerId: string = await accessId(credentials.amCaseWorker);
-        await new Promise(f => setTimeout(f, 20000));
+        await new Promise(f => setTimeout(f, 20000)); //Delay required for the Case to be ready
         await performEventOnCaseForActionFurtherEvidence(caseWorkerToken.trim(),
             serviceTokenForCaseWorker.trim(),caseWorkerId.trim(),'SSCS','Benefit',
             taxCreditCaseId.trim(), 'uploadDocumentFurtherEvidence');*/
@@ -243,9 +246,10 @@ export class IssueDirectionsNotice extends BaseStep {
       actionFurtherEvidenceTestdata.testfileone
     );
     await this.homePage.signOut();
+    await new Promise((f) => setTimeout(f, 2000)); //Delay required for the Case to be ready
 
     await this.loginUserWithCaseId(credentials.judge, false, pipCaseId);
-
+    await new Promise((f) => setTimeout(f, 12000)); //Delay required for the Case to be ready
     await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Issue directions notice');
 
@@ -271,7 +275,7 @@ export class IssueDirectionsNotice extends BaseStep {
   async performIssueDirectionErrorMessages() {
     //let pipCaseId = await createCaseBasedOnCaseType('DLASANDL');
     let pipCaseId = await createCaseBasedOnCaseType('PIP');
-
+    await new Promise((f) => setTimeout(f, 30000)); //Delay required for the Case to be ready
     /*let responseWriterToken: string = await accessToken(credentials.dwpResponseWriter);
         let serviceToken: string = await getSSCSServiceToken();
         let responseWriterId: string = await accessId(credentials.dwpResponseWriter);
@@ -284,7 +288,7 @@ export class IssueDirectionsNotice extends BaseStep {
         let caseWorkerToken: string = await accessToken(credentials.amCaseWorker);
         let serviceTokenForCaseWorker: string = await getSSCSServiceToken();
         let caseWorkerId: string = await accessId(credentials.amCaseWorker);
-        await new Promise(f => setTimeout(f, 20000));
+        await new Promise(f => setTimeout(f, 20000)); //Delay required for the Case to be ready
         await performEventOnCaseForActionFurtherEvidence(caseWorkerToken.trim(),
             serviceTokenForCaseWorker.trim(),caseWorkerId.trim(),'SSCS','Benefit',
             taxCreditCaseId.trim(), 'uploadDocumentFurtherEvidence');*/
@@ -300,9 +304,10 @@ export class IssueDirectionsNotice extends BaseStep {
       actionFurtherEvidenceTestdata.testfileone
     );
     await this.homePage.signOut();
+    await new Promise((f) => setTimeout(f, 2000)); //Delay required for the Case to be ready
 
     await this.loginUserWithCaseId(credentials.judge, false, pipCaseId);
-
+    await new Promise((f) => setTimeout(f, 12000)); //Delay required for the Case to be ready
     await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Issue directions notice');
     await this.issueDirectionPage.verifyPageContent();

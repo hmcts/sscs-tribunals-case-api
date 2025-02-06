@@ -31,6 +31,7 @@ export class UpdateOtherPartyData extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
+    await this.homePage.delay(3000);
 
     // Adding other party subscription
     await this.goToUpdateSubscriptionPage(this.page, ChildSupportCaseId);
@@ -41,6 +42,7 @@ export class UpdateOtherPartyData extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
+    await this.homePage.delay(3000);
 
     // Verifying History tab + end state
     await this.verifyHistoryTabDetails('Update subscription');
@@ -115,6 +117,7 @@ export class UpdateOtherPartyData extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
+    await this.homePage.delay(3000);
 
     // Adding other party subscription
     await this.goToUpdateSubscriptionPage(this.page, TaxCreditCaseId);
@@ -125,6 +128,7 @@ export class UpdateOtherPartyData extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
+    await this.homePage.delay(3000);
 
     // Verifying History tab + end state
     await this.verifyHistoryTabDetails('Update subscription');

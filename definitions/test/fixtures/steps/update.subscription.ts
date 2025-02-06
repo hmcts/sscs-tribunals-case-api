@@ -32,6 +32,7 @@ export class UpdateSubscription extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
+    await this.homePage.delay(3000);
 
     // Verifying History tab + end state
     await this.verifyHistoryTabDetails('Update subscription');
@@ -47,6 +48,7 @@ export class UpdateSubscription extends BaseStep {
 
     // Navigate to Subscriptions tab + validations
     await this.homePage.navigateToTab('Subscriptions');
+    await this.homePage.delay(1000);
     await this.subscriptionsTab.verifyPageContentByKeyValue;
   }
 

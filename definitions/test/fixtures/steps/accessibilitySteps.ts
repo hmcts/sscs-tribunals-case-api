@@ -64,14 +64,19 @@ export class AccessibilitySteps extends BaseStep {
     await axeTest(this.page);
 
     await this.homePage.chooseEvent('Upload response');
+    await this.homePage.delay(1000);
     await axeTest(this.page);
     await this.uploadResponsePage.verifyPageContent();
     await this.uploadResponsePage.uploadDocs();
     await this.uploadResponsePage.selectIssueCode('CC');
+    await this.homePage.delay(1000);
     await this.uploadResponsePage.chooseAssistOption('No');
+    await this.homePage.delay(1000);
     await this.uploadResponsePage.continueSubmission();
     //await axeTest(this.page);
     await this.page.getByText('submit').click();
+
+    await this.homePage.delay(1000);
 
     await this.homePage.navigateToTab('FTA Documents');
     await axeTest(this.page);
@@ -93,6 +98,7 @@ export class AccessibilitySteps extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
+    await this.homePage.delay(3000);
 
     // Moving to Related Appeals tab and verifying that the cases are linked by looking for 'secondPipCaseId' on 'firstPipCaseId' case.
     await this.homePage.navigateToTab('Related Appeals');
@@ -100,6 +106,7 @@ export class AccessibilitySteps extends BaseStep {
     await axeTest(this.page);
 
     await this.homePage.goToHomePage(firstCaseId);
+    await this.homePage.delay(1000);
     await this.homePage.navigateToTab('History');
     await this.historyTab.verifyPageContentByKeyValue('Event', 'Link a case');
     await axeTest(this.page);
@@ -128,6 +135,7 @@ export class AccessibilitySteps extends BaseStep {
     await this.createBundlePage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
 
+    await this.homePage.delay(5000);
     await this.homePage.reloadPage();
     await expect(this.homePage.summaryTab).toBeVisible();
     await this.homePage.clickBeforeTabBtn();

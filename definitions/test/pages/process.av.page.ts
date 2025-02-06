@@ -12,6 +12,7 @@ export class ProcessAVPage {
   }
 
   async selectRequestedEvidence(filename: string): Promise<void> {
+    await webActions.delay(5000);
     await webActions.verifyPageLabel(
       'h1.govuk-heading-l',
       'Process Audio/Video Evidence'
@@ -24,6 +25,7 @@ export class ProcessAVPage {
   }
 
   async verifyPageContent(partyType: string): Promise<void> {
+    await webActions.delay(5000);
     await webActions.verifyTextVisibility('Audio document');
     await webActions.verifyTextVisibility('test_av.mp3');
     await webActions.verifyTextVisibility(partyType);
@@ -31,6 +33,7 @@ export class ProcessAVPage {
   }
 
   async grantApprovalEvidence(): Promise<void> {
+    await webActions.delay(5000);
     await webActions.chooseOptionByLabel(
       '#processAudioVideoAction',
       'Admit audio/video evidence'
@@ -50,6 +53,7 @@ export class ProcessAVPage {
   }
 
   async rejectApprovalEvidence(): Promise<void> {
+    await webActions.delay(5000);
     await webActions.chooseOptionByLabel(
       '#processAudioVideoAction',
       'Exclude audio/video evidence'
@@ -69,8 +73,11 @@ export class ProcessAVPage {
   }
 
   async continueOnPreviewDoc(): Promise<void> {
+    await webActions.delay(3000);
     await webActions.verifyTextVisibility('Preview Document');
     await webActions.clickSubmitButton();
+    await webActions.delay(2000);
     await webActions.clickSubmitButton();
+    await webActions.delay(3000);
   }
 }

@@ -78,6 +78,7 @@ export class ReissueFurtherEvidence extends BaseStep {
     await this.eventNameAndDescriptionPage.confirmSubmission();
 
     await expect(this.homePage.summaryTab).toBeVisible();
+    await this.homePage.delay(3000);
   }
 
   async performReissueFurtherEvidence(caseId: string) {
@@ -92,6 +93,7 @@ export class ReissueFurtherEvidence extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
+    await this.homePage.delay(3000);
 
     // Verifying History tab + end state
     await this.verifyHistoryTabDetails('Reissue further evidence');

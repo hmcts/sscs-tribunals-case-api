@@ -19,9 +19,11 @@ export class UploadHearing extends BaseStep {
     await this.addHearingPage.submitHearing();
     await this.eventNameAndDescriptionPage.confirmSubmission();
 
+    await this.homePage.delay(3000);
     await this.homePage.chooseEvent('Hearing booked');
     await this.hearingBookedPage.submitHearingBooked();
     await this.homePage.signOut();
+    await new Promise((f) => setTimeout(f, 3000)); //Delay required for the Case to be ready
 
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
     await this.homePage.delay(60000); // wait for case update to happen
@@ -44,6 +46,7 @@ export class UploadHearing extends BaseStep {
       hearingRecordingTestData.hearingVenueValue
     );
     await this.homePage.signOut();
+    await new Promise((f) => setTimeout(f, 3000)); //Delay required for the Case to be ready
 
     await this.loginUserWithCaseId(
       credentials.dwpResponseWriter,
@@ -54,6 +57,7 @@ export class UploadHearing extends BaseStep {
     await this.requestRecordingPage.selectRecordingForRequest();
     await this.eventNameAndDescriptionPage.confirmSubmission();
     await this.homePage.signOut();
+    await new Promise((f) => setTimeout(f, 3000)); //Delay required for the Case to be ready
 
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
     await this.homePage.chooseEvent('Action hearing recording req');
@@ -91,9 +95,11 @@ export class UploadHearing extends BaseStep {
     await this.addHearingPage.submitHearing();
     await this.eventNameAndDescriptionPage.confirmSubmission();
 
+    await this.homePage.delay(3000);
     await this.homePage.chooseEvent('Hearing booked');
     await this.hearingBookedPage.submitHearingBooked();
     await this.homePage.signOut();
+    await new Promise((f) => setTimeout(f, 3000)); //Delay required for the Case to be ready
 
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
     await this.homePage.delay(60000); // wait for case update to happen

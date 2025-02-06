@@ -32,6 +32,7 @@ export class MarkCaseAsUrgent extends BaseStep {
     await this.eventNameAndDescriptionPage.confirmSubmission();
 
     await expect(this.homePage.summaryTab).toBeVisible();
+    await this.homePage.delay(3000);
     await this.verifyHistoryTabDetails(
       'With FTA',
       'Mark case as urgent',

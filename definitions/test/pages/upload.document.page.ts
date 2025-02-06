@@ -29,6 +29,7 @@ export class UploadDocumentPage {
       '#draftSscsFurtherEvidenceDocument_0_documentLink',
       'testfile1.pdf'
     );
+    await webActions.delay(3000);
     await webActions.clickSubmitButton();
 
     await webActions.verifyPageLabel(

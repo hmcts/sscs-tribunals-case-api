@@ -25,6 +25,7 @@ export class PrepareCaseForHearing extends BaseStep {
     await this.prepareCaseForHearingPage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
 
+    await this.homePage.delay(3000);
     await this.homePage.navigateToTab('History');
     await this.verifyHistoryTabDetails(prepareCaseForHearingData.eventName);
   }
@@ -38,6 +39,7 @@ export class PrepareCaseForHearing extends BaseStep {
       caseId
     );
     await expect(this.homePage.summaryTab).toBeVisible();
+    await this.homePage.delay(3000);
     await this.homePage.navigateToTab('Roles and access');
     await this.rolesAndAccessTab.allocateAdminRole(
       credentials.amRegionalCenterAdmin.email
@@ -176,6 +178,7 @@ export class PrepareCaseForHearing extends BaseStep {
     await this.eventNameAndDescriptionPage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
 
+    await this.homePage.delay(3000);
     await this.homePage.navigateToTab('History');
     await this.verifyHistoryTabDetails('Dormant', 'Strike out case');
 
@@ -188,6 +191,7 @@ export class PrepareCaseForHearing extends BaseStep {
     await this.createBundlePage.verifyPageContent();
     await this.createBundlePage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
+    await this.homePage.delay(3000);
     await this.homePage.navigateToTab('History');
     await this.verifyHistoryTabDetails('Create bundle');
   }

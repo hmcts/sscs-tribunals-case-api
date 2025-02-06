@@ -32,6 +32,7 @@ export class UploadRecordingPage {
         '#hearingRecording_recordings_value',
         'test_av.mp3'
       );
+      await webActions.delay(7000);
     }).toPass();
     await webActions.clickButton('Continue');
   }

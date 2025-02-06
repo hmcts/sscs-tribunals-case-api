@@ -27,7 +27,7 @@ export class SendToFTA extends BaseStep {
     let ftaResponseWriter: string = await accessId(
       credentials.dwpResponseWriter
     );
-
+    await new Promise((f) => setTimeout(f, 3000)); //Delay required for the Case to be ready
     await performEventOnCaseWithUploadResponse(
       ftaResponseWriterBearerToken.trim(),
       serviceToken.trim(),

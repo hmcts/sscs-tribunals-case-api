@@ -57,7 +57,9 @@ export class EventNameEventDescriptionPage {
   }
 
   async confirmSubmission(): Promise<void> {
+    await this.delay(3000);
     await webActions.clickSubmitButton();
+    await this.delay(3000);
   }
 
   async submitBtn(): Promise<void> {

@@ -50,6 +50,7 @@ export class SupplementaryResponse extends BaseStep {
       caseId
     );
     await expect(this.homePage.summaryTab).toBeVisible();
+    await this.homePage.delay(3000);
     await this.homePage.navigateToTab('Roles and access');
     await this.rolesAndAccessTab.allocateCtscRole(
       credentials.amCaseWorker.email
@@ -125,6 +126,7 @@ export class SupplementaryResponse extends BaseStep {
     await this.eventNameAndDescriptionPage.confirmSubmission();
 
     await expect(this.homePage.summaryTab).toBeVisible();
+    await this.homePage.delay(3000);
 
     // Verify task is removed from the tasks list within Tasks tab
     await this.tasksTab.verifyTaskIsHidden(task.name);
