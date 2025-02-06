@@ -315,7 +315,7 @@ public class CcdNotificationsPdfService {
             return IOUtils.toByteArray(in);
         } catch (IOException e) {
             log.info("Failed to get resource with exception {}", e.getMessage());
-            return new byte[0];
+            throw e;
         }
     }
 
