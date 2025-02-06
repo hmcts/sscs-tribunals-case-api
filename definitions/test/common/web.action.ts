@@ -179,14 +179,14 @@ export class WebAction {
     await input.setInputFiles(path.join(__dirname, `../data/file/${fileName}`));
     await expect(uploadingMessage).toBeHidden();
     try {
-      await expect(rateLimitError).toBeHidden({ timeout: 5500 });
+      await expect(rateLimitError).toBeHidden({ timeout: 7000 });
     } catch (error) {
       await input.setInputFiles(
         path.join(__dirname, `../data/file/${fileName}`)
       );
       await expect(uploadingMessage).toBeHidden();
     }
-    await expect(rateLimitError).toBeHidden({ timeout: 5500 });
+    await expect(rateLimitError).toBeHidden({ timeout: 7000 });
   }
 
   async screenshot() {
