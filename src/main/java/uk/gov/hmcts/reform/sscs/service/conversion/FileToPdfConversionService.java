@@ -72,7 +72,7 @@ public class FileToPdfConversionService {
         Detector detector = config.getDetector();
         Metadata metadata = new Metadata();
         metadata.set(HttpHeaders.CONTENT_TYPE, f.getOriginalFilename());
-        String newMimeType = detector.detect(TikaInputStream.get(file), metadata).getBaseType().toString();
+        String newMimeType = detector.detect(TikaInputStream.get(file.toPath()), metadata).getBaseType().toString();
 
         String extension =  FilenameUtils.getExtension(file.getName());
         final String fileName = String.format("%s.%s", FilenameUtils.getBaseName(f.getOriginalFilename()), extension);
