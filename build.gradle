@@ -4,18 +4,16 @@ plugins {
     id 'org.sonarqube' version '6.0.1.5171'
     id 'jacoco'
     id 'org.springframework.boot' version '3.4.2'
-    id 'uk.gov.hmcts.java' version '0.12.64'
+    id 'uk.gov.hmcts.java' version '0.12.65'
     id 'com.gorylenko.gradle-git-properties' version '2.4.2'
     id 'com.github.ben-manes.versions' version '0.46.0'
-    id "info.solidsoft.pitest" version '1.15.0'
     id 'org.owasp.dependencycheck' version '12.0.2'
     id 'au.com.dius.pact' version '4.3.15'
-    id 'com.github.hmcts.rse-cft-lib' version '0.19.1563'
+    id 'com.github.hmcts.rse-cft-lib' version '0.19.1565'
 }
 
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
-apply plugin: "info.solidsoft.pitest"
 
 gitProperties {
     gitPropertiesDir = new File("${project.rootDir}/src/main/resources/uk/gov/hmcts/reform/sscs")
@@ -251,8 +249,6 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/sscs/EnvironmentPropertiesPrinter.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/controller/FunctionalTestController.java,"
         property "sonar.host.url", "https://sonar.reform.hmcts.net/"
-        property "sonar.pitest.mode", "reuseReport"
-        property "sonar.pitest.reportsDirectory", "build/reports/pitest"
     }
 }
 
@@ -382,21 +378,10 @@ dependencies {
     implementation group: 'org.springframework', name: 'spring-jms'
     implementation group: 'org.apache.qpid', name: 'qpid-jms-client', version: '2.6.1'
 
-    implementation group: 'org.pitest', name: 'pitest', version:  '1.17.4'
-    implementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: pitest.pitestVersion.get()
-    implementation group:'org.codehaus.sonar-plugins', name:'sonar-pitest-plugin', version: '0.5'
-
     implementation group: 'com.github.hmcts', name: 'sscs-job-scheduler', version: '2.0.0'
     implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.5.0'
     implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.2.1-RELEASE'
     implementation group: 'org.commonmark', name: 'commonmark', version: '0.24.0'
-
-    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.3.1'
-    testImplementation group: 'io.rest-assured', name: 'xml-path', version: '5.3.1'
-    testImplementation group: 'io.rest-assured', name: 'json-path', version: '5.3.1'
-    testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.7', classifier: 'all', {
-        exclude group: 'commons-io', module: 'commons-io'
-    }
 
     implementation group: 'commons-io', name: 'commons-io', version:  versions.commonsio
 
@@ -430,11 +415,6 @@ dependencies {
         exclude group: 'org.codehaus.groovy', module: 'groovy-xml'
     }
 
-
-    integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  versions.commonsio
-
-    functionalTestImplementation group: 'commons-io', name: 'commons-io', version:  versions.commonsio
-
     implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
@@ -442,18 +422,21 @@ dependencies {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
     }
 
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.3.1'
+    testImplementation group: 'io.rest-assured', name: 'xml-path', version: '5.3.1'
+    testImplementation group: 'io.rest-assured', name: 'json-path', version: '5.3.1'
+    testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.7', classifier: 'all', {
+        exclude group: 'commons-io', module: 'commons-io'
+    }
+
     testImplementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5-fluent', version: '5.4.2'
 
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
-    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.37.0'
-    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
-    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.37.0'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.15.2'
+    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '4.1.0'
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.15.2'
+    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '4.1.0'
 
     testImplementation group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
-
-    // https://mvnrepository.com/artifact/net.bytebuddy/byte-buddy-dep
-    testImplementation group: 'net.bytebuddy', name: 'byte-buddy-dep', version: '1.17.0'
-
 
     testImplementation group: 'pl.pragmatists', name: 'JUnitParams', version: '1.1.1'
 
@@ -474,9 +457,9 @@ dependencies {
     // https://mvnrepository.com/artifact/org.awaitility/awaitility
     testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.2.2'
 
-    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-core', version: '8.0.6'
-    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-amqp-1-0-protocol', version: '8.0.6'
-    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-memory-store', version: '8.0.6'
+    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-core', version: '9.2.0'
+    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-amqp-1-0-protocol', version: '9.2.0'
+    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-memory-store', version: '9.2.0'
     testImplementation 'org.wiremock.integrations:wiremock-spring-boot:3.6.0'
 
     //pact contract testing
@@ -501,28 +484,6 @@ bootJar {
         attributes 'Implementation-Title': project.name,
                 'Implementation-Version': project.version
     }
-}
-
-pitest {
-    targetClasses = ['uk.gov.hmcts.reform.sscs.service.*']
-    excludedClasses = ['uk.gov.hmcts.reform.sscs.config.*',
-                       'uk.gov.hmcts.reform.sscs.builder.*',
-                       'uk.gov.hmcts.reform.sscs.domain.*',
-                       'uk.gov.hmcts.reform.sscs.exception.*',
-                       'uk.gov.hmcts.reform.sscs.healthcheck.*',
-                       'uk.gov.hmcts.reform.sscs.model.*',
-                       'uk.gov.hmcts.reform.sscs.transform.*',
-                       'uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication']
-    excludedMethods = ['equals', 'hashcode']
-    jvmArgs = ['-Xms1G','-Xmx3G']
-    enableDefaultIncrementalAnalysis = true
-    historyInputLocation = 'build/reports/pitest/fastermutationtesting'
-    historyOutputLocation = 'build/reports/pitest/fastermutationtestingoutput'
-    threads = 20
-    verbose = true
-    outputFormats = ['XML', 'HTML']
-    timestampedReports = false
-    mutationThreshold = 50
 }
 
 project.ext {
@@ -645,17 +606,6 @@ task highLevelDataSetup(type: JavaExec) {
     mainClass = "uk.gov.hmcts.reform.sscs.config.HighLevelDataSetupApp"
     classpath += sourceSets.main.runtimeClasspath
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
-}
-
-// this is required to force Java running on the Azure Windows Server OS into using
-// UTF-8 as the default character set instead of windows-1252 which causes issues
-applicationDefaultJvmArgs = ["-Dfile.encoding=UTF-8"]
-
-run {
-    def debug = System.getProperty("debug")
-    if (debug == 'true') {
-        jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
-    }
 }
 
 def dbHost = System.env.JOB_SCHEDULER_DB_HOST ?: "localhost"
