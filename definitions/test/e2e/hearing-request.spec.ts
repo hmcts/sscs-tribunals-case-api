@@ -7,6 +7,12 @@ test.describe(
   'Create a new hearing for an List assist case',
   { tag: '@nightly-pipeline' },
   async () => {
+    test.beforeEach('Case has to be Created', async ({ page }) => {
+      if (process.env.HEARING_API_DOWN === 'true') {
+        throw new Error('Hearing API is down');
+      }
+    });
+
     test(
       'Trigger a new hearing & cancellation for DLA case',
       { tag: '@aat-regression' },

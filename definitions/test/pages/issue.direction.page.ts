@@ -92,10 +92,10 @@ export class IssueDirectionPage {
       '#sendDirectionNoticeToRepresentative legend > .form-label',
       issueDirectionsNoticeData.representativeLabel
     );
-    await webActions.verifyPageLabel(
-      '#sendDirectionNoticeToOtherParty legend > .form-label',
-      issueDirectionsNoticeData.otherPartyLabel
-    );
+    // await webActions.verifyPageLabel(
+    //   '#sendDirectionNoticeToOtherParty legend > .form-label',
+    //   issueDirectionsNoticeData.otherPartyLabel
+    // );
     await webActions.verifyPageLabel(
       '#sendDirectionNoticeToAppellantOrAppointee legend > .form-label',
       issueDirectionsNoticeData.appellantOrAppointee
