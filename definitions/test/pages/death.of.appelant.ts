@@ -55,6 +55,7 @@ export class DeathOfAppellantPage {
     await webAction.inputField('#dateOfAppellantDeath-day', '01');
     await webAction.inputField('#dateOfAppellantDeath-month', '06');
     await webAction.inputField('#dateOfAppellantDeath-year', '2003');
+    await webAction.clickElementById('#dateOfAppellantDeath-day');
 
     if (yesNoOption === 'Yes') {
       //Verify Section Headings and Field Labels for the Appointee Details (Name, Identify, Address Details, Contact Details)
@@ -88,6 +89,7 @@ export class DeathOfAppellantPage {
     await webAction.inputField('#dateOfAppellantDeath-day', '01');
     await webAction.inputField('#dateOfAppellantDeath-month', 'AUG');
     await webAction.inputField('#dateOfAppellantDeath-year', '2028');
+    await webAction.clickElementById('#dateOfAppellantDeath-day');
   }
 
   async populateDeathOfAppellantDateInTheFuture(yesNoOption: string) {
@@ -97,6 +99,7 @@ export class DeathOfAppellantPage {
     await webAction.inputField('#dateOfAppellantDeath-day', '01');
     await webAction.inputField('#dateOfAppellantDeath-month', '08');
     await webAction.inputField('#dateOfAppellantDeath-year', '2028');
+    await webAction.clickElementById('#dateOfAppellantDeath-day');
   }
 
   async confirmSubmission(): Promise<void> {
