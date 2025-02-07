@@ -177,7 +177,7 @@ docmosis:
                 name: TB-SCS-LET-ENG-Issue-Generic-Letter.docx
             postHearingAppSorWritten:
                 cover: TB-SCS-GNO-ENG-00012.docx
-                name: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome.docx
+                name: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome-v2.docx
         welsh:
             d609-97:
                 name: TB-SCS-GNO-WEL-00469.docx
@@ -192,7 +192,7 @@ docmosis:
                 name: TB-SCS-LET-ENG-Issue-Generic-Letter.docx
             postHearingAppSorWritten:
                 cover: TB-SCS-GNO-WEL-00479.docx
-                name: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome.docx
+                name: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome-v2.docx
 
 document:
     bilingual:
@@ -871,13 +871,13 @@ notification:
             other_party:
                 docmosisId: TB-SCS-GNO-ENG-00784.docx
         libertyToApplyGranted:
-            docmosisId: TB-SCS-LET-ENG-Liberty-to-Apply-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-ENG-Liberty-to-Apply-Granted-Refused-v2.docx
         libertyToApplyRefused:
-            docmosisId: TB-SCS-LET-ENG-Liberty-to-Apply-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-ENG-Liberty-to-Apply-Granted-Refused-v2.docx
         sORExtendTime:
-            docmosisId: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome.docx
+            docmosisId: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome-v2.docx
         sORRefused:
-            docmosisId: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome.docx
+            docmosisId: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome-v2.docx
         paper:
             responseReceived:
                 appellant:
@@ -1488,13 +1488,13 @@ notification:
             other_party:
                 docmosisId: TB-SCS-GNO-WEL-00787.docx
         libertyToApplyGranted:
-            docmosisId: TB-SCS-LET-WEL-Liberty-to-Apply-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-WEL-Liberty-to-Apply-Granted-Refused-v2.docx
         libertyToApplyRefused:
-            docmosisId: TB-SCS-LET-WEL-Liberty-to-Apply-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-WEL-Liberty-to-Apply-Granted-Refused-v2.docx
         sORExtendTime:
-            docmosisId: TB-SCS-LET-WEL-Statement-Of-Reasons-Outcome.docx
+            docmosisId: TB-SCS-LET-WEL-Statement-Of-Reasons-Outcome-v2.docx
         sORRefused:
-            docmosisId: TB-SCS-LET-WEL-Statement-Of-Reasons-Outcome.docx
+            docmosisId: TB-SCS-LET-WEL-Statement-Of-Reasons-Outcome-v2.docx
         paper:
             responseReceived:
                 appellant:
