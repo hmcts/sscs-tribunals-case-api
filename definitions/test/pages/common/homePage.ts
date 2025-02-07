@@ -43,8 +43,8 @@ export class HomePage {
       name: 'Roles and access',
       exact: true
     });
-    this.appealDetailsTab = page.getByText('Appeal Details', { exact: true });
-    this.bundlesTab = page.getByText('Bundles', { exact: true });
+    this.appealDetailsTab = page.getByRole('tab', { name: 'Appeal Details', exact: true });
+    this.bundlesTab = page.getByRole('tab', { name: 'Bundles', exact: true });
     this.nextStepDropDown = '#next-step';
     this.submitNextStepButton = '//button[@class="submit"]';
     this.eventTitle = page.locator('h1.govuk-heading-l');
