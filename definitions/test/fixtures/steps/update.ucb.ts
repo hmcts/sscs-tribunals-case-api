@@ -16,7 +16,7 @@ export class UpdateUCB extends BaseStep {
     await this.updateUCBPage.verifyPageContent();
     await this.updateUCBPage.updateUCBToNo();
     await this.updateUCBPage.confirmSubmission();
-    await this.eventNameAndDescriptionPage.confirmSubmission();
+    await this.homePage.navigateToTab('Listing Requirements');
     await this.listingRequirementsTab.verifyContentNotPresent(
       ucbTestData.ucbFieldLabel,
       ucbTestData.ucbFieldValue_Yes

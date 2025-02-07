@@ -221,7 +221,7 @@ export class UrgentHearing extends BaseStep {
     await this.documentsTab.verifyFieldVisible('Yes');
     await this.documentsTab.verifyFieldVisible('Bundle addition');
     await this.documentsTab.verifyFieldVisible('Translation status');
-    await this.documentsTab.verifyFieldVisible('Translation Requested');
+    await this.documentsTab.verifyFieldVisible('Translation Required');
     //TODO - Further Verification that the Urgent Hearing Fields and the Interloculary State
     // should be verified post the Fix for SSCSCI-1013
   }
