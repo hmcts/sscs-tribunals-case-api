@@ -261,6 +261,8 @@ def runE2eTests() {
     stage('Playwright tests') {
         try {
             sh './gradlew runE2eTests'
+        } catch (Error) {
+            unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
         } finally {
             steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'definitions/test/playwright-report/**'
         }
