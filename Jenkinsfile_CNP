@@ -120,6 +120,7 @@ withPipeline(type, product, component) {
     def notificationTestsEnabled = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "run-notification-tests").size() > 0;
 
     enableHighLevelDataSetup()
+    enableMutationTest()
 
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
