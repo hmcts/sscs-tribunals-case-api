@@ -510,7 +510,9 @@ pact {
         pactDirectory = 'pacts'
         tags = [System.getenv("PACT_BRANCH_NAME") ?:'Dev']
         version = project.pacticipantVersion
+        pactPublish = project.pact.publish
     }
+    pactPublish = project.pact.publish
 }
 
 tasks.pactPublish { dependsOn(test) } 
