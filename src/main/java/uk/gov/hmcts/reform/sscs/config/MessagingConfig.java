@@ -57,7 +57,10 @@ public class MessagingConfig {
         if (reconnectOnException) {
             cachingConnectionFactory.setReconnectOnException(true);
         }
-        return cachingConnectionFactory;
+        var factory = new CachingConnectionFactory(jmsConnectionFactory);
+        factory.setCacheConsumers(false);
+        factory.setCacheProducers(false);
+        return factory;
     }
 
     @Bean("evidenceShareJmsTemplate")

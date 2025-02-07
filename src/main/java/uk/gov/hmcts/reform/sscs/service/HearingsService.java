@@ -70,7 +70,7 @@ public class HearingsService {
     private static final Long HEARING_VERSION_NUMBER = 1L;
 
     @Retryable(
-            value = UpdateCaseException.class,
+            retryFor = UpdateCaseException.class,
             maxAttemptsExpression = "${retry.hearing-response-update.max-retries}",
             backoff = @Backoff(delayExpression = "${retry.hearing-response-update.backoff}"))
     public void processHearingRequest(HearingRequest hearingRequest) throws UnhandleableHearingStateException,

@@ -8,6 +8,7 @@
   "DisplayOrder": 361,
   "PreConditionState(s)": "*",
   "CallBackURLAboutToStartEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToStart",
+  "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
   "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
   "PostConditionState": "*",
   "SecurityClassification": "Public"
