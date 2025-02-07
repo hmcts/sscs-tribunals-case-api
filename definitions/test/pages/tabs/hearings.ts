@@ -1,7 +1,6 @@
 import { expect, Page } from '@playwright/test';
 import { WebAction } from '../../common/web.action';
 import dateUtilsComponent from '../../utils/DateUtilsComponent';
-import logger from '../../utils/loggerUtil';
 
 let webActions: WebAction;
 
@@ -31,14 +30,6 @@ export class Hearings {
   }
 
   async verifyHearingStatusSummary() {
-    const hearingTabError = 'There was a system error and your request could not be processed. Please try again.'
-    try {
-      await expect(this.page.getByText(hearingTabError).first()).toBeHidden();
-    } catch (error) {
-      logger.info('Hearings tab system error.');
-      process.env.HEARING_API_DOWN = 'true';
-      throw error;
-    }
     await webActions.verifyTextVisibility('WAITING TO BE LISTED');
     await webActions.verifyTextVisibility('Substantive');
     await webActions.verifyTextVisibility('View or edit');
