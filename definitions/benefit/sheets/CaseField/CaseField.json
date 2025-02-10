@@ -448,7 +448,7 @@
   {"LiveFrom": "08/03/2022", "CaseTypeID": "Benefit", "ID": "activeHearingId", "Label": "Active Hearing ID", "FieldType": "Number","SecurityClassification": "PUBLIC"},
   {"LiveFrom": "08/03/2022", "CaseTypeID": "Benefit", "ID": "activeHearingVersionNumber", "Label": "Active Hearing Version Number", "FieldType": "Number", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/06/2022", "CaseTypeID": "Benefit", "ID": "overrideFields", "Label": "Overrides Listing Values", "FieldType": "overrideFields", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "01/06/2022", "CaseTypeID": "Benefit", "ID": "panelMemberComposition", "Label": "Panel Member Composition", "FieldType": "FixedRadioList", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/06/2022", "CaseTypeID": "Benefit", "ID": "panelMemberComposition", "Label": "Panel Member Composition", "FieldType": "FixedRadioList", "FieldTypeParameter": "FL_panelMemberComposition", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/06/2022", "CaseTypeID": "Benefit", "ID": "defaultListingValues", "Label": "Default Listing Values", "FieldType": "overrideFields", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "06/07/2022", "CaseTypeID": "Benefit", "ID": "amendReasons", "Label": "Amend Reason", "FieldType": "MultiSelectList", "FieldTypeParameter": "FL_amendReason", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "23/11/2022", "CaseTypeID": "Benefit", "ID": "adjournmentInProgress", "Label": "Adjournment in progress?", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
