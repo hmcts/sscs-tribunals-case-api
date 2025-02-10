@@ -1,29 +1,34 @@
-import {test} from "../lib/steps.factory";
-import {credentials} from "../config/config"
-import {accessToken, getSSCSServiceToken, accessId, getIDAMUserID} from "../api/client/idam/idam.service";
-import createCaseBasedOnCaseType from "../api/client/sscs/factory/appeal.type.factory";
+import { test } from '../lib/steps.factory';
+import { credentials } from '../config/config';
 import {
-    performEventOnCaseWithEmptyBody,
-    performEventOnCaseWithUploadResponse
-} from "../api/client/sscs/factory/appeal.update.factory";
-import logger from "../utils/loggerUtil";
+  accessToken,
+  getSSCSServiceToken,
+  accessId
+} from '../api/client/idam/idam.service';
+import createCaseBasedOnCaseType from '../api/client/sscs/factory/appeal.type.factory';
+import { performEventOnCaseWithUploadResponse } from '../api/client/sscs/factory/appeal.update.factory';
 //var event_token: string = JSON.parse(response_document).push({hello: 'value'});
-import fs from 'fs';
 
-test("Test to Test API Working....", async () => {
+test('Test to Test API Working....', async () => {
+  let pipCaseId = await createCaseBasedOnCaseType('PIP');
+  await new Promise((f) => setTimeout(f, 10000)); //Delay required for the Case to be ready
+  let responseWriterToken: string = await accessToken(
+    credentials.dwpResponseWriter
+  );
+  let serviceToken: string = await getSSCSServiceToken();
+  let responseWriterId: string = await accessId(credentials.dwpResponseWriter);
+  await performEventOnCaseWithUploadResponse(
+    responseWriterToken.trim(),
+    serviceToken.trim(),
+    responseWriterId.trim(),
+    'SSCS',
+    'Benefit',
+    pipCaseId.trim(),
+    'dwpUploadResponse',
+    'dwp'
+  );
 
-    let pipCaseId = await createCaseBasedOnCaseType('PIP');
-    await new Promise(f => setTimeout(f, 10000)); //Delay required for the Case to be ready
-    logger.info('The value of the response writer : ' + credentials.dwpResponseWriter.email)
-    let responseWriterToken: string = await accessToken(credentials.dwpResponseWriter);
-    let serviceToken: string = await getSSCSServiceToken();
-    let responseWriterId: string = await accessId(credentials.dwpResponseWriter);
-    await performEventOnCaseWithUploadResponse(responseWriterToken.trim(),
-        serviceToken.trim(), responseWriterId.trim(),
-        'SSCS', 'Benefit',
-        pipCaseId.trim(), 'dwpUploadResponse', 'dwp');
-
-    /*logger.info('The value of the response writer : '+credentials.amCaseWorker.email)
+  /*logger.info('The value of the response writer : '+credentials.amCaseWorker.email)
        let caseWorkerToken: string = await accessToken(credentials.amCaseWorker);
        let serviceTokenForCaseWorker: string = await getSSCSServiceToken();
        let caseWorkerId: string = await accessId(credentials.amCaseWorker);
@@ -32,8 +37,7 @@ test("Test to Test API Working....", async () => {
            serviceTokenForCaseWorker.trim(),caseWorkerId.trim(),'SSCS','Benefit',
            childSupportCaseId.trim(), 'uploadDocumentFurtherEvidence');*/
 
-
-   /* let token: string = await accessToken(credentials.amSuperUser);
+  /* let token: string = await accessToken(credentials.amSuperUser);
     let serviceToken: string = await getSSCSServiceToken();
     let userId: string = await accessId(credentials.amSuperUser);
     await new Promise(f => setTimeout(f, 3000)); //Delay required for the Case to be ready
@@ -42,8 +46,6 @@ test("Test to Test API Working....", async () => {
          'SSCS','Benefit',
          childSupportCaseId.trim(),'appealDormant');
     logger.info("The value of the IDAM Token : "+token);*/
-
-
 });
 
 /*test.only("Temporary testing of the JSON Node on Json Node", async ({addNoteSteps}) => {

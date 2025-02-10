@@ -36,7 +36,7 @@ public class UploadWelshDocumentsAboutToStartHandler implements PreSubmitCallbac
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
-        PreSubmitCallbackResponse response = new PreSubmitCallbackResponse<>(sscsCaseData);
+        final var response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         setOriginalDocumentDropdown(sscsCaseData, response);
 
