@@ -24,6 +24,7 @@ export class RequestTimeExtensionPage {
       '#tl1Form_documentLink',
       uploadResponseTestdata.testfileone
     );
+    await expect(this.page.locator('span.error-message')).toBeHidden();
   }
 
   async confirmSubmission(): Promise<void> {

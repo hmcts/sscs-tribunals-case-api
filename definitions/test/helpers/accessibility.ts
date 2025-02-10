@@ -15,15 +15,6 @@ async function axeTest(page: Page): Promise<void> {
       'wcag22aa'
     ])
     .analyze();
-
-  const reportHTML = createHtmlReport({
-    results: accessibilityScanResults,
-    options: {
-      projectkey: 'PlaywrightHomepage'
-    }
-  });
-
-  fs.writeFileSync('accessibility-report/report.html', reportHTML);
   expect(accessibilityScanResults.violations).toEqual([]);
 }
 
