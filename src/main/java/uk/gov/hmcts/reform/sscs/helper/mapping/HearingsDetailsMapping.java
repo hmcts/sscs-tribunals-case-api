@@ -36,11 +36,14 @@ import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 @Slf4j
 public final class HearingsDetailsMapping {
 
-    @Value("${feature.direction-hearings.enabled}")
     private static boolean isDirectionHearingsEnabled;
 
     private HearingsDetailsMapping() {
+    }
 
+    @Value("${feature.direction-hearings.enabled}")
+    public void setIsDirectionHearingsEnabled(boolean value) {
+        isDirectionHearingsEnabled = value;
     }
 
     public static HearingDetails buildHearingDetails(HearingWrapper wrapper, ReferenceDataServiceHolder refData) throws ListingException {
