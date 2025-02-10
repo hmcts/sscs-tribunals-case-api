@@ -249,6 +249,7 @@ ccd-case-document-am-api:
 
 xui-webapp:
   enabled: true
+  image: 'hmctspublic.azurecr.io/xui/webapp:pr-3979'
   nodejs:
     devmemoryRequests: "512Mi"
     devmemoryLimits: "1Gi"
@@ -295,6 +296,7 @@ xui-webapp:
       PROTOCOL: http
       LAUNCH_DARKLY_CLIENT_ID: 645baeea2787d812993d9d70
       PREVIEW_DEPLOYMENT_ID: "deployment-${SERVICE_NAME}"
+      ENABLE_HMC_PREVIEW_CCD: "true"
     keyVaults:
       rpx:
         resourceGroup: rpx
