@@ -4,7 +4,6 @@ import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcTemplateContent;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcScenario;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
 public class UcScenario2Test {
