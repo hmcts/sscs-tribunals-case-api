@@ -972,7 +972,8 @@
   {"LiveFrom": "03/12/2024", "CaseTypeID": "Benefit", "CaseEventID": "removeCaseOutcome", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
   {"LiveFrom": "02/12/2024", "CaseTypeID": "Benefit", "CaseEventID": "caseOutcomeMigration", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRU"},
   {"LiveFrom": "02/12/2024", "CaseTypeID": "Benefit", "CaseEventID": "caseOutcomeMigration", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
-  {"LiveFrom": "02/12/2024", "CaseTypeID": "Benefit", "CaseEventID": "caseOutcomeMigration", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRU"},
   {"LiveFrom": "02/12/2024", "CaseTypeID": "Benefit", "CaseEventID": "clearExpiredFilters", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRU"},
-  {"LiveFrom": "02/12/2024", "CaseTypeID": "Benefit", "CaseEventID": "clearExpiredFilters", "AccessProfile": "caseworker-sscs", "CRUD": "R"}
+  {"LiveFrom": "02/12/2024", "CaseTypeID": "Benefit", "CaseEventID": "clearExpiredFilters", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
+  {"LiveFrom": "02/12/2024", "CaseTypeID": "Benefit", "CaseEventID": "removeGapsOutcomeTab", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRU"},
+  {"LiveFrom": "02/12/2024", "CaseTypeID": "Benefit", "CaseEventID": "removeGapsOutcomeTab", "AccessProfile": "caseworker-sscs", "CRUD": "R"}
 ]
