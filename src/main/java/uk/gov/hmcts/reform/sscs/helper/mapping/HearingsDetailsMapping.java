@@ -12,7 +12,6 @@ import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -85,7 +84,7 @@ public final class HearingsDetailsMapping {
 
     public static HmcHearingType getHearingType(SscsCaseData sscsCaseData) {
         return isDirectionHearingsEnabled && getHmcHearingType(sscsCaseData) != null
-            ? getHmcHearingType(sscsCaseData) : HmcHearingType.SUBSTANTIVE;
+                ? getHmcHearingType(sscsCaseData) : HmcHearingType.SUBSTANTIVE;
     }
 
     public static boolean isCaseUrgent(@Valid SscsCaseData caseData) {
