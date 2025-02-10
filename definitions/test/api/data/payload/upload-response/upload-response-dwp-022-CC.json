@@ -64,9 +64,7 @@
       "languageInterpreter": "No",
       "languages": null,
       "signLanguageType": null,
-      "arrangements": [
-        "hearingLoop"
-      ],
+      "arrangements": ["hearingLoop"],
       "scheduleHearing": "Yes",
       "excludeDates": [
         {
