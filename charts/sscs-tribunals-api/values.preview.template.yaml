@@ -249,8 +249,8 @@ ccd-case-document-am-api:
 
 xui-webapp:
   enabled: true
-  image: 'hmctspublic.azurecr.io/xui/webapp:pr-3979'
   nodejs:
+    image: 'hmctspublic.azurecr.io/xui/webapp:pr-3979'
     devmemoryRequests: "512Mi"
     devmemoryLimits: "1Gi"
     devcpuRequests: "200m"
