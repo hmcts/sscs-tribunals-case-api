@@ -1,0 +1,247 @@
+[
+  {
+    "Version Number": "SSCS Scanned Corespondance",
+    "Description of Changes": "Initial definition file for Bulk Scanning Phase 1 and Phase 2",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "28/09/2018",
+    "Created By": "Nitin Prabhu"
+  },
+  {
+    "Version Number": "SSCS Scanned Corespondance",
+    "Description of Changes": "Updated callback URL for AAT",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "26/10/2018",
+    "Created By": "Jack Maloney"
+  },
+  {
+    "Version Number": "1.0.4",
+    "Description of Changes": "Added subtype to Document complex type",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "14/01/2019",
+    "Created By": "Aliveni Choppa"
+  },
+  {
+    "Version Number": "1.0.5",
+    "Description of Changes": "Added custom event history tab",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "27/03/2019",
+    "Created By": "Aliveni Choppa"
+  },
+  {
+    "Version Number": "1.0.6",
+    "Description of Changes": "Added exception record id to Workbasket results",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "03/04/2019",
+    "Created By": "Aliveni Choppa"
+  },
+  {
+    "Version Number": "1.0.7",
+    "Description of Changes": "Disable attaching to a case"
+  },
+  {
+    "Version Number": "1.0.8",
+    "Description of Changes": "Added new role to Authorisation tabs",
+    "LiveFrom": "30/05/2019",
+    "Created By": "Aliveni Choppa"
+  },
+  {
+    "Version Number": "1.0.9",
+    "Description of Changes": "Added poBox to WorkBasketResults tab",
+    "LiveFrom": "06/06/2019",
+    "Created By": "Aliveni Choppa"
+  },
+  {
+    "Version Number": "1.0.10",
+    "Description of Changes": "Added deliveryDate to ScannedDocument complex type",
+    "LiveFrom": "17/06/2019",
+    "Created By": "Aliveni Choppa"
+  },
+  {
+    "Version Number": "1.0.11",
+    "Description of Changes": "Added new document types",
+    "LiveFrom": "17/06/2019",
+    "Created By": "Aliveni Choppa"
+  },
+  {
+    "Version Number": "1.0.12",
+    "Description of Changes": "Added AuthorisationComplexType tab",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "19/06/2019",
+    "Created By": "Aliveni Choppa"
+  },
+  {
+    "Version Number": "1.0.13",
+    "Description of Changes": "Added changes to implement Phase 2 and replaced \"callagent\" role with \"clerk\"",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "12/07/2019",
+    "Created By": "Gareth Harvey"
+  },
+  {
+    "Version Number": "1.0.14",
+    "Description of Changes": "Add JourneyClassification to SearchInputFields and WorkBasketResultFields",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "01/08/2019",
+    "Created By": "Donatas Martinkus"
+  },
+  {
+    "Version Number": "1.0.15-SNAPSHOT",
+    "Description of Changes": "Add extra label for JourneyClassification in SearchInputField",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "22/08/2019",
+    "Created By": "Donatas Martinkus"
+  },
+  {
+    "Version Number": "1.0.16",
+    "Description of Changes": "Add Warnings tab",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "05/09/2019",
+    "Created By": "Leszek Gonczar"
+  },
+  {
+    "Version Number": "1.0.17",
+    "Description of Changes": "Add FormType to Ocr tab",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "12/09/2019",
+    "Created By": "Mustafa Dayican"
+  },
+  {
+    "Version Number": "1.0.18",
+    "Description of Changes": "Add envelopeId field",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "23/09/2019",
+    "Created By": "Leszek Gonczar"
+  },
+  {
+    "Version Number": "1.0.19",
+    "Description of Changes": "Add awaitingPaymentDCNProcessing field to ExceptionRecord",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "27/09/2019",
+    "Created By": "Aliveni Choppa"
+  },
+  {
+    "Version Number": "1.0.20",
+    "Description of Changes": "Add containsPayments field to ExceptionRecord",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "07/10/2019",
+    "Created By": "Aliveni Choppa"
+  },
+  {
+    "Version Number": "1.0.21",
+    "Description of Changes": "Add completeAwaitingPaymentDCNProcessing event",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "09/10/2019",
+    "Created By": "Leszek Gonczar"
+  },
+  {
+    "Version Number": "1.0.22",
+    "Description of Changes": "Remove containsPayments field from createCase event ",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "15/10/2019",
+    "Created By": "Aliveni Choppa"
+  },
+  {
+    "Version Number": "1.0.23",
+    "Description of Changes": "Remove authorization for completeAwaitingPaymentDCNProcessing event",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "16/10/2019",
+    "Created By": "Aliveni Choppa"
+  },
+  {
+    "Version Number": "1.0.24",
+    "Description of Changes": "Add envelope case reference received for supplementary evidence",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "30/10/2019",
+    "Created By": "Aliveni Choppa"
+  },
+  {
+    "Version Number": "1.0.25",
+    "Description of Changes": "Add new fields to show/hide case reference and legacy case reference received in the envelope. Remove envelopeCaseReference from workbasket results, search results and case type tab",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "04/11/2019",
+    "Created By": "Aliveni Choppa"
+  },
+  {
+    "Version Number": "1.0.26",
+    "Description of Changes": "Add surname field",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "12/12/2019",
+    "Created By": "Mustafa Dayican"
+  },
+  {
+    "Version Number": "1.0.27",
+    "Description of Changes": "Change 'corespondance' tab label to 'correspondence'",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "19/12/2019",
+    "Created By": "Aliveni Choppa"
+  },
+  {
+    "Version Number": "1.0.28",
+    "Description of Changes": "Make surname field visible and searchable",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "19/12/2019",
+    "Created By": "Mustafa Dayican"
+  },
+  {
+    "Version Number": "1.0.29",
+    "Description of Changes": "Add surname field to work basket result",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "07/01/2020",
+    "Created By": "Mustafa Dayican"
+  },
+  {
+    "Version Number": "1.0.30",
+    "Description of Changes": "Update create case callback url and callback timeout",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "14/05/2020",
+    "Created By": "Aliveni Choppa"
+  },
+  {
+    "Version Number": "1.0.31",
+    "Description of Changes": "Fix create case event post condition",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "16/06/2020",
+    "Created By": "Aliveni Choppa"
+  },
+  {
+    "Version Number": "1.0.32",
+    "Description of Changes": "Add searchCaseReference field to attachToExistingCase event",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "29/06/2020",
+    "Created By": "Aliveni Choppa"
+  },
+  {
+    "Version Number": "1.0.33",
+    "Description of Changes": "Enable search by formtype",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "10/07/2020",
+    "Created By": "Mustafa Dayican"
+  },
+  {
+    "Version Number": "1.1.0",
+    "Description of Changes": "Populate CaseEventToComplexFields tab",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "28/08/2020",
+    "Created By": "Donatas Martinkus"
+  },
+  {
+    "Version Number": "1.1.1",
+    "Description of Changes": "Remove 'Contains payment' from SearchInputFields and WorkBasketInputFields",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "18/11/2020",
+    "Created By": "Sanchita Chowdhury"
+  },
+  {
+    "Version Number": "1.1",
+    "Description of Changes": "Changed type of POBox to FixedList. Added POBox toWorkbasket",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "20/07/2021",
+    "Created By": "Andrey Pereverzin"
+  },
+  {
+    "Version Number": "1.1.2",
+    "Description of Changes": "Remove special characters from FieldShowCondition",
+    "Uses CCD Template": "N/A",
+    "LiveFrom": "03/03/2023",
+    "Created By": "Aliveni Choppa"
+  }
+]
