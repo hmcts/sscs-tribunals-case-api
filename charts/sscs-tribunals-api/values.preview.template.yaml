@@ -288,6 +288,8 @@ xui-webapp:
       FEATURE_HELMET_ENABLED: false
       FEATURE_OIDC_ENABLED: false
       FEATURE_JRD_E_LINKS_V2_ENABLED: true
+      FEATURE_ACCESS_MANAGEMENT_ENABLED: true
+      FEATURE_SUBSTANTIVE_ROLE_ENABLED: true
       ALLOW_CONFIG_MUTATIONS: true
       NOW: false
       REDISCLOUD_URL: http://dummyrediscloudurl
@@ -744,8 +746,3 @@ postgresql:
       - name: "pr-${CHANGE_ID}-org_role_mapping"
 
 
-ccd-def-cleanup:
-  enabled: true
-  change_id: ${CHANGE_ID}
-  case_type_ids:
-    - Benefit
