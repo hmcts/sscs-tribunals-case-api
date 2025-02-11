@@ -265,6 +265,17 @@
   {
     "LiveFrom": "06/10/2022",
     "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "panelMemberComposition",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "COMPLEX",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 3,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "LiveFrom": "06/10/2022",
+    "CaseEventID": "updateListingRequirements",
     "CaseFieldID": "panelMemberExclusions",
     "CaseTypeID": "Benefit",
     "DisplayContext": "COMPLEX",
