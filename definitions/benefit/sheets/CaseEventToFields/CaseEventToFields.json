@@ -176,6 +176,40 @@
   {
     "LiveFrom": "06/10/2022",
     "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "reserveTo",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "COMPLEX",
+    "PageDisplayOrder": 6,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "LiveFrom": "06/10/2022",
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "panelMemberExclusions",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "COMPLEX",
+    "PageDisplayOrder": 7,
+    "PageFieldDisplayOrder": 3,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "LiveFrom": "06/10/2022",
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "tribunalDirectPoToAttend",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "hearingRoute=\"listAssist\"",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 4,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "LiveFrom": "06/10/2022",
+    "CaseEventID": "updateListingRequirements",
     "CaseFieldID": "isFqpmRequired",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
@@ -200,6 +234,39 @@
   {
     "LiveFrom": "06/10/2022",
     "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "panelMemberCompositionJudge",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "COMPLEX",
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "LiveFrom": "06/10/2022",
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "panelMemberCompositionMedical",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "COMPLEX",
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "LiveFrom": "06/10/2022",
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "panelMemberCompositionTribunal",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "COMPLEX",
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "LiveFrom": "06/10/2022",
+    "CaseEventID": "updateListingRequirements",
     "CaseFieldID": "isMedicalMemberRequired",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
@@ -208,6 +275,19 @@
     "PageID": "1.0",
     "ShowSummaryChangeOption": "Y",
     "FieldShowCondition": "appeal.benefitType.code = \"infectedBloodCompensation\""
+  },
+  {
+    "LiveFrom": "06/07/2022",
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "amendReasons",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "[STATE]=\"readyToList\"",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "2.0",
+    "ShowSummaryChangeOption": "Y",
+    "PageLabel": "Amend Reason"
   },
   {
     "LiveFrom": "04/07/2022",
@@ -250,40 +330,6 @@
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 3,
     "PageID": "1.0"
-  },
-  {
-    "LiveFrom": "06/10/2022",
-    "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "reserveTo",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "COMPLEX",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 3,
-    "PageID": "1.0",
-    "ShowSummaryChangeOption": "Y"
-  },
-  {
-    "LiveFrom": "06/10/2022",
-    "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "panelMemberExclusions",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "COMPLEX",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 4,
-    "PageID": "1.0",
-    "ShowSummaryChangeOption": "Y"
-  },
-  {
-    "LiveFrom": "06/10/2022",
-    "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "tribunalDirectPoToAttend",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "FieldShowCondition": "hearingRoute=\"listAssist\"",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 5,
-    "PageID": "1.0",
-    "ShowSummaryChangeOption": "Y"
   },
   {
     "CaseEventID": "adminUpdateEvent",
@@ -401,19 +447,6 @@
     "PageID": "panelMembersExcluded",
     "PageLabel": "Are panel members excluded?",
     "ShowSummaryChangeOption": "Y"
-  },
-  {
-    "LiveFrom": "06/07/2022",
-    "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "amendReasons",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "[STATE]=\"readyToList\"",
-    "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder": 1,
-    "PageID": "2.0",
-    "ShowSummaryChangeOption": "Y",
-    "PageLabel": "Amend Reason"
   },
   {
     "LiveFrom": "01/01/2018",

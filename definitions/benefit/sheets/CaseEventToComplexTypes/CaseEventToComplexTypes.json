@@ -130,7 +130,7 @@
   },
   {
     "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "panelMemberComposition",
+    "CaseFieldID": "panelMemberCompositionJudge",
     "ListElementCode": "tribunalOrReqionalJudge",
     "ID": "updateListingRequirementsTribunalOrReqionalJudge",
     "DisplayContext": "OPTIONAL",
@@ -140,8 +140,18 @@
   },
   {
     "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "panelMemberComposition",
+    "CaseFieldID": "panelMemberCompositionMedical",
     "ListElementCode": "tribunalOrReqionalMedicalMember",
+    "ID": "updateListingRequirementsTribunalOrReqionalMedicalMember",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "10/02/2025",
+    "FieldDisplayOrder": 6,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "panelMemberCompositionTribunal",
+    "ListElementCode": "tribunalOrReqionalTribunalMember",
     "ID": "updateListingRequirementsTribunalOrReqionalMedicalMember",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "10/02/2025",
@@ -155,7 +165,7 @@
     "ID": "updateListingRequirementsArePanelMembersExclusions",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/02/2023",
-    "FieldDisplayOrder": 1,
+    "FieldDisplayOrder": 7,
     "PageID": "1.0"
   },
   {
@@ -166,7 +176,7 @@
     "DisplayContext": "OPTIONAL",
     "FieldShowCondition": "panelMemberExclusions.arePanelMembersExcluded = \"Yes\"",
     "LiveFrom": "01/02/2023",
-    "FieldDisplayOrder": 2,
+    "FieldDisplayOrder": 8,
     "PageID": "1.0"
   },
   {
@@ -176,7 +186,7 @@
     "ID": "updateListingRequirementsArePanelMembersReserved",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/02/2023",
-    "FieldDisplayOrder": 3,
+    "FieldDisplayOrder": 9,
     "PageID": "1.0"
   },
   {
@@ -187,7 +197,7 @@
     "DisplayContext": "OPTIONAL",
     "FieldShowCondition": "panelMemberExclusions.arePanelMembersReserved = \"Yes\"",
     "LiveFrom": "01/05/2023",
-    "FieldDisplayOrder": 4,
+    "FieldDisplayOrder": 10,
     "PageID": "1.0"
   },
   {
