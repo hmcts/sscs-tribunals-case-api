@@ -46,8 +46,6 @@ java:
     SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
     AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
     AMQP_USERNAME: "RootManageSharedAccessKey"
-    HMC_DEPLOYMENT_ID: "deployment-${SERVICE_NAME}"
-    HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-pr-${CHANGE_ID}"
     HEARINGS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
     ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
     ROBOTICS_EMAIL_TO: "fake"
@@ -64,6 +62,14 @@ java:
     HOURS_END_TIME: 23
     RUN_DB_MIGRATION_ON_STARTUP: true
     TEST_RECIPIENTS_POSTCODE: "*"
+    HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-aat"
+    HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-pr-${CHANGE_ID}"
+    TRIBUNALS_EVENT_QUEUE_NAME: "${SERVICE_NAME}-servicebus-tribunals-to-hearing-api"
+    TRIBUNALS_EVENT_QUEUE_POLICY_NAME: "RootManageSharedAccessKey"
+    TRIBUNALS_EVENT_QUEUE_NAMESPACE: "sscs-sb-preview"
+    HMC_HEARINGS_TOPIC_NAMESPACE: "hmc-servicebus-aat"
+    HMC_DEPLOYMENT_ID: "deployment-${SERVICE_NAME}"
+
   secrets:
     JOB_SCHEDULER_DB_PASSWORD:
       secretRef: postgres
