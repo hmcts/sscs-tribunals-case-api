@@ -309,8 +309,12 @@ public class CcdNotificationsPdfService {
     }
 
     private byte[] getSentEmailTemplate() throws IOException {
-        InputStream in = getClass().getResourceAsStream("/templates/sent_notification.html");
-        return IOUtils.toByteArray(in);
+        try (InputStream in = getClass().getResourceAsStream("/templates/sent_notification.html")) {
+            return IOUtils.toByteArray(in);
+        } catch (IOException e) {
+            log.info("Failed to get resource with exception {}", e.getMessage());
+            throw e;
+        }
     }
 
     private byte[] getMergedDocument(List<Pdf> pdfs, Long ccdCaseId) {
