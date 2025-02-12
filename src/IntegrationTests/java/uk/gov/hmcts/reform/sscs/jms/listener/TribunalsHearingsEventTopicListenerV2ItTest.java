@@ -54,7 +54,6 @@ import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.CcdCaseService;
 import uk.gov.hmcts.reform.sscs.service.HearingsService;
 import uk.gov.hmcts.reform.sscs.service.HmcHearingApi;
-import uk.gov.hmcts.reform.sscs.service.HmcHearingsApi;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
@@ -95,8 +94,6 @@ public class TribunalsHearingsEventTopicListenerV2ItTest {
     @MockitoBean
     private HmcHearingApi hearingApi;
     @MockitoBean
-    private HmcHearingsApi hmcHearingsApi;
-    @MockitoBean
     private UpdateCcdCaseService updateCcdCaseService;
 
     @Test
@@ -107,7 +104,7 @@ public class TribunalsHearingsEventTopicListenerV2ItTest {
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
         when(ccdCaseService.getStartEventResponse(anyLong(), any())).thenReturn(createSscsCaseDetails());
-        when(hmcHearingsApi.getHearingsRequest(any(), any(), any(), any(), any()))
+        when(hearingApi.getHearingsRequest(any(), any(), any(), any(), any(), any(), any()))
             .thenReturn(HearingsGetResponse.builder().build());
 
         when(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE, ISSUE_CODE, false, false))

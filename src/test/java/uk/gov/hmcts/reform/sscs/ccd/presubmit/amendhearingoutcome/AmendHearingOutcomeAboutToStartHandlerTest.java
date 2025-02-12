@@ -33,7 +33,7 @@ import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.HearingOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.HmcHearingsApiService;
+import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
 
 
 @RunWith(JUnitParamsRunner.class)
@@ -45,7 +45,7 @@ public class AmendHearingOutcomeAboutToStartHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
     @Mock
-    private HmcHearingsApiService hmcHearingsApiService;
+    private HmcHearingApiService hmcHearingApiService;
     @Mock
     private HearingOutcomeService hearingOutcomeService;
     private SscsCaseData sscsCaseData;
@@ -55,7 +55,7 @@ public class AmendHearingOutcomeAboutToStartHandlerTest {
     @BeforeEach
     void setup() {
         openMocks(this);
-        handler = new AmendHearingOutcomeAboutToStartHandler(hmcHearingsApiService, hearingOutcomeService);
+        handler = new AmendHearingOutcomeAboutToStartHandler(hmcHearingApiService, hearingOutcomeService);
         when(callback.getEvent()).thenReturn(EventType.AMEND_HEARING_OUTCOME);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build())
@@ -73,7 +73,7 @@ public class AmendHearingOutcomeAboutToStartHandlerTest {
 
     @Test
     void givenHearingOutcomeOnCase_ThenDontReturnError() {
-        when(hmcHearingsApiService.getHearingsRequest(any(),any())).thenReturn(
+        when(hmcHearingApiService.getHearingsRequest(any(),any())).thenReturn(
                 HearingsGetResponse.builder().caseHearings(List.of(CaseHearing.builder()
                                 .hearingId(1L)
                                 .hearingChannels(List.of(HearingChannel.FACE_TO_FACE))

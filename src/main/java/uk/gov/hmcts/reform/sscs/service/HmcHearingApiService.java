@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.exception.GetHearingException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
+import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingCancelRequestPayload;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingRequestPayload;
@@ -89,6 +91,20 @@ public class HmcHearingApiService {
                 hearingId,
                 hearingPayload);
     }
+
+    public HearingsGetResponse getHearingsRequest(String caseId, HmcStatus hmcStatus) {
+        log.debug("Sending Get Hearings Request for Case ID {}", caseId);
+        log.info("HMC Headers {}, {}", roleAssignmentUrl, dataStoreUrl); // TODO remove
+        return hmcHearingApi.getHearingsRequest(
+            getIdamTokens().getIdamOauth2Token(),
+            getIdamTokens().getServiceAuthorization(),
+            dataStoreUrl,
+            roleAssignmentUrl,
+            hmctsDeploymentId,
+            caseId,
+            hmcStatus);
+    }
+
 
     private IdamTokens getIdamTokens() {
         return idamService.getIdamTokens();
