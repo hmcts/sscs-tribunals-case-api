@@ -42,14 +42,17 @@ public class TopicConsumer {
 
     @JmsListener(
         destination = "${amqp.topic}",
-        containerFactory = "topicJmsListenerContainerFactory",
+        containerFactory = "evidenceShareJmsListenerContainerFactory",
         subscription = "${amqp.subscription}"
     )
-
     public void onMessage(String message, @Header(JmsHeaders.MESSAGE_ID) String messageId) {
         log.info("Message Id {} received from the service bus", messageId);
+        long startTime = System.currentTimeMillis();
         processEvidenceShareMessageWithRetry(message, 1, messageId);
         notificationsMessageProcessor.processMessage(message, messageId);
+        long endTime = System.currentTimeMillis();
+        log.info("Message Id {} processed in {} ms", messageId, endTime - startTime);
+        log.info("TopicConsumer processed in {}% of 5 minutes for ID {}", (endTime - startTime) / 30000, messageId);
     }
 
     private void processEvidenceShareMessageWithRetry(String message, int retry, String messageId) {

@@ -465,6 +465,21 @@
     "ShowEventNotes": "N"
   },
   {
+    "LiveFrom": "04/07/2024",
+    "CaseTypeID": "Benefit",
+    "ID": "amendHearingOutcome",
+    "Name": "Amend Hearing Outcome",
+    "Description": "Amend a Hearing Outcome",
+    "DisplayOrder": 361,
+    "PreConditionState(s)": "*",
+    "CallBackURLAboutToStartEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToStart",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
+    "PostConditionState": "*",
+    "ShowEventNotes": "Y",
+    "SecurityClassification": "Public"
+  },
+  {
     "LiveFrom": "24/03/2022",
     "CaseTypeID": "Benefit",
     "ID": "panelDoctorSpecialismAmend",
@@ -697,6 +712,18 @@
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
     "ShowSummary": "Y"
+  },
+  {
+    "LiveFrom": "22/01/2025",
+    "CaseTypeID": "Benefit",
+    "ID": "clearFailedFeFilter",
+    "Name": "Clear failed sending FE filter",
+    "DisplayOrder": 531,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "EventEnablingCondition": "hmctsDwpState=\"failedSendingFurtherEvidence\"",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
+    "SecurityClassification": "Public"
   },
   {
     "LiveFrom": "10/10/2019",
