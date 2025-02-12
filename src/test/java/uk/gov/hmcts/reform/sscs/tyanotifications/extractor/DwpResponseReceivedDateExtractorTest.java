@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.extractor;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_RESPOND;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_RECEIVED;
 

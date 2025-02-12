@@ -3,33 +3,50 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.UNREGISTERED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SENT_TO_DWP;
 
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeMessage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.UUID;
 import java.util.function.Consumer;
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -71,44 +88,44 @@ public class EvidenceShareServiceIt {
     public final SpringMethodRule springMethodRule = new SpringMethodRule();
     //end of rules needed for junitParamsRunner
 
-    @MockBean
+    @MockitoBean
     @SuppressWarnings({"PMD.UnusedPrivateField"})
     private IdamService idamService;
 
-    @MockBean
+    @MockitoBean
     @SuppressWarnings({"PMD.UnusedPrivateField"})
     private CcdClient ccdClient;
 
-    @MockBean
+    @MockitoBean
     @SuppressWarnings({"PMD.UnusedPrivateField"})
     private EvidenceDownloadClientApi evidenceDownloadClientApi;
 
-    @MockBean
+    @MockitoBean
     @SuppressWarnings({"PMD.UnusedPrivateField"})
     private EvidenceMetadataDownloadClientApi evidenceMetadataDownloadClientApi;
 
-    @MockBean
+    @MockitoBean
     private EvidenceManagementService evidenceManagementService;
 
-    @MockBean
+    @MockitoBean
     private EvidenceManagementSecureDocStoreService evidenceManagementSecureDocStoreService;
 
-    @MockBean
+    @MockitoBean
     private CcdService ccdService;
 
-    @MockBean
+    @MockitoBean
     private UpdateCcdCaseService updateCcdCaseService;
 
-    @MockBean
+    @MockitoBean
     private RestTemplate restTemplate;
 
-    @MockBean
+    @MockitoBean
     private BulkPrintService bulkPrintService;
 
     @Autowired
     private RoboticsService roboticsService;
 
-    @MockBean
+    @MockitoBean
     private EmailService emailService;
 
     @Autowired
@@ -132,7 +149,7 @@ public class EvidenceShareServiceIt {
     @Captor
     private ArgumentCaptor<Consumer<SscsCaseDetails>> consumerArgumentCaptor;
 
-    @MockBean
+    @MockitoBean
     protected AirLookupService airLookupService;
 
     private static final String FILE_CONTENT = "Welcome to PDF document service";
@@ -141,7 +158,7 @@ public class EvidenceShareServiceIt {
 
     protected MimeMessage message;
 
-    @MockBean(name = "sendGridMailSender")
+    @MockitoBean(name = "sendGridMailSender")
     protected JavaMailSender mailSender;
 
     Optional<UUID> expectedOptionalUuid = Optional.of(UUID.fromString("0f14d0ab-9605-4a62-a9e4-5ed26688389b"));
