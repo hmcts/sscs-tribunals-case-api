@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
@@ -12,11 +15,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -41,7 +44,7 @@ public class DocmosisPdfGenerationIt {
     @Autowired
     private RestTemplate restTemplate;
 
-    @MockBean
+    @MockitoBean
     protected AirLookupService airLookupService;
 
     private MockRestServiceServer mockServer;
@@ -80,7 +83,7 @@ public class DocmosisPdfGenerationIt {
             pdfGenerationService.generatePdf(DocumentHolder.builder().template(new Template("dl6-template.doc", "dl6")).placeholders(PLACEHOLDERS).build());
             fail("should have thrown bad-request exception");
         } catch (PdfGenerationException e) {
-            HttpStatus httpStatus = ((HttpClientErrorException) e.getCause()).getStatusCode();
+            var httpStatus = ((HttpClientErrorException) e.getCause()).getStatusCode();
             assertEquals(HttpStatus.BAD_REQUEST, httpStatus);
         }
     }
