@@ -82,6 +82,7 @@ public class UpdateNotListableSubmittedHandlerTest {
     @Test
     public void givenShouldReadyToListBeTriggeredYes_thenTriggerReadyToListEvent() {
         sscsCaseData.setShouldReadyToListBeTriggered(YesNo.YES);
+        sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder().hearingRoute(HearingRoute.LIST_ASSIST).build());
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
@@ -104,6 +105,7 @@ public class UpdateNotListableSubmittedHandlerTest {
     @Test
     public void givenShouldReadyToListBeTriggeredNo_thenDoNotTriggerReadyToListEvent() {
         sscsCaseData.setShouldReadyToListBeTriggered(YesNo.NO);
+        sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder().hearingRoute(HearingRoute.LIST_ASSIST).build());
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
@@ -120,8 +122,28 @@ public class UpdateNotListableSubmittedHandlerTest {
     }
 
     @Test
+    public void givenShouldReadyToListBeTriggeredYesButGaps_thenDoNotTriggerReadyToListEvent() {
+        sscsCaseData.setShouldReadyToListBeTriggered(YesNo.YES);
+        sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder().hearingRoute(HearingRoute.GAPS).build());
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        assertEquals(Collections.EMPTY_SET, response.getErrors());
+
+        verify(updateCcdCaseService, never()).updateCaseV2(
+            any(),
+            any(),
+            any(),
+            any(),
+            any(IdamTokens.class),
+            any());
+        assertEquals(YesNo.YES, sscsCaseData.getShouldReadyToListBeTriggered());
+    }
+
+    @Test
     public void givenShouldReadyToListBeTriggeredNull_thenDoNotTriggerReadyToListEvent() {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder().hearingRoute(HearingRoute.LIST_ASSIST).build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
@@ -145,6 +167,7 @@ public class UpdateNotListableSubmittedHandlerTest {
     @Test
     public void givenSubmittedEventAndShouldBeTriggered_thenThrowExceptionWithResponseBodyWhenReadyToListEventFailsToUpdate() {
         sscsCaseData.setShouldReadyToListBeTriggered(YesNo.YES);
+        sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder().hearingRoute(HearingRoute.LIST_ASSIST).build());
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         FeignException feignException = mock(FeignException.class);
