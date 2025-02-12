@@ -17,6 +17,7 @@ For versions and complete list of dependencies see build.gradle
 
 To build the project execute the following command:
 
+
 ```
 ./gradlew build
 ```
