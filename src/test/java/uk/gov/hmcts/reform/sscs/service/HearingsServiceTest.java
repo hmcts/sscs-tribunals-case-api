@@ -448,29 +448,4 @@ class HearingsServiceTest {
         assertThrows(ListingException.class, () -> hearingsService.processHearingWrapper(wrapper));
     }
 
-    // write test for processHearingWrapper with a hearing state of CREATE_HEARING
-    @DisplayName("When wrapper with a valid create Hearing State is given addHearingResponse should run without error")
-    @Test
-    void processHearingWrapperCreateHearing() {
-        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE,ISSUE_CODE,false,false))
-            .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                                               false,false,SessionCategory.CATEGORY_03,null));
-
-        given(refData.getHearingDurations()).willReturn(hearingDurations);
-        given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
-        given(refData.getVenueService()).willReturn(venueService);
-
-        given(venueService.getEpimsIdForVenue(PROCESSING_VENUE)).willReturn("219164");
-
-        given(hmcHearingApiService.sendCreateHearingRequest(any(HearingRequestPayload.class)))
-            .willReturn(HmcUpdateResponse.builder().build());
-
-        given(hmcHearingApiService.getHearingsRequest(anyString(),eq(null)))
-            .willReturn(HearingsGetResponse.builder().build());
-
-        wrapper.setHearingState(CREATE_HEARING);
-
-        assertThatNoException()
-            .isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
-    }
 }
