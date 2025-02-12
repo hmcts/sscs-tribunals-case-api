@@ -51,8 +51,8 @@ public class TopicConsumer {
         processEvidenceShareMessageWithRetry(message, 1, messageId);
         notificationsMessageProcessor.processMessage(message, messageId);
         long endTime = System.currentTimeMillis();
-        log.info("Message Id {} processed in {} ms", messageId, endTime - startTime);
-        log.info("TopicConsumer processed in {}% of 5 minutes for ID {}", (endTime - startTime) / 30000, messageId);
+        long timeTaken = endTime - startTime;
+        log.info("TopicConsumer processed in {}% of 5 minutes for ID {}, {} ms", (timeTaken / 300000) * 100, messageId, timeTaken);
     }
 
     private void processEvidenceShareMessageWithRetry(String message, int retry, String messageId) {
