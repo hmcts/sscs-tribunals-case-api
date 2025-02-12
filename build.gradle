@@ -40,7 +40,7 @@ compileTestJava {
     options.compilerArgs << '-Xlint:deprecation'
 }
 
-tasks.withType(Copy).configureEach { duplicatesStrategy DuplicatesStrategy.WARN }
+tasks.withType(Copy).configureEach { duplicatesStrategy=DuplicatesStrategy.WARN }
 
 application {
     mainClass.set('uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication')
@@ -203,10 +203,10 @@ repositories {
 
     // jitpack should be last resort
     // see: https://github.com/jitpack/jitpack.io/issues/1939
-    maven { url 'https://jitpack.io' }
+    maven { url="https://jitpack.io" }
     // Requires authentication, if it gets here the library cannot be found!
     maven {
-        url 'https://repo.spring.io/libs-milestone'
+        url="https://repo.spring.io/libs-milestone"
     }
 }
 
@@ -265,7 +265,7 @@ configurations {
 tasks.register('installLocalGitHook', Copy) {
     from new File(rootProject.rootDir, 'config/git/pre-commit')
     into { new File(rootProject.rootDir, '.git/hooks') }
-    fileMode 0775
+    filePermissions { unix(0775) }
 }
 
 generateGitProperties.dependsOn installLocalGitHook
@@ -538,7 +538,7 @@ bootWithCCD {
     doFirst() {
         if (!project.file('./.aat-env').exists()) {
             new ByteArrayOutputStream().withStream { os ->
-                exec {
+                ExecOperations.exec {
                     commandLine 'az', 'keyvault', 'secret', 'show', '--vault-name', 'sscs-aat', '-o', 'tsv', '--query', 'value', '--name', 'sscs-tribunals-case-api-dot-env'
                     standardOutput = os
                 }
