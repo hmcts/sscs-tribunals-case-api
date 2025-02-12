@@ -50,6 +50,12 @@ public class ClearHmctsDwpStateHandlerTest {
     }
 
     @Test
+    public void givenAClearFailedFeStateEvent_thenReturnTrue() {
+        when(callback.getEvent()).thenReturn(EventType.CLEAR_FAILED_FE_FILTER);
+        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
+    }
+
+    @Test
     public void givenANonHandleEvidenceEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
