@@ -350,7 +350,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '8.0.1'
 
 
-    implementation group: 'com.mchange', name: 'c3p0', version: '0.10.2'
+    implementation group: 'com.mchange', name: 'c3p0', version: '0.11.0-pre1'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
 
     implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6.0.2'
