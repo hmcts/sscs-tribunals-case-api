@@ -691,9 +691,9 @@ notification:
         processAudioVideo:
             docmosisId: TB-SCS-GNO-ENG-00677.docx
         setAsideGranted:
-            docmosisId: TB-SCS-LET-ENG-Set-Aside-Grant-Refused-v2.docx
+            docmosisId: TB-SCS-LET-ENG-Set-Aside-Grant-Refused.docx
         setAsideRefused:
-            docmosisId: TB-SCS-LET-ENG-Set-Aside-Grant-Refused-v2.docx
+            docmosisId: TB-SCS-LET-ENG-Set-Aside-Grant-Refused.docx
         directionIssued:
             appealToProceed:
                 appellant:
@@ -1330,9 +1330,9 @@ notification:
         processAudioVideoWelsh:
             docmosisId: TB-SCS-GNO-WEL-00678.docx
         setAsideGranted:
-            docmosisId: TB-SCS-LET-WEL-Set-Aside-Grant-Refused-v2.docx
+            docmosisId: TB-SCS-LET-WEL-Set-Aside-Grant-Refused.docx
         setAsideRefused:
-            docmosisId: TB-SCS-LET-WEL-Set-Aside-Grant-Refused-v2.docx
+            docmosisId: TB-SCS-LET-WEL-Set-Aside-Grant-Refused.docx
         directionIssuedWelsh:
             appealToProceed:
                 appellant:
