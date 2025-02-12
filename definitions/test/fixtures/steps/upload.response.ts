@@ -27,10 +27,21 @@ export class UploadResponse extends BaseStep {
     this.stepsHelper = new StepsHelper(this.page);
   }
 
-  setHearings() {
+  async validateHistory(caseId: string) {
+    let historyLinks = this.presetLinks;
     if (process.env.HEARINGS_ENABLED == "Yes") {
-      this.presetLinks.push('Add a hearing');
+      historyLinks.push('Add a hearing');
+      await this.loginUserWithCaseId(credentials.hmrcSuperUser, false, caseId);
+    } else {
+      await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
     }
+    await this.homePage.delay(1000);
+    await this.homePage.navigateToTab('History');
+    for (const linkName of historyLinks) {
+      await this.verifyHistoryTabLink(linkName);
+    }
+    await this.homePage.navigateToTab('Summary');
+    await this.summaryTab.verifyPresenceOfText('Ready to list');
   }
 
   async performUploadResponseWithFurtherInfoOnAPIPAndReviewResponse() {
@@ -48,18 +59,9 @@ export class UploadResponse extends BaseStep {
       responseReviewedTestData.headingValue
     );
     await this.responseReviewedPage.chooseInterlocOption('No');
-    await this.responseReviewedPage.confirmSubmission();
+    await this.checkYourAnswersPage.confirmAndSignOut();
 
-    await this.homePage.delay(1000);
-    await this.homePage.navigateToTab('History');
-    this.setHearings()
-    for (const linkName of this.presetLinks) {
-      await this.verifyHistoryTabLink(linkName);
-    }
-
-    await this.homePage.delay(3000);
-    await this.homePage.navigateToTab('Summary');
-    await this.summaryTab.verifyPresenceOfText('Ready to list');
+    await this.validateHistory(pipCaseId)
     // await performAppealDormantOnCase(pipCaseId);
   }
 
@@ -184,15 +186,7 @@ export class UploadResponse extends BaseStep {
     );
     await this.checkYourAnswersPage.confirmAndSignOut();
 
-    await this.homePage.delay(3000);
-    await this.loginUserWithCaseId(credentials.amCaseWorker, false, taxCaseId);
-    await this.homePage.navigateToTab('History');
-    this.setHearings()
-    for (const linkName of this.presetLinks) {
-      await this.verifyHistoryTabLink(linkName);
-    }
-    await this.homePage.navigateToTab('Summary');
-    await this.summaryTab.verifyPresenceOfText('Ready to list');
+    await this.validateHistory(taxCaseId)
     // await performAppealDormantOnCase(taxCaseId);
   }
 
@@ -238,18 +232,9 @@ export class UploadResponse extends BaseStep {
       null,
       'UC'
     );
-    await this.checkYourAnswersPage.confirmSubmission();
-    await this.homePage.clickSignOut();
+    await this.checkYourAnswersPage.confirmAndSignOut();
 
-    await this.loginUserWithCaseId(credentials.amCaseWorker, false, ucCaseId);
-    await this.homePage.delay(1000);
-    await this.homePage.navigateToTab('History');
-    this.setHearings()
-    for (const linkName of this.presetLinks) {
-      await this.verifyHistoryTabLink(linkName);
-    }
-    await this.homePage.navigateToTab('Summary');
-    await this.summaryTab.verifyPresenceOfText('Ready to list');
+    await this.validateHistory(ucCaseId)
     // await performAppealDormantOnCase(ucCaseId);
   }
 
@@ -289,23 +274,9 @@ export class UploadResponse extends BaseStep {
     );
     await this.uploadResponsePage.continueSubmission();
     await this.uploadResponsePage.enterJPDetails();
-    await this.checkYourAnswersPage.confirmSubmission();
+    await this.checkYourAnswersPage.confirmAndSignOut();
 
-    await this.homePage.signOut();
-    await new Promise((f) => setTimeout(f, 3000)); //Delay required for the Case to be ready
-
-    await this.loginUserWithCaseId(credentials.amCaseWorker, false, ucCaseId);
-    await this.homePage.reloadPage();
-    await this.homePage.delay(1000);
-    await this.homePage.navigateToTab('History');
-    this.setHearings()
-    for (const linkName of this.presetLinks) {
-      await this.verifyHistoryTabLink(linkName);
-    }
-
-    await this.homePage.clickBeforeTabBtn();
-    await this.homePage.navigateToTab('Summary');
-    await this.summaryTab.verifyPresenceOfText('Ready to list');
+    await this.validateHistory(ucCaseId)
     // await performAppealDormantOnCase(ucCaseId);
   }
 
