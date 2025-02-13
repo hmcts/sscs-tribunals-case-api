@@ -172,6 +172,8 @@ withPipeline(type, product, component) {
     }
 
     afterSuccess('smoketest:preview') {
+        sh './bin/setup-role-assignments.sh'
+
         if (notificationTestsEnabled) {
             runNotificationTests()
         }
@@ -184,7 +186,6 @@ withPipeline(type, product, component) {
                 reportFiles          : 'index.html',
                 reportName           : 'SSCS E2E Test Report'
         ])
-        sh './bin/setup-role-assignments.sh'
     }
 
     afterSuccess('smoketest:aat') {
