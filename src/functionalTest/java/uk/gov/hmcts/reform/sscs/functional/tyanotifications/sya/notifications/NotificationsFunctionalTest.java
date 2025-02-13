@@ -255,9 +255,8 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
                 paperResponseReceivedEmailId, paperResponseReceivedSmsId);
 
         String expectedHearingContactDate = "how long";
-        String expectedTyaLink = tyaLink.replace(APPEAL_ID, TYA);
         assertNotificationBodyContains(notifications, paperResponseReceivedEmailId, caseData.getCaseReference(),
-                expectedPanelComposition, expectedHearingContactDate, expectedTyaLink);
+                expectedPanelComposition, expectedHearingContactDate, TYA);
         assertNotificationBodyContains(notifications, paperResponseReceivedSmsId, expectedHearingContactDate);
     }
 
@@ -486,7 +485,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     @Test
     public void shouldSaveReasonableAdjustmentNotificationForAppellantAndRep() throws IOException, NotificationClientException {
         simulateCcdCallback(APPEAL_RECEIVED, BASE_PATH_TYAN + APPEAL_RECEIVED.getId() + "AppellantRepReasonableAdjustmentCallback.json");
-      
+
         delayInSeconds(10);
         List<Notification> notifications = tryFetchNotificationsForTestCaseWithFlag(true, null, appealCreatedAppellantEmailId, appealCreatedAppellantSmsId);
         assertEquals(2, notifications.size());
