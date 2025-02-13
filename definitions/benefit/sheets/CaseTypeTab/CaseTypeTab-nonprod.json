@@ -1,1 +1,6 @@
-[]
+[
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_judge", "TabLabel": "Listing Requirements", "TabDisplayOrder": 24, "CaseFieldID": "hmcHearingType", "TabFieldDisplayOrder": 16, "FieldShowCondition": "hmcHearingType=\"*\""},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_clerk", "TabLabel": "Listing Requirements", "TabDisplayOrder": 24, "CaseFieldID": "hmcHearingType", "TabFieldDisplayOrder": 17, "FieldShowCondition": "hmcHearingType=\"*\""},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_registrar", "TabLabel": "Listing Requirements", "TabDisplayOrder": 24, "CaseFieldID": "hmcHearingType", "TabFieldDisplayOrder": 16, "FieldShowCondition": "hmcHearingType=\"*\""},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_superuser", "TabLabel": "Listing Requirements", "TabDisplayOrder": 24, "CaseFieldID": "hmcHearingType", "TabFieldDisplayOrder": 18, "FieldShowCondition": "hmcHearingType=\"*\""}
+]
