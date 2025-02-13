@@ -28,9 +28,7 @@ export class UploadResponse extends BaseStep {
   }
 
   setHearings() {
-    if (process.env.HEARINGS_ENABLED == "Yes") {
-      this.presetLinks.push('Add a hearing');
-    }
+    this.presetLinks.push('Add a hearing');
   }
 
   async performUploadResponseWithFurtherInfoOnAPIPAndReviewResponse() {
