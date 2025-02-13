@@ -112,16 +112,13 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
     ]
 }
 
-def branchesToSync = ['demo', 'ithc', 'perftest']
-
 withPipeline(type, product, component) {
     def githubApi = new GithubAPI(this)
-    def notificationTestsEnabled = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "run-notification-tests").size() > 0;
 
     enableHighLevelDataSetup()
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
-    syncBranchesWithMaster(branchesToSync)
+    syncBranchesWithMaster(['demo', 'ithc', 'perftest'])
 
     env.DOCUMENT_MANAGEMENT_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.TEST_DOCUMENT_MANAGEMENT_URL = "http://dm-store-aat.service.core-compute-aat.internal"
@@ -174,30 +171,14 @@ withPipeline(type, product, component) {
     afterSuccess('smoketest:preview') {
         sh './bin/setup-role-assignments.sh'
 
-        if (notificationTestsEnabled) {
+        if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "run-notification-tests").size() > 0) {
             runNotificationTests()
         }
         runE2eTests()
-        publishHTML([
-                allowMissing         : true,
-                alwaysLinkToLastBuild: true,
-                keepAll              : true,
-                reportDir            : "playwright-report",
-                reportFiles          : 'index.html',
-                reportName           : 'SSCS E2E Test Report'
-        ])
     }
 
     afterSuccess('smoketest:aat') {
         runE2eTests()
-        publishHTML([
-                allowMissing         : true,
-                alwaysLinkToLastBuild: true,
-                keepAll              : true,
-                reportDir            : "playwright-report",
-                reportFiles          : 'index.html',
-                reportName           : 'SSCS E2E Test Report'
-        ])
     }
 }
 
@@ -253,6 +234,14 @@ def runE2eTests() {
             unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
         } finally {
             steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'definitions/test/playwright-report/**'
+            publishHTML([
+                    allowMissing         : true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll              : true,
+                    reportDir            : "playwright-report",
+                    reportFiles          : 'index.html',
+                    reportName           : 'SSCS E2E Test Report'
+            ])
         }
     }
 }
