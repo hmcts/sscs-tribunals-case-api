@@ -18,7 +18,7 @@ export class AppealDetails {
 
     async verifyAppealDetailsPageContentByKeyValue(fieldLabel: string, fieldValue: string): Promise<void> {
         await expect(this.page
-            .locator(`//*[normalize-space()="${fieldLabel}"]/../td[normalize-space()="${fieldValue}"]`)).toBeVisible();
+            .locator(`//*[normalize-space()="${fieldLabel}"]/../td[normalize-space()="${fieldValue}"]`).first()).toBeVisible();
     }
 
     async verifyAppealDetailsPageContentDoesNotExistByKeyValue(fieldLabel: string, fieldValue: string): Promise<void> {
