@@ -366,11 +366,6 @@ public abstract class AbstractFunctionalTest {
                 .map(Notification::getBody)
                 .collect(Collectors.toSet());
 
-            System.out.println("bodies-------------------" + bodies);
-            for (String match : matches) {
-                System.out.println("match-------------------" + match);
-            }
-
             assertThat(matches).allSatisfy(match ->
                 assertThat(bodies)
                     .as("Notification template %s [body] contains '%s'", templateId, match)
