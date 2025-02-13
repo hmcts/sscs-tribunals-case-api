@@ -28,7 +28,8 @@ export class UrgentHearing extends BaseStep {
     await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
       actionFurtherEvidenceTestdata.sender,
       actionFurtherEvidenceTestdata.urgentDocType,
-      actionFurtherEvidenceTestdata.testfileone
+      actionFurtherEvidenceTestdata.testfileone,
+      false
     );
     await this.eventNameAndDescriptionPage.verifyPageContent(
       actionFurtherEvidenceTestdata.eventName
@@ -84,7 +85,8 @@ export class UrgentHearing extends BaseStep {
     await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
       actionFurtherEvidenceTestdata.sender,
       actionFurtherEvidenceTestdata.urgentDocType,
-      actionFurtherEvidenceTestdata.testfileone
+      actionFurtherEvidenceTestdata.testfileone,
+      false
     );
 
     await this.eventNameAndDescriptionPage.verifyPageContent(
@@ -166,7 +168,8 @@ export class UrgentHearing extends BaseStep {
     await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
       actionFurtherEvidenceTestdata.sender,
       actionFurtherEvidenceTestdata.urgentDocType,
-      actionFurtherEvidenceTestdata.testfileone
+      actionFurtherEvidenceTestdata.testfileone,
+      false
     );
     await this.eventNameAndDescriptionPage.verifyPageContent(
       actionFurtherEvidenceTestdata.eventName
@@ -233,7 +236,8 @@ export class UrgentHearing extends BaseStep {
     await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
       actionFurtherEvidenceTestdata.sender,
       actionFurtherEvidenceTestdata.docType,
-      actionFurtherEvidenceTestdata.encrytpedFile
+      actionFurtherEvidenceTestdata.encrytpedFile,
+      false
     );
     await this.actionFurtherEvidencePage.verifyEncryptedFileErrorMsg();
 
@@ -266,7 +270,8 @@ export class UrgentHearing extends BaseStep {
     await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
       actionFurtherEvidenceTestdata.sender,
       actionFurtherEvidenceTestdata.urgentDocType,
-      actionFurtherEvidenceTestdata.testfileone
+      actionFurtherEvidenceTestdata.testfileone,
+      false
     );
     await this.eventNameAndDescriptionPage.verifyPageContent(
       actionFurtherEvidenceTestdata.eventName
