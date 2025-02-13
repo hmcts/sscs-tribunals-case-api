@@ -37,6 +37,9 @@ lib/applicationinsights-agent-*.jar
 lib/applicationinsights.log
 
 # definitions
+definitions/test/node_modules
+definitions/test/test-results
+definitions/test/playwright-report
 definitions/**/*.xlsx
 definitions/**/*.xlsx#
 

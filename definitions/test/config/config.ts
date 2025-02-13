@@ -77,6 +77,10 @@ export const credentials = {
     email: process.env.SUPER_USER_USERNAME,
     password: process.env.SUPER_USER_PASSWORD
   },
+  hmrcSuperUser: {
+    email: process.env.TEST_HMRC_SUPER_USER_USERNAME,
+    password: process.env.TEST_HMRC_SUPER_USER_PASSWORD
+  },
   dwpResponseWriter: {
     email: process.env.TEST_DWP_USERNAME,
     password: process.env.TEST_DWP_PASSWORD
