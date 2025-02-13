@@ -362,10 +362,10 @@ dependencies {
     implementation group: 'pl.touk', name: 'throwing-function', version: '1.3'
     // sscs-pdf-email-common
 
-    implementation group: 'com.azure', name: 'azure-core', version: '1.55.0'
+    implementation group: 'com.azure', name: 'azure-core', version: '1.55.1'
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.8'
 
-    implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.7.2'
+    implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.7.3'
 
     implementation group:'org.overviewproject', name: 'mime-types', version: '1.0.4'
 
