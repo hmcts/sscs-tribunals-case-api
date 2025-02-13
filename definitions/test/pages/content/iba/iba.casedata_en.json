@@ -16,22 +16,22 @@
         "lastName": "ibca_automation_lastname"
       },
       "identityDetails": {
-        "date": "1-1-2000",
+        "dob": "1-1-2000",
         "ibcaReferenceNumber": "A11B22"
       },
       "addressDetails": {
-        "line1": "85",
-        "line2": "Lowndes Grove",
+        "line1": "12, Highstreet, Test",
+        "line2": "Highstreet",
         "line3": "",
-        "town": "Milton Keynes",
-        "county": "Bucks",
-        "postcode": "W4 5YA",
+        "town": "Camden",
+        "county": "Hertfordshire",
+        "postcode": "TS1 1ST",
         "country": "United Kingdom",
         "isLiveInEngland": "Yes"
       },
       "contactDetails": {
-        "contactNumber": "07827297001",
-        "mobileNumber": "07827297002",
+        "contactNumber": "07398785050",
+        "mobileNumber": "07398785051",
         "contactEmail": "test@gmail.com"
       },
       "appellantRole": "I am appealing for myself"
@@ -63,8 +63,8 @@
         "lastName": "SL1"
       },
       "contactDetails": {
-        "contactNumber": "07827297002",
-        "mobileNumber": "07827297003",
+        "contactNumber": "07398785050",
+        "mobileNumber": "07398785051",
         "contactEmail": "testsupport@gmail.com"
       }
     },
@@ -90,15 +90,15 @@
         "lastName": "ibca_update_automation_lastname"
       },
       "identityDetails": {
-        "date": "1-1-2001",
+        "dob": "1-1-2001",
         "ibcaReferenceNumber": "C33B44"
       },
       "addressDetails": {
-        "line1": "87"
+        "line1": "12, Lowstreet, Test"
       },
       "contactDetails": {
-        "contactNumber": "07827297003",
-        "mobileNumber": "07827297004",
+        "contactNumber": "07398785050",
+        "mobileNumber": "07398785051",
         "contactEmail": "updatetest@gmail.com"
       },
       "appellantRole": "I am appealing for myself"
