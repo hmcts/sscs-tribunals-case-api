@@ -15,6 +15,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.JOINT_PARTY_EVI
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_PARTY_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_PARTY_REPRESENTATIVE_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.VIDEO_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
