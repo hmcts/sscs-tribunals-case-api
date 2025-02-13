@@ -122,11 +122,9 @@ export class IssueDirectionsNotice extends BaseStep {
     await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
       actionFurtherEvidenceTestdata.sender,
       actionFurtherEvidenceTestdata.other,
-      actionFurtherEvidenceTestdata.testfileone
+      actionFurtherEvidenceTestdata.testfileone,
+      true
     );
-    await new Promise((f) => setTimeout(f, 2000)); //Delay required for the Case to be ready
-    await this.homePage.signOut();
-    await new Promise((f) => setTimeout(f, 2000)); //Delay required for the Case to be ready
 
     await this.loginUserWithCaseId(credentials.judge, false, taxCreditCaseId);
     await new Promise((f) => setTimeout(f, 12000)); //Delay required for the Case to be ready
@@ -183,10 +181,9 @@ export class IssueDirectionsNotice extends BaseStep {
     await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
       actionFurtherEvidenceTestdata.sender,
       actionFurtherEvidenceTestdata.other,
-      actionFurtherEvidenceTestdata.testfileone
+      actionFurtherEvidenceTestdata.testfileone,
+      true
     );
-    await this.homePage.signOut();
-    await new Promise((f) => setTimeout(f, 2000)); //Delay required for the Case to be ready
 
     await this.loginUserWithCaseId(credentials.judge, false, esaCaseId);
     await new Promise((f) => setTimeout(f, 12000)); //Delay required for the Case to be ready
@@ -243,10 +240,9 @@ export class IssueDirectionsNotice extends BaseStep {
     await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
       actionFurtherEvidenceTestdata.sender,
       actionFurtherEvidenceTestdata.other,
-      actionFurtherEvidenceTestdata.testfileone
+      actionFurtherEvidenceTestdata.testfileone,
+      true
     );
-    await this.homePage.signOut();
-    await new Promise((f) => setTimeout(f, 2000)); //Delay required for the Case to be ready
 
     await this.loginUserWithCaseId(credentials.judge, false, pipCaseId);
     await new Promise((f) => setTimeout(f, 12000)); //Delay required for the Case to be ready
@@ -301,10 +297,9 @@ export class IssueDirectionsNotice extends BaseStep {
     await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
       actionFurtherEvidenceTestdata.sender,
       actionFurtherEvidenceTestdata.other,
-      actionFurtherEvidenceTestdata.testfileone
+      actionFurtherEvidenceTestdata.testfileone,
+      true
     );
-    await this.homePage.signOut();
-    await new Promise((f) => setTimeout(f, 2000)); //Delay required for the Case to be ready
 
     await this.loginUserWithCaseId(credentials.judge, false, pipCaseId);
     await new Promise((f) => setTimeout(f, 12000)); //Delay required for the Case to be ready
