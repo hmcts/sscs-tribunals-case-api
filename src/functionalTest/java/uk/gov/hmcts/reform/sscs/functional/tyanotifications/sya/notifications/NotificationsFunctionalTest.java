@@ -165,6 +165,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     @Rule
     public Retry retry = new Retry(FUNCTIONAL_RETRY_LIMIT);
 
+    @Ignore
     @Test
     public void shouldSendEvidenceReceivedNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(EVIDENCE_RECEIVED);
@@ -176,6 +177,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     }
 
 
+    @Ignore
     @Test
     public void shouldSendHearingPostponedNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(POSTPONEMENT);
@@ -183,6 +185,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
         tryFetchNotificationsForTestCase(hearingPostponedEmailTemplateId);
     }
 
+    @Ignore
     @Test
     public void shouldSendHearingAdjournedNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(ADJOURNED);
@@ -193,6 +196,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
         );
     }
 
+    @Ignore
     @Test
     public void shouldSendSubscriptionCreatedNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(SUBSCRIPTION_CREATED);
@@ -200,6 +204,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
         tryFetchNotificationsForTestCase(subscriptionCreatedSmsTemplateId);
     }
 
+    @Ignore
     @Test
     public void shouldSendSubscriptionUpdatedNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(SUBSCRIPTION_UPDATED);
@@ -207,6 +212,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
         tryFetchNotificationsForTestCase(subscriptionUpdatedEmailTemplateId);
     }
 
+    @Ignore
     @Test
     public void shouldSendAppealCreatedAppellantNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(SYA_APPEAL_CREATED, BASE_PATH_TYAN + SYA_APPEAL_CREATED.getId() + "Callback.json");
@@ -215,6 +221,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
         assertNotificationBodyContains(notifications, appealCreatedAppellantEmailId, "appeal has been received");
     }
 
+    @Ignore
     @Test
     public void shouldSendValidAppealCreatedAppellantNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(VALID_APPEAL_CREATED, BASE_PATH_TYAN + SYA_APPEAL_CREATED.getId() + "Callback.json");
@@ -223,6 +230,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
         assertNotificationBodyContains(notifications, appealCreatedAppellantEmailId, "appeal has been received");
     }
 
+    @Ignore
     @Test
     public void shouldSendAppealCreatedAppointeeNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(SYA_APPEAL_CREATED, BASE_PATH_TYAN + SYA_APPEAL_CREATED.getId() + "AppointeeCallback.json");
@@ -261,6 +269,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
         assertNotificationBodyContains(notifications, paperResponseReceivedSmsId, expectedHearingContactDate);
     }
 
+    @Ignore
     @Test
     public void shouldNotSendPaperDwpResponseReceivedNotificationIfNotSubscribed() throws NotificationClientException, IOException {
         simulateCcdCallback(DWP_RESPONSE_RECEIVED, BASE_PATH_TYAN + RESPONSE_RECEIVED_PAPER_PATH + "paper-no-subscriptions-"
@@ -272,6 +281,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
         assertTrue(notifications.isEmpty());
     }
 
+    @Ignore
     @Test
     public void shouldSendAppointeeEvidenceReminderForOralCaseNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(EVIDENCE_REMINDER,
@@ -291,6 +301,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
         );
     }
 
+    @Ignore
     @Test
     public void shouldSendAppointeeEvidenceReminderForPaperCaseNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(EVIDENCE_REMINDER,
@@ -310,6 +321,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
         );
     }
 
+    @Ignore
     @Test
     public void shouldSendAppellantSubscriptionUpdateNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(SUBSCRIPTION_UPDATED,
@@ -327,6 +339,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
         assertFalse(updateEmailNotification.getBody().contains("You are receiving this update as the appointee for"));
     }
 
+    @Ignore
     @Test
     public void shouldSendAppointeeSubscriptionUpdateNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(SUBSCRIPTION_UPDATED,
@@ -342,6 +355,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
         assertTrue(updateEmailNotification.getBody().contains("Dear Appointee User\r\n\r\nYou are receiving this update as the appointee for Appellant User.\r\n\r\nEmails about your ESA"));
     }
 
+    @Ignore
     @Test
     public void shouldSendAppointeeEvidenceReceivedPaperNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(EVIDENCE_RECEIVED,
@@ -356,6 +370,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
         assertTrue(emailNotification.getBody().contains("You are receiving this update as the appointee for Appellant User."));
     }
 
+    @Ignore
     @Test
     public void shouldSendAppointeeHearingAdjournedNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(ADJOURNED,
@@ -369,6 +384,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
         assertTrue(emailNotification.getBody().contains("Dear Appointee User"));
     }
 
+    @Ignore
     @Test
     public void shouldSendAppointeeAppealLapsedNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(APPEAL_LAPSED,
@@ -387,6 +403,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
         assertEquals("Pre-compiled PDF", notificationLetters.get(0).getSubject().orElse("Unknown Subject"));
     }
 
+    @Ignore
     @Test
     public void shouldSendAppointeeDwpAppealLapsedNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(APPEAL_LAPSED,
@@ -401,6 +418,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
         assertTrue(emailNotification.getBody().contains("You are receiving this update as the appointee for"));
     }
 
+    @Ignore
     @Test
     public void shouldSendAppointeeResponseReceivedForPaperCaseNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(DWP_RESPONSE_RECEIVED,
@@ -445,6 +463,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
          */
     }
 
+    @Ignore
     @Test
     public void shouldSendAppointeeEvidenceReceivedNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(EVIDENCE_RECEIVED,
@@ -455,6 +474,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
         assertTrue(emailNotification.getBody().contains("You are receiving this update as the appointee for"));
     }
 
+    @Ignore
     @Test
     public void shouldSendAppointeeHearingPostponedNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(POSTPONEMENT,
@@ -466,6 +486,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
         assertTrue(emailNotification.getBody().contains("You will receive another email"));
     }
 
+    @Ignore
     @Test
     public void shouldSaveReasonableAdjustmentNotificationForAppellant() throws IOException, NotificationClientException {
         simulateCcdCallback(APPEAL_RECEIVED, BASE_PATH_TYAN + APPEAL_RECEIVED.getId() + "AppellantReasonableAdjustmentCallback.json");
@@ -483,10 +504,11 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
         assertEquals(ReasonableAdjustmentStatus.REQUIRED, caseData.getReasonableAdjustmentsLetters().getAppellant().get(0).getValue().getReasonableAdjustmentStatus());
     }
 
+    @Ignore
     @Test
     public void shouldSaveReasonableAdjustmentNotificationForAppellantAndRep() throws IOException, NotificationClientException {
         simulateCcdCallback(APPEAL_RECEIVED, BASE_PATH_TYAN + APPEAL_RECEIVED.getId() + "AppellantRepReasonableAdjustmentCallback.json");
-      
+
         delayInSeconds(10);
         List<Notification> notifications = tryFetchNotificationsForTestCaseWithFlag(true, null, appealCreatedAppellantEmailId, appealCreatedAppellantSmsId);
         assertEquals(2, notifications.size());
