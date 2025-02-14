@@ -57,7 +57,9 @@ export class EventNameEventDescriptionPage {
   }
 
   async confirmSubmission(): Promise<void> {
+    const pageUrl = this.page.url();
     await webActions.clickSubmitButton();
+    await expect(this.page).not.toHaveURL(pageUrl);
   }
 
   async confirmAndSignOut(): Promise<void> {
