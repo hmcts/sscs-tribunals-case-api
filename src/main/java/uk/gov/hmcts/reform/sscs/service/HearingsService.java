@@ -142,6 +142,7 @@ public class HearingsService {
         if (isNull(hearing)) {
             HearingRequestPayload hearingPayload = buildHearingPayload(wrapper, refData);
             log.debug("Sending Create Hearing Request for Case ID {}", caseId);
+            log.debug("Hearing Payload: {}", hearingPayload);
             hmcUpdateResponse = hmcHearingApiService.sendCreateHearingRequest(hearingPayload);
 
             log.debug("Received Create Hearing Request Response for Case ID {}, Hearing State {} and Response:\n{}",
@@ -194,6 +195,7 @@ public class HearingsService {
         HearingRequestPayload hearingPayload = buildHearingPayload(wrapper, refData);
         String hearingId = getHearingId(wrapper);
         log.debug("Sending Update Hearing Request for Case ID {}", wrapper.getCaseData().getCcdCaseId());
+        log.debug("Hearing Payload: {}", hearingPayload);
         HmcUpdateResponse response = hmcHearingApiService.sendUpdateHearingRequest(hearingPayload, hearingId);
 
         log.debug("Received Update Hearing Request Response for Case ID {}, Hearing State {} and Response:\n{}",
