@@ -63,10 +63,12 @@ export class EventNameEventDescriptionPage {
   }
 
   async confirmAndSignOut(): Promise<void> {
-    const pageUrl = this.page.url();
+    let pageUrl = this.page.url();
     await this.confirmSubmission();
     await expect(this.page).not.toHaveURL(pageUrl);
+    pageUrl = this.page.url();
     await webActions.clickElementById('li a.hmcts-header__navigation-link');
+    await expect(this.page).not.toHaveURL(pageUrl);
   }
 
   async submitBtn(): Promise<void> {
