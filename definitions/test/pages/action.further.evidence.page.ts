@@ -85,8 +85,7 @@ export class ActionFurtherEvidencePage {
   async submitActionFurtherEvidence(
     senderOption: string,
     docType: string,
-    fileName: string,
-    shouldSignOut: boolean
+    fileName: string
   ): Promise<void> {
     await this.verifyPageContent();
     await this.selectFEOption();
@@ -98,11 +97,7 @@ export class ActionFurtherEvidencePage {
     await this.enterFileName();
     await this.enterScannedDate();
     await this.selectbundle();
-    if (shouldSignOut) {
-      await this.confirmAndSignOut();
-    } else {
-      await this.confirmSubmission();
-    }
+    await this.confirmSubmission();
   }
 
   async confirmAndSignOut(): Promise<void> {
