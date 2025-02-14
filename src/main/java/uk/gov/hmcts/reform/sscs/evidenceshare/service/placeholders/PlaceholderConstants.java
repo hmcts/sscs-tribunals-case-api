@@ -18,7 +18,6 @@ public final class PlaceholderConstants {
     public static final String SSCS_URL = "https://www.gov.uk/appeal-benefit-decision";
     public static final String IBCA_URL = "https://www.gov.uk/guidance/appeal-an-infected-blood-compensation-decision";
     public static final String SC_NUMBER_LITERAL = "sc_number";
-
     public static final String REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL = "rpc_address_line1";
     public static final String REGIONAL_OFFICE_ADDRESS_LINE2_LITERAL = "rpc_address_line2";
     public static final String REGIONAL_OFFICE_ADDRESS_LINE3_LITERAL = "rpc_address_line3";
@@ -60,8 +59,8 @@ public final class PlaceholderConstants {
     public static final String LETTER_NAME = "Generic Letter to %s %s.pdf";
     public static final String HEARING_DATE = "hearing_date";
     public static final String ENTITY_TYPE = "entityType";
-
     public static final String PHONE_NUMBER = "phone_number";
+    public static final String POSTPONEMENT_REQUEST = "postponement_request";
 
     private PlaceholderConstants() {
         //
