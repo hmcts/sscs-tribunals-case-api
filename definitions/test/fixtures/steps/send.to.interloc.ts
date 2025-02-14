@@ -13,6 +13,10 @@ export class SendToInterloc extends BaseStep {
     this.page = page;
   }
 
+  async signOut() {
+    await this.homePage.signOut();
+  }
+
   async performSendToInterloc(caseId: string) {
     await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
     await this.homePage.chooseEvent('Send to interloc');

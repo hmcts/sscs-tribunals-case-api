@@ -45,6 +45,7 @@ export class Reinstatement extends BaseStep {
       'Review by Judge'
     );
 
+    await this.homePage.signOut();
     await this.loginUserWithCaseId(credentials.judge, true, caseId);
     await this.homePage.chooseEvent(issueDirectionTestdata.eventNameCaptor);
 
@@ -101,7 +102,7 @@ export class Reinstatement extends BaseStep {
       'Interlocutory review state',
       'Review by Judge'
     );
-
+    await this.homePage.signOut();
     await this.loginUserWithCaseId(credentials.judge, true, caseId);
     await this.homePage.chooseEvent(issueDirectionTestdata.eventNameCaptor);
 
