@@ -13,6 +13,9 @@ export class SendCaseToTcw extends BaseStep {
     this.page = page;
   }
 
+  async signOut() {
+    await this.homePage.signOut();
+  }
   async performSendCaseToTcw(caseId: string) {
     await this.loginUserWithCaseId(credentials.judge, true, caseId);
     await this.homePage.chooseEvent('Send case to TCW');

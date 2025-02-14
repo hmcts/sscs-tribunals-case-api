@@ -423,6 +423,7 @@ export class UploadResponse extends BaseStep {
     await this.uploadResponseWithFurtherInfoAsDwpCaseWorker(caseId);
 
     // Verify CTSC Admin can view the unassigned Review FTA Response task
+    await this.homePage.signOut();
     await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
     await this.homePage.navigateToTab('Tasks');
     await this.tasksTab.verifyTaskIsDisplayed(task.name);

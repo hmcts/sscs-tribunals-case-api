@@ -98,7 +98,7 @@ export class LinkCase extends BaseStep {
     await expect(this.page.getByText(hyphenatedSecondCaseId)).toBeVisible();
 
     // Now that cases are linked, rerun the event to remove the link between the cases.
-    await this.goToLinkACasePage(this.page, firstPipCaseId);
+    await this.homePage.chooseEvent('Link a case');
 
     //Clicking remove buttons once event has been triggered
     await this.linkACasePage.removeLink();

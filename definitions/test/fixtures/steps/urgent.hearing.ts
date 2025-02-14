@@ -103,7 +103,7 @@ export class UrgentHearing extends BaseStep {
       'Interlocutory review state',
       'Review by Judge'
     );
-    await this.homePage.reloadPage();
+    await this.homePage.signOut();
 
     await this.loginUserWithCaseId(credentials.judge, true, caseId);
     await this.homePage.chooseEvent(issueDirectionTestdata.eventNameCaptor);
@@ -253,6 +253,10 @@ export class UrgentHearing extends BaseStep {
     await this.rolesAndAccessTab.allocateInterlocutoryJudge(
       credentials.salariedJudge.email
     );
+  }
+
+  async signOut() {
+    await this.homePage.signOut();
   }
 
   async requestAnUrgentHearing(caseId: string): Promise<void> {
