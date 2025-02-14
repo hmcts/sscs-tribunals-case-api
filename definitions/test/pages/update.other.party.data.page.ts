@@ -22,7 +22,7 @@ export class updateOtherPartyDataPage {
   }
 
   // Applying other party data for the Mandatory fields only
-  async applyOtherPartyData() {
+  async applyOtherPartyData( caseType: string = "NONIBC" ) {
     await this.page.getByRole('button', { name: 'Add new' }).click(); //fields are expanded here
     await this.page.getByText('First Name');
     await this.page
@@ -38,18 +38,29 @@ export class updateOtherPartyDataPage {
       .locator('#otherParties_0_address_town')
       .fill(addUpdateOtherPartyData.updateOtherPartyDataAddressTown);
     await this.page
+      .locator('#otherParties_0_address_country')
+      .fill(addUpdateOtherPartyData.updateOtherPartyDataAddressCountry);
+    await this.page
       .locator('#otherParties_0_address_postcode')
-      .fill(addUpdateOtherPartyData.updateOtherPartyDataAddressPostCode);
+      .fill(addUpdateOtherPartyData.updateOtherPartyDataAddressPostCode);      
     await this.page
       .locator('#otherParties_0_confidentialityRequired_No')
       .click();
     await this.page
       .locator('#otherParties_0_unacceptableCustomerBehaviour_No')
       .click();
-    await this.page
-      .locator('#otherParties_0_role_name')
-      .selectOption({ label: 'Paying parent' }); //selecting role drop down
-
+      if( caseType == "NONIBC") {
+        await this.page
+          .locator('#otherParties_0_role_name')
+          .selectOption({ label: 'Paying parent' }); //selecting role drop down
+      } else if( caseType == "IBC" ) {
+        await this.page
+          .locator('#otherParties_0_name_title')
+          .fill(addUpdateOtherPartyData.updateOtherPartyDataTitle);
+        await this.page
+          .locator('#otherParties_0_address_inMainlandUk_Yes')
+          .click(); //ToDo : Change to dynamic value
+      }
     await webAction.clickButton('Submit');
   }
 
