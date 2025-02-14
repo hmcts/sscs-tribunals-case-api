@@ -21,7 +21,6 @@ export class RequestTimeExtension extends BaseStep {
       false,
       caseId
     );
-    await this.homePage.reloadPage();
     await this.homePage.chooseEvent(reqTimeExtData.eventNameCaptor);
 
     await this.requestTimeExtensionPage.verifyPageContent();

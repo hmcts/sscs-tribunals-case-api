@@ -15,7 +15,6 @@ export class SendCaseToTcw extends BaseStep {
 
   async performSendCaseToTcw(caseId: string) {
     await this.loginUserWithCaseId(credentials.judge, true, caseId);
-    await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Send case to TCW');
 
     let sendCaseToTcwPage = new SendCaseToTcwPage(this.page);

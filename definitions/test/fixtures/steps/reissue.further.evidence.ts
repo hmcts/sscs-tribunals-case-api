@@ -18,7 +18,6 @@ export class ReissueFurtherEvidence extends BaseStep {
     uploadAudioFile?: boolean
   ) {
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
-    await this.homePage.reloadPage();
     await expect(this.homePage.summaryTab).toBeVisible();
     await this.homePage.chooseEvent('Upload document FE');
 

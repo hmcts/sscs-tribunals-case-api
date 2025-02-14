@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 import { WebAction } from '../../common/web.action';
 const eventTestData = require('../content/event.name.event.description_en.json');
 
@@ -57,9 +57,16 @@ export class EventNameEventDescriptionPage {
   }
 
   async confirmSubmission(): Promise<void> {
-    await this.delay(3000);
+    const pageUrl = this.page.url();
     await webActions.clickSubmitButton();
-    await this.delay(3000);
+    await expect(this.page).not.toHaveURL(pageUrl);
+  }
+
+  async confirmAndSignOut(): Promise<void> {
+    const pageUrl = this.page.url();
+    await this.confirmSubmission();
+    await expect(this.page).not.toHaveURL(pageUrl);
+    await webActions.clickElementById('li a.hmcts-header__navigation-link');
   }
 
   async submitBtn(): Promise<void> {
