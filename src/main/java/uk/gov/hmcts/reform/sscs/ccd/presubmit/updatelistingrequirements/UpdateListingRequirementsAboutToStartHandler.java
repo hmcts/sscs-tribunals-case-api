@@ -56,7 +56,7 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
             SchedulingAndListingFields schedulingAndListingFields = sscsCaseData.getSchedulingAndListingFields();
             OverrideFields overrideFields = schedulingAndListingFields.getOverrideFields();
 
-            if (isNull(overrideFields)) {
+            if (isNull(overrideFields) || isNull(overrideFields.getAppellantInterpreter())) {
                 overrideFields = initialiseOverrideFields();
                 schedulingAndListingFields.setOverrideFields(overrideFields);
             }
