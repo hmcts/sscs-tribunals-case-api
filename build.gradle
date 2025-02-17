@@ -282,7 +282,7 @@ tasks.register('runGitPreCommitTasks') {
 dependencyManagement {
     dependencies {
         //CVE-2022-25857
-        dependencySet(group: 'org.yaml', version: '2.3') {
+        dependencySet(group: 'org.yaml', version: '2.4') {
             entry 'snakeyaml'
         }
 
