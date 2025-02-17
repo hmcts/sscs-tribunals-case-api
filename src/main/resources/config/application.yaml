@@ -55,21 +55,6 @@ subscriptions:
     mac:
         secret: ${SUBSCRIPTIONS_MAC_SECRET:our-big-secret}
 
-amqp:
-    host: ${AMQP_HOST:localhost}
-    password: ${AMQP_PASSWORD:guest}
-    subscription: ${SUBSCRIPTION_NAME:test.queue}
-    topic: ${TOPIC_NAME:test.topic}
-    trustAllCerts: ${TRUST_ALL_CERTS:true}
-    username: ${AMQP_USERNAME:guest}
-    clientId: sscs-evidence-share
-    amqp-connection-string-template: ${JMS_AMQP_CONNECTION_TEMPLATE:amqps://%1s?amqp.idleTimeout=%2d}
-    idleTimeout: ${JMS_IDLE_TIMEOUT:30000}
-    reconnectOnException: ${AMQP_RECONNECT_ON_EXCEPTION:false}
-    prefetch:
-        override: ${AMQP_PREFETCH_OVERRIDE:false}
-        topicPrefetch: ${AMQP_TOPIC_PREFETCH:1}
-
 callback:
     maxRetryAttempts: ${CALLBACK_MAX_RETRY_ATTEMPTS:3}
 

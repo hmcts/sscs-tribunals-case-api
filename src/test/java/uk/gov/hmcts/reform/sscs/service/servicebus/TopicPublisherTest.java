@@ -1,110 +1,51 @@
 package uk.gov.hmcts.reform.sscs.service.servicebus;
 
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import jakarta.jms.Message;
-import java.net.NoRouteToHostException;
-import java.util.concurrent.atomic.AtomicReference;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.jms.IllegalStateException;
-import org.springframework.jms.connection.CachingConnectionFactory;
-import org.springframework.jms.connection.SingleConnectionFactory;
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.MessagePostProcessor;
+import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit4.SpringRunner;
+import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = TopicPublisher.class)
+@EnableRetry
+// TODO: ASB - is this now an integration test? It's kind of pointless anyway, as it's just testing the retryable annotation
 public class TopicPublisherTest {
 
-    private static final String DESTINATION = "Bermuda";
-    private final JmsTemplate jmsTemplate = mock(JmsTemplate.class);
-    private final CachingConnectionFactory connectionFactory = mock(CachingConnectionFactory.class);
-    private TopicPublisher underTest = new TopicPublisher(jmsTemplate, DESTINATION, connectionFactory);
-    private Message message = mock(Message.class);
+    @MockitoBean
+    private TopicConsumer topicConsumer;
 
-    @Captor
-    private ArgumentCaptor<MessagePostProcessor> lambdaCaptor;
+    @Mock
+    private Callback<SscsCaseData> callback;
+
+    @Autowired
+    private TopicPublisher topicPublisher;
 
     @Test
-    public void sendMessageCallsTheJmsTemplateAndSetsMessageId() throws Exception {
-
-        final AtomicReference<Message> msg = new AtomicReference<>();
-
-        String messageId = "id:123";
-
-        when(message.getJMSMessageID()).thenReturn(messageId);
-
-        doAnswer((i) -> {
-
-            msg.set(message);
-            return null;
-        }).when(jmsTemplate).convertAndSend(anyString(), anyString(), any());
-
-        underTest.sendMessage("a message", "1", msg);
-
-        verify(jmsTemplate).convertAndSend(eq(DESTINATION), any(), lambdaCaptor.capture());
-        MessagePostProcessor lambda = lambdaCaptor.getValue();
-        lambda.postProcessMessage(message);
-
-        Assert.assertEquals(messageId, msg.get().getJMSMessageID());
+    public void sendMessage_callsTopicConsumerOnMessage() {
+        topicPublisher.sendMessage(callback);
+        verify(topicConsumer, times(1)).onMessage(callback);
     }
 
-    @Test(expected = NoRouteToHostException.class)
-    public void recoverMessageThrowsThePassedException() throws Throwable {
-        Exception exception = new NoRouteToHostException("");
-        underTest.recoverMessage(exception);
+    @Test(expected = IllegalStateException.class)
+    public void sendMessage_retriesOnException() {
+        doThrow(new IllegalStateException()).when(topicConsumer).onMessage(callback);
+        topicPublisher.sendMessage(callback);
     }
 
     @Test
-    public void sendMessageWhenThrowException() {
-        doThrow(IllegalStateException.class).when(jmsTemplate).convertAndSend(anyString(),any(), any());
-
-        try {
-            underTest.sendMessage("a message", "1", new AtomicReference<>());
-        } catch (Exception e) {
-            verify(connectionFactory).resetConnection();
-            verify(jmsTemplate,times(2)).convertAndSend(eq(DESTINATION), any(), any());
-        }
-
-    }
-
-    @Test
-    public void sendMessageWhenThrowExceptionWhenConnectionFactoryInstanceDifferent() {
-        SingleConnectionFactory connectionFactory = mock(SingleConnectionFactory.class);
-
-        doThrow(IllegalStateException.class).when(jmsTemplate).convertAndSend(anyString(),any(), any());
-
-        underTest = new TopicPublisher(jmsTemplate, DESTINATION, connectionFactory);
-
-        try {
-            underTest.sendMessage("a message", "1", new AtomicReference<>());
-        } catch (Exception e) {
-            verify(connectionFactory,never()).resetConnection();
-            verify(jmsTemplate,times(1)).convertAndSend(eq(DESTINATION), any(), any());
-        }
-
-    }
-
-    @Test(expected = Exception.class)
-    public void sendMessageWhenOtherThrowException() {
-        doThrow(Exception.class).when(jmsTemplate).convertAndSend(anyString(),any(), any());
-
-        underTest.sendMessage("a message", "1", new AtomicReference<>());
-
-        Assert.assertTrue(false);
-
+    public void sendMessage_succeedsAfterRetry() {
+        doThrow(new IllegalStateException()).doNothing().when(topicConsumer).onMessage(callback);
+        topicPublisher.sendMessage(callback);
+        verify(topicConsumer, times(2)).onMessage(callback);
     }
 }
