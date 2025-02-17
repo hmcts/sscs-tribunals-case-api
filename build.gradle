@@ -330,7 +330,7 @@ dependencies {
 
     implementation group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.8'
 
-    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.8.4'
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.8.5'
 
     implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.5'
     implementation group: 'io.github.openfeign', name: 'feign-hc5', version: '13.5'
@@ -423,9 +423,9 @@ dependencies {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
     }
 
-    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.0'
-    testImplementation group: 'io.rest-assured', name: 'xml-path', version: '5.5.0'
-    testImplementation group: 'io.rest-assured', name: 'json-path', version: '5.5.0'
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.1'
+    testImplementation group: 'io.rest-assured', name: 'xml-path', version: '5.5.1'
+    testImplementation group: 'io.rest-assured', name: 'json-path', version: '5.5.1'
     testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.7', classifier: 'all', {
         exclude group: 'commons-io', module: 'commons-io'
     }
