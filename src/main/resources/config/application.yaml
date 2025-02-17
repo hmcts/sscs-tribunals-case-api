@@ -209,13 +209,13 @@ document_management:
 documents:
     english:
         CORRECTION_GRANTED: TB-SCS-GNO-ENG-corrected-decision-notice.docx
-        DECISION_ISSUED: TB-SCS-GNO-ENG-draft-decision-notice-v2.docx
+        DECISION_ISSUED: TB-SCS-GNO-ENG-draft-decision-notice.docx
         DIRECTION_ISSUED: TB-SCS-GNO-ENG-directions-notice-v2.docx
         ISSUE_FINAL_DECISION: TB-SCS-GNO-ENG-final-decision-notice-v2.docx
         SOR_WRITE: TB-SCS-GNO-ENG-sor-directions-notice-v2.docx
     welsh:
         CORRECTION_GRANTED: TB-SCS-GNO-ENG-corrected-decision-notice.docx
-        DECISION_ISSUED: TB-SCS-GNO-ENG-draft-decision-notice-v2.docx
+        DECISION_ISSUED: TB-SCS-GNO-ENG-draft-decision-notice.docx
         DIRECTION_ISSUED: TB-SCS-GNO-ENG-directions-notice-v2.docx
         ISSUE_FINAL_DECISION: TB-SCS-GNO-ENG-final-decision-notice-v2.docx
         SOR_WRITE: TB-SCS-GNO-ENG-sor-directions-notice-v2.docx
