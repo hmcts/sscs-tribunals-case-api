@@ -158,6 +158,7 @@ export class WebAction {
     await this.verifyElementVisibility(elementId);
     await this.page.locator(elementId).first()
       .setInputFiles(path.join(__dirname, `../data/file/${fileName}`));
+    await this.verifyElementHidden("span:has-text('Uploading...')");
   }
 
   async screenshot() {
