@@ -2006,6 +2006,9 @@ spring:
         mapper:
             accept-case-insensitive-enums: true
             accept-case-insensitive-properties: true
+    lifecycle:
+        timeout-per-shutdown-phase: 120s
+
 job.scheduler:
     retryPolicy:
         maxNumberOfJobExecutions: 2

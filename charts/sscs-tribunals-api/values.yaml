@@ -2,6 +2,7 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
   enabled: true
   image: 'hmctspublic.azurecr.io/sscs/tribunals-api:latest'
   applicationPort: 8080
+  terminationGracePeriodSeconds: 120
   aadIdentityName: sscs
   ingressHost: sscs-tribunals-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   spotInstances:
