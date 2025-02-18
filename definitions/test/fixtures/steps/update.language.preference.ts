@@ -18,6 +18,7 @@ export class UpdateLanguagePreference extends BaseStep {
   ) {
     if (loginRequired) {
       await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+      await this.homePage.reloadPage();
     }
 
     await this.homePage.chooseEvent(languagePreferenceData.eventName);

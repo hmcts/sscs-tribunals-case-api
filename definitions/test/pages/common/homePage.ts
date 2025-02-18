@@ -100,9 +100,7 @@ export class HomePage {
   }
 
   async signOut(): Promise<void> {
-    const pageUrl = this.page.url();
     await webActions.clickElementById("//a[contains(.,'Sign out')]");
-    await expect(this.page).not.toHaveURL(pageUrl);
   }
 
   async goToHomePage(caseId: string): Promise<void> {

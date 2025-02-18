@@ -59,7 +59,6 @@ java:
     HOURS_END_TIME: 23
     RUN_DB_MIGRATION_ON_STARTUP: true
     TEST_RECIPIENTS_POSTCODE: "*"
-    DIRECTION_HEARINGS_ENABLED: true
   secrets:
     JOB_SCHEDULER_DB_PASSWORD:
       secretRef: postgres
