@@ -812,13 +812,13 @@ notification:
                 docmosisId: TB-SCS-GNO-ENG-00094.docx
         issueFinalDecision:
             appellant:
-                docmosisId: TB-SCS-GNO-ENG-00454.docx
+                docmosisId: TB-SCS-GNO-ENG-00454-v2.docx
             appointee:
-                docmosisId: TB-SCS-GNO-ENG-00454.docx
+                docmosisId: TB-SCS-GNO-ENG-00454-v2.docx
             representative:
-                docmosisId: TB-SCS-GNO-ENG-00455.docx
+                docmosisId: TB-SCS-GNO-ENG-00455-v2.docx
             other_party:
-                docmosisId: TB-SCS-GNO-ENG-00795.docx
+                docmosisId: TB-SCS-GNO-ENG-00795-v2.docx
         issueAdjournmentNotice:
             appellant:
                 docmosisId: TB-SCS-GNO-ENG-00510-v2.docx
@@ -1440,11 +1440,11 @@ notification:
                 docmosisId: TB-SCS-GNO-WEL-00649-v2.docx
         issueFinalDecisionWelsh:
             appellant:
-                docmosisId: TB-SCS-GNO-WEL-00681.docx
+                docmosisId: TB-SCS-GNO-WEL-00681-v2.docx
             appointee:
-                docmosisId: TB-SCS-GNO-WEL-00681.docx
+                docmosisId: TB-SCS-GNO-WEL-00681-v2.docx
             representative:
-                docmosisId: TB-SCS-GNO-WEL-00682.docx
+                docmosisId: TB-SCS-GNO-WEL-00682-v2.docx
             other_party:
                 docmosisId: TB-SCS-GNO-WEL-00796.docx
         requestForInformation:
