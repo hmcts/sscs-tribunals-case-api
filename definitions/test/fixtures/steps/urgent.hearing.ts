@@ -23,7 +23,6 @@ export class UrgentHearing extends BaseStep {
 
   async requestAndGrantAnUrgentHearing(caseId: string) {
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
-    await this.homePage.reloadPage();
     await this.homePage.chooseEvent(actionFurtherEvidenceTestdata.eventName);
     await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
       actionFurtherEvidenceTestdata.sender,
@@ -49,7 +48,7 @@ export class UrgentHearing extends BaseStep {
       'Interlocutory review state',
       'Review by Judge'
     );
-    await this.homePage.reloadPage();
+    await this.homePage.signOut();
 
     await this.loginUserWithCaseId(credentials.judge, true, caseId);
     await this.homePage.chooseEvent(issueDirectionTestdata.eventNameCaptor);
@@ -80,7 +79,6 @@ export class UrgentHearing extends BaseStep {
 
   async requestAndRefuseAnUrgentHearing(caseId: string) {
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
-    await this.homePage.reloadPage();
     await this.homePage.chooseEvent(actionFurtherEvidenceTestdata.eventName);
     await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
       actionFurtherEvidenceTestdata.sender,
@@ -107,7 +105,7 @@ export class UrgentHearing extends BaseStep {
       'Interlocutory review state',
       'Review by Judge'
     );
-    await this.homePage.reloadPage();
+    await this.homePage.signOut();
 
     await this.loginUserWithCaseId(credentials.judge, true, caseId);
     await this.homePage.chooseEvent(issueDirectionTestdata.eventNameCaptor);
@@ -143,7 +141,6 @@ export class UrgentHearing extends BaseStep {
       false,
       welshPipCaseId
     );
-    await this.homePage.reloadPage();
 
     //The below Steps is required as a Welsh Case is assumed to have it's creation document to
     // be translated and thus an auto stop for Send to FTA till that happens
@@ -231,7 +228,6 @@ export class UrgentHearing extends BaseStep {
 
   async uploadEncryptedFiles(caseId: string) {
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
-    await this.homePage.reloadPage();
     await this.homePage.chooseEvent(actionFurtherEvidenceTestdata.eventName);
     await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
       actionFurtherEvidenceTestdata.sender,
@@ -263,9 +259,12 @@ export class UrgentHearing extends BaseStep {
     );
   }
 
+  async signOut() {
+    await this.homePage.signOut();
+  }
+
   async requestAnUrgentHearing(caseId: string): Promise<void> {
     await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
-    await this.homePage.reloadPage();
     await this.homePage.chooseEvent(actionFurtherEvidenceTestdata.eventName);
     await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
       actionFurtherEvidenceTestdata.sender,
