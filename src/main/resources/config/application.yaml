@@ -21,6 +21,8 @@ spring:
         multipart:
             max-file-size: ${MAX_FILE_SIZE:10MB}
             max-request-size: ${MAX_REQUEST_SIZE:10MB}
+    lifecycle:
+        timeout-per-shutdown-phase: 120s
 
     datasource:
         driverClassName: org.postgresql.Driver
@@ -2006,8 +2008,6 @@ spring:
         mapper:
             accept-case-insensitive-enums: true
             accept-case-insensitive-properties: true
-    lifecycle:
-        timeout-per-shutdown-phase: 120s
 
 job.scheduler:
     retryPolicy:
