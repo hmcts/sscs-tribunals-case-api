@@ -13,10 +13,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
@@ -70,22 +81,7 @@ class CaseUpdatedAboutToStartHandlerTest {
     }
 
     @Test
-    void givenBenefitType_shouldHaveCorrectBenefitSelectionWithInfectedBloodCompensationDisabled() {
-        ReflectionTestUtils.setField(handler, "isInfectedBloodCompensationEnabled", false);
-
-        var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        var benefitSelection = result.getData().getAppeal().getBenefitType().getDescriptionSelection();
-
-        assertThat(benefitSelection).isNotNull();
-        assertThat(benefitSelection.getValue()).isNotNull();
-        assertThat(benefitSelection.getValue().getCode()).isEqualTo("002");
-        assertThat(benefitSelection.getListItems()).hasSize(34);
-    }
-
-    @Test
-    void givenBenefitType_shouldHaveCorrectBenefitSelectionWithInfectedBloodCompensationEnabled() {
-        ReflectionTestUtils.setField(handler, "isInfectedBloodCompensationEnabled", true);
-
+    void givenBenefitType_shouldHaveCorrectBenefitSelection() {
         var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         var benefitSelection = result.getData().getAppeal().getBenefitType().getDescriptionSelection();
 
@@ -99,6 +95,7 @@ class CaseUpdatedAboutToStartHandlerTest {
     void givenPortOfEntryValueNotNull_shouldNotSetListUp() {
         DynamicList ukPortOfEntries = SscsUtil.getPortsOfEntry();
         ukPortOfEntries.setValue(new DynamicListItem("GBSTTRT00", "Althorpe"));
+        sscsCaseData.setBenefitCode("093");
         sscsCaseData.getAppeal().getAppellant().getAddress().setUkPortOfEntryList(ukPortOfEntries);
         var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         var portOfEntryList = result.getData().getAppeal().getAppellant().getAddress().getUkPortOfEntryList();
@@ -116,6 +113,7 @@ class CaseUpdatedAboutToStartHandlerTest {
     @Test
     void givenPortOfEntryValueNull_shouldSetListUpWithNullValue() {
         DynamicList ukPortOfEntries = SscsUtil.getPortsOfEntry();
+        sscsCaseData.setBenefitCode("093");
         sscsCaseData.getAppeal().getAppellant().getAddress().setUkPortOfEntryList(ukPortOfEntries);
         var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         var portOfEntryList = result.getData().getAppeal().getAppellant().getAddress().getUkPortOfEntryList();
@@ -131,6 +129,7 @@ class CaseUpdatedAboutToStartHandlerTest {
 
     @Test
     void givenPortOfEntryCode_shouldSetListUpWithValueFromCode() {
+        sscsCaseData.setBenefitCode("093");
         sscsCaseData.getAppeal().getAppellant().getAddress().setPortOfEntry("GBSTTRT00");
         var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         var portOfEntryList = result.getData().getAppeal().getAppellant().getAddress().getUkPortOfEntryList();
@@ -148,6 +147,7 @@ class CaseUpdatedAboutToStartHandlerTest {
 
     @Test
     void givenNoPortOfEntryCode_shouldSetListUpWithNullValue() {
+        sscsCaseData.setBenefitCode("093");
         var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         var portOfEntryList = result.getData().getAppeal().getAppellant().getAddress().getUkPortOfEntryList();
         var portOfEntry = result.getData().getAppeal().getAppellant().getAddress().getUkPortOfEntry();
@@ -158,6 +158,18 @@ class CaseUpdatedAboutToStartHandlerTest {
         assertThat(portOfEntryList).isNotNull();
         assertThat(portOfEntryList.getValue()).isNull();
         assertThat(portOfEntryList.getListItems()).hasSize(UkPortOfEntry.values().length);
+    }
+
+    @Test
+    void givenNonIbcCase_shouldNotSetListUp() {
+        var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        var portOfEntryList = result.getData().getAppeal().getAppellant().getAddress().getUkPortOfEntryList();
+        var portOfEntry = result.getData().getAppeal().getAppellant().getAddress().getUkPortOfEntry();
+        var portOfEntryCode = result.getData().getAppeal().getAppellant().getAddress().getPortOfEntry();
+
+        assertThat(portOfEntry).isNull();
+        assertThat(portOfEntryCode).isNull();
+        assertThat(portOfEntryList).isNull();
     }
 
     @Test

@@ -4,12 +4,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist.ReadyToListAboutToSubmitHandler.EXISTING_HEARING_WARNING;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist.ReadyToListAboutToSubmitHandler.GAPS_CASE_WARNING;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,7 +31,19 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
 import uk.gov.hmcts.reform.sscs.model.servicebus.NoOpMessagingService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
@@ -141,6 +158,26 @@ public class ReadyToListAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenAnIbcCase_shouldSuccessfullySendAHearingRequestMessageWithListAssist() {
+        buildRegionalProcessingCentreMap(HearingRoute.LIST_ASSIST);
+        when(sessionAwareServiceBusMessagingService.sendMessage(any())).thenReturn(true);
+
+        handler = new ReadyToListAboutToSubmitHandler(true, regionalProcessingCenterService,
+            hearingMessagingServiceFactory);
+
+        sscsCaseData = sscsCaseData.toBuilder().benefitCode("093").region("TEST").build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getData().getSchedulingAndListingFields().getHearingRoute()).isEqualTo(HearingRoute.LIST_ASSIST);
+        assertThat(response.getData().getSchedulingAndListingFields().getHearingState()).isEqualTo(HearingState.CREATE_HEARING);
+
+        assertThat(response.getErrors())
+            .as("A successfully sent message should not result in any errors.").isEmpty();
+    }
+
+    @Test
     public void givenAnRpcUsingListAssistAndAnExistingGapsCase_shouldResolveToGaps() {
         buildRegionalProcessingCentreMap(HearingRoute.LIST_ASSIST);
         when(sessionAwareServiceBusMessagingService.sendMessage(any())).thenReturn(true);
@@ -234,7 +271,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
 
         MatcherAssert.assertThat(response.getErrors().size(), is(0));
         MatcherAssert.assertThat(response.getWarnings().size(), is(1));
-        MatcherAssert.assertThat(response.getWarnings().iterator().next(), is("This is a GAPS case, If you do want to proceed, then please change the hearing route to List Assist"));
+        MatcherAssert.assertThat(response.getWarnings().iterator().next(), is(GAPS_CASE_WARNING));
     }
 
     @Test
@@ -246,7 +283,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
                 .schedulingAndListingFields(schedulingAndListingFields)
                 .region("TEST")
                 .build();
-        sscsCaseData.setIgnoreCallbackWarnings(YesNo.YES);
+        sscsCaseData.setIgnoreCallbackWarnings(YES);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         handler = new ReadyToListAboutToSubmitHandler(false, regionalProcessingCenterService,
@@ -259,7 +296,8 @@ public class ReadyToListAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAListAssistCaseIfAHearingExistsInTheFutureThenReturnWarning() {
+    @Parameters({"YES", "NO"})
+    public void givenAListAssistCaseIfAHearingExistsInTheFutureThenReturnWarning(YesNo ignoreCallbackWarnings) {
         HearingDetails hearingDetails1 = HearingDetails.builder()
                 .hearingDate(LocalDate.now().minusDays(10).toString())
                 .start(LocalDateTime.now().minusDays(10))
@@ -281,14 +319,20 @@ public class ReadyToListAboutToSubmitHandlerTest {
         sscsCaseData = sscsCaseData.toBuilder()
                 .hearings(List.of(hearing1, hearing2))
                 .region("TEST")
+                .ignoreCallbackWarnings(ignoreCallbackWarnings)
                 .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         handler = new ReadyToListAboutToSubmitHandler(false, regionalProcessingCenterService, hearingMessagingServiceFactory);
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         MatcherAssert.assertThat(response.getErrors().size(), is(0));
-        MatcherAssert.assertThat(response.getWarnings().size(), is(1));
-        MatcherAssert.assertThat(response.getWarnings().iterator().next(), is("There is already a hearing request in List assist, are you sure you want to send another request? If you do proceed, then please cancel the existing hearing request first"));
+        if (ignoreCallbackWarnings == NO) {
+            MatcherAssert.assertThat(response.getWarnings().size(), is(1));
+            assertTrue(response.getWarnings().contains(EXISTING_HEARING_WARNING));
+        } else {
+            MatcherAssert.assertThat(response.getWarnings().size(), is(0));
+        }
     }
 
     @Test

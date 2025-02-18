@@ -1,5 +1,5 @@
 {
-    "eventNameCaptor": "Review PHE request",
-    "pheGrantedText": "PHE on this case: Granted",
-    "pheReviewText": "PHE on this case: Under Review"
+  "eventNameCaptor": "Review PHE request",
+  "pheGrantedText": "PHE on this case: Granted",
+  "pheReviewText": "PHE on this case: Under Review"
 }

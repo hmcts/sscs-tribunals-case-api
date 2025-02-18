@@ -1,7 +1,12 @@
 package uk.gov.hmcts.reform.sscs.service.servicebus;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 import org.junit.Before;
@@ -15,7 +20,11 @@ import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.evidenceshare.exception.*;
+import uk.gov.hmcts.reform.sscs.evidenceshare.exception.BulkPrintException;
+import uk.gov.hmcts.reform.sscs.evidenceshare.exception.IssueFurtherEvidenceException;
+import uk.gov.hmcts.reform.sscs.evidenceshare.exception.PdfStoreException;
+import uk.gov.hmcts.reform.sscs.evidenceshare.exception.PostIssueFurtherEvidenceTasksException;
+import uk.gov.hmcts.reform.sscs.evidenceshare.exception.UnableToContactThirdPartyException;
 import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
 import uk.gov.hmcts.reform.sscs.exception.NoMrnDetailsException;
 import uk.gov.hmcts.reform.sscs.service.exceptions.ClientAuthorisationException;
@@ -42,7 +51,7 @@ public class TopicConsumerTest {
 
     @Before
     public void setup() {
-        topicConsumer = new TopicConsumer(RETRY_THREE_TIMES, dispatcher, deserializer, notificationsMessageProcessor, false);
+        topicConsumer = new TopicConsumer(RETRY_THREE_TIMES, dispatcher, deserializer, notificationsMessageProcessor);
     }
 
     @Test
@@ -134,7 +143,7 @@ public class TopicConsumerTest {
 
     @Test
     public void shouldProcessMessageForNotifications() {
-        topicConsumer = new TopicConsumer(RETRY_THREE_TIMES, dispatcher, deserializer, notificationsMessageProcessor, true);
+        topicConsumer = new TopicConsumer(RETRY_THREE_TIMES, dispatcher, deserializer, notificationsMessageProcessor);
         topicConsumer.onMessage(MESSAGE, "1");
         verify(notificationsMessageProcessor).processMessage(MESSAGE, "1");
     }

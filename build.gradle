@@ -1,21 +1,19 @@
 plugins {
     id 'application'
     id 'pmd'
-    id 'org.sonarqube' version '5.1.0.4882'
+    id 'org.sonarqube' version '6.0.1.5171'
     id 'jacoco'
-    id 'org.springframework.boot' version '2.7.18'
-    id 'uk.gov.hmcts.java' version '0.12.63'
+    id 'org.springframework.boot' version '3.4.2'
+    id 'uk.gov.hmcts.java' version '0.12.65'
     id 'com.gorylenko.gradle-git-properties' version '2.4.2'
     id 'com.github.ben-manes.versions' version '0.46.0'
-    id "info.solidsoft.pitest" version '1.15.0'
-    id 'org.owasp.dependencycheck' version '10.0.4'
+    id 'org.owasp.dependencycheck' version '12.1.0'
     id 'au.com.dius.pact' version '4.3.15'
-    id 'com.github.hmcts.rse-cft-lib' version '0.19.1520'
+    id 'com.github.hmcts.rse-cft-lib' version '0.19.1583'
 }
 
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
-apply plugin: "info.solidsoft.pitest"
 
 gitProperties {
     gitPropertiesDir = new File("${project.rootDir}/src/main/resources/uk/gov/hmcts/reform/sscs")
@@ -30,7 +28,7 @@ version = '1.0.0'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
@@ -52,7 +50,7 @@ application {
 }
 
 pmd {
-    toolVersion = "7.6.0"
+    toolVersion = "7.10.0"
     ignoreFailures = true
     sourceSets = [sourceSets.main, sourceSets.test]
     reportsDir = layout.buildDirectory.dir("reports/pmd").get().asFile
@@ -231,7 +229,7 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/sscs/evidenceshare/domain/**," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/TribunalsCaseApiApplication.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/email/Email.java," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/config/*," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/config/**/*.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/model/**/*.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/evidenceshare/model/**/*.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/EvidenceUploadService.java," +
@@ -249,10 +247,9 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/sscs/docmosis/domain/**," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/docmosis/config/**," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/EnvironmentPropertiesPrinter.java," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/controller/FunctionalTestController.java,"
+                "src/main/java/uk/gov/hmcts/reform/sscs/controller/FunctionalTestController.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/tyanotifications/utils/GetAllTemplatesFromNotify.java,"
         property "sonar.host.url", "https://sonar.reform.hmcts.net/"
-        property "sonar.pitest.mode", "reuseReport"
-        property "sonar.pitest.reportsDirectory", "build/reports/pitest"
     }
 }
 
@@ -285,32 +282,21 @@ tasks.register('runGitPreCommitTasks') {
 dependencyManagement {
     dependencies {
         //CVE-2022-25857
-        dependencySet(group: 'org.yaml', version: '2.0') {
+        dependencySet(group: 'org.yaml', version: '2.4') {
             entry 'snakeyaml'
         }
 
-        //CVE-2023-33202
-        dependencySet(group: 'org.springframework.security', version: '1.1.5') {
-            entry 'spring-security-rsa'
-        }
-
-        //CVE-2023-6378, CVE-2023-6481
-        dependencySet(group: 'ch.qos.logback', version: '1.2.13') {
-            entry 'logback-core'
-            entry 'logback-classic'
-        }
-
         imports {
-            mavenBom "org.springframework.cloud:spring-cloud-dependencies:2021.0.9"
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:2024.0.0"
         }
     }
 }
 
 def versions = [
-        springsecurity : '5.8.14',
+        springsecurity : '6.4.2',
         jackson        : '2.17.2',
-        lombok         : '1.18.28',
-        commonsio      : '2.13.0'
+        lombok         : '1.18.36',
+        commonsio      : '2.18.0'
 ]
 
 dependencies {
@@ -331,47 +317,55 @@ dependencies {
     implementation group: 'org.springframework.security', name: 'spring-security-web', version: versions.springsecurity
 
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
-    implementation group: 'org.springframework.retry', name: 'spring-retry', version: '1.3.4'
+    implementation group: 'org.springframework.retry', name: 'spring-retry', version: '2.0.11'
     implementation group: 'javax.annotation', name: 'javax.annotation-api', version: '1.3.2'
-    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.3'
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.5'
 
-    implementation group: 'com.google.guava', name: 'guava', version: '32.1.1-jre'
-    implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.19'
+    implementation group: 'com.google.guava', name: 'guava', version: '33.4.0-jre'
+    implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.27'
 
-    implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.2'
-    implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.1'
-    implementation group: 'com.github.hmcts', name: 'ccd-client', version: '4.9.5-SPRING2'
+    implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.0'
+    implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.3'
+    implementation group: 'com.github.hmcts', name: 'ccd-client', version: '5.0.3'
 
     implementation group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.8'
 
-    implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.7.0'
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.8.5'
 
-    implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '12.4'
-    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.11.0'
-    implementation group: 'com.squareup.okio', name: 'okio-jvm', version: '3.9.1'
+    implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.5'
+    implementation group: 'io.github.openfeign', name: 'feign-hc5', version: '13.5'
+    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
+    implementation group: 'com.squareup.okio', name: 'okio-jvm', version: '3.10.2'
 
-    implementation group: 'com.github.hmcts', name: 'auth-checker-lib', version: '2.3.0'
+    implementation group: 'com.github.hmcts', name: 'auth-checker-lib', version: '3.0.6'
 
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.0'
 
-    implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.0.1'
-    implementation group: 'com.github.hmcts', name: 'doc-assembly-client', version: '1.07'
+    implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.1.8'
+    implementation group: 'com.microsoft.azure', name: 'applicationinsights-web', version: '3.7.0'
+    implementation group: 'com.github.hmcts', name: 'doc-assembly-client', version: '2.0.3'
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.8.1'
     //remove when secure doc store is live
-    implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
-    implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
+    implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
+    implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '8.0.1'
 
 
-    implementation group: 'com.mchange', name: 'c3p0', version: '0.10.1'
+    implementation group: 'com.mchange', name: 'c3p0', version: '0.10.2'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.12.26'
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.23'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6.0.2'
 
-    implementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
-    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.1'
+    // sscs-pdf-email-common
+    implementation group: 'com.github.sps.junidecode', name: 'junidecode', version: '0.3'
+    implementation group: 'net.coobird', name: 'thumbnailator', version: '0.4.20'
+    implementation group: 'com.twelvemonkeys.imageio', name: 'imageio-tiff', version: '3.12.0'
+    implementation group: 'pl.touk', name: 'throwing-function', version: '1.3'
+    // sscs-pdf-email-common
 
-    implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.5.8'
+    implementation group: 'com.azure', name: 'azure-core', version: '1.55.1'
+    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.8'
+
+    implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.7.3'
 
     implementation group:'org.overviewproject', name: 'mime-types', version: '1.0.4'
 
@@ -383,52 +377,37 @@ dependencies {
 
     implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     implementation group: 'org.springframework', name: 'spring-jms'
-    implementation group: 'org.apache.qpid', name: 'qpid-jms-client', version: '1.10.0'
-
-    implementation group: 'org.pitest', name: 'pitest', version:  '1.17.3'
-    implementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: pitest.pitestVersion.get()
-    implementation group:'org.codehaus.sonar-plugins', name:'sonar-pitest-plugin', version: '0.5'
+    implementation group: 'org.apache.qpid', name: 'qpid-jms-client', version: '2.6.1'
 
     implementation group: 'com.github.hmcts', name: 'sscs-job-scheduler', version: '2.0.0'
-    implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.3.2'
-    implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '4.1.0-RELEASE'
-    implementation group: 'com.atlassian.commonmark', name: 'commonmark', version: '0.17.0'
-
-    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.3.1'
-    testImplementation group: 'io.rest-assured', name: 'xml-path', version: '5.3.1'
-    testImplementation group: 'io.rest-assured', name: 'json-path', version: '5.3.1'
-    testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.6', classifier: 'all', {
-        exclude group: 'commons-io', module: 'commons-io'
-    }
-    testImplementation group: 'com.github.hmcts', name: 'sscs-job-scheduler', version: '1.6.1', {
-        exclude group: "uk.gov.hmcts.reform", module:"properties-volume-spring-boot-starter"
-    }
+    implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.5.0'
+    implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.2.1-RELEASE'
+    implementation group: 'org.commonmark', name: 'commonmark', version: '0.24.0'
 
     implementation group: 'commons-io', name: 'commons-io', version:  versions.commonsio
 
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
     implementation group: 'org.apache.commons', name: 'commons-text', version: '1.10.0'
-    implementation group: 'org.apache.pdfbox', name: 'xmpbox', version: '2.0.29'
-    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.29'
-    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.8.0'
-    implementation group: 'org.apache.tika', name: 'tika-parsers', version: '2.8.0'
+    implementation group: 'org.apache.pdfbox', name: 'xmpbox', version: '2.0.33'
+    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.33'
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.9.3'
+    implementation group: 'org.apache.tika', name: 'tika-parsers', version: '2.9.3'
 
-    implementation group: 'org.json', name: 'json', version: '20240205'
+    implementation group: 'org.json', name: 'json', version: '20250107'
 
     implementation group: 'com.opencsv', name: 'opencsv', version: '5.7.1'
 
     implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.81"
 
-    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.86'
-    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.86'
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '10.1.26'
 
     //evidence-share depenedencies
-    implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
-    implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '3.0.23'
+    implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '8.0.1'
+    implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '5.0.1'
     // Remove this dependency once the secure doc-store is in use
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
-    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.2.1'
-    implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.1.0', {
+    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.7.0'
+    implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.1', {
         exclude group: 'org.apache.commons', module: 'commons-compress'
         exclude group: 'com.google.guava', module: 'guava'
         exclude group: 'org.apache.poi', module: 'poi-ooxml'
@@ -437,11 +416,6 @@ dependencies {
         exclude group: 'org.codehaus.groovy', module: 'groovy-xml'
     }
 
-
-    integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  versions.commonsio
-
-    functionalTestImplementation group: 'commons-io', name: 'commons-io', version:  versions.commonsio
-
     implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
@@ -449,21 +423,21 @@ dependencies {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
     }
 
-    testImplementation group: 'org.apache.httpcomponents', name: 'fluent-hc', version:  '4.5.14'
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.1'
+    testImplementation group: 'io.rest-assured', name: 'xml-path', version: '5.5.1'
+    testImplementation group: 'io.rest-assured', name: 'json-path', version: '5.5.1'
+    testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.7', classifier: 'all', {
+        exclude group: 'commons-io', module: 'commons-io'
+    }
 
-    testImplementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
-    testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.1'
+    testImplementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5-fluent', version: '5.4.2'
 
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
-    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.37.0'
-    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
-    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.37.0'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.15.2'
+    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '4.1.0'
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.15.2'
+    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '4.1.0'
 
     testImplementation group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
-
-    // https://mvnrepository.com/artifact/net.bytebuddy/byte-buddy-dep
-    testImplementation group: 'net.bytebuddy', name: 'byte-buddy-dep', version: '1.14.5'
-
 
     testImplementation group: 'pl.pragmatists', name: 'JUnitParams', version: '1.1.1'
 
@@ -484,10 +458,11 @@ dependencies {
     // https://mvnrepository.com/artifact/org.awaitility/awaitility
     testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.2.2'
 
-    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-core', version: '8.0.6'
-    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-amqp-1-0-protocol', version: '8.0.6'
-    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-memory-store', version: '8.0.6'
-    testImplementation group: 'com.github.tomakehurst', name: 'wiremock', version: '2.27.2'
+    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-core', version: '9.2.0'
+    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-amqp-1-0-protocol', version: '9.2.0'
+    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-memory-store', version: '9.2.0'
+    testImplementation 'org.wiremock.integrations:wiremock-spring-boot:3.6.0'
+
     //pact contract testing
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.16'
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.7'
@@ -512,28 +487,6 @@ bootJar {
     }
 }
 
-pitest {
-    targetClasses = ['uk.gov.hmcts.reform.sscs.service.*']
-    excludedClasses = ['uk.gov.hmcts.reform.sscs.config.*',
-                       'uk.gov.hmcts.reform.sscs.builder.*',
-                       'uk.gov.hmcts.reform.sscs.domain.*',
-                       'uk.gov.hmcts.reform.sscs.exception.*',
-                       'uk.gov.hmcts.reform.sscs.healthcheck.*',
-                       'uk.gov.hmcts.reform.sscs.model.*',
-                       'uk.gov.hmcts.reform.sscs.transform.*',
-                       'uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication']
-    excludedMethods = ['equals', 'hashcode']
-    jvmArgs = ['-Xms1G','-Xmx3G']
-    enableDefaultIncrementalAnalysis = true
-    historyInputLocation = 'build/reports/pitest/fastermutationtesting'
-    historyOutputLocation = 'build/reports/pitest/fastermutationtestingoutput'
-    threads = 20
-    verbose = true
-    outputFormats = ['XML', 'HTML']
-    timestampedReports = false
-    mutationThreshold = 50
-}
-
 project.ext {
     pacticipant = 'sscs_tribunalsCaseApi'
     pacticipantVersion = getCheckedOutGitCommitHash()
@@ -543,12 +496,6 @@ tasks.register('runAndPublishConsumerPactTests', Test) {
     logger.lifecycle("Runs pact Tests")
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
-}
-
-tasks.register('getSscsCommonVersion') {
-    doLast {
-        print '4.18.0'
-    }
 }
 
 runAndPublishConsumerPactTests.dependsOn contract
@@ -660,17 +607,6 @@ task highLevelDataSetup(type: JavaExec) {
     mainClass = "uk.gov.hmcts.reform.sscs.config.HighLevelDataSetupApp"
     classpath += sourceSets.main.runtimeClasspath
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
-}
-
-// this is required to force Java running on the Azure Windows Server OS into using
-// UTF-8 as the default character set instead of windows-1252 which causes issues
-applicationDefaultJvmArgs = ["-Dfile.encoding=UTF-8"]
-
-run {
-    def debug = System.getProperty("debug")
-    if (debug == 'true') {
-        jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
-    }
 }
 
 def dbHost = System.env.JOB_SCHEDULER_DB_HOST ?: "localhost"

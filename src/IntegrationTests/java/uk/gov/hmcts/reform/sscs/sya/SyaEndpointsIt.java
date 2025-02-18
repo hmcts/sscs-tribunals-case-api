@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.createUploadResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.mail.Session;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -31,7 +32,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import javax.mail.Session;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.apache.commons.io.IOUtils;
@@ -48,9 +48,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
@@ -91,23 +91,23 @@ public class SyaEndpointsIt extends AbstractEventIt {
     private static final String AUTH_TOKEN = "authToken";
     private static final String DUMMY_OAUTH_2_TOKEN = "oauth2Token";
 
-    @MockBean
+    @MockitoBean
     private CcdClient ccdClient;
 
-    @MockBean
+    @MockitoBean
     private IdamClient idamClient;
 
-    @MockBean
+    @MockitoBean
     @Qualifier("authTokenGenerator")
     private AuthTokenGenerator authTokenGenerator;
 
-    @MockBean
+    @MockitoBean
     private PDFServiceClient pdfServiceClient;
 
-    @MockBean
+    @MockitoBean
     private DocumentUploadClientApi documentUploadClientApi;
 
-    @MockBean
+    @MockitoBean
     private RefDataApi refDataApi;
 
     @Captor
@@ -201,6 +201,7 @@ public class SyaEndpointsIt extends AbstractEventIt {
 
         Map<String, Object> data = new HashMap<>();
         data.put("appeal", appeal);
+        given(ccdClient.startEvent(any(), any(), any())).willReturn(StartEventResponse.builder().caseDetails(CaseDetails.builder().id(1234567890L).data(data).build()).build());
 
         given(ccdClient.readForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(1234567890L).data(data).build());
 
@@ -217,6 +218,7 @@ public class SyaEndpointsIt extends AbstractEventIt {
 
     @Test
     public void givenAValidAppealWithNoMrnDate_createIncompleteCase() throws Exception {
+
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
 
         given(ccdClient.searchCases(any(), any())).willReturn(SearchResult.builder().cases(Collections.emptyList()).build());
@@ -240,6 +242,7 @@ public class SyaEndpointsIt extends AbstractEventIt {
 
         Map<String, Object> data = new HashMap<>();
         data.put("appeal", appeal);
+        given(ccdClient.startEvent(any(), any(), any())).willReturn(StartEventResponse.builder().caseDetails(CaseDetails.builder().id(1234567890L).data(data).build()).build());
 
         given(ccdClient.readForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(1234567890L).data(data).build());
 
@@ -279,6 +282,7 @@ public class SyaEndpointsIt extends AbstractEventIt {
 
         Map<String, Object> data = new HashMap<>();
         data.put("appeal", appeal);
+        given(ccdClient.startEvent(any(), any(), any())).willReturn(StartEventResponse.builder().caseDetails(CaseDetails.builder().id(1234567890L).data(data).build()).build());
 
         given(ccdClient.readForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(1234567890L).data(data).build());
 

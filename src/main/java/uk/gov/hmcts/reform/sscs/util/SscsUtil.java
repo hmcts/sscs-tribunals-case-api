@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.sscs.util;
 
-import static io.micrometer.core.instrument.util.StringUtils.isNotBlank;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.function.Predicate.not;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
@@ -369,11 +369,14 @@ public class SscsUtil {
         if (isNotBlank(finalDecisionCaseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName())) {
             names.add(finalDecisionCaseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName());
         }
+        if (isNotBlank(finalDecisionCaseData.getWriteFinalDecisionOtherPanelMemberName())) {
+            names.add(finalDecisionCaseData.getWriteFinalDecisionOtherPanelMemberName());
+        }
         if (isNotBlank(finalDecisionCaseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName())) {
             names.add(finalDecisionCaseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
         }
-        if (isNotBlank(finalDecisionCaseData.getWriteFinalDecisionOtherPanelMemberName())) {
-            names.add(finalDecisionCaseData.getWriteFinalDecisionOtherPanelMemberName());
+        if (isNotBlank(finalDecisionCaseData.getWriteFinalDecisionFinanciallyQualifiedPanelMemberName())) {
+            names.add(finalDecisionCaseData.getWriteFinalDecisionFinanciallyQualifiedPanelMemberName());
         }
         return StringUtils.getGramaticallyJoinedStrings(names);
     }
@@ -435,9 +438,8 @@ public class SscsUtil {
             .orElseGet(() -> new DynamicListItem(null, null));
     }
 
-    public static DynamicList getBenefitDescriptions(boolean isInfectedBloodCompensationEnabled) {
+    public static DynamicList getBenefitDescriptions() {
         List<DynamicListItem> items = Arrays.stream(Benefit.values())
-                .filter(benefit -> isInfectedBloodCompensationEnabled || !benefit.getShortName().equals("infectedBloodCompensation"))
                 .sorted(Comparator.comparing(Benefit::getDescription))
                 .map(SscsUtil::getBenefitDescriptionList)
                 .flatMap(List::stream)

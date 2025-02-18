@@ -93,7 +93,7 @@ public class BundlingHandler {
 
         log.info("Setting the bundleConfiguration on the case {} for case id {}", sscsCaseData.getBundleConfiguration(), callback.getCaseDetails().getId());
 
-        BundleCallback<SscsCaseData> bundleCallback = new BundleCallback(callback);
+        BundleCallback<SscsCaseData> bundleCallback = new BundleCallback<>(callback);
         return sendToBundleService(bundleCallback);
     }
 
