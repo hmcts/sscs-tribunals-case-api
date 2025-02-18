@@ -1,12 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -14,10 +13,16 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateCaseAboutToStartHandlerTest {
@@ -26,16 +31,10 @@ public class CreateCaseAboutToStartHandlerTest {
     @Mock
     private Callback<SscsCaseData> callback;
 
-    private CreateCaseAboutToStartHandler handler;
+    private final CreateCaseAboutToStartHandler handler = new CreateCaseAboutToStartHandler();
 
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
-
-    @BeforeEach
-    void setUp() {
-        handler = new CreateCaseAboutToStartHandler();
-        ReflectionTestUtils.setField(handler, "isInfectedBloodCompensationEnabled", true);
-    }
 
     @ParameterizedTest
     @CsvSource({

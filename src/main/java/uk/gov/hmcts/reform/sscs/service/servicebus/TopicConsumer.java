@@ -47,8 +47,12 @@ public class TopicConsumer {
     )
     public void onMessage(String message, @Header(JmsHeaders.MESSAGE_ID) String messageId) {
         log.info("Message Id {} received from the service bus", messageId);
+        long startTime = System.currentTimeMillis();
         processEvidenceShareMessageWithRetry(message, 1, messageId);
         notificationsMessageProcessor.processMessage(message, messageId);
+        long endTime = System.currentTimeMillis();
+        long timeTaken = endTime - startTime;
+        log.info("TopicConsumer processed in {}% of 5 minutes for ID {}, {} ms", (timeTaken / 300000) * 100, messageId, timeTaken);
     }
 
     private void processEvidenceShareMessageWithRetry(String message, int retry, String messageId) {
