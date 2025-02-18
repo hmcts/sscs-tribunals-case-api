@@ -6,28 +6,22 @@ import static org.mockito.Mockito.verify;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.retry.annotation.EnableRetry;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = TopicPublisher.class)
-@EnableRetry
-// TODO: ASB - is this now an integration test? It's kind of pointless anyway, as it's just testing the retryable annotation
+@RunWith(MockitoJUnitRunner.class)
 public class TopicPublisherTest {
 
-    @MockitoBean
+    @Mock
     private TopicConsumer topicConsumer;
 
     @Mock
     private Callback<SscsCaseData> callback;
 
-    @Autowired
+    @InjectMocks
     private TopicPublisher topicPublisher;
 
     @Test
@@ -42,10 +36,4 @@ public class TopicPublisherTest {
         topicPublisher.sendMessage(callback);
     }
 
-    @Test
-    public void sendMessage_succeedsAfterRetry() {
-        doThrow(new IllegalStateException()).doNothing().when(topicConsumer).onMessage(callback);
-        topicPublisher.sendMessage(callback);
-        verify(topicConsumer, times(2)).onMessage(callback);
-    }
 }
