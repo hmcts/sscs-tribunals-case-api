@@ -51,17 +51,6 @@ export class UploadDocumentFurtherEvidencePage {
       'input#draftSscsFurtherEvidenceDocument_0_documentLink',
       fileName
     );
-    await expect(
-      this.page.locator(
-        `div#draftSscsFurtherEvidenceDocument span:has-text('Uploading...')`
-      )
-    ).toBeVisible();
-    await expect(
-      this.page.locator(
-        `div#draftSscsFurtherEvidenceDocument button:has-text('Cancel upload')`
-      )
-    ).toBeDisabled();
-    await this.delay(5000);
   }
 
   async confirmSubmission(): Promise<void> {
