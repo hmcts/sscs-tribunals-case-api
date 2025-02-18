@@ -20,7 +20,6 @@ export class ListingRequirementPage {
       '#overrideFields_appellantInterpreter_interpreterLanguage',
       'Dutch'
     );
-    await webAction.clickElementById('#overrideFields_autoList_Yes');
     await webAction.clickButton('Continue');
   }
 

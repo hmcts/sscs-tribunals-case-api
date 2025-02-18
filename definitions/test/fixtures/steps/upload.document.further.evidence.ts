@@ -27,6 +27,7 @@ export class UploadDocumentFurtherEvidence extends BaseStep {
       false,
       caseId
     );
+    await this.homePage.reloadPage();
     await expect(this.homePage.summaryTab).toBeVisible();
     await this.homePage.chooseEvent('Upload document FE');
 

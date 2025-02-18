@@ -2085,9 +2085,9 @@
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 3,
-    "PageFieldDisplayOrder": 25,
-    "PageID": "3.0",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 23,
+    "PageID": "2.0",
     "PageLabel": "Issue direction",
     "PageShowCondition": "generateNotice=\"Yes\""
   },

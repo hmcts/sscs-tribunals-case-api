@@ -17,7 +17,6 @@ test.describe.serial(
       referredByAdminSteps
     }) => {
       await referredByAdminSteps.allocateCaseToLegalOpsRole(caseId);
-      await sendToInterlocSteps.signOut();
       await sendToInterlocSteps.performSendToInterloc(caseId);
     });
 

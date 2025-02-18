@@ -15,6 +15,7 @@ export class SendToJudge extends BaseStep {
 
   async performSendToJudge(caseId: string) {
     await this.loginUserWithCaseId(credentials.amSuperUser, false, caseId);
+    await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Send to Judge');
 
     let sendToJudgePage = new SendToJudgePage(this.page);
@@ -48,6 +49,7 @@ export class SendToJudge extends BaseStep {
       false,
       caseId
     );
+    await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Send to Judge');
 
     let sendToJudgePage = new SendToJudgePage(this.page);
