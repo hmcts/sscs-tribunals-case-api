@@ -65,7 +65,6 @@ test.describe.serial(
     test('Request an urgent hearing', async ({ urgentHearingSteps }) => {
       test.slow();
       await urgentHearingSteps.allocateCaseToInterlocutoryJudge(caseId);
-      await urgentHearingSteps.signOut();
       await urgentHearingSteps.requestAnUrgentHearing(caseId);
     });
 

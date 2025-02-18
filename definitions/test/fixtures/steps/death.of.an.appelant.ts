@@ -22,6 +22,7 @@ export class DeathOfAnAppelant extends BaseStep {
       false,
       caseId
     );
+    await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Death of appellant');
 
     let deathOfAppellantPage = new DeathOfAppellantPage(this.page);
@@ -56,6 +57,7 @@ export class DeathOfAnAppelant extends BaseStep {
       false,
       caseId
     );
+    await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Death of appellant');
 
     let deathOfAppellantPage = new DeathOfAppellantPage(this.page);
@@ -92,6 +94,7 @@ export class DeathOfAnAppelant extends BaseStep {
       false,
       caseId
     );
+    await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Death of appellant');
 
     let deathOfAppellantPage = new DeathOfAppellantPage(this.page);
@@ -117,6 +120,7 @@ export class DeathOfAnAppelant extends BaseStep {
       false,
       caseId
     );
+    await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Death of appellant');
 
     let deathOfAppellantPage = new DeathOfAppellantPage(this.page);

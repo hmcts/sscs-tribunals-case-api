@@ -17,6 +17,7 @@ export class CancelTranslations extends BaseStep {
   ): Promise<void> {
     if (loginRequired) {
       await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+      await this.homePage.reloadPage();
     }
 
     await this.homePage.chooseEvent('Welsh - cancel translations');

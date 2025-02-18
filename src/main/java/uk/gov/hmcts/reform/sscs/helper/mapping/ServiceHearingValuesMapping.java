@@ -35,7 +35,7 @@ public final class ServiceHearingValuesMapping {
                 .caseSlaStartDate(HearingsCaseMapping.getCaseCreated(caseData))
                 .hmctsInternalCaseName(HearingsCaseMapping.getInternalCaseName(caseData))
                 .autoListFlag(shouldBeAutoListed)
-                .hearingType(HearingsDetailsMapping.getHearingType(caseData))
+                .hearingType(HearingsDetailsMapping.getHearingType())
                 .caseType(BENEFIT)
                 .caseCategories(HearingsCaseMapping.buildCaseCategories(caseData, refData))
                 .hearingWindow(HearingsWindowMapping.buildHearingWindow(caseData, refData))

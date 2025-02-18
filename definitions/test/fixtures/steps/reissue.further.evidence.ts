@@ -18,6 +18,7 @@ export class ReissueFurtherEvidence extends BaseStep {
     uploadAudioFile?: boolean
   ) {
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+    await this.homePage.reloadPage();
     await expect(this.homePage.summaryTab).toBeVisible();
     await this.homePage.chooseEvent('Upload document FE');
 
@@ -57,7 +58,6 @@ export class ReissueFurtherEvidence extends BaseStep {
 
   async performActionEvidence(caseId: string) {
     //selecting the event "Action further evidence"
-    await this.homePage.signOut();
     await this.goToActionFurtherEvidence(this.page, caseId);
     await this.reissueFurtherEvidencePage.verifyPageContentActionEvent();
     //completing the action further evidence
@@ -82,7 +82,6 @@ export class ReissueFurtherEvidence extends BaseStep {
   }
 
   async performReissueFurtherEvidence(caseId: string) {
-    await this.homePage.signOut();
     // starting the 'Reissue Further Evidence' event
     await this.goToReissueFurtherEvidence(this.page, caseId);
     await this.reissueFurtherEvidencePage.verifyPageContentReissueEvent();

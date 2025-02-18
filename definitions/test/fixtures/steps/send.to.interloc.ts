@@ -13,12 +13,9 @@ export class SendToInterloc extends BaseStep {
     this.page = page;
   }
 
-  async signOut() {
-    await this.homePage.signOut();
-  }
-
   async performSendToInterloc(caseId: string) {
     await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+    await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Send to interloc');
 
     let sendToInterlocPage = new SendToInterlocPage(this.page);
@@ -56,6 +53,7 @@ export class SendToInterloc extends BaseStep {
       true,
       caseId
     );
+    await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Send to interloc');
 
     let sendToInterlocPage = new SendToInterlocPage(this.page);
@@ -89,6 +87,7 @@ export class SendToInterloc extends BaseStep {
 
   async performSendToInterlocReferralReasonComplexCase(caseId: string) {
     await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+    await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Send to interloc');
 
     let sendToInterlocPage = new SendToInterlocPage(this.page);
@@ -122,6 +121,7 @@ export class SendToInterloc extends BaseStep {
 
   async performSendToInterlocJudge(caseId: string) {
     await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+    await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Send to interloc');
 
     let sendToInterlocPage = new SendToInterlocPage(this.page);
