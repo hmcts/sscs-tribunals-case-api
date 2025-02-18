@@ -4,33 +4,6 @@
     "callback_response_status": null,
     "callback_response_status_code": null,
     "case_data": {
-      "otherParties": [
-        {
-          "value": {
-            "id": "1",
-            "name": {
-              "firstName": "Other Party 1",
-              "lastName": "User",
-              "title": "Mr"
-            },
-            "address": {
-              "line1" : "line1",
-              "line2" : "line2",
-              "town": "Newcastle",
-              "county": "Tyne and Wear",
-              "postcode": "TS4 4ST"
-            },
-            "otherPartySubscription" : {
-              "email": "sscstest+notify@greencroftconsulting.com",
-              "mobile": "07398785050",
-              "subscribeEmail": "Yes",
-              "subscribeSms": "Yes",
-              "wantSmsNotifications": "Yes",
-              "tya": "otherParty1"
-            }
-        }
-      }
-      ],
       "appeal": {
         "appealReasons": {},
         "appellant": {
@@ -52,33 +25,10 @@
             "firstName": "User",
             "lastName": "Test",
             "title": "Mr"
-          },
-          "isAddressSameAsAppointee":"no",
-          "appointee": {
-            "name": {
-              "title": "Mr",
-              "firstName": "Appointee",
-              "lastName": "User"
-            },
-            "contact": {
-              "email": "test@tester.com",
-              "mobile": "07848484848"
-            },
-            "address": {
-              "line1": "1 Appointee Street",
-              "line2": "Newcastle",
-              "town": "Newcastle",
-              "county": "Tyne and Wear",
-              "postcode": "TS1 1ST"
-            },
-            "identity": {
-              "dob": "1998-07-01",
-              "nino": ""
-            }
           }
         },
         "benefitType": {
-          "code": "infectedBloodCompensation"
+          "code": "ESA"
         },
         "hearingOptions": {
           "languageInterpreter": "Yes",
@@ -87,26 +37,26 @@
           "wantsToAttend": "Yes"
         },
         "mrnDetails": {},
+        "rep": {
+          "hasRepresentative": "Yes",
+          "name": {
+            "title": "Mr",
+            "firstName": "Harry",
+            "lastName": "Potter"
+          },
+          "address": {
+            "line1": "1 Representative Close",
+            "town": "Repton",
+            "county": "Repy",
+            "postcode": "TS3 3ST"
+          },
+          "contact": {},
+          "organisation": "HP Ltd"
+        },
         "signer": null,
         "hearingRoute": "oral"
       },
       "caseReference": "SC022/14/12423",
-      "originalSender": {
-        "value": {
-          "code": "appellant",
-          "label": "Appellant (or Appointee)"
-        },
-        "list_items": [
-          {
-            "code": "appellant",
-            "label": "Appellant (or Appointee)"
-          },
-          {
-            "code": "representative",
-            "label": "Representative"
-          }
-        ]
-      },
       "events": [
         {
           "id": "4beb1c7e-96c4-4020-9b1a-e8fdd70016b6",
