@@ -107,6 +107,8 @@ export class EnhancedConfidentiality extends BaseStep {
 
   async uploadSupplementaryCorrespondence(caseId: string) {
     await this.loginUserWithCaseId(credentials.superUser, false, caseId);
+    await this.homePage.reloadPage();
+    await this.homePage.delay(3000);
     await this.homePage.chooseEvent('Supplementary response');
     await this.supplementaryResponsePage.verifyPageContent();
     await this.supplementaryResponsePage.uploadSupplementaryResponseDoc(

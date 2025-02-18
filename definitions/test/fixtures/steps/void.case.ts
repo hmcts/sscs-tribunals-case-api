@@ -17,6 +17,7 @@ export class VoidCase extends BaseStep {
   ): Promise<void> {
     if (loginRequired) {
       await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+      await this.homePage.reloadPage();
     }
     await this.homePage.chooseEvent('Void case');
     await this.eventNameAndDescriptionPage.verifyPageContent('Void case');

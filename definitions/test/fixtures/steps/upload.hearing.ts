@@ -14,15 +14,19 @@ export class UploadHearing extends BaseStep {
 
   async requestAndGrantAnHearingRecording(caseId: string) {
     await this.loginUserWithCaseId(credentials.caseWorker, false, caseId);
+    await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Add a hearing');
     await this.addHearingPage.submitHearing();
     await this.eventNameAndDescriptionPage.confirmSubmission();
 
+    await this.homePage.delay(3000);
     await this.homePage.chooseEvent('Hearing booked');
     await this.hearingBookedPage.submitHearingBooked();
     await this.homePage.signOut();
+    await new Promise((f) => setTimeout(f, 3000)); //Delay required for the Case to be ready
 
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+    await this.homePage.delay(60000); // wait for case update to happen
     await this.homePage.chooseEvent('Upload hearing recording');
     await this.uploadRecordingPage.selectRecording();
     await this.uploadRecordingPage.chooseHearingTypeAndAddRecording();
@@ -86,6 +90,7 @@ export class UploadHearing extends BaseStep {
 
   async requestAndRefuseAnHearingRecording(caseId: string) {
     await this.loginUserWithCaseId(credentials.caseWorker, false, caseId);
+    await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Add a hearing');
     await this.addHearingPage.submitHearing();
     await this.eventNameAndDescriptionPage.confirmSubmission();
@@ -97,6 +102,7 @@ export class UploadHearing extends BaseStep {
     await new Promise((f) => setTimeout(f, 3000)); //Delay required for the Case to be ready
 
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+    await this.homePage.delay(60000); // wait for case update to happen
     await this.homePage.chooseEvent('Upload hearing recording');
     await this.uploadRecordingPage.selectRecording();
     await this.uploadRecordingPage.chooseHearingTypeAndAddRecording();
