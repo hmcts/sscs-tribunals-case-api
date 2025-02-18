@@ -136,22 +136,7 @@ export class HomePage {
     const expUrl = this.page.url();
 
     if (environment.name == 'pr') {
-      if (environment.hearingsEnabled == 'Yes') {
-        let matches = expUrl.match(/(\d+)/);
-        let PrNo = matches[0];
-        logger.debug(`PR number on url is ###### ${PrNo}`);
-
-        const optionToSelect = await this.page
-          .locator('option', { hasText: PrNo })
-          .textContent();
-        logger.debug(`case type dropdown value is ###### ${optionToSelect}`);
-        await webActions.chooseOptionByLabel(
-          this.caseTypeDropdown,
-          optionToSelect
-        );
-      } else {
-        await this.searchCaseWithPreviewDef();
-      }
+      await this.searchCaseWithPreviewDef();
     } else if (environment.name == 'aat') {
       await this.searchCaseWithAATDef();
     } else {

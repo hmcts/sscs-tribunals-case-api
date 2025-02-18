@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
 import uk.gov.hmcts.reform.sscs.model.multi.hearing.CaseHearing;
 import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
 import uk.gov.hmcts.reform.sscs.service.HearingOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.HmcHearingsApiService;
+import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingUpdateService;
 
@@ -26,15 +26,15 @@ import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingUpdateService;
 @Slf4j
 public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final HmcHearingsApiService hmcHearingsApiService;
+    private final HmcHearingApiService hmcHearingApiService;
     private final HearingUpdateService hearingUpdateService;
     private final VenueService venueService;
     private final HearingOutcomeService hearingOutcomeService;
 
-    public AddHearingOutcomeAboutToStartHandler(HmcHearingsApiService hmcHearingsApiService,
+    public AddHearingOutcomeAboutToStartHandler(HmcHearingApiService hmcHearingApiService,
                                                 HearingUpdateService hearingUpdateService, VenueService venueService,
                                                 HearingOutcomeService hearingOutcomeService) {
-        this.hmcHearingsApiService = hmcHearingsApiService;
+        this.hmcHearingApiService = hmcHearingApiService;
         this.hearingUpdateService = hearingUpdateService;
         this.venueService = venueService;
         this.hearingOutcomeService = hearingOutcomeService;
@@ -59,7 +59,7 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
         log.info("Add hearing outcome started");
 
         try {
-            HearingsGetResponse response = hmcHearingsApiService.getHearingsRequest(Long.toString(caseDetails.getId()), HmcStatus.COMPLETED);
+            HearingsGetResponse response = hmcHearingApiService.getHearingsRequest(Long.toString(caseDetails.getId()), HmcStatus.COMPLETED);
             List<CaseHearing> hmcHearings = response.getCaseHearings();
             log.info("Retrieved {} completed hearings for caseId {}", hmcHearings.size(), callback.getCaseDetails().getId());
             if (!hmcHearings.isEmpty()) {
