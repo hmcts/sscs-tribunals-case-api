@@ -62,6 +62,10 @@ export class EventNameEventDescriptionPage {
     await expect(this.page).not.toHaveURL(pageUrl);
   }
 
+  async confirmWithoutNavigation(): Promise<void> {
+    await webActions.clickSubmitButton();
+  }
+
   async confirmAndSignOut(): Promise<void> {
     let pageUrl = this.page.url();
     await this.confirmSubmission();

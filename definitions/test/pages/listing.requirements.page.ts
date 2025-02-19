@@ -24,6 +24,13 @@ export class ListingRequirementPage {
     await webAction.clickButton('Continue');
   }
 
+  async setAutolistOverrideValue(selection: boolean) {
+    await webAction.clickElementById('#overrideFields_autoList_' + (selection ? "Yes" : "No"));
+    await webAction.clickButton('Continue');
+    await webAction.clickElementById('#amendReasons-adminreq');
+    await webAction.clickSubmitButton();
+  }
+
   async submitUpdatedValues() {
     await webAction.clickElementById('#amendReasons-adminreq');
     await webAction.clickSubmitButton();
