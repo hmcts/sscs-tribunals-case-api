@@ -151,7 +151,7 @@ class OverridesMappingTest {
             .containsExactlyInAnyOrder(value);
     }
 
-    @DisplayName("When case data has multi ple amend reasons getAmendReasonCodes return a list with those reasons")
+    @DisplayName("When case data has multiple amend reasons getAmendReasonCodes return a list with those reasons")
     @Test
     void testGetAmendReasonCodes() {
         SscsCaseData caseData = SscsCaseData.builder()
