@@ -22,7 +22,7 @@ export class AppealDetails {
     await expect(
       this.page.locator(
         `//*[normalize-space()="${fieldLabel}"]/../td[normalize-space()="${fieldValue}"]`
-      )
+      ).first()
     ).toBeVisible();
   }
 
