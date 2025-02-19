@@ -26,7 +26,11 @@ public final class HearingsDurationMapping {
     private HearingsDurationMapping() {
     }
 
-    public static int getHearingDuration(SscsCaseData caseData, ReferenceDataServiceHolder refData) {
+    public static Integer getHearingDuration(SscsCaseData caseData, ReferenceDataServiceHolder refData) {
+        if (caseData.isIbcCase()) {
+            log.info("Hearing Duration for Case ID {} set to null as it is an IBCA case", caseData.getCcdCaseId());
+            return null;
+        }
         Integer duration;
         HearingDurationsService hearingDurationsService = refData.getHearingDurations();
         String caseId = caseData.getCcdCaseId();
@@ -65,6 +69,10 @@ public final class HearingsDurationMapping {
     public static Integer getHearingDurationAdjournment(SscsCaseData caseData, HearingDurationsService hearingDurationsService) {
         AdjournCaseNextHearingDurationType durationType = caseData.getAdjournment().getNextHearingListingDurationType();
 
+        if (caseData.isIbcCase()) {
+            log.info("Hearing Duration for Case ID {} set to null as it is an IBCA case", caseData.getCcdCaseId());
+            return null;
+        }
         Integer existingDuration = OverridesMapping.getDefaultListingValues(caseData).getDuration();
         if (nonNull(existingDuration) && durationType == STANDARD) {
             log.debug("existingDuration with STANDARD for caseId={}", caseData.getCcdCaseId());
@@ -94,6 +102,9 @@ public final class HearingsDurationMapping {
     }
 
     private static Integer handleStandardDuration(SscsCaseData caseData, Integer duration) {
+        if (duration == null) {
+            return null;
+        }
         if (isYes(caseData.getAppeal().getHearingOptions().getWantsToAttend())
                 && isInterpreterRequired(caseData)) {
             // if interpreter, add 30 minutes to existing duration
@@ -103,6 +114,9 @@ public final class HearingsDurationMapping {
     }
 
     private static Integer handleNonStandardDuration(SscsCaseData caseData, Integer duration) {
+        if (duration == null) {
+            return null;
+        }
         AdjournCaseNextHearingDurationUnits units = caseData.getAdjournment().getNextHearingListingDurationUnits();
         if (units == AdjournCaseNextHearingDurationUnits.SESSIONS && duration >= MIN_HEARING_SESSION_DURATION) {
             return duration * DURATION_SESSIONS_MULTIPLIER;
