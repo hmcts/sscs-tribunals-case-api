@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.helper.mapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,22 @@ class HearingsDurationMappingTest extends HearingsMappingBase {
         int result = HearingsDurationMapping.getHearingDuration(caseData, refData);
 
         assertThat(result).isEqualTo(expectedResult);
+    }
+
+    @DisplayName("When IBC case hearing duration is not set")
+    @Test
+    void testIbcCaseHearingDurationNotSet(){
+        caseData.setBenefitCode("093");
+        Integer result = HearingsDurationMapping.getHearingDuration(caseData,refData);
+        assertNull(result);
+    }
+
+    @DisplayName("When IBC case hearing duration is not set duration adjournment is null")
+    @Test
+    void testIbcCaseHearingDurationAdjournmentNotSet(){
+        caseData.setBenefitCode("093");
+        Integer result = HearingsDurationMapping.getHearingDurationAdjournment(caseData, refData.getHearingDurations());
+        assertNull(result);
     }
 
     @DisplayName("When an invalid adjournCaseDuration and adjournCaseDurationUnits is given and overrideDuration "
