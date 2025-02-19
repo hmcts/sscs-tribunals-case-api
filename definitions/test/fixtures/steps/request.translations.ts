@@ -13,7 +13,6 @@ export class RequestTranslations extends BaseStep {
 
   async performRequestTranslations(caseId: string) {
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
-    await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Welsh - request translations');
 
     await this.completeRequestTranslations();
