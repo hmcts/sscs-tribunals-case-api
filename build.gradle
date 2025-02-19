@@ -352,7 +352,7 @@ dependencies {
     implementation group: 'com.mchange', name: 'c3p0', version: '0.10.2'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'SSCSCI-1456-2-SNAPSHOT'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6.0.3'
 
     // sscs-pdf-email-common
     implementation group: 'com.github.sps.junidecode', name: 'junidecode', version: '0.3'
