@@ -41,7 +41,7 @@ export class UpdateOtherPartyData extends BaseStep {
     await this.homePage.delay(3000);
 
     // Adding other party subscription
-    await this.goToUpdateSubscriptionPage(this.page, ChildSupportCaseId);
+    await this.homePage.chooseEvent('Update subscription');
     await this.updateOtherPartyDataPage.applyOtherPartiesSubscription();
     await this.eventNameAndDescriptionPage.inputData(
       eventTestData.eventSummaryInput,
@@ -127,7 +127,7 @@ export class UpdateOtherPartyData extends BaseStep {
     await this.homePage.delay(3000);
 
     // Adding other party subscription
-    await this.goToUpdateSubscriptionPage(this.page, TaxCreditCaseId);
+    await this.homePage.chooseEvent('Update subscription');
     await this.updateOtherPartyDataPage.applyOtherPartiesSubscription();
     await this.eventNameAndDescriptionPage.inputData(
       eventTestData.eventSummaryInput,
@@ -226,10 +226,5 @@ export class UpdateOtherPartyData extends BaseStep {
   private async goToUpdateOtherPartyData(page: Page, caseId: string) {
     await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
     await this.homePage.chooseEvent('Update other party data');
-  }
-  // Event created to trigger Update subscription event from next steps dropdown menu:
-  private async goToUpdateSubscriptionPage(page: Page, caseId: string) {
-    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
-    await this.homePage.chooseEvent('Update subscription');
   }
 }
