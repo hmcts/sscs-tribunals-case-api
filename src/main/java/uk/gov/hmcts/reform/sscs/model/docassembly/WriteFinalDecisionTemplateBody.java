@@ -119,4 +119,6 @@ public class WriteFinalDecisionTemplateBody {
     private Boolean schedule9Paragraph4Applicable;
     @JsonProperty("is_hmrc")
     private boolean isHmrc;
+    @JsonProperty("is_ibca")
+    private boolean isIbca;
 }

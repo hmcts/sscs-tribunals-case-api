@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
@@ -345,6 +347,60 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(body.getDailyLivingNumberOfPoints());
         assertEquals(false, body.isDailyLivingIsEntited());
         assertEquals(false, body.isDailyLivingIsSeverelyLimited());
+        assertNull(body.getDailyLivingAwardRate());
+        assertNull(body.getDailyLivingDescriptors());
+        assertNull(payload.getDateIssued());
+        assertEquals(LocalDate.now(), payload.getGeneratedDate());
+    }
+
+    @Test
+    public void test() {
+
+        setCommonNonDescriptorRoutePreviewParams(sscsCaseData);
+
+        setDescriptorFlowIndicator("no", sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
+
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion(null);
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("infectedBloodCompensation").build());
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
+
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(DocumentLink.builder()
+            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentBinaryUrl(URL + "/binary")
+            .documentUrl(URL)
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
+
+        boolean appealAllowedExpectation = false;
+
+        boolean setAsideExpectation = false;
+
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10",
+            appealAllowedExpectation, setAsideExpectation, true, false, true,
+            documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+
+        assertEquals("Judge Full Name", payload.getUserName());
+        assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
+
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+
+        assertNotNull(body);
+        assertTrue(body.isIbca());
+        assertFalse(body.isHmrc());
+        // Common assertions
+        assertCommonNonDescriptorFlowPreviewParams(body, false);
+        assertNull(body.getMobilityAwardRate());
+        assertFalse(body.isMobilityIsSeverelyLimited());
+        assertFalse(body.isMobilityIsEntited());
+        assertNull(body.getMobilityDescriptors());
+        assertNull(body.getMobilityNumberOfPoints());
+        assertNull(body.getDailyLivingDescriptors());
+        assertNull(body.getDailyLivingNumberOfPoints());
+        assertFalse(body.isDailyLivingIsEntited());
+        assertFalse(body.isDailyLivingIsSeverelyLimited());
         assertNull(body.getDailyLivingAwardRate());
         assertNull(body.getDailyLivingDescriptors());
         assertNull(payload.getDateIssued());
