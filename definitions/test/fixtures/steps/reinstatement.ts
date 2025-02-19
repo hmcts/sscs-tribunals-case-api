@@ -20,7 +20,6 @@ export class Reinstatement extends BaseStep {
 
   async requestAndGrantAnReinstatement(caseId: string) {
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
-    await this.homePage.reloadPage();
     await this.homePage.chooseEvent(actionFurtherEvidenceTestdata.eventName);
     await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
       actionFurtherEvidenceTestdata.sender,
@@ -46,6 +45,7 @@ export class Reinstatement extends BaseStep {
       'Review by Judge'
     );
 
+    await this.homePage.signOut();
     await this.loginUserWithCaseId(credentials.judge, true, caseId);
     await this.homePage.chooseEvent(issueDirectionTestdata.eventNameCaptor);
 
@@ -77,7 +77,6 @@ export class Reinstatement extends BaseStep {
 
   async requestAndRefuseAnReinstatement(caseId: string) {
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
-    await this.homePage.reloadPage();
     await this.homePage.chooseEvent(actionFurtherEvidenceTestdata.eventName);
     await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
       actionFurtherEvidenceTestdata.sender,
@@ -103,7 +102,7 @@ export class Reinstatement extends BaseStep {
       'Interlocutory review state',
       'Review by Judge'
     );
-
+    await this.homePage.signOut();
     await this.loginUserWithCaseId(credentials.judge, true, caseId);
     await this.homePage.chooseEvent(issueDirectionTestdata.eventNameCaptor);
 
