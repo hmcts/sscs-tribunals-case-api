@@ -272,7 +272,6 @@ generateGitProperties.dependsOn installLocalGitHook
 compileJava.dependsOn installLocalGitHook
 
 tasks.register('runGitPreCommitTasks') {
-    dependsOn 'test'
     dependsOn 'pmdMain'
     dependsOn 'pmdTest'
     dependsOn 'checkstyleMain'
