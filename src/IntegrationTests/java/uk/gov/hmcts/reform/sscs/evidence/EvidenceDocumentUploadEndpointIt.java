@@ -18,8 +18,8 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -37,7 +37,7 @@ import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 @AutoConfigureMockMvc
 public class EvidenceDocumentUploadEndpointIt {
 
-    @MockBean
+    @MockitoBean
     protected AirLookupService airLookupService;
     public static final String AUTH_TOKEN = "authToken";
 
@@ -46,10 +46,10 @@ public class EvidenceDocumentUploadEndpointIt {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    @MockBean
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
 
-    @MockBean
+    @MockitoBean
     private DocumentUploadClientApi documentUploadClientApi;
 
     @Mock

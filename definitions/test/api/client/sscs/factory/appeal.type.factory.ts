@@ -1,7 +1,6 @@
 /* eslint-disable complexity */
 import { request } from '@playwright/test';
 import { urls } from '../../../../config/config';
-import logger from '../../../../utils/loggerUtil';
 import pipPayload from '../../../data/payload/create-appeal/pip_sya.json';
 import pipPayloadWelsh from '../../../data/payload/create-appeal/pip_sya_welsh.json';
 import ucPayload from '../../../data/payload/create-appeal/uc_sya.json';
@@ -15,65 +14,55 @@ import piprepFtoFSandLPayload from '../../../data/payload/create-appeal/pip_sand
 import piprepSandLPayload from '../../../data/payload/create-appeal/pip_sandl_rep.json';
 import pipIncompleteAppealPayload from '../../../data/payload/create-appeal/pip_incomplete_appeal.json';
 import pipNonCompliantAppealPayload from '../../../data/payload/create-appeal/pip_non_compliant_appeal.json';
+import ibcPayload from '../../../data/payload/create-appeal/ibca_sya.json';
 import { StringUtilsComponent } from '../../../../utils/StringUtilsComponent';
 
 async function createCaseBasedOnCaseType(caseType: string) {
-    let apiContext;
-    let dataPayload;
+  let apiContext;
+  let dataPayload;
 
-    //Formulate API Context For Request,wrapping the Request Endpoint
-    apiContext = await request.newContext({
-        // All requests we send go to this API Endpoint.
-        baseURL: urls.tribunalsApiUri,
-    });
+  //Formulate API Context For Request,wrapping the Request Endpoint
+  apiContext = await request.newContext({
+    // All requests we send go to this API Endpoint.
+    baseURL: urls.tribunalsApiUri
+  });
 
-    dataPayload =
-        caseType == "PIP"
-            ? pipPayload
-            : caseType == "UC"
-                ? ucPayload
-                : caseType == "ESA"
-                    ? esaPayload
-                    : caseType == "CHILDSUPPORT"
-                        ? childSupportPayload
-                        : caseType == "TAX CREDIT"
-                            ? taxCreditPayload
-                            : caseType == "PIPSANDL"
-                                ? pipSandLPayload
-                                : caseType == "DLASANDL"
-                                    ? dlaSandLPayload
-                                    : caseType == "UCSANDL"
-                                        ? ucSandLVideoPayload
-                                        : caseType == "PIPREPINTERSANDL"
-                                            ? piprepFtoFSandLPayload
-                                            : caseType == "PIPREPSANDL"
-                                                ? piprepSandLPayload
-                                                : caseType == "PIPINCOMPLETE"
-                                                    ? pipIncompleteAppealPayload
-                                                    : caseType == "PIPNONCOMPLIANT"
-                                                        ? pipNonCompliantAppealPayload
-                                                        : caseType == "WELSHPIP"
-                                                            ? pipPayloadWelsh
-                                                            : new Error("Unsupported case type");
+  const payloadMap: { [key: string]: any } = {
+    PIP: pipPayload,
+    UC: ucPayload,
+    ESA: esaPayload,
+    CHILDSUPPORT: childSupportPayload,
+    'TAX CREDIT': taxCreditPayload,
+    PIPSANDL: pipSandLPayload,
+    DLASANDL: dlaSandLPayload,
+    UCSANDL: ucSandLVideoPayload,
+    PIPREPINTERSANDL: piprepFtoFSandLPayload,
+    PIPREPSANDL: piprepSandLPayload,
+    PIPINCOMPLETE: pipIncompleteAppealPayload,
+    PIPNONCOMPLIANT: pipNonCompliantAppealPayload,
+    WELSHPIP: pipPayloadWelsh,
+    IBC: ibcPayload,
+  };
 
-    let caseTypeLower = caseType.toLowerCase();
-    let apiUrl = (caseTypeLower.includes('incomplete') || caseTypeLower.includes('noncompliant'))
-        ? `${urls.tribunalsApiUri}/appeals` 
-        : `${urls.tribunalsApiUri}/api/appeals`;
+  dataPayload = payloadMap[caseType] || new Error('Unsupported case type');
 
-    if(caseTypeLower.includes('noncompliant')) {
-        dataPayload.appellant.nino = StringUtilsComponent.getRandomNINumber();
-    }
+  let caseTypeLower = caseType.toLowerCase();
+  let apiUrl =
+    caseTypeLower.includes('incomplete') ||
+    caseTypeLower.includes('noncompliant')
+      ? `${urls.tribunalsApiUri}/appeals`
+      : `${urls.tribunalsApiUri}/api/appeals`;
 
-    const response = await apiContext.post(apiUrl, {
-        data: dataPayload
-    });
-    logger.info('The value of the Response Status : ' + response.statusText());
-    const respHeaders = response.headers();
-    const locationUrl: string = respHeaders.location;
-    let caseId = locationUrl.substring(locationUrl.lastIndexOf('/') + 1);
-    logger.info(`Case was successfully created and id is ${caseId}`);
-    return caseId;
+  if (caseTypeLower.includes('noncompliant')) {
+    dataPayload.appellant.nino = StringUtilsComponent.getRandomNINumber();
+  }
+
+  const response = await apiContext.post(apiUrl, {
+    data: dataPayload
+  });
+  const respHeaders = response.headers();
+  const locationUrl: string = respHeaders.location;
+  return locationUrl.substring(locationUrl.lastIndexOf('/') + 1);
 }
 
 export default createCaseBasedOnCaseType;

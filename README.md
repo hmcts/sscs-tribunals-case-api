@@ -7,11 +7,11 @@ Tribunals case api is a spring boot based application to create new appeals for 
 
 For versions and complete list of dependencies see build.gradle
 
-* Java 17
+* Java 21
 * Spring Boot
 * Gradle
 
-## Building and deploying the application 
+## Building and deploying the application
 
 ### Building the application
 
@@ -109,13 +109,6 @@ To run all unit tests execute the following command:
 
 ```
 ./gradlew test
-```
-### Mutation tests
-
-To run all mutation tests execute the following command:
-
-```
-./gradlew pitest
 ```
 
 ### Running contract or pact tests:

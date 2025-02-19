@@ -1,11 +1,12 @@
 package uk.gov.hmcts.reform.sscs.config;
 
-import javax.jms.ConnectionFactory;
+import jakarta.jms.ConnectionFactory;
 import javax.net.ssl.SSLContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.qpid.jms.JmsConnectionFactory;
 import org.apache.qpid.jms.policy.JmsDefaultPrefetchPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,24 +15,25 @@ import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
 @Configuration
 @Slf4j
 @EnableJms
 public class MessagingConfig {
 
-    @Bean
+    @Bean("evidenceShareJmsUrl")
     public String jmsUrlString(@Value("${amqp.amqp-connection-string-template}") final String amqpConnectionStringTemplate,
                                @Value("${amqp.idleTimeout}") final Long idleTimeout,
                                @Value("${amqp.host}") final String host) {
         return String.format(amqpConnectionStringTemplate, host, idleTimeout);
     }
 
-    @Bean
+    @Bean("evidenceShareJmsConnectionFactory")
     public ConnectionFactory jmsConnectionFactory(@Value("${spring.application.name}") final String clientId,
                                                   @Value("${amqp.username}") final String username,
                                                   @Value("${amqp.password}") final String password,
-                                                  @Autowired final String jmsUrlString,
+                                                  @Autowired @Qualifier("evidenceShareJmsUrl") final String jmsUrlString,
                                                   @Autowired(required = false) final SSLContext jmsSslContext,
                                                   @Value("${amqp.prefetch.override}") final boolean prefetchOverride,
                                                   @Value("${amqp.prefetch.topicPrefetch}") final int topicPrefetch,
@@ -55,18 +57,21 @@ public class MessagingConfig {
         if (reconnectOnException) {
             cachingConnectionFactory.setReconnectOnException(true);
         }
-        return cachingConnectionFactory;
+        var factory = new CachingConnectionFactory(jmsConnectionFactory);
+        factory.setCacheConsumers(false);
+        factory.setCacheProducers(false);
+        return factory;
     }
 
-    @Bean
-    public JmsTemplate jmsTemplate(ConnectionFactory jmsConnectionFactory) {
+    @Bean("evidenceShareJmsTemplate")
+    public JmsTemplate jmsTemplate(@Qualifier("evidenceShareJmsConnectionFactory") ConnectionFactory jmsConnectionFactory) {
         JmsTemplate returnValue = new JmsTemplate();
         returnValue.setConnectionFactory(jmsConnectionFactory);
         return returnValue;
     }
 
-    @Bean
-    public JmsListenerContainerFactory topicJmsListenerContainerFactory(ConnectionFactory connectionFactory) {
+    @Bean("evidenceShareJmsListenerContainerFactory")
+    public JmsListenerContainerFactory<DefaultMessageListenerContainer> topicJmsListenerContainerFactory(@Qualifier("evidenceShareJmsConnectionFactory") ConnectionFactory connectionFactory) {
         log.info("Creating JMSListenerContainer bean for topics..");
         DefaultJmsListenerContainerFactory returnValue = new DefaultJmsListenerContainerFactory();
         returnValue.setConnectionFactory(connectionFactory);

@@ -5,8 +5,40 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType.ORAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType.PAPER;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.*;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.APPELLANT;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.APPOINTEE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.JOINT_PARTY;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.OTHER_PARTY;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.REPRESENTATIVE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADJOURNED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADMIN_APPEAL_WITHDRAWN;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_DORMANT;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_LAPSED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_WITHDRAWN;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DECISION_ISSUED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DECISION_ISSUED_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DWP_APPEAL_LAPSED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DWP_RESPONSE_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DWP_UPLOAD_RESPONSE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.EVIDENCE_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.EVIDENCE_REMINDER;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.HEARING_BOOKED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.HEARING_REMINDER;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.HMCTS_APPEAL_LAPSED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_ADJOURNMENT_NOTICE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_ADJOURNMENT_NOTICE_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.JOINT_PARTY_ADDED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.NON_COMPLIANT;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.POSTPONEMENT;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.REQUEST_FOR_INFORMATION;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.RESEND_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SUBSCRIPTION_UPDATED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SYA_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.UPDATE_OTHER_PARTY_DATA;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.VALID_APPEAL_CREATED;
 
 import java.util.Collections;
 import java.util.List;
@@ -102,22 +134,22 @@ public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
             new Object[]{APPEAL_LAPSED, true, REPRESENTATIVE, ORAL, GAPS, null, "dc8164a8-b923-4896-9308-3bf8e74d5665", List.of("77180ecb-c7e8-407c-8d74-618ae37b47b6","ee58f7d0-8de7-4bee-acd4-252213db6b7b"), null, "TB-SCS-GNO-WEL-00658.docx"},
             new Object[]{APPEAL_LAPSED, true, REPRESENTATIVE, PAPER, GAPS, null, "dc8164a8-b923-4896-9308-3bf8e74d5665", List.of("77180ecb-c7e8-407c-8d74-618ae37b47b6","ee58f7d0-8de7-4bee-acd4-252213db6b7b"), null, "TB-SCS-GNO-WEL-00658.docx"},
 
-            new Object[]{APPEAL_RECEIVED, false, APPELLANT, ORAL, GAPS, "readyToList", "d5fd9f65-1283-4533-a1be-10043dae7af6", List.of("ede384aa-0b6e-4311-9f01-ee547573a07b"), "91143b85-dd9d-430c-ba23-e42ec90f44f8", "TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx"},
+            new Object[]{APPEAL_RECEIVED, false, APPELLANT, ORAL, GAPS, "readyToList", "d5fd9f65-1283-4533-a1be-10043dae7af6", List.of("ede384aa-0b6e-4311-9f01-ee547573a07b"), "91143b85-dd9d-430c-ba23-e42ec90f44f8", "TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx"},
             new Object[]{APPEAL_RECEIVED, false, APPELLANT, ORAL, GAPS, "validAppeal", "d5fd9f65-1283-4533-a1be-10043dae7af6", List.of("ede384aa-0b6e-4311-9f01-ee547573a07b"), "91143b85-dd9d-430c-ba23-e42ec90f44f8", null},
             new Object[]{APPEAL_RECEIVED, false, APPELLANT, PAPER, GAPS, null, "d5fd9f65-1283-4533-a1be-10043dae7af6", List.of("ede384aa-0b6e-4311-9f01-ee547573a07b"), "91143b85-dd9d-430c-ba23-e42ec90f44f8", null},
-            new Object[]{APPEAL_RECEIVED, false, APPOINTEE, ORAL, GAPS, "readyToList", "78cf9c9c-e2b8-44d7-bcf1-220311f114cb", List.of("ede384aa-0b6e-4311-9f01-ee547573a07b"), "747d026e-1bec-4e96-8a34-28f36e30bba5", "TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx"},
+            new Object[]{APPEAL_RECEIVED, false, APPOINTEE, ORAL, GAPS, "readyToList", "78cf9c9c-e2b8-44d7-bcf1-220311f114cb", List.of("ede384aa-0b6e-4311-9f01-ee547573a07b"), "747d026e-1bec-4e96-8a34-28f36e30bba5", "TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx"},
             new Object[]{APPEAL_RECEIVED, false, APPOINTEE, ORAL, GAPS, "validAppeal", "78cf9c9c-e2b8-44d7-bcf1-220311f114cb", List.of("ede384aa-0b6e-4311-9f01-ee547573a07b"), "747d026e-1bec-4e96-8a34-28f36e30bba5", null},
             new Object[]{APPEAL_RECEIVED, false, APPOINTEE, PAPER, GAPS, null, "78cf9c9c-e2b8-44d7-bcf1-220311f114cb", List.of("ede384aa-0b6e-4311-9f01-ee547573a07b"), "747d026e-1bec-4e96-8a34-28f36e30bba5", null},
-            new Object[]{APPEAL_RECEIVED, false, REPRESENTATIVE, ORAL, GAPS, "readyToList", "8003606e-3d80-4e17-b846-18698f8d681e", List.of("99bd4a56-256c-4de8-b187-d43a8dde466f"), "77ea8a2f-06df-4279-9c1f-0f23cb2d9bbf", "TB-SCS-LET-ENG-Appeal-Lodged-Representative.docx"},
+            new Object[]{APPEAL_RECEIVED, false, REPRESENTATIVE, ORAL, GAPS, "readyToList", "8003606e-3d80-4e17-b846-18698f8d681e", List.of("99bd4a56-256c-4de8-b187-d43a8dde466f"), "77ea8a2f-06df-4279-9c1f-0f23cb2d9bbf", "TB-SCS-LET-ENG-Appeal-Lodged-Representative-v2.docx"},
             new Object[]{APPEAL_RECEIVED, false, REPRESENTATIVE, ORAL, GAPS, "validAppeal", "8003606e-3d80-4e17-b846-18698f8d681e", List.of("99bd4a56-256c-4de8-b187-d43a8dde466f"), "77ea8a2f-06df-4279-9c1f-0f23cb2d9bbf", null},
             new Object[]{APPEAL_RECEIVED, false, REPRESENTATIVE, PAPER, GAPS, null, "8003606e-3d80-4e17-b846-18698f8d681e", List.of("99bd4a56-256c-4de8-b187-d43a8dde466f"), "77ea8a2f-06df-4279-9c1f-0f23cb2d9bbf", null},
-            new Object[]{APPEAL_RECEIVED, true, APPELLANT, ORAL, GAPS, "readyToList", "ba2654d8-3e76-43df-bf7d-f457d4d6819a", List.of("53369ca5-75a8-43a7-8e5e-4eda9df04001","ede384aa-0b6e-4311-9f01-ee547573a07b"), "830ba7f1-9757-4833-8520-2f872de7be44", "TB-SCS-LET-WEL-Appeal-Lodged-Appellant.docx"},
+            new Object[]{APPEAL_RECEIVED, true, APPELLANT, ORAL, GAPS, "readyToList", "ba2654d8-3e76-43df-bf7d-f457d4d6819a", List.of("53369ca5-75a8-43a7-8e5e-4eda9df04001","ede384aa-0b6e-4311-9f01-ee547573a07b"), "830ba7f1-9757-4833-8520-2f872de7be44", "TB-SCS-LET-WEL-Appeal-Lodged-Appellant-v2.docx"},
             new Object[]{APPEAL_RECEIVED, true, APPELLANT, ORAL, GAPS, "validAppeal", "ba2654d8-3e76-43df-bf7d-f457d4d6819a", List.of("53369ca5-75a8-43a7-8e5e-4eda9df04001","ede384aa-0b6e-4311-9f01-ee547573a07b"), "830ba7f1-9757-4833-8520-2f872de7be44", null},
             new Object[]{APPEAL_RECEIVED, true, APPELLANT, PAPER, GAPS, null, "ba2654d8-3e76-43df-bf7d-f457d4d6819a", List.of("53369ca5-75a8-43a7-8e5e-4eda9df04001","ede384aa-0b6e-4311-9f01-ee547573a07b"), "830ba7f1-9757-4833-8520-2f872de7be44", null},
-            new Object[]{APPEAL_RECEIVED, true, APPOINTEE, ORAL, GAPS, "readyToList", "c77d9768-5343-42a5-9333-7b399e3d7199", List.of("53369ca5-75a8-43a7-8e5e-4eda9df04001","ede384aa-0b6e-4311-9f01-ee547573a07b"), "95b0b0f8-fdf6-450f-b805-6aab46d63bf7", "TB-SCS-LET-WEL-Appeal-Lodged-Appellant.docx"},
+            new Object[]{APPEAL_RECEIVED, true, APPOINTEE, ORAL, GAPS, "readyToList", "c77d9768-5343-42a5-9333-7b399e3d7199", List.of("53369ca5-75a8-43a7-8e5e-4eda9df04001","ede384aa-0b6e-4311-9f01-ee547573a07b"), "95b0b0f8-fdf6-450f-b805-6aab46d63bf7", "TB-SCS-LET-WEL-Appeal-Lodged-Appellant-v2.docx"},
             new Object[]{APPEAL_RECEIVED, true, APPOINTEE, ORAL, GAPS, "validAppeal", "c77d9768-5343-42a5-9333-7b399e3d7199", List.of("53369ca5-75a8-43a7-8e5e-4eda9df04001","ede384aa-0b6e-4311-9f01-ee547573a07b"), "95b0b0f8-fdf6-450f-b805-6aab46d63bf7", null},
             new Object[]{APPEAL_RECEIVED, true, APPOINTEE, PAPER, GAPS, null, "c77d9768-5343-42a5-9333-7b399e3d7199", List.of("53369ca5-75a8-43a7-8e5e-4eda9df04001","ede384aa-0b6e-4311-9f01-ee547573a07b"), "95b0b0f8-fdf6-450f-b805-6aab46d63bf7", null},
-            new Object[]{APPEAL_RECEIVED, true, REPRESENTATIVE, ORAL, GAPS, "readyToList", "a4a85f03-c23c-4099-ab45-7a3ba9eee63a", List.of("6970bdda-7293-46d6-8876-7e1a7c4295fc","99bd4a56-256c-4de8-b187-d43a8dde466f"), "89cbb9d8-3b7d-4766-b481-585832e8bd90", "TB-SCS-LET-WEL-Appeal-Lodged-Representative.docx"},
+            new Object[]{APPEAL_RECEIVED, true, REPRESENTATIVE, ORAL, GAPS, "readyToList", "a4a85f03-c23c-4099-ab45-7a3ba9eee63a", List.of("6970bdda-7293-46d6-8876-7e1a7c4295fc","99bd4a56-256c-4de8-b187-d43a8dde466f"), "89cbb9d8-3b7d-4766-b481-585832e8bd90", "TB-SCS-LET-WEL-Appeal-Lodged-Representative-v2.docx"},
             new Object[]{APPEAL_RECEIVED, true, REPRESENTATIVE, ORAL, GAPS, "validAppeal", "a4a85f03-c23c-4099-ab45-7a3ba9eee63a", List.of("6970bdda-7293-46d6-8876-7e1a7c4295fc","99bd4a56-256c-4de8-b187-d43a8dde466f"), "89cbb9d8-3b7d-4766-b481-585832e8bd90", null},
             new Object[]{APPEAL_RECEIVED, true, REPRESENTATIVE, PAPER, GAPS, null, "a4a85f03-c23c-4099-ab45-7a3ba9eee63a", List.of("6970bdda-7293-46d6-8876-7e1a7c4295fc","99bd4a56-256c-4de8-b187-d43a8dde466f"), "89cbb9d8-3b7d-4766-b481-585832e8bd90", null},
 
@@ -250,20 +282,20 @@ public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
             new Object[]{HMCTS_APPEAL_LAPSED, true, REPRESENTATIVE, ORAL, GAPS, null, "dc8164a8-b923-4896-9308-3bf8e74d5665", List.of("77180ecb-c7e8-407c-8d74-618ae37b47b6","ee58f7d0-8de7-4bee-acd4-252213db6b7b"), null, "TB-SCS-GNO-WEL-00658.docx"},
             new Object[]{HMCTS_APPEAL_LAPSED, true, REPRESENTATIVE, PAPER, GAPS, null, "dc8164a8-b923-4896-9308-3bf8e74d5665", List.of("77180ecb-c7e8-407c-8d74-618ae37b47b6","ee58f7d0-8de7-4bee-acd4-252213db6b7b"), null, "TB-SCS-GNO-WEL-00658.docx"},
 
-            new Object[]{ISSUE_ADJOURNMENT_NOTICE, false, APPELLANT, ORAL, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00510.docx"},
-            new Object[]{ISSUE_ADJOURNMENT_NOTICE, false, APPELLANT, ORAL, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00510.docx"},
-            new Object[]{ISSUE_ADJOURNMENT_NOTICE, false, APPOINTEE, ORAL, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00510.docx"},
-            new Object[]{ISSUE_ADJOURNMENT_NOTICE, false, APPOINTEE, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00510.docx"},
-            new Object[]{ISSUE_ADJOURNMENT_NOTICE, false, JOINT_PARTY, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00510.docx"},
+            new Object[]{ISSUE_ADJOURNMENT_NOTICE, false, APPELLANT, ORAL, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00510-v2.docx"},
+            new Object[]{ISSUE_ADJOURNMENT_NOTICE, false, APPELLANT, ORAL, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00510-v2.docx"},
+            new Object[]{ISSUE_ADJOURNMENT_NOTICE, false, APPOINTEE, ORAL, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00510-v2.docx"},
+            new Object[]{ISSUE_ADJOURNMENT_NOTICE, false, APPOINTEE, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00510-v2.docx"},
+            new Object[]{ISSUE_ADJOURNMENT_NOTICE, false, JOINT_PARTY, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00510-v2.docx"},
             new Object[]{ISSUE_ADJOURNMENT_NOTICE, false, REPRESENTATIVE, ORAL, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00512.docx"},
             new Object[]{ISSUE_ADJOURNMENT_NOTICE, false, REPRESENTATIVE, ORAL, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00512.docx"},
             new Object[]{ISSUE_ADJOURNMENT_NOTICE, false, REPRESENTATIVE, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00512.docx"},
 
-            new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, true, APPELLANT, ORAL, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00649.docx"},
-            new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, true, APPOINTEE, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00649.docx"},
-            new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, true, JOINT_PARTY, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00649.docx"},
-            new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, true, REPRESENTATIVE, ORAL, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00649.docx"},
-            new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, true, REPRESENTATIVE, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00649.docx"},
+            new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, true, APPELLANT, ORAL, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00649-v2.docx"},
+            new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, true, APPOINTEE, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00649-v2.docx"},
+            new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, true, JOINT_PARTY, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00649-v2.docx"},
+            new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, true, REPRESENTATIVE, ORAL, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00649-v2.docx"},
+            new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, true, REPRESENTATIVE, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00649-v2.docx"},
 
             new Object[]{ISSUE_FINAL_DECISION, false, APPELLANT, ORAL, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00454.docx"},
             new Object[]{ISSUE_FINAL_DECISION, false, APPOINTEE, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00454.docx"},
@@ -314,12 +346,12 @@ public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
             new Object[]{REQUEST_FOR_INFORMATION, true, JOINT_PARTY, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00589.docx"},
             new Object[]{REQUEST_FOR_INFORMATION, true, REPRESENTATIVE, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00589.docx"},
 
-            new Object[]{RESEND_APPEAL_CREATED, false, APPELLANT, ORAL, GAPS, null, "01293b93-b23e-40a3-ad78-2c6cd01cd21c", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx"},
-            new Object[]{RESEND_APPEAL_CREATED, false, APPELLANT, PAPER, GAPS, null, "01293b93-b23e-40a3-ad78-2c6cd01cd21c", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx"},
-            new Object[]{RESEND_APPEAL_CREATED, false, APPOINTEE, ORAL, GAPS, null, "362d9a85-e0e4-412b-b874-020c0464e2b4", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx"},
-            new Object[]{RESEND_APPEAL_CREATED, false, APPOINTEE, PAPER, GAPS, null, "362d9a85-e0e4-412b-b874-020c0464e2b4", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx"},
-            new Object[]{RESEND_APPEAL_CREATED, false, REPRESENTATIVE, ORAL, GAPS, null, "652753bf-59b4-46eb-9c24-bd762338a098", List.of("a6c09fad-6265-4c7c-8b95-36245ffa5352"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Representative.docx"},
-            new Object[]{RESEND_APPEAL_CREATED, false, REPRESENTATIVE, PAPER, GAPS, null, "652753bf-59b4-46eb-9c24-bd762338a098", List.of("a6c09fad-6265-4c7c-8b95-36245ffa5352"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Representative.docx"},
+            new Object[]{RESEND_APPEAL_CREATED, false, APPELLANT, ORAL, GAPS, null, "01293b93-b23e-40a3-ad78-2c6cd01cd21c", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx"},
+            new Object[]{RESEND_APPEAL_CREATED, false, APPELLANT, PAPER, GAPS, null, "01293b93-b23e-40a3-ad78-2c6cd01cd21c", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx"},
+            new Object[]{RESEND_APPEAL_CREATED, false, APPOINTEE, ORAL, GAPS, null, "362d9a85-e0e4-412b-b874-020c0464e2b4", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx"},
+            new Object[]{RESEND_APPEAL_CREATED, false, APPOINTEE, PAPER, GAPS, null, "362d9a85-e0e4-412b-b874-020c0464e2b4", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx"},
+            new Object[]{RESEND_APPEAL_CREATED, false, REPRESENTATIVE, ORAL, GAPS, null, "652753bf-59b4-46eb-9c24-bd762338a098", List.of("a6c09fad-6265-4c7c-8b95-36245ffa5352"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Representative-v2.docx"},
+            new Object[]{RESEND_APPEAL_CREATED, false, REPRESENTATIVE, PAPER, GAPS, null, "652753bf-59b4-46eb-9c24-bd762338a098", List.of("a6c09fad-6265-4c7c-8b95-36245ffa5352"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Representative-v2.docx"},
 
             new Object[]{SUBSCRIPTION_UPDATED, false, null, ORAL, GAPS, null, "b8b2904f-629d-42cf-acea-1b74bde5b2ff", List.of("7397a76f-14cb-468c-b1a7-0570940ead91"), null, null},
             new Object[]{SUBSCRIPTION_UPDATED, true, null, ORAL, GAPS, null, "020c9611-6547-4a66-a05b-eca7e9a415ae", List.of("c4ecf5b9-2190-4256-a525-0e5f5bee27d0", "7397a76f-14cb-468c-b1a7-0570940ead91"), null, null},
@@ -414,22 +446,22 @@ public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
             new Object[]{APPEAL_LAPSED, true, REPRESENTATIVE, ORAL, LIST_ASSIST, null, "dc8164a8-b923-4896-9308-3bf8e74d5665", List.of("77180ecb-c7e8-407c-8d74-618ae37b47b6","ee58f7d0-8de7-4bee-acd4-252213db6b7b"), null, "TB-SCS-GNO-WEL-00658.docx"},
             new Object[]{APPEAL_LAPSED, true, REPRESENTATIVE, PAPER, LIST_ASSIST, null, "dc8164a8-b923-4896-9308-3bf8e74d5665", List.of("77180ecb-c7e8-407c-8d74-618ae37b47b6","ee58f7d0-8de7-4bee-acd4-252213db6b7b"), null, "TB-SCS-GNO-WEL-00658.docx"},
 
-            new Object[]{APPEAL_RECEIVED, false, APPELLANT, ORAL, LIST_ASSIST, "readyToList", "d5fd9f65-1283-4533-a1be-10043dae7af6", List.of("ede384aa-0b6e-4311-9f01-ee547573a07b"), "91143b85-dd9d-430c-ba23-e42ec90f44f8", "TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx"},
+            new Object[]{APPEAL_RECEIVED, false, APPELLANT, ORAL, LIST_ASSIST, "readyToList", "d5fd9f65-1283-4533-a1be-10043dae7af6", List.of("ede384aa-0b6e-4311-9f01-ee547573a07b"), "91143b85-dd9d-430c-ba23-e42ec90f44f8", "TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx"},
             new Object[]{APPEAL_RECEIVED, false, APPELLANT, ORAL, LIST_ASSIST, "validAppeal", "d5fd9f65-1283-4533-a1be-10043dae7af6", List.of("ede384aa-0b6e-4311-9f01-ee547573a07b"), "91143b85-dd9d-430c-ba23-e42ec90f44f8", null},
             new Object[]{APPEAL_RECEIVED, false, APPELLANT, PAPER, LIST_ASSIST, null, "d5fd9f65-1283-4533-a1be-10043dae7af6", List.of("ede384aa-0b6e-4311-9f01-ee547573a07b"), "91143b85-dd9d-430c-ba23-e42ec90f44f8", null},
-            new Object[]{APPEAL_RECEIVED, false, APPOINTEE, ORAL, LIST_ASSIST, "readyToList", "78cf9c9c-e2b8-44d7-bcf1-220311f114cb", List.of("ede384aa-0b6e-4311-9f01-ee547573a07b"), "747d026e-1bec-4e96-8a34-28f36e30bba5", "TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx"},
+            new Object[]{APPEAL_RECEIVED, false, APPOINTEE, ORAL, LIST_ASSIST, "readyToList", "78cf9c9c-e2b8-44d7-bcf1-220311f114cb", List.of("ede384aa-0b6e-4311-9f01-ee547573a07b"), "747d026e-1bec-4e96-8a34-28f36e30bba5", "TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx"},
             new Object[]{APPEAL_RECEIVED, false, APPOINTEE, ORAL, LIST_ASSIST, "validAppeal", "78cf9c9c-e2b8-44d7-bcf1-220311f114cb", List.of("ede384aa-0b6e-4311-9f01-ee547573a07b"), "747d026e-1bec-4e96-8a34-28f36e30bba5", null},
             new Object[]{APPEAL_RECEIVED, false, APPOINTEE, PAPER, LIST_ASSIST, null, "78cf9c9c-e2b8-44d7-bcf1-220311f114cb", List.of("ede384aa-0b6e-4311-9f01-ee547573a07b"), "747d026e-1bec-4e96-8a34-28f36e30bba5", null},
-            new Object[]{APPEAL_RECEIVED, false, REPRESENTATIVE, ORAL, LIST_ASSIST, "readyToList", "8003606e-3d80-4e17-b846-18698f8d681e", List.of("99bd4a56-256c-4de8-b187-d43a8dde466f"), "77ea8a2f-06df-4279-9c1f-0f23cb2d9bbf", "TB-SCS-LET-ENG-Appeal-Lodged-Representative.docx"},
+            new Object[]{APPEAL_RECEIVED, false, REPRESENTATIVE, ORAL, LIST_ASSIST, "readyToList", "8003606e-3d80-4e17-b846-18698f8d681e", List.of("99bd4a56-256c-4de8-b187-d43a8dde466f"), "77ea8a2f-06df-4279-9c1f-0f23cb2d9bbf", "TB-SCS-LET-ENG-Appeal-Lodged-Representative-v2.docx"},
             new Object[]{APPEAL_RECEIVED, false, REPRESENTATIVE, ORAL, LIST_ASSIST, "validAppeal", "8003606e-3d80-4e17-b846-18698f8d681e", List.of("99bd4a56-256c-4de8-b187-d43a8dde466f"), "77ea8a2f-06df-4279-9c1f-0f23cb2d9bbf", null},
             new Object[]{APPEAL_RECEIVED, false, REPRESENTATIVE, PAPER, LIST_ASSIST, null, "8003606e-3d80-4e17-b846-18698f8d681e", List.of("99bd4a56-256c-4de8-b187-d43a8dde466f"), "77ea8a2f-06df-4279-9c1f-0f23cb2d9bbf", null},
-            new Object[]{APPEAL_RECEIVED, true, APPELLANT, ORAL, LIST_ASSIST, "readyToList", "ba2654d8-3e76-43df-bf7d-f457d4d6819a", List.of("53369ca5-75a8-43a7-8e5e-4eda9df04001","ede384aa-0b6e-4311-9f01-ee547573a07b"), "830ba7f1-9757-4833-8520-2f872de7be44", "TB-SCS-LET-WEL-Appeal-Lodged-Appellant.docx"},
+            new Object[]{APPEAL_RECEIVED, true, APPELLANT, ORAL, LIST_ASSIST, "readyToList", "ba2654d8-3e76-43df-bf7d-f457d4d6819a", List.of("53369ca5-75a8-43a7-8e5e-4eda9df04001","ede384aa-0b6e-4311-9f01-ee547573a07b"), "830ba7f1-9757-4833-8520-2f872de7be44", "TB-SCS-LET-WEL-Appeal-Lodged-Appellant-v2.docx"},
             new Object[]{APPEAL_RECEIVED, true, APPELLANT, ORAL, LIST_ASSIST, "validAppeal", "ba2654d8-3e76-43df-bf7d-f457d4d6819a", List.of("53369ca5-75a8-43a7-8e5e-4eda9df04001","ede384aa-0b6e-4311-9f01-ee547573a07b"), "830ba7f1-9757-4833-8520-2f872de7be44", null},
             new Object[]{APPEAL_RECEIVED, true, APPELLANT, PAPER, LIST_ASSIST, null, "ba2654d8-3e76-43df-bf7d-f457d4d6819a", List.of("53369ca5-75a8-43a7-8e5e-4eda9df04001","ede384aa-0b6e-4311-9f01-ee547573a07b"), "830ba7f1-9757-4833-8520-2f872de7be44", null},
-            new Object[]{APPEAL_RECEIVED, true, APPOINTEE, ORAL, LIST_ASSIST, "readyToList", "c77d9768-5343-42a5-9333-7b399e3d7199", List.of("53369ca5-75a8-43a7-8e5e-4eda9df04001","ede384aa-0b6e-4311-9f01-ee547573a07b"), "95b0b0f8-fdf6-450f-b805-6aab46d63bf7", "TB-SCS-LET-WEL-Appeal-Lodged-Appellant.docx"},
+            new Object[]{APPEAL_RECEIVED, true, APPOINTEE, ORAL, LIST_ASSIST, "readyToList", "c77d9768-5343-42a5-9333-7b399e3d7199", List.of("53369ca5-75a8-43a7-8e5e-4eda9df04001","ede384aa-0b6e-4311-9f01-ee547573a07b"), "95b0b0f8-fdf6-450f-b805-6aab46d63bf7", "TB-SCS-LET-WEL-Appeal-Lodged-Appellant-v2.docx"},
             new Object[]{APPEAL_RECEIVED, true, APPOINTEE, ORAL, LIST_ASSIST, "validAppeal", "c77d9768-5343-42a5-9333-7b399e3d7199", List.of("53369ca5-75a8-43a7-8e5e-4eda9df04001","ede384aa-0b6e-4311-9f01-ee547573a07b"), "95b0b0f8-fdf6-450f-b805-6aab46d63bf7", null},
             new Object[]{APPEAL_RECEIVED, true, APPOINTEE, PAPER, LIST_ASSIST, null, "c77d9768-5343-42a5-9333-7b399e3d7199", List.of("53369ca5-75a8-43a7-8e5e-4eda9df04001","ede384aa-0b6e-4311-9f01-ee547573a07b"), "95b0b0f8-fdf6-450f-b805-6aab46d63bf7", null},
-            new Object[]{APPEAL_RECEIVED, true, REPRESENTATIVE, ORAL, LIST_ASSIST, "readyToList", "a4a85f03-c23c-4099-ab45-7a3ba9eee63a", List.of("6970bdda-7293-46d6-8876-7e1a7c4295fc","99bd4a56-256c-4de8-b187-d43a8dde466f"), "89cbb9d8-3b7d-4766-b481-585832e8bd90", "TB-SCS-LET-WEL-Appeal-Lodged-Representative.docx"},
+            new Object[]{APPEAL_RECEIVED, true, REPRESENTATIVE, ORAL, LIST_ASSIST, "readyToList", "a4a85f03-c23c-4099-ab45-7a3ba9eee63a", List.of("6970bdda-7293-46d6-8876-7e1a7c4295fc","99bd4a56-256c-4de8-b187-d43a8dde466f"), "89cbb9d8-3b7d-4766-b481-585832e8bd90", "TB-SCS-LET-WEL-Appeal-Lodged-Representative-v2.docx"},
             new Object[]{APPEAL_RECEIVED, true, REPRESENTATIVE, ORAL, LIST_ASSIST, "validAppeal", "a4a85f03-c23c-4099-ab45-7a3ba9eee63a", List.of("6970bdda-7293-46d6-8876-7e1a7c4295fc","99bd4a56-256c-4de8-b187-d43a8dde466f"), "89cbb9d8-3b7d-4766-b481-585832e8bd90", null},
             new Object[]{APPEAL_RECEIVED, true, REPRESENTATIVE, PAPER, LIST_ASSIST, null, "a4a85f03-c23c-4099-ab45-7a3ba9eee63a", List.of("6970bdda-7293-46d6-8876-7e1a7c4295fc","99bd4a56-256c-4de8-b187-d43a8dde466f"), "89cbb9d8-3b7d-4766-b481-585832e8bd90", null},
 
@@ -562,20 +594,20 @@ public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
             new Object[]{HMCTS_APPEAL_LAPSED, true, REPRESENTATIVE, ORAL, LIST_ASSIST, null, "dc8164a8-b923-4896-9308-3bf8e74d5665", List.of("77180ecb-c7e8-407c-8d74-618ae37b47b6","ee58f7d0-8de7-4bee-acd4-252213db6b7b"), null, "TB-SCS-GNO-WEL-00658.docx"},
             new Object[]{HMCTS_APPEAL_LAPSED, true, REPRESENTATIVE, PAPER, LIST_ASSIST, null, "dc8164a8-b923-4896-9308-3bf8e74d5665", List.of("77180ecb-c7e8-407c-8d74-618ae37b47b6","ee58f7d0-8de7-4bee-acd4-252213db6b7b"), null, "TB-SCS-GNO-WEL-00658.docx"},
 
-            new Object[]{ISSUE_ADJOURNMENT_NOTICE, false, APPELLANT, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00510.docx"},
-            new Object[]{ISSUE_ADJOURNMENT_NOTICE, false, APPELLANT, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00510.docx"},
-            new Object[]{ISSUE_ADJOURNMENT_NOTICE, false, APPOINTEE, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00510.docx"},
-            new Object[]{ISSUE_ADJOURNMENT_NOTICE, false, APPOINTEE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00510.docx"},
-            new Object[]{ISSUE_ADJOURNMENT_NOTICE, false, JOINT_PARTY, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00510.docx"},
+            new Object[]{ISSUE_ADJOURNMENT_NOTICE, false, APPELLANT, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00510-v2.docx"},
+            new Object[]{ISSUE_ADJOURNMENT_NOTICE, false, APPELLANT, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00510-v2.docx"},
+            new Object[]{ISSUE_ADJOURNMENT_NOTICE, false, APPOINTEE, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00510-v2.docx"},
+            new Object[]{ISSUE_ADJOURNMENT_NOTICE, false, APPOINTEE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00510-v2.docx"},
+            new Object[]{ISSUE_ADJOURNMENT_NOTICE, false, JOINT_PARTY, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00510-v2.docx"},
             new Object[]{ISSUE_ADJOURNMENT_NOTICE, false, REPRESENTATIVE, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00512.docx"},
             new Object[]{ISSUE_ADJOURNMENT_NOTICE, false, REPRESENTATIVE, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00512.docx"},
             new Object[]{ISSUE_ADJOURNMENT_NOTICE, false, REPRESENTATIVE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00512.docx"},
 
-            new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, true, APPELLANT, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00649.docx"},
-            new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, true, APPOINTEE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00649.docx"},
-            new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, true, JOINT_PARTY, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00649.docx"},
-            new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, true, REPRESENTATIVE, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00649.docx"},
-            new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, true, REPRESENTATIVE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00649.docx"},
+            new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, true, APPELLANT, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00649-v2.docx"},
+            new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, true, APPOINTEE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00649-v2.docx"},
+            new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, true, JOINT_PARTY, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00649-v2.docx"},
+            new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, true, REPRESENTATIVE, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00649-v2.docx"},
+            new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, true, REPRESENTATIVE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00649-v2.docx"},
 
             new Object[]{ISSUE_FINAL_DECISION, false, APPELLANT, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00454.docx"},
             new Object[]{ISSUE_FINAL_DECISION, false, APPOINTEE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00454.docx"},
@@ -626,12 +658,12 @@ public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
             new Object[]{REQUEST_FOR_INFORMATION, true, JOINT_PARTY, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00589.docx"},
             new Object[]{REQUEST_FOR_INFORMATION, true, REPRESENTATIVE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00589.docx"},
 
-            new Object[]{RESEND_APPEAL_CREATED, false, APPELLANT, ORAL, LIST_ASSIST, null, "01293b93-b23e-40a3-ad78-2c6cd01cd21c", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx"},
-            new Object[]{RESEND_APPEAL_CREATED, false, APPELLANT, PAPER, LIST_ASSIST, null, "01293b93-b23e-40a3-ad78-2c6cd01cd21c", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx"},
-            new Object[]{RESEND_APPEAL_CREATED, false, APPOINTEE, ORAL, LIST_ASSIST, null, "362d9a85-e0e4-412b-b874-020c0464e2b4", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx"},
-            new Object[]{RESEND_APPEAL_CREATED, false, APPOINTEE, PAPER, LIST_ASSIST, null, "362d9a85-e0e4-412b-b874-020c0464e2b4", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx"},
-            new Object[]{RESEND_APPEAL_CREATED, false, REPRESENTATIVE, ORAL, LIST_ASSIST, null, "652753bf-59b4-46eb-9c24-bd762338a098", List.of("a6c09fad-6265-4c7c-8b95-36245ffa5352"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Representative.docx"},
-            new Object[]{RESEND_APPEAL_CREATED, false, REPRESENTATIVE, PAPER, LIST_ASSIST, null, "652753bf-59b4-46eb-9c24-bd762338a098", List.of("a6c09fad-6265-4c7c-8b95-36245ffa5352"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Representative.docx"},
+            new Object[]{RESEND_APPEAL_CREATED, false, APPELLANT, ORAL, LIST_ASSIST, null, "01293b93-b23e-40a3-ad78-2c6cd01cd21c", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx"},
+            new Object[]{RESEND_APPEAL_CREATED, false, APPELLANT, PAPER, LIST_ASSIST, null, "01293b93-b23e-40a3-ad78-2c6cd01cd21c", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx"},
+            new Object[]{RESEND_APPEAL_CREATED, false, APPOINTEE, ORAL, LIST_ASSIST, null, "362d9a85-e0e4-412b-b874-020c0464e2b4", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx"},
+            new Object[]{RESEND_APPEAL_CREATED, false, APPOINTEE, PAPER, LIST_ASSIST, null, "362d9a85-e0e4-412b-b874-020c0464e2b4", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx"},
+            new Object[]{RESEND_APPEAL_CREATED, false, REPRESENTATIVE, ORAL, LIST_ASSIST, null, "652753bf-59b4-46eb-9c24-bd762338a098", List.of("a6c09fad-6265-4c7c-8b95-36245ffa5352"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Representative-v2.docx"},
+            new Object[]{RESEND_APPEAL_CREATED, false, REPRESENTATIVE, PAPER, LIST_ASSIST, null, "652753bf-59b4-46eb-9c24-bd762338a098", List.of("a6c09fad-6265-4c7c-8b95-36245ffa5352"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Representative-v2.docx"},
 
             new Object[]{SUBSCRIPTION_UPDATED, false, null, ORAL, LIST_ASSIST, null, "b8b2904f-629d-42cf-acea-1b74bde5b2ff", List.of("7397a76f-14cb-468c-b1a7-0570940ead91"), null, null},
             new Object[]{SUBSCRIPTION_UPDATED, true, null, ORAL, LIST_ASSIST, null, "020c9611-6547-4a66-a05b-eca7e9a415ae", List.of("c4ecf5b9-2190-4256-a525-0e5f5bee27d0", "7397a76f-14cb-468c-b1a7-0570940ead91"), null, null},
