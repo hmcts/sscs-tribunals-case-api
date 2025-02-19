@@ -59,7 +59,7 @@ export class LinkCase extends BaseStep {
       eventTestData.eventSummaryInput,
       eventTestData.eventDescriptionInput
     );
-    await this.eventNameAndDescriptionPage.confirmWithoutNavigation();
+    await this.eventNameAndDescriptionPage.confirmSubmission();
 
     // Error has been thrown and now is being verified.
     await this.linkACasePage.verifyCaseCannotLinkToItself();

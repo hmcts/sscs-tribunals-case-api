@@ -37,11 +37,9 @@ export class updateOtherPartyDataPage {
     await this.page
       .locator('#otherParties_0_address_town')
       .fill(addUpdateOtherPartyData.updateOtherPartyDataAddressTown);
-    if( caseType != "NONIBC") {
-      await this.page
-        .locator('#otherParties_0_address_country')
-        .fill(addUpdateOtherPartyData.updateOtherPartyDataAddressCountry);
-    }
+    await this.page
+      .locator('#otherParties_0_address_country')
+      .fill(addUpdateOtherPartyData.updateOtherPartyDataAddressCountry);
     await this.page
       .locator('#otherParties_0_address_postcode')
       .fill(addUpdateOtherPartyData.updateOtherPartyDataAddressPostCode);      
