@@ -15,7 +15,6 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCasePanelMembersExcluded;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTime;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AmendReason;
