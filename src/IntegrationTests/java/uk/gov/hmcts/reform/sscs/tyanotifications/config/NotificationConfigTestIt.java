@@ -297,14 +297,14 @@ public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
             new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, true, REPRESENTATIVE, ORAL, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00649-v2.docx"},
             new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, true, REPRESENTATIVE, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00649-v2.docx"},
 
-            new Object[]{ISSUE_FINAL_DECISION, false, APPELLANT, ORAL, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00454.docx"},
-            new Object[]{ISSUE_FINAL_DECISION, false, APPOINTEE, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00454.docx"},
-            new Object[]{ISSUE_FINAL_DECISION, false, REPRESENTATIVE, ORAL, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00455.docx"},
-            new Object[]{ISSUE_FINAL_DECISION, false, REPRESENTATIVE, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00455.docx"},
+            new Object[]{ISSUE_FINAL_DECISION, false, APPELLANT, ORAL, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00454-v2.docx"},
+            new Object[]{ISSUE_FINAL_DECISION, false, APPOINTEE, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00454-v2.docx"},
+            new Object[]{ISSUE_FINAL_DECISION, false, REPRESENTATIVE, ORAL, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00455-v2.docx"},
+            new Object[]{ISSUE_FINAL_DECISION, false, REPRESENTATIVE, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00455-v2.docx"},
 
-            new Object[]{ISSUE_FINAL_DECISION_WELSH, true, APPELLANT, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00681.docx"},
-            new Object[]{ISSUE_FINAL_DECISION_WELSH, true, APPOINTEE, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00681.docx"},
-            new Object[]{ISSUE_FINAL_DECISION_WELSH, true, REPRESENTATIVE, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00682.docx"},
+            new Object[]{ISSUE_FINAL_DECISION_WELSH, true, APPELLANT, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00681-v2.docx"},
+            new Object[]{ISSUE_FINAL_DECISION_WELSH, true, APPOINTEE, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00681-v2.docx"},
+            new Object[]{ISSUE_FINAL_DECISION_WELSH, true, REPRESENTATIVE, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00682-v2.docx"},
 
             new Object[]{JOINT_PARTY_ADDED, false, APPELLANT, ORAL, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00579.docx"},
             new Object[]{JOINT_PARTY_ADDED, false, JOINT_PARTY, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00579.docx"},
@@ -609,14 +609,14 @@ public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
             new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, true, REPRESENTATIVE, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00649-v2.docx"},
             new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, true, REPRESENTATIVE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00649-v2.docx"},
 
-            new Object[]{ISSUE_FINAL_DECISION, false, APPELLANT, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00454.docx"},
-            new Object[]{ISSUE_FINAL_DECISION, false, APPOINTEE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00454.docx"},
-            new Object[]{ISSUE_FINAL_DECISION, false, REPRESENTATIVE, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00455.docx"},
-            new Object[]{ISSUE_FINAL_DECISION, false, REPRESENTATIVE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00455.docx"},
+            new Object[]{ISSUE_FINAL_DECISION, false, APPELLANT, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00454-v2.docx"},
+            new Object[]{ISSUE_FINAL_DECISION, false, APPOINTEE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00454-v2.docx"},
+            new Object[]{ISSUE_FINAL_DECISION, false, REPRESENTATIVE, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00455-v2.docx"},
+            new Object[]{ISSUE_FINAL_DECISION, false, REPRESENTATIVE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00455-v2.docx"},
 
-            new Object[]{ISSUE_FINAL_DECISION_WELSH, true, APPELLANT, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00681.docx"},
-            new Object[]{ISSUE_FINAL_DECISION_WELSH, true, APPOINTEE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00681.docx"},
-            new Object[]{ISSUE_FINAL_DECISION_WELSH, true, REPRESENTATIVE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00682.docx"},
+            new Object[]{ISSUE_FINAL_DECISION_WELSH, true, APPELLANT, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00681-v2.docx"},
+            new Object[]{ISSUE_FINAL_DECISION_WELSH, true, APPOINTEE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00681-v2.docx"},
+            new Object[]{ISSUE_FINAL_DECISION_WELSH, true, REPRESENTATIVE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00682-v2.docx"},
 
             new Object[]{JOINT_PARTY_ADDED, false, APPELLANT, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00579.docx"},
             new Object[]{JOINT_PARTY_ADDED, false, JOINT_PARTY, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00579.docx"},
