@@ -130,6 +130,36 @@
   },
   {
     "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "panelMemberComposition",
+    "ListElementCode": "tribunalOrRegionalJudge",
+    "ID": "updateListingRequirementsTribunalOrRegionalJudge",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "10/02/2025",
+    "FieldDisplayOrder": 5,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "panelMemberComposition",
+    "ListElementCode": "tribunalOrRegionalMedicalMember",
+    "ID": "updateListingRequirementsTribunalOrRegionalMedicalMember",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "10/02/2025",
+    "FieldDisplayOrder": 6,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "panelMemberComposition",
+    "ListElementCode": "tribunalOrRegionalTribunalMember",
+    "ID": "updateListingRequirementsTribunalOrRegionalTribunalMember",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "10/02/2025",
+    "FieldDisplayOrder": 6,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
     "CaseFieldID": "panelMemberExclusions",
     "ListElementCode": "arePanelMembersExcluded",
     "ID": "updateListingRequirementsArePanelMembersExclusions",
