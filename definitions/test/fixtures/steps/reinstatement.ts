@@ -24,8 +24,7 @@ export class Reinstatement extends BaseStep {
     await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
       actionFurtherEvidenceTestdata.sender,
       actionFurtherEvidenceTestdata.reinstatementDocType,
-      actionFurtherEvidenceTestdata.testfileone,
-      false
+      actionFurtherEvidenceTestdata.testfileone
     );
     await this.eventNameAndDescriptionPage.verifyPageContent(
       actionFurtherEvidenceTestdata.eventName
@@ -82,8 +81,7 @@ export class Reinstatement extends BaseStep {
     await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
       actionFurtherEvidenceTestdata.sender,
       actionFurtherEvidenceTestdata.reinstatementDocType,
-      actionFurtherEvidenceTestdata.testfileone,
-      false
+      actionFurtherEvidenceTestdata.testfileone
     );
 
     await this.eventNameAndDescriptionPage.verifyPageContent(

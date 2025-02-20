@@ -85,8 +85,7 @@ export class ActionFurtherEvidencePage {
   async submitActionFurtherEvidence(
     senderOption: string,
     docType: string,
-    fileName: string,
-    shouldSignOut: boolean
+    fileName: string
   ): Promise<void> {
     await this.verifyPageContent();
     await this.selectFEOption();
@@ -98,27 +97,7 @@ export class ActionFurtherEvidencePage {
     await this.enterFileName();
     await this.enterScannedDate();
     await this.selectbundle();
-    if (shouldSignOut) {
-      await this.confirmAndSignOut();
-    } else {
-      await this.confirmSubmission();
-    }
-  }
-
-  async confirmAndSignOut(): Promise<void> {
-    const pageUrl = this.page.url();
     await this.confirmSubmission();
-    await expect(this.page).not.toHaveURL(pageUrl);
-    await webActions.clickElementById('li a.hmcts-header__navigation-link');
-    await expect(this.page.locator('#username')).toBeVisible();
-  }
-
-  async confirmAndSignOut(): Promise<void> {
-    const pageUrl = this.page.url();
-    await this.confirmSubmission();
-    await expect(this.page).not.toHaveURL(pageUrl);
-    await webActions.clickElementById('li a.hmcts-header__navigation-link');
-    await expect(this.page.locator('#username')).toBeVisible();
   }
 
   async confirmAndSignOut(): Promise<void> {

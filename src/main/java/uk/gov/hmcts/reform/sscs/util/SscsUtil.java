@@ -55,6 +55,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.JudicialUserPanel;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LibertyToApplyActions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PermissionToAppealActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
@@ -638,11 +639,10 @@ public class SscsUtil {
     }
 
     public static HmcHearingType getHmcHearingType(SscsCaseData sscsCaseData) {
-        return sscsCaseData.getSchedulingAndListingFields() != null
-            && sscsCaseData.getSchedulingAndListingFields().getOverrideFields() != null
-            && sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getHmcHearingType() != null
-            ? sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getHmcHearingType()
-            : sscsCaseData.getHmcHearingType();
+        return Optional.ofNullable(sscsCaseData.getSchedulingAndListingFields())
+            .map(SchedulingAndListingFields::getOverrideFields)
+            .map(OverrideFields::getHmcHearingType)
+            .orElse(sscsCaseData.getHmcHearingType());
     }
 }
 
