@@ -365,8 +365,8 @@ public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
             new Object[]{SYA_APPEAL_CREATED, true, APPELLANT, PAPER, GAPS, null, "8910e2d2-4332-4ef6-a4b5-025ffad4f17d", List.of("6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82","f41222ef-c05c-4682-9634-6b034a166368"), "830ba7f1-9757-4833-8520-2f872de7be44", null},
             new Object[]{SYA_APPEAL_CREATED, true, REPRESENTATIVE, ORAL, GAPS, null, "364bccc5-ffa6-495d-8035-e642d15114bf", List.of("f8391d2b-4d80-480e-87a9-816710f5650b","a6c09fad-6265-4c7c-8b95-36245ffa5352"), "89cbb9d8-3b7d-4766-b481-585832e8bd90", null},
 
-            new Object[]{UPDATE_OTHER_PARTY_DATA, false, OTHER_PARTY, ORAL, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00784.docx"},
-            new Object[]{UPDATE_OTHER_PARTY_DATA, false, OTHER_PARTY, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00784.docx"},
+            new Object[]{UPDATE_OTHER_PARTY_DATA, false, OTHER_PARTY, ORAL, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00784-v2.docx"},
+            new Object[]{UPDATE_OTHER_PARTY_DATA, false, OTHER_PARTY, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00784-v2.docx"},
             new Object[]{UPDATE_OTHER_PARTY_DATA, true, OTHER_PARTY, ORAL, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00787.docx"},
             new Object[]{UPDATE_OTHER_PARTY_DATA, true, OTHER_PARTY, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00787.docx"},
 
@@ -677,8 +677,8 @@ public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
             new Object[]{SYA_APPEAL_CREATED, true, APPELLANT, PAPER, LIST_ASSIST, null, "8910e2d2-4332-4ef6-a4b5-025ffad4f17d", List.of("6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82","f41222ef-c05c-4682-9634-6b034a166368"), "830ba7f1-9757-4833-8520-2f872de7be44", null},
             new Object[]{SYA_APPEAL_CREATED, true, REPRESENTATIVE, ORAL, LIST_ASSIST, null, "364bccc5-ffa6-495d-8035-e642d15114bf", List.of("f8391d2b-4d80-480e-87a9-816710f5650b","a6c09fad-6265-4c7c-8b95-36245ffa5352"), "89cbb9d8-3b7d-4766-b481-585832e8bd90", null},
 
-            new Object[]{UPDATE_OTHER_PARTY_DATA, false, OTHER_PARTY, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00784.docx"},
-            new Object[]{UPDATE_OTHER_PARTY_DATA, false, OTHER_PARTY, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00784.docx"},
+            new Object[]{UPDATE_OTHER_PARTY_DATA, false, OTHER_PARTY, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00784-v2.docx"},
+            new Object[]{UPDATE_OTHER_PARTY_DATA, false, OTHER_PARTY, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00784-v2.docx"},
             new Object[]{UPDATE_OTHER_PARTY_DATA, true, OTHER_PARTY, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00787.docx"},
             new Object[]{UPDATE_OTHER_PARTY_DATA, true, OTHER_PARTY, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00787.docx"},
 
