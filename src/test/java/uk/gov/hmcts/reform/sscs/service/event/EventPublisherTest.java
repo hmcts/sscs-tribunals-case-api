@@ -1,15 +1,11 @@
 package uk.gov.hmcts.reform.sscs.service.event;
 
 import static java.lang.Long.parseLong;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -34,12 +30,10 @@ public class EventPublisherTest {
 
     private static final String JURISDICTION = "Benefit";
 
-    private ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
-
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
-        eventPublisher = new EventPublisher(topicPublisher, mapper);
+        eventPublisher = new EventPublisher(topicPublisher);
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("1")
             .state(State.WITH_DWP)
@@ -47,17 +41,16 @@ public class EventPublisherTest {
     }
 
     @Test
-    public void testPublishEvent() throws JsonProcessingException {
+    public void testPublishEvent() {
 
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(parseLong(sscsCaseData.getCcdCaseId()), JURISDICTION,
             sscsCaseData.getState(), sscsCaseData, LocalDateTime.now(), "Benefit");
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(),
             EventType.DWP_SUPPLEMENTARY_RESPONSE, false);
-        String message = mapper.writeValueAsString(callback);
 
         eventPublisher.publishEvent(callback);
 
-        verify(topicPublisher).sendMessage(eq(message), eq(sscsCaseData.getCcdCaseId()), any(AtomicReference.class));
+        verify(topicPublisher).sendMessage(eq(callback));
     }
 
 }

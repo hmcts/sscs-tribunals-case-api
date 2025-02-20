@@ -6,9 +6,11 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 
+@Slf4j
 public class AppealToProceedFunctionalTest extends AbstractFunctionalTest {
 
     public AppealToProceedFunctionalTest() {
@@ -27,6 +29,11 @@ public class AppealToProceedFunctionalTest extends AbstractFunctionalTest {
 
         simulateCcdCallback(json);
 
+        try {
+            Thread.sleep(15000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
 
         assertEquals("sentToDwp", caseDetails.getData().getHmctsDwpState());
