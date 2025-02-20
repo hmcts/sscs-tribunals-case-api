@@ -493,7 +493,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     private void addSscsDocumentToCaseData(SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
         List<SscsDocument> documents = new ArrayList<>();
         documents.add(sscsDocument);
-        if (isTribunalInternalDocumentsEnabled && "yes".equalsIgnoreCase(sscsDocument.getValue().getIsInternalDocument())) {
+        if (isTribunalInternalDocumentsEnabled && YES.equalsIgnoreCase(sscsDocument.getValue().getIsInternalDocument())) {
             if (sscsCaseData.getSscsInternalDocument() != null) {
                 documents.addAll(sscsCaseData.getSscsInternalDocument());
             }
