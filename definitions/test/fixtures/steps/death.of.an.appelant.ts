@@ -126,7 +126,7 @@ export class DeathOfAnAppelant extends BaseStep {
       eventTestData.eventSummaryInput,
       eventTestData.eventDescriptionInput
     );
-    await this.eventNameAndDescriptionPage.confirmSubmission();
+    await this.eventNameAndDescriptionPage.confirmWithoutNavigation();
     await deathOfAppellantPage.verifyDeathDateNotBeIntheFutureErrorMsg();
     await deathOfAppellantPage.signOut();
     await performAppealDormantOnCase(caseId);
