@@ -1664,5 +1664,8 @@
   {"LiveFrom": "18/10/2024", "CaseTypeID": "Benefit", "CaseFieldID": "hearingOutcomeValue", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
   {"LiveFrom": "18/10/2024", "CaseTypeID": "Benefit", "CaseFieldID": "completedHearingsList", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
   {"LiveFrom": "18/10/2024", "CaseTypeID": "Benefit", "CaseFieldID": "completedHearingsList", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
-  {"LiveFrom": "18/10/2024", "CaseTypeID": "Benefit", "CaseFieldID": "completedHearingsList", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"}
+  {"LiveFrom": "18/10/2024", "CaseTypeID": "Benefit", "CaseFieldID": "completedHearingsList", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
+  {"LiveFrom": "18/10/2024", "CaseTypeID": "Benefit", "CaseFieldID": "sscsInternalDocument", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
+  {"LiveFrom": "18/10/2024", "CaseTypeID": "Benefit", "CaseFieldID": "sscsInternalDocument", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
+  {"LiveFrom": "18/10/2024", "CaseTypeID": "Benefit", "CaseFieldID": "sscsInternalDocument", "AccessProfile": "caseworker-sscs-judge", "CRUD": "CRUD"}
 ]
