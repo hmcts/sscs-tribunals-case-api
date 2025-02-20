@@ -6,9 +6,11 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 
+@Slf4j
 public class AppealToProceedFunctionalTest extends AbstractFunctionalTest {
 
     public AppealToProceedFunctionalTest() {
@@ -26,9 +28,16 @@ public class AppealToProceedFunctionalTest extends AbstractFunctionalTest {
         json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().toString());
 
         simulateCcdCallback(json);
-
+        // pause for 30 seconds
+        try {
+            Thread.sleep(30000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
 
+        // log caseDetails
+        log.info("caseDetails: {}", caseDetails);
         assertEquals("sentToDwp", caseDetails.getData().getHmctsDwpState());
         assertEquals("withDwp", caseDetails.getState());
     }
