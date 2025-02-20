@@ -2170,6 +2170,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getSscsDocument());
         SscsDocumentDetails sscsDocument = response.getData().getSscsInternalDocument().getFirst().getValue();
         assertEquals(scannedDocDetails.getUrl(), sscsDocument.getDocumentLink());
+        assertEquals(scannedDocDetails.getIsInternalDocument(), sscsDocument.getIsInternalDocument());
     }
 
     @Test
@@ -2202,11 +2203,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getSscsInternalDocument());
         SscsDocumentDetails sscsDocument = response.getData().getSscsDocument().getFirst().getValue();
         assertEquals(scannedDocDetails.getUrl(), sscsDocument.getDocumentLink());
+        assertNull(sscsDocument.getIsInternalDocument());
     }
 
     @Test
     @Parameters({"yes", "no", "null"})
-    public void givenIsInternalTribunalDocumentAny_andFlagIsOf_thenPutInDocumentsCollection(@Nullable String option) {
+    public void givenIsInternalTribunalDocumentAny_andFlagIsOff_thenPutInDocumentsCollection(@Nullable String option) {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false, false, false);
 
         DynamicListItem sendToInterlocListItem = new DynamicListItem(
