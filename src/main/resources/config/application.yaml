@@ -208,13 +208,13 @@ document_management:
     url: ${DOCUMENT_MANAGEMENT_URL:http://localhost:5005}
 documents:
     english:
-        CORRECTION_GRANTED: TB-SCS-GNO-ENG-corrected-decision-notice.docx
+        CORRECTION_GRANTED: TB-SCS-GNO-ENG-draft-corrected-decision-notice-v2.docx
         DECISION_ISSUED: TB-SCS-GNO-ENG-draft-decision-notice.docx
         DIRECTION_ISSUED: TB-SCS-GNO-ENG-directions-notice-v2.docx
         ISSUE_FINAL_DECISION: TB-SCS-GNO-ENG-final-decision-notice.docx
         SOR_WRITE: TB-SCS-GNO-ENG-sor-directions-notice-v2.docx
     welsh:
-        CORRECTION_GRANTED: TB-SCS-GNO-ENG-corrected-decision-notice.docx
+        CORRECTION_GRANTED: TB-SCS-GNO-ENG-draft-corrected-decision-notice-v2.docx
         DECISION_ISSUED: TB-SCS-GNO-ENG-draft-decision-notice.docx
         DIRECTION_ISSUED: TB-SCS-GNO-ENG-directions-notice-v2.docx
         ISSUE_FINAL_DECISION: TB-SCS-GNO-ENG-final-decision-notice.docx
