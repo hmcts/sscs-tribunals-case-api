@@ -27,7 +27,11 @@ public class FunctionalTestController {
 
     @PostMapping(value = "/testing-support/send", produces = APPLICATION_JSON_VALUE)
     public void send(@RequestBody String message) {
+
+        log.info("FT controller received message: {}", message);
         Callback<SscsCaseData> callback = mapper.deserialize(message);
+        log.info("Sending message for event: {} for case id: {}", callback.getEvent(), callback.getCaseDetails().getId());
+
         consumer.publishEvent(callback);
     }
 }
