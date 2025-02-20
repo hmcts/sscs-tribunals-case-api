@@ -95,14 +95,12 @@ public abstract class WriteFinalDecisionTemplateContent {
         return "The appeal is " + (allowed ? "allowed" : "refused") + ".";
     }
 
-    public String getConfirmedOrSetAsideSentence(boolean setAside, String decisionDate) {
-        return "The decision made by the Secretary of State on " + DATEFORMATTER.format(LocalDate.parse(decisionDate)) + " is "
-            + (!setAside ? "confirmed." : "set aside.");
-    }
-
-    public String getConfirmedOrSetAsideSentence(boolean setAside, String decisionDate, boolean isHmrc) {
+    public String getConfirmedOrSetAsideSentence(boolean setAside, String decisionDate, boolean isHmrc, boolean isIbc) {
         if (isHmrc) {
             return "The decision made by the Respondent on " + DATEFORMATTER.format(LocalDate.parse(decisionDate)) + " is "
+                    + (!setAside ? "confirmed." : "set aside.");
+        } else if (isIbc) {
+            return "The decision made by the Infected Blood Compensation Authority on " + DATEFORMATTER.format(LocalDate.parse(decisionDate)) + " is "
                     + (!setAside ? "confirmed." : "set aside.");
         } else {
             return "The decision made by the Secretary of State on " + DATEFORMATTER.format(LocalDate.parse(decisionDate)) + " is "

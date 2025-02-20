@@ -181,6 +181,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
             }
         }
 
+        writeFinalDecisionBuilder.isIbc(caseData.isIbcCase());
+
         WriteFinalDecisionTemplateBody payload = writeFinalDecisionBuilder.build();
 
         validateRequiredProperties(payload);
