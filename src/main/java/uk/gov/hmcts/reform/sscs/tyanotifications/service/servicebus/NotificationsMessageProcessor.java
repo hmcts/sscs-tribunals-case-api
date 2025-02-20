@@ -31,8 +31,7 @@ public class NotificationsMessageProcessor {
     public void processMessage(Callback<SscsCaseData> callback) {
         try {
             requireNonNull(callback, "callback must not be null");
-            CaseDetails<SscsCaseData> caseDetailsBefore = callback.getCaseDetailsBefore().orElse(null);
-
+            log.info("REMOVE callback: {}", callback);
             NotificationEventType event = getNotificationByCcdEvent(callback.getEvent());
             SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
@@ -41,10 +40,9 @@ public class NotificationsMessageProcessor {
                 return;
             }
 
-
             NotificationSscsCaseDataWrapper sscsCaseDataWrapper = buildSscsCaseDataWrapper(
                 caseData,
-                caseDetailsBefore != null ? caseDetailsBefore.getCaseData() : null,
+                callback.getCaseDetailsBefore().map(CaseDetails::getCaseData).orElse(null),
                 event,
                 callback.getCaseDetails().getState());
 
