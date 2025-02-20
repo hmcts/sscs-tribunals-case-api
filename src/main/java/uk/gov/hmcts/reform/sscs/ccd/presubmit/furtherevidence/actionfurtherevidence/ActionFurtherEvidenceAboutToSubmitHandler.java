@@ -55,22 +55,22 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     public static final String FURTHER_EVIDENCE_RECEIVED = "furtherEvidenceReceived";
     private static final String COVERSHEET = "coversheet";
     protected static final List<String> ACTIONS_THAT_REQUIRES_EVIDENCE_ISSUED_SET_TO_YES_AND_NOT_BULK_PRINTED = Stream.of(
-                    OTHER_DOCUMENT_MANUAL, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE, INFORMATION_RECEIVED_FOR_INTERLOC_TCW,
-                    SEND_TO_INTERLOC_REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_TCW)
-            .map(FurtherEvidenceActionDynamicListItems::getCode)
-            .toList();
+            OTHER_DOCUMENT_MANUAL, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE, INFORMATION_RECEIVED_FOR_INTERLOC_TCW,
+            SEND_TO_INTERLOC_REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_TCW)
+        .map(FurtherEvidenceActionDynamicListItems::getCode)
+        .toList();
     private static final Set<State> ADDITION_VALID_STATES = Set.of(State.DORMANT_APPEAL_STATE,
-            State.RESPONSE_RECEIVED,
-            State.READY_TO_LIST,
-            State.LISTING_ERROR,
-            State.HANDLING_ERROR,
-            State.HEARING,
-            State.NOT_LISTABLE,
-            State.WITH_DWP,
-            State.POST_HEARING);
+        State.RESPONSE_RECEIVED,
+        State.READY_TO_LIST,
+        State.LISTING_ERROR,
+        State.HANDLING_ERROR,
+        State.HEARING,
+        State.NOT_LISTABLE,
+        State.WITH_DWP,
+        State.POST_HEARING);
 
     private static final Set<DocumentType> SENDER_VALID_STATES = Set.of(POSTPONEMENT_REQUEST,
-            SET_ASIDE_APPLICATION);
+        SET_ASIDE_APPLICATION);
 
     private final FooterService footerService;
     private final BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder;
@@ -82,6 +82,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     @Value("${feature.postHearingsB.enabled}")
     private final boolean isPostHearingsBEnabled;
+
+    @Value("${feature.tribunal-internal-documents.enabled}")
+    private final boolean isTribunalInternalDocumentsEnabled;
 
     public static void checkWarningsAndErrors(SscsCaseData sscsCaseData, ScannedDocument scannedDocument, String caseId,
                                               boolean ignoreWarnings,
@@ -160,7 +163,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
 
         if (ScannedDocumentType.URGENT_HEARING_REQUEST.getValue().equals(scannedDocumentType)
-                && !OTHER_DOCUMENT_MANUAL.getCode().equals(actionCode)) {
+            && !OTHER_DOCUMENT_MANUAL.getCode().equals(actionCode)) {
             preSubmitCallbackResponse.addError(String
                 .format("Further evidence action must be '%s' for a %s", OTHER_DOCUMENT_MANUAL.getLabel(),
                     URGENT_HEARING_REQUEST.getLabel()));
@@ -184,10 +187,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     private static boolean isPostHearingApplicationWithWrongActionCode(String actionCode, String scannedDocumentType) {
         boolean isDocTypeRequiresReviewByJudge =
             ScannedDocumentType.SET_ASIDE_APPLICATION.getValue().equals(scannedDocumentType)
-            || ScannedDocumentType.STATEMENT_OF_REASONS_APPLICATION.getValue().equals(scannedDocumentType)
-            || ScannedDocumentType.LIBERTY_TO_APPLY_APPLICATION.getValue().equals(scannedDocumentType)
-            || ScannedDocumentType.PERMISSION_TO_APPEAL_APPLICATION.getValue().equals(scannedDocumentType)
-            || ScannedDocumentType.POST_HEARING_OTHER.getValue().equals(scannedDocumentType);
+                || ScannedDocumentType.STATEMENT_OF_REASONS_APPLICATION.getValue().equals(scannedDocumentType)
+                || ScannedDocumentType.LIBERTY_TO_APPLY_APPLICATION.getValue().equals(scannedDocumentType)
+                || ScannedDocumentType.PERMISSION_TO_APPEAL_APPLICATION.getValue().equals(scannedDocumentType)
+                || ScannedDocumentType.POST_HEARING_OTHER.getValue().equals(scannedDocumentType);
         boolean isNotInterlocReviewByJudge = !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode);
         return isDocTypeRequiresReviewByJudge && isNotInterlocReviewByJudge;
     }
@@ -320,8 +323,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     private static boolean isPostHearingRequest(SscsCaseData sscsCaseData, boolean isPostHearingsBEnabled) {
         boolean isPostHearingsBRequest = isPostHearingsBEnabled
             && (isLibertyToApplyApplication(sscsCaseData)
-                || isPermissionToAppealApplication(sscsCaseData)
-                || isPostHearingOther(sscsCaseData));
+            || isPermissionToAppealApplication(sscsCaseData)
+            || isPostHearingOther(sscsCaseData));
 
         return isSetAsideApplication(sscsCaseData)
             || isCorrectionApplication(sscsCaseData)
@@ -348,7 +351,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     private static boolean isStatementOfReasonsApplication(SscsCaseData sscsCaseData) {
         return isDocumentType(STATEMENT_OF_REASONS_APPLICATION, sscsCaseData);
     }
-  
+
     private static boolean isPermissionToAppealApplication(SscsCaseData sscsCaseData) {
         return isDocumentType(PERMISSION_TO_APPEAL_APPLICATION, sscsCaseData);
     }
@@ -490,12 +493,17 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     private void addSscsDocumentToCaseData(SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
         List<SscsDocument> documents = new ArrayList<>();
         documents.add(sscsDocument);
-
-        if (sscsCaseData.getSscsDocument() != null) {
-            documents.addAll(sscsCaseData.getSscsDocument());
+        if (isTribunalInternalDocumentsEnabled && "yes".equalsIgnoreCase(sscsDocument.getValue().getIsInternalDocument())) {
+            if (sscsCaseData.getSscsInternalDocument() != null) {
+                documents.addAll(sscsCaseData.getSscsInternalDocument());
+            }
+            sscsCaseData.setSscsInternalDocument(documents);
+        } else {
+            if (sscsCaseData.getSscsDocument() != null) {
+                documents.addAll(sscsCaseData.getSscsDocument());
+            }
+            sscsCaseData.setSscsDocument(documents);
         }
-
-        sscsCaseData.setSscsDocument(documents);
     }
 
     private boolean warningAddedForBundleAddition(SscsCaseData sscsCaseData, Boolean ignoreWarnings,
@@ -522,11 +530,11 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     private boolean checkIfPossibleToReinstateCaseFields(DynamicList furtherEvidenceAction) {
         return isFurtherEvidenceActionCode(furtherEvidenceAction, ISSUE_FURTHER_EVIDENCE.getCode())
-                || isFurtherEvidenceActionCode(furtherEvidenceAction, OTHER_DOCUMENT_MANUAL.getCode())
-                || isFurtherEvidenceActionCode(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode())
-                || isFurtherEvidenceActionCode(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode())
-                || isFurtherEvidenceActionCode(furtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode())
-                || isFurtherEvidenceActionCode(furtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode());
+            || isFurtherEvidenceActionCode(furtherEvidenceAction, OTHER_DOCUMENT_MANUAL.getCode())
+            || isFurtherEvidenceActionCode(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode())
+            || isFurtherEvidenceActionCode(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode())
+            || isFurtherEvidenceActionCode(furtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode())
+            || isFurtherEvidenceActionCode(furtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode());
 
     }
 
@@ -626,21 +634,24 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             originalSenderOtherPartyName = getOtherPartyName(sscsCaseData, originalSenderOtherPartyId);
         }
 
-        return SscsDocument.builder().value(SscsDocumentDetails.builder()
-            .documentType(documentType.getValue())
-            .documentFileName(fileName)
-            .originalPartySender(requestingParty)
-            .bundleAddition(bundleAddition)
-            .documentLink(url)
-            .editedDocumentLink(scannedDocument.getValue().getEditedUrl())
-            .documentDateAdded(scannedDate)
-            .controlNumber(scannedDocument.getValue().getControlNumber())
-            .evidenceIssued(evidenceIssued.getValue())
-            .originalSenderOtherPartyId(originalSenderOtherPartyId)
-            .originalSenderOtherPartyName(originalSenderOtherPartyName)
-            .documentTranslationStatus(
-                sscsCaseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null)
-            .build()).build();
+        return SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentType(documentType.getValue())
+                .documentFileName(fileName)
+                .originalPartySender(requestingParty)
+                .bundleAddition(bundleAddition)
+                .documentLink(url)
+                .editedDocumentLink(scannedDocument.getValue().getEditedUrl())
+                .documentDateAdded(scannedDate)
+                .controlNumber(scannedDocument.getValue().getControlNumber())
+                .evidenceIssued(evidenceIssued.getValue())
+                .originalSenderOtherPartyId(originalSenderOtherPartyId)
+                .originalSenderOtherPartyName(originalSenderOtherPartyName)
+                .documentTranslationStatus(
+                    sscsCaseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null)
+                .isInternalDocument(scannedDocument.getValue().getIsInternalDocument())
+                .build())
+            .build();
     }
 
     private String findOriginalSenderOtherPartyId(DocumentType documentType, String originalSender) {
