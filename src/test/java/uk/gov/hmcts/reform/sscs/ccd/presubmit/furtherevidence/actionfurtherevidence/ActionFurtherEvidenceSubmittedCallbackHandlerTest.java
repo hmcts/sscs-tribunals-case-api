@@ -92,7 +92,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
     @Before
     public void setUp() {
-        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, ccdClient, sscsCcdConvertService, idamService, false, false);
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, ccdClient, sscsCcdConvertService, idamService, false, false, false);
     }
 
 
@@ -149,7 +149,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
             State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit");
         CaseDetails<SscsCaseData> caseDetailsBefore = new CaseDetails<>(123L, "sscs",
-                State.INTERLOCUTORY_REVIEW_STATE, SscsCaseData.builder().build(), LocalDateTime.now(), "Benefit");
+            State.INTERLOCUTORY_REVIEW_STATE, SscsCaseData.builder().build(), LocalDateTime.now(), "Benefit");
         return new Callback<>(caseDetails, Optional.of(caseDetailsBefore), eventType, false);
     }
 
@@ -205,7 +205,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         given(ccdClient.startEvent(idamTokens, 123L, UPDATE_CASE_ONLY.getCcdType())).willReturn(startEventResponse);
 
 
-        DynamicList originalSender = new DynamicList(new DynamicListItem("appellant", "Appellant (or Appointee)"),null);
+        DynamicList originalSender = new DynamicList(new DynamicListItem("appellant", "Appellant (or Appointee)"), null);
 
         Callback<SscsCaseData> callback = buildCallback(furtherEvidenceActionSelectedOption, ACTION_FURTHER_EVIDENCE);
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
@@ -216,7 +216,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             eq(idamTokens), any(Consumer.class)))
             .willReturn(SscsCaseDetails.builder().data(sscsCaseData).build());
 
-        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, ccdClient, sscsCcdConvertService, idamService, true, false);
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, ccdClient, sscsCcdConvertService, idamService, true, false, false);
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
@@ -238,9 +238,9 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         if (eventType.equals("validSendToInterloc")) {
             assertThat(sscsCaseData.getSelectWhoReviewsCase(),
-                    equalTo(new DynamicList(new DynamicListItem(interlocReviewState.getCcdDefinition(), null), null)));
+                equalTo(new DynamicList(new DynamicListItem(interlocReviewState.getCcdDefinition(), null), null)));
             assertThat(sscsCaseData.getOriginalSender(),
-                    equalTo(originalSender));
+                equalTo(originalSender));
         }
     }
 
@@ -276,7 +276,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             eq(idamTokens), any(Consumer.class)))
             .willReturn(SscsCaseDetails.builder().data(sscsCaseData).build());
 
-        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, ccdClient, sscsCcdConvertService, idamService, true, true);
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, ccdClient, sscsCcdConvertService, idamService, true, true, false);
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
@@ -323,7 +323,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             eq(idamTokens), captor.capture()))
             .willReturn(SscsCaseDetails.builder().data(sscsCaseData).build());
 
-        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, ccdClient, sscsCcdConvertService, idamService, true, false);
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, ccdClient, sscsCcdConvertService, idamService, true, false, false);
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> handler.handle(SUBMITTED, callback, USER_AUTHORISATION));
         assertEquals(String.format("Post hearing request type is not implemented or recognised: %s", requestType), exception.getMessage());
@@ -354,7 +354,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         given(sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData())).willReturn(sscsCaseData);
 
-        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, ccdClient, sscsCcdConvertService, idamService, true, false);
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, ccdClient, sscsCcdConvertService, idamService, true, false, false);
 
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> handler.handle(SUBMITTED, callback, USER_AUTHORISATION));
         assertEquals("Post hearings B is not enabled", exception.getMessage());
@@ -401,6 +401,50 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     }
 
     @Test
+    @Parameters({"true", "false"})
+    public void givenFurtherEvidenceActionSelectedOptionAndUrgentCaseFlagNotSetInternalDocument_shouldTriggerUrgentCaseEventIfFlagOn(boolean isInternalDocumentFlagOn) {
+        Callback<SscsCaseData> callback = buildCallback(FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL.code, ACTION_FURTHER_EVIDENCE);
+        var idamTokens = IdamTokens.builder().build();
+        given(idamService.getIdamTokens()).willReturn(idamTokens);
+
+        var startEventResponse = StartEventResponse.builder()
+            .caseDetails(
+                uk.gov.hmcts.reform.ccd.client.model.CaseDetails.builder().build()
+            ).build();
+
+        given(ccdClient.startEvent(idamTokens, 123L, UPDATE_CASE_ONLY.getCcdType())).willReturn(startEventResponse);
+        given(idamService.getIdamTokens()).willReturn(idamTokens);
+
+        var sscsCaseData = callback.getCaseDetails().getCaseData();
+        var sscsDocument = SscsDocument.builder().id("1").value(
+            SscsDocumentDetails.builder()
+                .documentType(DocumentType.URGENT_HEARING_REQUEST.getValue())
+                .documentFileName("bla.pdf")
+                .isInternalDocument("yes")
+                .documentLink(DocumentLink.builder().documentUrl("www.test.com").build())
+                .documentDateAdded("2019-06-12T00:00:00.000")
+                .controlNumber("123")
+                .build()).build();
+
+        sscsCaseData.setSscsInternalDocument(List.of(sscsDocument));
+        sscsCaseData.setUrgentCase(null);
+        callback.getCaseDetailsBefore().get().getCaseData().setSscsInternalDocument(List.of());
+
+        given(sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData())).willReturn(sscsCaseData);
+        EventType expectedEvent = isInternalDocumentFlagOn ? MAKE_CASE_URGENT : ISSUE_FURTHER_EVIDENCE;
+        given(updateCcdCaseService.triggerCaseEventV2(anyLong(), eq(expectedEvent.getCcdType()), anyString(), anyString(),
+            eq(idamTokens)))
+            .willReturn(SscsCaseDetails.builder().data(sscsCaseData).build());
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, ccdClient, sscsCcdConvertService, idamService, false, false, isInternalDocumentFlagOn);
+
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        then(updateCcdCaseService).should(times(1))
+            .triggerCaseEventV2(eq(123L), eq(expectedEvent.getCcdType()), anyString(),
+                anyString(), eq(idamTokens));
+    }
+
+    @Test
     public void givenFurtherEvidenceActionSelectedOptionAndUrgentCaseFlagIsSet_shouldNotTriggerUrgentCaseEventAndUpdateCaseCorrectly() {
         Callback<SscsCaseData> callback = buildCallback(FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL.code, ACTION_FURTHER_EVIDENCE);
         var idamTokens = IdamTokens.builder().build();
@@ -415,19 +459,6 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         var sscsCaseData = callback.getCaseDetails().getCaseData();
         sscsCaseData.setUrgentCase("Yes");
-
-        var sscsDocument = SscsDocument.builder().id("1").value(
-            SscsDocumentDetails.builder()
-                .documentType(DocumentType.URGENT_HEARING_REQUEST.getValue())
-                .documentFileName("bla.pdf")
-                .documentLink(DocumentLink.builder().documentUrl("www.test.com").build())
-                .documentDateAdded("2019-06-12T00:00:00.000")
-                .controlNumber("123")
-                .build()).build();
-
-        sscsCaseData.setSscsDocument(List.of(sscsDocument));
-        callback.getCaseDetailsBefore().get().getCaseData().setSscsDocument(List.of());
-
 
         given(sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData())).willReturn(sscsCaseData);
 
@@ -459,22 +490,22 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         sscsCaseData.setUrgentCase("No");
 
         var oldUrgentDoc = SscsDocument.builder().id("1").value(
-                SscsDocumentDetails.builder()
-                        .documentType(DocumentType.URGENT_HEARING_REQUEST.getValue())
-                        .documentFileName("uhr.pdf")
-                        .documentLink(DocumentLink.builder().documentUrl("www.test.com").build())
-                        .documentDateAdded("2019-05-12T00:00:00.000")
-                        .controlNumber("124")
-                        .build()).build();
+            SscsDocumentDetails.builder()
+                .documentType(DocumentType.URGENT_HEARING_REQUEST.getValue())
+                .documentFileName("uhr.pdf")
+                .documentLink(DocumentLink.builder().documentUrl("www.test.com").build())
+                .documentDateAdded("2019-05-12T00:00:00.000")
+                .controlNumber("124")
+                .build()).build();
 
         var sscsDocument = SscsDocument.builder().id("2").value(
-                SscsDocumentDetails.builder()
-                        .documentType(DocumentType.OTHER_EVIDENCE.getValue())
-                        .documentFileName("test.pdf")
-                        .documentLink(DocumentLink.builder().documentUrl("www.test.com").build())
-                        .documentDateAdded("2019-06-12T00:00:00.000")
-                        .controlNumber("123")
-                        .build()).build();
+            SscsDocumentDetails.builder()
+                .documentType(DocumentType.OTHER_EVIDENCE.getValue())
+                .documentFileName("test.pdf")
+                .documentLink(DocumentLink.builder().documentUrl("www.test.com").build())
+                .documentDateAdded("2019-06-12T00:00:00.000")
+                .controlNumber("123")
+                .build()).build();
 
         sscsCaseData.setSscsDocument(List.of(sscsDocument, oldUrgentDoc));
         callback.getCaseDetailsBefore().get().getCaseData().setSscsDocument(List.of(oldUrgentDoc));
@@ -540,7 +571,10 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         var sscsCaseData = callback.getCaseDetails().getCaseData();
         sscsCaseData.setSscsDocument((Arrays.asList(SscsDocument.builder()
-            .value(SscsDocumentDetails.builder().documentType(DocumentType.POSTPONEMENT_REQUEST.getValue()).build()).build())));
+            .value(SscsDocumentDetails.builder()
+                .documentType(DocumentType.POSTPONEMENT_REQUEST.getValue())
+                .build())
+            .build())));
 
         given(sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData())).willReturn(sscsCaseData);
 
@@ -561,6 +595,51 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         captor.getValue().accept(sscsCaseDetails);
         assertEquals(InterlocReviewState.REVIEW_BY_TCW, sscsCaseData.getInterlocReviewState());
         assertEquals(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST, sscsCaseData.getInterlocReferralReason());
+    }
+
+    @Test
+    @Parameters({"true", "false"})
+    public void givenFurtherEvidenceActionPostponementRequestInternalDocument_shouldTriggerEventAndUpdateCaseCorrectly(boolean isInternalDocumentFlagOn) {
+        Callback<SscsCaseData> callback = buildCallback(
+            FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(),
+            ACTION_FURTHER_EVIDENCE);
+
+        var idamTokens = IdamTokens.builder().build();
+        given(idamService.getIdamTokens()).willReturn(idamTokens);
+
+        var startEventResponse = StartEventResponse.builder()
+            .caseDetails(
+                uk.gov.hmcts.reform.ccd.client.model.CaseDetails.builder().build()
+            ).build();
+
+        given(ccdClient.startEvent(idamTokens, 123L, UPDATE_CASE_ONLY.getCcdType())).willReturn(startEventResponse);
+
+        var sscsCaseData = callback.getCaseDetails().getCaseData();
+        sscsCaseData.setSscsInternalDocument((Collections.singletonList(SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentType(DocumentType.POSTPONEMENT_REQUEST.getValue())
+                .isInternalDocument("yes")
+                .build())
+            .build())));
+
+        given(sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData())).willReturn(sscsCaseData);
+
+        String eventType = "validSendToInterloc";
+
+        given(updateCcdCaseService.updateCaseV2(anyLong(), eq(eventType), anyString(), anyString(),
+            eq(idamTokens), any(Consumer.class)))
+            .willReturn(SscsCaseDetails.builder().data(sscsCaseData).build());
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, ccdClient, sscsCcdConvertService, idamService, false, false, isInternalDocumentFlagOn);
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+        ArgumentCaptor<Consumer<SscsCaseDetails>> captor = ArgumentCaptor.forClass(Consumer.class);
+        then(updateCcdCaseService).should(times(1))
+            .updateCaseV2(eq(123L), eq(eventType), eq(ActionFurtherEvidenceSubmittedCallbackHandler.TCW_REVIEW_SEND_TO_JUDGE),
+                anyString(), eq(idamTokens), captor.capture());
+
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        captor.getValue().accept(sscsCaseDetails);
+        assertEquals(InterlocReviewState.REVIEW_BY_TCW, sscsCaseData.getInterlocReviewState());
+        assertEquals(isInternalDocumentFlagOn ? InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST : null, sscsCaseData.getInterlocReferralReason());
     }
 
     @Test
@@ -591,7 +670,51 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             eq(idamTokens), any(Consumer.class)))
             .willReturn(SscsCaseDetails.builder().data(sscsCaseData).build());
 
-        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, ccdClient, sscsCcdConvertService, idamService, true, true);
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, ccdClient, sscsCcdConvertService, idamService, true, true, false);
+
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        ArgumentCaptor<Consumer<SscsCaseDetails>> captor = ArgumentCaptor.forClass(Consumer.class);
+
+        then(updateCcdCaseService).should(times(1))
+            .updateCaseV2(eq(123L), eq(POST_HEARING_OTHER.getCcdType()), anyString(),
+                anyString(), eq(idamTokens), captor.capture());
+
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        captor.getValue().accept(sscsCaseDetails);
+        assertEquals(REVIEW_BY_JUDGE, sscsCaseData.getInterlocReviewState());
+    }
+
+    @Test
+    public void givenPostHearingOtherAndFurtherEvidenceActionIsReviewByJudgeInternalDocumentFlagOn_shouldTriggerEventAndUpdateCaseCorrectly() {
+        Callback<SscsCaseData> callback = buildCallback(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(), ACTION_FURTHER_EVIDENCE);
+
+        var idamTokens = IdamTokens.builder().build();
+        given(idamService.getIdamTokens()).willReturn(idamTokens);
+
+        var startEventResponse = StartEventResponse.builder()
+            .caseDetails(
+                uk.gov.hmcts.reform.ccd.client.model.CaseDetails.builder().build()
+            ).build();
+
+        given(ccdClient.startEvent(idamTokens, 123L, UPDATE_CASE_ONLY.getCcdType())).willReturn(startEventResponse);
+
+        var sscsCaseData = callback.getCaseDetails().getCaseData();
+
+        sscsCaseData.setSscsInternalDocument(List.of(SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentType(DocumentType.POST_HEARING_OTHER.getValue())
+                .isInternalDocument("yes")
+                .build())
+            .build()));
+
+        given(sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData())).willReturn(sscsCaseData);
+
+        given(updateCcdCaseService.updateCaseV2(anyLong(), eq(POST_HEARING_OTHER.getCcdType()), anyString(), anyString(),
+            eq(idamTokens), any(Consumer.class)))
+            .willReturn(SscsCaseDetails.builder().data(sscsCaseData).build());
+
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, ccdClient, sscsCcdConvertService, idamService, true, true, true);
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
