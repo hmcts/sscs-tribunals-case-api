@@ -83,7 +83,7 @@ public final class OverridesMapping {
         Appeal appeal = caseData.getAppeal();
         HearingSubtype subtype = appeal.getHearingSubtype();
         HearingOptions options = appeal.getHearingOptions();
-        int duration = HearingsDurationMapping.getHearingDuration(caseData, refData);
+        Integer duration = caseData.isIbcCase() ? null : HearingsDurationMapping.getHearingDuration(caseData, refData);
         HearingInterpreter interpreter = getAppellantInterpreter(appeal, refData);
         HearingChannel channel = HearingChannelUtil.getIndividualPreferredHearingChannel(subtype, options, null);
         HearingWindow hearingWindow = getHearingDetailsHearingWindow(caseData, refData);
