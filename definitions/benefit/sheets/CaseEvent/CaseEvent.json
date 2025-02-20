@@ -296,7 +296,7 @@
     "LiveFrom": "01/01/2018",
     "CaseTypeID": "Benefit",
     "ID": "adminSendToReadyToList",
-    "Name": "Admin - send to Ready to List",
+    "Name": "Admin - send ReadyToList GAPS",
     "DisplayOrder": 230,
     "PreConditionState(s)": "appealCreated;dormantAppealState;postHearing;withUT;draft;draftArchived;hearing;incompleteApplication;incompleteApplicationInformationReqsted;interlocutoryReviewState;responseReceived;validAppeal;voidState;withDwp;handlingError",
     "PostConditionState": "readyToList",
