@@ -198,18 +198,6 @@ withPipeline(type, product, component) {
                 reportName           : 'SSCS E2E Test Report'
         ])
     }
-
-    afterSuccess('smoketest:aat') {
-        runE2eTestsMaster()
-        publishHTML([
-                allowMissing         : true,
-                alwaysLinkToLastBuild: true,
-                keepAll              : true,
-                reportDir            : "playwright-report",
-                reportFiles          : 'index.html',
-                reportName           : 'SSCS E2E Test Report'
-        ])
-    }
 }
 
 def runNotificationTests() {
@@ -265,16 +253,6 @@ def runE2eTests() {
             sh './gradlew runE2eTests'
         } catch (Error) {
             unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
-        } finally {
-            steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'definitions/test/playwright-report/**'
-        }
-    }
-}
-
-def runE2eTestsMaster() {
-    stage('Playwright tests') {
-        try {
-            sh './gradlew runE2eTests'
         } finally {
             steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'definitions/test/playwright-report/**'
         }
