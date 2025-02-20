@@ -114,6 +114,28 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
 
     @Test
     public void handleInitiatedUpdateListingRequirementsSandL() {
+        ReflectionTestUtils.setField(handler, "isScheduleListingEnabled", true);
+
+        sscsCaseData = CaseDataUtils.buildCaseData();
+
+        DynamicListItem item = new DynamicListItem("abcd", "Abcd Abcd");
+        DynamicList list = new DynamicList(item, List.of(item));
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(utils.generateInterpreterLanguageFields(any())).willReturn(list);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        HearingInterpreter interpreter = response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter();
+
+        assertEquals(0, response.getErrors().size());
+        assertNotNull(interpreter);
+        assertNotNull(interpreter.getInterpreterLanguage());
+        assertEquals(1, interpreter.getInterpreterLanguage().getListItems().size());
+    }
+
+    @Test
+    public void handleInitiatedUpdateListingRequirementsSandL() {
         sscsCaseData = CaseDataUtils.buildCaseData();
         DynamicList interpreterLanguage = new DynamicList(null, List.of());
         OverrideFields overrideFields = OverrideFields.builder()
