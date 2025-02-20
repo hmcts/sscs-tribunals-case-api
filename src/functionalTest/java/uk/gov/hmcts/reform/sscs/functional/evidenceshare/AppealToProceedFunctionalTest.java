@@ -28,16 +28,14 @@ public class AppealToProceedFunctionalTest extends AbstractFunctionalTest {
         json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().toString());
 
         simulateCcdCallback(json);
-        // pause for 30 seconds
+
         try {
-            Thread.sleep(30000);
+            Thread.sleep(15000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
 
-        // log caseDetails
-        log.info("caseDetails: {}", caseDetails);
         assertEquals("sentToDwp", caseDetails.getData().getHmctsDwpState());
         assertEquals("withDwp", caseDetails.getState());
     }

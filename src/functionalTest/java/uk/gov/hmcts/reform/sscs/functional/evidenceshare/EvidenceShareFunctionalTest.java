@@ -37,6 +37,12 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         json = json.replaceAll("NINO_TO_BE_REPLACED", getRandomNino());
 
         simulateCcdCallback(json);
+        try {
+            Thread.sleep(15000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
 
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
 
@@ -63,6 +69,12 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         json = json.replaceAll("NINO_TO_BE_REPLACED", getRandomNino());
 
         simulateCcdCallback(json);
+        try {
+            Thread.sleep(15000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
 
         assertNull(caseDetails.getData().getSscsDocument());
@@ -83,6 +95,12 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         json = json.replaceAll("NINO_TO_BE_REPLACED", getRandomNino());
 
         simulateCcdCallback(json);
+        try {
+            Thread.sleep(15000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
         SscsCaseData caseData = caseDetails.getData();
 
@@ -107,6 +125,12 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         json = json.replaceAll("NINO_TO_BE_REPLACED", getRandomNino());
 
         simulateCcdCallback(json);
+        try {
+            Thread.sleep(15000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
 
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
 
