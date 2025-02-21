@@ -44,6 +44,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
             SscsCaseData caseData = caseDetails.getData();
 
             List<SscsDocument> docs = caseData.getSscsDocument();
+            assertNotNull(docs);
             assertEquals(1, docs.size());
             assertEquals("dl6-" + ccdCaseId + ".pdf", docs.get(0).getValue().getDocumentFileName());
             assertEquals("withDwp", caseDetails.getState());
