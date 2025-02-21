@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.sscs.model;
 
-import java.util.List;
-
 public class AppConstants {
 
     public static final String ADDRESS_LINE_1 = "addressLine1";
