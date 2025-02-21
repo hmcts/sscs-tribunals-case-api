@@ -47,6 +47,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentTabChoice;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -411,7 +412,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             SscsDocumentDetails.builder()
                 .documentType(DocumentType.URGENT_HEARING_REQUEST.getValue())
                 .documentFileName("bla.pdf")
-                .isInternalDocument("yes")
+                .documentTabChoice(DocumentTabChoice.INTERNAL)
                 .documentLink(DocumentLink.builder().documentUrl("www.test.com").build())
                 .documentDateAdded("2019-06-12T00:00:00.000")
                 .controlNumber("123")
@@ -609,7 +610,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         sscsCaseData.setSscsInternalDocument((Collections.singletonList(SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
                 .documentType(DocumentType.POSTPONEMENT_REQUEST.getValue())
-                .isInternalDocument("yes")
+                .documentTabChoice(DocumentTabChoice.INTERNAL)
                 .build())
             .build())));
 
@@ -695,7 +696,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         sscsCaseData.setSscsInternalDocument(List.of(SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
                 .documentType(DocumentType.POST_HEARING_OTHER.getValue())
-                .isInternalDocument("yes")
+                .documentTabChoice(DocumentTabChoice.INTERNAL)
                 .build())
             .build()));
 

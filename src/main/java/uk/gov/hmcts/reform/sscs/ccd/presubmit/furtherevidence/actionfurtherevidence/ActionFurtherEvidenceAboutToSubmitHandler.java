@@ -493,14 +493,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     private void addSscsDocumentToCaseData(SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
         List<SscsDocument> documents = new ArrayList<>();
         documents.add(sscsDocument);
-        if (isTribunalInternalDocumentsEnabled && YES.equalsIgnoreCase(sscsDocument.getValue().getIsInternalDocument())) {
+        if (isTribunalInternalDocumentsEnabled && DocumentTabChoice.INTERNAL.equals(sscsDocument.getValue().getDocumentTabChoice())) {
             if (sscsCaseData.getSscsInternalDocument() != null) {
                 documents.addAll(sscsCaseData.getSscsInternalDocument());
             }
             sscsCaseData.setSscsInternalDocument(documents);
         } else {
             if (isTribunalInternalDocumentsEnabled) {
-                documents.getFirst().getValue().setIsInternalDocument(null);
+                documents.getFirst().getValue().setDocumentTabChoice(DocumentTabChoice.REGULAR);
             }
             if (sscsCaseData.getSscsDocument() != null) {
                 documents.addAll(sscsCaseData.getSscsDocument());
@@ -652,7 +652,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 .originalSenderOtherPartyName(originalSenderOtherPartyName)
                 .documentTranslationStatus(
                     sscsCaseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null)
-                .isInternalDocument(scannedDocument.getValue().getIsInternalDocument())
+                .documentTabChoice(scannedDocument.getValue().getDocumentTabChoice())
                 .build())
             .build();
     }

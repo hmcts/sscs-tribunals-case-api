@@ -76,6 +76,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentTabChoice;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
@@ -2154,7 +2155,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
             .fileName("Test.pdf")
             .url(DOC_LINK)
-            .isInternalDocument("yes")
+            .documentTabChoice(DocumentTabChoice.INTERNAL)
             .build();
         ScannedDocument scannedDocument = ScannedDocument.builder()
             .value(scannedDocDetails)
@@ -2170,12 +2171,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getSscsDocument());
         SscsDocumentDetails sscsDocument = response.getData().getSscsInternalDocument().getFirst().getValue();
         assertEquals(scannedDocDetails.getUrl(), sscsDocument.getDocumentLink());
-        assertEquals(scannedDocDetails.getIsInternalDocument(), sscsDocument.getIsInternalDocument());
+        assertEquals(scannedDocDetails.getDocumentTabChoice(), sscsDocument.getDocumentTabChoice());
     }
 
     @Test
-    @Parameters({"no", "null"})
-    public void givenNonInternalTribunalDocument_andFlagIsOn_thenPutInDocumentsCollection(@Nullable String option) {
+    @Parameters({"REGULAR", "null"})
+    public void givenNonInternalTribunalDocument_andFlagIsOn_thenPutInDocumentsCollection(@Nullable DocumentTabChoice option) {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false, false, true);
 
         DynamicListItem sendToInterlocListItem = new DynamicListItem(
@@ -2187,7 +2188,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
             .fileName("Test.pdf")
             .url(DOC_LINK)
-            .isInternalDocument(option)
+            .documentTabChoice(option)
             .build();
         ScannedDocument scannedDocument = ScannedDocument.builder()
             .value(scannedDocDetails)
@@ -2203,12 +2204,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getSscsInternalDocument());
         SscsDocumentDetails sscsDocument = response.getData().getSscsDocument().getFirst().getValue();
         assertEquals(scannedDocDetails.getUrl(), sscsDocument.getDocumentLink());
-        assertNull(sscsDocument.getIsInternalDocument());
+        assertEquals(DocumentTabChoice.REGULAR, sscsDocument.getDocumentTabChoice());
     }
 
     @Test
-    @Parameters({"yes", "no", "null"})
-    public void givenIsInternalTribunalDocumentAny_andFlagIsOff_thenPutInDocumentsCollection(@Nullable String option) {
+    @Parameters({"INTERNAL", "REGULAR", "null"})
+    public void givenIsInternalTribunalDocumentAny_andFlagIsOff_thenPutInDocumentsCollection(@Nullable DocumentTabChoice option) {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false, false, false);
 
         DynamicListItem sendToInterlocListItem = new DynamicListItem(
@@ -2220,7 +2221,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
             .fileName("Test.pdf")
             .url(DOC_LINK)
-            .isInternalDocument(option)
+            .documentTabChoice(option)
             .build();
         ScannedDocument scannedDocument = ScannedDocument.builder()
             .value(scannedDocDetails)

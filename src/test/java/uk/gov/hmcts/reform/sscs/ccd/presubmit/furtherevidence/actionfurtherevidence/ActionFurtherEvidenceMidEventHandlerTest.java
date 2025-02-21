@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentTabChoice;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -583,7 +584,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
             .value(ScannedDocumentDetails.builder()
                 .fileName("Test.pdf")
                 .url(DocumentLink.builder().documentUrl("test.com").build())
-                .isInternalDocument("yes")
+                .documentTabChoice(DocumentTabChoice.INTERNAL)
                 .includeInBundle("no")
                 .build())
             .build();
@@ -604,7 +605,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
             .value(ScannedDocumentDetails.builder()
                 .fileName("Test.pdf")
                 .url(DocumentLink.builder().documentUrl("test.com").build())
-                .isInternalDocument("yes")
+                .documentTabChoice(DocumentTabChoice.INTERNAL)
                 .includeInBundle("no")
                 .build())
             .build();
@@ -626,7 +627,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
             .value(ScannedDocumentDetails.builder()
                 .fileName("Test.pdf")
                 .url(DocumentLink.builder().documentUrl("test.com").build())
-                .isInternalDocument("yes")
+                .documentTabChoice(DocumentTabChoice.INTERNAL)
                 .includeInBundle("yes")
                 .build())
             .build();
@@ -648,7 +649,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
             .value(ScannedDocumentDetails.builder()
                 .fileName("Test.pdf")
                 .url(DocumentLink.builder().documentUrl("test.com").build())
-                .isInternalDocument("yes")
+                .documentTabChoice(DocumentTabChoice.INTERNAL)
                 .includeInBundle("yes")
                 .build())
             .build();

@@ -93,7 +93,7 @@ public class ActionFurtherEvidenceMidEventHandler implements PreSubmitCallbackHa
             Optional<ScannedDocumentDetails> invalidDocument = sscsCaseData.getScannedDocuments().stream()
                 .map(ScannedDocument::getValue)
                 .filter(Objects::nonNull)
-                .filter(details -> YES.equalsIgnoreCase(details.getIsInternalDocument()))
+                .filter(details -> DocumentTabChoice.INTERNAL.equals(details.getDocumentTabChoice()))
                 .filter(details -> !isFurtherEvidenceActionValidForInternal(sscsCaseData.getFurtherEvidenceAction())
                     || YES.equalsIgnoreCase(details.getIncludeInBundle()))
                 .findFirst();
