@@ -13,12 +13,11 @@ export class Hearing extends BaseStep {
     this.page = page;
   }
 
-  async setAutolist(caseId: string, selection: boolean) {
-    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+  async setAutolist(selection: boolean) {
     await this.homePage.navigateToTab('Summary');
     await this.homePage.chooseEvent('Update Listing Requirements');
     await this.listingRequirementPage.setAutolistOverrideValue(selection);
-    await this.checkYourAnswersPage.confirmAndSignOut();
+    await this.checkYourAnswersPage.confirmSubmission();
   }
 
   async verifyHearingIsTriggered(caseId: string, caseType: string) {
