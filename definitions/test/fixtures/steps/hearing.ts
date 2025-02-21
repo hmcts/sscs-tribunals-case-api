@@ -18,7 +18,6 @@ export class Hearing extends BaseStep {
     await this.homePage.navigateToTab('Summary');
     await this.homePage.chooseEvent('Update Listing Requirements');
     await this.listingRequirementPage.setAutolistOverrideValue(selection);
-    await this.listingRequirementPage.submitUpdatedValues();
     await this.checkYourAnswersPage.confirmAndSignOut();
   }
 
