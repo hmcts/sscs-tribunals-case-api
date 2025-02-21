@@ -6,6 +6,7 @@
     "ID": "scannedDocumentDocumentTabChoice",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "19/11/2019",
+    "FieldShowCondition": "documentTabChoice!=\"DONOTSHOW\"",
     "FieldDisplayOrder": 12
   }
 ]
