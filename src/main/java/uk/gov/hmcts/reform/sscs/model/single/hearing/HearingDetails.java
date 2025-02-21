@@ -7,8 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AmendReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.model.HearingLocation;
-import uk.gov.hmcts.reform.sscs.model.hmc.reference.HearingType;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 
 @Data
@@ -21,7 +21,7 @@ public class HearingDetails {
 
     private boolean autolistFlag;
 
-    private HearingType hearingType;
+    private HmcHearingType hearingType;
 
     private HearingWindow hearingWindow;
 
