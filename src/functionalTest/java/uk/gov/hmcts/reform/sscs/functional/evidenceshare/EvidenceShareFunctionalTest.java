@@ -37,24 +37,20 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         json = json.replaceAll("NINO_TO_BE_REPLACED", getRandomNino());
 
         simulateCcdCallback(json);
-        try {
-            Thread.sleep(15000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
+        defaultAwait().untilAsserted(() -> {
+            SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
 
-        SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+            SscsCaseData caseData = caseDetails.getData();
 
-        SscsCaseData caseData = caseDetails.getData();
-
-        List<SscsDocument> docs = caseData.getSscsDocument();
-        assertEquals(1, docs.size());
-        assertEquals("dl6-" + ccdCaseId + ".pdf", docs.get(0).getValue().getDocumentFileName());
-        assertEquals("withDwp", caseDetails.getState());
-        assertEquals(LocalDate.now().toString(), caseData.getDateSentToDwp());
-        //since the SUBMITTED callback no longer contains the updated caseData, the dateCaseSentToGaps will not be present
-        //better to test that in the UTs
+            List<SscsDocument> docs = caseData.getSscsDocument();
+            assertEquals(1, docs.size());
+            assertEquals("dl6-" + ccdCaseId + ".pdf", docs.get(0).getValue().getDocumentFileName());
+            assertEquals("withDwp", caseDetails.getState());
+            assertEquals(LocalDate.now().toString(), caseData.getDateSentToDwp());
+            //since the SUBMITTED callback no longer contains the updated caseData, the dateCaseSentToGaps will not be present
+            //better to test that in the UTs
+        });
     }
 
     @Test
@@ -69,19 +65,15 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         json = json.replaceAll("NINO_TO_BE_REPLACED", getRandomNino());
 
         simulateCcdCallback(json);
-        try {
-            Thread.sleep(15000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
-        SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+        defaultAwait().untilAsserted(() -> {
+            SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
 
-        assertNull(caseDetails.getData().getSscsDocument());
-        assertEquals("validAppeal", caseDetails.getState());
-        assertThat(caseDetails.getData().getHmctsDwpState())
+            assertNull(caseDetails.getData().getSscsDocument());
+            assertEquals("validAppeal", caseDetails.getState());
+            assertThat(caseDetails.getData().getHmctsDwpState())
                 .containsAnyOf("failedSending", "failedRobotics");
-
+        });
     }
 
     @Test
@@ -95,22 +87,19 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         json = json.replaceAll("NINO_TO_BE_REPLACED", getRandomNino());
 
         simulateCcdCallback(json);
-        try {
-            Thread.sleep(15000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
-        SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
-        SscsCaseData caseData = caseDetails.getData();
+        defaultAwait().untilAsserted(() -> {
+            SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+            SscsCaseData caseData = caseDetails.getData();
 
-        List<SscsDocument> docs = caseData.getSscsDocument();
+            List<SscsDocument> docs = caseData.getSscsDocument();
 
-        assertNotNull(docs);
-        assertEquals(1, docs.size());
-        assertEquals("dl16-" + ccdCaseId + ".pdf", docs.get(0).getValue().getDocumentFileName());
-        assertEquals("withDwp", caseDetails.getState());
-        assertEquals(LocalDate.now().toString(), caseData.getDateSentToDwp());
+            assertNotNull(docs);
+            assertEquals(1, docs.size());
+            assertEquals("dl16-" + ccdCaseId + ".pdf", docs.get(0).getValue().getDocumentFileName());
+            assertEquals("withDwp", caseDetails.getState());
+            assertEquals(LocalDate.now().toString(), caseData.getDateSentToDwp());
+        });
     }
 
     @Test
@@ -125,20 +114,16 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         json = json.replaceAll("NINO_TO_BE_REPLACED", getRandomNino());
 
         simulateCcdCallback(json);
-        try {
-            Thread.sleep(15000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
+        defaultAwait().untilAsserted(() -> {
+            SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
 
-        SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+            SscsCaseData caseData = caseDetails.getData();
 
-        SscsCaseData caseData = caseDetails.getData();
-
-        assertNull(caseData.getSscsDocument());
-        assertEquals("withDwp", caseDetails.getState());
-        assertEquals(LocalDate.now().toString(), caseData.getDateSentToDwp());
-        assertNull(caseData.getDateCaseSentToGaps());
+            assertNull(caseData.getSscsDocument());
+            assertEquals("withDwp", caseDetails.getState());
+            assertEquals(LocalDate.now().toString(), caseData.getDateSentToDwp());
+            assertNull(caseData.getDateCaseSentToGaps());
+        });
     }
 }

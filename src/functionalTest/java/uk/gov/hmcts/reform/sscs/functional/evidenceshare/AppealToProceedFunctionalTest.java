@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_TO_PROCEED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
 
@@ -29,14 +29,10 @@ public class AppealToProceedFunctionalTest extends AbstractFunctionalTest {
 
         simulateCcdCallback(json);
 
-        try {
-            Thread.sleep(15000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
-
-        assertEquals("sentToDwp", caseDetails.getData().getHmctsDwpState());
-        assertEquals("withDwp", caseDetails.getState());
+        defaultAwait().untilAsserted(() -> {
+            SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+            assertThat(caseDetails.getData().getHmctsDwpState()).isEqualTo("appealToProceed");
+            assertThat(caseDetails.getState()).isEqualTo("withDwp");
+        });
     }
 }

@@ -51,15 +51,11 @@ public class DwpUploadFunctionalTest extends AbstractFunctionalTest {
         json = json.replace("DWP_EVIDENCE_BINARY_DOCUMENT_URL", binaryUrl);
 
         simulateCcdCallback(json);
-        try {
-            Thread.sleep(15000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
-        SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
-
-        assertEquals("readyToList", caseDetails.getState());
+        defaultAwait().untilAsserted(() -> {
+            SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+            assertEquals("readyToList", caseDetails.getState());
+        });
     }
 
     private String uploadDocToDocMgmtStore() throws IOException {
