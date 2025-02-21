@@ -1,5 +1,7 @@
 [
   {"LiveFrom": "01/01/2018", "ID": "sscsDocument", "ListElementCode": "isInternalDocument", "FieldType": "YesOrNo", "ElementLabel": "Is an internal tribunal document", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "01/01/2018", "ID": "ScannedDocument", "ListElementCode": "isInternalDocument", "FieldType": "YesOrNo", "ElementLabel": "Is an internal tribunal document", "SecurityClassification": "PUBLIC"}
+  {"LiveFrom": "01/01/2018", "ID": "ScannedDocument", "ListElementCode": "isInternalDocument", "FieldType": "YesOrNo", "ElementLabel": "Is an internal tribunal document", "SecurityClassification": "PUBLIC"},
+  
+  {"LiveFrom": "01/01/2018", "ID": "hearingOptions", "ListElementCode": "hmcHearingType", "FieldType": "FixedRadioList", "FieldTypeParameter": "FL_hmcHearingType", "ElementLabel": "Hearing Type", "FieldShowCondition": "hmcHearingType=\"*\"", "SecurityClassification": "PUBLIC"}
 ]
 
