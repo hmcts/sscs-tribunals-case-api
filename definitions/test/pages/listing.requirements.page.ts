@@ -20,7 +20,15 @@ export class ListingRequirementPage {
       '#overrideFields_appellantInterpreter_interpreterLanguage',
       'Dutch'
     );
+    await webAction.clickElementById('#overrideFields_autoList_Yes');
     await webAction.clickButton('Continue');
+  }
+
+  async setAutolistOverrideValue(selection: boolean) {
+    await webAction.clickElementById('#overrideFields_autoList_' + (selection ? "Yes" : "No"));
+    await webAction.clickButton('Continue');
+    await webAction.clickElementById('#amendReasons-adminreq');
+    await webAction.clickSubmitButton();
   }
 
   async submitUpdatedValues() {
