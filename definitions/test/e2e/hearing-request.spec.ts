@@ -55,6 +55,7 @@ test.describe(
       hearingSteps
     }) => {
       caseId = await createCaseBasedOnCaseType('DLASANDL');
+      await hearingSteps.setAutolist(caseId, true);
       await uploadResponseSteps.performUploadResponse(caseId, 'dla');
       await hearingSteps.verifyHearingIsTriggered(caseId, 'dla');
       await hearingSteps.updateHearingViaEvent();
