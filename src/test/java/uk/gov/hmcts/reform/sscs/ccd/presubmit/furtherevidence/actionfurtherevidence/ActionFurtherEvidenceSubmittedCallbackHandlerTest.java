@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevid
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -13,6 +13,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ACTION_FURTHER_EVIDENCE;
@@ -26,22 +27,19 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurth
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -67,12 +65,10 @@ import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
-@RunWith(JUnitParamsRunner.class)
+@SuppressWarnings("unchecked")
 public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
     @Mock
     private CcdService ccdService;
 
@@ -90,23 +86,23 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
     private ActionFurtherEvidenceSubmittedCallbackHandler handler;
 
-    @Before
+    @BeforeEach
     public void setUp() {
+        openMocks(this);
         handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, ccdClient, sscsCcdConvertService, idamService, false, false, false);
     }
 
 
-    @Test
-    @Parameters(method = "generateCanHandleScenarios")
+    @ParameterizedTest
+    @MethodSource(value = "generateCanHandleScenarios")
     public void givenCanHandleIsCalled_shouldReturnCorrectResult(CallbackType callbackType,
                                                                  Callback<SscsCaseData> callback,
                                                                  boolean expectedResult) {
         boolean actualResult = handler.canHandle(callbackType, callback);
-
         assertEquals(expectedResult, actualResult);
     }
 
-    private Object[] generateCanHandleScenarios() {
+    private static Object[] generateCanHandleScenarios() {
         Callback<SscsCaseData> callbackWithValidEventAndInformationReceivedForInterlocTcwOption =
             buildCallback("informationReceivedForInterlocTcw", ACTION_FURTHER_EVIDENCE);
         Callback<SscsCaseData> callbackWithValidEventAndInformationReceivedForInterlocJudgeOption =
@@ -140,7 +136,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             new Object[]{SUBMITTED, callbackWithValidEventAndSendToInterlocReviewByTcwOption, true}};
     }
 
-    private Callback<SscsCaseData> buildCallback(String dynamicListItemCode, EventType eventType) {
+    private static Callback<SscsCaseData> buildCallback(String dynamicListItemCode, EventType eventType) {
         DynamicList dynamicList = new DynamicList(new DynamicListItem(dynamicListItemCode, "label"),
             Collections.singletonList(new DynamicListItem(dynamicListItemCode, "label")));
         SscsCaseData sscsCaseData = SscsCaseData.builder()
@@ -171,21 +167,17 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         var sscsCaseData = callback.getCaseDetails().getCaseData();
         given(sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData())).willReturn(sscsCaseData);
 
-        ArgumentCaptor<Consumer<SscsCaseData>> captor = ArgumentCaptor.forClass(Consumer.class);
-
         given(updateCcdCaseService.triggerCaseEventV2(anyLong(), eq("issueFurtherEvidence"),
             anyString(), anyString(), eq(idamTokens)))
             .willReturn(SscsCaseDetails.builder().data(sscsCaseData).build());
-
-
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         verify(updateCcdCaseService).triggerCaseEventV2(anyLong(), eq("issueFurtherEvidence"),
             anyString(), anyString(), eq(idamTokens));
     }
 
-    @Test
-    @Parameters({
+    @ParameterizedTest
+    @CsvSource({
         "informationReceivedForInterlocJudge, REVIEW_BY_JUDGE, interlocInformationReceivedActionFurtherEvidence",
         "informationReceivedForInterlocTcw, REVIEW_BY_TCW, interlocInformationReceivedActionFurtherEvidence",
         "sendToInterlocReviewByJudge, REVIEW_BY_JUDGE, validSendToInterloc",
@@ -244,8 +236,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         }
     }
 
-    @Test
-    @Parameters({
+    @ParameterizedTest
+    @CsvSource({
         "SET_ASIDE, setAsideRequest",
         "CORRECTION, correctionRequest",
         "STATEMENT_OF_REASONS, sORRequest",
@@ -292,10 +284,9 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         assertEquals(REVIEW_BY_JUDGE, sscsCaseData.getInterlocReviewState());
     }
 
-    @Ignore("Re-enable once new post hearings B types are added to the enum")
-    @Test
-    @Parameters({ // TODO add remaining post hearing B types once implemented
-    })
+    // TODO "Re-enable once new post hearings B types are added to the enum"
+    // @ParameterizedTest
+    // @CsvSource({})
     public void givenPostHearingNotImplementedAndFurtherEvidenceActionIsReviewByJudge_shouldThrowException(
         PostHearingRequestType requestType, String eventType) {
 
@@ -329,14 +320,14 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         assertEquals(String.format("Post hearing request type is not implemented or recognised: %s", requestType), exception.getMessage());
     }
 
-    @Test
-    @Parameters({
-        "LIBERTY_TO_APPLY, libertyToApplyRequest",
-        "PERMISSION_TO_APPEAL, permissionToAppealRequest"
+    @ParameterizedTest
+    @EnumSource(value = PostHearingRequestType.class, names = {
+        "LIBERTY_TO_APPLY",
+        "PERMISSION_TO_APPEAL"
         // TODO add remaining post hearing B types once implemented
     })
     public void givenPostHearingsBNotEnabledAndFurtherEvidenceActionIsReviewByJudge_shouldThrowException(
-        PostHearingRequestType requestType, String eventType) {
+        PostHearingRequestType requestType) {
 
         Callback<SscsCaseData> callback = buildCallback("sendToInterlocReviewByJudge", ACTION_FURTHER_EVIDENCE);
         var idamTokens = IdamTokens.builder().build();
@@ -386,7 +377,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         sscsCaseData.setSscsDocument(List.of(sscsDocument));
         sscsCaseData.setUrgentCase(null);
-        callback.getCaseDetailsBefore().get().getCaseData().setSscsDocument(List.of());
+        callback.getCaseDetailsBefore().orElse(callback.getCaseDetails()).getCaseData().setSscsDocument(List.of());
 
         given(sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData())).willReturn(sscsCaseData);
         given(updateCcdCaseService.triggerCaseEventV2(anyLong(), eq(MAKE_CASE_URGENT.getCcdType()), anyString(), anyString(),
@@ -400,8 +391,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
                 anyString(), eq(idamTokens));
     }
 
-    @Test
-    @Parameters({"true", "false"})
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     public void givenFurtherEvidenceActionSelectedOptionAndUrgentCaseFlagNotSetInternalDocument_shouldTriggerUrgentCaseEventIfFlagOn(boolean isInternalDocumentFlagOn) {
         Callback<SscsCaseData> callback = buildCallback(FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL.code, ACTION_FURTHER_EVIDENCE);
         var idamTokens = IdamTokens.builder().build();
@@ -428,7 +419,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         sscsCaseData.setSscsInternalDocument(List.of(sscsDocument));
         sscsCaseData.setUrgentCase(null);
-        callback.getCaseDetailsBefore().get().getCaseData().setSscsInternalDocument(List.of());
+        callback.getCaseDetailsBefore().orElse(callback.getCaseDetails()).getCaseData().setSscsInternalDocument(List.of());
 
         given(sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData())).willReturn(sscsCaseData);
         EventType expectedEvent = isInternalDocumentFlagOn ? MAKE_CASE_URGENT : ISSUE_FURTHER_EVIDENCE;
@@ -508,7 +499,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
                 .build()).build();
 
         sscsCaseData.setSscsDocument(List.of(sscsDocument, oldUrgentDoc));
-        callback.getCaseDetailsBefore().get().getCaseData().setSscsDocument(List.of(oldUrgentDoc));
+        callback.getCaseDetailsBefore().orElse(callback.getCaseDetails()).getCaseData().setSscsDocument(List.of(oldUrgentDoc));
 
 
         given(sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData())).willReturn(sscsCaseData);
@@ -570,7 +561,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         given(ccdClient.startEvent(idamTokens, 123L, UPDATE_CASE_ONLY.getCcdType())).willReturn(startEventResponse);
 
         var sscsCaseData = callback.getCaseDetails().getCaseData();
-        sscsCaseData.setSscsDocument((Arrays.asList(SscsDocument.builder()
+        sscsCaseData.setSscsDocument((Collections.singletonList(SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
                 .documentType(DocumentType.POSTPONEMENT_REQUEST.getValue())
                 .build())
@@ -597,8 +588,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         assertEquals(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST, sscsCaseData.getInterlocReferralReason());
     }
 
-    @Test
-    @Parameters({"true", "false"})
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     public void givenFurtherEvidenceActionPostponementRequestInternalDocument_shouldTriggerEventAndUpdateCaseCorrectly(boolean isInternalDocumentFlagOn) {
         Callback<SscsCaseData> callback = buildCallback(
             FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(),
