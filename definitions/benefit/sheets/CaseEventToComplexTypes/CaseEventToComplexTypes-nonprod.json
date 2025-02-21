@@ -2,10 +2,11 @@
   {
     "CaseEventID": "actionFurtherEvidence",
     "CaseFieldID": "scannedDocuments",
-    "ListElementCode": "isInternalDocument",
-    "ID": "scannedDocumentIsInternalDocument",
+    "ListElementCode": "documentTabChoice",
+    "ID": "scannedDocumentDocumentTabChoice",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "19/11/2019",
+    "FieldShowCondition": "documentTabChoice!=\"DONOTSHOW\"",
     "FieldDisplayOrder": 12
   }
 ]

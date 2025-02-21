@@ -1,6 +1,6 @@
 [
-  {"LiveFrom": "01/01/2018", "ID": "sscsDocument", "ListElementCode": "documentTabChoice", "FieldType": "FixedRadioList", "ElementLabel": "Should this document be stored in the Documents tab or the Tribunal internal documents tab?", "FieldTypeParameter": "FL_documentTabChoice", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "01/01/2018", "ID": "ScannedDocument", "ListElementCode": "documentTabChoice", "FieldType": "FixedRadioList", "ElementLabel": "Should this document be stored in the Documents tab or the Tribunal internal documents tab?", "FieldTypeParameter": "FL_documentTabChoice", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "ID": "sscsDocument", "ListElementCode": "documentTabChoice", "FieldType": "FixedRadioList", "ElementLabel": "Should this document be stored in the Documents tab or the Tribunal internal documents tab?", "FieldTypeParameter": "FL_documentTabChoice", "FieldShowCondition": "documentTabChoice=\"DONOTSHOW\"", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "ID": "ScannedDocument", "ListElementCode": "documentTabChoice", "FieldType": "FixedRadioList", "ElementLabel": "Should this document be stored in the Documents tab or the Tribunal internal documents tab?", "FieldTypeParameter": "FL_documentTabChoice", "FieldShowCondition": "documentTabChoice=\"DONOTSHOW\"", "SecurityClassification": "PUBLIC"},
   
   {"LiveFrom": "01/01/2018", "ID": "hearingOptions", "ListElementCode": "hmcHearingType", "FieldType": "FixedRadioList", "FieldTypeParameter": "FL_hmcHearingType", "ElementLabel": "Hearing Type", "FieldShowCondition": "hmcHearingType=\"*\"", "SecurityClassification": "PUBLIC"}
 ]
