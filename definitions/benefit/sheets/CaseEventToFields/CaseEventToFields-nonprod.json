@@ -23,5 +23,88 @@
     "PageLabel": "Issue direction",
     "PageShowCondition": "selectNextHmcHearingType=\"Yes\"",
     "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "uploadDocument",
+    "CaseFieldID": "uploadRemoveOrMoveDocument",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "PageLabel": "Upload/remove or move a document"
+  },
+  {
+    "CaseEventID": "uploadDocument",
+    "CaseFieldID": "uploadRemoveDocumentType",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "uploadRemoveDocumentType",
+    "PageLabel": "Upload/remove document from which tab",
+    "PageShowCondition": "uploadRemoveOrMoveDocument=\"uploadRemove\""
+  },
+  {
+    "CaseEventID": "uploadDocument",
+    "CaseFieldID": "moveDocumentTo",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "moveDocumentTo",
+    "PageLabel": "Move document to which tab",
+    "PageShowCondition": "uploadRemoveOrMoveDocument=\"move\""
+  },
+  {
+    "CaseEventID": "uploadDocument",
+    "CaseFieldID": "sscsDocument",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "sscsDocumentUploadRemove",
+    "PageLabel": "Upload/remove documents from Documents tab",
+    "PageShowCondition": "uploadRemoveOrMoveDocument=\"uploadRemove\" AND uploadRemoveDocumentType=\"document\""
+  },
+  {
+    "CaseEventID": "uploadDocument",
+    "CaseFieldID": "sscsInternalDocument",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "sscsInternalDocumentUploadRemove",
+    "PageLabel": "Upload/remove documents from Tribunal Internal Documents tab",
+    "PageShowCondition": "uploadRemoveOrMoveDocument=\"uploadRemove\" AND uploadRemoveDocumentType=\"internalDocument\""
+  },
+  {
+    "CaseEventID": "uploadDocument",
+    "CaseFieldID": "moveDocumentToInternalDocumentsTabDL",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "moveDocumentToInternalDocumentsTab",
+    "PageLabel": "Move documents to Tribunal Internal Documents tab",
+    "PageShowCondition": "uploadRemoveOrMoveDocument=\"move\" AND moveDocumentTo=\"internalDocument\""
+  },
+  {
+    "CaseEventID": "uploadDocument",
+    "CaseFieldID": "moveDocumentToDocumentsTabDL",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "moveDocumentToDocumentsTab",
+    "PageLabel": "Move documents to Documents tab",
+    "PageShowCondition": "uploadRemoveOrMoveDocument=\"move\" AND moveDocumentTo=\"document\""
   }
 ]
