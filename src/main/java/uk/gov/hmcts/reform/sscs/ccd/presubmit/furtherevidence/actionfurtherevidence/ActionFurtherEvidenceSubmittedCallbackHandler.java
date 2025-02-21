@@ -270,14 +270,14 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
         SscsCaseData caseData = (SscsCaseData) callback.getCaseDetails().getCaseData();
         CaseDetails<SscsCaseData> caseDetailsBefore = (CaseDetails<SscsCaseData>) callback.getCaseDetailsBefore().get();
         SscsDocument furtherEvidenceDoc = caseData.getSscsDocument() == null ? null : caseData.getSscsDocument().stream()
-            .filter(d -> caseDetailsBefore.getCaseData().getSscsDocument().stream().noneMatch(db -> db.getId().equals(d.getId())))
-            .filter(d -> "urgentHearingRequest".equals(d.getValue().getDocumentType()))
+            .filter(d -> emptyIfNull(caseDetailsBefore.getCaseData().getSscsDocument()).stream().noneMatch(db -> db.getId().equals(d.getId())))
+            .filter(d -> DocumentType.URGENT_HEARING_REQUEST.getValue().equals(d.getValue().getDocumentType()))
             .findFirst().orElse(null);
 
         SscsDocument furtherEvidenceInternalDoc = isTribunalInternalDocumentsEnabled && caseData.getSscsInternalDocument() != null
             ? caseData.getSscsInternalDocument().stream()
-            .filter(d -> caseDetailsBefore.getCaseData().getSscsInternalDocument().stream().noneMatch(db -> db.getId().equals(d.getId())))
-            .filter(d -> "urgentHearingRequest".equals(d.getValue().getDocumentType()))
+            .filter(d -> emptyIfNull(caseDetailsBefore.getCaseData().getSscsInternalDocument()).stream().noneMatch(db -> db.getId().equals(d.getId())))
+            .filter(d -> DocumentType.URGENT_HEARING_REQUEST.getValue().equals(d.getValue().getDocumentType()))
             .findFirst().orElse(null) : null;
         return (StringUtils.isEmpty(caseData.getUrgentCase()) || "No".equalsIgnoreCase(caseData.getUrgentCase()))
             && (StringUtils.isEmpty(caseData.getTranslationWorkOutstanding()) || "No".equalsIgnoreCase(caseData.getTranslationWorkOutstanding()))
