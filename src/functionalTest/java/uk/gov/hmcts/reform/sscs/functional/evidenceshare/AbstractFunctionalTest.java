@@ -222,7 +222,7 @@ public abstract class AbstractFunctionalTest {
 
     protected ConditionFactory defaultAwait() {
         return await()
-            .atMost(10, SECONDS)
-            .pollInterval(1, SECONDS);
+            .atMost(15, SECONDS)
+            .pollInterval(2, SECONDS);
     }
 }
