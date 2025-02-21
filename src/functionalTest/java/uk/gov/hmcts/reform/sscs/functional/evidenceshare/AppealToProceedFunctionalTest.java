@@ -31,7 +31,7 @@ public class AppealToProceedFunctionalTest extends AbstractFunctionalTest {
 
         defaultAwait().untilAsserted(() -> {
             SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
-            assertThat(caseDetails.getData().getHmctsDwpState()).isEqualTo("appealToProceed");
+            assertThat(caseDetails.getData().getHmctsDwpState()).isEqualTo("sentToDwp");
             assertThat(caseDetails.getState()).isEqualTo("withDwp");
         });
     }
