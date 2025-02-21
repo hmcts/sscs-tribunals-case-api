@@ -18,7 +18,6 @@ export class Hearing extends BaseStep {
     await this.homePage.navigateToTab('Summary');
     await this.homePage.chooseEvent('Update Listing Requirements');
     await this.listingRequirementPage.setAutolistOverrideValue(selection);
-    await this.listingRequirementPage.submitUpdatedValues();
     await this.checkYourAnswersPage.confirmAndSignOut();
   }
 
@@ -38,7 +37,7 @@ export class Hearing extends BaseStep {
       );
       await this.hearingsTab.verifyVenueListForPaperCase(
         hearingTestData.hearingVenueKey,
-        37
+        35
       );
     } else if (caseType === 'dla') {
       await this.hearingsTab.verifyPageContentByKeyValue(
