@@ -1,2 +1,9 @@
 [
+  {"LiveFrom": "01/09/2021", "ID": "FL_panelMemberCompositionJudge", "ListElementCode": "panelMemberCompositionTribunalJudge", "ListElement": "Tribunal Judge"},
+  {"LiveFrom": "01/09/2021", "ID": "FL_panelMemberCompositionJudge", "ListElementCode": "panelMemberCompositionRegionalJudge", "ListElement": "Regional Judge"},
+  {"LiveFrom": "01/09/2021", "ID": "FL_panelMemberCompositionMedical", "ListElementCode": "panelMemberCompositionTribunalMedicalMember", "ListElement": "Tribunal Member Medical"},
+  {"LiveFrom": "01/09/2021", "ID": "FL_panelMemberCompositionMedical", "ListElementCode": "panelMemberCompositionRegionalMedicalMember", "ListElement": "Regional Medical Member"},
+  {"LiveFrom": "01/09/2021", "ID": "FL_panelMemberCompositionTribunalMember", "ListElementCode": "panelMemberCompositionTribunalMemberDisability", "ListElement": "Tribunal Member Disability"},
+  {"LiveFrom": "01/09/2021", "ID": "FL_panelMemberCompositionTribunalMember", "ListElementCode": "panelMemberCompositionTribunalMemberFinanciallyQual", "ListElement": "Tribunal Member Financially Qualified"}
+
 ]
