@@ -80,7 +80,7 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     TOPIC_NAME: "sscs-evidenceshare-topic-{{ .Values.global.environment }}"
     AMQP_HOST: "sscs-servicebus-{{ .Values.global.environment }}.servicebus.windows.net"
     AMQP_USERNAME: "SendAndListenSharedAccessKey"
-
+    # END TODO
     SERVER_PORT: 8080
     REFORM_TEAM: sscs
     REFORM_SERVICE_NAME: sscs-tribunals-api
