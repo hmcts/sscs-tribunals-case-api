@@ -117,8 +117,7 @@ export class IssueDirectionsNotice extends BaseStep {
     await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
       actionFurtherEvidenceTestdata.sender,
       actionFurtherEvidenceTestdata.other,
-      actionFurtherEvidenceTestdata.testfileone,
-      true
+      actionFurtherEvidenceTestdata.testfileone
     );
     await this.eventNameAndDescriptionPage.verifyPageContent(
       actionFurtherEvidenceTestdata.eventName
@@ -177,8 +176,7 @@ export class IssueDirectionsNotice extends BaseStep {
     await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
       actionFurtherEvidenceTestdata.sender,
       actionFurtherEvidenceTestdata.other,
-      actionFurtherEvidenceTestdata.testfileone,
-      true
+      actionFurtherEvidenceTestdata.testfileone
     );
     await this.eventNameAndDescriptionPage.verifyPageContent(
       actionFurtherEvidenceTestdata.eventName
@@ -237,8 +235,7 @@ export class IssueDirectionsNotice extends BaseStep {
     await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
       actionFurtherEvidenceTestdata.sender,
       actionFurtherEvidenceTestdata.other,
-      actionFurtherEvidenceTestdata.testfileone,
-      true
+      actionFurtherEvidenceTestdata.testfileone
     );
     await this.eventNameAndDescriptionPage.verifyPageContent(
       actionFurtherEvidenceTestdata.eventName
@@ -295,8 +292,7 @@ export class IssueDirectionsNotice extends BaseStep {
     await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
       actionFurtherEvidenceTestdata.sender,
       actionFurtherEvidenceTestdata.other,
-      actionFurtherEvidenceTestdata.testfileone,
-      true
+      actionFurtherEvidenceTestdata.testfileone
     );
     await this.eventNameAndDescriptionPage.verifyPageContent(
       actionFurtherEvidenceTestdata.eventName
