@@ -78,7 +78,7 @@ import uk.gov.hmcts.reform.sscs.service.servicebus.TopicConsumer;
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest
 @TestPropertySource(locations = "classpath:config/application_es_it.properties")
-// TODO: ASB - why is this test so slow, is it this slow on master?
+// TODO: These are very slow, originally they stopped at TopicProducer so we should mock from that point
 public class EvidenceShareServiceIt {
 
     // Below rules are needed to use the junitParamsRunner together with SpringRunner

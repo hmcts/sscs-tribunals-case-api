@@ -30,7 +30,6 @@ public class CcdCallbackOrchestratorController {
     @RequestMapping(value = "/send", produces = APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     public ResponseEntity<String> send(@RequestBody String body) {
 
-        log.info("Received message: {}", body);
         Callback<SscsCaseData> callback = mapper.deserialize(body);
         log.info("Sending message for event: {} for case id: {}", callback.getEvent(), callback.getCaseDetails().getId());
         eventPublisher.publishEvent(callback);
