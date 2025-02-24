@@ -39,10 +39,6 @@ java:
     DELETED_REDACTED_DOC_ENABLED: true
     TESTING_SUPPORT_ENABLED: true
     EXUI_API_URL: "https://${SERVICE_NAME}-xui"
-    TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
-    SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
-    AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
-    AMQP_USERNAME: "RootManageSharedAccessKey"
     HEARINGS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
     ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
     ROBOTICS_EMAIL_TO: "fake"
@@ -67,9 +63,6 @@ java:
     HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING:
       secretRef: sscs-sb-preview
       key: connectionString
-    AMQP_PASSWORD:
-      secretRef: sscs-sb-preview
-      key: primaryKey
     TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
       secretRef: sscs-sb-preview
       key: primaryKey
