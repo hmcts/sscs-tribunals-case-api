@@ -36,6 +36,7 @@ public class TopicConsumer {
     }
 
     public void onMessage(Callback<SscsCaseData> callback) {
+        log.info("Received message for case ID: {}, event: {}", callback.getCaseDetails().getId(), callback.getEvent());
         processEvidenceShareMessageWithRetry(callback, 1);
         notificationsMessageProcessor.processMessage(callback);
     }
