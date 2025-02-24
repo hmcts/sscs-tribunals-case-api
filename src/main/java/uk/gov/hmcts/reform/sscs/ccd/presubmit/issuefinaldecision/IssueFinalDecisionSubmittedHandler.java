@@ -60,7 +60,7 @@ public class IssueFinalDecisionSubmittedHandler implements PreSubmitCallbackHand
                 return new PreSubmitCallbackResponse<>(caseData);
             }
         }
-        log.info("Publishing message for the event {} for case id: {}", callback.getEvent(), callback.getCaseDetails().getId());
+        log.info("Publishing message for the event {}", callback.getEvent());
         eventPublisher.publishEvent(callback);
 
         return new PreSubmitCallbackResponse<>(caseData);

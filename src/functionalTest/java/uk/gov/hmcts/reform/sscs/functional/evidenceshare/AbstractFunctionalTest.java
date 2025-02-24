@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
 import static io.restassured.RestAssured.baseURI;
 import static java.util.Collections.singletonList;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.awaitility.Awaitility.await;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DOCUMENT;
@@ -25,7 +23,6 @@ import java.util.Objects;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.awaitility.core.ConditionFactory;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
@@ -218,11 +215,5 @@ public abstract class AbstractFunctionalTest {
         UploadResponse upload = evidenceManagementSecureDocStoreService.upload(singletonList(file), idamTokens);
 
         return upload;
-    }
-
-    protected ConditionFactory defaultAwait() {
-        return await()
-            .atMost(15, SECONDS)
-            .pollInterval(2, SECONDS);
     }
 }

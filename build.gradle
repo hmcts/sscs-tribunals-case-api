@@ -376,7 +376,7 @@ dependencies {
 
     implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     implementation group: 'org.springframework', name: 'spring-jms'
-    implementation group: 'com.azure', name: 'azure-servicebus-jms', version: '2.0.0'
+    implementation group: 'org.apache.qpid', name: 'qpid-jms-client', version: '2.7.0'
 
     implementation group: 'com.github.hmcts', name: 'sscs-job-scheduler', version: '2.0.0'
     implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.5.0'
@@ -457,6 +457,9 @@ dependencies {
     // https://mvnrepository.com/artifact/org.awaitility/awaitility
     testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.3.0'
 
+    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-core', version: '9.2.0'
+    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-amqp-1-0-protocol', version: '9.2.0'
+    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-memory-store', version: '9.2.0'
     testImplementation 'org.wiremock.integrations:wiremock-spring-boot:3.6.0'
 
     //pact contract testing

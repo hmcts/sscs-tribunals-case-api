@@ -78,7 +78,6 @@ import uk.gov.hmcts.reform.sscs.service.servicebus.TopicConsumer;
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest
 @TestPropertySource(locations = "classpath:config/application_es_it.properties")
-// TODO: ASB - why is this test so slow, is it this slow on master?
 public class EvidenceShareServiceIt {
 
     // Below rules are needed to use the junitParamsRunner together with SpringRunner
@@ -186,9 +185,8 @@ public class EvidenceShareServiceIt {
         json = json.replace("CREATED_IN_GAPS_FROM", "readyToList");
 
         when(updateCcdCaseService.updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any(), any())).thenReturn(SscsCaseDetails.builder().build());
-        Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        topicConsumer.onMessage(json, "1");
 
         verify(updateCcdCaseService).updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any(), consumerArgumentCaptor.capture());
 
@@ -207,9 +205,8 @@ public class EvidenceShareServiceIt {
         json = json.replace("CREATED_IN_GAPS_FROM", "readyToList");
 
         when(updateCcdCaseService.updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any(), any())).thenReturn(SscsCaseDetails.builder().build());
-        Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        topicConsumer.onMessage(json, "1");
 
         verify(updateCcdCaseService).updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any(), consumerArgumentCaptor.capture());
         SscsCaseData sscsCaseData = verifySscsCaseData(json);
@@ -240,9 +237,8 @@ public class EvidenceShareServiceIt {
 
         String documentList = "Case has been sent to the FTA via Bulk Print with bulk print id: 0f14d0ab-9605-4a62-a9e4-5ed26688389b and with documents: dl16-12345656789.pdf, sscs1.pdf, filename1.pdf";
         when(updateCcdCaseService.updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq(documentList), any(), any())).thenReturn(SscsCaseDetails.builder().build());
-        Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        topicConsumer.onMessage(json, "1");
 
         Assert.assertEquals(3, documentCaptor.getValue().size());
         Assert.assertEquals("dl16-12345656789.pdf", documentCaptor.getValue().get(0).getName());
@@ -283,9 +279,8 @@ public class EvidenceShareServiceIt {
 
         String documentList = "Case has been sent to the FTA via Bulk Print with bulk print id: 0f14d0ab-9605-4a62-a9e4-5ed26688389b and with documents: dl16-12345656789.pdf, sscs1.pdf, filename1.pdf";
         when(updateCcdCaseService.updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq(documentList), any(), any())).thenReturn(SscsCaseDetails.builder().build());
-        Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        topicConsumer.onMessage(json, "1");
 
         Assert.assertEquals(3, documentCaptor.getValue().size());
         Assert.assertEquals("dl16-12345656789.pdf", documentCaptor.getValue().get(0).getName());
@@ -312,9 +307,8 @@ public class EvidenceShareServiceIt {
         json = json.replace("CASE_STATE", "readyToList");
         json = json.replace("CCD_EVENT_ID", "readyToList");
         json = json.replace("CREATED_IN_GAPS_FROM", "readyToList");
-        Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        topicConsumer.onMessage(json, "1");
 
         verify(emailService).sendEmail(anyLong(), any());
 
@@ -328,10 +322,8 @@ public class EvidenceShareServiceIt {
             .getResource("evidenceshare/validAppealCreatedCallback.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = json.replace("CREATED_IN_GAPS_FROM", "validAppeal");
-        Callback<SscsCaseData> callback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(callback);
-
+        topicConsumer.onMessage(json, "1");
 
         then(updateCcdCaseService)
             .should(times(1))
@@ -355,9 +347,8 @@ public class EvidenceShareServiceIt {
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = json.replace("PAPER", "ONLINE");
         json = json.replace("CREATED_IN_GAPS_FROM", "validAppeal");
-        Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        topicConsumer.onMessage(json, "1");
 
         verifyNoMoreInteractions(restTemplate);
         verifyNoMoreInteractions(evidenceManagementService);
@@ -374,9 +365,8 @@ public class EvidenceShareServiceIt {
             .getResource("evidenceshare/validAppealCreatedCallback.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = json.replace("CREATED_IN_GAPS_FROM", "readyToList");
-        Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        topicConsumer.onMessage(json, "1");
 
         verifyNoMoreInteractions(restTemplate);
         verifyNoMoreInteractions(evidenceManagementService);

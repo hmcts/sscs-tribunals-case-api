@@ -52,10 +52,9 @@ public class DwpUploadFunctionalTest extends AbstractFunctionalTest {
 
         simulateCcdCallback(json);
 
-        defaultAwait().untilAsserted(() -> {
-            SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
-            assertEquals("readyToList", caseDetails.getState());
-        });
+        SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+
+        assertEquals("readyToList", caseDetails.getState());
     }
 
     private String uploadDocToDocMgmtStore() throws IOException {
