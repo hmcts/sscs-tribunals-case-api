@@ -11,12 +11,6 @@ import uk.gov.hmcts.reform.sscs.model.servicebus.NoOpMessagingService;
 import uk.gov.hmcts.reform.sscs.model.servicebus.SessionAwareMessagingService;
 
 @Component
-/**
- * This factory provides the tribunals-to-hearings queue to publish messages (for LIST_ASSIST cases).
- *
- * TODO: Replace this implementation with one that sends messages directly to TribunalsHearingsEventQueueListener. Then
- * we can also remove the JMS configuration and implementation.
- */
 public class HearingMessagingServiceFactory {
 
     private final ServiceBusSenderClient hearingServiceBusClient;

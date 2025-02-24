@@ -1,20 +1,75 @@
 package uk.gov.hmcts.reform.sscs.service.servicebus;
 
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
+import jakarta.jms.Session;
+import java.util.concurrent.atomic.AtomicReference;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jms.IllegalStateException;
+import org.springframework.jms.connection.CachingConnectionFactory;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @Service
+@Slf4j
 public class TopicPublisher {
 
-    @Autowired
-    TopicConsumer topicConsumer;
+    private final JmsTemplate jmsTemplate;
 
-    @Async
-    public void sendMessage(Callback<SscsCaseData> message) {
-        topicConsumer.onMessage(message);
+    private final String destination;
+
+    private final ConnectionFactory connectionFactory;
+
+    @Autowired
+    public TopicPublisher(@Qualifier("evidenceShareJmsTemplate") JmsTemplate jmsTemplate,
+                          @Value("${amqp.topic}") final String destination,
+                          @Qualifier("evidenceShareJmsConnectionFactory") ConnectionFactory connectionFactory) {
+        this.jmsTemplate = jmsTemplate;
+        this.destination = destination;
+        this.connectionFactory = connectionFactory;
     }
 
+    @Retryable(
+        maxAttempts = 5,
+        backoff = @Backoff(delay = 2000, multiplier = 3)
+    )
+    public void sendMessage(final String message, String caseId, final AtomicReference<Message> msg) {
+        log.info("Tribs API - Sending message for caseId {}", caseId);
+
+        try {
+            jmsTemplate.convertAndSend(destination, message, m -> {
+                msg.set(m);
+                return m;
+            });
+
+            log.info("Message sent with message id {} for caseId {}", msg.get().getJMSMessageID(), caseId);
+
+        } catch (IllegalStateException e) {
+            if (connectionFactory instanceof CachingConnectionFactory) {
+                log.info("Send failed for caseId {}, attempting to reset connection...", caseId);
+                ((CachingConnectionFactory) connectionFactory).resetConnection();
+                log.info("Resending..");
+                jmsTemplate.send(destination, (Session session) -> session.createTextMessage(message));
+                log.info("In catch, message sent for caseId {}, messageId unknown", caseId);
+            } else {
+                log.error("In catch, send message failed for caseId {} with exception: {}", caseId, e);
+                throw e;
+            }
+        } catch (JMSException e) {
+            log.info("Failed retrieving Message Id for caseId {}", caseId);
+        }
+    }
+
+    @Recover
+    public void recoverMessage(Throwable ex) throws Throwable {
+        log.error("Tribs API - TopicPublisher.recover(): Send message failed with exception: ", ex);
+        throw ex;
+    }
 }
