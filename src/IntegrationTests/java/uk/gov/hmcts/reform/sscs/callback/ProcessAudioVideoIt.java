@@ -12,10 +12,10 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import javax.servlet.http.HttpServletResponse;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
@@ -23,9 +23,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
@@ -44,19 +44,19 @@ import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 @RunWith(JUnitParamsRunner.class)
 public class ProcessAudioVideoIt extends AbstractEventIt {
 
-    @MockBean
+    @MockitoBean
     private CcdService ccdService;
 
-    @MockBean
+    @MockitoBean
     private IdamService idamService;
 
-    @MockBean
+    @MockitoBean
     private PdfStoreService pdfStoreService;
 
-    @MockBean
+    @MockitoBean
     private GenerateFile generateFile;
 
-    @MockBean
+    @MockitoBean
     private UserDetailsService userDetailsService;
 
     @Before

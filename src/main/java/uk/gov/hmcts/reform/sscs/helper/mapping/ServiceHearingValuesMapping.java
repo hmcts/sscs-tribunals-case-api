@@ -2,9 +2,9 @@ package uk.gov.hmcts.reform.sscs.helper.mapping;
 
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsMapping.getSessionCaseCodeMap;
 
+import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
-import javax.validation.Valid;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.Judiciary;
@@ -35,7 +35,7 @@ public final class ServiceHearingValuesMapping {
                 .caseSlaStartDate(HearingsCaseMapping.getCaseCreated(caseData))
                 .hmctsInternalCaseName(HearingsCaseMapping.getInternalCaseName(caseData))
                 .autoListFlag(shouldBeAutoListed)
-                .hearingType(HearingsDetailsMapping.getHearingType())
+                .hearingType(HearingsDetailsMapping.getHearingType(caseData))
                 .caseType(BENEFIT)
                 .caseCategories(HearingsCaseMapping.buildCaseCategories(caseData, refData))
                 .hearingWindow(HearingsWindowMapping.buildHearingWindow(caseData, refData))

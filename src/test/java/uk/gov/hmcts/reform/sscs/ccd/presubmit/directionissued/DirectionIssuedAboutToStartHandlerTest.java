@@ -1,14 +1,23 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.*;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.NO_FURTHER_ACTION;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.SEND_TO_LISTING;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.SEND_TO_VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.BENEFIT_CODES_FOR_ISSUE_AND_SEND_TO_ADMIN;
 
 import java.util.ArrayList;
@@ -20,6 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -45,7 +55,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
     public void setUp() {
         openMocks(this);
         handler = new DirectionIssuedAboutToStartHandler(false);
-
+        ReflectionTestUtils.setField(handler, "isDirectionHearingsEnabled", true);
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -83,6 +93,8 @@ public class DirectionIssuedAboutToStartHandlerTest {
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getExtensionNextEventDl());
         assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
+        assertNull(response.getData().getHmcHearingType());
+        assertEquals(NO, response.getData().getSelectNextHmcHearingType());
     }
 
     @Test
@@ -394,5 +406,63 @@ public class DirectionIssuedAboutToStartHandlerTest {
         assertEquals(NO, sscsCaseData.getHasOtherPartyAppointee());
         assertEquals(YES, sscsCaseData.getHasOtherParties());
         assertEquals(NO, sscsCaseData.getHasJointParty());
+    }
+
+    @Test
+    public void givenNonDefaultSelectHmcHearingTypeNo_whenValueAboutToStart() {
+        when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
+        sscsCaseData.setSelectNextHmcHearingType(YES);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(SEND_TO_LISTING.getCode(), SEND_TO_LISTING.getLabel()));
+        listOptions.add(new DynamicListItem(NO_FURTHER_ACTION.getCode(), NO_FURTHER_ACTION.getLabel()));
+        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
+        assertEquals(expected, response.getData().getExtensionNextEventDl());
+        assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
+        assertEquals(NO, response.getData().getSelectNextHmcHearingType());
+        assertNull(response.getData().getHmcHearingType());
+    }
+
+    @Test
+    public void givenNullSelectHmcHearingTypeNo_whenNullAboutToStart() {
+        when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
+        sscsCaseData.setSelectNextHmcHearingType(null);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(SEND_TO_LISTING.getCode(), SEND_TO_LISTING.getLabel()));
+        listOptions.add(new DynamicListItem(NO_FURTHER_ACTION.getCode(), NO_FURTHER_ACTION.getLabel()));
+        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
+        assertEquals(expected, response.getData().getExtensionNextEventDl());
+        assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
+        assertEquals(NO, response.getData().getSelectNextHmcHearingType());
+        assertNull(response.getData().getHmcHearingType());
+    }
+
+    @Test
+    public void givenMidEvent_ThenDoesNotWipeHmcHearingTypeOrSelect() {
+        when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
+        sscsCaseData.setSelectNextHmcHearingType(YES);
+        sscsCaseData.setHmcHearingType(HmcHearingType.DIRECTION_HEARINGS);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(SEND_TO_LISTING.getCode(), SEND_TO_LISTING.getLabel()));
+        listOptions.add(new DynamicListItem(NO_FURTHER_ACTION.getCode(), NO_FURTHER_ACTION.getLabel()));
+        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
+        assertEquals(expected, response.getData().getExtensionNextEventDl());
+        assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
+        assertEquals(YES, response.getData().getSelectNextHmcHearingType());
+        assertEquals(HmcHearingType.DIRECTION_HEARINGS, response.getData().getHmcHearingType());
+    }
+
+    @Test
+    public void givenDirectionsDisabled_ThenDoesNotWipeHmcHearingTypeOrSelect() {
+        ReflectionTestUtils.setField(handler, "isDirectionHearingsEnabled", false);
+        when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
+        SscsCaseData mockedSscsCaseData = mock(SscsCaseData.class);
+        when(caseDetails.getCaseData()).thenReturn(mockedSscsCaseData);
+        when(mockedSscsCaseData.getSscsHearingRecordingCaseData()).thenReturn(SscsHearingRecordingCaseData.builder().build());
+        handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        verify(mockedSscsCaseData, never()).setSelectNextHmcHearingType(any());
+        verify(mockedSscsCaseData, never()).setHmcHearingType(any());
     }
 }

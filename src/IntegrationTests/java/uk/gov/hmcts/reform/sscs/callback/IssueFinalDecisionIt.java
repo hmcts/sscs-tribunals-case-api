@@ -7,7 +7,9 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Outcome.DECISION_IN_FAVOUR_OF_APPELLANT;
-import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.*;
+import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
+import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.createUploadResponse;
+import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -18,9 +20,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
@@ -32,13 +34,13 @@ import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 @AutoConfigureMockMvc
 public class IssueFinalDecisionIt extends AbstractEventIt {
 
-    @MockBean
+    @MockitoBean
     private CoreCaseDataApi coreCaseDataApi;
 
-    @MockBean
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
 
-    @MockBean
+    @MockitoBean
     private EvidenceManagementService evidenceManagementService;
 
     @Before

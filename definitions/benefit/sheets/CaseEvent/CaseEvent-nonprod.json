@@ -1,15 +1,2 @@
-[
-  {
-  "LiveFrom": "04/07/2024",
-  "CaseTypeID": "Benefit",
-  "ID": "amendHearingOutcome",
-  "Name": "Amend Hearing Outcome",
-  "Description": "Amend a Hearing Outcome",
-  "DisplayOrder": 361,
-  "PreConditionState(s)": "*",
-  "CallBackURLAboutToStartEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToStart",
-  "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
-  "PostConditionState": "*",
-  "SecurityClassification": "Public"
-  }
-]
+[]
+
