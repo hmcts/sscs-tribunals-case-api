@@ -21,6 +21,8 @@ spring:
         multipart:
             max-file-size: ${MAX_FILE_SIZE:10MB}
             max-request-size: ${MAX_REQUEST_SIZE:10MB}
+    lifecycle:
+        timeout-per-shutdown-phase: 120s
 
     datasource:
         driverClassName: org.postgresql.Driver
@@ -54,21 +56,6 @@ springdoc:
 subscriptions:
     mac:
         secret: ${SUBSCRIPTIONS_MAC_SECRET:our-big-secret}
-
-amqp:
-    host: ${AMQP_HOST:localhost}
-    password: ${AMQP_PASSWORD:guest}
-    subscription: ${SUBSCRIPTION_NAME:test.queue}
-    topic: ${TOPIC_NAME:test.topic}
-    trustAllCerts: ${TRUST_ALL_CERTS:true}
-    username: ${AMQP_USERNAME:guest}
-    clientId: sscs-evidence-share
-    amqp-connection-string-template: ${JMS_AMQP_CONNECTION_TEMPLATE:amqps://%1s?amqp.idleTimeout=%2d}
-    idleTimeout: ${JMS_IDLE_TIMEOUT:30000}
-    reconnectOnException: ${AMQP_RECONNECT_ON_EXCEPTION:false}
-    prefetch:
-        override: ${AMQP_PREFETCH_OVERRIDE:false}
-        topicPrefetch: ${AMQP_TOPIC_PREFETCH:1}
 
 callback:
     maxRetryAttempts: ${CALLBACK_MAX_RETRY_ATTEMPTS:3}
@@ -254,6 +241,8 @@ feature:
         enabled: ${GAPS_SWITCHOVER_FEATURE:false}
     hearing-recording-filter:
         enabled: ${UPLOAD_HEARING_FILTER_ENABLED:false}
+    direction-hearings:
+        enabled: ${DIRECTION_HEARINGS_ENABLED:false}
     postHearings:
         enabled: ${POST_HEARINGS_FEATURE:false}
     postHearingsB:
@@ -2019,6 +2008,7 @@ spring:
         mapper:
             accept-case-insensitive-enums: true
             accept-case-insensitive-properties: true
+
 job.scheduler:
     retryPolicy:
         maxNumberOfJobExecutions: 2
