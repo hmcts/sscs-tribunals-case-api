@@ -173,8 +173,6 @@ public class CreateCaseController {
             || syaCaseWrapper.getBenefitType().getCode() == null) {
             logBadRequest(syaCaseWrapper);
         }
-        //syaCaseWrapper.getAppellant().setNino(getRandomNino());
-        //syaCaseWrapper.getMrn().setDate(getRandomMrnDate());
         log.info("Appeal with IBCA ref - {} and benefit type {} received", syaCaseWrapper.getAppellant().getIbcaReference(),
             syaCaseWrapper.getBenefitType().getCode());
         Long caseId = submitAppealServiceBase.submitAppeal(syaCaseWrapper, authorisation);
