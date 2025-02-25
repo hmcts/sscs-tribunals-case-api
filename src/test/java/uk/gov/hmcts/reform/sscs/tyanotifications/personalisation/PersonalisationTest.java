@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.ORAL;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.PAPER;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.REGULAR;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.HMC_HEARING_TYPE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.SscsCaseDataUtils.getWelshDate;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.CC_DATE_FORMAT;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DWP_ACRONYM;
@@ -189,48 +190,8 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AppellantInfo;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AppellantInfoRequest;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Document;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Event;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Evidence;
-import uk.gov.hmcts.reform.sscs.ccd.domain.FormType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InfoRequests;
-import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
-import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFinalDecisionCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.helper.mapping.HearingsDetailsMapping;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
@@ -378,6 +339,8 @@ public class PersonalisationTest {
         personalisations.put(LanguagePreference.ENGLISH, englishMap);
         personalisations.put(LanguagePreference.WELSH, welshMap);
         personalisationConfiguration.setPersonalisation(personalisations);
+        ReflectionTestUtils.setField(HearingsDetailsMapping.class, "isDirectionHearingsEnabled", true);
+        ReflectionTestUtils.setField(personalisation, "isDirectionHearingsEnabled", true);
     }
 
 
@@ -1491,6 +1454,181 @@ public class PersonalisationTest {
         assertThat(dateParsed).isEqualTo(hearing.getValue().getStart().toLocalDate());
         LocalTime time = LocalTime.parse(result.get(HEARING_TIME).toString(), DateTimeFormatter.ofPattern(HEARING_TIME_FORMAT, Locale.ENGLISH));
         assertThat(time).isCloseTo(hearing.getValue().getStart().toLocalTime(), within(1, ChronoUnit.MINUTES));
+    }
+
+    @Test
+    public void shouldReturnOverrideFieldsDirectionHearingForFaceToFaceHearingBookedNotification() {
+        LocalDateTime hearingDate = LocalDateTime.now().plusDays(1);
+
+        Hearing hearing = createListAssistHearing(hearingDate);
+
+        List<Hearing> hearingList = new ArrayList<>();
+        hearingList.add(hearing);
+
+        SscsCaseData response = SscsCaseData.builder()
+            .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build())
+                .appellant(Appellant.builder().name(name).build())
+                .build())
+            .subscriptions(subscriptions)
+            .hearings(hearingList)
+            .schedulingAndListingFields(SchedulingAndListingFields.builder()
+                .hearingRoute(LIST_ASSIST)
+                .overrideFields(OverrideFields.builder().hmcHearingType(HmcHearingType.DIRECTION_HEARINGS).build())
+                .build())
+            .build();
+
+        Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
+            .notificationEventType(HEARING_BOOKED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
+
+        assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isNotNull();
+        assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isEqualTo("BBA3-DIR");
+    }
+
+
+    @Test
+    public void shouldReturnNullHmcHearingTypeIfDirectionHearingsFlagOff() {
+        ReflectionTestUtils.setField(personalisation, "isDirectionHearingsEnabled", false);
+        ReflectionTestUtils.setField(HearingsDetailsMapping.class, "isDirectionHearingsEnabled", false);
+        LocalDateTime hearingDate = LocalDateTime.now().plusDays(1);
+
+        Hearing hearing = createListAssistHearing(hearingDate);
+
+        List<Hearing> hearingList = new ArrayList<>();
+        hearingList.add(hearing);
+
+        SscsCaseData response = SscsCaseData.builder()
+            .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build())
+                .appellant(Appellant.builder().name(name).build())
+                .build())
+            .subscriptions(subscriptions)
+            .hearings(hearingList)
+            .schedulingAndListingFields(SchedulingAndListingFields.builder()
+                .hearingRoute(LIST_ASSIST)
+                .overrideFields(OverrideFields.builder().build())
+                .build())
+            .build();
+
+        Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
+            .notificationEventType(HEARING_BOOKED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
+
+        assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isNull();
+    }
+
+    @Test
+    public void shouldReturnOverrideFieldsSubstantiveHearingForFaceToFaceHearingBookedNotification() {
+        LocalDateTime hearingDate = LocalDateTime.now().plusDays(1);
+
+        Hearing hearing = createListAssistHearing(hearingDate);
+
+        List<Hearing> hearingList = new ArrayList<>();
+        hearingList.add(hearing);
+
+        SscsCaseData response = SscsCaseData.builder()
+            .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build())
+                .appellant(Appellant.builder().name(name).build())
+                .build())
+            .subscriptions(subscriptions)
+            .hearings(hearingList)
+            .schedulingAndListingFields(SchedulingAndListingFields.builder()
+                .hearingRoute(LIST_ASSIST)
+                .overrideFields(OverrideFields.builder().hmcHearingType(HmcHearingType.SUBSTANTIVE).build())
+                .build())
+            .build();
+
+        Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
+            .notificationEventType(HEARING_BOOKED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
+
+        assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isNotNull();
+        assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isEqualTo("BBA3-SUB");
+    }
+
+    @Test
+    public void shouldReturnDirectionHearingForFaceToFaceHearingBookedNotification() {
+        LocalDateTime hearingDate = LocalDateTime.now().plusDays(1);
+
+        Hearing hearing = createListAssistHearing(hearingDate);
+
+        List<Hearing> hearingList = new ArrayList<>();
+        hearingList.add(hearing);
+
+        SscsCaseData response = SscsCaseData.builder()
+            .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
+            .hmcHearingType(HmcHearingType.DIRECTION_HEARINGS)
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build())
+                .appellant(Appellant.builder().name(name).build())
+                .build())
+            .subscriptions(subscriptions)
+            .hearings(hearingList)
+            .schedulingAndListingFields(SchedulingAndListingFields.builder()
+                .hearingRoute(LIST_ASSIST)
+                .build())
+            .build();
+
+        Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
+            .notificationEventType(HEARING_BOOKED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
+
+        assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isNotNull();
+        assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isEqualTo("BBA3-DIR");
+    }
+
+    @Test
+    public void shouldReturnSubstantiveAsNullHearingForFaceToFaceHearingBookedNotification() {
+        LocalDateTime hearingDate = LocalDateTime.now().plusDays(1);
+
+        Hearing hearing = createListAssistHearing(hearingDate);
+
+        List<Hearing> hearingList = new ArrayList<>();
+        hearingList.add(hearing);
+
+        SscsCaseData response = SscsCaseData.builder()
+            .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build())
+                .appellant(Appellant.builder().name(name).build())
+                .build())
+            .subscriptions(subscriptions)
+            .hearings(hearingList)
+            .schedulingAndListingFields(SchedulingAndListingFields.builder()
+                .hearingRoute(LIST_ASSIST)
+                .build())
+            .build();
+
+        Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
+            .notificationEventType(HEARING_BOOKED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
+
+        assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isNotNull();
+        assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isEqualTo("BBA3-SUB");
+    }
+
+    @Test
+    public void shouldReturnSubstantiveHearingForFaceToFaceHearingBookedNotification() {
+        LocalDateTime hearingDate = LocalDateTime.now().plusDays(1);
+
+        Hearing hearing = createListAssistHearing(hearingDate);
+
+        List<Hearing> hearingList = new ArrayList<>();
+        hearingList.add(hearing);
+
+        SscsCaseData response = SscsCaseData.builder()
+            .hmcHearingType(HmcHearingType.SUBSTANTIVE)
+            .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build())
+                .appellant(Appellant.builder().name(name).build())
+                .build())
+            .subscriptions(subscriptions)
+            .hearings(hearingList)
+            .schedulingAndListingFields(SchedulingAndListingFields.builder()
+                .hearingRoute(LIST_ASSIST)
+                .build())
+            .build();
+
+        Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
+            .notificationEventType(HEARING_BOOKED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
+
+        assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isNotNull();
+        assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isEqualTo("BBA3-SUB");
     }
 
     @Test
