@@ -1,4 +1,5 @@
 [
-  {"LiveFrom": "01/01/2018", "ID": "hearingOptions", "ListElementCode": "hmcHearingType", "FieldType": "FixedRadioList", "FieldTypeParameter": "FL_hmcHearingType", "ElementLabel": "Hearing Type", "FieldShowCondition": "hmcHearingType=\"*\"", "SecurityClassification": "PUBLIC"}
+  {"LiveFrom": "01/01/2018", "ID": "hearingOptions", "ListElementCode": "hmcHearingType", "FieldType": "FixedRadioList", "FieldTypeParameter": "FL_hmcHearingType", "ElementLabel": "Next hearing type", "FieldShowCondition": "hmcHearingType=\"*\"", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "ID": "overrideFields", "ListElementCode": "hmcHearingType", "FieldType": "FixedRadioList", "FieldTypeParameter": "FL_hmcHearingType", "ElementLabel": "Next hearing type", "SecurityClassification": "PUBLIC"}
 ]
 
