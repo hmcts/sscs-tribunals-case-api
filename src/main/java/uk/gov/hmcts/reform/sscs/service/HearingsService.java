@@ -53,8 +53,6 @@ public class HearingsService {
 
     private final HmcHearingApiService hmcHearingApiService;
 
-    private final HmcHearingsApiService hmcHearingsApiService;
-
     private final CcdCaseService ccdCaseService;
 
     private final ReferenceDataServiceHolder refData;
@@ -133,7 +131,7 @@ public class HearingsService {
         SscsCaseData caseData = wrapper.getCaseData();
 
         String caseId = caseData.getCcdCaseId();
-        HearingsGetResponse hearingsGetResponse = hmcHearingsApiService.getHearingsRequest(caseId, null);
+        HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseId, null);
         CaseHearing hearing = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse);
         HmcUpdateResponse hmcUpdateResponse;
 
