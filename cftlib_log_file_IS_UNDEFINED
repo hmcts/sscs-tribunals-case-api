@@ -1,3 +1,0 @@
-2025-02-16T03:39:03.331 DEBUG [schedulerFactoryBean_Worker-5] org.quartz.simpl.SimpleThreadPool WorkerThread is shut down.
-2025-02-16T03:39:03.335 DEBUG [schedulerFactoryBean_Worker-4] org.quartz.simpl.SimpleThreadPool WorkerThread is shut down.
-2025-02-16T03:39:03.336 DEBUG [schedulerFactoryBean_Worker-6] org.quartz.simpl.SimpleThreadPool WorkerThread is shut down.
