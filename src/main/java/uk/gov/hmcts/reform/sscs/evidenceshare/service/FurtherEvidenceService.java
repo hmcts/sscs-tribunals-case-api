@@ -59,7 +59,6 @@ public class FurtherEvidenceService {
         }
     }
 
-
     public void updateCaseDocuments(List<? extends AbstractDocument> documents, SscsCaseData caseData, DocumentType documentType) {
         List<SscsDocument> sscsCaseDocuments = caseData.getSscsDocument();
 
