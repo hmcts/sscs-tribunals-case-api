@@ -2,6 +2,7 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
   enabled: true
   image: 'hmctspublic.azurecr.io/sscs/tribunals-api:latest'
   applicationPort: 8080
+  terminationGracePeriodSeconds: 120
   aadIdentityName: sscs
   ingressHost: sscs-tribunals-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   spotInstances:
@@ -45,8 +46,6 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
           alias: app-insights-connection-string
         - name: sscs-servicebus-connection-string-tf
           alias: HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING
-        - name: evidence-share-topic-shared-access-key
-          alias: AMQP_PASSWORD
         - name: robotics-email-to
           alias: ROBOTICS_EMAIL_TO
         - name: robotics-email-from
@@ -72,8 +71,16 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
           alias: HMC_HEARINGS_TOPIC_ACCESS_KEY
         - name: sscs-servicebus-shared-access-key
           alias: TRIBUNALS_EVENT_QUEUE_ACCESS_KEY
-
+        # TODO remove once deployed
+        - name: evidence-share-topic-shared-access-key
+          alias: AMQP_PASSWORD
   environment:
+    # TODO remove once deployed
+    SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-{{ .Values.global.environment }}"
+    TOPIC_NAME: "sscs-evidenceshare-topic-{{ .Values.global.environment }}"
+    AMQP_HOST: "sscs-servicebus-{{ .Values.global.environment }}.servicebus.windows.net"
+    AMQP_USERNAME: "SendAndListenSharedAccessKey"
+    # END TODO
     SERVER_PORT: 8080
     REFORM_TEAM: sscs
     REFORM_SERVICE_NAME: sscs-tribunals-api
@@ -114,10 +121,6 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     SEND_LETTER_SERVICE_BASEURL: "http://rpe-send-letter-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     SEND_LETTER_SERVICE_ENABLED: "true"
     TRUST_ALL_CERTS: "true"
-    SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-{{ .Values.global.environment }}"
-    TOPIC_NAME: "sscs-evidenceshare-topic-{{ .Values.global.environment }}"
-    AMQP_HOST: "sscs-servicebus-{{ .Values.global.environment }}.servicebus.windows.net"
-    AMQP_USERNAME: "SendAndListenSharedAccessKey"
     MAX_RETRY_ATTEMPTS: 3
     PDF_SERVICE_BASE_URL: https://docmosis.{{ .Values.global.environment }}.platform.hmcts.net/rs/render
     ROBOTICS_EMAIL_MESSAGE: "Please find attached the robotics json file \nPlease do not respond to this email"
