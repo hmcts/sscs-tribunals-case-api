@@ -176,8 +176,13 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         if (benefit.isPresent()) {
             if (benefit.get().getSscsType().equals(SscsType.SSCS5)) {
                 writeFinalDecisionBuilder.isHmrc(true);
+                writeFinalDecisionBuilder.isIbca(false);
+            } else if (benefit.get().getSscsType().equals(SscsType.SSCS8)) {
+                writeFinalDecisionBuilder.isHmrc(false);
+                writeFinalDecisionBuilder.isIbca(true);
             } else {
                 writeFinalDecisionBuilder.isHmrc(false);
+                writeFinalDecisionBuilder.isIbca(false);
             }
         }
 
