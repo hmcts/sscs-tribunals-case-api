@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.service.servicebus.hearings;
+package uk.gov.hmcts.reform.sscs.service.hmc.topic;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -11,8 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.model.servicebus.NoOpMessagingService;
 import uk.gov.hmcts.reform.sscs.model.servicebus.SessionAwareMessagingService;
-import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingMessageService;
-import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingMessagingServiceFactory;
 
 
 @ExtendWith(MockitoExtension.class)
