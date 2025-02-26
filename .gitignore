@@ -54,3 +54,5 @@ definitions/**/*.xlsx#
 befta_recent_executions_info_PREVIEW.json
 /notification_pdfs/*
 node_modules
+
+/bin
