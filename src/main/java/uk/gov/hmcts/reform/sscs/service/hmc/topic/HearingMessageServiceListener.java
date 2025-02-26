@@ -1,13 +1,12 @@
-package uk.gov.hmcts.reform.sscs.jms.listener;
+package uk.gov.hmcts.reform.sscs.service.hmc.topic;
 
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.LISTING_ERROR;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.jms.annotation.JmsListener;
 import org.springframework.retry.ExhaustedRetryException;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -23,8 +22,11 @@ import uk.gov.hmcts.reform.sscs.service.HearingsService;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty("flags.tribunals-to-hearings-api.enabled")
-public class TribunalsHearingsEventQueueListener {
+/**
+ * This class replaces an ASB queue implementation that used to listen for messages from the Tribunals API
+ * sent to the SSCS Hearings API. It is now a direct call inside the Tribunals API from the HearingMessageService.
+ */
+public class HearingMessageServiceListener {
 
     private final HearingsService hearingsService;
 
@@ -32,10 +34,7 @@ public class TribunalsHearingsEventQueueListener {
 
     private final IdamService idamService;
 
-    @JmsListener(
-            destination = "${azure.service-bus.tribunals-to-hearings-api.queueName}",
-            containerFactory = "hearingsToHmcEventTopicContainerFactory"
-    )
+    @Async
     public void handleIncomingMessage(HearingRequest message) throws TribunalsEventProcessingException, GetCaseException, UpdateCaseException {
         if (isNull(message)) {
             throw new TribunalsEventProcessingException("An exception occurred as message did not match format");

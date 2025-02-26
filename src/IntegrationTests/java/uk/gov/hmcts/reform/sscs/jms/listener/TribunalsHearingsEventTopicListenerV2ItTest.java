@@ -57,6 +57,7 @@ import uk.gov.hmcts.reform.sscs.service.HmcHearingApi;
 import uk.gov.hmcts.reform.sscs.service.HmcHearingsApi;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
+import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingMessageServiceListener;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @ExtendWith(SpringExtension.class)
@@ -68,7 +69,7 @@ public class TribunalsHearingsEventTopicListenerV2ItTest {
     private static final String CASE_ID = "1234123412341234";
     private static final String PROCESSING_VENUE_1 = "Cardiff";
 
-    private TribunalsHearingsEventQueueListener tribunalsHearingsEventQueueListener;
+    private HearingMessageServiceListener hearingMessageServiceListener;
 
     @Autowired
     private ObjectMapper mapper;
@@ -102,7 +103,7 @@ public class TribunalsHearingsEventTopicListenerV2ItTest {
     @Test
     public void testHearingsUpdateCaseV2() throws UpdateCaseException, TribunalsEventProcessingException, GetCaseException {
 
-        tribunalsHearingsEventQueueListener = new TribunalsHearingsEventQueueListener(hearingsService, updateCcdCaseService,
+        hearingMessageServiceListener = new HearingMessageServiceListener(hearingsService, updateCcdCaseService,
                 idamService);
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -132,7 +133,7 @@ public class TribunalsHearingsEventTopicListenerV2ItTest {
             + "  \"hearingRoute\": \"listAssist\",\n"
             + "  \"hearingState\": \"adjournCreateHearing\"\n"
             + "}\n";
-        tribunalsHearingsEventQueueListener.handleIncomingMessage(deserialize(message));
+        hearingMessageServiceListener.handleIncomingMessage(deserialize(message));
 
         verify(ccdCaseService, never()).updateCaseData(any(), any(), any());
 

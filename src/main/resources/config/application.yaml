@@ -92,11 +92,6 @@ auth:
         service:
             client:
                 baseUrl: ${IDAM_S2S_AUTH:http://localhost:4502}
-azure:
-    servicebus:
-        hearings:
-            connection-string: ${HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING}
-            destination: ${HEARINGS_EVENT_QUEUE_NAME}
 
 bundle:
     english:
@@ -293,16 +288,7 @@ idam:
         url: ${IDAM_S2S_AUTH:http://localhost:4502}
     url: ${IDAM_API_URL:http://localhost:5062}
 
-jms:
-    amqp-connection-string-template: ${JMS_AMQP_CONNECTION_TEMPLATE:"amqps://%1s?amqp.idleTimeout=%2d"}
-    enabled: ${ENABLE_JMS:false}
-    idleTimeout: ${JMS_IDLE_TIMEOUT:30000}
-    namespace: ${JMS_NAMESPACE}
-    password: ${JMS_PASSWORD:}
-    receiveTimeout: ${JMS_RECEIVE_TIMEOUT:30000}
-    tribunals-to-hearings-api:
-        queue: ${JMS_HEARINGS_EVENT_QUEUE_NAME:}
-    username: ${JMS_USERNAME:}
+
 judicial-ref:
     api:
         url: ${JUDICIAL_REF_API_URL:http://localhost:5555}
@@ -1970,13 +1956,6 @@ azure:
             idleTimeout: ${HMC_HEARINGS_TOPIC_IDLE_TIMEOUT:30000}
             username: ${HMC_HEARINGS_TOPIC_POLICY_NAME:}
             password: ${HMC_HEARINGS_TOPIC_ACCESS_KEY:}
-        tribunals-to-hearings-api:
-            namespace: ${TRIBUNALS_EVENT_QUEUE_NAMESPACE:}
-            queueName: ${TRIBUNALS_EVENT_QUEUE_NAME:}
-            receiveTimeout: ${TRIBUNALS_EVENT_QUEUE_RECEIVE_TIMEOUT:1}
-            idleTimeout: ${TRIBUNALS_EVENT_QUEUE_IDLE_TIMEOUT:30000}
-            username: ${TRIBUNALS_EVENT_QUEUE_POLICY_NAME:}
-            password: ${TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:}
 
 exui:
     url: ${EXUI_API_URL:http://localhost:3455}
@@ -1988,7 +1967,6 @@ sscs.serviceCode: ${SSCS_SERVICE_CODE:BBA3}
 
 flags:
     hmc-to-hearings-api.enabled: ${HMC_HEARINGS_LISTENING_ENABLED:false}
-    tribunals-to-hearings-api.enabled: ${TRIBUNALS_HEARINGS_LISTENING_ENABLED:false}
     adjournment.enabled: ${ADJOURNMENT_ENABLED:false}
     postHearings.enabled: ${POST_HEARING_ENABLED:false}
     deployment-filter.enabled: ${HMC_DEPLOYMENT_FILTER_ENABLED:false}
