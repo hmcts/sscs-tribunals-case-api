@@ -78,7 +78,7 @@ public class DirectionIssuedMidEventHandlerTest {
         openMocks(this);
         Map<EventType, String> englishEventTypeDocs = new HashMap<>();
         englishEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-ENG-directions-notice-v2.docx");
-        englishEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-ENG-draft-decision-notice.docx");
+        englishEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-ENG-draft-decision-notice-v2.docx");
         englishEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-00453.docx");
 
 
