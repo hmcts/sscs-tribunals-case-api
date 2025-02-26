@@ -14,7 +14,6 @@ export class EvidenceReminder extends BaseStep {
 
   async performEvidenceReminder(caseId: string) {
     await this.loginUserWithCaseId(credentials.amSuperUser, false, caseId);
-    await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Evidence reminder');
     await this.eventNameAndDescriptionPage.verifyPageContent(
       'Evidence reminder'
