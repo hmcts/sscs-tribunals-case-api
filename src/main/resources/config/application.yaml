@@ -21,6 +21,8 @@ spring:
         multipart:
             max-file-size: ${MAX_FILE_SIZE:10MB}
             max-request-size: ${MAX_REQUEST_SIZE:10MB}
+    lifecycle:
+        timeout-per-shutdown-phase: 120s
 
     datasource:
         driverClassName: org.postgresql.Driver
@@ -54,21 +56,6 @@ springdoc:
 subscriptions:
     mac:
         secret: ${SUBSCRIPTIONS_MAC_SECRET:our-big-secret}
-
-amqp:
-    host: ${AMQP_HOST:localhost}
-    password: ${AMQP_PASSWORD:guest}
-    subscription: ${SUBSCRIPTION_NAME:test.queue}
-    topic: ${TOPIC_NAME:test.topic}
-    trustAllCerts: ${TRUST_ALL_CERTS:true}
-    username: ${AMQP_USERNAME:guest}
-    clientId: sscs-evidence-share
-    amqp-connection-string-template: ${JMS_AMQP_CONNECTION_TEMPLATE:amqps://%1s?amqp.idleTimeout=%2d}
-    idleTimeout: ${JMS_IDLE_TIMEOUT:30000}
-    reconnectOnException: ${AMQP_RECONNECT_ON_EXCEPTION:false}
-    prefetch:
-        override: ${AMQP_PREFETCH_OVERRIDE:false}
-        topicPrefetch: ${AMQP_TOPIC_PREFETCH:1}
 
 callback:
     maxRetryAttempts: ${CALLBACK_MAX_RETRY_ATTEMPTS:3}
@@ -871,7 +858,7 @@ notification:
                 docmosisId: TB-SCS-GNO-ENG-00773.docx
         updateOtherPartyData:
             other_party:
-                docmosisId: TB-SCS-GNO-ENG-00784-v2.docx
+                docmosisId: TB-SCS-GNO-ENG-00784.docx
         libertyToApplyGranted:
             docmosisId: TB-SCS-LET-ENG-Liberty-to-Apply-Granted-Refused.docx
         libertyToApplyRefused:
@@ -1469,13 +1456,13 @@ notification:
                 docmosisId: TB-SCS-GNO-WEL-00602.docx
         actionHearingRecordingRequest:
             appellant:
-                docmosisId: TB-SCS-GNO-WEL-00765.docx
+                docmosisId: TB-SCS-GNO-WEL-00765-v2.docx
             representative:
-                docmosisId: TB-SCS-GNO-WEL-00765.docx
+                docmosisId: TB-SCS-GNO-WEL-00765-v2.docx
             appointee:
-                docmosisId: TB-SCS-GNO-WEL-00765.docx
+                docmosisId: TB-SCS-GNO-WEL-00765-v2.docx
             joint_party:
-                docmosisId: TB-SCS-GNO-WEL-00765.docx
+                docmosisId: TB-SCS-GNO-WEL-00765-v2.docx
         deathOfAppellant:
             representative:
                 docmosisId: TB-SCS-GNO-WEL-00774.docx
@@ -2021,6 +2008,7 @@ spring:
         mapper:
             accept-case-insensitive-enums: true
             accept-case-insensitive-properties: true
+
 job.scheduler:
     retryPolicy:
         maxNumberOfJobExecutions: 2
