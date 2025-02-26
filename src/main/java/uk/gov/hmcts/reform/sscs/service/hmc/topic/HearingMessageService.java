@@ -31,8 +31,7 @@ public class HearingMessageService implements SessionAwareMessagingService {
 
             hearingMessageServiceListener.handleIncomingMessage(hearingRequest);
             return true;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             log.error("Unable to send message {}. Cause: {}", message, ex.getMessage(), ex);
             return false;
         }
