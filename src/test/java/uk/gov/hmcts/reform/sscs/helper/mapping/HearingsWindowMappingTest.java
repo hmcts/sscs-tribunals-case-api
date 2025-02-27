@@ -19,7 +19,16 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Postponement;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingWindow;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
@@ -141,7 +150,7 @@ class HearingsWindowMappingTest {
     void testBuildHearingWindowNotAutoListUrgent() {
         SscsCaseData caseData = SscsCaseData.builder()
             .dwpResponseDate(LocalDate.now().toString())
-            .appeal(new Appeal(null, null, null, new HearingOptions("yes", null, null, null, null, null, null, null, null, null, null, null), null, null, null, null, new HearingSubtype("yes", "07444123456", null, null, null), null))
+            .appeal(new Appeal(null, null, null, new HearingOptions("yes", null, null, null, null, null, null, null, null, null, null, null, null), null, null, null, null, new HearingSubtype("yes", "07444123456", null, null, null), null))
             .build();
         HearingWindow result = HearingsWindowMapping.buildHearingWindow(caseData, refData);
 

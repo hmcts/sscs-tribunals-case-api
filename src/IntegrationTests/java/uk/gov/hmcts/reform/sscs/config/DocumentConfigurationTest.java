@@ -11,8 +11,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -24,7 +24,7 @@ import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 @TestPropertySource(locations = "classpath:config/application_it.properties")
 public class DocumentConfigurationTest {
 
-    @MockBean
+    @MockitoBean
     protected AirLookupService airLookupService;
 
     @ClassRule
@@ -40,7 +40,7 @@ public class DocumentConfigurationTest {
         return new Object[][] {
                 {LanguagePreference.ENGLISH, EventType.CORRECTION_GRANTED, Optional.empty(), "TB-SCS-GNO-ENG-corrected-decision-notice.docx"},
                 {LanguagePreference.ENGLISH, EventType.DECISION_ISSUED, Optional.empty(), "TB-SCS-GNO-ENG-draft-decision-notice.docx"},
-                {LanguagePreference.ENGLISH, EventType.DIRECTION_ISSUED, Optional.empty(), "TB-SCS-GNO-ENG-directions-notice.docx"},
+                {LanguagePreference.ENGLISH, EventType.DIRECTION_ISSUED, Optional.empty(), "TB-SCS-GNO-ENG-directions-notice-v2.docx"},
                 {LanguagePreference.ENGLISH, EventType.ISSUE_FINAL_DECISION, Optional.empty(), "TB-SCS-GNO-ENG-final-decision-notice.docx"},
                 {LanguagePreference.WELSH, EventType.CORRECTION_GRANTED, Optional.empty(), "TB-SCS-GNO-ENG-corrected-decision-notice.docx"},
                 {LanguagePreference.WELSH, EventType.DECISION_ISSUED, Optional.empty(), "TB-SCS-GNO-WEL-00473.docx"},

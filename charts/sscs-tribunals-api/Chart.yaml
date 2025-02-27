@@ -1,7 +1,7 @@
 apiVersion: v2
 name: sscs-tribunals-api
 home: https://github.com/hmcts/sscs-tribunals-case-api
-version: 0.0.176
+version: 0.0.185
 description: SSCS Tribunals Case API
 maintainers:
   - name: HMCTS SSCS Team
@@ -15,7 +15,7 @@ dependencies:
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/
     condition: java.enabled
   - name: job
-    version: 2.1.1
+    version: 2.1.2
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/
     condition: job.enabled
   - name: idam-pr
@@ -37,8 +37,8 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-tribunals-frontend.enabled
   - name: redis
-    version: 17.17.1
-    repository: "https://charts.bitnami.com/bitnami"
+    version: 20.8.0
+    repository: "oci://registry-1.docker.io/bitnamicharts"
     condition: redis.enabled
   - name: em-ccdorc
     version: 2.0.25
@@ -53,15 +53,15 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: ccd-case-document-am-api.enabled
   - name: servicebus
-    version: 1.0.7
-    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    version: 1.2.0
+    repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: servicebus.enabled
   - name: aac-manage-case-assignment
     version: ~0.2.16
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/
     condition: aac-manage-case-assignment.enabled
   - name: am-org-role-mapping-service
-    version: 0.0.68
+    version: 0.0.69
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/
     condition: am-org-role-mapping-service.enabled
   # WA
