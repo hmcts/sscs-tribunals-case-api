@@ -69,7 +69,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     private SscsCaseData sscsCaseData;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         openMocks(this);
         handler = new ActionFurtherEvidenceMidEventHandler(footerService, false, false, false);
 
@@ -115,7 +115,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
 
     @ParameterizedTest
     @CsvSource({"sendToInterlocReviewByTcw, Send to Interloc - Review by Tcw", "sendToInterlocReviewByJudge, Send to Interloc - Review by Judge"})
-    public void givenAPostponementRequestInInterlocTcwOrJudgeActionAndCaseInHearing_thenAddNoError(String furtherEvidenceActionCode, String furtherEvidenceActionLabel) {
+    void givenAPostponementRequestInInterlocTcwOrJudgeActionAndCaseInHearing_thenAddNoError(String furtherEvidenceActionCode, String furtherEvidenceActionLabel) {
 
         when(caseDetails.getState()).thenReturn(State.HEARING);
         sscsCaseData.getFurtherEvidenceAction().setValue(
@@ -136,7 +136,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
-    public void givenAPostponementRequestWithoutDetails_thenAddNoError() {
+    void givenAPostponementRequestWithoutDetails_thenAddNoError() {
         List<ScannedDocument> docs = new ArrayList<>();
         when(caseDetails.getState()).thenReturn(State.HEARING);
         sscsCaseData.getFurtherEvidenceAction().setValue(
@@ -158,7 +158,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
-    public void givenAPostponementRequestInOtherThanInterlocTcwOrJudgeAction_thenAddAnError() {
+    void givenAPostponementRequestInOtherThanInterlocTcwOrJudgeAction_thenAddAnError() {
         List<ScannedDocument> docs = new ArrayList<>();
         when(caseDetails.getState()).thenReturn(State.HEARING);
         sscsCaseData.getFurtherEvidenceAction().setValue(
@@ -181,7 +181,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
-    public void givenAPostponementRequestWithGaps_thenAddAnError() {
+    void givenAPostponementRequestWithGaps_thenAddAnError() {
         List<ScannedDocument> docs = new ArrayList<>();
         when(caseDetails.getState()).thenReturn(State.HEARING);
         sscsCaseData.getFurtherEvidenceAction().setValue(
@@ -209,7 +209,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
-    public void givenAPostponementRequestWithListAssist_thenNoError() {
+    void givenAPostponementRequestWithListAssist_thenNoError() {
         List<ScannedDocument> docs = new ArrayList<>();
         when(caseDetails.getState()).thenReturn(State.HEARING);
         sscsCaseData.getFurtherEvidenceAction().setValue(
@@ -235,7 +235,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
-    public void givenAPostponementRequestInOtherThanHearingState_thenAddAnError() {
+    void givenAPostponementRequestInOtherThanHearingState_thenAddAnError() {
         List<ScannedDocument> docs = new ArrayList<>();
         when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
         sscsCaseData.getFurtherEvidenceAction().setValue(
@@ -258,7 +258,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
-    public void givenMoreThanOnePostponementRequest_thenAddAnError() {
+    void givenMoreThanOnePostponementRequest_thenAddAnError() {
         List<ScannedDocument> docs = new ArrayList<>();
         when(caseDetails.getState()).thenReturn(State.HEARING);
         sscsCaseData.getFurtherEvidenceAction().setValue(
@@ -287,12 +287,12 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
-    public void givenAHandleEvidenceEvent_thenReturnTrue() {
+    void givenAHandleEvidenceEvent_thenReturnTrue() {
         assertTrue(handler.canHandle(MID_EVENT, callback));
     }
 
     @Test
-    public void givenANonHandleEvidenceEvent_thenReturnFalse() {
+    void givenANonHandleEvidenceEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
         assertFalse(handler.canHandle(MID_EVENT, callback));
@@ -300,7 +300,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
 
 
     @Test
-    public void givenACaseWithScannedDocumentsAndSscsCaseDocuments_thenAppendNewDocumentsToSscsDocumentsList() {
+    void givenACaseWithScannedDocumentsAndSscsCaseDocuments_thenAppendNewDocumentsToSscsDocumentsList() {
         List<SscsDocument> sscsDocuments = new ArrayList<>();
         SscsDocument doc = SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
@@ -321,7 +321,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
-    public void givenACaseWithScannedDocumentWithNoFileName_showAnError() {
+    void givenACaseWithScannedDocumentWithNoFileName_showAnError() {
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder()
                 .type("type")
@@ -338,7 +338,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
-    public void givenACaseWithScannedDocumentWithNoDocumentType_showAWarning() {
+    void givenACaseWithScannedDocumentWithNoDocumentType_showAWarning() {
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder()
                 .fileName("type.pdf")
@@ -355,7 +355,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
-    public void givenACaseWithNoScannedDocuments_thenAddAnErrorToResponse() {
+    void givenACaseWithNoScannedDocuments_thenAddAnErrorToResponse() {
         sscsCaseData.setScannedDocuments(null);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -366,7 +366,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
-    public void givenADocumentWithNoUrl_thenAddAnErrorToResponse() {
+    void givenADocumentWithNoUrl_thenAddAnErrorToResponse() {
         List<ScannedDocument> docs = new ArrayList<>();
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
@@ -384,7 +384,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
-    public void givenANonConfidentialCaseAndEditedDocumentPopulated_thenAddAnErrorToResponse() {
+    void givenANonConfidentialCaseAndEditedDocumentPopulated_thenAddAnErrorToResponse() {
         List<ScannedDocument> docs = new ArrayList<>();
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
@@ -407,7 +407,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"null", " ", "    "})
-    public void givenADocumentWithNoDocFileName_thenAddAnErrorToResponse(String filename) {
+    void givenADocumentWithNoDocFileName_thenAddAnErrorToResponse(String filename) {
         List<ScannedDocument> docs = new ArrayList<>();
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
@@ -426,7 +426,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
-    public void givenACaseWithUnreadableScannedDocument_showAnError() {
+    void givenACaseWithUnreadableScannedDocument_showAnError() {
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder()
                 .fileName("Testing.jpg")
@@ -448,7 +448,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
-    public void givenACaseWithPasswordEncryptedScannedDocument_showAnError() {
+    void givenACaseWithPasswordEncryptedScannedDocument_showAnError() {
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder()
                 .fileName("Testing.jpg")
@@ -471,7 +471,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
 
     @ParameterizedTest
     @EnumSource(value = PartyItemList.class, names = {"OTHER_PARTY", "OTHER_PARTY_REPRESENTATIVE"})
-    public void givenARequestWithOtherPartySelectedAsOriginalSenderAndOtherPartyHearingPreferencesDocumentSelected_thenNoErrorShown(PartyItemList partyItemList) {
+    void givenARequestWithOtherPartySelectedAsOriginalSenderAndOtherPartyHearingPreferencesDocumentSelected_thenNoErrorShown(PartyItemList partyItemList) {
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder()
                 .fileName("Testing.jpg")
@@ -491,7 +491,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
-    public void givenARequestWithOtherPartyNotSelectedAsOriginalSenderAndOtherPartyHearingPreferencesDocumentSelected_thenErrorShown() {
+    void givenARequestWithOtherPartyNotSelectedAsOriginalSenderAndOtherPartyHearingPreferencesDocumentSelected_thenErrorShown() {
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder()
                 .fileName("Testing.jpg")
@@ -515,7 +515,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     @ParameterizedTest
     @ValueSource(strings = {"setAsideApplication", "correctionApplication", "statementOfReasonsApplication",
         "libertyToApplyApplication", "permissionToAppealApplication"})
-    public void givenAGapsCaseAndPostponementRequest_thenAddAnErrorToResponse(String doctype) {
+    void givenAGapsCaseAndPostponementRequest_thenAddAnErrorToResponse(String doctype) {
         handler = new ActionFurtherEvidenceMidEventHandler(footerService, true, true, false);
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.GAPS);
         DynamicListItem issueEvidenceAction = new DynamicListItem(
@@ -542,7 +542,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
-    public void givenAGapsCaseAndNotPostponementRequest_thenDontAddErrorToResponse() {
+    void givenAGapsCaseAndNotPostponementRequest_thenDontAddErrorToResponse() {
         handler = new ActionFurtherEvidenceMidEventHandler(footerService, true, true, false);
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.GAPS);
         DynamicListItem issueEvidenceAction = new DynamicListItem(
@@ -568,14 +568,14 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
-    public void throwsExceptionIfItCannotHandleTheAppeal() {
+    void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
         assertThrows(IllegalStateException.class, () -> handler.handle(MID_EVENT, callback, USER_AUTHORISATION));
     }
 
     @ParameterizedTest
     @EnumSource(value = FurtherEvidenceActionDynamicListItems.class, mode = EnumSource.Mode.EXCLUDE, names = {"ADMIN_ACTION_CORRECTION", "ISSUE_FURTHER_EVIDENCE"})
-    public void givenInternalDocumentFlagOnAndValidActionNoBundle_thenDoNotAddErrorToResponse(FurtherEvidenceActionDynamicListItems action) {
+    void givenInternalDocumentFlagOnAndValidActionNoBundle_thenDoNotAddErrorToResponse(FurtherEvidenceActionDynamicListItems action) {
         handler = new ActionFurtherEvidenceMidEventHandler(footerService, false, false, true);
         DynamicListItem issueEvidenceAction = new DynamicListItem(action.getCode(), action.getLabel());
         sscsCaseData.getFurtherEvidenceAction().setValue(issueEvidenceAction);
@@ -596,7 +596,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
 
     @ParameterizedTest
     @EnumSource(value = FurtherEvidenceActionDynamicListItems.class, names = {"ADMIN_ACTION_CORRECTION", "ISSUE_FURTHER_EVIDENCE"})
-    public void givenInternalDocumentFlagOnAndInvalidActionNoBundle_thenAddErrorToResponse(FurtherEvidenceActionDynamicListItems action) {
+    void givenInternalDocumentFlagOnAndInvalidActionNoBundle_thenAddErrorToResponse(FurtherEvidenceActionDynamicListItems action) {
         handler = new ActionFurtherEvidenceMidEventHandler(footerService, false, false, true);
         DynamicListItem issueEvidenceAction = new DynamicListItem(action.getCode(), action.getLabel());
         sscsCaseData.getFurtherEvidenceAction().setValue(issueEvidenceAction);
@@ -618,7 +618,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
 
     @ParameterizedTest
     @EnumSource(value = FurtherEvidenceActionDynamicListItems.class, mode = EnumSource.Mode.EXCLUDE, names = {"ADMIN_ACTION_CORRECTION", "ISSUE_FURTHER_EVIDENCE"})
-    public void givenInternalDocumentFlagOnAndValidActionIncludeInBundle_thenAddErrorToResponse(FurtherEvidenceActionDynamicListItems action) {
+    void givenInternalDocumentFlagOnAndValidActionIncludeInBundle_thenAddErrorToResponse(FurtherEvidenceActionDynamicListItems action) {
         handler = new ActionFurtherEvidenceMidEventHandler(footerService, false, false, true);
         DynamicListItem issueEvidenceAction = new DynamicListItem(action.getCode(), action.getLabel());
         sscsCaseData.getFurtherEvidenceAction().setValue(issueEvidenceAction);
@@ -640,7 +640,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
 
     @ParameterizedTest
     @EnumSource(value = FurtherEvidenceActionDynamicListItems.class, names = {"ADMIN_ACTION_CORRECTION", "ISSUE_FURTHER_EVIDENCE"})
-    public void givenInternalDocumentFlagOnAndInvalidActionIncludeInBundle_thenAddOneErrorToResponse(FurtherEvidenceActionDynamicListItems action) {
+    void givenInternalDocumentFlagOnAndInvalidActionIncludeInBundle_thenAddOneErrorToResponse(FurtherEvidenceActionDynamicListItems action) {
         handler = new ActionFurtherEvidenceMidEventHandler(footerService, false, false, true);
         DynamicListItem issueEvidenceAction = new DynamicListItem(action.getCode(), action.getLabel());
         sscsCaseData.getFurtherEvidenceAction().setValue(issueEvidenceAction);

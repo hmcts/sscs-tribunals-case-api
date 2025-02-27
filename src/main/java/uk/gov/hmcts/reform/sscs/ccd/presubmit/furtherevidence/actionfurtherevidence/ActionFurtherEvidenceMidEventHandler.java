@@ -98,10 +98,8 @@ public class ActionFurtherEvidenceMidEventHandler implements PreSubmitCallbackHa
                     || YES.equalsIgnoreCase(details.getIncludeInBundle()))
                 .findFirst();
 
-            invalidDocument.ifPresent(details -> {
-                preSubmitCallbackResponse.addError(!isFurtherEvidenceActionValidForInternal(sscsCaseData.getFurtherEvidenceAction())
-                    ? FURTHER_ACTION_INVALID_INTERNAL_ERROR : INCLUDE_BUNDLE_AND_INTERNAL_ERROR);
-            });
+            invalidDocument.ifPresent(details -> preSubmitCallbackResponse.addError(!isFurtherEvidenceActionValidForInternal(sscsCaseData.getFurtherEvidenceAction())
+                ? FURTHER_ACTION_INVALID_INTERNAL_ERROR : INCLUDE_BUNDLE_AND_INTERNAL_ERROR));
         }
     }
 

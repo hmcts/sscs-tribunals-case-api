@@ -90,6 +90,9 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                         .hmcHearingType(caseData.getHmcHearingType())
                         .build());
             }
+            Optional.ofNullable(caseData.getSchedulingAndListingFields())
+                .map(SchedulingAndListingFields::getOverrideFields)
+                .ifPresent(overrideFields -> overrideFields.setHmcHearingType(null));
         }
         return validateDirectionType(caseData)
             .or(() -> validateDirectionDueDate(caseData))
