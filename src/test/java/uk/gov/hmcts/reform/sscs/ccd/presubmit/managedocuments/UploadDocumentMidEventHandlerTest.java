@@ -54,7 +54,7 @@ class UploadDocumentMidEventHandlerTest {
         when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
         when(callback.getEvent()).thenReturn(EventType.UPLOAD_DOCUMENT);
     }
-    
+
     @Test
     void canHandleWithCorrectEventAndCallbackType() {
         assertTrue(handler.canHandle(CallbackType.MID_EVENT, callback));
@@ -136,19 +136,24 @@ class UploadDocumentMidEventHandlerTest {
         assertTrue(response.getErrors().contains("No Tribunal Internal documents available to move"));
     }
 
-    private SscsDocument generateDocumentFromId(String id, DocumentType documentType) {
-        return SscsDocument.builder().value(SscsDocumentDetails.builder().documentType(documentType.getValue()).documentLink(DocumentLink.builder().documentUrl("some-slug/id_" + id).documentFilename("test" + id + ".pdf").build()).build()).build();
+    private SscsDocument generateDocumentFromId(String id, DocumentType documentType, boolean hasFileName) {
+        return SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentType(documentType.getValue())
+                .documentFileName(hasFileName ? "testSetFileName" + id : null)
+                .documentLink(DocumentLink.builder().documentUrl("some-slug/id_" + id).documentFilename("test" + id + ".pdf").build())
+                .build())
+            .build();
     }
 
     @Test
     void populatesCorrectDlIfMoveToDocumentsAndInternalDocumentsNotEmptyFlagOn() {
         when(callback.getPageId()).thenReturn("moveDocumentTo");
         sscsCaseData.getInternalCaseDocumentData().setMoveDocumentTo(REGULAR);
-        SscsDocument document1 = generateDocumentFromId("1", DocumentType.ADJOURNMENT_NOTICE);
-        SscsDocument document2 = generateDocumentFromId("2", DocumentType.AUDIO_DOCUMENT);
-        SscsDocument document3 = generateDocumentFromId("3", DocumentType.VIDEO_DOCUMENT);
-        SscsDocument document5 = generateDocumentFromId("4", DocumentType.AT38);
-        SscsDocument document4 = generateDocumentFromId("5", DocumentType.AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE);
+        SscsDocument document1 = generateDocumentFromId("1", DocumentType.ADJOURNMENT_NOTICE, false);
+        SscsDocument document2 = generateDocumentFromId("2", DocumentType.AUDIO_DOCUMENT, false);
+        SscsDocument document3 = generateDocumentFromId("3", DocumentType.VIDEO_DOCUMENT, false);
+        SscsDocument document5 = generateDocumentFromId("4", DocumentType.AT38, true);
+        SscsDocument document4 = generateDocumentFromId("5", DocumentType.AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE, false);
         sscsCaseDataBefore.getInternalCaseDocumentData().setSscsInternalDocument(List.of(document1, document2, document3, document4, document5));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.MID_EVENT, callback, "");
         assertNotNull(response);
@@ -158,18 +163,18 @@ class UploadDocumentMidEventHandlerTest {
         assertTrue(internalCaseDocumentData.getMoveDocumentToDocumentsTabDL().getValue().isEmpty());
         assertEquals(2, internalCaseDocumentData.getMoveDocumentToDocumentsTabDL().getListItems().size());
         assertTrue(internalCaseDocumentData.getMoveDocumentToDocumentsTabDL().getListItems().contains(new DynamicListItem("id_1", "test1.pdf")));
-        assertTrue(internalCaseDocumentData.getMoveDocumentToDocumentsTabDL().getListItems().contains(new DynamicListItem("id_4", "test4.pdf")));
+        assertTrue(internalCaseDocumentData.getMoveDocumentToDocumentsTabDL().getListItems().contains(new DynamicListItem("id_4", "testSetFileName4")));
     }
 
     @Test
     void populatesCorrectDlIfMoveToInternalDocumentsAndDocumentsNotEmptyFlagOn() {
         when(callback.getPageId()).thenReturn("moveDocumentTo");
         sscsCaseData.getInternalCaseDocumentData().setMoveDocumentTo(INTERNAL);
-        SscsDocument document1 = generateDocumentFromId("1", DocumentType.ADJOURNMENT_NOTICE);
-        SscsDocument document2 = generateDocumentFromId("2", DocumentType.AUDIO_DOCUMENT);
-        SscsDocument document3 = generateDocumentFromId("3", DocumentType.VIDEO_DOCUMENT);
-        SscsDocument document5 = generateDocumentFromId("4", DocumentType.AT38);
-        SscsDocument document4 = generateDocumentFromId("5", DocumentType.AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE);
+        SscsDocument document1 = generateDocumentFromId("1", DocumentType.ADJOURNMENT_NOTICE, true);
+        SscsDocument document2 = generateDocumentFromId("2", DocumentType.AUDIO_DOCUMENT, false);
+        SscsDocument document3 = generateDocumentFromId("3", DocumentType.VIDEO_DOCUMENT, true);
+        SscsDocument document5 = generateDocumentFromId("4", DocumentType.AT38, false);
+        SscsDocument document4 = generateDocumentFromId("5", DocumentType.AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE, false);
         sscsCaseDataBefore.setSscsDocument(List.of(document1, document2, document3, document4, document5));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.MID_EVENT, callback, "");
         assertNotNull(response);
@@ -178,7 +183,7 @@ class UploadDocumentMidEventHandlerTest {
         assertNull(internalCaseDocumentData.getMoveDocumentToDocumentsTabDL());
         assertTrue(internalCaseDocumentData.getMoveDocumentToInternalDocumentsTabDL().getValue().isEmpty());
         assertEquals(2, internalCaseDocumentData.getMoveDocumentToInternalDocumentsTabDL().getListItems().size());
-        assertTrue(internalCaseDocumentData.getMoveDocumentToInternalDocumentsTabDL().getListItems().contains(new DynamicListItem("id_1", "test1.pdf")));
+        assertTrue(internalCaseDocumentData.getMoveDocumentToInternalDocumentsTabDL().getListItems().contains(new DynamicListItem("id_1", "testSetFileName1")));
         assertTrue(internalCaseDocumentData.getMoveDocumentToInternalDocumentsTabDL().getListItems().contains(new DynamicListItem("id_4", "test4.pdf")));
     }
 }

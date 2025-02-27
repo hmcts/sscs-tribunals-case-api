@@ -81,8 +81,11 @@ public class UploadDocumentMidEventHandler implements PreSubmitCallbackHandler<S
 
     private List<DynamicListItem> createDynamicListItems(List<SscsDocument> documents) {
         return documents.stream()
-            .filter(doc -> isNotBlank(doc.getValue().getDocumentLink().getDocumentFilename()))
-            .map(doc -> new DynamicListItem(getDocumentIdFromUrl(doc), doc.getValue().getDocumentLink().getDocumentFilename()))
+            .filter(doc -> isNotBlank(doc.getValue().getDocumentFileName()) || isNotBlank(doc.getValue().getDocumentLink().getDocumentFilename()))
+            .map(doc -> new DynamicListItem(getDocumentIdFromUrl(doc),
+                isNotBlank(doc.getValue().getDocumentFileName())
+                    ? doc.getValue().getDocumentFileName()
+                    : doc.getValue().getDocumentLink().getDocumentFilename()))
             .collect(Collectors.toList());
     }
 
