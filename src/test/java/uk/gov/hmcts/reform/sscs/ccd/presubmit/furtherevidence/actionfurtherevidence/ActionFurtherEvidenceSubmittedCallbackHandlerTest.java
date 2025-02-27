@@ -88,7 +88,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     private ActionFurtherEvidenceSubmittedCallbackHandler handler;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         openMocks(this);
         handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, ccdClient, sscsCcdConvertService, idamService, false, false, false);
     }
@@ -96,7 +96,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
     @ParameterizedTest
     @MethodSource(value = "generateCanHandleScenarios")
-    public void givenCanHandleIsCalled_shouldReturnCorrectResult(CallbackType callbackType,
+    void givenCanHandleIsCalled_shouldReturnCorrectResult(CallbackType callbackType,
                                                                  Callback<SscsCaseData> callback,
                                                                  boolean expectedResult) {
         boolean actualResult = handler.canHandle(callbackType, callback);
@@ -151,7 +151,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     }
 
     @Test
-    public void givenIssueToAllParties_shouldUpdateCaseCorrectly() {
+    void givenIssueToAllParties_shouldUpdateCaseCorrectly() {
         Callback<SscsCaseData> callback = buildCallback("issueFurtherEvidence",
             ACTION_FURTHER_EVIDENCE);
 
@@ -185,7 +185,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         "sendToInterlocReviewByTcw, REVIEW_BY_TCW, validSendToInterloc",
         "adminActionCorrection, AWAITING_ADMIN_ACTION, correctionRequest"
     })
-    public void givenFurtherEvidenceActionSelectedOption_shouldTriggerEventAndUpdateCaseCorrectly(
+    void givenFurtherEvidenceActionSelectedOption_shouldTriggerEventAndUpdateCaseCorrectly(
         String furtherEvidenceActionSelectedOption, InterlocReviewState interlocReviewState, String eventType) {
         var idamTokens = IdamTokens.builder().build();
         given(idamService.getIdamTokens()).willReturn(idamTokens);
@@ -245,7 +245,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         "LIBERTY_TO_APPLY, libertyToApplyRequest",
         "PERMISSION_TO_APPEAL, permissionToAppealRequest"
     })
-    public void givenPostHearingAndFurtherEvidenceActionIsReviewByJudge_shouldTriggerEventAndUpdateCaseCorrectly(
+    void givenPostHearingAndFurtherEvidenceActionIsReviewByJudge_shouldTriggerEventAndUpdateCaseCorrectly(
         PostHearingRequestType requestType, String eventType) {
 
         Callback<SscsCaseData> callback = buildCallback("sendToInterlocReviewByJudge", ACTION_FURTHER_EVIDENCE);
@@ -288,7 +288,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     // TODO "Re-enable once new post hearings B types are added to the enum"
     // @ParameterizedTest
     // @CsvSource({})
-    public void givenPostHearingNotImplementedAndFurtherEvidenceActionIsReviewByJudge_shouldThrowException(
+    void givenPostHearingNotImplementedAndFurtherEvidenceActionIsReviewByJudge_shouldThrowException(
         PostHearingRequestType requestType, String eventType) {
 
         Callback<SscsCaseData> callback = buildCallback("sendToInterlocReviewByJudge", ACTION_FURTHER_EVIDENCE);
@@ -327,7 +327,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         "PERMISSION_TO_APPEAL"
         // TODO add remaining post hearing B types once implemented
     })
-    public void givenPostHearingsBNotEnabledAndFurtherEvidenceActionIsReviewByJudge_shouldThrowException(
+    void givenPostHearingsBNotEnabledAndFurtherEvidenceActionIsReviewByJudge_shouldThrowException(
         PostHearingRequestType requestType) {
 
         Callback<SscsCaseData> callback = buildCallback("sendToInterlocReviewByJudge", ACTION_FURTHER_EVIDENCE);
@@ -353,7 +353,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     }
 
     @Test
-    public void givenFurtherEvidenceActionSelectedOptionAndUrgentCaseFlagNotSet_shouldTriggerUrgentCaseEventAndUpdateCaseCorrectly() {
+    void givenFurtherEvidenceActionSelectedOptionAndUrgentCaseFlagNotSet_shouldTriggerUrgentCaseEventAndUpdateCaseCorrectly() {
         Callback<SscsCaseData> callback = buildCallback(FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL.code, ACTION_FURTHER_EVIDENCE);
         var idamTokens = IdamTokens.builder().build();
         given(idamService.getIdamTokens()).willReturn(idamTokens);
@@ -394,7 +394,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    public void givenFurtherEvidenceActionSelectedOptionAndUrgentCaseFlagNotSetInternalDocument_shouldTriggerUrgentCaseEventIfFlagOn(boolean isInternalDocumentFlagOn) {
+    void givenFurtherEvidenceActionSelectedOptionAndUrgentCaseFlagNotSetInternalDocument_shouldTriggerUrgentCaseEventIfFlagOn(boolean isInternalDocumentFlagOn) {
         Callback<SscsCaseData> callback = buildCallback(FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL.code, ACTION_FURTHER_EVIDENCE);
         var idamTokens = IdamTokens.builder().build();
         given(idamService.getIdamTokens()).willReturn(idamTokens);
@@ -437,7 +437,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     }
 
     @Test
-    public void givenFurtherEvidenceActionSelectedOptionAndUrgentCaseFlagIsSet_shouldNotTriggerUrgentCaseEventAndUpdateCaseCorrectly() {
+    void givenFurtherEvidenceActionSelectedOptionAndUrgentCaseFlagIsSet_shouldNotTriggerUrgentCaseEventAndUpdateCaseCorrectly() {
         Callback<SscsCaseData> callback = buildCallback(FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL.code, ACTION_FURTHER_EVIDENCE);
         var idamTokens = IdamTokens.builder().build();
         given(idamService.getIdamTokens()).willReturn(idamTokens);
@@ -466,7 +466,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     }
 
     @Test
-    public void givenFurtherEvidenceOtherDocSelectedAndOldUrgentDocIsPresent_shouldNotTriggerUrgentCaseEventAndUpdateCaseCorrectly() {
+    void givenFurtherEvidenceOtherDocSelectedAndOldUrgentDocIsPresent_shouldNotTriggerUrgentCaseEventAndUpdateCaseCorrectly() {
         Callback<SscsCaseData> callback = buildCallback(FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL.code, ACTION_FURTHER_EVIDENCE);
         var idamTokens = IdamTokens.builder().build();
         given(idamService.getIdamTokens()).willReturn(idamTokens);
@@ -517,7 +517,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     }
 
     @Test
-    public void givenFurtherEvidenceActionSelectedOptionWithManualDocument_shouldUpdateCaseCorrectly() {
+    void givenFurtherEvidenceActionSelectedOptionWithManualDocument_shouldUpdateCaseCorrectly() {
         Callback<SscsCaseData> callback = buildCallback(FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL.code, ACTION_FURTHER_EVIDENCE);
 
         var idamTokens = IdamTokens.builder().build();
@@ -546,7 +546,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     }
 
     @Test
-    public void givenFurtherEvidenceActionPostponementRequest_shouldTriggerEventAndUpdateCaseCorrectly() {
+    void givenFurtherEvidenceActionPostponementRequest_shouldTriggerEventAndUpdateCaseCorrectly() {
         Callback<SscsCaseData> callback = buildCallback(
             FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(),
             ACTION_FURTHER_EVIDENCE);
@@ -591,7 +591,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    public void givenFurtherEvidenceActionPostponementRequestInternalDocument_shouldTriggerEventAndUpdateCaseCorrectly(boolean isInternalDocumentFlagOn) {
+    void givenFurtherEvidenceActionPostponementRequestInternalDocument_shouldTriggerEventAndUpdateCaseCorrectly(boolean isInternalDocumentFlagOn) {
         Callback<SscsCaseData> callback = buildCallback(
             FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(),
             ACTION_FURTHER_EVIDENCE);
@@ -635,7 +635,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     }
 
     @Test
-    public void givenPostHearingOtherAndFurtherEvidenceActionIsReviewByJudge_shouldTriggerEventAndUpdateCaseCorrectly() {
+    void givenPostHearingOtherAndFurtherEvidenceActionIsReviewByJudge_shouldTriggerEventAndUpdateCaseCorrectly() {
         Callback<SscsCaseData> callback = buildCallback(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(), ACTION_FURTHER_EVIDENCE);
 
         var idamTokens = IdamTokens.builder().build();
@@ -678,7 +678,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     }
 
     @Test
-    public void givenPostHearingOtherAndFurtherEvidenceActionIsReviewByJudgeInternalDocumentFlagOn_shouldTriggerEventAndUpdateCaseCorrectly() {
+    void givenPostHearingOtherAndFurtherEvidenceActionIsReviewByJudgeInternalDocumentFlagOn_shouldTriggerEventAndUpdateCaseCorrectly() {
         Callback<SscsCaseData> callback = buildCallback(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(), ACTION_FURTHER_EVIDENCE);
 
         var idamTokens = IdamTokens.builder().build();
