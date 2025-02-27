@@ -136,15 +136,6 @@ class UploadDocumentMidEventHandlerTest {
         assertTrue(response.getErrors().contains("No Tribunal Internal documents available to move"));
     }
 
-    private SscsDocument generateDocumentFromId(String id, DocumentType documentType, boolean hasFileName) {
-        return SscsDocument.builder().value(SscsDocumentDetails.builder()
-                .documentType(documentType.getValue())
-                .documentFileName(hasFileName ? "testSetFileName" + id : null)
-                .documentLink(DocumentLink.builder().documentUrl("some-slug/id_" + id).documentFilename("test" + id + ".pdf").build())
-                .build())
-            .build();
-    }
-
     @Test
     void populatesCorrectDlIfMoveToDocumentsAndInternalDocumentsNotEmptyFlagOn() {
         when(callback.getPageId()).thenReturn("moveDocumentTo");
@@ -185,5 +176,14 @@ class UploadDocumentMidEventHandlerTest {
         assertEquals(2, internalCaseDocumentData.getMoveDocumentToInternalDocumentsTabDL().getListItems().size());
         assertTrue(internalCaseDocumentData.getMoveDocumentToInternalDocumentsTabDL().getListItems().contains(new DynamicListItem("id_1", "testSetFileName1")));
         assertTrue(internalCaseDocumentData.getMoveDocumentToInternalDocumentsTabDL().getListItems().contains(new DynamicListItem("id_4", "test4.pdf")));
+    }
+
+    private SscsDocument generateDocumentFromId(String id, DocumentType documentType, boolean hasFileName) {
+        return SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentType(documentType.getValue())
+                .documentFileName(hasFileName ? "testSetFileName" + id : null)
+                .documentLink(DocumentLink.builder().documentUrl("some-slug/id_" + id).documentFilename("test" + id + ".pdf").build())
+                .build())
+            .build();
     }
 }
