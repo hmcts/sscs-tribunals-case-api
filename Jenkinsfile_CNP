@@ -36,7 +36,6 @@ def secrets = [
                 secret('notification-test-key', 'NOTIFICATION_API_TEST_KEY'),
                 secret('sscs-email-mac-secret-text', 'EMAIL_MAC_SECRET_TEXT'),
                 secret('tya-link', 'SSCS_TRACK_YOUR_APPEAL_LINK'),
-                secret('evidence-share-topic-shared-access-key', 'AMQP_PASSWORD'),
 
                 // hearing-api
                 secret('s2s-micro', 'IDAM_S2S_AUTH_MICROSERVICES'),
@@ -70,6 +69,8 @@ def secrets = [
                 secret('test-e2e-caseofficer-password', 'TEST_AM_SUPERUSER_PASSWORD'),
                 secret('test-e2e-superuser-username', 'SUPER_USER_USERNAME'),
                 secret('test-e2e-superuser-password', 'SUPER_USER_PASSWORD'),
+                secret('test-e2e-hmrc-superuser-username', 'TEST_HMRC_SUPER_USER_USERNAME'),
+                secret('test-e2e-hmrc-superuser-password', 'TEST_HMRC_SUPER_USER_PASSWORD'),
                 secret('test-e2e-am-senior-tcw-case-allocator-username', 'TEST_AM_SENIOR_TRIBUNAL_CASEWORKER_CASE_ALLOCATOR_USERNAME'),
                 secret('test-e2e-am-senior-tcw-case-allocator-password', 'TEST_AM_SENIOR_TRIBUNAL_CASEWORKER_CASE_ALLOCATOR_PASSWORD')
         ],
@@ -186,18 +187,6 @@ withPipeline(type, product, component) {
         if (notificationTestsEnabled) {
             runNotificationTests()
         }
-        runE2eTests()
-        publishHTML([
-                allowMissing         : true,
-                alwaysLinkToLastBuild: true,
-                keepAll              : true,
-                reportDir            : "playwright-report",
-                reportFiles          : 'index.html',
-                reportName           : 'SSCS E2E Test Report'
-        ])
-    }
-
-    afterSuccess('smoketest:aat') {
         runE2eTests()
         publishHTML([
                 allowMissing         : true,

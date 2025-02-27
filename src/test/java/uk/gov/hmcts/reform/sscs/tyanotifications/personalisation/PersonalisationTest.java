@@ -754,9 +754,9 @@ public class PersonalisationTest {
             assertEquals(IBCA_FIRST_TIER_AGENCY_GROUP_WELSH, result.get(FIRST_TIER_AGENCY_GROUP_WELSH));
             assertEquals("", result.get(WITH_OPTIONAL_THE));
             assertEquals("", result.get(WITH_OPTIONAL_THE_WELSH));
-            assertEquals("0300 131 2850", result.get(HELPLINE_PHONE_NUMBER));
+            assertEquals("01274267247", result.get(HELPLINE_PHONE_NUMBER));
             assertEquals("0300 303 5170", result.get(PHONE_NUMBER_WELSH));
-            assertEquals("0300 131 2850", result.get(PHONE_NUMBER));
+            assertEquals("01274267247", result.get(PHONE_NUMBER));
         } else {
             assertEquals(DWP_ACRONYM, result.get(FIRST_TIER_AGENCY_ACRONYM));
             assertEquals(DWP_FULL_NAME, result.get(FIRST_TIER_AGENCY_FULL_NAME));

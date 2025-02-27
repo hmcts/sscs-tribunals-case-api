@@ -1,27 +1,27 @@
 [
   {
-    "LiveFrom": "13/01/2025",
-    "CaseEventID": "amendHearingOutcome",
-    "CaseFieldID": "hearingOutcomes",
+    "CaseEventID": "directionIssued",
+    "CaseFieldID": "selectNextHmcHearingType",
     "CaseTypeID": "Benefit",
-    "DisplayContext": "COMPLEX",
-    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 1,
+    "PageFieldDisplayOrder": 23,
     "PageID": "1.0",
+    "PageLabel": "Issue direction",
     "ShowSummaryChangeOption": "Y"
   },
   {
-    "LiveFrom": "30/10/2024",
-    "CaseEventID": "amendHearingOutcome",
-    "CaseFieldID": "completedHearingsList",
+    "CaseEventID": "directionIssued",
+    "CaseFieldID": "hmcHearingType",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 2,
-    "PageID": "1.0",
-    "ShowSummaryChangeOption": "N",
-    "RetainHiddenValue": "Yes",
-    "FieldShowCondition": "hearingOutcomes.hearingOutcomeId=\"DoNotShow\""
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 24,
+    "PageID": "2.0",
+    "PageLabel": "Issue direction",
+    "PageShowCondition": "selectNextHmcHearingType=\"Yes\"",
+    "ShowSummaryChangeOption": "Y"
   }
 ]

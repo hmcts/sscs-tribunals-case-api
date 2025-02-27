@@ -27,6 +27,9 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
     @Value("${feature.snl.enabled}")
     private boolean isScheduleListingEnabled;
 
+    @Value("${feature.direction-hearings.enabled}")
+    private boolean isDirectionHearingsEnabled;
+
     private final DynamicListLanguageUtil utils;
 
     @Override
@@ -56,7 +59,7 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
             SchedulingAndListingFields schedulingAndListingFields = sscsCaseData.getSchedulingAndListingFields();
             OverrideFields overrideFields = schedulingAndListingFields.getOverrideFields();
 
-            if (isNull(overrideFields)) {
+            if (isNull(overrideFields) || isNull(overrideFields.getAppellantInterpreter())) {
                 overrideFields = initialiseOverrideFields();
                 schedulingAndListingFields.setOverrideFields(overrideFields);
             }
@@ -66,6 +69,9 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
             appellantInterpreter.setInterpreterLanguage(interpreterLanguages);
 
             log.info("{} Languages in DynamicList for caseId {}", interpreterLanguages.getListItems().size(), caseId);
+            if (isDirectionHearingsEnabled && isNull(overrideFields.getHmcHearingType())) {
+                overrideFields.setHmcHearingType(sscsCaseData.getHmcHearingType());
+            }
         }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
