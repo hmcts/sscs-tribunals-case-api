@@ -80,12 +80,6 @@ java:
     JOB_SCHEDULER_DB_PASSWORD:
       secretRef: postgres
       key: PASSWORD
-    HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING:
-      secretRef: sscs-sb-preview
-      key: connectionString
-    TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
-      secretRef: sscs-sb-preview
-      key: primaryKey
   postgresql:
     enabled: false
 

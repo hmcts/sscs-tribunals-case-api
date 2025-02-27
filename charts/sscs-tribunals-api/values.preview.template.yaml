@@ -39,7 +39,6 @@ java:
     DELETED_REDACTED_DOC_ENABLED: true
     TESTING_SUPPORT_ENABLED: true
     EXUI_API_URL: "https://${SERVICE_NAME}-xui"
-    HEARINGS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
     ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
     ROBOTICS_EMAIL_TO: "fake"
     ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
@@ -62,12 +61,6 @@ java:
     JOB_SCHEDULER_DB_PASSWORD:
       secretRef: postgres
       key: PASSWORD
-    HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING:
-      secretRef: sscs-sb-preview
-      key: connectionString
-    TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
-      secretRef: sscs-sb-preview
-      key: primaryKey
   postgresql:
     enabled: false
 
@@ -608,8 +601,6 @@ servicebus:
     topics:
       - name: main-topic
         subscriptionNeeded: yes
-    queues:
-      - name: tribunals-to-hearing-api
 
 postgresql:
   enabled: ${PREVIEW_BRANCH_WITH_LOCAL_CCD}
