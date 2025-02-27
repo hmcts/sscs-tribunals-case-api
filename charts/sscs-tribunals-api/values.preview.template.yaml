@@ -294,7 +294,7 @@ xui-webapp:
       PROTOCOL: http
       LAUNCH_DARKLY_CLIENT_ID: 645baeea2787d812993d9d70
       PREVIEW_DEPLOYMENT_ID: "deployment-${SERVICE_NAME}"
-      ENABLE_HMC_PREVIEW_CCD: "true"
+      ENABLE_HEARING_DATA_SOURCE_HEADERS: "true"
     keyVaults:
       rpx:
         resourceGroup: rpx
