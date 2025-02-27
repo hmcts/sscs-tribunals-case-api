@@ -47,8 +47,10 @@ import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
+import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -117,6 +119,9 @@ public class ReissueFurtherEvidenceServiceIt {
 
     @Autowired
     private TopicConsumer topicConsumer;
+
+    @Autowired
+    private SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer;
 
     @MockitoBean
     protected AirLookupService airLookupService;
@@ -196,8 +201,9 @@ public class ReissueFurtherEvidenceServiceIt {
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         mockCcdCaseDataForStartEvent(json);
+        Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(json, "1");
+        topicConsumer.onMessage(sscsCaseDataCallback);
 
         verify(bulkPrintService).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -232,8 +238,9 @@ public class ReissueFurtherEvidenceServiceIt {
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         mockCcdCaseDataForStartEvent(json);
+        Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(json, "1");
+        topicConsumer.onMessage(sscsCaseDataCallback);
 
         verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -273,8 +280,9 @@ public class ReissueFurtherEvidenceServiceIt {
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         mockCcdCaseDataForStartEvent(json);
+        Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(json, "1");
+        topicConsumer.onMessage(sscsCaseDataCallback);
 
         verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -314,8 +322,9 @@ public class ReissueFurtherEvidenceServiceIt {
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         mockCcdCaseDataForStartEvent(json);
+        Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(json, "1");
+        topicConsumer.onMessage(sscsCaseDataCallback);
 
         verify(bulkPrintService, times(4)).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -365,8 +374,9 @@ public class ReissueFurtherEvidenceServiceIt {
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         mockCcdCaseDataForStartEvent(json);
+        Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(json, "1");
+        topicConsumer.onMessage(sscsCaseDataCallback);
 
         verify(bulkPrintService).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -401,8 +411,9 @@ public class ReissueFurtherEvidenceServiceIt {
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         mockCcdCaseDataForStartEvent(json);
+        Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(json, "1");
+        topicConsumer.onMessage(sscsCaseDataCallback);
 
         verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any(), any());
 
