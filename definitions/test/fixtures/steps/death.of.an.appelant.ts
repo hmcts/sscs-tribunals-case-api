@@ -22,7 +22,6 @@ export class DeathOfAnAppelant extends BaseStep {
       false,
       caseId
     );
-    await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Death of appellant');
 
     let deathOfAppellantPage = new DeathOfAppellantPage(this.page);
@@ -57,7 +56,6 @@ export class DeathOfAnAppelant extends BaseStep {
       false,
       caseId
     );
-    await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Death of appellant');
 
     let deathOfAppellantPage = new DeathOfAppellantPage(this.page);
@@ -94,7 +92,6 @@ export class DeathOfAnAppelant extends BaseStep {
       false,
       caseId
     );
-    await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Death of appellant');
 
     let deathOfAppellantPage = new DeathOfAppellantPage(this.page);
@@ -120,7 +117,6 @@ export class DeathOfAnAppelant extends BaseStep {
       false,
       caseId
     );
-    await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Death of appellant');
 
     let deathOfAppellantPage = new DeathOfAppellantPage(this.page);
@@ -130,7 +126,7 @@ export class DeathOfAnAppelant extends BaseStep {
       eventTestData.eventSummaryInput,
       eventTestData.eventDescriptionInput
     );
-    await this.eventNameAndDescriptionPage.confirmSubmission();
+    await this.eventNameAndDescriptionPage.confirmWithoutNavigation();
     await deathOfAppellantPage.verifyDeathDateNotBeIntheFutureErrorMsg();
     await deathOfAppellantPage.signOut();
     await performAppealDormantOnCase(caseId);

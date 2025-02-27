@@ -21,6 +21,8 @@ spring:
         multipart:
             max-file-size: ${MAX_FILE_SIZE:10MB}
             max-request-size: ${MAX_REQUEST_SIZE:10MB}
+    lifecycle:
+        timeout-per-shutdown-phase: 120s
 
     datasource:
         driverClassName: org.postgresql.Driver
@@ -54,21 +56,6 @@ springdoc:
 subscriptions:
     mac:
         secret: ${SUBSCRIPTIONS_MAC_SECRET:our-big-secret}
-
-amqp:
-    host: ${AMQP_HOST:localhost}
-    password: ${AMQP_PASSWORD:guest}
-    subscription: ${SUBSCRIPTION_NAME:test.queue}
-    topic: ${TOPIC_NAME:test.topic}
-    trustAllCerts: ${TRUST_ALL_CERTS:true}
-    username: ${AMQP_USERNAME:guest}
-    clientId: sscs-evidence-share
-    amqp-connection-string-template: ${JMS_AMQP_CONNECTION_TEMPLATE:amqps://%1s?amqp.idleTimeout=%2d}
-    idleTimeout: ${JMS_IDLE_TIMEOUT:30000}
-    reconnectOnException: ${AMQP_RECONNECT_ON_EXCEPTION:false}
-    prefetch:
-        override: ${AMQP_PREFETCH_OVERRIDE:false}
-        topicPrefetch: ${AMQP_TOPIC_PREFETCH:1}
 
 callback:
     maxRetryAttempts: ${CALLBACK_MAX_RETRY_ATTEMPTS:3}
@@ -105,11 +92,6 @@ auth:
         service:
             client:
                 baseUrl: ${IDAM_S2S_AUTH:http://localhost:4502}
-azure:
-    servicebus:
-        hearings:
-            connection-string: ${HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING}
-            destination: ${HEARINGS_EVENT_QUEUE_NAME}
 
 bundle:
     english:
@@ -254,6 +236,8 @@ feature:
         enabled: ${GAPS_SWITCHOVER_FEATURE:false}
     hearing-recording-filter:
         enabled: ${UPLOAD_HEARING_FILTER_ENABLED:false}
+    direction-hearings:
+        enabled: ${DIRECTION_HEARINGS_ENABLED:false}
     postHearings:
         enabled: ${POST_HEARINGS_FEATURE:false}
     postHearingsB:
@@ -304,16 +288,7 @@ idam:
         url: ${IDAM_S2S_AUTH:http://localhost:4502}
     url: ${IDAM_API_URL:http://localhost:5062}
 
-jms:
-    amqp-connection-string-template: ${JMS_AMQP_CONNECTION_TEMPLATE:"amqps://%1s?amqp.idleTimeout=%2d"}
-    enabled: ${ENABLE_JMS:false}
-    idleTimeout: ${JMS_IDLE_TIMEOUT:30000}
-    namespace: ${JMS_NAMESPACE}
-    password: ${JMS_PASSWORD:}
-    receiveTimeout: ${JMS_RECEIVE_TIMEOUT:30000}
-    tribunals-to-hearings-api:
-        queue: ${JMS_HEARINGS_EVENT_QUEUE_NAME:}
-    username: ${JMS_USERNAME:}
+
 judicial-ref:
     api:
         url: ${JUDICIAL_REF_API_URL:http://localhost:5555}
@@ -460,7 +435,7 @@ notification:
                 docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused.docx
             docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused.docx
         correctionRequest:
-            docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence.docx
+            docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence-v2.docx
         correctionGranted:
             appellant:
                 docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused.docx
@@ -486,11 +461,11 @@ notification:
                 docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused.docx
             docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused.docx
         setAsideRequest:
-            docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence.docx
+            docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence-v2.docx
         libertyToApplyRequest:
-            docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence.docx
+            docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence-v2.docx
         sORRequest:
-            docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence.docx
+            docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence-v2.docx
         reviewAndSetAside:
             docmosisId: TB-SCS-LET-ENG-Permission-to-Appeal-Review.docx
         permissionToAppealRefused:
@@ -498,7 +473,7 @@ notification:
         permissionToAppealGranted:
             docmosisId: TB-SCS-LET-ENG-Permission-to-Appeal-Granted-Refused.docx
         permissionToAppealRequest:
-            docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence.docx
+            docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence-v2.docx
         bundleCreatedForUpperTribunal:
             docmosisId: TB-SCS-LET-ENG-Share-with-Upper-Tribunal.docx
         jointPartyAdded:
@@ -1099,7 +1074,7 @@ notification:
                 docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused.docx
             docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused.docx
         correctionRequest:
-            docmosisId: TB-SCS-LET-WEL-Action-Further-Evidence.docx
+            docmosisId: TB-SCS-LET-WEL-Action-Further-Evidence-v2.docx
         correctionGranted:
             appellant:
                 docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused.docx
@@ -1125,11 +1100,11 @@ notification:
                 docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused.docx
             docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused.docx
         setAsideRequest:
-            docmosisId: TB-SCS-LET-WEL-Action-Further-Evidence.docx
+            docmosisId: TB-SCS-LET-WEL-Action-Further-Evidence-v2.docx
         libertyToApplyRequest:
-            docmosisId: TB-SCS-LET-WEL-Action-Further-Evidence.docx
+            docmosisId: TB-SCS-LET-WEL-Action-Further-Evidence-v2.docx
         sORRequest:
-            docmosisId: TB-SCS-LET-WEL-Action-Further-Evidence.docx
+            docmosisId: TB-SCS-LET-WEL-Action-Further-Evidence-v2.docx
         reviewAndSetAside:
             docmosisId: TB-SCS-LET-WEL-Permission-to-Appeal-Review.docx
         permissionToAppealRefused:
@@ -1137,7 +1112,7 @@ notification:
         permissionToAppealGranted:
             docmosisId: TB-SCS-LET-WEL-Permission-to-Appeal-Granted-Refused.docx
         permissionToAppealRequest:
-            docmosisId: TB-SCS-LET-WEL-Action-Further-Evidence.docx
+            docmosisId: TB-SCS-LET-WEL-Action-Further-Evidence-v2.docx
         bundleCreatedForUpperTribunal:
             docmosisId: TB-SCS-LET-WEL-Share-with-Upper-Tribunal.docx
         jointPartyAdded:
@@ -1981,13 +1956,6 @@ azure:
             idleTimeout: ${HMC_HEARINGS_TOPIC_IDLE_TIMEOUT:30000}
             username: ${HMC_HEARINGS_TOPIC_POLICY_NAME:}
             password: ${HMC_HEARINGS_TOPIC_ACCESS_KEY:}
-        tribunals-to-hearings-api:
-            namespace: ${TRIBUNALS_EVENT_QUEUE_NAMESPACE:}
-            queueName: ${TRIBUNALS_EVENT_QUEUE_NAME:}
-            receiveTimeout: ${TRIBUNALS_EVENT_QUEUE_RECEIVE_TIMEOUT:1}
-            idleTimeout: ${TRIBUNALS_EVENT_QUEUE_IDLE_TIMEOUT:30000}
-            username: ${TRIBUNALS_EVENT_QUEUE_POLICY_NAME:}
-            password: ${TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:}
 
 exui:
     url: ${EXUI_API_URL:http://localhost:3455}
@@ -1999,7 +1967,6 @@ sscs.serviceCode: ${SSCS_SERVICE_CODE:BBA3}
 
 flags:
     hmc-to-hearings-api.enabled: ${HMC_HEARINGS_LISTENING_ENABLED:false}
-    tribunals-to-hearings-api.enabled: ${TRIBUNALS_HEARINGS_LISTENING_ENABLED:false}
     adjournment.enabled: ${ADJOURNMENT_ENABLED:false}
     postHearings.enabled: ${POST_HEARING_ENABLED:false}
     deployment-filter.enabled: ${HMC_DEPLOYMENT_FILTER_ENABLED:false}
@@ -2019,6 +1986,7 @@ spring:
         mapper:
             accept-case-insensitive-enums: true
             accept-case-insensitive-properties: true
+
 job.scheduler:
     retryPolicy:
         maxNumberOfJobExecutions: 2
