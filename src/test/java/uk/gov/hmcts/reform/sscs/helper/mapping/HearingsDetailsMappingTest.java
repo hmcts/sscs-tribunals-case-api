@@ -278,7 +278,6 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
                 .build())
             .build());
         HmcHearingType result = HearingsDetailsMapping.getHearingType(caseData);
-
         assertThat(result).isEqualTo(HmcHearingType.DIRECTION_HEARINGS);
     }
 

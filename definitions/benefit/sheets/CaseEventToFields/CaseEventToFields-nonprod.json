@@ -1,16 +1,5 @@
 [
   {
-    "LiveFrom": "13/01/2025",
-    "CaseEventID": "amendHearingOutcome",
-    "CaseFieldID": "hearingOutcomes",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "COMPLEX",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 1,
-    "PageID": "1.0",
-    "ShowSummaryChangeOption": "Y"
-  },
-  {
     "CaseEventID": "directionIssued",
     "CaseFieldID": "selectNextHmcHearingType",
     "CaseTypeID": "Benefit",
