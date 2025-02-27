@@ -175,4 +175,10 @@ public final class PlaceholderUtility {
     private static boolean isValidName(Name name) {
         return isNoneBlank(name.getFirstName()) && isNoneBlank(name.getLastName());
     }
+
+    public static String getPostponementRequestStatus(SscsCaseData caseData) {
+        return (caseData.getPostponementRequest() == null
+                || caseData.getPostponementRequest().getActionPostponementRequestSelected() == null)
+                ? "" : caseData.getPostponementRequest().getActionPostponementRequestSelected();
+    }
 }
