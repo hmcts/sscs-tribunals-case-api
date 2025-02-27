@@ -14,6 +14,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.*;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyName;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.addDocumentToCaseDataDocuments;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.addDocumentToCaseDataInternalDocuments;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -491,24 +493,15 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private void addSscsDocumentToCaseData(SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
-        List<SscsDocument> documents = new ArrayList<>();
-        documents.add(sscsDocument);
-        if (isTribunalInternalDocumentsEnabled && DocumentTabChoice.INTERNAL.equals(sscsDocument.getValue().getDocumentTabChoice())) {
-            InternalCaseDocumentData internalCaseDocumentData = sscsCaseData.getInternalCaseDocumentData() != null
-                ? sscsCaseData.getInternalCaseDocumentData() : InternalCaseDocumentData.builder().build();
-            if (internalCaseDocumentData.getSscsInternalDocument() != null) {
-                documents.addAll(internalCaseDocumentData.getSscsInternalDocument());
-            }
-            internalCaseDocumentData.setSscsInternalDocument(documents);
-            sscsCaseData.setInternalCaseDocumentData(internalCaseDocumentData);
+        boolean isInternalDocument = isTribunalInternalDocumentsEnabled && DocumentTabChoice.INTERNAL.equals(sscsDocument.getValue().getDocumentTabChoice());
+
+        if (isInternalDocument) {
+            addDocumentToCaseDataInternalDocuments(sscsCaseData, sscsDocument);
         } else {
             if (isTribunalInternalDocumentsEnabled) {
-                documents.getFirst().getValue().setDocumentTabChoice(DocumentTabChoice.REGULAR);
+                sscsDocument.getValue().setDocumentTabChoice(DocumentTabChoice.REGULAR);
             }
-            if (sscsCaseData.getSscsDocument() != null) {
-                documents.addAll(sscsCaseData.getSscsDocument());
-            }
-            sscsCaseData.setSscsDocument(documents);
+            addDocumentToCaseDataDocuments(sscsCaseData, sscsDocument);
         }
     }
 
