@@ -67,20 +67,7 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
         #         hearings=api
         - name: hmc-servicebus-shared-access-key-tf
           alias: HMC_HEARINGS_TOPIC_ACCESS_KEY
-        # TODO remove after deployment
-        - name: sscs-servicebus-connection-string-tf
-          alias: HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING
-        - name: sscs-servicebus-shared-access-key
-          alias: TRIBUNALS_EVENT_QUEUE_ACCESS_KEY
-        # END TODO
   environment:
-    # TODO remove after deployment
-    HEARINGS_EVENT_QUEUE_NAME: tribunals-to-hearing-api-{{ .Values.global.environment }}
-    TRIBUNALS_EVENT_QUEUE_NAMESPACE: "sscs-servicebus-{{ .Values.global.environment }}"
-    TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api-{{ .Values.global.environment }}"
-    TRIBUNALS_HEARINGS_LISTENING_ENABLED: false
-    TRIBUNALS_EVENT_QUEUE_POLICY_NAME: SendAndListenSharedAccessKey
-    # END TODO
     SERVER_PORT: 8080
     REFORM_TEAM: sscs
     REFORM_SERVICE_NAME: sscs-tribunals-api
