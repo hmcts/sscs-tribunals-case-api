@@ -115,15 +115,14 @@ public class ResendToGapsAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"required,$.apellant,nino,apellant.nino is missing/not populated - please correct.",
-        "required,,nino,nino is missing/not populated - please correct.",
-        "minLength,$.apellant.nino,,apellant.nino is missing/not populated - please correct.",
-        "pattern,$.apellant.nino,,apellant.nino is invalid - please correct.",
-        "whoknows,$.apellant.nino,,An unexpected error has occurred. Please raise a ServiceNow ticket - the following field has caused the issue: apellant.nino"
+    @Parameters({"required,nino,apellant.nino is missing/not populated - please correct.",
+        "required,nino,nino is missing/not populated - please correct.",
+        "minLength,,apellant.nino is missing/not populated - please correct.",
+        "pattern,,apellant.nino is invalid - please correct.",
+        "whoknows,,An unexpected error has occurred. Please raise a ServiceNow ticket - the following field has caused the issue: apellant.nino"
     })
-    public void shouldReturnErrors_givenInvalidJson(String errorType, String path, String field, String expectedError) {
+    public void shouldReturnErrors_givenInvalidJson(String errorType, String field, String expectedError) {
         when(validationMessage.getType()).thenReturn(errorType);
-        when(validationMessage.getPath()).thenReturn(path);
         when(validationMessage.getArguments()).thenReturn(new String[]{field});
 
         Set<String> errorSet = new HashSet<>();
