@@ -170,15 +170,7 @@ public class SorPlaceholderServiceTest {
     }
 
     @Test
-    public void givenARefusedHearingPostponementRequest_thenSetPlaceholderAccordingly() {
-        caseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected(REFUSE.getValue()).build());
-
-        Map<String, Object> placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER,
-                Appointee.class.getSimpleName(), null);
-
-        assertEquals("refuse", placeholders.get(POSTPONEMENT_REQUEST));
-
-      void shouldReturnSubstantiveHearingPlaceholderDirectionFlagOff() {
+    void shouldReturnSubstantiveHearingPlaceholderDirectionFlagOff() {
         ReflectionTestUtils.setField(HearingsDetailsMapping.class, "isDirectionHearingsEnabled", false);
         caseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder().overrideFields(OverrideFields.builder().hmcHearingType(HmcHearingType.DIRECTION_HEARINGS).build()).build());
         var placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER,
@@ -192,7 +184,7 @@ public class SorPlaceholderServiceTest {
         ReflectionTestUtils.setField(HearingsDetailsMapping.class, "isDirectionHearingsEnabled", true);
         caseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder().overrideFields(OverrideFields.builder().hmcHearingType(HmcHearingType.DIRECTION_HEARINGS).build()).build());
         var placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER,
-            Appointee.class.getSimpleName(), null);
+                Appointee.class.getSimpleName(), null);
 
         assertEquals("BBA3-DIR", placeholders.get(HMC_HEARING_TYPE_LITERAL));
     }
@@ -202,7 +194,7 @@ public class SorPlaceholderServiceTest {
         ReflectionTestUtils.setField(HearingsDetailsMapping.class, "isDirectionHearingsEnabled", true);
         caseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder().overrideFields(OverrideFields.builder().hmcHearingType(HmcHearingType.SUBSTANTIVE).build()).build());
         var placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER,
-            Appointee.class.getSimpleName(), null);
+                Appointee.class.getSimpleName(), null);
 
         assertEquals("BBA3-SUB", placeholders.get(HMC_HEARING_TYPE_LITERAL));
     }
@@ -212,7 +204,7 @@ public class SorPlaceholderServiceTest {
         ReflectionTestUtils.setField(HearingsDetailsMapping.class, "isDirectionHearingsEnabled", true);
         caseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder().overrideFields(OverrideFields.builder().hmcHearingType(null).build()).build());
         var placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER,
-            Appointee.class.getSimpleName(), null);
+                Appointee.class.getSimpleName(), null);
 
         assertEquals("BBA3-SUB", placeholders.get(HMC_HEARING_TYPE_LITERAL));
     }
