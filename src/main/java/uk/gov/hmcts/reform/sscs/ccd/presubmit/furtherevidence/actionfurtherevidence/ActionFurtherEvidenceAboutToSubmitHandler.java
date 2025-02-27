@@ -494,10 +494,13 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         List<SscsDocument> documents = new ArrayList<>();
         documents.add(sscsDocument);
         if (isTribunalInternalDocumentsEnabled && DocumentTabChoice.INTERNAL.equals(sscsDocument.getValue().getDocumentTabChoice())) {
-            if (sscsCaseData.getSscsInternalDocument() != null) {
-                documents.addAll(sscsCaseData.getSscsInternalDocument());
+            InternalCaseDocumentData internalCaseDocumentData = sscsCaseData.getInternalCaseDocumentData() != null
+                ? sscsCaseData.getInternalCaseDocumentData() : InternalCaseDocumentData.builder().build();
+            if (internalCaseDocumentData.getSscsInternalDocument() != null) {
+                documents.addAll(internalCaseDocumentData.getSscsInternalDocument());
             }
-            sscsCaseData.setSscsInternalDocument(documents);
+            internalCaseDocumentData.setSscsInternalDocument(documents);
+            sscsCaseData.setInternalCaseDocumentData(internalCaseDocumentData);
         } else {
             if (isTribunalInternalDocumentsEnabled) {
                 documents.getFirst().getValue().setDocumentTabChoice(DocumentTabChoice.REGULAR);

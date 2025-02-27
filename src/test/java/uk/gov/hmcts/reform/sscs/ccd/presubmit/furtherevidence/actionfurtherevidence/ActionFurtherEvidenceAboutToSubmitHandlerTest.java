@@ -82,6 +82,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InternalCaseDocumentData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
@@ -2161,15 +2162,21 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             .value(scannedDocDetails)
             .build();
 
+        List<SscsDocument> existingInternalDocuments = new ArrayList<>();
+        existingInternalDocuments.add(SscsDocument.builder().id("id-1").value(SscsDocumentDetails.builder().documentTabChoice(DocumentTabChoice.INTERNAL).build()).build());
+        existingInternalDocuments.add(SscsDocument.builder().id("id-2").value(SscsDocumentDetails.builder().documentTabChoice(DocumentTabChoice.INTERNAL).build()).build());
+        existingInternalDocuments.add(SscsDocument.builder().id("id-3").value(SscsDocumentDetails.builder().documentTabChoice(DocumentTabChoice.INTERNAL).build()).build());
+
+        sscsCaseData.setInternalCaseDocumentData(InternalCaseDocumentData.builder().sscsInternalDocument(existingInternalDocuments).build());
         sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(1, response.getData().getSscsInternalDocument().size());
+        assertEquals(4, response.getData().getInternalCaseDocumentData().getSscsInternalDocument().size());
         assertNull(response.getData().getSscsDocument());
-        SscsDocumentDetails sscsDocument = response.getData().getSscsInternalDocument().getFirst().getValue();
+        SscsDocumentDetails sscsDocument = response.getData().getInternalCaseDocumentData().getSscsInternalDocument().getFirst().getValue();
         assertEquals(scannedDocDetails.getUrl(), sscsDocument.getDocumentLink());
         assertEquals(scannedDocDetails.getDocumentTabChoice(), sscsDocument.getDocumentTabChoice());
     }
@@ -2196,12 +2203,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
-
+        sscsCaseData.setInternalCaseDocumentData(InternalCaseDocumentData.builder().build());
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getData().getSscsDocument().size());
-        assertNull(response.getData().getSscsInternalDocument());
+        assertNull(response.getData().getInternalCaseDocumentData().getSscsInternalDocument());
         SscsDocumentDetails sscsDocument = response.getData().getSscsDocument().getFirst().getValue();
         assertEquals(scannedDocDetails.getUrl(), sscsDocument.getDocumentLink());
         assertEquals(DocumentTabChoice.REGULAR, sscsDocument.getDocumentTabChoice());
@@ -2234,7 +2241,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getData().getSscsDocument().size());
-        assertNull(response.getData().getSscsInternalDocument());
+        assertNull(response.getData().getInternalCaseDocumentData());
         SscsDocumentDetails sscsDocument = response.getData().getSscsDocument().getFirst().getValue();
         assertEquals(scannedDocDetails.getUrl(), sscsDocument.getDocumentLink());
     }
