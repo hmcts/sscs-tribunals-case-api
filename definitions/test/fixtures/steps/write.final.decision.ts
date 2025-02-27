@@ -25,7 +25,6 @@ export class WriteFinalDecision extends BaseStep {
             pipCaseId.trim(), 'dwpUploadResponse', 'dwp');*/
 
     await this.loginUserWithCaseId(credentials.judge, false, pipCaseId);
-    //await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Write final decision');
 
     //The Type of Appeal Page
@@ -106,7 +105,6 @@ export class WriteFinalDecision extends BaseStep {
             pipCaseId.trim(), 'dwpUploadResponse', 'dwp');*/
 
     await this.loginUserWithCaseId(credentials.judge, false, pipCaseId);
-    //await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Write final decision');
 
     //The Type of Appeal Page
@@ -211,7 +209,6 @@ export class WriteFinalDecision extends BaseStep {
         await this.homePage.clickSignOut();*/
 
     await this.loginUserWithCaseId(credentials.judge, false, taxCreditCaseId);
-    await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Write final decision');
 
     await this.writeFinalDecisionPage.verifyPageContentTypeOfAppealPage(false);
@@ -264,7 +261,6 @@ export class WriteFinalDecision extends BaseStep {
       false,
       universalCreditCaseId
     );
-    await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Write final decision');
 
     await this.writeFinalDecisionPage.verifyPageContentTypeOfAppealPage(false);
@@ -369,7 +365,6 @@ export class WriteFinalDecision extends BaseStep {
     esaCaseId: string
   ) {
     await this.loginUserWithCaseId(credentials.judge, false, esaCaseId);
-    await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Write final decision');
 
     await this.writeFinalDecisionPage.verifyPageContentTypeOfAppealPage(false);
@@ -470,7 +465,6 @@ export class WriteFinalDecision extends BaseStep {
     esaCaseId: string
   ) {
     await this.loginUserWithCaseId(credentials.judge, false, esaCaseId);
-    await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Write final decision');
 
     await this.writeFinalDecisionPage.verifyPageContentTypeOfAppealPage(false);

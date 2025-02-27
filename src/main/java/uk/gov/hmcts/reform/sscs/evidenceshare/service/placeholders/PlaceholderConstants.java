@@ -58,6 +58,7 @@ public final class PlaceholderConstants {
     public static final String HMCTS_IMG = "[userImage:hmcts.png]";
     public static final String LETTER_NAME = "Generic Letter to %s %s.pdf";
     public static final String HEARING_DATE = "hearing_date";
+    public static final String HMC_HEARING_TYPE_LITERAL = "hmc_hearing_type";
     public static final String ENTITY_TYPE = "entityType";
 
     public static final String PHONE_NUMBER = "phone_number";
