@@ -24,9 +24,17 @@ export class ListingRequirementPage {
     await webAction.clickButton('Continue');
   }
 
+  async setAutolistOverrideValue(selection: boolean) {
+    await webAction.clickElementById('#overrideFields_autoList_' + (selection ? "Yes" : "No"));
+    await webAction.clickButton('Continue');
+    await webAction.clickSubmitButton();
+    await webAction.verifyElementVisibility("#field-trigger-summary");
+  }
+
   async submitUpdatedValues() {
     await webAction.clickElementById('#amendReasons-adminreq');
     await webAction.clickSubmitButton();
+    await webAction.verifyElementVisibility("#field-trigger-summary");
     await webAction.clickSubmitButton();
   }
 }
