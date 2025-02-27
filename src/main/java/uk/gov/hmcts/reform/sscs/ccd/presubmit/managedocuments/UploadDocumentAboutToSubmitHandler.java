@@ -65,31 +65,16 @@ public class UploadDocumentAboutToSubmitHandler implements PreSubmitCallbackHand
         if (isTribunalInternalDocumentsEnabled) {
             if ("move".equalsIgnoreCase(sscsCaseData.getInternalCaseDocumentData().getUploadRemoveOrMoveDocument())) {
                 boolean moveToInternal = INTERNAL.equals(sscsCaseData.getInternalCaseDocumentData().getMoveDocumentTo());
-                List<SscsDocument> docList = Optional.ofNullable(moveToInternal ? sscsCaseData.getSscsDocument()
-                    : sscsCaseData.getInternalCaseDocumentData().getSscsInternalDocument()).orElse(Collections.emptyList());
                 DynamicMixedChoiceList dynamicList = sscsCaseData.getInternalCaseDocumentData().getDynamicList(moveToInternal);
                 List<DynamicListItem> selectedOptions = dynamicList.getValue();
-                if (emptyIfNull(dynamicList.getValue()).isEmpty()) {
+                if (emptyIfNull(selectedOptions).isEmpty()) {
                     PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
                     preSubmitCallbackResponse.addError("Please select at least one document to move");
                     return preSubmitCallbackResponse;
                 }
-                PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-                for (DynamicListItem doc : selectedOptions) {
-                    docList.stream()
-                        .filter(d -> getDocumentIdFromUrl(d).equalsIgnoreCase(doc.getCode()))
-                        .findFirst()
-                        .ifPresentOrElse(
-                            docToMove -> handleMove(sscsCaseData, docToMove, errorResponse, moveToInternal),
-                            () -> errorResponse.addError("Document " + doc.getLabel() + " could not be found on the case.")
-                        );
-                }
-
+                PreSubmitCallbackResponse<SscsCaseData> errorResponse = handleMove(sscsCaseData, moveToInternal, selectedOptions);
                 if (!errorResponse.getErrors().isEmpty()) {
                     return errorResponse;
-                }
-                if (!moveToInternal && YES.equals(sscsCaseData.getInternalCaseDocumentData().getShouldBeIssued())) {
-                    sscsCaseData.setDwpState(DwpState.FE_RECEIVED);
                 }
             }
             setCaseDataAfterMoveUploadRemove(sscsCaseData);
@@ -141,11 +126,30 @@ public class UploadDocumentAboutToSubmitHandler implements PreSubmitCallbackHand
         }
     }
 
-    private void handleMove(SscsCaseData sscsCaseData, SscsDocument docToMove, PreSubmitCallbackResponse<SscsCaseData> errorResponse, boolean moveToInternal) {
+    private void handleMoveToDocuments(SscsCaseData sscsCaseData, SscsDocument docToMove, PreSubmitCallbackResponse<SscsCaseData> errorResponse, boolean moveToInternal) {
         if (moveToInternal) {
             moveDocumentToTribunalInternalDocuments(sscsCaseData, docToMove);
         } else {
             moveDocumentToDocuments(sscsCaseData, docToMove, errorResponse);
         }
+    }
+
+    private PreSubmitCallbackResponse<SscsCaseData> handleMove(SscsCaseData sscsCaseData, boolean moveToInternal, List<DynamicListItem> selectedOptions) {
+        List<SscsDocument> docList = Optional.ofNullable(moveToInternal ? sscsCaseData.getSscsDocument()
+            : sscsCaseData.getInternalCaseDocumentData().getSscsInternalDocument()).orElse(Collections.emptyList());
+        PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+        for (DynamicListItem doc : selectedOptions) {
+            docList.stream()
+                .filter(d -> getDocumentIdFromUrl(d).equalsIgnoreCase(doc.getCode()))
+                .findFirst()
+                .ifPresentOrElse(
+                    docToMove -> handleMoveToDocuments(sscsCaseData, docToMove, errorResponse, moveToInternal),
+                    () -> errorResponse.addError("Document " + doc.getLabel() + " could not be found on the case.")
+                );
+        }
+        if (!moveToInternal && YES.equals(sscsCaseData.getInternalCaseDocumentData().getShouldBeIssued())) {
+            sscsCaseData.setDwpState(DwpState.FE_RECEIVED);
+        }
+        return errorResponse;
     }
 }

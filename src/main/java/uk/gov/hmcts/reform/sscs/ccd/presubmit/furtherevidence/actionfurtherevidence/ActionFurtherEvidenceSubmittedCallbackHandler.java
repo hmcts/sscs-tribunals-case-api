@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
@@ -279,9 +280,10 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
             .findFirst().orElse(null);
         InternalCaseDocumentData internalCaseDocumentData = caseData.getInternalCaseDocumentData() != null
             ? caseData.getInternalCaseDocumentData() : InternalCaseDocumentData.builder().build();
+        List<SscsDocument> internalCaseDocumentDataBefore = caseDetailsBefore.getCaseData().getInternalCaseDocumentData() != null ? caseDetailsBefore.getCaseData().getInternalCaseDocumentData().getSscsInternalDocument() : null;
         SscsDocument furtherEvidenceInternalDoc = isTribunalInternalDocumentsEnabled && internalCaseDocumentData.getSscsInternalDocument() != null
             ? internalCaseDocumentData.getSscsInternalDocument().stream()
-            .filter(d -> emptyIfNull(caseDetailsBefore.getCaseData().getInternalCaseDocumentData() != null ? caseDetailsBefore.getCaseData().getInternalCaseDocumentData().getSscsInternalDocument() : null).stream().noneMatch(db -> db.getId().equals(d.getId())))
+            .filter(d -> emptyIfNull(internalCaseDocumentDataBefore).stream().noneMatch(db -> db.getId().equals(d.getId())))
             .filter(d -> DocumentType.URGENT_HEARING_REQUEST.getValue().equals(d.getValue().getDocumentType()))
             .findFirst().orElse(null) : null;
         return (StringUtils.isEmpty(caseData.getUrgentCase()) || "No".equalsIgnoreCase(caseData.getUrgentCase()))

@@ -86,7 +86,7 @@ public class UploadDocumentMidEventHandler implements PreSubmitCallbackHandler<S
                 isNotBlank(doc.getValue().getDocumentFileName())
                     ? doc.getValue().getDocumentFileName()
                     : doc.getValue().getDocumentLink().getDocumentFilename()))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public static String getDocumentIdFromUrl(SscsDocument doc) {

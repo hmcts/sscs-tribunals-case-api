@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 @Service
 @Slf4j
 public class UploadDocumentSubmittedCallbackHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+    private final String ISSUE_TO_ALL_PARTIES = "Issue to all parties";
     private final UpdateCcdCaseService updateCcdCaseService;
 
     private final IdamService idamService;
@@ -48,12 +49,10 @@ public class UploadDocumentSubmittedCallbackHandler implements PreSubmitCallback
             && REGULAR.equals(sscsCaseData.getInternalCaseDocumentData().getMoveDocumentTo())
             && YES.equals(sscsCaseData.getInternalCaseDocumentData().getShouldBeIssued())) {
             log.info("Updating case using triggerCaseEventV2 for event: {}, event description: {}, caseId: {}",
-                EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(),
-                "Issue to all parties",
-                callback.getCaseDetails().getId());
+                EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), ISSUE_TO_ALL_PARTIES, callback.getCaseDetails().getId());
             SscsCaseDetails sscsCaseDetails = updateCcdCaseService.triggerCaseEventV2(callback.getCaseDetails().getId(),
-                EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), "Issue to all parties",
-                "Issue to all parties", idamService.getIdamTokens());
+                EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), ISSUE_TO_ALL_PARTIES,
+                ISSUE_TO_ALL_PARTIES, idamService.getIdamTokens());
             return new PreSubmitCallbackResponse<>(sscsCaseDetails.getData());
         }
         return new PreSubmitCallbackResponse<>(sscsCaseData);

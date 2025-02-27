@@ -68,7 +68,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @SuppressWarnings("unchecked")
-public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
+class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     @Mock
