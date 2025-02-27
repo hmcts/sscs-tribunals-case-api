@@ -83,7 +83,7 @@ class UploadDocumentAboutToStartHandlerTest {
         assertNotNull(response.getData().getInternalCaseDocumentData());
         assertNotNull(response.getData().getInternalCaseDocumentData().getMoveDocumentTo());
         assertNotNull(response.getData().getInternalCaseDocumentData().getShouldBeIssued());
-        assertNotNull( response.getData().getInternalCaseDocumentData().getUploadRemoveOrMoveDocument());
+        assertNotNull(response.getData().getInternalCaseDocumentData().getUploadRemoveOrMoveDocument());
     }
 
     @Test

@@ -78,14 +78,11 @@ public class UploadDocumentAboutToSubmitHandler implements PreSubmitCallbackHand
                 for (DynamicListItem doc : selectedOptions) {
                     docList.stream()
                         .filter(d -> getDocumentIdFromUrl(d).equalsIgnoreCase(doc.getCode()))
-                        .findFirst().ifPresentOrElse(docToMove -> {
-                                if (moveToInternal) {
-                                    moveDocumentToTribunalInternalDocuments(sscsCaseData, docToMove);
-                                } else {
-                                    moveDocumentToDocuments(sscsCaseData, docToMove, errorResponse);
-                                }
-                            },
-                            () -> errorResponse.addError("Document " + doc.getLabel() + " could not be found on the case."));
+                        .findFirst()
+                        .ifPresentOrElse(
+                            docToMove -> handleMove(sscsCaseData, docToMove, errorResponse, moveToInternal),
+                            () -> errorResponse.addError("Document " + doc.getLabel() + " could not be found on the case.")
+                        );
                 }
 
                 if (!errorResponse.getErrors().isEmpty()) {
@@ -141,6 +138,14 @@ public class UploadDocumentAboutToSubmitHandler implements PreSubmitCallbackHand
             addDocumentToCaseDataDocuments(sscsCaseData, docToMove);
         } else {
             addToDocumentTabAndIssue(sscsCaseData, docToMove, errorResponse);
+        }
+    }
+
+    private void handleMove(SscsCaseData sscsCaseData, SscsDocument docToMove, PreSubmitCallbackResponse<SscsCaseData> errorResponse, boolean moveToInternal) {
+        if (moveToInternal) {
+            moveDocumentToTribunalInternalDocuments(sscsCaseData, docToMove);
+        } else {
+            moveDocumentToDocuments(sscsCaseData, docToMove, errorResponse);
         }
     }
 }

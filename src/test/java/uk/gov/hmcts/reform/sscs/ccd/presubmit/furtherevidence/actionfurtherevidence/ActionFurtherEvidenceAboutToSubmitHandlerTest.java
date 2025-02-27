@@ -2153,6 +2153,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(sendToInterlocListItem);
 
+        List<SscsDocument> existingInternalDocuments = new ArrayList<>();
+        existingInternalDocuments.add(SscsDocument.builder().id("id-1").value(SscsDocumentDetails.builder().documentTabChoice(DocumentTabChoice.INTERNAL).build()).build());
+        existingInternalDocuments.add(SscsDocument.builder().id("id-2").value(SscsDocumentDetails.builder().documentTabChoice(DocumentTabChoice.INTERNAL).build()).build());
+        existingInternalDocuments.add(SscsDocument.builder().id("id-3").value(SscsDocumentDetails.builder().documentTabChoice(DocumentTabChoice.INTERNAL).build()).build());
+
+        sscsCaseData.setInternalCaseDocumentData(InternalCaseDocumentData.builder().sscsInternalDocument(existingInternalDocuments).build());
         ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
             .fileName("Test.pdf")
             .url(DOC_LINK)
@@ -2161,13 +2167,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         ScannedDocument scannedDocument = ScannedDocument.builder()
             .value(scannedDocDetails)
             .build();
-
-        List<SscsDocument> existingInternalDocuments = new ArrayList<>();
-        existingInternalDocuments.add(SscsDocument.builder().id("id-1").value(SscsDocumentDetails.builder().documentTabChoice(DocumentTabChoice.INTERNAL).build()).build());
-        existingInternalDocuments.add(SscsDocument.builder().id("id-2").value(SscsDocumentDetails.builder().documentTabChoice(DocumentTabChoice.INTERNAL).build()).build());
-        existingInternalDocuments.add(SscsDocument.builder().id("id-3").value(SscsDocumentDetails.builder().documentTabChoice(DocumentTabChoice.INTERNAL).build()).build());
-
-        sscsCaseData.setInternalCaseDocumentData(InternalCaseDocumentData.builder().sscsInternalDocument(existingInternalDocuments).build());
         sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
 
