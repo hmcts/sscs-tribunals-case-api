@@ -15,6 +15,7 @@ public class RootController {
     @GetMapping(value = "/", consumes = MediaType.ALL_VALUE)
     public void root() {
         // Only used for returning a 200 on /
+        System.out.println("Root endpoint hit");
     }
 }
 
