@@ -21,6 +21,8 @@ import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.FINAL_DE
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.HEARING_CCD;
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.HEARING_MYA;
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.HEARING_PAPER_MYA;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.HMC_HEARING_TYPE_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.HMC_HEARING_TYPE_MYA;
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.NOT_LISTABLE_CCD;
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.NOT_LISTABLE_MYA;
 
