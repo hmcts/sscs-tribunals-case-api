@@ -21,8 +21,7 @@
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "moveDocumentTo", "Label": " ", "FieldType": "FixedRadioList", "FieldTypeParameter": "FL_moveDocumentTo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "moveDocumentToInternalDocumentsTabDL", "Label": " ", "FieldType": "DynamicMultiSelectList", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "moveDocumentToDocumentsTabDL", "Label": " ", "FieldType": "DynamicMultiSelectList", "SecurityClassification": "PUBLIC"},
-
-
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "shouldBeIssued", "Label": "Should this document be issued out to parties?", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "draftSscsFurtherEvidenceDocument", "Label": "Further evidence  documents", "FieldType": "Collection", "FieldTypeParameter": "sscsFurtherEvidenceDoc", "RegularExpression": "No", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "addedDocuments", "Label": "Added documents", "FieldType": "Text", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "panel", "Label": "Panel", "FieldType": "panel", "SecurityClassification": "PUBLIC"},

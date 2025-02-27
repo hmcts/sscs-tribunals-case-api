@@ -57,7 +57,8 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "moveDocumentTo",
     "PageLabel": "Move document to which tab",
-    "PageShowCondition": "uploadRemoveOrMoveDocument=\"move\""
+    "PageShowCondition": "uploadRemoveOrMoveDocument=\"move\"",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=moveDocumentTo"
   },
   {
     "CaseEventID": "uploadDocument",
@@ -67,9 +68,9 @@
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 3,
     "PageFieldDisplayOrder": 1,
-    "PageID": "sscsDocumentUploadRemove",
-    "PageLabel": "Upload/remove documents from Documents tab",
-    "PageShowCondition": "uploadRemoveOrMoveDocument=\"uploadRemove\" AND uploadRemoveDocumentType=\"document\""
+    "PageID": "moveDocuments",
+    "FieldShowCondition": "uploadRemoveOrMoveDocument=\"uploadRemove\" AND uploadRemoveDocumentType=\"document\"",
+    "RetainHiddenValue": "Yes"
   },
   {
     "CaseEventID": "uploadDocument",
@@ -79,9 +80,9 @@
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 3,
     "PageFieldDisplayOrder": 1,
-    "PageID": "sscsInternalDocumentUploadRemove",
-    "PageLabel": "Upload/remove documents from Tribunal Internal Documents tab",
-    "PageShowCondition": "uploadRemoveOrMoveDocument=\"uploadRemove\" AND uploadRemoveDocumentType=\"internalDocument\""
+    "PageID": "moveDocuments",
+    "FieldShowCondition": "uploadRemoveOrMoveDocument=\"uploadRemove\" AND uploadRemoveDocumentType=\"internalDocument\"",
+    "RetainHiddenValue": "Yes"
   },
   {
     "CaseEventID": "uploadDocument",
@@ -91,9 +92,9 @@
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 3,
     "PageFieldDisplayOrder": 1,
-    "PageID": "moveDocumentToInternalDocumentsTab",
-    "PageLabel": "Move documents to Tribunal Internal Documents tab",
-    "PageShowCondition": "uploadRemoveOrMoveDocument=\"move\" AND moveDocumentTo=\"internalDocument\""
+    "PageID": "moveDocuments",
+    "FieldShowCondition": "uploadRemoveOrMoveDocument=\"move\" AND moveDocumentTo=\"internalDocument\"",
+    "RetainHiddenValue": "Yes"
   },
   {
     "CaseEventID": "uploadDocument",
@@ -103,8 +104,20 @@
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 3,
     "PageFieldDisplayOrder": 1,
-    "PageID": "moveDocumentToDocumentsTab",
-    "PageLabel": "Move documents to Documents tab",
-    "PageShowCondition": "uploadRemoveOrMoveDocument=\"move\" AND moveDocumentTo=\"document\""
+    "PageID": "moveDocuments",
+    "FieldShowCondition": "uploadRemoveOrMoveDocument=\"move\" AND moveDocumentTo=\"document\"",
+    "RetainHiddenValue": "Yes"
+  },
+  {
+    "CaseEventID": "uploadDocument",
+    "CaseFieldID": "shouldBeIssued",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "moveDocuments",
+    "FieldShowCondition": "uploadRemoveOrMoveDocument=\"move\" AND moveDocumentTo=\"document\"",
+    "RetainHiddenValue": "No"
   }
 ]
