@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.util;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.function.Predicate.not;
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
@@ -42,6 +43,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentTabChoice;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -52,6 +54,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InternalCaseDocumentData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.JudicialUserPanel;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LibertyToApplyActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
@@ -219,13 +222,37 @@ public class SscsUtil {
     }
 
     public static void addDocumentToCaseDataDocuments(SscsCaseData caseData, SscsDocument sscsDocument) {
-        List<SscsDocument> documents = new ArrayList<>();
-        documents.add(sscsDocument);
-
-        if (caseData.getSscsDocument() != null) {
-            documents.addAll(caseData.getSscsDocument());
-        }
+        List<SscsDocument> documents = new ArrayList<>(emptyIfNull(caseData.getSscsDocument()));
+        documents.addFirst(sscsDocument);
         caseData.setSscsDocument(documents);
+    }
+
+    public static void removeDocumentFromCaseDataDocuments(SscsCaseData caseData, SscsDocument sscsDocument) {
+        List<SscsDocument> caseDocuments = new ArrayList<>(emptyIfNull(caseData.getSscsDocument()));
+        caseDocuments.remove(sscsDocument);
+        caseData.setSscsDocument(caseDocuments);
+    }
+
+    public static void addDocumentToCaseDataInternalDocuments(SscsCaseData caseData, SscsDocument sscsDocument) {
+        InternalCaseDocumentData internalCaseDocumentData = Optional.ofNullable(caseData.getInternalCaseDocumentData())
+            .orElse(InternalCaseDocumentData.builder().build());
+        List<SscsDocument> documents = new ArrayList<>(emptyIfNull(internalCaseDocumentData.getSscsInternalDocument()));
+        sscsDocument.getValue().setDocumentTabChoice(DocumentTabChoice.INTERNAL);
+        if (!isNull(sscsDocument.getValue().getDocumentFileName()) && sscsDocument.getValue().getDocumentFileName().startsWith("Addition ")) {
+            sscsDocument.getValue().setDocumentFileName(sscsDocument.getValue().getDocumentLink().getDocumentFilename());
+        }
+        documents.addFirst(sscsDocument);
+        internalCaseDocumentData.setSscsInternalDocument(documents);
+        caseData.setInternalCaseDocumentData(internalCaseDocumentData);
+    }
+
+    public static void removeDocumentFromCaseDataInternalDocuments(SscsCaseData caseData, SscsDocument sscsDocument) {
+        InternalCaseDocumentData internalCaseDocumentData = Optional.ofNullable(caseData.getInternalCaseDocumentData())
+            .orElse(InternalCaseDocumentData.builder().build());
+        List<SscsDocument> caseDocuments = new ArrayList<>(emptyIfNull(internalCaseDocumentData.getSscsInternalDocument()));
+        caseDocuments.remove(sscsDocument);
+        internalCaseDocumentData.setSscsInternalDocument(caseDocuments);
+        caseData.setInternalCaseDocumentData(internalCaseDocumentData);
     }
 
     public static DocumentType getPostHearingReviewDocumentType(PostHearing postHearing, boolean isPostHearingsEnabled) {

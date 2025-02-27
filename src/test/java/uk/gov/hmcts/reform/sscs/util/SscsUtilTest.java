@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
@@ -34,6 +35,7 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.updateHearingInterpreter;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.validateBenefitIssueCode;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,7 +53,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Correction;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentTabChoice;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
@@ -59,6 +63,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InternalCaseDocumentData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LibertyToApplyActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
@@ -72,6 +77,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFinalDecisionCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
@@ -678,5 +685,78 @@ class SscsUtilTest {
         String result = SscsUtil.buildWriteFinalDecisionHeldBefore(mockedCaseData, "Judge Name");
 
         assertEquals("Judge Name, Disability Member and Medical Member", result);
+    }
+
+    @Test
+    void testAddDocumentToCaseDataDocuments() {
+        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build();
+        SscsUtil.addDocumentToCaseDataDocuments(caseData, sscsDocument);
+
+        List<SscsDocument> documents = caseData.getSscsDocument();
+        assertNotNull(documents);
+        assertEquals(1, documents.size());
+        assertEquals(sscsDocument, documents.getFirst());
+    }
+
+    @Test
+    void testRemoveDocumentFromCaseDataDocuments() {
+        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build();
+        List<SscsDocument> documents = new ArrayList<>();
+        documents.add(sscsDocument);
+        caseData.setSscsDocument(documents);
+
+        SscsUtil.removeDocumentFromCaseDataDocuments(caseData, sscsDocument);
+
+        List<SscsDocument> updatedDocuments = caseData.getSscsDocument();
+        assertNotNull(updatedDocuments);
+        assertTrue(updatedDocuments.isEmpty());
+    }
+
+    @Test
+    void testAddDocumentToCaseDataInternalDocuments() {
+        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build();
+        SscsUtil.addDocumentToCaseDataInternalDocuments(caseData, sscsDocument);
+
+        InternalCaseDocumentData internalCaseDocumentData = caseData.getInternalCaseDocumentData();
+        assertNotNull(internalCaseDocumentData);
+        List<SscsDocument> documents = internalCaseDocumentData.getSscsInternalDocument();
+        assertNotNull(documents);
+        assertEquals(1, documents.size());
+        assertEquals(sscsDocument, documents.getFirst());
+        assertEquals(DocumentTabChoice.INTERNAL, documents.getFirst().getValue().getDocumentTabChoice());
+    }
+
+    @Test
+    void testAddAdditionDocumentToCaseDataInternalDocuments() {
+        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder()
+            .documentFileName("Addition A - some-file-name.pdf").documentLink(DocumentLink.builder().documentFilename("some_file.pdf").build()).build()).build();
+        SscsUtil.addDocumentToCaseDataInternalDocuments(caseData, sscsDocument);
+
+        InternalCaseDocumentData internalCaseDocumentData = caseData.getInternalCaseDocumentData();
+        assertNotNull(internalCaseDocumentData);
+        List<SscsDocument> documents = internalCaseDocumentData.getSscsInternalDocument();
+        assertNotNull(documents);
+        assertEquals(1, documents.size());
+        SscsDocument expectedSscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder()
+            .documentFileName("some_file.pdf").documentLink(DocumentLink.builder().documentFilename("some_file.pdf").build()).build()).build();
+        assertEquals(expectedSscsDocument, documents.getFirst());
+        assertEquals(DocumentTabChoice.INTERNAL, documents.getFirst().getValue().getDocumentTabChoice());
+    }
+
+    @Test
+    void testRemoveDocumentFromCaseDataInternalDocuments() {
+        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build();
+        InternalCaseDocumentData internalCaseDocumentData = InternalCaseDocumentData.builder()
+            .sscsInternalDocument(new ArrayList<>(List.of(sscsDocument)))
+            .build();
+        caseData.setInternalCaseDocumentData(internalCaseDocumentData);
+
+        SscsUtil.removeDocumentFromCaseDataInternalDocuments(caseData, sscsDocument);
+
+        InternalCaseDocumentData updatedInternalCaseDocumentData = caseData.getInternalCaseDocumentData();
+        assertNotNull(updatedInternalCaseDocumentData);
+        List<SscsDocument> updatedDocuments = updatedInternalCaseDocumentData.getSscsInternalDocument();
+        assertNotNull(updatedDocuments);
+        assertTrue(updatedDocuments.isEmpty());
     }
 }
