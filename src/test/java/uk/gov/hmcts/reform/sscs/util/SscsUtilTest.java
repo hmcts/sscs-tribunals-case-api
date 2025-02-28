@@ -8,6 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.CORRECTION_GRANTED;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_CORRECTED_NOTICE;
@@ -37,12 +40,14 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.validateBenefitIssueCode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -84,6 +89,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
+import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @ExtendWith(MockitoExtension.class)
 class SscsUtilTest {
@@ -98,6 +104,9 @@ class SscsUtilTest {
 
     @Mock
     private SscsCaseData mockedCaseData;
+
+    @Mock
+    private FooterService footerService;
 
     @BeforeEach
     void setUp() {
@@ -688,6 +697,29 @@ class SscsUtilTest {
     }
 
     @Test
+    void testAddDocumentToDocumentTabAndBundle() {
+        SscsUtil.addDocumentToDocumentTabAndBundle(footerService, caseData, DocumentLink.builder().build(), DocumentType.DECISION_NOTICE);
+        verify(footerService).createFooterAndAddDocToCase(any(DocumentLink.class), eq(caseData), eq(DocumentType.DECISION_NOTICE), any(),
+            eq(null), eq(null), eq(null), eq(null), eq(false));
+    }
+
+    @Test
+    void testAddDocumentToDocumentTabAndBundleWithEventType() {
+        SscsUtil.addDocumentToDocumentTabAndBundle(footerService, caseData, DocumentLink.builder().build(), DocumentType.DECISION_NOTICE, READY_TO_LIST);
+        verify(footerService).createFooterAndAddDocToCase(any(DocumentLink.class), eq(caseData), eq(DocumentType.DECISION_NOTICE), any(),
+            eq(null), eq(null), eq(null), eq(READY_TO_LIST), eq(false));
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void testAddDocumentToDocumentTabAndBundleWithIssueBool(boolean issue) {
+        SscsUtil.addDocumentToDocumentTabAndBundle(footerService, caseData, DocumentLink.builder().build(), DocumentType.DECISION_NOTICE, null, issue);
+        verify(footerService).createFooterAndAddDocToCase(any(DocumentLink.class), eq(caseData), eq(DocumentType.DECISION_NOTICE), any(),
+            eq(null), eq(null), eq(null), eq(null), eq(issue));
+    }
+
+    @Test
     void testAddDocumentToCaseDataDocuments() {
         SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build();
         SscsUtil.addDocumentToCaseDataDocuments(caseData, sscsDocument);
@@ -727,9 +759,10 @@ class SscsUtilTest {
     }
 
     @Test
-    void testAddAdditionDocumentToCaseDataInternalDocuments() {
+    void testAddNonAdditionNamedDocumentToCaseDataInternalDocuments() {
+        String randomName = RandomStringUtils.secure().nextAlphabetic(10);
         SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder()
-            .documentFileName("Addition A - some-file-name.pdf").documentLink(DocumentLink.builder().documentFilename("some_file.pdf").build()).build()).build();
+            .documentFileName(randomName).build()).build();
         SscsUtil.addDocumentToCaseDataInternalDocuments(caseData, sscsDocument);
 
         InternalCaseDocumentData internalCaseDocumentData = caseData.getInternalCaseDocumentData();
@@ -737,9 +770,23 @@ class SscsUtilTest {
         List<SscsDocument> documents = internalCaseDocumentData.getSscsInternalDocument();
         assertNotNull(documents);
         assertEquals(1, documents.size());
-        SscsDocument expectedSscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder()
-            .documentFileName("some_file.pdf").documentLink(DocumentLink.builder().documentFilename("some_file.pdf").build()).build()).build();
-        assertEquals(expectedSscsDocument, documents.getFirst());
+        assertEquals(randomName, documents.getFirst().getValue().getDocumentFileName());
+        assertEquals(DocumentTabChoice.INTERNAL, documents.getFirst().getValue().getDocumentTabChoice());
+    }
+
+    @Test
+    void testAddAdditionNamedDocumentToCaseDataInternalDocuments() {
+        String randomName = RandomStringUtils.secure().nextAlphabetic(10);
+        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder()
+            .documentFileName("Addition A - " + randomName).build()).build();
+        SscsUtil.addDocumentToCaseDataInternalDocuments(caseData, sscsDocument);
+
+        InternalCaseDocumentData internalCaseDocumentData = caseData.getInternalCaseDocumentData();
+        assertNotNull(internalCaseDocumentData);
+        List<SscsDocument> documents = internalCaseDocumentData.getSscsInternalDocument();
+        assertNotNull(documents);
+        assertEquals(1, documents.size());
+        assertEquals(randomName, documents.getFirst().getValue().getDocumentFileName());
         assertEquals(DocumentTabChoice.INTERNAL, documents.getFirst().getValue().getDocumentTabChoice());
     }
 

@@ -212,12 +212,22 @@ public class SscsUtil {
                                                          DocumentLink documentLink,
                                                          DocumentType documentType,
                                                          EventType eventType) {
+        addDocumentToDocumentTabAndBundle(footerService, caseData, documentLink, documentType, eventType, false);
+    }
+
+
+    public static void addDocumentToDocumentTabAndBundle(FooterService footerService,
+                                                         SscsCaseData caseData,
+                                                         DocumentLink documentLink,
+                                                         DocumentType documentType,
+                                                         EventType eventType,
+                                                         boolean shouldBeIssued) {
         if (nonNull(documentLink)) {
             String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
             SscsDocumentTranslationStatus documentTranslationStatus = getDocumentTranslationStatus(caseData);
 
             footerService.createFooterAndAddDocToCase(documentLink, caseData, documentType, now,
-                null, null, documentTranslationStatus, eventType);
+                null, null, documentTranslationStatus, eventType, shouldBeIssued);
 
             updateTranslationStatus(caseData, documentTranslationStatus);
         }
@@ -241,7 +251,9 @@ public class SscsUtil {
         List<SscsDocument> documents = new ArrayList<>(emptyIfNull(internalCaseDocumentData.getSscsInternalDocument()));
         sscsDocument.getValue().setDocumentTabChoice(DocumentTabChoice.INTERNAL);
         if (!isNull(sscsDocument.getValue().getDocumentFileName()) && sscsDocument.getValue().getDocumentFileName().startsWith("Addition ")) {
-            sscsDocument.getValue().setDocumentFileName(sscsDocument.getValue().getDocumentLink().getDocumentFilename());
+            String[] splitFileName = sscsDocument.getValue().getDocumentFileName().split("- ");
+            String newFileName = String.join(" ", Arrays.copyOfRange(splitFileName, 1, splitFileName.length));
+            sscsDocument.getValue().setDocumentFileName(newFileName);
         }
         documents.addFirst(sscsDocument);
         internalCaseDocumentData.setSscsInternalDocument(documents);

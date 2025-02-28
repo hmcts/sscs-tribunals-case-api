@@ -89,6 +89,7 @@ public class UploadDocumentAboutToSubmitHandler implements PreSubmitCallbackHand
                 .forEach(doc -> {
                     doc.getValue().setBundleAddition(null);
                     doc.getValue().setDocumentTabChoice(INTERNAL);
+                    doc.getValue().setEvidenceIssued(null);
                 });
         }
         sscsCaseData.getInternalCaseDocumentData().setUploadRemoveDocumentType(null);
@@ -105,8 +106,8 @@ public class UploadDocumentAboutToSubmitHandler implements PreSubmitCallbackHand
                 ? docToMove.getValue().getDocumentFileName()
                 : docToMove.getValue().getDocumentLink().getDocumentFilename()));
         } else {
-            addDocumentToDocumentTabAndBundle(footerService, sscsCaseData,
-                docToMove.getValue().getDocumentLink(), DocumentType.fromValue(docToMove.getValue().getDocumentType()));
+            addDocumentToDocumentTabAndBundle(footerService, sscsCaseData, docToMove.getValue().getDocumentLink(),
+                DocumentType.fromValue(docToMove.getValue().getDocumentType()), null, true);
         }
     }
 

@@ -135,6 +135,7 @@ class UploadDocumentAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getInternalCaseDocumentData().getMoveDocumentToInternalDocumentsTabDL());
         assertNull(sscsCaseData.getInternalCaseDocumentData().getSscsInternalDocument().getFirst().getValue().getBundleAddition());
         assertEquals(INTERNAL, sscsCaseData.getInternalCaseDocumentData().getSscsInternalDocument().getFirst().getValue().getDocumentTabChoice());
+        assertNull(sscsCaseData.getInternalCaseDocumentData().getSscsInternalDocument().getFirst().getValue().getEvidenceIssued());
     }
 
     @ParameterizedTest
@@ -285,9 +286,9 @@ class UploadDocumentAboutToSubmitHandlerTest {
         assertEquals("some-slug/id_2", doc2.getDocumentLink().getDocumentUrl());
         assertEquals("some-slug/id_3", doc3.getDocumentLink().getDocumentUrl());
         assertEquals("Addition A - fileName.pdf", doc2.getDocumentFileName());
-        verify(footerService).createFooterAndAddDocToCase(eq(sscsDocument1.getValue().getDocumentLink()), eq(sscsCaseData), eq(DocumentType.APPELLANT_EVIDENCE), any(), eq(null), eq(null), eq(null), eq(null));
-        verify(footerService).createFooterAndAddDocToCase(eq(sscsDocument2.getValue().getDocumentLink()), eq(sscsCaseData), eq(DocumentType.DWP_EVIDENCE), any(), eq(null), eq(null), eq(null), eq(null));
-        verify(footerService).createFooterAndAddDocToCase(eq(sscsDocument3.getValue().getDocumentLink()), eq(sscsCaseData), eq(DocumentType.SET_ASIDE_APPLICATION), any(), eq(null), eq(null), eq(null), eq(null));
+        verify(footerService).createFooterAndAddDocToCase(eq(sscsDocument1.getValue().getDocumentLink()), eq(sscsCaseData), eq(DocumentType.APPELLANT_EVIDENCE), any(), eq(null), eq(null), eq(null), eq(null), eq(true));
+        verify(footerService).createFooterAndAddDocToCase(eq(sscsDocument2.getValue().getDocumentLink()), eq(sscsCaseData), eq(DocumentType.DWP_EVIDENCE), any(), eq(null), eq(null), eq(null), eq(null), eq(true));
+        verify(footerService).createFooterAndAddDocToCase(eq(sscsDocument3.getValue().getDocumentLink()), eq(sscsCaseData), eq(DocumentType.SET_ASIDE_APPLICATION), any(), eq(null), eq(null), eq(null), eq(null), eq(true));
     }
 
     private SscsDocument generateDocumentFromId(String id, DocumentType documentType) {
@@ -319,7 +320,7 @@ class UploadDocumentAboutToSubmitHandlerTest {
             documents.add(sscsDocument);
             caseData.setSscsDocument(documents);
             return null;
-        }).when(footerService).createFooterAndAddDocToCase(any(), any(), any(), any(), any(), any(), any(), any());
+        }).when(footerService).createFooterAndAddDocToCase(any(), any(), any(), any(), any(), any(), any(), any(), eq(true));
     }
 
 }
