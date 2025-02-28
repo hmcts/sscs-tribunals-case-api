@@ -1,0 +1,15 @@
+[
+  {
+    "LiveFrom": "01/01/2018",
+    "CaseTypeID": "Benefit",
+    "ID": "uploadDocument",
+    "Name": "Upload document",
+    "Description": "Upload document",
+    "DisplayOrder": 1710,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "ShowEventNotes": "Y",
+    "SecurityClassification": "Public"
+  }
+]
+
