@@ -147,6 +147,8 @@ class HearingDeleteConsumerTest extends BasePactTest {
             ContractTestDataProvider.IDAM_OAUTH2_TOKEN,
             ContractTestDataProvider.SERVICE_AUTHORIZATION_TOKEN,
             null,
+            null,
+            null,
             VALID_CASE_ID,
             ContractTestDataProvider.generateHearingDeleteRequest()
         );

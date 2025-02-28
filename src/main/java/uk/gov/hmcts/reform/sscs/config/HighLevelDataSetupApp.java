@@ -71,17 +71,12 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
     @Override
     protected List<String> getAllDefinitionFilesToLoadAt(String definitionsPath) {
         boolean isPreview = environment.name().equalsIgnoreCase(CcdEnvironment.PREVIEW.name());
-        boolean isHearingsPr = "yes".equalsIgnoreCase(System.getenv("HEARINGS_ENABLED"));
 
         if (isPreview) {
-            if (!isHearingsPr) {
-                return List.of(
-                    "definitions/bulkscan/CCD_BulkScanningDefinition_PR.xlsx",
-                    "definitions/benefit/CCD_SSCSDefinition_PR.xlsx"
-                );
-            } else {
-                return List.of("definitions/benefit/CCD_SSCSDefinition_PR.xlsx");
-            }
+            return List.of(
+                "definitions/bulkscan/CCD_BulkScanningDefinition_PR.xlsx",
+                "definitions/benefit/CCD_SSCSDefinition_PR.xlsx"
+            );
         } else {
             return List.of(
                 String.format("definitions/benefit/CCD_SSCSDefinition_%s.xlsx", environment.name().toUpperCase())

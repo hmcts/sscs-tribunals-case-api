@@ -18,18 +18,18 @@ import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
 import uk.gov.hmcts.reform.sscs.model.multi.hearing.CaseHearing;
 import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
 import uk.gov.hmcts.reform.sscs.service.HearingOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.HmcHearingsApiService;
+import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
 
 @Component
 @Slf4j
 public class AmendHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final HmcHearingsApiService hmcHearingsApiService;
+    private final HmcHearingApiService hmcHearingApiService;
     private final HearingOutcomeService hearingOutcomeService;
 
 
-    public AmendHearingOutcomeAboutToStartHandler(HmcHearingsApiService hmcHearingsApiService, HearingOutcomeService hearingOutcomeService) {
-        this.hmcHearingsApiService = hmcHearingsApiService;
+    public AmendHearingOutcomeAboutToStartHandler(HmcHearingApiService hmcHearingApiService, HearingOutcomeService hearingOutcomeService) {
+        this.hmcHearingApiService = hmcHearingApiService;
         this.hearingOutcomeService = hearingOutcomeService;
     }
 
@@ -54,7 +54,7 @@ public class AmendHearingOutcomeAboutToStartHandler implements PreSubmitCallback
             return preSubmitCallbackResponse;
         }
 
-        HearingsGetResponse response = hmcHearingsApiService.getHearingsRequest(Long.toString(caseDetails.getId()), HmcStatus.COMPLETED);
+        HearingsGetResponse response = hmcHearingApiService.getHearingsRequest(Long.toString(caseDetails.getId()), HmcStatus.COMPLETED);
         List<CaseHearing> hmcHearings = response.getCaseHearings();
         sscsCaseData.setCompletedHearingsList(hmcHearings.stream()
                 .map(hearingOutcomeService::mapCaseHearingToHearing)

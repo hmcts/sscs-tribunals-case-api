@@ -101,9 +101,6 @@ class HearingsServiceTest {
     private HmcHearingApiService hmcHearingApiService;
 
     @Mock
-    private HmcHearingsApiService hmcHearingsApiService;
-
-    @Mock
     private CcdCaseService ccdCaseService;
 
     @Mock
@@ -295,7 +292,7 @@ class HearingsServiceTest {
         given(hmcHearingApiService.sendCreateHearingRequest(any(HearingRequestPayload.class)))
             .willReturn(HmcUpdateResponse.builder().hearingRequestId(123L).versionNumber(1234L).status(HmcStatus.HEARING_REQUESTED).build());
 
-        given(hmcHearingsApiService.getHearingsRequest(anyString(), eq(null)))
+        given(hmcHearingApiService.getHearingsRequest(anyString(), eq(null)))
             .willReturn(HearingsGetResponse.builder().build());
     }
 
@@ -316,7 +313,7 @@ class HearingsServiceTest {
         given(hmcHearingApiService.sendCreateHearingRequest(any(HearingRequestPayload.class)))
                 .willReturn(HmcUpdateResponse.builder().build());
 
-        given(hmcHearingsApiService.getHearingsRequest(anyString(),eq(null)))
+        given(hmcHearingApiService.getHearingsRequest(anyString(),eq(null)))
             .willReturn(HearingsGetResponse.builder().build());
 
         wrapper.setHearingState(CREATE_HEARING);
@@ -353,7 +350,7 @@ class HearingsServiceTest {
                 .build()))
             .build();
 
-        given(hmcHearingsApiService.getHearingsRequest(anyString(),eq(null)))
+        given(hmcHearingApiService.getHearingsRequest(anyString(),eq(null)))
             .willReturn(hearingsGetResponse);
 
         wrapper.setHearingState(CREATE_HEARING);
@@ -379,7 +376,7 @@ class HearingsServiceTest {
                                       .build()))
             .build();
 
-        given(hmcHearingsApiService.getHearingsRequest(anyString(),eq(null)))
+        given(hmcHearingApiService.getHearingsRequest(anyString(),eq(null)))
             .willReturn(hearingsGetResponse);
 
         wrapper.setHearingState(CREATE_HEARING);
