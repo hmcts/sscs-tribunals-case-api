@@ -736,6 +736,7 @@ hmc-servicebus:
         fullName: hmc-to-cft-aat
         create: false
         subscriptionNeeded: yes
+        ignoreSubscriptionDeletion: true
         rules:
           - name: "servicefilter"
             filterType: CorrelationFilter
