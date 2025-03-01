@@ -136,6 +136,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
 
         Map<String, SscsDocument> binaryDocumentUrlLinkCaseDataMap = updatedCaseData.getSscsDocument()
                 .stream()
+                .filter(sscsDocument -> sscsDocument.getValue().getDocumentLink() != null)
                 .collect(toMap(document -> document.getValue().getDocumentLink().getDocumentBinaryUrl(), Function.identity()));
 
         try {
