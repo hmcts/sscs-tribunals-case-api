@@ -100,10 +100,13 @@ public abstract class WriteFinalDecisionTemplateContent {
             + (!setAside ? "confirmed." : "set aside.");
     }
 
-    public String getConfirmedOrSetAsideSentence(boolean setAside, String decisionDate, boolean isHmrc) {
+    public String getConfirmedOrSetAsideSentence(boolean setAside, String decisionDate, boolean isHmrc, boolean isIbca) {
         if (isHmrc) {
-            return "The decision made by the Respondent on " + DATEFORMATTER.format(LocalDate.parse(decisionDate)) + " is "
-                    + (!setAside ? "confirmed." : "set aside.");
+            return "The decision made by HM Revenue and Customs on " + DATEFORMATTER.format(LocalDate.parse(decisionDate)) + " is "
+                + (!setAside ? "confirmed." : "set aside.");
+        } else if (isIbca) {
+            return "The decision made by the Infected Blood Compensation Authority on " + DATEFORMATTER.format(LocalDate.parse(decisionDate)) + " is "
+                + (!setAside ? "confirmed." : "set aside.");
         } else {
             return "The decision made by the Secretary of State on " + DATEFORMATTER.format(LocalDate.parse(decisionDate)) + " is "
                     + (!setAside ? "confirmed." : "set aside.");
