@@ -39,6 +39,12 @@ public final class HearingsAutoListMapping {
             return isYes(overrideFields.getAutoList());
         }
 
+        if ("022".equals(caseData.getBenefitCode())
+                || "067".equals(caseData.getBenefitCode())
+                || caseData.isIbcCase()) {
+            return false;
+        }
+
         return !(HearingsDetailsMapping.isCaseUrgent(caseData)
                 || hasOrgRepresentative(caseData)
                 || shouldBeAdditionalSecurityFlag(caseData)
