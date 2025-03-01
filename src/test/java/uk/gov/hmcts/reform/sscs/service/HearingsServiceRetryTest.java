@@ -76,9 +76,6 @@ class HearingsServiceRetryTest {
     private HmcHearingApiService hmcHearingApiService;
 
     @MockitoBean
-    private HmcHearingsApiService hmcHearingsApiService;
-
-    @MockitoBean
     private CcdCaseService ccdCaseService;
 
     @MockitoBean

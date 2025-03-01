@@ -85,6 +85,7 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     IDAM_OAUTH2_REDIRECT_URL: "https://evidence-sharing-preprod.sscs.reform.hmcts.net"
     PDF_API_URL: "http://rpe-pdf-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+    ROLE_ASSIGNMENT_API_URL: "http://am-role-assignment-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     DOCUMENT_MANAGEMENT_URL: "http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     IDAM_S2S_AUTH: "http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     BULK_SCAN_URL: "http://sscs-bulk-scan-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
@@ -135,13 +136,10 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     EXUI_API_URL: "https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net"
     HMC_API_URL: "http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     SSCS_SERVICE_CODE: BBA3
-    HMC_DEPLOYMENT_FILTER_ENABLED: false
     HEARINGS_CASE_UPDATE_V2_ENABLED: true
 
 
 postgresql:
-  enabled: false
-idam-pr:
   enabled: false
 xui-webapp:
   enabled: false

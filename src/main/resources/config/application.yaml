@@ -1991,7 +1991,6 @@ flags:
     hmc-to-hearings-api.enabled: ${HMC_HEARINGS_LISTENING_ENABLED:false}
     adjournment.enabled: ${ADJOURNMENT_ENABLED:false}
     postHearings.enabled: ${POST_HEARING_ENABLED:false}
-    deployment-filter.enabled: ${HMC_DEPLOYMENT_FILTER_ENABLED:false}
 
 ---
 
