@@ -923,5 +923,7 @@
   {"LiveFrom": "01/09/2021", "ID": "FL_actionSendToFirstTier", "ListElementCode": "refused", "ListElement": "Refused"},
   {"LiveFrom": "01/09/2021", "ID": "FL_actionSendToFirstTier", "ListElementCode": "remitted", "ListElement": "Remit from UT"},
   {"LiveFrom": "01/09/2021", "ID": "FL_hmcHearingType", "ListElementCode": "BBA3-SUB", "ListElement": "Substantive"},
-  {"LiveFrom": "01/09/2021", "ID": "FL_hmcHearingType", "ListElementCode": "BBA3-DIR", "ListElement": "Direction"}
+  {"LiveFrom": "01/09/2021", "ID": "FL_hmcHearingType", "ListElementCode": "BBA3-DIR", "ListElement": "Direction"},
+  {"LiveFrom": "01/09/2021", "ID": "FL_documentTabChoice", "ListElementCode": "document", "ListElement": "Documents tab"},
+  {"LiveFrom": "01/09/2021", "ID": "FL_documentTabChoice", "ListElementCode": "internalDocument", "ListElement": "Tribunal internal documents tab"}
 ]
