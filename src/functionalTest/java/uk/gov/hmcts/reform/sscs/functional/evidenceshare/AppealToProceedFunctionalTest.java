@@ -25,12 +25,15 @@ public class AppealToProceedFunctionalTest extends AbstractFunctionalTest {
     @Test
     public void processAnAppealToProceedEvent_shouldUpdateHmctsDwpState() throws IOException {
 
+        //JobStoreTX
         System.out.println("processAnAppealToProceedEvent_shouldUpdateHmctsDwpState started");
 
         String jobStoreClass = environment.getProperty("job.scheduler.quartzProperties.org.quartz.jobStore.class");
         System.out.println("jobStoreClass: " + jobStoreClass);
         String testfunctionalmarker = environment.getProperty("test.functional.marker");
         System.out.println("test.functional.marker: " + testfunctionalmarker);
+        String maxCon = environment.getProperty("job.scheduler.quartzProperties.org.quartz.dataSource.jobscheduler.maxConnections", String.class);
+        System.out.println("maxCon: " + maxCon);
         assertEquals("org.quartz.simpl.RAMJobStore", jobStoreClass);
         createDigitalCaseWithEvent(NON_COMPLIANT);
 

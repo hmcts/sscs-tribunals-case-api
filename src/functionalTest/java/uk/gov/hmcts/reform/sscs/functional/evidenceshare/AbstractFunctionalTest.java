@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.ProfileValueSourceConfiguration;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
@@ -45,6 +46,7 @@ import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest
 @ProfileValueSourceConfiguration(EnvironmentProfileValueSource.class)
+@ActiveProfiles("functional")
 public abstract class AbstractFunctionalTest {
 
     private static final Logger log = getLogger(AbstractFunctionalTest.class);
