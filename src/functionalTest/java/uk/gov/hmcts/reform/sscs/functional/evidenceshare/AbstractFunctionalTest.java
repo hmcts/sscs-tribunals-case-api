@@ -49,7 +49,7 @@ import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest
 @ProfileValueSourceConfiguration(EnvironmentProfileValueSource.class)
-@ActiveProfiles("functional_abstract")
+//@ActiveProfiles("functional_abstract")
 public abstract class AbstractFunctionalTest {
 
     private static final Logger log = getLogger(AbstractFunctionalTest.class);
