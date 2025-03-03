@@ -64,26 +64,29 @@ public class UploadDocumentAboutToSubmitHandler implements PreSubmitCallbackHand
         }
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-        if (isTribunalInternalDocumentsEnabled) {
-            InternalCaseDocumentData internalCaseDocumentData = Optional.ofNullable(sscsCaseData.getInternalCaseDocumentData())
-                .orElseGet(() -> InternalCaseDocumentData.builder().build());
-            if ("move".equalsIgnoreCase(internalCaseDocumentData.getUploadRemoveOrMoveDocument())) {
-                boolean moveToInternal = INTERNAL.equals(internalCaseDocumentData.getMoveDocumentTo());
-                DynamicMixedChoiceList dynamicList = internalCaseDocumentData.getDynamicList(moveToInternal);
-                List<DynamicListItem> selectedOptions = dynamicList.getValue();
-                if (emptyIfNull(selectedOptions).isEmpty()) {
-                    PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-                    preSubmitCallbackResponse.addError("Please select at least one document to move");
-                    return preSubmitCallbackResponse;
-                }
-                PreSubmitCallbackResponse<SscsCaseData> errorResponse = processMoveRequest(sscsCaseData, internalCaseDocumentData, moveToInternal, selectedOptions);
-                if (!errorResponse.getErrors().isEmpty()) {
-                    return errorResponse;
-                }
-            }
-            resetInternalCaseDocumentData(sscsCaseData, internalCaseDocumentData);
-            sscsCaseData.setInternalCaseDocumentData(internalCaseDocumentData);
+        if (!isTribunalInternalDocumentsEnabled) {
+            return new PreSubmitCallbackResponse<>(sscsCaseData);
+
         }
+        InternalCaseDocumentData internalCaseDocumentData = Optional.ofNullable(sscsCaseData.getInternalCaseDocumentData())
+            .orElse(InternalCaseDocumentData.builder().build());
+        if ("move".equalsIgnoreCase(internalCaseDocumentData.getUploadRemoveOrMoveDocument())) {
+            boolean moveToInternal = INTERNAL.equals(internalCaseDocumentData.getMoveDocumentTo());
+            DynamicMixedChoiceList dynamicList = internalCaseDocumentData.getDynamicList(moveToInternal);
+            List<DynamicListItem> selectedOptions = dynamicList.getValue();
+            if (emptyIfNull(selectedOptions).isEmpty()) {
+                PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+                preSubmitCallbackResponse.addError("Please select at least one document to move");
+                return preSubmitCallbackResponse;
+            }
+            PreSubmitCallbackResponse<SscsCaseData> errorResponse = processMoveRequest(sscsCaseData, internalCaseDocumentData, moveToInternal, selectedOptions);
+            if (!errorResponse.getErrors().isEmpty()) {
+                return errorResponse;
+            }
+        }
+        resetInternalCaseDocumentData(sscsCaseData, internalCaseDocumentData);
+        sscsCaseData.setInternalCaseDocumentData(internalCaseDocumentData);
+
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
@@ -146,14 +149,12 @@ public class UploadDocumentAboutToSubmitHandler implements PreSubmitCallbackHand
     }
 
     private void resetInternalCaseDocumentData(SscsCaseData sscsCaseData, InternalCaseDocumentData internalCaseDocumentData) {
-        if (internalCaseDocumentData.getSscsInternalDocument() != null) {
-            internalCaseDocumentData.getSscsInternalDocument()
-                .forEach(doc -> {
-                    doc.getValue().setBundleAddition(null);
-                    doc.getValue().setDocumentTabChoice(INTERNAL);
-                    doc.getValue().setEvidenceIssued(null);
-                });
-        }
+        emptyIfNull(internalCaseDocumentData.getSscsInternalDocument())
+            .forEach(doc -> {
+                doc.getValue().setBundleAddition(null);
+                doc.getValue().setDocumentTabChoice(INTERNAL);
+                doc.getValue().setEvidenceIssued(null);
+            });
         internalCaseDocumentData.setUploadRemoveDocumentType(null);
         internalCaseDocumentData.setUploadRemoveOrMoveDocument(null);
         internalCaseDocumentData.setMoveDocumentToDocumentsTabDL(null);
