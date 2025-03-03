@@ -32,6 +32,7 @@ import static uk.gov.hmcts.reform.sscs.model.AppConstants.VENUE_NAME;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.DATEFORMATTER;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDateTime;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.stripUrl;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getHmcHearingType;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -46,6 +47,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.objectlab.kit.datecalc.common.DateCalculator;
 import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -61,6 +63,8 @@ public class TrackYourAppealJsonBuilder {
     public static final String PAPER = "paper";
     public static final String NOT_LISTABLE = "notListable";
     public static final String DOCUMENT_DATE_FORMAT = "yyyy-MM-dd";
+    @Value("${feature.direction-hearings.enabled}")
+    private boolean isDirectionHearingsEnabled;
 
     public ObjectNode build(SscsCaseData caseData,
                             RegionalProcessingCenter regionalProcessingCenter, Long caseId, boolean mya, String state) {
@@ -149,6 +153,9 @@ public class TrackYourAppealJsonBuilder {
         }
         caseNode.put("benefitType", caseData.getAppeal().getBenefitType().getCode().toLowerCase());
         caseNode.put("hearingType", getHearingType(caseData));
+        if (isDirectionHearingsEnabled && getHmcHearingType(caseData) != null) {
+            caseNode.put("hmcHearingType", getHmcHearingType(caseData).getHmcReference());
+        }
         if (StringUtils.isNotBlank(caseData.getCreatedInGapsFrom())) {
             caseNode.put("createdInGapsFrom", caseData.getCreatedInGapsFrom());
         }
