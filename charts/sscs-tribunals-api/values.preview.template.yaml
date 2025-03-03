@@ -63,7 +63,7 @@ java:
     TRIBUNALS_EVENT_QUEUE_POLICY_NAME: "RootManageSharedAccessKey"
     TRIBUNALS_EVENT_QUEUE_NAMESPACE: "sscs-sb-preview"
     HMC_HEARINGS_TOPIC_NAMESPACE: "hmc-servicebus-aat"
-    HMC_DEPLOYMENT_ID: "deployment-${SERVICE_NAME}"
+    HMC_DEPLOYMENT_ID: "sscs-${CHANGE_ID}"
     # START - DIRECTION HEARINGS RELEASE VARIABLES
     DIRECTION_HEARINGS_ENABLED: true
     HEARINGBOOKED_NEW_LETTER: TB-SCS-LET-ENG-Hearing-Booked-v2.docx
@@ -293,7 +293,7 @@ xui-webapp:
       UV_THREADPOOL_SIZE: 128
       PROTOCOL: http
       LAUNCH_DARKLY_CLIENT_ID: 645baeea2787d812993d9d70
-      PREVIEW_DEPLOYMENT_ID: "deployment-${SERVICE_NAME}"
+      PREVIEW_DEPLOYMENT_ID: "sscs-${CHANGE_ID}"
       ENABLE_HEARING_DATA_SOURCE_HEADERS: "true"
     keyVaults:
       rpx:
@@ -744,7 +744,7 @@ hmc-servicebus:
               - name: "hmctsServiceId"
                 value: "BBA3"
               - name: "deploymentId"
-                value: "deployment-${SERVICE_NAME}"
+                value: "sscs-${CHANGE_ID}"
 
 postgresql:
   enabled: ${PREVIEW_BRANCH_WITH_LOCAL_CCD}
