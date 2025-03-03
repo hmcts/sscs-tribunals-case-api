@@ -50,7 +50,7 @@ application {
 }
 
 pmd {
-    toolVersion = "7.10.0"
+    toolVersion = "7.11.0"
     ignoreFailures = true
     sourceSets = [sourceSets.main, sourceSets.test]
     reportsDir = layout.buildDirectory.dir("reports/pmd").get().asFile
@@ -321,7 +321,7 @@ dependencies {
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.5'
 
     implementation group: 'com.google.guava', name: 'guava', version: '33.4.0-jre'
-    implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.27'
+    implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.28'
 
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.0'
     implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.3'
@@ -407,7 +407,7 @@ dependencies {
     // Remove this dependency once the secure doc-store is in use
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.7.0'
-    implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.1', {
+    implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.3', {
         exclude group: 'org.apache.commons', module: 'commons-compress'
         exclude group: 'com.google.guava', module: 'guava'
         exclude group: 'org.apache.poi', module: 'poi-ooxml'
