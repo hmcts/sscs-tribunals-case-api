@@ -76,6 +76,7 @@ java:
     HMC_DEPLOYMENT_ID: "deployment-${SERVICE_NAME}"
     HMC_DEPLOYMENT_FILTER_ENABLED: true
     ADJOURNMENT_ENABLED: true
+    DIRECTION_HEARINGS_ENABLED: true
   secrets:
     JOB_SCHEDULER_DB_PASSWORD:
       secretRef: postgres
