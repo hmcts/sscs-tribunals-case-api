@@ -2154,9 +2154,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.getFurtherEvidenceAction().setValue(sendToInterlocListItem);
 
         List<SscsDocument> existingInternalDocuments = new ArrayList<>();
-        existingInternalDocuments.add(SscsDocument.builder().id("id-1").value(SscsDocumentDetails.builder().documentTabChoice(DocumentTabChoice.INTERNAL).build()).build());
-        existingInternalDocuments.add(SscsDocument.builder().id("id-2").value(SscsDocumentDetails.builder().documentTabChoice(DocumentTabChoice.INTERNAL).build()).build());
-        existingInternalDocuments.add(SscsDocument.builder().id("id-3").value(SscsDocumentDetails.builder().documentTabChoice(DocumentTabChoice.INTERNAL).build()).build());
+        existingInternalDocuments.add(SscsDocument.builder().id("id-1").value(SscsDocumentDetails.builder().build()).build());
+        existingInternalDocuments.add(SscsDocument.builder().id("id-2").value(SscsDocumentDetails.builder().build()).build());
+        existingInternalDocuments.add(SscsDocument.builder().id("id-3").value(SscsDocumentDetails.builder().build()).build());
 
         sscsCaseData.setInternalCaseDocumentData(InternalCaseDocumentData.builder().sscsInternalDocument(existingInternalDocuments).build());
         ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
@@ -2177,7 +2177,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getSscsDocument());
         SscsDocumentDetails sscsDocument = response.getData().getInternalCaseDocumentData().getSscsInternalDocument().getFirst().getValue();
         assertEquals(scannedDocDetails.getUrl(), sscsDocument.getDocumentLink());
-        assertEquals(scannedDocDetails.getDocumentTabChoice(), sscsDocument.getDocumentTabChoice());
     }
 
     @Test
@@ -2210,7 +2209,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getInternalCaseDocumentData().getSscsInternalDocument());
         SscsDocumentDetails sscsDocument = response.getData().getSscsDocument().getFirst().getValue();
         assertEquals(scannedDocDetails.getUrl(), sscsDocument.getDocumentLink());
-        assertEquals(DocumentTabChoice.REGULAR, sscsDocument.getDocumentTabChoice());
     }
 
     @Test

@@ -56,28 +56,41 @@ public class UploadDocumentMidEventHandler implements PreSubmitCallbackHandler<S
         SscsCaseData sscsCaseDataBefore = callback.getCaseDetailsBefore().map(CaseDetails::getCaseData).orElse(callback.getCaseDetails().getCaseData());
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-        if (isTribunalInternalDocumentsEnabled && MOVE_DOCUMENT_TO.equals(callback.getPageId())) {
-            List<String> invalidDocumentTypes = List.of(AUDIO_DOCUMENT.getValue(), VIDEO_DOCUMENT.getValue(), AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE.getValue());
-            List<SscsDocument> regularDocuments = Optional.ofNullable(sscsCaseDataBefore.getSscsDocument())
-                .orElse(Collections.emptyList())
-                .stream().filter(doc -> (!invalidDocumentTypes.contains(doc.getValue().getDocumentType())))
-                .toList();
-            List<SscsDocument> internalDocuments = Optional.ofNullable(sscsCaseDataBefore.getInternalCaseDocumentData())
-                .map(InternalCaseDocumentData::getSscsInternalDocument)
-                .orElse(Collections.emptyList())
-                .stream().filter(doc -> (!invalidDocumentTypes.contains(doc.getValue().getDocumentType())))
-                .toList();
-            InternalCaseDocumentData internalCaseDocumentData = Optional.ofNullable(sscsCaseData.getInternalCaseDocumentData())
-                .orElse(InternalCaseDocumentData.builder().build());
-            boolean moveToInternal = INTERNAL.equals(internalCaseDocumentData.getMoveDocumentTo());
-            List<DynamicListItem> dynamicListItems = createDynamicListItems(moveToInternal ? regularDocuments : internalDocuments);
-            DynamicMixedChoiceList dynamicMixedChoiceList = new DynamicMixedChoiceList(Collections.emptyList(), dynamicListItems);
-            if (dynamicMixedChoiceList.getListItems().isEmpty()) {
-                preSubmitCallbackResponse.addError("No " + (moveToInternal ? "" : "Tribunal Internal ") + "documents available to move");
-            }
-            internalCaseDocumentData.setDynamicList(moveToInternal, dynamicMixedChoiceList);
-            sscsCaseData.setInternalCaseDocumentData(internalCaseDocumentData);
+        if (!isTribunalInternalDocumentsEnabled || !MOVE_DOCUMENT_TO.equals(callback.getPageId())) {
+            return preSubmitCallbackResponse;
         }
+        List<String> invalidDocumentTypes = List.of(AUDIO_DOCUMENT.getValue(), VIDEO_DOCUMENT.getValue(), AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE.getValue());
+        List<SscsDocument> regularDocuments = Optional.ofNullable(sscsCaseDataBefore.getSscsDocument())
+            .orElse(Collections.emptyList())
+            .stream().filter(doc -> (!invalidDocumentTypes.contains(doc.getValue().getDocumentType())))
+            .toList();
+        List<SscsDocument> internalDocuments = Optional.ofNullable(sscsCaseDataBefore.getInternalCaseDocumentData())
+            .map(InternalCaseDocumentData::getSscsInternalDocument)
+            .orElse(Collections.emptyList())
+            .stream().filter(doc -> (!invalidDocumentTypes.contains(doc.getValue().getDocumentType())))
+            .toList();
+        InternalCaseDocumentData internalCaseDocumentData = Optional.ofNullable(sscsCaseData.getInternalCaseDocumentData())
+            .orElse(InternalCaseDocumentData.builder().build());
+        if (INTERNAL.equals(internalCaseDocumentData.getMoveDocumentTo())) {
+            List<DynamicListItem> regularDlItems = createDynamicListItems(regularDocuments);
+            if (regularDlItems.isEmpty()) {
+                preSubmitCallbackResponse.addError("No documents available to move");
+            } else {
+                internalCaseDocumentData
+                    .setMoveDocumentToInternalDocumentsTabDL(
+                        new DynamicMixedChoiceList(Collections.emptyList(), regularDlItems));
+            }
+        } else {
+            List<DynamicListItem> internalDlItems = createDynamicListItems(internalDocuments);
+            if (internalDlItems.isEmpty()) {
+                preSubmitCallbackResponse.addError("No Tribunal Internal documents available to move");
+            } else {
+                internalCaseDocumentData
+                    .setMoveDocumentToDocumentsTabDL(
+                        new DynamicMixedChoiceList(Collections.emptyList(), internalDlItems));
+            }
+        }
+        sscsCaseData.setInternalCaseDocumentData(internalCaseDocumentData);
         return preSubmitCallbackResponse;
     }
 

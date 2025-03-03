@@ -5,7 +5,6 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DocumentTabChoice.INTERNAL;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.DocumentTabChoice.REGULAR;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.managedocuments.UploadDocumentMidEventHandler.getDocumentIdFromUrl;
@@ -72,7 +71,9 @@ public class UploadDocumentAboutToSubmitHandler implements PreSubmitCallbackHand
             .orElse(InternalCaseDocumentData.builder().build());
         if ("move".equalsIgnoreCase(internalCaseDocumentData.getUploadRemoveOrMoveDocument())) {
             boolean moveToInternal = INTERNAL.equals(internalCaseDocumentData.getMoveDocumentTo());
-            DynamicMixedChoiceList dynamicList = internalCaseDocumentData.getDynamicList(moveToInternal);
+            DynamicMixedChoiceList dynamicList = moveToInternal
+                ? internalCaseDocumentData.getMoveDocumentToInternalDocumentsTabDL()
+                : internalCaseDocumentData.getMoveDocumentToDocumentsTabDL();
             List<DynamicListItem> selectedOptions = dynamicList.getValue();
             if (emptyIfNull(selectedOptions).isEmpty()) {
                 PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
@@ -116,11 +117,9 @@ public class UploadDocumentAboutToSubmitHandler implements PreSubmitCallbackHand
     private void moveDocument(SscsCaseData sscsCaseData, InternalCaseDocumentData internalCaseDocumentData, List<String> documentTypeList, SscsDocument docToMove, PreSubmitCallbackResponse<SscsCaseData> errorResponse, boolean moveToInternal) {
         if (moveToInternal) {
             removeDocumentFromCaseDataDocuments(sscsCaseData, docToMove);
-            docToMove.getValue().setDocumentTabChoice(INTERNAL);
             addDocumentToCaseDataInternalDocuments(sscsCaseData, docToMove);
         } else {
             removeDocumentFromCaseDataInternalDocuments(sscsCaseData, docToMove);
-            docToMove.getValue().setDocumentTabChoice(REGULAR);
             if (isNoOrNull(internalCaseDocumentData.getShouldBeIssued())) {
                 addDocumentToCaseDataDocuments(sscsCaseData, docToMove);
             } else {
@@ -151,7 +150,6 @@ public class UploadDocumentAboutToSubmitHandler implements PreSubmitCallbackHand
         emptyIfNull(internalCaseDocumentData.getSscsInternalDocument())
             .forEach(doc -> {
                 doc.getValue().setBundleAddition(null);
-                doc.getValue().setDocumentTabChoice(INTERNAL);
                 doc.getValue().setEvidenceIssued(null);
             });
         internalCaseDocumentData.setUploadRemoveDocumentType(null);

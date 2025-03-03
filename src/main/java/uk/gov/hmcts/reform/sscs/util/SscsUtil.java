@@ -43,7 +43,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentTabChoice;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -249,7 +248,6 @@ public class SscsUtil {
         InternalCaseDocumentData internalCaseDocumentData = Optional.ofNullable(caseData.getInternalCaseDocumentData())
             .orElse(InternalCaseDocumentData.builder().build());
         List<SscsDocument> documents = new ArrayList<>(emptyIfNull(internalCaseDocumentData.getSscsInternalDocument()));
-        sscsDocument.getValue().setDocumentTabChoice(DocumentTabChoice.INTERNAL);
         if (!isNull(sscsDocument.getValue().getDocumentFileName()) && sscsDocument.getValue().getDocumentFileName().startsWith("Addition ")) {
             String[] splitFileName = sscsDocument.getValue().getDocumentFileName().split("- ");
             String newFileName = String.join(" ", Arrays.copyOfRange(splitFileName, 1, splitFileName.length));

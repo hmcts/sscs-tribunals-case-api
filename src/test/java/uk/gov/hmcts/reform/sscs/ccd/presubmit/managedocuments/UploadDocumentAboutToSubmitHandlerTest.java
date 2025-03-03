@@ -134,7 +134,6 @@ class UploadDocumentAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getInternalCaseDocumentData().getMoveDocumentToDocumentsTabDL());
         assertNull(sscsCaseData.getInternalCaseDocumentData().getMoveDocumentToInternalDocumentsTabDL());
         assertNull(sscsCaseData.getInternalCaseDocumentData().getSscsInternalDocument().getFirst().getValue().getBundleAddition());
-        assertEquals(INTERNAL, sscsCaseData.getInternalCaseDocumentData().getSscsInternalDocument().getFirst().getValue().getDocumentTabChoice());
         assertNull(sscsCaseData.getInternalCaseDocumentData().getSscsInternalDocument().getFirst().getValue().getEvidenceIssued());
     }
 
@@ -143,7 +142,7 @@ class UploadDocumentAboutToSubmitHandlerTest {
     void ifMoveAndDlNoChoiceThenReturnError(DocumentTabChoice documentTabChoice) {
         sscsCaseData.getInternalCaseDocumentData().setUploadRemoveOrMoveDocument("move");
         sscsCaseData.getInternalCaseDocumentData().setMoveDocumentTo(documentTabChoice);
-        sscsCaseData.getInternalCaseDocumentData().setDynamicList(documentTabChoice.equals(INTERNAL), new DynamicMixedChoiceList(Collections.emptyList(), Collections.emptyList()));
+        setDynamicList(sscsCaseData, documentTabChoice.equals(INTERNAL), new DynamicMixedChoiceList(Collections.emptyList(), Collections.emptyList()));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, "");
         assertNotNull(response);
         assertEquals(1, response.getErrors().size());
@@ -159,7 +158,7 @@ class UploadDocumentAboutToSubmitHandlerTest {
         DynamicListItem dynamicListItem2 = new DynamicListItem("code2", "label2");
         DynamicMixedChoiceList dynamicMixedChoiceList = new DynamicMixedChoiceList(List.of(dynamicListItem, dynamicListItem2),
             List.of(dynamicListItem, dynamicListItem2));
-        sscsCaseData.getInternalCaseDocumentData().setDynamicList(documentTabChoice.equals(INTERNAL), dynamicMixedChoiceList);
+        setDynamicList(sscsCaseData, documentTabChoice.equals(INTERNAL), dynamicMixedChoiceList);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, "");
         assertNotNull(response);
         assertEquals(2, response.getErrors().size());
@@ -180,7 +179,7 @@ class UploadDocumentAboutToSubmitHandlerTest {
         sscsCaseData.getInternalCaseDocumentData().setMoveDocumentTo(INTERNAL);
         DynamicMixedChoiceList dynamicMixedChoiceList = new DynamicMixedChoiceList(List.of(dynamicListItem, dynamicListItem2),
             List.of(dynamicListItem, dynamicListItem2, dynamicListItem3));
-        sscsCaseData.getInternalCaseDocumentData().setDynamicList(true, dynamicMixedChoiceList);
+        setDynamicList(sscsCaseData, true, dynamicMixedChoiceList);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, "");
         assertNotNull(response);
         assertTrue(response.getErrors().isEmpty());
@@ -192,9 +191,6 @@ class UploadDocumentAboutToSubmitHandlerTest {
         assertEquals("some-slug/id_2", internalDoc1.getDocumentLink().getDocumentUrl());
         assertEquals("some-slug/id_1", internalDoc2.getDocumentLink().getDocumentUrl());
         assertEquals("some-slug/id_3", doc1.getDocumentLink().getDocumentUrl());
-        assertEquals(INTERNAL, internalDoc1.getDocumentTabChoice());
-        assertEquals(INTERNAL, internalDoc2.getDocumentTabChoice());
-        assertNull(doc1.getDocumentTabChoice());
     }
 
     @Test
@@ -210,7 +206,7 @@ class UploadDocumentAboutToSubmitHandlerTest {
         sscsCaseData.getInternalCaseDocumentData().setMoveDocumentTo(REGULAR);
         DynamicMixedChoiceList dynamicMixedChoiceList = new DynamicMixedChoiceList(List.of(dynamicListItem, dynamicListItem2),
             List.of(dynamicListItem, dynamicListItem2, dynamicListItem3));
-        sscsCaseData.getInternalCaseDocumentData().setDynamicList(false, dynamicMixedChoiceList);
+        setDynamicList(sscsCaseData, false, dynamicMixedChoiceList);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, "");
         assertNotNull(response);
         assertTrue(response.getErrors().isEmpty());
@@ -222,9 +218,6 @@ class UploadDocumentAboutToSubmitHandlerTest {
         assertEquals("some-slug/id_2", doc1.getDocumentLink().getDocumentUrl());
         assertEquals("some-slug/id_1", doc2.getDocumentLink().getDocumentUrl());
         assertEquals("some-slug/id_3", internalDoc1.getDocumentLink().getDocumentUrl());
-        assertEquals(REGULAR, doc1.getDocumentTabChoice());
-        assertEquals(REGULAR, doc2.getDocumentTabChoice());
-        assertEquals(INTERNAL, internalDoc1.getDocumentTabChoice());
     }
 
     @Test
@@ -250,7 +243,7 @@ class UploadDocumentAboutToSubmitHandlerTest {
         sscsCaseData.getInternalCaseDocumentData().setMoveDocumentTo(REGULAR);
         DynamicMixedChoiceList dynamicMixedChoiceList = new DynamicMixedChoiceList(List.of(dynamicListItem, dynamicListItem2, dynamicListItem3),
             List.of(dynamicListItem, dynamicListItem2, dynamicListItem3));
-        sscsCaseData.getInternalCaseDocumentData().setDynamicList(false, dynamicMixedChoiceList);
+        setDynamicList(sscsCaseData, false, dynamicMixedChoiceList);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, "");
         assertNotNull(response);
         assertEquals(2, response.getErrors().size());
@@ -273,7 +266,7 @@ class UploadDocumentAboutToSubmitHandlerTest {
         sscsCaseData.getInternalCaseDocumentData().setMoveDocumentTo(REGULAR);
         DynamicMixedChoiceList dynamicMixedChoiceList = new DynamicMixedChoiceList(List.of(dynamicListItem, dynamicListItem2, dynamicListItem3),
             List.of(dynamicListItem, dynamicListItem2, dynamicListItem3));
-        sscsCaseData.getInternalCaseDocumentData().setDynamicList(false, dynamicMixedChoiceList);
+        setDynamicList(sscsCaseData, false, dynamicMixedChoiceList);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, "");
         assertNotNull(response);
         assertTrue(response.getErrors().isEmpty());
@@ -321,6 +314,14 @@ class UploadDocumentAboutToSubmitHandlerTest {
             caseData.setSscsDocument(documents);
             return null;
         }).when(footerService).createFooterAndAddDocToCase(any(), any(), any(), any(), any(), any(), any(), any(), eq(true));
+    }
+
+    private void setDynamicList(SscsCaseData sscsCaseData, boolean isInternal, DynamicMixedChoiceList dynamicMixedChoiceList) {
+        if (isInternal) {
+            sscsCaseData.getInternalCaseDocumentData().setMoveDocumentToInternalDocumentsTabDL(dynamicMixedChoiceList);
+        } else {
+            sscsCaseData.getInternalCaseDocumentData().setMoveDocumentToDocumentsTabDL(dynamicMixedChoiceList);
+        }
     }
 
 }

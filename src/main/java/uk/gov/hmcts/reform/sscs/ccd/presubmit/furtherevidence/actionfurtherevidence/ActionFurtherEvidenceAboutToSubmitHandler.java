@@ -471,7 +471,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                     if (!equalsIgnoreCase(scannedDocument.getValue().getType(), COVERSHEET)) {
                         SscsDocument sscsDocument = buildSscsDocument(sscsCaseData, scannedDocument, caseState);
                         documentsAddedThisEvent.add(sscsDocument.getValue().getDocumentType());
-                        addSscsDocumentToCaseData(sscsCaseData, sscsDocument);
+                        addSscsDocumentToCaseData(sscsCaseData, sscsDocument, scannedDocument.getValue().getDocumentTabChoice());
                         setReinstateCaseFieldsIfReinstatementRequest(sscsCaseData, sscsDocument);
                         setTranslationWorkOutstanding(sscsCaseData);
                     }
@@ -492,15 +492,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         sscsCaseData.setScannedDocuments(null);
     }
 
-    private void addSscsDocumentToCaseData(SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
-        boolean isInternalDocument = isTribunalInternalDocumentsEnabled && DocumentTabChoice.INTERNAL.equals(sscsDocument.getValue().getDocumentTabChoice());
+    private void addSscsDocumentToCaseData(SscsCaseData sscsCaseData, SscsDocument sscsDocument, DocumentTabChoice documentTabChoice) {
+        boolean isInternalDocument = isTribunalInternalDocumentsEnabled && DocumentTabChoice.INTERNAL.equals(documentTabChoice);
 
         if (isInternalDocument) {
             addDocumentToCaseDataInternalDocuments(sscsCaseData, sscsDocument);
         } else {
-            if (isTribunalInternalDocumentsEnabled) {
-                sscsDocument.getValue().setDocumentTabChoice(DocumentTabChoice.REGULAR);
-            }
             addDocumentToCaseDataDocuments(sscsCaseData, sscsDocument);
         }
     }
@@ -648,7 +645,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 .originalSenderOtherPartyName(originalSenderOtherPartyName)
                 .documentTranslationStatus(
                     sscsCaseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null)
-                .documentTabChoice(scannedDocument.getValue().getDocumentTabChoice())
                 .build())
             .build();
     }

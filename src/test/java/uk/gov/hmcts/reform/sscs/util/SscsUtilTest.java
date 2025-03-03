@@ -60,7 +60,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentTabChoice;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
@@ -755,7 +754,6 @@ class SscsUtilTest {
         assertNotNull(documents);
         assertEquals(1, documents.size());
         assertEquals(sscsDocument, documents.getFirst());
-        assertEquals(DocumentTabChoice.INTERNAL, documents.getFirst().getValue().getDocumentTabChoice());
     }
 
     @Test
@@ -771,7 +769,6 @@ class SscsUtilTest {
         assertNotNull(documents);
         assertEquals(1, documents.size());
         assertEquals(randomName, documents.getFirst().getValue().getDocumentFileName());
-        assertEquals(DocumentTabChoice.INTERNAL, documents.getFirst().getValue().getDocumentTabChoice());
     }
 
     @Test
@@ -787,7 +784,6 @@ class SscsUtilTest {
         assertNotNull(documents);
         assertEquals(1, documents.size());
         assertEquals(randomName, documents.getFirst().getValue().getDocumentFileName());
-        assertEquals(DocumentTabChoice.INTERNAL, documents.getFirst().getValue().getDocumentTabChoice());
     }
 
     @Test
