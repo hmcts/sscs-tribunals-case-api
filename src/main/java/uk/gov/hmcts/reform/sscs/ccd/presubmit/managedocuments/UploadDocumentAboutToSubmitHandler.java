@@ -66,8 +66,8 @@ public class UploadDocumentAboutToSubmitHandler implements PreSubmitCallbackHand
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         if (!isTribunalInternalDocumentsEnabled) {
             return new PreSubmitCallbackResponse<>(sscsCaseData);
-
         }
+
         InternalCaseDocumentData internalCaseDocumentData = Optional.ofNullable(sscsCaseData.getInternalCaseDocumentData())
             .orElse(InternalCaseDocumentData.builder().build());
         if ("move".equalsIgnoreCase(internalCaseDocumentData.getUploadRemoveOrMoveDocument())) {
@@ -84,9 +84,8 @@ public class UploadDocumentAboutToSubmitHandler implements PreSubmitCallbackHand
                 return errorResponse;
             }
         }
-        resetInternalCaseDocumentData(sscsCaseData, internalCaseDocumentData);
+        resetInternalCaseDocumentData(internalCaseDocumentData);
         sscsCaseData.setInternalCaseDocumentData(internalCaseDocumentData);
-
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
@@ -148,7 +147,7 @@ public class UploadDocumentAboutToSubmitHandler implements PreSubmitCallbackHand
         }
     }
 
-    private void resetInternalCaseDocumentData(SscsCaseData sscsCaseData, InternalCaseDocumentData internalCaseDocumentData) {
+    private void resetInternalCaseDocumentData(InternalCaseDocumentData internalCaseDocumentData) {
         emptyIfNull(internalCaseDocumentData.getSscsInternalDocument())
             .forEach(doc -> {
                 doc.getValue().setBundleAddition(null);
@@ -159,6 +158,5 @@ public class UploadDocumentAboutToSubmitHandler implements PreSubmitCallbackHand
         internalCaseDocumentData.setUploadRemoveOrMoveDocument(null);
         internalCaseDocumentData.setMoveDocumentToDocumentsTabDL(null);
         internalCaseDocumentData.setMoveDocumentToInternalDocumentsTabDL(null);
-
     }
 }
