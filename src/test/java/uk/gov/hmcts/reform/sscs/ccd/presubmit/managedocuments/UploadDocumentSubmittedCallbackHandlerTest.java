@@ -19,7 +19,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InternalCaseDocumentData;
@@ -86,16 +85,14 @@ class UploadDocumentSubmittedCallbackHandlerTest {
 
     @Test
     void handleThrowsIfCannotHandle() {
-        assertThrows(IllegalStateException.class, () -> handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, ""), "Cannot handle callback");
+        assertThrows(IllegalStateException.class, () -> handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback), "Cannot handle callback");
     }
 
     @Test
     void doesNothingIfInternalDocumentFlagOff() {
         handler = new UploadDocumentSubmittedCallbackHandler(updateCcdCaseService, idamService, false);
         when(callback.getPageId()).thenReturn("moveDocumentTo");
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.SUBMITTED, callback, "");
-        assertNotNull(response);
-        assertTrue(response.getErrors().isEmpty());
+        handler.handle(CallbackType.SUBMITTED, callback);
         verify(updateCcdCaseService, never()).triggerCaseEventV2(any(), any(), any(), any(), any());
     }
 
@@ -103,9 +100,7 @@ class UploadDocumentSubmittedCallbackHandlerTest {
     void doesNothingIfFlagOnButMoveToInternal() {
         when(callback.getPageId()).thenReturn("moveDocumentTo");
         sscsCaseData.getInternalCaseDocumentData().setMoveDocumentTo(INTERNAL);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.SUBMITTED, callback, "");
-        assertNotNull(response);
-        assertTrue(response.getErrors().isEmpty());
+        handler.handle(CallbackType.SUBMITTED, callback);
         verify(updateCcdCaseService, never()).triggerCaseEventV2(any(), any(), any(), any(), any());
     }
 
@@ -114,10 +109,7 @@ class UploadDocumentSubmittedCallbackHandlerTest {
         when(callback.getPageId()).thenReturn("moveDocumentTo");
         sscsCaseData.getInternalCaseDocumentData().setMoveDocumentTo(REGULAR);
         sscsCaseData.getInternalCaseDocumentData().setShouldBeIssued(NO);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.SUBMITTED, callback, "");
-        assertNotNull(response);
-        assertEquals(sscsCaseData, response.getData());
-        assertTrue(response.getErrors().isEmpty());
+        handler.handle(CallbackType.SUBMITTED, callback);
         verify(updateCcdCaseService, never()).triggerCaseEventV2(any(), any(), any(), any(), any());
     }
 
@@ -126,15 +118,9 @@ class UploadDocumentSubmittedCallbackHandlerTest {
         when(callback.getPageId()).thenReturn("moveDocumentTo");
         when(caseDetails.getId()).thenReturn(1234L);
         when(updateCcdCaseService.triggerCaseEventV2(any(), any(), any(), any(), any())).thenReturn(sscsCaseDetails);
-        SscsCaseData sscsCaseDataTriggered = SscsCaseData.builder().build();
-        when(sscsCaseDetails.getData()).thenReturn(sscsCaseDataTriggered);
         sscsCaseData.getInternalCaseDocumentData().setMoveDocumentTo(REGULAR);
         sscsCaseData.getInternalCaseDocumentData().setShouldBeIssued(YES);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.SUBMITTED, callback, "");
-        assertNotNull(response);
-        assertEquals(sscsCaseDataTriggered, response.getData());
-        assertNotEquals(sscsCaseData, response.getData());
-        assertTrue(response.getErrors().isEmpty());
+        handler.handle(CallbackType.SUBMITTED, callback);
         verify(updateCcdCaseService).triggerCaseEventV2(1234L, EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(),
             "Issue to all parties", "Issue to all parties", idamService.getIdamTokens());
     }
