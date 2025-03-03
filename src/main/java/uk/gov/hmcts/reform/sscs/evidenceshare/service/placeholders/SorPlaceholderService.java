@@ -9,9 +9,9 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.HEARING_DATE;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.HMCTS2;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.HMCTS_IMG;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.HMC_HEARING_TYPE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.NAME;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.PHONE_NUMBER;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.POSTPONEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.getPostponementRequestStatus;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.LetterType.DOCMOSIS;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getAddressPlaceholders;
@@ -60,6 +60,10 @@ public class SorPlaceholderService {
         placeholders.put(APPEAL_REF, caseData.getCcdCaseId());
         placeholders.put(ENTITY_TYPE, entityType);
         placeholders.put(APPELLANT_NAME, caseData.getAppeal().getAppellant().getName().getFullNameNoTitle());
+        placeholders.put(HMC_HEARING_TYPE_LITERAL, 
+                         
+                         
+                         (caseData).getHmcReference());
 
         Hearing latestHearing = caseData.getLatestHearing();
         if (!isNull(latestHearing) && !isNull(latestHearing.getValue())) {
@@ -68,10 +72,16 @@ public class SorPlaceholderService {
 
         RegionalProcessingCenter rpc = caseData.getRegionalProcessingCenter();
         if (!isNull(rpc)) {
-            placeholders.put(PHONE_NUMBER, determinePhoneNumber(rpc));
+            placeholders.put(
+              
+              
+              
+              , determinePhoneNumber(rpc));
         }
 
-        placeholders.put(POSTPONEMENT_REQUEST,  getPostponementRequestStatus(caseData));
+        placeholders.put(
+          
+          ,  getPostponementRequestStatus(caseData));
 
         return placeholders;
     }

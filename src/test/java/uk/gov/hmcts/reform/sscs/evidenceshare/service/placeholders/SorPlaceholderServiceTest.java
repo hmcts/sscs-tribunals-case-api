@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.ADDRESS_NAME;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.APPELLANT_NAME;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.HMC_HEARING_TYPE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.ENTITY_TYPE;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_1;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_2;
@@ -24,14 +25,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
-import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
+import uk.gov.hmcts.reform.sscs.helper.mapping.HearingsDetailsMapping;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
@@ -155,7 +152,6 @@ public class SorPlaceholderServiceTest {
         assertEquals(appellantName, placeholders.get(APPELLANT_NAME));
     }
 
-    @Test
     public void whenNotAHearingPostponementRequest_thenPlaceholderIsEmptyString() {
         Map<String, Object> placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER,
                 Appointee.class.getSimpleName(), null);
@@ -181,5 +177,44 @@ public class SorPlaceholderServiceTest {
                 Appointee.class.getSimpleName(), null);
 
         assertEquals("refuse", placeholders.get(POSTPONEMENT_REQUEST));
+    }
+  
+    void shouldReturnSubstantiveHearingPlaceholderDirectionFlagOff() {
+        ReflectionTestUtils.setField(HearingsDetailsMapping.class, "isDirectionHearingsEnabled", false);
+        caseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder().overrideFields(OverrideFields.builder().hmcHearingType(HmcHearingType.DIRECTION_HEARINGS).build()).build());
+        var placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER,
+                Appointee.class.getSimpleName(), null);
+
+        assertEquals("BBA3-SUB", placeholders.get(HMC_HEARING_TYPE_LITERAL));
+    }
+
+    @Test
+    void shouldReturnDirectionHearingPlaceholderDirectionFlagOn() {
+        ReflectionTestUtils.setField(HearingsDetailsMapping.class, "isDirectionHearingsEnabled", true);
+        caseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder().overrideFields(OverrideFields.builder().hmcHearingType(HmcHearingType.DIRECTION_HEARINGS).build()).build());
+        var placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER,
+            Appointee.class.getSimpleName(), null);
+
+        assertEquals("BBA3-DIR", placeholders.get(HMC_HEARING_TYPE_LITERAL));
+    }
+
+    @Test
+    void shouldReturnSubstantiveHearingPlaceholderDirectionFlagOn() {
+        ReflectionTestUtils.setField(HearingsDetailsMapping.class, "isDirectionHearingsEnabled", true);
+        caseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder().overrideFields(OverrideFields.builder().hmcHearingType(HmcHearingType.SUBSTANTIVE).build()).build());
+        var placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER,
+            Appointee.class.getSimpleName(), null);
+
+        assertEquals("BBA3-SUB", placeholders.get(HMC_HEARING_TYPE_LITERAL));
+    }
+
+    @Test
+    void shouldReturnSubstantiveDueToNullHearingPlaceholder() {
+        ReflectionTestUtils.setField(HearingsDetailsMapping.class, "isDirectionHearingsEnabled", true);
+        caseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder().overrideFields(OverrideFields.builder().hmcHearingType(null).build()).build());
+        var placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER,
+            Appointee.class.getSimpleName(), null);
+
+        assertEquals("BBA3-SUB", placeholders.get(HMC_HEARING_TYPE_LITERAL));
     }
 }
