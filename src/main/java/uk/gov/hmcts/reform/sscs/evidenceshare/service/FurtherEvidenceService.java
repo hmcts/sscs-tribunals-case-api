@@ -69,9 +69,7 @@ public class FurtherEvidenceService {
                 if (doc.getValue().getClass().isAssignableFrom(SscsDocumentDetails.class)) {
                     sscsCaseDocuments
                             .stream()
-                            .filter(d -> !VIDEO_DOCUMENT.getValue().equals(d.getValue().getDocumentType()))
-                            .filter(d -> !AUDIO_DOCUMENT.getValue().equals(d.getValue().getDocumentType()))
-                            .filter(d -> d.getValue().getDocumentLink().getDocumentBinaryUrl().equals(doc.getValue().getDocumentLink().getDocumentBinaryUrl()))
+                            .filter(d -> d.getValue().getDocumentLink() != null && d.getValue().getDocumentLink().getDocumentBinaryUrl().equals(doc.getValue().getDocumentLink().getDocumentBinaryUrl()))
                             .peek(d -> {
                                 DocumentLink resizedLink = doc.getValue().getResizedDocumentLink();
                                 d.getValue().setResizedDocumentLink(resizedLink);

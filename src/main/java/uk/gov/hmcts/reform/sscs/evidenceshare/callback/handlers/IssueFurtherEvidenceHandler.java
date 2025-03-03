@@ -145,7 +145,8 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
                     EventType.UPDATE_CASE_ONLY.getCcdType(),
                     idamTokens,
                     sscsCaseDetails -> {
-                        sscsCaseDetails.getData().getSscsDocument().forEach(
+                        sscsCaseDetails.getData().getSscsDocument()
+                                .forEach(
                                 sscsDocument -> {
                                     String documentBinaryUrl = sscsDocument.getValue().getDocumentLink().getDocumentBinaryUrl();
                                     if (binaryDocumentUrlLinkCaseDataMap.containsKey(documentBinaryUrl)) {
