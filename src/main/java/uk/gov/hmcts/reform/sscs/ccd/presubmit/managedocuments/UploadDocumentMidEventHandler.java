@@ -10,15 +10,14 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.DocumentTabChoice.INTERNAL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicMixedChoiceList;
@@ -36,6 +35,7 @@ public class UploadDocumentMidEventHandler implements PreSubmitCallbackHandler<S
 
     @Value("${feature.tribunal-internal-documents.enabled}")
     private final boolean isTribunalInternalDocumentsEnabled;
+    private static final String MOVE_DOCUMENT_TO = "moveDocumentTo";
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -53,11 +53,11 @@ public class UploadDocumentMidEventHandler implements PreSubmitCallbackHandler<S
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        SscsCaseData sscsCaseDataBefore = callback.getCaseDetailsBefore().orElse(callback.getCaseDetails()).getCaseData();
+        SscsCaseData sscsCaseDataBefore = callback.getCaseDetailsBefore().map(CaseDetails::getCaseData).orElse(callback.getCaseDetails().getCaseData());
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-        if (isTribunalInternalDocumentsEnabled && "moveDocumentTo".equals(callback.getPageId())) {
-            List<String> invalidDocumentTypes = Stream.of(AUDIO_DOCUMENT, VIDEO_DOCUMENT, AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE).map(DocumentType::getValue).toList();
+        if (isTribunalInternalDocumentsEnabled && MOVE_DOCUMENT_TO.equals(callback.getPageId())) {
+            List<String> invalidDocumentTypes = List.of(AUDIO_DOCUMENT.getValue(), VIDEO_DOCUMENT.getValue(), AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE.getValue());
             List<SscsDocument> regularDocuments = Optional.ofNullable(sscsCaseDataBefore.getSscsDocument())
                 .orElse(Collections.emptyList())
                 .stream().filter(doc -> (!invalidDocumentTypes.contains(doc.getValue().getDocumentType())))
@@ -67,13 +67,16 @@ public class UploadDocumentMidEventHandler implements PreSubmitCallbackHandler<S
                 .orElse(Collections.emptyList())
                 .stream().filter(doc -> (!invalidDocumentTypes.contains(doc.getValue().getDocumentType())))
                 .toList();
-            boolean moveToInternal = INTERNAL.equals(sscsCaseData.getInternalCaseDocumentData().getMoveDocumentTo());
+            InternalCaseDocumentData internalCaseDocumentData = Optional.ofNullable(sscsCaseData.getInternalCaseDocumentData())
+                .orElse(InternalCaseDocumentData.builder().build());
+            boolean moveToInternal = INTERNAL.equals(internalCaseDocumentData.getMoveDocumentTo());
             List<DynamicListItem> dynamicListItems = createDynamicListItems(moveToInternal ? regularDocuments : internalDocuments);
             DynamicMixedChoiceList dynamicMixedChoiceList = new DynamicMixedChoiceList(Collections.emptyList(), dynamicListItems);
             if (dynamicMixedChoiceList.getListItems().isEmpty()) {
                 preSubmitCallbackResponse.addError("No " + (moveToInternal ? "" : "Tribunal Internal ") + "documents available to move");
             }
-            sscsCaseData.getInternalCaseDocumentData().setDynamicList(moveToInternal, dynamicMixedChoiceList);
+            internalCaseDocumentData.setDynamicList(moveToInternal, dynamicMixedChoiceList);
+            sscsCaseData.setInternalCaseDocumentData(internalCaseDocumentData);
         }
         return preSubmitCallbackResponse;
     }
