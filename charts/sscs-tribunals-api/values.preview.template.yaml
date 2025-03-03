@@ -725,7 +725,7 @@ servicebus:
     queues:
       - name: tribunals-to-hearing-api
 
-hmc-servicebus:
+hmcsb:
   enabled: true
   resourceGroup: hmc-shared-aat
   sbNamespace: hmc-servicebus-aat
