@@ -74,7 +74,6 @@ java:
     TRIBUNALS_EVENT_QUEUE_NAMESPACE: "sscs-sb-preview"
     HMC_HEARINGS_TOPIC_NAMESPACE: "hmc-servicebus-aat"
     HMC_DEPLOYMENT_ID: "deployment-${SERVICE_NAME}"
-    HMC_DEPLOYMENT_FILTER_ENABLED: true
     ADJOURNMENT_ENABLED: true
   secrets:
     JOB_SCHEDULER_DB_PASSWORD:
