@@ -49,7 +49,6 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
         openMocks(this);
         handler = new UpdateListingRequirementsAboutToStartHandler(utils);
         ReflectionTestUtils.setField(handler, "isScheduleListingEnabled", true);
-        ReflectionTestUtils.setField(handler, "isDirectionHearingsEnabled", false);
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).build();
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
@@ -158,7 +157,6 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
     @ParameterizedTest
     @EnumSource(value = HmcHearingType.class, names = {"SUBSTANTIVE", "DIRECTION_HEARINGS"})
     public void setOverrideHmcHearingTypeIfNonNull(HmcHearingType expectedHearingType) {
-        ReflectionTestUtils.setField(handler, "isDirectionHearingsEnabled", true);
         sscsCaseData = CaseDataUtils.buildCaseData();
         sscsCaseData.setHmcHearingType(expectedHearingType);
         DynamicList interpreterLanguage = new DynamicList(null, List.of());
@@ -173,7 +171,6 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
 
     @Test
     public void setOverrideHmcHearingTypeIfNull() {
-        ReflectionTestUtils.setField(handler, "isDirectionHearingsEnabled", true);
         sscsCaseData = CaseDataUtils.buildCaseData();
         sscsCaseData.setHmcHearingType(null);
         DynamicList interpreterLanguage = new DynamicList(null, List.of());

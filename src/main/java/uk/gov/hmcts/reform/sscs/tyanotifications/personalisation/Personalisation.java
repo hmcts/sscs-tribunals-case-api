@@ -256,9 +256,6 @@ public class Personalisation<E extends NotificationWrapper> {
     @Value("${feature.postHearings.enabled}")
     private boolean isPostHearingsEnabled;
 
-    @Value("${feature.direction-hearings.enabled}")
-    private boolean isDirectionHearingsEnabled;
-
     private static String tya(Subscription subscription) {
         if (subscription != null) {
             return defaultIfBlank(subscription.getTya(), EMPTY);
@@ -438,9 +435,7 @@ public class Personalisation<E extends NotificationWrapper> {
         personalisation.put(APPOINTEE_NAME, getName(APPOINTEE, ccdResponse, responseWrapper));
 
         personalisation.put(HEARING_TYPE, responseWrapper.getNewSscsCaseData().getAppeal().getHearingType());
-        if (isDirectionHearingsEnabled) {
-            personalisation.put(HMC_HEARING_TYPE_LITERAL, getHearingType(ccdResponse).getHmcReference());
-        }
+        personalisation.put(HMC_HEARING_TYPE_LITERAL, getHearingType(ccdResponse).getHmcReference());
 
         if (subscriptionWithType.getSubscriptionType() == REPRESENTATIVE) {
             personalisation.put(PersonalisationMappingConstants.REPRESENTATIVE, "Yes");
