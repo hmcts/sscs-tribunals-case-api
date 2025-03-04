@@ -743,7 +743,7 @@ hmcsb:
             correlationFilter:
               - name: "hmctsServiceId"
                 value: "BBA3"
-              - name: "deploymentId"
+              - name: "hmctsDeploymentId"
                 value: "sscs-${CHANGE_ID}"
 
 postgresql:

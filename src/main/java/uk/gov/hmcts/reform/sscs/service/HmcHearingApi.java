@@ -29,7 +29,6 @@ public interface HmcHearingApi {
     String DATA_STORE_URL = "Data-Store-Url";
     String HEARING_ENDPOINT = "/hearing";
     String HEARINGS_ENDPOINT = "/hearings";
-    String PARTIES_NOTIFIED_ENDPOINT = "/partiesNotified";
     String ID = "id";
     String HMCTS_DEPLOYMENT_ID = "hmctsDeploymentId";
 

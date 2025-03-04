@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.exception.HearingUpdateException;
 import uk.gov.hmcts.reform.sscs.exception.HmcEventProcessingException;
 import uk.gov.hmcts.reform.sscs.exception.MessageProcessingException;
 import uk.gov.hmcts.reform.sscs.model.hmc.message.HmcMessage;
+import static uk.gov.hmcts.reform.sscs.service.HmcHearingApi.HMCTS_DEPLOYMENT_ID;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageServiceV2;
 
 @Slf4j
@@ -25,18 +26,12 @@ public class HmcHearingsEventTopicListener {
 
     private final ObjectMapper objectMapper;
 
-    private final String sscsServiceCode;
-
     private final ProcessHmcMessageServiceV2 processHmcMessageServiceV2;
 
     @Value("${hmc.deployment-id}")
     private String hmctsDeploymentId;
 
-    private static final String HMCTS_DEPLOYMENT_ID = "hmctsDeploymentId";
-
-    public HmcHearingsEventTopicListener(@Value("${sscs.serviceCode}") String sscsServiceCode,
-                                         ProcessHmcMessageServiceV2 processHmcMessageServiceV2) {
-        this.sscsServiceCode = sscsServiceCode;
+    public HmcHearingsEventTopicListener(ProcessHmcMessageServiceV2 processHmcMessageServiceV2) {
         this.processHmcMessageServiceV2 = processHmcMessageServiceV2;
         this.objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
