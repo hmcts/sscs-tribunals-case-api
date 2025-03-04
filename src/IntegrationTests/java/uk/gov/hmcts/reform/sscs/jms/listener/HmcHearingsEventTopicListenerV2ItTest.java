@@ -113,14 +113,14 @@ public class HmcHearingsEventTopicListenerV2ItTest {
         when(ccdCaseService.getCaseDetails(anyLong())).thenReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
         when(venueService.getVenueDetailsForActiveVenueByEpimsId(any())).thenReturn(VenueDetails.builder().build());
 
-        when(hearingApi.getHearingRequest(any(), any(), any(), any(), any()))
+        when(hearingApi.getHearingRequest(any(), any(), any(), any(), any(), any(), any()))
             .thenReturn(hearingGetResponse);
 
         hmcHearingsEventTopicListener.onMessage(bytesMessage);
 
         verify(idamService, times(3)).getIdamTokens();
 
-        verify(hearingApi).getHearingRequest(any(), any(), any(), any(), any());
+        verify(hearingApi).getHearingRequest(any(), any(), any(), any(), any(), any(), any());
 
         verify(ccdCaseService, never()).updateCaseData(any(), any(), any());
         verify(updateCcdCaseService).updateCaseV2DynamicEvent(eq(Long.parseLong(CASE_ID)), eq(idamTokens), any());
