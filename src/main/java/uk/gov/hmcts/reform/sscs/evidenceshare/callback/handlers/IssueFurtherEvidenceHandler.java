@@ -146,6 +146,8 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
                     idamTokens,
                     sscsCaseDetails -> {
                         sscsCaseDetails.getData().getSscsDocument()
+                                .stream()
+                                .filter(sscsDocument -> sscsDocument.getValue().getDocumentLink() != null)
                                 .forEach(
                                 sscsDocument -> {
                                     String documentBinaryUrl = sscsDocument.getValue().getDocumentLink().getDocumentBinaryUrl();
