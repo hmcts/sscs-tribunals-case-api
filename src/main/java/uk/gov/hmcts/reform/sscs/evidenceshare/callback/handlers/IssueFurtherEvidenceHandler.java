@@ -149,15 +149,12 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
                                 .stream()
                                 .filter(sscsDocument -> sscsDocument.getValue().getDocumentLink() != null)
                                 .forEach(
-                                sscsDocument -> {
-                                    String documentBinaryUrl = sscsDocument.getValue().getDocumentLink().getDocumentBinaryUrl();
-                                    if (binaryDocumentUrlLinkCaseDataMap.containsKey(documentBinaryUrl)) {
-                                        sscsDocument.getValue().setResizedDocumentLink(
-                                                binaryDocumentUrlLinkCaseDataMap.get(documentBinaryUrl).getValue().getResizedDocumentLink()
-                                        );
-                                    }
-                                }
-                        );
+                                        sscsDocument -> {
+                                            String documentBinaryUrl = sscsDocument.getValue().getDocumentLink().getDocumentBinaryUrl();
+                                            if (binaryDocumentUrlLinkCaseDataMap.containsKey(documentBinaryUrl)) {
+                                                sscsDocument.getValue().setResizedDocumentLink(binaryDocumentUrlLinkCaseDataMap.get(documentBinaryUrl).getValue().getResizedDocumentLink());
+                                            }
+                                        });
 
                         final String description = determineDescription(sscsCaseDetails.getData().getSscsDocument());
                         setEvidenceIssuedFlagToYes(sscsCaseDetails.getData().getSscsDocument());
