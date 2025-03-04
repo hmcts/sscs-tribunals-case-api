@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.jms.listener;
 
+import static uk.gov.hmcts.reform.sscs.service.HmcHearingApi.HMCTS_DEPLOYMENT_ID;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -16,7 +18,6 @@ import uk.gov.hmcts.reform.sscs.exception.HearingUpdateException;
 import uk.gov.hmcts.reform.sscs.exception.HmcEventProcessingException;
 import uk.gov.hmcts.reform.sscs.exception.MessageProcessingException;
 import uk.gov.hmcts.reform.sscs.model.hmc.message.HmcMessage;
-import static uk.gov.hmcts.reform.sscs.service.HmcHearingApi.HMCTS_DEPLOYMENT_ID;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageServiceV2;
 
 @Slf4j
