@@ -263,7 +263,6 @@ flags.hmc-to-hearings-api.enabled=${HMC_HEARINGS_LISTENING_ENABLED:false}
 flags.tribunals-to-hearings-api.enabled=${TRIBUNALS_HEARINGS_LISTENING_ENABLED:false}
 flags.adjournment.enabled=${ADJOURNMENT_ENABLED:false}
 flags.postHearings.enabled=${POST_HEARING_ENABLED:false}
-flags.deployment-filter.enabled=${HMC_DEPLOYMENT_FILTER_ENABLED:false}
 feign.httpclient.enabled=true
 feign.client.config.default.connectTimeout=10000
 feign.client.config.default.readTimeout=10000
