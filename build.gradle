@@ -9,7 +9,7 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.46.0'
     id 'org.owasp.dependencycheck' version '12.1.0'
     id 'au.com.dius.pact' version '4.3.15'
-    id 'com.github.hmcts.rse-cft-lib' version '0.19.1605'
+    id 'com.github.hmcts.rse-cft-lib' version '0.19.1606'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -239,6 +239,7 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/StorePdfService.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/servicebus/SessionAwareServiceBusMessagingService.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/coversheet/PdfCoverSheet.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/service/HmcHearingApiService.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/controllers/CreateCaseController.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/data/PdfData.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/writefinaldecision/esa/EsaWriteFinalDecisionMidEventValidationHandler.java," +
