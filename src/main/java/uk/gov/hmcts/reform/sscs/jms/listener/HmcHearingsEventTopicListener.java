@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.jms.listener;
 
+import static uk.gov.hmcts.reform.sscs.service.HmcHearingApi.HMCTS_DEPLOYMENT_ID;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -25,18 +27,12 @@ public class HmcHearingsEventTopicListener {
 
     private final ObjectMapper objectMapper;
 
-    private final String sscsServiceCode;
-
     private final ProcessHmcMessageServiceV2 processHmcMessageServiceV2;
 
     @Value("${hmc.deployment-id}")
     private String hmctsDeploymentId;
 
-    private static final String HMCTS_DEPLOYMENT_ID = "hmctsDeploymentId";
-
-    public HmcHearingsEventTopicListener(@Value("${sscs.serviceCode}") String sscsServiceCode,
-                                         ProcessHmcMessageServiceV2 processHmcMessageServiceV2) {
-        this.sscsServiceCode = sscsServiceCode;
+    public HmcHearingsEventTopicListener(ProcessHmcMessageServiceV2 processHmcMessageServiceV2) {
         this.processHmcMessageServiceV2 = processHmcMessageServiceV2;
         this.objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
