@@ -8,15 +8,5 @@
     "LiveFrom": "19/11/2019",
     "FieldShowCondition": "documentTabChoice!=\"DONOTSHOW\"",
     "FieldDisplayOrder": 12
-  },
-  {
-    "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "overrideFields",
-    "ListElementCode": "hmcHearingType",
-    "ID": "updateListingRequirementsOverrideFieldsTypeOfHearing",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/07/2022",
-    "FieldDisplayOrder": 7,
-    "PageID": "1.0"
   }
 ]
