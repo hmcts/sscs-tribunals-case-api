@@ -58,10 +58,7 @@ java:
     RUN_DB_MIGRATION_ON_STARTUP: true
     TEST_RECIPIENTS_POSTCODE: "*"
     HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-aat"
-    HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-pr-${CHANGE_ID}"
-    TRIBUNALS_EVENT_QUEUE_NAME: "${SERVICE_NAME}-servicebus-tribunals-to-hearing-api"
-    TRIBUNALS_EVENT_QUEUE_POLICY_NAME: "RootManageSharedAccessKey"
-    TRIBUNALS_EVENT_QUEUE_NAMESPACE: "sscs-sb-preview"
+    HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "${SERVICE_NAME}-hmcsb-sscs"
     HMC_HEARINGS_TOPIC_NAMESPACE: "hmc-servicebus-aat"
     HMC_DEPLOYMENT_ID: "sscs-${CHANGE_ID}"
     # START - DIRECTION HEARINGS RELEASE VARIABLES
@@ -743,7 +740,7 @@ hmcsb:
             correlationFilter:
               - name: "hmctsServiceId"
                 value: "BBA3"
-              - name: "deploymentId"
+              - name: "hmctsDeploymentId"
                 value: "sscs-${CHANGE_ID}"
 
 postgresql:
