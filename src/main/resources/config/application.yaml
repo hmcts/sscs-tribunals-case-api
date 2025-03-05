@@ -716,13 +716,13 @@ notification:
                     docmosisId: TB-SCS-GNO-ENG-00557-v2.docx
             grantReinstatement:
                 appellant:
-                    docmosisId: TB-SCS-GNO-ENG-00584.docx
+                    docmosisId: TB-SCS-GNO-ENG-00584-v2.docx
                 appointee:
-                    docmosisId: TB-SCS-GNO-ENG-00584.docx
+                    docmosisId: TB-SCS-GNO-ENG-00584-v2.docx
                 representative:
-                    docmosisId: TB-SCS-GNO-ENG-00584.docx
+                    docmosisId: TB-SCS-GNO-ENG-00584-v2.docx
                 other_party:
-                    docmosisId: TB-SCS-GNO-ENG-00584.docx
+                    docmosisId: TB-SCS-GNO-ENG-00584-v2.docx
             refuseReinstatement:
                 appellant:
                     docmosisId: TB-SCS-GNO-ENG-00585-v2.docx
@@ -767,15 +767,15 @@ notification:
                     docmosisId: TB-SCS-GNO-ENG-00089.docx
         actionPostponementRequest:
             appellant:
-              docmosisId: TB-SCS-LET-ENG-Action-Postponement-Request-v2.docx
+              docmosisId: TB-SCS-LET-ENG-Action-Postponement-Request.docx
             appointee:
-              docmosisId: TB-SCS-LET-ENG-Action-Postponement-Request-v2.docx
+              docmosisId: TB-SCS-LET-ENG-Action-Postponement-Request.docx
             representative:
-              docmosisId: TB-SCS-LET-ENG-Action-Postponement-Request-v2.docx
+              docmosisId: TB-SCS-LET-ENG-Action-Postponement-Request.docx
             joint_party:
-              docmosisId: TB-SCS-LET-ENG-Action-Postponement-Request-v2.docx
+              docmosisId: TB-SCS-LET-ENG-Action-Postponement-Request.docx
             other_party:
-              docmosisId: TB-SCS-LET-ENG-Action-Postponement-Request-v2.docx
+              docmosisId: TB-SCS-LET-ENG-Action-Postponement-Request.docx
         decisionIssued:
             appellant:
                 docmosisId: TB-SCS-GNO-ENG-00094.docx
