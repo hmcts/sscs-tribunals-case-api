@@ -15,6 +15,7 @@ import static uk.gov.hmcts.reform.sscs.util.ConfidentialityRequestUtil.isAtLeast
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -158,7 +159,9 @@ public class BundlingHandler {
                 .stream()
                 .filter(sscsDocument -> sscsDocument.getValue() != null)
                 .filter(sscsDocument -> isNull(sscsDocument.getValue().getDocumentFileName()))
-                .forEach(sscsDocument -> sscsDocument.getValue().setDocumentFileName(sscsDocument.getValue().getDocumentLink().getDocumentFilename()));
+                .forEach(sscsDocument -> sscsDocument.getValue().setDocumentFileName(Optional.ofNullable(
+                    sscsDocument.getValue().getDocumentLink()).orElse(sscsDocument.getValue().getAvDocumentLink())
+                    .getDocumentFilename()));
     }
 
     private void setMultiBundleConfig(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {

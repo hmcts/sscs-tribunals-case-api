@@ -6,10 +6,11 @@ plugins {
     id 'org.springframework.boot' version '3.4.3'
     id 'uk.gov.hmcts.java' version '0.12.65'
     id 'com.gorylenko.gradle-git-properties' version '2.4.2'
-    id 'com.github.ben-manes.versions' version '0.46.0'
+    id 'com.github.ben-manes.versions' version '0.51.0'
     id 'org.owasp.dependencycheck' version '12.1.0'
     id 'au.com.dius.pact' version '4.3.15'
     id 'com.github.hmcts.rse-cft-lib' version '0.19.1609'
+    id 'info.solidsoft.pitest' version '1.9.11'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -82,6 +83,14 @@ sourceSets {
             srcDir file('src/contractTest/java')
         }
         resources.srcDir file('src/contractTest/resources')
+    }
+    smokeTest {
+        java {
+            compileClasspath += main.output
+            runtimeClasspath += main.output
+            srcDir file('src/smokeTest/java')
+        }
+        resources.srcDir file('src/smokeTest/resources')
     }
 }
 
@@ -208,6 +217,24 @@ repositories {
     maven {
         url 'https://repo.spring.io/libs-milestone'
     }
+}
+
+project.tasks.named('pitest') {
+    group = "Verification"
+}
+
+pitest {
+    targetClasses = ['uk.gov.hmcts.reform.sscs.*']
+    excludedClasses = [
+            'uk.gov.hmcts.reform.sscs.config.*',
+            'uk.gov.hmcts.reform.sscs.bulkscancore.domain.*',
+            'uk.gov.hmcts.reform.sscs.domain.*',
+            'uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication'
+    ]
+    threads = 10
+    outputFormats = ['XML', 'HTML']
+    timestampedReports = false
+    mutationThreshold = 90
 }
 
 processResources.dependsOn(generateGitProperties)
@@ -469,12 +496,27 @@ dependencies {
 
     contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBoot.class.package.implementationVersion
 
+    testImplementation(group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBoot.class.package.implementationVersion) {
+        exclude group: "com.vaadin.external.google", module: "android-json"
+    }
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
 
     cftlibImplementation group: 'org.springframework.boot', name: 'spring-boot-devtools', version: springBoot.class.package.implementationVersion
     cftlibAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
+    implementation group: 'me.xdrop', name: 'fuzzywuzzy', version: '1.4.0'
+    implementation group: 'io.github.openfeign', name: 'feign-jackson', version: '13.3'
+    implementation group: 'com.github.everit-org.json-schema', name: 'org.everit.json.schema', version: '1.14.4'
+    implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
+    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-assertj', version: '3.4.1'
+    testImplementation group: 'org.pitest', name: 'pitest', version: '1.17.0'
+    testImplementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: pitest.pitestVersion.get()
+    testImplementation group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: '0.5'
+    testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner'
+    testImplementation group: 'com.typesafe', name: 'config', version: '1.4.3'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.11.0'
+    testImplementation group: 'org.apiguardian', name: 'apiguardian-api', version: '1.1.2'
 }
 
 bootJar {
