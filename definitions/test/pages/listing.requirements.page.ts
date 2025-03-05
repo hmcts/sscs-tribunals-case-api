@@ -37,4 +37,13 @@ export class ListingRequirementPage {
     await webAction.verifyElementVisibility("#field-trigger-summary");
     await webAction.clickSubmitButton();
   }
+
+  async submitEventNoChange() {
+    await webAction.clickButton('Continue');
+    await webAction.verifyElementVisibility('#amendReasons-adminreq');
+    await webAction.clickSubmitButton();
+    await webAction.verifyElementVisibility("#field-trigger-summary");
+    await webAction.clickSubmitButton();
+
+  }
 }
