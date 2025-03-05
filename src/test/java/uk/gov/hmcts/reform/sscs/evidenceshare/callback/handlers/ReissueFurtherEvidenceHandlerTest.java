@@ -428,6 +428,51 @@ public class ReissueFurtherEvidenceHandlerTest {
         );
     }
 
+    @Test
+    public void givenIssueFurtherEvidenceCallback_shouldReissueChosenEvidenceWhenSscsDocumentsContainsVideoAudioDocs() {
+        SscsDocument pdfDoc = SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
+                        .documentLink(DocumentLink.builder().documentUrl("pdf.doc").build())
+                        .editedDocumentLink(DocumentLink.builder().documentUrl("pdfRedacted.doc").build())
+                        .build())
+                .build();
+        SscsDocument videoDoc = SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
+                        .avDocumentLink(DocumentLink.builder().documentUrl("video.mp4").build())
+                        .build())
+                .build();
+        SscsDocument audioDoc = SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
+                        .documentLink(DocumentLink.builder().documentUrl("audio.mp3").build())
+                        .build())
+                .build();
+
+        DynamicListItem dynamicListItem = new DynamicListItem(
+                pdfDoc.getValue().getEditedDocumentLink().getDocumentUrl(), "First document");
+
+        DynamicList dynamicList = new DynamicList(dynamicListItem, List.of(dynamicListItem));
+        SscsCaseData caseData = SscsCaseData.builder()
+                .ccdCaseId("1563382899630221")
+                .reissueArtifactUi(ReissueArtifactUi.builder()
+                        .reissueFurtherEvidenceDocument(dynamicList)
+                        .build())
+                .build();
+        caseData.setSscsDocument(List.of(audioDoc, videoDoc, pdfDoc));
+
+        when(furtherEvidenceService.canHandleAnyDocument(List.of(audioDoc, videoDoc, pdfDoc))).thenReturn(true);
+        doNothing().when(furtherEvidenceService)
+                .issue(List.of(pdfDoc), caseData, APPELLANT_EVIDENCE, List.of(), null);
+
+        handler.handle(CallbackType.SUBMITTED,
+                HandlerHelper.buildTestCallbackForGivenData(caseData, INTERLOCUTORY_REVIEW_STATE, REISSUE_FURTHER_EVIDENCE));
+
+        verify(furtherEvidenceService).issue(
+                argThat(argument -> argument.size() == 1 && argument.getFirst() == pdfDoc),
+                eq(caseData), eq(APPELLANT_EVIDENCE), eq(List.of()), eq(null)
+        );
+    }
+
+
     private static List<OtherPartyOption> getOtherPartyOptions(YesNo resendToOtherParty, YesNo resendToOtherPartyRep) {
         List<OtherPartyOption> otherPartyOptions = new ArrayList<>();
         if (resendToOtherParty != null) {

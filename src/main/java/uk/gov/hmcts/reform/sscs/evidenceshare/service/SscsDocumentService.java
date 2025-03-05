@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.AUDIO_DOCUMENT;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.VIDEO_DOCUMENT;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -40,11 +42,13 @@ public class SscsDocumentService {
         Objects.requireNonNull(documentType);
 
         return sscsDocuments.stream()
-            .filter(doc -> documentType.getValue().equals(doc.getValue().getDocumentType())
-                && "No".equals(doc.getValue().getEvidenceIssued()))
-            .filter(doc -> otherPartyOriginalSenderId == null || (otherPartyOriginalSenderId != null && otherPartyOriginalSenderId.equals(doc.getValue().getOriginalSenderOtherPartyId())))
-            .map(doc -> PdfDocument.builder().pdf(toPdf(doc, isConfidentialCase)).document(doc).build())
-            .collect(Collectors.toList());
+                .filter(doc -> documentType.getValue().equals(doc.getValue().getDocumentType())
+                        && "No".equals(doc.getValue().getEvidenceIssued()))
+                .filter(d -> !VIDEO_DOCUMENT.getValue().equals(d.getValue().getDocumentType()))
+                .filter(d -> !AUDIO_DOCUMENT.getValue().equals(d.getValue().getDocumentType()))
+                .filter(doc -> otherPartyOriginalSenderId == null || (otherPartyOriginalSenderId != null && otherPartyOriginalSenderId.equals(doc.getValue().getOriginalSenderOtherPartyId())))
+                .map(doc -> PdfDocument.builder().pdf(toPdf(doc, isConfidentialCase)).document(doc).build())
+                .collect(Collectors.toList());
     }
 
     private Pdf toPdf(AbstractDocument sscsDocument, boolean isConfidentialCase) {

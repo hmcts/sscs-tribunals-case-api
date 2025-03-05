@@ -136,6 +136,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
 
         Map<String, SscsDocument> binaryDocumentUrlLinkCaseDataMap = updatedCaseData.getSscsDocument()
                 .stream()
+                .filter(sscsDocument -> sscsDocument.getValue().getDocumentLink() != null)
                 .collect(toMap(document -> document.getValue().getDocumentLink().getDocumentBinaryUrl(), Function.identity()));
 
         try {
@@ -144,16 +145,16 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
                     EventType.UPDATE_CASE_ONLY.getCcdType(),
                     idamTokens,
                     sscsCaseDetails -> {
-                        sscsCaseDetails.getData().getSscsDocument().forEach(
-                                sscsDocument -> {
-                                    String documentBinaryUrl = sscsDocument.getValue().getDocumentLink().getDocumentBinaryUrl();
-                                    if (binaryDocumentUrlLinkCaseDataMap.containsKey(documentBinaryUrl)) {
-                                        sscsDocument.getValue().setResizedDocumentLink(
-                                                binaryDocumentUrlLinkCaseDataMap.get(documentBinaryUrl).getValue().getResizedDocumentLink()
-                                        );
-                                    }
-                                }
-                        );
+                        sscsCaseDetails.getData().getSscsDocument()
+                                .stream()
+                                .filter(sscsDocument -> sscsDocument.getValue().getDocumentLink() != null)
+                                .forEach(
+                                        sscsDocument -> {
+                                            String documentBinaryUrl = sscsDocument.getValue().getDocumentLink().getDocumentBinaryUrl();
+                                            if (binaryDocumentUrlLinkCaseDataMap.containsKey(documentBinaryUrl)) {
+                                                sscsDocument.getValue().setResizedDocumentLink(binaryDocumentUrlLinkCaseDataMap.get(documentBinaryUrl).getValue().getResizedDocumentLink());
+                                            }
+                                        });
 
                         final String description = determineDescription(sscsCaseDetails.getData().getSscsDocument());
                         setEvidenceIssuedFlagToYes(sscsCaseDetails.getData().getSscsDocument());
