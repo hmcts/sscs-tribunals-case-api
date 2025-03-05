@@ -194,11 +194,21 @@
   {
     "CaseEventID": "updateListingRequirements",
     "CaseFieldID": "overrideFields",
+    "ListElementCode": "hmcHearingType",
+    "ID": "updateListingRequirementsOverrideFieldsHmcHearingType",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/07/2022",
+    "FieldDisplayOrder": 7,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "overrideFields",
     "ListElementCode": "autoList",
     "ID": "updateListingRequirementsOverrideFieldsAutoList",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/07/2022",
-    "FieldDisplayOrder": 7,
+    "FieldDisplayOrder": 8,
     "PageID": "1.0"
   },
   {
@@ -208,7 +218,7 @@
     "ID": "updateListingRequirementsOverrideFieldsHearingVenueEpimsIdsValue",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/07/2022",
-    "FieldDisplayOrder": 8,
+    "FieldDisplayOrder": 9,
     "PageID": "1.0"
   },
   {
@@ -218,7 +228,7 @@
     "ID": "updateListingRequirementsOverrideFieldsHearingWindowFirstDateTimeMustBe",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/07/2022",
-    "FieldDisplayOrder": 10,
+    "FieldDisplayOrder": 11,
     "PageID": "1.0"
   },
   {
@@ -228,7 +238,7 @@
     "ID": "updateListingRequirementsOverrideFieldsHearingWindowDateRangeStart",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/07/2022",
-    "FieldDisplayOrder": 10,
+    "FieldDisplayOrder": 11,
     "PageID": "1.0"
   },
   {
@@ -238,7 +248,7 @@
     "ID": "updateListingRequirementsOverrideFieldsHearingWindowDateRangeEnd",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/07/2022",
-    "FieldDisplayOrder": 10,
+    "FieldDisplayOrder": 11,
     "PageID": "1.0"
   },
   {

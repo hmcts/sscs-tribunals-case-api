@@ -161,7 +161,6 @@ public class CcdNotificationsPdfService {
         } catch (CcdException ccdEx) {
             log.error(FAILED_TO_UPDATE_CCD_CASE_USING_V_2_BUT_CARRYING_ON_WITH_EVENT,
                     ccdCaseId, EventType.NOTIFICATION_SENT.getCcdType(), ccdEx);
-
         }
     }
 
@@ -228,7 +227,6 @@ public class CcdNotificationsPdfService {
         } catch (CcdException ccdEx) {
             log.error(FAILED_TO_UPDATE_CCD_CASE_USING_V_2_BUT_CARRYING_ON_WITH_EVENT,
                     ccdCaseId, EventType.NOTIFICATION_SENT.getCcdType(), ccdEx);
-
         }
     }
 
