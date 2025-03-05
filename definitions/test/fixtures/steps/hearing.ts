@@ -143,4 +143,10 @@ export class Hearing extends BaseStep {
       'Admin requested change'
     );
   }
+
+  async updateListingRequirementsNoChange() {
+    await this.homePage.chooseEvent('Update Listing Requirements');
+    await this.listingRequirementPage.submitEventNoChange();
+
+  }
 }
