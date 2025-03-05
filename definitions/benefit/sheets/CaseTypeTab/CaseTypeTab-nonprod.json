@@ -1,1 +1,13 @@
-[]
+[
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "internal_documents_clerk", "TabLabel": "Tribunal Internal Documents", "TabDisplayOrder": 3, "CaseFieldID": "isInc5249521CaseLabel", "TabFieldDisplayOrder": 1, "FieldShowCondition": "historicSscsInterlocDirectionDocs=\"DONOTSHOW\""},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "internal_documents_clerk", "TabLabel": "Tribunal Internal Documents", "TabDisplayOrder": 3, "CaseFieldID": "sscsInternalDocument", "TabFieldDisplayOrder": 1},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-clerk", "TabID": "internal_documents_clerk", "TabLabel": "Tribunal Internal Documents", "TabDisplayOrder": 3, "CaseFieldID": "dwpState", "TabFieldDisplayOrder": 2, "FieldShowCondition": "historicSscsInterlocDirectionDocs=\"DONOTSHOW\""},
+
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "internal_documents_judge", "TabLabel": "Tribunal Internal Documents", "TabDisplayOrder": 3, "CaseFieldID": "isInc5249521CaseLabel", "TabFieldDisplayOrder": 1, "FieldShowCondition": "historicSscsInterlocDirectionDocs=\"DONOTSHOW\""},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "internal_documents_judge", "TabLabel": "Tribunal Internal Documents", "TabDisplayOrder": 3, "CaseFieldID": "sscsInternalDocument", "TabFieldDisplayOrder": 1},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-judge", "TabID": "internal_documents_judge", "TabLabel": "Tribunal Internal Documents", "TabDisplayOrder": 3, "CaseFieldID": "dwpState", "TabFieldDisplayOrder": 2, "FieldShowCondition": "historicSscsInterlocDirectionDocs=\"DONOTSHOW\""},
+
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "internal_documents_superuser", "TabLabel": "Tribunal Internal Documents", "TabDisplayOrder": 3, "CaseFieldID": "isInc5249521CaseLabel", "TabFieldDisplayOrder": 1, "FieldShowCondition": "historicSscsInterlocDirectionDocs=\"DONOTSHOW\""},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "internal_documents_superuser", "TabLabel": "Tribunal Internal Documents", "TabDisplayOrder": 3, "CaseFieldID": "sscsInternalDocument", "TabFieldDisplayOrder": 1},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "TabID": "internal_documents_superuser", "TabLabel": "Tribunal Internal Documents", "TabDisplayOrder": 3, "CaseFieldID": "dwpState", "TabFieldDisplayOrder": 2, "FieldShowCondition": "historicSscsInterlocDirectionDocs=\"DONOTSHOW\""}
+]
