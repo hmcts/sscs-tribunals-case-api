@@ -173,8 +173,11 @@ public class CreateCaseController {
             || syaCaseWrapper.getBenefitType().getCode() == null) {
             logBadRequest(syaCaseWrapper);
         }
-        syaCaseWrapper.getAppellant().setNino(getRandomNino());
-        syaCaseWrapper.getMrn().setDate(getRandomMrnDate());
+
+        if (syaCaseWrapper.getBenefitType() != null && !syaCaseWrapper.getBenefitType().getCode().equals("infectedBloodCompensation")) {
+            syaCaseWrapper.getAppellant().setNino(getRandomNino());
+            syaCaseWrapper.getMrn().setDate(getRandomMrnDate());
+        }
         log.info("Appeal with Nino - {} and benefit type {} received", syaCaseWrapper.getAppellant().getNino(),
             syaCaseWrapper.getBenefitType().getCode());
         Long caseId = submitAppealServiceBase.submitAppeal(syaCaseWrapper, authorisation);
