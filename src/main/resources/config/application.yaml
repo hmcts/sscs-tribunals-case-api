@@ -1634,9 +1634,9 @@ notification:
                     smsId: 40f2669c-4389-4ac9-82cf-e98a4a9dd0e2
             appealDormant:
                 appellant:
-                    emailId: 7e26960c-40d3-4430-a720-9da1917199fe
+                    emailId: 2d352f2b-3f1c-4ad1-9f73-2909ec5e4695
                 appointee:
-                    emailId: 7e26960c-40d3-4430-a720-9da1917199fe
+                    emailId: 2d352f2b-3f1c-4ad1-9f73-2909ec5e4695
                 representative:
                     emailId: 10e958ff-4ff4-4a38-b79c-298e89aa8079
                 joint_party:
