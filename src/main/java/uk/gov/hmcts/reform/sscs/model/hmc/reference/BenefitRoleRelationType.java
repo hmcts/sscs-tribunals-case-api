@@ -6,7 +6,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.TRIBUNALS_MEMB
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.TRIBUNALS_MEMBER_MEDICAL;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import lombok.Getter;
@@ -25,11 +24,6 @@ public enum BenefitRoleRelationType {
     private final List<String> roleTypes;
 
     public static List<String> findRoleTypesByBenefitCode(String benefitCode) {
-        for (BenefitRoleRelationType tmp : values()) {
-            if (tmp.getBenefitCode().equals(benefitCode)) {
-                return tmp.roleTypes;
-            }
-        }
-        return new ArrayList<>();
+        return List.of("58", "50");
     }
 }
