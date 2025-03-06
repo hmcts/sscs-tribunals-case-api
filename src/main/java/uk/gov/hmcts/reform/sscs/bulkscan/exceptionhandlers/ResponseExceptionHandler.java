@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.sscs.bulkscan.exceptions.ForbiddenException;
 import uk.gov.hmcts.reform.sscs.bulkscan.exceptions.InvalidExceptionRecordException;
 import uk.gov.hmcts.reform.sscs.bulkscan.exceptions.UnauthorizedException;
 
-@ControllerAdvice
+@ControllerAdvice(basePackages = "uk.gov.hmcts.reform.sscs.bulkscan")
 public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(ResponseExceptionHandler.class);
