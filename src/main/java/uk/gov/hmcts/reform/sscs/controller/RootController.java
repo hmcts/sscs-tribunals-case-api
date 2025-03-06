@@ -15,11 +15,6 @@ public class RootController {
      * Application insights registers that as a 404 and adds it as an exception,
      * This is here to reduce the noise
      */
-    @GetMapping(value = "/", consumes = MediaType.ALL_VALUE)
-    public void root() {
-        // Only used for returning a 200 on /
-    }
-
     /**
      * Root GET endpoint.
      *
@@ -29,7 +24,7 @@ public class RootController {
      *
      * @return Welcome message from the service.
      */
-    @GetMapping
+    @GetMapping(value = "/", consumes = MediaType.ALL_VALUE)
     public ResponseEntity<String> welcome() {
         return ok("Welcome to sscs-tribunals-api");
     }

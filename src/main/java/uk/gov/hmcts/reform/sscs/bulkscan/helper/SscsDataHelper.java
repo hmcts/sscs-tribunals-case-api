@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.helper;
 
 import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -192,7 +193,7 @@ public class SscsDataHelper {
         LocalDate mrnDate = findMrnDateTime(((Appeal) caseValidationResponse.getTransformedCase()
             .get("appeal")).getMrnDetails());
 
-        if (!caseValidationResponse.getWarnings().isEmpty()) {
+        if (!isEmpty(caseValidationResponse.getWarnings())) {
             return caseEvent.getIncompleteApplicationEventId();
         } else if (mrnDate != null && mrnDate.plusMonths(13L).isBefore(LocalDate.now())) {
             return caseEvent.getNonCompliantEventId();

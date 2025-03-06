@@ -10,7 +10,7 @@ import org.junit.Test;
 
 public class BulkScanSchemaTest {
 
-    InputStream inputStream = getClass().getResourceAsStream("/schema/sscs-bulk-scan-schema.json");
+    InputStream inputStream = getClass().getResourceAsStream("/config/schema/sscs-bulk-scan-schema.json");
 
     JSONObject validJsonData = new JSONObject(
             new JSONTokener(getClass().getResourceAsStream("/schema/valid_ocr_agreed.json")));

@@ -1748,7 +1748,7 @@ feign:
 # Document store
 document_management.url: ${DOCUMENT_MANAGEMENT_URL:http://dm-store:5005}
 
-schema.location: /schema/sscs-bulk-scan-schema.json
+schema.location: /config/schema/sscs-bulk-scan-schema.json
 
 appeal.email.host: ${EMAIL_SERVER_HOST:localhost}
 appeal.email.port: ${EMAIL_SERVER_PORT:1025}

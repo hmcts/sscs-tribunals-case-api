@@ -32,6 +32,7 @@ public class AuthorisationServiceTest {
 
     @Before
     public void setUp() {
+        openMocks(this);
         service = new AuthorisationService(serviceAuthorisationApi,
             // authTokenValidator,
             "ccd_data");
