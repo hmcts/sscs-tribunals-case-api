@@ -21,10 +21,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.authorisation.validators.AuthTokenValidator;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -34,14 +36,15 @@ import uk.gov.hmcts.reform.sscs.service.RefDataService;
 @AutoConfigureMockMvc
 @ContextConfiguration
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(locations = "classpath:application_it.yaml")
+@ActiveProfiles("integration")
+@TestPropertySource(locations = "classpath:config/application_it.properties")
 public class OcrValidationTest  {
 
     @Autowired
     private MockMvc mvc;
 
     @MockitoBean
-    protected AuthTokenValidator authTokenValidator;
+    protected ServiceAuthorisationApi serviceAuthorisationApi;
 
     @MockitoBean
     protected IdamService idamService;
@@ -54,7 +57,7 @@ public class OcrValidationTest  {
 
     @Test
     public void should_return_200_when_ocr_form_validation_request_data_is_valid() throws Throwable {
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String content = readResource("mappings/ocr-validation/valid-ocr-data.json");
 
@@ -71,7 +74,7 @@ public class OcrValidationTest  {
 
     @Test
     public void should_return_200_when_ocr_form_validation_request_data_is_valid_Sscs2() throws Throwable {
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String content = readResource("mappings/ocr-validation/valid-ocr-data.json");
 
@@ -88,7 +91,7 @@ public class OcrValidationTest  {
 
     @Test
     public void should_return_200_when_ocr_form_for_uc_validation_request_data_is_valid() throws Throwable {
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String content = readResource("mappings/ocr-validation/valid-ocr-data-for-uc.json");
 
@@ -105,7 +108,7 @@ public class OcrValidationTest  {
 
     @Test
     public void should_return_200_when_ocr_form_with_address_line3_blank_validation_request_data_is_valid() throws Throwable {
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String content = readResource("mappings/ocr-validation/valid-ocr-data-address-line3.json");
 
@@ -122,7 +125,7 @@ public class OcrValidationTest  {
 
     @Test
     public void should_return_200_when_ocr_form_with_hearing_sub_type_validation_request_data_is_valid() throws Throwable {
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String content = readResource("mappings/ocr-validation/valid-ocr-data-with-hearing-sub-type.json");
 
@@ -139,7 +142,7 @@ public class OcrValidationTest  {
 
     @Test
     public void should_return_200_with_status_warnings_when_ocr_form_validation_request_data_is_incomplete() throws Throwable {
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String content = readResource("mappings/ocr-validation/incomplete-ocr-data.json");
 
@@ -156,7 +159,7 @@ public class OcrValidationTest  {
 
     @Test
     public void should_return_200_when_ocr_form_with_form_type_sscs1u_and_hearing_sub_type_validation_request_data_are_empty() throws Throwable {
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String content = readResource("mappings/ocr-validation/invalid-ocr-data-with-hearing-sub-type-sscs1u.json");
 
@@ -173,7 +176,7 @@ public class OcrValidationTest  {
 
     @Test
     public void should_return_200_when_ocr_form_with_form_type_sscs1peu_and_hearing_sub_type_validation_request_data_are_empty() throws Throwable {
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String content = readResource("mappings/ocr-validation/invalid-ocr-data-with-hearing-sub-type-sscs1peu.json");
 
@@ -190,7 +193,7 @@ public class OcrValidationTest  {
 
     @Test
     public void should_return_200_when_ocr_form_with_form_type_sscs1_and_hearing_sub_type_validation_request_data_are_empty() throws Throwable {
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String content = readResource("mappings/ocr-validation/invalid-ocr-data-with-hearing-sub-type.json");
 
@@ -207,7 +210,7 @@ public class OcrValidationTest  {
 
     @Test
     public void should_return_200_with_status_errors_when_ocr_form_validation_request_fails_schema_validation() throws Throwable {
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String content = readResource("mappings/ocr-validation/invalid-ocr-data-fails-schema.json");
 
@@ -225,7 +228,7 @@ public class OcrValidationTest  {
     @Test
     //Convert errors with transforming data to warnings during validation endpoint
     public void should_return_200_with_status_warnings_when_ocr_form_validation_request_has_errors_with_transformation() throws Throwable {
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String content = readResource("mappings/ocr-validation/invalid-ocr-data-transformation.json");
 
@@ -243,7 +246,7 @@ public class OcrValidationTest  {
     @Test
     //Convert errors with the validating data to warnings during validation endpoint
     public void should_return_200_with_status_warnings_when_ocr_form_validation_request_has_errors_with_validation() throws Throwable {
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String content = readResource("mappings/ocr-validation/invalid-ocr-data-validation.json");
 
@@ -260,7 +263,7 @@ public class OcrValidationTest  {
 
     @Test
     public void should_return_200_with_status_warnings_when_ocr_form_validation_request_has_duplicate_case_warnings() throws Throwable {
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         SscsCaseDetails caseDetails = SscsCaseDetails.builder().id(1L).build();
 
@@ -293,7 +296,7 @@ public class OcrValidationTest  {
 
     @Test
     public void fuzzyMatchingMaternityAllowanceBenefitTypeForSscs1uForm() throws Throwable {
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String content = readResource("mappings/ocr-validation/valid-ocr-data.json");
         content = content.replaceAll("benefit_type_description", "benefit_type_other");
@@ -312,7 +315,7 @@ public class OcrValidationTest  {
 
     @Test
     public void fuzzyMatchingInvalidNameBenefitTypeForSscs1uForm() throws Throwable {
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String content = readResource("mappings/ocr-validation/valid-ocr-data.json");
         content = content.replaceAll("benefit_type_description", "benefit_type_other");
@@ -332,7 +335,7 @@ public class OcrValidationTest  {
 
     @Test
     public void should_return_200_with_error_when_ocr_form_with_sscs2_data_is_used_for_sscs1_form() throws Throwable {
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String content = readResource("mappings/ocr-validation/sscs2-valid-ocr-data.json");
 
@@ -358,7 +361,7 @@ public class OcrValidationTest  {
 
     @Test
     public void should_return_200_when_ocr_form_with_sscs2_form_validation_request_data_is_valid() throws Throwable {
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String content = readResource("mappings/ocr-validation/sscs2-valid-ocr-data.json");
 
@@ -375,7 +378,7 @@ public class OcrValidationTest  {
 
     @Test
     public void should_return_200_when_ocr_form_with_sscs5_form_validation_request_data_is_valid() throws Throwable {
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String content = readResource("mappings/ocr-validation/sscs5-valid-ocr-data.json");
 
@@ -392,7 +395,7 @@ public class OcrValidationTest  {
 
     @Test
     public void should_return_200_with_warning_when_ocr_form_with_sscs2_form_validation_request_data_is_invalid() throws Throwable {
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String content = readResource("mappings/ocr-validation/sscs2-invalid-ocr-data.json");
 
@@ -414,7 +417,7 @@ public class OcrValidationTest  {
 
     @Test
     public void should_return_200_with_warning_when_ocr_form_with_sscs2_form_validation_request_appellant_role_invalid() throws Throwable {
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String content = readResource("mappings/ocr-validation/sscs2-invalid-ocr-data-appellant-role.json");
 
@@ -432,7 +435,7 @@ public class OcrValidationTest  {
 
     @Test
     public void should_return_200_with_error_when_ocr_form_with_sscs5_form_validation_request_benefit_type_invalid() throws Throwable {
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String content = readResource("mappings/ocr-validation/sscs5-invalid-ocr-data-benefit-type.json");
 

@@ -5,7 +5,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.google.common.io.Resources.getResource;
-import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Strings.concat;
 import static org.mockito.Mockito.verify;
@@ -45,9 +44,15 @@ import org.junit.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.runner.RunWith;
+import org.skyscreamer.jsonassert.Customization;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
+import org.skyscreamer.jsonassert.comparator.CustomComparator;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.bulkscan.BaseTest;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.ErrorResponse;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.ExceptionRecord;
@@ -59,6 +64,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.SscsQueryBuilder;
 import uk.gov.hmcts.reform.sscs.bulkscan.domain.transformation.SuccessfulTransformationResponse;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 
+@RunWith(SpringRunner.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
@@ -93,7 +99,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         checkForLinkedCases(FIND_CASE_EVENT_URL);
         findCaseByForCaseworker(FIND_CASE_EVENT_URL, MRN_DATE_YESTERDAY_YYYY_MM_DD, "ESA");
 
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
             exceptionCaseData(caseDataWithMrnDate(MRN_DATE_YESTERDAY_DD_MM_YYYY, this::addAppellant, "SSCS1")),
@@ -109,7 +115,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     //FIXME: delete after bulk scan auto case creation is switch on
     @Test
     public void should_transform_incomplete_case_when_data_missing() throws Exception {
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
             exceptionCaseData(caseDataWithMissingAppellantDetails()),
@@ -130,7 +136,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         checkForLinkedCases(FIND_CASE_EVENT_URL);
         findCaseByForCaseworker(FIND_CASE_EVENT_URL, "2017-01-01", "ESA");
 
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
             exceptionCaseData(caseDataWithMrnDate("01/01/2017", this::addAppellant, "SSCS1")),
@@ -149,7 +155,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     @Test
     public void should_return_error_list_populated_when_exception_record_transformation_fails() {
         // Given
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
             exceptionCaseData(caseDataWithContradictingValues()),
@@ -165,14 +171,14 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         assertThat(result.getBody().errors)
             .containsOnly("is_hearing_type_oral and is_hearing_type_paper have contradicting values");
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     //FIXME: delete after bulk scan auto case creation is switch on
     @Test
     public void should_return_error_list_populated_when_key_value_pair_validation_fails() {
         // Given
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
             exceptionCaseData(caseDataWithInvalidKey()),
@@ -188,7 +194,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         assertThat(result.getBody().errors)
             .containsOnly("#: extraneous key [invalid_key] is not permitted");
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     //FIXME: delete after bulk scan auto case creation is switch on
@@ -196,7 +202,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     public void should_not_create_duplicate_non_compliant_case_when_mrndate_nino_benefit_code_case_exists() throws Exception {
         // Given
         checkForLinkedCases(FIND_CASE_EVENT_URL);
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
             exceptionCaseData(caseDataWithMrnDate("01/01/2017", this::addAppellant, "SSCS1")),
@@ -214,14 +220,14 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         assertThat(result.getBody().errors)
             .containsOnly("Duplicate case already exists - please reject this exception record");
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     //FIXME: delete after bulk scan auto case creation is switch on
     @Test
     public void should_return_warnings_when_tell_tribunal_about_dates_is_true_and_no_excluded_dates_provided() {
         // Given
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
             exceptionCaseData(caseDataWithNoExcludedHearingDates()),
@@ -238,7 +244,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         assertThat(result.getBody().getWarnings())
             .contains(HEARING_EXCLUDE_DATES_MISSING);
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     @ParameterizedTest
@@ -264,7 +270,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     @MethodSource("endPoints")
     public void should_return_status_code_403_when_service_auth_token_is_missing(String url, boolean isAuto) {
         // Given
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("forbidden_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("forbidden_service");
 
         ExceptionRecord exceptionRecord =
             (isAuto) ? autoExceptionCaseData(caseData(), "SSCS1PEU") : exceptionCaseData(caseData());
@@ -277,7 +283,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         // Then
         assertThat(result.getStatusCodeValue()).isEqualTo(403);
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     @Test
@@ -285,7 +291,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         checkForLinkedCases(FIND_CASE_EVENT_URL);
         findCaseByForCaseworker(FIND_CASE_EVENT_URL, MRN_DATE_YESTERDAY_YYYY_MM_DD, "ESA");
 
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
             autoExceptionCaseData(caseDataWithMrnDate(MRN_DATE_YESTERDAY_DD_MM_YYYY, this::addAppellant, "SSCS1PEU"),
@@ -304,7 +310,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         checkForLinkedCases(FIND_CASE_EVENT_URL);
         findCaseByForCaseworker(FIND_CASE_EVENT_URL, MRN_DATE_YESTERDAY_YYYY_MM_DD, "attendanceAllowance");
 
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
             autoExceptionCaseData(caseDataWithMrnDate(MRN_DATE_YESTERDAY_DD_MM_YYYY, this::addAppellant, "SSCS1U"),
@@ -324,7 +330,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         checkForLinkedCases(FIND_CASE_EVENT_URL);
         findCaseByForCaseworker(FIND_CASE_EVENT_URL, MRN_DATE_YESTERDAY_YYYY_MM_DD, "ESA");
 
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         when(venueService.getEpimsIdForVenue(COVENTRY_CMCB)).thenReturn(COVENTRY_CMCB_EPIMS_ID);
         when(refDataService.getCourtVenueRefDataByEpimsId(COVENTRY_CMCB_EPIMS_ID)).thenReturn(CourtVenue.builder().regionId(
@@ -346,7 +352,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
     @Test
     public void auto_scan_should_not_transform_incomplete_case_when_data_missing() {
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
             autoExceptionCaseData(caseDataWithMissingAppellantAndHearingSubTypeDetails(), "SSCS1PEU"),
@@ -367,14 +373,14 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
                 "person1_nino is empty",
                 "hearing_type_telephone, hearing_type_video and hearing_type_face_to_face are empty. At least one must be populated");
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
 
     }
 
     @Test
     public void auto_scan_should_not_transform_case_when_tell_tribunal_about_dates_is_true_and_no_excluded_dates_provided() {
         // Given
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
             exceptionCaseData(caseDataWithNoExcludedHearingDates()),
@@ -390,7 +396,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         assertThat(result.getBody().warnings)
             .contains("Excluded dates have been provided which must be recorded on CCD");
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     @Test
@@ -399,7 +405,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         checkForLinkedCases(FIND_CASE_EVENT_URL);
         findCaseByForCaseworker(FIND_CASE_EVENT_URL, MRN_DATE_YESTERDAY_YYYY_MM_DD, "childSupport");
 
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         when(venueService.getEpimsIdForVenue(CHELMSFORD)).thenReturn(CHELMSFORD_EPIMS_ID);
         when(refDataService.getCourtVenueRefDataByEpimsId(CHELMSFORD_EPIMS_ID)).thenReturn(CourtVenue.builder().regionId(
@@ -422,7 +428,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         checkForLinkedCases(FIND_CASE_EVENT_URL);
         findCaseByForCaseworker(FIND_CASE_EVENT_URL, MRN_DATE_YESTERDAY_YYYY_MM_DD, "taxFreeChildcare");
 
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         when(venueService.getEpimsIdForVenue(BASILDON_CC)).thenReturn(BASILDON_CC_EPIMS_ID);
         when(refDataService.getCourtVenueRefDataByEpimsId(BASILDON_CC_EPIMS_ID)).thenReturn(CourtVenue.builder().regionId("1").epimsId(
@@ -441,7 +447,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
     @Test
     public void should_return_error_list_populated_when_sscs2_key_value_pair_validation_fails() {
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
             exceptionCaseData(caseDataWithInvalidKey(), "SSCS2", false),
@@ -455,14 +461,14 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         assertThat(result.getBody().errors)
             .containsOnly("#: extraneous key [invalid_key] is not permitted");
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     @Test
     public void should_return_warning_list_populated_when_sscs2_missing_data_validation_fails() {
         checkForLinkedCases(FIND_CASE_EVENT_URL);
         findCaseByForCaseworker(FIND_CASE_EVENT_URL, MRN_DATE_YESTERDAY_YYYY_MM_DD, "childSupport");
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
             exceptionCaseData(caseDataWithoutChildMaintenanceAndPartiallyMissingOtherPartyNameAddress(SSCS2), "SSCS2", false),
@@ -479,14 +485,14 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
                 "other_party_address_line2 is empty",
                 "other_party_postcode is empty");
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     @Test
     public void should_return_warning_list_populated_when_sscs2_appellant_role_empty() {
         checkForLinkedCases(FIND_CASE_EVENT_URL);
         findCaseByForCaseworker(FIND_CASE_EVENT_URL, MRN_DATE_YESTERDAY_YYYY_MM_DD, "childSupport");
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
             exceptionCaseData(caseDataWithoutAppellantRole(SSCS2), "SSCS2", false),
@@ -500,14 +506,14 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         assertThat(result.getBody().warnings)
             .containsOnly("is_paying_parent, is_receiving_parent, is_another_party and other_party_details fields are empty");
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     @Test
     public void should_return_no_warning_when_sscs2_appellant_role_empty_ignore_warnings() {
         checkForLinkedCases(FIND_CASE_EVENT_URL);
         findCaseByForCaseworker(FIND_CASE_EVENT_URL, MRN_DATE_YESTERDAY_YYYY_MM_DD, "childSupport");
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
             exceptionCaseData(caseDataWithoutAppellantRole(SSCS2), "SSCS2", true),
@@ -520,14 +526,14 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         assertThat(result.getStatusCodeValue()).isEqualTo(200);
         assertThat(result.getBody().warnings).doesNotContain("is_paying_parent, is_receiving_parent, is_another_party and other_party_details fields are empty");
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     @Test
     public void should_return_warning_list_populated_when_sscs2_appellant_role_invalid() {
         checkForLinkedCases(FIND_CASE_EVENT_URL);
         findCaseByForCaseworker(FIND_CASE_EVENT_URL, MRN_DATE_YESTERDAY_YYYY_MM_DD, "childSupport");
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
             exceptionCaseData(caseDataWithInvalidAppellantRole(SSCS2), "SSCS2", false),
@@ -541,14 +547,14 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         assertThat(result.getBody().warnings)
             .containsOnly("is_paying_parent, is_receiving_parent and is_another_party have conflicting values");
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     @Test
     public void should_return_no_warning_sscs2_appellant_role_invalid_ignore_warning() {
         checkForLinkedCases(FIND_CASE_EVENT_URL);
         findCaseByForCaseworker(FIND_CASE_EVENT_URL, MRN_DATE_YESTERDAY_YYYY_MM_DD, "childSupport");
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
             exceptionCaseData(caseDataWithInvalidAppellantRole(SSCS2), "SSCS2", true),
@@ -562,7 +568,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         assertThat(result.getBody().warnings)
             .doesNotContain("is_paying_parent, is_receiving_parent and is_another_party have conflicting values");
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     //FIXME: update after bulk scan auto case creation is switch on
@@ -918,15 +924,14 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         ObjectMapper obj = new ObjectMapper();
         String jsonStr = obj.writeValueAsString(callbackResponse);
 
+        JSONAssert.assertEquals(expected, jsonStr,
+            new CustomComparator(JSONCompareMode.LENIENT,
+                new Customization("case_creation_details.case_data.appeal.appellant.id", (o1, o2) -> true),
+                new Customization("case_creation_details.case_data.appeal.appellant.appointee.id", (o1, o2) -> true),
+                new Customization("case_creation_details.case_data.appeal.rep.id", (o1, o2) -> true)
+            ));
 
-        assertThatJson(jsonStr)
-            .whenIgnoringPaths(
-                "case_creation_details.case_data.appeal.appellant.id",
-                "case_creation_details.case_data.appeal.appellant.appointee.id",
-                "case_creation_details.case_data.appeal.rep.id")
-            .isEqualTo(expected);
-
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     private String getAppellantTya(SuccessfulTransformationResponse callbackResponse) {

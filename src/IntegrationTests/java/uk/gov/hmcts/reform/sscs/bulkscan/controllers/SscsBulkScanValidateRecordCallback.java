@@ -52,7 +52,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
     public void should_handle_callback_and_return_caseid_and_state_case_created_in_validate_record_data()
         throws Exception {
         // Given
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
         checkForLinkedCases(FIND_CASE_EVENT_URL);
 
         String validationJson = loadJson("mappings/validation/validate-appeal-created-case-request.json");
@@ -74,14 +74,14 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
         assertEquals("readyToList", callbackResponse.getData().get("createdInGapsFrom"));
         assertEquals("Cardiff", callbackResponse.getData().get("processingVenue"));
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     @Test
     public void should_handle_callback_and_return_caseid_and_state_case_created_in_validate_interloc_record_data()
         throws Exception {
         // Given
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
         checkForLinkedCases(FIND_CASE_EVENT_URL);
 
         String validationJson = loadJson("mappings/validation/validate-interloc-appeal-created-case-request.json");
@@ -100,14 +100,14 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
         assertThat(callbackResponse.getErrors()).isEmpty();
         assertThat(callbackResponse.getWarnings()).isEmpty();
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     @Test
     public void should_handle_callback_and_return_caseid_and_state_case_created_for_sscs2_record_data()
         throws Exception {
         // Given
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
         checkForLinkedCases(FIND_CASE_EVENT_URL);
 
         String validationJson = loadJson("mappings/validation/sscs2-validate-appeal-created-case-request.json");
@@ -128,13 +128,13 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
 
         assertEquals("Test1234", callbackResponse.getData().get("childMaintenanceNumber"));
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     @Test
     public void should_return_warning_when_child_maintenance_number_is_not_entered_and_other_party_partially_entered() throws IOException {
         // Given
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String validationJson =
             loadJson("mappings/validation/sscs2-validate-appeal-created-partially-entered-data.json");
@@ -153,13 +153,13 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
                 "Other party first name is empty",
                 "Other party address town is empty");
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     @Test
     public void should_return_error_when_appellant_details_are_partially_entered() throws IOException {
         // Given
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String validationJson = loadJson("mappings/validation/validate-appeal-created-missing-appellant-request.json");
 
@@ -187,14 +187,14 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
                 "Benefit type description is empty",
                 "Hearing type is invalid");
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     @Test
     public void should_return_error_when_appointee_details_are_only_partially_entered_and_missing_hearing_sub_type_for_form_type_null()
         throws IOException {
         // Given
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String validationJson = loadJson("mappings/validation/validate-appeal-created-missing-appointee-request.json");
 
@@ -212,14 +212,14 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
                 "Appointee first name is empty",
                 "Appointee last name is empty");
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     @Test
     public void should_return_error_when_appointee_details_are_only_partially_entered_and_missing_hearing_sub_type_for_auto_scan_form()
         throws IOException {
         // Given
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String validationJson =
             loadJson("mappings/validation/auto-validate-appeal-created-missing-appointee-request.json");
@@ -239,14 +239,14 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
                 "Appointee last name is empty",
                 "Hearing option telephone, video and face to face are empty. At least one must be populated");
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     @Test
     public void should_return_error_when_appellant_and_appointee_details_are_only_partially_entered_for_auto_scan_form_type()
         throws IOException {
         // Given
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String validationJson =
             loadJson("mappings/validation/auto-validate-appeal-created-missing-appellant-and-appointee-request.json");
@@ -268,14 +268,14 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
                 "Appellant last name is empty",
                 "Hearing option telephone, video and face to face are empty. At least one must be populated");
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     @Test
     public void should_return_error_when_appellant_and_appointee_details_are_only_partially_entered_for_form_type_null()
         throws IOException {
         // Given
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String validationJson =
             loadJson("mappings/validation/validate-appeal-created-missing-appellant-and-appointee-request.json");
@@ -296,13 +296,13 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
                 "Appellant first name is empty",
                 "Appellant last name is empty");
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     @Test
     public void should_return_error_when_representative_details_are_only_partially_entered() throws IOException {
         // Given
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String validationJson =
             loadJson("mappings/validation/validate-appeal-created-missing-representative-request.json");
@@ -322,7 +322,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
                 "Representative address county is empty",
                 "Representative postcode is empty");
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     @Test
@@ -330,7 +330,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
     public void should_return_error_when_representative_details_are_not_entered(String fieldToRename)
         throws IOException {
         // Given
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String validationJson =
             loadJson("mappings/validation/validate-appeal-created-missing-representative-request.json")
@@ -347,7 +347,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
         assertThat(result.getBody().getErrors())
             .containsOnly(HAS_REPRESENTATIVE_FIELD_MISSING);
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     @Test
@@ -372,7 +372,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
     @Test
     public void should_return_status_code_403_when_service_auth_token_is_missing() throws IOException {
         // Given
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("forbidden_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("forbidden_service");
 
         String validationJson = loadJson("mappings/validation/validate-appeal-created-case-request.json");
 
@@ -385,14 +385,14 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
         // Then
         assertThat(result.getStatusCodeValue()).isEqualTo(403);
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     @Test
     public void should_return_warning_when_postcode_is_invalid()
         throws Exception {
         // Given
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
         checkForLinkedCases(FIND_CASE_EVENT_URL);
 
         final String invalidPostcode = "CM13 9HY";
@@ -411,13 +411,13 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
         assertThat(result.getBody().getWarnings())
             .containsOnly("Appellant postcode is not a valid postcode");
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     @Test
     public void should_return_warning_when_appellant_role_is_not_entered() throws IOException {
         // Given
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String validationJson =
             loadJson("mappings/validation/sscs2-validate-appeal-created-missing-appellant-role.json");
@@ -433,13 +433,13 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
         assertThat(result.getBody().getErrors())
             .containsOnly("Appellant role and/or description is missing");
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     @Test
     public void should_return_warning_when_appellant_role_description_is_not_entered() throws IOException {
         // Given
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         String validationJson =
             loadJson("mappings/validation/sscs2-validate-appeal-created-missing-appellant-role-description.json");
@@ -455,7 +455,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
         assertThat(result.getBody().getErrors())
             .containsOnly("Appellant role and/or description is missing");
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     @Test
@@ -463,7 +463,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
     public void should_handle_callback_and_return_caseid_and_state_case_created_for_sscs5_record_data()
         throws Exception {
         // Given
-        when(authTokenValidator.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
         checkForLinkedCases(FIND_CASE_EVENT_URL);
 
         String validationJson = loadJson("mappings/validation/sscs5-validate-appeal-created-case-request.json");
@@ -484,7 +484,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
 
         assertEquals("TCO Preston Appeals Team", callbackResponse.getData().get("dwpRegionalCentre"));
 
-        verify(authTokenValidator).getServiceName(SERVICE_AUTH_TOKEN);
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     private HttpHeaders httpHeaders() {
