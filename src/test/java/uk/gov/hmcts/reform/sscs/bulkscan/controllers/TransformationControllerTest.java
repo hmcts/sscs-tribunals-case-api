@@ -3,30 +3,39 @@ package uk.gov.hmcts.reform.sscs.bulkscan.controllers;
 import static java.util.Arrays.asList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit4.rules.SpringClassRule;
+import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import uk.gov.hmcts.reform.authorisation.exceptions.InvalidTokenException;
+import uk.gov.hmcts.reform.sscs.bulkscan.exceptionhandlers.ResponseExceptionHandler;
+import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.handlers.CcdCallbackHandler;
 import uk.gov.hmcts.reform.sscs.bulkscan.domain.transformation.CaseCreationDetails;
@@ -35,12 +44,14 @@ import uk.gov.hmcts.reform.sscs.bulkscan.exceptions.ForbiddenException;
 import uk.gov.hmcts.reform.sscs.bulkscan.exceptions.InvalidExceptionRecordException;
 import uk.gov.hmcts.reform.sscs.bulkscan.exceptions.UnauthorizedException;
 
-@SuppressWarnings("checkstyle:lineLength")
-@WebMvcTest(TransformationController.class)
+@RunWith(JUnitParamsRunner.class)
 public class TransformationControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @ClassRule
+    public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
+
+    @Rule
+    public final SpringMethodRule springMethodRule = new SpringMethodRule();
 
     @MockitoBean
     private CcdCallbackHandler ccdCallbackHandler;
@@ -48,9 +59,15 @@ public class TransformationControllerTest {
     @MockitoBean
     private AuthorisationService authService;
 
-    @BeforeEach
-    void setUp() {
-        Mockito.reset(authService);
+    private TransformationController transformationController;
+    private MockMvc mockMvc;
+
+    @Before
+    public void setUp() {
+        transformationController = new TransformationController(authService, ccdCallbackHandler);
+        mockMvc = standaloneSetup(transformationController)
+            .setControllerAdvice(new ResponseExceptionHandler())
+            .build();
     }
 
     private Map<String, Object> hmctsServiceIdMap = new HashMap<>() {
@@ -66,8 +83,8 @@ public class TransformationControllerTest {
     };
 
     //FIXME: update after bulk scan auto case creation is switch on
-    @ParameterizedTest
-    @ValueSource(strings = {"/transform-exception-record", "/transform-scanned-data"})
+    @Test
+    @Parameters({"/transform-exception-record", "/transform-scanned-data"})
     public void should_return_case_data_if_transformation_succeeded(String url) throws Exception {
         given(authService.authenticate("testServiceAuthHeader")).willReturn("testServiceName");
 
@@ -101,8 +118,8 @@ public class TransformationControllerTest {
     }
 
     //FIXME: update after bulk scan auto case creation is switch on
-    @ParameterizedTest
-    @ValueSource(strings = {"/transform-exception-record", "/transform-scanned-data"})
+    @Test
+    @Parameters({"/transform-exception-record", "/transform-scanned-data"})
     public void should_return_422_with_errors_if_transformation_failed(String url) throws Exception {
         given(ccdCallbackHandler.handle(any()))
             .willThrow(new InvalidExceptionRecordException(
@@ -120,16 +137,16 @@ public class TransformationControllerTest {
     }
 
     //FIXME: delete after bulk scan auto case creation is switch on
-    @ParameterizedTest
-    @MethodSource("exceptionsAndStatuses")
+    @Test
+    @Parameters(method = "exceptionsAndStatuses")
     public void should_return_proper_status_codes_for_auth_exceptions_when_transforming_scanned_data(RuntimeException exc, HttpStatus status) throws Exception {
         given(authService.authenticate(any())).willThrow(exc);
 
         sendRequest("{}", "/transform-exception-record").andExpect(status().is(status.value()));
     }
 
-    @ParameterizedTest
-    @MethodSource("exceptionsAndStatuses")
+    @Test
+    @Parameters(method = "exceptionsAndStatuses")
     public void new_endpoint_should_return_proper_status_codes_for_auth_exceptions_when_transforming_scanned_data(RuntimeException exc, HttpStatus status) throws Exception {
         given(authService.authenticate(any())).willThrow(exc);
 
@@ -145,11 +162,11 @@ public class TransformationControllerTest {
             );
     }
 
-    private static Stream<Arguments> exceptionsAndStatuses() {
-        return Stream.of(
-            Arguments.of(new UnauthorizedException(null), UNAUTHORIZED),
-            Arguments.of(new InvalidTokenException(null, null), UNAUTHORIZED),
-            Arguments.of(new ForbiddenException(null), FORBIDDEN)
-        );
+    private static Object[][] exceptionsAndStatuses() {
+        return new Object[][] {
+            {new UnauthorizedException(null), UNAUTHORIZED},
+            {new InvalidTokenException(null, null), UNAUTHORIZED},
+            {new ForbiddenException(null), FORBIDDEN}
+        };
     }
 }

@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ACTION_FURTHER_EVIDE
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INTERLOC_INFORMATION_RECEIVED;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -52,6 +53,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.handlers.CcdCallbackHandler;
+import uk.gov.hmcts.reform.sscs.bulkscan.exceptionhandlers.ResponseExceptionHandler;
 import uk.gov.hmcts.reform.sscs.bulkscan.exceptions.ForbiddenException;
 import uk.gov.hmcts.reform.sscs.bulkscan.exceptions.UnauthorizedException;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -75,7 +77,6 @@ import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 @RunWith(JUnitParamsRunner.class)
 public class CcdCallbackControllerTest {
 
-    // begin: needed to use spring runner and junitparamsRunner together
     @ClassRule
     public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
     public static final String JURISDICTION = "SSCS";
@@ -84,19 +85,13 @@ public class CcdCallbackControllerTest {
     @Rule
     public final SpringMethodRule springMethodRule = new SpringMethodRule();
 
-    // end
-
     private MockMvc mockMvc;
 
-    @SuppressWarnings("PMD.UnusedPrivateField")
     @MockitoBean
     private AuthorisationService authorisationService;
 
     @MockitoBean
     private SscsCaseCallbackDeserializer deserializer;
-
-    @MockitoBean
-    private Callback<SscsCaseData> caseDataCallback;
 
     @MockitoBean
     private PreSubmitCallbackDispatcher dispatcher;
@@ -122,6 +117,7 @@ public class CcdCallbackControllerTest {
     public void setUp() {
         controller = new CcdCallbackController(authorisationService, deserializer, dispatcher, ccdCallbackHandler);
         mockMvc = standaloneSetup(controller)
+            .setControllerAdvice(new ResponseExceptionHandler())
             .setMessageConverters(new ByteArrayHttpMessageConverter(), new StringHttpMessageConverter(),
                 new ResourceHttpMessageConverter(false), new SourceHttpMessageConverter<>(),
                 new AllEncompassingFormHttpMessageConverter(),
@@ -235,5 +231,90 @@ public class CcdCallbackControllerTest {
             new Object[]{requestWithNullContent},
             new Object[]{requestWithContentAndHeaderNull}
         };
+    }
+
+    @Test
+    public void should_successfully_handle_callback_and_return_validate_response() throws Exception {
+        given(callback.getCaseDetails()).willReturn(caseDetails);
+        given(deserializer.deserialize(anyString())).willReturn(callback);
+        given(ccdCallbackHandler.handleValidationAndUpdate(
+            ArgumentMatchers.any(),
+            eq(IdamTokens.builder().idamOauth2Token(TEST_USER_AUTH_TOKEN).serviceAuthorization(TEST_SERVICE_AUTH_TOKEN).userId(TEST_USER_ID).build()))
+        ).willReturn(new PreSubmitCallbackResponse<>(SscsCaseData.builder().state(State.WITH_DWP).build()));
+
+        given(authorisationService.authenticate("test-header"))
+            .willReturn("some-service");
+
+        doNothing().when(authorisationService).assertIsAllowedToHandleCallback("some-service");
+
+        mockMvc.perform(post("/validate-record")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", TEST_USER_AUTH_TOKEN)
+                .header("serviceauthorization", TEST_SERVICE_AUTH_TOKEN)
+                .header("user-id", TEST_USER_ID)
+                .content(exceptionRecord("validation/validate-appeal-created-case-request.json")))
+            .andExpect(jsonPath("$['data'].state", is("withDwp")));
+    }
+
+    @Test
+    public void should_throw_exception_when_handler_fails() throws Exception {
+        given(callback.getCaseDetails()).willReturn(caseDetails);
+        given(deserializer.deserialize(anyString())).willReturn(callback);
+        given(ccdCallbackHandler.handleValidationAndUpdate(
+            ArgumentMatchers.any(),
+            eq(IdamTokens.builder().idamOauth2Token(TEST_USER_AUTH_TOKEN).serviceAuthorization(TEST_SERVICE_AUTH_TOKEN).userId(TEST_USER_ID).build()))
+        ).willThrow(RuntimeException.class);
+
+        given(authorisationService.authenticate("test-header"))
+            .willReturn("some-service");
+
+        doNothing().when(authorisationService).assertIsAllowedToHandleCallback("some-service");
+
+        MvcResult result =  mockMvc.perform(post("/validate-record")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", TEST_USER_AUTH_TOKEN)
+                .header("serviceauthorization", TEST_SERVICE_AUTH_TOKEN)
+                .header("user-id", TEST_USER_ID)
+                .content(exceptionRecord("validation/validate-appeal-created-case-request.json")))
+            .andReturn();
+
+        String content = result.getResponse().getContentAsString();
+
+        assertThat(content, containsString("There was an unknown error when processing the case. If the error persists, please contact the Bulk Scan development team"));
+    }
+
+    @Test
+    public void should_throw_unauthenticated_exception_when_auth_header_is_missing() throws Exception {
+        // given
+        given(callback.getCaseDetails()).willReturn(caseDetails);
+        given(deserializer.deserialize(anyString())).willReturn(callback);
+        willThrow(UnauthorizedException.class)
+            .given(authorisationService).authenticate(null);
+
+        // when
+        mockMvc.perform(post("/validate-record")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", TEST_USER_AUTH_TOKEN)
+                .header("user-id", TEST_USER_ID)
+                .content(exceptionRecord("validation/validate-appeal-created-case-request.json")))
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void should_throw_unauthorized_exception_when_auth_header_is_missing() throws Exception {
+        // given
+        given(callback.getCaseDetails()).willReturn(caseDetails);
+        given(deserializer.deserialize(anyString())).willReturn(callback);
+        willThrow(ForbiddenException.class)
+            .given(authorisationService).authenticate(null);
+
+        // when
+        mockMvc.perform(post("/validate-record")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", TEST_USER_AUTH_TOKEN)
+                .header("Authorization", TEST_USER_AUTH_TOKEN)
+                .header("user-id", TEST_USER_ID)
+                .content(exceptionRecord("validation/validate-appeal-created-case-request.json")))
+            .andExpect(status().isForbidden());
     }
 }
