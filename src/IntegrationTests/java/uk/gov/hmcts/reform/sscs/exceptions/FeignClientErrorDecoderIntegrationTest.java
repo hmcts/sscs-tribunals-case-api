@@ -92,6 +92,8 @@ public class FeignClientErrorDecoderIntegrationTest {
                     IDAM_OAUTH2_TOKEN,
                     SERVICE_AUTHORIZATION_TOKEN,
                     null,
+                    null,
+                    null,
                     CASE_ID,
                     null))
             .extracting(STATUS).isEqualTo(expectedHttpStatus);

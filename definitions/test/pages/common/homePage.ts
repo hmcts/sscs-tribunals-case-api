@@ -100,7 +100,9 @@ export class HomePage {
   }
 
   async signOut(): Promise<void> {
+    const pageUrl = this.page.url();
     await webActions.clickElementById("//a[contains(.,'Sign out')]");
+    await expect(this.page).not.toHaveURL(pageUrl);
   }
 
   async goToHomePage(caseId: string): Promise<void> {
@@ -136,22 +138,7 @@ export class HomePage {
     const expUrl = this.page.url();
 
     if (environment.name == 'pr') {
-      if (environment.hearingsEnabled == 'Yes') {
-        let matches = expUrl.match(/(\d+)/);
-        let PrNo = matches[0];
-        logger.debug(`PR number on url is ###### ${PrNo}`);
-
-        const optionToSelect = await this.page
-          .locator('option', { hasText: PrNo })
-          .textContent();
-        logger.debug(`case type dropdown value is ###### ${optionToSelect}`);
-        await webActions.chooseOptionByLabel(
-          this.caseTypeDropdown,
-          optionToSelect
-        );
-      } else {
-        await this.searchCaseWithPreviewDef();
-      }
+      await this.searchCaseWithPreviewDef();
     } else if (environment.name == 'aat') {
       await this.searchCaseWithAATDef();
     } else {
@@ -327,5 +314,15 @@ export class HomePage {
         break;
       }
     }
+  }
+
+  async startCaseCreate(jurisdiction, caseType, event): Promise<void> {
+    await this.page.getByRole('link', { name: 'Create case' }).waitFor();
+    await this.page.getByRole('link', { name: 'Create case' }).click();
+    await this.delay(3000);
+    await this.page.getByLabel('Jurisdiction').selectOption(jurisdiction);
+    await this.page.getByLabel('Case type').selectOption(caseType);
+    await this.page.getByLabel('Event').selectOption(event);
+    await this.page.getByRole('button', { name: 'Start' }).click();
   }
 }

@@ -13,6 +13,13 @@ export class Hearing extends BaseStep {
     this.page = page;
   }
 
+  async setAutolist(selection: boolean) {
+    await this.homePage.navigateToTab('Summary');
+    await this.homePage.chooseEvent('Update Listing Requirements');
+    await this.listingRequirementPage.setAutolistOverrideValue(selection);
+    await this.checkYourAnswersPage.confirmSubmission();
+  }
+
   async verifyHearingIsTriggered(caseId: string, caseType: string) {
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
     await this.homePage.navigateToTab('Summary');
@@ -29,7 +36,7 @@ export class Hearing extends BaseStep {
       );
       await this.hearingsTab.verifyVenueListForPaperCase(
         hearingTestData.hearingVenueKey,
-        37
+        35
       );
     } else if (caseType === 'dla') {
       await this.hearingsTab.verifyPageContentByKeyValue(
@@ -135,5 +142,11 @@ export class Hearing extends BaseStep {
       'Amend Reason',
       'Admin requested change'
     );
+  }
+
+  async updateListingRequirementsNoChange() {
+    await this.homePage.chooseEvent('Update Listing Requirements');
+    await this.listingRequirementPage.submitEventNoChange();
+
   }
 }

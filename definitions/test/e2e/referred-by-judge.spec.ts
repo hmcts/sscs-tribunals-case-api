@@ -17,6 +17,7 @@ test.describe.serial(
       referredByJudgeSteps
     }) => {
       await referredByJudgeSteps.allocateCaseToLegalOpsRole(caseId);
+      await sendCaseToTcwSteps.signOut();
       await sendCaseToTcwSteps.performSendCaseToTcw(caseId);
     });
 
