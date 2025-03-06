@@ -1,24 +1,27 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.fenoaction;
 
-import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FE_RECEIVED;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import junitparams.converters.Nullable;
-import net.javacrumbs.jsonunit.core.Option;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.skyscreamer.jsonassert.Customization;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
+import org.skyscreamer.jsonassert.comparator.CustomComparator;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -30,7 +33,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.BaseHandlerTest;
 
-@RunWith(JUnitParamsRunner.class)
 class FeNoActionAboutToStartHandlerTest extends BaseHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
@@ -39,17 +41,23 @@ class FeNoActionAboutToStartHandlerTest extends BaseHandlerTest {
     @Mock private Callback<SscsCaseData> mockCallback;
     @Mock private CaseDetails<SscsCaseData> mockCaseDetails;
     @Mock private SscsCaseData mockCaseData;
+    private final ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
 
-    @Test
-    @Parameters({
+    @BeforeEach
+    public void setUp() {
+        super.setUp();
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
         "ABOUT_TO_START,FE_NO_ACTION,withDwp,true",
         "ABOUT_TO_SUBMIT,FE_NO_ACTION,withDwp,false",
         "ABOUT_TO_START,FE_NO_ACTION,appealCreated,true",
         "ABOUT_TO_START,APPEAL_RECEIVED,withDwp,false",
         "null,FE_NO_ACTION,withDwp,false",
         "ABOUT_TO_SUBMIT,null,withDwp,false"
-    })
-    public void canHandle(@Nullable CallbackType callbackType, @Nullable EventType eventType, String state,
+    }, nullValues={"null"})
+    public void canHandle(CallbackType callbackType, EventType eventType, String state,
                           boolean expectedResult) throws IOException {
         boolean actualResult = handler.canHandle(callbackType, buildTestCallbackGivenData(eventType, state,
             "appellantEvidence","", FE_NO_ACTION_CALLBACK_JSON));
@@ -64,15 +72,15 @@ class FeNoActionAboutToStartHandlerTest extends BaseHandlerTest {
                 "appellantEvidence", "", FE_NO_ACTION_CALLBACK_JSON), USER_AUTHORISATION);
 
         String expectedCaseData = fetchData("fenoaction/expectedFeNoActionAboutToStartCallbackResponse.json");
-        assertThatJson(actualCaseData)
-            .whenIgnoringPaths(
-                "data.jointPartyId",
-                "data.appeal.appellant.appointee.id",
-                "data.appeal.appellant.id",
-                "data.appeal.rep.id",
-                "data.sscsDocument[0].id")
-            .when(Option.TREATING_NULL_AS_ABSENT)
-            .isEqualTo(expectedCaseData);
+
+        JSONAssert.assertEquals(expectedCaseData, objectWriter.writeValueAsString(actualCaseData),
+            new CustomComparator(JSONCompareMode.LENIENT,
+                new Customization("data.jointPartyId", (o1, o2) -> true),
+                new Customization("data.appeal.appellant.appointee.id", (o1, o2) -> true),
+                new Customization("data.appeal.appellant.id", (o1, o2) -> true),
+                new Customization("data.appeal.rep.id", (o1, o2) -> true),
+                new Customization("data.sscsDocument[0].id", (o1, o2) -> true)
+            ));
         assertEquals(FE_RECEIVED, actualCaseData.getData().getDwpState());
 
         List<DynamicListItem> listOptions = new ArrayList<>();
@@ -81,18 +89,17 @@ class FeNoActionAboutToStartHandlerTest extends BaseHandlerTest {
         assertEquals(listOptions, actualCaseData.getData().getDwpStateFeNoAction().getListItems());
     }
 
-    @Test(expected = IllegalStateException.class)
-    @Parameters({
+    @ParameterizedTest
+    @CsvSource(value = {
         "ABOUT_TO_SUBMIT,FE_NO_ACTION,withDwp",
         "ABOUT_TO_START,UPLOAD_DOCUMENT,appealCreated",
         "ABOUT_TO_SUBMIT,null,withDwp",
         "null,UPLOAD_DOCUMENT,withDwp"
-    })
-    public void handleCornerCaseScenarios(@Nullable CallbackType callbackType, @Nullable EventType eventType,
-                                          @Nullable String state)
-        throws IOException {
-        handler.handle(callbackType, buildTestCallbackGivenData(eventType, state,
-            "appellantEvidence", "", FE_NO_ACTION_CALLBACK_JSON), USER_AUTHORISATION);
+    }, nullValues={"null"})
+    public void handleCornerCaseScenarios(CallbackType callbackType, EventType eventType,
+                                          String state) {
+        assertThrows(IllegalStateException.class, () -> handler.handle(callbackType, buildTestCallbackGivenData(eventType, state,
+            "appellantEvidence", "", FE_NO_ACTION_CALLBACK_JSON), USER_AUTHORISATION));
     }
 
     @ParameterizedTest
