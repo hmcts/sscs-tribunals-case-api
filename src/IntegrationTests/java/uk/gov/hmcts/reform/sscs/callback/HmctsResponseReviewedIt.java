@@ -43,12 +43,9 @@ public class HmctsResponseReviewedIt extends AbstractEventIt {
     @MockitoBean
     private IdamService idamService;
 
-    @MockitoBean
-    private CcdCallbackHandler ccdCallbackHandler;
-
     @Before
     public void setup() throws IOException {
-        CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher, ccdCallbackHandler);
+        CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         mapper.findAndRegisterModules();
         json = getJson("callback/hmctsResponseReviewedCallback.json");

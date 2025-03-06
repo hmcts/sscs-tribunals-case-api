@@ -60,9 +60,6 @@ public class ProcessAudioVideoIt extends AbstractEventIt {
     @MockitoBean
     private UserDetailsService userDetailsService;
 
-    @MockitoBean
-    private CcdCallbackHandler ccdCallbackHandler;
-
     @Before
     public void setup() throws IOException {
         when(generateFile.assemble(any())).thenReturn("document.url");
@@ -72,7 +69,7 @@ public class ProcessAudioVideoIt extends AbstractEventIt {
 
         when(userDetailsService.buildLoggedInUserName(any())).thenReturn("Logged in user");
 
-        CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher, ccdCallbackHandler);
+        CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         mapper.findAndRegisterModules();
 

@@ -26,12 +26,9 @@ import uk.gov.hmcts.reform.sscs.controller.CcdCallbackController;
 @AutoConfigureMockMvc
 public class RequestInfoIt extends AbstractEventIt {
 
-    @MockitoBean
-    private CcdCallbackHandler ccdCallbackHandler;
-
     @Before
     public void setup() throws IOException {
-        CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher, ccdCallbackHandler);
+        CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         mapper.findAndRegisterModules();
         json = getJson("callback/requestInfoCallback.json");

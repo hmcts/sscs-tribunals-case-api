@@ -66,12 +66,9 @@ public class PostHearingRequestIt extends AbstractEventIt {
     @MockitoBean
     private SscsCcdConvertService sscsCcdConvertService;
 
-    @MockitoBean
-    private CcdCallbackHandler ccdCallbackHandler;
-
     @BeforeEach
     public void setup() throws IOException {
-        CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher, ccdCallbackHandler);
+        CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         mapper.registerModule(new JavaTimeModule());
         json = getJson("callback/postHearingRequest.json");
