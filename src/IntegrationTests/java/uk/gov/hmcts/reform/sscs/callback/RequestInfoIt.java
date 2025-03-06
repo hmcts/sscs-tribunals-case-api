@@ -4,8 +4,8 @@ import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_INFORMATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INCOMPLETE_APPLICATION_INFORMATION_REQUESTED;
-import static uk.gov.hmcts.reform.sscs.bulkscan.helper.IntegrationTestHelper.assertHttpStatus;
-import static uk.gov.hmcts.reform.sscs.bulkscan.helper.IntegrationTestHelper.getRequestWithAuthHeader;
+import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
+import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -15,7 +15,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.handlers.CcdCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.controller.CcdCallbackController;
@@ -24,9 +26,12 @@ import uk.gov.hmcts.reform.sscs.controller.CcdCallbackController;
 @AutoConfigureMockMvc
 public class RequestInfoIt extends AbstractEventIt {
 
+    @MockitoBean
+    private CcdCallbackHandler ccdCallbackHandler;
+
     @Before
     public void setup() throws IOException {
-        CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
+        CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher, ccdCallbackHandler);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         mapper.findAndRegisterModules();
         json = getJson("callback/requestInfoCallback.json");

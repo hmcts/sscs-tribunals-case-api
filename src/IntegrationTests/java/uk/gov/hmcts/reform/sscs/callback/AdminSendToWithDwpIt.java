@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.sscs.callback;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static uk.gov.hmcts.reform.sscs.bulkscan.helper.IntegrationTestHelper.assertHttpStatus;
-import static uk.gov.hmcts.reform.sscs.bulkscan.helper.IntegrationTestHelper.getRequestWithAuthHeader;
+import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
+import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
 import java.io.IOException;
 import java.time.LocalDate;

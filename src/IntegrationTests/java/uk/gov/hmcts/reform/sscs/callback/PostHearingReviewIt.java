@@ -9,8 +9,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.bulkscan.helper.IntegrationTestHelper.assertHttpStatus;
-import static uk.gov.hmcts.reform.sscs.bulkscan.helper.IntegrationTestHelper.getRequestWithAuthHeader;
+import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
+import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
@@ -28,6 +28,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.handlers.CcdCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
@@ -65,9 +66,12 @@ public class PostHearingReviewIt extends AbstractEventIt {
     @MockitoBean
     private SscsCcdConvertService sscsCcdConvertService;
 
+    @MockitoBean
+    private CcdCallbackHandler ccdCallbackHandler;
+        
     @BeforeEach
     public void setup() throws IOException {
-        CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
+        CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher, ccdCallbackHandler);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         mapper.registerModule(new JavaTimeModule());
         json = getJson("callback/postHearingReview.json");

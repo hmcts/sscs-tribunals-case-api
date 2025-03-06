@@ -5,8 +5,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.bulkscan.helper.IntegrationTestHelper.assertHttpStatus;
-import static uk.gov.hmcts.reform.sscs.bulkscan.helper.IntegrationTestHelper.getRequestWithAuthHeader;
+import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
+import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
 import java.io.IOException;
 import junitparams.JUnitParamsRunner;
@@ -25,6 +25,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.handlers.CcdCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -53,10 +54,13 @@ public class EditBundleIt extends AbstractEventIt {
     @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
 
+    @MockitoBean
+    private CcdCallbackHandler ccdCallbackHandler;
+
 
     @Before
     public void setup() throws IOException {
-        CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
+        CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher, ccdCallbackHandler);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         mapper.findAndRegisterModules();
         json = getJson("callback/editBundleCallback.json");

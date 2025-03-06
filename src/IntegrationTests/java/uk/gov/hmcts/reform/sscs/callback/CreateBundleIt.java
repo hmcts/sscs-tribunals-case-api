@@ -7,8 +7,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.bulkscan.helper.IntegrationTestHelper.assertHttpStatus;
-import static uk.gov.hmcts.reform.sscs.bulkscan.helper.IntegrationTestHelper.getRequestWithAuthHeader;
+import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
+import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -34,6 +34,7 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
+import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.handlers.CcdCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseData;
@@ -74,9 +75,12 @@ public class CreateBundleIt extends AbstractEventIt {
     @Captor
     private ArgumentCaptor<HttpEntity<Callback<SscsCaseData>>> captor;
 
+    @MockitoBean
+    private CcdCallbackHandler ccdCallbackHandler;
+
     @Before
     public void setup() throws IOException {
-        CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
+        CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher, ccdCallbackHandler);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         mapper.findAndRegisterModules();
         json = getJson("callback/createBundleCallback.json");
