@@ -53,7 +53,7 @@ spring.main.allow-bean-definition-overriding: true  # https://github.com/spring-
 springdoc:
     packagesToScan: uk.gov.hmcts.reform.sscs.controller, uk.gov.hmcts.reform.sscs.bulkscan.controllers
     api-docs:
-        path: /v2/api-docs
+        path: /v3/api-docs
 
 subscriptions:
     mac:
