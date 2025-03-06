@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs;
+package uk.gov.hmcts.reform.sscs.smoke;
 
 import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.sscs.bulkscan.common.TestHelper.exceptionRecord;

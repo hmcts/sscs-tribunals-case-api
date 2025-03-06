@@ -20,11 +20,11 @@ import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.TestSocketUtils;
 import uk.gov.hmcts.reform.authorisation.validators.AuthTokenValidator;
@@ -46,16 +46,16 @@ public abstract class BaseTest {
     @LocalServerPort
     protected int randomServerPort;
 
-    @MockBean
+    @MockitoBean
     protected AuthTokenValidator authTokenValidator;
 
-    @MockBean
+    @MockitoBean
     protected IdamService idamService;
 
-    @MockBean
+    @MockitoBean
     protected RefDataService refDataService;
 
-    @MockBean
+    @MockitoBean
     protected VenueService venueService;
 
     @Rule

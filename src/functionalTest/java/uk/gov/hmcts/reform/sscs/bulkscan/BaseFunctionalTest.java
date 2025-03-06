@@ -5,8 +5,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
-import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils;
-import com.microsoft.applicationinsights.core.dependencies.apachecommons.io.FileUtils;
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
@@ -19,6 +17,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -177,7 +177,7 @@ public class BaseFunctionalTest {
         String secondChar = generateRandomCharacterFromRange("ABCEHJLMPRSWXY");
         String lastChar = generateRandomCharacterFromRange("ABCD");
 
-        return firstChar + secondChar + RandomStringUtils.random(6, false, true) + lastChar;
+        return firstChar + secondChar + RandomStringUtils.secure().next(6, false, true) + lastChar;
     }
 
     private String generateRandomCharacterFromRange(String range) {

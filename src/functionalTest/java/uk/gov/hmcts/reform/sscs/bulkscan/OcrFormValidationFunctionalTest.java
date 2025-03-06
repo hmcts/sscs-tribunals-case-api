@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.bulkscan;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.OK;
 
 import io.restassured.mapper.ObjectMapperType;

@@ -35,6 +35,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -77,6 +78,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.bulkscan.constants.*;
+import uk.gov.hmcts.reform.sscs.domain.CaseResponse;
 import uk.gov.hmcts.reform.sscs.exception.UnknownFileTypeException;
 import uk.gov.hmcts.reform.sscs.bulkscan.helper.AppealPostcodeHelper;
 import uk.gov.hmcts.reform.sscs.bulkscan.helper.SscsDataHelper;
@@ -108,6 +110,7 @@ public class SscsCaseTransformer implements CaseTransformer {
     private final CaseManagementLocationService caseManagementLocationService;
 
     private final RegionalProcessingCenterService regionalProcessingCenterService;
+    @Setter
     private boolean ucOfficeFeatureActive;
 
     private Set<String> errors;
@@ -135,10 +138,6 @@ public class SscsCaseTransformer implements CaseTransformer {
         this.caseManagementLocationService = caseManagementLocationService;
         this.ucOfficeFeatureActive = ucOfficeFeatureActive;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
-    }
-
-    public void setUcOfficeFeatureActive(boolean ucOfficeFeatureActive) {
-        this.ucOfficeFeatureActive = ucOfficeFeatureActive;
     }
 
     @Override

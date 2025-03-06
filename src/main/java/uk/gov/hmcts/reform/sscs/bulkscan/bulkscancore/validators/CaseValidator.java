@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.validators;
 
 import java.util.Map;
-import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.CaseResponse;
+import uk.gov.hmcts.reform.sscs.domain.CaseResponse;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.ExceptionRecord;
 
 /**

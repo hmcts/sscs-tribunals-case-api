@@ -124,7 +124,7 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     PDF_SERVICE_BASE_URL: https://docmosis.{{ .Values.global.environment }}.platform.hmcts.net/rs/render
     ROBOTICS_EMAIL_MESSAGE: "Please find attached the robotics json file \nPlease do not respond to this email"
     EMAIL_SERVER_HOST: "mta.reform.hmcts.net"
-    EMAIL_SERVER_PORT: "25"
+    EMAIL_SERVER_PORT: 25
     EMAIL_SMTP_TLS_ENABLED: "true"
     EMAIL_SMTP_SSL_TRUST: "*"
     CALLBACK_MAX_RETRY_ATTEMPTS: 3

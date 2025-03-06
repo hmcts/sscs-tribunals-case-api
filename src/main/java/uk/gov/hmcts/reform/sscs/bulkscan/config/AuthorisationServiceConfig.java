@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.authorisation.validators.ServiceAuthTokenValidator;
 @Configuration
 @Lazy
 @EnableFeignClients(basePackageClasses = ServiceAuthorisationApi.class)
-public class AuthServiceConfig {
+public class AuthorisationServiceConfig {
 
     @Bean
     @ConditionalOnProperty(name = "idam.s2s-auth.url")

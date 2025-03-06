@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.transformers;
+package uk.gov.hmcts.reform.sscs.transformers;
 
 import java.util.Map;
 import uk.gov.hmcts.reform.sscs.domain.CaseResponse;

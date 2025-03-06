@@ -14,22 +14,20 @@ import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.CaseResponse;
+import uk.gov.hmcts.reform.sscs.domain.CaseResponse;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.ExceptionRecord;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.ScannedData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FormType;
 import uk.gov.hmcts.reform.sscs.bulkscan.json.SscsJsonExtractor;
-
-
 
 @Component
 @Slf4j
 public class FormTypeValidator {
 
     private final SscsJsonExtractor sscsJsonExtractor;
-    private final Schema sscs1Schema = tryLoadSscsSchema("/schema/sscs-bulk-scan-schema.json");
-    private final Schema sscs2Schema = tryLoadSscsSchema("/schema/sscs2-bulk-scan-schema.json");
-    private final Schema sscs5Schema = tryLoadSscsSchema("/schema/sscs5-bulk-scan-schema.json");
+    private final Schema sscs1Schema = tryLoadSscsSchema("/config/schema/sscs-bulk-scan-schema.json");
+    private final Schema sscs2Schema = tryLoadSscsSchema("/config/schema/sscs2-bulk-scan-schema.json");
+    private final Schema sscs5Schema = tryLoadSscsSchema("/config/schema/sscs5-bulk-scan-schema.json");
 
     public FormTypeValidator(SscsJsonExtractor sscsJsonExtractor) {
         this.sscsJsonExtractor = sscsJsonExtractor;
@@ -61,8 +59,6 @@ public class FormTypeValidator {
                 sscs5Schema.validate(new JSONObject(build(exceptionRecord.getOcrDataFields())));
             } else if (formType != null && (formType.equals(FormType.SSCS1U) || formType.equals(FormType.SSCS1)
                 || formType.equals(FormType.SSCS1PE) || formType.equals(FormType.SSCS1PEU))) {
-
-
                 sscs1Schema.validate(new JSONObject(build(exceptionRecord.getOcrDataFields())));
             }
         } catch (ValidationException ex) {

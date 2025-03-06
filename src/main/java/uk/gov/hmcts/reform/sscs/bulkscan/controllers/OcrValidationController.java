@@ -22,8 +22,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriUtils;
-import uk.gov.hmcts.reform.sscs.bulkscan.auth.AuthService;
-import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.CaseResponse;
+import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
+import uk.gov.hmcts.reform.sscs.domain.CaseResponse;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.ExceptionRecord;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.handlers.CcdCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FormType;
@@ -37,11 +37,11 @@ public class OcrValidationController {
 
     @Autowired
     private CcdCallbackHandler handler;
-    private final AuthService authService;
+    private final AuthorisationService authService;
 
     public OcrValidationController(
         CcdCallbackHandler handler,
-        AuthService authService
+        AuthorisationService authService
     ) {
         this.handler = handler;
         this.authService = authService;

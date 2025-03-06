@@ -90,6 +90,7 @@ import uk.gov.hmcts.reform.sscs.bulkscan.constants.BenefitTypeIndicatorSscs1U;
 import uk.gov.hmcts.reform.sscs.bulkscan.constants.BenefitTypeIndicatorSscs5;
 import uk.gov.hmcts.reform.sscs.bulkscan.helper.AppealPostcodeHelper;
 import uk.gov.hmcts.reform.sscs.bulkscan.helper.SscsDataHelper;
+import uk.gov.hmcts.reform.sscs.domain.CaseResponse;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.bulkscan.json.SscsJsonExtractor;
