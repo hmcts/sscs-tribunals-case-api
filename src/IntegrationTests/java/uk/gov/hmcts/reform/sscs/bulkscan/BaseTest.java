@@ -17,7 +17,6 @@ import org.joda.time.DateTimeUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -25,10 +24,8 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.TestSocketUtils;
 import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
-import uk.gov.hmcts.reform.authorisation.validators.AuthTokenValidator;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsQueryBuilder;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -86,10 +83,10 @@ public abstract class BaseTest {
         ccdServer.stop();
     }
 
-    protected void findCaseByForCaseworker(String eventUrl, String mrnDate, String benefitType) {
+    protected void findCaseByForCaseworker(String mrnDate, String benefitType) {
         SearchSourceBuilder query = SscsQueryBuilder.findCcdCaseByNinoAndBenefitTypeAndMrnDateQuery("BB000000B", benefitType, mrnDate);
 
-        ccdServer.stubFor(post(concat(eventUrl)).atPriority(1)
+        ccdServer.stubFor(post(concat(uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.FIND_CASE_EVENT_URL)).atPriority(1)
             .withHeader(AUTHORIZATION, equalTo(USER_AUTH_TOKEN))
             .withHeader(SERVICE_AUTHORIZATION_HEADER_KEY, equalTo(SERVICE_AUTH_TOKEN))
             .withHeader(CONTENT_TYPE, equalTo(APPLICATION_JSON_VALUE))
@@ -100,10 +97,10 @@ public abstract class BaseTest {
                 .withBody("{\"total\":0,\"cases\":[]}")));
     }
 
-    protected void checkForLinkedCases(String eventUrl) {
+    protected void checkForLinkedCases() {
         SearchSourceBuilder query = SscsQueryBuilder.findCaseBySingleField("data.appeal.appellant.identity.nino", "BB000000B");
 
-        ccdServer.stubFor(post(concat(eventUrl)).atPriority(1)
+        ccdServer.stubFor(post(concat(uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.FIND_CASE_EVENT_URL)).atPriority(1)
             .withHeader(AUTHORIZATION, equalTo(idamTokens.getIdamOauth2Token()))
             .withHeader(SERVICE_AUTHORIZATION_HEADER_KEY, equalTo(idamTokens.getServiceAuthorization()))
             .withHeader(CONTENT_TYPE, equalTo(APPLICATION_JSON_VALUE))

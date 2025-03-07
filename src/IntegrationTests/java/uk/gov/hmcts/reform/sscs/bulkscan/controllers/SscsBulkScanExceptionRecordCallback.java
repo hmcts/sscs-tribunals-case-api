@@ -17,7 +17,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.FormType.SSCS2;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.FormType.SSCS5;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_EXCLUDE_DATES_MISSING;
 import static uk.gov.hmcts.reform.sscs.bulkscan.helper.OcrDataBuilderTest.buildScannedValidationOcrData;
-import static uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.FIND_CASE_EVENT_URL;
 import static uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.SERVICE_AUTHORIZATION_HEADER_KEY;
 import static uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.SERVICE_AUTH_TOKEN;
 import static uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.USER_AUTH_TOKEN;
@@ -97,8 +96,8 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     @Test
     public void should_handle_callback_and_return_caseid_and_state_case_created_in_exception_record_data()
         throws Exception {
-        checkForLinkedCases(FIND_CASE_EVENT_URL);
-        findCaseByForCaseworker(FIND_CASE_EVENT_URL, MRN_DATE_YESTERDAY_YYYY_MM_DD, "ESA");
+        checkForLinkedCases();
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "ESA");
 
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
@@ -134,8 +133,8 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     //FIXME: delete after bulk scan auto case creation is switch on
     @Test
     public void should_create_non_compliant_case_when_mrn_date_greater_than_13_months() throws Exception {
-        checkForLinkedCases(FIND_CASE_EVENT_URL);
-        findCaseByForCaseworker(FIND_CASE_EVENT_URL, "2017-01-01", "ESA");
+        checkForLinkedCases();
+        findCaseByForCaseworker("2017-01-01", "ESA");
 
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
@@ -202,7 +201,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     @Test
     public void should_not_create_duplicate_non_compliant_case_when_mrndate_nino_benefit_code_case_exists() throws Exception {
         // Given
-        checkForLinkedCases(FIND_CASE_EVENT_URL);
+        checkForLinkedCases();
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
@@ -210,7 +209,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
             httpHeaders()
         );
 
-        findCaseByForCaseworkerReturnCaseDetails(FIND_CASE_EVENT_URL, "2017-01-01");
+        findCaseByForCaseworkerReturnCaseDetails();
 
         // When
         ResponseEntity<ErrorResponse> result =
@@ -289,8 +288,8 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
     @Test
     public void auto_scan_should_handle_callback_and_return_caseid_and_state_case_created() throws Exception {
-        checkForLinkedCases(FIND_CASE_EVENT_URL);
-        findCaseByForCaseworker(FIND_CASE_EVENT_URL, MRN_DATE_YESTERDAY_YYYY_MM_DD, "ESA");
+        checkForLinkedCases();
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "ESA");
 
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
@@ -308,8 +307,8 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
     @Test
     public void auto_scan_should_handle_callback_and_return_caseid_and_state_case_created_Sscs1U() throws Exception {
-        checkForLinkedCases(FIND_CASE_EVENT_URL);
-        findCaseByForCaseworker(FIND_CASE_EVENT_URL, MRN_DATE_YESTERDAY_YYYY_MM_DD, "attendanceAllowance");
+        checkForLinkedCases();
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "attendanceAllowance");
 
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
@@ -328,8 +327,8 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
     @Test
     public void auto_scan_with_appointee_should_handle_callback_and_return_caseid_and_state_case_created() throws Exception {
-        checkForLinkedCases(FIND_CASE_EVENT_URL);
-        findCaseByForCaseworker(FIND_CASE_EVENT_URL, MRN_DATE_YESTERDAY_YYYY_MM_DD, "ESA");
+        checkForLinkedCases();
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "ESA");
 
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
@@ -403,8 +402,8 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     @Test
     public void should_handle_sscs2_callback_and_return_caseid_and_state_case_created_in_exception_record_data()
         throws Exception {
-        checkForLinkedCases(FIND_CASE_EVENT_URL);
-        findCaseByForCaseworker(FIND_CASE_EVENT_URL, MRN_DATE_YESTERDAY_YYYY_MM_DD, "childSupport");
+        checkForLinkedCases();
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "childSupport");
 
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
@@ -426,8 +425,8 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     @Test
     public void should_handle_sscs5_callback_and_return_caseid_and_state_case_created_in_exception_record_data()
         throws Exception {
-        checkForLinkedCases(FIND_CASE_EVENT_URL);
-        findCaseByForCaseworker(FIND_CASE_EVENT_URL, MRN_DATE_YESTERDAY_YYYY_MM_DD, "taxFreeChildcare");
+        checkForLinkedCases();
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "taxFreeChildcare");
 
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
@@ -467,12 +466,12 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
     @Test
     public void should_return_warning_list_populated_when_sscs2_missing_data_validation_fails() {
-        checkForLinkedCases(FIND_CASE_EVENT_URL);
-        findCaseByForCaseworker(FIND_CASE_EVENT_URL, MRN_DATE_YESTERDAY_YYYY_MM_DD, "childSupport");
+        checkForLinkedCases();
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "childSupport");
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
-            exceptionCaseData(caseDataWithoutChildMaintenanceAndPartiallyMissingOtherPartyNameAddress(SSCS2), "SSCS2", false),
+            exceptionCaseData(caseDataWithoutChildMaintenanceAndPartiallyMissingOtherPartyNameAddress(), "SSCS2", false),
             httpHeaders()
         );
 
@@ -491,12 +490,12 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
     @Test
     public void should_return_warning_list_populated_when_sscs2_appellant_role_empty() {
-        checkForLinkedCases(FIND_CASE_EVENT_URL);
-        findCaseByForCaseworker(FIND_CASE_EVENT_URL, MRN_DATE_YESTERDAY_YYYY_MM_DD, "childSupport");
+        checkForLinkedCases();
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "childSupport");
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
-            exceptionCaseData(caseDataWithoutAppellantRole(SSCS2), "SSCS2", false),
+            exceptionCaseData(caseDataWithoutAppellantRole(), "SSCS2", false),
             httpHeaders()
         );
 
@@ -512,12 +511,12 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
     @Test
     public void should_return_no_warning_when_sscs2_appellant_role_empty_ignore_warnings() {
-        checkForLinkedCases(FIND_CASE_EVENT_URL);
-        findCaseByForCaseworker(FIND_CASE_EVENT_URL, MRN_DATE_YESTERDAY_YYYY_MM_DD, "childSupport");
+        checkForLinkedCases();
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "childSupport");
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
-            exceptionCaseData(caseDataWithoutAppellantRole(SSCS2), "SSCS2", true),
+            exceptionCaseData(caseDataWithoutAppellantRole(), "SSCS2", true),
             httpHeaders()
         );
 
@@ -532,12 +531,12 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
     @Test
     public void should_return_warning_list_populated_when_sscs2_appellant_role_invalid() {
-        checkForLinkedCases(FIND_CASE_EVENT_URL);
-        findCaseByForCaseworker(FIND_CASE_EVENT_URL, MRN_DATE_YESTERDAY_YYYY_MM_DD, "childSupport");
+        checkForLinkedCases();
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "childSupport");
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
-            exceptionCaseData(caseDataWithInvalidAppellantRole(SSCS2), "SSCS2", false),
+            exceptionCaseData(caseDataWithInvalidAppellantRole(), "SSCS2", false),
             httpHeaders()
         );
 
@@ -553,12 +552,12 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
     @Test
     public void should_return_no_warning_sscs2_appellant_role_invalid_ignore_warning() {
-        checkForLinkedCases(FIND_CASE_EVENT_URL);
-        findCaseByForCaseworker(FIND_CASE_EVENT_URL, MRN_DATE_YESTERDAY_YYYY_MM_DD, "childSupport");
+        checkForLinkedCases();
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "childSupport");
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
-            exceptionCaseData(caseDataWithInvalidAppellantRole(SSCS2), "SSCS2", true),
+            exceptionCaseData(caseDataWithInvalidAppellantRole(), "SSCS2", true),
             httpHeaders()
         );
 
@@ -697,13 +696,12 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
     @SuppressWarnings("unchecked")
     private List<OcrDataField> getOcrDataFields(Map<String, Object> scannedData) {
-        List<OcrDataField> ocrData = buildScannedValidationOcrData(scannedData.entrySet().stream().map(f -> {
+        return (List<OcrDataField>) buildScannedValidationOcrData(scannedData.entrySet().stream().map(f -> {
             HashMap<String, Object> valueMap = new HashMap<>();
             valueMap.put("name", f.getKey());
             valueMap.put("value", f.getValue());
             return valueMap;
         }).toArray(HashMap[]::new));
-        return ocrData;
     }
 
     private Map<String, Object> caseData() {
@@ -820,7 +818,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
     }
 
-    private Map<String, Object> caseDataWithoutChildMaintenanceAndPartiallyMissingOtherPartyNameAddress(FormType formType) {
+    private Map<String, Object> caseDataWithoutChildMaintenanceAndPartiallyMissingOtherPartyNameAddress() {
 
         Map<String, Object> ocrList = new HashMap<>();
         ocrList.put("person1_child_maintenance_number", "");
@@ -831,9 +829,6 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         ocrList.put("other_party_address_line3","Hatch End");
         addAppellant(ocrList);
         ocrList.put("mrn_date", MRN_DATE_YESTERDAY_DD_MM_YYYY);
-        if (!SSCS2.equals(formType) && !SSCS5.equals(formType)) {
-            ocrList.put("office", "Balham DRT");
-        }
         ocrList.put("contains_mrn", true);
         ocrList.put("is_hearing_type_oral", true);
         ocrList.put("is_hearing_type_paper", false);
@@ -848,15 +843,12 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         return exceptionRecord(ocrList, null);
     }
 
-    private Map<String, Object> caseDataWithoutAppellantRole(FormType formType) {
+    private Map<String, Object> caseDataWithoutAppellantRole() {
 
         Map<String, Object> ocrList = new HashMap<>();
         ocrList.put("person1_child_maintenance_number", "12334");
         addAppellant(ocrList);
         ocrList.put("mrn_date", MRN_DATE_YESTERDAY_DD_MM_YYYY);
-        if (!SSCS2.equals(formType) && !SSCS5.equals(formType)) {
-            ocrList.put("office", "Balham DRT");
-        }
         ocrList.put("contains_mrn", true);
         ocrList.put("is_hearing_type_oral", true);
         ocrList.put("is_hearing_type_paper", false);
@@ -870,15 +862,12 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         return exceptionRecord(ocrList, null);
     }
 
-    private Map<String, Object> caseDataWithInvalidAppellantRole(FormType formType) {
+    private Map<String, Object> caseDataWithInvalidAppellantRole() {
 
         Map<String, Object> ocrList = new HashMap<>();
         ocrList.put("person1_child_maintenance_number", "123");
         addAppellant(ocrList);
         ocrList.put("mrn_date", MRN_DATE_YESTERDAY_DD_MM_YYYY);
-        if (!SSCS2.equals(formType) && !SSCS5.equals(formType)) {
-            ocrList.put("office", "Balham DRT");
-        }
         ocrList.put("contains_mrn", true);
         ocrList.put("is_hearing_type_oral", true);
         ocrList.put("is_hearing_type_paper", false);
@@ -895,10 +884,10 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         return exceptionRecord(ocrList, null);
     }
 
-    private void findCaseByForCaseworkerReturnCaseDetails(String eventUrl, String mrnDate) throws Exception {
-        SearchSourceBuilder query = SscsQueryBuilder.findCcdCaseByNinoAndBenefitTypeAndMrnDateQuery("BB000000B", "ESA", mrnDate);
+    private void findCaseByForCaseworkerReturnCaseDetails() throws Exception {
+        SearchSourceBuilder query = SscsQueryBuilder.findCcdCaseByNinoAndBenefitTypeAndMrnDateQuery("BB000000B", "ESA", "2017-01-01");
 
-        ccdServer.stubFor(post(concat(eventUrl)).atPriority(1)
+        ccdServer.stubFor(post(concat(uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.FIND_CASE_EVENT_URL)).atPriority(1)
                 .withHeader(AUTHORIZATION, equalTo(USER_AUTH_TOKEN))
                 .withHeader(SERVICE_AUTHORIZATION_HEADER_KEY, equalTo(SERVICE_AUTH_TOKEN))
                 .withHeader(CONTENT_TYPE, equalTo(APPLICATION_JSON_VALUE))

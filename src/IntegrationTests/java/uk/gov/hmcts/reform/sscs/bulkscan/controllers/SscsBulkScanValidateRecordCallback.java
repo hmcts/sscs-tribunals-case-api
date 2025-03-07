@@ -54,7 +54,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
         throws Exception {
         // Given
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
-        checkForLinkedCases(FIND_CASE_EVENT_URL);
+        checkForLinkedCases();
 
         String validationJson = loadJson("mappings/validation/validate-appeal-created-case-request.json");
 
@@ -83,7 +83,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
         throws Exception {
         // Given
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
-        checkForLinkedCases(FIND_CASE_EVENT_URL);
+        checkForLinkedCases();
 
         String validationJson = loadJson("mappings/validation/validate-interloc-appeal-created-case-request.json");
 
@@ -109,7 +109,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
         throws Exception {
         // Given
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
-        checkForLinkedCases(FIND_CASE_EVENT_URL);
+        checkForLinkedCases();
 
         String validationJson = loadJson("mappings/validation/sscs2-validate-appeal-created-case-request.json");
 
@@ -394,7 +394,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
         throws Exception {
         // Given
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
-        checkForLinkedCases(FIND_CASE_EVENT_URL);
+        checkForLinkedCases();
 
         final String invalidPostcode = "CM13 9HY";
         String validationJson = loadJson("mappings/validation/validate-appeal-created-case-request.json")
@@ -460,12 +460,11 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void should_handle_callback_and_return_caseid_and_state_case_created_for_sscs5_record_data()
         throws Exception {
         // Given
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
-        checkForLinkedCases(FIND_CASE_EVENT_URL);
+        checkForLinkedCases();
 
         String validationJson = loadJson("mappings/validation/sscs5-validate-appeal-created-case-request.json");
 

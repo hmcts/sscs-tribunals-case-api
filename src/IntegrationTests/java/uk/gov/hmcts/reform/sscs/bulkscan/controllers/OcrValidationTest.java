@@ -16,6 +16,7 @@ import static uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.SERVICE_AUT
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -27,7 +28,6 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
-import uk.gov.hmcts.reform.authorisation.validators.AuthTokenValidator;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -454,6 +454,6 @@ public class OcrValidationTest  {
 
 
     private String readResource(final String fileName) throws IOException {
-        return Resources.toString(Resources.getResource(fileName), Charsets.UTF_8);
+        return Resources.toString(Resources.getResource(fileName), StandardCharsets.UTF_8);
     }
 }
