@@ -1679,6 +1679,7 @@ notification:
                         emailId: 385e1c56-7b69-4af2-8b0d-50a8ab66679e
                         # SSCS-11586 smsId: 54f9c139-1c3d-4f4c-ae79-d75e4eafcfec
                         # SSCS-11586 joint_party:
+                        # SSCS-11586 emailId: b2f8f063-bb06-494d-a59e-cc037106a9c3
                         # SSCS-11586 smsId: 534e7537-3012-42de-a6c3-9036b133c525
                         # SSCS-11586 other_party:
                         # SSCS-11586 smsId: 54f9c139-1c3d-4f4c-ae79-d75e4eafcfec
