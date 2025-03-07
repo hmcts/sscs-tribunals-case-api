@@ -246,9 +246,6 @@ public class SscsUtil {
     }
 
     public static void addDocumentToCaseDataInternalDocuments(SscsCaseData caseData, SscsDocument sscsDocument) {
-        InternalCaseDocumentData internalCaseDocumentData = Optional.ofNullable(caseData.getInternalCaseDocumentData())
-            .orElse(InternalCaseDocumentData.builder().build());
-        List<SscsDocument> documents = new ArrayList<>(emptyIfNull(internalCaseDocumentData.getSscsInternalDocument()));
         if (!isNull(sscsDocument.getValue().getDocumentFileName()) && sscsDocument.getValue().getDocumentFileName().startsWith("Addition ")) {
             String[] splitFileName = sscsDocument.getValue().getDocumentFileName().split("- ");
             String newFileName = String.join(" ", Arrays.copyOfRange(splitFileName, 1, splitFileName.length));
@@ -256,6 +253,9 @@ public class SscsUtil {
         }
         sscsDocument.getValue().setBundleAddition(null);
         sscsDocument.getValue().setEvidenceIssued(null);
+        InternalCaseDocumentData internalCaseDocumentData = Optional.ofNullable(caseData.getInternalCaseDocumentData())
+            .orElse(InternalCaseDocumentData.builder().build());
+        List<SscsDocument> documents = new ArrayList<>(emptyIfNull(internalCaseDocumentData.getSscsInternalDocument()));
         documents.addFirst(sscsDocument);
         internalCaseDocumentData.setSscsInternalDocument(documents);
         caseData.setInternalCaseDocumentData(internalCaseDocumentData);
