@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -731,16 +732,22 @@ class SscsUtilTest {
 
     @Test
     void testRemoveDocumentFromCaseDataDocuments() {
-        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build();
+        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder()
+            .documentLink(DocumentLink.builder().documentUrl("some-url/1029103123").build()).build()).build();
+        SscsDocument sscsDocument2 = SscsDocument.builder().value(SscsDocumentDetails.builder()
+            .documentLink(DocumentLink.builder().documentUrl("some-url/1029103126").build()).build()).build();
         List<SscsDocument> documents = new ArrayList<>();
         documents.add(sscsDocument);
+        documents.add(sscsDocument2);
         caseData.setSscsDocument(documents);
 
-        SscsUtil.removeDocumentFromCaseDataDocuments(caseData, sscsDocument);
+        SscsUtil.removeDocumentFromCaseDataDocuments(caseData, sscsDocument2);
 
         List<SscsDocument> updatedDocuments = caseData.getSscsDocument();
         assertNotNull(updatedDocuments);
-        assertTrue(updatedDocuments.isEmpty());
+        assertEquals(1, updatedDocuments.size());
+        assertNotEquals(sscsDocument2.getValue().getDocumentLink().getDocumentUrl(), updatedDocuments.getFirst().getValue().getDocumentLink().getDocumentUrl());
+        assertEquals(sscsDocument.getValue().getDocumentLink().getDocumentUrl(), updatedDocuments.getFirst().getValue().getDocumentLink().getDocumentUrl());
     }
 
     @Test
@@ -788,9 +795,12 @@ class SscsUtilTest {
 
     @Test
     void testRemoveDocumentFromCaseDataInternalDocuments() {
-        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build();
+        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder()
+            .documentLink(DocumentLink.builder().documentUrl("some-url/1029103123").build()).build()).build();
+        SscsDocument sscsDocument2 = SscsDocument.builder().value(SscsDocumentDetails.builder()
+            .documentLink(DocumentLink.builder().documentUrl("some-url/1029103126").build()).build()).build();
         InternalCaseDocumentData internalCaseDocumentData = InternalCaseDocumentData.builder()
-            .sscsInternalDocument(new ArrayList<>(List.of(sscsDocument)))
+            .sscsInternalDocument(new ArrayList<>(List.of(sscsDocument, sscsDocument2)))
             .build();
         caseData.setInternalCaseDocumentData(internalCaseDocumentData);
 
@@ -799,7 +809,8 @@ class SscsUtilTest {
         InternalCaseDocumentData updatedInternalCaseDocumentData = caseData.getInternalCaseDocumentData();
         assertNotNull(updatedInternalCaseDocumentData);
         List<SscsDocument> updatedDocuments = updatedInternalCaseDocumentData.getSscsInternalDocument();
-        assertNotNull(updatedDocuments);
-        assertTrue(updatedDocuments.isEmpty());
+        assertEquals(1, updatedDocuments.size());
+        assertEquals(sscsDocument2.getValue().getDocumentLink().getDocumentUrl(), updatedDocuments.getFirst().getValue().getDocumentLink().getDocumentUrl());
+        assertNotEquals(sscsDocument.getValue().getDocumentLink().getDocumentUrl(), updatedDocuments.getFirst().getValue().getDocumentLink().getDocumentUrl());
     }
 }

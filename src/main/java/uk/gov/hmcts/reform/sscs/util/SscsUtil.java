@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.managedocuments.UploadDocumentMidEventHandler.getDocumentIdFromUrl;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.FACE_TO_FACE;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.NOT_ATTENDING;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
@@ -240,7 +241,7 @@ public class SscsUtil {
 
     public static void removeDocumentFromCaseDataDocuments(SscsCaseData caseData, SscsDocument sscsDocument) {
         List<SscsDocument> caseDocuments = new ArrayList<>(emptyIfNull(caseData.getSscsDocument()));
-        caseDocuments.remove(sscsDocument);
+        caseDocuments = removeDocumentFromDocList(getDocumentIdFromUrl(sscsDocument), caseDocuments);
         caseData.setSscsDocument(caseDocuments);
     }
 
@@ -253,6 +254,8 @@ public class SscsUtil {
             String newFileName = String.join(" ", Arrays.copyOfRange(splitFileName, 1, splitFileName.length));
             sscsDocument.getValue().setDocumentFileName(newFileName);
         }
+        sscsDocument.getValue().setBundleAddition(null);
+        sscsDocument.getValue().setEvidenceIssued(null);
         documents.addFirst(sscsDocument);
         internalCaseDocumentData.setSscsInternalDocument(documents);
         caseData.setInternalCaseDocumentData(internalCaseDocumentData);
@@ -262,9 +265,14 @@ public class SscsUtil {
         InternalCaseDocumentData internalCaseDocumentData = Optional.ofNullable(caseData.getInternalCaseDocumentData())
             .orElse(InternalCaseDocumentData.builder().build());
         List<SscsDocument> caseDocuments = new ArrayList<>(emptyIfNull(internalCaseDocumentData.getSscsInternalDocument()));
-        caseDocuments.remove(sscsDocument);
+        caseDocuments = removeDocumentFromDocList(getDocumentIdFromUrl(sscsDocument), caseDocuments);
         internalCaseDocumentData.setSscsInternalDocument(caseDocuments);
         caseData.setInternalCaseDocumentData(internalCaseDocumentData);
+    }
+
+    private static List<SscsDocument> removeDocumentFromDocList(String docId, List<SscsDocument> caseDocuments) {
+        return caseDocuments.stream()
+            .filter(doc -> !getDocumentIdFromUrl(doc).equalsIgnoreCase(docId)).toList();
     }
 
     public static DocumentType getPostHearingReviewDocumentType(PostHearing postHearing, boolean isPostHearingsEnabled) {
