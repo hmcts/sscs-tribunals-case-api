@@ -18,8 +18,8 @@ import org.junit.Test;
 
 public class SscsOcrDataUtilTest {
 
-    Map<String, Object> pairs = new HashMap<>();
-    Set<String> errors = new HashSet<>();
+    final Map<String, Object> pairs = new HashMap<>();
+    final Set<String> errors = new HashSet<>();
 
     @Test
     public void givenAPersonExists_thenReturnTrue() {
@@ -223,7 +223,7 @@ public class SscsOcrDataUtilTest {
         pairs.put("hearing_type_oral", "No");
         List<String> extracted = extractValuesWhereBooleansValid(pairs, errors, Arrays.asList("hearing_type_oral", "hearing_type_paper"));
         assertEquals(1, extracted.size());
-        assertEquals(Arrays.asList("hearing_type_oral"), extracted);
+        assertEquals(List.of("hearing_type_oral"), extracted);
         assertTrue(errors.isEmpty());
     }
 
@@ -242,7 +242,7 @@ public class SscsOcrDataUtilTest {
         pairs.put("hearing_type_paper", "blah");
         List<String> extracted = extractValuesWhereBooleansValid(pairs, errors, Arrays.asList("hearing_type_oral", "hearing_type_paper"));
         assertEquals(1, extracted.size());
-        assertEquals(Arrays.asList("hearing_type_oral"), extracted);
+        assertEquals(List.of("hearing_type_oral"), extracted);
         assertEquals(1, errors.size());
         assertEquals("hearing_type_paper has an invalid value. Should be Yes/No or True/False", errors.iterator().next());
     }

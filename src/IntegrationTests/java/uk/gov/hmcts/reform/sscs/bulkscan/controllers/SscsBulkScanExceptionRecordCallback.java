@@ -51,6 +51,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.skyscreamer.jsonassert.comparator.CustomComparator;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.bulkscan.BaseTest;
@@ -167,7 +168,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
             this.restTemplate.postForEntity(baseUrl + TRANSFORM_EXCEPTION_RECORD, request, ErrorResponse.class);
 
         // Then
-        assertThat(result.getStatusCodeValue()).isEqualTo(422);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
         assertThat(result.getBody().errors)
             .containsOnly("is_hearing_type_oral and is_hearing_type_paper have contradicting values");
 
@@ -190,7 +191,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
             this.restTemplate.postForEntity(baseUrl + TRANSFORM_EXCEPTION_RECORD, request, ErrorResponse.class);
 
         // Then
-        assertThat(result.getStatusCodeValue()).isEqualTo(422);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
         assertThat(result.getBody().errors)
             .containsOnly("#: extraneous key [invalid_key] is not permitted");
 
@@ -216,7 +217,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
             this.restTemplate.postForEntity(baseUrl + TRANSFORM_EXCEPTION_RECORD, request, ErrorResponse.class);
 
         // Then
-        assertThat(result.getStatusCodeValue()).isEqualTo(422);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
         assertThat(result.getBody().errors)
             .containsOnly("Duplicate case already exists - please reject this exception record");
 
@@ -240,7 +241,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
                 .postForEntity(baseUrl + TRANSFORM_EXCEPTION_RECORD, request, SuccessfulTransformationResponse.class);
 
         // Then
-        assertThat(result.getStatusCodeValue()).isEqualTo(200);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(result.getBody().getWarnings())
             .contains(HEARING_EXCLUDE_DATES_MISSING);
 
@@ -263,7 +264,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
             this.restTemplate.postForEntity(url, request, Void.class);
 
         // Then
-        assertThat(result.getStatusCodeValue()).isEqualTo(401);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     @ParameterizedTest
@@ -281,7 +282,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
             this.restTemplate.postForEntity(url, request, Void.class);
 
         // Then
-        assertThat(result.getStatusCodeValue()).isEqualTo(403);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
 
         verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
@@ -363,7 +364,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
             this.restTemplate.postForEntity(baseUrl + TRANSFORM_SCANNED_DATA, request, ErrorResponse.class);
 
         // Then
-        assertThat(result.getStatusCodeValue()).isEqualTo(422);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
         assertThat(result.getBody().errors)
             .contains("person1_last_name is empty",
                 "person1_address_line1 is empty",
@@ -392,7 +393,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
             this.restTemplate.postForEntity(baseUrl + TRANSFORM_SCANNED_DATA, request, ErrorResponse.class);
 
         // Then
-        assertThat(result.getStatusCodeValue()).isEqualTo(200);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(result.getBody().warnings)
             .contains("Excluded dates have been provided which must be recorded on CCD");
 
@@ -457,7 +458,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         ResponseEntity<ErrorResponse> result =
             this.restTemplate.postForEntity(baseUrl + TRANSFORM_EXCEPTION_RECORD, request, ErrorResponse.class);
 
-        assertThat(result.getStatusCodeValue()).isEqualTo(422);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
         assertThat(result.getBody().errors)
             .containsOnly("#: extraneous key [invalid_key] is not permitted");
 
@@ -478,7 +479,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         ResponseEntity<ErrorResponse> result =
             this.restTemplate.postForEntity(baseUrl + TRANSFORM_EXCEPTION_RECORD, request, ErrorResponse.class);
 
-        assertThat(result.getStatusCodeValue()).isEqualTo(200);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(result.getBody().warnings)
             .contains("person1_child_maintenance_number is empty",
                 "other_party_last_name is empty",
@@ -502,7 +503,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         ResponseEntity<ErrorResponse> result =
             this.restTemplate.postForEntity(baseUrl + TRANSFORM_EXCEPTION_RECORD, request, ErrorResponse.class);
 
-        assertThat(result.getStatusCodeValue()).isEqualTo(200);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(result.getBody().warnings)
             .containsOnly("is_paying_parent, is_receiving_parent, is_another_party and other_party_details fields are empty");
 
@@ -523,7 +524,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         ResponseEntity<ErrorResponse> result =
             this.restTemplate.postForEntity(baseUrl + TRANSFORM_EXCEPTION_RECORD, request, ErrorResponse.class);
 
-        assertThat(result.getStatusCodeValue()).isEqualTo(200);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(result.getBody().warnings).doesNotContain("is_paying_parent, is_receiving_parent, is_another_party and other_party_details fields are empty");
 
         verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
@@ -543,7 +544,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         ResponseEntity<ErrorResponse> result =
             this.restTemplate.postForEntity(baseUrl + TRANSFORM_EXCEPTION_RECORD, request, ErrorResponse.class);
 
-        assertThat(result.getStatusCodeValue()).isEqualTo(200);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(result.getBody().warnings)
             .containsOnly("is_paying_parent, is_receiving_parent and is_another_party have conflicting values");
 
@@ -564,7 +565,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         ResponseEntity<ErrorResponse> result =
             this.restTemplate.postForEntity(baseUrl + TRANSFORM_EXCEPTION_RECORD, request, ErrorResponse.class);
 
-        assertThat(result.getStatusCodeValue()).isEqualTo(200);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(result.getBody().warnings)
             .doesNotContain("is_paying_parent, is_receiving_parent and is_another_party have conflicting values");
 
@@ -911,7 +912,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     private void verifyResultData(ResponseEntity<SuccessfulTransformationResponse> result,
                                   String expectedDataFileLocation,
                                   Function<SuccessfulTransformationResponse, String> getTya) throws Exception {
-        assertThat(result.getStatusCodeValue()).isEqualTo(200);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         SuccessfulTransformationResponse callbackResponse = result.getBody();
 

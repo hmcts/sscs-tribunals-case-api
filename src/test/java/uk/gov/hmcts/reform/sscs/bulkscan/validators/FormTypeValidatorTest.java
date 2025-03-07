@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.bulkscan.helper.OcrDataBuilderTest.buildS
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.domain.CaseResponse;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.ExceptionRecord;
@@ -15,8 +16,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.FormType;
 import uk.gov.hmcts.reform.sscs.bulkscan.json.SscsJsonExtractor;
 
 public class FormTypeValidatorTest {
-    SscsJsonExtractor sscsJsonExtractor = new SscsJsonExtractor();
-    FormTypeValidator validator = new FormTypeValidator(sscsJsonExtractor);
+    final SscsJsonExtractor sscsJsonExtractor = new SscsJsonExtractor();
+    final FormTypeValidator validator = new FormTypeValidator(sscsJsonExtractor);
 
     @Test
     public void givenNewFieldsInV2OfTheForm_thenNoErrorsAreGiven() {
@@ -31,14 +32,13 @@ public class FormTypeValidatorTest {
         pairs.put("representative_want_sms_notifications", true);
 
         @SuppressWarnings("unchecked")
-        List scanOcrData = buildScannedValidationOcrData(pairs.entrySet().stream().map(f -> {
+        List<OcrDataField> scanOcrData = buildScannedValidationOcrData(pairs.entrySet().stream().map(f -> {
             HashMap<String, Object> valueMap = new HashMap<>();
             valueMap.put("name", f.getKey());
             valueMap.put("value", f.getValue());
             return valueMap;
         }).toArray(HashMap[]::new));
 
-        @SuppressWarnings("unchecked")
         ExceptionRecord exceptionRecord = ExceptionRecord.builder().ocrDataFields(scanOcrData).formType(FormType.SSCS1PEU.toString()).build();
 
         CaseResponse response = validator.validate("caseId", exceptionRecord);
@@ -71,7 +71,7 @@ public class FormTypeValidatorTest {
         ExceptionRecord exceptionRecord = ExceptionRecord.builder().ocrDataFields(scanOcrData).formType("invalid_key").build();
 
         CaseResponse response = validator.validate("123456", exceptionRecord);
-        assertEquals("No valid form type was found. There needs to be a valid form_type on the OCR data or on the exception record.", response.getErrors().get(0));
+        assertEquals("No valid form type was found. There needs to be a valid form_type on the OCR data or on the exception record.", response.getErrors().getFirst());
     }
 
     @Test
@@ -112,28 +112,16 @@ public class FormTypeValidatorTest {
 
     @Test
     public void givenAValidSscs2Fields_thenReturnValidCaseResponse() {
-        Map<String, Object> pairs = new HashMap<>();
-        pairs.put("is_paying_parent", true);
-        pairs.put("is_receiving_parent", false);
-        pairs.put("is_another_party", false);
-        pairs.put("person1_child_maintenance_number", "123467");
-        pairs.put("other_party_title", "Mr");
-        pairs.put("other_party_first_name", "John");
-        pairs.put("other_party_last_name", "Smith");
-        pairs.put("is_other_party_address_known", "Yes");
-        pairs.put("other_party_address_line1", "123 The Road");
-        pairs.put("other_party_address_line2", "The Town");
-        pairs.put("other_party_postcode", "RM1 1PT");
+        Map<String, Object> pairs = getSscs2Map();
 
         @SuppressWarnings("unchecked")
-        List scanOcrData = buildScannedValidationOcrData(pairs.entrySet().stream().map(f -> {
+        List<OcrDataField> scanOcrData = buildScannedValidationOcrData(pairs.entrySet().stream().map(f -> {
             HashMap<String, Object> valueMap = new HashMap<>();
             valueMap.put("name", f.getKey());
             valueMap.put("value", f.getValue());
             return valueMap;
         }).toArray(HashMap[]::new));
 
-        @SuppressWarnings("unchecked")
         ExceptionRecord exceptionRecord = ExceptionRecord.builder().ocrDataFields(scanOcrData).formType(FormType.SSCS2.toString()).build();
 
         CaseResponse response = validator.validate("caseId", exceptionRecord);
@@ -161,6 +149,42 @@ public class FormTypeValidatorTest {
 
     @Test
     public void givenAValidBenefitTypesForSscs5_thenReturnValidCaseResponse() {
+        Map<String, Object> pairs = getSscs5Map();
+
+        @SuppressWarnings("unchecked")
+        List<OcrDataField> scanOcrData = buildScannedValidationOcrData(pairs.entrySet().stream().map(f -> {
+            HashMap<String, Object> valueMap = new HashMap<>();
+            valueMap.put("name", f.getKey());
+            valueMap.put("value", f.getValue());
+            return valueMap;
+        }).toArray(HashMap[]::new));
+
+        ExceptionRecord exceptionRecord = ExceptionRecord.builder().ocrDataFields(scanOcrData).formType(FormType.SSCS5.toString()).build();
+
+        CaseResponse response = validator.validate("caseId", exceptionRecord);
+        assertNull(response.getErrors());
+        assertEquals(0, response.getWarnings().size());
+    }
+
+    @NotNull
+    private static Map<String, Object> getSscs2Map() {
+        Map<String, Object> pairs = new HashMap<>();
+        pairs.put("is_paying_parent", true);
+        pairs.put("is_receiving_parent", false);
+        pairs.put("is_another_party", false);
+        pairs.put("person1_child_maintenance_number", "123467");
+        pairs.put("other_party_title", "Mr");
+        pairs.put("other_party_first_name", "John");
+        pairs.put("other_party_last_name", "Smith");
+        pairs.put("is_other_party_address_known", "Yes");
+        pairs.put("other_party_address_line1", "123 The Road");
+        pairs.put("other_party_address_line2", "The Town");
+        pairs.put("other_party_postcode", "RM1 1PT");
+        return pairs;
+    }
+
+    @NotNull
+    private static Map<String, Object> getSscs5Map() {
         Map<String, Object> pairs = new HashMap<>();
         pairs.put("is_benefit_type_tax_credit", true);
         pairs.put("is_benefit_type_guardians_allowance", false);
@@ -170,20 +194,6 @@ public class FormTypeValidatorTest {
         pairs.put("is_benefit_type_30_hours_tax_free_childcare", false);
         pairs.put("is_benefit_type_guaranteed_minimum_pension", false);
         pairs.put("is_benefit_type_national_insurance_credits", false);
-
-        @SuppressWarnings("unchecked")
-        List scanOcrData = buildScannedValidationOcrData(pairs.entrySet().stream().map(f -> {
-            HashMap<String, Object> valueMap = new HashMap<>();
-            valueMap.put("name", f.getKey());
-            valueMap.put("value", f.getValue());
-            return valueMap;
-        }).toArray(HashMap[]::new));
-
-        @SuppressWarnings("unchecked")
-        ExceptionRecord exceptionRecord = ExceptionRecord.builder().ocrDataFields(scanOcrData).formType(FormType.SSCS5.toString()).build();
-
-        CaseResponse response = validator.validate("caseId", exceptionRecord);
-        assertNull(response.getErrors());
-        assertEquals(0, response.getWarnings().size());
+        return pairs;
     }
 }

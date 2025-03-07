@@ -56,7 +56,7 @@ public class PostcodeValidator {
             return true;
         }
         if (testPostcodes.contains(postcode)) {
-            log.info("PostcodeValidator received a test postcode ", postcode);
+            log.info("PostcodeValidator received a test postcode {}", postcode);
             return true;
         }
         HttpHeaders headers = new HttpHeaders();
@@ -72,13 +72,11 @@ public class PostcodeValidator {
                     byte[].class,
                     postcode
                 );
-            logIfNotValidPostCode(postcode, response.getStatusCodeValue());
-            return response.getStatusCodeValue() == 200 && nonNull(response.getBody()) && contains(new String(response.getBody()), POSTCODE_RESULT);
+            logIfNotValidPostCode(postcode, response.getStatusCode().value());
+            return response.getStatusCode().is2xxSuccessful() && nonNull(response.getBody()) && contains(new String(response.getBody()), POSTCODE_RESULT);
 
         } catch (RestClientResponseException e) {
-            if (e.getRawStatusCode() != 200) {
-                log.info("Post code search returned statusCode {} for postcode {}", e.getRawStatusCode(), postcode);
-            }
+            logIfNotValidPostCode(postcode, e.getStatusCode().value());
             return false;
         }
     }

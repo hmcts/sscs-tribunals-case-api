@@ -7,12 +7,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
-import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
@@ -20,16 +16,8 @@ import static uk.gov.hmcts.reform.sscs.bulkscan.common.TestHelper.TEST_SERVICE_A
 import static uk.gov.hmcts.reform.sscs.bulkscan.common.TestHelper.TEST_USER_AUTH_TOKEN;
 import static uk.gov.hmcts.reform.sscs.bulkscan.common.TestHelper.TEST_USER_ID;
 import static uk.gov.hmcts.reform.sscs.bulkscan.common.TestHelper.exceptionRecord;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ACTION_FURTHER_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INTERLOC_INFORMATION_RECEIVED;
 
-import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.util.Optional;
 import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -49,30 +37,19 @@ import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.handlers.CcdCallbackHandler;
 import uk.gov.hmcts.reform.sscs.bulkscan.exceptionhandlers.ResponseExceptionHandler;
 import uk.gov.hmcts.reform.sscs.bulkscan.exceptions.ForbiddenException;
 import uk.gov.hmcts.reform.sscs.bulkscan.exceptions.UnauthorizedException;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackDispatcher;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.controller.CcdCallbackController;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
-@SuppressWarnings("unchecked")
 @RunWith(JUnitParamsRunner.class)
 public class CcdBulkScanCallbackControllerTest {
 
@@ -95,8 +72,6 @@ public class CcdBulkScanCallbackControllerTest {
     @MockitoBean
     private CcdCallbackHandler ccdCallbackHandler;
 
-    private CcdBulkScanCallbackController controller;
-
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
@@ -105,7 +80,7 @@ public class CcdBulkScanCallbackControllerTest {
 
     @Before
     public void setUp() {
-        controller = new CcdBulkScanCallbackController(authorisationService, deserializer, ccdCallbackHandler);
+        CcdBulkScanCallbackController controller = new CcdBulkScanCallbackController(authorisationService, deserializer, ccdCallbackHandler);
         mockMvc = standaloneSetup(controller)
             .setControllerAdvice(new ResponseExceptionHandler())
             .setMessageConverters(new ByteArrayHttpMessageConverter(), new StringHttpMessageConverter(),

@@ -10,15 +10,15 @@ import org.junit.Test;
 
 public class BulkScanSchemaTest {
 
-    InputStream inputStream = getClass().getResourceAsStream("/config/schema/sscs-bulk-scan-schema.json");
+    final InputStream inputStream = getClass().getResourceAsStream("/config/schema/sscs-bulk-scan-schema.json");
 
-    JSONObject validJsonData = new JSONObject(
+    final JSONObject validJsonData = new JSONObject(
             new JSONTokener(getClass().getResourceAsStream("/schema/valid_ocr_agreed.json")));
 
-    JSONObject invalidJsonData = new JSONObject(
+    final JSONObject invalidJsonData = new JSONObject(
         new JSONTokener(getClass().getResourceAsStream("/schema/invalid_ocr_key.json")));
 
-    Schema schema = SchemaLoader.load(new JSONObject(new JSONTokener(inputStream)));
+    final Schema schema = SchemaLoader.load(new JSONObject(new JSONTokener(inputStream)));
 
     @Test
     public void givenValidInputAgreedWithOcrProvider_thenValidateAgainstSchema() throws ValidationException {

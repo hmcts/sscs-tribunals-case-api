@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.bulkscan.controllers;
 import static java.util.Arrays.asList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.MockitoAnnotations.openMocks;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -14,18 +13,14 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Stream;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -35,7 +30,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import uk.gov.hmcts.reform.authorisation.exceptions.InvalidTokenException;
 import uk.gov.hmcts.reform.sscs.bulkscan.exceptionhandlers.ResponseExceptionHandler;
-import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.handlers.CcdCallbackHandler;
 import uk.gov.hmcts.reform.sscs.bulkscan.domain.transformation.CaseCreationDetails;
@@ -59,24 +53,23 @@ public class TransformationControllerTest {
     @MockitoBean
     private AuthorisationService authService;
 
-    private TransformationController transformationController;
     private MockMvc mockMvc;
 
     @Before
     public void setUp() {
-        transformationController = new TransformationController(authService, ccdCallbackHandler);
+        TransformationController transformationController = new TransformationController(authService, ccdCallbackHandler);
         mockMvc = standaloneSetup(transformationController)
             .setControllerAdvice(new ResponseExceptionHandler())
             .build();
     }
 
-    private Map<String, Object> hmctsServiceIdMap = new HashMap<>() {
+    private final Map<String, Object> hmctsServiceIdMap = new HashMap<>() {
         {
             put("HMCTSServiceId", "BBA3");
         }
     };
 
-    private Map<String, Map<String, Object>> supplementaryDataRequestMap = new HashMap<>() {
+    private final Map<String, Map<String, Object>> supplementaryDataRequestMap = new HashMap<>() {
         {
             put("$set", hmctsServiceIdMap);
         }
@@ -88,33 +81,37 @@ public class TransformationControllerTest {
     public void should_return_case_data_if_transformation_succeeded(String url) throws Exception {
         given(authService.authenticate("testServiceAuthHeader")).willReturn("testServiceName");
 
-        Map<String, Object> pairs = new HashMap<>();
-
-        pairs.put("person1_first_name", "George");
-
-        SuccessfulTransformationResponse transformationResult =
-            new SuccessfulTransformationResponse(
-                new CaseCreationDetails(
-                    "case-type-id",
-                    "event-id",
-                    pairs
-                ),
-                asList(
-                    "warning-1",
-                    "warning-2"
-                ),
-                supplementaryDataRequestMap
-            );
+        SuccessfulTransformationResponse transformationResult = getSuccessfulTransformationResponse();
 
         given(ccdCallbackHandler.handle(any())).willReturn(transformationResult);
 
-        sendRequest("{}", url)
+        sendRequest(url)
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.case_creation_details.case_type_id").value("case-type-id"))
             .andExpect(jsonPath("$.case_creation_details.event_id").value("event-id"))
             .andExpect(jsonPath("$.case_creation_details.case_data.person1_first_name").value("George"))
             .andExpect(jsonPath("$.warnings[0]").value("warning-1"))
             .andExpect(jsonPath("$.warnings[1]").value("warning-2"));
+    }
+
+    @NotNull
+    private SuccessfulTransformationResponse getSuccessfulTransformationResponse() {
+        Map<String, Object> pairs = new HashMap<>();
+
+        pairs.put("person1_first_name", "George");
+
+        return new SuccessfulTransformationResponse(
+            new CaseCreationDetails(
+                "case-type-id",
+                "event-id",
+                pairs
+            ),
+            asList(
+                "warning-1",
+                "warning-2"
+            ),
+            supplementaryDataRequestMap
+        );
     }
 
     //FIXME: update after bulk scan auto case creation is switch on
@@ -129,7 +126,7 @@ public class TransformationControllerTest {
                 )
             ));
 
-        sendRequest("{}", url)
+        sendRequest(url)
             .andDo(print())
             .andExpect(status().isUnprocessableEntity())
             .andExpect(jsonPath("$.errors[0]").value("error-1"))
@@ -142,7 +139,7 @@ public class TransformationControllerTest {
     public void should_return_proper_status_codes_for_auth_exceptions_when_transforming_scanned_data(RuntimeException exc, HttpStatus status) throws Exception {
         given(authService.authenticate(any())).willThrow(exc);
 
-        sendRequest("{}", "/transform-exception-record").andExpect(status().is(status.value()));
+        sendRequest("/transform-exception-record").andExpect(status().is(status.value()));
     }
 
     @Test
@@ -150,15 +147,15 @@ public class TransformationControllerTest {
     public void new_endpoint_should_return_proper_status_codes_for_auth_exceptions_when_transforming_scanned_data(RuntimeException exc, HttpStatus status) throws Exception {
         given(authService.authenticate(any())).willThrow(exc);
 
-        sendRequest("{}", "/transform-scanned-data").andExpect(status().is(status.value()));
+        sendRequest("/transform-scanned-data").andExpect(status().is(status.value()));
     }
 
-    private ResultActions sendRequest(String body, String url) throws Exception {
+    private ResultActions sendRequest(String url) throws Exception {
         return mockMvc
             .perform(
                 post(url)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(body)
+                    .content("{}")
             );
     }
 

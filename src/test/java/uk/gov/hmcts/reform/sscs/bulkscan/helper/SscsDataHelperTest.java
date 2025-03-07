@@ -237,7 +237,7 @@ public class SscsDataHelperTest {
 
         sscsDataHelper.addSscsDataToMap(transformedCase, appeal, null, null, FormType.SSCS2, "123456", otherParties);
 
-        OtherParty otherParty = ((List<CcdValue<OtherParty>>) transformedCase.get("otherParties")).get(0).getValue();
+        OtherParty otherParty = ((List<CcdValue<OtherParty>>) transformedCase.get("otherParties")).getFirst().getValue();
         assertEquals("other_party_1", otherParty.getId());
         assertEquals("123456", transformedCase.get("childMaintenanceNumber"));
     }

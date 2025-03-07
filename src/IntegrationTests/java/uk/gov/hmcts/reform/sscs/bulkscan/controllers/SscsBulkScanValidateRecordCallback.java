@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
@@ -64,7 +65,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
             this.restTemplate.postForEntity(baseUrl, request, AboutToStartOrSubmitCallbackResponse.class);
 
         // Then
-        assertThat(result.getStatusCodeValue()).isEqualTo(200);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         AboutToStartOrSubmitCallbackResponse callbackResponse = result.getBody();
 
@@ -93,7 +94,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
             this.restTemplate.postForEntity(baseUrl, request, AboutToStartOrSubmitCallbackResponse.class);
 
         // Then
-        assertThat(result.getStatusCodeValue()).isEqualTo(200);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         AboutToStartOrSubmitCallbackResponse callbackResponse = result.getBody();
 
@@ -119,7 +120,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
             this.restTemplate.postForEntity(baseUrl, request, AboutToStartOrSubmitCallbackResponse.class);
 
         // Then
-        assertThat(result.getStatusCodeValue()).isEqualTo(200);
+        assertThat(result.getStatusCode()).isEqualTo(200);
 
         AboutToStartOrSubmitCallbackResponse callbackResponse = result.getBody();
 
@@ -146,7 +147,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
             this.restTemplate.postForEntity(baseUrl, request, AboutToStartOrSubmitCallbackResponse.class);
 
         // Then
-        assertThat(result.getStatusCodeValue()).isEqualTo(200);
+        assertThat(result.getStatusCode()).isEqualTo(200);
         assertThat(result.getBody().getErrors())
             .containsOnly(
                 "Child maintenance number is empty",
@@ -170,7 +171,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
             this.restTemplate.postForEntity(baseUrl, request, AboutToStartOrSubmitCallbackResponse.class);
 
         // Then
-        assertThat(result.getStatusCodeValue()).isEqualTo(200);
+        assertThat(result.getStatusCode()).isEqualTo(200);
         assertThat(result.getBody().getErrors())
             .containsOnly(
                 "Appellant title is empty",
@@ -205,7 +206,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
             this.restTemplate.postForEntity(baseUrl, request, AboutToStartOrSubmitCallbackResponse.class);
 
         // Then
-        assertThat(result.getStatusCodeValue()).isEqualTo(200);
+        assertThat(result.getStatusCode()).isEqualTo(200);
         assertThat(result.getBody().getErrors())
             .containsOnly(
                 "Appointee title is empty",
@@ -231,7 +232,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
             this.restTemplate.postForEntity(baseUrl, request, AboutToStartOrSubmitCallbackResponse.class);
 
         // Then
-        assertThat(result.getStatusCodeValue()).isEqualTo(200);
+        assertThat(result.getStatusCode()).isEqualTo(200);
         assertThat(result.getBody().getErrors())
             .containsOnly(
                 "Appointee title is empty",
@@ -258,7 +259,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
             this.restTemplate.postForEntity(baseUrl, request, AboutToStartOrSubmitCallbackResponse.class);
 
         // Then
-        assertThat(result.getStatusCodeValue()).isEqualTo(200);
+        assertThat(result.getStatusCode()).isEqualTo(200);
         assertThat(result.getBody().getErrors())
             .containsOnly("Appointee title is empty",
                 "Appointee first name is empty",
@@ -287,7 +288,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
             this.restTemplate.postForEntity(baseUrl, request, AboutToStartOrSubmitCallbackResponse.class);
 
         // Then
-        assertThat(result.getStatusCodeValue()).isEqualTo(200);
+        assertThat(result.getStatusCode()).isEqualTo(200);
         assertThat(result.getBody().getErrors())
             .containsOnly("Appointee title is empty",
                 "Appointee first name is empty",
@@ -314,7 +315,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
             this.restTemplate.postForEntity(baseUrl, request, AboutToStartOrSubmitCallbackResponse.class);
 
         // Then
-        assertThat(result.getStatusCodeValue()).isEqualTo(200);
+        assertThat(result.getStatusCode()).isEqualTo(200);
         assertThat(result.getBody().getErrors())
             .containsOnly(
                 "Representative organisation, Representative first name and Representative last name are empty. At least one must be populated",
@@ -343,7 +344,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
             this.restTemplate.postForEntity(baseUrl, request, AboutToStartOrSubmitCallbackResponse.class);
 
         // Then
-        assertThat(result.getStatusCodeValue()).isEqualTo(200);
+        assertThat(result.getStatusCode()).isEqualTo(200);
         assertThat(result.getBody().getErrors())
             .containsOnly(HAS_REPRESENTATIVE_FIELD_MISSING);
 
@@ -366,7 +367,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
             this.restTemplate.postForEntity(baseUrl, request, Void.class);
 
         // Then
-        assertThat(result.getStatusCodeValue()).isEqualTo(401);
+        assertThat(result.getStatusCode()).isEqualTo(401);
     }
 
     @Test
@@ -383,7 +384,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
             this.restTemplate.postForEntity(baseUrl, request, Void.class);
 
         // Then
-        assertThat(result.getStatusCodeValue()).isEqualTo(403);
+        assertThat(result.getStatusCode()).isEqualTo(403);
 
         verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
@@ -406,7 +407,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
             this.restTemplate.postForEntity(baseUrl, request, AboutToStartOrSubmitCallbackResponse.class);
 
         // Then
-        assertThat(result.getStatusCodeValue()).isEqualTo(200);
+        assertThat(result.getStatusCode()).isEqualTo(200);
         assertThat(result.getBody().getErrors().size()).isEqualTo(0);
         assertThat(result.getBody().getWarnings())
             .containsOnly("Appellant postcode is not a valid postcode");
@@ -429,7 +430,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
             this.restTemplate.postForEntity(baseUrl, request, AboutToStartOrSubmitCallbackResponse.class);
 
         // Then
-        assertThat(result.getStatusCodeValue()).isEqualTo(200);
+        assertThat(result.getStatusCode()).isEqualTo(200);
         assertThat(result.getBody().getErrors())
             .containsOnly("Appellant role and/or description is missing");
 
@@ -451,7 +452,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
             this.restTemplate.postForEntity(baseUrl, request, AboutToStartOrSubmitCallbackResponse.class);
 
         // Then
-        assertThat(result.getStatusCodeValue()).isEqualTo(200);
+        assertThat(result.getStatusCode()).isEqualTo(200);
         assertThat(result.getBody().getErrors())
             .containsOnly("Appellant role and/or description is missing");
 
@@ -475,7 +476,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
             this.restTemplate.postForEntity(baseUrl, request, AboutToStartOrSubmitCallbackResponse.class);
 
         // Then
-        assertThat(result.getStatusCodeValue()).isEqualTo(200);
+        assertThat(result.getStatusCode()).isEqualTo(200);
 
         AboutToStartOrSubmitCallbackResponse callbackResponse = result.getBody();
 

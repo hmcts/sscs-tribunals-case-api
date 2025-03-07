@@ -62,7 +62,7 @@ public class OcrDataBuilderTest {
     }
 
     @SafeVarargs
-    public static final List<OcrDataField> buildScannedValidationOcrData(Map<String, Object>... valueMap) {
+    public static List<OcrDataField> buildScannedValidationOcrData(Map<String, Object>... valueMap) {
         List<OcrDataField> scannedOcrDataList = new ArrayList<>();
 
         for (Map<String, Object> values: valueMap) {

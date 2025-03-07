@@ -28,7 +28,7 @@ public class SscsJsonExtractorTest {
         sscsJsonExtractor = new SscsJsonExtractor();
     }
 
-    LocalDateTime now = LocalDateTime.now();
+    final LocalDateTime now = LocalDateTime.now();
 
     @Test
     public void givenExceptionCaseData_thenExtractIntoKeyValuePairs() {
@@ -55,7 +55,7 @@ public class SscsJsonExtractorTest {
 
         ScannedData result = sscsJsonExtractor.extractJson(ExceptionRecord.builder().scannedDocuments(inputScannedDocs).build());
 
-        assertEquals(scannedDoc, result.getRecords().get(0));
+        assertEquals(scannedDoc, result.getRecords().getFirst());
     }
 
     @Test

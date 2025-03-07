@@ -18,6 +18,7 @@ import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
@@ -55,13 +56,13 @@ public class PostcodeValidatorTest {
 
     private void setUpSuccessResponse() {
         setupRestTemplateResponse();
-        when(responseEntity.getStatusCodeValue()).thenReturn(200);
+        when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
         when(responseEntity.getBody()).thenReturn("true".getBytes());
     }
 
     private void setUpFailureResponse() {
         setupRestTemplateResponse();
-        when(responseEntity.getStatusCodeValue()).thenReturn(200);
+        when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
         when(responseEntity.getBody()).thenReturn("unknown".getBytes());
     }
 
@@ -109,7 +110,7 @@ public class PostcodeValidatorTest {
     @Test
     public void shouldHandleNon200Exception() {
         setupRestTemplateResponse();
-        when(responseEntity.getStatusCodeValue()).thenReturn(404);
+        when(responseEntity.getStatusCode()).thenReturn(HttpStatus.NOT_FOUND);
         assertFalse(postcodeValidator.isValid("80202"));
     }
 }

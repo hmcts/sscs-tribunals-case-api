@@ -74,7 +74,7 @@ sourceSets {
         java {
             compileClasspath += main.output + test.output
             runtimeClasspath += main.output + test.output
-            srcDir('src/functionalTest/java')
+            srcDir('src/functionalTest/java/uk/gov/hmcts/reform/sscs/bulkscan')
         }
     }
     contractTest {
@@ -113,7 +113,9 @@ tasks.register('functional', Test) {
     description = 'Executes non-destructive functional tests in AAT against a running CCD and notification service'
     setTestClassesDirs(sourceSets.functionalTest.output.classesDirs)
     setClasspath(sourceSets.functionalTest.runtimeClasspath)
-    include "uk/gov/hmcts/reform/sscs/functional/**"
+    exclude "uk/gov/hmcts/reform/sscs/functional/**"
+    exclude "uk/gov/hmcts/reform/sscs/controllers/**"
+    include "uk/gov/hmcts/reform/sscs/bulkscan/**"
     exclude "uk/gov/hmcts/reform/sscs/smoke/**"
     maxParallelForks = Runtime.runtime.availableProcessors()
 }
@@ -269,7 +271,11 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/sscs/docmosis/config/**," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/EnvironmentPropertiesPrinter.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/controller/FunctionalTestController.java," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/tyanotifications/utils/GetAllTemplatesFromNotify.java,"
+                "src/main/java/uk/gov/hmcts/reform/sscs/tyanotifications/utils/GetAllTemplatesFromNotify.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/bulkscan/domain/**," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/bulkscan/bulkscancore/domain/**," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/bulkscan/BulkScanApplication.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/bulkscan/config/**,"
         property "sonar.host.url", "https://sonar.reform.hmcts.net/"
     }
 }
