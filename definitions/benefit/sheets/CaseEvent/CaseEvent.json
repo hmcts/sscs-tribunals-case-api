@@ -193,7 +193,6 @@
     "Name": "Add case outcome",
     "Description": "Add a case outcome",
     "DisplayOrder": 141,
-    "EventEnablingCondition": "caseOutcome=\"DONOTSHOW\"",
     "PreConditionState(s)": "dormantAppealState;postHearing;withUT;hearing;readyToList",
     "PostConditionState": "*",
     "ShowEventNotes": "Y",
