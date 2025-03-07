@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
@@ -250,17 +251,21 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
     }
 
     private boolean isPostponementRequest(SscsCaseData caseData) {
+        InternalCaseDocumentData internalCaseDocumentData = caseData.getInternalCaseDocumentData() != null
+            ? caseData.getInternalCaseDocumentData() : InternalCaseDocumentData.builder().build();
         return Stream.concat(
             emptyIfNull(caseData.getSscsDocument()).stream(),
-            isTribunalInternalDocumentsEnabled ? emptyIfNull(caseData.getSscsInternalDocument()).stream() : Stream.empty()
+            isTribunalInternalDocumentsEnabled ? emptyIfNull(internalCaseDocumentData.getSscsInternalDocument()).stream() : Stream.empty()
         ).anyMatch(document -> document.getValue().getDocumentType() != null
             && document.getValue().getDocumentType().equals(DocumentType.POSTPONEMENT_REQUEST.getValue()));
     }
 
     private boolean isPostHearingOtherRequest(SscsCaseData caseData) {
+        InternalCaseDocumentData internalCaseDocumentData = caseData.getInternalCaseDocumentData() != null
+            ? caseData.getInternalCaseDocumentData() : InternalCaseDocumentData.builder().build();
         return Stream.concat(
             emptyIfNull(caseData.getSscsDocument()).stream(),
-            isTribunalInternalDocumentsEnabled ? emptyIfNull(caseData.getSscsInternalDocument()).stream() : Stream.empty()
+            isTribunalInternalDocumentsEnabled ? emptyIfNull(internalCaseDocumentData.getSscsInternalDocument()).stream() : Stream.empty()
         ).anyMatch(document -> document.getValue().getDocumentType() != null
             && document.getValue().getDocumentType().equals(DocumentType.POST_HEARING_OTHER
             .getValue()));
@@ -273,10 +278,12 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
             .filter(d -> emptyIfNull(caseDetailsBefore.getCaseData().getSscsDocument()).stream().noneMatch(db -> db.getId().equals(d.getId())))
             .filter(d -> DocumentType.URGENT_HEARING_REQUEST.getValue().equals(d.getValue().getDocumentType()))
             .findFirst().orElse(null);
-
-        SscsDocument furtherEvidenceInternalDoc = isTribunalInternalDocumentsEnabled && caseData.getSscsInternalDocument() != null
-            ? caseData.getSscsInternalDocument().stream()
-            .filter(d -> emptyIfNull(caseDetailsBefore.getCaseData().getSscsInternalDocument()).stream().noneMatch(db -> db.getId().equals(d.getId())))
+        InternalCaseDocumentData internalCaseDocumentData = caseData.getInternalCaseDocumentData() != null
+            ? caseData.getInternalCaseDocumentData() : InternalCaseDocumentData.builder().build();
+        List<SscsDocument> internalCaseDocumentDataBefore = caseDetailsBefore.getCaseData().getInternalCaseDocumentData() != null ? caseDetailsBefore.getCaseData().getInternalCaseDocumentData().getSscsInternalDocument() : null;
+        SscsDocument furtherEvidenceInternalDoc = isTribunalInternalDocumentsEnabled && internalCaseDocumentData.getSscsInternalDocument() != null
+            ? internalCaseDocumentData.getSscsInternalDocument().stream()
+            .filter(d -> emptyIfNull(internalCaseDocumentDataBefore).stream().noneMatch(db -> db.getId().equals(d.getId())))
             .filter(d -> DocumentType.URGENT_HEARING_REQUEST.getValue().equals(d.getValue().getDocumentType()))
             .findFirst().orElse(null) : null;
         return (StringUtils.isEmpty(caseData.getUrgentCase()) || "No".equalsIgnoreCase(caseData.getUrgentCase()))

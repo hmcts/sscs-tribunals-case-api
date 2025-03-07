@@ -14,6 +14,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.*;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyName;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.addDocumentToCaseDataDocuments;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.addDocumentToCaseDataInternalDocuments;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -469,7 +471,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                     if (!equalsIgnoreCase(scannedDocument.getValue().getType(), COVERSHEET)) {
                         SscsDocument sscsDocument = buildSscsDocument(sscsCaseData, scannedDocument, caseState);
                         documentsAddedThisEvent.add(sscsDocument.getValue().getDocumentType());
-                        addSscsDocumentToCaseData(sscsCaseData, sscsDocument);
+                        addSscsDocumentToCaseData(sscsCaseData, sscsDocument, scannedDocument.getValue().getDocumentTabChoice());
                         setReinstateCaseFieldsIfReinstatementRequest(sscsCaseData, sscsDocument);
                         setTranslationWorkOutstanding(sscsCaseData);
                     }
@@ -490,22 +492,13 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         sscsCaseData.setScannedDocuments(null);
     }
 
-    private void addSscsDocumentToCaseData(SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
-        List<SscsDocument> documents = new ArrayList<>();
-        documents.add(sscsDocument);
-        if (isTribunalInternalDocumentsEnabled && DocumentTabChoice.INTERNAL.equals(sscsDocument.getValue().getDocumentTabChoice())) {
-            if (sscsCaseData.getSscsInternalDocument() != null) {
-                documents.addAll(sscsCaseData.getSscsInternalDocument());
-            }
-            sscsCaseData.setSscsInternalDocument(documents);
+    private void addSscsDocumentToCaseData(SscsCaseData sscsCaseData, SscsDocument sscsDocument, DocumentTabChoice documentTabChoice) {
+        boolean isInternalDocument = isTribunalInternalDocumentsEnabled && DocumentTabChoice.INTERNAL.equals(documentTabChoice);
+
+        if (isInternalDocument) {
+            addDocumentToCaseDataInternalDocuments(sscsCaseData, sscsDocument);
         } else {
-            if (isTribunalInternalDocumentsEnabled) {
-                documents.getFirst().getValue().setDocumentTabChoice(DocumentTabChoice.REGULAR);
-            }
-            if (sscsCaseData.getSscsDocument() != null) {
-                documents.addAll(sscsCaseData.getSscsDocument());
-            }
-            sscsCaseData.setSscsDocument(documents);
+            addDocumentToCaseDataDocuments(sscsCaseData, sscsDocument);
         }
     }
 
@@ -652,7 +645,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 .originalSenderOtherPartyName(originalSenderOtherPartyName)
                 .documentTranslationStatus(
                     sscsCaseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null)
-                .documentTabChoice(scannedDocument.getValue().getDocumentTabChoice())
                 .build())
             .build();
     }

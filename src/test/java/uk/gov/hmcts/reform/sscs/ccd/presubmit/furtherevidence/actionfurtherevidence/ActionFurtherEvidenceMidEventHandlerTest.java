@@ -55,7 +55,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfState;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
-public class ActionFurtherEvidenceMidEventHandlerTest {
+class ActionFurtherEvidenceMidEventHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
     private final List<ScannedDocument> scannedDocumentList = new ArrayList<>();
