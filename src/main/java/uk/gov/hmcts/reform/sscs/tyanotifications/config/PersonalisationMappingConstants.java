@@ -131,6 +131,7 @@ public final class PersonalisationMappingConstants {
     public static final String SENDER_NAME = "sender_name";
     public static final String LETTER_CONTENT_TYPE = "letter_content_type";
     public static final String FURTHER_EVIDENCE_ACTION = "further_evidence_action";
+    public static final String POSTPONEMENT_REQUEST = "postponement_request";
 
     private PersonalisationMappingConstants() {
         //
