@@ -15,6 +15,7 @@ import static uk.gov.hmcts.reform.sscs.util.ConfidentialityRequestUtil.isAtLeast
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -98,6 +99,7 @@ public class BundlingHandler {
         return sendToBundleService(bundleCallback);
     }
 
+    @SuppressWarnings("unchecked")
     private PreSubmitCallbackResponse<SscsCaseData> sendToBundleService(BundleCallback<SscsCaseData> callback) {
         return serviceRequestExecutor.post(callback, bundleUrl + CREATE_BUNDLE_ENDPOINT);
     }
@@ -126,15 +128,13 @@ public class BundlingHandler {
 
     private boolean hasBundleAdditionsWithSameCharacter(SscsCaseData sscsCaseData) {
         return emptyIfNull(sscsCaseData.getSscsDocument())
-                .stream()
-                .filter(document -> document.getValue() != null)
-                .map(document -> document.getValue().getBundleAddition())
-                .filter(bundleAddition -> bundleAddition != null)
-                .map(String::toUpperCase)
-                .collect(Collectors.groupingBy(Function.identity(), counting()))    // create a map {A=2,B=1}
-                .entrySet().stream()
-                .filter(bundleAdditionItem -> bundleAdditionItem.getValue() > 1)
-                .count() > 0;
+            .stream()
+            .filter(document -> document.getValue() != null)
+            .map(document -> document.getValue().getBundleAddition())
+            .filter(Objects::nonNull)
+            .map(String::toUpperCase)
+            .collect(Collectors.groupingBy(Function.identity(), counting()))    // create a map {A=2,B=1}
+            .entrySet().stream().anyMatch(bundleAdditionItem -> bundleAdditionItem.getValue() > 1);
 
     }
 

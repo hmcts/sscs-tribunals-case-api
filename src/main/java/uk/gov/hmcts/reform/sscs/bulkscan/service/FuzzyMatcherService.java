@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.bulkscan.service;
 
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
+import static java.util.Objects.isNull;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toUnmodifiableSet;
 import static org.apache.commons.lang3.ArrayUtils.contains;
@@ -149,14 +150,16 @@ public class FuzzyMatcherService {
 
     private Optional<? extends Benefit> benefitByContainsString(String caseId, String code) {
         List<Benefit> benefits = findBenefitsInTheContainsStringSet(code);
-        Optional<Benefit> benefitOptional = (benefits.size() == 1) ? Optional.of(benefits.get(0)) : Optional.empty();
-        logInfoIfPresent(caseId, code, benefitOptional);
+        Optional<Benefit> benefitOptional = (benefits.size() == 1) ? Optional.of(benefits.getFirst()) : Optional.empty();
+        logInfoIfPresent(caseId, code, benefitOptional.orElse(null));
         logWarningIfMultipleContainsStringMatchesOnBenefits(caseId, code, benefits);
         return benefitOptional;
     }
 
-    private void logInfoIfPresent(String caseId, String code, Optional<Benefit> benefitOptional) {
-        benefitOptional.ifPresent(benefit -> log.info("Search code {}, contains the word that matches the benefit {} for caseId {}", code, benefit.getShortName(), caseId));
+    private void logInfoIfPresent(String caseId, String code, Benefit benefit) {
+        if (!isNull(benefit)) {
+            log.info("Search code {}, contains the word that matches the benefit {} for caseId {}", code, benefit.getShortName(), caseId);
+        }
     }
 
     private void logWarningIfMultipleContainsStringMatchesOnBenefits(String caseId, String code, List<Benefit> benefits) {

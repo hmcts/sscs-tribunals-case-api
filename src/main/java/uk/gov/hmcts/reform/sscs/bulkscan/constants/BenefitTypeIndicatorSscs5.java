@@ -5,8 +5,10 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 import java.util.Optional;
+import lombok.Getter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 
+@Getter
 public enum BenefitTypeIndicatorSscs5 {
     TAX_CREDIT("is_benefit_type_tax_credit", Benefit.TAX_CREDIT),
     GUARDIANS_ALLOWANCE("is_benefit_type_guardians_allowance", Benefit.GUARDIANS_ALLOWANCE),
@@ -36,14 +38,6 @@ public enum BenefitTypeIndicatorSscs5 {
             .filter(v -> v.getIndicatorString().equals(indicatorString))
             .map(BenefitTypeIndicatorSscs5::getBenefit)
             .findFirst();
-    }
-
-    public String getIndicatorString() {
-        return indicatorString;
-    }
-
-    public Benefit getBenefit() {
-        return benefit;
     }
 
 }

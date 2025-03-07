@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.helper;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
@@ -73,7 +74,7 @@ public class SscsDataHelper {
 
         if (appeal != null) {
             if (appeal.getBenefitType() != null && isNotBlank(appeal.getBenefitType().getCode())) {
-                String benefitCode = null;
+                String benefitCode;
                 String addressName = null;
                 if (appeal.getMrnDetails() != null) {
                     addressName = appeal.getMrnDetails().getDwpIssuingOffice();
@@ -134,7 +135,7 @@ public class SscsDataHelper {
             }
 
             if (appeal.getBenefitType() != null) {
-                Optional<Benefit> benefit = Benefit.getBenefitOptionalByCode(appeal.getBenefitType().getCode());
+                Benefit benefit = Benefit.getBenefitOptionalByCode(appeal.getBenefitType().getCode()).orElse(null);
                 if (isHmrcBenefit(benefit, formType)) {
                     appealData.put("ogdType", "HMRC");
                 } else {
@@ -144,11 +145,11 @@ public class SscsDataHelper {
         }
     }
 
-    private boolean isHmrcBenefit(Optional<Benefit> benefit, FormType formType) {
-        if (benefit.isEmpty()) {
+    private boolean isHmrcBenefit(Benefit benefit, FormType formType) {
+        if (isNull(benefit)) {
             return FormType.SSCS5.equals(formType);
         }
-        return SscsType.SSCS5.equals(benefit.get().getSscsType());
+        return SscsType.SSCS5.equals(benefit.getSscsType());
     }
 
     private void setCaseAccessManagementCategories(Appeal appeal, Map<String, Object> appealData) {

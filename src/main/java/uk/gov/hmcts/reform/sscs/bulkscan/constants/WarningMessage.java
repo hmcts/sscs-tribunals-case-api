@@ -64,8 +64,8 @@ public enum WarningMessage {
     PERSON1_CHILD_MAINTENANCE_NUMBER("person1_child_maintenance_number", "Child maintenance number"),
     APPELLANT_PARTY_NAME("is_paying_parent, is_receiving_parent, is_another_party and other_party_details", "Appellant role and/or description"),
     APPELLANT_PARTY_DESCRIPTION("other_party_details", "Appellant role and/or description");
-    private String exceptionRecordMessage;
-    private String validationRecordMessage;
+    private final String exceptionRecordMessage;
+    private final String validationRecordMessage;
 
     WarningMessage(String exceptionRecordMessage, String validationRecordMessage) {
         this.exceptionRecordMessage = exceptionRecordMessage;

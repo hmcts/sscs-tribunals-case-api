@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.OcrDataField;
 @Data
 public class OcrDataValidationRequest {
 
-    @Schema(description = "List of ocr data fields to be validated.", required = true)
+    @Schema(description = "List of ocr data fields to be validated.", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty
     private final List<OcrDataField> ocrDataFields;
 

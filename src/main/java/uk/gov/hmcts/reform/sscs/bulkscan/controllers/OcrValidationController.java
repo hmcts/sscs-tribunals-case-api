@@ -36,7 +36,7 @@ public class OcrValidationController {
     private static final Logger logger = getLogger(OcrValidationController.class);
 
     @Autowired
-    private CcdCallbackHandler handler;
+    private final CcdCallbackHandler handler;
     private final AuthorisationService authService;
 
     public OcrValidationController(

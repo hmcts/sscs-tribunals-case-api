@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -89,6 +90,7 @@ public class SscsCaseValidator implements CaseValidator {
     private List<String> titles;
 
     //TODO: Remove when uc-office-feature switched on
+    @Setter
     private boolean ucOfficeFeatureActive;
 
     public SscsCaseValidator(RegionalProcessingCenterService regionalProcessingCenterService,
@@ -100,10 +102,6 @@ public class SscsCaseValidator implements CaseValidator {
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.postcodeValidator = postcodeValidator;
         this.sscsJsonExtractor = sscsJsonExtractor;
-        this.ucOfficeFeatureActive = ucOfficeFeatureActive;
-    }
-
-    public void setUcOfficeFeatureActive(boolean ucOfficeFeatureActive) {
         this.ucOfficeFeatureActive = ucOfficeFeatureActive;
     }
 
@@ -160,8 +158,8 @@ public class SscsCaseValidator implements CaseValidator {
             .build();
     }
 
-    private List<String> validateAppeal(Map<String, Object> ocrCaseData, Map<String, Object> caseData,
-                                        boolean ignoreMrnValidation, boolean validateIbcRoleField, boolean ignoreWarnings, boolean ignorePartyRoleValidation) {
+    private void validateAppeal(Map<String, Object> ocrCaseData, Map<String, Object> caseData,
+                                boolean ignoreMrnValidation, boolean validateIbcRoleField, boolean ignoreWarnings, boolean ignorePartyRoleValidation) {
 
         FormType formType = (FormType) caseData.get("formType");
         Appeal appeal = (Appeal) caseData.get("appeal");
@@ -204,7 +202,6 @@ public class SscsCaseValidator implements CaseValidator {
             checkAdditionalEvidence(lists);
         }
 
-        return warnings;
     }
 
     private void checkChildMaintenance(Map<String, Object> caseData, boolean ignoreWarnings) {
@@ -218,19 +215,15 @@ public class SscsCaseValidator implements CaseValidator {
 
     private void checkAdditionalEvidence(List<SscsDocument> sscsDocuments) {
         sscsDocuments.stream().filter(sscsDocument -> sscsDocument.getValue().getDocumentFileName() == null)
-            .forEach(sscsDocument -> {
-                errors.add(
-                    "There is a file attached to the case that does not have a filename, add a filename, e.g. filename.pdf");
-            });
+            .forEach(sscsDocument -> errors.add(
+                "There is a file attached to the case that does not have a filename, add a filename, e.g. filename.pdf"));
 
         sscsDocuments.stream().filter(sscsDocument -> sscsDocument.getValue().getDocumentLink() != null
                 && sscsDocument.getValue().getDocumentLink().getDocumentFilename() != null
                 && sscsDocument.getValue().getDocumentLink().getDocumentFilename().indexOf('.') == -1)
-            .forEach(sscsDocument -> {
-                errors.add("There is a file attached to the case called "
-                    + sscsDocument.getValue().getDocumentLink().getDocumentFilename()
-                    + ", filenames must have extension, e.g. filename.pdf");
-            });
+            .forEach(sscsDocument -> errors.add("There is a file attached to the case called "
+                + sscsDocument.getValue().getDocumentLink().getDocumentFilename()
+                + ", filenames must have extension, e.g. filename.pdf"));
     }
 
     private void checkAppellant(Appeal appeal, Map<String, Object> ocrCaseData, Map<String, Object> caseData,
@@ -240,22 +233,22 @@ public class SscsCaseValidator implements CaseValidator {
 
         if (appellant == null) {
             warnings.add(
-                getMessageByCallbackType(callbackType, personType, getWarningMessageName(personType, appellant) + TITLE,
+                getMessageByCallbackType(callbackType, personType, getWarningMessageName(personType, null) + TITLE,
                     IS_EMPTY));
             warnings.add(getMessageByCallbackType(callbackType, personType,
-                getWarningMessageName(personType, appellant) + FIRST_NAME, IS_EMPTY));
+                getWarningMessageName(personType, null) + FIRST_NAME, IS_EMPTY));
             warnings.add(getMessageByCallbackType(callbackType, personType,
-                getWarningMessageName(personType, appellant) + LAST_NAME, IS_EMPTY));
+                getWarningMessageName(personType, null) + LAST_NAME, IS_EMPTY));
             warnings.add(getMessageByCallbackType(callbackType, personType,
-                getWarningMessageName(personType, appellant) + ADDRESS_LINE1, IS_EMPTY));
+                getWarningMessageName(personType, null) + ADDRESS_LINE1, IS_EMPTY));
             warnings.add(getMessageByCallbackType(callbackType, personType,
-                getWarningMessageName(personType, appellant) + ADDRESS_LINE3, IS_EMPTY));
+                getWarningMessageName(personType, null) + ADDRESS_LINE3, IS_EMPTY));
             warnings.add(getMessageByCallbackType(callbackType, personType,
-                getWarningMessageName(personType, appellant) + ADDRESS_LINE4, IS_EMPTY));
+                getWarningMessageName(personType, null) + ADDRESS_LINE4, IS_EMPTY));
             warnings.add(getMessageByCallbackType(callbackType, personType,
-                getWarningMessageName(personType, appellant) + ADDRESS_POSTCODE, IS_EMPTY));
+                getWarningMessageName(personType, null) + ADDRESS_POSTCODE, IS_EMPTY));
             warnings.add(
-                getMessageByCallbackType(callbackType, personType, getWarningMessageName(personType, appellant) + (isIbcOrSscs8 ? IBCA_REFERENCE : NINO),
+                getMessageByCallbackType(callbackType, personType, getWarningMessageName(personType, null) + (isIbcOrSscs8 ? IBCA_REFERENCE : NINO),
                     IS_EMPTY));
         } else {
             checkAppointee(appellant, ocrCaseData, caseData, isIbcOrSscs8);
@@ -366,7 +359,7 @@ public class SscsCaseValidator implements CaseValidator {
 
         OtherParty otherParty;
         if (otherParties != null && !otherParties.isEmpty()) {
-            otherParty = otherParties.get(0).getValue();
+            otherParty = otherParties.getFirst().getValue();
 
             Name name = otherParty.getName();
             Address address = otherParty.getAddress();
@@ -449,7 +442,7 @@ public class SscsCaseValidator implements CaseValidator {
 
         if (dwpIssuingOffice != null && appeal.getBenefitType() != null && appeal.getBenefitType().getCode() != null) {
 
-            Optional<OfficeMapping> officeMapping = Optional.empty();
+            Optional<OfficeMapping> officeMapping;
             //TODO: remove when ucOfficeFeatureActive fully enabled.
             if (!ucOfficeFeatureActive && Benefit.UC.getShortName().equals(appeal.getBenefitType().getCode())) {
                 officeMapping = dwpAddressLookupService.getDefaultDwpMappingByBenefitType(Benefit.UC.getShortName());
@@ -458,7 +451,7 @@ public class SscsCaseValidator implements CaseValidator {
                     dwpAddressLookupService.getDwpMappingByOffice(appeal.getBenefitType().getCode(), dwpIssuingOffice);
             }
 
-            if (!officeMapping.isPresent()) {
+            if (officeMapping.isEmpty()) {
                 log.info("DwpHandling handling office is not valid");
                 warnings.add(getMessageByCallbackType(callbackType, "", ISSUING_OFFICE, IS_INVALID));
             }

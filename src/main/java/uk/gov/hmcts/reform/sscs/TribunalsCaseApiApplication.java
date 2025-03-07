@@ -264,7 +264,7 @@ public class TribunalsCaseApiApplication implements CommandLineRunner {
                                   SscsCaseCallbackDeserializer deserializer) {
         // Had to wire these up like this Spring will not wire up CcdActionExecutor otherwise.
         CcdActionExecutor ccdActionExecutor = new CcdActionExecutor(notificationService, retryNotificationService, ccdService, updateCcdCaseService, idamService, deserializer);
-        return new JobMapper(asList(
+        return new JobMapper(List.of(
             new JobMapping<>(payload -> !payload.contains("onlineHearingId"), ccdActionDeserializer, ccdActionExecutor)
         ));
     }

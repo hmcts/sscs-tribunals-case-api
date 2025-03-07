@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.exceptions;
 
 import java.util.List;
+import lombok.Getter;
 
+@Getter
 public class InvalidExceptionRecordException extends RuntimeException {
 
     private final List<String> errors;
@@ -11,7 +13,4 @@ public class InvalidExceptionRecordException extends RuntimeException {
         this.errors = errors;
     }
 
-    public List<String> getErrors() {
-        return errors;
-    }
 }

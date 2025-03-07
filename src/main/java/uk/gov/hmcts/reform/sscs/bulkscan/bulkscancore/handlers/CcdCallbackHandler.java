@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.handlers;
 
+import static java.util.Objects.isNull;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -277,18 +278,18 @@ public class CcdCallbackHandler {
             }
             if (appeal != null && appeal.getBenefitType() != null) {
                 FormType formType = callback.getCaseDetails().getCaseData().getFormType();
-                Optional<Benefit> benefit = Benefit.getBenefitOptionalByCode(appeal.getBenefitType().getCode());
+                Benefit benefit = Benefit.getBenefitOptionalByCode(appeal.getBenefitType().getCode()).orElse(null);
                 String ogdType = isHmrcBenefit(benefit, formType) ? "HMRC" : "DWP";
                 callback.getCaseDetails().getCaseData().getCaseAccessManagementFields().setOgdType(ogdType);
             }
         }
     }
 
-    private boolean isHmrcBenefit(Optional<Benefit> benefit, FormType formType) {
-        if (benefit.isEmpty()) {
+    private boolean isHmrcBenefit(Benefit benefit, FormType formType) {
+        if (isNull(benefit)) {
             return FormType.SSCS5.equals(formType);
         }
-        return SscsType.SSCS5.equals(benefit.get().getSscsType());
+        return SscsType.SSCS5.equals(benefit.getSscsType());
     }
 
     private PreSubmitCallbackResponse<SscsCaseData> convertWarningsToErrors(SscsCaseData caseData, CaseResponse caseResponse) {
@@ -348,10 +349,10 @@ public class CcdCallbackHandler {
 
     private boolean reasonsIsNotBlank(Appeal appeal) {
         return !isEmpty(appeal.getAppealReasons().getReasons())
-            && appeal.getAppealReasons().getReasons().get(0) != null
-            && appeal.getAppealReasons().getReasons().get(0).getValue() != null
-            && (StringUtils.isNotBlank(appeal.getAppealReasons().getReasons().get(0).getValue().getReason())
-            || StringUtils.isNotBlank(appeal.getAppealReasons().getReasons().get(0).getValue().getDescription()));
+            && appeal.getAppealReasons().getReasons().getFirst() != null
+            && appeal.getAppealReasons().getReasons().getFirst().getValue() != null
+            && (StringUtils.isNotBlank(appeal.getAppealReasons().getReasons().getFirst().getValue().getReason())
+            || StringUtils.isNotBlank(appeal.getAppealReasons().getReasons().getFirst().getValue().getDescription()));
     }
 
 }

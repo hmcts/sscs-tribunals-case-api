@@ -63,13 +63,8 @@ public class FormTypeValidator {
             }
         } catch (ValidationException ex) {
             log.error("Validation failed: {}", ex.getAllMessages());
-            if (errors == null) {
-                errors = new ArrayList<>();
-            }
 
-            for (String message : ex.getAllMessages()) {
-                errors.add(message);
-            }
+            errors = new ArrayList<>(ex.getAllMessages());
         }
 
         return CaseResponse.builder().errors(errors).warnings(new ArrayList<>())

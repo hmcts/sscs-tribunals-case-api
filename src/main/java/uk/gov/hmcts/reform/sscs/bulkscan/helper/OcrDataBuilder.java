@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.helper;
 
-import io.micrometer.core.instrument.util.StringUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.OcrDataField;
 
 public class OcrDataBuilder {
