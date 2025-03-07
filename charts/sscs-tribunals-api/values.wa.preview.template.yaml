@@ -41,6 +41,7 @@ java:
     ELASTIC_SEARCH_FEATURE: true
     ELINKS_V2_FEATURE_ENABLED: true
     DELETED_REDACTED_DOC_ENABLED: true
+    DIRECTION_HEARINGS_ENABLED: true
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
