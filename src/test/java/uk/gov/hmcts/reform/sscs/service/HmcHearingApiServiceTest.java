@@ -64,7 +64,7 @@ class HmcHearingApiServiceTest {
                 .requestDetails(RequestDetails.builder().build())
                 .build();
 
-        given(hmcHearingApi.getHearingRequest(IDAM_OAUTH2_TOKEN, SERVICE_AUTHORIZATION, null, HEARING_ID, null))
+        given(hmcHearingApi.getHearingRequest(IDAM_OAUTH2_TOKEN, SERVICE_AUTHORIZATION, null, null, null, HEARING_ID, null))
                 .willReturn(response);
 
         HearingGetResponse result = hmcHearingsService.getHearingRequest(HEARING_ID);
@@ -77,7 +77,7 @@ class HmcHearingApiServiceTest {
     @DisplayName("When the api getHearingRequest returns a null the correct error and message is thrown")
     @Test
     void testGetHearingRequestNullResponse() {
-        given(hmcHearingApi.getHearingRequest(IDAM_OAUTH2_TOKEN, SERVICE_AUTHORIZATION, null,  HEARING_ID, null))
+        given(hmcHearingApi.getHearingRequest(IDAM_OAUTH2_TOKEN, SERVICE_AUTHORIZATION, null, null, null,  HEARING_ID, null))
                 .willReturn(null);
 
         assertThatExceptionOfType(GetHearingException.class)
@@ -99,7 +99,7 @@ class HmcHearingApiServiceTest {
                 .versionNumber(VERSION)
                 .build();
 
-        given(hmcHearingApi.createHearingRequest(IDAM_OAUTH2_TOKEN, SERVICE_AUTHORIZATION, null,  payload)).willReturn(response);
+        given(hmcHearingApi.createHearingRequest(IDAM_OAUTH2_TOKEN, SERVICE_AUTHORIZATION, null, null, null,  payload)).willReturn(response);
 
         HmcUpdateResponse result = hmcHearingsService.sendCreateHearingRequest(payload);
 
@@ -122,7 +122,7 @@ class HmcHearingApiServiceTest {
                 .versionNumber(VERSION)
                 .build();
 
-        given(hmcHearingApi.updateHearingRequest(IDAM_OAUTH2_TOKEN, SERVICE_AUTHORIZATION, null, String.valueOf(HEARING_REQUEST_ID), payload)).willReturn(response);
+        given(hmcHearingApi.updateHearingRequest(IDAM_OAUTH2_TOKEN, SERVICE_AUTHORIZATION, null, null, null, String.valueOf(HEARING_REQUEST_ID), payload)).willReturn(response);
 
         HmcUpdateResponse result = hmcHearingsService.sendUpdateHearingRequest(payload, String.valueOf(HEARING_REQUEST_ID));
 
@@ -142,7 +142,7 @@ class HmcHearingApiServiceTest {
                 .versionNumber(VERSION)
                 .build();
 
-        given(hmcHearingApi.cancelHearingRequest(IDAM_OAUTH2_TOKEN, SERVICE_AUTHORIZATION, null, String.valueOf(HEARING_REQUEST_ID), payload)).willReturn(response);
+        given(hmcHearingApi.cancelHearingRequest(IDAM_OAUTH2_TOKEN, SERVICE_AUTHORIZATION, null, null, null, String.valueOf(HEARING_REQUEST_ID), payload)).willReturn(response);
 
         HmcUpdateResponse result = hmcHearingsService.sendCancelHearingRequest(payload, String.valueOf(HEARING_REQUEST_ID));
 
