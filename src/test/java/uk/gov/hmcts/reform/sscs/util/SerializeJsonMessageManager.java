@@ -89,6 +89,8 @@ public enum SerializeJsonMessageManager {
     AUDIO_VIDEO_EVIDENCE_MYA("tya/audioVideoEvidenceMya.json"),
     HEARING_RECORDING_CCD("tya/hearingRecordingCcd.json"),
     HEARING_RECORDING_MYA("tya/hearingRecordingMya.json"),
+    HMC_HEARING_TYPE_MYA("tya/hmcHearingTypeMya.json"),
+    HMC_HEARING_TYPE_CCD("tya/hmcHearingTypeCcd.json"),
     SESSION_SAMPLE("drafts/session-sample.json"),
     SESSION_SAMPLE_IBC("drafts/session-sample-ibc.json"),
     SESSION_SAMPLE_IBC_INTERNATIONAL("drafts/session-sample-ibc-international.json"),
