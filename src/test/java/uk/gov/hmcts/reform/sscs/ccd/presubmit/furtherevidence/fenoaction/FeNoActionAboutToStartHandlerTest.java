@@ -38,9 +38,12 @@ class FeNoActionAboutToStartHandlerTest extends BaseHandlerTest {
 
     private FeNoActionAboutToStartHandler handler = new FeNoActionAboutToStartHandler();
     private static final String FE_NO_ACTION_CALLBACK_JSON = "fenoaction/feNoActionAboutToStartCallback.json";
-    @Mock private Callback<SscsCaseData> mockCallback;
-    @Mock private CaseDetails<SscsCaseData> mockCaseDetails;
-    @Mock private SscsCaseData mockCaseData;
+    @Mock
+    private Callback<SscsCaseData> mockCallback;
+    @Mock
+    private CaseDetails<SscsCaseData> mockCaseDetails;
+    @Mock
+    private SscsCaseData mockCaseData;
     private final ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
 
     @BeforeEach
@@ -56,11 +59,11 @@ class FeNoActionAboutToStartHandlerTest extends BaseHandlerTest {
         "ABOUT_TO_START,APPEAL_RECEIVED,withDwp,false",
         "null,FE_NO_ACTION,withDwp,false",
         "ABOUT_TO_SUBMIT,null,withDwp,false"
-    }, nullValues={"null"})
+    }, nullValues = {"null"})
     public void canHandle(CallbackType callbackType, EventType eventType, String state,
                           boolean expectedResult) throws IOException {
         boolean actualResult = handler.canHandle(callbackType, buildTestCallbackGivenData(eventType, state,
-            "appellantEvidence","", FE_NO_ACTION_CALLBACK_JSON));
+            "appellantEvidence", "", FE_NO_ACTION_CALLBACK_JSON));
 
         assertEquals(expectedResult, actualResult);
     }
@@ -95,7 +98,7 @@ class FeNoActionAboutToStartHandlerTest extends BaseHandlerTest {
         "ABOUT_TO_START,UPLOAD_DOCUMENT,appealCreated",
         "ABOUT_TO_SUBMIT,null,withDwp",
         "null,UPLOAD_DOCUMENT,withDwp"
-    }, nullValues={"null"})
+    }, nullValues = {"null"})
     public void handleCornerCaseScenarios(CallbackType callbackType, EventType eventType,
                                           String state) {
         assertThrows(IllegalStateException.class, () -> handler.handle(callbackType, buildTestCallbackGivenData(eventType, state,

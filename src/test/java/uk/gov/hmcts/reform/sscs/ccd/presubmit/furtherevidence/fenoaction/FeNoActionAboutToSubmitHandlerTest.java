@@ -42,7 +42,7 @@ public class FeNoActionAboutToSubmitHandlerTest extends BaseHandlerTest {
         "ABOUT_TO_SUBMIT,APPEAL_RECEIVED,withDwp,false",
         "null,FE_NO_ACTION,withDwp,false",
         "ABOUT_TO_SUBMIT,null,withDwp,false"
-    }, nullValues={"null"})
+    }, nullValues = {"null"})
     public void canHandle(CallbackType callbackType, EventType eventType, String state,
                           boolean expectedResult) throws IOException {
         boolean actualResult = handler.canHandle(callbackType, buildTestCallbackGivenData(eventType, state,
@@ -76,7 +76,7 @@ public class FeNoActionAboutToSubmitHandlerTest extends BaseHandlerTest {
         "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,appealCreated",
         "ABOUT_TO_SUBMIT,null,withDwp",
         "null,UPLOAD_DOCUMENT,withDwp"
-    }, nullValues={"null"})
+    }, nullValues = {"null"})
     public void handleCornerCaseScenarios(CallbackType callbackType, EventType eventType,
                                           String state) {
         assertThrows(IllegalStateException.class, () -> handler.handle(callbackType, buildTestCallbackGivenData(eventType, state, "appellantEvidence",

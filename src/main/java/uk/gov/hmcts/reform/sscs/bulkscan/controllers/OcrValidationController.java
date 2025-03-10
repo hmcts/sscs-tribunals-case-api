@@ -22,14 +22,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriUtils;
-import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
-import uk.gov.hmcts.reform.sscs.domain.CaseResponse;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.ExceptionRecord;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.handlers.CcdCallbackHandler;
-import uk.gov.hmcts.reform.sscs.ccd.domain.FormType;
 import uk.gov.hmcts.reform.sscs.bulkscan.domain.validation.OcrDataValidationRequest;
 import uk.gov.hmcts.reform.sscs.bulkscan.domain.validation.OcrValidationResponse;
 import uk.gov.hmcts.reform.sscs.bulkscan.domain.validation.ValidationStatus;
+import uk.gov.hmcts.reform.sscs.ccd.domain.FormType;
+import uk.gov.hmcts.reform.sscs.domain.CaseResponse;
+import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
 @RestController
 public class OcrValidationController {

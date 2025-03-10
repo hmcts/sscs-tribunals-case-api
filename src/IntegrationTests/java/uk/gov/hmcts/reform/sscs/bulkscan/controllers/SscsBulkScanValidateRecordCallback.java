@@ -8,7 +8,12 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HAS_REPRESENTATIVE_FIELD_MISSING;
-import static uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.*;
+import static uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.JSON_TYPE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.SERVICE_AUTHORIZATION_HEADER_KEY;
+import static uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.SERVICE_AUTH_TOKEN;
+import static uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.USER_AUTH_TOKEN;
+import static uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.USER_ID;
+import static uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.USER_ID_HEADER;
 
 import com.google.common.io.Resources;
 import java.io.IOException;

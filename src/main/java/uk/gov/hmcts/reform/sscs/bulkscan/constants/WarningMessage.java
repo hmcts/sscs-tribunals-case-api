@@ -1,6 +1,23 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.constants;
 
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.*;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_COUNTRY;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_LINE1;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_LINE2;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_LINE3;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_LINE4;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_PORT_OF_ENTRY;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_POSTCODE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.DOB;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.FIRST_NAME;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_OPTIONS_EXCLUDE_DATES_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TELEPHONE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_VIDEO_EMAIL_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBCA_REFERENCE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ISSUING_OFFICE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.LAST_NAME;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.MOBILE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.NINO;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.TITLE;
 import static uk.gov.hmcts.reform.sscs.bulkscan.domain.CallbackType.EXCEPTION_CALLBACK;
 
 import uk.gov.hmcts.reform.sscs.bulkscan.domain.CallbackType;

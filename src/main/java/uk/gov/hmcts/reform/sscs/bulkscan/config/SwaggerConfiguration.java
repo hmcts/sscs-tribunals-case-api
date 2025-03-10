@@ -14,7 +14,7 @@ public class SwaggerConfiguration {
     private String applicationName;
 
     @Bean
-    public OpenAPI openAPI() {
+    public OpenAPI openApi() {
         return new OpenAPI()
             .info(new Info()
                 .title(applicationName)

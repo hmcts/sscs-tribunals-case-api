@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.constants;
 
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.*;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IS_ANOTHER_PARTY;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IS_PAYING_PARENT;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IS_RECEIVING_PARENT;
 
 import java.util.Arrays;
 import java.util.List;

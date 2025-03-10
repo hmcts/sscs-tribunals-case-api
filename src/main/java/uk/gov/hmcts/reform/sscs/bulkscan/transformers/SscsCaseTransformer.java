@@ -1,15 +1,91 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.transformers;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.AppellantRole.OTHER;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
-import static uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService.normaliseNino;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.*;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_COUNTRY;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_LINE1;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_LINE2;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_LINE3;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_LINE4;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_PORT_OF_ENTRY;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_POSTCODE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.AGREE_LESS_HEARING_NOTICE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.APPEAL_GROUNDS;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.APPEAL_GROUNDS_2;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.BENEFIT_TYPE_DESCRIPTION;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.BENEFIT_TYPE_OTHER;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.DEFAULT_SIGN_LANGUAGE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.DOB;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.EMAIL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.FIELDS_EMPTY;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.FIRST_NAME;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.FORM_TYPE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_EXCLUDE_DATES_MISSING;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_OPTIONS_ACCESSIBLE_HEARING_ROOMS_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_OPTIONS_DIALECT_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_OPTIONS_EXCLUDE_DATES_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_OPTIONS_HEARING_LOOP_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_OPTIONS_LANGUAGE_TYPE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_OPTIONS_SIGN_LANGUAGE_INTERPRETER_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_OPTIONS_SIGN_LANGUAGE_TYPE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_SUPPORT_ARRANGEMENTS_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TELEPHONE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TYPE_FACE_TO_FACE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TYPE_ORAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TYPE_PAPER;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TYPE_TELEPHONE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TYPE_VIDEO_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_VIDEO_EMAIL_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBCA_ISSUING_OFFICE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBCA_REFERENCE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBC_ROLE_FOR_DECEASED;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBC_ROLE_FOR_LACKING_CAPACITY;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBC_ROLE_FOR_POA;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBC_ROLE_FOR_SELF;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBC_ROLE_FOR_U18;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IS_BENEFIT_TYPE_OTHER;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IS_HEARING_TYPE_ORAL_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IS_HEARING_TYPE_PAPER_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IS_INVALID;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IS_OTHER_PARTY_ADDRESS_KNOWN;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.KEEP_HOME_ADDRESS_CONFIDENTIAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.LAST_NAME;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.MOBILE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.MRN_DATE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.NINO;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.NO_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.OTHER_PARTY_DETAILS;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.OTHER_PARTY_VALUE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.PERSON1_VALUE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.PERSON2_VALUE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.PERSON_1_CHILD_MAINTENANCE_NUMBER;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.PHONE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.REPRESENTATIVE_VALUE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.TELL_TRIBUNAL_ABOUT_DATES;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.TITLE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.YES_LITERAL;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.WarningMessage.getMessageByCallbackType;
 import static uk.gov.hmcts.reform.sscs.bulkscan.domain.CallbackType.EXCEPTION_CALLBACK;
 import static uk.gov.hmcts.reform.sscs.bulkscan.helper.SscsDataHelper.getValidationStatus;
+import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.areBooleansValid;
+import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.checkBooleanValue;
+import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.convertBooleanToYesNo;
+import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.convertBooleanToYesNoString;
+import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.doValuesContradict;
+import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.extractBooleanValue;
+import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.extractValuesWhereBooleansValid;
+import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.findBooleanExists;
+import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.generateDateForCcd;
+import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.getBoolean;
+import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.getDateForCcd;
+import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.getField;
+import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.hasAddress;
+import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.hasPerson;
+import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.isExactlyOneBooleanTrue;
+import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.isExactlyZeroBooleanTrue;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.AppellantRole.OTHER;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
+import static uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService.normaliseNino;
 import static uk.gov.hmcts.reform.sscs.model.AllowedFileTypes.getContentTypeForFileName;
-import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.*;
 import static uk.gov.hmcts.reform.sscs.utility.AppealNumberGenerator.generateAppealNumber;
 
 import java.util.ArrayList;
@@ -29,8 +105,21 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.*;
+import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.ExceptionRecord;
+import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.InputScannedDoc;
+import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.ScannedData;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.transformers.CaseTransformer;
+import uk.gov.hmcts.reform.sscs.bulkscan.constants.AppellantRoleIndicator;
+import uk.gov.hmcts.reform.sscs.bulkscan.constants.BenefitTypeIndicator;
+import uk.gov.hmcts.reform.sscs.bulkscan.constants.BenefitTypeIndicatorSscs1U;
+import uk.gov.hmcts.reform.sscs.bulkscan.constants.BenefitTypeIndicatorSscs5;
+import uk.gov.hmcts.reform.sscs.bulkscan.constants.WarningMessage;
+import uk.gov.hmcts.reform.sscs.bulkscan.helper.AppealPostcodeHelper;
+import uk.gov.hmcts.reform.sscs.bulkscan.helper.SscsDataHelper;
+import uk.gov.hmcts.reform.sscs.bulkscan.json.SscsJsonExtractor;
+import uk.gov.hmcts.reform.sscs.bulkscan.service.CaseManagementLocationService;
+import uk.gov.hmcts.reform.sscs.bulkscan.service.FuzzyMatcherService;
+import uk.gov.hmcts.reform.sscs.bulkscan.validators.FormTypeValidator;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReason;
@@ -65,20 +154,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.bulkscan.constants.*;
 import uk.gov.hmcts.reform.sscs.domain.CaseResponse;
 import uk.gov.hmcts.reform.sscs.exception.UnknownFileTypeException;
-import uk.gov.hmcts.reform.sscs.bulkscan.helper.AppealPostcodeHelper;
-import uk.gov.hmcts.reform.sscs.bulkscan.helper.SscsDataHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.bulkscan.json.SscsJsonExtractor;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
-import uk.gov.hmcts.reform.sscs.bulkscan.service.CaseManagementLocationService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
-import uk.gov.hmcts.reform.sscs.bulkscan.service.FuzzyMatcherService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
-import uk.gov.hmcts.reform.sscs.bulkscan.validators.FormTypeValidator;
 
 @Slf4j
 @Component
@@ -152,7 +234,7 @@ public class SscsCaseTransformer implements CaseTransformer {
         ScannedData scannedData = sscsJsonExtractor.extractJson(exceptionRecord);
         String formType = getField(scannedData.getOcrCaseData(), FORM_TYPE);
         String orgFormType = exceptionRecord.getFormType();
-        boolean formTypeUpdated = formType != null && !formType.equals(orgFormType);
+        final boolean formTypeUpdated = formType != null && !formType.equals(orgFormType);
 
         if (formType == null || notAValidFormType(formType)) {
             formType = exceptionRecord.getFormType();
@@ -161,8 +243,6 @@ public class SscsCaseTransformer implements CaseTransformer {
                 formType = null;
             }
         }
-
-
         log.info("formtype for case {} is {}", caseId, formType);
 
         log.info("Extracting and transforming exception record caseId {}", caseId);

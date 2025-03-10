@@ -13,8 +13,6 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.JourneyClassification.NEW_APPLICATION;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.FormType.SSCS2;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.FormType.SSCS5;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_EXCLUDE_DATES_MISSING;
 import static uk.gov.hmcts.reform.sscs.bulkscan.helper.OcrDataBuilderTest.buildScannedValidationOcrData;
 import static uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.SERVICE_AUTHORIZATION_HEADER_KEY;
@@ -22,6 +20,8 @@ import static uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.SERVICE_AUT
 import static uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.USER_AUTH_TOKEN;
 import static uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.USER_ID;
 import static uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.USER_ID_HEADER;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.FormType.SSCS2;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.FormType.SSCS5;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Resources;
@@ -58,10 +58,10 @@ import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.ErrorResponse;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.ExceptionRecord;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.InputScannedDoc;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.OcrDataField;
+import uk.gov.hmcts.reform.sscs.bulkscan.domain.transformation.SuccessfulTransformationResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FormType;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsQueryBuilder;
-import uk.gov.hmcts.reform.sscs.bulkscan.domain.transformation.SuccessfulTransformationResponse;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 
 @RunWith(SpringRunner.class)

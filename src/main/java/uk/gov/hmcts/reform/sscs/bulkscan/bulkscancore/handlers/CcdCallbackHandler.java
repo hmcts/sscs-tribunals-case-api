@@ -5,12 +5,12 @@ import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.sscs.bulkscan.validators.SscsCaseValidator.IS_NOT_A_VALID_POSTCODE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.NONE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.generateBenefitCode;
 import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.generateCaseCode;
 import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.generateIssueCode;
-import static uk.gov.hmcts.reform.sscs.bulkscan.validators.SscsCaseValidator.IS_NOT_A_VALID_POSTCODE;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,10 +23,16 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.domain.CaseResponse;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.ExceptionRecord;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.transformers.CaseTransformer;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.validators.CaseValidator;
+import uk.gov.hmcts.reform.sscs.bulkscan.domain.transformation.CaseCreationDetails;
+import uk.gov.hmcts.reform.sscs.bulkscan.domain.transformation.SuccessfulTransformationResponse;
+import uk.gov.hmcts.reform.sscs.bulkscan.exceptions.InvalidExceptionRecordException;
+import uk.gov.hmcts.reform.sscs.bulkscan.handler.InterlocReferralReasonOptions;
+import uk.gov.hmcts.reform.sscs.bulkscan.helper.AppealPostcodeHelper;
+import uk.gov.hmcts.reform.sscs.bulkscan.helper.SscsDataHelper;
+import uk.gov.hmcts.reform.sscs.bulkscan.service.CaseManagementLocationService;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
@@ -39,14 +45,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FormType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsType;
-import uk.gov.hmcts.reform.sscs.bulkscan.domain.transformation.CaseCreationDetails;
-import uk.gov.hmcts.reform.sscs.bulkscan.domain.transformation.SuccessfulTransformationResponse;
-import uk.gov.hmcts.reform.sscs.bulkscan.exceptions.InvalidExceptionRecordException;
-import uk.gov.hmcts.reform.sscs.bulkscan.handler.InterlocReferralReasonOptions;
-import uk.gov.hmcts.reform.sscs.bulkscan.helper.AppealPostcodeHelper;
-import uk.gov.hmcts.reform.sscs.bulkscan.helper.SscsDataHelper;
+import uk.gov.hmcts.reform.sscs.domain.CaseResponse;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.bulkscan.service.CaseManagementLocationService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 
 @Slf4j
@@ -138,7 +138,7 @@ public class CcdCallbackHandler {
                     eventId,
                     caseValidationResponse.getTransformedCase()
                 ),
-            caseValidationResponse.getWarnings(), Map.of("$set", Map.of("HMCTSServiceId", "BBA3")));
+                caseValidationResponse.getWarnings(), Map.of("$set", Map.of("HMCTSServiceId", "BBA3")));
         }
     }
 
