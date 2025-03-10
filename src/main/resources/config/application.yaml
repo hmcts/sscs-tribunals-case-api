@@ -1046,14 +1046,19 @@ notification:
                         docmosisId: ${HEARINGBOOKED_NEW_LETTER:TB-SCS-LET-ENG-Hearing-Booked.docx}
                         # SSCS-11586 hearingReminder:
                         # SSCS-11586 appellant:
+                        # SSCS-11586 emailId: 78d2e987-02de-4875-ae43-1139a5c868ff
                         # SSCS-11586 smsId: 18960596-1983-4da8-8b5c-dc1c851bb19b
                         # SSCS-11586 appointee:
+                        # SSCS-11586 emailId: 78d2e987-02de-4875-ae43-1139a5c868ff
                         # SSCS-11586 smsId: 18960596-1983-4da8-8b5c-dc1c851bb19b
                         # SSCS-11586 representative:
+                        emailId: 8efabd96-5020-4cb5-a23b-678006fdf7d5
                         # SSCS-11586 smsId: bb3df0ea-8259-43c4-95de-9eef96206575
                         # SSCS-11586 joint_party:
+                        # SSCS-11586 emailId: 78d2e987-02de-4875-ae43-1139a5c868ff
                         # SSCS-11586 smsId: 18960596-1983-4da8-8b5c-dc1c851bb19b
                         # SSCS-11586 other_party:
+                        # SSCS-11586 emailId: 8efabd96-5020-4cb5-a23b-678006fdf7d5
                         # SSCS-11586 smsId: bb3df0ea-8259-43c4-95de-9eef96206575
     welsh:
         adminCorrectionHeader:
@@ -1672,16 +1677,19 @@ notification:
                         docmosisId: ${HEARINGBOOKED_NEW_LETTER_WELSH:TB-SCS-LET-WEL-Hearing-Booked.docx}
                         # SSCS-11586 hearingReminder:
                         # SSCS-11586 appellant:
+                        # SSCS-11586 emailId: e6969b5d-cd8c-4ff8-ab76-faaed6f388c3
                         # SSCS-11586 smsId: adf60ff5-f83d-4931-9f35-fda2609afb7e
                         # SSCS-11586 appointee:
+                        # SSCS-11586 emailId: e6969b5d-cd8c-4ff8-ab76-faaed6f388c3
                         # SSCS-11586 smsId: adf60ff5-f83d-4931-9f35-fda2609afb7e
                         # SSCS-11586 representative:
                         emailId: 385e1c56-7b69-4af2-8b0d-50a8ab66679e
                         # SSCS-11586 smsId: 54f9c139-1c3d-4f4c-ae79-d75e4eafcfec
                         # SSCS-11586 joint_party:
-                        # SSCS-11586 emailId: b2f8f063-bb06-494d-a59e-cc037106a9c3
+                        # SSCS-11586 emailId: d798661e-611b-4ff1-86e7-4cccda64cb36
                         # SSCS-11586 smsId: 534e7537-3012-42de-a6c3-9036b133c525
                         # SSCS-11586 other_party:
+                        # SSCS-11586 emailId: 385e1c56-7b69-4af2-8b0d-50a8ab66679e
                         # SSCS-11586 smsId: 54f9c139-1c3d-4f4c-ae79-d75e4eafcfec
 smsSender:
     pip: 80b11be7-5c10-2773-8351-070e22d5ab6b
