@@ -1044,21 +1044,21 @@ notification:
                         # SSCS-11586 emailId: a56e67cb-6b4b-41e3-8f4c-cd1cdb6809c1
                         # SSCS-11586 smsId: e04c548d-1ba9-40b5-bf9b-ea5e7bbadbac
                         docmosisId: ${HEARINGBOOKED_NEW_LETTER:TB-SCS-LET-ENG-Hearing-Booked.docx}
-                        # SSCS-11586 hearingReminder:
-                        # SSCS-11586 appellant:
-                        # SSCS-11586 emailId: 78d2e987-02de-4875-ae43-1139a5c868ff
+                hearingReminder:
+                    appellant:
+                        emailId: 778d2e987-02de-4875-ae43-1139a5c868ff
                         # SSCS-11586 smsId: 18960596-1983-4da8-8b5c-dc1c851bb19b
-                        # SSCS-11586 appointee:
-                        # SSCS-11586 emailId: 78d2e987-02de-4875-ae43-1139a5c868ff
+                    appointee:
+                        emailId: 778d2e987-02de-4875-ae43-1139a5c868ff
                         # SSCS-11586 smsId: 18960596-1983-4da8-8b5c-dc1c851bb19b
-                        # SSCS-11586 representative:
+                    representative:
                         emailId: 8efabd96-5020-4cb5-a23b-678006fdf7d5
                         # SSCS-11586 smsId: bb3df0ea-8259-43c4-95de-9eef96206575
-                        # SSCS-11586 joint_party:
-                        # SSCS-11586 emailId: 78d2e987-02de-4875-ae43-1139a5c868ff
+                    joint_party:
+                        emailId: 78d2e987-02de-4875-ae43-1139a5c868ff
                         # SSCS-11586 smsId: 18960596-1983-4da8-8b5c-dc1c851bb19b
-                        # SSCS-11586 other_party:
-                        # SSCS-11586 emailId: 8efabd96-5020-4cb5-a23b-678006fdf7d5
+                    other_party:
+                        emailId: 8efabd96-5020-4cb5-a23b-678006fdf7d5
                         # SSCS-11586 smsId: bb3df0ea-8259-43c4-95de-9eef96206575
     welsh:
         adminCorrectionHeader:

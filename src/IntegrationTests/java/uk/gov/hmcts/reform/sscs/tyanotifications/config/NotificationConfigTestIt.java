@@ -59,10 +59,10 @@ public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
 
         Template template = getTemplate(eventType, subscriptionType, hearingType, hearingRoute, welsh, createdInGapsFrom);
 
-        assertThat(expectedEmailTemplateId).isEqualTo(template.getEmailTemplateId());
-        assertThat(expectedSmsTemplateId).isEqualTo(template.getSmsTemplateId());
-        assertThat(expectedLetterTemplateId).isEqualTo(template.getLetterTemplateId());
-        assertThat(expectedDocmosisTemplateId).isEqualTo(template.getDocmosisTemplateId());
+        assertThat(template.getEmailTemplateId()).isEqualTo(expectedEmailTemplateId);
+        assertThat(template.getSmsTemplateId()).isEqualTo(expectedSmsTemplateId);
+        assertThat(template.getLetterTemplateId()).isEqualTo(expectedLetterTemplateId);
+        assertThat(template.getDocmosisTemplateId()).isEqualTo(expectedDocmosisTemplateId);
     }
 
 
@@ -565,13 +565,14 @@ public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
             // SSCS-11586 new Object[]{HEARING_BOOKED, true, REPRESENTATIVE, ORAL, LIST_ASSIST, null, "c7047e95-42ac-4d6a-91d9-c8f31f2685b8", List.of("5e7444fe-860c-4623-b5c5-b23af1ddbb0b","e04c548d-1ba9-40b5-bf9b-ea5e7bbadbac"), null, "TB-SCS-LET-WEL-Hearing-Booked.docx"},
             new Object[]{HEARING_BOOKED, true, REPRESENTATIVE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, null},
 
-            //new Object[]{HEARING_REMINDER, false, APPELLANT, ORAL, LIST_ASSIST, null, "78d2e987-02de-4875-ae43-1139a5c868ff", List.of("18960596-1983-4da8-8b5c-dc1c851bb19b"), null, null},
+            new Object[]{HEARING_REMINDER, false, APPELLANT, ORAL, LIST_ASSIST, null, "78d2e987-02de-4875-ae43-1139a5c868ff", Collections.emptyList(), null, null},
             new Object[]{HEARING_REMINDER, false, APPELLANT, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, null},
-            //new Object[]{HEARING_REMINDER, false, APPOINTEE, ORAL, LIST_ASSIST, null, "78d2e987-02de-4875-ae43-1139a5c868ff", List.of("18960596-1983-4da8-8b5c-dc1c851bb19b"), null, null},
+            new Object[]{HEARING_REMINDER, false, APPOINTEE, ORAL, LIST_ASSIST, null, "78d2e987-02de-4875-ae43-1139a5c868ff", Collections.emptyList(), null, null},
             new Object[]{HEARING_REMINDER, false, APPOINTEE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, null},
-            //new Object[]{HEARING_REMINDER, false, JOINT_PARTY, ORAL, LIST_ASSIST, null, "78d2e987-02de-4875-ae43-1139a5c868ff", List.of("18960596-1983-4da8-8b5c-dc1c851bb19b"), null, null},
+            new Object[]{HEARING_REMINDER, false, JOINT_PARTY, ORAL, LIST_ASSIST, null, "78d2e987-02de-4875-ae43-1139a5c868ff", Collections.emptyList(), null, null},
             new Object[]{HEARING_REMINDER, false, JOINT_PARTY, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, null},
-            new Object[]{HEARING_REMINDER, false, REPRESENTATIVE, ORAL, LIST_ASSIST, null, "8efabd96-5020-4cb5-a23b-678006fdf7d5", List.of("bb3df0ea-8259-43c4-95de-9eef96206575"), null, null},
+            new Object[]{HEARING_REMINDER, false, REPRESENTATIVE, ORAL, LIST_ASSIST, null, "8efabd96-5020-4cb5-a23b-678006fdf7d5", Collections.emptyList(), null, null},
+            
             new Object[]{HEARING_REMINDER, false, REPRESENTATIVE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, null},
             //new Object[]{HEARING_REMINDER, true, APPELLANT, ORAL, LIST_ASSIST, null, "d798661e-611b-4ff1-86e7-4cccda64cb36", List.of("adf60ff5-f83d-4931-9f35-fda2609afb7e", "18960596-1983-4da8-8b5c-dc1c851bb19b"), null, null},
             new Object[]{HEARING_REMINDER, true, APPELLANT, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, null},
