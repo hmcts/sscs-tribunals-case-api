@@ -35,10 +35,10 @@ import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 public class OcrValidationController {
     private static final Logger logger = getLogger(OcrValidationController.class);
 
-    @Autowired
     private final CcdCallbackHandler handler;
     private final AuthorisationService authService;
 
+    @Autowired
     public OcrValidationController(
         CcdCallbackHandler handler,
         AuthorisationService authService

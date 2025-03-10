@@ -300,7 +300,7 @@ public class CcdCallbackHandler {
         List<String> warningsThatAreNotErrors = getWarningsThatShouldNotBeErrors(caseResponse);
         List<String> filteredWarnings = emptyIfNull(allWarnings).stream()
             .filter(w -> !warningsThatAreNotErrors.contains(w))
-            .collect(Collectors.toList());
+            .toList();
 
         if (!isEmpty(filteredWarnings)) {
             log.info(LOGSTR_VALIDATION_WARNING, caseData.getCcdCaseId(), stringJoin(filteredWarnings));
@@ -325,7 +325,7 @@ public class CcdCallbackHandler {
     private List<String> getWarningsThatShouldNotBeErrors(CaseResponse caseResponse) {
         return emptyIfNull(caseResponse.getWarnings()).stream()
             .filter(warning -> warning.endsWith(IS_NOT_A_VALID_POSTCODE))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private void stampReferredCase(CaseResponse caseValidationResponse, String eventId) {

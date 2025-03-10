@@ -230,11 +230,9 @@ public class SscsCaseTransformer implements CaseTransformer {
             return formTypeValidatorResponse;
         }
 
-
         ScannedData scannedData = sscsJsonExtractor.extractJson(exceptionRecord);
         String formType = getField(scannedData.getOcrCaseData(), FORM_TYPE);
         String orgFormType = exceptionRecord.getFormType();
-        final boolean formTypeUpdated = formType != null && !formType.equals(orgFormType);
 
         if (formType == null || notAValidFormType(formType)) {
             formType = exceptionRecord.getFormType();
@@ -254,7 +252,7 @@ public class SscsCaseTransformer implements CaseTransformer {
 
         IdamTokens token = idamService.getIdamTokens();
 
-        Map<String, Object> transformed = transformData(caseId, sscsJsonExtractor.extractJson(exceptionRecord), token, formType, errors, ignoreWarningsValue, formTypeUpdated, orgFormType);
+        Map<String, Object> transformed = transformData(caseId, sscsJsonExtractor.extractJson(exceptionRecord), token, formType, errors, ignoreWarningsValue, orgFormType);
 
         duplicateCaseCheck(caseId, transformed, token);
 
@@ -283,8 +281,8 @@ public class SscsCaseTransformer implements CaseTransformer {
                                               String formType,
                                               Set<String> errors,
                                               boolean ignoreWarnings,
-                                              boolean formTypeUpdated,
                                               String orgFormType) {
+        boolean formTypeUpdated = formType != null && !formType.equals(orgFormType);
         boolean isSscs8 = FormType.SSCS8.toString().equalsIgnoreCase(formType);
         Appeal appeal = buildAppealFromData(scannedData.getOcrCaseData(), caseId, formType, errors, ignoreWarnings, isSscs8);
         List<SscsDocument> sscsDocuments = buildDocumentsFromData(scannedData.getRecords(), formTypeUpdated, orgFormType, formType);
@@ -480,7 +478,7 @@ public class SscsCaseTransformer implements CaseTransformer {
     private String contradictingValuesError(List<String> validProvidedBooleanValues, Map<String, Object> pairs) {
         return uk.gov.hmcts.reform.sscs.utility.StringUtils
             .getGramaticallyJoinedStrings(validProvidedBooleanValues.stream()
-                .filter(value -> extractBooleanValue(pairs, errors, value)).collect(Collectors.toList()))
+                .filter(value -> extractBooleanValue(pairs, errors, value)).toList())
             + " have contradicting values";
     }
 
@@ -516,21 +514,7 @@ public class SscsCaseTransformer implements CaseTransformer {
             // Of the provided benefit type booleans (if any), check that exactly one is set to true, outputting errors
             // for conflicting values.
             // If one is set to true, extract the string indicator value (eg. IS_BENEFIT_TYPE_PIP) and lookup the Benefit type.
-            if (isExactlyOneBooleanTrue(pairs, errors,
-                validProvidedBooleanValues.toArray(new String[validValuesSize]))) {
-                String valueIndicatorWithTrueValue = valueIndicatorWithTrueValue(pairs, validProvidedBooleanValues);
-
-                if (!IS_BENEFIT_TYPE_OTHER.equals(valueIndicatorWithTrueValue)) {
-                    code = getBenefitCodeFromIndicators(pairs, benefitTypeOther, valueIndicatorWithTrueValue,
-                        validProvidedBooleanValues);
-                }
-            } else {
-                String error = contradictingValuesError(validProvidedBooleanValues, pairs);
-                if (!StringUtils.isEmpty(benefitTypeOther)) {
-                    error = error.replace(IS_BENEFIT_TYPE_OTHER, BENEFIT_TYPE_OTHER);
-                }
-                errors.add(error);
-            }
+            code = handleValidBooleans(pairs, validProvidedBooleanValues, validValuesSize, code, benefitTypeOther);
         } else {
             if (StringUtils.isEmpty(benefitTypeOther)) {
                 errors.add((uk.gov.hmcts.reform.sscs.utility.StringUtils
@@ -546,8 +530,26 @@ public class SscsCaseTransformer implements CaseTransformer {
             // only add when no other errors, otherwise similar errors get added to the list
             errors.add(BENEFIT_TYPE_OTHER + " " + IS_INVALID);
         }
-        return (benefit.isPresent() && errors.size() == 0)
+        return (benefit.isPresent() && errors.isEmpty())
             ? BenefitType.builder().code(code).description(benefit.get().getDescription()).build() : null;
+    }
+
+    private String handleValidBooleans(Map<String, Object> pairs, List<String> validProvidedBooleanValues, int validValuesSize, String code, String benefitTypeOther) {
+        if (isExactlyOneBooleanTrue(pairs, errors,
+            validProvidedBooleanValues.toArray(new String[validValuesSize]))) {
+            String valueIndicatorWithTrueValue = valueIndicatorWithTrueValue(pairs, validProvidedBooleanValues);
+            if (!IS_BENEFIT_TYPE_OTHER.equals(valueIndicatorWithTrueValue)) {
+                code = getBenefitCodeFromIndicators(pairs, benefitTypeOther, valueIndicatorWithTrueValue,
+                    validProvidedBooleanValues);
+            }
+        } else {
+            String error = contradictingValuesError(validProvidedBooleanValues, pairs);
+            if (!StringUtils.isEmpty(benefitTypeOther)) {
+                error = error.replace(IS_BENEFIT_TYPE_OTHER, BENEFIT_TYPE_OTHER);
+            }
+            errors.add(error);
+        }
+        return code;
     }
 
     private String getBenefitCodeFromIndicators(Map<String, Object> pairs, String benefitTypeOther,
@@ -561,7 +563,7 @@ public class SscsCaseTransformer implements CaseTransformer {
         } else {
             errors.add(uk.gov.hmcts.reform.sscs.utility.StringUtils
                 .getGramaticallyJoinedStrings(validProvidedBooleanValues.stream()
-                    .filter(value -> extractBooleanValue(pairs, errors, value)).collect(Collectors.toList()))
+                    .filter(value -> extractBooleanValue(pairs, errors, value)).toList())
                 + " and " + BENEFIT_TYPE_OTHER + " have contradicting values");
         }
         return null;
@@ -660,40 +662,55 @@ public class SscsCaseTransformer implements CaseTransformer {
         return null;
     }
 
+    private boolean warnAppellantPartyNameEmpty(boolean ignoreWarnings) {
+        if (!ignoreWarnings) {
+            warnings.add(getMessageByCallbackType(EXCEPTION_CALLBACK, "", WarningMessage.APPELLANT_PARTY_NAME.toString(),
+                FIELDS_EMPTY));
+        }
+        return false;
+    }
+
+    private boolean warnConflictingValues(List<String> validValues, String otherPartyDetails, boolean ignoreWarnings) {
+        if (StringUtils.isNotEmpty(otherPartyDetails)) {
+            validValues.add(OTHER_PARTY_DETAILS);
+        }
+        if (!ignoreWarnings) {
+            warnings.add(uk.gov.hmcts.reform.sscs.utility.StringUtils
+                .getGramaticallyJoinedStrings(validValues) + " have conflicting values");
+        }
+        return false;
+    }
+
+    private boolean warnOtherRoleEmptyOtherPartyDetails(boolean ignoreWarnings) {
+        if (!ignoreWarnings) {
+            warnings.add(getMessageByCallbackType(EXCEPTION_CALLBACK, "", WarningMessage.APPELLANT_PARTY_DESCRIPTION.toString(),
+                FIELDS_EMPTY));
+        }
+        return false;
+    }
+
+    private boolean warnNonOtherRoleWithOtherPartyDetails(List<String> validValues, boolean ignoreWarnings) {
+        if (!ignoreWarnings) {
+            warnings.add(uk.gov.hmcts.reform.sscs.utility.StringUtils
+                .getGramaticallyJoinedStrings(List.of(validValues.getFirst(), OTHER_PARTY_DETAILS))
+                + " have conflicting values");
+        }
+        return false;
+    }
+
     private boolean validateValues(List<String> validValues, String otherPartyDetails, boolean ignoreWarnings) {
         if (validValues.isEmpty() && StringUtils.isEmpty(otherPartyDetails)) {
-            if (!ignoreWarnings) {
-                warnings.add(getMessageByCallbackType(EXCEPTION_CALLBACK, "", WarningMessage.APPELLANT_PARTY_NAME.toString(),
-                    FIELDS_EMPTY));
-            }
-            return false;
+            return warnAppellantPartyNameEmpty(ignoreWarnings);
         } else if (!validValues.isEmpty()) {
             if (validValues.size() > 1) {
-                if (StringUtils.isNotEmpty(otherPartyDetails)) {
-                    validValues.add(OTHER_PARTY_DETAILS);
-                }
-                if (!ignoreWarnings) {
-                    warnings.add(uk.gov.hmcts.reform.sscs.utility.StringUtils
-                        .getGramaticallyJoinedStrings(validValues) + " have conflicting values");
-                }
-                return false;
+                return warnConflictingValues(validValues, otherPartyDetails, ignoreWarnings);
             }
 
             AppellantRole appellantRole = AppellantRoleIndicator.findByIndicatorString(validValues.getFirst()).orElse(null);
-
             if (OTHER.equals(appellantRole) && StringUtils.isEmpty(otherPartyDetails)) {
-                if (!ignoreWarnings) {
-                    warnings.add(getMessageByCallbackType(EXCEPTION_CALLBACK, "", WarningMessage.APPELLANT_PARTY_DESCRIPTION.toString(),
-                        FIELDS_EMPTY));
-                }
-                return false;
+                return warnOtherRoleEmptyOtherPartyDetails(ignoreWarnings);
             } else if (StringUtils.isNotEmpty(otherPartyDetails) && !OTHER.equals(appellantRole)) {
-                if (!ignoreWarnings) {
-                    warnings.add(uk.gov.hmcts.reform.sscs.utility.StringUtils
-                        .getGramaticallyJoinedStrings(List.of(validValues.getFirst(), OTHER_PARTY_DETAILS))
-                        + " have conflicting values");
-                }
-                return false;
+                return warnNonOtherRoleWithOtherPartyDetails(validValues, ignoreWarnings);
             }
         }
         return true;
@@ -1027,10 +1044,11 @@ public class SscsCaseTransformer implements CaseTransformer {
         List<ExcludeDate> excludeDates = new ArrayList<>();
 
         if (excludedDatesList != null && !excludedDatesList.isEmpty()) {
-            String[] items = excludedDatesList.split(",\\s*");
+            String[] items = Arrays.stream(excludedDatesList.split(","))
+                .map(String::trim).toArray(String[]::new);
 
             for (String item : items) {
-                List<String> range = Arrays.asList(item.split("\\s*-\\s*"));
+                List<String> range = Arrays.stream(item.split("-")).map(String::trim).toList();
                 String errorMessage = "hearing_options_exclude_dates contains an invalid date range. "
                     + "Should be single dates separated by commas and/or a date range "
                     + "e.g. 01/01/2020, 07/01/2020, 12/01/2020 - 15/01/2020";
@@ -1084,30 +1102,35 @@ public class SscsCaseTransformer implements CaseTransformer {
     private List<SscsDocument> buildDocumentsFromData(List<InputScannedDoc> records, boolean formTypeUpdated, String orgFormType, String newFormType) {
         List<SscsDocument> documentDetails = new ArrayList<>();
         if (records != null) {
-            for (InputScannedDoc record : records) {
+            for (InputScannedDoc inputScannedRecord : records) {
 
-                String formType = record.getSubtype();
-                if (formTypeUpdated && "Form".equals(record.getType())) {
-                    if ((record.getSubtype() == null && orgFormType == null)
-                        || (orgFormType != null && orgFormType.equals(record.getSubtype()))) {
-                        formType = newFormType;
-                    }
-                }
+                String formType = handleFormType(inputScannedRecord, formTypeUpdated, orgFormType, newFormType);
 
-                checkFileExtensionValid(record.getFileName());
+                checkFileExtensionValid(inputScannedRecord.getFileName());
 
                 String scannedDate =
-                    record.getScannedDate() != null ? record.getScannedDate().toLocalDate().toString() : null;
+                    inputScannedRecord.getScannedDate() != null ? inputScannedRecord.getScannedDate().toLocalDate().toString() : null;
 
                 SscsDocumentDetails details = SscsDocumentDetails.builder()
-                    .documentLink(record.getUrl())
+                    .documentLink(inputScannedRecord.getUrl())
                     .documentDateAdded(scannedDate)
-                    .documentFileName(record.getFileName())
+                    .documentFileName(inputScannedRecord.getFileName())
                     .documentType(findDocumentType(formType)).build();
                 documentDetails.add(SscsDocument.builder().value(details).build());
             }
         }
         return documentDetails;
+    }
+
+    private String handleFormType(InputScannedDoc record, boolean formTypeUpdated, String orgFormType, String newFormType) {
+        String formType = record.getSubtype();
+        boolean bool1 = formTypeUpdated && "Form".equals(record.getType());
+        boolean bool2 = record.getSubtype() == null && orgFormType == null;
+        boolean bool3 = orgFormType != null && orgFormType.equals(record.getSubtype());
+        if (bool1 && (bool2 || bool3)) {
+            return newFormType;
+        }
+        return formType;
     }
 
     private String findDocumentType(String formType) {

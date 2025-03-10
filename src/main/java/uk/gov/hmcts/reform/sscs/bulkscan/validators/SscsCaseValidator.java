@@ -569,17 +569,7 @@ public class SscsCaseValidator implements CaseValidator {
         }
     }
 
-    private void checkPersonAddressAndDob(Address address, Identity identity, String personType,
-                                          Map<String, Object> ocrCaseData, Map<String, Object> caseData,
-                                          Appellant appellant, boolean isIbcOrSscs8) {
-
-        boolean isAddressLine4Present = findBooleanExists(getField(ocrCaseData, personType + "_address_line4"));
-
-        // Remove this part if/when the mainland UK question is added to sscs8 form
-        if (isIbcOrSscs8 && address != null && address.getInMainlandUk() == null) {
-            address.setInMainlandUk(Boolean.TRUE.equals(doesAddressPortOfEntryExist(address)) ? YesNo.NO : YesNo.YES);
-        }
-
+    private void checkAddressLine1(Address address, String personType, Appellant appellant) {
         if (!doesAddressLine1Exist(address)) {
             warnings.add(getMessageByCallbackType(callbackType, personType,
                 getWarningMessageName(personType, appellant) + ADDRESS_LINE1, IS_EMPTY));
@@ -587,17 +577,19 @@ public class SscsCaseValidator implements CaseValidator {
             warnings.add(getMessageByCallbackType(callbackType, personType,
                 getWarningMessageName(personType, appellant) + ADDRESS_LINE1, HAS_INVALID_ADDRESS));
         }
+    }
 
-        String townLine = (isAddressLine4Present) ? ADDRESS_LINE3 : ADDRESS_LINE2;
+    private void checkAddressTown(Address address, String personType, Appellant appellant, String townLine) {
         if (!doesAddressTownExist(address)) {
-
             warnings.add(getMessageByCallbackType(callbackType, personType,
                 getWarningMessageName(personType, appellant) + townLine, IS_EMPTY));
         } else if (!address.getTown().matches(ADDRESS_REGEX)) {
             warnings.add(getMessageByCallbackType(callbackType, personType,
                 getWarningMessageName(personType, appellant) + townLine, HAS_INVALID_ADDRESS));
         }
+    }
 
+    private void checkCounty(boolean isIbcOrSscs8, Address address, boolean isAddressLine4Present, String personType, Appellant appellant) {
         // Removed from IBC as it's an optional field for non mainland UK addresses
         if (!isIbcOrSscs8 || isInMainlandUk(address)) {
             // Once form has been updated to account for this, this can be re-enabled
@@ -610,7 +602,9 @@ public class SscsCaseValidator implements CaseValidator {
                     getWarningMessageName(personType, appellant) + countyLine, HAS_INVALID_ADDRESS));
             }
         }
+    }
 
+    private void checkPostcodeAddress(boolean isIbcOrSscs8, Address address, String personType, Appellant appellant, Map<String, Object> caseData) {
         if (isAddressPostcodeValid(address, personType, appellant) && address != null) {
             if (personType.equals(getPerson1OrPerson2(appellant))) {
                 boolean isPort = YesNo.NO.equals(address.getInMainlandUk());
@@ -628,6 +622,26 @@ public class SscsCaseValidator implements CaseValidator {
                 }
             }
         }
+    }
+
+    private void checkPersonAddressAndDob(Address address, Identity identity, String personType,
+                                          Map<String, Object> ocrCaseData, Map<String, Object> caseData,
+                                          Appellant appellant, boolean isIbcOrSscs8) {
+
+        boolean isAddressLine4Present = findBooleanExists(getField(ocrCaseData, personType + "_address_line4"));
+
+        // Remove this part if/when the mainland UK question is added to sscs8 form
+        if (isIbcOrSscs8 && address != null && address.getInMainlandUk() == null) {
+            address.setInMainlandUk(Boolean.TRUE.equals(doesAddressPortOfEntryExist(address)) ? YesNo.NO : YesNo.YES);
+        }
+
+        checkAddressLine1(address, personType, appellant);
+
+        String townLine = (isAddressLine4Present) ? ADDRESS_LINE3 : ADDRESS_LINE2;
+        checkAddressTown(address, personType, appellant, townLine);
+        checkCounty(isIbcOrSscs8, address, isAddressLine4Present, personType, appellant);
+        checkPostcodeAddress(isIbcOrSscs8, address, personType, appellant, caseData);
+
         if (identity != null) {
             checkDateValidDate(identity.getDob(), getWarningMessageName(personType, appellant) + DOB, personType, true);
         }

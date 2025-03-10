@@ -173,7 +173,7 @@ public class FuzzyMatcherService {
             .filter(pair -> contains(lowerCase(code).split(" "), pair.getLeft()))
             .map(Pair::getRight)
             .distinct()
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private String getBenefitNames(List<Benefit> benefits) {
