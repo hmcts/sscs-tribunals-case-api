@@ -31,7 +31,7 @@ import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.HearingOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.HmcHearingsApiService;
+import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingUpdateService;
 
@@ -51,7 +51,7 @@ public class AddHearingOutcomeAboutToStartHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
     @Mock
-    private HmcHearingsApiService hmcHearingsApiService;
+    private HmcHearingApiService hmcHearingApiService;
     @Mock
     private HearingUpdateService hearingUpdateService;
     @Mock
@@ -63,7 +63,7 @@ public class AddHearingOutcomeAboutToStartHandlerTest {
     @BeforeEach
     void setup() {
         openMocks(this);
-        handler = new AddHearingOutcomeAboutToStartHandler(hmcHearingsApiService, hearingUpdateService, venueService, hearingOutcomeService);
+        handler = new AddHearingOutcomeAboutToStartHandler(hmcHearingApiService, hearingUpdateService, venueService, hearingOutcomeService);
         when(callback.getEvent()).thenReturn(EventType.ADD_HEARING_OUTCOME);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build()).hearingOutcomeValue(HearingOutcomeValue.builder().build()).build();
@@ -83,7 +83,7 @@ public class AddHearingOutcomeAboutToStartHandlerTest {
             .build());
         when(hearingUpdateService.convertUtcToUk(HEARING_START_DATE_TIME)).thenReturn(HEARING_START_DATE_TIME);
         when(hearingUpdateService.convertUtcToUk(HEARING_END_DATE_TIME)).thenReturn(HEARING_END_DATE_TIME);
-        when(hmcHearingsApiService.getHearingsRequest(any(),any())).thenReturn(
+        when(hmcHearingApiService.getHearingsRequest(any(),any())).thenReturn(
             HearingsGetResponse.builder().caseHearings(List.of(CaseHearing.builder()
                     .hearingId(1L)
                     .hearingChannels(List.of(HearingChannel.FACE_TO_FACE))
@@ -122,7 +122,7 @@ public class AddHearingOutcomeAboutToStartHandlerTest {
             .thenReturn(HEARING_START_DATE_TIME.minusMonths(1));
         when(hearingUpdateService.convertUtcToUk(HEARING_END_DATE_TIME.minusMonths(1)))
             .thenReturn(HEARING_END_DATE_TIME.minusMonths(1));
-        when(hmcHearingsApiService.getHearingsRequest(any(),any())).thenReturn(
+        when(hmcHearingApiService.getHearingsRequest(any(),any())).thenReturn(
                 HearingsGetResponse.builder().caseHearings(
                         List.of(CaseHearing.builder()
                                 .hearingId(1L)
@@ -183,7 +183,7 @@ public class AddHearingOutcomeAboutToStartHandlerTest {
                         .build()))
                 .build();
 
-        when(hmcHearingsApiService.getHearingsRequest(any(),any())).thenReturn(
+        when(hmcHearingApiService.getHearingsRequest(any(),any())).thenReturn(
                 HearingsGetResponse.builder().caseHearings(
                         List.of(caseHearing1,caseHearing2)).build());
         when(hearingOutcomeService.mapCaseHearingToHearing(caseHearing1)).thenReturn(
@@ -203,7 +203,7 @@ public class AddHearingOutcomeAboutToStartHandlerTest {
 
     @Test
     void givenNoCompletedHearingOnCase_ThenReturnError() {
-        when(hmcHearingsApiService.getHearingsRequest(any(),any())).thenReturn(
+        when(hmcHearingApiService.getHearingsRequest(any(),any())).thenReturn(
                 HearingsGetResponse.builder().caseHearings(List.of()).build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_START,callback,USER_AUTHORISATION);
         assertThat(response.getErrors()).isNotEmpty();
@@ -212,7 +212,7 @@ public class AddHearingOutcomeAboutToStartHandlerTest {
 
     @Test
     void givenCallToHmcFails_ThenReturnError() {
-        when(hmcHearingsApiService.getHearingsRequest(any(),any())).thenAnswer(i -> {
+        when(hmcHearingApiService.getHearingsRequest(any(),any())).thenAnswer(i -> {
             throw new Exception("exception");
         });
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_START,callback,USER_AUTHORISATION);
