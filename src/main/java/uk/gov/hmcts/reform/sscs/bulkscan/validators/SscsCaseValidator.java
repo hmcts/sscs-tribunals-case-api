@@ -677,10 +677,7 @@ public class SscsCaseValidator implements CaseValidator {
     }
 
     private Boolean doesAddressLine1Exist(Address address) {
-        if (address != null) {
-            return StringUtils.isNotEmpty(address.getLine1());
-        }
-        return false;
+        return address != null && StringUtils.isNotEmpty(address.getLine1());
     }
 
     private boolean isInMainlandUk(Address address) {
@@ -695,24 +692,15 @@ public class SscsCaseValidator implements CaseValidator {
     }
 
     private Boolean doesAddressTownExist(Address address) {
-        if (address != null) {
-            return StringUtils.isNotEmpty(address.getTown());
-        }
-        return false;
+        return address != null && StringUtils.isNotEmpty(address.getTown());
     }
 
     private Boolean doesAddressCountyExist(Address address) {
-        if (address != null) {
-            return StringUtils.isNotEmpty(address.getCounty());
-        }
-        return false;
+        return address != null && StringUtils.isNotEmpty(address.getCounty());
     }
 
     private Boolean doesAddressPortOfEntryExist(Address address) {
-        if (address != null) {
-            return StringUtils.isNotEmpty(address.getPortOfEntry());
-        }
-        return false;
+        return address != null && StringUtils.isNotEmpty(address.getPortOfEntry());
     }
 
     private Boolean isAddressPostcodeValid(Address address, String personType, Appellant appellant) {
