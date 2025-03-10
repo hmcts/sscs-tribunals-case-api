@@ -270,7 +270,7 @@ class UploadDocumentAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, "");
         assertNotNull(response);
         assertTrue(response.getErrors().isEmpty());
-        assertEquals(0, sscsCaseData.getInternalCaseDocumentData().getSscsInternalDocument().size());
+        assertNull(sscsCaseData.getInternalCaseDocumentData().getSscsInternalDocument());
         assertEquals(3, sscsCaseData.getSscsDocument().size());
         SscsDocumentDetails doc1 = sscsCaseData.getSscsDocument().get(0).getValue();
         SscsDocumentDetails doc2 = sscsCaseData.getSscsDocument().get(1).getValue();

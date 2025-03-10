@@ -156,5 +156,8 @@ public class UploadDocumentAboutToSubmitHandler implements PreSubmitCallbackHand
         internalCaseDocumentData.setUploadRemoveOrMoveDocument(null);
         internalCaseDocumentData.setMoveDocumentToDocumentsTabDL(null);
         internalCaseDocumentData.setMoveDocumentToInternalDocumentsTabDL(null);
+        if (emptyIfNull(internalCaseDocumentData.getSscsInternalDocument()).isEmpty()) {
+            internalCaseDocumentData.setSscsInternalDocument(null);
+        }
     }
 }
