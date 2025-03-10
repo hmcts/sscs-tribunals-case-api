@@ -47,21 +47,22 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
                 caseData.getDocumentStaging().getPostHearingPreviewDocument(),
                 SscsUtil.getPostHearingReviewDocumentType(postHearing, isPostHearingsEnabled));
 
-        updatePanelMemberList(caseData);
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = updatePanelMemberList(caseData);
 
         clearPostHearingRequestFormatAndContentFields(caseData, caseData.getPostHearing().getRequestType());
 
-        return new PreSubmitCallbackResponse<>(caseData);
+        return preSubmitCallbackResponse;
     }
 
-    private void updatePanelMemberList(SscsCaseData caseData) {
+    private PreSubmitCallbackResponse<SscsCaseData> updatePanelMemberList(SscsCaseData caseData) {
         PostHearing postHearing = caseData.getPostHearing();
 
         PostHearingReviewType reviewType = postHearing.getReviewType();
         if (SET_ASIDE.equals(reviewType) && SetAsideActions.GRANT.equals(postHearing.getSetAside().getAction())) {
-            SscsUtil.addPanelMembersToExclusions(caseData, false);
+            return SscsUtil.addPanelMembersToExclusions(caseData, false);
         } else if (LIBERTY_TO_APPLY.equals(reviewType) && LibertyToApplyActions.GRANT.equals(postHearing.getLibertyToApply().getAction())) {
-            SscsUtil.addPanelMembersToExclusions(caseData, true);
+            return SscsUtil.addPanelMembersToExclusions(caseData, true);
         }
+        return new PreSubmitCallbackResponse<>(caseData);
     }
 }

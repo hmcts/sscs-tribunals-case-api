@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @ExtendWith(MockitoExtension.class)
 class PostHearingReviewAboutToSubmitHandlerTest {
@@ -148,5 +149,20 @@ class PostHearingReviewAboutToSubmitHandlerTest {
 
         assertThat(response.getErrors()).isEmpty();
         assertThat(response.getData().getSchedulingAndListingFields().getPanelMemberExclusions().getReservedPanelMembers().contains(new CollectionItem<>("", judge))).isTrue();
+    }
+
+    @Test
+    void givenNoLatestHearing_thenShouldWarn() {
+        caseData.getPostHearing().setReviewType(PostHearingReviewType.LIBERTY_TO_APPLY);
+        caseData.getPostHearing().getLibertyToApply().setAction(LibertyToApplyActions.GRANT);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getWarnings()).hasSize(1);
+        assertThat(response.getWarnings()).contains(SscsUtil.NO_LATEST_HEARING_WARNING);
     }
 }
