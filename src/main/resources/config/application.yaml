@@ -1046,10 +1046,10 @@ notification:
                         docmosisId: ${HEARINGBOOKED_NEW_LETTER:TB-SCS-LET-ENG-Hearing-Booked.docx}
                 hearingReminder:
                     appellant:
-                        emailId: 778d2e987-02de-4875-ae43-1139a5c868ff
+                        emailId: 78d2e987-02de-4875-ae43-1139a5c868ff
                         # SSCS-11586 smsId: 18960596-1983-4da8-8b5c-dc1c851bb19b
                     appointee:
-                        emailId: 778d2e987-02de-4875-ae43-1139a5c868ff
+                        emailId: 78d2e987-02de-4875-ae43-1139a5c868ff
                         # SSCS-11586 smsId: 18960596-1983-4da8-8b5c-dc1c851bb19b
                     representative:
                         emailId: 8efabd96-5020-4cb5-a23b-678006fdf7d5
