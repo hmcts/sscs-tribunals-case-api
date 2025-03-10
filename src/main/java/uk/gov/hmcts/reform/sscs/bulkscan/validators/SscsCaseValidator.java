@@ -570,7 +570,7 @@ public class SscsCaseValidator implements CaseValidator {
     }
 
     private void checkAddressLine1(Address address, String personType, Appellant appellant) {
-        if (!doesAddressLine1Exist(address)) {
+        if (address == null || !doesAddressLine1Exist(address)) {
             warnings.add(getMessageByCallbackType(callbackType, personType,
                 getWarningMessageName(personType, appellant) + ADDRESS_LINE1, IS_EMPTY));
         } else if (!address.getLine1().matches(ADDRESS_REGEX)) {
@@ -580,7 +580,7 @@ public class SscsCaseValidator implements CaseValidator {
     }
 
     private void checkAddressTown(Address address, String personType, Appellant appellant, String townLine) {
-        if (!doesAddressTownExist(address)) {
+        if (address == null || !doesAddressTownExist(address)) {
             warnings.add(getMessageByCallbackType(callbackType, personType,
                 getWarningMessageName(personType, appellant) + townLine, IS_EMPTY));
         } else if (!address.getTown().matches(ADDRESS_REGEX)) {
@@ -594,7 +594,7 @@ public class SscsCaseValidator implements CaseValidator {
         if (!isIbcOrSscs8 || isInMainlandUk(address)) {
             // Once form has been updated to account for this, this can be re-enabled
             String countyLine = (isAddressLine4Present) ? ADDRESS_LINE4 : "_ADDRESS_LINE3_COUNTY";
-            if (!doesAddressCountyExist(address)) {
+            if (address == null || !doesAddressCountyExist(address)) {
                 warnings.add(getMessageByCallbackType(callbackType, personType,
                     getWarningMessageName(personType, appellant) + countyLine, IS_EMPTY));
             } else if (!address.getCounty().matches(COUNTY_REGEX)) {
