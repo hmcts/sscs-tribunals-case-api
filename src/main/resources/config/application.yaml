@@ -193,13 +193,13 @@ documents:
         CORRECTION_GRANTED: TB-SCS-GNO-ENG-corrected-decision-notice.docx
         DECISION_ISSUED: TB-SCS-GNO-ENG-draft-decision-notice.docx
         DIRECTION_ISSUED: TB-SCS-GNO-ENG-directions-notice-v2.docx
-        ISSUE_FINAL_DECISION: TB-SCS-GNO-ENG-final-decision-notice.docx
+        ISSUE_FINAL_DECISION: TB-SCS-GNO-ENG-final-decision-notice-v2.docx
         SOR_WRITE: TB-SCS-GNO-ENG-sor-directions-notice-v2.docx
     welsh:
         CORRECTION_GRANTED: TB-SCS-GNO-ENG-corrected-decision-notice.docx
         DECISION_ISSUED: TB-SCS-GNO-ENG-draft-decision-notice.docx
         DIRECTION_ISSUED: TB-SCS-GNO-ENG-directions-notice-v2.docx
-        ISSUE_FINAL_DECISION: TB-SCS-GNO-ENG-final-decision-notice.docx
+        ISSUE_FINAL_DECISION: TB-SCS-GNO-ENG-final-decision-notice-v2.docx
         SOR_WRITE: TB-SCS-GNO-ENG-sor-directions-notice-v2.docx
 dwp:
     response:
@@ -716,13 +716,13 @@ notification:
                     docmosisId: TB-SCS-GNO-ENG-00557-v2.docx
             grantReinstatement:
                 appellant:
-                    docmosisId: TB-SCS-GNO-ENG-00584.docx
+                    docmosisId: TB-SCS-GNO-ENG-00584-v2.docx
                 appointee:
-                    docmosisId: TB-SCS-GNO-ENG-00584.docx
+                    docmosisId: TB-SCS-GNO-ENG-00584-v2.docx
                 representative:
-                    docmosisId: TB-SCS-GNO-ENG-00584.docx
+                    docmosisId: TB-SCS-GNO-ENG-00584-v2.docx
                 other_party:
-                    docmosisId: TB-SCS-GNO-ENG-00584.docx
+                    docmosisId: TB-SCS-GNO-ENG-00584-v2.docx
             refuseReinstatement:
                 appellant:
                     docmosisId: TB-SCS-GNO-ENG-00585-v2.docx
@@ -1355,13 +1355,13 @@ notification:
                     docmosisId: TB-SCS-GNO-WEL-00592.docx
             grantReinstatement:
                 appellant:
-                    docmosisId: TB-SCS-GNO-WEL-00586.docx
+                    docmosisId: TB-SCS-GNO-WEL-00586-v2.docx
                 appointee:
-                    docmosisId: TB-SCS-GNO-WEL-00586.docx
+                    docmosisId: TB-SCS-GNO-WEL-00586-v2.docx
                 representative:
-                    docmosisId: TB-SCS-GNO-WEL-00586.docx
+                    docmosisId: TB-SCS-GNO-WEL-00586-v2.docx
                 other_party:
-                    docmosisId: TB-SCS-GNO-WEL-00586.docx
+                    docmosisId: TB-SCS-GNO-WEL-00586-v2.docx
             refuseReinstatement:
                 appellant:
                     docmosisId: TB-SCS-GNO-WEL-00587-v2.docx
@@ -1991,7 +1991,6 @@ flags:
     hmc-to-hearings-api.enabled: ${HMC_HEARINGS_LISTENING_ENABLED:false}
     adjournment.enabled: ${ADJOURNMENT_ENABLED:false}
     postHearings.enabled: ${POST_HEARING_ENABLED:false}
-    deployment-filter.enabled: ${HMC_DEPLOYMENT_FILTER_ENABLED:false}
 
 ---
 

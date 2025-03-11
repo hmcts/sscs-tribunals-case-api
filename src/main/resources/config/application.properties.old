@@ -72,12 +72,12 @@ documents.english.CORRECTION_GRANTED=TB-SCS-GNO-ENG-corrected-decision-notice.do
 documents.english.DIRECTION_ISSUED=TB-SCS-GNO-ENG-directions-notice-v2.docx
 documents.english.SOR_WRITE=TB-SCS-GNO-ENG-sor-directions-notice-v2.docx
 documents.english.DECISION_ISSUED=TB-SCS-GNO-ENG-draft-decision-notice.docx
-documents.english.ISSUE_FINAL_DECISION=TB-SCS-GNO-ENG-final-decision-notice.docx
+documents.english.ISSUE_FINAL_DECISION=TB-SCS-GNO-ENG-final-decision-notice-v2.docx
 documents.welsh.CORRECTION_GRANTED=TB-SCS-GNO-ENG-corrected-decision-notice.docx
 documents.welsh.DIRECTION_ISSUED=TB-SCS-GNO-ENG-directions-notice-v2.docx
 documents.welsh.SOR_WRITE=TB-SCS-GNO-ENG-sor-directions-notice-v2.docx
 documents.welsh.DECISION_ISSUED=TB-SCS-GNO-ENG-draft-decision-notice.docx
-documents.welsh.ISSUE_FINAL_DECISION=TB-SCS-GNO-ENG-final-decision-notice.docx
+documents.welsh.ISSUE_FINAL_DECISION=TB-SCS-GNO-ENG-final-decision-notice-v2.docx
 
 document.bilingual.notice.template=TB-SCS-GNO-WEL-00473.docx
 
@@ -263,7 +263,6 @@ flags.hmc-to-hearings-api.enabled=${HMC_HEARINGS_LISTENING_ENABLED:false}
 flags.tribunals-to-hearings-api.enabled=${TRIBUNALS_HEARINGS_LISTENING_ENABLED:false}
 flags.adjournment.enabled=${ADJOURNMENT_ENABLED:false}
 flags.postHearings.enabled=${POST_HEARING_ENABLED:false}
-flags.deployment-filter.enabled=${HMC_DEPLOYMENT_FILTER_ENABLED:false}
 feign.httpclient.enabled=true
 feign.client.config.default.connectTimeout=10000
 feign.client.config.default.readTimeout=10000

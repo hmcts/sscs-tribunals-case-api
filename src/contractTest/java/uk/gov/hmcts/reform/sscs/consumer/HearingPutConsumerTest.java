@@ -142,6 +142,8 @@ class HearingPutConsumerTest extends BasePactTest {
             IDAM_OAUTH2_TOKEN,
             SERVICE_AUTHORIZATION_TOKEN,
             null,
+            null,
+            null,
             VALID_CASE_ID,
             generateHearingRequest()
         );
