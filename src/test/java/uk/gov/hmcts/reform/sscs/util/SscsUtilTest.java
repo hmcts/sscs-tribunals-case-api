@@ -7,8 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.CORRECTION_GRANTED;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_CORRECTED_NOTICE;
@@ -36,7 +34,6 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.updateHearingInterpreter;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.validateBenefitIssueCode;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,19 +54,15 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
-import uk.gov.hmcts.reform.sscs.ccd.domain.JudicialUserPanel;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LibertyToApplyActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PermissionToAppealActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
@@ -77,14 +70,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Postponement;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFinalDecisionCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 
 @ExtendWith(MockitoExtension.class)
@@ -100,18 +91,6 @@ class SscsUtilTest {
 
     @Mock
     private SscsCaseData mockedCaseData;
-
-    @Mock
-    private SchedulingAndListingFields schedulingAndListingFields;
-
-    @Mock
-    private Hearing latestHearing;
-
-    @Mock
-    private HearingDetails hearingDetails;
-
-    @Mock
-    private JudicialUserPanel panel;
 
     @BeforeEach
     void setUp() {
@@ -409,9 +388,9 @@ class SscsUtilTest {
         DynamicList interpreterLanguage = new DynamicList(interpreterLanguageItem, List.of());
 
         HearingInterpreter appellantInterpreter = HearingInterpreter.builder()
-            .isInterpreterWanted(YesNo.YES)
-            .interpreterLanguage(interpreterLanguage)
-            .build();
+                .isInterpreterWanted(YesNo.YES)
+                .interpreterLanguage(interpreterLanguage)
+                .build();
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
@@ -434,9 +413,9 @@ class SscsUtilTest {
         DynamicList interpreterLanguage = new DynamicList(interpreterLanguageItem, List.of());
 
         HearingInterpreter appellantInterpreter = HearingInterpreter.builder()
-            .isInterpreterWanted(YesNo.NO)
-            .interpreterLanguage(interpreterLanguage)
-            .build();
+                .isInterpreterWanted(YesNo.NO)
+                .interpreterLanguage(interpreterLanguage)
+                .build();
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
@@ -453,13 +432,13 @@ class SscsUtilTest {
         caseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
 
         caseData.getAppeal().setHearingOptions(HearingOptions.builder()
-            .languageInterpreter("Yes")
-            .languages("French")
-            .build());
+                .languageInterpreter("Yes")
+                .languages("French")
+                .build());
 
         HearingInterpreter appellantInterpreter = HearingInterpreter.builder()
-            .isInterpreterWanted(YesNo.NO)
-            .build();
+                .isInterpreterWanted(YesNo.NO)
+                .build();
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
@@ -478,9 +457,9 @@ class SscsUtilTest {
         caseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
 
         HearingInterpreter appellantInterpreter = HearingInterpreter.builder()
-            .isInterpreterWanted(YesNo.YES)
-            .interpreterLanguage(null)
-            .build();
+                .isInterpreterWanted(YesNo.YES)
+                .interpreterLanguage(null)
+                .build();
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
@@ -500,9 +479,9 @@ class SscsUtilTest {
         DynamicList interpreterLanguage = new DynamicList(null, List.of(interpreterLanguageItem2, interpreterLanguageItem3));
 
         HearingInterpreter appellantInterpreter = HearingInterpreter.builder()
-            .isInterpreterWanted(YesNo.YES)
-            .interpreterLanguage(interpreterLanguage)
-            .build();
+                .isInterpreterWanted(YesNo.YES)
+                .interpreterLanguage(interpreterLanguage)
+                .build();
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
@@ -601,15 +580,15 @@ class SscsUtilTest {
     @Test
     void shouldGenerateUniqueIbcaId() {
         final Appellant appellant = Appellant.builder()
-            .name(Name.builder()
-                .lastName("Test")
-                .build()
-            )
-            .identity(Identity.builder()
-                .ibcaReference("IBCA12345")
-                .build()
-            )
-            .build();
+                .name(Name.builder()
+                        .lastName("Test")
+                        .build()
+                )
+                .identity(Identity.builder()
+                        .ibcaReference("IBCA12345")
+                        .build()
+                )
+                .build();
 
         final String result = generateUniqueIbcaId(appellant);
 
@@ -619,46 +598,46 @@ class SscsUtilTest {
     @Test
     void shouldReturnTrueWhenIsIbcaCase() {
         final SscsCaseData sscsCaseData = SscsCaseData.builder()
-            .benefitCode("093")
-            .appeal(Appeal.builder()
-                .benefitType(BenefitType.builder()
-                    .descriptionSelection(
-                        new DynamicList(
-                            new DynamicListItem(
-                                "infectedBloodCompensation",
-                                "infectedBloodCompensation"
-                            ),
-                            emptyList()
+                .benefitCode("093")
+                .appeal(Appeal.builder()
+                        .benefitType(BenefitType.builder()
+                                .descriptionSelection(
+                                        new DynamicList(
+                                                new DynamicListItem(
+                                                        "infectedBloodCompensation",
+                                                        "infectedBloodCompensation"
+                                                ),
+                                                emptyList()
+                                        )
+                                )
+                                .build()
                         )
-                    )
-                    .build()
+                        .build()
                 )
-                .build()
-            )
-            .build();
+                .build();
         assertTrue(sscsCaseData.isIbcCase());
     }
 
     @Test
     void shouldReturnFalseWhenNotIbcaCase() {
         final SscsCaseData sscsCaseData = SscsCaseData.builder()
-            .benefitCode("037")
-            .appeal(Appeal.builder()
-                .benefitType(BenefitType.builder()
-                    .descriptionSelection(
-                        new DynamicList(
-                            new DynamicListItem(
-                                "DLA",
-                                "DLA"
-                            ),
-                            emptyList()
+                .benefitCode("037")
+                .appeal(Appeal.builder()
+                        .benefitType(BenefitType.builder()
+                                .descriptionSelection(
+                                        new DynamicList(
+                                                new DynamicListItem(
+                                                        "DLA",
+                                                        "DLA"
+                                                ),
+                                                emptyList()
+                                        )
+                                )
+                                .build()
                         )
-                    )
-                    .build()
+                        .build()
                 )
-                .build()
-            )
-            .build();
+                .build();
         assertFalse(sscsCaseData.isIbcCase());
     }
 
@@ -699,120 +678,5 @@ class SscsUtilTest {
         String result = SscsUtil.buildWriteFinalDecisionHeldBefore(mockedCaseData, "Judge Name");
 
         assertEquals("Judge Name, Disability Member and Medical Member", result);
-    }
-
-    @Test
-    void shouldAddPanelMembersToExclusionsWhenPanelMembersExist() {
-        when(mockedCaseData.getSchedulingAndListingFields()).thenReturn(schedulingAndListingFields);
-        when(mockedCaseData.getLatestHearing()).thenReturn(latestHearing);
-        when(latestHearing.getValue()).thenReturn(hearingDetails);
-        when(hearingDetails.getPanel()).thenReturn(panel);
-        JudicialUserBase panelMember = JudicialUserBase.builder().idamId("id1").build();
-        List<JudicialUserBase> panelMembers = List.of(panelMember);
-        when(panel.getAllPanelMembers()).thenReturn(panelMembers);
-
-        PanelMemberExclusions panelMemberExclusions = PanelMemberExclusions.builder().build();
-        when(schedulingAndListingFields.getPanelMemberExclusions()).thenReturn(panelMemberExclusions);
-
-        SscsUtil.addPanelMembersToExclusions(mockedCaseData, true);
-
-        assertEquals(1, panelMemberExclusions.getReservedPanelMembers().size());
-        assertEquals("id1", panelMemberExclusions.getReservedPanelMembers().get(0).getValue().getIdamId());
-        assertEquals(YesNo.YES, panelMemberExclusions.getArePanelMembersReserved());
-    }
-
-    @Test
-    void shouldAddPanelMembersToExclusionsWhenPanelMembersAreExcluded() {
-        when(mockedCaseData.getSchedulingAndListingFields()).thenReturn(schedulingAndListingFields);
-        when(mockedCaseData.getLatestHearing()).thenReturn(latestHearing);
-        when(latestHearing.getValue()).thenReturn(hearingDetails);
-        when(hearingDetails.getPanel()).thenReturn(panel);
-        JudicialUserBase panelMember = JudicialUserBase.builder().idamId("id1").build();
-        List<JudicialUserBase> panelMembers = List.of(panelMember);
-        when(panel.getAllPanelMembers()).thenReturn(panelMembers);
-
-        PanelMemberExclusions panelMemberExclusions = PanelMemberExclusions.builder().build();
-        when(schedulingAndListingFields.getPanelMemberExclusions()).thenReturn(panelMemberExclusions);
-
-        SscsUtil.addPanelMembersToExclusions(mockedCaseData, false);
-
-        assertEquals(1, panelMemberExclusions.getExcludedPanelMembers().size());
-        assertEquals("id1", panelMemberExclusions.getExcludedPanelMembers().getFirst().getValue().getIdamId());
-        assertEquals(YesNo.YES, panelMemberExclusions.getArePanelMembersExcluded());
-    }
-
-    @Test
-    void shouldAddWarningWhenNoLatestHearing() {
-        when(mockedCaseData.getSchedulingAndListingFields()).thenReturn(schedulingAndListingFields);
-        when(mockedCaseData.getLatestHearing()).thenReturn(latestHearing);
-        when(mockedCaseData.getLatestHearing()).thenReturn(null);
-        PanelMemberExclusions panelMemberExclusions = PanelMemberExclusions.builder().build();
-        when(schedulingAndListingFields.getPanelMemberExclusions()).thenReturn(panelMemberExclusions);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = SscsUtil.addPanelMembersToExclusions(mockedCaseData, true);
-
-        assertEquals(1, response.getWarnings().size());
-        assertTrue(response.getWarnings().contains(SscsUtil.NO_LATEST_HEARING_WARNING));
-        assertNull(panelMemberExclusions.getExcludedPanelMembers());
-    }
-
-    @Test
-    void shouldInitializePanelMemberExclusionsIfNull() {
-        when(mockedCaseData.getSchedulingAndListingFields()).thenReturn(schedulingAndListingFields);
-        when(mockedCaseData.getLatestHearing()).thenReturn(latestHearing);
-        when(latestHearing.getValue()).thenReturn(hearingDetails);
-        when(hearingDetails.getPanel()).thenReturn(panel);
-        when(schedulingAndListingFields.getPanelMemberExclusions()).thenReturn(null);
-
-        SscsUtil.addPanelMembersToExclusions(mockedCaseData, true);
-
-        verify(schedulingAndListingFields).setPanelMemberExclusions(any(PanelMemberExclusions.class));
-    }
-
-    @Test
-    void shouldNotAddPanelMembersWhenPanelIsNull() {
-        when(mockedCaseData.getSchedulingAndListingFields()).thenReturn(schedulingAndListingFields);
-        when(mockedCaseData.getLatestHearing()).thenReturn(latestHearing);
-        when(latestHearing.getValue()).thenReturn(hearingDetails);
-        when(hearingDetails.getPanel()).thenReturn(null);
-        PanelMemberExclusions panelMemberExclusions = PanelMemberExclusions.builder().build();
-        when(schedulingAndListingFields.getPanelMemberExclusions()).thenReturn(panelMemberExclusions);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = SscsUtil.addPanelMembersToExclusions(mockedCaseData, true);
-
-        assertTrue(response.getWarnings().isEmpty());
-        assertNull(panelMemberExclusions.getExcludedPanelMembers());
-    }
-
-    @Test
-    void shouldNotAddPanelMembersWhenPanelMembersAreNull() {
-        when(mockedCaseData.getSchedulingAndListingFields()).thenReturn(schedulingAndListingFields);
-        when(mockedCaseData.getLatestHearing()).thenReturn(latestHearing);
-        when(latestHearing.getValue()).thenReturn(hearingDetails);
-        when(hearingDetails.getPanel()).thenReturn(panel);
-        when(panel.getAllPanelMembers()).thenReturn(null);
-        PanelMemberExclusions panelMemberExclusions = PanelMemberExclusions.builder().build();
-        when(schedulingAndListingFields.getPanelMemberExclusions()).thenReturn(panelMemberExclusions);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = SscsUtil.addPanelMembersToExclusions(mockedCaseData, true);
-
-        assertTrue(response.getWarnings().isEmpty());
-        assertNull(panelMemberExclusions.getExcludedPanelMembers());
-    }
-
-    @Test
-    void shouldNotAddPanelMembersWhenPanelMembersAreEmpty() {
-        when(mockedCaseData.getSchedulingAndListingFields()).thenReturn(schedulingAndListingFields);
-        when(mockedCaseData.getLatestHearing()).thenReturn(latestHearing);
-        when(latestHearing.getValue()).thenReturn(hearingDetails);
-        when(hearingDetails.getPanel()).thenReturn(panel);
-        when(panel.getAllPanelMembers()).thenReturn(Collections.emptyList());
-        PanelMemberExclusions panelMemberExclusions = PanelMemberExclusions.builder().build();
-        when(schedulingAndListingFields.getPanelMemberExclusions()).thenReturn(panelMemberExclusions);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = SscsUtil.addPanelMembersToExclusions(mockedCaseData, true);
-
-        assertTrue(response.getWarnings().isEmpty());
-        assertNull(panelMemberExclusions.getExcludedPanelMembers());
     }
 }

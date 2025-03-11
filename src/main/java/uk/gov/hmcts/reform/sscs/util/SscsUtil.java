@@ -53,6 +53,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.JudicialUserPanel;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LibertyToApplyActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
@@ -84,7 +85,6 @@ public class SscsUtil {
 
     public static final String INVALID_BENEFIT_ISSUE_CODE = "Incorrect benefit/issue code combination";
     public static final String BENEFIT_CODE_NOT_IN_USE = "The benefit code selected is not in use";
-    public static final String NO_LATEST_HEARING_WARNING = "No latest hearing found. Unable to set panel members exclusions.";
 
     private static final String ID_FORMAT = "%s_%s";
 
@@ -128,28 +128,20 @@ public class SscsUtil {
         caseData.setDocumentStaging(DocumentStaging.builder().build());
     }
 
-    public static PreSubmitCallbackResponse<SscsCaseData> addPanelMembersToExclusions(SscsCaseData caseData, boolean arePanelMembersReserved) {
+    public static void addPanelMembersToExclusions(SscsCaseData caseData, boolean arePanelMembersReserved) {
         PanelMemberExclusions panelMemberExclusions = caseData.getSchedulingAndListingFields().getPanelMemberExclusions();
 
         if (isNull(panelMemberExclusions)) {
             panelMemberExclusions = PanelMemberExclusions.builder().build();
             caseData.getSchedulingAndListingFields().setPanelMemberExclusions(panelMemberExclusions);
         }
+        JudicialUserPanel panel = caseData.getLatestHearing().getValue().getPanel();
 
-        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
-        PanelMemberExclusions finalPanelMemberExclusions = panelMemberExclusions;
-        Optional.ofNullable(caseData.getLatestHearing())
-            .ifPresentOrElse(
-                hearing -> {
-                    if (nonNull(hearing.getValue().getPanel())) {
-                        setAdjournmentPanelMembersExclusions(finalPanelMemberExclusions,
-                            hearing.getValue().getPanel().getAllPanelMembers(),
-                            arePanelMembersReserved ? AdjournCasePanelMembersExcluded.RESERVED : AdjournCasePanelMembersExcluded.YES);
-                    }
-                },
-                () -> preSubmitCallbackResponse.addWarning(NO_LATEST_HEARING_WARNING)
-            );
-        return preSubmitCallbackResponse;
+        if (nonNull(panel)) {
+            setAdjournmentPanelMembersExclusions(panelMemberExclusions,
+                panel.getAllPanelMembers(),
+                arePanelMembersReserved ? AdjournCasePanelMembersExcluded.RESERVED : AdjournCasePanelMembersExcluded.YES);
+        }
     }
 
     public static void setAdjournmentPanelMembersExclusions(PanelMemberExclusions exclusions,
