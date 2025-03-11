@@ -75,9 +75,10 @@ public class PlaceholderService {
 
     public void build(SscsCaseData caseData, Map<String, Object> placeholders, Address address, String caseCreatedDate) {
         Appeal appeal = caseData.getAppeal();
-        Benefit benefit = Benefit.getBenefitOptionalByCode(appeal.getBenefitType().getCode()).orElse(null);
+        Benefit benefit = caseData.getBenefitType().orElse(null);
         String description = Optional.ofNullable(appeal.getBenefitType())
             .map(BenefitType::getDescription)
+            .map(String::toUpperCase)
             .orElseGet(() -> (benefit != null) ? benefit.getDescription().toUpperCase() : StringUtils.EMPTY);
 
         String shouldHideNino = appeal.getBenefitType() != null && Benefit.CHILD_SUPPORT.getShortName().equals(appeal.getBenefitType().getCode()) ? YesNo.YES.getValue() : YesNo.NO.getValue();
@@ -86,11 +87,8 @@ public class PlaceholderService {
             placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, IBC_ACRONYM);
             placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL_WELSH, IBC_ACRONYM_WELSH);
         } else if (benefit != null) {
-            String benefitAcronym = benefit.isHasAcronym() ? benefit.name() : benefit.getDescription();
-            String benefitAcronymWelsh = benefit.isHasAcronym() ? benefit.name() : benefit.getWelshDescription();
-
-            placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, benefitAcronym);
-            placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL_WELSH, benefitAcronymWelsh);
+            placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, benefit.isHasAcronym() ? benefit.name() : benefit.getDescription());
+            placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL_WELSH, benefit.isHasAcronym() ? benefit.name() : benefit.getWelshDescription());
         }
 
         placeholders.put(SHOULD_HIDE_NINO, shouldHideNino);

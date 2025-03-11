@@ -2,9 +2,12 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.APPELLANT_FULL_NAME_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.BENEFIT_NAME_ACRONYM_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.BENEFIT_NAME_ACRONYM_LITERAL_WELSH;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.BENEFIT_TYPE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.CASE_CREATED_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.CASE_ID_LITERAL;
@@ -109,6 +112,8 @@ public class PlaceholderServiceTest {
         assertEquals(now, placeholders.get(CASE_CREATED_DATE_LITERAL));
         assertEquals("Mr T Tibbs", placeholders.get(APPELLANT_FULL_NAME_LITERAL));
         assertEquals("PERSONAL INDEPENDENCE PAYMENT", placeholders.get(BENEFIT_TYPE_LITERAL));
+        assertEquals("PIP", placeholders.get(BENEFIT_NAME_ACRONYM_LITERAL));
+        assertEquals("PIP", placeholders.get(BENEFIT_NAME_ACRONYM_LITERAL_WELSH));
         assertEquals("123456", placeholders.get(CASE_ID_LITERAL));
         assertEquals("JT0123456B", placeholders.get(NINO_LITERAL));
         assertEquals("https://www.gov.uk/appeal-benefit-decision", placeholders.get(SSCS_URL_LITERAL));
@@ -174,6 +179,8 @@ public class PlaceholderServiceTest {
         assertEquals("SC123/12/1234", placeholders.get(SC_NUMBER_LITERAL));
         assertEquals("No", placeholders.get(SHOULD_HIDE_NINO));
         assertEquals("NI No", placeholders.get(LABEL));
+        assertNull(placeholders.get(BENEFIT_NAME_ACRONYM_LITERAL));
+        assertNull(placeholders.get(BENEFIT_NAME_ACRONYM_LITERAL_WELSH));
     }
 
     @Test
@@ -269,7 +276,7 @@ public class PlaceholderServiceTest {
                 .description("Infected Blood Compensation")
                 .build()
         );
-        caseData.getAppeal().getAppellant().setIdentity(Identity.builder().ibcaReference("IBCA123456").build());
+        caseData.getAppeal().getAppellant().setIdentity(Identity.builder().ibcaReference("E24D55").build());
 
         Address address = Address.builder()
                 .line1("Unit 2")
@@ -290,6 +297,8 @@ public class PlaceholderServiceTest {
         assertEquals(now, placeholders.get(CASE_CREATED_DATE_LITERAL));
         assertEquals("Mr T Tibbs", placeholders.get(APPELLANT_FULL_NAME_LITERAL));
         assertEquals("INFECTED BLOOD COMPENSATION", placeholders.get(BENEFIT_TYPE_LITERAL));
+        assertEquals("IBC", placeholders.get(BENEFIT_NAME_ACRONYM_LITERAL));
+        assertEquals("IGH", placeholders.get(BENEFIT_NAME_ACRONYM_LITERAL_WELSH));
         assertEquals("123456", placeholders.get(CASE_ID_LITERAL));
         assertEquals(IBCA_URL, placeholders.get(SSCS_URL_LITERAL));
         assertEquals("Line 1", placeholders.get(EXELA_ADDRESS_LINE1_LITERAL));
@@ -301,7 +310,7 @@ public class PlaceholderServiceTest {
         assertEquals("Bedford", placeholders.get(RECIPIENT_ADDRESS_LINE_4_LITERAL));
         assertEquals("L2 5UZ", placeholders.get(RECIPIENT_ADDRESS_LINE_5_LITERAL));
         assertEquals("No", placeholders.get(SHOULD_HIDE_NINO));
-        assertEquals("IBCA123456", placeholders.get(NINO_LITERAL));
+        assertEquals("E24D55", placeholders.get(NINO_LITERAL));
         assertEquals("IBCA Reference", placeholders.get(LABEL));
     }
 }
