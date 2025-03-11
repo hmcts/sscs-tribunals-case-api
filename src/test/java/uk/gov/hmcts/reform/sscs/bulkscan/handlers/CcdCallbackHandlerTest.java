@@ -253,8 +253,8 @@ public class CcdCallbackHandlerTest {
 
         verify(caseValidator).validateExceptionRecord(warningCaptor.capture(), eq(exceptionRecord), eq(transformedCase), eq(false));
 
-        assertThat(warningCaptor.getAllValues().getFirst().getWarnings()).hasSize(1);
-        assertThat(warningCaptor.getAllValues().getFirst().getWarnings().getFirst()).isEqualTo("First warning");
+        assertThat(warningCaptor.getAllValues().get(0).getWarnings()).hasSize(1);
+        assertThat(warningCaptor.getAllValues().get(0).getWarnings().get(0)).isEqualTo("First warning");
 
         assertThat(ccdCallbackResponse.getWarnings()).hasSize(2);
     }
@@ -305,7 +305,7 @@ public class CcdCallbackHandlerTest {
             .build();
 
         CaseResponse caseValidationResponse = CaseResponse.builder().build();
-        when(caseValidator.validateValidationRecord(any(), anyBoolean(), anyBoolean())).thenReturn(caseValidationResponse);
+        when(caseValidator.validateValidationRecord(any(), anyBoolean())).thenReturn(caseValidationResponse);
         when(appealPostcodeHelper.resolvePostCodeOrPort(appeal.getAppellant())).thenReturn("CV35 2TD");
 
         when(caseManagementLocationService.retrieveCaseManagementLocation(PROCESSING_VENUE, rpc)).thenReturn(
@@ -331,8 +331,8 @@ public class CcdCallbackHandlerTest {
         assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseAccessCategory()).isEqualTo("personalIndependencePayment");
         assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getValue().getCode()).isEqualTo("PIP");
         assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getValue().getLabel()).isEqualTo("Personal Independence Payment");
-        assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getListItems().getFirst().getCode()).isEqualTo("PIP");
-        assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getListItems().getFirst().getLabel()).isEqualTo("Personal Independence Payment");
+        assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getListItems().get(0).getCode()).isEqualTo("PIP");
+        assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getListItems().get(0).getLabel()).isEqualTo("Personal Independence Payment");
         assertEquals("rpcEpimsId", ccdCallbackResponse.getData().getCaseManagementLocation().getBaseLocation());
         assertEquals(REGION_ID, ccdCallbackResponse.getData().getCaseManagementLocation().getRegion());
     }
@@ -357,7 +357,7 @@ public class CcdCallbackHandlerTest {
             .build();
 
         CaseResponse caseValidationResponse = CaseResponse.builder().build();
-        when(caseValidator.validateValidationRecord(any(), anyBoolean(), anyBoolean())).thenReturn(caseValidationResponse);
+        when(caseValidator.validateValidationRecord(any(), anyBoolean())).thenReturn(caseValidationResponse);
 
         PreSubmitCallbackResponse<SscsCaseData> ccdCallbackResponse = invokeValidationCallbackHandler(caseDetails.getCaseData());
 
@@ -378,8 +378,8 @@ public class CcdCallbackHandlerTest {
         assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseAccessCategory()).isEqualTo("employmentAndSupportAllowance");
         assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getValue().getCode()).isEqualTo("ESA");
         assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getValue().getLabel()).isEqualTo("Employment and Support Allowance");
-        assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getListItems().getFirst().getCode()).isEqualTo("ESA");
-        assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getListItems().getFirst().getLabel()).isEqualTo("Employment and Support Allowance");
+        assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getListItems().get(0).getCode()).isEqualTo("ESA");
+        assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getListItems().get(0).getLabel()).isEqualTo("Employment and Support Allowance");
     }
 
     @Test
@@ -404,7 +404,7 @@ public class CcdCallbackHandlerTest {
 
         caseDetails.getCaseData().setDirectionTypeDl(appealToProccedDynamicList);
         CaseResponse caseValidationResponse = CaseResponse.builder().build();
-        when(caseValidator.validateValidationRecord(any(), eq(true), anyBoolean())).thenReturn(caseValidationResponse);
+        when(caseValidator.validateValidationRecord(any(), eq(true))).thenReturn(caseValidationResponse);
 
         PreSubmitCallbackResponse<SscsCaseData> ccdCallbackResponse = invokeValidationCallbackHandler(caseDetails.getCaseData(), EventType.DIRECTION_ISSUED);
 
@@ -425,8 +425,8 @@ public class CcdCallbackHandlerTest {
         assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseAccessCategory()).isEqualTo("employmentAndSupportAllowance");
         assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getValue().getCode()).isEqualTo("ESA");
         assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getValue().getLabel()).isEqualTo("Employment and Support Allowance");
-        assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getListItems().getFirst().getCode()).isEqualTo("ESA");
-        assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getListItems().getFirst().getLabel()).isEqualTo("Employment and Support Allowance");
+        assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getListItems().get(0).getCode()).isEqualTo("ESA");
+        assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getListItems().get(0).getLabel()).isEqualTo("Employment and Support Allowance");
     }
 
     @Test
@@ -451,7 +451,7 @@ public class CcdCallbackHandlerTest {
 
         caseDetails.getCaseData().setDirectionTypeDl(appealToProccedDynamicList);
         CaseResponse caseValidationResponse = CaseResponse.builder().build();
-        when(caseValidator.validateValidationRecord(any(), eq(true), anyBoolean())).thenReturn(caseValidationResponse);
+        when(caseValidator.validateValidationRecord(any(), eq(true))).thenReturn(caseValidationResponse);
 
         PreSubmitCallbackResponse<SscsCaseData> ccdCallbackResponse = invokeValidationCallbackHandler(caseDetails.getCaseData(), EventType.DIRECTION_ISSUED_WELSH);
 
@@ -472,8 +472,8 @@ public class CcdCallbackHandlerTest {
         assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseAccessCategory()).isEqualTo("employmentAndSupportAllowance");
         assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getValue().getCode()).isEqualTo("ESA");
         assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getValue().getLabel()).isEqualTo("Employment and Support Allowance");
-        assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getListItems().getFirst().getCode()).isEqualTo("ESA");
-        assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getListItems().getFirst().getLabel()).isEqualTo("Employment and Support Allowance");
+        assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getListItems().get(0).getCode()).isEqualTo("ESA");
+        assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getListItems().get(0).getLabel()).isEqualTo("Employment and Support Allowance");
     }
 
     @Test
@@ -496,7 +496,7 @@ public class CcdCallbackHandlerTest {
             .build();
 
         CaseResponse caseValidationResponse = CaseResponse.builder().warnings(Lists.list("Mrn date is empty")).build();
-        when(caseValidator.validateValidationRecord(any(), eq(false), anyBoolean())).thenReturn(caseValidationResponse);
+        when(caseValidator.validateValidationRecord(any(), eq(false))).thenReturn(caseValidationResponse);
 
         PreSubmitCallbackResponse<SscsCaseData> ccdCallbackResponse = invokeValidationCallbackHandler(caseDetails.getCaseData());
 
@@ -518,8 +518,8 @@ public class CcdCallbackHandlerTest {
         assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseAccessCategory()).isEqualTo("employmentAndSupportAllowance");
         assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getValue().getCode()).isEqualTo("ESA");
         assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getValue().getLabel()).isEqualTo("Employment and Support Allowance");
-        assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getListItems().getFirst().getCode()).isEqualTo("ESA");
-        assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getListItems().getFirst().getLabel()).isEqualTo("Employment and Support Allowance");
+        assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getListItems().get(0).getCode()).isEqualTo("ESA");
+        assertThat(ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getListItems().get(0).getLabel()).isEqualTo("Employment and Support Allowance");
         assertLogContains("Warnings found while validating exception record id 123 - Mrn date is empty");
     }
 
@@ -532,7 +532,7 @@ public class CcdCallbackHandlerTest {
             .caseId("123")
             .build();
 
-        when(caseValidator.validateValidationRecord(any(), anyBoolean(), anyBoolean()))
+        when(caseValidator.validateValidationRecord(any(), anyBoolean()))
             .thenReturn(CaseResponse.builder()
                 .errors(ImmutableList.of("NI Number is invalid"))
                 .build());
@@ -555,7 +555,7 @@ public class CcdCallbackHandlerTest {
             .caseId("123")
             .build();
 
-        when(caseValidator.validateValidationRecord(any(), anyBoolean(), anyBoolean()))
+        when(caseValidator.validateValidationRecord(any(), anyBoolean()))
             .thenReturn(CaseResponse.builder()
                 .warnings(ImmutableList.of("Postcode is invalid"))
                 .build());
@@ -579,7 +579,7 @@ public class CcdCallbackHandlerTest {
             .caseId("123")
             .build();
 
-        when(caseValidator.validateValidationRecord(any(), anyBoolean(), anyBoolean()))
+        when(caseValidator.validateValidationRecord(any(), anyBoolean()))
             .thenReturn(CaseResponse.builder()
                 .errors(ImmutableList.of("Benefit type is invalid"))
                 .build());
@@ -600,7 +600,7 @@ public class CcdCallbackHandlerTest {
             .caseId("123")
             .build();
 
-        when(caseValidator.validateValidationRecord(any(), anyBoolean(), anyBoolean()))
+        when(caseValidator.validateValidationRecord(any(), anyBoolean()))
             .thenReturn(CaseResponse.builder()
                 .errors(ImmutableList.of("Benefit type is invalid"))
                 .build());
@@ -620,7 +620,7 @@ public class CcdCallbackHandlerTest {
             .caseId("123")
             .build();
 
-        when(caseValidator.validateValidationRecord(any(), anyBoolean(), anyBoolean()))
+        when(caseValidator.validateValidationRecord(any(), anyBoolean()))
             .thenReturn(CaseResponse.builder()
                 .errors(ImmutableList.of("Benefit type is invalid"))
                 .build());
@@ -640,7 +640,7 @@ public class CcdCallbackHandlerTest {
             .caseId("123")
             .build();
 
-        when(caseValidator.validateValidationRecord(any(), anyBoolean(), anyBoolean()))
+        when(caseValidator.validateValidationRecord(any(), anyBoolean()))
             .thenReturn(CaseResponse.builder()
                 .errors(ImmutableList.of("Benefit type is invalid"))
                 .build());
@@ -649,52 +649,6 @@ public class CcdCallbackHandlerTest {
 
         assertEquals("sscs5Unknown", ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getValue().getCode());
         assertEquals("SSCS5 Unknown", ccdCallbackResponse.getData().getCaseAccessManagementFields().getCaseManagementCategory().getValue().getLabel());
-    }
-
-
-    @Test
-    public void should_pass_validateIbcRoleField_true_for_valid_appeal_event_sscs8_form() {
-        SscsCaseDetails caseDetails = SscsCaseDetails
-            .builder()
-            .caseData(SscsCaseData.builder().formType(FormType.SSCS8).build())
-            .build();
-
-        CaseResponse caseValidationResponse = CaseResponse.builder().build();
-        when(caseValidator.validateValidationRecord(any(), anyBoolean(), anyBoolean())).thenReturn(caseValidationResponse);
-
-        invokeValidationCallbackHandler(caseDetails.getCaseData());
-
-        verify(caseValidator).validateValidationRecord(any(), anyBoolean(), eq(true));
-    }
-
-    @Test
-    public void should_pass_validateIbcRoleField_false_for_non_valid_appeal_event_sscs8_form() {
-        SscsCaseDetails caseDetails = SscsCaseDetails
-            .builder()
-            .caseData(SscsCaseData.builder().formType(FormType.SSCS8).build())
-            .build();
-
-        CaseResponse caseValidationResponse = CaseResponse.builder().build();
-        when(caseValidator.validateValidationRecord(any(), anyBoolean(), anyBoolean())).thenReturn(caseValidationResponse);
-
-        invokeValidationCallbackHandler(caseDetails.getCaseData(), EventType.DIRECTION_ISSUED);
-
-        verify(caseValidator).validateValidationRecord(any(), anyBoolean(), eq(false));
-    }
-
-    @Test
-    public void should_pass_validateIbcRoleField_false_for_valid_appeal_event_non_sscs8_form() {
-        SscsCaseDetails caseDetails = SscsCaseDetails
-            .builder()
-            .caseData(SscsCaseData.builder().formType(FormType.SSCS2).build())
-            .build();
-
-        CaseResponse caseValidationResponse = CaseResponse.builder().build();
-        when(caseValidator.validateValidationRecord(any(), anyBoolean(), anyBoolean())).thenReturn(caseValidationResponse);
-
-        invokeValidationCallbackHandler(caseDetails.getCaseData());
-
-        verify(caseValidator).validateValidationRecord(any(), anyBoolean(), eq(false));
     }
 
     private void assertLogContains(final String logMessage) {

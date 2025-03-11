@@ -1,18 +1,15 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.constants;
 
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_COUNTRY;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_LINE1;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_LINE2;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_LINE3;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_LINE4;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_PORT_OF_ENTRY;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_POSTCODE;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.DOB;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.FIRST_NAME;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_OPTIONS_EXCLUDE_DATES_LITERAL;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TELEPHONE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_VIDEO_EMAIL_LITERAL;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBCA_REFERENCE;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ISSUING_OFFICE;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.LAST_NAME;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.MOBILE;
@@ -58,9 +55,6 @@ public enum WarningMessage {
     APPOINTEE_POSTCODE(ADDRESS_POSTCODE, "Appointee postcode"),
     REPRESENTATIVE_POSTCODE(ADDRESS_POSTCODE, "Representative postcode"),
     OTHER_PARTY_POSTCODE(ADDRESS_POSTCODE, "Other party postcode"),
-    APPELLANT_ADDRESS_COUNTRY(ADDRESS_COUNTRY, "Appellant address country"),
-    APPELLANT_ADDRESS_PORT_OF_ENTRY(ADDRESS_PORT_OF_ENTRY, "Appellant address port of entry"),
-    APPELLANT_IBCA_REFERENCE(IBCA_REFERENCE, "Appellant ibca reference"),
     BENEFIT_TYPE_DESCRIPTION(SscsConstants.BENEFIT_TYPE_DESCRIPTION, "Benefit type description"),
     BENEFIT_TYPE_OTHER(SscsConstants.BENEFIT_TYPE_OTHER, "Benefit type description"),
     MRN_DATE(SscsConstants.MRN_DATE, "Mrn date"),

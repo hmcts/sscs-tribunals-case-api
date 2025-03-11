@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.sscs.domain.CaseResponse;
  * If case validation is not required then return original case data in the transformation.
  */
 public interface CaseValidator {
-    CaseResponse  validateValidationRecord(Map<String, Object> caseData, boolean ignoreMrnValidation, boolean validateIbcRoleField);
+    CaseResponse  validateValidationRecord(Map<String, Object> caseData, boolean ignoreMrnValidation);
 
     CaseResponse validateExceptionRecord(CaseResponse transformResponse, ExceptionRecord exceptionRecord, Map<String, Object> caseData, boolean combineWarnings);
 }
