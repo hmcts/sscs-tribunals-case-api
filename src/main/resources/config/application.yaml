@@ -1047,19 +1047,19 @@ notification:
                 hearingReminder:
                     appellant:
                         emailId: 78d2e987-02de-4875-ae43-1139a5c868ff
-                        # SSCS-11586 smsId: 18960596-1983-4da8-8b5c-dc1c851bb19b
+                        smsId: 3e8ef646-1649-4707-ab59-9743c1500397
                     appointee:
                         emailId: 78d2e987-02de-4875-ae43-1139a5c868ff
-                        # SSCS-11586 smsId: 18960596-1983-4da8-8b5c-dc1c851bb19b
+                        smsId: 3e8ef646-1649-4707-ab59-9743c1500397
                     representative:
                         emailId: 8efabd96-5020-4cb5-a23b-678006fdf7d5
-                        # SSCS-11586 smsId: bb3df0ea-8259-43c4-95de-9eef96206575
+                        smsId: d3fac5c8-b7c2-4f72-88a9-9d0cb3e81e29
                     joint_party:
                         emailId: 78d2e987-02de-4875-ae43-1139a5c868ff
-                        # SSCS-11586 smsId: 18960596-1983-4da8-8b5c-dc1c851bb19b
+                        smsId: 3e8ef646-1649-4707-ab59-9743c1500397
                     other_party:
                         emailId: 8efabd96-5020-4cb5-a23b-678006fdf7d5
-                        # SSCS-11586 smsId: bb3df0ea-8259-43c4-95de-9eef96206575
+                        smsId: d3fac5c8-b7c2-4f72-88a9-9d0cb3e81e29
     welsh:
         adminCorrectionHeader:
             appellant:
@@ -1678,19 +1678,19 @@ notification:
                 hearingReminder:
                     appellant:
                         emailId: e6969b5d-cd8c-4ff8-ab76-faaed6f388c3
-                        # SSCS-11586 smsId: adf60ff5-f83d-4931-9f35-fda2609afb7e
+                        smsId: ec79f3ac-f7fe-41f0-a033-f0c20cfd1c69
                     appointee:
-                         emailId: e6969b5d-cd8c-4ff8-ab76-faaed6f388c3
-                        # SSCS-11586 smsId: adf60ff5-f83d-4931-9f35-fda2609afb7e
+                        emailId: e6969b5d-cd8c-4ff8-ab76-faaed6f388c3
+                        smsId: ec79f3ac-f7fe-41f0-a033-f0c20cfd1c69
                     representative:
                         emailId: 385e1c56-7b69-4af2-8b0d-50a8ab66679e
-                        # SSCS-11586 smsId: 54f9c139-1c3d-4f4c-ae79-d75e4eafcfec
+                        smsId: fdedbabe-a46e-410f-849f-345edada0a6d
                     joint_party:
                         emailId: d798661e-611b-4ff1-86e7-4cccda64cb36
-                        # SSCS-11586 smsId: 534e7537-3012-42de-a6c3-9036b133c525
+                        smsId: ae62c0e6-d910-4802-8ce8-9cd863fe9170
                     other_party:
                         emailId: 385e1c56-7b69-4af2-8b0d-50a8ab66679e
-                        # SSCS-11586 smsId: 54f9c139-1c3d-4f4c-ae79-d75e4eafcfec
+                        smsId: fdedbabe-a46e-410f-849f-345edada0a6d
 smsSender:
     pip: 80b11be7-5c10-2773-8351-070e22d5ab6b
     esa: f84a568d-bd01-4940-a48a-5bcfc52940e0
