@@ -113,8 +113,8 @@ tasks.register('functional', Test) {
     description = 'Executes non-destructive functional tests in AAT against a running CCD and notification service'
     setTestClassesDirs(sourceSets.functionalTest.output.classesDirs)
     setClasspath(sourceSets.functionalTest.runtimeClasspath)
-    exclude "uk/gov/hmcts/reform/sscs/functional/**"
-    exclude "uk/gov/hmcts/reform/sscs/controllers/**"
+    include "uk/gov/hmcts/reform/sscs/functional/**"
+    include "uk/gov/hmcts/reform/sscs/controllers/**"
     include "uk/gov/hmcts/reform/sscs/bulkscan/**"
     exclude "uk/gov/hmcts/reform/sscs/smoke/**"
     maxParallelForks = Runtime.runtime.availableProcessors()
