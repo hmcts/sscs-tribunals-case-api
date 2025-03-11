@@ -52,11 +52,8 @@ public class UpdateNotListableSubmittedHandler implements PreSubmitCallbackHandl
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-        boolean isListAssist = Optional.ofNullable(sscsCaseData.getSchedulingAndListingFields())
-            .map(fields -> fields.getHearingRoute() == LIST_ASSIST)
-            .orElse(false);
 
-        if (YES.equals(sscsCaseData.getShouldReadyToListBeTriggered()) && isListAssist) {
+        if (YES.equals(sscsCaseData.getShouldReadyToListBeTriggered())) {
             try {
                 updateCcdCaseService.updateCaseV2(
                     callback.getCaseDetails().getId(),

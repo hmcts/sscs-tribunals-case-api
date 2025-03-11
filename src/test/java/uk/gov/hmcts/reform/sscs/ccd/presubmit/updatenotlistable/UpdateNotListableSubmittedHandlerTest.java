@@ -122,7 +122,7 @@ public class UpdateNotListableSubmittedHandlerTest {
     }
 
     @Test
-    public void givenShouldReadyToListBeTriggeredYesButGaps_thenDoNotTriggerReadyToListEvent() {
+    public void givenShouldReadyToListBeTriggeredYesButGaps_thenTriggerReadyToListEvent() {
         sscsCaseData.setShouldReadyToListBeTriggered(YesNo.YES);
         sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder().hearingRoute(HearingRoute.GAPS).build());
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -130,13 +130,14 @@ public class UpdateNotListableSubmittedHandlerTest {
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
 
-        verify(updateCcdCaseService, never()).updateCaseV2(
-            any(),
-            any(),
-            any(),
-            any(),
+        verify(updateCcdCaseService).updateCaseV2(
+            eq(123L),
+            eq(READY_TO_LIST.getCcdType()),
+            eq("Ready to list"),
+            eq("Makes an appeal ready to list"),
             any(IdamTokens.class),
-            any());
+            consumerArgumentCaptor.capture());
+
         assertEquals(YesNo.YES, sscsCaseData.getShouldReadyToListBeTriggered());
     }
 
