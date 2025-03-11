@@ -85,12 +85,12 @@ public class PlaceholderService {
         if (caseData.isIbcCase()) {
             placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, IBC_ACRONYM);
             placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL_WELSH, IBC_ACRONYM_WELSH);
-        } else if (benefit != null && benefit.isHasAcronym()) {
-            placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, benefit.name());
-            placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL_WELSH, benefit.name());
-        } else {
-            placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, benefit.getDescription());
-            placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL_WELSH, benefit.getWelshDescription());
+        } else if (benefit != null) {
+            String benefitAcronym = benefit.isHasAcronym() ? benefit.name() : benefit.getDescription();
+            String benefitAcronymWelsh = benefit.isHasAcronym() ? benefit.name() : benefit.getWelshDescription();
+
+            placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, benefitAcronym);
+            placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL_WELSH, benefitAcronymWelsh);
         }
 
         placeholders.put(SHOULD_HIDE_NINO, shouldHideNino);
