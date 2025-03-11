@@ -30,10 +30,15 @@ public final class OverridesMapping {
     }
 
     public static OverrideFields getDefaultListingValues(@Valid SscsCaseData caseData) {
-        return Optional.ofNullable(caseData)
+        OverrideFields defaultListingValues = Optional.ofNullable(caseData)
                 .map(SscsCaseData::getSchedulingAndListingFields)
                 .map(SchedulingAndListingFields::getDefaultListingValues)
                 .orElse(OverrideFields.builder().build());
+        assert caseData != null;
+        if (caseData.isIbcCase()) {
+            defaultListingValues.setDuration(null);
+        }
+        return defaultListingValues;
     }
 
     public static OverrideFields getOverrideFields(@Valid SscsCaseData caseData) {
