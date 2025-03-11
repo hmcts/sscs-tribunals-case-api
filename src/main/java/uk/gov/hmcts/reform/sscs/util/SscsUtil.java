@@ -5,6 +5,17 @@ import static java.util.Objects.nonNull;
 import static java.util.function.Predicate.not;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode.CHILD_BENEFIT_LONE_PARENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode.CHILD_TAX_CREDIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode.COEG;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode.CREDITS_APPROVED_TRAINING;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode.GUARDIANS_ALLOWANCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode.HRP;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode.IBC;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode.PENALTY_PROCEEDINGS;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode.TAX_FREE_CHILDCARE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode.THIRTY_HOURS_FREE_CHILDCARE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode.WORKING_TAX_CREDIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
@@ -35,6 +46,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCasePanelMembersExcluded;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
@@ -87,6 +99,9 @@ public class SscsUtil {
     public static final String BENEFIT_CODE_NOT_IN_USE = "The benefit code selected is not in use";
 
     private static final String ID_FORMAT = "%s_%s";
+    private static final List<BenefitCode> POSSIBLE_FQPM_BENEFIT_CODES = List.of(CHILD_TAX_CREDIT, WORKING_TAX_CREDIT,
+        PENALTY_PROCEEDINGS, GUARDIANS_ALLOWANCE, TAX_FREE_CHILDCARE, HRP, CHILD_BENEFIT_LONE_PARENT,
+        THIRTY_HOURS_FREE_CHILDCARE, COEG, CREDITS_APPROVED_TRAINING, IBC);
 
     private SscsUtil() {
         //
@@ -351,7 +366,7 @@ public class SscsUtil {
                                                 PreSubmitCallbackResponse<SscsCaseData> response,
                                                 SessionCategoryMapService categoryMapService) {
         boolean isSecondDoctorPresent = isNotBlank(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism());
-        boolean fqpmRequired = isYes(caseData.getIsFqpmRequired());
+        boolean fqpmRequired = isFqpmRequiredForSessionCategory(caseData, caseData.getBenefitCode());
 
 
         if (isNull(Benefit.getBenefitFromBenefitCode(caseData.getBenefitCode()))) {
@@ -362,6 +377,10 @@ public class SscsUtil {
             isSecondDoctorPresent, fqpmRequired))) {
             response.addError(INVALID_BENEFIT_ISSUE_CODE);
         }
+    }
+
+    public static boolean isFqpmRequiredForSessionCategory(SscsCaseData caseData, String benefitCode) {
+        return !POSSIBLE_FQPM_BENEFIT_CODES.contains(BenefitCode.getBenefitCode(benefitCode)) && isYes(caseData.getIsFqpmRequired());
     }
 
     public static String buildWriteFinalDecisionHeldBefore(SscsCaseData caseData, @NonNull String signedInJudgeName) {

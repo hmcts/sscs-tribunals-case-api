@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isConfidential;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleBenefitType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleIbcaCase;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isFqpmRequiredForSessionCategory;
 
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.ArrayList;
@@ -234,7 +235,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private void validateBenefitIssueCode(SscsCaseData caseData,
                                           PreSubmitCallbackResponse<SscsCaseData> response) {
         boolean isSecondDoctorPresent = isNotBlank(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism());
-        boolean fqpmRequired = isYes(caseData.getIsFqpmRequired());
+        boolean fqpmRequired = isFqpmRequiredForSessionCategory(caseData, caseData.getBenefitCode());
 
         if (isNull(categoryMapService.getSessionCategory(caseData.getBenefitCode(), caseData.getIssueCode(),
                 isSecondDoctorPresent, fqpmRequired))) {

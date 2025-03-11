@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.model.hmc.reference.EntityRoleCode.INTERP
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.EntityRoleCode.JOINT_PARTY;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.EntityRoleCode.OTHER_PARTY;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.EntityRoleCode.REPRESENTATIVE;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isFqpmRequiredForSessionCategory;
 
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
@@ -46,7 +47,7 @@ public final class HearingsMapping {
 
     public static SessionCategoryMap getSessionCaseCodeMap(SscsCaseData caseData, ReferenceDataServiceHolder refData) {
         boolean doctorSpecialistSecond = isNotBlank(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism());
-        boolean fqpmRequired = isYes(caseData.getIsFqpmRequired());
+        boolean fqpmRequired = isFqpmRequiredForSessionCategory(caseData, caseData.getBenefitCode());
         return refData.getSessionCategoryMaps()
                 .getSessionCategory(caseData.getBenefitCode(),
                         caseData.getIssueCode(),
