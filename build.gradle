@@ -74,6 +74,8 @@ sourceSets {
         java {
             compileClasspath += main.output + test.output
             runtimeClasspath += main.output + test.output
+            // TODO use below
+            // srcDir('src/functionalTest/java')
             srcDir('src/functionalTest/java/uk/gov/hmcts/reform/sscs/bulkscan')
         }
     }
@@ -446,6 +448,10 @@ dependencies {
     implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBoot.class.package.implementationVersion, {
+        exclude group: 'com.vaadin.external.google', module: 'android-json'
+    }
+
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.1'
     testImplementation group: 'io.rest-assured', name: 'xml-path', version: '5.5.1'
     testImplementation group: 'io.rest-assured', name: 'json-path', version: '5.5.1'
@@ -491,9 +497,6 @@ dependencies {
 
     contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBoot.class.package.implementationVersion
 
-    testImplementation(group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBoot.class.package.implementationVersion) {
-        exclude group: "com.vaadin.external.google", module: "android-json"
-    }
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
 
