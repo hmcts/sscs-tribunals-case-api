@@ -574,13 +574,13 @@ public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
             new Object[]{HEARING_REMINDER, false, REPRESENTATIVE, ORAL, LIST_ASSIST, null, "8efabd96-5020-4cb5-a23b-678006fdf7d5", List.of("d3fac5c8-b7c2-4f72-88a9-9d0cb3e81e29"), null, null},
             new Object[]{HEARING_REMINDER, false, REPRESENTATIVE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, null},
             
-            new Object[]{HEARING_REMINDER, true, APPELLANT, ORAL, LIST_ASSIST, null, "e6969b5d-cd8c-4ff8-ab76-faaed6f388c3", List.of("ec79f3ac-f7fe-41f0-a033-f0c20cfd1c69"), null, null},
+            new Object[]{HEARING_REMINDER, true, APPELLANT, ORAL, LIST_ASSIST, null, "e6969b5d-cd8c-4ff8-ab76-faaed6f388c3", List.of("ec79f3ac-f7fe-41f0-a033-f0c20cfd1c69", "3e8ef646-1649-4707-ab59-9743c1500397"), null, null},
             new Object[]{HEARING_REMINDER, true, APPELLANT, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, null},
-            new Object[]{HEARING_REMINDER, true, APPOINTEE, ORAL, LIST_ASSIST, null, "e6969b5d-cd8c-4ff8-ab76-faaed6f388c3", List.of("ec79f3ac-f7fe-41f0-a033-f0c20cfd1c69"), null, null},
+            new Object[]{HEARING_REMINDER, true, APPOINTEE, ORAL, LIST_ASSIST, null, "e6969b5d-cd8c-4ff8-ab76-faaed6f388c3", List.of("ec79f3ac-f7fe-41f0-a033-f0c20cfd1c69", "3e8ef646-1649-4707-ab59-9743c1500397"), null, null},
             new Object[]{HEARING_REMINDER, true, APPOINTEE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, null},
-            new Object[]{HEARING_REMINDER, true, JOINT_PARTY, ORAL, LIST_ASSIST, null, "d798661e-611b-4ff1-86e7-4cccda64cb36", List.of("ae62c0e6-d910-4802-8ce8-9cd863fe9170"), null, null},
+            new Object[]{HEARING_REMINDER, true, JOINT_PARTY, ORAL, LIST_ASSIST, null, "d798661e-611b-4ff1-86e7-4cccda64cb36", List.of("ae62c0e6-d910-4802-8ce8-9cd863fe9170", "3e8ef646-1649-4707-ab59-9743c1500397"), null, null},
             new Object[]{HEARING_REMINDER, true, JOINT_PARTY, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, null},
-            new Object[]{HEARING_REMINDER, true, REPRESENTATIVE, ORAL, LIST_ASSIST, null, "385e1c56-7b69-4af2-8b0d-50a8ab66679e", List.of("fdedbabe-a46e-410f-849f-345edada0a6d"), null, null},
+            new Object[]{HEARING_REMINDER, true, REPRESENTATIVE, ORAL, LIST_ASSIST, null, "385e1c56-7b69-4af2-8b0d-50a8ab66679e", List.of("fdedbabe-a46e-410f-849f-345edada0a6d", "d3fac5c8-b7c2-4f72-88a9-9d0cb3e81e29"), null, null},
             new Object[]{HEARING_REMINDER, true, REPRESENTATIVE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, null},
 
             new Object[]{HMCTS_APPEAL_LAPSED, false, APPELLANT, ORAL, LIST_ASSIST, null, "8ce8d794-75e8-49a0-b4d2-0c6cd2061c11", List.of("d2b4394b-d1c9-4d5c-a44e-b382e41c67e5"), null, "TB-SCS-GNO-ENG-00656.docx"},
