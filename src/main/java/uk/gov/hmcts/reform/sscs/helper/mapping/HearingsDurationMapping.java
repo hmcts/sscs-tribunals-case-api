@@ -52,7 +52,7 @@ public final class HearingsDurationMapping {
             log.info("Hearing Duration for Case ID {} set as existing defaultListingDuration value {}", caseId, defaultListingDuration);
             return handleStandardDuration(caseData, defaultListingDuration);
         }
-        if (caseData.isIbcCase()){
+        if (caseData.isIbcCase()) {
             throw new ListingException("Hearing duration is required to list case");
         }
         // otherwise we set duration based on existing duration values ref data json
@@ -80,7 +80,7 @@ public final class HearingsDurationMapping {
             log.debug("existingDuration with NON_STANDARD for caseId={}", caseData.getCcdCaseId());
             return handleNonStandardDuration(caseData, nextDuration);
         }
-        if (caseData.isIbcCase()){
+        if (caseData.isIbcCase()) {
             throw new ListingException("Hearing duration is required to list case");
         }
         log.debug("getHearingDurationBenefitIssueCodes for caseId={}", caseData.getCcdCaseId());

@@ -173,7 +173,7 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
     @DisplayName("When getAdjournCaseNextHearingListingDurationType is standard "
         + "getHearingDurationAdjournment returns existing duration")
     @Test
-    void getHearingDurationAdjournment_existingHearingListingDurationTypeIsStandard() throws ListingException{
+    void getHearingDurationAdjournment_existingHearingListingDurationTypeIsStandard() throws ListingException {
         given(refData.getHearingDurations()).willReturn(hearingDurations);
 
         setAdjournmentDurationAndUnits(null, SESSIONS);
@@ -200,7 +200,7 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
     @DisplayName("When typeOfHearing is not equal to nextTypeOfHearing "
         + "getHearingDurationAdjournment returns duration based on benefit code")
     @Test
-    void getHearingDurationAdjournment_nextTypeOfHearing() throws ListingException{
+    void getHearingDurationAdjournment_nextTypeOfHearing() throws ListingException {
         given(refData.getHearingDurations()).willReturn(hearingDurations);
 
         setAdjournmentDurationAndUnits(null, SESSIONS);
