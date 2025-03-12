@@ -35,28 +35,28 @@ export class HomePage {
   constructor(page: Page) {
     this.page = page;
 
-    this.notePadTab = page.getByRole('tab').filter({ hasText: /Notepad/ });
-    this.summaryTab = page.getByRole('tab').filter({ hasText: /Summary/ });
-    this.historyTab = page.getByRole('tab').filter({ hasText: /History/ });
-    this.tasksTab = page.getByRole('tab').filter({ hasText: /Tasks/ });
-    this.welshTab = page.getByRole('tab').filter({ hasText: /Welsh/ });
-    this.rolesAndAccessTab = page.getByRole('tab').filter({ hasText: /Roles and access/ });
-    this.appealDetailsTab = page.getByRole('tab').filter({ hasText: /Appeal Details/ });
-    this.bundlesTab = page.getByRole('tab').filter({ hasText: /Bundles/ });
+    this.notePadTab = page.getByRole('tab').filter({ hasText: /^Notepad$/ });
+    this.summaryTab = page.getByRole('tab').filter({ hasText: /^Summary$/ });
+    this.historyTab = page.getByRole('tab').filter({ hasText: /^History$/ });
+    this.tasksTab = page.getByRole('tab').filter({ hasText: /^Tasks$/ });
+    this.welshTab = page.getByRole('tab').filter({ hasText: /^Welsh$/ });
+    this.rolesAndAccessTab = page.getByRole('tab').filter({ hasText: /^Roles and access$/ });
+    this.appealDetailsTab = page.getByRole('tab').filter({ hasText: /^Appeal Details$/ });
+    this.bundlesTab = page.getByRole('tab').filter({ hasText: /^Bundles$/ });
     this.nextStepDropDown = '#next-step';
     this.submitNextStepButton = '//button[@class="submit"]';
     this.eventTitle = page.locator('h1.govuk-heading-l');
-    this.hearingRecordingsTab = page.getByRole('tab').filter({ hasText: /Hearing Recordings/ });
-    this.documentsTab = page.getByRole('tab').filter({ hasText: /Documents/ });
-    this.listingRequirementsTab = page.getByRole('tab').filter({ hasText: /Listing Requirements/ });
-    this.audioVideoEvidenceTab = page.getByRole('tab').filter({ hasText: /Audio\/Video evidence/ });
+    this.hearingRecordingsTab = page.getByRole('tab').filter({ hasText: /^Hearing Recordings$/ });
+    this.documentsTab = page.getByRole('tab').filter({ hasText: /^Documents$/ });
+    this.listingRequirementsTab = page.getByRole('tab').filter({ hasText: /^Listing Requirements$/ });
+    this.audioVideoEvidenceTab = page.getByRole('tab').filter({ hasText: /^Audio\/Video evidence$/ });
     this.beforeTabBtn = page.locator(
       '//html/body/exui-root/exui-case-home/div/exui-case-details-home/exui-case-viewer-container/ccd-case-viewer/div/ccd-case-full-access-view/div[2]/div/mat-tab-group/mat-tab-header/button[1]/div'
     );
-    this.subscriptionsTab = page.getByRole('tab').filter({ hasText: /Subscriptions/ });
-    this.ftaDocumentsTab = page.getByRole('tab').filter({ hasText: /FTA Documents/ });
-    this.otherPartyDetailsTab = page.getByRole('tab').filter({ hasText: /Other Party Details/ });
-    this.hearingsTab = page.getByRole('tab').filter({ hasText: /Hearings/ });
+    this.subscriptionsTab = page.getByRole('tab').filter({ hasText: /^Subscriptions$/ });
+    this.ftaDocumentsTab = page.getByRole('tab').filter({ hasText: /^FTA Documents$/ });
+    this.otherPartyDetailsTab = page.getByRole('tab').filter({ hasText: /^Other Party Details$/ });
+    this.hearingsTab = page.getByRole('tab').filter({ hasText: /^Hearings$/ });
     this.afterTabBtn = page.locator(
       '//html/body/exui-root/exui-case-home/div/exui-case-details-home/exui-case-viewer-container/ccd-case-viewer/div/ccd-case-full-access-view/div[2]/div/mat-tab-group/mat-tab-header/button[2]/div'
     );
