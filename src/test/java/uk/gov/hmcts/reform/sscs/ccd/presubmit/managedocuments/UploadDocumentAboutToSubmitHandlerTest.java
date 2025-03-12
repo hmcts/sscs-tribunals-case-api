@@ -124,7 +124,7 @@ class UploadDocumentAboutToSubmitHandlerTest {
     @Test
     void setsInternalDocsBundleFieldsIfFlagOn() {
         SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder()
-            .bundleAddition("A").documentTabChoice(REGULAR).documentFileName("file").build()).build();
+            .bundleAddition("A").documentFileName("file").build()).build();
         sscsCaseData.getInternalCaseDocumentData().setSscsInternalDocument(List.of(sscsDocument));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, "");
         assertNotNull(response);
