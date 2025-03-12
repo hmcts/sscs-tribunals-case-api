@@ -53,6 +53,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InternalCaseDocumentData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -67,7 +68,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @SuppressWarnings("unchecked")
-public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
+class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     @Mock
@@ -417,10 +418,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
                 .documentDateAdded("2019-06-12T00:00:00.000")
                 .controlNumber("123")
                 .build()).build();
-
-        sscsCaseData.setSscsInternalDocument(List.of(sscsDocument));
+        sscsCaseData.setInternalCaseDocumentData(InternalCaseDocumentData.builder().sscsInternalDocument(List.of(sscsDocument)).build());
         sscsCaseData.setUrgentCase(null);
-        callback.getCaseDetailsBefore().orElse(callback.getCaseDetails()).getCaseData().setSscsInternalDocument(List.of());
 
         given(sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData())).willReturn(sscsCaseData);
         EventType expectedEvent = isInternalDocumentFlagOn ? MAKE_CASE_URGENT : ISSUE_FURTHER_EVIDENCE;
@@ -607,12 +606,13 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         given(ccdClient.startEvent(idamTokens, 123L, UPDATE_CASE_ONLY.getCcdType())).willReturn(startEventResponse);
 
         var sscsCaseData = callback.getCaseDetails().getCaseData();
-        sscsCaseData.setSscsInternalDocument((Collections.singletonList(SscsDocument.builder()
-            .value(SscsDocumentDetails.builder()
-                .documentType(DocumentType.POSTPONEMENT_REQUEST.getValue())
-                .documentTabChoice(DocumentTabChoice.INTERNAL)
-                .build())
-            .build())));
+        sscsCaseData.setInternalCaseDocumentData(InternalCaseDocumentData.builder().sscsInternalDocument((Collections.singletonList(SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
+                    .documentType(DocumentType.POSTPONEMENT_REQUEST.getValue())
+                    .documentTabChoice(DocumentTabChoice.INTERNAL)
+                    .build())
+                .build())))
+            .build());
 
         given(sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData())).willReturn(sscsCaseData);
 
@@ -692,13 +692,13 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         given(ccdClient.startEvent(idamTokens, 123L, UPDATE_CASE_ONLY.getCcdType())).willReturn(startEventResponse);
 
         var sscsCaseData = callback.getCaseDetails().getCaseData();
-
-        sscsCaseData.setSscsInternalDocument(List.of(SscsDocument.builder()
-            .value(SscsDocumentDetails.builder()
-                .documentType(DocumentType.POST_HEARING_OTHER.getValue())
-                .documentTabChoice(DocumentTabChoice.INTERNAL)
-                .build())
-            .build()));
+        sscsCaseData.setInternalCaseDocumentData(InternalCaseDocumentData.builder().sscsInternalDocument(List.of(SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
+                    .documentType(DocumentType.POST_HEARING_OTHER.getValue())
+                    .documentTabChoice(DocumentTabChoice.INTERNAL)
+                    .build())
+                .build()))
+            .build());
 
         given(sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData())).willReturn(sscsCaseData);
 
