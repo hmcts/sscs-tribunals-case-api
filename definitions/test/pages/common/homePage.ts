@@ -35,8 +35,6 @@ export class HomePage {
   constructor(page: Page) {
     this.page = page;
 
-    let summaryTab = page.getByRole('tab').filter({ hasText: /Notepad/ });
-    
     this.notePadTab = page.getByRole('tab').filter({ hasText: /Notepad/ });
     this.summaryTab = page.getByRole('tab').filter({ hasText: /Summary/ });
     this.historyTab = page.getByRole('tab').filter({ hasText: /History/ });
