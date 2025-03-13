@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import uk.gov.hmcts.reform.sscs.config.FeignClientConfig;
+import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
+import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingCancelRequestPayload;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingRequestPayload;
@@ -23,7 +25,10 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.HmcUpdateResponse;
 public interface HmcHearingApi {
 
     String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+    String ROLE_ASSIGNMENT_URL = "Role-Assignment-Url";
+    String DATA_STORE_URL = "Data-Store-Url";
     String HEARING_ENDPOINT = "/hearing";
+    String HEARINGS_ENDPOINT = "/hearings";
     String ID = "id";
     String HMCTS_DEPLOYMENT_ID = "hmctsDeploymentId";
 
@@ -32,6 +37,8 @@ public interface HmcHearingApi {
             @RequestHeader(AUTHORIZATION) String authorisation,
             @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization,
             @RequestHeader(value = HMCTS_DEPLOYMENT_ID, required = false) String hmctsDeploymentId,
+            @RequestHeader(value = DATA_STORE_URL, required = false) String dataStoreUrl,
+            @RequestHeader(value = ROLE_ASSIGNMENT_URL, required = false) String roleAssignmentUrl,
             @RequestBody HearingRequestPayload hearingPayload
     );
 
@@ -40,6 +47,8 @@ public interface HmcHearingApi {
             @RequestHeader(AUTHORIZATION) String authorisation,
             @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization,
             @RequestHeader(value = HMCTS_DEPLOYMENT_ID, required = false) String hmctsDeploymentId,
+            @RequestHeader(value = DATA_STORE_URL, required = false) String dataStoreUrl,
+            @RequestHeader(value = ROLE_ASSIGNMENT_URL, required = false) String roleAssignmentUrl,
             @PathVariable String id,
             @RequestBody HearingRequestPayload hearingPayload
     );
@@ -49,6 +58,8 @@ public interface HmcHearingApi {
             @RequestHeader(AUTHORIZATION) String authorisation,
             @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization,
             @RequestHeader(value = HMCTS_DEPLOYMENT_ID, required = false) String hmctsDeploymentId,
+            @RequestHeader(value = DATA_STORE_URL, required = false) String dataStoreUrl,
+            @RequestHeader(value = ROLE_ASSIGNMENT_URL, required = false) String roleAssignmentUrl,
             @PathVariable String id,
             @RequestBody HearingCancelRequestPayload hearingDeletePayload
     );
@@ -58,7 +69,21 @@ public interface HmcHearingApi {
             @RequestHeader(AUTHORIZATION) String authorisation,
             @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization,
             @RequestHeader(value = HMCTS_DEPLOYMENT_ID, required = false) String hmctsDeploymentId,
+            @RequestHeader(value = DATA_STORE_URL, required = false) String dataStoreUrl,
+            @RequestHeader(value = ROLE_ASSIGNMENT_URL, required = false) String roleAssignmentUrl,
             @PathVariable String id,
             @RequestParam(name = "isValid", required = false) Boolean isValid
     );
+
+    @GetMapping(HEARINGS_ENDPOINT + "/{caseId}")
+    HearingsGetResponse getHearingsRequest(
+        @RequestHeader(AUTHORIZATION) String authorisation,
+        @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization,
+        @RequestHeader(value = DATA_STORE_URL, required = false) String dataStoreUrl,
+        @RequestHeader(value = ROLE_ASSIGNMENT_URL, required = false) String roleAssignmentUrl,
+        @RequestHeader(value = "hmctsDeploymentId", required = false) String hmctsDeploymentId,
+        @PathVariable String caseId,
+        @RequestParam(name = "status", required = false) HmcStatus hmcStatus
+    );
+
 }
