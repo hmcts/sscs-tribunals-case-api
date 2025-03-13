@@ -275,6 +275,8 @@ feature:
         enabled: ${SCOTTISH_PO_BOX_ENABLED:false}
     urgent-hearing:
         enabled: ${URGENT_HEARING_ENABLED:false}
+    tribunal-internal-documents:
+        enabled: ${TRIBUNAL_INTERNAL_DOCUMENTS_ENABLED:false}
     hearings-case-updateV2:
         enabled: ${HEARINGS_CASE_UPDATE_V2_ENABLED:false}
 
@@ -786,15 +788,15 @@ notification:
                     docmosisId: TB-SCS-GNO-ENG-00089.docx
         actionPostponementRequest:
             appellant:
-              docmosisId: TB-SCS-LET-ENG-Action-Postponement-Request.docx
+              docmosisId: TB-SCS-LET-ENG-Action-Postponement-Request-v2.docx
             appointee:
-              docmosisId: TB-SCS-LET-ENG-Action-Postponement-Request.docx
+              docmosisId: TB-SCS-LET-ENG-Action-Postponement-Request-v2.docx
             representative:
-              docmosisId: TB-SCS-LET-ENG-Action-Postponement-Request.docx
+              docmosisId: TB-SCS-LET-ENG-Action-Postponement-Request-v2.docx
             joint_party:
-              docmosisId: TB-SCS-LET-ENG-Action-Postponement-Request.docx
+              docmosisId: TB-SCS-LET-ENG-Action-Postponement-Request-v2.docx
             other_party:
-              docmosisId: TB-SCS-LET-ENG-Action-Postponement-Request.docx
+              docmosisId: TB-SCS-LET-ENG-Action-Postponement-Request-v2.docx
         decisionIssued:
             appellant:
                 docmosisId: TB-SCS-GNO-ENG-00094.docx
@@ -1425,15 +1427,15 @@ notification:
                     docmosisId: TB-SCS-GNO-WEL-00639-v2.docx
         actionPostponementRequestWelsh:
             appellant:
-                docmosisId: TB-SCS-LET-WEL-Action-Postponement-Request.docx
+                docmosisId: TB-SCS-LET-WEL-Action-Postponement-Request-v2.docx
             appointee:
-                docmosisId: TB-SCS-LET-WEL-Action-Postponement-Request.docx
+                docmosisId: TB-SCS-LET-WEL-Action-Postponement-Request-v2.docx
             representative:
-                docmosisId: TB-SCS-LET-WEL-Action-Postponement-Request.docx
+                docmosisId: TB-SCS-LET-WEL-Action-Postponement-Request-v2.docx
             joint_party:
-                docmosisId: TB-SCS-LET-WEL-Action-Postponement-Request.docx
+                docmosisId: TB-SCS-LET-WEL-Action-Postponement-Request-v2.docx
             other_party:
-                docmosisId: TB-SCS-LET-WEL-Action-Postponement-Request.docx
+                docmosisId: TB-SCS-LET-WEL-Action-Postponement-Request-v2.docx
         decisionIssuedWelsh:
             appellant:
                 docmosisId: TB-SCS-GNO-WEL-00474.docx
