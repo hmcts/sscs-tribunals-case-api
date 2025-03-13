@@ -49,6 +49,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
@@ -135,12 +136,15 @@ public class SscsUtil {
             panelMemberExclusions = PanelMemberExclusions.builder().build();
             caseData.getSchedulingAndListingFields().setPanelMemberExclusions(panelMemberExclusions);
         }
-        JudicialUserPanel panel = caseData.getLatestHearing().getValue().getPanel();
 
-        if (nonNull(panel)) {
-            setAdjournmentPanelMembersExclusions(panelMemberExclusions,
-                panel.getAllPanelMembers(),
-                arePanelMembersReserved ? AdjournCasePanelMembersExcluded.RESERVED : AdjournCasePanelMembersExcluded.YES);
+        if (caseData.getLatestHearing() != null) {
+            JudicialUserPanel panel = caseData.getLatestHearing().getValue().getPanel();
+
+            if (nonNull(panel)) {
+                setAdjournmentPanelMembersExclusions(panelMemberExclusions,
+                    panel.getAllPanelMembers(),
+                    arePanelMembersReserved ? AdjournCasePanelMembersExcluded.RESERVED : AdjournCasePanelMembersExcluded.YES);
+            }
         }
     }
 
@@ -627,7 +631,7 @@ public class SscsUtil {
                 postHearing.getPermissionToAppeal().setRequestFormat(null);
                 docGen.setPermissionToAppealBodyContent(null);
             }
-            default -> {
+            case null, default -> {
             }
         }
     }
@@ -643,6 +647,18 @@ public class SscsUtil {
             .map(SchedulingAndListingFields::getOverrideFields)
             .map(OverrideFields::getHmcHearingType)
             .orElse(sscsCaseData.getHmcHearingType());
+    }
+
+    public static void setHearingRouteIfNotSet(SscsCaseData sscsCaseData) {
+        SchedulingAndListingFields schedulingAndListingFields =
+            Optional.ofNullable(sscsCaseData.getSchedulingAndListingFields())
+                .orElse(SchedulingAndListingFields.builder().build());
+        if (isNull(schedulingAndListingFields.getHearingRoute())) {
+            HearingRoute hearingRoute = Optional.ofNullable(sscsCaseData.getRegionalProcessingCenter())
+                .orElse(RegionalProcessingCenter.builder().build()).getHearingRoute();
+            schedulingAndListingFields.setHearingRoute(hearingRoute);
+            sscsCaseData.setSchedulingAndListingFields(schedulingAndListingFields);
+        }
     }
 }
 
