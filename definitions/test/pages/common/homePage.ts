@@ -65,7 +65,7 @@ export class HomePage {
     this.caseRefInputField = '//*[@id="[CASE_REFERENCE]"]';
     this.searchResultsField =
       '#search-result > table > tbody > tr > td:nth-child(1) >';
-    this.ftaCommunicationTab = page.getByRole('tab').filter({ hasText: /^FTA Communcations$/});
+    this.ftaCommunicationTab = page.getByRole('tab').filter({ hasText: /^FTA Communications$/});
 
     webActions = new WebAction(this.page);
   }
