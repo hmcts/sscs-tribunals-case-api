@@ -31,6 +31,7 @@ export class HomePage {
   readonly caseTypeDropdown: string;
   readonly caseRefInputField: string;
   readonly searchResultsField: string;
+  readonly ftaCommunicationTab: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -64,6 +65,7 @@ export class HomePage {
     this.caseRefInputField = '//*[@id="[CASE_REFERENCE]"]';
     this.searchResultsField =
       '#search-result > table > tbody > tr > td:nth-child(1) >';
+    this.ftaCommunicationTab = page.getByRole('tab').filter({ hasText: /^FTA Communcations$/});
 
     webActions = new WebAction(this.page);
   }
@@ -284,6 +286,11 @@ export class HomePage {
       case 'Hearings': {
         await expect(this.hearingsTab).toBeVisible();
         await this.hearingsTab.click();
+        break;
+      }
+      case 'FTA Communications':{
+        await expect(this.ftaCommunicationTab).toBeVisible();
+        await this.ftaCommunicationTab.click();
         break;
       }
       default: {
