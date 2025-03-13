@@ -741,8 +741,10 @@ class SscsUtilTest {
         assertNull(schedulingAndListingFields.getPanelMemberExclusions());
         assertNull(schedulingAndListingFields.getPanelMemberExclusions());
         SscsUtil.addPanelMembersToExclusions(mockedCaseData, false);
-        assertNull(schedulingAndListingFields.getPanelMemberExclusions());
-        assertNull(schedulingAndListingFields.getPanelMemberExclusions());
+        assertNull(schedulingAndListingFields.getPanelMemberExclusions().getArePanelMembersExcluded());
+        assertNull(schedulingAndListingFields.getPanelMemberExclusions().getExcludedPanelMembers());
+        assertNull(schedulingAndListingFields.getPanelMemberExclusions().getReservedPanelMembers());
+        assertNull(schedulingAndListingFields.getPanelMemberExclusions().getArePanelMembersReserved());
     }
 
     @Test
@@ -752,8 +754,10 @@ class SscsUtilTest {
         assertNull(schedulingAndListingFields.getPanelMemberExclusions());
         assertNull(schedulingAndListingFields.getPanelMemberExclusions());
         SscsUtil.addPanelMembersToExclusions(mockedCaseData, false);
-        assertNull(schedulingAndListingFields.getPanelMemberExclusions());
-        assertNull(schedulingAndListingFields.getPanelMemberExclusions());
+        assertNull(schedulingAndListingFields.getPanelMemberExclusions().getArePanelMembersExcluded());
+        assertNull(schedulingAndListingFields.getPanelMemberExclusions().getExcludedPanelMembers());
+        assertNull(schedulingAndListingFields.getPanelMemberExclusions().getReservedPanelMembers());
+        assertNull(schedulingAndListingFields.getPanelMemberExclusions().getArePanelMembersReserved());
     }
 
     @Test
