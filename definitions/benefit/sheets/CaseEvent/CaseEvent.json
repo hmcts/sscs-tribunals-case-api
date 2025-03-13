@@ -3302,5 +3302,16 @@
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
     "SecurityClassification": "Public"
+  },
+
+  {
+    "LiveFrom": "13/03/2025",
+    "CaseTypeID": "Benefit",
+    "ID": "ftaCommunication",
+    "Name": "FTA Communication",
+    "DisplayOrder": 1304,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public"
   }
 ]

@@ -4605,5 +4605,16 @@
     "ShowSummaryChangeOption": "N",
     "RetainHiddenValue": "Yes",
     "FieldShowCondition": "hearingOutcomeValue.hearingOutcomeId=\"DoNotShow\""
+  },
+  {
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "ftaCommunicationDD",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "1.0",
+    "PageLabel": "FTA Communication"
   }
 ]
