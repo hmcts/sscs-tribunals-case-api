@@ -27,15 +27,10 @@ public class AuthorisationServiceTest {
 
     private static final String CCD_DATA = "ccd_data";
 
-    // @Mock
-    // private AuthTokenValidator authTokenValidator;
-
     @Before
     public void setUp() {
         openMocks(this);
-        service = new AuthorisationService(serviceAuthorisationApi,
-            // authTokenValidator,
-            "ccd_data");
+        service = new AuthorisationService(serviceAuthorisationApi, "ccd_data");
     }
 
     @Test

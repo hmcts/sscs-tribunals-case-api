@@ -19,15 +19,12 @@ import uk.gov.hmcts.reform.sscs.service.exceptions.ClientAuthorisationException;
 public class AuthorisationService {
     private static final org.slf4j.Logger LOG = getLogger(AuthorisationService.class);
     public static final String SERVICE_AUTHORISATION_HEADER = "ServiceAuthorization";
-    //private final AuthTokenValidator authTokenValidator;
     private final List<String> allowedServices;
     private final ServiceAuthorisationApi serviceAuthorisationApi;
 
     public AuthorisationService(ServiceAuthorisationApi serviceAuthorisationApi,
-                                // AuthTokenValidator authTokenValidator,
                                 @Value("${allowed-services-for-callback}") String configuredServicesCsv) {
         this.serviceAuthorisationApi = serviceAuthorisationApi;
-        // this.authTokenValidator = authTokenValidator;
         this.allowedServices = Splitter.on(",").splitToList(configuredServicesCsv);
     }
 
