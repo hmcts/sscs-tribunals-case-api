@@ -64,6 +64,7 @@ public final class PersonalisationMappingConstants {
     public static final String HEARING_DATE_WELSH = "welsh_hearing_date";
     public static final String HEARING_DETAILS_LITERAL = "hearing_details";
     public static final String HEARING_DETAILS_LITERAL_WELSH = "welsh_hearing_details";
+    public static final String HMC_HEARING_TYPE_LITERAL = "hmc_hearing_type";
     public static final String HEARING_INFO_LINK_LITERAL = "hearing_info_link";
     public static final String HEARING_TIME = "hearing_time";
     public static final String HEARING_TYPE = "hearing_type";
@@ -130,6 +131,7 @@ public final class PersonalisationMappingConstants {
     public static final String SENDER_NAME = "sender_name";
     public static final String LETTER_CONTENT_TYPE = "letter_content_type";
     public static final String FURTHER_EVIDENCE_ACTION = "further_evidence_action";
+    public static final String POSTPONEMENT_REQUEST = "postponement_request";
 
     private PersonalisationMappingConstants() {
         //

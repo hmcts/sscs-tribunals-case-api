@@ -1413,17 +1413,6 @@
     "PageLabel": "Upload Cor documents"
   },
   {
-    "CaseEventID": "uploadDocument",
-    "CaseFieldID": "sscsDocument",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 1,
-    "PageID": "1.0",
-    "PageLabel": "Upload documents"
-  },
-  {
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
     "CaseEventID": "uploadDocumentFurtherEvidence",
     "CaseFieldID": "draftSscsFurtherEvidenceDocument",
@@ -2078,6 +2067,31 @@
     "PageFieldDisplayOrder": 22,
     "PageID": "1.0",
     "PageLabel": "Issue direction"
+  },
+  {
+    "CaseEventID": "directionIssued",
+    "CaseFieldID": "selectNextHmcHearingType",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 23,
+    "PageID": "1.0",
+    "PageLabel": "Issue direction",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "directionIssued",
+    "CaseFieldID": "hmcHearingType",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 24,
+    "PageID": "2.0",
+    "PageLabel": "Issue direction",
+    "PageShowCondition": "selectNextHmcHearingType=\"Yes\"",
+    "ShowSummaryChangeOption": "Y"
   },
   {
     "CaseEventID": "directionIssued",
