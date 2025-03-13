@@ -8,7 +8,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -181,7 +180,7 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
     }
 
     @Test
-    public void givenAHmctsResponseReviewedSubmittedEventAndInterlocIsNotRequiredAndIbcaCase_thenNoFurtherEventShouldTrigger() {
+    public void givenAHmctsResponseReviewedSubmittedEventAndInterlocIsNotRequiredAndIbcaCase_thenTriggerReadyToListEvent() {
         sscsCaseData = sscsCaseData.toBuilder()
                 .benefitCode(IBCA_BENEFIT_CODE)
                 .isInterlocRequired("No")
@@ -191,7 +190,19 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
-        verifyNoInteractions(updateCcdCaseService);
+
+        verify(updateCcdCaseService).updateCaseV2(
+            eq(123L),
+            eq(READY_TO_LIST.getCcdType()),
+            eq("Ready to list"),
+            eq("Makes an appeal ready to list"),
+            any(IdamTokens.class),
+            consumerArgumentCaptor.capture());
+
+        Consumer<SscsCaseDetails> mutator = consumerArgumentCaptor.getValue();
+        mutator.accept(SscsCaseDetails.builder().data(sscsCaseData).build());
+
+        assertEquals(YesNo.YES, sscsCaseData.getIgnoreCallbackWarnings());
     }
 
     @Test(expected = IllegalStateException.class)

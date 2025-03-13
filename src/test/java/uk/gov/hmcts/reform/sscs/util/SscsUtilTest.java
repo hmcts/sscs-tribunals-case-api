@@ -5,8 +5,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.CORRECTION_GRANTED;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_CORRECTED_NOTICE;
@@ -34,13 +39,16 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.updateHearingInterpreter;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.validateBenefitIssueCode;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -51,6 +59,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Correction;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
@@ -59,6 +68,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InternalCaseDocumentData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LibertyToApplyActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
@@ -72,11 +82,14 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFinalDecisionCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
+import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @ExtendWith(MockitoExtension.class)
 class SscsUtilTest {
@@ -91,6 +104,9 @@ class SscsUtilTest {
 
     @Mock
     private SscsCaseData mockedCaseData;
+
+    @Mock
+    private FooterService footerService;
 
     @BeforeEach
     void setUp() {
@@ -678,5 +694,123 @@ class SscsUtilTest {
         String result = SscsUtil.buildWriteFinalDecisionHeldBefore(mockedCaseData, "Judge Name");
 
         assertEquals("Judge Name, Disability Member and Medical Member", result);
+    }
+
+    @Test
+    void testAddDocumentToDocumentTabAndBundle() {
+        SscsUtil.addDocumentToDocumentTabAndBundle(footerService, caseData, DocumentLink.builder().build(), DocumentType.DECISION_NOTICE);
+        verify(footerService).createFooterAndAddDocToCase(any(DocumentLink.class), eq(caseData), eq(DocumentType.DECISION_NOTICE), any(),
+            eq(null), eq(null), eq(null), eq(null), eq(false));
+    }
+
+    @Test
+    void testAddDocumentToDocumentTabAndBundleWithEventType() {
+        SscsUtil.addDocumentToDocumentTabAndBundle(footerService, caseData, DocumentLink.builder().build(), DocumentType.DECISION_NOTICE, READY_TO_LIST);
+        verify(footerService).createFooterAndAddDocToCase(any(DocumentLink.class), eq(caseData), eq(DocumentType.DECISION_NOTICE), any(),
+            eq(null), eq(null), eq(null), eq(READY_TO_LIST), eq(false));
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void testAddDocumentToDocumentTabAndBundleWithIssueBool(boolean issue) {
+        SscsUtil.addDocumentToDocumentTabAndBundle(footerService, caseData, DocumentLink.builder().build(), DocumentType.DECISION_NOTICE, null, issue);
+        verify(footerService).createFooterAndAddDocToCase(any(DocumentLink.class), eq(caseData), eq(DocumentType.DECISION_NOTICE), any(),
+            eq(null), eq(null), eq(null), eq(null), eq(issue));
+    }
+
+    @Test
+    void testAddDocumentToCaseDataDocuments() {
+        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build();
+        SscsUtil.addDocumentToCaseDataDocuments(caseData, sscsDocument);
+
+        List<SscsDocument> documents = caseData.getSscsDocument();
+        assertNotNull(documents);
+        assertEquals(1, documents.size());
+        assertEquals(sscsDocument, documents.getFirst());
+    }
+
+    @Test
+    void testRemoveDocumentFromCaseDataDocuments() {
+        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder()
+            .documentLink(DocumentLink.builder().documentUrl("some-url/1029103123").build()).build()).build();
+        SscsDocument sscsDocument2 = SscsDocument.builder().value(SscsDocumentDetails.builder()
+            .documentLink(DocumentLink.builder().documentUrl("some-url/1029103126").build()).build()).build();
+        List<SscsDocument> documents = new ArrayList<>();
+        documents.add(sscsDocument);
+        documents.add(sscsDocument2);
+        caseData.setSscsDocument(documents);
+
+        SscsUtil.removeDocumentFromCaseDataDocuments(caseData, sscsDocument2);
+
+        List<SscsDocument> updatedDocuments = caseData.getSscsDocument();
+        assertNotNull(updatedDocuments);
+        assertEquals(1, updatedDocuments.size());
+        assertNotEquals(sscsDocument2.getValue().getDocumentLink().getDocumentUrl(), updatedDocuments.getFirst().getValue().getDocumentLink().getDocumentUrl());
+        assertEquals(sscsDocument.getValue().getDocumentLink().getDocumentUrl(), updatedDocuments.getFirst().getValue().getDocumentLink().getDocumentUrl());
+    }
+
+    @Test
+    void testAddDocumentToCaseDataInternalDocuments() {
+        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build();
+        SscsUtil.addDocumentToCaseDataInternalDocuments(caseData, sscsDocument);
+
+        InternalCaseDocumentData internalCaseDocumentData = caseData.getInternalCaseDocumentData();
+        assertNotNull(internalCaseDocumentData);
+        List<SscsDocument> documents = internalCaseDocumentData.getSscsInternalDocument();
+        assertNotNull(documents);
+        assertEquals(1, documents.size());
+        assertEquals(sscsDocument, documents.getFirst());
+    }
+
+    @Test
+    void testAddNonAdditionNamedDocumentToCaseDataInternalDocuments() {
+        String randomName = RandomStringUtils.secure().nextAlphabetic(10);
+        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder()
+            .documentFileName(randomName).build()).build();
+        SscsUtil.addDocumentToCaseDataInternalDocuments(caseData, sscsDocument);
+
+        InternalCaseDocumentData internalCaseDocumentData = caseData.getInternalCaseDocumentData();
+        assertNotNull(internalCaseDocumentData);
+        List<SscsDocument> documents = internalCaseDocumentData.getSscsInternalDocument();
+        assertNotNull(documents);
+        assertEquals(1, documents.size());
+        assertEquals(randomName, documents.getFirst().getValue().getDocumentFileName());
+    }
+
+    @Test
+    void testAddAdditionNamedDocumentToCaseDataInternalDocuments() {
+        String randomName = RandomStringUtils.secure().nextAlphabetic(10);
+        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder()
+            .documentFileName("Addition A - " + randomName).build()).build();
+        SscsUtil.addDocumentToCaseDataInternalDocuments(caseData, sscsDocument);
+
+        InternalCaseDocumentData internalCaseDocumentData = caseData.getInternalCaseDocumentData();
+        assertNotNull(internalCaseDocumentData);
+        List<SscsDocument> documents = internalCaseDocumentData.getSscsInternalDocument();
+        assertNotNull(documents);
+        assertEquals(1, documents.size());
+        assertEquals(randomName, documents.getFirst().getValue().getDocumentFileName());
+    }
+
+    @Test
+    void testRemoveDocumentFromCaseDataInternalDocuments() {
+        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder()
+            .documentLink(DocumentLink.builder().documentUrl("some-url/1029103123").build()).build()).build();
+        SscsDocument sscsDocument2 = SscsDocument.builder().value(SscsDocumentDetails.builder()
+            .documentLink(DocumentLink.builder().documentUrl("some-url/1029103126").build()).build()).build();
+        InternalCaseDocumentData internalCaseDocumentData = InternalCaseDocumentData.builder()
+            .sscsInternalDocument(new ArrayList<>(List.of(sscsDocument, sscsDocument2)))
+            .build();
+        caseData.setInternalCaseDocumentData(internalCaseDocumentData);
+
+        SscsUtil.removeDocumentFromCaseDataInternalDocuments(caseData, sscsDocument);
+
+        InternalCaseDocumentData updatedInternalCaseDocumentData = caseData.getInternalCaseDocumentData();
+        assertNotNull(updatedInternalCaseDocumentData);
+        List<SscsDocument> updatedDocuments = updatedInternalCaseDocumentData.getSscsInternalDocument();
+        assertEquals(1, updatedDocuments.size());
+        assertEquals(sscsDocument2.getValue().getDocumentLink().getDocumentUrl(), updatedDocuments.getFirst().getValue().getDocumentLink().getDocumentUrl());
+        assertNotEquals(sscsDocument.getValue().getDocumentLink().getDocumentUrl(), updatedDocuments.getFirst().getValue().getDocumentLink().getDocumentUrl());
     }
 }
