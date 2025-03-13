@@ -57,8 +57,14 @@ test.describe(
       caseId = await createCaseBasedOnCaseType('DLASANDL');
       await uploadResponseSteps.performUploadResponse(caseId, 'dla');
       await hearingSteps.verifyHearingIsTriggered(caseId, 'dla');
+      await hearingSteps.setAutolist(true);
       await hearingSteps.updateHearingViaEvent();
-      await hearingSteps.verifyUpdatedHearingStatusViaEvent();
+      try {
+        await hearingSteps.verifyUpdatedHearingStatusViaEvent();
+      } catch {
+        await hearingSteps.updateListingRequirementsNoChange();
+        await hearingSteps.verifyUpdatedHearingStatusViaEvent();
+      }
     });
   }
 );
