@@ -61,7 +61,7 @@ export class MoveDocumentsPage {
   }
 
   async verifyDocumentIssuedError(): Promise<void> {
-    await this.confirmSubmission();
+    await webActions.clickButton('Submit');
     await webActions.verifyPageLabel(
       'a.validation-error',
       'Should this document be issued out to parties? is required'
