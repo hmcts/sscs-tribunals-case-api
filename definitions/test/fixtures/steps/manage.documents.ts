@@ -56,8 +56,8 @@ export class ManageDocuments extends BaseStep {
     if (to === 'Documents') {
       await this.moveDocumentsPage.verifyIssuedQuestion();
       await this.moveDocumentsPage.verifyMoveToDocumentsChoices(filename);
-      await this.moveDocumentsPage.selectNotIssued();
       await this.moveDocumentsPage.selectInternalDocumentToMove(filename);
+      await this.moveDocumentsPage.selectNotIssued();
     } else if (to === 'Tribunal Internal Documents') {
       await this.moveDocumentsPage.verifyMoveToInternalDocumentsChoices(
         filename
