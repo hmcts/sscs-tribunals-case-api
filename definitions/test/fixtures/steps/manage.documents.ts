@@ -49,11 +49,9 @@ export class ManageDocuments extends BaseStep {
     await this.moveToTabPage.verifyMovePage();
     if (to === 'Documents') {
       await this.moveToTabPage.selectInternalDocumentsTab();
-      await this.moveToTabPage.verifyErrorNoDocuments();
       await this.moveToTabPage.selectDocumentsTab();
     } else if (to === 'Tribunal Internal Documents') {
       await this.moveToTabPage.selectDocumentsTab();
-      await this.moveToTabPage.verifyErrorNoInternalDocuments();
       await this.moveToTabPage.selectInternalDocumentsTab();
     }
     await this.moveDocumentsPage.verifyMoveDocumentsPage();
@@ -70,6 +68,16 @@ export class ManageDocuments extends BaseStep {
     }
     await this.moveDocumentsPage.confirmSubmission();
     await this.eventNameAndDescriptionPage.confirmSubmission();
+  }
+
+  async moveInternalDocumentNoneFoundErrorCheck() {
+    await this.triggerManageDocumentsEvent();
+    await this.uploadRemoveOrMoveDocumentPage.verifyUploadRemoveOrMovePage();
+    await this.uploadRemoveOrMoveDocumentPage.selectMoveDocument();
+    await this.moveToTabPage.verifyMovePage();
+    await this.moveToTabPage.selectDocumentsTab();
+    await this.moveToTabPage.verifyErrorNoDocuments();
+    await this.moveToTabPage.page.getByRole('link', {name: 'Cancel', exact: true}).click();
   }
 
   async moveDocumentNoneFoundErrorCheck() {

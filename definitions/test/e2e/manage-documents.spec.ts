@@ -142,10 +142,12 @@ test.describe(
         credentials.caseWorker,
         caseId
       );
+      await manageDocumentsSteps.removeDocumentFromTab('Documents', 'SSCS1');
+      await manageDocumentsSteps.moveInternalDocumentNoneFoundErrorCheck();
+      await manageDocumentsSteps.moveDocumentNoneFoundErrorCheck();
       let documentType = 'Other document';
       let fileName = 'testfile1.pdf';
       let tab = 'Tribunal Internal Documents';
-      await manageDocumentsSteps.moveDocumentNoneFoundErrorCheck();
       await manageDocumentsSteps.uploadDocumentToTab(
         tab,
         documentType,
