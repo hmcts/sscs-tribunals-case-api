@@ -2,9 +2,20 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.GRANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.REFUSE;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.*;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.ADDRESS_NAME;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.APPELLANT_NAME;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.ENTITY_TYPE;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.HMC_HEARING_TYPE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_1;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_2;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_4;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_POSTCODE;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.NAME;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.POSTPONEMENT_REQUEST;
 
 import java.util.List;
 import java.util.Map;
@@ -141,6 +152,34 @@ public class SorPlaceholderServiceTest {
         assertEquals(appellantName, placeholders.get(APPELLANT_NAME));
     }
 
+    @Test
+    void whenNotAHearingPostponementRequest_thenPlaceholderIsEmptyString() {
+        Map<String, Object> placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER,
+                Appointee.class.getSimpleName(), null);
+
+        assertEquals("", placeholders.get(POSTPONEMENT_REQUEST));
+    }
+
+    @Test
+    void givenAGrantedHearingPostponementRequest_thenSetPlaceholderAccordingly() {
+        caseData.setPostponementRequest(uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest.builder().actionPostponementRequestSelected(GRANT.getValue()).build());
+
+        Map<String, Object> placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER,
+                Appointee.class.getSimpleName(), null);
+
+        assertEquals("grant", placeholders.get(POSTPONEMENT_REQUEST));
+    }
+
+    @Test
+    void givenARefusedHearingPostponementRequest_thenSetPlaceholderAccordingly() {
+        caseData.setPostponementRequest(uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest.builder().actionPostponementRequestSelected(REFUSE.getValue()).build());
+
+        Map<String, Object> placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER,
+                Appointee.class.getSimpleName(), null);
+
+        assertEquals("refuse", placeholders.get(POSTPONEMENT_REQUEST));
+    }
+  
     @ParameterizedTest
     @EnumSource(value = HmcHearingType.class, names = {"DIRECTION_HEARINGS", "SUBSTANTIVE"})
     void shouldReturnDirectionHearingPlaceholder(HmcHearingType hmcHearingType) {
