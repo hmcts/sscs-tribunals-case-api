@@ -80,8 +80,13 @@ test.describe(
         credentials.caseWorker,
         caseId
       );
-      let documentType = 'SSCS1';
-      let fileName = 'BloggsPIP_RFQ.pdf';
+      let documentType = 'Other document';
+      let fileName = 'testfile1.pdf';
+      await manageDocumentsSteps.uploadDocumentToTab(
+        'Documents',
+        documentType,
+        fileName
+      );
       await manageDocumentsSteps.verifyFileInTab(
         'Documents',
         documentType,
