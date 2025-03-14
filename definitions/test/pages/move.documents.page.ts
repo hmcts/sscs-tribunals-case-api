@@ -74,13 +74,15 @@ export class MoveDocumentsPage {
     await expect(this.page).not.toHaveURL(pageUrl);
   }
 
+  async submit(): Promise<void> {
+    await webActions.clickButton('Submit');
+  }
+
   async selectNotIssued(): Promise<void> {
     await webActions.clickElementById('#shouldBeIssued_No');
-    await this.confirmSubmission();
   }
 
   async selectIssued(): Promise<void> {
     await webActions.clickElementById('#shouldBeIssued_Yes');
-    await this.confirmSubmission();
   }
 }

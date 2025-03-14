@@ -99,6 +99,7 @@ export class ManageDocuments extends BaseStep {
     await this.moveDocumentsPage.verifyMoveToDocumentsChoices(filename);
     await this.moveDocumentsPage.verifyDocumentIssuedError();
     await this.moveDocumentsPage.selectNotIssued();
+    await this.moveDocumentsPage.submit();
     await this.moveDocumentsPage.verifyNoDocumentsError();
   }
 
@@ -113,6 +114,7 @@ export class ManageDocuments extends BaseStep {
     await this.moveDocumentsPage.verifyMoveToDocumentsChoices(filename);
     await this.moveDocumentsPage.selectInternalDocumentToMove(filename);
     await this.moveDocumentsPage.selectIssued();
+    await this.moveDocumentsPage.submit();
     await this.eventNameAndDescriptionPage.confirmSubmission();
   }
 
