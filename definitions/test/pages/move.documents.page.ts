@@ -22,6 +22,13 @@ export class MoveDocumentsPage {
     await expect(locator).toBeVisible();
   }
 
+  async selectDocumentToMove(filename: string): Promise<void> {
+    let locator = this.page
+      .locator('#moveDocumentToInternalDocumentsTabDL div.multiple-choice')
+      .filter({ hasText: filename });
+    await locator.locator('input').first().check();
+  }
+
   async verifyIssuedQuestion() {
     await webActions.verifyPageLabel(
       '#shouldBeIssued span',
@@ -38,7 +45,7 @@ export class MoveDocumentsPage {
     await expect(locator).toBeVisible();
   }
 
-  async selectDocumentToMove(filename: string): Promise<void> {
+  async selectInternalDocumentToMove(filename: string): Promise<void> {
     let locator = this.page
       .locator('#moveDocumentToDocumentsTabDL div.multiple-choice')
       .filter({ hasText: filename });
@@ -46,7 +53,7 @@ export class MoveDocumentsPage {
   }
 
   async verifyNoDocumentsError(): Promise<void> {
-    await this.confirmSubmission();
+    await webActions.clickButton('Submit');
     await webActions.verifyPageLabel(
       'div.error-summary ul li',
       'Please select at least one document to move'
@@ -54,7 +61,7 @@ export class MoveDocumentsPage {
   }
 
   async verifyDocumentIssuedError(): Promise<void> {
-    await this.confirmSubmission();
+    await webActions.clickButton('Submit');
     await webActions.verifyPageLabel(
       'a.validation-error',
       'Should this document be issued out to parties? is required'
@@ -67,13 +74,15 @@ export class MoveDocumentsPage {
     await expect(this.page).not.toHaveURL(pageUrl);
   }
 
+  async submit(): Promise<void> {
+    await webActions.clickButton('Submit');
+  }
+
   async selectNotIssued(): Promise<void> {
     await webActions.clickElementById('#shouldBeIssued_No');
-    await this.confirmSubmission();
   }
 
   async selectIssued(): Promise<void> {
     await webActions.clickElementById('#shouldBeIssued_Yes');
-    await this.confirmSubmission();
   }
 }
