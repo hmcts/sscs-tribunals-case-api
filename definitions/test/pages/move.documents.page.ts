@@ -46,7 +46,7 @@ export class MoveDocumentsPage {
   }
 
   async verifyNoDocumentsError(): Promise<void> {
-    await this.confirmSubmission();
+    await webActions.clickButton('Submit');
     await webActions.verifyPageLabel(
       'div.error-summary ul li',
       'Please select at least one document to move'

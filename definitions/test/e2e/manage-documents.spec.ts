@@ -133,5 +133,25 @@ test.describe(
         fileName
       );
     });
+
+    test('Move document error message checks', async ({
+      manageDocumentsSteps
+    }) => {
+      caseId = await createCaseBasedOnCaseType('PIPREPSANDL');
+      await manageDocumentsSteps.fastLoginUserWithCaseId(
+        credentials.caseWorker,
+        caseId
+      );
+      let documentType = 'Other document';
+      let fileName = 'testfile1.pdf';
+      let tab = 'Tribunal Internal Documents';
+      await manageDocumentsSteps.uploadDocumentToTab(
+        tab,
+        documentType,
+        fileName
+      );
+      await manageDocumentsSteps.verifyFileInTab(tab, documentType, fileName);
+      await manageDocumentsSteps.moveDocumentErrorChecks(fileName);
+    });
   }
 );

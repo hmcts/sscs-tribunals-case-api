@@ -60,18 +60,31 @@ export class ManageDocuments extends BaseStep {
     if (to === 'Documents') {
       await this.moveDocumentsPage.verifyIssuedQuestion();
       await this.moveDocumentsPage.verifyMoveToDocumentsChoices(filename);
-      await this.moveDocumentsPage.verifyDocumentIssuedError();
       await this.moveDocumentsPage.selectNotIssued();
     } else if (to === 'Tribunal Internal Documents') {
       await this.moveDocumentsPage.verifyMoveToInternalDocumentsChoices(
         filename
       );
     }
-    await this.moveDocumentsPage.verifyNoDocumentsError();
-    await this.page.goBack();
     await this.moveDocumentsPage.selectDocumentToMove(filename);
     await this.moveDocumentsPage.confirmSubmission();
     await this.eventNameAndDescriptionPage.confirmSubmission();
+  }
+
+  async moveDocumentErrorChecks(filename: string) {
+    await this.triggerManageDocumentsEvent();
+    await this.uploadRemoveOrMoveDocumentPage.verifyUploadRemoveOrMovePage();
+    await this.uploadRemoveOrMoveDocumentPage.selectMoveDocument();
+    await this.moveToTabPage.verifyMovePage();
+    await this.moveToTabPage.selectInternalDocumentsTab();
+    await this.moveToTabPage.verifyErrorNoDocuments();
+    await this.moveToTabPage.selectDocumentsTab();
+    await this.moveDocumentsPage.verifyMoveDocumentsPage();
+    await this.moveDocumentsPage.verifyIssuedQuestion();
+    await this.moveDocumentsPage.verifyMoveToDocumentsChoices(filename);
+    await this.moveDocumentsPage.verifyDocumentIssuedError();
+    await this.moveDocumentsPage.selectNotIssued();
+    await this.moveDocumentsPage.verifyNoDocumentsError();
   }
 
   async moveDocumentToDocumentsWithIssue(filename: string) {
