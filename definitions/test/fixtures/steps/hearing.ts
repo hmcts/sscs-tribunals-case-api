@@ -26,7 +26,7 @@ export class Hearing extends BaseStep {
     await this.summaryTab.verifyPresenceOfText('Ready to list');
 
     await this.homePage.navigateToTab(hearingTestData.tabName);
-    await this.hearingsTab.verifyHearingStatusSummary();
+    await this.hearingsTab.verifyHearingStatusSummary(false);
     await this.hearingsTab.clickHearingDetails();
 
     if (caseType === 'pip') {
@@ -63,9 +63,9 @@ export class Hearing extends BaseStep {
     await this.hearingsTab.clickBackLink();
   }
 
-  async verifyHearingIsTriggeredForUCCase() {
+  async verifyHearingIsTriggeredForUCCase(isDirectionHearing: boolean) {
     await this.homePage.navigateToTab(hearingTestData.tabName);
-    await this.hearingsTab.verifyHearingStatusSummary();
+    await this.hearingsTab.verifyHearingStatusSummary(isDirectionHearing);
     await this.hearingsTab.clickHearingDetails();
     await this.hearingsTab.verifyPageContentByKeyValue(
       hearingTestData.hearingLengthKey,
@@ -141,6 +141,19 @@ export class Hearing extends BaseStep {
     await this.listingRequirementsTab.verifyContentByKeyValueForASpan(
       'Amend Reason',
       'Admin requested change'
+    );
+  }
+
+  async updateHearingToDirectionViaEvent() {
+    await this.homePage.chooseEvent('Update Listing Requirements');
+    await this.listingRequirementPage.updateHearingToDirection();
+    await this.listingRequirementPage.submitUpdatedValues();
+
+    await this.homePage.clickAfterTabBtn();
+    await this.homePage.navigateToTab('Listing Requirements');
+    await this.listingRequirementsTab.verifyContentByKeyValueForASpan(
+      'Next hearing type',
+      'Direction'
     );
   }
 

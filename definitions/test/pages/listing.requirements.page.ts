@@ -44,6 +44,12 @@ export class ListingRequirementPage {
     await webAction.clickSubmitButton();
     await webAction.verifyElementVisibility("#field-trigger-summary");
     await webAction.clickSubmitButton();
+  }
 
+  async updateHearingToDirection() {
+    await webAction.clickElementById(
+      '#overrideFields_hmcHearingType-BBA3-DIR'
+    );
+    await webAction.clickButton('Continue');
   }
 }

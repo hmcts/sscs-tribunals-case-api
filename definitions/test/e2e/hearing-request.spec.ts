@@ -24,7 +24,30 @@ test.describe(
     }) => {
       caseId = await createCaseBasedOnCaseType('UCSANDL');
       await uploadResponseSteps.performUploadResponseOnAUniversalCredit(caseId);
-      await hearingSteps.verifyHearingIsTriggeredForUCCase();
+      await hearingSteps.verifyHearingIsTriggeredForUCCase(false);
+    });
+
+    test('Trigger a new direction hearing via issue direction notice for UC case', async ({
+      uploadResponseSteps,
+      hearingSteps,
+      issueDirectionsNoticeSteps
+    }) => {
+      caseId = await createCaseBasedOnCaseType('UCSANDL');
+      await issueDirectionsNoticeSteps.performIssueDirectionNoticeDirectionHearing(
+        caseId
+      );
+      await uploadResponseSteps.performUploadResponseOnAUniversalCredit(caseId);
+      await hearingSteps.verifyHearingIsTriggeredForUCCase(true);
+    });
+
+    test('Trigger a new direction hearing via update listing reqs for UC case', async ({
+      uploadResponseSteps,
+      hearingSteps
+    }) => {
+      caseId = await createCaseBasedOnCaseType('UCSANDL');
+      await hearingSteps.updateHearingToDirectionViaEvent()
+      await uploadResponseSteps.performUploadResponseOnAUniversalCredit(caseId);
+      await hearingSteps.verifyHearingIsTriggeredForUCCase(true);
     });
 
     test('Trigger a new hearing for PIP case', async ({
