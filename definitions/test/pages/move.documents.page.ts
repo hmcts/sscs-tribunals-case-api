@@ -22,6 +22,13 @@ export class MoveDocumentsPage {
     await expect(locator).toBeVisible();
   }
 
+  async selectDocumentToMove(filename: string): Promise<void> {
+    let locator = this.page
+      .locator('#moveDocumentToInternalDocumentsTabDL div.multiple-choice')
+      .filter({ hasText: filename });
+    await locator.locator('input').first().check();
+  }
+
   async verifyIssuedQuestion() {
     await webActions.verifyPageLabel(
       '#shouldBeIssued span',
@@ -38,7 +45,7 @@ export class MoveDocumentsPage {
     await expect(locator).toBeVisible();
   }
 
-  async selectDocumentToMove(filename: string): Promise<void> {
+  async selectInternalDocumentToMove(filename: string): Promise<void> {
     let locator = this.page
       .locator('#moveDocumentToDocumentsTabDL div.multiple-choice')
       .filter({ hasText: filename });

@@ -145,13 +145,14 @@ test.describe(
       let documentType = 'Other document';
       let fileName = 'testfile1.pdf';
       let tab = 'Tribunal Internal Documents';
+      await manageDocumentsSteps.moveDocumentNoneFoundErrorCheck();
       await manageDocumentsSteps.uploadDocumentToTab(
         tab,
         documentType,
         fileName
       );
       await manageDocumentsSteps.verifyFileInTab(tab, documentType, fileName);
-      await manageDocumentsSteps.moveDocumentErrorChecks(fileName);
+      await manageDocumentsSteps.moveDocumentNoneSelectedErrorChecks(fileName);
     });
   }
 );
