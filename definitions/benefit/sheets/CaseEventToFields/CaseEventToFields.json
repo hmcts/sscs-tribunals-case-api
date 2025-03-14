@@ -4608,7 +4608,7 @@
   },
   {
     "CaseEventID": "ftaCommunication",
-    "CaseFieldID": "ftaCommunicationDD",
+    "CaseFieldID": "ftaRequestType",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "13/03/2025",

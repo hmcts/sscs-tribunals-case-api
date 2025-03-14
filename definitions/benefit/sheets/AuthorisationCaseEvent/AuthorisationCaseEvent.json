@@ -982,6 +982,6 @@
   {"LiveFrom": "02/12/2024", "CaseTypeID": "Benefit", "CaseEventID": "clearFailedFeFilter", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
   {"LiveFrom": "30/11/2022", "CaseTypeID": "Benefit", "CaseEventID": "amendHearingOutcome", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "30/11/2022", "CaseTypeID": "Benefit", "CaseEventID": "amendHearingOutcome", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
-  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseEventID": "ftaCommunication", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"}
-
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseEventID": "ftaCommunication", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseEventID": "ftaCommunication", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"}
 ]
