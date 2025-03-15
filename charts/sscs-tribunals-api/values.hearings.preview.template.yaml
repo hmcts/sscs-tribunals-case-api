@@ -75,7 +75,6 @@ java:
     HMC_HEARINGS_TOPIC_NAMESPACE: "hmc-servicebus-aat"
     HMC_DEPLOYMENT_ID: "deployment-${SERVICE_NAME}"
     ADJOURNMENT_ENABLED: true
-    DIRECTION_HEARINGS_ENABLED: true
   secrets:
     JOB_SCHEDULER_DB_PASSWORD:
       secretRef: postgres
