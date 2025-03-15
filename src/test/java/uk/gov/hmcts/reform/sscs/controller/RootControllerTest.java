@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -7,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 public class RootControllerTest {
@@ -23,7 +25,8 @@ public class RootControllerTest {
 
     @Test
     public void root() throws Exception {
-        mockMvc.perform(get("/"))
-                .andExpect(status().isOk());
+        MvcResult response = mockMvc.perform(get("/")).andExpect(status().isOk()).andReturn();
+
+        assertThat(response.getResponse().getContentAsString()).startsWith("Welcome");
     }
 }

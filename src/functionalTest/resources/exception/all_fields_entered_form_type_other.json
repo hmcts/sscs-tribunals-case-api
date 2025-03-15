@@ -1,0 +1,243 @@
+{
+  "id": "id",
+  "case_type_id": "case_type_id",
+  "po_box": "po_box",
+  "po_box_jurisdiction": "bulkscan",
+  "form_type": "Other",
+  "journey_classification": "NEW_APPLICATION",
+  "delivery_date": "2019-08-01T01:02:03.456Z",
+  "opening_date": "2019-08-02T02:03:04.567Z",
+  "scanned_documents": [
+    {
+      "type": "Form",
+      "subtype": "XYZ",
+      "url": {
+        "document_url": "url",
+        "document_binary_url": "binary-url",
+        "document_filename": "987654321-123456789.pdf"
+      },
+      "control_number": "987654321",
+      "file_name": "987654321-123456789.pdf",
+      "scanned_date": "2019-08-01T00:01:02.345Z",
+      "delivery_date": "2019-08-01T01:02:03.456Z"
+    }
+  ],
+  "ocr_data_fields": [
+    {
+      "name": "contains_mrn",
+      "value": "TRUE"
+    },
+    {
+      "name": "mrn_date",
+      "value": "MRN_DATE"
+    },
+    {
+      "name": "office",
+      "value": "Balham DRT"
+    },
+    {
+      "name": "benefit_type_description",
+      "value": "ESA"
+    },
+    {
+      "name": "person1_title",
+      "value": "Dr"
+    },
+    {
+      "name": "person1_first_name",
+      "value": "Frederick"
+    },
+    {
+      "name": "person1_last_name",
+      "value": "Falafel"
+    },
+    {
+      "name": "person1_address_line1",
+      "value": "1 New Street"
+    },
+    {
+      "name": "person1_address_line2",
+      "value": "Smallville"
+    },
+    {
+      "name": "person1_address_line3",
+      "value": "Newbury"
+    },
+    {
+      "name": "person1_address_line4",
+      "value": "Berkshire"
+    },
+    {
+      "name": "person1_postcode",
+      "value": "CF48 2HY"
+    },
+    {
+      "name": "person1_phone",
+      "value": "01895733303"
+    },
+    {
+      "name": "person1_mobile",
+      "value": "07832882849"
+    },
+    {
+      "name": "person1_dob",
+      "value": "11/11/1976"
+    },
+    {
+      "name": "person1_nino",
+      "value": "{PERSON1_NINO}"
+    },
+    {
+      "name": "person2_title",
+      "value": "Mrs"
+    },
+    {
+      "name": "person2_first_name",
+      "value": "Sarah"
+    },
+    {
+      "name": "person2_last_name",
+      "value": "Smith"
+    },
+    {
+      "name": "person2_address_line1",
+      "value": "109 Drake Close"
+    },
+    {
+      "name": "person2_address_line2",
+      "value": "Hutton"
+    },
+    {
+      "name": "person2_address_line3",
+      "value": "Brentwood"
+    },
+    {
+      "name": "person2_address_line4",
+      "value": "Essex"
+    },
+    {
+      "name": "person2_postcode",
+      "value": "SE166RS"
+    },
+    {
+      "name": "person2_dob",
+      "value": "09/12/1979"
+    },
+    {
+      "name": "person2_nino",
+      "value": "{PERSON2_NINO}"
+    },
+    {
+      "name": "representative_company",
+      "value": "ABC Advisory Services"
+    },
+    {
+      "name": "representative_address_line1",
+      "value": "63 Grove Hill Road"
+    },
+    {
+      "name": "representative_address_line2",
+      "value": "The Square"
+    },
+    {
+      "name": "representative_address_line3",
+      "value": "Redhill"
+    },
+    {
+      "name": "representative_address_line4",
+      "value": "Surrey"
+    },
+    {
+      "name": "representative_postcode",
+      "value": "RH1 5BT"
+    },
+    {
+      "name": "representative_phone",
+      "value": "02072323231"
+    },
+    {
+      "name": "representative_title",
+      "value": "Mr"
+    },
+    {
+      "name": "representative_first_name",
+      "value": "Peter"
+    },
+    {
+      "name": "representative_last_name",
+      "value": "Hyland"
+    },
+    {
+      "name": "appeal_grounds",
+      "value": "see scanned SSCS1 form"
+    },
+    {
+      "name": "appeal_late_reason",
+      "value": "see scanned SSCS1 form"
+    },
+    {
+      "name": "is_hearing_type_oral",
+      "value": "false"
+    },
+    {
+      "name": "is_hearing_type_paper",
+      "value": "true"
+    },
+    {
+      "name": "hearing_options_exclude_dates",
+      "value": "01/11/2030,01/12/2030"
+    },
+    {
+      "name": "hearing_support_arrangements",
+      "value": "Wheelchair access"
+    },
+    {
+      "name": "hearing_options_hearing_loop",
+      "value": "Yes"
+    },
+    {
+      "name": "hearing_options_accessible_hearing_rooms",
+      "value": "No"
+    },
+    {
+      "name": "hearing_options_sign_language_interpreter",
+      "value": "No"
+    },
+    {
+      "name": "hearing_options_language_type",
+      "value": "Spanish"
+    },
+    {
+      "name": "hearing_options_dialect",
+      "value": ""
+    },
+    {
+      "name": "hearing_options_sign_language_type",
+      "value": ""
+    },
+    {
+      "name": "agree_less_hearing_notice",
+      "value": "TRUE"
+    },
+    {
+      "name": "signature_name",
+      "value": "Sarah Smith"
+    },
+    {
+      "name": "signature_appeal_date",
+      "value": "01/04/2018"
+    },
+    {
+      "name": "is_benefit_type_pip",
+      "value": "no"
+    },
+    {
+      "name": "is_benefit_type_esa",
+      "value": "yes"
+    },
+     {
+      "name": "is_benefit_type_uc",
+      "value": "no"
+    }
+  ]
+}
