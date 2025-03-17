@@ -1,11 +1,12 @@
 import { test } from '../lib/steps.factory';
 import createCaseBasedOnCaseType from '../api/client/sscs/factory/appeal.type.factory';
+import { credentials } from '../config/config';
 
 let caseId: string;
 
 test.describe(
   'Create a new hearing for an List assist case',
-  { tag: '@nightly-pipeline @test-pipeline' },
+  { tag: '@nightly-pipeline' },
   async () => {
     test(
       'Trigger a new hearing & cancellation for DLA case',
@@ -33,10 +34,9 @@ test.describe(
       issueDirectionsNoticeSteps
     }) => {
       caseId = await createCaseBasedOnCaseType('UCSANDL');
-      await issueDirectionsNoticeSteps.performIssueDirectionNoticeDirectionHearing(
-        caseId
-      );
-      await uploadResponseSteps.performUploadResponseOnAUniversalCredit(caseId);
+      await issueDirectionsNoticeSteps.fastLoginUserWithCaseId(credentials.hmrcSuperUser, caseId);
+      await issueDirectionsNoticeSteps.performIssueDirectionNoticeDirectionHearing();
+      await uploadResponseSteps.performUploadResponseOnAUniversalCredit(caseId, false);
       await hearingSteps.verifyHearingIsTriggeredForUCCase(true);
     });
 
@@ -45,8 +45,9 @@ test.describe(
       hearingSteps
     }) => {
       caseId = await createCaseBasedOnCaseType('UCSANDL');
-      await hearingSteps.updateHearingToDirectionViaEvent()
-      await uploadResponseSteps.performUploadResponseOnAUniversalCredit(caseId);
+      await hearingSteps.fastLoginUserWithCaseId(credentials.hmrcSuperUser, caseId);
+      await hearingSteps.updateHearingToDirectionViaEvent();
+      await uploadResponseSteps.performUploadResponseOnAUniversalCredit(caseId, false);
       await hearingSteps.verifyHearingIsTriggeredForUCCase(true);
     });
 

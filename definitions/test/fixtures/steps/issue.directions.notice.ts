@@ -317,8 +317,7 @@ export class IssueDirectionsNotice extends BaseStep {
     await this.issueDirectionPage.verifyErrorMsg(false, false, true);
   }
 
-  async performIssueDirectionNoticeDirectionHearing(caseId: string) {
-    await this.loginUserWithCaseId(credentials.judge, false, caseId);
+  async performIssueDirectionNoticeDirectionHearing() {
     await this.homePage.chooseEvent('Issue directions notice');
 
     await this.issueDirectionPage.verifyPageContent();
@@ -328,20 +327,14 @@ export class IssueDirectionsNotice extends BaseStep {
       issueDirectionTestdata.docTitle,
       true
     );
-    await this.eventNameAndDescriptionPage.verifyPageContent(
+    await this.eventNameAndDescriptionPage.verifyCyaPageContent(
       'Issue directions notice',
-      true,
-      'Direction type'
-    );
-    await this.eventNameAndDescriptionPage.verifyPageContent(
-      'Issue directions notice',
-      true,
-      'Do you want to select next hearing type i.e. Substantive or Directions hearing'
-    );
-    await this.eventNameAndDescriptionPage.verifyPageContent(
-      'Issue directions notice',
-      true,
-      'Next hearing type'
+      [
+        'Direction type',
+        'Do you want to select next hearing type i.e. Substantive or Directions hearing',
+        'Next hearing type'
+      ],
+      ['Provide information', 'Yes', 'Direction']
     );
     await this.eventNameAndDescriptionPage.inputData(
       eventTestData.eventSummaryInput,

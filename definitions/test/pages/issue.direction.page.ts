@@ -70,7 +70,7 @@ export class IssueDirectionPage {
       issueDirectionsNoticeData.noNoticeLabel
     );
     await webActions.verifyPageLabel(
-      '#generateNotice legend > .form-label',
+      '#selectNextHmcHearingType legend > .form-label',
       issueDirectionsNoticeData.selectNextHearingTypeLabel
     );
     await webActions.verifyPageLabel(
