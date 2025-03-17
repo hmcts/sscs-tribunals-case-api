@@ -115,7 +115,60 @@
     "PageDisplayOrder": 2,
     "PageFieldDisplayOrder": 1,
     "PageID": "1.0",
-    "PageShowCondition": "FL_ftaRequestType=\"newRequest\"",
+    "PageShowCondition": "FL_tribunalRequestType=\"newRequest\"",
     "PageLabel": "Tribunal Communication Topic"
+  },
+  /* work in progress,
+  {
+    "CaseEventID": "tribunalCommunication",
+    "CaseFieldID": "tribunalRequestQuestion",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "1.0",
+    "PageShowCondition": "FL_tribunalRequestType=\"newRequest\"",
+    "PageLabel": "FTA Communication Topic"
   }
+,
+  {
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "ftaRequestTopic",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "PageShowCondition": "FL_ftaRequestType=\"replyToFtaQuery\"",
+    "PageLabel": "FTA Communication Topic"
+  }
+,
+  {
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "ftaRequestTopic",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "PageShowCondition": "FL_ftaRequestType=\"reviewFtaReply\"",
+    "PageLabel": "FTA Communication Topic"
+  }
+,
+  {
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "ftaRequestTopic",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "PageShowCondition": "FL_ftaRequestType=\"deleteRequestReply\"",
+    "PageLabel": "FTA Communication Topic"
+  }
+*/
 ]
