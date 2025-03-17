@@ -94,5 +94,28 @@
     "PageID": "moveDocuments",
     "FieldShowCondition": "uploadRemoveOrMoveDocument=\"move\" AND moveDocumentTo=\"document\"",
     "RetainHiddenValue": "No"
+  },
+  {
+    "CaseEventID": "tribunalCommunication",
+    "CaseFieldID": "tribunalRequestType",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "17/03/2025",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "PageLabel": "Tribunal Communication"
+  },
+  {
+    "CaseEventID": "tribunalCommunication",
+    "CaseFieldID": "tribunalRequestTopic",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "17/03/2025",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "PageShowCondition": "FL_ftaRequestType=\"newRequest\"",
+    "PageLabel": "Tribunal Communication Topic"
   }
 ]

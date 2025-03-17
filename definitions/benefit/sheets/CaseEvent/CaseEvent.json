@@ -3302,5 +3302,16 @@
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
     "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "17/03/2025",
+    "CaseTypeID": "Benefit",
+    "ID": "tribunalCommunication",
+    "Name": "Tribunal Communication",
+    "DisplayOrder": 1305,
+    "PreConditionState(s)": "*",
+    "PostconditionState": "*",
+    "SecurityClassidication": "Public",
+    "EventEnablingCondition": "appeal.benefitType.code=\"infectedBloodCompensation\""
   }
 ]
