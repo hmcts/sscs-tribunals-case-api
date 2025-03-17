@@ -17,7 +17,7 @@ export class UploadToRemoveFromDocumentsPage {
 
   async addNewDocument(type: string, filename: string): Promise<void> {
     await webActions.clickButton('Add new');
-    let typeLocator = this.page.getByLabel('Type (Optional)').last();
+    let typeLocator = this.page.getByLabel('Type (Optional)').locator('visible=true').last();
     try {
       await expect(typeLocator).toBeVisible({ timeout: 10_000 });
     } catch {
@@ -26,6 +26,7 @@ export class UploadToRemoveFromDocumentsPage {
     await typeLocator.selectOption({ label: type });
     let typeId = await this.page
       .getByLabel('Type (Optional)')
+      .locator('visible=true')
       .last()
       .getAttribute('id');
     let uploadId = typeId.replace('documentType', 'documentLink');
