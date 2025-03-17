@@ -6,7 +6,7 @@ let caseId: string;
 
 test.describe(
   'Create a new hearing for an List assist case',
-  { tag: '@nightly-pipeline' },
+  { tag: '@test-pipeline' },
   async () => {
     test(
       'Trigger a new hearing & cancellation for DLA case',
