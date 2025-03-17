@@ -21,6 +21,7 @@ export class HomePage {
   readonly beforeTabBtn: Locator;
   readonly hearingRecordingsTab: Locator;
   readonly documentsTab: Locator;
+  readonly internalDocumentsTab: Locator;
   readonly listingRequirementsTab: Locator;
   readonly subscriptionsTab: Locator;
   readonly audioVideoEvidenceTab: Locator;
@@ -48,6 +49,7 @@ export class HomePage {
     this.eventTitle = page.locator('h1.govuk-heading-l');
     this.hearingRecordingsTab = page.getByRole('tab').filter({ hasText: /^Hearing Recordings$/ });
     this.documentsTab = page.getByRole('tab').filter({ hasText: /^Documents$/ });
+    this.internalDocumentsTab = page.getByRole('tab').filter({ hasText: /^Tribunal Internal Documents$/ });
     this.listingRequirementsTab = page.getByRole('tab').filter({ hasText: /^Listing Requirements$/ });
     this.audioVideoEvidenceTab = page.getByRole('tab').filter({ hasText: /^Audio\/Video evidence$/ });
     this.beforeTabBtn = page.locator(
@@ -256,6 +258,11 @@ export class HomePage {
       case 'Documents': {
         await expect(this.documentsTab).toBeVisible();
         await this.documentsTab.click();
+        break;
+      }
+      case 'Tribunal Internal Documents': {
+        await expect(this.internalDocumentsTab).toBeVisible();
+        await this.internalDocumentsTab.click();
         break;
       }
       case 'Listing Requirements': {

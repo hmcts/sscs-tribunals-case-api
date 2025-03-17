@@ -48,6 +48,7 @@ import { ReferredByJudge } from '../fixtures/steps/referred.by.judge';
 import { AccessibilitySteps } from '../fixtures/steps/accessibilitySteps';
 import { CreateUpdateToCaseDataSteps } from '../fixtures/steps/update.to.case.data';
 import { GenerateAppealPdfSteps } from '../fixtures/steps/generate.appeal.pdf';
+import { ManageDocuments } from '../fixtures/steps/manage.documents';
 
 type MyStepsFixtures = {
   addNoteSteps: Note;
@@ -86,6 +87,7 @@ type MyStepsFixtures = {
   updateOtherPartyDataSteps: UpdateOtherPartyData;
   issueFinalDecisionSteps: WriteFinalDecision;
   updateNotListableSteps: UpdateNotListable;
+  manageDocumentsSteps: ManageDocuments;
   searchFilterSteps: SearchFilter;
   hearingSteps: Hearing;
   reissueFurtherEvidenceSteps: ReissueFurtherEvidence;
@@ -317,6 +319,12 @@ export const test = stepsFactory.extend<MyStepsFixtures>({
     console.log(`Test started: ${testInfo.title}`);
     const updateNotListableSteps = new UpdateNotListable(page);
     await use(updateNotListableSteps);
+    console.log(`${testInfo.title} ${testInfo.status}`);
+  },
+  manageDocumentsSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
+    const manageDocumentsSteps = new ManageDocuments(page);
+    await use(manageDocumentsSteps);
     console.log(`${testInfo.title} ${testInfo.status}`);
   },
   searchFilterSteps: async ({ page }, use, testInfo) => {
