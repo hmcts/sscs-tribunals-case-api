@@ -181,7 +181,7 @@
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "dwpDocuments_sscs", "TabLabel": "FTA Documents", "TabDisplayOrder": 18, "CaseFieldID": "dwpEvidenceBundleDocument", "TabFieldDisplayOrder": 8},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "dwpDocuments_sscs", "TabLabel": "FTA Documents", "TabDisplayOrder": 18, "CaseFieldID": "dwpLT203", "TabFieldDisplayOrder": 9},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "dwpDocuments_sscs", "TabLabel": "FTA Documents", "TabDisplayOrder": 18, "CaseFieldID": "dwpLapseLetter", "TabFieldDisplayOrder": 10},
-  {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile":"caseworker-sscs-superuser", "TabID": "dwpDocuments_sscs", "TabLabel": "FTA Documents", "TabDisplayOrder": 18, "CaseFieldID": "dwpSupplementaryResponseDoc", "TabFieldDisplayOrder": 11},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "dwpDocuments_sscs", "TabLabel": "FTA Documents", "TabDisplayOrder": 18, "CaseFieldID": "dwpSupplementaryResponseDoc", "TabFieldDisplayOrder": 11},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "dwpDocuments_sscs", "TabLabel": "FTA Documents", "TabDisplayOrder": 18, "CaseFieldID": "dwpNoActionDoc", "TabFieldDisplayOrder": 12},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "dwpDocuments_sscs", "TabLabel": "FTA Documents", "TabDisplayOrder": 18, "CaseFieldID": "dwpOtherDoc", "TabFieldDisplayOrder": 13},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs", "TabID": "dwpDocuments_sscs", "TabLabel": "FTA Documents", "TabDisplayOrder": 18, "CaseFieldID": "tl1Form", "TabFieldDisplayOrder": 14},
