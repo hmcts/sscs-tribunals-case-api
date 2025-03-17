@@ -101,6 +101,7 @@ export class WebAction {
 
   async clickSubmitButton(): Promise<void> {
     await this.verifyElementVisibility('//*[@class=\'button\']');
+    await expect(this.page.locator('//*[@class=\'button\']').first()).toBeEnabled();
     await this.page.locator('//*[@class=\'button\']').first().click();
   }
 

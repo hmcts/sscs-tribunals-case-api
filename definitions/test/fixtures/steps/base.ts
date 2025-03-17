@@ -59,6 +59,11 @@ import { PrepareCaseForHearingPage } from '../../pages/prepare.case.for.hearing.
 import { ReviewConfidentialityPage } from '../../pages/review.confidentiality.page';
 import { SendToJudgePage } from '../../pages/send.to.judge.page';
 import { CreateUpdateToCaseDataPage } from '../../pages/create.update.to.case.data.page';
+import { UploadRemoveOrMoveDocumentPage } from '../../pages/upload.remove.or.move.document.page';
+import { UploadToRemoveFromTabPage } from '../../pages/upload.to.remove.from.tab.page';
+import { UploadToRemoveFromDocumentsPage } from '../../pages/upload.to.remove.from.documents.page';
+import { MoveToTabPage } from '../../pages/move.to.tab.page';
+import { MoveDocumentsPage } from '../../pages/move.documents.page';
 
 export abstract class BaseStep {
   readonly page: Page;
@@ -89,6 +94,11 @@ export abstract class BaseStep {
   protected addHearingPage: AddHearingPage;
   protected hearingBookedPage: HearingBookedPage;
   protected uploadRecordingPage: UploadRecordingPage;
+  protected uploadRemoveOrMoveDocumentPage: UploadRemoveOrMoveDocumentPage;
+  protected uploadToRemoveFromTabPage: UploadToRemoveFromTabPage;
+  protected uploadToRemoveFromDocumentsPage: UploadToRemoveFromDocumentsPage;
+  protected moveToTabPage: MoveToTabPage;
+  protected moveDocumentsPage: MoveDocumentsPage;
   protected hearingRecordingsTab: HearingRecordings;
   protected requestRecordingPage: RequestRecordingPage;
   protected actionRecordingPage: ActionRecordingPage;
@@ -156,6 +166,15 @@ export abstract class BaseStep {
     this.addHearingPage = new AddHearingPage(this.page);
     this.hearingBookedPage = new HearingBookedPage(this.page);
     this.uploadRecordingPage = new UploadRecordingPage(this.page);
+    this.uploadRemoveOrMoveDocumentPage = new UploadRemoveOrMoveDocumentPage(
+      this.page
+    );
+    this.uploadToRemoveFromTabPage = new UploadToRemoveFromTabPage(this.page);
+    this.uploadToRemoveFromDocumentsPage = new UploadToRemoveFromDocumentsPage(
+      this.page
+    );
+    this.moveToTabPage = new MoveToTabPage(this.page);
+    this.moveDocumentsPage = new MoveDocumentsPage(this.page);
     this.hearingRecordingsTab = new HearingRecordings(this.page);
     this.requestRecordingPage = new RequestRecordingPage(this.page);
     this.actionRecordingPage = new ActionRecordingPage(this.page);
@@ -206,6 +225,16 @@ export abstract class BaseStep {
     await this.homePage.goToHomePage(caseId);
   }
 
+  async fastLoginUserWithCaseId(user, caseId?: string) {
+    await this.loginPage.goToLoginPage();
+    await this.loginPage.verifySuccessfulLoginForUser(user, false);
+    await this.loginPage.goToCase(caseId);
+  }
+
+  async signOut() {
+    await this.homePage.signOut();
+  }
+
   async loginUserWithoutCaseId(user, clearCacheFlag: boolean = false) {
     await this.loginPage.goToLoginPage();
     await this.loginPage.verifySuccessfulLoginForUser(user, clearCacheFlag);
@@ -228,6 +257,7 @@ export abstract class BaseStep {
   async verifyHistoryTabLink(linkLabel: string) {
     await this.historyTab.verifyHistoryPageEventLink(linkLabel);
   }
+
   async verifyOtherPartyDetails(
     state?: string,
     event?: string,
