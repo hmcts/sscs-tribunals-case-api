@@ -241,6 +241,8 @@ export class UploadResponse extends BaseStep {
     );
     if (needsToLogin) {
       await this.checkYourAnswersPage.confirmAndSignOut();
+    } else {
+      await this.checkYourAnswersPage.confirmSubmission();
     }
 
     await this.validateHistory(ucCaseId, needsToLogin);

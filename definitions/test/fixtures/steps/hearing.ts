@@ -147,7 +147,7 @@ export class Hearing extends BaseStep {
   async updateHearingToDirectionViaEvent() {
     await this.homePage.chooseEvent('Update Listing Requirements');
     await this.listingRequirementPage.updateHearingToDirection();
-    await this.listingRequirementPage.submitUpdatedValues();
+    await this.listingRequirementPage.submitUpdatedValuesNoReasons();
 
     await this.homePage.clickAfterTabBtn();
     await this.homePage.navigateToTab('Listing Requirements');
