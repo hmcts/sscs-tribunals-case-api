@@ -6,7 +6,7 @@ let caseId: string;
 
 test.describe(
   'Manage documents tests',
-  { tag: '@test-pipeline' },
+  { tag: '@nightly-pipeline' },
   async () => {
     test('Upload/remove documents from documents tab', async ({
       manageDocumentsSteps
