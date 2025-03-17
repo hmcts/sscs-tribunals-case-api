@@ -108,8 +108,8 @@ withNightlyPipeline(type, product, component) {
 
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
-//    enableFortifyScan()
-//    enableFullFunctionalTest()
+    enableFortifyScan()
+    enableFullFunctionalTest()
 
     afterAlways('DependencyCheckNightly') {
         runE2eTestsNightly()
@@ -121,15 +121,15 @@ withNightlyPipeline(type, product, component) {
                 reportFiles          : 'index.html',
                 reportName           : 'SSCS E2E Test Report'
         ])
-//        runAccessibilityTestsNightly()
-//        publishHTML([
-//                allowMissing         : true,
-//                alwaysLinkToLastBuild: true,
-//                keepAll              : true,
-//                reportDir            : "accessibility-report",
-//                reportFiles          : 'index.html',
-//                reportName           : 'SSCS Accessibility Test Report'
-//        ])
+        runAccessibilityTestsNightly()
+        publishHTML([
+                allowMissing         : true,
+                alwaysLinkToLastBuild: true,
+                keepAll              : true,
+                reportDir            : "accessibility-report",
+                reportFiles          : 'index.html',
+                reportName           : 'SSCS Accessibility Test Report'
+        ])
     }
 
 
