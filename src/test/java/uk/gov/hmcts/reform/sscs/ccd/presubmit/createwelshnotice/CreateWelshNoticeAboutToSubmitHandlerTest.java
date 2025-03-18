@@ -66,7 +66,7 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
     @Mock
     private WelshFooterService welshFooterService;
 
-    String template = "TB-SCS-GNO-WEL-00473.docx";
+    String template = "TB-SCS-GNO-WEL-00473-v2.docx";
     @Mock
     private Callback<SscsCaseData> callback;
 
@@ -144,6 +144,37 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
         assertEquals(ENGLISH_PDF,response.getData().getSscsWelshDocuments().get(0).getValue().getOriginalDocumentFileName());
         Map<String, Object> placeholders = (Map<String, Object>) capture.getValue();
         assertEquals(true, placeholders.get("should_hide_nino"));
+    }
+
+    @Test
+    @Parameters({"infectedBloodCompensation, some-ibca-reference, IBCA Reference, Cyfeirnod IBCA",
+        "childSupport, some-nino, NI No, Rhif Yswiriant Gwladol"})
+    public void shouldSetNinoIbcaRefCorrectly(String benefitCode, String ref, String label, String labelWelsh) {
+        byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
+
+        SscsDocument sscsDocument = createSscsDocument();
+        when(pdfStoreService.storeDocument(any(), anyString())).thenReturn(sscsDocument);
+        ArgumentCaptor<Object> capture = ArgumentCaptor.forClass(Object.class);
+        when(docmosisPdfService.createPdf(capture.capture(),any())).thenReturn(expectedPdf);
+        FooterDetails footerDetails = new FooterDetails(DocumentLink.builder().build(), "bundleAddition", "bundleFilename");
+        when(welshFooterService.addFooterToExistingToContentAndCreateNewUrl(any(),any(), any(), any(), any())).thenReturn(footerDetails);
+
+        Callback<SscsCaseData> callback = buildCallback(buildSscsDocuments(DocumentType.DIRECTION_NOTICE),
+            buildSscsWelshDocuments(DocumentType.DIRECTION_NOTICE.getValue()));
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(benefitCode);
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getIdentity().setNino("some-nino");
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getIdentity().setIbcaReference("some-ibca-reference");
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertNull(response.getData().getEnglishBodyContent());
+        assertNull(response.getData().getWelshBodyContent());
+        assertEquals(DIRECTION_ISSUED_WELSH.getCcdType(), response.getData().getSscsWelshPreviewNextEvent());
+        assertEquals("No",response.getData().getTranslationWorkOutstanding());
+        assertEquals(ENGLISH_PDF,response.getData().getSscsWelshDocuments().get(0).getValue().getOriginalDocumentFileName());
+        Map<String, Object> placeholders = (Map<String, Object>) capture.getValue();
+        assertEquals(label, placeholders.get("label"));
+        assertEquals(labelWelsh, placeholders.get("label_welsh"));
+        assertEquals(ref, placeholders.get("nino"));
+
     }
 
     private Callback<SscsCaseData> buildCallback(List<SscsDocument> sscsDocuments, List<SscsWelshDocument> welshDocuments) {
