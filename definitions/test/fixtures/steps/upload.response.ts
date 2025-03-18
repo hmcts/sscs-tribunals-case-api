@@ -27,9 +27,26 @@ export class UploadResponse extends BaseStep {
     this.stepsHelper = new StepsHelper(this.page);
   }
 
-  setHearings() {
-    if (process.env.HEARINGS_ENABLED == "Yes") {
-      this.presetLinks.push('Add a hearing');
+  async validateHistory(caseId: string, needsToLogin: boolean = true) {
+    let historyLinks = this.presetLinks;
+    historyLinks.push('Add a hearing');
+    if (needsToLogin) {
+      await this.fastLoginUserWithCaseId(credentials.hmrcSuperUser, caseId);
+    }
+    await this.homePage.navigateToTab('Summary');
+    await this.summaryTab.verifyPresenceOfText('Ready to list');
+    await this.homePage.delay(1000);
+    await this.homePage.reloadPage();
+    await this.homePage.navigateToTab('History');
+    try {
+      await Promise.all(
+        historyLinks.map((linkName) => this.verifyHistoryTabLink(linkName))
+      );
+    } catch {
+      await this.homePage.reloadPage();
+      await Promise.all(
+        historyLinks.map((linkName) => this.verifyHistoryTabLink(linkName))
+      );
     }
   }
 
@@ -48,18 +65,9 @@ export class UploadResponse extends BaseStep {
       responseReviewedTestData.headingValue
     );
     await this.responseReviewedPage.chooseInterlocOption('No');
-    await this.responseReviewedPage.confirmSubmission();
+    await this.checkYourAnswersPage.confirmAndSignOut();
 
-    await this.homePage.delay(1000);
-    await this.homePage.navigateToTab('History');
-    this.setHearings()
-    for (const linkName of this.presetLinks) {
-      await this.verifyHistoryTabLink(linkName);
-    }
-
-    await this.homePage.delay(3000);
-    await this.homePage.navigateToTab('Summary');
-    await this.summaryTab.verifyPresenceOfText('Ready to list');
+    await this.validateHistory(pipCaseId);
     // await performAppealDormantOnCase(pipCaseId);
   }
 
@@ -184,28 +192,21 @@ export class UploadResponse extends BaseStep {
     );
     await this.checkYourAnswersPage.confirmAndSignOut();
 
-    await this.homePage.delay(3000);
-    await this.loginUserWithCaseId(credentials.amCaseWorker, false, taxCaseId);
-    await this.homePage.navigateToTab('History');
-    this.setHearings()
-    for (const linkName of this.presetLinks) {
-      await this.verifyHistoryTabLink(linkName);
-    }
-    await this.homePage.navigateToTab('Summary');
-    await this.summaryTab.verifyPresenceOfText('Ready to list');
+    await this.validateHistory(taxCaseId);
     // await performAppealDormantOnCase(taxCaseId);
   }
 
-  async performUploadResponseOnAUniversalCredit(ucCaseId: string) {
-    // let ucCaseId = await createCaseBasedOnCaseType("UC");
-    await this.loginUserWithCaseId(
-      credentials.dwpResponseWriter,
-      false,
-      ucCaseId
-    );
-
+  async performUploadResponseOnAUniversalCredit(
+    ucCaseId: string,
+    needsToLogin: boolean = true
+  ) {
+    if (needsToLogin) {
+      await this.fastLoginUserWithCaseId(
+        credentials.dwpResponseWriter,
+        ucCaseId
+      );
+    }
     await this.homePage.chooseEvent('Upload response');
-    await this.homePage.delay(4000);
     await this.uploadResponsePage.verifyPageContent();
     await this.uploadResponsePage.uploadDocs();
     await this.uploadResponsePage.chooseAssistOption('No');
@@ -238,18 +239,13 @@ export class UploadResponse extends BaseStep {
       null,
       'UC'
     );
-    await this.checkYourAnswersPage.confirmSubmission();
-    await this.homePage.clickSignOut();
-
-    await this.loginUserWithCaseId(credentials.amCaseWorker, false, ucCaseId);
-    await this.homePage.delay(1000);
-    await this.homePage.navigateToTab('History');
-    this.setHearings()
-    for (const linkName of this.presetLinks) {
-      await this.verifyHistoryTabLink(linkName);
+    if (needsToLogin) {
+      await this.checkYourAnswersPage.confirmAndSignOut();
+    } else {
+      await this.checkYourAnswersPage.confirmSubmission();
     }
-    await this.homePage.navigateToTab('Summary');
-    await this.summaryTab.verifyPresenceOfText('Ready to list');
+
+    await this.validateHistory(ucCaseId, needsToLogin);
     // await performAppealDormantOnCase(ucCaseId);
   }
 
@@ -262,7 +258,6 @@ export class UploadResponse extends BaseStep {
     );
 
     await this.homePage.chooseEvent('Upload response');
-    await this.homePage.delay(4000);
     await this.uploadResponsePage.verifyPageContent();
     await this.uploadResponsePage.uploadDocs();
     await this.uploadResponsePage.chooseAssistOption('No');
@@ -289,23 +284,9 @@ export class UploadResponse extends BaseStep {
     );
     await this.uploadResponsePage.continueSubmission();
     await this.uploadResponsePage.enterJPDetails();
-    await this.checkYourAnswersPage.confirmSubmission();
+    await this.checkYourAnswersPage.confirmAndSignOut();
 
-    await this.homePage.signOut();
-    await new Promise((f) => setTimeout(f, 3000)); //Delay required for the Case to be ready
-
-    await this.loginUserWithCaseId(credentials.amCaseWorker, false, ucCaseId);
-    await this.homePage.reloadPage();
-    await this.homePage.delay(1000);
-    await this.homePage.navigateToTab('History');
-    this.setHearings()
-    for (const linkName of this.presetLinks) {
-      await this.verifyHistoryTabLink(linkName);
-    }
-
-    await this.homePage.clickBeforeTabBtn();
-    await this.homePage.navigateToTab('Summary');
-    await this.summaryTab.verifyPresenceOfText('Ready to list');
+    await this.validateHistory(ucCaseId);
     // await performAppealDormantOnCase(ucCaseId);
   }
 
@@ -318,7 +299,6 @@ export class UploadResponse extends BaseStep {
     );
 
     await this.homePage.chooseEvent('Upload response');
-    await this.homePage.delay(2000);
     await this.uploadResponsePage.verifyPageContent();
     await this.uploadResponsePage.uploadPartialDocs();
     await this.uploadResponsePage.selectIssueCode(
@@ -455,6 +435,7 @@ export class UploadResponse extends BaseStep {
     await this.uploadResponseWithFurtherInfoAsDwpCaseWorker(caseId);
 
     // Verify CTSC Admin can view the unassigned Review FTA Response task
+    await this.homePage.signOut();
     await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
     await this.homePage.navigateToTab('Tasks');
     await this.tasksTab.verifyTaskIsDisplayed(task.name);

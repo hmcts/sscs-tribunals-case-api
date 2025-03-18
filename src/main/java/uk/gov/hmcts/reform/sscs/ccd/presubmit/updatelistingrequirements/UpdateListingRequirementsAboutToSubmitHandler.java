@@ -5,7 +5,9 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getHmcHearingType;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +30,9 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
     private final ListAssistHearingMessageHelper listAssistHearingMessageHelper;
 
+    @Value("${feature.direction-hearings.enabled}")
+    private boolean isDirectionHearingsEnabled;
+
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
@@ -39,8 +44,8 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType,
-        Callback<SscsCaseData> callback,
-        String userAuthorisation) {
+                                                          Callback<SscsCaseData> callback,
+                                                          String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
@@ -99,6 +104,14 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             } else {
                 callbackResponse.addError("An error occurred during message publish. Please try again.");
             }
+        }
+        if (isDirectionHearingsEnabled) {
+            sscsCaseData.getAppeal()
+                .setHearingOptions(Optional.ofNullable(sscsCaseData.getAppeal().getHearingOptions())
+                    .map(HearingOptions::toBuilder)
+                    .orElseGet(HearingOptions::builder)
+                    .hmcHearingType(getHmcHearingType(sscsCaseData))
+                    .build());
         }
         return callbackResponse;
     }

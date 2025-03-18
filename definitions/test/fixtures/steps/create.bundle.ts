@@ -96,7 +96,6 @@ export class CreateBundle extends BaseStep {
     await this.homePage.clickSignOut();
 
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
-    await this.homePage.navigateToTab('History');
     await this.verifyHistoryTabDetails(
       'Response received',
       'Stitching bundle complete'

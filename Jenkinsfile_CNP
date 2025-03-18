@@ -36,7 +36,6 @@ def secrets = [
                 secret('notification-test-key', 'NOTIFICATION_API_TEST_KEY'),
                 secret('sscs-email-mac-secret-text', 'EMAIL_MAC_SECRET_TEXT'),
                 secret('tya-link', 'SSCS_TRACK_YOUR_APPEAL_LINK'),
-                secret('evidence-share-topic-shared-access-key', 'AMQP_PASSWORD'),
 
                 // hearing-api
                 secret('s2s-micro', 'IDAM_S2S_AUTH_MICROSERVICES'),
@@ -70,6 +69,8 @@ def secrets = [
                 secret('test-e2e-caseofficer-password', 'TEST_AM_SUPERUSER_PASSWORD'),
                 secret('test-e2e-superuser-username', 'SUPER_USER_USERNAME'),
                 secret('test-e2e-superuser-password', 'SUPER_USER_PASSWORD'),
+                secret('test-e2e-hmrc-superuser-username', 'TEST_HMRC_SUPER_USER_USERNAME'),
+                secret('test-e2e-hmrc-superuser-password', 'TEST_HMRC_SUPER_USER_PASSWORD'),
                 secret('test-e2e-am-senior-tcw-case-allocator-username', 'TEST_AM_SENIOR_TRIBUNAL_CASEWORKER_CASE_ALLOCATOR_USERNAME'),
                 secret('test-e2e-am-senior-tcw-case-allocator-password', 'TEST_AM_SENIOR_TRIBUNAL_CASEWORKER_CASE_ALLOCATOR_PASSWORD')
         ],
@@ -112,18 +113,13 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
     ]
 }
 
-def branchesToSync = ['demo', 'ithc', 'perftest']
-
 withPipeline(type, product, component) {
     def githubApi = new GithubAPI(this)
-    def isHearingsPr = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:hearings").size() > 0;
-    def notificationTestsEnabled = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "run-notification-tests").size() > 0;
 
     enableHighLevelDataSetup()
-
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
-    syncBranchesWithMaster(branchesToSync)
+    syncBranchesWithMaster(['demo', 'ithc', 'perftest'])
 
     env.DOCUMENT_MANAGEMENT_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.TEST_DOCUMENT_MANAGEMENT_URL = "http://dm-store-aat.service.core-compute-aat.internal"
@@ -136,15 +132,6 @@ withPipeline(type, product, component) {
     }
     onPR() {
         setPreviewEnvVars();
-        echo "isHearingsPr  " + isHearingsPr
-        if (isHearingsPr) {
-            env.CASE_TYPE = "Benefit-${CHANGE_ID}"
-            setAatEnvVars();
-            env.TEST_E2E_URL_WEB = "https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-            env.TEST_E2E_API_URI = "https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-            env.HEARINGS_ENABLED = "Yes"
-            env.ENVIRONMENT = "pr"
-        }
 
         if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "dependencies").size() > 0) {
             enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
@@ -168,7 +155,7 @@ withPipeline(type, product, component) {
     }
 
     before('highleveldatasetup') {
-        generateDefinitions(isHearingsPr)
+        generateDefinitions()
     }
 
     afterSuccess('akschartsinstall') {
@@ -183,30 +170,12 @@ withPipeline(type, product, component) {
     }
 
     afterSuccess('smoketest:preview') {
-        if (notificationTestsEnabled) {
+        sh './bin/setup-role-assignments.sh'
+
+        if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "run-notification-tests").size() > 0) {
             runNotificationTests()
         }
         runE2eTests()
-        publishHTML([
-                allowMissing         : true,
-                alwaysLinkToLastBuild: true,
-                keepAll              : true,
-                reportDir            : "playwright-report",
-                reportFiles          : 'index.html',
-                reportName           : 'SSCS E2E Test Report'
-        ])
-    }
-
-    afterSuccess('smoketest:aat') {
-        runE2eTests()
-        publishHTML([
-                allowMissing         : true,
-                alwaysLinkToLastBuild: true,
-                keepAll              : true,
-                reportDir            : "playwright-report",
-                reportFiles          : 'index.html',
-                reportName           : 'SSCS E2E Test Report'
-        ])
     }
 }
 
@@ -220,16 +189,12 @@ def runNotificationTests() {
     }
 }
 
-def generateDefinitions(isHearingsPr) {
-    if (env.ENVIRONMENT == "pr" && !isHearingsPr) {
-        env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    }
-    sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${isHearingsPr}"
+def generateDefinitions() {
+    sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT}"
     steps.archiveArtifacts artifacts: "definitions/benefit/*.xlsx"
-    if (!isHearingsPr) {
-        sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT} ${isHearingsPr}"
-        steps.archiveArtifacts artifacts: "definitions/bulkscan/*.xlsx"
-    }
+
+    sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT}"
+    steps.archiveArtifacts artifacts: "definitions/bulkscan/*.xlsx"
 }
 
 def setAatEnvVars() {
@@ -245,6 +210,7 @@ def setAatEnvVars() {
 }
 
 def setPreviewEnvVars() {
+    env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.PREVIEW_BRANCH_WITH_LOCAL_CCD = true;
     env.TEST_E2E_URL_WEB = "https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.TEST_E2E_API_URI = "https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
@@ -254,7 +220,6 @@ def setPreviewEnvVars() {
     env.CASE_DOCUMENT_AM_URL = "https://ccd-case-document-am-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.EM_STITCHING_API_URL = "https://em-stitching-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.ENVIRONMENT = "pr"
-    env.HEARINGS_ENABLED = 'No'
 }
 
 def runE2eTests() {
@@ -265,6 +230,14 @@ def runE2eTests() {
             unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
         } finally {
             steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'definitions/test/playwright-report/**'
+            publishHTML([
+                    allowMissing         : true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll              : true,
+                    reportDir            : "playwright-report",
+                    reportFiles          : 'index.html',
+                    reportName           : 'SSCS E2E Test Report'
+            ])
         }
     }
 }
