@@ -40,7 +40,7 @@ public final class HearingsPanelMapping {
 
     private final String serviceCode = "BBA3";
 
-    private HearingsPanelMapping(RefDataService refDataService) {
+    HearingsPanelMapping(RefDataService refDataService) {
 
         this.refDataService = refDataService;
     }

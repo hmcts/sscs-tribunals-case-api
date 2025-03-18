@@ -1,9 +1,13 @@
 package uk.gov.hmcts.reform.sscs.helper.mapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 import java.util.Collections;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,12 +24,14 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SessionCategory;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsIndustrialInjuriesData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.model.DefaultPanelCategory;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.RequirementType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.MemberType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelPreference;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
+import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 class HearingsPanelMappingTest extends HearingsMappingBase {
@@ -38,6 +44,17 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
 
     @Mock
     private ReferenceDataServiceHolder refData;
+
+    @Mock
+    private static RefDataService refDataService;
+
+    private HearingsPanelMapping hearingsPanelMapping;
+
+    @BeforeEach
+    public void setUp() {
+        openMocks(this);
+        hearingsPanelMapping = new HearingsPanelMapping(refDataService);
+    }
 
     @DisplayName("getAuthorisationTypes returns an empty list")
     @Test
@@ -278,5 +295,14 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
         // LA is not currently set up to handle specialism for FQPM panel members.
         String result = HearingsPanelMapping.getPanelMemberSpecialism(PanelMember.FQPM, null, null);
         assertThat(result).isNull();
+    }
+
+    @DisplayName("getAuthorisationTypes returns an empty list")
+    @Test
+    void testGetRoles() {
+        when(refDataService.getDefaultPanelCategory(any(), any())).thenReturn(List.of(DefaultPanelCategory.builder().externalReference("1").build()));
+        List<String> result = hearingsPanelMapping.getRoleTypes("");
+
+        assertThat(result).isNotEmpty();
     }
 }
