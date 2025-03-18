@@ -10,11 +10,13 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.AUDIO_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DWP_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.JOINT_PARTY_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_PARTY_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_PARTY_REPRESENTATIVE_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.VIDEO_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
@@ -739,9 +741,27 @@ public class FurtherEvidenceServiceTest {
                     .documentLink(DocumentLink.builder().documentBinaryUrl("not-original2.com").build())
                     .build()).build();
 
+        SscsDocument videoLinkDoc = SscsDocument
+                .builder()
+                .value(
+                        SscsDocumentDetails
+                                .builder()
+                                .documentType(VIDEO_DOCUMENT.getValue())
+                                .avDocumentLink(DocumentLink.builder().documentBinaryUrl("not-original2.com").build())
+                                .build()).build();
+
+        SscsDocument audioLinkDoc = SscsDocument
+                .builder()
+                .value(
+                        SscsDocumentDetails
+                                .builder()
+                                .documentType(AUDIO_DOCUMENT.getValue())
+                                .avDocumentLink(DocumentLink.builder().documentBinaryUrl("not-original3.com").build())
+                                .build()).build();
+
         SscsCaseData caseData = SscsCaseData
             .builder()
-            .sscsDocument(Arrays.asList(originalDoc, differentTypeDoc, differentLinkDoc))
+            .sscsDocument(Arrays.asList(originalDoc, differentTypeDoc, differentLinkDoc, videoLinkDoc, audioLinkDoc))
             .sscsWelshDocuments(Collections.singletonList(originalWelshDoc))
             .build();
 
