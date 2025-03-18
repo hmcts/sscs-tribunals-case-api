@@ -316,4 +316,31 @@ export class IssueDirectionsNotice extends BaseStep {
     await this.issueDirectionPage.confirmSubmission();
     await this.issueDirectionPage.verifyErrorMsg(false, false, true);
   }
+
+  async performIssueDirectionNoticeDirectionHearing() {
+    await this.homePage.chooseEvent('Issue directions notice');
+
+    await this.issueDirectionPage.verifyPageContent();
+    await this.issueDirectionPage.submitIssueDirectionDirectionHearing(
+      issueDirectionTestdata.preHearingType,
+      'Provide information',
+      issueDirectionTestdata.docTitle,
+      true
+    );
+    await this.eventNameAndDescriptionPage.verifyCyaPageContent(
+      'Issue directions notice',
+      [
+        'Direction type',
+        'Do you want to select next hearing type i.e. Substantive or Directions hearing',
+        'Next hearing type'
+      ],
+      ['Provide information', 'Yes', 'Direction']
+    );
+    await this.eventNameAndDescriptionPage.inputData(
+      eventTestData.eventSummaryInput,
+      eventTestData.eventDescriptionInput
+    );
+    await this.eventNameAndDescriptionPage.confirmSubmission();
+    await this.verifyHistoryTabDetails('Issue directions notice');
+  }
 }
