@@ -1138,7 +1138,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true,
                 true, true, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
-        assertEquals(body.isIbc(), true);
+        assertEquals(body.isIbca(), true);
     }
 
     @Test
@@ -1157,7 +1157,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true,
                 true, true, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
-        assertEquals(body.isIbc(), false);
+        assertEquals(body.isIbca(), false);
     }
 
     protected abstract boolean isDescriptorFlowSupported();
