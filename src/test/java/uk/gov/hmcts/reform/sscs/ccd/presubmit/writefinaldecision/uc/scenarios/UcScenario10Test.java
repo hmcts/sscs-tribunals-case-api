@@ -93,7 +93,7 @@ public class UcScenario10Test {
                         .anythingElse("Something else")
                         .summaryOfOutcomeDecision("This is the summary of outcome decision")
                         .schedule8Paragraph4Applicable(true)
-                        .isIbc(true)
+                        .isIbca(true)
                         .ucSchedule6Descriptors(schedule6Descriptors).build();
 
         UcTemplateContent content = UcScenario.SCENARIO_10.getContent(body);

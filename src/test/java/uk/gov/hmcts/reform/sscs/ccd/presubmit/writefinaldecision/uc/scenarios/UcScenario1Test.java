@@ -174,7 +174,7 @@ public class UcScenario1Test {
                         .appellantName("Felix Sydney")
                         .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
                         .anythingElse("Something else")
-                        .isIbc(true)
+                        .isIbca(true)
                         .ucSchedule6Descriptors(schedule6Descriptors).build();
 
         UcTemplateContent content = UcScenario.SCENARIO_1.getContent(body);
