@@ -351,8 +351,8 @@ dependencies {
 
 
     implementation group: 'com.mchange', name: 'c3p0', version: '0.10.2'
-    implementation group: 'org.flywaydb', name: 'flyway-core', version: '11.3.4'
-    implementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '11.3.4'
+    implementation group: 'org.flywaydb', name: 'flyway-core', version: '11.4.0'
+    implementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '11.4.0'
 
     implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6.1.4'
 
@@ -366,7 +366,7 @@ dependencies {
     implementation group: 'com.azure', name: 'azure-core', version: '1.55.3'
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.9'
 
-    implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.7.3'
+    implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.7.4'
 
     implementation group:'org.overviewproject', name: 'mime-types', version: '1.0.4'
 
