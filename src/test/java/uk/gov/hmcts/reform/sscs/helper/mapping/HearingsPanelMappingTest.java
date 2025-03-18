@@ -301,7 +301,7 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
     @Test
     void testGetRoles() {
         when(refDataService.getDefaultPanelCategory(any(), any())).thenReturn(List.of(DefaultPanelCategory.builder().externalReference("1").build()));
-        List<String> result = hearingsPanelMapping.getRoleTypes("");
+        List<String> result = hearingsPanelMapping.getRoleTypes(caseData);
 
         assertThat(result).isNotEmpty();
     }

@@ -49,7 +49,7 @@ public final class HearingsPanelMapping {
                                                          ReferenceDataServiceHolder refData) {
 
         return PanelRequirements.builder()
-                .roleTypes(getRoleTypes(caseData.getBenefitCode()))
+                .roleTypes(getRoleTypes(caseData))
                 .authorisationTypes(getAuthorisationTypes())
                 .authorisationSubTypes(getAuthorisationSubTypes())
                 .panelPreferences(getPanelPreferences(caseData))
@@ -57,8 +57,9 @@ public final class HearingsPanelMapping {
                 .build();
     }
 
-    public List<String> getRoleTypes(String benefitCode) {
-        List<DefaultPanelCategory> panelCodes = refDataService.getDefaultPanelCategory(key, serviceCode);
+    public List<String> getRoleTypes(SscsCaseData caseData) {
+        String updatedKey = key + caseData.getBenefitCode() + caseData.getIssueCode();
+        List<DefaultPanelCategory> panelCodes = refDataService.getDefaultPanelCategory(updatedKey, serviceCode);
         return panelCodes.stream().map(DefaultPanelCategory::getExternalReference).collect(Collectors.toList());
     }
 
