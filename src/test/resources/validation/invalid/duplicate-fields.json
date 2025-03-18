@@ -1,0 +1,21 @@
+{
+  "_comment": "Duplicate last_name field",
+  "ocr_data_fields": [
+    {
+      "name": "first_name",
+      "value": "John"
+    },
+    {
+      "name": "last_name",
+      "value": "Test"
+    },
+    {
+      "name": "last_name",
+      "value": "duplicate"
+    },
+    {
+      "name": "date_of_birth",
+      "value": "1990-01-01"
+    }
+  ]
+}
