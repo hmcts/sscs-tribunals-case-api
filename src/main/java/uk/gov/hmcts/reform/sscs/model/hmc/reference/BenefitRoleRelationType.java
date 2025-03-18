@@ -24,6 +24,6 @@ public enum BenefitRoleRelationType {
     private final List<String> roleTypes;
 
     public static List<String> findRoleTypesByBenefitCode(String benefitCode) {
-        return List.of("58", "50");
+        return List.of("58", "58");
     }
 }
