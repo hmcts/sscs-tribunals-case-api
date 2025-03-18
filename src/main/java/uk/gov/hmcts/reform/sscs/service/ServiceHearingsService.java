@@ -45,8 +45,6 @@ public class ServiceHearingsService {
 
     private final IdamService idamService;
 
-
-
     private final ServiceHearingValuesMapping serviceHearingValuesMapping;
 
     public ServiceHearingValues getServiceHearingValues(ServiceHearingRequest request)

@@ -64,6 +64,7 @@ import uk.gov.hmcts.reform.sscs.exception.GetHearingException;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.exception.UnhandleableHearingStateException;
 import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
+import uk.gov.hmcts.reform.sscs.helper.mapping.HearingsMapping;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.HearingEvent;
@@ -123,6 +124,9 @@ class HearingsServiceTest {
 
     @Mock
     private HearingServiceConsumer hearingServiceConsumer;
+
+    @Mock
+    private HearingsMapping hearingsMapping;
 
     @Mock
     private Consumer<SscsCaseDetails> sscsCaseDetailsConsumer;
@@ -224,7 +228,7 @@ class HearingsServiceTest {
 
     @DisplayName("When wrapper with a valid adjourn create Hearing State is given addHearingResponse should run without error")
     @Test
-    void processHearingWrapperAdjournmentCreate() throws UpdateCaseException {
+    void processHearingWrapperAdjournmentCreate() throws ListingException {
         mockHearingResponseForAdjournmentCreate();
 
         HearingEvent hearingEvent = HearingEvent.ADJOURN_CREATE_HEARING;
@@ -232,6 +236,8 @@ class HearingsServiceTest {
         wrapper.setEventId(hearingEvent.getEventType().getCcdType());
 
         when(hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(any(), any(), anyBoolean())).thenReturn(sscsCaseDetailsConsumer);
+        given(hearingsMapping.buildHearingPayload(any(), any())).willReturn(HearingRequestPayload.builder().build());
+
 
         assertThatNoException()
             .isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
@@ -289,7 +295,7 @@ class HearingsServiceTest {
 
         given(venueService.getEpimsIdForVenue(PROCESSING_VENUE)).willReturn("219164");
 
-        given(hmcHearingApiService.sendCreateHearingRequest(any(HearingRequestPayload.class)))
+        given(hmcHearingApiService.sendCreateHearingRequest(any()))
             .willReturn(HmcUpdateResponse.builder().hearingRequestId(123L).versionNumber(1234L).status(HmcStatus.HEARING_REQUESTED).build());
 
         given(hmcHearingApiService.getHearingsRequest(anyString(), eq(null)))
@@ -310,7 +316,7 @@ class HearingsServiceTest {
 
         given(venueService.getEpimsIdForVenue(PROCESSING_VENUE)).willReturn("219164");
 
-        given(hmcHearingApiService.sendCreateHearingRequest(any(HearingRequestPayload.class)))
+        given(hmcHearingApiService.sendCreateHearingRequest(any()))
                 .willReturn(HmcUpdateResponse.builder().build());
 
         given(hmcHearingApiService.getHearingsRequest(anyString(),eq(null)))
@@ -387,7 +393,7 @@ class HearingsServiceTest {
 
     @DisplayName("When wrapper with a valid create Hearing State is given addHearingResponse should run without error")
     @Test
-    void processHearingWrapperUpdate() {
+    void processHearingWrapperUpdate() throws ListingException {
         given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE,ISSUE_CODE,false,false))
             .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
                 false,false,SessionCategory.CATEGORY_03,null));
@@ -398,6 +404,8 @@ class HearingsServiceTest {
         given(venueService.getEpimsIdForVenue(PROCESSING_VENUE)).willReturn("219164");
 
         given(refData.getVenueService()).willReturn(venueService);
+
+        given(hearingsMapping.buildHearingPayload(any(), any())).willReturn(HearingRequestPayload.builder().build());
 
         given(hmcHearingApiService.sendUpdateHearingRequest(any(HearingRequestPayload.class), anyString()))
                 .willReturn(HmcUpdateResponse.builder().build());
