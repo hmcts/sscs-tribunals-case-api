@@ -28,5 +28,6 @@
   "reservedToInterlocLabel": "Reserved to (Interloc): (Optional)",
   "generateNoticeLabel": "Generate notice",
   "yesNoticeLabel": "Yes",
-  "noNoticeLabel": "No"
+  "noNoticeLabel": "No",
+  "selectNextHearingTypeLabel": "Do you want to select next hearing type i.e. Substantive or Directions hearing"
 }

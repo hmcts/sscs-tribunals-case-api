@@ -58,10 +58,7 @@ java:
     RUN_DB_MIGRATION_ON_STARTUP: true
     TEST_RECIPIENTS_POSTCODE: "*"
     HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-aat"
-    HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-pr-${CHANGE_ID}"
-    TRIBUNALS_EVENT_QUEUE_NAME: "${SERVICE_NAME}-servicebus-tribunals-to-hearing-api"
-    TRIBUNALS_EVENT_QUEUE_POLICY_NAME: "RootManageSharedAccessKey"
-    TRIBUNALS_EVENT_QUEUE_NAMESPACE: "sscs-sb-preview"
+    HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "${SERVICE_NAME}-hmcsb-sscs"
     HMC_HEARINGS_TOPIC_NAMESPACE: "hmc-servicebus-aat"
     HMC_DEPLOYMENT_ID: "sscs-${CHANGE_ID}"
     # START - DIRECTION HEARINGS RELEASE VARIABLES
@@ -69,6 +66,7 @@ java:
     HEARINGBOOKED_NEW_LETTER: TB-SCS-LET-ENG-Hearing-Booked-v2.docx
     HEARINGBOOKED_NEW_LETTER_WELSH: TB-SCS-LET-WEL-Hearing-Booked-v2.docx
     # END - DIRECTION HEARINGS RELEASE VARIABLES
+    TRIBUNAL_INTERNAL_DOCUMENTS_ENABLED: true
   secrets:
     JOB_SCHEDULER_DB_PASSWORD:
       secretRef: postgres
@@ -253,7 +251,7 @@ xui-webapp:
     devcpuLimits: "1000m"
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
-    image: hmctspublic.azurecr.io/xui/webapp:pr-3979
+    image: hmctspublic.azurecr.io/xui/webapp:latest
     ingressHost: xui-${SERVICE_FQDN}
     environment:
       HEALTH_CCD_COMPONENT_API: ${CCD_GW_API}/health
@@ -633,6 +631,7 @@ ccd:
 
   ccd-api-gateway-web:
     nodejs:
+      image: hmctspublic.azurecr.io/ccd/api-gateway-web:prod-66a4048-20250203150702
       imagePullPolicy: Always
       environment:
         ADDRESS_LOOKUP_TOKEN: ${ADDRESS_LOOKUP_TOKEN}
@@ -743,7 +742,7 @@ hmcsb:
             correlationFilter:
               - name: "hmctsServiceId"
                 value: "BBA3"
-              - name: "deploymentId"
+              - name: "hmctsDeploymentId"
                 value: "sscs-${CHANGE_ID}"
 
 postgresql:
