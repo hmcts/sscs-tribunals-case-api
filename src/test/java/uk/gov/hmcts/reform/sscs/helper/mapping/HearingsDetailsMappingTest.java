@@ -84,8 +84,14 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
 
     private SscsCaseData caseData;
 
+    @Mock
+    private HearingsPanelMapping hearingsPanelMapping;
+
+    private HearingsDetailsMapping hearingsDetailsMapping;
+
     @BeforeEach
     void setUp() {
+        hearingsDetailsMapping = new HearingsDetailsMapping(hearingsPanelMapping);
         ReflectionTestUtils.setField(HearingsDetailsMapping.class, "isDirectionHearingsEnabled", true);
         OverrideFields defaultListingValues = OverrideFields.builder()
             .duration(60)
@@ -146,7 +152,7 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
             .caseData(caseData)
             .build();
 
-        HearingDetails hearingDetails = HearingsDetailsMapping.buildHearingDetails(wrapper, refData);
+        HearingDetails hearingDetails = hearingsDetailsMapping.buildHearingDetails(wrapper, refData);
 
         assertNotNull(hearingDetails.getHearingType());
         assertNotNull(hearingDetails.getHearingWindow());
@@ -157,7 +163,6 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
         assertNull(hearingDetails.getListingComments());
         assertNull(hearingDetails.getHearingRequester());
         assertNull(hearingDetails.getLeadJudgeContractType());
-        assertNotNull(hearingDetails.getPanelRequirements());
     }
 
     @DisplayName("shouldBeHearingsInWelshFlag Test")

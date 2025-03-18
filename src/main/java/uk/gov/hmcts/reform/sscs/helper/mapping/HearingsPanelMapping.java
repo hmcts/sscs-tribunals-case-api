@@ -14,29 +14,40 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMember;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberMedicallyQualified;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.model.DefaultPanelCategory;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
-import uk.gov.hmcts.reform.sscs.model.hmc.reference.BenefitRoleRelationType;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.RequirementType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.MemberType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelPreference;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
+import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @Slf4j
+@Component
 public final class HearingsPanelMapping {
 
-    private HearingsPanelMapping() {
+    private final RefDataService refDataService;
 
+    private final String key = "defaultPanelCategory/CaseSubType/BBA3-";
+
+    private final String serviceCode = "BBA3";
+
+    private HearingsPanelMapping(RefDataService refDataService) {
+
+        this.refDataService = refDataService;
     }
 
-    public static PanelRequirements getPanelRequirements(SscsCaseData caseData,
+    public PanelRequirements getPanelRequirements(SscsCaseData caseData,
                                                          ReferenceDataServiceHolder refData) {
+
         return PanelRequirements.builder()
                 .roleTypes(getRoleTypes(caseData.getBenefitCode()))
                 .authorisationTypes(getAuthorisationTypes())
@@ -46,8 +57,9 @@ public final class HearingsPanelMapping {
                 .build();
     }
 
-    public static List<String> getRoleTypes(String benefitCode) {
-        return BenefitRoleRelationType.findRoleTypesByBenefitCode(benefitCode);
+    public List<String> getRoleTypes(String benefitCode) {
+        List<DefaultPanelCategory> panelCodes = refDataService.getDefaultPanelCategory(key, serviceCode);
+        return panelCodes.stream().map(DefaultPanelCategory::getExternalReference).collect(Collectors.toList());
     }
 
     public static List<String> getAuthorisationTypes() {

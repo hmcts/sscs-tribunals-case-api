@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.helper.mapping;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsCaseMapping.buildHearingCaseDetails;
-import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsDetailsMapping.buildHearingDetails;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsPartiesMapping.buildHearingPartiesDetails;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsRequestMapping.buildHearingRequestDetails;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.EntityRoleCode.APPELLANT;
@@ -14,6 +13,7 @@ import static uk.gov.hmcts.reform.sscs.model.hmc.reference.EntityRoleCode.OTHER_
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.EntityRoleCode.REPRESENTATIVE;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Entity;
@@ -29,16 +29,20 @@ import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @Slf4j
+@Component
 public final class HearingsMapping {
 
-    private HearingsMapping() {
+    private final HearingsDetailsMapping hearingsDetailsMapping;
+
+    HearingsMapping(HearingsDetailsMapping hearingsDetailsMapping) {
+        this.hearingsDetailsMapping = hearingsDetailsMapping;
     }
 
-    public static HearingRequestPayload buildHearingPayload(HearingWrapper wrapper, ReferenceDataServiceHolder refData)
+    public HearingRequestPayload buildHearingPayload(HearingWrapper wrapper, ReferenceDataServiceHolder refData)
             throws ListingException {
         return HearingRequestPayload.builder()
                 .requestDetails(buildHearingRequestDetails(wrapper))
-                .hearingDetails(buildHearingDetails(wrapper, refData))
+                .hearingDetails(hearingsDetailsMapping.buildHearingDetails(wrapper, refData))
                 .caseDetails(buildHearingCaseDetails(wrapper, refData))
                 .partiesDetails(buildHearingPartiesDetails(wrapper, refData))
                 .build();

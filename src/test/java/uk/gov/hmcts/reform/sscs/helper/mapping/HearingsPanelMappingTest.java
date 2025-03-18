@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.helper.mapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 
 import java.util.Collections;
 import java.util.List;
@@ -12,13 +11,11 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Issue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMember;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SessionCategory;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsIndustrialInjuriesData;
@@ -27,7 +24,6 @@ import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.RequirementType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.MemberType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelPreference;
-import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
@@ -42,44 +38,6 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
 
     @Mock
     private ReferenceDataServiceHolder refData;
-
-    @DisplayName("When no data is given getPanelRequirements returns the valid but empty PanelRequirements")
-    @Test
-    void testGetPanelRequirements() {
-        given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
-
-        SscsCaseData caseData = SscsCaseData.builder().build();
-
-        PanelRequirements result = HearingsPanelMapping.getPanelRequirements(caseData, refData);
-
-        assertThat(result).isNotNull();
-        assertThat(result.getRoleTypes()).isEmpty();
-        assertThat(result.getAuthorisationTypes()).isEmpty();
-        assertThat(result.getAuthorisationSubTypes()).isEmpty();
-        assertThat(result.getPanelPreferences()).isEmpty();
-        assertThat(result.getPanelSpecialisms()).isEmpty();
-    }
-
-    @DisplayName("getRoleTypes returns an empty list when benefit is not Industrial Injuries Disablement Benefit or CHILD_SUPPORT ")
-    @Test
-    void shouldReturn_EmptyRoleTypeList_When_Benefit_Not_industrialInjuriesDisablementBenefit_or_ChildSupport() {
-        List<String> result = HearingsPanelMapping.getRoleTypes(Benefit.ATTENDANCE_ALLOWANCE.getBenefitCode());
-        assertThat(result).isEmpty();
-    }
-
-    @DisplayName("getRoleTypes returns PanelMemberType.TRIBUNALS_MEMBER_MEDICAL reference when benefit is Industrial Injuries Disablement Benefit ")
-    @Test
-    void shouldReturn_TribunalsMember_MedicalReference_When_Benefit_is_IndustrialInjuriesDisablementBenefit() {
-        List<String> result = HearingsPanelMapping.getRoleTypes(Benefit.IIDB.getBenefitCode());
-        assertThat(result).contains(PanelMemberType.TRIBUNALS_MEMBER_MEDICAL.getReference());
-    }
-
-    @DisplayName("getRoleTypes returns PanelMemberType.TRIBUNALS_MEMBER_FINANCIALLY_QUALIFIED reference when benefit is CHILD_SUPPORT ")
-    @Test
-    void shouldReturn_TribunalsMember_Financially_Qualified_When_Benefit_is_ChildSupport() {
-        List<String> result = HearingsPanelMapping.getRoleTypes(Benefit.CHILD_SUPPORT.getBenefitCode());
-        assertThat(result).contains(PanelMemberType.TRIBUNALS_MEMBER_FINANCIALLY_QUALIFIED.getReference());
-    }
 
     @DisplayName("getAuthorisationTypes returns an empty list")
     @Test

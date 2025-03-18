@@ -45,6 +45,10 @@ public class ServiceHearingsService {
 
     private final IdamService idamService;
 
+
+
+    private final ServiceHearingValuesMapping serviceHearingValuesMapping;
+
     public ServiceHearingValues getServiceHearingValues(ServiceHearingRequest request)
             throws GetCaseException, UpdateCaseException, ListingException, JsonProcessingException {
         SscsCaseDetails caseDetails = ccdCaseService.getCaseDetails(request.getCaseId());
@@ -52,7 +56,7 @@ public class ServiceHearingsService {
         SscsCaseData caseData = caseDetails.getData();
         String originalCaseData = objectMapper.writeValueAsString(caseData);
 
-        ServiceHearingValues model = ServiceHearingValuesMapping.mapServiceHearingValues(caseData, refData);
+        ServiceHearingValues model = serviceHearingValuesMapping.mapServiceHearingValues(caseData, refData);
 
         String updatedCaseData = objectMapper.writeValueAsString(caseData);
 

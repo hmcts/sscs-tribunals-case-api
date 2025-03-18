@@ -15,6 +15,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCasePanelMembersExcluded;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTime;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AmendReason;
@@ -35,16 +36,20 @@ import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @Slf4j
+@Component
 public final class HearingsDetailsMapping {
 
     @Getter
     @Setter
     private static boolean isDirectionHearingsEnabled;
 
-    private HearingsDetailsMapping() {
+    private final HearingsPanelMapping hearingsPanelMapping;
+
+    HearingsDetailsMapping(HearingsPanelMapping hearingsPanelMapping) {
+        this.hearingsPanelMapping = hearingsPanelMapping;
     }
 
-    public static HearingDetails buildHearingDetails(HearingWrapper wrapper, ReferenceDataServiceHolder refData) throws ListingException {
+    public HearingDetails buildHearingDetails(HearingWrapper wrapper, ReferenceDataServiceHolder refData) throws ListingException {
         // get case data and set adjournmentInProgress flag for use in downstream method calls
         SscsCaseData caseData = wrapper.getCaseData();
         boolean adjournmentInProgress = refData.isAdjournmentFlagEnabled()
@@ -56,7 +61,7 @@ public final class HearingsDetailsMapping {
         List<String> nonStandardDurationReasons = HearingsDurationMapping.getNonStandardHearingDurationReasons();
         int physicalAttendees = HearingsNumberAttendeesMapping.getNumberOfPhysicalAttendees(caseData, adjournmentInProgress);
         List<HearingLocation> locations = HearingsLocationMapping.getHearingLocations(caseData, refData);
-        PanelRequirements panelRequirements = HearingsPanelMapping.getPanelRequirements(caseData, refData);
+        PanelRequirements panelRequirements = hearingsPanelMapping.getPanelRequirements(caseData, refData);
         List<AmendReason> amendReasons = OverridesMapping.getAmendReasonCodes(caseData);
         List<HearingChannel> channels = HearingsChannelMapping.getHearingChannels(caseData, adjournmentInProgress);
         // build hearing details to be used in payload for hmc create / update hearing requests

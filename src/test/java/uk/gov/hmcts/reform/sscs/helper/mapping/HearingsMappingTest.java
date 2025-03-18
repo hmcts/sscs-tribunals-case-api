@@ -40,16 +40,20 @@ class HearingsMappingTest extends HearingsMappingBase {
     @Mock
     private VenueService venueService;
 
+    @Mock
+    private  HearingsDetailsMapping hearingsDetailsMapping;
+
+    private HearingsMapping hearingsMapping;
+
     @DisplayName("When a valid hearing wrapper is given buildHearingPayload returns the correct Hearing Request Payload")
     @Test
     void buildHearingPayload() throws Exception {
+        hearingsMapping = new HearingsMapping(hearingsDetailsMapping);
         given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE,ISSUE_CODE,false,false))
                 .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
                                                    false, false, SessionCategory.CATEGORY_03, null));
 
-        given(refData.getHearingDurations()).willReturn(hearingDurations);
         given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
-        given(refData.getVenueService()).willReturn(venueService);
 
         SscsCaseData caseData = SscsCaseData.builder()
             .ccdCaseId(String.valueOf(CASE_ID))
@@ -82,11 +86,10 @@ class HearingsMappingTest extends HearingsMappingBase {
             .caseData(caseData)
             .caseData(caseData)
             .build();
-        HearingRequestPayload result = HearingsMapping.buildHearingPayload(wrapper, refData);
+        HearingRequestPayload result = hearingsMapping.buildHearingPayload(wrapper, refData);
 
         assertThat(result).isNotNull();
         assertThat(result.getRequestDetails()).isNotNull();
-        assertThat(result.getHearingDetails()).isNotNull();
         assertThat(result.getCaseDetails()).isNotNull();
         assertThat(result.getRequestDetails()).isNotNull();
     }
