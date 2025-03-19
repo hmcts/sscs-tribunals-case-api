@@ -2,6 +2,10 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.confirmpanelcomposition;
 
 import static java.util.Objects.requireNonNull;
 
+import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -36,6 +40,24 @@ public class ConfirmPanelCompositionAboutToSubmitHandler implements PreSubmitCal
 
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
+
+        FtaCommunicationFields ftaCommunicationFields = sscsCaseData.getFtaCommunicationFields();
+        List<FtaCommunication> ftaComs = ftaCommunicationFields.getFtaCommunications();
+
+        String topic = sscsCaseData.getFtaCommunicationFields().getFtaRequestTopic();
+        String question = sscsCaseData.getFtaCommunicationFields().getFtaRequestQuestion();
+        LocalDateTime now = LocalDateTime.now();
+        ftaComs.add(FtaCommunication.builder()
+            .requestText(question)
+            .requestTopic(topic)
+            .requestDateTime(now)
+            .requestUserName("TBC")
+            .requestDueDate(now.plusDays(2))
+            .build());
+        
+        ftaComs.sort(Comparator.comparing(FtaCommunication::getRequestDateTime).reversed());
+
+        //sscsCaseData.setFtaCommunicationFields(ftaCommunicationFields);
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
