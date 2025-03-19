@@ -21,7 +21,7 @@ export class Hearing extends BaseStep {
   }
 
   async verifyHearingIsTriggered(caseId: string, caseType: string) {
-    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+    await this.loginUserWithCaseId(credentials.hmrcSuperUser, false, caseId);
     await this.homePage.navigateToTab('Summary');
     await this.summaryTab.verifyPresenceOfText('Ready to list');
 
