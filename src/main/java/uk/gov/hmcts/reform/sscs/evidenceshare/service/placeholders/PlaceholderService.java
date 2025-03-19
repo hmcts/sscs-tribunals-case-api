@@ -83,13 +83,6 @@ public class PlaceholderService {
     public void build(SscsCaseData caseData, Map<String, Object> placeholders, Address address, String caseCreatedDate) {
         Appeal appeal = caseData.getAppeal();
         Benefit benefit = caseData.getBenefitType().orElse(null);
-        String description = Optional.ofNullable(appeal.getBenefitType())
-            .map(BenefitType::getDescription)
-            .map(String::toUpperCase)
-            .orElseGet(() -> (benefit != null) ? benefit.getDescription().toUpperCase() : StringUtils.EMPTY);
-
-        String shouldHideNino = appeal.getBenefitType() != null && Benefit.CHILD_SUPPORT.getShortName().equals(appeal.getBenefitType().getCode()) ? YesNo.YES.getValue() : YesNo.NO.getValue();
-
         if (caseData.isIbcCase()) {
             placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, IBC_ACRONYM);
             placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL_WELSH, IBC_ACRONYM_WELSH);
@@ -97,6 +90,12 @@ public class PlaceholderService {
             placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, benefit.isHasAcronym() ? benefit.name() : benefit.getDescription());
             placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL_WELSH, benefit.isHasAcronym() ? benefit.name() : benefit.getWelshDescription());
         }
+        String description = Optional.ofNullable(appeal.getBenefitType())
+            .map(BenefitType::getDescription)
+            .map(String::toUpperCase)
+            .orElseGet(() -> (benefit != null) ? benefit.getDescription().toUpperCase() : StringUtils.EMPTY);
+
+        String shouldHideNino = appeal.getBenefitType() != null && Benefit.CHILD_SUPPORT.getShortName().equals(appeal.getBenefitType().getCode()) ? YesNo.YES.getValue() : YesNo.NO.getValue();
 
         if (benefit != null && SscsType.SSCS5.equals(benefit.getSscsType())) {
             placeholders.put(FIRST_TIER_AGENCY_ACRONYM, HMRC_ACRONYM);
@@ -131,7 +130,7 @@ public class PlaceholderService {
             placeholders.put(CASE_CREATED_DATE_LITERAL, caseCreatedDate);
         }
 
-        placeholders.put(POSTPONEMENT_REQUEST,  getPostponementRequestStatus(caseData));
+        placeholders.put(POSTPONEMENT_REQUEST, getPostponementRequestStatus(caseData));
 
         buildExcelaAddress(caseData.getIsScottishCase(), placeholders);
         populateRpcPlaceHolders(caseData, placeholders);
