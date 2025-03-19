@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.confirmpanelcomposition;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication;
 
 import static java.util.Objects.requireNonNull;
 
@@ -7,6 +7,8 @@ import java.util.Comparator;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -14,11 +16,17 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 
 @Service
 @Slf4j
-public class ConfirmPanelCompositionAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+    private IdamService idamService;
+
+    @Autowired
+    public FtaCommunicationAboutToSubmitHandler(IdamService idamService) {
+        this.idamService = idamService;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -26,7 +34,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandler implements PreSubmitCal
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == EventType.CONFIRM_PANEL_COMPOSITION;
+                && callback.getEvent() == EventType.FTA_COMMUNICATION;
     }
 
     @Override
@@ -40,17 +48,23 @@ public class ConfirmPanelCompositionAboutToSubmitHandler implements PreSubmitCal
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
+        List<FtaCommunication> ftaComs = sscsCaseData.getFtaCommunicationFields().getFtaCommunications();
 
-        processInterloc(sscsCaseData);
-        return response;
+        String topic = sscsCaseData.getFtaCommunicationFields().getFtaRequestTopic();
+        String question = sscsCaseData.getFtaCommunicationFields().getFtaRequestQuestion();
+        LocalDateTime now = LocalDateTime.now();
+        final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
+        ftaComs.add(FtaCommunication.builder()
+            .requestText(question)
+            .requestTopic(topic)
+            .requestDateTime(now)
+            .requestUserName(userDetails.getName())
+            .requestDueDate(now.plusDays(2))
+            .build());
+        
+        ftaComs.sort(Comparator.comparing(FtaCommunication::getRequestDateTime).reversed());
+
+        return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    private void processInterloc(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getIsFqpmRequired() != null && sscsCaseData.getInterlocReviewState() != null
-                && sscsCaseData.getInterlocReviewState().equals(InterlocReviewState.REVIEW_BY_JUDGE)) {
-            sscsCaseData.setInterlocReferralReason(null);
-            sscsCaseData.setInterlocReviewState(null);
-        }
-    }
 }
