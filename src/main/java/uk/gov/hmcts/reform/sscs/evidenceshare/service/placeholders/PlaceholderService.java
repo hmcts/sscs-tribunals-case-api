@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.EXELA_ADDRESS_LINE2_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.EXELA_ADDRESS_LINE3_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.EXELA_ADDRESS_POSTCODE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.FIRST_TIER_AGENCY_ACRONYM;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.GENERATED_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.IBCA_REFERENCE_LABEL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.IBCA_URL;
@@ -34,6 +35,9 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.WELSH_GENERATED_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.defaultToEmptyStringIfNull;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.getPostponementRequestStatus;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DWP_ACRONYM;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.HMRC_ACRONYM;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBCA_ACRONYM;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBC_ACRONYM;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBC_ACRONYM_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.LetterType.PLACEHOLDER_SERVICE;
@@ -53,6 +57,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.docmosis.config.PdfDocumentConfig;
 import uk.gov.hmcts.reform.sscs.evidenceshare.config.ExelaAddressConfig;
@@ -91,6 +96,14 @@ public class PlaceholderService {
         } else if (benefit != null) {
             placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, benefit.isHasAcronym() ? benefit.name() : benefit.getDescription());
             placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL_WELSH, benefit.isHasAcronym() ? benefit.name() : benefit.getWelshDescription());
+        }
+
+        if (benefit != null && SscsType.SSCS5.equals(benefit.getSscsType())) {
+            placeholders.put(FIRST_TIER_AGENCY_ACRONYM, HMRC_ACRONYM);
+        } else if (benefit != null && SscsType.SSCS8.equals(benefit.getSscsType())) {
+            placeholders.put(FIRST_TIER_AGENCY_ACRONYM, IBCA_ACRONYM);
+        } else {
+            placeholders.put(FIRST_TIER_AGENCY_ACRONYM, DWP_ACRONYM);
         }
 
         placeholders.put(SHOULD_HIDE_NINO, shouldHideNino);

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.TAX_CREDIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.GRANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.REFUSE;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.APPELLANT_FULL_NAME_LITERAL;
@@ -16,6 +17,7 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.EXELA_ADDRESS_LINE1_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.EXELA_ADDRESS_LINE2_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.EXELA_ADDRESS_LINE3_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.FIRST_TIER_AGENCY_ACRONYM;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.GENERATED_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.IBCA_URL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LABEL;
@@ -241,6 +243,8 @@ public class PlaceholderServiceTest {
         caseData.setLanguagePreferenceWelsh("Yes");
         given(pdfDocumentConfig.getHmctsWelshImgKey()).willReturn("hmctsWelshImgKey");
         given(pdfDocumentConfig.getHmctsWelshImgVal()).willReturn("welshhmcts.png");
+        caseData.getAppeal().getBenefitType().setCode(TAX_CREDIT.getShortName());
+        caseData.getAppeal().getBenefitType().setDescription(TAX_CREDIT.getDescription());
         Address address = Address.builder()
             .line1("Unit 2")
             .line2("156 The Road")
@@ -251,6 +255,7 @@ public class PlaceholderServiceTest {
         service.build(caseData, placeholders, address, welshDate);
         assertEquals("HM Courts & Tribunals Service", placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL));
         assertEquals("welshhmcts.png", placeholders.get("hmctsWelshImgKey"));
+        assertEquals("HMRC", placeholders.get(FIRST_TIER_AGENCY_ACRONYM));
         assertNotNull(placeholders.get(WELSH_CASE_CREATED_DATE_LITERAL));
     }
 
@@ -259,7 +264,6 @@ public class PlaceholderServiceTest {
         caseData.setLanguagePreferenceWelsh("Yes");
         caseData.getAppeal().getBenefitType().setCode(CHILD_SUPPORT.getShortName());
         caseData.getAppeal().getBenefitType().setDescription(CHILD_SUPPORT.getDescription());
-
         Address address = Address.builder()
             .line1("Unit 2")
             .line2("156 The Road")
@@ -268,7 +272,7 @@ public class PlaceholderServiceTest {
             .postcode("L2 5UZ").build();
 
         service.build(caseData, placeholders, address, welshDate);
-
+        assertEquals("DWP", placeholders.get(FIRST_TIER_AGENCY_ACRONYM));
         assertEquals("Yes", placeholders.get(SHOULD_HIDE_NINO));
     }
 
@@ -303,6 +307,7 @@ public class PlaceholderServiceTest {
         assertEquals("INFECTED BLOOD COMPENSATION", placeholders.get(BENEFIT_TYPE_LITERAL));
         assertEquals("IBC", placeholders.get(BENEFIT_NAME_ACRONYM_LITERAL));
         assertEquals("IGH", placeholders.get(BENEFIT_NAME_ACRONYM_LITERAL_WELSH));
+        assertEquals("IBCA", placeholders.get(FIRST_TIER_AGENCY_ACRONYM));
         assertEquals("123456", placeholders.get(CASE_ID_LITERAL));
         assertEquals(IBCA_URL, placeholders.get(SSCS_URL_LITERAL));
         assertEquals("Line 1", placeholders.get(EXELA_ADDRESS_LINE1_LITERAL));
@@ -361,7 +366,7 @@ public class PlaceholderServiceTest {
                 .postcode("L2 5UZ").build();
 
         service.build(caseData, placeholders, address, now);
-
+        assertEquals("DWP", placeholders.get(FIRST_TIER_AGENCY_ACRONYM));
         assertEquals("refuse", placeholders.get(POSTPONEMENT_REQUEST));
     }
 }
