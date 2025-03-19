@@ -27,9 +27,7 @@ test.describe(
     }) => {
       test.slow();
       let ucCaseId = await createCaseBasedOnCaseType('UC');
-      await uploadResponseSteps.performUploadResponseOnAUniversalCredit(
-        ucCaseId
-      );
+      await uploadResponseSteps.performUploadResponseOnAUniversalCredit(ucCaseId);
     });
   }
 );
