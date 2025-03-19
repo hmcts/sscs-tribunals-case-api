@@ -60,8 +60,8 @@ public final class HearingsPanelMapping {
     public List<String> getRoleTypes(SscsCaseData caseData) {
         String updatedKey = key + caseData.getBenefitCode() + caseData.getIssueCode();
         List<DefaultPanelCategory> panelCodes = refDataService.getDefaultPanelCategory(serviceCode, updatedKey);
-        return panelCodes != null ?
-                panelCodes.stream().map(DefaultPanelCategory::getExternalReference).collect(Collectors.toList())
+        return panelCodes != null
+                ? panelCodes.stream().map(DefaultPanelCategory::getExternalReference).collect(Collectors.toList())
                 : List.of();
     }
 
