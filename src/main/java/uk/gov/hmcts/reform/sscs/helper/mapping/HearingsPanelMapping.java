@@ -36,7 +36,7 @@ public final class HearingsPanelMapping {
 
     private final RefDataService refDataService;
 
-    private final String key = "defaultPanelCategory/CaseSubType/BBA3-";
+    private final String key = "panelCategory/caseSubType/BBA3-";
 
     private final String serviceCode = "BBA3";
 
