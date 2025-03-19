@@ -29,9 +29,9 @@ export class Hearings {
     );
   }
 
-  async verifyHearingStatusSummary() {
+  async verifyHearingStatusSummary(isDirectionHearing: boolean) {
     await webActions.verifyTextVisibility('WAITING TO BE LISTED');
-    await webActions.verifyTextVisibility('Substantive');
+    await webActions.verifyTextVisibility(isDirectionHearing ? 'Direction Hearings' : 'Substantive');
     await webActions.verifyTextVisibility('View or edit');
     await webActions.isLinkClickable('Cancel');
   }
