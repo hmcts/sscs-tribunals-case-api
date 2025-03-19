@@ -7,18 +7,27 @@ import java.util.Comparator;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 
 
 @Service
 @Slf4j
 public class ConfirmPanelCompositionAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+    private IdamService idamService;
+
+    @Autowired
+    public ConfirmPanelCompositionAboutToSubmitHandler(IdamService idamService) {
+        this.idamService = idamService;
+    }
 
 
     @Override
@@ -41,23 +50,21 @@ public class ConfirmPanelCompositionAboutToSubmitHandler implements PreSubmitCal
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        FtaCommunicationFields ftaCommunicationFields = sscsCaseData.getFtaCommunicationFields();
-        List<FtaCommunication> ftaComs = ftaCommunicationFields.getFtaCommunications();
+        List<FtaCommunication> ftaComs = sscsCaseData.getFtaCommunicationFields().getFtaCommunications();
 
         String topic = sscsCaseData.getFtaCommunicationFields().getFtaRequestTopic();
         String question = sscsCaseData.getFtaCommunicationFields().getFtaRequestQuestion();
         LocalDateTime now = LocalDateTime.now();
+        final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
         ftaComs.add(FtaCommunication.builder()
             .requestText(question)
             .requestTopic(topic)
             .requestDateTime(now)
-            .requestUserName("TBC")
+            .requestUserName(userDetails.getName())
             .requestDueDate(now.plusDays(2))
             .build());
         
         ftaComs.sort(Comparator.comparing(FtaCommunication::getRequestDateTime).reversed());
-
-        //sscsCaseData.setFtaCommunicationFields(ftaCommunicationFields);
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
