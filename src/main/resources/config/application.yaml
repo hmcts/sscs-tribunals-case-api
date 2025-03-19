@@ -294,6 +294,9 @@ idam:
 judicial-ref:
     api:
         url: ${JUDICIAL_REF_API_URL:http://localhost:5555}
+common-ref:
+    api:
+        url: ${COMMON_REF_API_URL:http://localhost:5555}
 location_ref:
     api:
         url: ${RD_LOCATION_REF_API_URL:http://localhost:5555}
