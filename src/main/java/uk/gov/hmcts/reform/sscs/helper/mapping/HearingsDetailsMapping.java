@@ -12,8 +12,6 @@ import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCasePanelMembersExcluded;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTime;
@@ -36,10 +34,6 @@ import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @Slf4j
 public final class HearingsDetailsMapping {
-
-    @Getter
-    @Setter
-    private static boolean isDirectionHearingsEnabled;
 
     private HearingsDetailsMapping() {
     }
@@ -83,7 +77,7 @@ public final class HearingsDetailsMapping {
     }
 
     public static HmcHearingType getHearingType(SscsCaseData sscsCaseData) {
-        return isDirectionHearingsEnabled && getHmcHearingType(sscsCaseData) != null
+        return getHmcHearingType(sscsCaseData) != null
                 ? getHmcHearingType(sscsCaseData) : HmcHearingType.SUBSTANTIVE;
     }
 
