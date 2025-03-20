@@ -41,8 +41,8 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
 
     @Test
     @Parameters({
-        "Appellant, 8620e023-f663-477e-a771-9cfad50ee30f, 446c7b23-7342-42e1-adff-b4c367e951cb, 1, 1, 1, true",
-        "Appointee, 8620e023-f663-477e-a771-9cfad50ee30f, 446c7b23-7342-42e1-adff-b4c367e951cb, 1, 1, 1, false",
+        "Appellant, 6919c7bd-96c7-4b6a-8a1d-4f8591a2ca19, 446c7b23-7342-42e1-adff-b4c367e951cb, 1, 1, 1, true",
+        "Appointee, 6919c7bd-96c7-4b6a-8a1d-4f8591a2ca19, 446c7b23-7342-42e1-adff-b4c367e951cb, 1, 1, 1, false",
         "Reps, e29a2275-553f-4e70-97f4-2994c095f281, f59440ee-19ca-4d47-a702-13e9cecaccbd, 1, 1, 2, false"
     })
     public void givenCallbackWithSubscriptions_shouldSendEmailSmsAndLetterNotifications(
