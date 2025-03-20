@@ -2849,7 +2849,7 @@
     "Name": "Review Post Hearing App",
     "Description": "Review Post Hearing Application",
     "DisplayOrder": 1381,
-    "PreConditionState(s)": "dormantAppealState;postHearing;withUT",
+    "PreConditionState(s)": "dormantAppealState;postHearing",
     "PostConditionState": "*",
     "EventEnablingCondition": "hearingRoute=\"listAssist\"",
     "ShowEventNotes": "Y",
