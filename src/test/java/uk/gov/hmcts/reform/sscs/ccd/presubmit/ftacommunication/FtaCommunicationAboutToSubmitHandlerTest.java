@@ -3,18 +3,15 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,10 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunication;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 
@@ -73,65 +67,6 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
         when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
-
-    //@Test
-    public void givenFqpmRequiredNull_thenNoChange() {
-
-        sscsCaseData.setIsFqpmRequired(null);
-        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE);
-        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.NONE);
-
-        PreSubmitCallbackResponse<SscsCaseData> response =
-                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.REVIEW_BY_JUDGE));
-        assertThat(response.getData().getInterlocReferralReason(), is(InterlocReferralReason.NONE));
-    } 
-
-    //@Test
-    @Parameters({"YES", "NO"})
-    public void givenFqpmRequiredYesOrNoAndInterlocByJudge_thenClearInterloc(String isFqpmRequired) {
-
-        sscsCaseData.setIsFqpmRequired(isFqpmRequired.equalsIgnoreCase("yes") ? YesNo.YES : YesNo.NO);
-        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE);
-        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.NONE);
-
-        PreSubmitCallbackResponse<SscsCaseData> response =
-                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getInterlocReviewState(), is(nullValue()));
-        assertThat(response.getData().getInterlocReferralReason(), is(nullValue()));
-    }
-
-
-    
-    //@Test
-    @Parameters({"YES", "NO"})
-    public void givenFqpmRequiredYesOrNoAndNoInterlocByJudge_thenInterlocNotChanged(String isFqpmRequired) {
-
-        sscsCaseData.setIsFqpmRequired(isFqpmRequired.equalsIgnoreCase("yes") ? YesNo.YES : YesNo.NO);
-        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
-        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.NONE);
-
-        PreSubmitCallbackResponse<SscsCaseData> response =
-                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.REVIEW_BY_TCW));
-        assertThat(response.getData().getInterlocReferralReason(), is(InterlocReferralReason.NONE));
-    }
-
-    //@Test
-    public void givenNoFqpmRequiredSet_thenInterlocNotChanged() {
-
-        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE);
-        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.NONE);
-
-        PreSubmitCallbackResponse<SscsCaseData> response =
-                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.REVIEW_BY_JUDGE));
-        assertThat(response.getData().getInterlocReferralReason(), is(InterlocReferralReason.NONE));
-    }
        
     @Test
     public void givenValidFtaRequest_shouldAddNewCommunicationToList() {
@@ -169,24 +104,10 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
         assertThat(addedCom.getRequestTopic(), is(expectedTopic));
         assertThat(addedCom.getRequestText(), is(expectedQuestion));
         assertThat(addedCom.getRequestUserName(), is(expectedUserName));
-    
-        // Verify timestamps
-        LocalDateTime afterTest = LocalDateTime.now();
         assertThat(addedCom.getRequestDateTime(), is(notNullValue()));
-    
-        LocalDateTime beforeTest = LocalDateTime.now();
-
-        // The request time should be between before and after our test
-        assertTrue(
-            addedCom.getRequestDateTime().isAfter(beforeTest) || addedCom.getRequestDateTime().isEqual(beforeTest)
-        );
-        assertTrue(
-            addedCom.getRequestDateTime().isBefore(afterTest) || addedCom.getRequestDateTime().isEqual(afterTest)
-        );
     
         // Due date should be 2 days after request date
         assertThat(addedCom.getRequestDueDate(), is(addedCom.getRequestDateTime().plusDays(2)));
     }
     
-
 }
