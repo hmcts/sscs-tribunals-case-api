@@ -4615,7 +4615,7 @@
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
     "PageID": "1.0",
-    "PageLabel": "FTA Communication"
+    "PageLabel": "Select FTA Communication action"
   }
   ,
   {
@@ -4628,7 +4628,7 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "1.0",
     "PageShowCondition": "FL_ftaRequestType=\"newRequest\"",
-    "PageLabel": "FTA Communication Topic"
+    "PageLabel": "Send a new request"
   }
   ,
   {
@@ -4641,46 +4641,8 @@
     "PageFieldDisplayOrder": 2,
     "PageID": "1.0",
     "PageShowCondition": "FL_ftaRequestType=\"newRequest\"",
-    "PageLabel": "FTA Communication Topic"
+    "PageLabel": "FTA Request Question"
   }
-  ,
-  {
-    "CaseEventID": "ftaCommunication",
-    "CaseFieldID": "ftaRequestTopic",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
-    "LiveFrom": "13/03/2025",
-    "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder": 1,
-    "PageID": "1.0",
-    "PageShowCondition": "FL_ftaRequestType=\"replyToFtaQuery\"",
-    "PageLabel": "FTA Communication Topic"
-  }
-  ,
-  {
-    "CaseEventID": "ftaCommunication",
-    "CaseFieldID": "ftaRequestTopic",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
-    "LiveFrom": "13/03/2025",
-    "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder": 1,
-    "PageID": "1.0",
-    "PageShowCondition": "FL_ftaRequestType=\"reviewFtaReply\"",
-    "PageLabel": "FTA Communication Topic"
-  }
-  ,
-  {
-    "CaseEventID": "ftaCommunication",
-    "CaseFieldID": "ftaRequestTopic",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
-    "LiveFrom": "13/03/2025",
-    "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder": 1,
-    "PageID": "1.0",
-    "PageShowCondition": "FL_ftaRequestType=\"deleteRequestReply\"",
-    "PageLabel": "FTA Communication Topic"
-  }
+  
 
 ]
