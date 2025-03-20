@@ -3,7 +3,9 @@ package uk.gov.hmcts.reform.sscs.helper.mapping;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AmendReason.ADMIN_ERROR;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AmendReason.JUDGE_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
@@ -21,25 +23,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AmendReason;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingWindow;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Issue;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SessionCategory;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.exception.InvalidMappingException;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.HearingWrapper;
@@ -70,7 +54,6 @@ class OverridesMappingTest {
     @Mock
     private SignLanguagesService signLanguages;
     @Mock
-
     private SessionCategoryMapService sessionCategoryMaps;
     @Mock
     private ReferenceDataServiceHolder refData;
@@ -113,6 +96,24 @@ class OverridesMappingTest {
 
         OverrideFields result = OverridesMapping.getOverrideFields(caseData);
         assertThat(result).isEqualTo(overrideFields);
+    }
+
+    @DisplayName("When IBC case, hearing duration set to null")
+    @Test
+    void testIbcCaseHearingDuration() throws ListingException {
+        try {
+            when(refData.getVenueService()).thenReturn(venueService);
+            caseData.setBenefitCode("093");
+            when(refData.getSessionCategoryMaps()).thenReturn(sessionCategoryMaps);
+            when(sessionCategoryMaps.getSessionCategory("093", ISSUE_CODE,false,false))
+                    .thenReturn(new SessionCategoryMap(BenefitCode.IBC, Issue.DD,
+                            false,false,SessionCategory.CATEGORY_01,null));
+            OverridesMapping.setOverrideValues(caseData,refData);
+            assertNull(caseData.getSchedulingAndListingFields().getOverrideFields().getDuration());
+        } catch (ListingException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     @DisplayName("When override fields is null, getOverrideFields returns a empty override fields")
