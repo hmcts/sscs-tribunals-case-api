@@ -83,7 +83,7 @@ public class DirectionIssuedMidEventHandlerTest {
 
         Map<EventType, String> welshEventTypeDocs = new HashMap<>();
         welshEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-ENG-directions-notice-v2.docx");
-        welshEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-ENG-draft-decision-notice.docx");
+        welshEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-ENG-draft-decision-notice-v2.docx");
         welshEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-final-decision-notice-v2.docx");
 
         Map<LanguagePreference, Map<EventType, String>> documents =  new HashMap<>();
