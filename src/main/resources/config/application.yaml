@@ -179,7 +179,7 @@ docmosis:
 document:
     bilingual:
         notice:
-            template: TB-SCS-GNO-WEL-00473.docx
+            template: TB-SCS-GNO-WEL-00473-v2.docx
     pdf:
         hmctsImgKey: hmcts2
         hmctsImgVal: '[userImage:hmcts.png]'

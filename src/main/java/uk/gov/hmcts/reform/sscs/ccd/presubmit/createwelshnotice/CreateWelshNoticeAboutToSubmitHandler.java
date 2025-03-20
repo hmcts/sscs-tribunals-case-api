@@ -3,6 +3,10 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.createwelshnotice;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.IBCA_REFERENCE_LABEL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.IBCA_REFERENCE_LABEL_WELSH;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.NINO_LABEL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.NINO_LABEL_WELSH;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -56,7 +60,7 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
         this.docmosisPdfService = docmosisPdfService;
         this.pdfStoreService = pdfStoreService;
         this.welshFooterService = welshFooterService;
-        this.directionTemplatePath  = template;
+        this.directionTemplatePath = template;
     }
 
     @Override
@@ -65,7 +69,7 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
         requireNonNull(callbackType, "callbackType must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent().equals(CREATE_WELSH_NOTICE);
+            && callback.getEvent().equals(CREATE_WELSH_NOTICE);
     }
 
     @Override
@@ -83,7 +87,7 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
         LocalDate dateAdded =
             Optional.ofNullable(caseData.getDocumentStaging().getDateAdded()).orElse(LocalDate.now());
         final String filename = String.format("%s on %s.pdf", caseData.getDocumentTypes().getValue().getCode(),
-                dateAdded.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+            dateAdded.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
         byte[] content = docmosisPdfService.createPdf(placeholderMap, directionTemplatePath);
 
         DocumentLink newDocLink = null;
@@ -98,20 +102,20 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
             final FooterDetails footerDetails = welshFooterService.addFooterToExistingToContentAndCreateNewUrl(newDocLink, caseData.getSscsWelshDocuments(), fromValue(caseData.getDocumentTypes().getValue().getCode()), null, LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 
             SscsWelshDocumentDetails sscsWelshDocumentDetails = SscsWelshDocumentDetails.builder()
-                    .documentType(caseData.getDocumentTypes().getValue().getCode())
-                    .documentFileName(footerDetails.getBundleFileName())
-                    .bundleAddition(footerDetails.getBundleAddition())
-                    .documentLink(footerDetails.getUrl())
-                    .originalDocumentFileName(caseData.getOriginalNoticeDocuments().getValue().getLabel())
-                    .build();
+                .documentType(caseData.getDocumentTypes().getValue().getCode())
+                .documentFileName(footerDetails.getBundleFileName())
+                .bundleAddition(footerDetails.getBundleAddition())
+                .documentLink(footerDetails.getUrl())
+                .originalDocumentFileName(caseData.getOriginalNoticeDocuments().getValue().getLabel())
+                .build();
 
             if (caseData.getSscsWelshDocuments() == null) {
                 List<SscsWelshDocument> sscsWelshDocumentsList = new ArrayList<>();
                 caseData.setSscsWelshDocuments(sscsWelshDocumentsList);
             }
             caseData.getSscsWelshDocuments().add(SscsWelshDocument.builder()
-                    .value(sscsWelshDocumentDetails)
-                    .build());
+                .value(sscsWelshDocumentDetails)
+                .build());
         }
 
         String nextEvent = getNextEvent(caseData.getDocumentTypes().getValue().getCode());
@@ -125,7 +129,7 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
         for (SscsDocument sscsDocument : caseData.getSscsDocument()) {
             SscsDocumentDetails sscsDocumentDetails = sscsDocument.getValue();
             if (SscsDocumentTranslationStatus.TRANSLATION_REQUESTED.equals(sscsDocumentDetails.getDocumentTranslationStatus())
-                    && sscsDocumentDetails.getDocumentType().equals(caseData.getDocumentTypes().getValue().getCode())) {
+                && sscsDocumentDetails.getDocumentType().equals(caseData.getDocumentTypes().getValue().getCode())) {
                 sscsDocumentDetails.setDocumentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE);
             }
         }
@@ -133,18 +137,25 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
 
     private Map<String, Object> caseDataMap(SscsCaseData caseData) {
         Map<String, Object> dataMap = new HashMap<>();
-        LocalDate dateAdded = Optional.ofNullable(caseData.getDocumentStaging().getDateAdded()).orElse(LocalDate.now());
-        String documentTypeLabel = getEnglishNoticeType(caseData.getDocumentTypes().getValue().getLabel() != null ? caseData.getDocumentTypes().getValue().getLabel() : caseData.getDocumentTypes().getValue().getCode());
-
         dataMap.put("appellant_full_name", buildFullName(caseData));
         dataMap.put("case_id", caseData.getCcdCaseId());
-        dataMap.put("nino", caseData.getAppeal().getAppellant().getIdentity().getNino());
+        if (caseData.isIbcCase()) {
+            dataMap.put("label", IBCA_REFERENCE_LABEL);
+            dataMap.put("label_welsh", IBCA_REFERENCE_LABEL_WELSH);
+            dataMap.put("nino", caseData.getAppeal().getAppellant().getIdentity().getIbcaReference());
+        } else {
+            dataMap.put("label",  NINO_LABEL);
+            dataMap.put("label_welsh", NINO_LABEL_WELSH);
+            dataMap.put("nino", caseData.getAppeal().getAppellant().getIdentity().getNino());
+        }
+        String documentTypeLabel = getEnglishNoticeType(caseData.getDocumentTypes().getValue().getLabel() != null ? caseData.getDocumentTypes().getValue().getLabel() : caseData.getDocumentTypes().getValue().getCode());
         dataMap.put("en_notice_type", documentTypeLabel.toUpperCase());
         dataMap.put("cy_notice_type", getWelshNoticeType(documentTypeLabel));
         dataMap.put("en_notice_body", caseData.getEnglishBodyContent());
         dataMap.put("cy_notice_body", caseData.getWelshBodyContent());
         dataMap.put("user_name", caseData.getDocumentGeneration().getSignedBy());
         dataMap.put("user_role", caseData.getDocumentGeneration().getSignedRole());
+        LocalDate dateAdded = Optional.ofNullable(caseData.getDocumentStaging().getDateAdded()).orElse(LocalDate.now());
         dataMap.put("date_added", dateAdded.toString());
         dataMap.put("generated_date", formatter.format(new Date()));
         dataMap.put("welsh_date_added", LocalDateToWelshStringConverter.convert(dateAdded));
@@ -156,7 +167,7 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
 
     protected boolean isBenefitTypeValidToHideNino(Optional<Benefit> benefitType) {
         return benefitType.filter(benefit -> SscsType.SSCS2.equals(benefit.getSscsType())
-                || SscsType.SSCS5.equals(benefit.getSscsType())).isPresent();
+            || SscsType.SSCS5.equals(benefit.getSscsType())).isPresent();
     }
 
     private String buildFullName(SscsCaseData caseData) {
