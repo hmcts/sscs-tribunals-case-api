@@ -293,7 +293,7 @@ dependencyManagement {
 }
 
 def versions = [
-        springsecurity : '6.4.3',
+        springsecurity : '6.4.4',
         jackson        : '2.17.2',
         lombok         : '1.18.36',
         commonsio      : '2.18.0'
@@ -364,7 +364,7 @@ dependencies {
     // sscs-pdf-email-common
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.55.3'
-    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.9'
+    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.10'
 
     implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.7.4'
 

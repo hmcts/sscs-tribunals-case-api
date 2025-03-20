@@ -9,9 +9,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
@@ -45,7 +42,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReserveTo;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
@@ -71,7 +67,6 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(handler, "isDirectionHearingsEnabled", true);
         sscsCaseData = SscsCaseData.builder()
             .appeal(Appeal.builder().build())
             .dwpIsOfficerAttending("Yes")
@@ -396,21 +391,5 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
         assertTrue(response.getErrors().isEmpty());
         assertEquals(hmcHearingType, response.getData().getAppeal().getHearingOptions().getHmcHearingType());
-    }
-
-    @Test
-    void givenDirectionHearingsFlagOff_thenDoNotSetHearingOptionsHmcHearingType() {
-        ReflectionTestUtils.setField(handler, "isDirectionHearingsEnabled", false);
-        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        SscsCaseData mockedSscsCaseData = mock(SscsCaseData.class);
-        given(caseDetails.getCaseData()).willReturn(mockedSscsCaseData);
-        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
-        given(mockedSscsCaseData.getSchedulingAndListingFields()).willReturn(SchedulingAndListingFields.builder().build());
-
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        verify(mockedSscsCaseData, never()).getAppeal();
-
     }
 }
