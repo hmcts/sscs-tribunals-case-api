@@ -4626,7 +4626,7 @@
     "LiveFrom": "13/03/2025",
     "PageDisplayOrder": 2,
     "PageFieldDisplayOrder": 1,
-    "PageID": "1.0",
+    "PageID": "2.0",
     "PageShowCondition": "FL_ftaRequestType=\"newRequest\"",
     "PageLabel": "Send a new request"
   }
@@ -4640,7 +4640,6 @@
     "PageDisplayOrder": 2,
     "PageFieldDisplayOrder": 2,
     "PageID": "1.0",
-    "PageShowCondition": "FL_ftaRequestType=\"newRequest\"",
     "PageLabel": "FTA Request Question"
   }
   
