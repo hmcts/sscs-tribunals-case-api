@@ -723,7 +723,7 @@
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "dwpSupplementaryResponseDoc", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "isRip1Doc", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "dwpIsOfficerAttending", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CRUD": "CRUD"},
-  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "Rip1Doc", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "rip1Doc", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "dwpState", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "dwpOtherDoc", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "dwpTimeExtension", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "R"},
