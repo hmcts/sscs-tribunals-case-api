@@ -1,4 +1,4 @@
 [
-  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "fta_communications_superuser", "TabLabel": "FTA Communications", "TabDisplayOrder": 12, "CaseFieldID": "ftaComRequest", "TabFieldDisplayOrder": 2, "FieldShowCondition": "ftaComRequest=\"*\""},
-  {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "TabID": "fta_communications_superuser", "TabLabel": "FTA Communications", "TabDisplayOrder": 12, "CaseFieldID": "dwpState", "TabFieldDisplayOrder": 2, "FieldShowCondition": "ftaComRequest=\"DONOTSHOW\""}
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "fta_communications", "TabLabel": "FTA Communications", "TabDisplayOrder": 12, "CaseFieldID": "ftaComRequest", "TabFieldDisplayOrder": 2, "FieldShowCondition": "ftaComRequest=\"*\""},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs", "TabID": "fta_communications", "TabLabel": "FTA Communications", "TabDisplayOrder": 12, "CaseFieldID": "dwpState", "TabFieldDisplayOrder": 2, "FieldShowCondition": "ftaComRequest=\"DONOTSHOW\""}
 ]
