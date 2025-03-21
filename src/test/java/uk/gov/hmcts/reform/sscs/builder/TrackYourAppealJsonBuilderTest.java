@@ -21,6 +21,8 @@ import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.FINAL_DE
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.HEARING_CCD;
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.HEARING_MYA;
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.HEARING_PAPER_MYA;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.HMC_HEARING_TYPE_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.HMC_HEARING_TYPE_MYA;
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.NOT_LISTABLE_CCD;
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.NOT_LISTABLE_MYA;
 
@@ -148,6 +150,14 @@ public class TrackYourAppealJsonBuilderTest {
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter(), 1L, true, "appealCreated");
         assertJsonEquals("file.mp3", objectNode.get("appeal").get("audioVideoEvidence").get(0).get("name"));
+    }
+
+    @Test
+    public void shouldReturnHmcHearingTypeInTheMyaResponseWithHearing() {
+        SscsCaseData caseData = HMC_HEARING_TYPE_CCD.getDeserializeMessage();
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+            populateRegionalProcessingCenter(), 1L, true, "hearing");
+        assertJsonEquals(HMC_HEARING_TYPE_MYA.getSerializedMessage(), objectNode);
     }
 
     private RegionalProcessingCenter populateRegionalProcessingCenter() {

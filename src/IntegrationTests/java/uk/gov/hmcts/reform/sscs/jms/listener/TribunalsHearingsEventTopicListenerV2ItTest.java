@@ -54,9 +54,9 @@ import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.CcdCaseService;
 import uk.gov.hmcts.reform.sscs.service.HearingsService;
 import uk.gov.hmcts.reform.sscs.service.HmcHearingApi;
-import uk.gov.hmcts.reform.sscs.service.HmcHearingsApi;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
+import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingMessageServiceListener;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @ExtendWith(SpringExtension.class)
@@ -68,7 +68,7 @@ public class TribunalsHearingsEventTopicListenerV2ItTest {
     private static final String CASE_ID = "1234123412341234";
     private static final String PROCESSING_VENUE_1 = "Cardiff";
 
-    private TribunalsHearingsEventQueueListener tribunalsHearingsEventQueueListener;
+    private HearingMessageServiceListener hearingMessageServiceListener;
 
     @Autowired
     private ObjectMapper mapper;
@@ -95,19 +95,17 @@ public class TribunalsHearingsEventTopicListenerV2ItTest {
     @MockitoBean
     private HmcHearingApi hearingApi;
     @MockitoBean
-    private HmcHearingsApi hmcHearingsApi;
-    @MockitoBean
     private UpdateCcdCaseService updateCcdCaseService;
 
     @Test
     public void testHearingsUpdateCaseV2() throws UpdateCaseException, TribunalsEventProcessingException, GetCaseException {
 
-        tribunalsHearingsEventQueueListener = new TribunalsHearingsEventQueueListener(hearingsService, updateCcdCaseService,
+        hearingMessageServiceListener = new HearingMessageServiceListener(hearingsService, updateCcdCaseService,
                 idamService);
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
         when(ccdCaseService.getStartEventResponse(anyLong(), any())).thenReturn(createSscsCaseDetails());
-        when(hmcHearingsApi.getHearingsRequest(any(), any(), any(), any(), any()))
+        when(hearingApi.getHearingsRequest(any(), any(), any(), any(), any(), any(), any()))
             .thenReturn(HearingsGetResponse.builder().build());
 
         when(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE, ISSUE_CODE, false, false))
@@ -125,14 +123,14 @@ public class TribunalsHearingsEventTopicListenerV2ItTest {
         when(refData.getVerbalLanguages()).thenReturn(verbalLanguages);
         when(verbalLanguages.getVerbalLanguage(any())).thenReturn(Language.builder().reference("LANG").build());
         HmcUpdateResponse response = HmcUpdateResponse.builder().hearingRequestId(22L).build();
-        when(hearingApi.createHearingRequest(any(), any(), any(), any())).thenReturn(response);
+        when(hearingApi.createHearingRequest(any(), any(), any(), any(), any(), any())).thenReturn(response);
 
         String message = "{\n"
             + "  \"ccdCaseId\": \"" + CASE_ID + "\",\n"
             + "  \"hearingRoute\": \"listAssist\",\n"
             + "  \"hearingState\": \"adjournCreateHearing\"\n"
             + "}\n";
-        tribunalsHearingsEventQueueListener.handleIncomingMessage(deserialize(message));
+        hearingMessageServiceListener.handleIncomingMessage(deserialize(message));
 
         verify(ccdCaseService, never()).updateCaseData(any(), any(), any());
 

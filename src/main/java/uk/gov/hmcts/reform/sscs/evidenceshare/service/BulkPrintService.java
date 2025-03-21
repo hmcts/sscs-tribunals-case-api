@@ -42,6 +42,7 @@ public class BulkPrintService implements PrintService {
     private static final String LETTER_TYPE_KEY = "letterType";
     private static final String APPELLANT_NAME = "appellantName";
     private static final String IS_INTERNATIONAL = "isInternational";
+    private static final String IS_IBCA = "isIbca";
     public static final String RECIPIENTS = "recipients";
 
     private final SendLetterApi sendLetterApi;
@@ -174,6 +175,7 @@ public class BulkPrintService implements PrintService {
         if (NO.equals(isInUk)) {
             additionalData.put(IS_INTERNATIONAL, "true");
         }
+        additionalData.put(IS_IBCA, sscsCaseData.isIbcCase() ? "true" : "false");
         return additionalData;
     }
 

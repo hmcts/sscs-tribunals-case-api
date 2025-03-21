@@ -14,6 +14,7 @@ import piprepFtoFSandLPayload from '../../../data/payload/create-appeal/pip_sand
 import piprepSandLPayload from '../../../data/payload/create-appeal/pip_sandl_rep.json';
 import pipIncompleteAppealPayload from '../../../data/payload/create-appeal/pip_incomplete_appeal.json';
 import pipNonCompliantAppealPayload from '../../../data/payload/create-appeal/pip_non_compliant_appeal.json';
+import ibcPayload from '../../../data/payload/create-appeal/ibca_sya.json';
 import { StringUtilsComponent } from '../../../../utils/StringUtilsComponent';
 
 async function createCaseBasedOnCaseType(caseType: string) {
@@ -39,7 +40,8 @@ async function createCaseBasedOnCaseType(caseType: string) {
     PIPREPSANDL: piprepSandLPayload,
     PIPINCOMPLETE: pipIncompleteAppealPayload,
     PIPNONCOMPLIANT: pipNonCompliantAppealPayload,
-    WELSHPIP: pipPayloadWelsh
+    WELSHPIP: pipPayloadWelsh,
+    IBC: ibcPayload,
   };
 
   dataPayload = payloadMap[caseType] || new Error('Unsupported case type');

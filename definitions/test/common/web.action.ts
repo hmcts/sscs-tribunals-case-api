@@ -101,6 +101,7 @@ export class WebAction {
 
   async clickSubmitButton(): Promise<void> {
     await this.verifyElementVisibility('//*[@class=\'button\']');
+    await expect(this.page.locator('//*[@class=\'button\']').first()).toBeEnabled();
     await this.page.locator('//*[@class=\'button\']').first().click();
   }
 
@@ -158,6 +159,7 @@ export class WebAction {
     await this.verifyElementVisibility(elementId);
     await this.page.locator(elementId).first()
       .setInputFiles(path.join(__dirname, `../data/file/${fileName}`));
+    await this.verifyElementHidden("span:has-text('Uploading...')");
   }
 
   async screenshot() {
