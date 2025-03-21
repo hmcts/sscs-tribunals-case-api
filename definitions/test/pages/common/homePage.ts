@@ -217,7 +217,7 @@ export class HomePage {
           await expect(this.page.locator('table.EventLogTable')).toBeVisible({ timeout: 10000 });
         } catch {
           await this.page.goto(this.page.url().split('#')[0] + '#History');
-          await expect(this.page.locator('table.EventLogTable')).toBeVisible({ timeout: 10000 });
+          await expect(this.page.locator('table.EventLogTable')).toBeVisible();
         }
         break;
       }
@@ -228,7 +228,7 @@ export class HomePage {
           await expect(this.page.locator('#summaryCreatedInGapsFrom')).toBeVisible({ timeout: 10000 });
         } catch {
           await this.page.goto(this.page.url().split('#')[0] + '#Summary');
-          await expect(this.page.locator('#summaryCreatedInGapsFrom')).toBeVisible({ timeout: 10000 });
+          await expect(this.page.locator('#summaryCreatedInGapsFrom')).toBeVisible();
         }
         break;
       }
@@ -276,10 +276,10 @@ export class HomePage {
         try {
           await expect(this.listingRequirementsTab).toBeVisible();
           await this.listingRequirementsTab.click();
-          await expect(this.page.locator('div.case-viewer-label:hasText("Tribunal direct PO to attend?")').first()).toBeVisible({ timeout: 10000 });
+          await expect(this.page.locator('div.case-viewer-label').filter({hasText: 'Tribunal direct PO to attend?'}).first()).toBeVisible({ timeout: 10000 });
         } catch {
           await this.page.goto(this.page.url().split('#')[0] + '#Listing Requirements');
-          await expect(this.page.locator('div.case-viewer-label:hasText("Tribunal direct PO to attend?")').first()).toBeVisible({ timeout: 10000 });
+          await expect(this.page.locator('div.case-viewer-label').filter({hasText: 'Tribunal direct PO to attend?'}).first()).toBeVisible();
         }
         break;
       }
