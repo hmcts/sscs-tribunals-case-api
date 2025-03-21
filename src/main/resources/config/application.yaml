@@ -469,9 +469,9 @@ notification:
         reviewAndSetAside:
             docmosisId: TB-SCS-LET-ENG-Permission-to-Appeal-Review.docx
         permissionToAppealRefused:
-            docmosisId: TB-SCS-LET-ENG-Permission-to-Appeal-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-ENG-Permission-to-Appeal-Granted-Refused-v2.docx
         permissionToAppealGranted:
-            docmosisId: TB-SCS-LET-ENG-Permission-to-Appeal-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-ENG-Permission-to-Appeal-Granted-Refused-v2.docx
         permissionToAppealRequest:
             docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence-v2.docx
         bundleCreatedForUpperTribunal:
@@ -1108,9 +1108,9 @@ notification:
         reviewAndSetAside:
             docmosisId: TB-SCS-LET-WEL-Permission-to-Appeal-Review.docx
         permissionToAppealRefused:
-            docmosisId: TB-SCS-LET-WEL-Permission-to-Appeal-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-WEL-Permission-to-Appeal-Granted-Refused-v2.docx
         permissionToAppealGranted:
-            docmosisId: TB-SCS-LET-WEL-Permission-to-Appeal-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-WEL-Permission-to-Appeal-Granted-Refused-v2.docx
         permissionToAppealRequest:
             docmosisId: TB-SCS-LET-WEL-Action-Further-Evidence-v2.docx
         bundleCreatedForUpperTribunal:
