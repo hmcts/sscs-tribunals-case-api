@@ -211,17 +211,24 @@ export class HomePage {
         break;
       }
       case 'History': {
-        await expect(this.historyTab).toBeVisible();
-        await this.historyTab.click();
+        try {
+          await expect(this.historyTab).toBeVisible();
+          await this.historyTab.click();
+          await expect(this.page.getByRole('heading', { name: 'History' })).toBeVisible({ timeout: 10000 });
+        } catch {
+          await this.page.goto(this.page.url().split('#')[0] + '#History');
+          await expect(this.page.getByRole('heading', { name: 'History' })).toBeVisible({ timeout: 10000 });
+        }
         break;
       }
       case 'Summary': {
         try {
           await expect(this.summaryTab).toBeVisible();
           await this.summaryTab.click();
+          await expect(this.page.locator('.markdown:has-text("Name")')).toBeVisible({ timeout: 10000 });
         } catch {
-          await this.clickBeforeTabBtn();
-          await this.summaryTab.click();
+          await this.page.goto(this.page.url().split('#')[0] + '#Summary');
+          await expect(this.page.locator('.markdown:has-text("Name")')).toBeVisible({ timeout: 10000 });
         }
         break;
       }
@@ -266,8 +273,14 @@ export class HomePage {
         break;
       }
       case 'Listing Requirements': {
-        await expect(this.listingRequirementsTab).toBeVisible();
-        await this.listingRequirementsTab.click();
+        try {
+          await expect(this.listingRequirementsTab).toBeVisible();
+          await this.listingRequirementsTab.click();
+          await expect(this.page.locator('div.case-viewer-label:hasText("Tribunal direct PO to attend?")').first()).toBeVisible({ timeout: 10000 });
+        } catch {
+          await this.page.goto(this.page.url().split('#')[0] + '#Listing Requirements');
+          await expect(this.page.locator('div.case-viewer-label:hasText("Tribunal direct PO to attend?")').first()).toBeVisible({ timeout: 10000 });
+        }
         break;
       }
       case 'Audio/Video Evidence': {

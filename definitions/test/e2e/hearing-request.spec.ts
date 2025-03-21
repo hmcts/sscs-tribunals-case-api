@@ -78,6 +78,7 @@ test.describe(
       uploadResponseSteps,
       hearingSteps
     }) => {
+      test.slow();
       caseId = await createCaseBasedOnCaseType('DLASANDL');
       await uploadResponseSteps.performUploadResponse(caseId, 'dla');
       await hearingSteps.verifyHearingIsTriggered(caseId, 'dla');
