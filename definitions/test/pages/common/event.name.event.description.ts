@@ -1,5 +1,6 @@
 import { expect, Page } from '@playwright/test';
 import { WebAction } from '../../common/web.action';
+
 const eventTestData = require('../content/event.name.event.description_en.json');
 
 let webActions: WebAction;
@@ -63,7 +64,10 @@ export class EventNameEventDescriptionPage {
       eventTestData.eventSummaryCheckTheInformationText
     );
     await webActions.verifyPageLabel('.case-field-label > .text-16', keys);
-    await webActions.verifyPageLabel('.case-field-content span.text-16', values);
+    await webActions.verifyPageLabel(
+      '.case-field-content span.text-16',
+      values
+    );
     await webActions.verifyPageLabel(
       "[for='field-trigger-summary']",
       eventTestData.eventSummaryLabel
@@ -85,7 +89,12 @@ export class EventNameEventDescriptionPage {
   async confirmSubmission(): Promise<void> {
     const pageUrl = this.page.url();
     await webActions.clickSubmitButton();
-    await expect(this.page).not.toHaveURL(pageUrl);
+    try {
+      await expect(this.page).not.toHaveURL(pageUrl);
+    } catch {
+      await webActions.clickSubmitButton();
+      await expect(this.page).not.toHaveURL(pageUrl);
+    }
   }
 
   async confirmWithoutNavigation(): Promise<void> {

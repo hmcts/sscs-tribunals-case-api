@@ -215,7 +215,7 @@ export abstract class BaseStep {
     this.createUpdateToCaseDataPage = new CreateUpdateToCaseDataPage(this.page);
   }
 
-  async loginUserWithCaseId(
+  async loginUserWithCaseIdViaCaseList(
     user,
     clearCacheFlag: boolean = false,
     caseId?: string
@@ -225,9 +225,13 @@ export abstract class BaseStep {
     await this.homePage.goToHomePage(caseId);
   }
 
-  async fastLoginUserWithCaseId(user, caseId?: string) {
+  async loginUserWithCaseId(
+    user,
+    clearCacheFlag: boolean = false,
+    caseId?: string
+  ) {
     await this.loginPage.goToLoginPage();
-    await this.loginPage.verifySuccessfulLoginForUser(user, false);
+    await this.loginPage.verifySuccessfulLoginForUser(user, clearCacheFlag);
     await this.loginPage.goToCase(caseId);
   }
 

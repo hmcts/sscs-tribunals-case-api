@@ -1,5 +1,5 @@
 import { WebAction } from '../common/web.action';
-import { Page } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 import updatenotListableData from './content/update.not.listable_en.json';
 import eventTestData from './content/event.name.event.description_en.json';
 
@@ -74,12 +74,6 @@ export class NotListablePage {
       '#field-trigger-description',
       eventTestData.eventDescriptionInput
     );
-  }
-
-  async confirmSubmission(): Promise<void> {
-    await this.page.waitForTimeout(3000);
-    await this.page.getByText('Submit').dblclick();
-    await this.page.waitForLoadState('domcontentloaded');
   }
 
   async continueEvent(): Promise<void> {
