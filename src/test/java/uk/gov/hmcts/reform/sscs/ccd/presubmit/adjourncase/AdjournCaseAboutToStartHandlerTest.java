@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
@@ -39,6 +41,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
@@ -67,7 +72,7 @@ class AdjournCaseAboutToStartHandlerTest {
         handler = new AdjournCaseAboutToStartHandler(dynamicListLanguageUtil);
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
-                .appeal(Appeal.builder().build())
+            .appeal(Appeal.builder().build())
             .adjournment(Adjournment.builder()
                 .generateNotice(YES)
                 .typeOfHearing(AdjournCaseTypeOfHearing.VIDEO)
@@ -130,18 +135,34 @@ class AdjournCaseAboutToStartHandlerTest {
         sscsCaseData.setSscsDocument(documentList);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertTrue(response.getData().getAdjournment().getAdjournmentInProgress().toBoolean());
+        assertEquals(0, response.getErrors().size());
     }
 
     @Test
     void givenANonAdjournCaseEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
+        assertFalse(handler.canHandle(ABOUT_TO_START, callback));
     }
 
     @ParameterizedTest
     @EnumSource(value = CallbackType.class, names = {"ABOUT_TO_SUBMIT", "MID_EVENT", "SUBMITTED"})
     void givenANonAboutToStartCallbackType_thenReturnFalse(CallbackType callbackType) {
-        assertThat(handler.canHandle(callbackType, callback)).isFalse();
+        assertFalse(handler.canHandle(callbackType, callback));
+    }
+
+    @Test
+    void givenANullCaseDetails_thenReturnFalse() {
+        when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
+        when(callback.getCaseDetails()).thenReturn(null);
+        assertFalse(handler.canHandle(ABOUT_TO_START, callback));
+    }
+
+    @Test
+    void givenANullCaseData_thenReturnFalse() {
+        when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(null);
+        assertFalse(handler.canHandle(ABOUT_TO_START, callback));
     }
 
     @Test
@@ -150,6 +171,82 @@ class AdjournCaseAboutToStartHandlerTest {
 
         assertThatThrownBy(() -> handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION))
             .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void givenNullAppealNullTypeOfHearing_thenDoNotError() {
+        when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        sscsCaseData.setAppeal(null);
+        sscsCaseData.setHmcHearingType(null);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    void givenNullHearingOptionsNullTypeOfHearing_thenDoNotError() {
+        when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        sscsCaseData.getAppeal().setHearingOptions(null);
+        sscsCaseData.setHmcHearingType(null);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    void givenSubstantiveHearingSetInCase_thenDoNotError() {
+        when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        sscsCaseData.setHmcHearingType(HmcHearingType.SUBSTANTIVE);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    void givenSubstantiveHearingSetInOverride_thenDoNotError() {
+        when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        sscsCaseData.setHmcHearingType(HmcHearingType.DIRECTION_HEARINGS);
+        sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
+            .overrideFields(OverrideFields.builder()
+                .hmcHearingType(HmcHearingType.SUBSTANTIVE)
+                .build())
+            .build());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    void givenDirectionHearingSetInCase_thenError() {
+        when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        sscsCaseData.setHmcHearingType(HmcHearingType.DIRECTION_HEARINGS);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors())
+            .hasSize(1)
+            .contains("In order to run this event the hearing type must be substantive, please update the hearing type to proceed");
+    }
+
+    @Test
+    void givenDirectionHearingSetInOverride_thenError() {
+        when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        sscsCaseData.setHmcHearingType(HmcHearingType.SUBSTANTIVE);
+        sscsCaseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
+            .overrideFields(OverrideFields.builder()
+                .hmcHearingType(HmcHearingType.DIRECTION_HEARINGS)
+                .build())
+            .build());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors())
+            .hasSize(1)
+            .contains("In order to run this event the hearing type must be substantive, please update the hearing type to proceed");
     }
 
 }

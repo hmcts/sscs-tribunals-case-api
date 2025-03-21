@@ -46,6 +46,9 @@ import { ReferredByAdmin } from '../fixtures/steps/referred.by.admin';
 import { SendCaseToTcw } from '../fixtures/steps/send.case.to.tcw';
 import { ReferredByJudge } from '../fixtures/steps/referred.by.judge';
 import { AccessibilitySteps } from '../fixtures/steps/accessibilitySteps';
+import { CreateUpdateToCaseDataSteps } from '../fixtures/steps/update.to.case.data';
+import { GenerateAppealPdfSteps } from '../fixtures/steps/generate.appeal.pdf';
+import { ManageDocuments } from '../fixtures/steps/manage.documents';
 
 type MyStepsFixtures = {
   addNoteSteps: Note;
@@ -84,6 +87,7 @@ type MyStepsFixtures = {
   updateOtherPartyDataSteps: UpdateOtherPartyData;
   issueFinalDecisionSteps: WriteFinalDecision;
   updateNotListableSteps: UpdateNotListable;
+  manageDocumentsSteps: ManageDocuments;
   searchFilterSteps: SearchFilter;
   hearingSteps: Hearing;
   reissueFurtherEvidenceSteps: ReissueFurtherEvidence;
@@ -95,6 +99,8 @@ type MyStepsFixtures = {
   sendCaseToTcwSteps: SendCaseToTcw;
   referredByJudgeSteps: ReferredByJudge;
   accessibilitySteps: AccessibilitySteps;
+  createUpdateToCaseDataSteps: CreateUpdateToCaseDataSteps;
+  generateAppealPdfSteps: GenerateAppealPdfSteps;
 };
 
 export const test = stepsFactory.extend<MyStepsFixtures>({
@@ -315,6 +321,12 @@ export const test = stepsFactory.extend<MyStepsFixtures>({
     await use(updateNotListableSteps);
     console.log(`${testInfo.title} ${testInfo.status}`);
   },
+  manageDocumentsSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
+    const manageDocumentsSteps = new ManageDocuments(page);
+    await use(manageDocumentsSteps);
+    console.log(`${testInfo.title} ${testInfo.status}`);
+  },
   searchFilterSteps: async ({ page }, use, testInfo) => {
     console.log(`Test started: ${testInfo.title}`);
     const searchFilterSteps = new SearchFilter(page);
@@ -380,5 +392,13 @@ export const test = stepsFactory.extend<MyStepsFixtures>({
     const accessibilitySteps = new AccessibilitySteps(page);
     await use(accessibilitySteps);
     console.log(`${testInfo.title} ${testInfo.status}`);
-  }
+  },
+  createUpdateToCaseDataSteps: async ({ page }, use) => {
+    const createUpdateToCaseDataSteps = new CreateUpdateToCaseDataSteps(page);
+    await use(createUpdateToCaseDataSteps);
+  },
+  generateAppealPdfSteps: async ({ page }, use) => {
+    const generateAppealPdfSteps = new GenerateAppealPdfSteps(page);
+    await use(generateAppealPdfSteps);
+  },
 });
