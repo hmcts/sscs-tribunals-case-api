@@ -13,7 +13,6 @@ export class Note extends BaseStep {
 
   async performAddANote(caseId: string) {
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
-    await this.homePage.reloadPage();
     await this.homePage.chooseEvent('Add a note');
 
     /* speak with Pettedson regarding test step 38 */

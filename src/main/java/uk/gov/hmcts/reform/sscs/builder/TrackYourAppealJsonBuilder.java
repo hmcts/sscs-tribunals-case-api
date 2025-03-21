@@ -32,6 +32,7 @@ import static uk.gov.hmcts.reform.sscs.model.AppConstants.VENUE_NAME;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.DATEFORMATTER;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDateTime;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.stripUrl;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getHmcHearingType;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -149,6 +150,9 @@ public class TrackYourAppealJsonBuilder {
         }
         caseNode.put("benefitType", caseData.getAppeal().getBenefitType().getCode().toLowerCase());
         caseNode.put("hearingType", getHearingType(caseData));
+        if (getHmcHearingType(caseData) != null) {
+            caseNode.put("hmcHearingType", getHmcHearingType(caseData).getHmcReference());
+        }
         if (StringUtils.isNotBlank(caseData.getCreatedInGapsFrom())) {
             caseNode.put("createdInGapsFrom", caseData.getCreatedInGapsFrom());
         }
