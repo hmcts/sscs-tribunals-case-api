@@ -216,7 +216,7 @@ export class HomePage {
           await this.historyTab.click();
           await expect(this.page.locator('table.EventLogTable')).toBeVisible({ timeout: 10000 });
         } catch {
-          await this.page.goto(this.page.url().split('#')[0] + '#History');
+          await this.page.goto(this.getUrlWithoutTab() + '#History');
           await expect(this.page.locator('table.EventLogTable')).toBeVisible();
         }
         break;
@@ -227,7 +227,7 @@ export class HomePage {
           await this.summaryTab.click();
           await expect(this.page.locator('#summaryCreatedInGapsFrom')).toBeVisible({ timeout: 10000 });
         } catch {
-          await this.page.goto(this.page.url().split('#')[0] + '#Summary');
+          await this.page.goto(this.getUrlWithoutTab() + '#Summary');
           await expect(this.page.locator('#summaryCreatedInGapsFrom')).toBeVisible();
         }
         break;
@@ -278,7 +278,7 @@ export class HomePage {
           await this.listingRequirementsTab.click();
           await expect(this.page.locator('div.case-viewer-label').filter({hasText: 'Tribunal direct PO to attend?'}).first()).toBeVisible({ timeout: 10000 });
         } catch {
-          await this.page.goto(this.page.url().split('#')[0] + '#Listing Requirements');
+          await this.page.goto(this.getUrlWithoutTab() + '#Listing Requirements');
           await expect(this.page.locator('div.case-viewer-label').filter({hasText: 'Tribunal direct PO to attend?'}).first()).toBeVisible();
         }
         break;
@@ -311,6 +311,11 @@ export class HomePage {
         break;
       }
     }
+  }
+
+  getUrlWithoutTab(): string {
+    let url = this.page.url().split('#')[0];
+    return url.split('/hearings')[0];
   }
 
   async startCaseCreate(jurisdiction, caseType, event): Promise<void> {
