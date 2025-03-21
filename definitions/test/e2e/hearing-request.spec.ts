@@ -34,7 +34,7 @@ test.describe(
       issueDirectionsNoticeSteps
     }) => {
       caseId = await createCaseBasedOnCaseType('UCSANDL');
-      await issueDirectionsNoticeSteps.fastLoginUserWithCaseId(credentials.hmrcSuperUser, caseId);
+      await issueDirectionsNoticeSteps.loginUserWithCaseId(credentials.hmrcSuperUser, false, caseId);
       await issueDirectionsNoticeSteps.performIssueDirectionNoticeDirectionHearing();
       await uploadResponseSteps.performUploadResponseOnAUniversalCredit(caseId, false);
       await hearingSteps.verifyHearingIsTriggeredForUCCase(true);
@@ -45,7 +45,7 @@ test.describe(
       hearingSteps
     }) => {
       caseId = await createCaseBasedOnCaseType('UCSANDL');
-      await hearingSteps.fastLoginUserWithCaseId(credentials.hmrcSuperUser, caseId);
+      await hearingSteps.loginUserWithCaseId(credentials.hmrcSuperUser, false, caseId);
       await hearingSteps.updateHearingToDirectionViaEvent();
       await uploadResponseSteps.performUploadResponseOnAUniversalCredit(caseId, false);
       await hearingSteps.verifyHearingIsTriggeredForUCCase(true);
