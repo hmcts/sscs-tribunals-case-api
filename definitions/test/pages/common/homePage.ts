@@ -214,10 +214,10 @@ export class HomePage {
         try {
           await expect(this.historyTab).toBeVisible();
           await this.historyTab.click();
-          await expect(this.page.getByRole('heading', { name: 'History' })).toBeVisible({ timeout: 10000 });
+          await expect(this.page.locator('table.EventLogTable')).toBeVisible({ timeout: 10000 });
         } catch {
           await this.page.goto(this.page.url().split('#')[0] + '#History');
-          await expect(this.page.getByRole('heading', { name: 'History' })).toBeVisible({ timeout: 10000 });
+          await expect(this.page.locator('table.EventLogTable')).toBeVisible({ timeout: 10000 });
         }
         break;
       }
@@ -225,10 +225,10 @@ export class HomePage {
         try {
           await expect(this.summaryTab).toBeVisible();
           await this.summaryTab.click();
-          await expect(this.page.locator('.markdown:has-text("Name")')).toBeVisible({ timeout: 10000 });
+          await expect(this.page.locator('#summaryCreatedInGapsFrom')).toBeVisible({ timeout: 10000 });
         } catch {
           await this.page.goto(this.page.url().split('#')[0] + '#Summary');
-          await expect(this.page.locator('.markdown:has-text("Name")')).toBeVisible({ timeout: 10000 });
+          await expect(this.page.locator('#summaryCreatedInGapsFrom')).toBeVisible({ timeout: 10000 });
         }
         break;
       }
