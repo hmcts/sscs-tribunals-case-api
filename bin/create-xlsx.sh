@@ -3,15 +3,13 @@
 TYPE=$1
 VERSION=$2
 ENV=$3
-IS_HEARINGS_PR=${4:-false}
-CHANGE_ID=${5:-$CHANGE_ID}
-LIKE_PROD=${6:-$ENV}
-SHUTTERED=${7:-false}
+LIKE_PROD=${4:-$ENV}
+SHUTTERED=${5:-false}
 
 RUN_DIR=$(pwd)
 
 if [ -z "$TYPE" ] || [ -z "$VERSION" ] || [ -z "$ENV" ]; then
-    echo "Usage: create-xlsx.sh [type] [version] [env] [is_hearings_pr] [change_id] [like_prod] [shuttered]"
+    echo "Usage: create-xlsx.sh [type] [version] [env] [like_prod] [shuttered]"
     exit 1
 fi
 
@@ -59,16 +57,6 @@ if [ "$ENV" = "local" ]; then
     BULK_SCAN_API_URL="http://localhost:8090"
     BULK_SCAN_ORCHESTRATOR_URL="http://localhost:8099"
 elif [ "$ENV" = "pr" ]; then
-    if [ "$IS_HEARINGS_PR" = true ]; then
-        UPPERCASE_ENV="$CHANGE_ID"
-        if [[ "$OSTYPE" == "darwin"* ]]; then
-            # macOS
-            find ./definitions/benefit/sheets/ -type f -exec sed -i '' "s/Benefit/Benefit-$CHANGE_ID/g" {} +
-        else
-            # Linux and other Unix-like systems
-            find ./definitions/benefit/sheets/ -type f -exec sed -i "s/Benefit/Benefit-$CHANGE_ID/g" {} +
-        fi
-    fi
     EM_CCD_ORCHESTRATOR_URL=${EM_CCD_ORCHESTRATOR_URL:="https://em-ccdorc-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"}
     TRIBUNALS_API_URL=${TRIBUNALS_API_URL:="https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"}
     BULK_SCAN_API_URL="http://sscs-bulk-scan-aat.service.core-compute-aat.internal"
