@@ -56,6 +56,16 @@ class DateUtilsComponent {
     });
   }
 
+  static formatDateToSpecifiedDateNumberFormat(date) {
+    return date
+      .toLocaleString('en-GB', {
+        day: 'numeric',
+        month: 'numeric',
+        year: 'numeric'
+      })
+      .replaceAll('/', '-');
+  }
+
   static checkWeekend(date) {
     switch (date.getDay()) {
       case 0: //Sunday

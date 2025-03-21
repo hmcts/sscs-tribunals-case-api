@@ -56,7 +56,7 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
             SchedulingAndListingFields schedulingAndListingFields = sscsCaseData.getSchedulingAndListingFields();
             OverrideFields overrideFields = schedulingAndListingFields.getOverrideFields();
 
-            if (isNull(overrideFields)) {
+            if (isNull(overrideFields) || isNull(overrideFields.getAppellantInterpreter())) {
                 overrideFields = initialiseOverrideFields();
                 schedulingAndListingFields.setOverrideFields(overrideFields);
             }
@@ -66,6 +66,9 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
             appellantInterpreter.setInterpreterLanguage(interpreterLanguages);
 
             log.info("{} Languages in DynamicList for caseId {}", interpreterLanguages.getListItems().size(), caseId);
+            if (isNull(overrideFields.getHmcHearingType())) {
+                overrideFields.setHmcHearingType(sscsCaseData.getHmcHearingType());
+            }
         }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);

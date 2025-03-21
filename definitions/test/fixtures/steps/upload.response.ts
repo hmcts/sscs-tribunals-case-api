@@ -27,21 +27,31 @@ export class UploadResponse extends BaseStep {
     this.stepsHelper = new StepsHelper(this.page);
   }
 
-  async validateHistory(caseId: string) {
+  async validateHistory(caseId: string, needsToLogin: boolean = true) {
     let historyLinks = this.presetLinks;
-    if (process.env.HEARINGS_ENABLED == "Yes") {
-      historyLinks.push('Add a hearing');
-      await this.loginUserWithCaseId(credentials.hmrcSuperUser, false, caseId);
-    } else {
-      await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
-    }
-    await this.homePage.delay(1000);
-    await this.homePage.navigateToTab('History');
-    for (const linkName of historyLinks) {
-      await this.verifyHistoryTabLink(linkName);
+    historyLinks.push('Add a hearing');
+    if (needsToLogin) {
+      await this.fastLoginUserWithCaseId(credentials.hmrcSuperUser, caseId);
     }
     await this.homePage.navigateToTab('Summary');
-    await this.summaryTab.verifyPresenceOfText('Ready to list');
+    await this.homePage.delay(1000);
+    await this.homePage.reloadPage();
+    try {
+      await this.homePage.navigateToTab('Summary');
+      await this.summaryTab.verifyPresenceOfText('Ready to list');
+      await this.homePage.navigateToTab('History');
+      await Promise.all(
+        historyLinks.map((linkName) => this.verifyHistoryTabLink(linkName))
+      );
+    } catch {
+      await this.homePage.reloadPage();
+      await this.homePage.navigateToTab('Summary');
+      await this.summaryTab.verifyPresenceOfText('Ready to list');
+      await this.homePage.navigateToTab('History');
+      await Promise.all(
+        historyLinks.map((linkName) => this.verifyHistoryTabLink(linkName))
+      );
+    }
   }
 
   async performUploadResponseWithFurtherInfoOnAPIPAndReviewResponse() {
@@ -61,7 +71,7 @@ export class UploadResponse extends BaseStep {
     await this.responseReviewedPage.chooseInterlocOption('No');
     await this.checkYourAnswersPage.confirmAndSignOut();
 
-    await this.validateHistory(pipCaseId)
+    await this.validateHistory(pipCaseId);
     // await performAppealDormantOnCase(pipCaseId);
   }
 
@@ -186,20 +196,21 @@ export class UploadResponse extends BaseStep {
     );
     await this.checkYourAnswersPage.confirmAndSignOut();
 
-    await this.validateHistory(taxCaseId)
+    await this.validateHistory(taxCaseId);
     // await performAppealDormantOnCase(taxCaseId);
   }
 
-  async performUploadResponseOnAUniversalCredit(ucCaseId: string) {
-    // let ucCaseId = await createCaseBasedOnCaseType("UC");
-    await this.loginUserWithCaseId(
-      credentials.dwpResponseWriter,
-      false,
-      ucCaseId
-    );
-
+  async performUploadResponseOnAUniversalCredit(
+    ucCaseId: string,
+    needsToLogin: boolean = true
+  ) {
+    if (needsToLogin) {
+      await this.fastLoginUserWithCaseId(
+        credentials.dwpResponseWriter,
+        ucCaseId
+      );
+    }
     await this.homePage.chooseEvent('Upload response');
-    await this.homePage.delay(4000);
     await this.uploadResponsePage.verifyPageContent();
     await this.uploadResponsePage.uploadDocs();
     await this.uploadResponsePage.chooseAssistOption('No');
@@ -232,9 +243,13 @@ export class UploadResponse extends BaseStep {
       null,
       'UC'
     );
-    await this.checkYourAnswersPage.confirmAndSignOut();
+    if (needsToLogin) {
+      await this.checkYourAnswersPage.confirmAndSignOut();
+    } else {
+      await this.checkYourAnswersPage.confirmSubmission();
+    }
 
-    await this.validateHistory(ucCaseId)
+    await this.validateHistory(ucCaseId, needsToLogin);
     // await performAppealDormantOnCase(ucCaseId);
   }
 
@@ -247,7 +262,6 @@ export class UploadResponse extends BaseStep {
     );
 
     await this.homePage.chooseEvent('Upload response');
-    await this.homePage.delay(4000);
     await this.uploadResponsePage.verifyPageContent();
     await this.uploadResponsePage.uploadDocs();
     await this.uploadResponsePage.chooseAssistOption('No');
@@ -276,7 +290,7 @@ export class UploadResponse extends BaseStep {
     await this.uploadResponsePage.enterJPDetails();
     await this.checkYourAnswersPage.confirmAndSignOut();
 
-    await this.validateHistory(ucCaseId)
+    await this.validateHistory(ucCaseId);
     // await performAppealDormantOnCase(ucCaseId);
   }
 
@@ -289,7 +303,6 @@ export class UploadResponse extends BaseStep {
     );
 
     await this.homePage.chooseEvent('Upload response');
-    await this.homePage.delay(2000);
     await this.uploadResponsePage.verifyPageContent();
     await this.uploadResponsePage.uploadPartialDocs();
     await this.uploadResponsePage.selectIssueCode(
@@ -426,6 +439,7 @@ export class UploadResponse extends BaseStep {
     await this.uploadResponseWithFurtherInfoAsDwpCaseWorker(caseId);
 
     // Verify CTSC Admin can view the unassigned Review FTA Response task
+    await this.homePage.signOut();
     await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
     await this.homePage.navigateToTab('Tasks');
     await this.tasksTab.verifyTaskIsDisplayed(task.name);
