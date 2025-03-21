@@ -809,7 +809,7 @@ class SscsUtilTest {
     void setHearingRouteIfNotSet_shouldSetToNullIfNoRpc(HearingRoute hearingRoute) {
         SscsUtil.setHearingRouteIfNotSet(caseData);
         assertNull(caseData.getSchedulingAndListingFields().getHearingRoute());
-
+    }
       
     @Test
     void testAddDocumentToDocumentTabAndBundle() {
