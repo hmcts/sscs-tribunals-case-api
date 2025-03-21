@@ -21,16 +21,15 @@ export class RequestTimeExtension extends BaseStep {
       false,
       caseId
     );
-    await this.homePage.reloadPage();
     await this.homePage.chooseEvent(reqTimeExtData.eventNameCaptor);
 
     await this.requestTimeExtensionPage.verifyPageContent();
     await this.requestTimeExtensionPage.uploadTimeExtensionDoc();
     await this.requestTimeExtensionPage.confirmSubmission();
-
+    await this.homePage.signOut();
     await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
     await this.homePage.navigateToTab('History');
-    await this.historyTab.verifyHistoryPageEventLink(reqTimeExtData.eventName);
+    await this.historyTab.verifyHistoryPageEventLink(reqTimeExtData.eventNameCaptor);
 
     await this.homePage.navigateToTab('Appeal Details');
     await this.appealDetailsTab.verifyAppealDetailsPageContentByKeyValue(

@@ -1,6 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -35,6 +39,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReserveTo;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -71,19 +76,19 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     @Test
     void givenValidCallback_thenReturnTrue() {
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isTrue();
+        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
     @Test
     void givenInvalidCallbackType_thenReturnFalse() {
-        assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
+        assertFalse(handler.canHandle(ABOUT_TO_START, callback));
     }
 
     @Test
     void givenInvalidEventType_thenReturnFalse() {
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         given(callback.getEvent()).willReturn(EventType.ADD_HEARING);
-        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
+        assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
     @Test
@@ -99,7 +104,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
             callback,
             USER_AUTHORISATION);
 
-        assertThat(response.getErrors()).isEmpty();
+        assertTrue(response.getErrors().isEmpty());
     }
 
     @Test
@@ -117,7 +122,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
 
         given(listAssistHearingMessageHelper.sendHearingMessage(
-            anyString(),any(HearingRoute.class),any(HearingState.class),eq(null)))
+            anyString(), any(HearingRoute.class), any(HearingState.class), eq(null)))
             .willReturn(true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
@@ -125,11 +130,11 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
             callback,
             USER_AUTHORISATION);
 
-        assertThat(response.getErrors()).isEmpty();
+        assertTrue(response.getErrors().isEmpty());
 
-        assertThat(response.getData()).isNotNull();
+        assertNotNull(response.getData());
         SscsCaseData caseData = response.getData();
-        assertThat(caseData.getSchedulingAndListingFields().getHearingState()).isEqualTo(UPDATE_HEARING);
+        assertEquals(UPDATE_HEARING, caseData.getSchedulingAndListingFields().getHearingState());
     }
 
     @Test
@@ -147,7 +152,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
 
         given(listAssistHearingMessageHelper.sendHearingMessage(
-            anyString(),any(HearingRoute.class),any(HearingState.class),eq(null)))
+            anyString(), any(HearingRoute.class), any(HearingState.class), eq(null)))
             .willReturn(false);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
@@ -155,10 +160,9 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
             callback,
             USER_AUTHORISATION);
 
-        assertThat(response.getErrors())
-            .hasSize(1)
-            .contains("An error occurred during message publish. Please try again.");
-        assertThat(response.getData()).isNotNull();
+        assertEquals(1, response.getErrors().size());
+        assertTrue(response.getErrors().contains("An error occurred during message publish. Please try again."));
+        assertNotNull(response.getData());
     }
 
     @Test
@@ -174,7 +178,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
             callback,
             USER_AUTHORISATION);
 
-        assertThat(response.getErrors()).isEmpty();
+        assertTrue(response.getErrors().isEmpty());
     }
 
     @Test
@@ -193,7 +197,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
             callback,
             USER_AUTHORISATION);
 
-        assertThat(response.getErrors()).isEmpty();
+        assertTrue(response.getErrors().isEmpty());
     }
 
     @ParameterizedTest
@@ -213,9 +217,9 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
             callback,
             USER_AUTHORISATION);
 
-        assertThat(response.getErrors()).isEmpty();
+        assertTrue(response.getErrors().isEmpty());
         YesNo result = response.getData().getSchedulingAndListingFields().getReserveTo().getReservedDistrictTribunalJudge();
-        assertThat(result).isEqualTo(reservedDtj);
+        assertEquals(reservedDtj, result);
     }
 
     @Test
@@ -234,9 +238,9 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
             callback,
             USER_AUTHORISATION);
 
-        assertThat(response.getErrors()).isEmpty();
+        assertTrue(response.getErrors().isEmpty());
         JudicialUserBase result = response.getData().getSchedulingAndListingFields().getReserveTo().getReservedJudge();
-        assertThat(result).isNull();
+        assertNull(result);
     }
 
     @Test
@@ -249,21 +253,21 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().appellantHearingChannel(VIDEO).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-                ABOUT_TO_SUBMIT,
-                callback,
-                USER_AUTHORISATION);
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
 
-        assertThat(response.getErrors()).isEmpty();
-        assertThat(response.getData().getAppeal().getHearingSubtype()).isNotNull();
-        assertThat(response.getData().getAppeal().getHearingSubtype().isWantsHearingTypeVideo()).isTrue();
+        assertTrue(response.getErrors().isEmpty());
+        assertNotNull(response.getData().getAppeal().getHearingSubtype());
+        assertTrue(response.getData().getAppeal().getHearingSubtype().isWantsHearingTypeVideo());
     }
 
     @Test
     void givenHearingChannelIsNull_thenReturnCaseDataHearingSubtype() {
         HearingSubtype hearingSubType = HearingSubtype.builder()
-                .hearingTelephoneNumber("09038920")
-                .wantsHearingTypeTelephone(YES.getValue())
-                .build();
+            .hearingTelephoneNumber("09038920")
+            .wantsHearingTypeTelephone(YES.getValue())
+            .build();
 
         sscsCaseData.getAppeal().setHearingSubtype(hearingSubType);
 
@@ -275,13 +279,13 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().appellantHearingChannel(null).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-                ABOUT_TO_SUBMIT,
-                callback,
-                USER_AUTHORISATION);
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
 
-        assertThat(response.getErrors()).isEmpty();
-        assertThat(response.getData().getAppeal().getHearingSubtype()).isNotNull();
-        assertThat(response.getData().getAppeal().getHearingSubtype().isWantsHearingTypeTelephone()).isTrue();
+        assertTrue(response.getErrors().isEmpty());
+        assertNotNull(response.getData().getAppeal().getHearingSubtype());
+        assertTrue(response.getData().getAppeal().getHearingSubtype().isWantsHearingTypeTelephone());
     }
 
     @Test
@@ -295,47 +299,97 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         DynamicList interpreterLanguage = new DynamicList(interpreterLanguageItem, List.of());
 
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
-                .appellantInterpreter(HearingInterpreter.builder()
-                        .isInterpreterWanted(YES)
-                        .interpreterLanguage(interpreterLanguage)
-                        .build())
-                .build());
+            .appellantInterpreter(HearingInterpreter.builder()
+                .isInterpreterWanted(YES)
+                .interpreterLanguage(interpreterLanguage)
+                .build())
+            .build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-                ABOUT_TO_SUBMIT,
-                callback,
-                USER_AUTHORISATION);
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
 
-        assertThat(response.getErrors()).isEmpty();
-        assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo("Yes");
-        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isNotNull();
-        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isEqualTo("Arabic");
+        assertTrue(response.getErrors().isEmpty());
+        assertEquals("Yes", response.getData().getAppeal().getHearingOptions().getLanguageInterpreter());
+        assertNotNull(response.getData().getAppeal().getHearingOptions().getLanguages());
+        assertEquals("Arabic", response.getData().getAppeal().getHearingOptions().getLanguages());
 
     }
 
     @Test
-    void givenAppellantInterpreterIsNull_thenDontUpdateCaseDataInterpreter() {
+    void givenAppellantInterpreterIsNull_thenDoNotUpdateCaseDataInterpreter() {
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
         given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
 
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
-                .appellantInterpreter(null)
-                .build());
+            .appellantInterpreter(null)
+            .build());
 
         sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder()
-                .languageInterpreter("Yes")
-                .languages("Welsh")
-                .build());
+            .languageInterpreter("Yes")
+            .languages("Welsh")
+            .build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-                ABOUT_TO_SUBMIT,
-                callback,
-                USER_AUTHORISATION);
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
 
-        assertThat(response.getErrors()).isEmpty();
-        assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo("Yes");
-        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isNotNull();
+        assertTrue(response.getErrors().isEmpty());
+        assertEquals("Yes", response.getData().getAppeal().getHearingOptions().getLanguageInterpreter());
+        assertNotNull(response.getData().getAppeal().getHearingOptions().getLanguages());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = HmcHearingType.class, names = {"SUBSTANTIVE", "DIRECTION_HEARINGS"})
+    void givenHmcHearingTypeIsNotNull_thenUpdateToNonNullHearingOptions(HmcHearingType hmcHearingType) {
+        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
+        given(callback.getCaseDetails()).willReturn(caseDetails);
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
+
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
+            .appellantInterpreter(null)
+            .hmcHearingType(hmcHearingType)
+            .build());
+
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder()
+            .languageInterpreter("Yes")
+            .languages("Welsh")
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertTrue(response.getErrors().isEmpty());
+        assertEquals("Yes", response.getData().getAppeal().getHearingOptions().getLanguageInterpreter());
+        assertNotNull(response.getData().getAppeal().getHearingOptions().getLanguages());
+        assertEquals(hmcHearingType, response.getData().getAppeal().getHearingOptions().getHmcHearingType());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = HmcHearingType.class, names = {"SUBSTANTIVE", "DIRECTION_HEARINGS"})
+    void givenHmcHearingTypeIsNotNull_thenUpdateToNullHearingOptions(HmcHearingType hmcHearingType) {
+        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
+        given(callback.getCaseDetails()).willReturn(caseDetails);
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
+
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
+            .hmcHearingType(hmcHearingType)
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertTrue(response.getErrors().isEmpty());
+        assertEquals(hmcHearingType, response.getData().getAppeal().getHearingOptions().getHmcHearingType());
     }
 }

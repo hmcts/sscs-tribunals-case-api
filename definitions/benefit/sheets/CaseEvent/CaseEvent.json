@@ -297,7 +297,7 @@
     "LiveFrom": "01/01/2018",
     "CaseTypeID": "Benefit",
     "ID": "adminSendToReadyToList",
-    "Name": "Admin - send to Ready to List",
+    "Name": "Admin - send ReadyToList GAPS",
     "DisplayOrder": 230,
     "PreConditionState(s)": "appealCreated;dormantAppealState;postHearing;withUT;draft;draftArchived;hearing;incompleteApplication;incompleteApplicationInformationReqsted;interlocutoryReviewState;responseReceived;validAppeal;voidState;withDwp;handlingError",
     "PostConditionState": "readyToList",
@@ -464,6 +464,21 @@
     "PostConditionState": "*",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N"
+  },
+  {
+    "LiveFrom": "04/07/2024",
+    "CaseTypeID": "Benefit",
+    "ID": "amendHearingOutcome",
+    "Name": "Amend Hearing Outcome",
+    "Description": "Amend a Hearing Outcome",
+    "DisplayOrder": 361,
+    "PreConditionState(s)": "*",
+    "CallBackURLAboutToStartEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToStart",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
+    "PostConditionState": "*",
+    "ShowEventNotes": "Y",
+    "SecurityClassification": "Public"
   },
   {
     "LiveFrom": "24/03/2022",
@@ -698,6 +713,18 @@
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
     "ShowSummary": "Y"
+  },
+  {
+    "LiveFrom": "22/01/2025",
+    "CaseTypeID": "Benefit",
+    "ID": "clearFailedFeFilter",
+    "Name": "Clear failed sending FE filter",
+    "DisplayOrder": 531,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "EventEnablingCondition": "hmctsDwpState=\"failedSendingFurtherEvidence\"",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
+    "SecurityClassification": "Public"
   },
   {
     "LiveFrom": "10/10/2019",
@@ -1520,6 +1547,22 @@
   {
     "LiveFrom": "01/01/2018",
     "CaseTypeID": "Benefit",
+    "ID": "uploadDocument",
+    "Name": "Manage documents",
+    "Description": "Upload, edit and remove documents",
+    "DisplayOrder": 1075,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "ShowEventNotes": "Y",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToStartEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToStart",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
+    "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdSubmittedEvent"
+  },
+  {
+    "LiveFrom": "01/01/2018",
+    "CaseTypeID": "Benefit",
     "ID": "manageDwpDocuments",
     "Name": "Manage FTA document(s)",
     "Description": "Manage FTA document(s)",
@@ -2338,18 +2381,6 @@
     "Name": "Upload Cor document",
     "Description": "Upload cor document",
     "DisplayOrder": 1700,
-    "PreConditionState(s)": "*",
-    "PostConditionState": "*",
-    "ShowEventNotes": "Y",
-    "SecurityClassification": "Public"
-  },
-  {
-    "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
-    "ID": "uploadDocument",
-    "Name": "Upload document",
-    "Description": "Upload document",
-    "DisplayOrder": 1710,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
     "ShowEventNotes": "Y",

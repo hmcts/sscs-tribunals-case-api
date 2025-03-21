@@ -17,7 +17,6 @@ export const urls = {
 const versionFilePath = path.resolve(__dirname, '../../benefit/VERSION.yaml');
 export const environment = {
   name: process.env.ENVIRONMENT ?? '',
-  hearingsEnabled: process.env.HEARINGS_ENABLED,
   aatDefVersion: yaml.load(fs.readFileSync(versionFilePath, 'utf8'))
 };
 
@@ -77,6 +76,10 @@ export const credentials = {
   superUser: {
     email: process.env.SUPER_USER_USERNAME,
     password: process.env.SUPER_USER_PASSWORD
+  },
+  hmrcSuperUser: {
+    email: process.env.TEST_HMRC_SUPER_USER_USERNAME,
+    password: process.env.TEST_HMRC_SUPER_USER_PASSWORD
   },
   dwpResponseWriter: {
     email: process.env.TEST_DWP_USERNAME,
