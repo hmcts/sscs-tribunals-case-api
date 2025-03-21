@@ -4627,7 +4627,7 @@
     "PageDisplayOrder": 2,
     "PageFieldDisplayOrder": 1,
     "PageID": "2.0",
-    "PageShowCondition": "FL_ftaRequestType=\"newRequest\"",
+    "PageShowCondition": "ftaRequestType=\"newRequest\"",
     "PageLabel": "Send a new request"
   }
   ,
