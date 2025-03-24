@@ -59,13 +59,13 @@ public final class ServiceHearingValuesMapping {
                 .screenFlow(null)
                 .vocabulary(null)
                 .caseInterpreterRequiredFlag(HearingChannelUtil.isInterpreterRequired(caseData))
-                .panelRequirements(HearingsPanelMapping.getPanelRequirements(caseData, refData))
+                .panelRequirements(null)
                 .build();
     }
 
     public static Judiciary getJudiciary(@Valid SscsCaseData sscsCaseData, ReferenceDataServiceHolder refData) {
         return Judiciary.builder()
-                .roleType(HearingsPanelMapping.getRoleTypes(sscsCaseData.getBenefitCode()))
+                .roleType(null)
                 .authorisationTypes(HearingsPanelMapping.getAuthorisationTypes())
                 .authorisationSubType(HearingsPanelMapping.getAuthorisationSubTypes())
                 .judiciarySpecialisms(HearingsPanelMapping.getPanelSpecialisms(sscsCaseData, getSessionCaseCodeMap(sscsCaseData, refData)))

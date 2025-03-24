@@ -5,6 +5,7 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberMedicallyQualified.getPanelMemberMedicallyQualified;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsMapping.getSessionCaseCodeMap;
 
 import jakarta.validation.Valid;
@@ -14,31 +15,37 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMember;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberMedicallyQualified;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
-import uk.gov.hmcts.reform.sscs.model.hmc.reference.BenefitRoleRelationType;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.RequirementType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.MemberType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelPreference;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
+import uk.gov.hmcts.reform.sscs.reference.data.model.PanelCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @Slf4j
+@Component
 public final class HearingsPanelMapping {
 
-    private HearingsPanelMapping() {
+    private final PanelCategoryMapService panelCategoryMapService;
 
+    HearingsPanelMapping(PanelCategoryMapService panelCategoryMapService) {
+
+        this.panelCategoryMapService = panelCategoryMapService;
     }
 
-    public static PanelRequirements getPanelRequirements(SscsCaseData caseData,
+    public PanelRequirements getPanelRequirements(SscsCaseData caseData,
                                                          ReferenceDataServiceHolder refData) {
         return PanelRequirements.builder()
-                .roleTypes(getRoleTypes(caseData.getBenefitCode()))
+                .roleTypes(getRoleTypes(caseData))
                 .authorisationTypes(getAuthorisationTypes())
                 .authorisationSubTypes(getAuthorisationSubTypes())
                 .panelPreferences(getPanelPreferences(caseData))
@@ -46,8 +53,15 @@ public final class HearingsPanelMapping {
                 .build();
     }
 
-    public static List<String> getRoleTypes(String benefitCode) {
-        return BenefitRoleRelationType.findRoleTypesByBenefitCode(benefitCode);
+    public List<String> getRoleTypes(SscsCaseData caseData) {
+        String benefitIssueCode = caseData.getBenefitCode() + caseData.getIssueCode();
+        String specialismCount = caseData.getSscsIndustrialInjuriesData().getPanelDoctorSpecialism() != null
+                ? caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism() != null
+                ? "2" : "1" : null;
+        String isFqpm =  isYes(caseData.getIsFqpmRequired()) ? "true" : null;
+        PanelCategoryMap panelComp = panelCategoryMapService
+                .getPanelCategoryMap(benefitIssueCode, null, specialismCount, isFqpm);
+        return panelComp != null ? panelComp.getJohTiers() : Collections.emptyList();
     }
 
     public static List<String> getAuthorisationTypes() {

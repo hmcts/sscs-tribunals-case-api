@@ -40,9 +40,15 @@ class HearingsMappingTest extends HearingsMappingBase {
     @Mock
     private VenueService venueService;
 
+    @Mock
+    private  HearingsDetailsMapping hearingsDetailsMapping;
+
+    private HearingsMapping hearingsMapping;
+
     @DisplayName("When a valid hearing wrapper is given buildHearingPayload returns the correct Hearing Request Payload")
     @Test
     void buildHearingPayload() throws Exception {
+        hearingsMapping = new HearingsMapping(hearingsDetailsMapping);
         given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE,ISSUE_CODE,false,false))
                 .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
                                                    false, false, SessionCategory.CATEGORY_03, null));
@@ -82,7 +88,7 @@ class HearingsMappingTest extends HearingsMappingBase {
             .caseData(caseData)
             .caseData(caseData)
             .build();
-        HearingRequestPayload result = HearingsMapping.buildHearingPayload(wrapper, refData);
+        HearingRequestPayload result = hearingsMapping.buildHearingPayload(wrapper, refData);
 
         assertThat(result).isNotNull();
         assertThat(result.getRequestDetails()).isNotNull();
