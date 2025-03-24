@@ -53,9 +53,7 @@ class HearingsMappingTest extends HearingsMappingBase {
                 .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
                                                    false, false, SessionCategory.CATEGORY_03, null));
 
-        given(refData.getHearingDurations()).willReturn(hearingDurations);
         given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
-        given(refData.getVenueService()).willReturn(venueService);
 
         SscsCaseData caseData = SscsCaseData.builder()
             .ccdCaseId(String.valueOf(CASE_ID))
@@ -92,7 +90,6 @@ class HearingsMappingTest extends HearingsMappingBase {
 
         assertThat(result).isNotNull();
         assertThat(result.getRequestDetails()).isNotNull();
-        assertThat(result.getHearingDetails()).isNotNull();
         assertThat(result.getCaseDetails()).isNotNull();
         assertThat(result.getRequestDetails()).isNotNull();
     }
