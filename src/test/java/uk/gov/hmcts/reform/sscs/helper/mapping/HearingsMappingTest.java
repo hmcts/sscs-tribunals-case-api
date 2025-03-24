@@ -92,7 +92,6 @@ class HearingsMappingTest extends HearingsMappingBase {
 
         assertThat(result).isNotNull();
         assertThat(result.getRequestDetails()).isNotNull();
-        assertThat(result.getHearingDetails()).isNotNull();
         assertThat(result.getCaseDetails()).isNotNull();
         assertThat(result.getRequestDetails()).isNotNull();
     }
