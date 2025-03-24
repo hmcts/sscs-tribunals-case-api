@@ -6,10 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.TribunalCommunication;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -50,21 +47,21 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        List<TribunalCommunication> tribunalComms = sscsCaseData.getTribunalCommunicationFields().getTribunalCommunications();
+        List<TribunalCommunicationFields> tribunalComms = sscsCaseData.getTribunalCommunications().getTribunalCommunicationFields();
 
-        String topic = sscsCaseData.getTribunalCommunicationFields().getTribunalRequestTopic();
-        String question = sscsCaseData.getTribunalCommunicationFields().getTribunalRequestMessage();
+        String topic = sscsCaseData.getTribunalCommunications().getTribunalRequestTopic();
+        String question = sscsCaseData.getTribunalCommunications().getTribunalRequestQuestion();
         LocalDateTime now = LocalDateTime.now();
         final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
-        tribunalComms.add(TribunalCommunication.builder()
+        tribunalComms.add(TribunalCommunicationFields.builder()
                 .requestMessage(question)
                 .requestTopic(topic)
                 .requestDateTime(now)
                 .requestUserName(userDetails.getName())
-                .requestDueDate(now.plusDays(2))
+                .requestResponseDue(now.plusDays(2))
                 .build());
 
-        tribunalComms.sort(Comparator.comparing(TribunalCommunication::getRequestDateTime).reversed());
+        tribunalComms.sort(Comparator.comparing(TribunalCommunicationFields::getRequestDateTime).reversed());
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }

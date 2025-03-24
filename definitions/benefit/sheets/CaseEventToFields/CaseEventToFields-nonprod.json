@@ -104,7 +104,7 @@
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder" : 1,
     "PageID": "1.0",
-    "PageLabel": "Tribunal Communication"
+    "PageLabel": "Select Tribunal Communication Type"
   },
   {
     "LiveFrom": "18/03/2025",
@@ -114,12 +114,12 @@
     "DisplayContext": "MANDATORY",
     "PageDisplayOrder": 2,
     "PageFieldDisplayOrder" : 1,
-    "PageID": "1.0",
-    "PageShowCondition": "FL_tribunalRequestType=\"newRequest\"",
-    "PageLabel": "Tribunal Communication"
+    "PageID": "2.0",
+    "PageShowCondition": "tribunalRequestType=\"newRequest\"",
+    "PageLabel": "Send a Tribunal Communication Request"
   },
   {
-    "LiveFrom": "18/03/2025",// are these three topic fields because each of these has a topic choice? why are these not part of the type field instaed?
+    "LiveFrom": "18/03/2025",
     "CaseEventID": "tribunalCommunication",
     "CaseFieldID" : "tribunalRequestQuestion",
     "CaseTypeID": "Benefit",
@@ -127,31 +127,6 @@
     "PageDisplayOrder": 2,
     "PageFieldDisplayOrder" : 2,
     "PageID": "1.0",
-    "PageShowCondition": "FL_tribunalRequestType=\"newRequest\"",
-    "PageLabel": "Tribunal Communication Type"
-  },
-  {
-    "LiveFrom": "18/03/2025",//
-    "CaseEventID": "tribunalCommunication",
-    "CaseFieldID" : "tribunalRequestTopic",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
-    "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder" : 1,
-    "PageID": "1.0",
-    "PageShowCondition": "FL_tribunalRequestType=\"replyToTribunalRequest\"",
-    "PageLabel": "Tribunal Communication Type"
-  },
-  {
-    "LiveFrom": "18/03/2025",//
-    "CaseEventID": "tribunalCommunication",
-    "CaseFieldID": "tribunalRequestTopic",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
-    "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder": 1,
-    "PageID": "1.0",
-    "PageShowCondition": "FL_tribunalRequestType=\"reviewTribunalReply\"",
-    "PageLabel": "Tribunal Communication Type"
+    "PageLabel": "Tribunal Communication Message"
   }
 ]
