@@ -5,6 +5,7 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberMedicallyQualified.getPanelMemberMedicallyQualified;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsMapping.getSessionCaseCodeMap;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.BenefitRoleRelationType.findRoleTypesByBenefitCode;
 
@@ -27,6 +28,7 @@ import uk.gov.hmcts.reform.sscs.model.hmc.reference.RequirementType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.MemberType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelPreference;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
+import uk.gov.hmcts.reform.sscs.reference.data.model.PanelCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
@@ -54,6 +56,17 @@ public final class HearingsPanelMapping {
                 .panelPreferences(getPanelPreferences(caseData))
                 .panelSpecialisms(getPanelSpecialisms(caseData, getSessionCaseCodeMap(caseData, refData)))
                 .build();
+    }
+
+    public List<String> getRoleTypes(SscsCaseData caseData) {
+        String benefitIssueCode = caseData.getBenefitCode() + caseData.getIssueCode();
+        String specialismCount = caseData.getSscsIndustrialInjuriesData().getPanelDoctorSpecialism() != null
+                ? caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism() != null
+                ? "2" : "1" : null;
+        String isFqpm =  isYes(caseData.getIsFqpmRequired()) ? "true" : null;
+        PanelCategoryMap panelComp = panelCategoryMapService
+                .getPanelCategoryMap(benefitIssueCode, null, specialismCount, isFqpm);
+        return panelComp != null ? panelComp.getJohTiers() : Collections.emptyList();
     }
 
     public static List<String> getAuthorisationTypes() {
