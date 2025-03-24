@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.sscs.helper.mapping;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
@@ -309,6 +311,16 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
         List<String> result = hearingsPanelMapping.getRoleTypes(caseData);
         assertThat(result).isNotEmpty();
         assertThat(result.getFirst()).isEqualTo(JOH_CODE);
+    }
+
+    @DisplayName("getPanelCategoryMap is called with correct number of specialisms and fqpm")
+    @Test
+    void testGetRolesWithSpecialismAndFqpm() {
+        caseData.getSscsIndustrialInjuriesData().setPanelDoctorSpecialism("cardiologist");
+        caseData.getSscsIndustrialInjuriesData().setSecondPanelDoctorSpecialism("eyeSurgeon");
+        caseData.setIsFqpmRequired(YesNo.YES);
+        hearingsPanelMapping.getRoleTypes(caseData);
+        verify(panelCategoryMapService).getPanelCategoryMap(any(), any(), eq("2"), eq("true"));
     }
 
     @DisplayName("getRoleTypes does not throw exception when panelCategoryMap is null")

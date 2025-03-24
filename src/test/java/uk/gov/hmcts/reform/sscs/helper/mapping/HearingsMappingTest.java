@@ -88,6 +88,7 @@ class HearingsMappingTest extends HearingsMappingBase {
             .build();
         HearingRequestPayload result = hearingsMapping.buildHearingPayload(wrapper, refData);
 
+
         assertThat(result).isNotNull();
         assertThat(result.getRequestDetails()).isNotNull();
         assertThat(result.getCaseDetails()).isNotNull();
