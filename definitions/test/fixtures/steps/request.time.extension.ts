@@ -28,6 +28,7 @@ export class RequestTimeExtension extends BaseStep {
     await this.requestTimeExtensionPage.confirmSubmission();
     await this.homePage.signOut();
     await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+    await this.homePage.delay(2000);
     await this.homePage.navigateToTab('History');
     await this.historyTab.verifyHistoryPageEventLink(reqTimeExtData.eventNameCaptor);
 
