@@ -9,9 +9,11 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -106,8 +108,55 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
         assertThat(addedCom.getRequestUserName(), is(expectedUserName));
         assertThat(addedCom.getRequestDateTime(), is(notNullValue()));
     
-        // Due date should be 2 days after request date
-        assertThat(addedCom.getRequestDueDate(), is(addedCom.getRequestDateTime().plusDays(2)));
     }
-    
+
+    @Test
+    @Parameters(method = "dueDateParameters")
+    public void calculateDueDate_shouldAdjustForWeekends(LocalDateTime inputDate, LocalDateTime expectedDueDate) {
+        LocalDateTime actualDueDate = handler.calculateDueDate(inputDate);
+        
+        assertThat(actualDueDate, is(expectedDueDate));
+    }
+
+    @SuppressWarnings("unused")
+    private Object[] dueDateParameters() {
+        return new Object[] {
+            // Normal weekday -> Weekday (2 days later)
+            new Object[] {
+                LocalDateTime.of(2023, 6, 5, 10, 0), // Monday
+                LocalDateTime.of(2023, 6, 7, 10, 0)  // Wednesday (2 days later)
+            },
+            // Normal weekday -> Weekday (2 days later)
+            new Object[] {
+                LocalDateTime.of(2023, 6, 6, 10, 0), // Tuesday
+                LocalDateTime.of(2023, 6, 8, 10, 0)  // Thursday (2 days later)
+            },
+            // Normal weekday -> Weekday (2 days later)
+            new Object[] {
+                LocalDateTime.of(2023, 6, 7, 10, 0), // Wednesday
+                LocalDateTime.of(2023, 6, 9, 10, 0)  // Friday (2 days later)
+            },
+            // Thursday -> Add 2 days = Saturday, should be moved to Monday (4 days later)
+            new Object[] {
+                LocalDateTime.of(2023, 6, 8, 10, 0), // Thursday
+                LocalDateTime.of(2023, 6, 12, 10, 0) // Monday (4 days later)
+            },
+            // Friday -> Add 2 days = Sunday, should be moved to Monday (3 days later)
+            new Object[] {
+                LocalDateTime.of(2023, 6, 9, 10, 0), // Friday
+                LocalDateTime.of(2023, 6, 12, 10, 0) // Monday (3 days later)
+            },
+            // Saturday -> Add 2 days = Monday (normal)
+            new Object[] {
+                LocalDateTime.of(2023, 6, 10, 10, 0), // Saturday
+                LocalDateTime.of(2023, 6, 12, 10, 0)  // Monday (2 days later)
+            },
+            // Sunday -> Add 2 days = Tuesday (normal)
+            new Object[] {
+                LocalDateTime.of(2023, 6, 11, 10, 0), // Sunday
+                LocalDateTime.of(2023, 6, 13, 10, 0)  // Tuesday (2 days later)
+            }
+        };
+    }
+ 
 }

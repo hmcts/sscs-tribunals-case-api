@@ -52,18 +52,30 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         String topic = sscsCaseData.getFtaCommunicationFields().getFtaRequestTopic();
         String question = sscsCaseData.getFtaCommunicationFields().getFtaRequestQuestion();
         LocalDateTime now = LocalDateTime.now();
+        LocalDateTime dueDate = calculateDueDate(LocalDateTime.now());
         final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
         ftaComs.add(FtaCommunication.builder()
             .requestText(question)
             .requestTopic(topic)
             .requestDateTime(now)
             .requestUserName(userDetails.getName())
-            .requestDueDate(now.plusDays(2))
+            .requestDueDate(dueDate)
             .build());
         
         ftaComs.sort(Comparator.comparing(FtaCommunication::getRequestDateTime).reversed());
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
+    }
+
+    public LocalDateTime calculateDueDate(LocalDateTime now) {
+        //2 working days from now
+        LocalDateTime dueDate = now.plusDays(2);
+        if (dueDate.getDayOfWeek().getValue() == 6) {
+            dueDate = dueDate.plusDays(2);
+        } else if (dueDate.getDayOfWeek().getValue() == 7) {
+            dueDate = dueDate.plusDays(1);
+        }
+        return dueDate;
     }
 
 }
