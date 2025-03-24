@@ -1717,6 +1717,6 @@
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "ftaRequestType", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "ftaRequestTopic", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "ftaRequestQuestion", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
-  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "ftaComRequest", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"}
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "ftaCommunications", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"}
   
 ]
