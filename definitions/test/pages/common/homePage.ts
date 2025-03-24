@@ -275,6 +275,7 @@ export class HomePage {
       case 'Listing Requirements': {
         try {
           await expect(this.listingRequirementsTab).toBeVisible();
+          await this.delay(3000);
           await this.listingRequirementsTab.click();
           await expect(this.page.locator('div.case-viewer-label').filter({hasText: 'Tribunal direct PO to attend?'}).first()).toBeVisible({ timeout: 10000 });
         } catch {
