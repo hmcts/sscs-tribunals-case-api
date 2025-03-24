@@ -53,8 +53,6 @@ public class HearingsService {
 
     private final HmcHearingApiService hmcHearingApiService;
 
-    private final HmcHearingsApiService hmcHearingsApiService;
-
     private final CcdCaseService ccdCaseService;
 
     private final ReferenceDataServiceHolder refData;
@@ -70,7 +68,7 @@ public class HearingsService {
     private static final Long HEARING_VERSION_NUMBER = 1L;
 
     @Retryable(
-            value = UpdateCaseException.class,
+            retryFor = UpdateCaseException.class,
             maxAttemptsExpression = "${retry.hearing-response-update.max-retries}",
             backoff = @Backoff(delayExpression = "${retry.hearing-response-update.backoff}"))
     public void processHearingRequest(HearingRequest hearingRequest) throws UnhandleableHearingStateException,
@@ -133,7 +131,7 @@ public class HearingsService {
         SscsCaseData caseData = wrapper.getCaseData();
 
         String caseId = caseData.getCcdCaseId();
-        HearingsGetResponse hearingsGetResponse = hmcHearingsApiService.getHearingsRequest(caseId, null);
+        HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseId, null);
         CaseHearing hearing = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse);
         HmcUpdateResponse hmcUpdateResponse;
 

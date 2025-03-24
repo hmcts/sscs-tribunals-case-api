@@ -13,22 +13,22 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
@@ -54,22 +54,22 @@ public class CreateWelshNoticeIt extends AbstractEventIt {
     @Autowired
     private WelshFooterService welshFooterService;
 
-    @MockBean
+    @MockitoBean
     private DocmosisPdfService docmosisPdfService;
 
-    @MockBean
+    @MockitoBean
     private CoreCaseDataApi coreCaseDataApi;
 
-    @MockBean
+    @MockitoBean
     private IdamClient idamClient;
 
-    @MockBean
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
 
-    @MockBean
+    @MockitoBean
     private EvidenceManagementService evidenceManagementService;
 
-    @MockBean
+    @MockitoBean
     UploadResponse uploadResponse;
 
     @Before

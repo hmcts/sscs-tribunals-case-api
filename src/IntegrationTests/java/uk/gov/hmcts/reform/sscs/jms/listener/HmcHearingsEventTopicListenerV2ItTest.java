@@ -15,17 +15,17 @@ import static uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus.LISTED;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
+import jakarta.jms.JMSException;
 import java.time.LocalDateTime;
-import javax.jms.JMSException;
 import org.apache.qpid.jms.message.JmsBytesMessage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
@@ -70,34 +70,34 @@ public class HmcHearingsEventTopicListenerV2ItTest {
 
     private HmcHearingsEventTopicListener hmcHearingsEventTopicListener;
 
-    @MockBean
+    @MockitoBean
     private ObjectMapper mapper;
 
     @Autowired
     private ProcessHmcMessageServiceV2 processHmcMessageServiceV2;
 
-    @MockBean
+    @MockitoBean
     private JmsBytesMessage bytesMessage;
 
-    @MockBean
+    @MockitoBean
     private IdamService idamService;
 
-    @MockBean
+    @MockitoBean
     private CcdCaseService ccdCaseService;
 
-    @MockBean
+    @MockitoBean
     private VenueService venueService;
 
-    @MockBean
+    @MockitoBean
     private HmcHearingApi hearingApi;
 
-    @MockBean
+    @MockitoBean
     private UpdateCcdCaseService updateCcdCaseService;
 
     @Test
     public void testHearingsUpdateV2() throws JMSException, HmcEventProcessingException, JsonProcessingException, CaseException, MessageProcessingException {
 
-        hmcHearingsEventTopicListener = new HmcHearingsEventTopicListener("BBA3", processHmcMessageServiceV2);
+        hmcHearingsEventTopicListener = new HmcHearingsEventTopicListener(processHmcMessageServiceV2);
         ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "objectMapper", mapper);
 
         HmcMessage hmcMessage = createHmcMessage("BBA3");
@@ -113,14 +113,14 @@ public class HmcHearingsEventTopicListenerV2ItTest {
         when(ccdCaseService.getCaseDetails(anyLong())).thenReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
         when(venueService.getVenueDetailsForActiveVenueByEpimsId(any())).thenReturn(VenueDetails.builder().build());
 
-        when(hearingApi.getHearingRequest(any(), any(), any(), any(), any()))
+        when(hearingApi.getHearingRequest(any(), any(), any(), any(), any(), any(), any()))
             .thenReturn(hearingGetResponse);
 
         hmcHearingsEventTopicListener.onMessage(bytesMessage);
 
         verify(idamService, times(3)).getIdamTokens();
 
-        verify(hearingApi).getHearingRequest(any(), any(), any(), any(), any());
+        verify(hearingApi).getHearingRequest(any(), any(), any(), any(), any(), any(), any());
 
         verify(ccdCaseService, never()).updateCaseData(any(), any(), any());
         verify(updateCcdCaseService).updateCaseV2DynamicEvent(eq(Long.parseLong(CASE_ID)), eq(idamTokens), any());

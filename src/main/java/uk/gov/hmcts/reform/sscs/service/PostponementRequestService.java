@@ -39,7 +39,7 @@ public class PostponementRequestService {
                 .documentFileName(sscsCaseData.getPostponementRequest().getPostponementPreviewDocument().getDocumentFilename())
                 .documentType(DocumentType.POSTPONEMENT_REQUEST.getValue())
                 .documentDateAdded(LocalDate.now().format(DateTimeFormatter.ISO_DATE))
-                .originalPartySender(originalSender.getValue())
+                .originalPartySender(originalSender.getLabel())
                 .partyUploaded(uploadParty.orElse(null))
                 .build()).build();
     }

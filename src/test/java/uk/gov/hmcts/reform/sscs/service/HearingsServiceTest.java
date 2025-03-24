@@ -40,7 +40,25 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseManagementLocation;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Issue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SessionCategory;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.exception.GetHearingException;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
@@ -81,9 +99,6 @@ class HearingsServiceTest {
 
     @Mock
     private HmcHearingApiService hmcHearingApiService;
-
-    @Mock
-    private HmcHearingsApiService hmcHearingsApiService;
 
     @Mock
     private CcdCaseService ccdCaseService;
@@ -277,7 +292,7 @@ class HearingsServiceTest {
         given(hmcHearingApiService.sendCreateHearingRequest(any(HearingRequestPayload.class)))
             .willReturn(HmcUpdateResponse.builder().hearingRequestId(123L).versionNumber(1234L).status(HmcStatus.HEARING_REQUESTED).build());
 
-        given(hmcHearingsApiService.getHearingsRequest(anyString(), eq(null)))
+        given(hmcHearingApiService.getHearingsRequest(anyString(), eq(null)))
             .willReturn(HearingsGetResponse.builder().build());
     }
 
@@ -298,7 +313,7 @@ class HearingsServiceTest {
         given(hmcHearingApiService.sendCreateHearingRequest(any(HearingRequestPayload.class)))
                 .willReturn(HmcUpdateResponse.builder().build());
 
-        given(hmcHearingsApiService.getHearingsRequest(anyString(),eq(null)))
+        given(hmcHearingApiService.getHearingsRequest(anyString(),eq(null)))
             .willReturn(HearingsGetResponse.builder().build());
 
         wrapper.setHearingState(CREATE_HEARING);
@@ -335,7 +350,7 @@ class HearingsServiceTest {
                 .build()))
             .build();
 
-        given(hmcHearingsApiService.getHearingsRequest(anyString(),eq(null)))
+        given(hmcHearingApiService.getHearingsRequest(anyString(),eq(null)))
             .willReturn(hearingsGetResponse);
 
         wrapper.setHearingState(CREATE_HEARING);
@@ -361,7 +376,7 @@ class HearingsServiceTest {
                                       .build()))
             .build();
 
-        given(hmcHearingsApiService.getHearingsRequest(anyString(),eq(null)))
+        given(hmcHearingApiService.getHearingsRequest(anyString(),eq(null)))
             .willReturn(hearingsGetResponse);
 
         wrapper.setHearingState(CREATE_HEARING);

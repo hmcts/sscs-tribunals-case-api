@@ -4,7 +4,35 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.GRANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.REFUSE;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.APPELLANT_FULL_NAME_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.BENEFIT_TYPE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.CASE_CREATED_DATE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.CASE_ID_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.EXELA_ADDRESS_LINE1_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.EXELA_ADDRESS_LINE2_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.EXELA_ADDRESS_LINE3_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.GENERATED_DATE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.IBCA_URL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LABEL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.NINO_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.POSTPONEMENT_REQUEST;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_1_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_2_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_3_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_4_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_5_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE2_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE3_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE4_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_COUNTY_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_POSTCODE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.SC_NUMBER_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.SHOULD_HIDE_NINO;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.SSCS_URL_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.WELSH_CASE_CREATED_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderHelper.buildCaseData;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderHelper.buildCaseDataWithoutBenefitType;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
@@ -23,6 +51,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.config.PdfDocumentConfig;
 import uk.gov.hmcts.reform.sscs.evidenceshare.config.ExelaAddressConfig;
@@ -278,5 +307,52 @@ public class PlaceholderServiceTest {
         assertEquals("No", placeholders.get(SHOULD_HIDE_NINO));
         assertEquals("IBCA123456", placeholders.get(NINO_LITERAL));
         assertEquals("IBCA Reference", placeholders.get(LABEL));
+    }
+
+
+    @Test
+    public void whenNotAHearingPostponementRequest_thenPlaceholderIsEmptyString() {
+        Address address = Address.builder()
+                .line1("Unit 2")
+                .line2("156 The Road")
+                .town("Lechworth")
+                .county("Bedford")
+                .postcode("L2 5UZ").build();
+
+        service.build(caseData, placeholders, address, now);
+
+        assertEquals("", placeholders.get(POSTPONEMENT_REQUEST));
+    }
+
+    @Test
+    public void givenAGrantedHearingPostponementRequest_thenSetPlaceholderAccordingly() {
+        caseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected(GRANT.getValue()).build());
+
+        Address address = Address.builder()
+                .line1("Unit 2")
+                .line2("156 The Road")
+                .town("Lechworth")
+                .county("Bedford")
+                .postcode("L2 5UZ").build();
+
+        service.build(caseData, placeholders, address, now);
+
+        assertEquals("grant", placeholders.get(POSTPONEMENT_REQUEST));
+    }
+
+    @Test
+    public void givenARefusedHearingPostponementRequest_thenSetPlaceholderAccordingly() {
+        caseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected(REFUSE.getValue()).build());
+
+        Address address = Address.builder()
+                .line1("Unit 2")
+                .line2("156 The Road")
+                .town("Lechworth")
+                .county("Bedford")
+                .postcode("L2 5UZ").build();
+
+        service.build(caseData, placeholders, address, now);
+
+        assertEquals("refuse", placeholders.get(POSTPONEMENT_REQUEST));
     }
 }

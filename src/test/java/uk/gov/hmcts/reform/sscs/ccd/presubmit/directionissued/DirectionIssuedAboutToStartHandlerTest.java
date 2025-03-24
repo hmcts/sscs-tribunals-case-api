@@ -1,15 +1,19 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.*;
-import static uk.gov.hmcts.reform.sscs.model.AppConstants.BENEFIT_CODES_FOR_ISSUE_AND_SEND_TO_ADMIN;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.NO_FURTHER_ACTION;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.SEND_TO_LISTING;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.SEND_TO_VALID_APPEAL;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,7 +49,6 @@ public class DirectionIssuedAboutToStartHandlerTest {
     public void setUp() {
         openMocks(this);
         handler = new DirectionIssuedAboutToStartHandler(false);
-
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -83,6 +86,8 @@ public class DirectionIssuedAboutToStartHandlerTest {
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getExtensionNextEventDl());
         assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
+        assertNull(response.getData().getHmcHearingType());
+        assertEquals(NO, response.getData().getSelectNextHmcHearingType());
     }
 
     @Test
@@ -130,6 +135,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
         listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
+        listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
         listOptions.add(new DynamicListItem(GRANT_EXTENSION.toString(), GRANT_EXTENSION.getLabel()));
         listOptions.add(new DynamicListItem(REFUSE_EXTENSION.toString(), REFUSE_EXTENSION.getLabel()));
 
@@ -137,14 +143,14 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(4, response.getData().getDirectionTypeDl().getListItems().size());
+        assertEquals(5, response.getData().getDirectionTypeDl().getListItems().size());
     }
 
     @Test
-    public void givenSpecificBenefitCodeAppeal_populateDirectionTypeDropdown() {
-        for (String benefitCode : BENEFIT_CODES_FOR_ISSUE_AND_SEND_TO_ADMIN) {
+    public void givenAnyBenefitCodeAppeal_populateDirectionTypeDropdown() {
+        for (BenefitCode benefitCode : BenefitCode.values()) {
             when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
-            sscsCaseData.setBenefitCode(benefitCode);
+            sscsCaseData.setBenefitCode(String.valueOf(benefitCode.getCcdReference()));
 
             List<DynamicListItem> listOptions = new ArrayList<>();
             listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
@@ -167,12 +173,13 @@ public class DirectionIssuedAboutToStartHandlerTest {
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
         listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
+        listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(2, response.getData().getDirectionTypeDl().getListItems().size());
+        assertEquals(3, response.getData().getDirectionTypeDl().getListItems().size());
     }
 
     @Test
@@ -186,6 +193,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
         listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
+        listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
         listOptions.add(new DynamicListItem(GRANT_REINSTATEMENT.toString(), GRANT_REINSTATEMENT.getLabel()));
         listOptions.add(new DynamicListItem(REFUSE_REINSTATEMENT.toString(), REFUSE_REINSTATEMENT.getLabel()));
 
@@ -193,7 +201,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(4, response.getData().getDirectionTypeDl().getListItems().size());
+        assertEquals(5, response.getData().getDirectionTypeDl().getListItems().size());
     }
 
     @Test
@@ -206,6 +214,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
         listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
+        listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
         listOptions.add(new DynamicListItem(GRANT_URGENT_HEARING.toString(), GRANT_URGENT_HEARING.getLabel()));
         listOptions.add(new DynamicListItem(REFUSE_URGENT_HEARING.toString(), REFUSE_URGENT_HEARING.getLabel()));
 
@@ -213,7 +222,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(4, response.getData().getDirectionTypeDl().getListItems().size());
+        assertEquals(5, response.getData().getDirectionTypeDl().getListItems().size());
     }
 
     @Test
@@ -226,12 +235,13 @@ public class DirectionIssuedAboutToStartHandlerTest {
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
         listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
+        listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(2, response.getData().getDirectionTypeDl().getListItems().size());
+        assertEquals(3, response.getData().getDirectionTypeDl().getListItems().size());
     }
 
     @Test
@@ -245,6 +255,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
         listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
+        listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
         listOptions.add(new DynamicListItem(GRANT_EXTENSION.toString(), GRANT_EXTENSION.getLabel()));
         listOptions.add(new DynamicListItem(REFUSE_EXTENSION.toString(), REFUSE_EXTENSION.getLabel()));
 
@@ -252,7 +263,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         DynamicList expected = new DynamicList(new DynamicListItem(GRANT_EXTENSION.toString(), GRANT_EXTENSION.toString()), listOptions);
         assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(4, response.getData().getDirectionTypeDl().getListItems().size());
+        assertEquals(5, response.getData().getDirectionTypeDl().getListItems().size());
     }
 
     @Test
@@ -263,12 +274,13 @@ public class DirectionIssuedAboutToStartHandlerTest {
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
         listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
+        listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(2, response.getData().getDirectionTypeDl().getListItems().size());
+        assertEquals(3, response.getData().getDirectionTypeDl().getListItems().size());
     }
 
     @Test
@@ -282,12 +294,13 @@ public class DirectionIssuedAboutToStartHandlerTest {
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
         listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
+        listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
         listOptions.add(new DynamicListItem(REFUSE_HEARING_RECORDING_REQUEST.toString(), REFUSE_HEARING_RECORDING_REQUEST.getLabel()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
-        assertEquals(3, response.getData().getDirectionTypeDl().getListItems().size());
+        assertEquals(4, response.getData().getDirectionTypeDl().getListItems().size());
         assertEquals(expected, response.getData().getDirectionTypeDl());
     }
 
@@ -302,11 +315,12 @@ public class DirectionIssuedAboutToStartHandlerTest {
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
         listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
+        listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
-        assertEquals(2, response.getData().getDirectionTypeDl().getListItems().size());
+        assertEquals(3, response.getData().getDirectionTypeDl().getListItems().size());
         assertEquals(expected, response.getData().getDirectionTypeDl());
     }
 
@@ -394,5 +408,51 @@ public class DirectionIssuedAboutToStartHandlerTest {
         assertEquals(NO, sscsCaseData.getHasOtherPartyAppointee());
         assertEquals(YES, sscsCaseData.getHasOtherParties());
         assertEquals(NO, sscsCaseData.getHasJointParty());
+    }
+
+    @Test
+    public void givenNonDefaultSelectHmcHearingTypeNo_whenValueAboutToStart() {
+        when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
+        sscsCaseData.setSelectNextHmcHearingType(YES);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(SEND_TO_LISTING.getCode(), SEND_TO_LISTING.getLabel()));
+        listOptions.add(new DynamicListItem(NO_FURTHER_ACTION.getCode(), NO_FURTHER_ACTION.getLabel()));
+        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
+        assertEquals(expected, response.getData().getExtensionNextEventDl());
+        assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
+        assertEquals(NO, response.getData().getSelectNextHmcHearingType());
+        assertNull(response.getData().getHmcHearingType());
+    }
+
+    @Test
+    public void givenNullSelectHmcHearingTypeNo_whenNullAboutToStart() {
+        when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
+        sscsCaseData.setSelectNextHmcHearingType(null);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(SEND_TO_LISTING.getCode(), SEND_TO_LISTING.getLabel()));
+        listOptions.add(new DynamicListItem(NO_FURTHER_ACTION.getCode(), NO_FURTHER_ACTION.getLabel()));
+        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
+        assertEquals(expected, response.getData().getExtensionNextEventDl());
+        assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
+        assertEquals(NO, response.getData().getSelectNextHmcHearingType());
+        assertNull(response.getData().getHmcHearingType());
+    }
+
+    @Test
+    public void givenMidEvent_ThenDoesNotWipeHmcHearingTypeOrSelect() {
+        when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
+        sscsCaseData.setSelectNextHmcHearingType(YES);
+        sscsCaseData.setHmcHearingType(HmcHearingType.DIRECTION_HEARINGS);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(SEND_TO_LISTING.getCode(), SEND_TO_LISTING.getLabel()));
+        listOptions.add(new DynamicListItem(NO_FURTHER_ACTION.getCode(), NO_FURTHER_ACTION.getLabel()));
+        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
+        assertEquals(expected, response.getData().getExtensionNextEventDl());
+        assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
+        assertEquals(YES, response.getData().getSelectNextHmcHearingType());
+        assertEquals(HmcHearingType.DIRECTION_HEARINGS, response.getData().getHmcHearingType());
     }
 }

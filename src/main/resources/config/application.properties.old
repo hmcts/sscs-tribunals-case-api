@@ -68,17 +68,16 @@ docmosis.convert.endpoint= ${PDF_SERVICE_CONVERT_URL:https://docmosis.aat.platfo
 docmosis.health.endpoint= ${PDF_SERVICE_HEALTH_URL:https://docmosis.aat.platform.hmcts.net/rs/status}
 docmosis.uri=${DOCMOSIS_SERVICE_BASE_URL:https://docmosis.aat.platform.hmcts.net/rs/render}
 
-documents.english.CORRECTION_GRANTED=TB-SCS-GNO-ENG-corrected-decision-notice.docx
-documents.english.DIRECTION_ISSUED=TB-SCS-GNO-ENG-directions-notice.docx
-documents.english.SOR_WRITE=TB-SCS-GNO-ENG-sor-directions-notice.docx
-documents.english.DECISION_ISSUED=TB-SCS-GNO-ENG-draft-decision-notice.docx
-documents.english.ISSUE_FINAL_DECISION=TB-SCS-GNO-ENG-final-decision-notice.docx
-documents.welsh.CORRECTION_GRANTED=TB-SCS-GNO-ENG-corrected-decision-notice.docx
-documents.welsh.DIRECTION_ISSUED=TB-SCS-GNO-ENG-directions-notice.docx
-documents.welsh.SOR_WRITE=TB-SCS-GNO-ENG-sor-directions-notice.docx
-documents.welsh.DECISION_ISSUED=TB-SCS-GNO-ENG-draft-decision-notice.docx
-documents.welsh.ISSUE_FINAL_DECISION=TB-SCS-GNO-ENG-final-decision-notice.docx
-
+documents.english.CORRECTION_GRANTED=TB-SCS-GNO-ENG-corrected-decision-notice-v2.docx
+documents.english.DIRECTION_ISSUED=TB-SCS-GNO-ENG-directions-notice-v2.docx
+documents.english.SOR_WRITE=TB-SCS-GNO-ENG-sor-directions-notice-v2.docx
+documents.english.DECISION_ISSUED=TB-SCS-GNO-ENG-draft-decision-notice-v2.docx
+documents.english.ISSUE_FINAL_DECISION=TB-SCS-GNO-ENG-final-decision-notice-v2.docx
+documents.welsh.CORRECTION_GRANTED=TB-SCS-GNO-ENG-corrected-decision-notice-v2.docx
+documents.welsh.DIRECTION_ISSUED=TB-SCS-GNO-ENG-directions-notice-v2.docx
+documents.welsh.SOR_WRITE=TB-SCS-GNO-ENG-sor-directions-notice-v2.docx
+documents.welsh.DECISION_ISSUED=TB-SCS-GNO-ENG-draft-decision-notice-v2.docx
+documents.welsh.ISSUE_FINAL_DECISION=TB-SCS-GNO-ENG-final-decision-notice-v2.docx
 document.bilingual.notice.template=TB-SCS-GNO-WEL-00473.docx
 
 evidence.english.template=TB-SCS-GNO-ENG-00012.docx
@@ -263,7 +262,6 @@ flags.hmc-to-hearings-api.enabled=${HMC_HEARINGS_LISTENING_ENABLED:false}
 flags.tribunals-to-hearings-api.enabled=${TRIBUNALS_HEARINGS_LISTENING_ENABLED:false}
 flags.adjournment.enabled=${ADJOURNMENT_ENABLED:false}
 flags.postHearings.enabled=${POST_HEARING_ENABLED:false}
-flags.deployment-filter.enabled=${HMC_DEPLOYMENT_FILTER_ENABLED:false}
 feign.httpclient.enabled=true
 feign.client.config.default.connectTimeout=10000
 feign.client.config.default.readTimeout=10000

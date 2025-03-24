@@ -527,6 +527,7 @@
   {"LiveFrom": "01/01/2018", "ID": "FL_issueCodesUc", "ListElementCode": "DS", "ListElement": "DS"},
   {"LiveFrom": "01/01/2018", "ID": "FL_issueCodesUc", "ListElementCode": "DK", "ListElement": "DK"},
   {"LiveFrom": "01/01/2018", "ID": "FL_issueCodesIbcaOnly", "ListElementCode": "DD", "ListElement": "DD"},
+  {"LiveFrom": "01/01/2018", "ID": "FL_issueCodesIbcaOnly", "ListElementCode": "SD", "ListElement": "SD"},
   {"LiveFrom": "01/01/2018", "ID": "FL_issueCodesIbcaOnly", "ListElementCode": "CE", "ListElement": "CE"},
   {"LiveFrom": "01/01/2018", "ID": "FL_issueCodesIbcaOnly", "ListElementCode": "RA", "ListElement": "RA"},
   {"LiveFrom": "01/01/2018", "ID": "FL_issueCodesIbcaOnly", "ListElementCode": "OS", "ListElement": "OS"},
@@ -920,5 +921,15 @@
   {"LiveFrom": "05/05/2023", "ID": "FL_dwpStates", "ListElementCode": "decisionRemade", "ListElement": "Review Decision"},
   {"LiveFrom": "01/09/2021", "ID": "FL_actionSendToFirstTier", "ListElementCode": "remade", "ListElement": "Remade"},
   {"LiveFrom": "01/09/2021", "ID": "FL_actionSendToFirstTier", "ListElementCode": "refused", "ListElement": "Refused"},
-  {"LiveFrom": "01/09/2021", "ID": "FL_actionSendToFirstTier", "ListElementCode": "remitted", "ListElement": "Remit from UT"}
+  {"LiveFrom": "01/09/2021", "ID": "FL_actionSendToFirstTier", "ListElementCode": "remitted", "ListElement": "Remit from UT"},
+  {"LiveFrom": "01/09/2021", "ID": "FL_hmcHearingType", "ListElementCode": "BBA3-SUB", "ListElement": "Substantive"},
+  {"LiveFrom": "01/09/2021", "ID": "FL_hmcHearingType", "ListElementCode": "BBA3-DIR", "ListElement": "Direction"},
+  {"LiveFrom": "01/09/2021", "ID": "FL_documentTabChoice", "ListElementCode": "document", "ListElement": "Documents tab"},
+  {"LiveFrom": "01/09/2021", "ID": "FL_documentTabChoice", "ListElementCode": "internalDocument", "ListElement": "Tribunal internal documents tab"},
+  {"LiveFrom": "01/09/2021", "ID": "FL_uploadRemoveOrMoveDocument", "ListElementCode": "uploadRemove", "ListElement": "Upload/remove document"},
+  {"LiveFrom": "01/09/2021", "ID": "FL_uploadRemoveOrMoveDocument", "ListElementCode": "move", "ListElement": "Move document"},
+  {"LiveFrom": "01/09/2021", "ID": "FL_uploadRemoveDocumentType", "ListElementCode": "document", "ListElement": "Upload to/remove from Documents tab"},
+  {"LiveFrom": "01/09/2021", "ID": "FL_uploadRemoveDocumentType", "ListElementCode": "internalDocument", "ListElement": "Upload to/remove from Tribunal internal documents tab"},
+  {"LiveFrom": "01/09/2021", "ID": "FL_moveDocumentTo", "ListElementCode": "internalDocument", "ListElement": "Move document to Tribunal internal documents tab"},
+  {"LiveFrom": "01/09/2021", "ID": "FL_moveDocumentTo", "ListElementCode": "document", "ListElement": "Move document to Documents tab"}
 ]
