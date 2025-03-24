@@ -25,6 +25,7 @@
     "PostConditionState": "*",
     "SecurityClassification": "Public",
     "EventEnablingCondition": "appeal.benefitType.code=\"infectedBloodCompensation\""
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit"
   }
 ]
 
