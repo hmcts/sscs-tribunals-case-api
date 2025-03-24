@@ -305,9 +305,9 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
     @DisplayName("getRoleTypes returns an valid list")
     @Test
     void testGetRoles() {
-        PanelCategoryMap panelCategoryMap = new PanelCategoryMap("022DD",null,null,null);
+        PanelCategoryMap panelCategoryMap = new PanelCategoryMap("022DD",null,null);
         panelCategoryMap.setJohTiers(new ArrayList<>(List.of(JOH_CODE)));
-        when(panelCategoryMapService.getPanelCategoryMap(any(),any(),any(),any())).thenReturn(panelCategoryMap);
+        when(panelCategoryMapService.getPanelCategoryMap(any(),any(),any())).thenReturn(panelCategoryMap);
         List<String> result = hearingsPanelMapping.getRoleTypes(caseData);
         assertThat(result).isNotEmpty();
         assertThat(result.getFirst()).isEqualTo(JOH_CODE);
@@ -320,13 +320,13 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
         caseData.getSscsIndustrialInjuriesData().setSecondPanelDoctorSpecialism("eyeSurgeon");
         caseData.setIsFqpmRequired(YesNo.YES);
         hearingsPanelMapping.getRoleTypes(caseData);
-        verify(panelCategoryMapService).getPanelCategoryMap(any(), any(), eq("2"), eq("true"));
+        verify(panelCategoryMapService).getPanelCategoryMap(any(), eq("2"), eq("true"));
     }
 
     @DisplayName("getRoleTypes does not throw exception when panelCategoryMap is null")
     @Test
     void testGetRolesWithInvalidCode() {
-        when(panelCategoryMapService.getPanelCategoryMap(any(),any(),any(),any())).thenReturn(null);
+        when(panelCategoryMapService.getPanelCategoryMap(any(),any(),any())).thenReturn(null);
         assertThatNoException()
                 .isThrownBy(() -> hearingsPanelMapping.getRoleTypes(caseData));
     }
