@@ -187,14 +187,13 @@ export class UrgentHearing extends BaseStep {
       'Refused'
     );
 
-    await new Promise((f) => setTimeout(f, 1000)); //Delay required for the Case to be ready
+    await this.homePage.delay(1000);
     await this.homePage.navigateToTab('History');
     await this.historyTab.verifyPageContentDoesNotExistByKeyValue(
       'Interlocutory review state',
       'N/A'
     );
 
-    await new Promise((f) => setTimeout(f, 1000)); //Delay required for the Case to be ready
     await this.homePage.navigateToTab('Documents');
     await this.documentsTab.verifyFieldVisible('Evidence issued');
     await this.documentsTab.verifyFieldVisible('Yes');
