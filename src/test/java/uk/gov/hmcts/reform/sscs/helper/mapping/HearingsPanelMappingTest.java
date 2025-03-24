@@ -1,10 +1,13 @@
 package uk.gov.hmcts.reform.sscs.helper.mapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +24,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Issue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMember;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SessionCategory;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsIndustrialInjuriesData;
@@ -30,7 +32,7 @@ import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.RequirementType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.MemberType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelPreference;
-import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
+import uk.gov.hmcts.reform.sscs.reference.data.model.PanelCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
@@ -43,12 +45,15 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
     public static final String JUDGE_ID_JUDGE_ROLE_TYPE = JUDGE_ID + "|" + JUDGE_ROLE_TYPE;
     public static final String IIDB_BENEFIT_CODE = "067";
     public static final String JUDGE_JOH_CODE = "84";
+    public static final String JOH_CODE = "58";
     @Mock
     private SessionCategoryMapService sessionCategoryMaps;
 
     @Mock
     private ReferenceDataServiceHolder refData;
 
+    @Mock
+    private PanelCategoryMapService panelCategoryMapService;
     @Mock
     private PanelCategoryService panelCategoryService;
 
@@ -76,7 +81,6 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
         assertThat(result.getPanelPreferences()).isEmpty();
         assertThat(result.getPanelSpecialisms()).isEmpty();
     }
-
     @DisplayName("getRoleTypes returns TRIBUNALS_MEMBER_MEDICAL when benefit is IIDB and feature flag is disabled")
     @Test
     void shouldReturnTribunalsMemberMedicalWhenBenefitIsIndustrialInjuriesDisablementBenefit() {
@@ -86,7 +90,6 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
         PanelRequirements result = hearingsPanelMapping.getPanelRequirements(caseData, refData);
         assertThat(result.getRoleTypes()).contains(PanelMemberType.TRIBUNALS_MEMBER_MEDICAL.getReference());
     }
-
     @DisplayName("HearingsPanelMapping should call panelCategoryService and return role types when feature flag is enabled")
     @Test
     void shouldPopulateRoleTypesFromPanelCategoryServiceWhenFeatureFlagIsEnabled() {
@@ -338,6 +341,25 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
         // LA is not currently set up to handle specialism for FQPM panel members.
         String result = HearingsPanelMapping.getPanelMemberSpecialism(PanelMember.FQPM, null, null);
         assertThat(result).isNull();
+    }
+
+    @DisplayName("getRoleTypes returns an valid list")
+    @Test
+    void testGetRoles() {
+        PanelCategoryMap panelCategoryMap = new PanelCategoryMap("022DD",null,null,null);
+        panelCategoryMap.setJohTiers(new ArrayList<>(List.of(JOH_CODE)));
+        when(panelCategoryMapService.getPanelCategoryMap(any(),any(),any(),any())).thenReturn(panelCategoryMap);
+        List<String> result = hearingsPanelMapping.getRoleTypes(caseData);
+        assertThat(result).isNotEmpty();
+        assertThat(result.getFirst()).isEqualTo(JOH_CODE);
+    }
+
+    @DisplayName("getRoleTypes does not throw exception when panelCategoryMap is null")
+    @Test
+    void testGetRolesWithInvalidCode() {
+        when(panelCategoryMapService.getPanelCategoryMap(any(),any(),any(),any())).thenReturn(null);
+        assertThatNoException()
+                .isThrownBy(() -> hearingsPanelMapping.getRoleTypes(caseData));
     }
 
 }
