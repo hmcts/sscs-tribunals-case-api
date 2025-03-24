@@ -126,7 +126,6 @@
     "DisplayContext": "MANDATORY",
     "PageDisplayOrder": 2,
     "PageFieldDisplayOrder" : 2,
-    "PageID": "1.0",
-    "PageLabel": "Tribunal Communication Message"
+    "PageID": "2.0"
   }
 ]

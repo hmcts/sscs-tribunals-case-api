@@ -12,9 +12,7 @@ import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -47,10 +45,15 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        List<TribunalCommunicationFields> tribunalComms = sscsCaseData.getTribunalCommunications().getTribunalCommunicationFields();
-
-        String topic = sscsCaseData.getTribunalCommunications().getTribunalRequestTopic();
-        String question = sscsCaseData.getTribunalCommunications().getTribunalRequestQuestion();
+        //List<TribunalCommunicationFields> tribunalComms = sscsCaseData.getTribunalCommunications().getTribunalCommunicationFields();
+//        List<TribunalCommunicationFields> tribunalComms = Collections.emptyList();
+//        if (sscsCaseData.getTribunalCommunications() != null && sscsCaseData.getTribunalCommunications().getTribunalCommunicationFields() != null) {
+//            tribunalComms = sscsCaseData.getTribunalCommunications().getTribunalCommunicationFields();
+//        }
+        TribunalCommunication tribunalCommunication = Optional.ofNullable(sscsCaseData.getTribunalCommunications()).orElse(TribunalCommunication.builder().build());
+        List<TribunalCommunicationFields> tribunalComms = tribunalCommunication.getTribunalCommunicationFields();
+        String topic = tribunalCommunication.getTribunalRequestTopic();
+        String question = tribunalCommunication.getTribunalRequestQuestion();
         LocalDateTime now = LocalDateTime.now();
         final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
         tribunalComms.add(TribunalCommunicationFields.builder()
@@ -63,6 +66,7 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
 
         tribunalComms.sort(Comparator.comparing(TribunalCommunicationFields::getRequestDateTime).reversed());
 
+        sscsCaseData.setTribunalCommunications(tribunalCommunication);
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 }
