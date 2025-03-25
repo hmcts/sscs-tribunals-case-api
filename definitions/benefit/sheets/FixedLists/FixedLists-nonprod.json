@@ -1,6 +1,6 @@
 [
   {"LiveFrom": "18/03/2025", "ID": "FL_tribunalRequestType", "ListElementCode": "newRequest","ListElement": "New Request"},
-  {"LiveFrom": "18/03/2025", "ID": "FL_tribunalRequestType", "ListElementCode": "replyToTribunalRequest","ListElement": "Reply to Tribunal Query"}, //one more needed, outside ticket scope
+  {"LiveFrom": "18/03/2025", "ID": "FL_tribunalRequestType", "ListElementCode": "replyToTribunalRequest","ListElement": "Reply to Tribunal Query"},
   {"LiveFrom": "18/03/2025", "ID": "FL_tribunalRequestTopic", "ListElementCode": "appealType","ListElement": "Appeal Type"},
   {"LiveFrom": "18/03/2025", "ID": "FL_tribunalRequestTopic", "ListElementCode": "appellantInformation","ListElement": "Appellant Personal Information"},
   {"LiveFrom": "18/03/2025", "ID": "FL_tribunalRequestTopic", "ListElementCode": "appointeeInformation","ListElement": "Appointee Personal Information"},
