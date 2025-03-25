@@ -1307,7 +1307,7 @@
     "CaseFieldID": "otherParties",
     "CaseTypeID": "Benefit",
     "DisplayContext": "COMPLEX",
-    "FieldShowCondition": "appeal.benefitType.code=\"childSupport\" OR appeal.benefitType.code=\"taxCredit\" OR appeal.benefitType.code=\"guardiansAllowance\" OR appeal.benefitType.code=\"taxFreeChildcare\" OR appeal.benefitType.code=\"homeResponsibilitiesProtection\" OR appeal.benefitType.code=\"childBenefit\" OR appeal.benefitType.code=\"thirtyHoursFreeChildcare\" OR appeal.benefitType.code=\"guaranteedMinimumPension\" OR appeal.benefitType.code=\"nationalInsuranceCredits\"",
+    "FieldShowCondition": "appeal.benefitType.code=\"childSupport\" OR appeal.benefitType.code=\"taxCredit\" OR appeal.benefitType.code=\"guardiansAllowance\" OR appeal.benefitType.code=\"taxFreeChildcare\" OR appeal.benefitType.code=\"homeResponsibilitiesProtection\" OR appeal.benefitType.code=\"childBenefit\" OR appeal.benefitType.code=\"thirtyHoursFreeChildcare\" OR appeal.benefitType.code=\"guaranteedMinimumPension\" OR appeal.benefitType.code=\"nationalInsuranceCredits\" OR appeal.benefitType.code=\"infectedBloodCompensation\"",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 3,
@@ -1411,17 +1411,6 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "1.0",
     "PageLabel": "Upload Cor documents"
-  },
-  {
-    "CaseEventID": "uploadDocument",
-    "CaseFieldID": "sscsDocument",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 1,
-    "PageID": "1.0",
-    "PageLabel": "Upload documents"
   },
   {
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
@@ -2078,6 +2067,31 @@
     "PageFieldDisplayOrder": 22,
     "PageID": "1.0",
     "PageLabel": "Issue direction"
+  },
+  {
+    "CaseEventID": "directionIssued",
+    "CaseFieldID": "selectNextHmcHearingType",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 23,
+    "PageID": "1.0",
+    "PageLabel": "Issue direction",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "directionIssued",
+    "CaseFieldID": "hmcHearingType",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 24,
+    "PageID": "2.0",
+    "PageLabel": "Issue direction",
+    "PageShowCondition": "selectNextHmcHearingType=\"Yes\"",
+    "ShowSummaryChangeOption": "Y"
   },
   {
     "CaseEventID": "directionIssued",

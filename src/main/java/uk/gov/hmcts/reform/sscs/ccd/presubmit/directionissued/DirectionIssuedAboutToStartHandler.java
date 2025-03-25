@@ -7,7 +7,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.*;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
-import static uk.gov.hmcts.reform.sscs.model.AppConstants.BENEFIT_CODES_FOR_ISSUE_AND_SEND_TO_ADMIN;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +22,6 @@ import uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil;
 @Service
 public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private final boolean isPostHearingsEnabled;
-    @Value("${feature.direction-hearings.enabled}")
-    private boolean isDirectionHearingsEnabled;
 
     public DirectionIssuedAboutToStartHandler(@Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
         this.isPostHearingsEnabled = isPostHearingsEnabled;
@@ -56,7 +53,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
 
         clearFields(sscsCaseData);
         setPartiesToSendLetter(sscsCaseData);
-        if (isDirectionHearingsEnabled && callbackType.equals(CallbackType.ABOUT_TO_START)) {
+        if (callbackType.equals(CallbackType.ABOUT_TO_START)) {
             sscsCaseData.setSelectNextHmcHearingType(NO);
             sscsCaseData.setHmcHearingType(null);
         }
@@ -69,10 +66,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
 
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
         listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
-
-        if (sscsCaseData.getBenefitCode() != null && BENEFIT_CODES_FOR_ISSUE_AND_SEND_TO_ADMIN.contains(sscsCaseData.getBenefitCode())) {
-            listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
-        }
+        listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
 
         if (isYes(sscsCaseData.getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding())) {
             listOptions.add(new DynamicListItem(REFUSE_HEARING_RECORDING_REQUEST.toString(), REFUSE_HEARING_RECORDING_REQUEST.getLabel()));

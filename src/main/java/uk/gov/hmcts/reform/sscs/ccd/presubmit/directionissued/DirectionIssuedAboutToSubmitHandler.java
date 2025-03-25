@@ -43,8 +43,6 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private final int dwpResponseDueDaysChildSupport;
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
-    @Value("${feature.direction-hearings.enabled}")
-    private boolean isDirectionHearingsEnabled;
 
     @Autowired
     public DirectionIssuedAboutToSubmitHandler(FooterService footerService,
@@ -76,21 +74,22 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         SscsDocumentTranslationStatus documentTranslationStatus = caseData.isLanguagePreferenceWelsh() && callback.getEvent() == EventType.DIRECTION_ISSUED ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
         log.info("DocumentTranslationStatus is {},  for case id : {}", documentTranslationStatus, caseData.getCcdCaseId());
-        if (isDirectionHearingsEnabled) {
-            YesNo selectNextHmcHearingType = caseData.getSelectNextHmcHearingType();
-            if (isNoOrNull(selectNextHmcHearingType)) {
-                Optional.ofNullable(caseData.getAppeal())
-                    .map(Appeal::getHearingOptions)
-                    .ifPresent(hearingOptions -> hearingOptions.setHmcHearingType(null));
-            } else {
-                caseData.getAppeal()
-                    .setHearingOptions(Optional.ofNullable(caseData.getAppeal().getHearingOptions())
-                        .map(HearingOptions::toBuilder)
-                        .orElseGet(HearingOptions::builder)
-                        .hmcHearingType(caseData.getHmcHearingType())
-                        .build());
-            }
+        YesNo selectNextHmcHearingType = caseData.getSelectNextHmcHearingType();
+        if (isNoOrNull(selectNextHmcHearingType)) {
+            Optional.ofNullable(caseData.getAppeal())
+                .map(Appeal::getHearingOptions)
+                .ifPresent(hearingOptions -> hearingOptions.setHmcHearingType(null));
+        } else {
+            caseData.getAppeal()
+                .setHearingOptions(Optional.ofNullable(caseData.getAppeal().getHearingOptions())
+                    .map(HearingOptions::toBuilder)
+                    .orElseGet(HearingOptions::builder)
+                    .hmcHearingType(caseData.getHmcHearingType())
+                    .build());
         }
+        Optional.ofNullable(caseData.getSchedulingAndListingFields())
+            .map(SchedulingAndListingFields::getOverrideFields)
+            .ifPresent(overrideFields -> overrideFields.setHmcHearingType(null));
         return validateDirectionType(caseData)
             .or(() -> validateDirectionDueDate(caseData))
             .orElseGet(() -> validateForPdfAndCreateCallbackResponse(callback, caseDetails, caseData, documentTranslationStatus));

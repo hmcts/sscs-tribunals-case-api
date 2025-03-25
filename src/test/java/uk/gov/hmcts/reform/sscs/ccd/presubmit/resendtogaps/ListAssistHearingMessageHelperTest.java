@@ -16,9 +16,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
-import uk.gov.hmcts.reform.sscs.service.servicebus.HearingMessagingServiceFactory;
-import uk.gov.hmcts.reform.sscs.service.servicebus.JmsMessagingService;
-import uk.gov.hmcts.reform.sscs.service.servicebus.SessionAwareServiceBusMessagingService;
+import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingMessageService;
+import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingMessagingServiceFactory;
 
 public class ListAssistHearingMessageHelperTest {
 
@@ -26,10 +25,7 @@ public class ListAssistHearingMessageHelperTest {
     private HearingMessagingServiceFactory hearingMessagingServiceFactory;
 
     @Mock
-    private SessionAwareServiceBusMessagingService sessionAwareServiceBusMessagingService;
-
-    @Mock
-    private JmsMessagingService jmsMessagingService;
+    private HearingMessageService hearingsMessageService;
 
     @Captor
     private ArgumentCaptor<HearingRequest> hearingRequestCaptor;
@@ -47,37 +43,18 @@ public class ListAssistHearingMessageHelperTest {
     @Test
     public void shouldSendExpectedCancellationMessage_sessionAwareMessageBus() {
         when(hearingMessagingServiceFactory.getMessagingService(LIST_ASSIST))
-            .thenReturn(sessionAwareServiceBusMessagingService);
+            .thenReturn(hearingsMessageService);
         messageHelper.sendListAssistCancelHearingMessage(CCD_CASE_ID, CancellationReason.OTHER);
-        verify(sessionAwareServiceBusMessagingService).sendMessage(hearingRequestCaptor.capture());
+        verify(hearingsMessageService).sendMessage(hearingRequestCaptor.capture());
         assertCancelHearingRequest(hearingRequestCaptor.getValue());
     }
 
     @Test
     public void shouldSendExpectedCreateMessage_sessionAwareMessageBus() {
         when(hearingMessagingServiceFactory.getMessagingService(LIST_ASSIST))
-            .thenReturn(sessionAwareServiceBusMessagingService);
+            .thenReturn(hearingsMessageService);
         messageHelper.sendListAssistCreateHearingMessage(CCD_CASE_ID);
-        verify(sessionAwareServiceBusMessagingService).sendMessage(hearingRequestCaptor.capture());
-        assertCreateHearingRequest(hearingRequestCaptor.getValue());
-    }
-
-    @Test
-    public void shouldSendExpectedCancellationMessage_jms() {
-        when(hearingMessagingServiceFactory.getMessagingService(LIST_ASSIST))
-            .thenReturn(jmsMessagingService);
-        messageHelper.sendListAssistCancelHearingMessage(CCD_CASE_ID, CancellationReason.OTHER);
-        verify(jmsMessagingService).sendMessage(hearingRequestCaptor.capture());
-        assertCancelHearingRequest(hearingRequestCaptor.getValue());
-
-    }
-
-    @Test
-    public void shouldSendExpectedCreateMessage_jms() {
-        when(hearingMessagingServiceFactory.getMessagingService(LIST_ASSIST))
-            .thenReturn(jmsMessagingService);
-        messageHelper.sendListAssistCreateHearingMessage(CCD_CASE_ID);
-        verify(jmsMessagingService).sendMessage(hearingRequestCaptor.capture());
+        verify(hearingsMessageService).sendMessage(hearingRequestCaptor.capture());
         assertCreateHearingRequest(hearingRequestCaptor.getValue());
     }
 

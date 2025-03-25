@@ -66,6 +66,9 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
             appellantInterpreter.setInterpreterLanguage(interpreterLanguages);
 
             log.info("{} Languages in DynamicList for caseId {}", interpreterLanguages.getListItems().size(), caseId);
+            if (isNull(overrideFields.getHmcHearingType())) {
+                overrideFields.setHmcHearingType(sscsCaseData.getHmcHearingType());
+            }
         }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);

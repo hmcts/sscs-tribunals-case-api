@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.util;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.function.Predicate.not;
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
@@ -11,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.managedocuments.UploadDocumentMidEventHandler.getDocumentIdFromUrl;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.FACE_TO_FACE;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.NOT_ATTENDING;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
@@ -51,9 +53,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InternalCaseDocumentData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.JudicialUserPanel;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LibertyToApplyActions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PermissionToAppealActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
@@ -137,14 +142,14 @@ public class SscsUtil {
 
         if (nonNull(panel)) {
             setAdjournmentPanelMembersExclusions(panelMemberExclusions,
-                    panel.getAllPanelMembers(),
-                    arePanelMembersReserved ? AdjournCasePanelMembersExcluded.RESERVED : AdjournCasePanelMembersExcluded.YES);
+                panel.getAllPanelMembers(),
+                arePanelMembersReserved ? AdjournCasePanelMembersExcluded.RESERVED : AdjournCasePanelMembersExcluded.YES);
         }
     }
 
     public static void setAdjournmentPanelMembersExclusions(PanelMemberExclusions exclusions,
-                                           List<JudicialUserBase> adjournmentPanelMembers,
-                                           AdjournCasePanelMembersExcluded panelMemberExcluded) {
+                                                            List<JudicialUserBase> adjournmentPanelMembers,
+                                                            AdjournCasePanelMembersExcluded panelMemberExcluded) {
         if (nonNull(adjournmentPanelMembers)) {
             List<CollectionItem<JudicialUserBase>> panelMembersList = getPanelMembersList(exclusions, panelMemberExcluded);
 
@@ -163,18 +168,18 @@ public class SscsUtil {
             if (panelMemberExcluded.equals(AdjournCasePanelMembersExcluded.YES)) {
                 log.info("Excluding {} panel members with Personal Codes {}", adjournmentPanelMembers.size(),
                     adjournmentPanelMembers.stream()
-                            .filter(Objects::nonNull)
-                            .map(JudicialUserBase::getPersonalCode)
-                            .toList());
+                        .filter(Objects::nonNull)
+                        .map(JudicialUserBase::getPersonalCode)
+                        .toList());
 
                 exclusions.setExcludedPanelMembers(panelMembersList);
                 exclusions.setArePanelMembersExcluded(YES);
             } else if (panelMemberExcluded.equals(AdjournCasePanelMembersExcluded.RESERVED)) {
                 log.info("Reserving {} panel members with Personal Codes {}", adjournmentPanelMembers.size(),
                     adjournmentPanelMembers.stream()
-                            .filter(Objects::nonNull)
-                            .map(JudicialUserBase::getPersonalCode)
-                            .toList());
+                        .filter(Objects::nonNull)
+                        .map(JudicialUserBase::getPersonalCode)
+                        .toList());
 
                 exclusions.setReservedPanelMembers(panelMembersList);
                 exclusions.setArePanelMembersReserved(YES);
@@ -183,7 +188,7 @@ public class SscsUtil {
     }
 
     private static List<CollectionItem<JudicialUserBase>> getPanelMembersList(PanelMemberExclusions exclusions,
-                                                                        AdjournCasePanelMembersExcluded panelMemberExcluded) {
+                                                                              AdjournCasePanelMembersExcluded panelMemberExcluded) {
         if (panelMemberExcluded.equals(AdjournCasePanelMembersExcluded.YES)) {
             return exclusions.getExcludedPanelMembers();
         }
@@ -207,25 +212,67 @@ public class SscsUtil {
                                                          DocumentLink documentLink,
                                                          DocumentType documentType,
                                                          EventType eventType) {
+        addDocumentToDocumentTabAndBundle(footerService, caseData, documentLink, documentType, eventType, false);
+    }
+
+
+    public static void addDocumentToDocumentTabAndBundle(FooterService footerService,
+                                                         SscsCaseData caseData,
+                                                         DocumentLink documentLink,
+                                                         DocumentType documentType,
+                                                         EventType eventType,
+                                                         boolean shouldBeIssued) {
         if (nonNull(documentLink)) {
             String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
             SscsDocumentTranslationStatus documentTranslationStatus = getDocumentTranslationStatus(caseData);
 
             footerService.createFooterAndAddDocToCase(documentLink, caseData, documentType, now,
-                null, null, documentTranslationStatus, eventType);
+                null, null, documentTranslationStatus, eventType, shouldBeIssued);
 
             updateTranslationStatus(caseData, documentTranslationStatus);
         }
     }
 
     public static void addDocumentToCaseDataDocuments(SscsCaseData caseData, SscsDocument sscsDocument) {
-        List<SscsDocument> documents = new ArrayList<>();
-        documents.add(sscsDocument);
-
-        if (caseData.getSscsDocument() != null) {
-            documents.addAll(caseData.getSscsDocument());
-        }
+        List<SscsDocument> documents = new ArrayList<>(emptyIfNull(caseData.getSscsDocument()));
+        documents.addFirst(sscsDocument);
         caseData.setSscsDocument(documents);
+    }
+
+    public static void removeDocumentFromCaseDataDocuments(SscsCaseData caseData, SscsDocument sscsDocument) {
+        List<SscsDocument> caseDocuments = new ArrayList<>(emptyIfNull(caseData.getSscsDocument()));
+        caseDocuments = removeDocumentFromDocList(getDocumentIdFromUrl(sscsDocument), caseDocuments);
+        caseData.setSscsDocument(caseDocuments);
+    }
+
+    public static void addDocumentToCaseDataInternalDocuments(SscsCaseData caseData, SscsDocument sscsDocument) {
+        if (!isNull(sscsDocument.getValue().getDocumentFileName()) && sscsDocument.getValue().getDocumentFileName().startsWith("Addition ")) {
+            String[] splitFileName = sscsDocument.getValue().getDocumentFileName().split("- ");
+            String newFileName = String.join(" ", Arrays.copyOfRange(splitFileName, 1, splitFileName.length));
+            sscsDocument.getValue().setDocumentFileName(newFileName);
+        }
+        sscsDocument.getValue().setBundleAddition(null);
+        sscsDocument.getValue().setEvidenceIssued(null);
+        InternalCaseDocumentData internalCaseDocumentData = Optional.ofNullable(caseData.getInternalCaseDocumentData())
+            .orElse(InternalCaseDocumentData.builder().build());
+        List<SscsDocument> documents = new ArrayList<>(emptyIfNull(internalCaseDocumentData.getSscsInternalDocument()));
+        documents.addFirst(sscsDocument);
+        internalCaseDocumentData.setSscsInternalDocument(documents);
+        caseData.setInternalCaseDocumentData(internalCaseDocumentData);
+    }
+
+    public static void removeDocumentFromCaseDataInternalDocuments(SscsCaseData caseData, SscsDocument sscsDocument) {
+        InternalCaseDocumentData internalCaseDocumentData = Optional.ofNullable(caseData.getInternalCaseDocumentData())
+            .orElse(InternalCaseDocumentData.builder().build());
+        List<SscsDocument> caseDocuments = new ArrayList<>(emptyIfNull(internalCaseDocumentData.getSscsInternalDocument()));
+        caseDocuments = removeDocumentFromDocList(getDocumentIdFromUrl(sscsDocument), caseDocuments);
+        internalCaseDocumentData.setSscsInternalDocument(caseDocuments);
+        caseData.setInternalCaseDocumentData(internalCaseDocumentData);
+    }
+
+    private static List<SscsDocument> removeDocumentFromDocList(String docId, List<SscsDocument> caseDocuments) {
+        return caseDocuments.stream()
+            .filter(doc -> !getDocumentIdFromUrl(doc).equalsIgnoreCase(docId)).toList();
     }
 
     public static DocumentType getPostHearingReviewDocumentType(PostHearing postHearing, boolean isPostHearingsEnabled) {
@@ -340,7 +387,7 @@ public class SscsUtil {
     public static boolean isOriginalDecisionNoticeUploaded(SscsCaseData sscsCaseData) {
         return isNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecision());
     }
-      
+
     public static boolean isGapsCase(SscsCaseData sscsCaseData) {
         return GAPS.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute());
     }
@@ -357,11 +404,11 @@ public class SscsUtil {
         }
 
         if (isNull(categoryMapService.getSessionCategory(caseData.getBenefitCode(), caseData.getIssueCode(),
-                isSecondDoctorPresent, fqpmRequired))) {
+            isSecondDoctorPresent, fqpmRequired))) {
             response.addError(INVALID_BENEFIT_ISSUE_CODE);
         }
     }
-  
+
     public static String buildWriteFinalDecisionHeldBefore(SscsCaseData caseData, @NonNull String signedInJudgeName) {
         List<String> names = new ArrayList<>();
         names.add(signedInJudgeName);
@@ -413,9 +460,9 @@ public class SscsUtil {
         if (nonNull(hearing)) {
             HearingDetails hearingDetails = hearing.getValue();
             return nonNull(hearingDetails)
-                    && isNotBlank(hearingDetails.getHearingDate())
-                    && nonNull(hearingDetails.getVenue())
-                    && isNotBlank(hearingDetails.getVenue().getName());
+                && isNotBlank(hearingDetails.getHearingDate())
+                && nonNull(hearingDetails.getVenue())
+                && isNotBlank(hearingDetails.getVenue().getName());
         }
 
         return false;
@@ -423,9 +470,9 @@ public class SscsUtil {
 
     public static DynamicList getPortsOfEntry() {
         List<DynamicListItem> items = Arrays.stream(UkPortOfEntry.values())
-                .sorted(Comparator.comparing(UkPortOfEntry::getLabel))
-                .map(ukPortOfEntry -> new DynamicListItem(ukPortOfEntry.getLocationCode(), ukPortOfEntry.getLabel()))
-                .toList();
+            .sorted(Comparator.comparing(UkPortOfEntry::getLabel))
+            .map(ukPortOfEntry -> new DynamicListItem(ukPortOfEntry.getLocationCode(), ukPortOfEntry.getLabel()))
+            .toList();
 
         return new DynamicList(null, items);
     }
@@ -440,18 +487,18 @@ public class SscsUtil {
 
     public static DynamicList getBenefitDescriptions() {
         List<DynamicListItem> items = Arrays.stream(Benefit.values())
-                .sorted(Comparator.comparing(Benefit::getDescription))
-                .map(SscsUtil::getBenefitDescriptionList)
-                .flatMap(List::stream)
-                .toList();
+            .sorted(Comparator.comparing(Benefit::getDescription))
+            .map(SscsUtil::getBenefitDescriptionList)
+            .flatMap(List::stream)
+            .toList();
 
         return new DynamicList(null, items);
     }
 
     private static List<DynamicListItem> getBenefitDescriptionList(Benefit benefit) {
         return benefit.getCaseLoaderKeyId().stream()
-                .map(code -> new DynamicListItem(code, benefit.getDescription() + " / " + code))
-                .toList();
+            .map(code -> new DynamicListItem(code, benefit.getDescription() + " / " + code))
+            .toList();
     }
 
     public static void handleBenefitType(SscsCaseData caseData) {
@@ -574,7 +621,7 @@ public class SscsUtil {
     private static String hearingChannelToYesNoString(HearingChannel expectedHearingChannel, HearingChannel hearingChannel) {
         return expectedHearingChannel.equals(hearingChannel) ? YES.toString() : NO.toString();
     }
-  
+
     public static void createFinalDecisionNoticeFromPreviewDraft(Callback<SscsCaseData> callback,
                                                                  FooterService footerService,
                                                                  boolean isPostHearingsEnabled) {
@@ -582,10 +629,10 @@ public class SscsUtil {
         DocumentLink docLink = sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument();
 
         DocumentLink documentLink = DocumentLink.builder()
-                .documentUrl(docLink.getDocumentUrl())
-                .documentFilename(docLink.getDocumentFilename())
-                .documentBinaryUrl(docLink.getDocumentBinaryUrl())
-                .build();
+            .documentUrl(docLink.getDocumentUrl())
+            .documentFilename(docLink.getDocumentFilename())
+            .documentBinaryUrl(docLink.getDocumentBinaryUrl())
+            .build();
 
         String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         DocumentType docType = SscsUtil.getIssueFinalDecisionDocumentType(sscsCaseData, callback.getEvent(), isPostHearingsEnabled);
@@ -632,8 +679,15 @@ public class SscsUtil {
 
     public static String getSscsType(SscsCaseData caseData) {
         return !isNull(caseData.getBenefitCode())
-                ? Benefit.getBenefitFromBenefitCode(caseData.getBenefitCode()).getSscsType().getId().toUpperCase()
-                : null;
+            ? Benefit.getBenefitFromBenefitCode(caseData.getBenefitCode()).getSscsType().getId().toUpperCase()
+            : null;
+    }
+
+    public static HmcHearingType getHmcHearingType(SscsCaseData sscsCaseData) {
+        return Optional.ofNullable(sscsCaseData.getSchedulingAndListingFields())
+            .map(SchedulingAndListingFields::getOverrideFields)
+            .map(OverrideFields::getHmcHearingType)
+            .orElse(sscsCaseData.getHmcHearingType());
     }
 }
 
