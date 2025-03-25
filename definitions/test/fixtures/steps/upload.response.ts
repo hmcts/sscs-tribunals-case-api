@@ -31,19 +31,23 @@ export class UploadResponse extends BaseStep {
     let historyLinks = this.presetLinks;
     historyLinks.push('Add a hearing');
     if (needsToLogin) {
-      await this.fastLoginUserWithCaseId(credentials.hmrcSuperUser, caseId);
+      await this.loginUserWithCaseId(credentials.hmrcSuperUser, false, caseId);
     }
     await this.homePage.navigateToTab('Summary');
-    await this.summaryTab.verifyPresenceOfText('Ready to list');
     await this.homePage.delay(1000);
     await this.homePage.reloadPage();
-    await this.homePage.navigateToTab('History');
     try {
+      await this.homePage.navigateToTab('Summary');
+      await this.summaryTab.verifyPresenceOfText('Ready to list');
+      await this.homePage.navigateToTab('History');
       await Promise.all(
         historyLinks.map((linkName) => this.verifyHistoryTabLink(linkName))
       );
     } catch {
       await this.homePage.reloadPage();
+      await this.homePage.navigateToTab('Summary');
+      await this.summaryTab.verifyPresenceOfText('Ready to list');
+      await this.homePage.navigateToTab('History');
       await Promise.all(
         historyLinks.map((linkName) => this.verifyHistoryTabLink(linkName))
       );
@@ -201,8 +205,9 @@ export class UploadResponse extends BaseStep {
     needsToLogin: boolean = true
   ) {
     if (needsToLogin) {
-      await this.fastLoginUserWithCaseId(
+      await this.loginUserWithCaseId(
         credentials.dwpResponseWriter,
+        false,
         ucCaseId
       );
     }
