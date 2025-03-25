@@ -50,7 +50,7 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
         //            tribunalComms = sscsCaseData.getTribunalCommunications().getTribunalCommunicationFields();
         //        }
         TribunalCommunication tribunalCommunication = Optional.ofNullable(sscsCaseData.getTribunalCommunications()).orElse(TribunalCommunication.builder().build());
-        List <TribunalCommunicationFields>tribunalComms = tribunalCommunication.getTribunalCommunicationFields() != null ? tribunalCommunication.getTribunalCommunicationFields() : Collections.emptyList();
+        List <TribunalCommunicationFields> tribunalComms = tribunalCommunication.getTribunalCommunicationFields() != null ? tribunalCommunication.getTribunalCommunicationFields() : Collections.emptyList();
         String topic = tribunalCommunication.getTribunalRequestTopic();
         String question = tribunalCommunication.getTribunalRequestQuestion();
         LocalDateTime now = LocalDateTime.now();
