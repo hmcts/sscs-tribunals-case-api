@@ -94,38 +94,5 @@
     "PageID": "moveDocuments",
     "FieldShowCondition": "uploadRemoveOrMoveDocument=\"move\" AND moveDocumentTo=\"document\"",
     "RetainHiddenValue": "No"
-  },
-  {
-    "LiveFrom": "18/03/2025",
-    "CaseEventID": "tribunalCommunication",
-    "CaseFieldID" : "tribunalRequestType",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder" : 1,
-    "PageID": "1.0",
-    "PageLabel": "Select Tribunal Communication Type"
-  },
-  {
-    "LiveFrom": "18/03/2025",
-    "CaseEventID": "tribunalCommunication",
-    "CaseFieldID" : "tribunalRequestTopic",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
-    "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder" : 1,
-    "PageID": "2.0",
-    "PageShowCondition": "tribunalRequestType=\"newRequest\"",
-    "PageLabel": "Send a Tribunal Communication Request"
-  },
-  {
-    "LiveFrom": "18/03/2025",
-    "CaseEventID": "tribunalCommunication",
-    "CaseFieldID" : "tribunalRequestQuestion",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
-    "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder" : 2,
-    "PageID": "2.0"
   }
 ]
