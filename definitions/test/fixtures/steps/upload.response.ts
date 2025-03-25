@@ -31,7 +31,7 @@ export class UploadResponse extends BaseStep {
     let historyLinks = this.presetLinks;
     historyLinks.push('Add a hearing');
     if (needsToLogin) {
-      await this.fastLoginUserWithCaseId(credentials.hmrcSuperUser, caseId);
+      await this.loginUserWithCaseId(credentials.hmrcSuperUser, false, caseId);
     }
     await this.homePage.navigateToTab('Summary');
     await this.homePage.delay(1000);
@@ -205,8 +205,9 @@ export class UploadResponse extends BaseStep {
     needsToLogin: boolean = true
   ) {
     if (needsToLogin) {
-      await this.fastLoginUserWithCaseId(
+      await this.loginUserWithCaseId(
         credentials.dwpResponseWriter,
+        false,
         ucCaseId
       );
     }
