@@ -990,7 +990,7 @@ public class NotificationsIt extends NotificationsItBase {
                 LIST_ASSIST_ROUTE,
                 Collections.singletonList("aa0930a3-e1bd-4b50-ac6b-34df73ec8378"),
                 Collections.singletonList("8aa77a9c-9bc6-424d-8716-1c948681270e"),
-                Arrays.asList("TB-SCS-LET-ENG-Hearing-Booked.docx", "TB-SCS-LET-ENG-Hearing-Booked.docx"),
+                Arrays.asList("TB-SCS-LET-ENG-Hearing-Booked-v2.docx", "TB-SCS-LET-ENG-Hearing-Booked-v2.docx"),
                 "yes",
                 "yes",
                 "1",

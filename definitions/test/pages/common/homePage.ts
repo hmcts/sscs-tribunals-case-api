@@ -21,6 +21,7 @@ export class HomePage {
   readonly beforeTabBtn: Locator;
   readonly hearingRecordingsTab: Locator;
   readonly documentsTab: Locator;
+  readonly internalDocumentsTab: Locator;
   readonly listingRequirementsTab: Locator;
   readonly subscriptionsTab: Locator;
   readonly audioVideoEvidenceTab: Locator;
@@ -34,52 +35,30 @@ export class HomePage {
 
   constructor(page: Page) {
     this.page = page;
-    this.notePadTab = page.locator('//div[contains(text(), "Notepad")]');
-    this.summaryTab = page.getByRole('tab', { name: 'Summary', exact: true });
-    this.historyTab = page.getByRole('tab', { name: 'History', exact: true });
-    this.tasksTab = page.getByRole('tab', { name: 'Tasks', exact: true });
-    this.welshTab = page.getByRole('tab', { name: 'Welsh', exact: true });
-    this.rolesAndAccessTab = page.getByRole('tab', {
-      name: 'Roles and access',
-      exact: true
-    });
-    this.appealDetailsTab = page.getByRole('tab', { name: 'Appeal Details', exact: true });
-    this.bundlesTab = page.getByRole('tab', { name: 'Bundles', exact: true });
+
+    this.notePadTab = page.getByRole('tab').filter({ hasText: /^Notepad$/ });
+    this.summaryTab = page.getByRole('tab').filter({ hasText: /^Summary$/ });
+    this.historyTab = page.getByRole('tab').filter({ hasText: /^History$/ });
+    this.tasksTab = page.getByRole('tab').filter({ hasText: /^Tasks$/ });
+    this.welshTab = page.getByRole('tab').filter({ hasText: /^Welsh$/ });
+    this.rolesAndAccessTab = page.getByRole('tab').filter({ hasText: /^Roles and access$/ });
+    this.appealDetailsTab = page.getByRole('tab').filter({ hasText: /^Appeal Details$/ });
+    this.bundlesTab = page.getByRole('tab').filter({ hasText: /^Bundles$/ });
     this.nextStepDropDown = '#next-step';
     this.submitNextStepButton = '//button[@class="submit"]';
     this.eventTitle = page.locator('h1.govuk-heading-l');
-    this.hearingRecordingsTab = page.getByRole('tab', {
-      name: 'Hearing Recordings',
-      exact: true
-    });
-    this.documentsTab = page.getByRole('tab', {
-      name: 'Documents',
-      exact: true
-    });
-    this.listingRequirementsTab = page.getByRole('tab', {
-      name: 'Listing Requirements',
-      exact: true
-    });
-    this.audioVideoEvidenceTab = page.getByRole('tab', {
-      name: 'Audio/Video evidence',
-      exact: true
-    });
+    this.hearingRecordingsTab = page.getByRole('tab').filter({ hasText: /^Hearing Recordings$/ });
+    this.documentsTab = page.getByRole('tab').filter({ hasText: /^Documents$/ });
+    this.internalDocumentsTab = page.getByRole('tab').filter({ hasText: /^Tribunal Internal Documents$/ });
+    this.listingRequirementsTab = page.getByRole('tab').filter({ hasText: /^Listing Requirements$/ });
+    this.audioVideoEvidenceTab = page.getByRole('tab').filter({ hasText: /^Audio\/Video evidence$/ });
     this.beforeTabBtn = page.locator(
       '//html/body/exui-root/exui-case-home/div/exui-case-details-home/exui-case-viewer-container/ccd-case-viewer/div/ccd-case-full-access-view/div[2]/div/mat-tab-group/mat-tab-header/button[1]/div'
     );
-    this.subscriptionsTab = page.getByRole('tab', {
-      name: 'Subscriptions',
-      exact: true
-    });
-    this.ftaDocumentsTab = page.getByRole('tab', {
-      name: 'FTA Documents',
-      exact: true
-    });
-    this.otherPartyDetailsTab = page.getByRole('tab', {
-      name: 'Other Party Details',
-      exact: true
-    });
-    this.hearingsTab = page.getByRole('tab', { name: 'Hearings', exact: true });
+    this.subscriptionsTab = page.getByRole('tab').filter({ hasText: /^Subscriptions$/ });
+    this.ftaDocumentsTab = page.getByRole('tab').filter({ hasText: /^FTA Documents$/ });
+    this.otherPartyDetailsTab = page.getByRole('tab').filter({ hasText: /^Other Party Details$/ });
+    this.hearingsTab = page.getByRole('tab').filter({ hasText: /^Hearings$/ });
     this.afterTabBtn = page.locator(
       '//html/body/exui-root/exui-case-home/div/exui-case-details-home/exui-case-viewer-container/ccd-case-viewer/div/ccd-case-full-access-view/div[2]/div/mat-tab-group/mat-tab-header/button[2]/div'
     );
@@ -138,22 +117,7 @@ export class HomePage {
     const expUrl = this.page.url();
 
     if (environment.name == 'pr') {
-      if (environment.hearingsEnabled == 'Yes') {
-        let matches = expUrl.match(/(\d+)/);
-        let PrNo = matches[0];
-        logger.debug(`PR number on url is ###### ${PrNo}`);
-
-        const optionToSelect = await this.page
-          .locator('option', { hasText: PrNo })
-          .textContent();
-        logger.debug(`case type dropdown value is ###### ${optionToSelect}`);
-        await webActions.chooseOptionByLabel(
-          this.caseTypeDropdown,
-          optionToSelect
-        );
-      } else {
-        await this.searchCaseWithPreviewDef();
-      }
+      await this.searchCaseWithPreviewDef();
     } else if (environment.name == 'aat') {
       await this.searchCaseWithAATDef();
     } else {
@@ -247,17 +211,24 @@ export class HomePage {
         break;
       }
       case 'History': {
-        await expect(this.historyTab).toBeVisible();
-        await this.historyTab.click();
+        try {
+          await expect(this.historyTab).toBeVisible();
+          await this.historyTab.click();
+          await expect(this.page.locator('table.EventLogTable')).toBeVisible({ timeout: 10000 });
+        } catch {
+          await this.page.goto(this.getUrlWithoutTab() + '#History');
+          await expect(this.page.locator('table.EventLogTable')).toBeVisible();
+        }
         break;
       }
       case 'Summary': {
         try {
           await expect(this.summaryTab).toBeVisible();
           await this.summaryTab.click();
+          await expect(this.page.locator('#summaryCreatedInGapsFrom')).toBeVisible({ timeout: 10000 });
         } catch {
-          await this.clickBeforeTabBtn();
-          await this.summaryTab.click();
+          await this.page.goto(this.getUrlWithoutTab() + '#Summary');
+          await expect(this.page.locator('#summaryCreatedInGapsFrom')).toBeVisible();
         }
         break;
       }
@@ -296,9 +267,21 @@ export class HomePage {
         await this.documentsTab.click();
         break;
       }
+      case 'Tribunal Internal Documents': {
+        await expect(this.internalDocumentsTab).toBeVisible();
+        await this.internalDocumentsTab.click();
+        break;
+      }
       case 'Listing Requirements': {
-        await expect(this.listingRequirementsTab).toBeVisible();
-        await this.listingRequirementsTab.click();
+        try {
+          await expect(this.listingRequirementsTab).toBeVisible();
+          await this.delay(3000);
+          await this.listingRequirementsTab.click();
+          await expect(this.page.locator('div.case-viewer-label').filter({hasText: 'Tribunal direct PO to attend?'}).first()).toBeVisible({ timeout: 10000 });
+        } catch {
+          await this.page.goto(this.getUrlWithoutTab() + '#Listing Requirements');
+          await expect(this.page.locator('div.case-viewer-label').filter({hasText: 'Tribunal direct PO to attend?'}).first()).toBeVisible();
+        }
         break;
       }
       case 'Audio/Video Evidence': {
@@ -329,6 +312,11 @@ export class HomePage {
         break;
       }
     }
+  }
+
+  getUrlWithoutTab(): string {
+    let url = this.page.url().split('#')[0];
+    return url.split('/hearings')[0];
   }
 
   async startCaseCreate(jurisdiction, caseType, event): Promise<void> {

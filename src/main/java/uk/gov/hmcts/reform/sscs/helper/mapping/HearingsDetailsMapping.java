@@ -6,13 +6,13 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingPriority.STANDARD;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingPriority.URGENT;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getHmcHearingType;
 
 import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCasePanelMembersExcluded;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTime;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AmendReason;
@@ -35,11 +35,7 @@ import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 @Slf4j
 public final class HearingsDetailsMapping {
 
-    @Value("${feature.direction-hearings.enabled}")
-    private static boolean isDirectionHearingsEnabled;
-
     private HearingsDetailsMapping() {
-
     }
 
     public static HearingDetails buildHearingDetails(HearingWrapper wrapper, ReferenceDataServiceHolder refData) throws ListingException {
@@ -81,8 +77,8 @@ public final class HearingsDetailsMapping {
     }
 
     public static HmcHearingType getHearingType(SscsCaseData sscsCaseData) {
-        return isDirectionHearingsEnabled && sscsCaseData.getHmcHearingType() != null
-            ? sscsCaseData.getHmcHearingType() : HmcHearingType.SUBSTANTIVE;
+        return getHmcHearingType(sscsCaseData) != null
+                ? getHmcHearingType(sscsCaseData) : HmcHearingType.SUBSTANTIVE;
     }
 
     public static boolean isCaseUrgent(@Valid SscsCaseData caseData) {
