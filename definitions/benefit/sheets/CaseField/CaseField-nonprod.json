@@ -1,6 +1,8 @@
 [
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "functionalTest", "Label": "From functional test", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom":"18/03/2025", "CaseTypeID": "Benefit", "ID" : "tribunalRequestType", "Label" : "New Request", "FieldType" : "FixedRadioList", "FieldTypeParameter": "FL_tribunalRequestType", "SecurityClassification": "PUBLIC"},
   {"LiveFrom":"18/03/2025", "CaseTypeID": "Benefit", "ID" : "tribunalRequestTopic", "Label" : "Tribunal Topic", "FieldType" : "FixedList", "FieldTypeParameter": "FL_tribunalRequestTopic", "SecurityClassification": "PUBLIC"},
   {"LiveFrom":"18/03/2025", "CaseTypeID": "Benefit", "ID" : "tribunalRequestQuestion", "Label" : "Request Question", "FieldType" : "TextArea", "Max" : "500", "SecurityClassification": "PUBLIC"},
   {"LiveFrom":"18/03/2025", "CaseTypeID": "Benefit", "ID" : "tribunalCommunicationFields", "Label" : "Tribunal Communications", "FieldType" : "Collection", "FieldTypeParameter": "tribunalRequest", "SecurityClassification": "PUBLIC"}
+
 ]

@@ -1,4 +1,13 @@
 [
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "internal_documents_clerk", "TabLabel": "Tribunal Internal Documents", "TabDisplayOrder": 8, "CaseFieldID": "sscsInternalDocument", "TabFieldDisplayOrder": 1, "TabShowCondition": "sscsInternalDocument=\"*\"", "FieldShowCondition": "sscsInternalDocument=\"*\""},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-clerk", "TabID": "internal_documents_clerk", "TabLabel": "Tribunal Internal Documents", "TabDisplayOrder": 8, "CaseFieldID": "dwpState", "TabFieldDisplayOrder": 2, "FieldShowCondition": "sscsInternalDocument=\"DONOTSHOW\""},
+
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "internal_documents_judge", "TabLabel": "Tribunal Internal Documents", "TabDisplayOrder": 8, "CaseFieldID": "sscsInternalDocument", "TabFieldDisplayOrder": 1, "TabShowCondition": "sscsInternalDocument=\"*\"", "FieldShowCondition": "sscsInternalDocument=\"*\""},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-judge", "TabID": "internal_documents_judge", "TabLabel": "Tribunal Internal Documents", "TabDisplayOrder": 8, "CaseFieldID": "dwpState", "TabFieldDisplayOrder": 2, "FieldShowCondition": "sscsInternalDocument=\"DONOTSHOW\""},
+
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "internal_documents_superuser", "TabLabel": "Tribunal Internal Documents", "TabDisplayOrder": 8, "CaseFieldID": "sscsInternalDocument", "TabFieldDisplayOrder": 1, "TabShowCondition": "sscsInternalDocument=\"*\"", "FieldShowCondition": "sscsInternalDocument=\"*\""},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "TabID": "internal_documents_superuser", "TabLabel": "Tribunal Internal Documents", "TabDisplayOrder": 8, "CaseFieldID": "dwpState", "TabFieldDisplayOrder": 2, "FieldShowCondition": "sscsInternalDocument=\"DONOTSHOW\""},
+
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "tribunal_communications", "TabLabel": "Tribunal Communications", "TabDisplayOrder": 12, "CaseFieldID": "tribunalCommunicationFields", "TabFieldDisplayOrder": 2, "TabShowCondition": "tribunalCommunicationFields=\"*\"", "FieldShowCondition": "tribunalCommunicationFields=\"*\""},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs", "TabID": "tribunal_communications", "TabLabel": "Tribunal Communications", "TabDisplayOrder": 12, "CaseFieldID": "dwpState", "TabFieldDisplayOrder": 2, "FieldShowCondition": "tribunalCommunicationFields=\"DONOTSHOW\""}
 ]
