@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
@@ -16,9 +17,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import junitparams.NamedParameters;
+import junitparams.Parameters;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
@@ -29,6 +32,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartyAttendedQuestion;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartyAttendedQuestionDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceTestBase;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
@@ -55,7 +59,7 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
     @Override
     protected WriteFinalDecisionPreviewDecisionServiceBase createPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
-        DocumentConfiguration documentConfiguration) {
+                                                                                        DocumentConfiguration documentConfiguration) {
         return new GenWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService, genDecisionNoticeQuestionService,
             genDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
     }
@@ -63,47 +67,47 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     @NamedParameters("previewEndDateAndRateCombinations")
     @SuppressWarnings("unused")
     private Object[] previewEndDateAndRateCombinations() {
-        return new Object[] {
-            new Object[] {"2018-11-10", "standardRate", "lower", "lower"},
-            new Object[] {"2018-11-10", "standardRate", "same", "lower"},
-            new Object[] {"2018-11-10", "standardRate", "higher", "lower"},
-            new Object[] {"2018-11-10", "standardRate", "lower", "same"},
-            new Object[] {"2018-11-10", "standardRate", "same", "same"},
-            new Object[] {"2018-11-10", "standardRate", "higher", "same"},
-            new Object[] {"2018-11-10", "enhancedRate", "same", "lower"},
-            new Object[] {"2018-11-10", "enhancedRate", "higher", "lower"},
-            new Object[] {"2018-11-10", "enhancedRate", "same", "same"},
-            new Object[] {"2018-11-10", "enhancedRate", "higher", "same"},
-            new Object[] {"2018-11-10", "noAward", "lower", "lower"},
-            new Object[] {"2018-11-10", "noAward", "same", "lower"},
-            new Object[] {"2018-11-10", "noAward", "lower", "same"},
-            new Object[] {"2018-11-10", "noAward", "same", "same"},
-            new Object[] {"2018-11-10", "notConsidered", "lower", "lower"},
-            new Object[] {"2018-11-10", "notConsidered", "same", "lower"},
-            new Object[] {"2018-11-10", "notConsidered", "higher", "lower"},
-            new Object[] {"2018-11-10", "notConsidered", "lower", "same"},
-            new Object[] {"2018-11-10", "notConsidered", "same", "same"},
-            new Object[] {"2018-11-10", "notConsidered", "higher", "same"},
-            new Object[] {null, "standardRate", "lower", "lower"},
-            new Object[] {null, "standardRate", "same", "lower"},
-            new Object[] {null, "standardRate", "higher", "lower"},
-            new Object[] {null, "standardRate", "lower", "same"},
-            new Object[] {null, "standardRate", "same", "same"},
-            new Object[] {null, "standardRate", "higher", "same"},
-            new Object[] {null, "enhancedRate", "same", "lower"},
-            new Object[] {null, "enhancedRate", "higher", "lower"},
-            new Object[] {null, "enhancedRate", "same", "same"},
-            new Object[] {null, "enhancedRate", "higher", "same"},
-            new Object[] {null, "noAward", "lower", "lower"},
-            new Object[] {null, "noAward", "same", "lower"},
-            new Object[] {null, "noAward", "lower", "same"},
-            new Object[] {null, "noAward", "same", "same"},
-            new Object[] {null, "notConsidered", "lower", "lower"},
-            new Object[] {null, "notConsidered", "same", "lower"},
-            new Object[] {null, "notConsidered", "higher", "lower"},
-            new Object[] {null, "notConsidered", "lower", "same"},
-            new Object[] {null, "notConsidered", "same", "same"},
-            new Object[] {null, "notConsidered", "higher", "same"},
+        return new Object[]{
+            new Object[]{"2018-11-10", "standardRate", "lower", "lower"},
+            new Object[]{"2018-11-10", "standardRate", "same", "lower"},
+            new Object[]{"2018-11-10", "standardRate", "higher", "lower"},
+            new Object[]{"2018-11-10", "standardRate", "lower", "same"},
+            new Object[]{"2018-11-10", "standardRate", "same", "same"},
+            new Object[]{"2018-11-10", "standardRate", "higher", "same"},
+            new Object[]{"2018-11-10", "enhancedRate", "same", "lower"},
+            new Object[]{"2018-11-10", "enhancedRate", "higher", "lower"},
+            new Object[]{"2018-11-10", "enhancedRate", "same", "same"},
+            new Object[]{"2018-11-10", "enhancedRate", "higher", "same"},
+            new Object[]{"2018-11-10", "noAward", "lower", "lower"},
+            new Object[]{"2018-11-10", "noAward", "same", "lower"},
+            new Object[]{"2018-11-10", "noAward", "lower", "same"},
+            new Object[]{"2018-11-10", "noAward", "same", "same"},
+            new Object[]{"2018-11-10", "notConsidered", "lower", "lower"},
+            new Object[]{"2018-11-10", "notConsidered", "same", "lower"},
+            new Object[]{"2018-11-10", "notConsidered", "higher", "lower"},
+            new Object[]{"2018-11-10", "notConsidered", "lower", "same"},
+            new Object[]{"2018-11-10", "notConsidered", "same", "same"},
+            new Object[]{"2018-11-10", "notConsidered", "higher", "same"},
+            new Object[]{null, "standardRate", "lower", "lower"},
+            new Object[]{null, "standardRate", "same", "lower"},
+            new Object[]{null, "standardRate", "higher", "lower"},
+            new Object[]{null, "standardRate", "lower", "same"},
+            new Object[]{null, "standardRate", "same", "same"},
+            new Object[]{null, "standardRate", "higher", "same"},
+            new Object[]{null, "enhancedRate", "same", "lower"},
+            new Object[]{null, "enhancedRate", "higher", "lower"},
+            new Object[]{null, "enhancedRate", "same", "same"},
+            new Object[]{null, "enhancedRate", "higher", "same"},
+            new Object[]{null, "noAward", "lower", "lower"},
+            new Object[]{null, "noAward", "same", "lower"},
+            new Object[]{null, "noAward", "lower", "same"},
+            new Object[]{null, "noAward", "same", "same"},
+            new Object[]{null, "notConsidered", "lower", "lower"},
+            new Object[]{null, "notConsidered", "same", "lower"},
+            new Object[]{null, "notConsidered", "higher", "lower"},
+            new Object[]{null, "notConsidered", "lower", "same"},
+            new Object[]{null, "notConsidered", "same", "same"},
+            new Object[]{null, "notConsidered", "higher", "same"},
         };
     }
 
@@ -263,18 +267,18 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-                .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
-                .documentBinaryUrl(URL + "/binary")
-                .documentUrl(URL)
-                .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
+            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentBinaryUrl(URL + "/binary")
+            .documentUrl(URL)
+            .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = true;
 
         boolean setAsideExpectation = true;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10",
-                appealAllowedExpectation, setAsideExpectation, true, false, true,
-                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, false, true,
+            documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -354,7 +358,7 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     }
 
     @Test
-    public void test() {
+    public void ifIbcCase_handlesCorrectly() {
 
         setCommonNonDescriptorRoutePreviewParams(sscsCaseData);
 
@@ -459,5 +463,48 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(body.getDailyLivingDescriptors());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
+    }
+
+    @Test
+    @Parameters({"093,true,false", "058,false,false", "001,false,false"})
+    public void givenBenefitCodeWriteFinalDecisionTemplateBodyIsIbcaAndHmrcSetCorrectly(String benefitCode, boolean isIbca, boolean isHmrc) {
+        sscsCaseData.setBenefitCode(benefitCode);
+        when(caseDetails.getState()).thenReturn(State.POST_HEARING);
+        sscsCaseData.getPostHearing().getCorrection().setIsCorrectionFinalDecisionInProgress(YES);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision(DATE_OF_DECISION);
+        setHigherRateScenarioFields(sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionJudge(ORIGINAL_JUDGE_NAME);
+        service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false, true, true);
+
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true,
+            true, true, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertEquals(body.isIbca(), isIbca);
+        assertEquals(body.isHmrc(), isHmrc);
+    }
+
+    @Test
+    @Parameters({"INFECTED_BLOOD_COMPENSATION,true,false", "NATIONAL_INSURANCE_CREDITS,false,true", "UC,false,false"})
+    public void givenBenefitTypeWriteFinalDecisionTemplateBodyIsIbcaAndHmrcSetCorrectlyFromFormType(Benefit benefit, boolean isIbca, boolean isHmrc) {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder()
+            .code(benefit.getShortName())
+            .description(benefit.getDescription())
+            .build());
+        when(caseDetails.getState()).thenReturn(State.POST_HEARING);
+        sscsCaseData.getPostHearing().getCorrection().setIsCorrectionFinalDecisionInProgress(YES);
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision(DATE_OF_DECISION);
+        setHigherRateScenarioFields(sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionJudge(ORIGINAL_JUDGE_NAME);
+        service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false, true, true);
+
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true,
+            true, true, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertEquals(body.isIbca(), isIbca);
+        assertEquals(body.isHmrc(), isHmrc);
     }
 }

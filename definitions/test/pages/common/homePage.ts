@@ -211,17 +211,24 @@ export class HomePage {
         break;
       }
       case 'History': {
-        await expect(this.historyTab).toBeVisible();
-        await this.historyTab.click();
+        try {
+          await expect(this.historyTab).toBeVisible();
+          await this.historyTab.click();
+          await expect(this.page.locator('table.EventLogTable')).toBeVisible({ timeout: 10000 });
+        } catch {
+          await this.page.goto(this.getUrlWithoutTab() + '#History');
+          await expect(this.page.locator('table.EventLogTable')).toBeVisible();
+        }
         break;
       }
       case 'Summary': {
         try {
           await expect(this.summaryTab).toBeVisible();
           await this.summaryTab.click();
+          await expect(this.page.locator('#summaryCreatedInGapsFrom')).toBeVisible({ timeout: 10000 });
         } catch {
-          await this.clickBeforeTabBtn();
-          await this.summaryTab.click();
+          await this.page.goto(this.getUrlWithoutTab() + '#Summary');
+          await expect(this.page.locator('#summaryCreatedInGapsFrom')).toBeVisible();
         }
         break;
       }
@@ -266,8 +273,15 @@ export class HomePage {
         break;
       }
       case 'Listing Requirements': {
-        await expect(this.listingRequirementsTab).toBeVisible();
-        await this.listingRequirementsTab.click();
+        try {
+          await expect(this.listingRequirementsTab).toBeVisible();
+          await this.delay(3000);
+          await this.listingRequirementsTab.click();
+          await expect(this.page.locator('div.case-viewer-label').filter({hasText: 'Tribunal direct PO to attend?'}).first()).toBeVisible({ timeout: 10000 });
+        } catch {
+          await this.page.goto(this.getUrlWithoutTab() + '#Listing Requirements');
+          await expect(this.page.locator('div.case-viewer-label').filter({hasText: 'Tribunal direct PO to attend?'}).first()).toBeVisible();
+        }
         break;
       }
       case 'Audio/Video Evidence': {
@@ -298,6 +312,11 @@ export class HomePage {
         break;
       }
     }
+  }
+
+  getUrlWithoutTab(): string {
+    let url = this.page.url().split('#')[0];
+    return url.split('/hearings')[0];
   }
 
   async startCaseCreate(jurisdiction, caseType, event): Promise<void> {
