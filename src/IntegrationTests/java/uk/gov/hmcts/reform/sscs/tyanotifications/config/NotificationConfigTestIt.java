@@ -367,8 +367,8 @@ public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
 
             new Object[]{UPDATE_OTHER_PARTY_DATA, false, OTHER_PARTY, ORAL, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00784-v2.docx"},
             new Object[]{UPDATE_OTHER_PARTY_DATA, false, OTHER_PARTY, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00784-v2.docx"},
-            new Object[]{UPDATE_OTHER_PARTY_DATA, true, OTHER_PARTY, ORAL, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00787.docx"},
-            new Object[]{UPDATE_OTHER_PARTY_DATA, true, OTHER_PARTY, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00787.docx"},
+            new Object[]{UPDATE_OTHER_PARTY_DATA, true, OTHER_PARTY, ORAL, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00787-v2.docx"},
+            new Object[]{UPDATE_OTHER_PARTY_DATA, true, OTHER_PARTY, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00787-v2.docx"},
 
             new Object[]{VALID_APPEAL_CREATED, false, APPELLANT, ORAL, GAPS, null, "4917669f-d1b4-4748-851f-f10b90f27da3", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, null},
             new Object[]{VALID_APPEAL_CREATED, false, APPELLANT, PAPER, GAPS, null, "4917669f-d1b4-4748-851f-f10b90f27da3", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, null},
@@ -679,8 +679,8 @@ public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
 
             new Object[]{UPDATE_OTHER_PARTY_DATA, false, OTHER_PARTY, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00784-v2.docx"},
             new Object[]{UPDATE_OTHER_PARTY_DATA, false, OTHER_PARTY, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00784-v2.docx"},
-            new Object[]{UPDATE_OTHER_PARTY_DATA, true, OTHER_PARTY, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00787.docx"},
-            new Object[]{UPDATE_OTHER_PARTY_DATA, true, OTHER_PARTY, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00787.docx"},
+            new Object[]{UPDATE_OTHER_PARTY_DATA, true, OTHER_PARTY, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00787-v2.docx"},
+            new Object[]{UPDATE_OTHER_PARTY_DATA, true, OTHER_PARTY, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00787-v2.docx"},
 
             new Object[]{VALID_APPEAL_CREATED, false, APPELLANT, ORAL, LIST_ASSIST, null, "4917669f-d1b4-4748-851f-f10b90f27da3", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, null},
             new Object[]{VALID_APPEAL_CREATED, false, APPELLANT, PAPER, LIST_ASSIST, null, "4917669f-d1b4-4748-851f-f10b90f27da3", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, null},
