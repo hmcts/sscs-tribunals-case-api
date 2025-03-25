@@ -107,7 +107,37 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
         assertThat(addedCom.getRequestText(), is(expectedQuestion));
         assertThat(addedCom.getRequestUserName(), is(expectedUserName));
         assertThat(addedCom.getRequestDateTime(), is(notNullValue()));
+    }
     
+    @Test
+    public void givenNullCommunicationsList_shouldHandleGracefully() {
+        // Setup FTA communication fields with null communications list
+        String expectedTopic = "Test Topic";
+        String expectedQuestion = "Test Question";
+        String expectedUserName = "Test User";
+    
+        FtaCommunicationFields fields = FtaCommunicationFields.builder()
+            .ftaRequestTopic(expectedTopic)
+            .ftaRequestQuestion(expectedQuestion)
+            .ftaCommunications(null) // Explicitly set to null
+            .build();
+        
+        sscsCaseData.setFtaCommunicationFields(fields);
+    
+        // Mock user details
+        UserDetails userDetails = UserDetails.builder()
+            .name(expectedUserName)
+            .build();
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
+    
+        // Execute the function
+        PreSubmitCallbackResponse<SscsCaseData> response = 
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+    
+        // Verify a new FTA communication was added
+        List<FtaCommunication> resultComs = response.getData().getFtaCommunicationFields().getFtaCommunications();
+    
+        assertThat(resultComs, is(notNullValue()));
     }
 
     @Test
@@ -158,5 +188,4 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
             }
         };
     }
- 
 }

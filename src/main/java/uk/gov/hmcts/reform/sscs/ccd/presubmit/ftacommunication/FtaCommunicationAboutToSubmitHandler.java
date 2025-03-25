@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication;
 import static java.util.Objects.requireNonNull;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -50,7 +51,7 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
 
         List<FtaCommunication> ftaComs = 
             sscsCaseData.getFtaCommunicationFields().getFtaCommunications() != null 
-            ? sscsCaseData.getFtaCommunicationFields().getFtaCommunications() : Collections.emptyList();
+            ? sscsCaseData.getFtaCommunicationFields().getFtaCommunications() : new ArrayList<FtaCommunication>();
 
         String topic = sscsCaseData.getFtaCommunicationFields().getFtaRequestTopic();
         String question = sscsCaseData.getFtaCommunicationFields().getFtaRequestQuestion();
@@ -66,6 +67,8 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
             .build());
         
         ftaComs.sort(Comparator.comparing(FtaCommunication::getRequestDateTime).reversed());
+
+        sscsCaseData.getFtaCommunicationFields().setFtaCommunications(ftaComs);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
