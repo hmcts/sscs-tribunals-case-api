@@ -47,6 +47,10 @@ export class WebAction {
     await expect(this.page.getByText(labelText).first()).toBeVisible();
   }
 
+  async verifyTextVisibilityFastFail(labelText: string) {
+    await expect(this.page.getByText(labelText).first()).toBeVisible({timeout: 5000});
+  }
+
   async verifyElementVisibility(elementlocator: string) {
     await expect(this.page.locator(elementlocator).first()).toBeVisible();
   }

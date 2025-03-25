@@ -23,7 +23,7 @@ export class UpdateNotListable extends BaseStep {
     await this.notListablePage.enterValidDirectionDueDate();
     await this.notListablePage.continueEvent();
 
-    await this.notListablePage.confirmSubmission();
+    await this.eventNameAndDescriptionPage.confirmSubmission();
     // verifying that event has submitted successfully and details are showing in Summary and History Tabs
     await this.verifyHistoryTabDetails('Not listable', 'Not listable');
   }
@@ -165,7 +165,7 @@ export class UpdateNotListable extends BaseStep {
     await this.notListablePage.enterValidDirectionDueDate();
     await this.notListablePage.continueEvent();
 
-    await this.notListablePage.confirmSubmission();
+    await this.eventNameAndDescriptionPage.confirmSubmission();
 
     // verifying that event has submitted successfully and details are showing in Summary and History Tabs
     await this.verifyHistoryTabDetails('Not listable', 'Not listable');
@@ -200,7 +200,7 @@ export class UpdateNotListable extends BaseStep {
     await this.notListablePage.enterValidDirectionDueDate();
     await this.notListablePage.continueEvent();
 
-    await this.notListablePage.confirmSubmission();
+    await this.eventNameAndDescriptionPage.confirmSubmission();
 
     // verifying that event has submitted successfully and details are showing in Summary and History Tabs
     await this.verifyHistoryTabDetails('Not listable', 'Not listable');
