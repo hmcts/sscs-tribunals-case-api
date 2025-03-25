@@ -1052,6 +1052,18 @@
     "SecurityClassification": "Public"
   },
   {
+    "LiveFrom": "13/03/2025",
+    "CaseTypeID": "Benefit",
+    "ID": "ftaCommunication",
+    "Name": "FTA Communication",
+    "DisplayOrder": 717,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "EventEnablingCondition": "appeal.benefitType.code=\"infectedBloodCompensation\"",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit"
+  },
+  {
     "LiveFrom": "22/10/2019",
     "CaseTypeID": "Benefit",
     "ID": "dwpDirectionResponse",
@@ -3318,18 +3330,5 @@
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
     "SecurityClassification": "Public"
-  },
-  {
-    "LiveFrom": "13/03/2025",
-    "CaseTypeID": "Benefit",
-    "ID": "ftaCommunication",
-    "Name": "FTA Communication",
-    "DisplayOrder": 1304,
-    "PreConditionState(s)": "*",
-    "PostConditionState": "*",
-    "SecurityClassification": "Public",
-    "EventEnablingCondition": "appeal.benefitType.code=\"infectedBloodCompensation\"",
-    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit"
-
   }
 ]

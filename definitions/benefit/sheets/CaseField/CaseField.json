@@ -534,6 +534,6 @@
   {"LiveFrom": "18/10/2024", "CaseTypeID": "Benefit", "ID": "completedHearingsList", "Label": "Completed Hearings", "FieldType": "Collection", "FieldTypeParameter": "hearingDetails", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "ID": "ftaRequestType", "Label": "New Request", "FieldType": "FixedRadioList", "FieldTypeParameter": "FL_ftaRequestType", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "ID": "ftaRequestTopic", "Label": "Request Topic", "FieldType": "FixedList", "FieldTypeParameter": "FL_ftaRequestTopic", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "ftaRequestQuestion", "Label": "Request Question", "FieldType": "TextArea", "Max": 500, "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "ftaRequestQuestion", "Label": "Request Question", "FieldType": "TextArea", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "ftaCommunications", "Label": "Request Question", "FieldType": "Collection", "FieldTypeParameter": "ftaRequest", "SecurityClassification": "PUBLIC"}
 ]
