@@ -9,11 +9,9 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,8 +21,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.TribunalCommunicationFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.TribunalCommunication;
+import uk.gov.hmcts.reform.sscs.ccd.domain.TribunalCommunicationFields;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 
@@ -107,12 +105,12 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
         assertThat(addedCom.getRequestUserName(), is(expectedUserName));
         assertThat(addedCom.getRequestDateTime(), is(notNullValue()));
     }
+    /*
+    @Test
+    @Parameters(method = "dueDateParameters")
+    public void calculateDueDate_shouldAdjustForWeekends(LocalDateTime inputDate, LocalDateTime expectedDueDate) {
+        LocalDateTime actualDueDate = handler.calculateDueDate(inputDate);
 
-//    @Test
-//    @Parameters(method = "dueDateParameters")
-//    public void calculateDueDate_shouldAdjustForWeekends(LocalDateTime inputDate, LocalDateTime expectedDueDate) {
-//        LocalDateTime actualDueDate = handler.calculateDueDate(inputDate);
-//
-//        assertThat(actualDueDate, is(expectedDueDate));
-//    }
+        assertThat(actualDueDate, is(expectedDueDate));
+    }*/
 }
