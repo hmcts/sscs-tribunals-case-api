@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication;
 import static java.util.Objects.requireNonNull;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +48,9 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        List<FtaCommunication> ftaComs = sscsCaseData.getFtaCommunicationFields().getFtaCommunications();
+        List<FtaCommunication> ftaComs = 
+            sscsCaseData.getFtaCommunicationFields().getFtaCommunications() != null 
+            ? sscsCaseData.getFtaCommunicationFields().getFtaCommunications() : Collections.emptyList();
 
         String topic = sscsCaseData.getFtaCommunicationFields().getFtaRequestTopic();
         String question = sscsCaseData.getFtaCommunicationFields().getFtaRequestQuestion();
