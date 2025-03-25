@@ -50,11 +50,11 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
         //            tribunalComms = sscsCaseData.getTribunalCommunications().getTribunalCommunicationFields();
         //        }
         TribunalCommunication tribunalCommunication = Optional.ofNullable(sscsCaseData.getTribunalCommunications()).orElse(TribunalCommunication.builder().build());
-        List<TribunalCommunicationFields> tribunalComms = tribunalCommunication.getTribunalCommunicationFields() != null ? tribunalCommunication.getTribunalCommunicationFields() : Collections.emptyList();
         String topic = tribunalCommunication.getTribunalRequestTopic();
         String question = tribunalCommunication.getTribunalRequestQuestion();
         LocalDateTime now = LocalDateTime.now();
         final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
+        List<TribunalCommunicationFields> tribunalComms = new ArrayList<>();
         tribunalComms.add(TribunalCommunicationFields.builder()
                 .requestMessage(question)
                 .requestTopic(topic)
@@ -62,9 +62,12 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
                 .requestUserName(userDetails.getName())
                 .requestResponseDue(now.plusDays(2))
                 .build());
+        if (tribunalCommunication.getTribunalCommunicationFields() != null) {
+            tribunalComms.addAll(tribunalCommunication.getTribunalCommunicationFields());
+        }
 
         tribunalComms.sort(Comparator.comparing(TribunalCommunicationFields::getRequestDateTime).reversed());
-
+        tribunalCommunication.setTribunalCommunicationFields(tribunalComms);
         sscsCaseData.setTribunalCommunications(tribunalCommunication);
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
