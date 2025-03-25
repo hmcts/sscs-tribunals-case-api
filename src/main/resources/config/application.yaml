@@ -190,14 +190,14 @@ document_management:
     url: ${DOCUMENT_MANAGEMENT_URL:http://localhost:5005}
 documents:
     english:
-        CORRECTION_GRANTED: TB-SCS-GNO-ENG-corrected-decision-notice.docx
-        DECISION_ISSUED: TB-SCS-GNO-ENG-draft-decision-notice.docx
+        CORRECTION_GRANTED: TB-SCS-GNO-ENG-corrected-decision-notice-v2.docx
+        DECISION_ISSUED: TB-SCS-GNO-ENG-draft-decision-notice-v2.docx
         DIRECTION_ISSUED: TB-SCS-GNO-ENG-directions-notice-v2.docx
         ISSUE_FINAL_DECISION: TB-SCS-GNO-ENG-final-decision-notice-v2.docx
         SOR_WRITE: TB-SCS-GNO-ENG-sor-directions-notice-v2.docx
     welsh:
-        CORRECTION_GRANTED: TB-SCS-GNO-ENG-corrected-decision-notice.docx
-        DECISION_ISSUED: TB-SCS-GNO-ENG-draft-decision-notice.docx
+        CORRECTION_GRANTED: TB-SCS-GNO-ENG-corrected-decision-notice-v2.docx
+        DECISION_ISSUED: TB-SCS-GNO-ENG-draft-decision-notice-v2.docx
         DIRECTION_ISSUED: TB-SCS-GNO-ENG-directions-notice-v2.docx
         ISSUE_FINAL_DECISION: TB-SCS-GNO-ENG-final-decision-notice-v2.docx
         SOR_WRITE: TB-SCS-GNO-ENG-sor-directions-notice-v2.docx
@@ -664,7 +664,7 @@ notification:
         struckOut:
             docmosisId: TB-SCS-GNO-ENG-00466.docx
         processAudioVideo:
-            docmosisId: TB-SCS-GNO-ENG-00677.docx
+            docmosisId: TB-SCS-GNO-ENG-00677-v2.docx
         setAsideGranted:
             docmosisId: TB-SCS-LET-ENG-Set-Aside-Grant-Refused.docx
         setAsideRefused:
@@ -1303,7 +1303,7 @@ notification:
         struckOut:
             docmosisId: TB-SCS-GNO-WEL-00593.docx
         processAudioVideoWelsh:
-            docmosisId: TB-SCS-GNO-WEL-00678.docx
+            docmosisId: TB-SCS-GNO-WEL-00678-v2.docx
         setAsideGranted:
             docmosisId: TB-SCS-LET-WEL-Set-Aside-Grant-Refused.docx
         setAsideRefused:
