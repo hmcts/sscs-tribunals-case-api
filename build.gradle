@@ -1,7 +1,7 @@
 plugins {
     id 'application'
     id 'pmd'
-    id 'org.sonarqube' version '6.0.1.5171'
+    id 'org.sonarqube' version '6.1.0.5360'
     id 'jacoco'
     id 'org.springframework.boot' version '3.4.3'
     id 'uk.gov.hmcts.java' version '0.12.65'
@@ -351,8 +351,8 @@ dependencies {
 
 
     implementation group: 'com.mchange', name: 'c3p0', version: '0.10.2'
-    implementation group: 'org.flywaydb', name: 'flyway-core', version: '11.4.0'
-    implementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '11.4.0'
+    implementation group: 'org.flywaydb', name: 'flyway-core', version: '11.4.1'
+    implementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '11.4.1'
 
     implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'SSCSCI-1760-SNAPSHOT'
 
@@ -427,7 +427,7 @@ dependencies {
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.1'
     testImplementation group: 'io.rest-assured', name: 'xml-path', version: '5.5.1'
     testImplementation group: 'io.rest-assured', name: 'json-path', version: '5.5.1'
-    testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.7', classifier: 'all', {
+    testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.8', classifier: 'all', {
         exclude group: 'commons-io', module: 'commons-io'
     }
 
