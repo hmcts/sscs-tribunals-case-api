@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,7 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == EventType.FTA_COMMUNICATION;
+            && callback.getEvent() == EventType.FTA_COMMUNICATION;
     }
 
     @Override
@@ -48,26 +49,33 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        List<FtaCommunication> ftaComs = 
-            sscsCaseData.getFtaCommunicationFields().getFtaCommunications() != null 
-            ? sscsCaseData.getFtaCommunicationFields().getFtaCommunications() : new ArrayList<FtaCommunication>();
+        FtaCommunicationFields ftaCommunicationFields = Optional.ofNullable(sscsCaseData.getFtaCommunicationFields())
+            .orElse(FtaCommunicationFields.builder().build());
 
-        String topic = sscsCaseData.getFtaCommunicationFields().getFtaRequestTopic();
-        String question = sscsCaseData.getFtaCommunicationFields().getFtaRequestQuestion();
+        String topic = ftaCommunicationFields.getFtaRequestTopic();
+        String question = ftaCommunicationFields.getFtaRequestQuestion();
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime dueDate = calculateDueDate(LocalDateTime.now());
         final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
-        ftaComs.add(FtaCommunication.builder()
-            .requestText(question)
-            .requestTopic(topic)
-            .requestDateTime(now)
-            .requestUserName(userDetails.getName())
-            .requestDueDate(dueDate)
-            .build());
-        
-        ftaComs.sort(Comparator.comparing(FtaCommunication::getRequestDateTime).reversed());
 
-        sscsCaseData.getFtaCommunicationFields().setFtaCommunications(ftaComs);
+        List<FtaCommunication> ftaComs = Optional.ofNullable(ftaCommunicationFields.getFtaCommunications())
+            .orElse(new ArrayList<>());
+
+        ftaComs.add(FtaCommunication.builder()
+            .value(FtaCommunicationDetails.builder()
+                .requestText(question)
+                .requestTopic(topic)
+                .requestDateTime(now)
+                .requestUserName(userDetails.getName())
+                .requestDueDate(dueDate)
+                .build())
+            .build());
+
+        ftaComs.sort(Comparator.comparing(ftaCom ->
+            ((FtaCommunication) ftaCom).getValue().getRequestDateTime()).reversed());
+
+        ftaCommunicationFields.setFtaCommunications(ftaComs);
+        sscsCaseData.setFtaCommunicationFields(ftaCommunicationFields);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
