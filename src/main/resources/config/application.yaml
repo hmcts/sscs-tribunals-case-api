@@ -201,14 +201,14 @@ document_management:
     url: ${DOCUMENT_MANAGEMENT_URL:http://localhost:5005}
 documents:
     english:
-        CORRECTION_GRANTED: TB-SCS-GNO-ENG-corrected-decision-notice.docx
-        DECISION_ISSUED: TB-SCS-GNO-ENG-draft-decision-notice.docx
+        CORRECTION_GRANTED: TB-SCS-GNO-ENG-corrected-decision-notice-v2.docx
+        DECISION_ISSUED: TB-SCS-GNO-ENG-draft-decision-notice-v2.docx
         DIRECTION_ISSUED: TB-SCS-GNO-ENG-directions-notice-v2.docx
         ISSUE_FINAL_DECISION: TB-SCS-GNO-ENG-final-decision-notice-v2.docx
         SOR_WRITE: TB-SCS-GNO-ENG-sor-directions-notice-v2.docx
     welsh:
-        CORRECTION_GRANTED: TB-SCS-GNO-ENG-corrected-decision-notice.docx
-        DECISION_ISSUED: TB-SCS-GNO-ENG-draft-decision-notice.docx
+        CORRECTION_GRANTED: TB-SCS-GNO-ENG-corrected-decision-notice-v2.docx
+        DECISION_ISSUED: TB-SCS-GNO-ENG-draft-decision-notice-v2.docx
         DIRECTION_ISSUED: TB-SCS-GNO-ENG-directions-notice-v2.docx
         ISSUE_FINAL_DECISION: TB-SCS-GNO-ENG-final-decision-notice-v2.docx
         SOR_WRITE: TB-SCS-GNO-ENG-sor-directions-notice-v2.docx
@@ -249,8 +249,6 @@ feature:
         enabled: ${GAPS_SWITCHOVER_FEATURE:false}
     hearing-recording-filter:
         enabled: ${UPLOAD_HEARING_FILTER_ENABLED:false}
-    direction-hearings:
-        enabled: ${DIRECTION_HEARINGS_ENABLED:false}
     postHearings:
         enabled: ${POST_HEARINGS_FEATURE:false}
     postHearingsB:
@@ -685,7 +683,7 @@ notification:
         struckOut:
             docmosisId: TB-SCS-GNO-ENG-00466.docx
         processAudioVideo:
-            docmosisId: TB-SCS-GNO-ENG-00677.docx
+            docmosisId: TB-SCS-GNO-ENG-00677-v2.docx
         setAsideGranted:
             docmosisId: TB-SCS-LET-ENG-Set-Aside-Grant-Refused.docx
         setAsideRefused:
@@ -1048,23 +1046,23 @@ notification:
                     appellant:
                         # SSCS-11586 emailId: aa0930a3-e1bd-4b50-ac6b-34df73ec8378
                         # SSCS-11586 smsId: 8aa77a9c-9bc6-424d-8716-1c948681270e
-                        docmosisId: ${HEARINGBOOKED_NEW_LETTER:TB-SCS-LET-ENG-Hearing-Booked.docx}
+                        docmosisId: TB-SCS-LET-ENG-Hearing-Booked-v2.docx
                     representative:
                         # SSCS-11586 emailId: a56e67cb-6b4b-41e3-8f4c-cd1cdb6809c1
                         # SSCS-11586 smsId: e04c548d-1ba9-40b5-bf9b-ea5e7bbadbac
-                        docmosisId: ${HEARINGBOOKED_NEW_LETTER:TB-SCS-LET-ENG-Hearing-Booked.docx}
+                        docmosisId: TB-SCS-LET-ENG-Hearing-Booked-v2.docx
                     appointee:
                         # SSCS-11586 emailId: aa0930a3-e1bd-4b50-ac6b-34df73ec8378
                         # SSCS-11586 smsId: 8aa77a9c-9bc6-424d-8716-1c948681270e
-                        docmosisId: ${HEARINGBOOKED_NEW_LETTER:TB-SCS-LET-ENG-Hearing-Booked.docx}
+                        docmosisId: TB-SCS-LET-ENG-Hearing-Booked-v2.docx
                     joint_party:
                         # SSCS-11586 emailId: aa0930a3-e1bd-4b50-ac6b-34df73ec8378
                         # SSCS-11586 smsId: 8aa77a9c-9bc6-424d-8716-1c948681270e
-                        docmosisId: ${HEARINGBOOKED_NEW_LETTER:TB-SCS-LET-ENG-Hearing-Booked.docx}
+                        docmosisId: TB-SCS-LET-ENG-Hearing-Booked-v2.docx
                     other_party:
                         # SSCS-11586 emailId: a56e67cb-6b4b-41e3-8f4c-cd1cdb6809c1
                         # SSCS-11586 smsId: e04c548d-1ba9-40b5-bf9b-ea5e7bbadbac
-                        docmosisId: ${HEARINGBOOKED_NEW_LETTER:TB-SCS-LET-ENG-Hearing-Booked.docx}
+                        docmosisId: TB-SCS-LET-ENG-Hearing-Booked-v2.docx
                         # SSCS-11586 hearingReminder:
                         # SSCS-11586 appellant:
                         # SSCS-11586 emailId: 07bebee4-f07a-4a0d-9c50-65be30dc72a5
@@ -1324,7 +1322,7 @@ notification:
         struckOut:
             docmosisId: TB-SCS-GNO-WEL-00593.docx
         processAudioVideoWelsh:
-            docmosisId: TB-SCS-GNO-WEL-00678.docx
+            docmosisId: TB-SCS-GNO-WEL-00678-v2.docx
         setAsideGranted:
             docmosisId: TB-SCS-LET-WEL-Set-Aside-Grant-Refused.docx
         setAsideRefused:
@@ -1679,23 +1677,23 @@ notification:
                     appellant:
                         # SSCS-11586 emailId: aca83c9c-05c0-49d5-8ded-e581a0107408
                         # SSCS-11586 smsId: a51a7435-dffe-4455-9183-5c6f4f13bee3
-                        docmosisId: ${HEARINGBOOKED_NEW_LETTER_WELSH:TB-SCS-LET-WEL-Hearing-Booked.docx}
+                        docmosisId: TB-SCS-LET-WEL-Hearing-Booked-v2.docx
                     representative:
                         # SSCS-11586 emailId: c7047e95-42ac-4d6a-91d9-c8f31f2685b8
                         # SSCS-11586 smsId: 5e7444fe-860c-4623-b5c5-b23af1ddbb0b
-                        docmosisId: ${HEARINGBOOKED_NEW_LETTER_WELSH:TB-SCS-LET-WEL-Hearing-Booked.docx}
+                        docmosisId: TB-SCS-LET-WEL-Hearing-Booked-v2.docx
                     appointee:
                         # SSCS-11586 emailId: aca83c9c-05c0-49d5-8ded-e581a0107408
                         # SSCS-11586 smsId: a51a7435-dffe-4455-9183-5c6f4f13bee3
-                        docmosisId: ${HEARINGBOOKED_NEW_LETTER_WELSH:TB-SCS-LET-WEL-Hearing-Booked.docx}
+                        docmosisId: TB-SCS-LET-WEL-Hearing-Booked-v2.docx
                     joint_party:
                         # SSCS-11586 emailId: 1df83ea1-bdd5-4ce0-901d-769c3a8509cb
                         # SSCS-11586 smsId: a11f7576-c44c-40f5-96cf-2920dce41bd5
-                        docmosisId: ${HEARINGBOOKED_NEW_LETTER_WELSH:TB-SCS-LET-WEL-Hearing-Booked.docx}
+                        docmosisId: TB-SCS-LET-WEL-Hearing-Booked-v2.docx
                     other_party:
                         # SSCS-11586 emailId: c7047e95-42ac-4d6a-91d9-c8f31f2685b8
                         # SSCS-11586 smsId: 5e7444fe-860c-4623-b5c5-b23af1ddbb0b
-                        docmosisId: ${HEARINGBOOKED_NEW_LETTER_WELSH:TB-SCS-LET-WEL-Hearing-Booked.docx}
+                        docmosisId: TB-SCS-LET-WEL-Hearing-Booked-v2.docx
                         # SSCS-11586 hearingReminder:
                         # SSCS-11586 appellant:
                         # SSCS-11586 emailId: 07eb8f5f-3436-4c2e-9676-7ee213239cc5
