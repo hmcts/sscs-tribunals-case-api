@@ -281,6 +281,7 @@ xui-webapp:
       FEATURE_ACCESS_MANAGEMENT_ENABLED: true
       FEATURE_SUBSTANTIVE_ROLE_ENABLED: true
       ALLOW_CONFIG_MUTATIONS: true
+      DEFAULT_PANEL_COMP_ENABLED: true
       NOW: false
       REDISCLOUD_URL: http://dummyrediscloudurl
       UV_THREADPOOL_SIZE: 128
