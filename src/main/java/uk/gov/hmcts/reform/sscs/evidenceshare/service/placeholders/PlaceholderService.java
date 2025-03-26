@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.APPELLANT_FULL_NAME_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.BENEFIT_NAME_ACRONYM_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.BENEFIT_TYPE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.CASE_CREATED_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.CASE_ID_LITERAL;
@@ -32,6 +33,7 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.WELSH_GENERATED_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.defaultToEmptyStringIfNull;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.getPostponementRequestStatus;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBC_ACRONYM;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.LetterType.PLACEHOLDER_SERVICE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getAddressPlaceholders;
 
@@ -79,7 +81,7 @@ public class PlaceholderService {
         }
 
         placeholders.put(SHOULD_HIDE_NINO, shouldHideNino);
-        placeholders.put(BENEFIT_TYPE_LITERAL, description);
+        placeholders.put(BENEFIT_TYPE_LITERAL, caseData.isIbcCase() ? IBC_ACRONYM : description);
         placeholders.put(APPELLANT_FULL_NAME_LITERAL, appeal.getAppellant().getName().getAbbreviatedFullName());
         placeholders.put(CASE_ID_LITERAL, caseData.getCcdCaseId());
         String ninoLiteral = defaultToEmptyStringIfNull(caseData.isIbcCase() ? appeal.getAppellant().getIdentity().getIbcaReference() : appeal.getAppellant().getIdentity().getNino());
