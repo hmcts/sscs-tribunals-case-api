@@ -2,11 +2,11 @@ package uk.gov.hmcts.reform.sscs.bulkscan.validators;
 
 import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -14,6 +14,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.CHILD_MAINTENANCE_NUMBER;
 import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.OTHER_PARTY_ADDRESS_LINE1;
 import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.OTHER_PARTY_ADDRESS_LINE2;
@@ -61,16 +62,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import junitparams.converters.Nullable;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.ExceptionRecord;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.OcrDataField;
@@ -109,7 +105,6 @@ import uk.gov.hmcts.reform.sscs.domain.CaseResponse;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
-@RunWith(JUnitParamsRunner.class)
 public class SscsCaseValidatorTest {
 
     private static final String VALID_MOBILE = "07832882849";
@@ -118,8 +113,6 @@ public class SscsCaseValidatorTest {
     private final List<String> titles = new ArrayList<>();
     private final Map<String, Object> ocrCaseData = new HashMap<>();
     private final List<OcrDataField> ocrList = new ArrayList<>();
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
     @Mock
     RegionalProcessingCenterService regionalProcessingCenterService;
     @Mock
@@ -138,8 +131,9 @@ public class SscsCaseValidatorTest {
     private ExceptionRecord exceptionRecordSscs2;
     private ExceptionRecord exceptionRecordSscs5;
 
-    @Before
+    @BeforeEach
     public void setup() {
+        openMocks(this);
         dwpAddressLookupService = new DwpAddressLookupService();
         scannedData = mock(ScannedData.class);
         caseDetails = mock(CaseDetails.class);
@@ -184,8 +178,8 @@ public class SscsCaseValidatorTest {
         given(sscsJsonExtractor.extractJson(exceptionRecordSscs5)).willReturn(scannedData);
     }
 
-    @Test
-    @Parameters({"ESA", "JSA", "PIP", "DLA", "attendanceAllowance", "industrialInjuriesDisablement",
+    @ParameterizedTest
+    @CsvSource({"ESA", "JSA", "PIP", "DLA", "attendanceAllowance", "industrialInjuriesDisablement",
         "socialFund", "incomeSupport", "industrialDeathBenefit", "pensionCredit", "retirementPension"})
     public void givenAnAppealContainsAnInvalidOfficeForBenefitTypeOtherNotAutoOffice_thenAddAWarning(
         String benefitShortName) {
@@ -200,8 +194,8 @@ public class SscsCaseValidatorTest {
         assertEquals("office is invalid", response.getWarnings().getFirst());
     }
 
-    @Test
-    @Parameters({"carersAllowance", "bereavementBenefit", "maternityAllowance", "bereavementSupportPaymentScheme"})
+    @ParameterizedTest
+    @CsvSource({"carersAllowance", "bereavementBenefit", "maternityAllowance", "bereavementSupportPaymentScheme"})
     public void givenAnAppealContainsAnInvalidOfficeForBenefitTypeOtherAutoOffice_thenDoNotAddAWarning(
         String benefitShortName) {
         defaultMrnDetails.setDwpIssuingOffice("Invalid Test Office");
@@ -246,8 +240,8 @@ public class SscsCaseValidatorTest {
         assertEquals(0, response.getErrors().size());
     }
 
-    @Test
-    @Parameters({"The Pension Service 11", "Recovery from Estates"})
+    @ParameterizedTest
+    @CsvSource({"The Pension Service 11", "Recovery from Estates"})
     public void givenAnAppealContainsAValidOfficeForBenefitTypeAttendanceAllowance_thenDoNotAddAWarning(
         String dwpIssuingOffice) {
         defaultMrnDetails.setDwpIssuingOffice(dwpIssuingOffice);
@@ -261,12 +255,12 @@ public class SscsCaseValidatorTest {
                 false);
 
         String assertionMessage = "Asserting Benefit: Attendance Allowance with Office: " + dwpIssuingOffice;
-        assertEquals(assertionMessage, 0, response.getWarnings().size());
-        assertEquals(assertionMessage, 0, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size(), assertionMessage);
+        assertEquals(0, response.getErrors().size(), assertionMessage);
     }
 
-    @Test
-    @Parameters({"Disability Benefit Centre 4", "The Pension Service 11", "Recovery from Estates"})
+    @ParameterizedTest
+    @CsvSource({"Disability Benefit Centre 4", "The Pension Service 11", "Recovery from Estates"})
     public void givenAnAppealContainsAValidOfficeForBenefitTypeDla_thenDoNotAddAWarning(String dwpIssuingOffice) {
         defaultMrnDetails.setDwpIssuingOffice(dwpIssuingOffice);
 
@@ -277,12 +271,12 @@ public class SscsCaseValidatorTest {
             false);
 
         String assertionMessage = "Asserting Benefit: DLA with Office: " + dwpIssuingOffice;
-        assertEquals(assertionMessage, 0, response.getWarnings().size());
-        assertEquals(assertionMessage, 0, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size(), assertionMessage);
+        assertEquals(0, response.getErrors().size(), assertionMessage);
     }
 
-    @Test
-    @Parameters({"Worthing DRT", "Birkenhead DRT", "Recovery from Estates", "Inverness DRT"})
+    @ParameterizedTest
+    @CsvSource({"Worthing DRT", "Birkenhead DRT", "Recovery from Estates", "Inverness DRT"})
     public void givenAnAppealContainsAValidOfficeForBenefitTypeIncomeSupport_thenDoNotAddAWarning(
         String dwpIssuingOffice) {
         defaultMrnDetails.setDwpIssuingOffice(dwpIssuingOffice);
@@ -294,12 +288,12 @@ public class SscsCaseValidatorTest {
             false);
 
         String assertionMessage = "Asserting Benefit: Income Support with Office: " + dwpIssuingOffice;
-        assertEquals(assertionMessage, 0, response.getWarnings().size());
-        assertEquals(assertionMessage, 0, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size(), assertionMessage);
+        assertEquals(0, response.getErrors().size(), assertionMessage);
     }
 
-    @Test
-    @Parameters({"Barrow IIDB Centre", "Barnsley Benefit Centre"})
+    @ParameterizedTest
+    @CsvSource({"Barrow IIDB Centre", "Barnsley Benefit Centre"})
     public void givenAnAppealContainsAValidOfficeForBenefitTypeIidb_thenDoNotAddAWarning(String dwpIssuingOffice) {
         defaultMrnDetails.setDwpIssuingOffice(dwpIssuingOffice);
 
@@ -310,12 +304,12 @@ public class SscsCaseValidatorTest {
             false);
 
         String assertionMessage = "Asserting Benefit: IIDB with Office: " + dwpIssuingOffice;
-        assertEquals(assertionMessage, 0, response.getWarnings().size());
-        assertEquals(assertionMessage, 0, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size(), assertionMessage);
+        assertEquals(0, response.getErrors().size(), assertionMessage);
     }
 
-    @Test
-    @Parameters({"Worthing DRT", "Birkenhead DRT", "Recovery from Estates", "Inverness DRT"})
+    @ParameterizedTest
+    @CsvSource({"Worthing DRT", "Birkenhead DRT", "Recovery from Estates", "Inverness DRT"})
     public void givenAnAppealContainsAValidOfficeForBenefitTypeJsa_thenDoNotAddAWarning(String dwpIssuingOffice) {
         defaultMrnDetails.setDwpIssuingOffice(dwpIssuingOffice);
 
@@ -326,12 +320,12 @@ public class SscsCaseValidatorTest {
             false);
 
         String assertionMessage = "Asserting Benefit: JSA with Office: " + dwpIssuingOffice;
-        assertEquals(assertionMessage, 0, response.getWarnings().size());
-        assertEquals(assertionMessage, 0, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size(), assertionMessage);
+        assertEquals(0, response.getErrors().size(), assertionMessage);
     }
 
-    @Test
-    @Parameters({"St Helens Sure Start Maternity Grant", "Funeral Payment Dispute Resolution Team",
+    @ParameterizedTest
+    @CsvSource({"St Helens Sure Start Maternity Grant", "Funeral Payment Dispute Resolution Team",
         "Pensions Dispute Resolution Team"})
     public void givenAnAppealContainsAValidOfficeForBenefitTypeSocialFund_thenDoNotAddAWarning(
         String dwpIssuingOffice) {
@@ -344,12 +338,12 @@ public class SscsCaseValidatorTest {
             false);
 
         String assertionMessage = "Asserting Benefit: Social Fund with Office: " + dwpIssuingOffice;
-        assertEquals(assertionMessage, 0, response.getWarnings().size());
-        assertEquals(assertionMessage, 0, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size(), assertionMessage);
+        assertEquals(0, response.getErrors().size(), assertionMessage);
     }
 
-    @Test
-    @Parameters({"Barrow IIDB Centre", "Barnsley Benefit Centre"})
+    @ParameterizedTest
+    @CsvSource({"Barrow IIDB Centre", "Barnsley Benefit Centre"})
     public void givenAnAppealContainsAValidOfficeForBenefitTypeIndustrialDeathBenefit_thenDoNotAddAWarning(
         String dwpIssuingOffice) {
         defaultMrnDetails.setDwpIssuingOffice(dwpIssuingOffice);
@@ -361,12 +355,12 @@ public class SscsCaseValidatorTest {
             false);
 
         String assertionMessage = "Asserting Benefit: Industrial Death Benefit with Office: " + dwpIssuingOffice;
-        assertEquals(assertionMessage, 0, response.getWarnings().size());
-        assertEquals(assertionMessage, 0, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size(), assertionMessage);
+        assertEquals(0, response.getErrors().size(), assertionMessage);
     }
 
-    @Test
-    @Parameters({"Pensions Dispute Resolution Team", "Recovery from Estates"})
+    @ParameterizedTest
+    @CsvSource({"Pensions Dispute Resolution Team", "Recovery from Estates"})
     public void givenAnAppealContainsAValidOfficeForBenefitTypePensionCredit_thenDoNotAddAWarning(
         String dwpIssuingOffice) {
         defaultMrnDetails.setDwpIssuingOffice(dwpIssuingOffice);
@@ -378,12 +372,12 @@ public class SscsCaseValidatorTest {
             false);
 
         String assertionMessage = "Asserting Benefit: Pension Credit with Office: " + dwpIssuingOffice;
-        assertEquals(assertionMessage, 0, response.getWarnings().size());
-        assertEquals(assertionMessage, 0, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size(), assertionMessage);
+        assertEquals(0, response.getErrors().size(), assertionMessage);
     }
 
-    @Test
-    @Parameters({"Pensions Dispute Resolution Team", "Recovery from Estates"})
+    @ParameterizedTest
+    @CsvSource({"Pensions Dispute Resolution Team", "Recovery from Estates"})
     public void givenAnAppealContainsAValidOfficeForBenefitTypeRetirementPension_thenDoNotAddAWarning(
         String dwpIssuingOffice) {
         defaultMrnDetails.setDwpIssuingOffice(dwpIssuingOffice);
@@ -395,12 +389,12 @@ public class SscsCaseValidatorTest {
             false);
 
         String assertionMessage = "Asserting Benefit: Retirement Pension with Office: " + dwpIssuingOffice;
-        assertEquals(assertionMessage, 0, response.getWarnings().size());
-        assertEquals(assertionMessage, 0, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size(), assertionMessage);
+        assertEquals(0, response.getErrors().size(), assertionMessage);
     }
 
-    @Test
-    @Parameters({"Pensions Dispute Resolution Team"})
+    @ParameterizedTest
+    @CsvSource({"Pensions Dispute Resolution Team"})
     public void givenAnAppealContainsAValidOfficeForBenefitTypeBereavementBenefit_thenDoNotAddAWarning(
         String dwpIssuingOffice) {
         defaultMrnDetails.setDwpIssuingOffice(dwpIssuingOffice);
@@ -412,12 +406,12 @@ public class SscsCaseValidatorTest {
             false);
 
         String assertionMessage = "Asserting Benefit: Bereavement Benefit with Office: " + dwpIssuingOffice;
-        assertEquals(assertionMessage, 0, response.getWarnings().size());
-        assertEquals(assertionMessage, 0, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size(), assertionMessage);
+        assertEquals(0, response.getErrors().size(), assertionMessage);
     }
 
-    @Test
-    @Parameters({"Carer’s Allowance Dispute Resolution Team"})
+    @ParameterizedTest
+    @CsvSource({"Carer’s Allowance Dispute Resolution Team"})
     public void givenAnAppealContainsAValidOfficeForBenefitTypeCarersAllowance_thenDoNotAddAWarning(
         String dwpIssuingOffice) {
         defaultMrnDetails.setDwpIssuingOffice(dwpIssuingOffice);
@@ -429,12 +423,12 @@ public class SscsCaseValidatorTest {
             false);
 
         String assertionMessage = "Asserting Benefit: Carers Allowance with Office: " + dwpIssuingOffice;
-        assertEquals(assertionMessage, 0, response.getWarnings().size());
-        assertEquals(assertionMessage, 0, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size(), assertionMessage);
+        assertEquals(0, response.getErrors().size(), assertionMessage);
     }
 
-    @Test
-    @Parameters({"Walsall Benefit Centre"})
+    @ParameterizedTest
+    @CsvSource({"Walsall Benefit Centre"})
     public void givenAnAppealContainsAValidOfficeForBenefitTypeMaternityAllowance_thenDoNotAddAWarning(
         String dwpIssuingOffice) {
         defaultMrnDetails.setDwpIssuingOffice(dwpIssuingOffice);
@@ -446,12 +440,12 @@ public class SscsCaseValidatorTest {
             false);
 
         String assertionMessage = "Asserting Benefit: Maternity Allowance with Office: " + dwpIssuingOffice;
-        assertEquals(assertionMessage, 0, response.getWarnings().size());
-        assertEquals(assertionMessage, 0, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size(), assertionMessage);
+        assertEquals(0, response.getErrors().size(), assertionMessage);
     }
 
-    @Test
-    @Parameters({"Pensions Dispute Resolution Team"})
+    @ParameterizedTest
+    @CsvSource({"Pensions Dispute Resolution Team"})
     public void givenAnAppealContainsAValidOfficeForBenefitTypeBsps_thenDoNotAddAWarning(String dwpIssuingOffice) {
         defaultMrnDetails.setDwpIssuingOffice(dwpIssuingOffice);
 
@@ -464,8 +458,8 @@ public class SscsCaseValidatorTest {
 
         String assertionMessage =
             "Asserting Benefit: Bereavement Support Payment Scheme with Office: " + dwpIssuingOffice;
-        assertEquals(assertionMessage, 0, response.getWarnings().size());
-        assertEquals(assertionMessage, 0, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size(), assertionMessage);
+        assertEquals(0, response.getErrors().size(), assertionMessage);
     }
 
     @Test
@@ -970,9 +964,9 @@ public class SscsCaseValidatorTest {
         verify(regionalProcessingCenterService).getByPostcode(PORT_OF_NORWICH_A_FINE_CITY, true);
     }
 
-    @Test
-    @Parameters({"DIRECTION_ISSUED", "null"})
-    public void givenAnIbcCase_warnsIfNoAppealReasonsIfNotValidateAppealEvent(@Nullable EventType eventType) {
+    @ParameterizedTest
+    @CsvSource(value = {"DIRECTION_ISSUED", "null"}, nullValues = {"null"})
+    public void givenAnIbcCase_warnsIfNoAppealReasonsIfNotValidateAppealEvent(EventType eventType) {
         defaultMrnDetails.setDwpIssuingOffice("IBCA");
         Appellant appellant = buildAppellant(false);
         appellant.getAddress().setPostcode(null);
@@ -1324,8 +1318,8 @@ public class SscsCaseValidatorTest {
         assertEquals(1, response.getWarnings().size());
     }
 
-    @Test
-    @Parameters({"SSCS2", "SSCS5"})
+    @ParameterizedTest
+    @CsvSource({"SSCS2", "SSCS5"})
     public void givenAnMrnDoesNotContainADwpIssuingOfficeAndFormTypeIsSscs2OrSscs5_thenDoNotAddAWarning(FormType formType) {
         Map<String, Object> ocrCaseDataInvalidOffice = new HashMap<>();
         given(scannedData.getOcrCaseData()).willReturn(ocrCaseDataInvalidOffice);
@@ -1440,8 +1434,8 @@ public class SscsCaseValidatorTest {
         assertEquals(BENEFIT_TYPE_DESCRIPTION + " is empty", response.getWarnings().getFirst());
     }
 
-    @Test
-    @Parameters({"SSCS1U", "SSCS5"})
+    @ParameterizedTest
+    @CsvSource({"SSCS1U", "SSCS5"})
     public void givenAnAppealDoesNotContainABenefitTypeOtherForSscs1UOrSscs5Form_thenDoNotAddAWarning(FormType formType) {
         Map<String, Object> caseData = buildMinimumAppealDataWithBenefitType(null, buildAppellant(false), true, formType);
         caseData.put("formType", formType);
@@ -1580,9 +1574,9 @@ public class SscsCaseValidatorTest {
         assertEquals("representative_title is invalid", response.getWarnings().getFirst());
     }
 
-    @Test
-    @Parameters({"", "null", " "})
-    public void givenARepresentativeTitleIsEmpty_thenDoNotAddAnyWarnings(@Nullable String title) {
+    @ParameterizedTest
+    @CsvSource(value = {"''", "null", "' '"}, nullValues = {"null"})
+    public void givenARepresentativeTitleIsEmpty_thenDoNotAddAnyWarnings(String title) {
         Representative representative = buildRepresentative();
         representative.setContact(Contact.builder().build());
         representative.getName().setTitle(title);
@@ -2053,8 +2047,8 @@ public class SscsCaseValidatorTest {
         assertEquals(0, response.getErrors().size());
     }
 
-    @Test
-    @Parameters({"07900123456", "01277323440", "01277323440 ext 123"})
+    @ParameterizedTest
+    @CsvSource({"07900123456", "01277323440", "01277323440 ext 123"})
     public void givenAnAppealWithValidHearingPhoneNumber_thenDoNotAddWarning(String number) {
         HearingSubtype hearingSubtype = HearingSubtype.builder().hearingTelephoneNumber(number).build();
 
@@ -2152,8 +2146,8 @@ public class SscsCaseValidatorTest {
         assertEquals(0, response.getWarnings().size());
     }
 
-    @Test
-    @Parameters({"SSCS1PEU", "SSCS2", "SSCS5"})
+    @ParameterizedTest
+    @CsvSource({"SSCS1PEU", "SSCS2", "SSCS5"})
     public void givenAnAppealWithAnEmptyHearingSubTypeAndFormTypeIsSscs1peuForSscsCase_thenAddWarning(FormType formType) {
         Map<String, Object> pairs =
             buildMinimumAppealDataWithHearingSubtype(HearingSubtype.builder().build(), buildAppellant(false), false, formType);
@@ -2226,8 +2220,8 @@ public class SscsCaseValidatorTest {
         assertEquals(CHILD_MAINTENANCE_NUMBER, response.getTransformedCase().get("childMaintenanceNumber"));
     }
 
-    @Test
-    @Parameters({", test2, test3, TS1 1ST, other_party_address_line1 is empty, 1",
+    @ParameterizedTest
+    @CsvSource({", test2, test3, TS1 1ST, other_party_address_line1 is empty, 1",
         "test1, , , TS1 1ST, other_party_address_line2 is empty, 1",
         "test1, test2, , , other_party_postcode is empty, 1",
         "test1, , , , other_party_address_line2 is empty, 2",
@@ -2272,8 +2266,8 @@ public class SscsCaseValidatorTest {
         assertFalse(response.getWarnings().isEmpty());
     }
 
-    @Test
-    @Parameters({"true", "false"})
+    @ParameterizedTest
+    @CsvSource({"true", "false"})
     public void givenOtherParty_WithFirstNameOrLastNameMissing_WarningSeen(boolean isFirstnameBlank) {
         Name name = Name.builder().firstName(isFirstnameBlank ? "" : "fn").lastName(!isFirstnameBlank ? "" : "ln").build();
         CaseResponse response = validator.validateExceptionRecord(transformResponse,
@@ -2446,8 +2440,8 @@ public class SscsCaseValidatorTest {
         assertEquals("Mr Jerry Fisher", ((List<CcdValue<OtherParty>>) response.getTransformedCase().get("otherParties")).getFirst().getValue().getName().getFullName());
     }
 
-    @Test
-    @Parameters({", test2, test3, TS1 1ST",
+    @ParameterizedTest
+    @CsvSource({", test2, test3, TS1 1ST",
         "test1, , , TS1 1ST",
         "test1, test2, test3,"
     })
