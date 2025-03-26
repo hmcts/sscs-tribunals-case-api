@@ -239,11 +239,9 @@ public class CcdCallbackHandlerTest {
         SuccessfulTransformationResponse ccdCallbackResponse = invokeCallbackHandler(exceptionRecord);
 
         verify(caseValidator).validateExceptionRecord(warningCaptor.capture(), eq(exceptionRecord), eq(transformedCase), eq(false));
-
+        assertEquals(2, ccdCallbackResponse.getWarnings().size());
         assertEquals(1, warningCaptor.getAllValues().getFirst().getWarnings().size());
         assertEquals("First warning", warningCaptor.getAllValues().getFirst().getWarnings().getFirst());
-
-        assertEquals(2, ccdCallbackResponse.getWarnings().size());
     }
 
     @Test

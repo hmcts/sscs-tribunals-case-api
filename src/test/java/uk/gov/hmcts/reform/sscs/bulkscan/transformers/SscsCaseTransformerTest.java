@@ -2158,12 +2158,11 @@ public class SscsCaseTransformerTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"true", "Yes", "false", "No"})
-    public void givenHearingSubtypeDetailsAreProvided_WithoutHearingTypeTelephoneOrVideoOrHearingTelephone_thenBuildAnAppealHearingSubtypeDetails(String hearingSubtypeFlag) {
+    @CsvSource({"true, Yes", "Yes, Yes", "false, No", "No, No"})
+    public void givenHearingSubtypeDetailsAreProvided_WithoutHearingTypeTelephoneOrVideoOrHearingTelephone_thenBuildAnAppealHearingSubtypeDetails(String hearingSubtypeFlag, String expectedResult) {
 
         pairs.put(HEARING_VIDEO_EMAIL_LITERAL, HEARING_VIDEO_EMAIL);
         pairs.put(HEARING_TYPE_FACE_TO_FACE_LITERAL, hearingSubtypeFlag);
-        String expectedResult = hearingSubtypeFlag.equals("true") || hearingSubtypeFlag.equals("Yes") ? "Yes" : "No";
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
