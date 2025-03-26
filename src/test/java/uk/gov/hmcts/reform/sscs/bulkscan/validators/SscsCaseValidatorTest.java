@@ -12,12 +12,14 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.CHILD_MAINTENANCE_NUMBER;
 import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.OTHER_PARTY_ADDRESS_LINE1;
 import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.OTHER_PARTY_ADDRESS_LINE2;
 import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.OTHER_PARTY_ADDRESS_LINE3;
 import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.OTHER_PARTY_POSTCODE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.APPEAL_GROUNDS;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.BENEFIT_TYPE_DESCRIPTION;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HAS_REPRESENTATIVE_FIELD_MISSING;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TYPE_FACE_TO_FACE_LITERAL;
@@ -25,7 +27,15 @@ import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TYPE_PAPER;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TYPE_TELEPHONE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TYPE_VIDEO_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBC_ROLE_FOR_DECEASED;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBC_ROLE_FOR_LACKING_CAPACITY;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBC_ROLE_FOR_POA;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBC_ROLE_FOR_SELF;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBC_ROLE_FOR_U18;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IS_EMPTY;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IS_MISSING;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.NO_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.PORT_OF_ENTRY_INVALID_ERROR;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.ATTENDANCE_ALLOWANCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.BEREAVEMENT_BENEFIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.BEREAVEMENT_SUPPORT_PAYMENT_SCHEME;
@@ -46,6 +56,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.SOCIAL_FUND;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -67,6 +78,9 @@ import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.ScannedData;
 import uk.gov.hmcts.reform.sscs.bulkscan.json.SscsJsonExtractor;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReasonDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReasons;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
@@ -75,6 +89,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DateRange;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FormType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
@@ -141,6 +156,7 @@ public class SscsCaseValidatorTest {
         ocrCaseData.put("person2_address_line4", "county");
         ocrCaseData.put("representative_address_line4", "county");
         ocrCaseData.put("office", "2");
+        ocrCaseData.put("appeal_grounds", "True");
 
         given(regionalProcessingCenterService.getByPostcode(eq(VALID_POSTCODE), anyBoolean()))
             .willReturn(RegionalProcessingCenter.builder().address1("Address 1").name("Liverpool").build());
@@ -181,7 +197,7 @@ public class SscsCaseValidatorTest {
                 FormType.SSCS1U),
             false);
 
-        assertEquals("office is invalid", response.getWarnings().get(0));
+        assertEquals("office is invalid", response.getWarnings().getFirst());
     }
 
     @Test
@@ -211,7 +227,7 @@ public class SscsCaseValidatorTest {
                 FormType.SSCS1U),
             false);
 
-        assertEquals("office is invalid", response.getWarnings().get(0));
+        assertEquals("office is invalid", response.getWarnings().getFirst());
     }
 
     @Test
@@ -482,6 +498,41 @@ public class SscsCaseValidatorTest {
     }
 
     @Test
+    public void givenAnAppellantIsEmptySscs8_thenAddAWarningForIbcaReference() {
+        Map<String, Object> ocrCaseDataEmptyOffice = new HashMap<>();
+        ocrCaseDataEmptyOffice.put("person1_address_line4", "county");
+        ocrCaseDataEmptyOffice.put("person2_address_line4", "county");
+        ocrCaseDataEmptyOffice.put("representative_address_line4", "county");
+        given(scannedData.getOcrCaseData()).willReturn(ocrCaseDataEmptyOffice);
+        Map<String, Object> pairs = new HashMap<>();
+        BenefitType benefitType = BenefitType.builder().code(INFECTED_BLOOD_COMPENSATION.getShortName()).build();
+        AppealReasons appealReasons = AppealReasons.builder().reasons(List.of(AppealReason.builder().value(AppealReasonDetails.builder().reason("some reason").description("some description").build()).build())).build();
+        pairs.put("appeal", Appeal.builder()
+            .hearingType(HEARING_TYPE_ORAL)
+            .hearingSubtype(HearingSubtype.builder().wantsHearingTypeFaceToFace("Yes").build())
+            .benefitType(benefitType)
+            .appealReasons(appealReasons).build());
+
+        pairs.put("bulkScanCaseReference", 123);
+        pairs.put("formType", FormType.SSCS8);
+
+        CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord, pairs, false);
+
+        assertThat(response.getWarnings())
+            .containsOnly(
+                "person1_title is empty",
+                "person1_first_name is empty",
+                "person1_last_name is empty",
+                "person1_address_line1 is empty",
+                "person1_address_line3 is empty",
+                "person1_address_line4 is empty",
+                "person1_postcode is empty",
+                "person1_ibca_reference is empty",
+                "mrn_date is empty",
+                "appeal_grounds is missing");
+    }
+
+    @Test
     public void givenAnAppellantWithNoName_thenAddWarnings() {
         Map<String, Object> pairs = new HashMap<>();
 
@@ -582,6 +633,56 @@ public class SscsCaseValidatorTest {
     }
 
     @Test
+    public void givenIbcCaseAppellantWithNoAddress_thenAddWarnings() {
+        Map<String, Object> pairs = new HashMap<>();
+        AppealReasons appealReasons = AppealReasons.builder().reasons(List.of(AppealReason.builder().value(AppealReasonDetails.builder().reason("some reason").description("some description").build()).build())).build();
+        pairs.put("appeal", Appeal.builder().appellant(Appellant.builder().name(
+                    Name.builder().firstName("Harry").lastName("Kane").build())
+                .identity(Identity.builder().ibcaReference("A12A21").build())
+                .ibcRole("some-role").build())
+            .appealReasons(appealReasons)
+            .benefitType(BenefitType.builder().code(INFECTED_BLOOD_COMPENSATION.getShortName()).build())
+            .mrnDetails(defaultMrnDetails)
+            .hearingType(HEARING_TYPE_ORAL)
+            .hearingSubtype(HearingSubtype.builder().wantsHearingTypeFaceToFace("Yes").build()).build());
+        pairs.put("bulkScanCaseReference", 123);
+        pairs.put("formType", FormType.SSCS8);
+
+        CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord, pairs, false);
+
+        assertThat(response.getWarnings())
+            .containsOnly(
+                "person1_address_line1 is empty",
+                "person1_address_line2 is empty",
+                "person1_postcode is empty");
+    }
+
+    @Test
+    public void givenIbcCaseAppellantWithPortOfEntry_thenNoWarningsForCountyPostcode() {
+        Map<String, Object> pairs = new HashMap<>();
+        AppealReasons appealReasons = AppealReasons.builder().reasons(List.of(AppealReason.builder().value(AppealReasonDetails.builder().reason("some reason").description("some description").build()).build())).build();
+        pairs.put("appeal", Appeal.builder().appellant(Appellant.builder().name(
+                    Name.builder().firstName("Harry").lastName("Kane").build())
+                .identity(Identity.builder().ibcaReference("A12A21").build())
+                .ibcRole("some-role").address(Address.builder().portOfEntry(PORT_OF_NORWICH_A_FINE_CITY)
+                    .build()).build())
+            .appealReasons(appealReasons)
+            .benefitType(BenefitType.builder().code(INFECTED_BLOOD_COMPENSATION.getShortName()).build())
+            .mrnDetails(defaultMrnDetails)
+            .hearingType(HEARING_TYPE_ORAL)
+            .hearingSubtype(HearingSubtype.builder().wantsHearingTypeFaceToFace("Yes").build()).build());
+        pairs.put("bulkScanCaseReference", 123);
+        pairs.put("formType", FormType.SSCS8);
+
+        CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord, pairs, false);
+
+        assertThat(response.getWarnings())
+            .containsOnly(
+                "person1_address_line1 is empty",
+                "person1_address_line2 is empty");
+    }
+
+    @Test
     public void givenAnAppellantDoesNotContainATitle_thenAddAWarning() {
         Appellant appellant = buildAppellant(false);
         appellant.getName().setTitle(null);
@@ -590,7 +691,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_title is empty", response.getWarnings().get(0));
+        assertEquals("person1_title is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -602,7 +703,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_title is invalid", response.getWarnings().get(0));
+        assertEquals("person1_title is invalid", response.getWarnings().getFirst());
     }
 
     @Test
@@ -653,7 +754,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_first_name is empty", response.getWarnings().get(0));
+        assertEquals("person1_first_name is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -665,7 +766,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_last_name is empty", response.getWarnings().get(0));
+        assertEquals("person1_last_name is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -677,7 +778,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_address_line1 is empty", response.getWarnings().get(0));
+        assertEquals("person1_address_line1 is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -689,7 +790,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_address_line1 has invalid characters at the beginning", response.getWarnings().get(0));
+        assertEquals("person1_address_line1 has invalid characters at the beginning", response.getWarnings().getFirst());
     }
 
     @Test
@@ -702,7 +803,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_address_line3 is empty", response.getWarnings().get(0));
+        assertEquals("person1_address_line3 is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -715,7 +816,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_address_line3 has invalid characters at the beginning", response.getWarnings().get(0));
+        assertEquals("person1_address_line3 has invalid characters at the beginning", response.getWarnings().getFirst());
     }
 
     @Test
@@ -730,7 +831,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_address_line2 is empty", response.getWarnings().get(0));
+        assertEquals("person1_address_line2 is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -745,7 +846,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_address_line2 has invalid characters at the beginning", response.getWarnings().get(0));
+        assertEquals("person1_address_line2 has invalid characters at the beginning", response.getWarnings().getFirst());
     }
 
     @Test
@@ -758,7 +859,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_address_line4 is empty", response.getWarnings().get(0));
+        assertEquals("person1_address_line4 is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -771,7 +872,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_address_line4 has invalid characters at the beginning", response.getWarnings().get(0));
+        assertEquals("person1_address_line4 has invalid characters at the beginning", response.getWarnings().getFirst());
     }
 
     @Test
@@ -786,7 +887,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_address_line3 is empty", response.getWarnings().get(0));
+        assertEquals("person1_address_line3 is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -801,7 +902,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_address_line3 has invalid characters at the beginning", response.getWarnings().get(0));
+        assertEquals("person1_address_line3 has invalid characters at the beginning", response.getWarnings().getFirst());
     }
 
     @Test
@@ -828,23 +929,131 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_postcode is empty", response.getWarnings().get(0));
+        assertEquals("person1_postcode is empty", response.getWarnings().getFirst());
         verifyNoInteractions(regionalProcessingCenterService);
     }
 
     @Test
-    public void givenAnAppellantDoesNotContainAPostcodeButNotInUk_thenLetItGoElsa() {
+    public void givenAnIbcCase_warnsIfNoAppealReasons() {
         defaultMrnDetails.setDwpIssuingOffice("IBCA");
         Appellant appellant = buildAppellant(false);
         appellant.getAddress().setPostcode(null);
         appellant.getAddress().setInMainlandUk(YesNo.NO);
         appellant.getAddress().setPortOfEntry(PORT_OF_NORWICH_A_FINE_CITY);
+        appellant.getIdentity().setIbcaReference("A12A12");
+        appellant.setIbcRole("some-role");
 
-        var data = buildMinimumAppealDataWithBenefitType(INFECTED_BLOOD_COMPENSATION.getShortName(), appellant, true, FormType.SSCS5);
+        var data = buildMinimumAppealDataWithBenefitTypeWithAppealReasons(INFECTED_BLOOD_COMPENSATION.getShortName(), appellant, true, FormType.SSCS8, null);
+        CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord, data, false);
+
+        assertEquals(1, response.getWarnings().size());
+        assertTrue(response.getWarnings().contains(APPEAL_GROUNDS + " " + IS_EMPTY));
+        verify(regionalProcessingCenterService).getByPostcode(PORT_OF_NORWICH_A_FINE_CITY, true);
+    }
+
+    @Test
+    public void givenAnIbcCase_warnsIfAppealReasonsOcrIsFalse() {
+        defaultMrnDetails.setDwpIssuingOffice("IBCA");
+        Appellant appellant = buildAppellant(false);
+        appellant.getAddress().setPostcode(null);
+        appellant.getAddress().setInMainlandUk(YesNo.NO);
+        appellant.getAddress().setPortOfEntry(PORT_OF_NORWICH_A_FINE_CITY);
+        appellant.getIdentity().setIbcaReference("A12A12");
+        appellant.setIbcRole("some-role");
+        ocrCaseData.put(APPEAL_GROUNDS, "False");
+        AppealReasons appealReasons = AppealReasons.builder().reasons(List.of(AppealReason.builder().value(AppealReasonDetails.builder().reason("some reason").description("some description").build()).build())).build();
+        var data = buildMinimumAppealDataWithBenefitTypeWithAppealReasons(INFECTED_BLOOD_COMPENSATION.getShortName(), appellant, true, FormType.SSCS8, appealReasons);
+        CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord, data, false);
+
+        assertEquals(1, response.getWarnings().size());
+        assertTrue(response.getWarnings().contains(APPEAL_GROUNDS + " " + IS_MISSING));
+        verify(regionalProcessingCenterService).getByPostcode(PORT_OF_NORWICH_A_FINE_CITY, true);
+    }
+
+    @Test
+    @Parameters({"DIRECTION_ISSUED", "null"})
+    public void givenAnIbcCase_warnsIfNoAppealReasonsIfNotValidateAppealEvent(@Nullable EventType eventType) {
+        defaultMrnDetails.setDwpIssuingOffice("IBCA");
+        Appellant appellant = buildAppellant(false);
+        appellant.getAddress().setPostcode(null);
+        appellant.getAddress().setInMainlandUk(YesNo.NO);
+        appellant.getAddress().setPortOfEntry(PORT_OF_NORWICH_A_FINE_CITY);
+        appellant.getIdentity().setIbcaReference("A12A12");
+        appellant.setIbcRole("some-role");
+
+        var data = buildMinimumAppealDataWithBenefitTypeWithAppealReasons(INFECTED_BLOOD_COMPENSATION.getShortName(), appellant, true, FormType.SSCS8, null);
+        CaseResponse response = validator.validateValidationRecord(data, false, eventType);
+
+        assertEquals(1, response.getWarnings().size());
+        assertTrue(response.getWarnings().contains("Grounds for appeal " + IS_EMPTY));
+        verify(regionalProcessingCenterService).getByPostcode(PORT_OF_NORWICH_A_FINE_CITY, true);
+    }
+
+    @Test
+    public void givenAnIbcCase_doesNotWarnIfNoAppealReasonsIfValidateAppealEvent() {
+        defaultMrnDetails.setDwpIssuingOffice("IBCA");
+        Appellant appellant = buildAppellant(false);
+        appellant.getAddress().setPostcode(null);
+        appellant.getAddress().setInMainlandUk(YesNo.NO);
+        appellant.getAddress().setPortOfEntry(PORT_OF_NORWICH_A_FINE_CITY);
+        appellant.getIdentity().setIbcaReference("A12A12");
+        appellant.setIbcRole("some-role");
+
+        var data = buildMinimumAppealDataWithBenefitTypeWithAppealReasons(INFECTED_BLOOD_COMPENSATION.getShortName(), appellant, true, FormType.SSCS8, null);
+        CaseResponse response = validator.validateValidationRecord(data, false, EventType.VALID_APPEAL);
+
+        assertTrue(response.getWarnings().isEmpty());
+        verify(regionalProcessingCenterService).getByPostcode(PORT_OF_NORWICH_A_FINE_CITY, true);
+    }
+
+    @Test
+    public void givenAnIbcCase_doesNotWarnIfAppealReasons() {
+        defaultMrnDetails.setDwpIssuingOffice("IBCA");
+        Appellant appellant = buildAppellant(false);
+        appellant.getAddress().setPostcode(null);
+        appellant.getAddress().setInMainlandUk(YesNo.NO);
+        appellant.getAddress().setPortOfEntry(PORT_OF_NORWICH_A_FINE_CITY);
+        appellant.getIdentity().setIbcaReference("A12A12");
+        appellant.setIbcRole("some-role");
+        AppealReasons appealReasons = AppealReasons.builder().reasons(List.of(AppealReason.builder().value(AppealReasonDetails.builder().reason("some reason").description("some description").build()).build())).build();
+        var data = buildMinimumAppealDataWithBenefitTypeWithAppealReasons(INFECTED_BLOOD_COMPENSATION.getShortName(), appellant, true, FormType.SSCS8, appealReasons);
         CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord, data, false);
 
         assertEquals(0, response.getWarnings().size());
-        verifyNoInteractions(regionalProcessingCenterService);
+        verify(regionalProcessingCenterService).getByPostcode(PORT_OF_NORWICH_A_FINE_CITY, true);
+    }
+
+    @Test
+    public void givenAnIbcCase_doesNotWarnPortOfEntryIfInUk() {
+        defaultMrnDetails.setDwpIssuingOffice("IBCA");
+        Appellant appellant = buildAppellant(false);
+        appellant.getAddress().setPostcode(VALID_POSTCODE);
+        appellant.getAddress().setInMainlandUk(YesNo.YES);
+        appellant.getIdentity().setIbcaReference("A12A12");
+        appellant.setIbcRole("some-role");
+        AppealReasons appealReasons = AppealReasons.builder().reasons(List.of(AppealReason.builder().value(AppealReasonDetails.builder().reason("some reason").description("some description").build()).build())).build();
+        var data = buildMinimumAppealDataWithBenefitTypeWithAppealReasons(INFECTED_BLOOD_COMPENSATION.getShortName(), appellant, true, FormType.SSCS8, appealReasons);
+        CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord, data, false);
+
+        assertEquals(0, response.getWarnings().size());
+        verify(regionalProcessingCenterService).getByPostcode(VALID_POSTCODE, true);
+    }
+
+    @Test
+    public void givenAnIbcCase_errorsIfInvalidPortOfEntry() {
+        defaultMrnDetails.setDwpIssuingOffice("IBCA");
+        Appellant appellant = buildAppellant(false);
+        appellant.getAddress().setPostcode(null);
+        appellant.getAddress().setInMainlandUk(YesNo.NO);
+        appellant.getAddress().setPortOfEntry("some-invalid-port");
+        appellant.getIdentity().setIbcaReference("A12A12");
+        appellant.setIbcRole("some-role");
+        AppealReasons appealReasons = AppealReasons.builder().reasons(List.of(AppealReason.builder().value(AppealReasonDetails.builder().reason("some reason").description("some description").build()).build())).build();
+        var data = buildMinimumAppealDataWithBenefitTypeWithAppealReasons(INFECTED_BLOOD_COMPENSATION.getShortName(), appellant, true, FormType.SSCS8, appealReasons);
+        CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord, data, false);
+
+        assertEquals(0, response.getWarnings().size());
+        assertTrue(response.getErrors().contains(PORT_OF_ENTRY_INVALID_ERROR));
     }
 
     @Test
@@ -859,7 +1068,7 @@ public class SscsCaseValidatorTest {
         assertNull(response.getTransformedCase().get("regionalProcessingCenter"));
         assertNull(response.getTransformedCase().get("region"));
         assertEquals("person1_postcode is not a postcode that maps to a regional processing center",
-            response.getWarnings().get(0));
+            response.getWarnings().getFirst());
     }
 
     @Test
@@ -886,7 +1095,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_nino is empty", response.getWarnings().get(0));
+        assertEquals("person1_nino is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -898,7 +1107,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_nino is invalid", response.getWarnings().get(0));
+        assertEquals("person1_nino is invalid", response.getWarnings().getFirst());
     }
 
     @Test
@@ -915,6 +1124,149 @@ public class SscsCaseValidatorTest {
     }
 
     @Test
+    public void givenSscs8DoesNotContainIbcaReference_thenAddAWarning() {
+        Appellant appellant = buildAppellant(false);
+        appellant.getIdentity().setIbcaReference(null);
+        appellant.setIbcRole("some-role");
+
+        CaseResponse response = validator
+            .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS8),
+                false);
+
+        assertEquals("person1_ibca_reference is empty", response.getWarnings().getFirst());
+    }
+
+    @Test
+    public void givenIbcCaseDoesNotContainIbcaReference_thenAddAWarning() {
+        Appellant appellant = buildAppellant(false);
+        appellant.getIdentity().setIbcaReference(null);
+        appellant.setIbcRole("some-role");
+
+        CaseResponse response = validator
+            .validateExceptionRecord(transformResponse, exceptionRecord,
+                buildMinimumAppealDataWithBenefitType(INFECTED_BLOOD_COMPENSATION.getShortName(), appellant, true, FormType.SSCS8),
+                false);
+
+        assertEquals("person1_ibca_reference is empty", response.getWarnings().getFirst());
+    }
+
+    @Test
+    public void givenSscs8DoesNotContainValidIbcaReference_thenAddAWarning() {
+        Appellant appellant = buildAppellant(false);
+        appellant.getIdentity().setIbcaReference("NOT VALID");
+        appellant.setIbcRole("some-role");
+
+        CaseResponse response = validator
+            .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS8),
+                false);
+
+        assertEquals("person1_ibca_reference is invalid", response.getWarnings().getFirst());
+    }
+
+    @Test
+    public void givenSscs8HasNoAppellantIbcRole_thenAddAnError() {
+        Appellant appellant = buildAppellant(false);
+        appellant.getIdentity().setIbcaReference("A12A12");
+
+        CaseResponse response = validator
+            .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS8),
+                false);
+
+        assertEquals(1, response.getErrors().size());
+        String actualError = response.getErrors().getFirst();
+        assertTrue(actualError.startsWith("One of the following must be True: "));
+        assertTrue(actualError.contains("person1_as_rep_of_deceased"));
+        assertTrue(actualError.contains("person1_on_behalf_of_a_person_who_lacks_capacity"));
+        assertTrue(actualError.contains("person1_as_poa"));
+        assertTrue(actualError.contains("person1_for_self"));
+        assertTrue(actualError.contains("person1_for_person_under_18"));
+    }
+
+    @Test
+    public void givenSscs8HasOneAppellantIbcRole_thenDoNotError() {
+        Appellant appellant = buildAppellant(false);
+        appellant.getIdentity().setIbcaReference("A12A12");
+        ocrCaseData.put(IBC_ROLE_FOR_SELF, true);
+
+        CaseResponse response = validator
+            .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS8),
+                false);
+
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    public void givenSscs8HasAllAppellantIbcRoles_thenAddErrors() {
+        ocrCaseData.put(IBC_ROLE_FOR_SELF, true);
+        ocrCaseData.put(IBC_ROLE_FOR_U18, true);
+        ocrCaseData.put(IBC_ROLE_FOR_DECEASED, true);
+        ocrCaseData.put(IBC_ROLE_FOR_POA, true);
+        ocrCaseData.put(IBC_ROLE_FOR_LACKING_CAPACITY, true);
+        Appellant appellant = buildAppellant(false);
+        appellant.getIdentity().setIbcaReference("A12A12");
+        appellant.setIbcRole(null);
+
+        CaseResponse response = validator
+            .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS8),
+                false);
+        assertEquals(1, response.getErrors().size());
+        String error = response.getErrors().getFirst().replace(" cannot all be True", "");
+        List<String> errors = Arrays.asList(error.split(", "));
+        assertTrue(errors.contains(IBC_ROLE_FOR_SELF));
+        assertTrue(errors.contains(IBC_ROLE_FOR_U18));
+        assertTrue(errors.contains(IBC_ROLE_FOR_LACKING_CAPACITY));
+        assertTrue(errors.contains(IBC_ROLE_FOR_POA));
+        assertTrue(errors.contains(IBC_ROLE_FOR_DECEASED));
+    }
+
+    @Test
+    public void givenSscs8HasMultipleAppellantIbcRoles_thenAddErrors() {
+        ocrCaseData.put(IBC_ROLE_FOR_SELF, true);
+        ocrCaseData.put(IBC_ROLE_FOR_U18, true);
+        ocrCaseData.put(IBC_ROLE_FOR_POA, true);
+        Appellant appellant = buildAppellant(false);
+        appellant.getIdentity().setIbcaReference("A12A12");
+        appellant.setIbcRole(null);
+
+        CaseResponse response = validator
+            .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS8),
+                false);
+
+        assertEquals(1, response.getErrors().size());
+        String error = response.getErrors().getFirst().replace(" cannot all be True", "");
+        List<String> errors = Arrays.asList(error.split(", "));
+        assertTrue(errors.contains(IBC_ROLE_FOR_SELF));
+        assertTrue(errors.contains(IBC_ROLE_FOR_U18));
+        assertTrue(errors.contains(IBC_ROLE_FOR_POA));
+    }
+
+    @Test
+    public void givenValidAppealEventSscs8HasIbcRoleSet_thenDoNotError() {
+        Appellant appellant = buildAppellant(false);
+        appellant.getIdentity().setIbcaReference("A12A12");
+        appellant.setIbcRole("myself");
+
+        CaseResponse response = validator
+            .validateValidationRecord(buildMinimumAppealData(appellant, true, FormType.SSCS8),
+                false, EventType.VALID_APPEAL);
+
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    public void givenValidAppealEventSscs8HasIbcRoleNotSet_thenError() {
+        Appellant appellant = buildAppellant(false);
+        appellant.getIdentity().setIbcaReference("A12A12");
+        appellant.setIbcRole(null);
+
+        CaseResponse response = validator
+            .validateValidationRecord(buildMinimumAppealData(appellant, true, FormType.SSCS8),
+                false, EventType.VALID_APPEAL);
+
+        assertEquals(Collections.singletonList("ibcRole is empty"), response.getErrors());
+    }
+
+    @Test
     public void givenAnAppointeeExistsAndAnAppellantDoesNotContainANino_thenAddAWarningAboutPerson2() {
         Appellant appellant = buildAppellant(true);
         appellant.getIdentity().setNino(null);
@@ -923,7 +1275,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person2_nino is empty", response.getWarnings().get(0));
+        assertEquals("person2_nino is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -939,7 +1291,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_nino is empty", response.getWarnings().get(0));
+        assertEquals("person1_nino is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -948,7 +1300,7 @@ public class SscsCaseValidatorTest {
             buildMinimumAppealDataWithMrn(MrnDetails.builder().dwpIssuingOffice("2").build(), buildAppellant(false),
                 true, FormType.SSCS1PE), false);
 
-        assertEquals("mrn_date is empty", response.getWarnings().get(0));
+        assertEquals("mrn_date is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -957,7 +1309,7 @@ public class SscsCaseValidatorTest {
             buildMinimumAppealDataWithMrn(MrnDetails.builder().dwpIssuingOffice("2").mrnDate("2148-10-10").build(),
                 buildAppellant(false), true, FormType.SSCS1PE), false);
 
-        assertEquals("mrn_date is in future", response.getWarnings().get(0));
+        assertEquals("mrn_date is in future", response.getWarnings().getFirst());
     }
 
     @Test
@@ -968,7 +1320,7 @@ public class SscsCaseValidatorTest {
             buildMinimumAppealDataWithMrn(MrnDetails.builder().mrnDate("2019-01-01").dwpIssuingOffice(null).build(),
                 buildAppellant(false), true, FormType.SSCS1PE), false);
 
-        assertEquals("office is empty", response.getWarnings().get(0));
+        assertEquals("office is empty", response.getWarnings().getFirst());
         assertEquals(1, response.getWarnings().size());
     }
 
@@ -995,7 +1347,7 @@ public class SscsCaseValidatorTest {
             buildMinimumAppealDataWithMrn(MrnDetails.builder().mrnDate("2019-01-01").dwpIssuingOffice("Bla").build(),
                 buildAppellant(false), true, FormType.SSCS1PE), false);
 
-        assertEquals("office is invalid", response.getWarnings().get(0));
+        assertEquals("office is invalid", response.getWarnings().getFirst());
         assertEquals(1, response.getWarnings().size());
     }
 
@@ -1006,7 +1358,7 @@ public class SscsCaseValidatorTest {
             buildMinimumAppealDataWithMrn(MrnDetails.builder().mrnDate("2019-01-01").dwpIssuingOffice(null).build(),
                 buildAppellant(false), true, FormType.SSCS1PE), false);
 
-        assertEquals("office is empty", response.getWarnings().get(0));
+        assertEquals("office is empty", response.getWarnings().getFirst());
         assertEquals(1, response.getWarnings().size());
     }
 
@@ -1020,7 +1372,7 @@ public class SscsCaseValidatorTest {
             buildMinimumAppealDataWithMrn(MrnDetails.builder().mrnDate("2019-01-01").dwpIssuingOffice(null).build(),
                 buildAppellant(false), true, FormType.SSCS1PE), false);
 
-        assertEquals("office is invalid", response.getWarnings().get(0));
+        assertEquals("office is invalid", response.getWarnings().getFirst());
         assertEquals(1, response.getWarnings().size());
     }
 
@@ -1055,7 +1407,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_dob is in future", response.getWarnings().get(0));
+        assertEquals("person1_dob is in future", response.getWarnings().getFirst());
     }
 
     @Test
@@ -1067,7 +1419,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_dob is in future", response.getWarnings().get(0));
+        assertEquals("person1_dob is in future", response.getWarnings().getFirst());
     }
 
     @Test
@@ -1077,7 +1429,7 @@ public class SscsCaseValidatorTest {
         CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord,
             buildMinimumAppealDataWithExcludedDate("2018-10-10", appellant, true, FormType.SSCS1PE), false);
 
-        assertEquals("hearing_options_exclude_dates is in past", response.getWarnings().get(0));
+        assertEquals("hearing_options_exclude_dates is in past", response.getWarnings().getFirst());
     }
 
     @Test
@@ -1085,7 +1437,7 @@ public class SscsCaseValidatorTest {
         CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord,
             buildMinimumAppealDataWithBenefitType(null, buildAppellant(false), true, FormType.SSCS1PE), false);
 
-        assertEquals(BENEFIT_TYPE_DESCRIPTION + " is empty", response.getWarnings().get(0));
+        assertEquals(BENEFIT_TYPE_DESCRIPTION + " is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -1111,7 +1463,7 @@ public class SscsCaseValidatorTest {
         }
 
         assertEquals(BENEFIT_TYPE_DESCRIPTION + " invalid. Should be one of: " + String.join(", ", benefitNameList),
-            response.getErrors().get(0));
+            response.getErrors().getFirst());
     }
 
     @Test
@@ -1158,7 +1510,7 @@ public class SscsCaseValidatorTest {
         CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord,
             buildMinimumAppealDataWithBenefitType("Bla", buildAppellantWithMobileNumber("07776156"), true, FormType.SSCS1PE), false);
 
-        assertEquals("person1_mobile is invalid", response.getErrors().get(0));
+        assertEquals("person1_mobile is invalid", response.getErrors().getFirst());
     }
 
     @Test
@@ -1170,7 +1522,7 @@ public class SscsCaseValidatorTest {
         CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord,
             buildMinimumAppealDataWithRepresentative(buildAppellant(false), representative, true, FormType.SSCS1PE), false);
 
-        assertEquals("representative_mobile is invalid", response.getErrors().get(0));
+        assertEquals("representative_mobile is invalid", response.getErrors().getFirst());
     }
 
     @Test
@@ -1181,7 +1533,7 @@ public class SscsCaseValidatorTest {
         CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord,
             buildMinimumAppealDataWithBenefitType("Bla", appellant, true, FormType.SSCS1PE), false);
 
-        assertEquals("person1_mobile is invalid", response.getErrors().get(0));
+        assertEquals("person1_mobile is invalid", response.getErrors().getFirst());
     }
 
     @Test
@@ -1192,7 +1544,7 @@ public class SscsCaseValidatorTest {
         CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord,
             buildMinimumAppealDataWithBenefitType("Bla", appellant, true, FormType.SSCS1PE), false);
 
-        assertEquals("person1_mobile is invalid", response.getErrors().get(0));
+        assertEquals("person1_mobile is invalid", response.getErrors().getFirst());
         assertEquals("person2_mobile is invalid", response.getErrors().get(1));
     }
 
@@ -1201,7 +1553,7 @@ public class SscsCaseValidatorTest {
         CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord,
             buildMinimumAppealDataWithBenefitType("Bla", buildAppellantWithMobileNumber("077761560000"), true, FormType.SSCS1PE), false);
 
-        assertEquals("person1_mobile is invalid", response.getErrors().get(0));
+        assertEquals("person1_mobile is invalid", response.getErrors().getFirst());
     }
 
     @Test
@@ -1213,7 +1565,7 @@ public class SscsCaseValidatorTest {
         CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord,
             buildMinimumAppealDataWithRepresentative(buildAppellant(false), representative, true, FormType.SSCS1PE), false);
 
-        assertEquals("representative_mobile is invalid", response.getErrors().get(0));
+        assertEquals("representative_mobile is invalid", response.getErrors().getFirst());
     }
 
     @Test
@@ -1225,7 +1577,7 @@ public class SscsCaseValidatorTest {
         CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord,
             buildMinimumAppealDataWithRepresentative(buildAppellant(false), representative, true, FormType.SSCS1PE), false);
 
-        assertEquals("representative_title is invalid", response.getWarnings().get(0));
+        assertEquals("representative_title is invalid", response.getWarnings().getFirst());
     }
 
     @Test
@@ -1250,7 +1602,7 @@ public class SscsCaseValidatorTest {
         CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord,
             buildMinimumAppealDataWithBenefitType("Bla", appellant, true, FormType.SSCS1PE), false);
 
-        assertEquals("person1_mobile is invalid", response.getErrors().get(0));
+        assertEquals("person1_mobile is invalid", response.getErrors().getFirst());
     }
 
     @Test
@@ -1261,7 +1613,7 @@ public class SscsCaseValidatorTest {
         CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord,
             buildMinimumAppealDataWithBenefitType("Bla", appellant, true, FormType.SSCS1PE), false);
 
-        assertEquals("person1_mobile is invalid", response.getErrors().get(0));
+        assertEquals("person1_mobile is invalid", response.getErrors().getFirst());
         assertEquals("person2_mobile is invalid", response.getErrors().get(1));
     }
 
@@ -1283,7 +1635,7 @@ public class SscsCaseValidatorTest {
         CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord,
             buildMinimumAppealDataWithBenefitType("Bla", buildAppellantWithPostcode("Bla Bla"), true, FormType.SSCS1PE), false);
 
-        assertEquals("person1_postcode is not in a valid format", response.getErrors().get(0));
+        assertEquals("person1_postcode is not in a valid format", response.getErrors().getFirst());
     }
 
     @Test
@@ -1292,7 +1644,7 @@ public class SscsCaseValidatorTest {
         given(postcodeValidator.isValid(anyString())).willReturn(false);
         CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealDataWithBenefitType(PIP.name(), buildAppellantWithPostcode("W1 1LA"), true, FormType.SSCS1PE), false);
 
-        assertEquals("person1_postcode is not a valid postcode", response.getWarnings().get(0));
+        assertEquals("person1_postcode is not a valid postcode", response.getWarnings().getFirst());
     }
 
     @Test
@@ -1308,14 +1660,16 @@ public class SscsCaseValidatorTest {
 
     @Test
     public void givenAnIbcAppealContainsAnValidPostcodeFormatButFound_thenNoErrorOrWarnings() {
+        ocrCaseData.put(IBC_ROLE_FOR_SELF, true);
         given(postcodeValidator.isValidPostcodeFormat(anyString())).willReturn(true);
         given(postcodeValidator.isValid(anyString())).willReturn(true);
-
+        AppealReasons appealReasons = AppealReasons.builder().reasons(List.of(AppealReason.builder().value(AppealReasonDetails.builder().reason("some reason").description("some description").build()).build())).build();
         given(regionalProcessingCenterService.getByPostcode(anyString(), eq(true))).willReturn(RegionalProcessingCenter.builder().address1("Address 1").name("Liverpool").build());
-        CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealDataWithBenefitType(INFECTED_BLOOD_COMPENSATION.getShortName(), buildAppellantWithPostcode("W1 1LA"), true, FormType.SSCS1PE), false);
+        CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealDataWithBenefitTypeWithAppealReasons(INFECTED_BLOOD_COMPENSATION.getShortName(), buildAppellantWithPostcode("W1 1LA"), true, FormType.SSCS8, appealReasons), false);
 
         assertThat(response.getWarnings().size()).isEqualTo(0);
         assertThat(response.getErrors().size()).isEqualTo(0);
+        ocrCaseData.remove(IBC_ROLE_FOR_SELF);
     }
 
     @Test
@@ -1342,7 +1696,7 @@ public class SscsCaseValidatorTest {
 
         assertEquals(
             "representative_company, representative_first_name and representative_last_name are empty. At least one must be populated",
-            response.getWarnings().get(0));
+            response.getWarnings().getFirst());
     }
 
     @Test
@@ -1385,7 +1739,7 @@ public class SscsCaseValidatorTest {
 
         assertEquals(
             "representative_company, representative_first_name and representative_last_name are empty. At least one must be populated",
-            response.getWarnings().get(0));
+            response.getWarnings().getFirst());
     }
 
     @Test
@@ -1410,7 +1764,7 @@ public class SscsCaseValidatorTest {
         CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord,
             buildMinimumAppealDataWithRepresentative(buildAppellant(false), representative, true, FormType.SSCS1PE), false);
 
-        assertEquals("representative_address_line1 is empty", response.getWarnings().get(0));
+        assertEquals("representative_address_line1 is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -1422,7 +1776,7 @@ public class SscsCaseValidatorTest {
         CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord,
             buildMinimumAppealDataWithRepresentative(buildAppellant(false), representative, true, FormType.SSCS1PE), false);
 
-        assertEquals("representative_address_line3 is empty", response.getWarnings().get(0));
+        assertEquals("representative_address_line3 is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -1434,7 +1788,7 @@ public class SscsCaseValidatorTest {
         CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord,
             buildMinimumAppealDataWithRepresentative(buildAppellant(false), representative, true, FormType.SSCS1PE), false);
 
-        assertEquals("representative_address_line4 is empty", response.getWarnings().get(0));
+        assertEquals("representative_address_line4 is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -1447,7 +1801,7 @@ public class SscsCaseValidatorTest {
         CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord,
             buildMinimumAppealDataWithRepresentative(buildAppellant(false), representative, true, FormType.SSCS1PE), false);
 
-        assertEquals("representative_address_line3 is empty", response.getWarnings().get(0));
+        assertEquals("representative_address_line3 is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -1458,7 +1812,7 @@ public class SscsCaseValidatorTest {
         CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord,
             buildMinimumAppealDataWithRepresentative(buildAppellant(false), representative, true, FormType.SSCS1PE), false);
 
-        assertEquals("representative_postcode is empty", response.getWarnings().get(0));
+        assertEquals("representative_postcode is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -1469,7 +1823,7 @@ public class SscsCaseValidatorTest {
 
         assertEquals(1, response.getErrors().size());
         assertEquals("The \"Has representative\" field is not selected, please select an option to proceed",
-            response.getErrors().get(0));
+            response.getErrors().getFirst());
     }
 
     @Test
@@ -1480,7 +1834,7 @@ public class SscsCaseValidatorTest {
             buildMinimumAppealDataWithRepresentative(buildAppellant(false), representative, true, FormType.SSCS1PE), false);
 
         assertEquals(1, response.getErrors().size());
-        assertEquals(HAS_REPRESENTATIVE_FIELD_MISSING, response.getErrors().get(0));
+        assertEquals(HAS_REPRESENTATIVE_FIELD_MISSING, response.getErrors().getFirst());
     }
 
     @Test
@@ -1492,7 +1846,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_title is empty", response.getWarnings().get(0));
+        assertEquals("person1_title is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -1504,7 +1858,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_first_name is empty", response.getWarnings().get(0));
+        assertEquals("person1_first_name is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -1516,7 +1870,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_last_name is empty", response.getWarnings().get(0));
+        assertEquals("person1_last_name is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -1528,7 +1882,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_address_line1 is empty", response.getWarnings().get(0));
+        assertEquals("person1_address_line1 is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -1541,7 +1895,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_address_line3 is empty", response.getWarnings().get(0));
+        assertEquals("person1_address_line3 is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -1556,7 +1910,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_address_line2 is empty", response.getWarnings().get(0));
+        assertEquals("person1_address_line2 is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -1569,7 +1923,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_address_line4 is empty", response.getWarnings().get(0));
+        assertEquals("person1_address_line4 is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -1584,7 +1938,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_address_line3 is empty", response.getWarnings().get(0));
+        assertEquals("person1_address_line3 is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -1596,7 +1950,7 @@ public class SscsCaseValidatorTest {
             .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
                 false);
 
-        assertEquals("person1_postcode is empty", response.getWarnings().get(0));
+        assertEquals("person1_postcode is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -1604,7 +1958,7 @@ public class SscsCaseValidatorTest {
         CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord,
             buildMinimumAppealDataWithHearingType(null, buildAppellant(false), true, FormType.SSCS1PE), false);
 
-        assertEquals("is_hearing_type_oral and/or is_hearing_type_paper is invalid", response.getWarnings().get(0));
+        assertEquals("is_hearing_type_oral and/or is_hearing_type_paper is invalid", response.getWarnings().getFirst());
     }
 
     @Test
@@ -1637,7 +1991,7 @@ public class SscsCaseValidatorTest {
 
         assertEquals(
             "There is a file attached to the case that does not have a filename, add a filename, e.g. filename.pdf",
-            response.getErrors().get(0));
+            response.getErrors().getFirst());
     }
 
     @Test
@@ -1646,11 +2000,11 @@ public class SscsCaseValidatorTest {
 
         pairs.put("sscsDocument", buildDocument("Waiver"));
 
-        CaseResponse response = validator.validateValidationRecord(pairs, true);
+        CaseResponse response = validator.validateValidationRecord(pairs, true, null);
 
         assertEquals(
             "There is a file attached to the case called Waiver, filenames must have extension, e.g. filename.pdf",
-            response.getErrors().get(0));
+            response.getErrors().getFirst());
     }
 
     @Test
@@ -1659,9 +2013,9 @@ public class SscsCaseValidatorTest {
         Appellant appellant = buildAppellant(false);
         appellant.getAddress().setPostcode(null);
 
-        CaseResponse response = validator.validateValidationRecord(buildMinimumAppealData(appellant, false, FormType.SSCS1PE), false);
+        CaseResponse response = validator.validateValidationRecord(buildMinimumAppealData(appellant, false, FormType.SSCS1PE), false, null);
 
-        assertEquals("Appellant postcode is empty", response.getWarnings().get(0));
+        assertEquals("Appellant postcode is empty", response.getWarnings().getFirst());
         verifyNoInteractions(regionalProcessingCenterService);
     }
 
@@ -1672,7 +2026,7 @@ public class SscsCaseValidatorTest {
             buildMinimumAppealDataWithMrn(MrnDetails.builder().dwpIssuingOffice("Sheffield DRT").build(),
                 buildAppellant(false), false, FormType.SSCS1PE);
 
-        CaseResponse response = validator.validateValidationRecord(pairs, true);
+        CaseResponse response = validator.validateValidationRecord(pairs, true, null);
 
         assertEquals(0, response.getWarnings().size());
         assertEquals(0, response.getErrors().size());
@@ -1685,9 +2039,9 @@ public class SscsCaseValidatorTest {
             buildMinimumAppealDataWithMrn(MrnDetails.builder().dwpIssuingOffice("Sheffield DRT").build(),
                 buildAppellant(false), false, FormType.SSCS1PE);
 
-        CaseResponse response = validator.validateValidationRecord(pairs, false);
+        CaseResponse response = validator.validateValidationRecord(pairs, false, null);
 
-        assertEquals("Mrn date is empty", response.getWarnings().get(0));
+        assertEquals("Mrn date is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -1720,7 +2074,7 @@ public class SscsCaseValidatorTest {
 
         assertEquals(
             "Telephone hearing selected but the number used is invalid. Please check either the hearing_telephone_number or person1_phone fields",
-            response.getWarnings().get(0));
+            response.getWarnings().getFirst());
         assertEquals(0, response.getErrors().size());
     }
 
@@ -1730,11 +2084,11 @@ public class SscsCaseValidatorTest {
             HearingSubtype.builder().wantsHearingTypeTelephone("Yes").hearingTelephoneNumber("01222").build(),
             buildAppellant(false), false, FormType.SSCS1PE);
 
-        CaseResponse response = validator.validateValidationRecord(pairs, true);
+        CaseResponse response = validator.validateValidationRecord(pairs, true, null);
 
         assertEquals(
             "Telephone hearing selected but the number used is invalid. Please check either the telephone or hearing telephone number fields",
-            response.getWarnings().get(0));
+            response.getWarnings().getFirst());
         assertEquals(0, response.getErrors().size());
     }
 
@@ -1747,7 +2101,7 @@ public class SscsCaseValidatorTest {
             buildMinimumAppealDataWithHearingSubtype(hearingSubtype, buildAppellant(false), true, FormType.SSCS1PE), false);
 
         assertEquals("hearing_telephone_number has not been provided but data indicates hearing telephone is required",
-            response.getWarnings().get(0));
+            response.getWarnings().getFirst());
         assertEquals(0, response.getErrors().size());
     }
 
@@ -1757,10 +2111,10 @@ public class SscsCaseValidatorTest {
             HearingSubtype.builder().wantsHearingTypeTelephone("Yes").hearingTelephoneNumber(null).build(),
             buildAppellant(false), false, FormType.SSCS1PE);
 
-        CaseResponse response = validator.validateValidationRecord(pairs, true);
+        CaseResponse response = validator.validateValidationRecord(pairs, true, null);
 
         assertEquals("Hearing telephone number has not been provided but data indicates hearing telephone is required",
-            response.getWarnings().get(0));
+            response.getWarnings().getFirst());
         assertEquals(0, response.getErrors().size());
     }
 
@@ -1773,7 +2127,7 @@ public class SscsCaseValidatorTest {
             buildMinimumAppealDataWithHearingSubtype(hearingSubtype, buildAppellant(false), true, FormType.SSCS1PE), false);
 
         assertEquals("hearing_video_email has not been provided but data indicates hearing video is required",
-            response.getWarnings().get(0));
+            response.getWarnings().getFirst());
         assertEquals(0, response.getErrors().size());
     }
 
@@ -1783,10 +2137,10 @@ public class SscsCaseValidatorTest {
             HearingSubtype.builder().wantsHearingTypeVideo("Yes").hearingVideoEmail(null).build(),
             buildAppellant(false), false, FormType.SSCS1PE);
 
-        CaseResponse response = validator.validateValidationRecord(pairs, true);
+        CaseResponse response = validator.validateValidationRecord(pairs, true, null);
 
         assertEquals("Hearing video email address has not been provided but data indicates hearing video is required",
-            response.getWarnings().get(0));
+            response.getWarnings().getFirst());
         assertEquals(0, response.getErrors().size());
     }
 
@@ -1794,7 +2148,7 @@ public class SscsCaseValidatorTest {
     public void givenAnAppealWithAnHearingTypePaperAndEmptyHearingSubTypeForSscsCase_thenNoWarning() {
         Map<String, Object> pairs =
             buildMinimumAppealDataWithHearingType(HEARING_TYPE_PAPER, buildAppellant(false), false, FormType.SSCS1PE);
-        CaseResponse response = validator.validateValidationRecord(pairs, true);
+        CaseResponse response = validator.validateValidationRecord(pairs, true, null);
         assertEquals(0, response.getWarnings().size());
     }
 
@@ -1807,10 +2161,10 @@ public class SscsCaseValidatorTest {
             pairs.put("childMaintenanceNumber", "123456");
         }
         pairs.put("formType", formType);
-        CaseResponse response = validator.validateValidationRecord(pairs, true);
+        CaseResponse response = validator.validateValidationRecord(pairs, true, null);
         assertEquals(1, response.getWarnings().size());
         assertEquals("Hearing option telephone, video and face to face are empty. At least one must be populated",
-            response.getWarnings().get(0));
+            response.getWarnings().getFirst());
     }
 
     @Test
@@ -1826,7 +2180,7 @@ public class SscsCaseValidatorTest {
         Map<String, Object> pairs =
             buildMinimumAppealDataWithHearingSubtype(HearingSubtype.builder().build(), buildAppellant(false), false, FormType.SSCS1PE);
         pairs.put("formType", null);
-        CaseResponse response = validator.validateValidationRecord(pairs, true);
+        CaseResponse response = validator.validateValidationRecord(pairs, true, EventType.DIRECTION_ISSUED);
         assertEquals(0, response.getWarnings().size());
     }
 
@@ -1859,14 +2213,14 @@ public class SscsCaseValidatorTest {
             caseData,
             false);
 
-        assertEquals("person1_child_maintenance_number is empty", response.getWarnings().get(0));
+        assertEquals("person1_child_maintenance_number is empty", response.getWarnings().getFirst());
     }
 
     @Test
     public void givenSscs2FormWithChildMaintenance_thenAppellantShouldReturnValue() {
 
         CaseResponse response = validator.validateExceptionRecord(transformResponse,
-            exceptionRecordSscs2, buildCaseWithChildMaintenanceWithOtherPartyNameAddress(CHILD_MAINTENANCE_NUMBER,OTHER_PARTY_ADDRESS_LINE1, OTHER_PARTY_ADDRESS_LINE2,OTHER_PARTY_ADDRESS_LINE3, OTHER_PARTY_POSTCODE, buildOtherPartyName()), false);
+            exceptionRecordSscs2, buildCaseWithChildMaintenanceWithOtherPartyNameAddress(CHILD_MAINTENANCE_NUMBER, OTHER_PARTY_ADDRESS_LINE1, OTHER_PARTY_ADDRESS_LINE2, OTHER_PARTY_ADDRESS_LINE3, OTHER_PARTY_POSTCODE, buildOtherPartyName()), false);
 
         assertEquals(0, response.getWarnings().size());
         assertEquals(CHILD_MAINTENANCE_NUMBER, response.getTransformedCase().get("childMaintenanceNumber"));
@@ -1883,19 +2237,19 @@ public class SscsCaseValidatorTest {
 
         CaseResponse response = validator.validateExceptionRecord(transformResponse,
             exceptionRecordSscs2,
-            buildCaseWithChildMaintenanceWithOtherPartyNameAddress(CHILD_MAINTENANCE_NUMBER,line1, line2,line3, postcode, buildOtherPartyName()),
+            buildCaseWithChildMaintenanceWithOtherPartyNameAddress(CHILD_MAINTENANCE_NUMBER, line1, line2, line3, postcode, buildOtherPartyName()),
             false);
 
         assertFalse(response.getWarnings().isEmpty());
         assertEquals(size, response.getWarnings().size());
-        assertEquals(warning, response.getWarnings().get(0));
+        assertEquals(warning, response.getWarnings().getFirst());
     }
 
     @Test
     public void givenOtherParty_WithFirstNameLastNamePopulated_WithNoAddress_noWarnings() {
         CaseResponse response = validator.validateExceptionRecord(transformResponse,
             exceptionRecord,
-            buildCaseWithChildMaintenanceWithOtherPartyNameAddress(CHILD_MAINTENANCE_NUMBER,"", "","", "", buildOtherPartyName()),
+            buildCaseWithChildMaintenanceWithOtherPartyNameAddress(CHILD_MAINTENANCE_NUMBER, "", "", "", "", buildOtherPartyName()),
             false);
         assertTrue(response.getWarnings().isEmpty());
     }
@@ -1904,7 +2258,7 @@ public class SscsCaseValidatorTest {
     public void givenOtherParty_WithNoName_WithNoAddress_noWarnings() {
         CaseResponse response = validator.validateExceptionRecord(transformResponse,
             exceptionRecord,
-            buildCaseWithChildMaintenanceWithOtherPartyNameAddress(CHILD_MAINTENANCE_NUMBER,"", "","", "", Name.builder().build()),
+            buildCaseWithChildMaintenanceWithOtherPartyNameAddress(CHILD_MAINTENANCE_NUMBER, "", "", "", "", Name.builder().build()),
             false);
         assertTrue(response.getWarnings().isEmpty());
     }
@@ -1913,7 +2267,7 @@ public class SscsCaseValidatorTest {
     public void givenOtherParty_NoName_WithAddressPresent_WarningSeen() {
         CaseResponse response = validator.validateExceptionRecord(transformResponse,
             exceptionRecord,
-            buildCaseWithChildMaintenanceWithOtherPartyNameAddress(CHILD_MAINTENANCE_NUMBER,"line1", "","line3", "W1", Name.builder().build()),
+            buildCaseWithChildMaintenanceWithOtherPartyNameAddress(CHILD_MAINTENANCE_NUMBER, "line1", "", "line3", "W1", Name.builder().build()),
             false);
         assertFalse(response.getWarnings().isEmpty());
     }
@@ -1924,7 +2278,7 @@ public class SscsCaseValidatorTest {
         Name name = Name.builder().firstName(isFirstnameBlank ? "" : "fn").lastName(!isFirstnameBlank ? "" : "ln").build();
         CaseResponse response = validator.validateExceptionRecord(transformResponse,
             exceptionRecord,
-            buildCaseWithChildMaintenanceWithOtherPartyNameAddress(CHILD_MAINTENANCE_NUMBER,"line1", "line2","line3", "W1", name),
+            buildCaseWithChildMaintenanceWithOtherPartyNameAddress(CHILD_MAINTENANCE_NUMBER, "line1", "line2", "line3", "W1", name),
             false);
         assertFalse(response.getWarnings().isEmpty());
         assertEquals(1, response.getWarnings().size());
@@ -1936,7 +2290,7 @@ public class SscsCaseValidatorTest {
         CaseResponse response = validator.validateExceptionRecord(transformResponse,
             exceptionRecord,
             buildCaseWithChildMaintenanceWithOtherPartyNameAddress(
-                CHILD_MAINTENANCE_NUMBER,OTHER_PARTY_ADDRESS_LINE1, OTHER_PARTY_ADDRESS_LINE2,OTHER_PARTY_ADDRESS_LINE3, OTHER_PARTY_POSTCODE, buildOtherPartyName()),
+                CHILD_MAINTENANCE_NUMBER, OTHER_PARTY_ADDRESS_LINE1, OTHER_PARTY_ADDRESS_LINE2, OTHER_PARTY_ADDRESS_LINE3, OTHER_PARTY_POSTCODE, buildOtherPartyName()),
             false);
 
         assertTrue(response.getWarnings().isEmpty());
@@ -1950,11 +2304,11 @@ public class SscsCaseValidatorTest {
         otherPartyName.setLastName(null);
         CaseResponse response = validator.validateExceptionRecord(transformResponse,
             exceptionRecordSscs2, buildCaseWithChildMaintenanceWithOtherPartyNameAddress(
-                CHILD_MAINTENANCE_NUMBER,OTHER_PARTY_ADDRESS_LINE1, OTHER_PARTY_ADDRESS_LINE2,OTHER_PARTY_ADDRESS_LINE3, OTHER_PARTY_POSTCODE, otherPartyName),
+                CHILD_MAINTENANCE_NUMBER, OTHER_PARTY_ADDRESS_LINE1, OTHER_PARTY_ADDRESS_LINE2, OTHER_PARTY_ADDRESS_LINE3, OTHER_PARTY_POSTCODE, otherPartyName),
             false);
 
         assertEquals(1, response.getWarnings().size());
-        assertEquals("other_party_last_name is empty", response.getWarnings().get(0));
+        assertEquals("other_party_last_name is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -1963,11 +2317,11 @@ public class SscsCaseValidatorTest {
         otherPartyName.setFirstName(null);
         CaseResponse response = validator.validateExceptionRecord(transformResponse,
             exceptionRecordSscs2, buildCaseWithChildMaintenanceWithOtherPartyNameAddress(
-                CHILD_MAINTENANCE_NUMBER,OTHER_PARTY_ADDRESS_LINE1, OTHER_PARTY_ADDRESS_LINE2,OTHER_PARTY_ADDRESS_LINE3, OTHER_PARTY_POSTCODE, otherPartyName),
+                CHILD_MAINTENANCE_NUMBER, OTHER_PARTY_ADDRESS_LINE1, OTHER_PARTY_ADDRESS_LINE2, OTHER_PARTY_ADDRESS_LINE3, OTHER_PARTY_POSTCODE, otherPartyName),
             false);
 
         assertEquals(1, response.getWarnings().size());
-        assertEquals("other_party_first_name is empty", response.getWarnings().get(0));
+        assertEquals("other_party_first_name is empty", response.getWarnings().getFirst());
     }
 
     @Test
@@ -1976,11 +2330,11 @@ public class SscsCaseValidatorTest {
         otherPartyName.setTitle("Random");
         CaseResponse response = validator.validateExceptionRecord(transformResponse,
             exceptionRecordSscs2, buildCaseWithChildMaintenanceWithOtherPartyNameAddress(
-                CHILD_MAINTENANCE_NUMBER,OTHER_PARTY_ADDRESS_LINE1, OTHER_PARTY_ADDRESS_LINE2,OTHER_PARTY_ADDRESS_LINE3, OTHER_PARTY_POSTCODE, otherPartyName),
+                CHILD_MAINTENANCE_NUMBER, OTHER_PARTY_ADDRESS_LINE1, OTHER_PARTY_ADDRESS_LINE2, OTHER_PARTY_ADDRESS_LINE3, OTHER_PARTY_POSTCODE, otherPartyName),
             false);
 
         assertEquals(1, response.getWarnings().size());
-        assertEquals("other_party_title is invalid", response.getWarnings().get(0));
+        assertEquals("other_party_title is invalid", response.getWarnings().getFirst());
     }
 
     @Test
@@ -1994,7 +2348,7 @@ public class SscsCaseValidatorTest {
 
         CaseResponse response = validator.validateExceptionRecord(transformResponse,
             exceptionRecordSscs2, buildCaseWithChildMaintenanceWithOtherPartyNameAddress(
-                CHILD_MAINTENANCE_NUMBER,OTHER_PARTY_ADDRESS_LINE1, OTHER_PARTY_ADDRESS_LINE2,null, OTHER_PARTY_POSTCODE, otherPartyName),
+                CHILD_MAINTENANCE_NUMBER, OTHER_PARTY_ADDRESS_LINE1, OTHER_PARTY_ADDRESS_LINE2, null, OTHER_PARTY_POSTCODE, otherPartyName),
             false);
 
         assertEquals(0, response.getWarnings().size());
@@ -2010,7 +2364,7 @@ public class SscsCaseValidatorTest {
 
         CaseResponse response = validator.validateExceptionRecord(transformResponse,
             exceptionRecordSscs2, buildCaseWithChildMaintenanceWithOtherPartyNameAddress(null,
-                OTHER_PARTY_ADDRESS_LINE1, OTHER_PARTY_ADDRESS_LINE2,null, OTHER_PARTY_POSTCODE,
+                OTHER_PARTY_ADDRESS_LINE1, OTHER_PARTY_ADDRESS_LINE2, null, OTHER_PARTY_POSTCODE,
                 buildOtherPartyName()), false);
 
         assertEquals(0, response.getWarnings().size());
@@ -2026,11 +2380,11 @@ public class SscsCaseValidatorTest {
 
         CaseResponse response = validator.validateExceptionRecord(transformResponse,
             exceptionRecordSscs2, buildCaseWithChildMaintenanceWithOtherPartyNameAddress(null,
-                OTHER_PARTY_ADDRESS_LINE1, OTHER_PARTY_ADDRESS_LINE2,null, OTHER_PARTY_POSTCODE,
+                OTHER_PARTY_ADDRESS_LINE1, OTHER_PARTY_ADDRESS_LINE2, null, OTHER_PARTY_POSTCODE,
                 buildOtherPartyName()), false);
 
         assertEquals(1, response.getWarnings().size());
-        assertEquals("person1_child_maintenance_number is empty", response.getWarnings().get(0));
+        assertEquals("person1_child_maintenance_number is empty", response.getWarnings().getFirst());
     }
 
 
@@ -2045,7 +2399,7 @@ public class SscsCaseValidatorTest {
 
         CaseResponse response = validator.validateExceptionRecord(transformResponse,
             exceptionRecordSscs2, buildCaseWithChildMaintenanceWithOtherPartyNameAddress(
-                CHILD_MAINTENANCE_NUMBER,OTHER_PARTY_ADDRESS_LINE1, OTHER_PARTY_ADDRESS_LINE2,OTHER_PARTY_ADDRESS_LINE3, OTHER_PARTY_POSTCODE, otherPartyName),
+                CHILD_MAINTENANCE_NUMBER, OTHER_PARTY_ADDRESS_LINE1, OTHER_PARTY_ADDRESS_LINE2, OTHER_PARTY_ADDRESS_LINE3, OTHER_PARTY_POSTCODE, otherPartyName),
             false);
 
         assertEquals(0, response.getWarnings().size());
@@ -2064,14 +2418,14 @@ public class SscsCaseValidatorTest {
 
         CaseResponse response = validator.validateExceptionRecord(transformResponse,
             exceptionRecordSscs2, buildCaseWithChildMaintenanceWithOtherPartyNameAddress(
-                CHILD_MAINTENANCE_NUMBER,OTHER_PARTY_ADDRESS_LINE1, OTHER_PARTY_ADDRESS_LINE2,OTHER_PARTY_ADDRESS_LINE3, OTHER_PARTY_POSTCODE, otherPartyName),
+                CHILD_MAINTENANCE_NUMBER, OTHER_PARTY_ADDRESS_LINE1, OTHER_PARTY_ADDRESS_LINE2, OTHER_PARTY_ADDRESS_LINE3, OTHER_PARTY_POSTCODE, otherPartyName),
             false);
 
         assertEquals(0, response.getWarnings().size());
-        assertEquals("Jerry Fisher", ((List<CcdValue<OtherParty>>) response.getTransformedCase().get("otherParties")).get(0).getValue().getName().getFullNameNoTitle());
+        assertEquals("Jerry Fisher", ((List<CcdValue<OtherParty>>) response.getTransformedCase().get("otherParties")).getFirst().getValue().getName().getFullNameNoTitle());
         @SuppressWarnings("unchecked")
         List<CcdValue<OtherParty>> otherParties = ((List<CcdValue<OtherParty>>) response.getTransformedCase().get("otherParties"));
-        assertNotNull(otherParties.get(0).getValue().getAddress());
+        assertNotNull(otherParties.getFirst().getValue().getAddress());
     }
 
     @Test
@@ -2085,11 +2439,11 @@ public class SscsCaseValidatorTest {
 
         CaseResponse response = validator.validateExceptionRecord(transformResponse,
             exceptionRecordSscs2, buildCaseWithChildMaintenanceWithOtherPartyNameAddress(
-                CHILD_MAINTENANCE_NUMBER,OTHER_PARTY_ADDRESS_LINE1, OTHER_PARTY_ADDRESS_LINE2,OTHER_PARTY_ADDRESS_LINE3, OTHER_PARTY_POSTCODE, otherPartyName),
+                CHILD_MAINTENANCE_NUMBER, OTHER_PARTY_ADDRESS_LINE1, OTHER_PARTY_ADDRESS_LINE2, OTHER_PARTY_ADDRESS_LINE3, OTHER_PARTY_POSTCODE, otherPartyName),
             false);
 
         assertEquals(0, response.getWarnings().size());
-        assertEquals("Mr Jerry Fisher", ((List<CcdValue<OtherParty>>) response.getTransformedCase().get("otherParties")).get(0).getValue().getName().getFullName());
+        assertEquals("Mr Jerry Fisher", ((List<CcdValue<OtherParty>>) response.getTransformedCase().get("otherParties")).getFirst().getValue().getName().getFullName());
     }
 
     @Test
@@ -2105,15 +2459,15 @@ public class SscsCaseValidatorTest {
 
         CaseResponse response = validator.validateExceptionRecord(transformResponse,
             exceptionRecordSscs2, buildCaseWithChildMaintenanceWithOtherPartyNameAddress(
-                CHILD_MAINTENANCE_NUMBER,line1, line2, line3, postcode, buildOtherPartyName()),
+                CHILD_MAINTENANCE_NUMBER, line1, line2, line3, postcode, buildOtherPartyName()),
             false);
 
         assertEquals(0, response.getWarnings().size());
         @SuppressWarnings("unchecked")
         List<CcdValue<OtherParty>> otherParties = ((List<CcdValue<OtherParty>>) response.getTransformedCase().get("otherParties"));
         assertNotNull(otherParties);
-        assertNotNull(otherParties.get(0).getValue().getName());
-        assertNull(otherParties.get(0).getValue().getAddress());
+        assertNotNull(otherParties.getFirst().getValue().getName());
+        assertNull(otherParties.getFirst().getValue().getAddress());
     }
 
     private Object buildDocument(String filename) {
@@ -2138,6 +2492,15 @@ public class SscsCaseValidatorTest {
                                                               FormType formType) {
         return buildMinimumAppealDataWithMrnDateAndBenefitType(mrn, ESA.name(), appellant, buildMinimumRep(), null,
             exceptionCaseType, HEARING_TYPE_PAPER, null, formType);
+    }
+
+    private Map<String, Object> buildMinimumAppealDataWithBenefitTypeWithAppealReasons(String benefitCode, Appellant appellant,
+                                                                                       Boolean exceptionCaseType,
+                                                                                       FormType formType,
+                                                                                       AppealReasons appealReasons) {
+        return buildMinimumAppealDataWithMrnDateFormTypeAndBenefitType(defaultMrnDetails, benefitCode, appellant,
+            buildMinimumRep(), null, exceptionCaseType, HEARING_TYPE_ORAL,
+            HearingSubtype.builder().wantsHearingTypeFaceToFace("Yes").build(), formType, appealReasons);
     }
 
     private Map<String, Object> buildMinimumAppealDataWithBenefitType(String benefitCode, Appellant appellant,
@@ -2189,7 +2552,7 @@ public class SscsCaseValidatorTest {
                                                                                  FormType formType) {
         return buildMinimumAppealDataWithMrnDateFormTypeAndBenefitType(defaultMrnDetails, benefitCode, appellant,
             buildMinimumRep(), null, exceptionCaseType, HEARING_TYPE_ORAL,
-            HearingSubtype.builder().wantsHearingTypeFaceToFace("Yes").build(), formType);
+            HearingSubtype.builder().wantsHearingTypeFaceToFace("Yes").build(), formType, null);
     }
 
     private Map<String, Object> buildMinimumAppealDataWithMrnDateAndBenefitType(MrnDetails mrn, String benefitCode,
@@ -2202,7 +2565,7 @@ public class SscsCaseValidatorTest {
                                                                                 FormType formType) {
         return buildMinimumAppealDataWithMrnDateFormTypeAndBenefitType(mrn, benefitCode, appellant, representative,
             excludeDates,
-            exceptionCaseType, hearingType, hearingSubtype, formType);
+            exceptionCaseType, hearingType, hearingSubtype, formType, null);
     }
 
     private Map<String, Object> buildMinimumAppealDataWithMrnDateFormTypeAndBenefitType(MrnDetails mrn,
@@ -2213,13 +2576,14 @@ public class SscsCaseValidatorTest {
                                                                                         Boolean exceptionCaseType,
                                                                                         String hearingType,
                                                                                         HearingSubtype hearingSubtype,
-                                                                                        FormType formType) {
+                                                                                        FormType formType,
+                                                                                        AppealReasons appealReasons) {
         Map<String, Object> dataMap = new HashMap<>();
         List<ExcludeDate> excludedDates = new ArrayList<>();
         excludedDates.add(ExcludeDate.builder().value(DateRange.builder().start(excludeDates).build()).build());
-
         dataMap.put("formType", formType);
         dataMap.put("appeal", Appeal.builder()
+            .appealReasons(appealReasons)
             .mrnDetails(
                 MrnDetails.builder().mrnDate(mrn.getMrnDate()).dwpIssuingOffice(mrn.getDwpIssuingOffice()).build())
             .benefitType(BenefitType.builder().code(benefitCode).build())
@@ -2259,9 +2623,10 @@ public class SscsCaseValidatorTest {
             .name(Name.builder().title("Mr").firstName("Bob").lastName("Smith").build())
             .address(
                 Address.builder().line1("101 My Road").town("Brentwood").county("Essex").postcode(postcode).build())
-            .identity(Identity.builder().nino("BB000000B").build())
+            .identity(Identity.builder().nino("BB000000B").ibcaReference("A12A12").build())
             .contact(Contact.builder().mobile(mobileNumber).build())
             .appointee(appointee)
+            .ibcRole("myself")
             .role(Role.builder().name("Paying parent").build()).build();
     }
 
@@ -2275,7 +2640,8 @@ public class SscsCaseValidatorTest {
             true,
             HEARING_TYPE_ORAL,
             HearingSubtype.builder().wantsHearingTypeFaceToFace("Yes").build(),
-            FormType.SSCS2);
+            FormType.SSCS2,
+            null);
         datamap.put("childMaintenanceNumber", childMaintenanceNumber);
         datamap.put("otherParties", Collections.singletonList(CcdValue.<OtherParty>builder().value(
                 OtherParty.builder()
@@ -2320,5 +2686,4 @@ public class SscsCaseValidatorTest {
                 Address.builder().line1("101 My Road").town("Brentwood").county("Essex").postcode("CM13 1HG").build())
             .build();
     }
-
 }

@@ -14,7 +14,7 @@
             "firstName": "John",
             "lastName": null
           },
-          "address": null,
+          "address": {},
           "contact": {
             "email": null,
             "phone": null,

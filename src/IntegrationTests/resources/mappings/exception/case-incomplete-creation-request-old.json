@@ -18,7 +18,7 @@
           "firstName": "John",
           "lastName": null
         },
-        "address": { },
+        "address": {},
         "contact": {
           "email": null,
           "phone": null,
@@ -28,9 +28,9 @@
           "dob": null,
           "nino": null
         },
-        "isAppointee" : "No",
+        "isAppointee": "No",
         "appointee": null,
-        "isAddressSameAsAppointee" : null
+        "isAddressSameAsAppointee": null
       },
       "benefitType": {
         "code": "ESA",
@@ -38,11 +38,11 @@
       },
       "hearingSubtype": {},
       "hearingOptions": {
-        "wantsToAttend" : "Yes",
-        "wantsSupport" : "No",
+        "wantsToAttend": "Yes",
+        "wantsSupport": "No",
         "languageInterpreter": "No",
-        "arrangements" : [],
-        "scheduleHearing" : "No"
+        "arrangements": [],
+        "scheduleHearing": "No"
       },
       "appealReasons": null,
       "rep": {
@@ -54,9 +54,9 @@
       },
       "signer": null,
       "hearingType": "oral",
-      "receivedVia" : "Paper"
+      "receivedVia": "Paper"
     },
-    "sscsDocument" : [ ],
+    "sscsDocument": [],
     "subscriptions": {
       "appellantSubscription": {
         "wantSmsNotifications": "No",
@@ -66,15 +66,15 @@
         "subscribeSms": "No",
         "reason": null
       },
-      "supporterSubscription" : null,
-      "representativeSubscription" : null,
-      "appointeeSubscription" : null
+      "supporterSubscription": null,
+      "representativeSubscription": null,
+      "appointeeSubscription": null
     },
-    "evidencePresent" : "No",
-    "bulkScanCaseReference" : "1234567890",
-    "caseCreated" : "2018-01-11"
+    "evidencePresent": "No",
+    "bulkScanCaseReference": "1234567890",
+    "caseCreated": "2018-01-11"
   },
-  "security_classification" : "PUBLIC",
-  "event_token" : "test_event_token",
-  "ignore_warning" : false
+  "security_classification": "PUBLIC",
+  "event_token": "test_event_token",
+  "ignore_warning": false
 }

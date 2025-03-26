@@ -1,15 +1,18 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.constants;
 
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_COUNTRY;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_LINE1;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_LINE2;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_LINE3;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_LINE4;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_PORT_OF_ENTRY;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_POSTCODE;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.DOB;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.FIRST_NAME;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_OPTIONS_EXCLUDE_DATES_LITERAL;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TELEPHONE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_VIDEO_EMAIL_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBCA_REFERENCE;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ISSUING_OFFICE;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.LAST_NAME;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.MOBILE;
@@ -55,9 +58,13 @@ public enum WarningMessage {
     APPOINTEE_POSTCODE(ADDRESS_POSTCODE, "Appointee postcode"),
     REPRESENTATIVE_POSTCODE(ADDRESS_POSTCODE, "Representative postcode"),
     OTHER_PARTY_POSTCODE(ADDRESS_POSTCODE, "Other party postcode"),
+    APPELLANT_ADDRESS_COUNTRY(ADDRESS_COUNTRY, "Appellant address country"),
+    APPELLANT_ADDRESS_PORT_OF_ENTRY(ADDRESS_PORT_OF_ENTRY, "Appellant address port of entry"),
+    APPELLANT_IBCA_REFERENCE(IBCA_REFERENCE, "Appellant ibca reference"),
     BENEFIT_TYPE_DESCRIPTION(SscsConstants.BENEFIT_TYPE_DESCRIPTION, "Benefit type description"),
     BENEFIT_TYPE_OTHER(SscsConstants.BENEFIT_TYPE_OTHER, "Benefit type description"),
     MRN_DATE(SscsConstants.MRN_DATE, "Mrn date"),
+    APPEAL_GROUNDS(SscsConstants.APPEAL_GROUNDS, "Grounds for appeal"),
     OFFICE(ISSUING_OFFICE, "DWP issuing office"),
     HEARING_OPTIONS_EXCLUDE_DATES(HEARING_OPTIONS_EXCLUDE_DATES_LITERAL, "Hearing options exclude dates"),
     APPELLANT_NINO(NINO, "Appellant nino"),
@@ -75,8 +82,8 @@ public enum WarningMessage {
     PERSON1_CHILD_MAINTENANCE_NUMBER("person1_child_maintenance_number", "Child maintenance number"),
     APPELLANT_PARTY_NAME("is_paying_parent, is_receiving_parent, is_another_party and other_party_details", "Appellant role and/or description"),
     APPELLANT_PARTY_DESCRIPTION("other_party_details", "Appellant role and/or description");
-    private final String exceptionRecordMessage;
-    private final String validationRecordMessage;
+    private String exceptionRecordMessage;
+    private String validationRecordMessage;
 
     WarningMessage(String exceptionRecordMessage, String validationRecordMessage) {
         this.exceptionRecordMessage = exceptionRecordMessage;

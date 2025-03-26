@@ -12,74 +12,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.AGREE_LESS_HEARING_NOTICE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPEAL_LATE_REASON;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPEAL_REASON;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_ADDRESS_LINE1;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_ADDRESS_LINE2;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_ADDRESS_LINE3;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_ADDRESS_LINE4;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_DATE_OF_BIRTH;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_EMAIL;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_FIRST_NAME;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_LAST_NAME;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_MOBILE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_NINO;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_PHONE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_POSTCODE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_TITLE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPOINTEE_ADDRESS_LINE1;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPOINTEE_ADDRESS_LINE2;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPOINTEE_ADDRESS_LINE3;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPOINTEE_ADDRESS_LINE4;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPOINTEE_DATE_OF_BIRTH;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPOINTEE_FIRST_NAME;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPOINTEE_LAST_NAME;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPOINTEE_MOBILE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPOINTEE_PHONE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPOINTEE_POSTCODE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPOINTEE_TITLE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.BENEFIT_CODE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.BENEFIT_TYPE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.BENEFIT_TYPE_DESCRIPTION;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.CASE_CODE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.CHILD_MAINTENANCE_NUMBER;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.DWP_REGIONAL_CENTRE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.HEARING_LOOP;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.HEARING_OPTIONS_DIALECT_TYPE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.HEARING_OPTIONS_EXCLUDE_DATES;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.HEARING_OPTIONS_LANGUAGE_TYPE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.HEARING_TELEPHONE_NUMBER;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.HEARING_VIDEO_EMAIL;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.ISSUE_CODE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.IS_HEARING_TYPE_ORAL;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.IS_HEARING_TYPE_PAPER;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.MRN_DATE_VALUE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.OFFICE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.OTHER_PARTY_ADDRESS_LINE1;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.OTHER_PARTY_ADDRESS_LINE2;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.OTHER_PARTY_ADDRESS_LINE3;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.OTHER_PARTY_FIRST_NAME;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.OTHER_PARTY_ID_ONE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.OTHER_PARTY_LAST_NAME;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.OTHER_PARTY_POSTCODE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.OTHER_PARTY_TITLE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.PROCESSING_VENUE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.REGION_ID;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.REPRESENTATIVE_ADDRESS_LINE1;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.REPRESENTATIVE_ADDRESS_LINE2;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.REPRESENTATIVE_ADDRESS_LINE3;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.REPRESENTATIVE_ADDRESS_LINE4;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.REPRESENTATIVE_EMAIL;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.REPRESENTATIVE_NAME;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.REPRESENTATIVE_PERSON_FIRST_NAME;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.REPRESENTATIVE_PERSON_LAST_NAME;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.REPRESENTATIVE_PERSON_TITLE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.REPRESENTATIVE_PHONE_NUMBER;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.REPRESENTATIVE_POSTCODE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.SIGNATURE_NAME;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.SIGN_LANGUAGE_REQUIRED;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.SIGN_LANGUAGE_TYPE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.*;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.APPEAL_GROUNDS;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.APPEAL_GROUNDS_2;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.BENEFIT_TYPE_OTHER;
@@ -97,6 +30,11 @@ import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TYPE_TELEPHONE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TYPE_VIDEO_LITERAL;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_VIDEO_EMAIL_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBC_ROLE_FOR_DECEASED;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBC_ROLE_FOR_LACKING_CAPACITY;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBC_ROLE_FOR_POA;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBC_ROLE_FOR_SELF;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBC_ROLE_FOR_U18;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ISSUING_OFFICE;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IS_BENEFIT_TYPE_OTHER;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IS_BENEFIT_TYPE_TAX_CREDIT;
@@ -115,6 +53,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.FormType.SSCS1PEU;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.FormType.SSCS2;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.FormType.SSCS5;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.FormType.SSCS8;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService.normaliseNino;
 
@@ -210,7 +149,6 @@ public class SscsCaseTransformerTest {
     FormTypeValidator formTypeValidator;
 
     FormTypeValidator formTypeValidator2;
-
 
     @Mock
     private IdamService idamService;
@@ -339,7 +277,7 @@ public class SscsCaseTransformerTest {
         pairs.put(BenefitTypeIndicator.PIP.getIndicatorString(), true);
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
         assertFalse(result.getErrors().isEmpty());
-        assertEquals("is_benefit_type_pip and is_benefit_type_esa have contradicting values", result.getErrors().get(0));
+        assertEquals("is_benefit_type_pip and is_benefit_type_esa have contradicting values", result.getErrors().getFirst());
     }
 
     @Test
@@ -354,7 +292,7 @@ public class SscsCaseTransformerTest {
         pairs.put(BenefitTypeIndicatorSscs5.NATIONAL_INSURANCE_CREDITS.getIndicatorString(), true);
         CaseResponse result = transformer.transformExceptionRecord(sscs5ExceptionRecord, false);
         assertFalse(result.getErrors().isEmpty());
-        assertEquals("is_benefit_type_tax_credit, is_benefit_type_guardians_allowance, is_benefit_type_tax_free_childcare, is_benefit_type_home_responsibilities_protection, is_benefit_type_child_benefit, is_benefit_type_30_hours_tax_free_childcare, is_benefit_type_guaranteed_minimum_pension and is_benefit_type_national_insurance_credits have contradicting values", result.getErrors().get(0));
+        assertEquals("is_benefit_type_tax_credit, is_benefit_type_guardians_allowance, is_benefit_type_tax_free_childcare, is_benefit_type_home_responsibilities_protection, is_benefit_type_child_benefit, is_benefit_type_30_hours_tax_free_childcare, is_benefit_type_guaranteed_minimum_pension and is_benefit_type_national_insurance_credits have contradicting values", result.getErrors().getFirst());
     }
 
     @Test
@@ -369,7 +307,7 @@ public class SscsCaseTransformerTest {
         pairs.put(BenefitTypeIndicatorSscs5.NATIONAL_INSURANCE_CREDITS.getIndicatorString(), false);
         CaseResponse result = transformer.transformExceptionRecord(sscs5ExceptionRecord, false);
         assertEquals(1, result.getErrors().size());
-        assertEquals("is_benefit_type_tax_credit and is_benefit_type_guardians_allowance have contradicting values", result.getErrors().get(0));
+        assertEquals("is_benefit_type_tax_credit and is_benefit_type_guardians_allowance have contradicting values", result.getErrors().getFirst());
     }
 
     @Test
@@ -384,14 +322,14 @@ public class SscsCaseTransformerTest {
         pairs.put(BenefitTypeIndicatorSscs5.NATIONAL_INSURANCE_CREDITS.getIndicatorString(), false);
         CaseResponse result = transformer.transformExceptionRecord(sscs5ExceptionRecord, false);
         assertEquals(1, result.getErrors().size());
-        assertEquals("is_benefit_type_tax_credit, is_benefit_type_guardians_allowance, is_benefit_type_tax_free_childcare, is_benefit_type_home_responsibilities_protection, is_benefit_type_child_benefit, is_benefit_type_30_hours_tax_free_childcare, is_benefit_type_guaranteed_minimum_pension and is_benefit_type_national_insurance_credits fields are empty or false", result.getErrors().get(0));
+        assertEquals("is_benefit_type_tax_credit, is_benefit_type_guardians_allowance, is_benefit_type_tax_free_childcare, is_benefit_type_home_responsibilities_protection, is_benefit_type_child_benefit, is_benefit_type_30_hours_tax_free_childcare, is_benefit_type_guaranteed_minimum_pension and is_benefit_type_national_insurance_credits fields are empty or false", result.getErrors().getFirst());
     }
 
     @Test
     public void givenAllSscs5BenefitTypesAreMissing_thenReturnAnError() {
         CaseResponse result = transformer.transformExceptionRecord(sscs5ExceptionRecord, false);
         assertEquals(1, result.getErrors().size());
-        assertEquals("is_benefit_type_tax_credit, is_benefit_type_guardians_allowance, is_benefit_type_tax_free_childcare, is_benefit_type_home_responsibilities_protection, is_benefit_type_child_benefit, is_benefit_type_30_hours_tax_free_childcare, is_benefit_type_guaranteed_minimum_pension and is_benefit_type_national_insurance_credits fields are empty or false", result.getErrors().get(0));
+        assertEquals("is_benefit_type_tax_credit, is_benefit_type_guardians_allowance, is_benefit_type_tax_free_childcare, is_benefit_type_home_responsibilities_protection, is_benefit_type_child_benefit, is_benefit_type_30_hours_tax_free_childcare, is_benefit_type_guaranteed_minimum_pension and is_benefit_type_national_insurance_credits fields are empty or false", result.getErrors().getFirst());
     }
 
     @Test
@@ -402,7 +340,7 @@ public class SscsCaseTransformerTest {
         pairs.put(BenefitTypeIndicatorSscs1U.OTHER.getIndicatorString(), false);
         CaseResponse result = transformer.transformExceptionRecord(sscs1UExceptionRecord, false);
         assertEquals(1, result.getErrors().size());
-        assertEquals("is_benefit_type_pip, is_benefit_type_esa, is_benefit_type_uc and benefit_type_other fields are empty", result.getErrors().get(0));
+        assertEquals("is_benefit_type_pip, is_benefit_type_esa, is_benefit_type_uc and benefit_type_other fields are empty", result.getErrors().getFirst());
     }
 
     @Test
@@ -414,7 +352,7 @@ public class SscsCaseTransformerTest {
         pairs.put(BenefitTypeIndicatorSscs1U.OTHER.getIndicatorString(), false);
         CaseResponse result = transformer.transformExceptionRecord(sscs1UExceptionRecord, false);
         assertEquals(1, result.getErrors().size());
-        assertEquals("is_benefit_type_pip, is_benefit_type_esa, is_benefit_type_uc and benefit_type_other fields are empty", result.getErrors().get(0));
+        assertEquals("is_benefit_type_pip, is_benefit_type_esa, is_benefit_type_uc and benefit_type_other fields are empty", result.getErrors().getFirst());
     }
 
     @Test
@@ -525,7 +463,7 @@ public class SscsCaseTransformerTest {
         pairs.put(BENEFIT_TYPE_OTHER, "Not a valid type");
         CaseResponse result = transformer.transformExceptionRecord(sscs1UExceptionRecord, false);
         assertEquals(1, result.getErrors().size());
-        assertEquals("benefit_type_other is invalid", result.getErrors().get(0));
+        assertEquals("benefit_type_other is invalid", result.getErrors().getFirst());
     }
 
     @Test
@@ -536,7 +474,7 @@ public class SscsCaseTransformerTest {
         pairs.put(BenefitTypeIndicatorSscs1U.OTHER.getIndicatorString(), true);
         CaseResponse result = transformer.transformExceptionRecord(sscs1UExceptionRecord, false);
         assertEquals(1, result.getErrors().size());
-        assertEquals("benefit_type_other is invalid", result.getErrors().get(0));
+        assertEquals("benefit_type_other is invalid", result.getErrors().getFirst());
     }
 
     @Test
@@ -548,7 +486,7 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(sscs1UExceptionRecord, false);
         assertEquals(1, result.getErrors().size());
-        assertEquals("is_benefit_type_pip and benefit_type_other have contradicting values", result.getErrors().get(0));
+        assertEquals("is_benefit_type_pip and benefit_type_other have contradicting values", result.getErrors().getFirst());
     }
 
     @Test
@@ -559,7 +497,7 @@ public class SscsCaseTransformerTest {
         pairs.put(BENEFIT_TYPE_OTHER, "Attendance Allowance");
         CaseResponse result = transformer.transformExceptionRecord(sscs1UExceptionRecord, false);
         assertEquals(1, result.getErrors().size());
-        assertEquals("is_benefit_type_pip and benefit_type_other have contradicting values", result.getErrors().get(0));
+        assertEquals("is_benefit_type_pip and benefit_type_other have contradicting values", result.getErrors().getFirst());
     }
 
     @Test
@@ -571,7 +509,7 @@ public class SscsCaseTransformerTest {
         pairs.put(BenefitTypeIndicatorSscs1U.UC.getIndicatorString(), "Yes");
         CaseResponse result = transformer.transformExceptionRecord(sscs1UExceptionRecord, false);
         assertEquals(1, result.getErrors().size());
-        assertEquals("is_benefit_type_esa, is_benefit_type_uc and is_benefit_type_other have contradicting values", result.getErrors().get(0));
+        assertEquals("is_benefit_type_esa, is_benefit_type_uc and is_benefit_type_other have contradicting values", result.getErrors().getFirst());
     }
 
     @Test
@@ -583,7 +521,7 @@ public class SscsCaseTransformerTest {
         pairs.put(BenefitTypeIndicatorSscs1U.UC.getIndicatorString(), true);
         CaseResponse result = transformer.transformExceptionRecord(sscs1UExceptionRecord, false);
         assertEquals(1, result.getErrors().size());
-        assertEquals("is_benefit_type_esa, is_benefit_type_uc and is_benefit_type_other have contradicting values", result.getErrors().get(0));
+        assertEquals("is_benefit_type_esa, is_benefit_type_uc and is_benefit_type_other have contradicting values", result.getErrors().getFirst());
     }
 
     @Test
@@ -852,6 +790,100 @@ public class SscsCaseTransformerTest {
         assertEquals(CASE_CODE, result.getTransformedCase().get("caseCode"));
         assertEquals(DWP_REGIONAL_CENTRE, result.getTransformedCase().get("dwpRegionalCentre"));
 
+        assertTrue(result.getErrors().isEmpty());
+    }
+
+    @Test
+    public void givenSscs8IbcInUk_thenBuildAnAppealWithIbcRoleAndIbcaReference() {
+        pairs.put("person1_title", APPELLANT_TITLE);
+        pairs.put("person1_first_name", APPELLANT_FIRST_NAME);
+        pairs.put("person1_last_name", APPELLANT_LAST_NAME);
+        pairs.put("person1_address_line1", APPELLANT_ADDRESS_LINE1);
+        pairs.put("person1_address_line2", APPELLANT_ADDRESS_LINE2);
+        pairs.put("person1_address_line3", APPELLANT_ADDRESS_LINE3);
+        pairs.put("person1_address_line4", APPELLANT_ADDRESS_LINE4);
+        pairs.put("person1_postcode", APPELLANT_POSTCODE);
+        pairs.put("person1_phone", APPELLANT_PHONE);
+        pairs.put("person1_mobile", APPELLANT_MOBILE);
+        pairs.put("person1_dob", APPELLANT_DATE_OF_BIRTH);
+        pairs.put("person1_email", APPELLANT_EMAIL);
+        pairs.put(APPEAL_GROUNDS, APPEAL_REASON);
+        pairs.put("person1_ibca_reference", APPELLANT_IBCA_REFERENCE);
+        pairs.put(IBC_ROLE_FOR_SELF, true);
+        pairs.put("form_type", SSCS8_FORM_TYPE);
+
+        CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
+
+        assertEquals(SSCS8, result.getTransformedCase().get("formType"));
+        Appeal transformedAppeal = (Appeal) result.getTransformedCase().get("appeal");
+        assertNotNull(transformedAppeal);
+        assertEquals(APPELLANT_IBC_ROLE_FOR_SELF, transformedAppeal.getAppellant().getIbcRole());
+        assertEquals(APPELLANT_IBCA_REFERENCE, transformedAppeal.getAppellant().getIdentity().getIbcaReference());
+        Address address = transformedAppeal.getAppellant().getAddress();
+        assertNotNull(address);
+        Address expectedAddress = Address.builder().line1(APPELLANT_ADDRESS_LINE1).line2(APPELLANT_ADDRESS_LINE2).town(APPELLANT_ADDRESS_LINE3).postcode(APPELLANT_POSTCODE).inMainlandUk(YesNo.YES).build();
+        assertEquals(expectedAddress, address);
+        assertTrue(result.getErrors().isEmpty());
+    }
+
+    @Test
+    public void givenPortOfEntry_thenBuildAnAppealWithAddressWithCountryPortOfEntry() {
+        pairs.put("person1_address_line1", APPELLANT_ADDRESS_LINE1);
+        pairs.put("person1_address_line2", APPELLANT_ADDRESS_LINE2);
+        pairs.put("person1_address_line3", APPELLANT_ADDRESS_LINE3);
+        pairs.put("person1_address_line4", APPELLANT_ADDRESS_LINE4);
+        pairs.put("person1_Country", APPELLANT_ADDRESS_COUNTRY);
+        pairs.put("person1_port_of_entry", APPELLANT_PORT_OF_ENTRY);
+        pairs.put("person1_postcode", APPELLANT_POSTCODE);
+        pairs.put("person1_ibca_reference", APPELLANT_IBCA_REFERENCE);
+        pairs.put(IBC_ROLE_FOR_SELF, true);
+        pairs.put("form_type", SSCS8_FORM_TYPE);
+
+        CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
+
+        assertEquals(SSCS8, result.getTransformedCase().get("formType"));
+        Appeal transformedAppeal = (Appeal) result.getTransformedCase().get("appeal");
+        assertNotNull(transformedAppeal);
+        assertEquals(APPELLANT_IBC_ROLE_FOR_SELF, transformedAppeal.getAppellant().getIbcRole());
+        assertEquals(APPELLANT_IBCA_REFERENCE, transformedAppeal.getAppellant().getIdentity().getIbcaReference());
+        Address address = transformedAppeal.getAppellant().getAddress();
+        assertNotNull(address);
+        Address expectedAddress = Address.builder().line1(APPELLANT_ADDRESS_LINE1).line2(APPELLANT_ADDRESS_LINE2).town(APPELLANT_ADDRESS_LINE3).country(APPELLANT_ADDRESS_COUNTRY).postcode(APPELLANT_POSTCODE).portOfEntry(APPELLANT_PORT_OF_ENTRY).inMainlandUk(YesNo.NO).build();
+        assertEquals(expectedAddress, address);
+        assertTrue(result.getErrors().isEmpty());
+    }
+
+    @Test
+    @Parameters({
+        IBC_ROLE_FOR_SELF + "," + APPELLANT_IBC_ROLE_FOR_SELF,
+        IBC_ROLE_FOR_U18 + "," + APPELLANT_IBC_ROLE_FOR_U18,
+        IBC_ROLE_FOR_DECEASED + "," + APPELLANT_IBC_ROLE_FOR_DECEASED,
+        IBC_ROLE_FOR_POA + "," + APPELLANT_IBC_ROLE_FOR_POA,
+        IBC_ROLE_FOR_LACKING_CAPACITY + "," + APPELLANT_IBC_ROLE_FOR_LACKING_CAPACITY
+    })
+    public void givenChosenIbcRole_thenBuildAnAppealWithIbcRoleSet(String ibcRoleBoolean, String ibcRoleValue) {
+        pairs.put("person1_address_line1", APPELLANT_ADDRESS_LINE1);
+        pairs.put("person1_address_line2", APPELLANT_ADDRESS_LINE2);
+        pairs.put("person1_address_line3", APPELLANT_ADDRESS_LINE3);
+        pairs.put("person1_address_line4", APPELLANT_ADDRESS_LINE4);
+        pairs.put("person1_Country", APPELLANT_ADDRESS_COUNTRY);
+        pairs.put("person1_port_of_entry", APPELLANT_PORT_OF_ENTRY);
+        pairs.put("person1_postcode", APPELLANT_POSTCODE);
+        pairs.put("person1_ibca_reference", APPELLANT_IBCA_REFERENCE);
+        pairs.put(ibcRoleBoolean, true);
+        pairs.put("form_type", SSCS8_FORM_TYPE);
+
+        CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
+
+        assertEquals(SSCS8, result.getTransformedCase().get("formType"));
+        Appeal transformedAppeal = (Appeal) result.getTransformedCase().get("appeal");
+        assertNotNull(transformedAppeal);
+        assertEquals(ibcRoleValue, transformedAppeal.getAppellant().getIbcRole());
+        assertEquals(APPELLANT_IBCA_REFERENCE, transformedAppeal.getAppellant().getIdentity().getIbcaReference());
+        Address address = transformedAppeal.getAppellant().getAddress();
+        assertNotNull(address);
+        Address expectedAddress = Address.builder().line1(APPELLANT_ADDRESS_LINE1).line2(APPELLANT_ADDRESS_LINE2).town(APPELLANT_ADDRESS_LINE3).country(APPELLANT_ADDRESS_COUNTRY).postcode(APPELLANT_POSTCODE).portOfEntry(APPELLANT_PORT_OF_ENTRY).inMainlandUk(YesNo.NO).build();
+        assertEquals(expectedAddress, address);
         assertTrue(result.getErrors().isEmpty());
     }
 
@@ -1207,7 +1239,7 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("hearingLoop", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().get(0));
+        assertEquals("hearingLoop", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().getFirst());
         assertEquals("Yes", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getWantsSupport());
 
         assertTrue(result.getErrors().isEmpty());
@@ -1231,7 +1263,7 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("hearingLoop", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().get(0));
+        assertEquals("hearingLoop", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().getFirst());
 
         assertTrue(result.getErrors().isEmpty());
     }
@@ -1258,7 +1290,7 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("disabledAccess", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().get(0));
+        assertEquals("disabledAccess", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().getFirst());
         assertTrue(result.getErrors().isEmpty());
     }
 
@@ -1282,7 +1314,7 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("2030-12-01", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates().get(0).getValue().getStart());
+        assertEquals("2030-12-01", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates().getFirst().getValue().getStart());
         assertEquals(YES_LITERAL, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getScheduleHearing());
 
         assertTrue(result.getErrors().isEmpty());
@@ -1295,7 +1327,7 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("2030-12-01", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates().get(0).getValue().getStart());
+        assertEquals("2030-12-01", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates().getFirst().getValue().getStart());
         assertEquals(YES_LITERAL, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getWantsToAttend());
 
         assertTrue(result.getErrors().isEmpty());
@@ -1310,7 +1342,7 @@ public class SscsCaseTransformerTest {
 
         List<ExcludeDate> excludeDateList = ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates();
 
-        assertEquals("2030-12-01", excludeDateList.get(0).getValue().getStart());
+        assertEquals("2030-12-01", excludeDateList.getFirst().getValue().getStart());
         assertEquals("2030-12-15", excludeDateList.get(1).getValue().getStart());
         assertEquals("2030-12-31", excludeDateList.get(1).getValue().getEnd());
         assertEquals(YES_LITERAL, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getWantsToAttend());
@@ -1338,7 +1370,7 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("2030-12-01", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates().get(0).getValue().getStart());
+        assertEquals("2030-12-01", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates().getFirst().getValue().getStart());
         assertEquals(NO_LITERAL, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getScheduleHearing());
 
         assertTrue(result.getErrors().isEmpty());
@@ -1352,7 +1384,7 @@ public class SscsCaseTransformerTest {
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
         List<ExcludeDate> excludeDates = ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates();
-        assertEquals("2018-12-12", (excludeDates.get(0).getValue().getStart()));
+        assertEquals("2018-12-12", (excludeDates.getFirst().getValue().getStart()));
         assertEquals("2018-12-16", (excludeDates.get(1).getValue().getStart()));
 
         assertTrue(result.getErrors().isEmpty());
@@ -1366,7 +1398,7 @@ public class SscsCaseTransformerTest {
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
         List<ExcludeDate> excludeDates = ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates();
-        assertEquals("2018-12-12", (excludeDates.get(0).getValue().getStart()));
+        assertEquals("2018-12-12", (excludeDates.getFirst().getValue().getStart()));
         assertEquals("2018-12-16", (excludeDates.get(1).getValue().getStart()));
 
         assertTrue(result.getErrors().isEmpty());
@@ -1406,7 +1438,7 @@ public class SscsCaseTransformerTest {
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
         List<ExcludeDate> excludeDates = ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates();
-        assertEquals("2018-12-12", (excludeDates.get(0).getValue().getStart()));
+        assertEquals("2018-12-12", (excludeDates.getFirst().getValue().getStart()));
         assertEquals("2018-12-16", (excludeDates.get(1).getValue().getStart()));
         assertEquals("2018-12-18", (excludeDates.get(1).getValue().getEnd()));
 
@@ -1421,8 +1453,8 @@ public class SscsCaseTransformerTest {
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
         List<ExcludeDate> excludeDates = ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates();
-        assertEquals("2018-12-16", (excludeDates.get(0).getValue().getStart()));
-        assertEquals("2018-12-18", (excludeDates.get(0).getValue().getEnd()));
+        assertEquals("2018-12-16", (excludeDates.getFirst().getValue().getStart()));
+        assertEquals("2018-12-18", (excludeDates.getFirst().getValue().getEnd()));
 
         assertTrue(result.getErrors().isEmpty());
     }
@@ -1435,7 +1467,7 @@ public class SscsCaseTransformerTest {
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
         List<ExcludeDate> excludeDates = ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates();
-        assertEquals("2018-12-12", (excludeDates.get(0).getValue().getStart()));
+        assertEquals("2018-12-12", (excludeDates.getFirst().getValue().getStart()));
         assertEquals("2018-12-14", (excludeDates.get(1).getValue().getStart()));
         assertEquals("2018-12-16", (excludeDates.get(2).getValue().getStart()));
         assertEquals("2018-12-18", (excludeDates.get(2).getValue().getEnd()));
@@ -1512,7 +1544,7 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("signLanguageInterpreter", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().get(0));
+        assertEquals("signLanguageInterpreter", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().getFirst());
         assertEquals(SIGN_LANGUAGE_TYPE, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getSignLanguageType());
 
         assertTrue(result.getErrors().isEmpty());
@@ -1525,7 +1557,7 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("signLanguageInterpreter", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().get(0));
+        assertEquals("signLanguageInterpreter", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().getFirst());
         assertEquals(DEFAULT_SIGN_LANGUAGE, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getSignLanguageType());
 
         assertTrue(result.getErrors().isEmpty());
@@ -1551,7 +1583,7 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("signLanguageInterpreter", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().get(0));
+        assertEquals("signLanguageInterpreter", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().getFirst());
         assertEquals(SIGN_LANGUAGE_TYPE, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getSignLanguageType());
         assertEquals("No", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getLanguageInterpreter());
 
@@ -1565,7 +1597,7 @@ public class SscsCaseTransformerTest {
         pairs.put(HEARING_OPTIONS_DIALECT_LITERAL, HEARING_OPTIONS_DIALECT_TYPE);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
-        assertEquals("signLanguageInterpreter", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().get(0));
+        assertEquals("signLanguageInterpreter", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().getFirst());
         assertEquals(SIGN_LANGUAGE_TYPE, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getSignLanguageType());
         assertEquals(HEARING_OPTIONS_LANGUAGE_TYPE + " " + HEARING_OPTIONS_DIALECT_TYPE, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getLanguages());
     }
@@ -1579,7 +1611,7 @@ public class SscsCaseTransformerTest {
         pairs.put(HEARING_OPTIONS_SIGN_LANGUAGE_INTERPRETER_LITERAL, true);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
-        assertEquals("signLanguageInterpreter", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().get(0));
+        assertEquals("signLanguageInterpreter", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().getFirst());
         assertEquals("British Sign Language", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getSignLanguageType());
         assertEquals(HEARING_OPTIONS_LANGUAGE_TYPE + " " + HEARING_OPTIONS_DIALECT_TYPE, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getLanguages());
     }
@@ -1606,7 +1638,7 @@ public class SscsCaseTransformerTest {
 
         assertEquals("Yes", result.getTransformedCase().get("linkedCasesBoolean"));
 
-        assertEquals("123", ((CaseLink)((List<?>) result.getTransformedCase().get("associatedCase")).get(0)).getValue().getCaseReference());
+        assertEquals("123", ((CaseLink)((List<?>) result.getTransformedCase().get("associatedCase")).getFirst()).getValue().getCaseReference());
     }
 
     @Test
@@ -1625,9 +1657,9 @@ public class SscsCaseTransformerTest {
 
         String message = "Duplicate case already exists - please reject this exception record";
         if (combineWarnings) {
-            assertEquals(message, result.getWarnings().get(0));
+            assertEquals(message, result.getWarnings().getFirst());
         } else {
-            assertEquals(message, result.getErrors().get(0));
+            assertEquals(message, result.getErrors().getFirst());
         }
     }
 
@@ -1692,10 +1724,10 @@ public class SscsCaseTransformerTest {
         Map<String, Object> transformedCase = result.getTransformedCase();
         @SuppressWarnings("unchecked")
         List<SscsDocument> docs = ((List<SscsDocument>) transformedCase.get("sscsDocument"));
-        assertEquals(LocalDateTime.now().toLocalDate().toString(), docs.get(0).getValue().getDocumentDateAdded());
-        assertEquals(scannedRecord.getFileName(), docs.get(0).getValue().getDocumentFileName());
-        assertEquals(scannedRecord.getUrl().getDocumentUrl(), docs.get(0).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals("appellantEvidence", docs.get(0).getValue().getDocumentType());
+        assertEquals(LocalDateTime.now().toLocalDate().toString(), docs.getFirst().getValue().getDocumentDateAdded());
+        assertEquals(scannedRecord.getFileName(), docs.getFirst().getValue().getDocumentFileName());
+        assertEquals(scannedRecord.getUrl().getDocumentUrl(), docs.getFirst().getValue().getDocumentLink().getDocumentUrl());
+        assertEquals("appellantEvidence", docs.getFirst().getValue().getDocumentType());
 
         assertEquals(YES_LITERAL, transformedCase.get("evidencePresent"));
 
@@ -1719,10 +1751,10 @@ public class SscsCaseTransformerTest {
         Map<String, Object> transformedCase = result.getTransformedCase();
         @SuppressWarnings("unchecked")
         List<SscsDocument> docs = ((List<SscsDocument>) transformedCase.get("sscsDocument"));
-        assertEquals(LocalDateTime.now().toLocalDate().toString(), docs.get(0).getValue().getDocumentDateAdded());
-        assertEquals(scannedRecord.getFileName(), docs.get(0).getValue().getDocumentFileName());
-        assertEquals(scannedRecord.getUrl().getDocumentUrl(), docs.get(0).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals("appellantEvidence", docs.get(0).getValue().getDocumentType());
+        assertEquals(LocalDateTime.now().toLocalDate().toString(), docs.getFirst().getValue().getDocumentDateAdded());
+        assertEquals(scannedRecord.getFileName(), docs.getFirst().getValue().getDocumentFileName());
+        assertEquals(scannedRecord.getUrl().getDocumentUrl(), docs.getFirst().getValue().getDocumentLink().getDocumentUrl());
+        assertEquals("appellantEvidence", docs.getFirst().getValue().getDocumentType());
 
         assertEquals(YES_LITERAL, transformedCase.get("evidencePresent"));
 
@@ -1784,10 +1816,10 @@ public class SscsCaseTransformerTest {
 
         @SuppressWarnings("unchecked")
         List<SscsDocument> docs = ((List<SscsDocument>) result.getTransformedCase().get("sscsDocument"));
-        assertEquals(LocalDateTime.now().toLocalDate().toString(), docs.get(0).getValue().getDocumentDateAdded());
-        assertEquals(scannedRecord1.getFileName(), docs.get(0).getValue().getDocumentFileName());
-        assertEquals(scannedRecord1.getUrl().getDocumentUrl(), docs.get(0).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals(documentType, docs.get(0).getValue().getDocumentType());
+        assertEquals(LocalDateTime.now().toLocalDate().toString(), docs.getFirst().getValue().getDocumentDateAdded());
+        assertEquals(scannedRecord1.getFileName(), docs.getFirst().getValue().getDocumentFileName());
+        assertEquals(scannedRecord1.getUrl().getDocumentUrl(), docs.getFirst().getValue().getDocumentLink().getDocumentUrl());
+        assertEquals(documentType, docs.getFirst().getValue().getDocumentType());
         assertEquals(LocalDateTime.now().toLocalDate().toString(), docs.get(1).getValue().getDocumentDateAdded());
         assertEquals(scannedRecord2.getFileName(), docs.get(1).getValue().getDocumentFileName());
         assertEquals(scannedRecord2.getUrl().getDocumentUrl(), docs.get(1).getValue().getDocumentLink().getDocumentUrl());
@@ -1988,7 +2020,7 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("2030-12-01", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates().get(0).getValue().getStart());
+        assertEquals("2030-12-01", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates().getFirst().getValue().getStart());
 
         assertTrue(result.getErrors().isEmpty());
     }
@@ -2003,7 +2035,7 @@ public class SscsCaseTransformerTest {
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
         assertEquals(1, result.getWarnings().size());
-        assertEquals(HEARING_EXCLUDE_DATES_MISSING, result.getWarnings().get(0));
+        assertEquals(HEARING_EXCLUDE_DATES_MISSING, result.getWarnings().getFirst());
 
         assertNull(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates());
 
@@ -2019,7 +2051,7 @@ public class SscsCaseTransformerTest {
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
         assertEquals(1, result.getWarnings().size());
-        assertEquals(HEARING_EXCLUDE_DATES_MISSING, result.getWarnings().get(0));
+        assertEquals(HEARING_EXCLUDE_DATES_MISSING, result.getWarnings().getFirst());
 
         assertNull(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates());
 
@@ -2072,7 +2104,7 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, true);
 
-        assertEquals("NI Number is invalid", result.getErrors().get(0));
+        assertEquals("NI Number is invalid", result.getErrors().getFirst());
     }
 
     @Test
@@ -2180,7 +2212,7 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
         assertEquals(3, result.getErrors().size());
-        assertEquals(HEARING_TYPE_TELEPHONE_LITERAL + " has an invalid value. Should be Yes/No or True/False", result.getErrors().get(0));
+        assertEquals(HEARING_TYPE_TELEPHONE_LITERAL + " has an invalid value. Should be Yes/No or True/False", result.getErrors().getFirst());
         assertEquals(HEARING_TYPE_FACE_TO_FACE_LITERAL + " has an invalid value. Should be Yes/No or True/False", result.getErrors().get(1));
         assertEquals(HEARING_TYPE_VIDEO_LITERAL + " has an invalid value. Should be Yes/No or True/False", result.getErrors().get(2));
     }
@@ -2237,7 +2269,7 @@ public class SscsCaseTransformerTest {
         pairs.put(APPEAL_GROUNDS_2, "My appeal grounds");
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
-        assertEquals("My appeal grounds", ((Appeal) result.getTransformedCase().get("appeal")).getAppealReasons().getReasons().get(0).getValue().getDescription());
+        assertEquals("My appeal grounds", ((Appeal) result.getTransformedCase().get("appeal")).getAppealReasons().getReasons().getFirst().getValue().getDescription());
     }
 
     @Test
@@ -2377,7 +2409,7 @@ public class SscsCaseTransformerTest {
         assertNoErrorsOrWarnings(result);
 
         @SuppressWarnings("unchecked")
-        OtherParty otherParty = ((List<CcdValue<OtherParty>>) result.getTransformedCase().get("otherParties")).get(0).getValue();
+        OtherParty otherParty = ((List<CcdValue<OtherParty>>) result.getTransformedCase().get("otherParties")).getFirst().getValue();
         assertEquals(OTHER_PARTY_ID_ONE, otherParty.getId());
         Name otherPartyName = otherParty.getName();
         assertEquals(OTHER_PARTY_TITLE, otherPartyName.getTitle());
@@ -2432,11 +2464,11 @@ public class SscsCaseTransformerTest {
         pairs.put("is_paying_parent", "true");
         CaseResponse result = transformer.transformExceptionRecord(sscs2ExceptionRecord, false);
         assertFalse(result.getErrors().isEmpty());
-        assertEquals("is_other_party_address_known has an invalid value. Should be Yes/No or True/False", result.getErrors().get(0));
+        assertEquals("is_other_party_address_known has an invalid value. Should be Yes/No or True/False", result.getErrors().getFirst());
         assertTrue(result.getWarnings().isEmpty());
         @SuppressWarnings("unchecked")
         List<CcdValue<OtherParty>> otherParties = ((List<CcdValue<OtherParty>>) result.getTransformedCase().get("otherParties"));
-        assertNull(otherParties.get(0).getValue().getAddress());
+        assertNull(otherParties.getFirst().getValue().getAddress());
     }
 
     @Test
@@ -2463,7 +2495,7 @@ public class SscsCaseTransformerTest {
         assertNoErrorsOrWarnings(result);
         @SuppressWarnings("unchecked")
         List<CcdValue<OtherParty>> otherParties = ((List<CcdValue<OtherParty>>) result.getTransformedCase().get("otherParties"));
-        assertNotNull(otherParties.get(0).getValue().getAddress());
+        assertNotNull(otherParties.getFirst().getValue().getAddress());
     }
 
     @Test
@@ -2531,7 +2563,7 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(sscs2ExceptionRecord, false);
         assertFalse(result.getWarnings().isEmpty());
-        assertEquals(errorMessage, result.getWarnings().get(0));
+        assertEquals(errorMessage, result.getWarnings().getFirst());
     }
 
     @Test
@@ -2714,7 +2746,7 @@ public class SscsCaseTransformerTest {
     }
 
     private void assertError(CaseResponse result, int errorCount) {
-        assertTrue(result.getErrors().size() == errorCount);
+        assertEquals(errorCount, result.getErrors().size());
         assertTrue(result.getWarnings().isEmpty());
     }
 
@@ -2818,8 +2850,6 @@ public class SscsCaseTransformerTest {
     public void givenNullFormAndWithSscs5FormTypeInput_thenDocumentUpdated() {
         checkFormTypeAndDocumentUpdated(null, "sscs5", "sscs5");
     }
-
-
 
     private Appeal buildTestAppealData() {
         Name appellantName = Name.builder().title(APPELLANT_TITLE).firstName(APPELLANT_FIRST_NAME).lastName(APPELLANT_LAST_NAME).build();

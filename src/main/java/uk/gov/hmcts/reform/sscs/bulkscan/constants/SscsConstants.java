@@ -38,6 +38,7 @@ public final class SscsConstants {
     public static final String TELL_TRIBUNAL_ABOUT_DATES = "tell_tribunal_about_dates";
     public static final String MRN_DATE = "mrn_date";
     public static final String ISSUING_OFFICE = "office";
+    public static final String IBCA_ISSUING_OFFICE = "IBCA";
     public static final String YES_LITERAL = "Yes";
     public static final String NO_LITERAL = "No";
     public static final String TITLE = "_title";
@@ -47,12 +48,22 @@ public final class SscsConstants {
     public static final String ADDRESS_LINE2 = "_address_line2";
     public static final String ADDRESS_LINE3 = "_address_line3";
     public static final String ADDRESS_LINE4 = "_address_line4";
+    public static final String ADDRESS_COUNTRY = "_Country";
+    public static final String ADDRESS_PORT_OF_ENTRY = "_port_of_entry";
     public static final String ADDRESS_POSTCODE = "_postcode";
     public static final String PHONE = "_phone";
     public static final String MOBILE = "_mobile";
     public static final String EMAIL = "_email";
     public static final String NINO = "_nino";
+    public static final String IBCA_REFERENCE = "_ibca_reference";
     public static final String DOB = "_dob";
+    public static final String WANTS_SMS_NOTIFICATIONS = "_want_sms_notifications";
+    public static final String IBC_ROLE_FOR_SELF = "person1_for_self";
+    public static final String IBC_ROLE_FOR_U18 = "person1_for_person_under_18";
+    public static final String IBC_ROLE_FOR_LACKING_CAPACITY = "person1_on_behalf_of_a_person_who_lacks_capacity";
+    public static final String IBC_ROLE_FOR_POA = "person1_as_poa";
+    public static final String IBC_ROLE_FOR_DECEASED = "person1_as_rep_of_deceased";
+    public static final String IBC_ROLE = "ibcRole";
     public static final String IS_EMPTY = "is empty";
     public static final String IS_MISSING = "is missing";
     public static final String ARE_EMPTY = "are empty. At least one must be populated";
@@ -77,6 +88,7 @@ public final class SscsConstants {
     public static final String IS_ANOTHER_PARTY = "is_another_party";
     public static final String OTHER_PARTY_DETAILS = "other_party_details";
     public static final String FORM_TYPE = "form_type";
+    public static final String PORT_OF_ENTRY_INVALID_ERROR = "person1_port_of_entry is not a valid port of entry code. Please refer to guidance to update it to its associated port of entry code. Please refer to guidance.";
 
     public static final String INFECTED_BLOOD_COMPENSATION = "infectedBloodCompensation";
 }

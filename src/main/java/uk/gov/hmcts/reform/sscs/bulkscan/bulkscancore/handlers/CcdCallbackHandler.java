@@ -166,13 +166,15 @@ public class CcdCallbackHandler {
         );
 
         boolean ignoreMrnValidation = false;
-        if (callback.getEvent() != null && (EventType.DIRECTION_ISSUED.equals(callback.getEvent())
-            || EventType.DIRECTION_ISSUED_WELSH.equals(callback.getEvent()))
+        EventType eventType = callback.getEvent();
+        if ((EventType.DIRECTION_ISSUED.equals(eventType)
+            || EventType.DIRECTION_ISSUED_WELSH.equals(eventType))
             && callback.getCaseDetails().getCaseData().getDirectionTypeDl() != null) {
             ignoreMrnValidation = StringUtils.equals(DirectionType.APPEAL_TO_PROCEED.toString(),
                 callback.getCaseDetails().getCaseData().getDirectionTypeDl().getValue().getCode());
         }
-        CaseResponse caseValidationResponse = caseValidator.validateValidationRecord(appealData, ignoreMrnValidation);
+
+        CaseResponse caseValidationResponse = caseValidator.validateValidationRecord(appealData, ignoreMrnValidation, eventType);
 
         PreSubmitCallbackResponse<SscsCaseData> validationErrorResponse = convertWarningsToErrors(callback.getCaseDetails().getCaseData(), caseValidationResponse);
 

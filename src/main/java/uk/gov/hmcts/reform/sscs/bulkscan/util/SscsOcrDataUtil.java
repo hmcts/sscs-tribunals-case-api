@@ -15,16 +15,17 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 public final class SscsOcrDataUtil {
 
-    private SscsOcrDataUtil() {
+    private static final String INVALID_YES_NO_ERROR_MESSAGE = " has an invalid value. Should be Yes/No or True/False";
 
+    private SscsOcrDataUtil() {
     }
 
     public static Boolean hasPerson(Map<String, Object> pairs, String person) {
 
-        return findBooleanExists(getField(pairs,person + "_title"), getField(pairs,person + "_first_name"),
-            getField(pairs,person + "_last_name"), getField(pairs,person + "_address_line1"), getField(pairs,person + "_address_line2"),
-            getField(pairs,person + "_address_line3"), getField(pairs,person + "_address_line4"), getField(pairs,person + "_postcode"),
-            getField(pairs,person + "_dob"), getField(pairs,person + "_nino"),  getField(pairs,person + "_company"),  getField(pairs,person + "_phone"));
+        return findBooleanExists(getField(pairs, person + "_title"), getField(pairs, person + "_first_name"),
+            getField(pairs, person + "_last_name"), getField(pairs, person + "_address_line1"), getField(pairs, person + "_address_line2"),
+            getField(pairs, person + "_address_line3"), getField(pairs, person + "_address_line4"), getField(pairs, person + "_postcode"),
+            getField(pairs, person + "_dob"), getField(pairs, person + "_nino"), getField(pairs, person + "_company"), getField(pairs, person + "_phone"));
     }
 
     public static boolean findBooleanExists(String... values) {
@@ -38,8 +39,8 @@ public final class SscsOcrDataUtil {
 
     public static Boolean hasAddress(Map<String, Object> pairs, String person) {
 
-        return findBooleanExists(getField(pairs,person + "_address_line1"), getField(pairs,person + "_address_line2"),
-            getField(pairs,person + "_address_line3"), getField(pairs,person + "_address_line4"), getField(pairs,person + "_postcode"));
+        return findBooleanExists(getField(pairs, person + "_address_line1"), getField(pairs, person + "_address_line2"),
+            getField(pairs, person + "_address_line3"), getField(pairs, person + "_address_line4"), getField(pairs, person + "_postcode"));
     }
 
     public static String getField(Map<String, Object> pairs, String field) {
@@ -69,7 +70,6 @@ public final class SscsOcrDataUtil {
      * valid representations of booleans.
      * Adds an error for the any value specified that exists in pairs map that isn't a valid representation
      * of a boolean
-     *
      */
     public static List<String> extractValuesWhereBooleansValid(Map<String, Object> pairs, Set<String> errors, List<String> values) {
         return values.stream().filter(value -> checkBooleanValue(pairs, errors, value)).collect(Collectors.toList());
@@ -92,7 +92,7 @@ public final class SscsOcrDataUtil {
             if (booleanValue) {
                 return true;
             } else {
-                errors.add(value + " has an invalid value. Should be Yes/No or True/False");
+                errors.add(value + INVALID_YES_NO_ERROR_MESSAGE);
             }
         }
         return false;
@@ -104,12 +104,23 @@ public final class SscsOcrDataUtil {
             if (booleanValue != null) {
                 return booleanValue;
             } else {
-                errors.add(value + " has an invalid value. Should be Yes/No or True/False");
+                errors.add(value + INVALID_YES_NO_ERROR_MESSAGE);
             }
         }
         return false;
     }
 
+    public static boolean extractBooleanValueWarning(Map<String, Object> pairs, List<String> warnings, String value) {
+        if (pairs.get(value) != null) {
+            Boolean booleanValue = BooleanUtils.toBooleanObject(pairs.get(value).toString());
+            if (booleanValue != null) {
+                return booleanValue;
+            } else {
+                warnings.add(value + INVALID_YES_NO_ERROR_MESSAGE);
+            }
+        }
+        return false;
+    }
 
     public static boolean getBoolean(Map<String, Object> pairs, Set<String> errors, String value) {
         return checkBooleanValue(pairs, errors, value) && BooleanUtils.toBoolean(pairs.get(value).toString());
@@ -131,11 +142,12 @@ public final class SscsOcrDataUtil {
     }
 
     public static String getDateForCcd(String ocrField, Set<String> errors, String errorMessage) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/uuuu").withResolverStyle(ResolverStyle.STRICT);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("[d/M/uuuu][ddMMuuuu]")
+            .withResolverStyle(ResolverStyle.STRICT);
 
         if (!StringUtils.isEmpty(ocrField)) {
             try {
-                return LocalDate.parse(ocrField, formatter).toString();
+                return LocalDate.parse(ocrField, formatter).format(DateTimeFormatter.ofPattern("uuuu-MM-dd"));
             } catch (DateTimeParseException ex) {
                 errors.add(errorMessage);
             }

@@ -1,60 +1,27 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.validators;
 
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_LINE1;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_LINE2;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_LINE3;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_LINE4;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_POSTCODE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ARE_EMPTY;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.BENEFIT_TYPE_DESCRIPTION;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.DOB;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.EMAIL_SELECTED_NOT_PROVIDED;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.FIRST_NAME;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HAS_INVALID_ADDRESS;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HAS_REPRESENTATIVE_FIELD_MISSING;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_OPTIONS_EXCLUDE_DATES_LITERAL;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_SUB_TYPE_TELEPHONE_OR_VIDEO_FACE_TO_FACE_DESCRIPTION;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TELEPHONE_NUMBER_MULTIPLE_LITERAL;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TYPE_DESCRIPTION;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TYPE_ORAL;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TYPE_PAPER;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TYPE_TELEPHONE_LITERAL;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TYPE_VIDEO_LITERAL;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.INFECTED_BLOOD_COMPENSATION;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ISSUING_OFFICE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IS_EMPTY;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IS_INVALID;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IS_IN_FUTURE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IS_IN_PAST;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IS_MISSING;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.LAST_NAME;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.MOBILE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.MRN_DATE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.NINO;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.OTHER_PARTY_VALUE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.PERSON1_VALUE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.PERSON2_VALUE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.PERSON_1_CHILD_MAINTENANCE_NUMBER;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.PHONE_SELECTED_NOT_PROVIDED;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.REPRESENTATIVE_NAME_OR_ORGANISATION_DESCRIPTION;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.REPRESENTATIVE_VALUE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.TITLE;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.YES_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.*;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.WarningMessage.getMessageByCallbackType;
 import static uk.gov.hmcts.reform.sscs.bulkscan.domain.CallbackType.EXCEPTION_CALLBACK;
 import static uk.gov.hmcts.reform.sscs.bulkscan.domain.CallbackType.VALIDATION_CALLBACK;
 import static uk.gov.hmcts.reform.sscs.bulkscan.helper.SscsDataHelper.getValidationStatus;
+import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.extractBooleanValueWarning;
 import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.findBooleanExists;
+import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.getBoolean;
 import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.getField;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,6 +34,7 @@ import uk.gov.hmcts.reform.sscs.bulkscan.domain.CallbackType;
 import uk.gov.hmcts.reform.sscs.bulkscan.json.SscsJsonExtractor;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReasons;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AppellantRole;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
@@ -74,6 +42,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FormType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
@@ -83,6 +52,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Role;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.domain.CaseResponse;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
@@ -129,6 +99,7 @@ public class SscsCaseValidator implements CaseValidator {
     private List<String> titles;
 
     //TODO: Remove when uc-office-feature switched on
+    @Setter
     private boolean ucOfficeFeatureActive;
 
     public SscsCaseValidator(RegionalProcessingCenterService regionalProcessingCenterService,
@@ -140,10 +111,6 @@ public class SscsCaseValidator implements CaseValidator {
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.postcodeValidator = postcodeValidator;
         this.sscsJsonExtractor = sscsJsonExtractor;
-        this.ucOfficeFeatureActive = ucOfficeFeatureActive;
-    }
-
-    public void setUcOfficeFeatureActive(boolean ucOfficeFeatureActive) {
         this.ucOfficeFeatureActive = ucOfficeFeatureActive;
     }
 
@@ -169,7 +136,7 @@ public class SscsCaseValidator implements CaseValidator {
         ScannedData ocrCaseData = sscsJsonExtractor.extractJson(exceptionRecord);
 
         boolean ignoreWarningsValue = exceptionRecord.getIgnoreWarnings() != null ? exceptionRecord.getIgnoreWarnings() : false;
-        validateAppeal(ocrCaseData.getOcrCaseData(), caseData, false, ignoreWarningsValue, true);
+        validateAppeal(ocrCaseData.getOcrCaseData(), caseData, false, ignoreWarningsValue, true, null);
 
         if (combineWarnings) {
             warnings = combineWarnings();
@@ -185,13 +152,18 @@ public class SscsCaseValidator implements CaseValidator {
 
     @Override
     public CaseResponse validateValidationRecord(Map<String, Object> caseData, boolean ignoreMrnValidation) {
+        return validateValidationRecord(caseData, ignoreMrnValidation, null);
+    }
+
+    @Override
+    public CaseResponse validateValidationRecord(Map<String, Object> caseData, boolean ignoreMrnValidation, EventType eventType) {
         warnings = new ArrayList<>();
         errors = new ArrayList<>();
         callbackType = VALIDATION_CALLBACK;
 
         Map<String, Object> ocrCaseData = new HashMap<>();
 
-        validateAppeal(ocrCaseData, caseData, ignoreMrnValidation, false, false);
+        validateAppeal(ocrCaseData, caseData, ignoreMrnValidation, false, false, eventType);
 
         return CaseResponse.builder()
             .errors(errors)
@@ -201,31 +173,33 @@ public class SscsCaseValidator implements CaseValidator {
     }
 
     private List<String> validateAppeal(Map<String, Object> ocrCaseData, Map<String, Object> caseData,
-                                        boolean ignoreMrnValidation, boolean ignoreWarnings, boolean ignorePartyRoleValidation) {
+                                        boolean ignoreMrnValidation, boolean ignoreWarnings, boolean ignorePartyRoleValidation, EventType eventType) {
 
         FormType formType = (FormType) caseData.get("formType");
         Appeal appeal = (Appeal) caseData.get("appeal");
         String appellantPersonType = getPerson1OrPerson2(appeal.getAppellant());
-        final String benefitTypeCode = Optional.of(appeal)
-            .map(Appeal::getBenefitType)
-            .map(BenefitType::getCode)
-            .orElse(null);
 
+        final boolean isIbcOrSscs8 = isIbcOrSscs8(formType,
+            Optional.ofNullable(appeal.getBenefitType()).orElse(BenefitType.builder().build()).getCode());
+
+        boolean validateIbcRoleField = FormType.SSCS8.equals(formType) && VALID_APPEAL.equals(eventType);
         checkAppellant(
             appeal,
             ocrCaseData,
             caseData,
             appellantPersonType,
             formType,
+            validateIbcRoleField,
             ignorePartyRoleValidation,
             ignoreWarnings,
-            benefitTypeCode
+            isIbcOrSscs8
         );
-
-        if (!INFECTED_BLOOD_COMPENSATION.equals(benefitTypeCode)) {
-            checkRepresentative(appeal, ocrCaseData, caseData, benefitTypeCode);
+        boolean isFromValidateAppealEvent = VALID_APPEAL.equals(eventType);
+        if (isIbcOrSscs8 && !isFromValidateAppealEvent) {
+            checkAppealReasons(appeal, ocrCaseData);
         }
 
+        checkRepresentative(appeal, ocrCaseData, caseData, isIbcOrSscs8);
         checkMrnDetails(appeal, ocrCaseData, ignoreMrnValidation, formType);
 
         if (formType != null && formType.equals(FormType.SSCS2)) {
@@ -277,11 +251,9 @@ public class SscsCaseValidator implements CaseValidator {
             });
     }
 
-
     private void checkAppellant(Appeal appeal, Map<String, Object> ocrCaseData, Map<String, Object> caseData,
-                                String personType, FormType formType, boolean ignorePartyRoleValidation,
-                                boolean ignoreWarnings, String benefitTypeCode) {
-
+                                String personType, FormType formType, boolean validateIbcRoleField,
+                                boolean ignorePartyRoleValidation, boolean ignoreWarnings, boolean isIbcOrSscs8) {
         Appellant appellant = appeal.getAppellant();
 
         if (appellant == null) {
@@ -301,18 +273,24 @@ public class SscsCaseValidator implements CaseValidator {
             warnings.add(getMessageByCallbackType(callbackType, personType,
                 getWarningMessageName(personType, appellant) + ADDRESS_POSTCODE, IS_EMPTY));
             warnings.add(
-                getMessageByCallbackType(callbackType, personType, getWarningMessageName(personType, appellant) + NINO,
+                getMessageByCallbackType(callbackType, personType, getWarningMessageName(personType, appellant) + (isIbcOrSscs8 ? IBCA_REFERENCE : NINO),
                     IS_EMPTY));
         } else {
+            checkAppointee(appellant, ocrCaseData, caseData, isIbcOrSscs8);
 
-            checkAppointee(appellant, ocrCaseData, caseData, benefitTypeCode);
+            checkPersonName(appellant.getName(), personType, appellant, isIbcOrSscs8);
 
-            checkPersonName(appellant.getName(), personType, appellant);
+            checkPersonAddressAndDob(appellant.getAddress(), appellant.getIdentity(), personType, ocrCaseData, caseData,
+                appellant, isIbcOrSscs8);
 
-            if (!INFECTED_BLOOD_COMPENSATION.equals(benefitTypeCode)) {
-                checkPersonAddressAndDob(appellant.getAddress(), appellant.getIdentity(), personType, ocrCaseData, caseData,
-                    appellant, benefitTypeCode);
+            if (isIbcOrSscs8) {
+                checkAppellantIbcaReference(appellant, personType);
+            } else {
                 checkAppellantNino(appellant, personType);
+            }
+
+            if (FormType.SSCS8.equals(formType)) {
+                checkIbcRole(personType, ocrCaseData, appellant, validateIbcRoleField);
             }
 
             checkMobileNumber(appellant.getContact(), personType);
@@ -322,7 +300,21 @@ public class SscsCaseValidator implements CaseValidator {
                 checkAppellantRole(appellant.getRole(), ignoreWarnings);
             }
         }
+    }
 
+    private void checkAppealReasons(Appeal appeal, Map<String, Object> ocrCaseData) {
+        AppealReasons appealReasons = appeal.getAppealReasons();
+        if (appealReasons == null || appealReasons.getReasons() == null || appealReasons.getReasons().isEmpty()) {
+            warnings.add(getMessageByCallbackType(callbackType, "", APPEAL_GROUNDS,
+                IS_EMPTY));
+        } else if (!ocrCaseData.isEmpty()) {
+            boolean appealReasonBool = getBoolean(ocrCaseData, Collections.emptySet(), APPEAL_GROUNDS)
+                || getBoolean(ocrCaseData, Collections.emptySet(), APPEAL_GROUNDS_2);
+            if (!appealReasonBool) {
+                warnings.add(getMessageByCallbackType(callbackType, "", APPEAL_GROUNDS,
+                    IS_MISSING));
+            }
+        }
     }
 
     private void checkAppellantRole(Role role, boolean ignoreWarnings) {
@@ -366,23 +358,23 @@ public class SscsCaseValidator implements CaseValidator {
         }
     }
 
-    private void checkAppointee(Appellant appellant, Map<String, Object> ocrCaseData, Map<String, Object> caseData, String benefitTypeCode) {
+    private void checkAppointee(Appellant appellant, Map<String, Object> ocrCaseData, Map<String, Object> caseData, boolean isIbcOrSscs8) {
         if (appellant != null && !isAppointeeDetailsEmpty(appellant.getAppointee())) {
-            checkPersonName(appellant.getAppointee().getName(), PERSON1_VALUE, appellant);
+            checkPersonName(appellant.getAppointee().getName(), PERSON1_VALUE, appellant, isIbcOrSscs8);
             checkPersonAddressAndDob(appellant.getAppointee().getAddress(), appellant.getAppointee().getIdentity(),
-                PERSON1_VALUE, ocrCaseData, caseData, appellant, benefitTypeCode);
+                PERSON1_VALUE, ocrCaseData, caseData, appellant, isIbcOrSscs8);
             checkMobileNumber(appellant.getAppointee().getContact(), PERSON1_VALUE);
         }
     }
 
-    private void checkRepresentative(Appeal appeal, Map<String, Object> ocrCaseData, Map<String, Object> caseData, String benefitTypeCode) {
+    private void checkRepresentative(Appeal appeal, Map<String, Object> ocrCaseData, Map<String, Object> caseData, boolean isIbcOrSscs8) {
         if (appeal.getRep() == null || StringUtils.isBlank(appeal.getRep().getHasRepresentative())) {
             errors.add(HAS_REPRESENTATIVE_FIELD_MISSING);
         }
         if (appeal.getRep() != null && StringUtils.equals(appeal.getRep().getHasRepresentative(), YES_LITERAL)) {
             final Contact repsContact = appeal.getRep().getContact();
             checkPersonAddressAndDob(appeal.getRep().getAddress(), null, REPRESENTATIVE_VALUE, ocrCaseData, caseData,
-                appeal.getAppellant(), benefitTypeCode);
+                appeal.getAppellant(), isIbcOrSscs8);
 
             Name name = appeal.getRep().getName();
 
@@ -432,7 +424,7 @@ public class SscsCaseValidator implements CaseValidator {
                     IS_INVALID));
         }
 
-        boolean hasNoName = ! doesFirstNameExist(name) && !doesLastNameExist(name);
+        boolean hasNoName = !doesFirstNameExist(name) && !doesLastNameExist(name);
 
         if (!hasNoName) {
             otherPartyNameValidation(name);
@@ -502,7 +494,7 @@ public class SscsCaseValidator implements CaseValidator {
                 log.info("DwpHandling handling office is not valid");
                 warnings.add(getMessageByCallbackType(callbackType, "", ISSUING_OFFICE, IS_INVALID));
             }
-        } else if (dwpIssuingOffice == null && !FormType.SSCS2.equals(formType) && !FormType.SSCS5.equals(formType)) {
+        } else if (dwpIssuingOffice == null && !FormType.SSCS2.equals(formType) && !FormType.SSCS5.equals(formType) && !FormType.SSCS8.equals(formType)) {
             warnings.add(getMessageByCallbackType(callbackType, "", ISSUING_OFFICE, IS_EMPTY));
         }
     }
@@ -517,16 +509,17 @@ public class SscsCaseValidator implements CaseValidator {
         }
     }
 
-    private void checkPersonName(Name name, String personType, Appellant appellant) {
-
-        if (!doesTitleExist(name)) {
-            warnings.add(
-                getMessageByCallbackType(callbackType, personType, getWarningMessageName(personType, appellant) + TITLE,
-                    IS_EMPTY));
-        } else if (name != null && !isTitleValid(name.getTitle())) {
-            warnings.add(
-                getMessageByCallbackType(callbackType, personType, getWarningMessageName(personType, appellant) + TITLE,
-                    IS_INVALID));
+    private void checkPersonName(Name name, String personType, Appellant appellant, boolean isIbcOrSscs8) {
+        if (!isIbcOrSscs8) {
+            if (!doesTitleExist(name)) {
+                warnings.add(
+                    getMessageByCallbackType(callbackType, personType, getWarningMessageName(personType, appellant) + TITLE,
+                        IS_EMPTY));
+            } else if (name != null && !isTitleValid(name.getTitle())) {
+                warnings.add(
+                    getMessageByCallbackType(callbackType, personType, getWarningMessageName(personType, appellant) + TITLE,
+                        IS_INVALID));
+            }
         }
 
         if (!doesFirstNameExist(name)) {
@@ -539,11 +532,45 @@ public class SscsCaseValidator implements CaseValidator {
         }
     }
 
+    private Map<String, Boolean> getIbcRoleMapping(Map<String, Object> ocrCaseData) {
+        return Map.of(
+            IBC_ROLE_FOR_SELF, extractBooleanValueWarning(ocrCaseData, warnings, IBC_ROLE_FOR_SELF),
+            IBC_ROLE_FOR_U18, extractBooleanValueWarning(ocrCaseData, warnings, IBC_ROLE_FOR_U18),
+            IBC_ROLE_FOR_LACKING_CAPACITY, extractBooleanValueWarning(ocrCaseData, warnings, IBC_ROLE_FOR_LACKING_CAPACITY),
+            IBC_ROLE_FOR_POA, extractBooleanValueWarning(ocrCaseData, warnings, IBC_ROLE_FOR_POA),
+            IBC_ROLE_FOR_DECEASED, extractBooleanValueWarning(ocrCaseData, warnings, IBC_ROLE_FOR_DECEASED)
+        );
+    }
+
+    private void checkIbcRole(String personType, Map<String, Object> ocrCaseData, Appellant appellant, boolean validateIbcRoleField) {
+        if (!validateIbcRoleField && personType.equalsIgnoreCase("person1")) {
+            Map<String, Boolean> ibcRoles = getIbcRoleMapping(ocrCaseData);
+
+            long trueCount = ibcRoles.values().stream().filter(bool -> bool).count();
+
+            if (trueCount > 1) {
+                List<String> trueValues = ibcRoles.keySet().stream().filter(ibcRoles::get).toList();
+                errors.add(String.join(", ", trueValues) + " cannot all be True");
+            } else if (trueCount == 0) {
+                errors.add("One of the following must be True: " + String.join(", ", ibcRoles.keySet()));
+            }
+        }
+
+        if (validateIbcRoleField && appellant.getIbcRole() == null) {
+            errors.add(IBC_ROLE + " " + IS_EMPTY);
+        }
+    }
+
     private void checkPersonAddressAndDob(Address address, Identity identity, String personType,
                                           Map<String, Object> ocrCaseData, Map<String, Object> caseData,
-                                          Appellant appellant, String benefitTypeCode) {
+                                          Appellant appellant, boolean isIbcOrSscs8) {
 
         boolean isAddressLine4Present = findBooleanExists(getField(ocrCaseData, personType + "_address_line4"));
+
+        // Remove this part if/when the mainland UK question is added to sscs8 form
+        if (isIbcOrSscs8 && address != null && address.getInMainlandUk() == null) {
+            address.setInMainlandUk(Boolean.TRUE.equals(doesAddressPortOfEntryExist(address)) ? YesNo.NO : YesNo.YES);
+        }
 
         if (!doesAddressLine1Exist(address)) {
             warnings.add(getMessageByCallbackType(callbackType, personType,
@@ -553,36 +580,48 @@ public class SscsCaseValidator implements CaseValidator {
                 getWarningMessageName(personType, appellant) + ADDRESS_LINE1, HAS_INVALID_ADDRESS));
         }
 
-        String townLine = (isAddressLine4Present) ? ADDRESS_LINE3 : ADDRESS_LINE2;
-        if (!doesAddressTownExist(address)) {
+        if (!isIbcOrSscs8) {
+            String townLine = (isAddressLine4Present) ? ADDRESS_LINE3 : ADDRESS_LINE2;
+            if (!doesAddressTownExist(address)) {
 
-            warnings.add(getMessageByCallbackType(callbackType, personType,
-                getWarningMessageName(personType, appellant) + townLine, IS_EMPTY));
-        } else if (!address.getTown().matches(ADDRESS_REGEX)) {
-            warnings.add(getMessageByCallbackType(callbackType, personType,
-                getWarningMessageName(personType, appellant) + townLine, HAS_INVALID_ADDRESS));
-        }
-
-        String countyLine = (isAddressLine4Present) ? ADDRESS_LINE4 : "_ADDRESS_LINE3_COUNTY";
-        if (!doesAddressCountyExist(address)) {
-            warnings.add(getMessageByCallbackType(callbackType, personType,
-                getWarningMessageName(personType, appellant) + countyLine, IS_EMPTY));
-        } else if (!address.getCounty().matches(COUNTY_REGEX)) {
-            warnings.add(getMessageByCallbackType(callbackType, personType,
-                getWarningMessageName(personType, appellant) + countyLine, HAS_INVALID_ADDRESS));
+                warnings.add(getMessageByCallbackType(callbackType, personType,
+                    getWarningMessageName(personType, appellant) + townLine, IS_EMPTY));
+            } else if (!address.getTown().matches(ADDRESS_REGEX)) {
+                warnings.add(getMessageByCallbackType(callbackType, personType,
+                    getWarningMessageName(personType, appellant) + townLine, HAS_INVALID_ADDRESS));
+            }
+            // Removed from IBC as it's not on the SSCS8 form
+            String countyLine = (isAddressLine4Present) ? ADDRESS_LINE4 : "_ADDRESS_LINE3_COUNTY";
+            if (!doesAddressCountyExist(address)) {
+                warnings.add(getMessageByCallbackType(callbackType, personType,
+                    getWarningMessageName(personType, appellant) + countyLine, IS_EMPTY));
+            } else if (!address.getCounty().matches(COUNTY_REGEX)) {
+                warnings.add(getMessageByCallbackType(callbackType, personType,
+                    getWarningMessageName(personType, appellant) + countyLine, HAS_INVALID_ADDRESS));
+            }
+        } else {
+            boolean hasLine3 = findBooleanExists(getField(ocrCaseData, personType + ADDRESS_LINE3));
+            String townLine = (hasLine3) ? ADDRESS_LINE3 : ADDRESS_LINE2;
+            if (!doesAddressTownExist(address)) {
+                warnings.add(getMessageByCallbackType(callbackType, personType,
+                    getWarningMessageName(personType, appellant) + townLine, IS_EMPTY));
+            } else if (!address.getTown().matches(ADDRESS_REGEX)) {
+                warnings.add(getMessageByCallbackType(callbackType, personType,
+                    getWarningMessageName(personType, appellant) + townLine, HAS_INVALID_ADDRESS));
+            }
         }
 
         if (isAddressPostcodeValid(address, personType, appellant) && address != null) {
             if (personType.equals(getPerson1OrPerson2(appellant))) {
-                boolean isIbc = INFECTED_BLOOD_COMPENSATION.equals(benefitTypeCode);
-                var postCodeOrPort = YesNo.NO.equals(address.getInMainlandUk()) ? address.getPortOfEntry() : address.getPostcode();
+                boolean isPort = YesNo.NO.equals(address.getInMainlandUk());
+                String postCodeOrPort = isPort ? address.getPortOfEntry() : address.getPostcode();
 
-                RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(postCodeOrPort, isIbc);
+                RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(postCodeOrPort, isIbcOrSscs8);
 
                 if (rpc != null) {
                     caseData.put("region", rpc.getName());
                     caseData.put("regionalProcessingCenter", rpc);
-                } else {
+                } else if (!isPort) {
                     warnings.add(getMessageByCallbackType(callbackType, personType,
                         getWarningMessageName(personType, appellant) + ADDRESS_POSTCODE,
                         "is not a postcode that maps to a regional processing center"));
@@ -630,6 +669,10 @@ public class SscsCaseValidator implements CaseValidator {
         return false;
     }
 
+    private boolean isInMainlandUk(Address address) {
+        return address == null || address.getInMainlandUk() == null || YesNo.YES.equals(address.getInMainlandUk());
+    }
+
     private Boolean doesAddressPostcodeExist(Address address) {
         if (address != null) {
             return StringUtils.isNotEmpty(address.getPostcode());
@@ -651,9 +694,31 @@ public class SscsCaseValidator implements CaseValidator {
         return false;
     }
 
+    private Boolean doesAddressPortOfEntryExist(Address address) {
+        if (address != null) {
+            return StringUtils.isNotEmpty(address.getPortOfEntry());
+        }
+        return false;
+    }
+
+    private Boolean isPortOfEntryValid(Address address) {
+        if (address != null && address.getPortOfEntry() != null) {
+            // TODO get actual wording for warning message below
+            String portOfEntry = address.getPortOfEntry();
+            List<String> validPortCodes = Arrays.stream(UkPortOfEntry.values()).map((UkPortOfEntry::getLocationCode)).toList();
+            if (!validPortCodes.contains(portOfEntry)) {
+                errors.add(PORT_OF_ENTRY_INVALID_ERROR);
+                return false;
+            } else {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private Boolean isAddressPostcodeValid(Address address, String personType, Appellant appellant) {
-        if (address != null && YesNo.NO.equals(address.getInMainlandUk())) {
-            return true;
+        if (address != null && YesNo.NO.equals(address.getInMainlandUk()) && personType.equals(PERSON1_VALUE)) {
+            return isPortOfEntryValid(address);
         }
         if (address != null && address.getPostcode() != null) {
             if (postcodeValidator.isValidPostcodeFormat(address.getPostcode())) {
@@ -681,6 +746,20 @@ public class SscsCaseValidator implements CaseValidator {
         } else {
             warnings.add(
                 getMessageByCallbackType(callbackType, personType, getWarningMessageName(personType, appellant) + NINO,
+                    IS_EMPTY));
+        }
+    }
+
+    private void checkAppellantIbcaReference(Appellant appellant, String personType) {
+        if (appellant != null && appellant.getIdentity() != null && appellant.getIdentity().getIbcaReference() != null) {
+            if (!String.join("", appellant.getIdentity().getIbcaReference().split(" ")).matches(
+                "^[A-z]\\d{2}[A-z]\\d{2}$")) {
+                warnings.add(getMessageByCallbackType(callbackType, personType,
+                    getWarningMessageName(personType, appellant) + IBCA_REFERENCE, IS_INVALID));
+            }
+        } else {
+            warnings.add(
+                getMessageByCallbackType(callbackType, personType, getWarningMessageName(personType, appellant) + IBCA_REFERENCE,
                     IS_EMPTY));
         }
     }
@@ -782,7 +861,13 @@ public class SscsCaseValidator implements CaseValidator {
                     .build());
             }
         } else {
-            if (formType == null || (!formType.equals(FormType.SSCS1U) && !formType.equals(FormType.SSCS5))) {
+            if (FormType.SSCS8.equals(formType)) {
+                appeal.setBenefitType(BenefitType.builder()
+                    .description(Benefit.INFECTED_BLOOD_COMPENSATION.getDescription())
+                    .code(Benefit.INFECTED_BLOOD_COMPENSATION.getShortName())
+                    .build());
+            }
+            if (formType == null || (!formType.equals(FormType.SSCS1U) && !formType.equals(FormType.SSCS5) && !formType.equals(FormType.SSCS8))) {
                 warnings.add(getMessageByCallbackType(callbackType, "", BENEFIT_TYPE_DESCRIPTION, IS_EMPTY));
             }
         }
@@ -801,7 +886,7 @@ public class SscsCaseValidator implements CaseValidator {
         String hearingType = appeal.getHearingType();
         FormType formType = (FormType) caseData.get("formType");
         log.info("Bulk-scan form type: {}", formType != null ? formType.toString() : null);
-        if ((FormType.SSCS1PEU.equals(formType) || FormType.SSCS2.equals(formType) || FormType.SSCS5.equals(formType))
+        if ((FormType.SSCS1PEU.equals(formType) || FormType.SSCS2.equals(formType) || FormType.SSCS5.equals(formType) || FormType.SSCS8.equals(formType))
             && hearingType != null && hearingType.equals(HEARING_TYPE_ORAL)
             && !isValidHearingSubType(appeal)) {
             warnings.add(
@@ -862,5 +947,10 @@ public class SscsCaseValidator implements CaseValidator {
         } else {
             return "APPOINTEE";
         }
+    }
+
+    private boolean isIbcOrSscs8(FormType formType, String benefitTypeCode) {
+        return Benefit.INFECTED_BLOOD_COMPENSATION.getShortName().equals(benefitTypeCode)
+            || FormType.SSCS8.equals(formType);
     }
 }
