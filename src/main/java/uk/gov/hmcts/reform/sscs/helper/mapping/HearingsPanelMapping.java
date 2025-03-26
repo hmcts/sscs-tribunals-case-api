@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberMedicallyQualified;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
+import uk.gov.hmcts.reform.sscs.model.hmc.reference.BenefitRoleRelationType;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.RequirementType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.MemberType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelPreference;
@@ -59,14 +60,18 @@ public final class HearingsPanelMapping {
     }
 
     public List<String> getRoleTypes(SscsCaseData caseData) {
-        String benefitIssueCode = caseData.getBenefitCode() + caseData.getIssueCode();
-        String specialismCount = caseData.getSscsIndustrialInjuriesData().getPanelDoctorSpecialism() != null
-                ? caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism() != null
-                ? "2" : "1" : null;
-        String isFqpm =  isYes(caseData.getIsFqpmRequired()) ? "true" : null;
-        PanelCategoryMap panelComp = panelCategoryMapService
-                .getPanelCategoryMap(benefitIssueCode, specialismCount, isFqpm);
-        return panelComp != null ? panelComp.getJohTiers() : Collections.emptyList();
+        if (defaultPanelCompEnabled) {
+            String benefitIssueCode = caseData.getBenefitCode() + caseData.getIssueCode();
+            String specialismCount = caseData.getSscsIndustrialInjuriesData().getPanelDoctorSpecialism() != null
+                    ? caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism() != null
+                    ? "2" : "1" : null;
+            String isFqpm =  isYes(caseData.getIsFqpmRequired()) ? "true" : null;
+            PanelCategoryMap panelComp = panelCategoryMapService
+                    .getPanelCategoryMap(benefitIssueCode, specialismCount, isFqpm);
+            return panelComp != null ? panelComp.getJohTiers() : Collections.emptyList();
+        } else {
+            return BenefitRoleRelationType.findRoleTypesByBenefitCode(caseData.getBenefitCode());
+        }
     }
 
     public static List<String> getAuthorisationTypes() {
