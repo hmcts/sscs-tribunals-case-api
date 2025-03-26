@@ -18,6 +18,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
@@ -305,6 +306,7 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
     @DisplayName("getRoleTypes returns an valid list")
     @Test
     void testGetRoles() {
+        ReflectionTestUtils.setField(hearingsPanelMapping, "defaultPanelCompEnabled", true);
         PanelCategoryMap panelCategoryMap = new PanelCategoryMap("022DD",null,null);
         panelCategoryMap.setJohTiers(new ArrayList<>(List.of(JOH_CODE)));
         when(panelCategoryMapService.getPanelCategoryMap(any(),any(),any())).thenReturn(panelCategoryMap);
@@ -316,6 +318,7 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
     @DisplayName("getPanelCategoryMap is called with correct number of specialisms and fqpm")
     @Test
     void testGetRolesWithSpecialismAndFqpm() {
+        ReflectionTestUtils.setField(hearingsPanelMapping, "defaultPanelCompEnabled", true);
         caseData.getSscsIndustrialInjuriesData().setPanelDoctorSpecialism("cardiologist");
         caseData.getSscsIndustrialInjuriesData().setSecondPanelDoctorSpecialism("eyeSurgeon");
         caseData.setIsFqpmRequired(YesNo.YES);
@@ -326,6 +329,7 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
     @DisplayName("getRoleTypes does not throw exception when panelCategoryMap is null")
     @Test
     void testGetRolesWithInvalidCode() {
+        ReflectionTestUtils.setField(hearingsPanelMapping, "defaultPanelCompEnabled", true);
         when(panelCategoryMapService.getPanelCategoryMap(any(),any(),any())).thenReturn(null);
         assertThatNoException()
                 .isThrownBy(() -> hearingsPanelMapping.getRoleTypes(caseData));
