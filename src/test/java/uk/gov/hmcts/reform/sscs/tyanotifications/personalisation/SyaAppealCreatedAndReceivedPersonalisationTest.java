@@ -1,11 +1,61 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.personalisation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.MockitoAnnotations.openMocks;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.*;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.ADDRESS;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.ANYTHING;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.ATTENDING_HEARING;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.CHILD_MAINTENANCE_NUMBER;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.DATES_NOT_ATTENDING;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.DATE_OF_BIRTH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.DATE_OF_MRN;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.DATE_OF_RDN;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.DISABLED_ACCESS;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.EMAIL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.HAVE_AN_APPOINTEE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.HAVE_A_REPRESENTATIVE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.HEARING_LOOP;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.IBCA_REFERENCE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.LANGUAGE_INTERPRETER;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.MOBILE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.NINO;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.NOSTRING;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.NOT_PROVIDED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.NOT_REQUIRED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.ORGANISATION;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.OTHER;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.OTHER_ARRANGEMENTS;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.PHONE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.REASON_FOR_LATE_APPEAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.REASON_FOR_NO_MRN;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.RECEIVE_TEXT_MESSAGE_REMINDER;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.REQUIRED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.SIGN_INTERPRETER;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.WHAT_DISAGREE_WITH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.WHY_DISAGREE_WITH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.YESSTRING;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPOINTEE_DETAILS_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPOINTEE_DETAILS_LITERAL_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_ARRANGEMENT_DETAILS_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_ARRANGEMENT_DETAILS_LITERAL_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_DETAILS_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_DETAILS_LITERAL_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.MRN_DETAILS_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.MRN_DETAILS_LITERAL_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.OTHER_PARTY_DETAILS;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.OTHER_PARTY_DETAILS_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.REASONS_FOR_APPEALING_DETAILS_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.REASONS_FOR_APPEALING_DETAILS_LITERAL_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.REPRESENTATIVE_DETAILS_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.REPRESENTATIVE_DETAILS_LITERAL_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.SHOW_OTHER_PARTY_DETAILS;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.TEXT_MESSAGE_REMINDER_DETAILS_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.TEXT_MESSAGE_REMINDER_DETAILS_LITERAL_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.YOUR_DETAILS_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.YOUR_DETAILS_LITERAL_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.REPRESENTATIVE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_RECEIVED;
 
@@ -14,11 +64,33 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Spy;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReasonDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReasons;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DateRange;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
+import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
@@ -37,20 +109,36 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
     @Spy
     private PersonalisationConfiguration syaAppealCreatedPersonalisationConfiguration;
 
-    @Before
+    @BeforeEach
     public void setup() {
         openMocks(this);
+        Map<String, String> englishMap = getEnglishMap();
+
+        Map<String, String> welshMap = getWelshMap();
+
+        Map<LanguagePreference, Map<String, String>> personalisations = new HashMap<>();
+        personalisations.put(LanguagePreference.ENGLISH, englishMap);
+        personalisations.put(LanguagePreference.WELSH, welshMap);
+
+        super.setup();
+
+        syaAppealCreatedPersonalisationConfiguration.setPersonalisation(personalisations);
+    }
+
+    private static Map<String, String> getEnglishMap() {
         Map<String, String> englishMap = new HashMap<>();
         englishMap.put(ATTENDING_HEARING.name(), "Attending the hearing: ");
         englishMap.put(YESSTRING.name(), "yes");
         englishMap.put(NOSTRING.name(), "no");
         englishMap.put(DATES_NOT_ATTENDING.name(), "Dates you can't attend: ");
         englishMap.put(DATE_OF_MRN.name(), "Date of MRN: ");
+        englishMap.put(DATE_OF_RDN.name(), "Date of Review Decision Notice: ");
         englishMap.put(REASON_FOR_LATE_APPEAL.name(), "Reason for late appeal: ");
         englishMap.put(REASON_FOR_NO_MRN.name(), "Reason for no MRN: ");
         englishMap.put(PersonalisationConfiguration.PersonalisationKey.NAME.name(), "Name: ");
         englishMap.put(DATE_OF_BIRTH.name(), "Date of birth: ");
         englishMap.put(NINO.name(), "National Insurance number: ");
+        englishMap.put(IBCA_REFERENCE.name(), "Ibca Reference: ");
         englishMap.put(ADDRESS.name(), "Address: ");
         englishMap.put(EMAIL.name(), "Email: ");
         englishMap.put(PHONE.name(), "Phone: ");
@@ -72,18 +160,23 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
         englishMap.put(NOT_REQUIRED.name(), "Not required");
         englishMap.put(OTHER.name(), "Other");
         englishMap.put(CHILD_MAINTENANCE_NUMBER.name(), "Child maintenance number: ");
+        return englishMap;
+    }
 
+    private static Map<String, String> getWelshMap() {
         Map<String, String> welshMap = new HashMap<>();
         welshMap.put(ATTENDING_HEARING.name(), "Ydych chi'n bwriadu mynychu'r gwrandawiad: ");
         welshMap.put(YESSTRING.name(), "ydw");
         welshMap.put(NOSTRING.name(), "nac ydw");
         welshMap.put(DATES_NOT_ATTENDING.name(), "Dyddiadau na allwch fynychu: ");
         welshMap.put(DATE_OF_MRN.name(), "Dyddiad yr MRN: ");
+        welshMap.put(DATE_OF_RDN.name(), "Dyddiad yr Hysbysiad o Benderfyniad Adolygiad: ");
         welshMap.put(REASON_FOR_LATE_APPEAL.name(), "Rheswm dros apêl hwyr: ");
         welshMap.put(REASON_FOR_NO_MRN.name(), "Rheswm dros ddim MRN: ");
         welshMap.put(PersonalisationConfiguration.PersonalisationKey.NAME.name(), "Enw: ");
         welshMap.put(DATE_OF_BIRTH.name(), "Dyddiad geni: ");
         welshMap.put(NINO.name(), "Rhif Yswiriant Gwladol: ");
+        welshMap.put(IBCA_REFERENCE.name(), "Cyfeirnod IBCA: ");
         welshMap.put(ADDRESS.name(), "Cyfeiriad: ");
         welshMap.put(EMAIL.name(), "E-bost: ");
         welshMap.put(PHONE.name(), "Rhif ffôn: ");
@@ -105,14 +198,7 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
         welshMap.put(NOT_REQUIRED.name(), "Dim yn ofynnol");
         welshMap.put(OTHER.name(), "Arall");
         welshMap.put(CHILD_MAINTENANCE_NUMBER.name(), "Child maintenance number placeholder: ");
-
-        Map<LanguagePreference, Map<String, String>> personalisations = new HashMap<>();
-        personalisations.put(LanguagePreference.ENGLISH, englishMap);
-        personalisations.put(LanguagePreference.WELSH, welshMap);
-
-        super.setup();
-
-        syaAppealCreatedPersonalisationConfiguration.setPersonalisation(personalisations);
+        return welshMap;
     }
 
     @Test
@@ -149,7 +235,7 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
         assertEquals("Date of MRN: 3 May 2018\n"
                 + "\nReason for late appeal: My train was cancelled.",
             result.get(MRN_DETAILS_LITERAL));
-        assertNull("Welsh mrn details should be set", result.get(HEARING_DETAILS_LITERAL_WELSH));
+        assertNull(result.get(HEARING_DETAILS_LITERAL_WELSH), "Welsh mrn details should be set");
     }
 
     @Test
@@ -173,6 +259,53 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
     }
 
     @Test
+    public void givenAnIbcAppeal_setMrnDetailsForTemplate() {
+        response = SscsCaseData.builder()
+            .benefitCode("093")
+            .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code("infectedBloodAppeal").build())
+                .mrnDetails(MrnDetails.builder()
+                    .mrnDate("2018-06-29")
+                    .mrnLateReason("My train was cancelled.")
+                    .mrnMissingReason("My dog ate my homework.")
+                    .build())
+                .build())
+            .build();
+
+        Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setMrnDetails(new HashMap<>(), response);
+
+        assertEquals("Date of Review Decision Notice: 2018-06-29\n"
+                + "\nReason for late appeal: My train was cancelled.\n"
+                + "\nReason for no MRN: My dog ate my homework.",
+            result.get(MRN_DETAILS_LITERAL));
+    }
+
+    @Test
+    public void givenAnIbcAppeal_setMrnDetailsForTemplate_welsh() {
+        response = SscsCaseData.builder()
+            .benefitCode("093")
+            .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
+            .languagePreferenceWelsh("Yes")
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code("infectedBloodAppeal").build())
+                .mrnDetails(MrnDetails.builder()
+                    .mrnDate("2018-06-29")
+                    .mrnLateReason("My train was cancelled.")
+                    .build())
+                .build())
+            .build();
+
+        Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setMrnDetails(new HashMap<>(), response);
+
+        assertEquals("Date of Review Decision Notice: 2018-06-29\n"
+                + "\nReason for late appeal: My train was cancelled.",
+            result.get(MRN_DETAILS_LITERAL));
+
+        assertEquals("Dyddiad yr Hysbysiad o Benderfyniad Adolygiad: 29 Mehefin 2018\n"
+                + "\nRheswm dros apêl hwyr: My train was cancelled.",
+            result.get(MRN_DETAILS_LITERAL_WELSH));
+    }
+
+    @Test
     public void givenAnAppeal_setYourDetailsForTemplate() {
         response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
@@ -190,6 +323,31 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
         assertEquals("Name: Manish Sharma\n"
                 + "\nDate of birth: 12 March 1971\n"
                 + "\nNational Insurance number: NP 27 28 67 B\n"
+                + "\nAddress: 122 Breach Street, The Village, My town, Cardiff, CF11 2HB\n"
+                + "\nEmail: manish.sharma@gmail.com\n"
+                + "\nPhone: 0797 243 8179",
+            result.get(YOUR_DETAILS_LITERAL));
+    }
+
+    @Test
+    public void givenAnIbcAppeal_setYourDetailsForTemplate() {
+        response = SscsCaseData.builder()
+            .benefitCode("093")
+            .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code("infectedBloodAppeal").build())
+                .appellant(Appellant.builder()
+                    .name(Name.builder().firstName("Manish").lastName("Sharma").title("Mrs").build())
+                    .identity(Identity.builder().ibcaReference("E24D44").dob("1971-03-12").build())
+                    .address(Address.builder().line1("122 Breach Street").line2("The Village").town("My town").county("Cardiff").inMainlandUk(YesNo.YES).postcode("CF11 2HB").build())
+                    .contact(Contact.builder().email("manish.sharma@gmail.com").phone("0797 243 8179").build())
+                    .build()).build())
+            .build();
+
+        Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setYourDetails(new HashMap<>(), response);
+
+        assertEquals("Name: Manish Sharma\n"
+                + "\nDate of birth: 1971-03-12\n"
+                + "\nIbca Reference: E24D44\n"
                 + "\nAddress: 122 Breach Street, The Village, My town, Cardiff, CF11 2HB\n"
                 + "\nEmail: manish.sharma@gmail.com\n"
                 + "\nPhone: 0797 243 8179",
@@ -223,6 +381,40 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
         assertEquals("Enw: Manish Sharma\n"
                 + "\nDyddiad geni: 12 Mawrth 1971\n"
                 + "\nRhif Yswiriant Gwladol: NP 27 28 67 B\n"
+                + "\nCyfeiriad: 122 Breach Street, The Village, My town, Cardiff, CF11 2HB\n"
+                + "\nE-bost: manish.sharma@gmail.com\n"
+                + "\nRhif ffôn: 0797 243 8179",
+            result.get(YOUR_DETAILS_LITERAL_WELSH));
+    }
+
+    @Test
+    public void givenAnIbcAppeal_setYourDetailsForTemplate_welsh() {
+        response = SscsCaseData.builder()
+            .languagePreferenceWelsh("yes")
+            .benefitCode("093")
+            .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code("infectedBloodAppeal").build())
+                .appellant(Appellant.builder()
+                    .name(Name.builder().firstName("Manish").lastName("Sharma").title("Mrs").build())
+                    .identity(Identity.builder().ibcaReference("E24D44").dob("1971-03-12").build())
+                    .address(Address.builder().line1("122 Breach Street").line2("The Village").town("My town").county("Cardiff").inMainlandUk(YesNo.YES).postcode("CF11 2HB").build())
+                    .contact(Contact.builder().email("manish.sharma@gmail.com").phone("0797 243 8179").build())
+                    .build()).build())
+            .build();
+
+        Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.setYourDetails(new HashMap<>(), response);
+
+        assertEquals("Name: Manish Sharma\n"
+                + "\nDate of birth: 1971-03-12\n"
+                + "\nIbca Reference: E24D44\n"
+                + "\nAddress: 122 Breach Street, The Village, My town, Cardiff, CF11 2HB\n"
+                + "\nEmail: manish.sharma@gmail.com\n"
+                + "\nPhone: 0797 243 8179",
+            result.get(YOUR_DETAILS_LITERAL));
+
+        assertEquals("Enw: Manish Sharma\n"
+                + "\nDyddiad geni: 12 Mawrth 1971\n"
+                + "\nCyfeirnod IBCA: E24D44\n"
                 + "\nCyfeiriad: 122 Breach Street, The Village, My town, Cardiff, CF11 2HB\n"
                 + "\nE-bost: manish.sharma@gmail.com\n"
                 + "\nRhif ffôn: 0797 243 8179",
@@ -513,7 +705,7 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
         assertEquals("No", result.get(SHOW_OTHER_PARTY_DETAILS));
         assertEquals("", result.get(OTHER_PARTY_DETAILS));
         assertEquals("", result.get(OTHER_PARTY_DETAILS_WELSH));
-        assertThat(result.get(YOUR_DETAILS_LITERAL).toString()).doesNotContain("Child maintenance number:");
+        assertFalse(result.get(YOUR_DETAILS_LITERAL).toString().contains("Child maintenance number:"));
     }
 
     @Test
@@ -555,7 +747,7 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
                 + "\nAddress: First Floor, My Building, 222 Corporation Street, Glasgow, GL11 6TF\n\n",
             result.get(OTHER_PARTY_DETAILS));
         assertNull(result.get(OTHER_PARTY_DETAILS_WELSH));
-        assertThat(result.get(YOUR_DETAILS_LITERAL).toString()).contains("Child maintenance number: 123456");
+        assertTrue(result.get(YOUR_DETAILS_LITERAL).toString().contains("Child maintenance number: 123456"));
     }
 
     @Test
@@ -604,7 +796,7 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
                 + "\nAddress: Second Floor, My House, 333 Corporation Street, London, EC1 6TF\n\n",
             result.get(OTHER_PARTY_DETAILS));
         assertNull(result.get(OTHER_PARTY_DETAILS_WELSH));
-        assertThat(result.get(YOUR_DETAILS_LITERAL).toString()).contains("Child maintenance number: 123456");
+        assertTrue(result.get(YOUR_DETAILS_LITERAL).toString().contains("Child maintenance number: 123456"));
     }
 
     @Test
@@ -646,7 +838,7 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
                 + "\nAddress: Not provided\n\n",
             result.get(OTHER_PARTY_DETAILS));
         assertNull(result.get(OTHER_PARTY_DETAILS_WELSH));
-        assertThat(result.get(YOUR_DETAILS_LITERAL).toString()).contains("Child maintenance number: 123456");
+        assertTrue(result.get(YOUR_DETAILS_LITERAL).toString().contains("Child maintenance number: 123456"));
     }
 
     @Test
@@ -913,7 +1105,7 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
         assertEquals("Attending the hearing: yes\n"
                 + "\nDates you can't attend: 3 January 2018, 5 January 2018",
             result.get(HEARING_DETAILS_LITERAL));
-        assertNull("Welsh details not be set ", result.get(HEARING_DETAILS_LITERAL_WELSH));
+        assertNull(result.get(HEARING_DETAILS_LITERAL_WELSH), "Welsh details not be set ");
     }
 
     @Test

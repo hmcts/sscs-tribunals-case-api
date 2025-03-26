@@ -1,9 +1,15 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.REISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
@@ -26,7 +32,23 @@ import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartyOption;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartyOptionDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ReissueArtifactUi;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.exception.RequiredFieldMissingException;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
@@ -405,6 +427,51 @@ public class ReissueFurtherEvidenceHandlerTest {
             eq(caseData), eq(APPELLANT_EVIDENCE), eq(List.of()), eq(null)
         );
     }
+
+    @Test
+    public void givenIssueFurtherEvidenceCallback_shouldReissueChosenEvidenceWhenSscsDocumentsContainsVideoAudioDocs() {
+        SscsDocument pdfDoc = SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
+                        .documentLink(DocumentLink.builder().documentUrl("pdf.doc").build())
+                        .editedDocumentLink(DocumentLink.builder().documentUrl("pdfRedacted.doc").build())
+                        .build())
+                .build();
+        SscsDocument videoDoc = SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
+                        .avDocumentLink(DocumentLink.builder().documentUrl("video.mp4").build())
+                        .build())
+                .build();
+        SscsDocument audioDoc = SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
+                        .documentLink(DocumentLink.builder().documentUrl("audio.mp3").build())
+                        .build())
+                .build();
+
+        DynamicListItem dynamicListItem = new DynamicListItem(
+                pdfDoc.getValue().getEditedDocumentLink().getDocumentUrl(), "First document");
+
+        DynamicList dynamicList = new DynamicList(dynamicListItem, List.of(dynamicListItem));
+        SscsCaseData caseData = SscsCaseData.builder()
+                .ccdCaseId("1563382899630221")
+                .reissueArtifactUi(ReissueArtifactUi.builder()
+                        .reissueFurtherEvidenceDocument(dynamicList)
+                        .build())
+                .build();
+        caseData.setSscsDocument(List.of(audioDoc, videoDoc, pdfDoc));
+
+        when(furtherEvidenceService.canHandleAnyDocument(List.of(audioDoc, videoDoc, pdfDoc))).thenReturn(true);
+        doNothing().when(furtherEvidenceService)
+                .issue(List.of(pdfDoc), caseData, APPELLANT_EVIDENCE, List.of(), null);
+
+        handler.handle(CallbackType.SUBMITTED,
+                HandlerHelper.buildTestCallbackForGivenData(caseData, INTERLOCUTORY_REVIEW_STATE, REISSUE_FURTHER_EVIDENCE));
+
+        verify(furtherEvidenceService).issue(
+                argThat(argument -> argument.size() == 1 && argument.getFirst() == pdfDoc),
+                eq(caseData), eq(APPELLANT_EVIDENCE), eq(List.of()), eq(null)
+        );
+    }
+
 
     private static List<OtherPartyOption> getOtherPartyOptions(YesNo resendToOtherParty, YesNo resendToOtherPartyRep) {
         List<OtherPartyOption> otherPartyOptions = new ArrayList<>();

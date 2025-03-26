@@ -35,7 +35,7 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
         new CcdRoleConfig("caseworker-sscs-pcqextractor", "PUBLIC"),
         new CcdRoleConfig("caseworker-sscs-hmrcresponsewriter", "PUBLIC"),
         new CcdRoleConfig("caseworker-sscs-ibcaresponsewriter", "PUBLIC"),
-        new CcdRoleConfig("caseworker-wa-task-configuration", "PUBLIC"),
+        new CcdRoleConfig("caseworker-wa-task-configuration", "RESTRICTED"),
         new CcdRoleConfig("caseworker-ras-validation", "PUBLIC"),
         new CcdRoleConfig("GS_profile", "PUBLIC")
     };
@@ -71,17 +71,12 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
     @Override
     protected List<String> getAllDefinitionFilesToLoadAt(String definitionsPath) {
         boolean isPreview = environment.name().equalsIgnoreCase(CcdEnvironment.PREVIEW.name());
-        boolean isHearingsPr = "yes".equalsIgnoreCase(System.getenv("HEARINGS_ENABLED"));
 
         if (isPreview) {
-            if (!isHearingsPr) {
-                return List.of(
-                    "definitions/bulkscan/CCD_BulkScanningDefinition_PR.xlsx",
-                    "definitions/benefit/CCD_SSCSDefinition_PR.xlsx"
-                );
-            } else {
-                return List.of("definitions/benefit/CCD_SSCSDefinition_PR.xlsx");
-            }
+            return List.of(
+                "definitions/bulkscan/CCD_BulkScanningDefinition_PR.xlsx",
+                "definitions/benefit/CCD_SSCSDefinition_PR.xlsx"
+            );
         } else {
             return List.of(
                 String.format("definitions/benefit/CCD_SSCSDefinition_%s.xlsx", environment.name().toUpperCase())
@@ -97,7 +92,8 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
 
     @Override
     protected boolean shouldTolerateDataSetupFailure() {
-        return BeftaMain.getConfig().getDefinitionStoreUrl().contains("demo");
+        return BeftaMain.getConfig().getDefinitionStoreUrl().contains("demo")
+                || BeftaMain.getConfig().getDefinitionStoreUrl().contains("prod");
     }
 
     @Override

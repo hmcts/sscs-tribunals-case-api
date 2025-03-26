@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatenotlistable;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -12,19 +10,16 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.NOT_LISTABLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
-@RunWith(JUnitParamsRunner.class)
 public class UpdateNotListableAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
@@ -38,7 +33,7 @@ public class UpdateNotListableAboutToSubmitHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         handler = new UpdateNotListableAboutToSubmitHandler();
@@ -68,6 +63,39 @@ public class UpdateNotListableAboutToSubmitHandlerTest {
         assertNull(response.getData().getNotListableProvideReasons());
         assertEquals(READY_TO_LIST, response.getData().getState());
         assertNull(response.getData().getDirectionDueDate());
+        assertEquals(YesNo.YES, response.getData().getShouldReadyToListBeTriggered());
+    }
+
+    @Test
+    public void givenUpdateNotListableWithDirectionsFulfilledNoAndCertainCondition_thenTriggerReadyToList() {
+        sscsCaseData.setState(NOT_LISTABLE);
+        sscsCaseData.setUpdateNotListableDirectionsFulfilled("no");
+        sscsCaseData.setUpdateNotListableInterlocReview("no");
+        sscsCaseData.setUpdateNotListableSetNewDueDate("no");
+        sscsCaseData.setUpdateNotListableWhereShouldCaseMoveTo("readyToList");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(READY_TO_LIST, response.getData().getState());
+        assertEquals(YesNo.YES, response.getData().getShouldReadyToListBeTriggered());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "no, no, no, withDwp",
+        "no, yes, no, readyToList",
+        "no, no, yes, readyToList"
+    })
+    public void givenUpdateNotListableWithDirectionsFulfilledNoAndNoCertainCondition_thenDoNotTriggerReadyToList(String directionsFulfilled, String interlocReview, String setNewDueDate, String whereShouldCaseMoveTo) {
+        sscsCaseData.setState(NOT_LISTABLE);
+        sscsCaseData.setUpdateNotListableDirectionsFulfilled(directionsFulfilled);
+        sscsCaseData.setUpdateNotListableInterlocReview(interlocReview);
+        sscsCaseData.setUpdateNotListableSetNewDueDate(setNewDueDate);
+        sscsCaseData.setUpdateNotListableWhereShouldCaseMoveTo(whereShouldCaseMoveTo);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getShouldReadyToListBeTriggered());
     }
 
     @Test
@@ -80,6 +108,7 @@ public class UpdateNotListableAboutToSubmitHandlerTest {
 
         assertEquals("reason1", response.getData().getNotListableProvideReasons());
         assertEquals(NOT_LISTABLE, response.getData().getState());
+        assertNull(response.getData().getShouldReadyToListBeTriggered());
     }
 
     @Test
@@ -93,6 +122,7 @@ public class UpdateNotListableAboutToSubmitHandlerTest {
         assertEquals(REVIEW_BY_TCW, response.getData().getInterlocReviewState());
         assertEquals(LocalDate.now(), response.getData().getInterlocReferralDate());
         assertNull(response.getData().getDirectionDueDate());
+        assertNull(response.getData().getShouldReadyToListBeTriggered());
     }
 
     @Test
@@ -106,32 +136,35 @@ public class UpdateNotListableAboutToSubmitHandlerTest {
         assertEquals(REVIEW_BY_JUDGE, response.getData().getInterlocReviewState());
         assertEquals(LocalDate.now(), response.getData().getInterlocReferralDate());
         assertNull(response.getData().getDirectionDueDate());
+        assertNull(response.getData().getShouldReadyToListBeTriggered());
     }
 
     @Test
     public void givenUpdateNotListableSetNewDueDateYes_thenWriteToDirectionDueDateField() {
-        String tomorrowDate = LocalDate.now().plus(1, ChronoUnit.DAYS).toString();
+        String tomorrowDate = LocalDate.now().plusDays(1).toString();
         sscsCaseData.setUpdateNotListableSetNewDueDate("Yes");
         sscsCaseData.setUpdateNotListableDueDate(tomorrowDate);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(tomorrowDate, response.getData().getDirectionDueDate());
+        assertNull(response.getData().getShouldReadyToListBeTriggered());
     }
 
     @Test
     public void givenUpdateNotListableSetNewDueDateNo_thenDirectionDueDateFieldIsNull() {
-        String tomorrowDate = LocalDate.now().plus(1, ChronoUnit.DAYS).toString();
+        String tomorrowDate = LocalDate.now().plusDays(1).toString();
         sscsCaseData.setUpdateNotListableSetNewDueDate("No");
         sscsCaseData.setUpdateNotListableDueDate(null);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getDirectionDueDate());
+        assertNull(response.getData().getShouldReadyToListBeTriggered());
     }
 
-    @Test
-    @Parameters({"readyToList, READY_TO_LIST", "withDwp, WITH_DWP"})
+    @ParameterizedTest
+    @CsvSource({"readyToList, READY_TO_LIST", "withDwp, WITH_DWP"})
     public void givenUpdateNotListableWhatShouldCaseMoveToNextReadyToList_thenSetStateToReadyToList(String nextState, State expectedState) {
         sscsCaseData.setUpdateNotListableWhereShouldCaseMoveTo(nextState);
         sscsCaseData.setNotListableProvideReasons("reason1");
@@ -140,10 +173,11 @@ public class UpdateNotListableAboutToSubmitHandlerTest {
 
         assertEquals(expectedState, response.getData().getState());
         assertNull(response.getData().getNotListableProvideReasons());
+        assertNull(response.getData().getShouldReadyToListBeTriggered());
     }
 
     @Test
-    public void givenUpdateNotListableEvent_thenClearTransientFields() {
+    public void givenUpdateNotListableEvent_thenClearTransientFields_andTriggerReadyToList() {
         sscsCaseData.setUpdateNotListableDueDate(LocalDate.now().toString());
         sscsCaseData.setUpdateNotListableWhereShouldCaseMoveTo("withDwp");
         sscsCaseData.setNotListableProvideReasons("reason1");
@@ -161,15 +195,15 @@ public class UpdateNotListableAboutToSubmitHandlerTest {
         assertNull(response.getData().getUpdateNotListableDirectionsFulfilled());
     }
 
-    @Test
-    @Parameters({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
+    @ParameterizedTest
+    @CsvSource({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThrows(IllegalStateException.class, () -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION));
     }
 }

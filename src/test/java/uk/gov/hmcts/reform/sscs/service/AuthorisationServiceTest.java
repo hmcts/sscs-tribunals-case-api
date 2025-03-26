@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import feign.FeignException;
 import org.junit.Before;

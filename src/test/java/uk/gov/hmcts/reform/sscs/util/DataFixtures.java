@@ -1,7 +1,13 @@
 package uk.gov.hmcts.reform.sscs.util;
 
 import java.util.List;
-import uk.gov.hmcts.reform.sscs.domain.wrapper.*;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.AddressDetails;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.AppealDetails;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.FinalDecision;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.OnlineHearing;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.Statement;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.UserDetails;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.UserType;
 
 public class DataFixtures {
     private DataFixtures() {

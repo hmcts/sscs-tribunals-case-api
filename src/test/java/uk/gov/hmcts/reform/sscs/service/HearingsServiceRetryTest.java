@@ -25,12 +25,24 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.retry.ExhaustedRetryException;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseManagementLocation;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SessionCategory;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -60,34 +72,31 @@ class HearingsServiceRetryTest {
     private static final String EVENT_ID = "EVENT_ID";
     private static final String EVENT_TOKEN = "EVENT_TOKEN";
 
-    @MockBean
+    @MockitoBean
     private HmcHearingApiService hmcHearingApiService;
 
-    @MockBean
-    private HmcHearingsApiService hmcHearingsApiService;
-
-    @MockBean
+    @MockitoBean
     private CcdCaseService ccdCaseService;
 
-    @MockBean
+    @MockitoBean
     private ReferenceDataServiceHolder refData;
 
-    @MockBean
+    @MockitoBean
     private HearingDurationsService hearingDurations;
 
     @Mock
     private SessionCategoryMapService sessionCategoryMaps;
 
-    @MockBean
+    @MockitoBean
     private IdamService idamService;
 
-    @MockBean
+    @MockitoBean
     private UpdateCcdCaseService updateCcdCaseService;
 
-    @MockBean
+    @MockitoBean
     private HearingServiceConsumer hearingServiceConsumer;
 
-    @MockBean
+    @MockitoBean
     private Consumer<SscsCaseDetails> sscsCaseDetailsConsumer;
 
     @Mock
@@ -162,12 +171,14 @@ class HearingsServiceRetryTest {
         assertThatNoException()
             .isThrownBy(() -> hearingsService.hearingResponseUpdate(wrapper, response));
 
-        verify(ccdCaseService, times(1))
-            .updateCaseData(
-                any(SscsCaseData.class),
-                eq(wrapper),
-                any(HearingEvent.class)
-            );
+        verify(updateCcdCaseService).updateCaseV2(
+                eq(CASE_ID),
+                eq(event.getEventType().getCcdType()),
+                eq(event.getSummary()),
+                eq(event.getDescription()),
+                any(),
+                any()
+        );
     }
 
 

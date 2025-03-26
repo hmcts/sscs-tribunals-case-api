@@ -18,7 +18,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
@@ -33,12 +32,13 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
 import uk.gov.hmcts.reform.sscs.service.CcdCaseService;
 import uk.gov.hmcts.reform.sscs.service.HearingsService;
+import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingMessageServiceListener;
 
 @ExtendWith(MockitoExtension.class)
 class TribunalsHearingsEventTopicListenerTest {
 
     @InjectMocks
-    private TribunalsHearingsEventQueueListener tribunalsHearingsEventQueueListener;
+    private HearingMessageServiceListener hearingMessageServiceListener;
 
     @Mock
     private HearingsService hearingsService;
@@ -57,11 +57,9 @@ class TribunalsHearingsEventTopicListenerTest {
     @Test
     @DisplayName("When a valid request comes in make sure processHearingRequest is hit")
     void whenAValidRequestComesIn_makeSureProcessHearingRequestIsHit() throws Exception {
-
-        ReflectionTestUtils.setField(tribunalsHearingsEventQueueListener, "isByPassHearingServiceEnabled", true);
         HearingRequest hearingRequest = createHearingRequest();
 
-        tribunalsHearingsEventQueueListener.handleIncomingMessage(hearingRequest);
+        hearingMessageServiceListener.handleIncomingMessage(hearingRequest);
 
         verify(hearingsService, times(1)).processHearingRequest((hearingRequest));
     }
@@ -70,12 +68,11 @@ class TribunalsHearingsEventTopicListenerTest {
     @DisplayName("When an invalid request comes in make sure exception is thrown")
     @MethodSource("throwableParameters")
     void whenAnInvalidRequestComesIn_makeSureExceptionIsThrown(Class<? extends Throwable> throwable) throws Exception {
-        ReflectionTestUtils.setField(tribunalsHearingsEventQueueListener, "isByPassHearingServiceEnabled", true);
         HearingRequest hearingRequest = new HearingRequest();
 
         doThrow(throwable).when(hearingsService).processHearingRequest(hearingRequest);
 
-        assertThrows(TribunalsEventProcessingException.class, () -> tribunalsHearingsEventQueueListener.handleIncomingMessage(hearingRequest));
+        assertThrows(TribunalsEventProcessingException.class, () -> hearingMessageServiceListener.handleIncomingMessage(hearingRequest));
     }
 
     private static Stream<Arguments> throwableParameters() {
@@ -88,8 +85,7 @@ class TribunalsHearingsEventTopicListenerTest {
     @Test
     @DisplayName("When an null request comes in make sure exception is thrown")
     void whenAnNullRequestComesIn_makeSureExceptionIsThrown() {
-        ReflectionTestUtils.setField(tribunalsHearingsEventQueueListener, "isByPassHearingServiceEnabled", true);
-        assertThrows(TribunalsEventProcessingException.class, () -> tribunalsHearingsEventQueueListener.handleIncomingMessage(null));
+        assertThrows(TribunalsEventProcessingException.class, () -> hearingMessageServiceListener.handleIncomingMessage(null));
     }
 
     private HearingRequest createHearingRequest() {
@@ -100,34 +96,8 @@ class TribunalsHearingsEventTopicListenerTest {
     }
 
     @Test
-    @DisplayName("When a listing exception is thrown, catch the error and update the state")
-    void whenListingExceptionThrown_UpdateCaseDataState() throws Exception {
-        ReflectionTestUtils.setField(tribunalsHearingsEventQueueListener, "hearingsCaseUpdateV2Enabled", false);
-        ReflectionTestUtils.setField(tribunalsHearingsEventQueueListener, "isByPassHearingServiceEnabled", true);
-        SscsCaseData caseData = SscsCaseData.builder().build();
-        SscsCaseDetails caseDetails = SscsCaseDetails.builder().data(caseData).build();
-        HearingRequest hearingRequest = createHearingRequest();
-
-        doThrow(ListingException.class)
-            .when(hearingsService)
-            .processHearingRequest(hearingRequest);
-
-        when(ccdCaseService.getCaseDetails(CASE_ID)).thenReturn(caseDetails);
-        when(ccdCaseService.updateCaseData(caseData,
-                                           EventType.LISTING_ERROR,
-                                           null,
-                                           null)).thenReturn(caseDetails);
-
-        assertDoesNotThrow(() -> tribunalsHearingsEventQueueListener.handleIncomingMessage(hearingRequest));
-
-        verifyNoInteractions(updateCcdCaseService);
-    }
-
-    @Test
     @DisplayName("When a listing exception is thrown, with hearingsCaseUpdateV2Enabled, catch the error and update the state")
     void whenListingExceptionThrownWithV2Enabled_UpdateCaseDataState() throws Exception {
-        ReflectionTestUtils.setField(tribunalsHearingsEventQueueListener, "hearingsCaseUpdateV2Enabled", true);
-        ReflectionTestUtils.setField(tribunalsHearingsEventQueueListener, "isByPassHearingServiceEnabled", true);
         SscsCaseData caseData = SscsCaseData.builder().build();
         SscsCaseDetails caseDetails = SscsCaseDetails.builder().data(caseData).build();
         HearingRequest hearingRequest = createHearingRequest();
@@ -145,6 +115,6 @@ class TribunalsHearingsEventTopicListenerTest {
         )).thenReturn(caseDetails);
 
         verifyNoInteractions(ccdCaseService);
-        assertDoesNotThrow(() -> tribunalsHearingsEventQueueListener.handleIncomingMessage(hearingRequest));
+        assertDoesNotThrow(() -> hearingMessageServiceListener.handleIncomingMessage(hearingRequest));
     }
 }
