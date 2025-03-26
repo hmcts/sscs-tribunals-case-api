@@ -1,7 +1,12 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.tribunalcommunication;
 
+import static java.util.Objects.requireNonNull;
+
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,8 +31,8 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        Objects.requireNonNull(callback, "callback must not be null");
-        Objects.requireNonNull(callbackType, "callbackType must not be null");
+       requireNonNull(callback, "callback must not be null");
+       requireNonNull(callbackType, "callbackType must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
                 && callback.getEvent() == EventType.TRIBUNAL_COMMUNICATION;
@@ -49,26 +54,29 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
         //        if (sscsCaseData.getTribunalCommunications() != null && sscsCaseData.getTribunalCommunications().getTribunalCommunicationFields() != null) {
         //            tribunalComms = sscsCaseData.getTribunalCommunications().getTribunalCommunicationFields();
         //        }
-        TribunalCommunication tribunalCommunication = Optional.ofNullable(sscsCaseData.getTribunalCommunications()).orElse(TribunalCommunication.builder().build());
-        String topic = tribunalCommunication.getTribunalRequestTopic();
-        String question = tribunalCommunication.getTribunalRequestQuestion();
-        LocalDateTime now = LocalDateTime.now();
+        TribunalCommunicationDetails tribunalCommunicationDetails = Optional.ofNullable(sscsCaseData.getTribunalCommunicationsDetails()).orElse(TribunalCommunicationDetails.builder().build());
+        String topic = tribunalCommunicationDetails.getTribunalRequestTopic();
+        String question = tribunalCommunicationDetails.getTribunalRequestQuestion();
+        LocalDateTime dueDate = LocalDateTime.now().plusDays(2);
         final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
-        List<TribunalCommunicationFields> tribunalComms = new ArrayList<>();
-        tribunalComms.add(TribunalCommunicationFields.builder()
-                .requestMessage(question)
-                .requestTopic(topic)
-                .requestDateTime(now)
-                .requestUserName(userDetails.getName())
-                .requestResponseDue(now.plusDays(2))
+
+        List<TribunalCommunication> tribunalComms = Optional.ofNullable(tribunalCommunicationDetails.getTribunalCommunications()).orElse(new ArrayList<>());
+        tribunalComms.add(TribunalCommunication.builder()
+                .value(TribunalCommunicationFields.builder()
+                    .requestMessage(question)
+                    .requestTopic(topic)
+                    .requestDateTime(LocalDateTime.now())
+                    .requestUserName(userDetails.getName())
+                    .requestResponseDue(dueDate)
+                    .build())
                 .build());
-        if (tribunalCommunication.getTribunalCommunicationFields() != null) {
-            tribunalComms.addAll(tribunalCommunication.getTribunalCommunicationFields());
+        if (tribunalCommunicationDetails.getTribunalCommunications() != null) {
+            tribunalComms.addAll(tribunalCommunicationDetails.getTribunalCommunications());
         }
 
-        tribunalComms.sort(Comparator.comparing(TribunalCommunicationFields::getRequestDateTime).reversed());
-        tribunalCommunication.setTribunalCommunicationFields(tribunalComms);
-        sscsCaseData.setTribunalCommunications(tribunalCommunication);
+        tribunalComms.sort(Comparator.comparing(tribunalComm -> ((TribunalCommunication) tribunalComm).getValue().getRequestDateTime()).reversed());
+        tribunalCommunicationDetails.setTribunalCommunications(tribunalComms);
+        sscsCaseData.setTribunalCommunicationsDetails(tribunalCommunicationDetails);
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 }
