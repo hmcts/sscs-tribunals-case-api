@@ -81,7 +81,10 @@ public class PlaceholderService {
         }
 
         placeholders.put(SHOULD_HIDE_NINO, shouldHideNino);
-        placeholders.put(BENEFIT_TYPE_LITERAL, caseData.isIbcCase() ? IBC_ACRONYM : description);
+        if (caseData.isIbcCase()) {
+            placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, IBC_ACRONYM);
+        }
+        placeholders.put(BENEFIT_TYPE_LITERAL, description);
         placeholders.put(APPELLANT_FULL_NAME_LITERAL, appeal.getAppellant().getName().getAbbreviatedFullName());
         placeholders.put(CASE_ID_LITERAL, caseData.getCcdCaseId());
         String ninoLiteral = defaultToEmptyStringIfNull(caseData.isIbcCase() ? appeal.getAppellant().getIdentity().getIbcaReference() : appeal.getAppellant().getIdentity().getNino());
