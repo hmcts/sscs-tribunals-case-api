@@ -56,7 +56,7 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
             String topic = ftaCommunicationFields.getFtaRequestTopic();
             String question = ftaCommunicationFields.getFtaRequestQuestion();
             LocalDateTime now = LocalDateTime.now();
-            LocalDateTime dueDate = calculateDueDate(LocalDateTime.now());
+            LocalDateTime dueDate = calculateDueDate(now);
             final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
 
             List<FtaCommunication> ftaComs = Optional.ofNullable(ftaCommunicationFields.getFtaCommunications())
