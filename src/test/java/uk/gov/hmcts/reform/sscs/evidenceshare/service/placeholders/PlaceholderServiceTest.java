@@ -13,6 +13,7 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.EXELA_ADDRESS_LINE1_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.EXELA_ADDRESS_LINE2_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.EXELA_ADDRESS_LINE3_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.EXELA_ADDRESS_POSTCODE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.GENERATED_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.IBCA_URL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LABEL;
