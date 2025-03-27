@@ -24,7 +24,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunication;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationFilter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.FtaRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.TribunalCommunicationFilter;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 
@@ -82,6 +85,7 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
             .ftaRequestTopic(expectedTopic)
             .ftaRequestQuestion(expectedQuestion)
             .ftaCommunications(existingComs)
+            .ftaRequestType(FtaRequestType.NEW_REQUEST)
             .build();
         
         sscsCaseData.setFtaCommunicationFields(fields);
@@ -106,6 +110,10 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
         assertEquals(expectedQuestion, addedCom.getRequestText());
         assertEquals(expectedUserName, addedCom.getRequestUserName());
         assertNotNull(addedCom.getRequestDateTime());
+        
+        // Verify the enum values are correctly set
+        assertEquals(FtaCommunicationFilter.AWAITING_INFO_FROM_FTA, response.getData().getFtaCommunicationFields().getFtaCommunicationFilter());
+        assertEquals(TribunalCommunicationFilter.NEW_FTA_FILTER, response.getData().getFtaCommunicationFields().getTribunalCommunicationFilter());
     }
 
     @Test
@@ -139,6 +147,7 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
             .ftaRequestTopic(expectedTopic)
             .ftaRequestQuestion(expectedQuestion)
             .ftaCommunications(existingComs)
+            .ftaRequestType(FtaRequestType.NEW_REQUEST)
             .build();
 
         sscsCaseData.setFtaCommunicationFields(fields);
@@ -165,6 +174,10 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
         assertEquals(expectedUserName, addedCom.getRequestUserName());
         assertNotNull(addedCom.getRequestDateTime());
         assertEquals(ftaCommunicationPast, resultComs.getLast());
+        
+        // Verify the enum values are correctly set
+        assertEquals(FtaCommunicationFilter.AWAITING_INFO_FROM_FTA, response.getData().getFtaCommunicationFields().getFtaCommunicationFilter());
+        assertEquals(TribunalCommunicationFilter.NEW_FTA_FILTER, response.getData().getFtaCommunicationFields().getTribunalCommunicationFilter());
     }
     
     @Test
@@ -178,6 +191,7 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
             .ftaRequestTopic(expectedTopic)
             .ftaRequestQuestion(expectedQuestion)
             .ftaCommunications(null) // Explicitly set to null
+            .ftaRequestType(FtaRequestType.NEW_REQUEST)
             .build();
         
         sscsCaseData.setFtaCommunicationFields(fields);
@@ -196,6 +210,10 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
         List<FtaCommunication> resultComs = response.getData().getFtaCommunicationFields().getFtaCommunications();
     
         assertNotNull(resultComs);
+        
+        // Verify the enum values are correctly set
+        assertEquals(FtaCommunicationFilter.AWAITING_INFO_FROM_FTA, response.getData().getFtaCommunicationFields().getFtaCommunicationFilter());
+        assertEquals(TribunalCommunicationFilter.NEW_FTA_FILTER, response.getData().getFtaCommunicationFields().getTribunalCommunicationFilter());
     }
 
     @ParameterizedTest

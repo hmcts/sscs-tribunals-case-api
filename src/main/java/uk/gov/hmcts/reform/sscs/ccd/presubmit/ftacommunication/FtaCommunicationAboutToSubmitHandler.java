@@ -52,30 +52,34 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         FtaCommunicationFields ftaCommunicationFields = Optional.ofNullable(sscsCaseData.getFtaCommunicationFields())
             .orElse(FtaCommunicationFields.builder().build());
 
-        String topic = ftaCommunicationFields.getFtaRequestTopic();
-        String question = ftaCommunicationFields.getFtaRequestQuestion();
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime dueDate = calculateDueDate(LocalDateTime.now());
-        final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
+        if (ftaCommunicationFields.getFtaRequestType() == FtaRequestType.NEW_REQUEST)  {  
+            String topic = ftaCommunicationFields.getFtaRequestTopic();
+            String question = ftaCommunicationFields.getFtaRequestQuestion();
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime dueDate = calculateDueDate(LocalDateTime.now());
+            final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
 
-        List<FtaCommunication> ftaComs = Optional.ofNullable(ftaCommunicationFields.getFtaCommunications())
-            .orElse(new ArrayList<>());
+            List<FtaCommunication> ftaComs = Optional.ofNullable(ftaCommunicationFields.getFtaCommunications())
+                .orElse(new ArrayList<>());
+            
+            ftaComs.add(FtaCommunication.builder()
+                .value(FtaCommunicationDetails.builder()
+                        .requestText(question)
+                        .requestTopic(topic)
+                        .requestDateTime(now)
+                        .requestUserName(userDetails.getName())
+                        .requestDueDate(dueDate)
+                    .build())
+                .build());
 
-        ftaComs.add(FtaCommunication.builder()
-            .value(FtaCommunicationDetails.builder()
-                .requestText(question)
-                .requestTopic(topic)
-                .requestDateTime(now)
-                .requestUserName(userDetails.getName())
-                .requestDueDate(dueDate)
-                .build())
-            .build());
+            ftaComs.sort(Comparator.comparing(ftaCom ->
+                ((FtaCommunication) ftaCom).getValue().getRequestDateTime()).reversed());
 
-        ftaComs.sort(Comparator.comparing(ftaCom ->
-            ((FtaCommunication) ftaCom).getValue().getRequestDateTime()).reversed());
-
-        ftaCommunicationFields.setFtaCommunications(ftaComs);
-        sscsCaseData.setFtaCommunicationFields(ftaCommunicationFields);
+            ftaCommunicationFields.setFtaCommunications(ftaComs);
+            ftaCommunicationFields.setFtaCommunicationFilter(FtaCommunicationFilter.AWAITING_INFO_FROM_FTA);
+            ftaCommunicationFields.setTribunalCommunicationFilter(TribunalCommunicationFilter.NEW_FTA_FILTER);
+            sscsCaseData.setFtaCommunicationFields(ftaCommunicationFields);
+        }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
