@@ -5,6 +5,7 @@ import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsMapping.getSession
 import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.Judiciary;
@@ -13,16 +14,19 @@ import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.ServiceHearingValues
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 import uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil;
 
-
+@Component
 public final class ServiceHearingValuesMapping {
 
     public static final String BENEFIT = "Benefit";
 
-    private ServiceHearingValuesMapping() {
+    private final HearingsPanelMapping hearingsPanelMapping;
+
+    ServiceHearingValuesMapping(HearingsPanelMapping hearingsPanelMapping) {
+        this.hearingsPanelMapping = hearingsPanelMapping;
     }
 
 
-    public static ServiceHearingValues mapServiceHearingValues(@Valid SscsCaseData caseData, ReferenceDataServiceHolder refData)
+    public ServiceHearingValues mapServiceHearingValues(@Valid SscsCaseData caseData, ReferenceDataServiceHolder refData)
             throws ListingException {
 
         boolean shouldBeAutoListed = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
@@ -59,13 +63,13 @@ public final class ServiceHearingValuesMapping {
                 .screenFlow(null)
                 .vocabulary(null)
                 .caseInterpreterRequiredFlag(HearingChannelUtil.isInterpreterRequired(caseData))
-                .panelRequirements(null)
+                .panelRequirements(hearingsPanelMapping.getPanelRequirements(caseData, refData))
                 .build();
     }
 
-    public static Judiciary getJudiciary(@Valid SscsCaseData sscsCaseData, ReferenceDataServiceHolder refData) {
+    public Judiciary getJudiciary(@Valid SscsCaseData sscsCaseData, ReferenceDataServiceHolder refData) {
         return Judiciary.builder()
-                .roleType(null)
+                .roleType(hearingsPanelMapping.getRoleTypes(sscsCaseData))
                 .authorisationTypes(HearingsPanelMapping.getAuthorisationTypes())
                 .authorisationSubType(HearingsPanelMapping.getAuthorisationSubTypes())
                 .judiciarySpecialisms(HearingsPanelMapping.getPanelSpecialisms(sscsCaseData, getSessionCaseCodeMap(sscsCaseData, refData)))
