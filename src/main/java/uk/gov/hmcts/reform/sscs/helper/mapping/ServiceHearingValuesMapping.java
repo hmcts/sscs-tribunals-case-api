@@ -9,6 +9,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.Judiciary;
@@ -26,14 +27,11 @@ public final class ServiceHearingValuesMapping {
 
     private final HearingsPanelMapping hearingsPanelMapping;
 
-    private final PanelCategoryService panelCategoryService;
-
     @Value("${feature.default-panel-comp.enabled}")
     private boolean defaultPanelCompEnabled;
 
-    ServiceHearingValuesMapping(HearingsPanelMapping hearingsPanelMapping, PanelCategoryService panelCategoryService) {
+    ServiceHearingValuesMapping(HearingsPanelMapping hearingsPanelMapping) {
         this.hearingsPanelMapping = hearingsPanelMapping;
-        this.panelCategoryService = panelCategoryService;
     }
 
 
@@ -85,7 +83,7 @@ public final class ServiceHearingValuesMapping {
 
     public Judiciary getJudiciary(@Valid SscsCaseData sscsCaseData, ReferenceDataServiceHolder refData) {
         return Judiciary.builder()
-                .roleType(defaultPanelCompEnabled ? panelCategoryService.getRoleTypes(sscsCaseData) : findRoleTypesByBenefitCode(sscsCaseData.getBenefitCode()))
+                .roleType(hearingsPanelMapping.getRoleTypes(sscsCaseData))
                 .authorisationTypes(HearingsPanelMapping.getAuthorisationTypes())
                 .authorisationSubType(HearingsPanelMapping.getAuthorisationSubTypes())
                 .judiciarySpecialisms(HearingsPanelMapping.getPanelSpecialisms(sscsCaseData, getSessionCaseCodeMap(sscsCaseData, refData)))
