@@ -1,4 +1,4 @@
-import { expect, Page } from '@playwright/test';
+import { APIRequestContext, expect, Page } from '@playwright/test';
 import { BaseStep } from './base';
 import { credentials, environment } from '../../config/config';
 import createCaseBasedOnCaseType from '../../api/client/sscs/factory/appeal.type.factory';
@@ -130,10 +130,12 @@ export class UploadResponse extends BaseStep {
 
     await this.homePage.navigateToTab('Summary');
     await this.summaryTab.verifyPresenceOfText('Ready to list');
-    if (environment.name == 'aat') {
+    try {
+      await this.homePage.navigateToTab('Listing Requirements');
+    } catch {
       await this.page.locator('button.mat-tab-header-pagination-after').click();
+      await this.homePage.navigateToTab('Listing Requirements');
     }
-    await this.homePage.navigateToTab('Listing Requirements');
     await this.listingRequirementsTab.verifyContentByKeyValueForASpan(
       ucbTestData.ucbFieldLabel,
       ucbTestData.ucbFieldValue_Yes
@@ -512,5 +514,15 @@ export class UploadResponse extends BaseStep {
       uploadResponseTestdata.pipIssueCode
     );
     await this.checkYourAnswersPage.confirmSubmission();
+  }
+
+  async checkHmcEnvironment(request: APIRequestContext) {
+    if (environment.name == 'aat') {
+      console.log('Checking HMC AAT is up before attempting test...');
+      const response = await request.get(
+        'http://hmc-cft-hearing-service-aat.service.core-compute-aat.internal/health'
+      )
+      expect(response.status()).toBe(200)
+    }
   }
 }

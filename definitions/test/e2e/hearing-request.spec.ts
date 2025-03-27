@@ -8,6 +8,13 @@ test.describe(
   'Create a new hearing for an List assist case',
   { tag: '@nightly-pipeline' },
   async () => {
+    test.beforeEach(
+      'Check HMC environment',
+      async ({ uploadResponseSteps, request }) => {
+        await uploadResponseSteps.checkHmcEnvironment(request);
+      }
+    );
+
     test(
       'Trigger a new hearing & cancellation for DLA case',
       { tag: '@aat-regression' },
@@ -34,9 +41,16 @@ test.describe(
       issueDirectionsNoticeSteps
     }) => {
       caseId = await createCaseBasedOnCaseType('UCSANDL');
-      await issueDirectionsNoticeSteps.loginUserWithCaseId(credentials.hmrcSuperUser, false, caseId);
+      await issueDirectionsNoticeSteps.loginUserWithCaseId(
+        credentials.hmrcSuperUser,
+        false,
+        caseId
+      );
       await issueDirectionsNoticeSteps.performIssueDirectionNoticeDirectionHearing();
-      await uploadResponseSteps.performUploadResponseOnAUniversalCredit(caseId, false);
+      await uploadResponseSteps.performUploadResponseOnAUniversalCredit(
+        caseId,
+        false
+      );
       await hearingSteps.verifyHearingIsTriggeredForUCCase(true);
     });
 
@@ -45,9 +59,16 @@ test.describe(
       hearingSteps
     }) => {
       caseId = await createCaseBasedOnCaseType('UCSANDL');
-      await hearingSteps.loginUserWithCaseId(credentials.hmrcSuperUser, false, caseId);
+      await hearingSteps.loginUserWithCaseId(
+        credentials.hmrcSuperUser,
+        false,
+        caseId
+      );
       await hearingSteps.updateHearingToDirectionViaEvent();
-      await uploadResponseSteps.performUploadResponseOnAUniversalCredit(caseId, false);
+      await uploadResponseSteps.performUploadResponseOnAUniversalCredit(
+        caseId,
+        false
+      );
       await hearingSteps.verifyHearingIsTriggeredForUCCase(true);
     });
 

@@ -32,6 +32,7 @@ test.describe('Enhanced confidentiality test', async () => {
     'Refuse - confidentiality request for a party on a case',
     { tag: ['@preview-regression', '@nightly-pipeline'] },
     async ({ uploadResponseSteps, enhancedConfidentialitySteps }) => {
+      test.slow();
       await uploadResponseSteps.performUploadResponseOnAUniversalCreditWithJP(
         caseId
       );
