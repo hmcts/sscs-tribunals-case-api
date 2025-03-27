@@ -80,7 +80,6 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
     }
 
     public LocalDateTime dueDate(LocalDateTime now){
-        now = LocalDateTime.now();
         LocalDateTime replyDueDate = now.plusDays(2);
         if(replyDueDate.getDayOfWeek().getValue() == 6) {
             replyDueDate = replyDueDate.plusDays(2);

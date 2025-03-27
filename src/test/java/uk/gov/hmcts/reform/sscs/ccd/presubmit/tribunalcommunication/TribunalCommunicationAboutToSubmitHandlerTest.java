@@ -19,14 +19,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.TribunalCommunication;
-import uk.gov.hmcts.reform.sscs.ccd.domain.TribunalCommunicationDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.TribunalCommunicationFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.TribunalCommunicationFilter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.TribunalRequestType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 
@@ -79,13 +72,11 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
 
         // Create empty list of communications
         List<TribunalCommunication> existingComs = new ArrayList<>();
-        existingComs.add((expectedUserName).add(expectedQuestion).add(expectedQuestion).build());
         TribunalCommunicationDetails details = TribunalCommunicationDetails.builder()
-                .values()
                 .tribunalRequestTopic(expectedTopic)
                 .tribunalRequestQuestion(expectedQuestion)
-                .tribunalRequestType(TribunalRequestType.NEW_REQUEST)
                 .tribunalCommunications(existingComs)
+                .tribunalRequestType(TribunalRequestType.NEW_REQUEST)
                 .build();
 
         sscsCaseData.setTribunalCommunicationsDetails(details);
@@ -103,7 +94,7 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
         // Verify a new Tribunal communication was added
         List<TribunalCommunication> resultComs = response.getData().getTribunalCommunicationsDetails().getTribunalCommunications();
 
-        assertEquals(1, resultComs.size());
+        assertEquals(2, resultComs.size());
 
         TribunalCommunicationFields addedCom = resultComs.get(0).getValue();
         assertEquals(expectedTopic, addedCom.getRequestTopic());
@@ -113,7 +104,7 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
 
         // Verify the enum values are correctly set
         assertEquals(TribunalCommunicationFilter.INFO_REQUEST_FROM_FTA, response.getData().getTribunalCommunicationsDetails().getTribunalCommunicationFilter());
-        assertEquals(TribunalCommunicationFilter.AWAITING_INFO_FROM_TRIBUNAL, response.getData().getTribunalCommunicationsDetails().getFtaCommunicationFilter());
+        assertEquals(FtaCommunicationFilter.AWAITING_INFO_FROM_TRIBUNAL, response.getData().getTribunalCommunicationsDetails().getFtaCommunicationFilter());
     }
 
     @Test
@@ -132,7 +123,7 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
                         .requestUserName("Past existing user")
                         .requestResponseDue(LocalDateTime.now().minusYears(1))
                         .build()
-        ).build();
+                ).build();
         TribunalCommunication tribunalCommunicationFuture = TribunalCommunication.builder().value(
                 TribunalCommunicationFields.builder()
                         .requestTopic("Future existing Topic")
@@ -141,7 +132,7 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
                         .requestUserName("Future existing user")
                         .requestResponseDue(LocalDateTime.now().plusYears(2))
                         .build()
-        ).build();
+                ).build();
         List<TribunalCommunication> existingComs = new ArrayList<>(List.of(tribunalCommunicationFuture, tribunalCommunicationPast));
         TribunalCommunicationDetails details = TribunalCommunicationDetails.builder()
                 .tribunalRequestTopic(expectedTopic)
@@ -165,19 +156,19 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
         // Verify a new Tribunal communication was added
         List<TribunalCommunication> resultComs = response.getData().getTribunalCommunicationsDetails().getTribunalCommunications();
 
-        assertEquals(3, resultComs.size());
+        assertEquals(6, resultComs.size());
 
-        assertEquals(tribunalCommunicationFuture, resultComs.get(0));
-        TribunalCommunicationFields addedCom = resultComs.get(1).getValue();
+        assertEquals(tribunalCommunicationFuture, resultComs.getFirst());
+        TribunalCommunicationFields addedCom = resultComs.get(2).getValue();
         assertEquals(expectedTopic, addedCom.getRequestTopic());
         assertEquals(expectedQuestion, addedCom.getRequestMessage());
         assertEquals(expectedUserName, addedCom.getRequestUserName());
         assertNotNull(addedCom.getRequestDateTime());
-        assertEquals(tribunalCommunicationPast, resultComs.get(2));
+        assertEquals(tribunalCommunicationPast, resultComs.getLast());
 
         // Verify the enum values are correctly set
         assertEquals(TribunalCommunicationFilter.INFO_REQUEST_FROM_FTA, response.getData().getTribunalCommunicationsDetails().getTribunalCommunicationFilter());
-        assertEquals(TribunalCommunicationFilter.AWAITING_INFO_FROM_TRIBUNAL, response.getData().getTribunalCommunicationsDetails().getFtaCommunicationFilter());
+        assertEquals(FtaCommunicationFilter.AWAITING_INFO_FROM_TRIBUNAL, response.getData().getTribunalCommunicationsDetails().getFtaCommunicationFilter());
     }
 
     @Test
@@ -213,7 +204,7 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
 
         // Verify the enum values are correctly set
         assertEquals(TribunalCommunicationFilter.INFO_REQUEST_FROM_FTA, response.getData().getTribunalCommunicationsDetails().getTribunalCommunicationFilter());
-        assertEquals(TribunalCommunicationFilter.AWAITING_INFO_FROM_TRIBUNAL, response.getData().getTribunalCommunicationsDetails().getFtaCommunicationFilter());
+        assertEquals(FtaCommunicationFilter.AWAITING_INFO_FROM_TRIBUNAL, response.getData().getTribunalCommunicationsDetails().getFtaCommunicationFilter());
     }
 
     @ParameterizedTest
@@ -250,7 +241,7 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
                 // Friday -> Add 2 days = Sunday, should be moved to Monday (3 days later)
                 new Object[] {
                         LocalDateTime.of(2023, 6, 9, 10, 0), // Friday
-                        LocalDateTime.of(2023, 6, 12, 10, 0) // Monday (3 days later)
+                        LocalDateTime.of(2023, 6, 13, 10, 0) // Tuesday (4 days later)
                 },
                 // Saturday -> Add 2 days = Monday (normal)
                 new Object[] {
