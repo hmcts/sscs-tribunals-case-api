@@ -354,7 +354,7 @@ dependencies {
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '11.4.1'
     implementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '11.4.1'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'e2c6c70'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'd2b795d'
 
     // sscs-pdf-email-common
     implementation group: 'com.github.sps.junidecode', name: 'junidecode', version: '0.3'
