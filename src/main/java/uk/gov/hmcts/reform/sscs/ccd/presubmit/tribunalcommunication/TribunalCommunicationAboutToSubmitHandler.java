@@ -49,11 +49,6 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        //List<TribunalCommunicationFields> tribunalComms = sscsCaseData.getTribunalCommunications().getTribunalCommunicationFields();
-        //        List<TribunalCommunicationFields> tribunalComms = Collections.emptyList();
-        //        if (sscsCaseData.getTribunalCommunications() != null && sscsCaseData.getTribunalCommunications().getTribunalCommunicationFields() != null) {
-        //            tribunalComms = sscsCaseData.getTribunalCommunications().getTribunalCommunicationFields();
-        //        }
         TribunalCommunicationDetails tribunalCommunicationDetails = Optional.ofNullable(sscsCaseData.getTribunalCommunicationsDetails()).orElse(TribunalCommunicationDetails.builder().build());
         String topic = tribunalCommunicationDetails.getTribunalRequestTopic();
         String question = tribunalCommunicationDetails.getTribunalRequestQuestion();

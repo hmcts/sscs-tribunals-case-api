@@ -1,8 +1,8 @@
 [
-  {"LiveFrom": "18/03/2025", "ID": "tribunalRequest", "ListElementCode": "requestMadeDateTime", "FieldType": "DateTime", "ElementLabel": "Request Start Date and Time", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "18/03/2025", "ID": "tribunalRequest", "ListElementCode": "requestDueDate", "FieldType": "Date", "ElementLabel": "Request Due Date", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "18/03/2025", "ID": "tribunalRequest", "ListElementCode": "requestMadeDateTime", "FieldType": "DateTime", "ElementLabel": "Date Of Request", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "18/03/2025", "ID": "tribunalRequest", "ListElementCode": "requestDueDate", "FieldType": "Date", "ElementLabel": "Tribunal Comms Reply Due Date", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/03/2025", "ID": "tribunalRequest", "ListElementCode": "requestTopics", "FieldType": "FixedList", "ElementLabel": "Request Topic", "FieldTypeParameter" : "FL_tribunalRequestTopic", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/03/2025", "ID": "tribunalRequest", "ListElementCode": "requestText", "FieldType": "TextArea", "ElementLabel": "Request", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "18/03/2025", "ID": "tribunalRequest", "ListElementCode": "requestUserName", "FieldType": "Text", "ElementLabel": "Request from User", "SecurityClassification": "PUBLIC"}
+  {"LiveFrom": "18/03/2025", "ID": "tribunalRequest", "ListElementCode": "requestUserName", "FieldType": "Text", "ElementLabel": "Request From", "SecurityClassification": "PUBLIC"}
 
 ]
