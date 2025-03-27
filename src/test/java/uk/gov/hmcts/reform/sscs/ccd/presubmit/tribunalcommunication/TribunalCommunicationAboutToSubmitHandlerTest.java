@@ -79,7 +79,9 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
 
         // Create empty list of communications
         List<TribunalCommunication> existingComs = new ArrayList<>();
+        existingComs.add((expectedUserName).add(expectedQuestion).add(expectedQuestion).build());
         TribunalCommunicationDetails details = TribunalCommunicationDetails.builder()
+                .values()
                 .tribunalRequestTopic(expectedTopic)
                 .tribunalRequestQuestion(expectedQuestion)
                 .tribunalRequestType(TribunalRequestType.NEW_REQUEST)
