@@ -79,7 +79,7 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    private LocalDateTime dueDate(LocalDateTime now){
+    public LocalDateTime dueDate(LocalDateTime now){
         now = LocalDateTime.now();
         LocalDateTime replyDueDate = now.plusDays(2);
         if(replyDueDate.getDayOfWeek().getValue() == 6) {

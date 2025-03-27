@@ -1,20 +1,21 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.tribunalcommunication;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import junitparams.JUnitParamsRunner;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -22,11 +23,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.TribunalCommunication;
+import uk.gov.hmcts.reform.sscs.ccd.domain.TribunalCommunicationDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.TribunalCommunicationFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.TribunalCommunicationFilter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.TribunalRequestType;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 
-@RunWith(JUnitParamsRunner.class)
 public class TribunalCommunicationAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
@@ -43,7 +46,7 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
     @Mock
     private IdamService idamService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
 
@@ -61,10 +64,10 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
         assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThrows(IllegalStateException.class, () -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION));
     }
 
     @Test
@@ -75,14 +78,15 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
         String expectedUserName = "Test User";
 
         // Create empty list of communications
-        List<TribunalCommunicationFields> existingComs = new ArrayList<>();
-        TribunalCommunication fields = TribunalCommunication.builder()
+        List<TribunalCommunication> existingComs = new ArrayList<>();
+        TribunalCommunicationDetails details = TribunalCommunicationDetails.builder()
                 .tribunalRequestTopic(expectedTopic)
                 .tribunalRequestQuestion(expectedQuestion)
-                .tribunalCommunicationFields(existingComs)
+                .tribunalRequestType(TribunalRequestType.NEW_REQUEST)
+                .tribunalCommunications(existingComs)
                 .build();
 
-        sscsCaseData.setTribunalCommunications(fields);
+        sscsCaseData.setTribunalCommunicationsDetails(details);
 
         // Mock user details
         UserDetails userDetails = UserDetails.builder()
@@ -95,22 +99,167 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         // Verify a new Tribunal communication was added
-        List<TribunalCommunicationFields> resultComs = response.getData().getTribunalCommunications().getTribunalCommunicationFields();
+        List<TribunalCommunication> resultComs = response.getData().getTribunalCommunicationsDetails().getTribunalCommunications();
 
-        assertThat(resultComs.size(), is(1));
+        assertEquals(1, resultComs.size());
 
-        TribunalCommunicationFields addedCom = resultComs.get(0);
-        assertThat(addedCom.getRequestTopic(), is(expectedTopic));
-        assertThat(addedCom.getRequestMessage(), is(expectedQuestion));
-        assertThat(addedCom.getRequestUserName(), is(expectedUserName));
-        assertThat(addedCom.getRequestDateTime(), is(notNullValue()));
+        TribunalCommunicationFields addedCom = resultComs.get(0).getValue();
+        assertEquals(expectedTopic, addedCom.getRequestTopic());
+        assertEquals(expectedQuestion, addedCom.getRequestMessage());
+        assertEquals(expectedUserName, addedCom.getRequestUserName());
+        assertNotNull(addedCom.getRequestDateTime());
+
+        // Verify the enum values are correctly set
+        assertEquals(TribunalCommunicationFilter.INFO_REQUEST_FROM_FTA, response.getData().getTribunalCommunicationsDetails().getTribunalCommunicationFilter());
+        assertEquals(TribunalCommunicationFilter.AWAITING_INFO_FROM_TRIBUNAL, response.getData().getTribunalCommunicationsDetails().getFtaCommunicationFilter());
     }
-    /*
-    @Test
-    @Parameters(method = "dueDateParameters")
-    public void calculateDueDate_shouldAdjustForWeekends(LocalDateTime inputDate, LocalDateTime expectedDueDate) {
-        LocalDateTime actualDueDate = handler.calculateDueDate(inputDate);
 
-        assertThat(actualDueDate, is(expectedDueDate));
-    }*/
+    @Test
+    public void givenValidTribunalRequest_shouldAddNewCommunicationToPopulatedList() {
+        // Setup Tribunal communication fields
+        String expectedTopic = "Test Topic";
+        String expectedQuestion = "Test Question";
+        String expectedUserName = "Test User";
+
+        // Create list of existing communications
+        TribunalCommunication tribunalCommunicationPast = TribunalCommunication.builder().value(
+                TribunalCommunicationFields.builder()
+                        .requestTopic("Past existing Topic")
+                        .requestMessage("Past existing Question")
+                        .requestDateTime(LocalDateTime.now().minusYears(2))
+                        .requestUserName("Past existing user")
+                        .requestResponseDue(LocalDateTime.now().minusYears(1))
+                        .build()
+        ).build();
+        TribunalCommunication tribunalCommunicationFuture = TribunalCommunication.builder().value(
+                TribunalCommunicationFields.builder()
+                        .requestTopic("Future existing Topic")
+                        .requestMessage("Future existing Question")
+                        .requestDateTime(LocalDateTime.now().plusYears(1))
+                        .requestUserName("Future existing user")
+                        .requestResponseDue(LocalDateTime.now().plusYears(2))
+                        .build()
+        ).build();
+        List<TribunalCommunication> existingComs = new ArrayList<>(List.of(tribunalCommunicationFuture, tribunalCommunicationPast));
+        TribunalCommunicationDetails details = TribunalCommunicationDetails.builder()
+                .tribunalRequestTopic(expectedTopic)
+                .tribunalRequestQuestion(expectedQuestion)
+                .tribunalRequestType(TribunalRequestType.NEW_REQUEST)
+                .tribunalCommunications(existingComs)
+                .build();
+
+        sscsCaseData.setTribunalCommunicationsDetails(details);
+
+        // Mock user details
+        UserDetails userDetails = UserDetails.builder()
+                .name(expectedUserName)
+                .build();
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
+
+        // Execute the function
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        // Verify a new Tribunal communication was added
+        List<TribunalCommunication> resultComs = response.getData().getTribunalCommunicationsDetails().getTribunalCommunications();
+
+        assertEquals(3, resultComs.size());
+
+        assertEquals(tribunalCommunicationFuture, resultComs.get(0));
+        TribunalCommunicationFields addedCom = resultComs.get(1).getValue();
+        assertEquals(expectedTopic, addedCom.getRequestTopic());
+        assertEquals(expectedQuestion, addedCom.getRequestMessage());
+        assertEquals(expectedUserName, addedCom.getRequestUserName());
+        assertNotNull(addedCom.getRequestDateTime());
+        assertEquals(tribunalCommunicationPast, resultComs.get(2));
+
+        // Verify the enum values are correctly set
+        assertEquals(TribunalCommunicationFilter.INFO_REQUEST_FROM_FTA, response.getData().getTribunalCommunicationsDetails().getTribunalCommunicationFilter());
+        assertEquals(TribunalCommunicationFilter.AWAITING_INFO_FROM_TRIBUNAL, response.getData().getTribunalCommunicationsDetails().getFtaCommunicationFilter());
+    }
+
+    @Test
+    public void givenNullCommunicationsList_shouldHandleGracefully() {
+        // Setup Tribunal communication fields with null communications list
+        String expectedTopic = "Test Topic";
+        String expectedQuestion = "Test Question";
+        String expectedUserName = "Test User";
+
+        TribunalCommunicationDetails details = TribunalCommunicationDetails.builder()
+                .tribunalRequestTopic(expectedTopic)
+                .tribunalRequestQuestion(expectedQuestion)
+                .tribunalRequestType(TribunalRequestType.NEW_REQUEST)
+                .tribunalCommunications(null) // Explicitly set to null
+                .build();
+
+        sscsCaseData.setTribunalCommunicationsDetails(details);
+
+        // Mock user details
+        UserDetails userDetails = UserDetails.builder()
+                .name(expectedUserName)
+                .build();
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
+
+        // Execute the function
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        // Verify a new Tribunal communication was added
+        List<TribunalCommunication> resultComs = response.getData().getTribunalCommunicationsDetails().getTribunalCommunications();
+
+        assertNotNull(resultComs);
+
+        // Verify the enum values are correctly set
+        assertEquals(TribunalCommunicationFilter.INFO_REQUEST_FROM_FTA, response.getData().getTribunalCommunicationsDetails().getTribunalCommunicationFilter());
+        assertEquals(TribunalCommunicationFilter.AWAITING_INFO_FROM_TRIBUNAL, response.getData().getTribunalCommunicationsDetails().getFtaCommunicationFilter());
+    }
+
+    @ParameterizedTest
+    @MethodSource(value = {"dueDateParameters"})
+    public void calculateDueDate_shouldAdjustForWeekends(LocalDateTime inputDate, LocalDateTime expectedDueDate) {
+        LocalDateTime actualDueDate = handler.dueDate(inputDate);
+
+        assertEquals(expectedDueDate, actualDueDate);
+    }
+
+    @SuppressWarnings("unused")
+    private static Object[] dueDateParameters() {
+        return new Object[] {
+                // Normal weekday -> Weekday (2 days later)
+                new Object[] {
+                        LocalDateTime.of(2023, 6, 5, 10, 0), // Monday
+                        LocalDateTime.of(2023, 6, 7, 10, 0)  // Wednesday (2 days later)
+                },
+                // Normal weekday -> Weekday (2 days later)
+                new Object[] {
+                        LocalDateTime.of(2023, 6, 6, 10, 0), // Tuesday
+                        LocalDateTime.of(2023, 6, 8, 10, 0)  // Thursday (2 days later)
+                },
+                // Normal weekday -> Weekday (2 days later)
+                new Object[] {
+                        LocalDateTime.of(2023, 6, 7, 10, 0), // Wednesday
+                        LocalDateTime.of(2023, 6, 9, 10, 0)  // Friday (2 days later)
+                },
+                // Thursday -> Add 2 days = Saturday, should be moved to Monday (4 days later)
+                new Object[] {
+                        LocalDateTime.of(2023, 6, 8, 10, 0), // Thursday
+                        LocalDateTime.of(2023, 6, 12, 10, 0) // Monday (4 days later)
+                },
+                // Friday -> Add 2 days = Sunday, should be moved to Monday (3 days later)
+                new Object[] {
+                        LocalDateTime.of(2023, 6, 9, 10, 0), // Friday
+                        LocalDateTime.of(2023, 6, 12, 10, 0) // Monday (3 days later)
+                },
+                // Saturday -> Add 2 days = Monday (normal)
+                new Object[] {
+                        LocalDateTime.of(2023, 6, 10, 10, 0), // Saturday
+                        LocalDateTime.of(2023, 6, 12, 10, 0)  // Monday (2 days later)
+                },
+                // Sunday -> Add 2 days = Tuesday (normal)
+                new Object[] {
+                        LocalDateTime.of(2023, 6, 11, 10, 0), // Sunday
+                        LocalDateTime.of(2023, 6, 13, 10, 0)  // Tuesday (2 days later)
+                }
+        };
+    }
 }
