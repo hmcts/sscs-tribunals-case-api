@@ -1,0 +1,190 @@
+{
+  "case_creation_details": {
+    "case_data": {
+      "otherParties": [
+        {
+          "value": {
+            "id": "1",
+            "name": {
+              "firstName": "Zoe",
+              "lastName": "Butler",
+              "title": "Mrs"
+            },
+            "address": {
+              "line1": "299 Harrow",
+              "town": "The Avenue",
+              "county": "Hatch End",
+              "postcode": "HA5 4QT"
+            }
+          }
+        }
+      ],
+      "CaseAccessCategory": "childSupport",
+      "caseManagementCategory": {
+        "value": {
+          "code": "childSupport",
+          "label": "Child Support"
+        },
+        "list_items": [
+          {
+            "code": "childSupport",
+            "label": "Child Support"
+          }
+        ]
+      },
+      "caseNameHmctsInternal": "John Smith",
+      "caseNameHmctsRestricted": "John Smith",
+      "caseNamePublic": "John Smith",
+      "ogdType": "DWP",
+      "appeal": {
+        "mrnDetails": {
+          "dwpIssuingOffice": "Child Maintenance Service Group",
+          "mrnDate": "MRN_DATE",
+          "mrnLateReason": null,
+          "mrnMissingReason": null
+        },
+        "appellant": {
+          "name": {
+            "title": "Mr",
+            "firstName": "John",
+            "lastName": "Smith"
+          },
+          "address": {
+            "line1": "2 Drake Close",
+            "line2": "Hutton",
+            "town": "Brentwood",
+            "county": "Essex",
+            "postcode": "CM13 1AQ"
+          },
+          "contact": {
+            "email": null,
+            "phone": "01234567899",
+            "mobile": "07411222222"
+          },
+          "organisation": null,
+          "id": "24ea0144-a793-4dde-8bcf-6fc258541204",
+          "identity": {
+            "dob": "1976-11-11",
+            "nino": "BB000000B"
+          },
+          "appointee": null,
+          "confidentialityRequired": null,
+          "isAppointee": "No",
+          "isAddressSameAsAppointee": null,
+          "role": {
+            "name": "Paying parent"
+          }
+        },
+        "benefitType": {
+          "code": "childSupport",
+          "description": "Child Support"
+        },
+        "hearingSubtype": {
+          "wantsHearingTypeTelephone": "Yes",
+          "hearingTelephoneNumber": "01234567890",
+          "wantsHearingTypeVideo": "Yes",
+          "hearingVideoEmail": "my@email.com",
+          "wantsHearingTypeFaceToFace": "No"
+        },
+        "hearingOptions": {
+          "wantsToAttend": "Yes",
+          "wantsSupport": "No",
+          "languageInterpreter": "No",
+          "languages": null,
+          "arrangements": [],
+          "scheduleHearing": "Yes",
+          "excludeDates": [
+            {
+              "value": {
+                "start": "2030-12-01",
+                "end": null
+              }
+            }
+          ]
+        },
+        "appealReasons": null,
+        "rep": {
+          "id": "5cf6987a-11ef-4d4b-af9a-e719dd003b45",
+          "identity": null,
+          "hasRepresentative": "No",
+          "organisation": null,
+          "name": null,
+          "address": null,
+          "contact": null
+        },
+        "signer": null,
+        "hearingType": "oral",
+        "receivedVia": "Paper"
+      },
+      "sscsDocument": [
+        {
+          "value": {
+            "documentType": "appellantEvidence",
+            "documentFileName": "11111.pdf",
+            "documentDateAdded": "2018-10-10",
+            "documentLink": {
+              "document_url": "http://www.bbc.com",
+              "document_binary_url": "http://www.bbc.com/binary",
+              "document_filename": "myfile.jpg"
+            }
+          }
+        }
+      ],
+      "subscriptions": {
+        "appellantSubscription": {
+          "wantSmsNotifications": "No",
+          "email": null,
+          "mobile": "07411222222",
+          "subscribeEmail": "No",
+          "subscribeSms": "No",
+          "reason": null,
+          "lastLoggedIntoMya": null,
+          "tya": "TYA_RANDOM_NUMBER"
+        },
+        "supporterSubscription": null,
+        "representativeSubscription": null,
+        "appointeeSubscription": null,
+        "jointPartySubscription": null
+      },
+      "region": "BRADFORD",
+      "regionalProcessingCenter": {
+        "name": "BRADFORD",
+        "address1": "HM Courts & Tribunals Service",
+        "address2": "Social Security & Child Support Appeals",
+        "address3": "Phoenix House",
+        "address4": "Rushton Avenue",
+        "city": "BRADFORD",
+        "postcode": "BD3 7BH",
+        "phoneNumber": "0300 123 1142",
+        "faxNumber": "0126 434 7983",
+        "email": "SSCS_Bradford@justice.gov.uk",
+        "hearingRoute": "gaps",
+        "epimsId": "698118"
+      },
+      "caseManagementLocation": {
+        "baseLocation": "698118",
+        "region": "1"
+      },
+      "processingVenue": "Chelmsford",
+      "evidencePresent": "Yes",
+      "bulkScanCaseReference": "1234567890",
+      "benefitCode": "022",
+      "caseCode": "022DD",
+      "caseCreated": "2018-01-11",
+      "createdInGapsFrom": "readyToList",
+      "dwpRegionalCentre": "Child Support",
+      "issueCode": "DD",
+      "linkedCasesBoolean": "No",
+      "formType": "sscs2",
+      "childMaintenanceNumber": "Test1234"
+    },
+    "case_type_id": "Benefit",
+    "event_id": "validAppealCreated"
+  },
+  "warnings": [],
+  "supplementary_data": {
+    "$set": {
+      "HMCTSServiceId": "BBA3"
+    }
+  }
+}

@@ -1,0 +1,205 @@
+{
+  "case_creation_details": {
+    "case_data": {
+      "CaseAccessCategory": "taxCredit",
+      "caseManagementCategory": {
+        "value": {
+          "code": "taxCredit",
+          "label": "Tax Credit"
+        },
+        "list_items": [
+          {
+            "code": "taxCredit",
+            "label": "Tax Credit"
+          }
+        ]
+      },
+      "caseNameHmctsInternal": "Frederick Falafel",
+      "caseNameHmctsRestricted": "Frederick Falafel",
+      "caseNamePublic": "Frederick Falafel",
+      "ogdType": "HMRC",
+      "appeal": {
+        "appealReasons": {
+          "reasons": [
+            {
+              "value": {
+                "description": "see scanned SSCS5 form",
+                "reason": null
+              }
+            }
+          ]
+        },
+        "appellant": {
+          "address": {
+            "county": "Berkshire",
+            "line1": "1 New Street",
+            "line2": "Smallville",
+            "postcode": "CF48 2HY",
+            "town": "Newbury"
+          },
+          "contact": {
+            "email": null,
+            "mobile": "07832882849",
+            "phone": "01895733303"
+          },
+          "organisation": null,
+          "id": null,
+          "identity": {
+            "dob": "1976-11-11",
+            "nino": "{PERSON1_NINO}"
+          },
+          "isAddressSameAsAppointee": null,
+          "isAppointee": "No",
+          "confidentialityRequired": "Yes",
+          "appointee": null,
+          "name": {
+            "firstName": "Frederick",
+            "lastName": "Falafel",
+            "title": "Dr"
+          },
+          "role": null
+        },
+        "benefitType": {
+          "code": "taxCredit",
+          "description": "Tax Credit"
+        },
+        "hearingOptions": {
+          "agreeLessNotice": "Yes",
+          "arrangements": [
+            "hearingLoop"
+          ],
+          "excludeDates": [
+            {
+              "value": {
+                "end": null,
+                "start": "2030-11-01"
+              }
+            },
+            {
+              "value": {
+                "end": null,
+                "start": "2030-12-01"
+              }
+            }
+          ],
+          "languageInterpreter": "Yes",
+          "languages": "Spanish",
+          "other": "Wheelchair access",
+          "scheduleHearing": "No",
+          "wantsSupport": "Yes",
+          "wantsToAttend": "No"
+        },
+        "hearingSubtype": {},
+        "hearingType": "paper",
+        "mrnDetails": {
+          "dwpIssuingOffice": "Tax Credit Office",
+          "mrnDate": "MRN_DATE",
+          "mrnLateReason": "see scanned SSCS5 form",
+          "mrnMissingReason": null
+        },
+        "receivedVia": "Paper",
+        "rep": {
+          "id": null,
+          "identity":null,
+          "address": {
+            "county": "Surrey",
+            "line1": "63 Grove Hill Road",
+            "line2": "The Square",
+            "postcode": "RH1 5BT",
+            "town": "Redhill"
+          },
+          "contact": {
+            "email": null,
+            "mobile": null,
+            "phone": "02072323231"
+          },
+          "hasRepresentative": "Yes",
+          "name": {
+            "firstName": "Peter",
+            "lastName": "Hyland",
+            "title": "Mr"
+          },
+          "organisation": "ABC Advisory Services"
+        },
+        "signer": "Sarah Smith"
+      },
+      "benefitCode": "053",
+      "bulkScanCaseReference": "id",
+      "caseManagementLocation":{
+        "region":"8",
+        "baseLocation":"372653"
+      },
+      "caseCode": "053DD",
+      "caseCreated": "2019-08-02",
+      "createdInGapsFrom": "readyToList",
+      "dwpRegionalCentre": "TCO Preston Appeals Team",
+      "evidencePresent": "Yes",
+      "formType": "sscs5",
+      "isConfidentialCase": "Yes",
+      "issueCode": "DD",
+      "linkedCasesBoolean": "No",
+      "region": "CARDIFF",
+      "regionalProcessingCenter": {
+        "faxNumber": "0870 739 4438",
+        "address4": "Newport Road",
+        "phoneNumber": "0300 123 1142",
+        "name": "CARDIFF",
+        "address1": "HM Courts & Tribunals Service",
+        "address2": "Social Security & Child Support Appeals",
+        "address3": "Eastgate House",
+        "postcode": "CF24 0AB",
+        "city": "CARDIFF",
+        "email": "Cardiff_SYA_Respon@justice.gov.uk",
+        "hearingRoute": "gaps"
+      },
+      "processingVenue": "Cardiff",
+      "sscsDocument": [
+        {
+          "value": {
+            "documentDateAdded": "2019-08-01",
+            "documentFileName": "987654321-123456789.pdf",
+            "documentLink": {
+              "document_binary_url": "binary-url",
+              "document_filename": "987654321-123456789.pdf",
+              "document_url": "url"
+            },
+            "documentType": "appellantEvidence"
+          }
+        }
+      ],
+      "subscriptions": {
+        "appellantSubscription": {
+          "wantSmsNotifications": "No",
+          "tya": "TYA_RANDOM_NUMBER_APPELLANT",
+          "email": null,
+          "mobile": "07832882849",
+          "subscribeEmail": "No",
+          "subscribeSms": "No",
+          "reason": null,
+          "lastLoggedIntoMya": null
+        },
+        "appointeeSubscription": null,
+        "jointPartySubscription": null,
+        "representativeSubscription": {
+          "email": null,
+          "lastLoggedIntoMya": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeEmail": "No",
+          "subscribeSms": "No",
+          "tya": "TYA_RANDOM_NUMBER_REP",
+          "wantSmsNotifications": "No"
+        },
+        "supporterSubscription": null
+      }
+    },
+    "case_type_id": "Benefit",
+    "event_id": "validAppealCreated"
+  },
+  "warnings": [],
+  "supplementary_data": {
+    "$set" : {
+      "HMCTSServiceId": "BBA3"
+    }
+  }
+}
