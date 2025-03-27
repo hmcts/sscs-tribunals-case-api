@@ -218,41 +218,41 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
     @SuppressWarnings("unused")
     private static Object[] dueDateParameters() {
         return new Object[] {
-                // Normal weekday -> Weekday (2 days later)
-                new Object[] {
-                        LocalDateTime.of(2023, 6, 5, 10, 0), // Monday
-                        LocalDateTime.of(2023, 6, 7, 10, 0)  // Wednesday (2 days later)
-                },
-                // Normal weekday -> Weekday (2 days later)
-                new Object[] {
-                        LocalDateTime.of(2023, 6, 6, 10, 0), // Tuesday
-                        LocalDateTime.of(2023, 6, 8, 10, 0)  // Thursday (2 days later)
-                },
-                // Normal weekday -> Weekday (2 days later)
-                new Object[] {
-                        LocalDateTime.of(2023, 6, 7, 10, 0), // Wednesday
-                        LocalDateTime.of(2023, 6, 9, 10, 0)  // Friday (2 days later)
-                },
-                // Thursday -> Add 2 days = Saturday, should be moved to Monday (4 days later)
-                new Object[] {
-                        LocalDateTime.of(2023, 6, 8, 10, 0), // Thursday
-                        LocalDateTime.of(2023, 6, 12, 10, 0) // Monday (4 days later)
-                },
-                // Friday -> Add 2 days = Sunday, should be moved to Monday (3 days later)
-                new Object[] {
-                        LocalDateTime.of(2023, 6, 9, 10, 0), // Friday
-                        LocalDateTime.of(2023, 6, 13, 10, 0) // Tuesday (4 days later)
-                },
-                // Saturday -> Add 2 days = Monday (normal)
-                new Object[] {
-                        LocalDateTime.of(2023, 6, 10, 10, 0), // Saturday
-                        LocalDateTime.of(2023, 6, 12, 10, 0)  // Monday (2 days later)
-                },
-                // Sunday -> Add 2 days = Tuesday (normal)
-                new Object[] {
-                        LocalDateTime.of(2023, 6, 11, 10, 0), // Sunday
-                        LocalDateTime.of(2023, 6, 13, 10, 0)  // Tuesday (2 days later)
-                }
+            // Normal weekday -> Weekday (2 days later)
+            new Object[] {
+                    LocalDateTime.of(2023, 6, 5, 10, 0), // Monday
+                    LocalDateTime.of(2023, 6, 7, 10, 0)  // Wednesday (2 days later)
+            },
+            // Normal weekday -> Weekday (2 days later)
+            new Object[] {
+                    LocalDateTime.of(2023, 6, 6, 10, 0), // Tuesday
+                    LocalDateTime.of(2023, 6, 8, 10, 0)  // Thursday (2 days later)
+            },
+            // Normal weekday -> Weekday (2 days later)
+            new Object[] {
+                    LocalDateTime.of(2023, 6, 7, 10, 0), // Wednesday
+                    LocalDateTime.of(2023, 6, 9, 10, 0)  // Friday (2 days later)
+            },
+            // Thursday -> Add 2 days = Saturday, should be moved to Monday (4 days later)
+            new Object[] {
+                    LocalDateTime.of(2023, 6, 8, 10, 0), // Thursday
+                    LocalDateTime.of(2023, 6, 12, 10, 0) // Monday (4 days later)
+            },
+            // Friday -> Add 2 days = Sunday, should be moved to Monday (3 days later)
+            new Object[] {
+                    LocalDateTime.of(2023, 6, 9, 10, 0), // Friday
+                    LocalDateTime.of(2023, 6, 13, 10, 0) // Tuesday (4 days later)
+            },
+            // Saturday -> Add 2 days = Monday (normal)
+            new Object[] {
+                    LocalDateTime.of(2023, 6, 10, 10, 0), // Saturday
+                    LocalDateTime.of(2023, 6, 12, 10, 0)  // Monday (2 days later)
+            },
+            // Sunday -> Add 2 days = Tuesday (normal)
+            new Object[] {
+                    LocalDateTime.of(2023, 6, 11, 10, 0), // Sunday
+                    LocalDateTime.of(2023, 6, 13, 10, 0)  // Tuesday (2 days later)
+            }
         };
     }
 }
