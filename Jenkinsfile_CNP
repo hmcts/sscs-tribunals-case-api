@@ -177,6 +177,18 @@ withPipeline(type, product, component) {
         }
         runE2eTests()
     }
+
+    afterSuccess('smoketest:aat') {
+        runE2eTestsMaster()
+        publishHTML([
+                allowMissing         : true,
+                alwaysLinkToLastBuild: true,
+                keepAll              : true,
+                reportDir            : "playwright-report",
+                reportFiles          : 'index.html',
+                reportName           : 'SSCS E2E Test Report'
+        ])
+    }
 }
 
 def runNotificationTests() {
@@ -238,6 +250,16 @@ def runE2eTests() {
                     reportFiles          : 'index.html',
                     reportName           : 'SSCS E2E Test Report'
             ])
+        }
+    }
+}
+
+def runE2eTestsMaster() {
+    stage('Playwright tests') {
+        try {
+            sh './gradlew runE2eTests'
+        } finally {
+            steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'definitions/test/playwright-report/**'
         }
     }
 }
