@@ -545,9 +545,9 @@
   {"LiveFrom": "18/10/2024", "ID": "hearingOutcomeValue", "ListElementCode": "hearingOutcomeId", "FieldType": "FixedList", "FieldTypeParameter": "FL_caseOutcome", "ElementLabel": "Hearing Outcome", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/10/2024", "ID": "hearingOutcomeValue", "ListElementCode": "didPoAttendHearing", "FieldType": "YesOrNo", "ElementLabel": "Did PO Attend?", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/10/2024", "ID": "hearingOutcomeValue", "ListElementCode": "completedHearings", "FieldType": "DynamicList", "ElementLabel": "Hearing", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "13/03/2025", "ID": "ftaRequest", "ListElementCode": "requestDueDate", "FieldType": "DateTime", "ElementLabel": "Request Due Date Time", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "13/03/2025", "ID": "ftaRequest", "ListElementCode": "requestDateTime", "FieldType": "DateTime", "ElementLabel": "Request Start Date and Time", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "13/03/2025", "ID": "ftaRequest", "ListElementCode": "requestDueDate", "FieldType": "Date", "ElementLabel": "FTA Comms Reply Due Date", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "13/03/2025", "ID": "ftaRequest", "ListElementCode": "requestDateTime", "FieldType": "DateTime", "ElementLabel": "Date Of Request", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "13/03/2025", "ID": "ftaRequest", "ListElementCode": "requestTopic", "FieldType": "FixedList", "FieldTypeParameter": "FL_ftaRequestTopic", "ElementLabel": "Request Topic", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "13/03/2025", "ID": "ftaRequest", "ListElementCode": "requestText", "FieldType": "TextArea", "ElementLabel": "Request Text", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "13/03/2025", "ID": "ftaRequest", "ListElementCode": "requestUserName", "FieldType": "Text", "ElementLabel": "Request User Name", "SecurityClassification": "PUBLIC"}
+  {"LiveFrom": "13/03/2025", "ID": "ftaRequest", "ListElementCode": "requestText", "FieldType": "TextArea", "ElementLabel": "Request", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "13/03/2025", "ID": "ftaRequest", "ListElementCode": "requestUserName", "FieldType": "Text", "ElementLabel": "Request Submitted By", "SecurityClassification": "PUBLIC"}
 ]

@@ -942,6 +942,12 @@
   {"LiveFrom": "13/03/2025", "ID": "FL_ftaRequestTopic", "ListElementCode": "issuingOffice", "ListElement": "Issuing office"},
   {"LiveFrom": "13/03/2025", "ID": "FL_ftaRequestTopic", "ListElementCode": "jointPartyPersonalInfo", "ListElement": "Joint party personal information"},
   {"LiveFrom": "13/03/2025", "ID": "FL_ftaRequestTopic", "ListElementCode": "mrnDetails", "ListElement": "MRN/Review Decision Notice Details"},
-  {"LiveFrom": "13/03/2025", "ID": "FL_ftaRequestTopic", "ListElementCode": "otherPartyPersonalInfo", "ListElement": "Other party personal information"}
+  {"LiveFrom": "13/03/2025", "ID": "FL_ftaRequestTopic", "ListElementCode": "otherPartyPersonalInfo", "ListElement": "Other party personal information"},
+  {"LiveFrom": "13/03/2025", "ID": "FL_ftaCommunicationFilter", "ListElementCode": "awaitingInfoFromFta", "ListElement": "Awaiting info from FTA"},
+  {"LiveFrom": "13/03/2025", "ID": "FL_ftaCommunicationFilter", "ListElementCode": "infoProvidedByFta", "ListElement": "Info Provided by FTA"},
+  {"LiveFrom": "13/03/2025", "ID": "FL_ftaCommunicationFilter", "ListElementCode": "infoRequestFromFta", "ListElement": "Info Request from FTA"},
+  {"LiveFrom": "13/03/2025", "ID": "FL_tribunalCommunicationFilter", "ListElementCode": "provideInfoToTribunal", "ListElement": "Provide info to Tribunal"},
+  {"LiveFrom": "13/03/2025", "ID": "FL_tribunalCommunicationFilter", "ListElementCode": "awaitingInfoFromTribunal", "ListElement": "Awaiting info from Tribunal"},
+  {"LiveFrom": "13/03/2025", "ID": "FL_tribunalCommunicationFilter", "ListElementCode": "infoProvidedFromTribunal", "ListElement": "Info Provided from Tribunal"}
 
 ]
