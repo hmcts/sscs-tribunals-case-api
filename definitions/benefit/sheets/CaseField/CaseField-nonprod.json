@@ -3,8 +3,7 @@
   {"LiveFrom":"18/03/2025", "CaseTypeID": "Benefit", "ID" : "tribunalRequestType", "Label" : "New Request", "FieldType" : "FixedRadioList", "FieldTypeParameter": "FL_tribunalRequestType", "SecurityClassification": "PUBLIC"},
   {"LiveFrom":"18/03/2025", "CaseTypeID": "Benefit", "ID" : "tribunalRequestTopic", "Label" : "Tribunal Topic", "FieldType" : "FixedList", "FieldTypeParameter": "FL_tribunalRequestTopic", "SecurityClassification": "PUBLIC"},
   {"LiveFrom":"18/03/2025", "CaseTypeID": "Benefit", "ID" : "tribunalRequestQuestion", "Label" : "Request", "FieldType" : "TextArea", "Max" : "500", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom":"18/03/2025", "CaseTypeID": "Benefit", "ID" : "tribunalCommunicationFields", "Label" : "Tribunal Communications", "FieldType" : "Collection", "FieldTypeParameter": "tribunalRequest", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "ID": "ftaCommunicationFilter", "Label": "FTA Communication", "FieldType": "FixedList", "FieldTypeParameter": "FL_ftaCommunicationFilter", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "ID": "tribunalCommunicationFilter", "Label": "Tribunal Communication", "FieldType": "FixedList", "FieldTypeParameter": "FL_tribunalCommunicationFilter", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "tribunalCommunications", "Label": "Tribunal Communications", "FieldType": "Collection", "FieldTypeParameter": "tribunalCommunications", "SecurityClassification": "PUBLIC"}
+  {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "tribunalCommunications", "Label": "Tribunal Communications", "FieldType": "Collection", "FieldTypeParameter": "tribunalRequest", "SecurityClassification": "PUBLIC"}
 ]
