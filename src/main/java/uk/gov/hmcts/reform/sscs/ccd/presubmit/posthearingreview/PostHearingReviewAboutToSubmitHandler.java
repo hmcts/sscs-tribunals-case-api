@@ -41,14 +41,13 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         PostHearing postHearing = caseData.getPostHearing();
-        log.info("Review Post Hearing App: handling action {} for case {}", postHearing.getReviewType(), caseData.getCcdCaseId());
+        log.info("Review Post Hearing App: handling action {} for case {}", postHearing != null ? postHearing.getReviewType() : "No request type", caseData.getCcdCaseId());
 
         SscsUtil.addDocumentToDocumentTabAndBundle(footerService, caseData,
                 caseData.getDocumentStaging().getPostHearingPreviewDocument(),
                 SscsUtil.getPostHearingReviewDocumentType(postHearing, isPostHearingsEnabled));
 
         updatePanelMemberList(caseData);
-
         clearPostHearingRequestFormatAndContentFields(caseData, caseData.getPostHearing().getRequestType());
 
         return new PreSubmitCallbackResponse<>(caseData);
