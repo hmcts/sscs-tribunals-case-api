@@ -1,4 +1,4 @@
 [
-  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "tribunal_communications", "TabLabel": "Tribunal Communications", "TabDisplayOrder": 12, "CaseFieldID": "tribunalCommunicationFields", "TabFieldDisplayOrder": 2, "TabShowCondition": "tribunalCommunicationFields=\"*\"", "FieldShowCondition": "tribunalCommunicationFields=\"*\""},
-  {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs", "TabID": "tribunal_communications", "TabLabel": "Tribunal Communications", "TabDisplayOrder": 12, "CaseFieldID": "dwpState", "TabFieldDisplayOrder": 2, "FieldShowCondition": "tribunalCommunicationFields=\"DONOTSHOW\""}
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "tribunal_communications", "TabLabel": "Tribunal Communications", "TabDisplayOrder": 12, "CaseFieldID": "tribunalCommunications", "TabFieldDisplayOrder": 2, "TabShowCondition": "tribunalCommunications=\"*\"", "FieldShowCondition": "tribunalCommunicationFields=\"*\""},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs", "TabID": "tribunal_communications", "TabLabel": "Tribunal Communications", "TabDisplayOrder": 12, "CaseFieldID": "dwpState", "TabFieldDisplayOrder": 2, "FieldShowCondition": "tribunalCommunications=\"DONOTSHOW\""}
 ]
