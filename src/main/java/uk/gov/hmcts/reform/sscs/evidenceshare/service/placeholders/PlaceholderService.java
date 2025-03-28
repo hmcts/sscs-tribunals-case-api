@@ -15,6 +15,7 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LABEL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.NINO_LABEL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.NINO_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.POSTPONEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE2_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE3_LITERAL;
@@ -30,6 +31,7 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.WELSH_CASE_CREATED_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.WELSH_GENERATED_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.defaultToEmptyStringIfNull;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.getPostponementRequestStatus;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.LetterType.PLACEHOLDER_SERVICE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getAddressPlaceholders;
 
@@ -89,10 +91,10 @@ public class PlaceholderService {
         if (caseData.isLanguagePreferenceWelsh()) {
             if (caseCreatedDate != null) {
                 placeholders.put(WELSH_CASE_CREATED_DATE_LITERAL,
-                    LocalDateToWelshStringConverter.convert(caseCreatedDate));
+                        LocalDateToWelshStringConverter.convert(caseCreatedDate));
             }
             placeholders.put(WELSH_GENERATED_DATE_LITERAL,
-                LocalDateToWelshStringConverter.convert(LocalDateTime.now().toLocalDate()));
+                    LocalDateToWelshStringConverter.convert(LocalDateTime.now().toLocalDate()));
             placeholders.put(pdfDocumentConfig.getHmctsWelshImgKey(), pdfDocumentConfig.getHmctsWelshImgVal());
         }
         placeholders.put(SC_NUMBER_LITERAL, defaultToEmptyStringIfNull(caseData.getCaseReference()));
@@ -101,20 +103,25 @@ public class PlaceholderService {
             placeholders.put(CASE_CREATED_DATE_LITERAL, caseCreatedDate);
         }
 
-        buildExcelaAddress(caseData.getIsScottishCase(), placeholders);
+        placeholders.put(POSTPONEMENT_REQUEST,  getPostponementRequestStatus(caseData));
+        buildExcelaAddress(caseData.isIbcCase(), caseData.getIsScottishCase(), placeholders);
         populateRpcPlaceHolders(caseData, placeholders);
 
         placeholders.putAll(getAddressPlaceholders(address, true, PLACEHOLDER_SERVICE));
     }
 
-    public void buildExcelaAddress(String isScottish, Map<String, Object> placeholders) {
-        placeholders.put(EXELA_ADDRESS_LINE1_LITERAL, exelaAddressConfig.getAddressLine1());
+    public void buildExcelaAddress(boolean isIbc, String isScottish, Map<String, Object> placeholders) {
         placeholders.put(EXELA_ADDRESS_LINE3_LITERAL, exelaAddressConfig.getAddressLine3());
-
         if ("Yes".equalsIgnoreCase(isScottish) && scottishPoBoxEnabled) {
+            placeholders.put(EXELA_ADDRESS_LINE1_LITERAL, exelaAddressConfig.getAddressLine1());
             placeholders.put(EXELA_ADDRESS_LINE2_LITERAL, exelaAddressConfig.getScottishAddressLine2());
             placeholders.put(EXELA_ADDRESS_POSTCODE_LITERAL, exelaAddressConfig.getScottishPostcode());
+        } else if (isIbc) {
+            placeholders.put(EXELA_ADDRESS_LINE1_LITERAL, exelaAddressConfig.getIbcAddressLine1());
+            placeholders.put(EXELA_ADDRESS_LINE2_LITERAL, exelaAddressConfig.getIbcAddressLine2());
+            placeholders.put(EXELA_ADDRESS_POSTCODE_LITERAL, exelaAddressConfig.getIbcAddressPostcode());
         } else {
+            placeholders.put(EXELA_ADDRESS_LINE1_LITERAL, exelaAddressConfig.getAddressLine1());
             placeholders.put(EXELA_ADDRESS_LINE2_LITERAL, exelaAddressConfig.getAddressLine2());
             placeholders.put(EXELA_ADDRESS_POSTCODE_LITERAL, exelaAddressConfig.getAddressPostcode());
         }
@@ -136,6 +143,6 @@ public class PlaceholderService {
 
     public boolean hasRegionalProcessingCenter(SscsCaseData ccdResponse) {
         return nonNull(ccdResponse.getRegionalProcessingCenter())
-            && nonNull(ccdResponse.getRegionalProcessingCenter().getName());
+                && nonNull(ccdResponse.getRegionalProcessingCenter().getName());
     }
 }
