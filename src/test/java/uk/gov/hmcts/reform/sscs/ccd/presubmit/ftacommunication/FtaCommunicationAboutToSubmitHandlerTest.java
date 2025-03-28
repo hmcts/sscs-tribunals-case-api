@@ -17,6 +17,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
+
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
@@ -51,8 +53,9 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
     @BeforeEach
     public void setUp() {
         openMocks(this);
-
-        handler = new FtaCommunicationAboutToSubmitHandler(idamService);
+        
+        handler = new FtaCommunicationAboutToSubmitHandler(idamService, true);
+        ReflectionTestUtils.setField(handler, "isFtaCommuncationEnabled", true);
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").build();
 
@@ -219,6 +222,7 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
     @ParameterizedTest
     @MethodSource(value = {"dueDateParameters"})
     public void calculateDueDate_shouldAdjustForWeekends(LocalDateTime inputDate, LocalDateTime expectedDueDate) {
+       
         LocalDateTime actualDueDate = handler.calculateDueDate(inputDate);
         
         assertEquals(expectedDueDate, actualDueDate);

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -24,8 +25,12 @@ import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private IdamService idamService;
 
+    @Value("${feature.fta-communication.enabled}")
+    private final boolean isFtaCommuncationEnabled;
+
     @Autowired
-    public FtaCommunicationAboutToSubmitHandler(IdamService idamService) {
+    public FtaCommunicationAboutToSubmitHandler(IdamService idamService,boolean isFtaCommuncationEnabled) {
+        this.isFtaCommuncationEnabled = isFtaCommuncationEnabled;
         this.idamService = idamService;
     }
 
@@ -48,6 +53,10 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
 
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
+
+        if (!isFtaCommuncationEnabled) {
+            return new PreSubmitCallbackResponse<>(sscsCaseData);
+        }
 
         FtaCommunicationFields ftaCommunicationFields = Optional.ofNullable(sscsCaseData.getFtaCommunicationFields())
             .orElse(FtaCommunicationFields.builder().build());
