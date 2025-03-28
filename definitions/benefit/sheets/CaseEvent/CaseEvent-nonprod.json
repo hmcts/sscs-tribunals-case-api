@@ -1,2 +1,15 @@
-[]
-
+[
+  {
+    "LiveFrom": "18/03/2025",
+    "CaseTypeID": "Benefit",
+    "ID": "tribunalCommunication",
+    "Name": "Tribunal Communication",
+    "DisplayOrder": 1306,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "ShowEventNotes": "Y",
+    "SecurityClassification": "Public",
+    "EventEnablingCondition": "appeal.benefitType.code=\"infectedBloodCompensation\"",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit"
+  }
+]
