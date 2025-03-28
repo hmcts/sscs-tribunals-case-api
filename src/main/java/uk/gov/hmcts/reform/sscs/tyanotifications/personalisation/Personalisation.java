@@ -748,7 +748,7 @@ public class Personalisation<E extends NotificationWrapper> {
 
         if (EventType.READY_TO_LIST.getCcdType().equals(ccdResponse.getCreatedInGapsFrom())) {
             personalisation.put(REGIONAL_OFFICE_NAME_LITERAL, evidenceProperties.getAddress().getLine1());
-            personalisation.put(SUPPORT_CENTRE_NAME_LITERAL, evidenceProperties.getAddress().getLine2());
+            personalisation.put(SUPPORT_CENTRE_NAME_LITERAL, evidenceProperties.getAddress().getLine2(ccdResponse));
             personalisation.put(ADDRESS_LINE_LITERAL, evidenceProperties.getAddress().getLine3(ccdResponse));
             personalisation.put(TOWN_LITERAL, evidenceProperties.getAddress().getTown());
             personalisation.put(COUNTY_LITERAL, evidenceProperties.getAddress().getCounty());
