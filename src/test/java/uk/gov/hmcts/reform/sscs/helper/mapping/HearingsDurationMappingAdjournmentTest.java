@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingDuration;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
@@ -67,7 +68,7 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
     void getHearingDuration(
         Integer adjournCaseDuration,
         AdjournCaseNextHearingDurationUnits adjournCaseDurationUnits,
-        int expected) {
+        int expected) throws ListingException {
         given(refData.isAdjournmentFlagEnabled()).willReturn(true);
 
         setAdjournmentDurationAndUnits(adjournCaseDuration, adjournCaseDurationUnits);
@@ -79,7 +80,7 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
     @DisplayName("When adjournment flag is enabled but getHearingDurationAdjournment returns null "
         + "uses default hearing duration")
     @Test
-    void getHearingDurationAdjournmentReturnsNullWithFeatureFlagEnabled() {
+    void getHearingDurationAdjournmentReturnsNullWithFeatureFlagEnabled() throws ListingException {
         OverrideFields defaultListingValues = OverrideFields.builder()
             .duration(null)
             .build();
@@ -116,7 +117,7 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
     @DisplayName("When a valid duration is given but adjournCaseDurationUnits is not provided "
         + "getHearingDuration returns the default adjournment duration")
     @Test
-    void getHearingDurationWithNullUnits() {
+    void getHearingDurationWithNullUnits() throws ListingException {
         given(hearingDurations.getHearingDurationBenefitIssueCodes(caseData)).willReturn(HearingsDurationMappingTest.DURATION_PAPER);
 
         given(refData.getHearingDurations()).willReturn(hearingDurations);
@@ -151,7 +152,7 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
     @DisplayName("When getAdjournCaseNextHearingListingDurationType is non standard and  "
         + "nextHearingListingDuration is blank, getHearingDurationAdjournment returns null")
     @Test
-    void getHearingDurationAdjournment_nextHearingListingDurationIsBlank() {
+    void getHearingDurationAdjournment_nextHearingListingDurationIsBlank() throws ListingException {
         given(refData.getHearingDurations()).willReturn(hearingDurations);
         given(hearingDurations.getHearingDurationBenefitIssueCodes(caseData)).willReturn(null);
 
@@ -172,7 +173,7 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
     @DisplayName("When getAdjournCaseNextHearingListingDurationType is standard "
         + "getHearingDurationAdjournment returns existing duration")
     @Test
-    void getHearingDurationAdjournment_existingHearingListingDurationTypeIsStandard() {
+    void getHearingDurationAdjournment_existingHearingListingDurationTypeIsStandard() throws ListingException {
         given(refData.getHearingDurations()).willReturn(hearingDurations);
 
         setAdjournmentDurationAndUnits(null, SESSIONS);
@@ -199,7 +200,7 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
     @DisplayName("When typeOfHearing is not equal to nextTypeOfHearing "
         + "getHearingDurationAdjournment returns duration based on benefit code")
     @Test
-    void getHearingDurationAdjournment_nextTypeOfHearing() {
+    void getHearingDurationAdjournment_nextTypeOfHearing() throws ListingException {
         given(refData.getHearingDurations()).willReturn(hearingDurations);
 
         setAdjournmentDurationAndUnits(null, SESSIONS);
