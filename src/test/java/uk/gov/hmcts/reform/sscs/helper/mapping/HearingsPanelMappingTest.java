@@ -45,9 +45,10 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
     public static final String JUDGE_ID = "2000";
     public static final String JUDGE_ROLE_TYPE = "64";
     public static final String JUDGE_ID_JUDGE_ROLE_TYPE = JUDGE_ID + "|" + JUDGE_ROLE_TYPE;
-    public static final String IIDB_BENEFIT_CODE = "067";
+    private static final String JOH_CODE = "58";
+    private static final String IIDB_BENEFIT_CODE = "067";
+    private static final String TRIBUNAL_MEDICAL_MEMBER_CODE = "58";
     public static final String JUDGE_JOH_CODE = "84";
-    public static final String JOH_CODE = "58";
     @Mock
     private SessionCategoryMapService sessionCategoryMaps;
 
@@ -368,6 +369,15 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
         verify(panelCategoryMapService).getPanelCategoryMap(any(), eq("2"), eq("true"));
     }
 
+    @DisplayName("getPanelCategoryMap is called with null values for specialism and fqpm when not in case data")
+    @Test
+    void testGetRolesWithNoSpecialismAndFqpm() {
+        ReflectionTestUtils.setField(hearingsPanelMapping, "defaultPanelCompEnabled", true);
+        caseData.setIsFqpmRequired(YesNo.NO);
+        hearingsPanelMapping.getRoleTypes(caseData);
+        verify(panelCategoryMapService).getPanelCategoryMap(any(), eq(null), eq(null));
+    }
+
     @DisplayName("getRoleTypes does not throw exception when panelCategoryMap is null")
     @Test
     void testGetRolesWithInvalidCode() {
@@ -375,6 +385,15 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
         when(panelCategoryMapService.getPanelCategoryMap(any(),any(),any())).thenReturn(null);
         assertThatNoException()
                 .isThrownBy(() -> hearingsPanelMapping.getRoleTypes(caseData));
+    }
+
+    @DisplayName("getRoleTypes should call findRoleTypesByBenefitCode when default panel comp feature is disabled")
+    @Test
+    void testGetRolesWithDefaultCompDisabled() {
+        ReflectionTestUtils.setField(hearingsPanelMapping, "defaultPanelCompEnabled", false);
+        caseData.setBenefitCode(IIDB_BENEFIT_CODE);
+        List<String> result = hearingsPanelMapping.getRoleTypes(caseData);
+        assertThat(result.getFirst()).isEqualTo(TRIBUNAL_MEDICAL_MEMBER_CODE);
     }
 
 }
