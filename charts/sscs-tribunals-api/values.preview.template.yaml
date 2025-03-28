@@ -8,9 +8,6 @@ java:
   devmemoryRequests: 1Gi
   devmemoryLimits: 2Gi
   environment:
-    # TODO Remove below after testing
-    BULK_SCAN_URL: "https://sscs-bulk-scan-pr-1552.preview.platform.hmcts.net"
-    # End of TODO
     MYA_LINK: http://sscs-cor-frontend-aat.service.core-compute-aat.internal/sign-in?tya=appeal_id
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
     CORE_CASE_DATA_API_URL: ${CORE_CASE_DATA_API_URL}
@@ -64,6 +61,7 @@ java:
     HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "${SERVICE_NAME}-hmcsb-sscs"
     HMC_HEARINGS_TOPIC_NAMESPACE: "hmc-servicebus-aat"
     HMC_DEPLOYMENT_ID: "sscs-${CHANGE_ID}"
+    SCOTTISH_PO_BOX_ENABLED: true
     TRIBUNAL_INTERNAL_DOCUMENTS_ENABLED: true
   secrets:
     JOB_SCHEDULER_DB_PASSWORD:
