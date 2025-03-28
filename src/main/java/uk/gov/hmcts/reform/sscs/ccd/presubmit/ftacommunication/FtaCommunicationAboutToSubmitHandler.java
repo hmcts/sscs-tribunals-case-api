@@ -25,11 +25,12 @@ import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private IdamService idamService;
 
-    @Value("${feature.fta-communication.enabled}")
     private final boolean isFtaCommuncationEnabled;
 
     @Autowired
-    public FtaCommunicationAboutToSubmitHandler(IdamService idamService,boolean isFtaCommuncationEnabled) {
+    public FtaCommunicationAboutToSubmitHandler(
+            IdamService idamService,
+            @Value("${feature.fta-communication.enabled}") boolean isFtaCommuncationEnabled) {
         this.isFtaCommuncationEnabled = isFtaCommuncationEnabled;
         this.idamService = idamService;
     }
