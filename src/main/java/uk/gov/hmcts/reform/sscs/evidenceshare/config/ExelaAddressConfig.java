@@ -16,4 +16,7 @@ public class ExelaAddressConfig {
     private String addressPostcode;
     private String scottishAddressLine2;
     private String scottishPostcode;
+    private String ibcAddressLine1;
+    private String ibcAddressLine2;
+    private String ibcAddressPostcode;
 }

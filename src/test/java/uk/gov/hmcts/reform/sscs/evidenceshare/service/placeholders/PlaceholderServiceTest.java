@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.GRANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.REFUSE;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.APPELLANT_FULL_NAME_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.BENEFIT_TYPE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.CASE_CREATED_DATE_LITERAL;
@@ -11,10 +13,12 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.EXELA_ADDRESS_LINE1_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.EXELA_ADDRESS_LINE2_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.EXELA_ADDRESS_LINE3_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.EXELA_ADDRESS_POSTCODE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.GENERATED_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.IBCA_URL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LABEL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.NINO_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.POSTPONEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_1_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_2_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_3_LITERAL;
@@ -48,6 +52,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.config.PdfDocumentConfig;
 import uk.gov.hmcts.reform.sscs.evidenceshare.config.ExelaAddressConfig;
@@ -82,14 +87,11 @@ public class PlaceholderServiceTest {
         placeholders = new HashMap<>();
 
         given(pdfDocumentConfig.getHmctsImgKey()).willReturn("hmctsKey");
-        given(exelaAddressConfig.getAddressLine1()).willReturn("Line 1");
-        given(exelaAddressConfig.getAddressLine2()).willReturn("Line 2");
-        given(exelaAddressConfig.getAddressLine3()).willReturn("Line 3");
-        given(exelaAddressConfig.getAddressPostcode()).willReturn("Postcode");
     }
 
     @Test
     public void givenACase_thenPopulateThePlaceholders() {
+        setAddressMocks();
         Address address = Address.builder()
             .line1("Unit 2")
             .line2("156 The Road")
@@ -125,6 +127,7 @@ public class PlaceholderServiceTest {
 
     @Test
     public void givenACase_thenPopulateThePlaceholdersWithBenefitTypeEmpty() {
+        setAddressMocks();
         Address address = Address.builder()
             .line1("Unit 2")
             .line2("156 The Road")
@@ -140,6 +143,7 @@ public class PlaceholderServiceTest {
 
     @Test
     public void givenACase_thenPopulateThePlaceholdersWithBenefitTypeDescriptionEmpty() {
+        setAddressMocks();
         Address address = Address.builder()
             .line1("Unit 2")
             .line2("156 The Road")
@@ -178,6 +182,7 @@ public class PlaceholderServiceTest {
 
     @Test
     public void givenARecipientAddressWith4Lines_thenPopulateThePlaceholders() {
+        setAddressMocks();
         Address address = Address.builder()
             .line1("Unit 2")
             .town("Lechworth")
@@ -194,6 +199,7 @@ public class PlaceholderServiceTest {
 
     @Test
     public void givenAnAppellantWithALongNameAndAddressExceeding45Characters_thenGenerateThePlaceholdersWithTruncatedName() {
+        setAddressMocks();
         Address address = Address.builder()
             .line1("MyFirstVeryVeryLongAddressLineWithLotsOfCharacters")
             .line2("MySecondVeryVeryLongAddressLineWithLotsOfCharacters")
@@ -213,6 +219,7 @@ public class PlaceholderServiceTest {
 
     @Test
     public void givenARecipientAddressWith3Lines_thenPopulateThePlaceholders() {
+        setAddressMocks();
         Address address = Address.builder()
             .line1("Unit 2")
             .county("Bedford")
@@ -227,6 +234,7 @@ public class PlaceholderServiceTest {
 
     @Test
     public void givenALanguagePreferenceIsWelsh_ThenPickWelshLogo() {
+        setAddressMocks();
         caseData.setLanguagePreferenceWelsh("Yes");
         given(pdfDocumentConfig.getHmctsWelshImgKey()).willReturn("hmctsWelshImgKey");
         given(pdfDocumentConfig.getHmctsWelshImgVal()).willReturn("welshhmcts.png");
@@ -245,6 +253,7 @@ public class PlaceholderServiceTest {
 
     @Test
     public void givenAChildSupportCase_thenShouldHideNino() {
+        setAddressMocks();
         caseData.setLanguagePreferenceWelsh("Yes");
         caseData.getAppeal().getBenefitType().setCode(CHILD_SUPPORT.getShortName());
         caseData.getAppeal().getBenefitType().setDescription(CHILD_SUPPORT.getDescription());
@@ -263,20 +272,24 @@ public class PlaceholderServiceTest {
 
     @Test
     public void givenAnIbcaCase_thenPopulateThePlaceholders() {
+        given(exelaAddressConfig.getIbcAddressLine1()).willReturn("IBC line 1");
+        given(exelaAddressConfig.getIbcAddressLine2()).willReturn("IBC line 2");
+        given(exelaAddressConfig.getIbcAddressPostcode()).willReturn("IBC postcode");
+        given(exelaAddressConfig.getAddressLine3()).willReturn("Line 3");
         caseData.setBenefitCode(IBCA_BENEFIT_CODE);
         caseData.getAppeal().setBenefitType(BenefitType.builder()
-                .code("infectedBloodCompensation")
-                .description("Infected Blood Compensation")
-                .build()
+            .code("infectedBloodCompensation")
+            .description("Infected Blood Compensation")
+            .build()
         );
         caseData.getAppeal().getAppellant().setIdentity(Identity.builder().ibcaReference("IBCA123456").build());
 
         Address address = Address.builder()
-                .line1("Unit 2")
-                .line2("156 The Road")
-                .town("Lechworth")
-                .county("Bedford")
-                .postcode("L2 5UZ").build();
+            .line1("Unit 2")
+            .line2("156 The Road")
+            .town("Lechworth")
+            .county("Bedford")
+            .postcode("L2 5UZ").build();
 
         service.build(caseData, placeholders, address, now);
 
@@ -292,9 +305,10 @@ public class PlaceholderServiceTest {
         assertEquals("INFECTED BLOOD COMPENSATION", placeholders.get(BENEFIT_TYPE_LITERAL));
         assertEquals("123456", placeholders.get(CASE_ID_LITERAL));
         assertEquals(IBCA_URL, placeholders.get(SSCS_URL_LITERAL));
-        assertEquals("Line 1", placeholders.get(EXELA_ADDRESS_LINE1_LITERAL));
-        assertEquals("Line 2", placeholders.get(EXELA_ADDRESS_LINE2_LITERAL));
+        assertEquals("IBC line 1", placeholders.get(EXELA_ADDRESS_LINE1_LITERAL));
+        assertEquals("IBC line 2", placeholders.get(EXELA_ADDRESS_LINE2_LITERAL));
         assertEquals("Line 3", placeholders.get(EXELA_ADDRESS_LINE3_LITERAL));
+        assertEquals("IBC postcode", placeholders.get(EXELA_ADDRESS_POSTCODE_LITERAL));
         assertEquals("Unit 2", placeholders.get(RECIPIENT_ADDRESS_LINE_1_LITERAL));
         assertEquals("156 The Road", placeholders.get(RECIPIENT_ADDRESS_LINE_2_LITERAL));
         assertEquals("Lechworth", placeholders.get(RECIPIENT_ADDRESS_LINE_3_LITERAL));
@@ -303,5 +317,97 @@ public class PlaceholderServiceTest {
         assertEquals("No", placeholders.get(SHOULD_HIDE_NINO));
         assertEquals("IBCA123456", placeholders.get(NINO_LITERAL));
         assertEquals("IBCA Reference", placeholders.get(LABEL));
+    }
+
+    @Test
+    public void givenAScottishCase_thenPopulateThePlaceholders() {
+        service = new PlaceholderService(pdfDocumentConfig, exelaAddressConfig, true);
+        given(exelaAddressConfig.getScottishAddressLine2()).willReturn("Scottish line 2");
+        given(exelaAddressConfig.getScottishPostcode()).willReturn("Scottish postcode");
+        given(exelaAddressConfig.getAddressLine1()).willReturn("Line 1");
+        given(exelaAddressConfig.getAddressLine3()).willReturn("Line 3");
+        caseData.setIsScottishCase("Yes");
+
+        Address address = Address.builder()
+            .line1("Unit 2")
+            .line2("156 The Road")
+            .town("Lechworth")
+            .county("Bedford")
+            .postcode("L2 5UZ").build();
+
+        service.build(caseData, placeholders, address, now);
+        assertEquals("HM Courts & Tribunals Service", placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL));
+        assertEquals("Social Security & Child Support Appeals", placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE2_LITERAL));
+        assertEquals("Prudential Buildings", placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE3_LITERAL));
+        assertEquals("36 Dale Street", placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE4_LITERAL));
+        assertEquals("LIVERPOOL", placeholders.get(REGIONAL_OFFICE_COUNTY_LITERAL));
+        assertEquals("L2 5UZ", placeholders.get(REGIONAL_OFFICE_POSTCODE_LITERAL));
+        assertEquals(now, placeholders.get(GENERATED_DATE_LITERAL));
+        assertEquals(now, placeholders.get(CASE_CREATED_DATE_LITERAL));
+        assertEquals("Mr T Tibbs", placeholders.get(APPELLANT_FULL_NAME_LITERAL));
+        assertEquals("PERSONAL INDEPENDENCE PAYMENT", placeholders.get(BENEFIT_TYPE_LITERAL));
+        assertEquals("123456", placeholders.get(CASE_ID_LITERAL));
+        assertEquals("JT0123456B", placeholders.get(NINO_LITERAL));
+        assertEquals("https://www.gov.uk/appeal-benefit-decision", placeholders.get(SSCS_URL_LITERAL));
+        assertEquals("Line 1", placeholders.get(EXELA_ADDRESS_LINE1_LITERAL));
+        assertEquals("Scottish line 2", placeholders.get(EXELA_ADDRESS_LINE2_LITERAL));
+        assertEquals("Scottish postcode", placeholders.get(EXELA_ADDRESS_POSTCODE_LITERAL));
+        assertEquals("Line 3", placeholders.get(EXELA_ADDRESS_LINE3_LITERAL));
+        assertEquals("Unit 2", placeholders.get(RECIPIENT_ADDRESS_LINE_1_LITERAL));
+        assertEquals("156 The Road", placeholders.get(RECIPIENT_ADDRESS_LINE_2_LITERAL));
+        assertEquals("Lechworth", placeholders.get(RECIPIENT_ADDRESS_LINE_3_LITERAL));
+        assertEquals("Bedford", placeholders.get(RECIPIENT_ADDRESS_LINE_4_LITERAL));
+        assertEquals("L2 5UZ", placeholders.get(RECIPIENT_ADDRESS_LINE_5_LITERAL));
+        assertEquals("SC123/12/1234", placeholders.get(SC_NUMBER_LITERAL));
+    }
+
+    @Test
+    public void whenNotAHearingPostponementRequest_thenPlaceholderIsEmptyString() {
+        Address address = Address.builder()
+            .line1("Unit 2")
+            .line2("156 The Road")
+            .town("Lechworth")
+            .county("Bedford")
+            .postcode("L2 5UZ").build();
+
+        service.build(caseData, placeholders, address, now);
+
+        assertEquals("", placeholders.get(POSTPONEMENT_REQUEST));
+    }
+
+    @Test
+    public void givenAGrantedHearingPostponementRequest_thenSetPlaceholderAccordingly() {
+        caseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected(GRANT.getValue()).build());
+        Address address = Address.builder()
+            .line1("Unit 2")
+            .line2("156 The Road")
+            .town("Lechworth")
+            .county("Bedford")
+            .postcode("L2 5UZ").build();
+
+        service.build(caseData, placeholders, address, now);
+        assertEquals("grant", placeholders.get(POSTPONEMENT_REQUEST));
+    }
+
+    @Test
+    public void givenARefusedHearingPostponementRequest_thenSetPlaceholderAccordingly() {
+        caseData.setPostponementRequest(PostponementRequest.builder().actionPostponementRequestSelected(REFUSE.getValue()).build());
+
+        Address address = Address.builder()
+            .line1("Unit 2")
+            .line2("156 The Road")
+            .town("Lechworth")
+            .county("Bedford")
+            .postcode("L2 5UZ").build();
+
+        service.build(caseData, placeholders, address, now);
+        assertEquals("refuse", placeholders.get(POSTPONEMENT_REQUEST));
+    }
+
+    private void setAddressMocks() {
+        given(exelaAddressConfig.getAddressLine1()).willReturn("Line 1");
+        given(exelaAddressConfig.getAddressLine2()).willReturn("Line 2");
+        given(exelaAddressConfig.getAddressLine3()).willReturn("Line 3");
+        given(exelaAddressConfig.getAddressPostcode()).willReturn("Postcode");
     }
 }

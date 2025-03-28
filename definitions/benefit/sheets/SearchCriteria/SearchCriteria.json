@@ -7,6 +7,11 @@
   {
     "LiveFrom": "6/2/2023",
     "CaseTypeID": "Benefit",
+    "OtherCaseReference":  "appeal.appellant.identity.ibcaReference"
+  },
+  {
+    "LiveFrom": "6/2/2023",
+    "CaseTypeID": "Benefit",
     "OtherCaseReference":  "caseReference"
   }
 ]

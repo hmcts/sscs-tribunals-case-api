@@ -256,9 +256,6 @@ public class Personalisation<E extends NotificationWrapper> {
     @Value("${feature.postHearings.enabled}")
     private boolean isPostHearingsEnabled;
 
-    @Value("${feature.direction-hearings.enabled}")
-    private boolean isDirectionHearingsEnabled;
-
     private static String tya(Subscription subscription) {
         if (subscription != null) {
             return defaultIfBlank(subscription.getTya(), EMPTY);
@@ -438,9 +435,7 @@ public class Personalisation<E extends NotificationWrapper> {
         personalisation.put(APPOINTEE_NAME, getName(APPOINTEE, ccdResponse, responseWrapper));
 
         personalisation.put(HEARING_TYPE, responseWrapper.getNewSscsCaseData().getAppeal().getHearingType());
-        if (isDirectionHearingsEnabled) {
-            personalisation.put(HMC_HEARING_TYPE_LITERAL, getHearingType(ccdResponse).getHmcReference());
-        }
+        personalisation.put(HMC_HEARING_TYPE_LITERAL, getHearingType(ccdResponse).getHmcReference());
 
         if (subscriptionWithType.getSubscriptionType() == REPRESENTATIVE) {
             personalisation.put(PersonalisationMappingConstants.REPRESENTATIVE, "Yes");
@@ -753,7 +748,7 @@ public class Personalisation<E extends NotificationWrapper> {
 
         if (EventType.READY_TO_LIST.getCcdType().equals(ccdResponse.getCreatedInGapsFrom())) {
             personalisation.put(REGIONAL_OFFICE_NAME_LITERAL, evidenceProperties.getAddress().getLine1());
-            personalisation.put(SUPPORT_CENTRE_NAME_LITERAL, evidenceProperties.getAddress().getLine2());
+            personalisation.put(SUPPORT_CENTRE_NAME_LITERAL, evidenceProperties.getAddress().getLine2(ccdResponse));
             personalisation.put(ADDRESS_LINE_LITERAL, evidenceProperties.getAddress().getLine3(ccdResponse));
             personalisation.put(TOWN_LITERAL, evidenceProperties.getAddress().getTown());
             personalisation.put(COUNTY_LITERAL, evidenceProperties.getAddress().getCounty());

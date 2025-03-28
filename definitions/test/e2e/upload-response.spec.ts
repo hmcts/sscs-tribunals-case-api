@@ -9,27 +9,31 @@ test.describe(
   { tag: ['@preview-regression', '@nightly-pipeline'] },
   async () => {
     test('As a caseworker review response submitted with any further info', async ({
-      uploadResponseSteps
+      uploadResponseSteps,
+      request
     }) => {
       test.slow();
+      await uploadResponseSteps.checkHmcEnvironment(request);
       await uploadResponseSteps.performUploadResponseWithFurtherInfoOnAPIPAndReviewResponse();
     });
 
     test('As a caseworker review response submitted without any further info', async ({
-      uploadResponseSteps
+      uploadResponseSteps,
+      request
     }) => {
       test.slow();
+      await uploadResponseSteps.checkHmcEnvironment(request);
       await uploadResponseSteps.performUploadResponseWithoutFurtherInfoOnATaxCredit();
     });
 
     test('As a caseworker review response submitted for an UC case', async ({
-      uploadResponseSteps
+      uploadResponseSteps,
+      request
     }) => {
       test.slow();
+      await uploadResponseSteps.checkHmcEnvironment(request);
       let ucCaseId = await createCaseBasedOnCaseType('UC');
-      await uploadResponseSteps.performUploadResponseOnAUniversalCredit(
-        ucCaseId
-      );
+      await uploadResponseSteps.performUploadResponseOnAUniversalCredit(ucCaseId);
     });
   }
 );
