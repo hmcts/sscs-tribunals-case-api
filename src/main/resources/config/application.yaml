@@ -412,6 +412,9 @@ tya.evidence.address.scottishPostcode: CM20 9TT
 tya.evidence.address.telephone: 0300 123 1142
 tya.evidence.address.telephoneWelsh: 0300 303 5170
 tya.evidence.address.scottishPoBoxFeatureEnabled: ${SCOTTISH_PO_BOX_ENABLED:false}
+tya.evidence.address.ibcAddressLine2: HMCTS Infected Blood Compensation Appeals
+tya.evidence.address.ibcAddressLine3: PO Box 13618
+tya.evidence.address.ibcAddressPostcode: CM20 9WX
 
 helpline:
     telephone: 0300 123 1142
@@ -664,7 +667,7 @@ notification:
         struckOut:
             docmosisId: TB-SCS-GNO-ENG-00466.docx
         processAudioVideo:
-            docmosisId: TB-SCS-GNO-ENG-00677.docx
+            docmosisId: TB-SCS-GNO-ENG-00677-v2.docx
         setAsideGranted:
             docmosisId: TB-SCS-LET-ENG-Set-Aside-Grant-Refused.docx
         setAsideRefused:
@@ -1303,7 +1306,7 @@ notification:
         struckOut:
             docmosisId: TB-SCS-GNO-WEL-00593.docx
         processAudioVideoWelsh:
-            docmosisId: TB-SCS-GNO-WEL-00678.docx
+            docmosisId: TB-SCS-GNO-WEL-00678-v2.docx
         setAsideGranted:
             docmosisId: TB-SCS-LET-WEL-Set-Aside-Grant-Refused.docx
         setAsideRefused:
@@ -1923,6 +1926,9 @@ exela:
     addressPostcode: CM20 9QF
     scottishAddressLine2: PO BOX 13150
     scottishPostcode: CM20 9TT
+    ibcAddressLine1: HMCTS Infected Blood Compensation Appeals
+    ibcAddressLine2: PO Box 13618
+    ibcAddressPostcode: CM20 9WX
 
 http:
     connect:

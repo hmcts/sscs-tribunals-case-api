@@ -1,5 +1,6 @@
 import { test } from '../lib/steps.factory';
 import createCaseBasedOnCaseType from '../api/client/sscs/factory/appeal.type.factory';
+import { request } from '@playwright/test';
 
 let caseId: string;
 
@@ -31,7 +32,9 @@ test.describe('Enhanced confidentiality test', async () => {
   test(
     'Refuse - confidentiality request for a party on a case',
     { tag: ['@preview-regression', '@nightly-pipeline'] },
-    async ({ uploadResponseSteps, enhancedConfidentialitySteps }) => {
+    async ({ uploadResponseSteps, enhancedConfidentialitySteps, request }) => {
+      test.slow();
+      await uploadResponseSteps.checkHmcEnvironment(request);
       await uploadResponseSteps.performUploadResponseOnAUniversalCreditWithJP(
         caseId
       );
