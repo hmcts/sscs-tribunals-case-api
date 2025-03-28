@@ -5,5 +5,7 @@
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalRequestQuestion", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalCommunicationFields", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "25/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalCommunicationFilter", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
-  {"LiveFrom": "25/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "ftaCommunicationFilter", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"}
+  {"LiveFrom": "25/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "ftaCommunicationFilter", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalCommunications", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalCommunications", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"}
 ]
