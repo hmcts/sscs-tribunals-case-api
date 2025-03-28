@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.defaultToEmptyStringIfNull;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.getPostponementRequestStatus;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.truncateAddressLine;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBC_ACRONYM;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.LetterType.DOCMOSIS;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getAddressPlaceholders;
 
@@ -64,9 +65,14 @@ public class GenericLetterPlaceholderService {
         String appellantName = caseData.getAppeal().getAppellant().getName().getFullNameNoTitle();
         placeholders.put(APPELLANT_NAME, appellantName);
 
-        placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, getBenefitAcronym(caseData));
+        if (caseData.isIbcCase()) {
+            placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, IBC_ACRONYM);
+            placeholders.put(SSCS_URL_LITERAL, IBCA_URL);
+        } else {
+            placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, getBenefitAcronym(caseData));
+            placeholders.put(SSCS_URL_LITERAL, SSCS_URL);
+        }
 
-        placeholders.put(SSCS_URL_LITERAL, caseData.isIbcCase() ? IBCA_URL : SSCS_URL);
         placeholders.put(GENERATED_DATE_LITERAL, LocalDateTime.now().toLocalDate().toString());
         placeholders.put(IS_REPRESENTATIVE, "No");
 

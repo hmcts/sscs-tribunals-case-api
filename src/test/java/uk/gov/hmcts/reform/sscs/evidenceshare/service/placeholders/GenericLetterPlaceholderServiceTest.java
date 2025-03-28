@@ -13,6 +13,7 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLette
 import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.REPRESENTATIVE_LETTER;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.ADDRESS_NAME;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.APPELLANT_NAME;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.BENEFIT_NAME_ACRONYM_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.IBCA_URL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.INFO_REQUEST_DETAIL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.IS_REPRESENTATIVE;
@@ -26,6 +27,7 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.POSTPONEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.SSCS_URL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.SSCS_URL_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBC_ACRONYM;
 
 import java.util.List;
 import java.util.Map;
@@ -191,12 +193,13 @@ class GenericLetterPlaceholderServiceTest {
     }
 
     @Test
-    void shouldReturnIbcaUrlForIbcCase() {
+    void shouldReturnIbcaUrlAndAcronymForIbcCase() {
         caseData.setBenefitCode("093");
         Map<String, Object> placeholders = genericLetterPlaceholderService.populatePlaceholders(caseData, APPELLANT_LETTER,
             null);
 
         assertNotNull(placeholders);
+        assertEquals(IBC_ACRONYM, placeholders.get(BENEFIT_NAME_ACRONYM_LITERAL));
         assertEquals(IBCA_URL, placeholders.get(SSCS_URL_LITERAL));
     }
 
