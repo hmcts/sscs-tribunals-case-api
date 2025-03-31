@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.helper.SscsHelper;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingMessagingServiceFactory;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
 @Slf4j
@@ -88,7 +89,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
         String region = sscsCaseData.getRegion();
 
         if (sscsCaseData.isIbcCase()) {
-            setListAssistRoutes(sscsCaseData);
+            SscsUtil.setListAssistRoutes(sscsCaseData);
             return HearingHandler.valueOf(HearingRoute.LIST_ASSIST.name()).handle(sscsCaseData, gapsSwitchOverFeature,
                 hearingMessagingServiceFactory.getMessagingService(HearingRoute.LIST_ASSIST));
         }
@@ -102,22 +103,5 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         return HearingHandler.valueOf(route.name()).handle(sscsCaseData, gapsSwitchOverFeature,
             hearingMessagingServiceFactory.getMessagingService(route));
-    }
-
-    private void setListAssistRoutes(SscsCaseData sscsCaseData) {
-        SchedulingAndListingFields schedulingAndListingFields = Optional.ofNullable(sscsCaseData.getSchedulingAndListingFields())
-            .orElse(SchedulingAndListingFields.builder().build());
-        schedulingAndListingFields.setHearingRoute(HearingRoute.LIST_ASSIST);
-        sscsCaseData.setSchedulingAndListingFields(schedulingAndListingFields);
-
-        RegionalProcessingCenter rpc = Optional.ofNullable(sscsCaseData.getRegionalProcessingCenter())
-            .orElse(RegionalProcessingCenter.builder().build());
-        sscsCaseData.setRegionalProcessingCenter(rpc.toBuilder().hearingRoute(HearingRoute.LIST_ASSIST).build());
-        Appeal appeal = Optional.ofNullable(sscsCaseData.getAppeal()).orElse(Appeal.builder().build());
-        HearingOptions hearingOptions = Optional.ofNullable(appeal.getHearingOptions())
-            .orElse(HearingOptions.builder().build());
-        hearingOptions.setHearingRoute(HearingRoute.LIST_ASSIST);
-        appeal.setHearingOptions(hearingOptions);
-        sscsCaseData.setAppeal(appeal);
     }
 }
