@@ -264,6 +264,8 @@ feature:
         enabled: ${TRIBUNAL_INTERNAL_DOCUMENTS_ENABLED:false}
     hearings-case-updateV2:
         enabled: ${HEARINGS_CASE_UPDATE_V2_ENABLED:false}
+    fta-communication:
+        enabled: ${TRIBUNAL_COMMUNICATION_ENABLED:false}
 
 
 idam:
