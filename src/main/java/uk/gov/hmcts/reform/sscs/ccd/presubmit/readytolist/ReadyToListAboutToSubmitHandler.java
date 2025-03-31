@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,9 +11,12 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -83,6 +87,11 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
         
         String region = sscsCaseData.getRegion();
 
+        if (sscsCaseData.isIbcCase()) {
+            setListAssistRoutes(sscsCaseData);
+            return HearingHandler.valueOf(HearingRoute.LIST_ASSIST.name()).handle(sscsCaseData, gapsSwitchOverFeature,
+                hearingMessagingServiceFactory.getMessagingService(HearingRoute.LIST_ASSIST));
+        }
         Map<String, RegionalProcessingCenter> regionalProcessingCenterMap = regionalProcessingCenterService
                 .getRegionalProcessingCenterMap();
 
@@ -93,5 +102,22 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         return HearingHandler.valueOf(route.name()).handle(sscsCaseData, gapsSwitchOverFeature,
             hearingMessagingServiceFactory.getMessagingService(route));
+    }
+
+    private void setListAssistRoutes(SscsCaseData sscsCaseData) {
+        SchedulingAndListingFields schedulingAndListingFields = Optional.ofNullable(sscsCaseData.getSchedulingAndListingFields())
+            .orElse(SchedulingAndListingFields.builder().build());
+        schedulingAndListingFields.setHearingRoute(HearingRoute.LIST_ASSIST);
+        sscsCaseData.setSchedulingAndListingFields(schedulingAndListingFields);
+
+        RegionalProcessingCenter rpc = Optional.ofNullable(sscsCaseData.getRegionalProcessingCenter())
+            .orElse(RegionalProcessingCenter.builder().build());
+        sscsCaseData.setRegionalProcessingCenter(rpc.toBuilder().hearingRoute(HearingRoute.LIST_ASSIST).build());
+        Appeal appeal = Optional.ofNullable(sscsCaseData.getAppeal()).orElse(Appeal.builder().build());
+        HearingOptions hearingOptions = Optional.ofNullable(appeal.getHearingOptions())
+            .orElse(HearingOptions.builder().build());
+        hearingOptions.setHearingRoute(HearingRoute.LIST_ASSIST);
+        appeal.setHearingOptions(hearingOptions);
+        sscsCaseData.setAppeal(appeal);
     }
 }

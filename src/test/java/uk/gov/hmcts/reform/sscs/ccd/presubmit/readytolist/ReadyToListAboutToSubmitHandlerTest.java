@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -410,5 +411,28 @@ public class ReadyToListAboutToSubmitHandlerTest {
                 callback, USER_AUTHORISATION);
 
         assertEquals(HearingRoute.GAPS, response.getData().getSchedulingAndListingFields().getHearingRoute());
+    }
+
+    @Test
+    public void givenIbcCase_HearingRoutesShouldBeListAssist() {
+
+        handler = new ReadyToListAboutToSubmitHandler(true, regionalProcessingCenterService,
+            hearingMessagingServiceFactory);
+
+        sscsCaseData = sscsCaseData.toBuilder().benefitCode("093").region("FakeRegion").build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT,
+            callback, USER_AUTHORISATION);
+
+        assertEquals(HearingRoute.LIST_ASSIST, response.getData().getSchedulingAndListingFields().getHearingRoute());
+        assertEquals(HearingRoute.LIST_ASSIST, response.getData().getAppeal().getHearingOptions().getHearingRoute());
+        assertEquals(HearingRoute.LIST_ASSIST, response.getData().getRegionalProcessingCenter().getHearingRoute());
+        PreSubmitCallbackResponse<SscsCaseData> expectedResponse = HearingHandler
+            .valueOf(HearingRoute.LIST_ASSIST.name()).handle(sscsCaseData, true,
+            hearingMessagingServiceFactory.getMessagingService(HearingRoute.LIST_ASSIST));
+        assertEquals(expectedResponse.getData(), response.getData());
+        assertEquals(expectedResponse.getErrors(), response.getErrors());
+        assertEquals(expectedResponse.getWarnings(), response.getWarnings());
     }
 }
