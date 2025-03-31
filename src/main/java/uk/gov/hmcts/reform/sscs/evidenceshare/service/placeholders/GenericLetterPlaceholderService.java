@@ -91,11 +91,9 @@ public class GenericLetterPlaceholderService {
         placeholders.put(INFO_REQUEST_DETAIL, caseData.getGenericLetterText());
         placeholders.put(HMCTS2, HMCTS_IMG);
         placeholders.put(CASE_ID_LITERAL, caseData.getCcdCaseId());
-
         placeholders.put(POSTPONEMENT_REQUEST,  getPostponementRequestStatus(caseData));
-
-        placeholderService.buildExcelaAddress(caseData.getIsScottishCase(), placeholders);
-
+      
+        placeholderService.buildExcelaAddress(caseData.isIbcCase(), caseData.getIsScottishCase(), placeholders);
         return placeholders;
     }
 
