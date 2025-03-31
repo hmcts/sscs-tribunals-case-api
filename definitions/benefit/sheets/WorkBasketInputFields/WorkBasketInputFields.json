@@ -88,7 +88,7 @@
   {"LiveFrom": "20/06/2019", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "CaseFieldID": "translationWorkOutstanding", "Label": "Translation outstanding", "DisplayOrder": 15},
   {"LiveFrom": "20/06/2019", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "CaseFieldID": "reasonableAdjustmentsOutstanding", "Label": "Alternative letter format required", "DisplayOrder": 16},
   {"LiveFrom": "20/06/2019", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "CaseFieldID": "hasUnprocessedAudioVideoEvidence", "Label": "Does case have unprocessed audio/video evidence?", "DisplayOrder": 17},
-  {"LiveFrom": "16/12/2021", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "CaseFieldID": "dwpDueDate", "Label": "FTA response due date !!!!", "DisplayOrder": 18},
+  {"LiveFrom": "16/12/2021", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "CaseFieldID": "dwpDueDate", "Label": "FTA response due date !!!!!", "DisplayOrder": 18},
   {"LiveFrom": "20/06/2019", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "CaseFieldID": "unprocessedPostponementRequest", "Label": "Postponement request", "DisplayOrder": 18},
   {"LiveFrom": "13/01/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "CaseFieldID": "tribunalDirectPoToAttend", "Label": "Tribunal direct PO to attend?", "DisplayOrder": 18},
   {"LiveFrom": "10/10/2019", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "CaseFieldID": "dwpIsOfficerAttending", "Label": "FTA recommend PO to attend?", "DisplayOrder": 18},
