@@ -65,7 +65,7 @@
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "caseHistory", "Label": "Case history", "FieldType": "CaseHistoryViewer", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "relistingReason", "Label": "Relisting reason", "FieldType": "Text", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "dateSentToDwp", "Label": "Date evidence sent to FTA", "FieldType": "Date", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "dwpDueDate", "Label": "FTA response due date", "FieldType": "Date", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "dwpDueDate", "Label": "FTA response due date 3", "FieldType": "Date", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "interlocReviewState", "Label": "Interlocutory review state", "HintText": "The state of a case whilst in interlocutory review", "FieldType": "FixedList", "FieldTypeParameter": "FL_interlocWorkflow", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "hmctsDwpState", "Label": "Sent to FTA state", "HintText": "The state of a case after attempting to send to FTA", "FieldType": "FixedList", "FieldTypeParameter": "FL_withDwpWorkflow", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "dwpResponseState", "Label": "FTA response state", "HintText": "The response state of a case with FTA", "FieldType": "FixedList", "FieldTypeParameter": "FL_dwpWorkFlow", "SecurityClassification": "PUBLIC"},
