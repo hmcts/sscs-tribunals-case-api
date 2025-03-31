@@ -133,5 +133,6 @@
   {"LiveFrom": "01/01/2024", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "poAttendanceConfirmed", "Label": "PO attendance confirmed?", "DisplayOrder": 13},
   {"LiveFrom": "01/01/2024", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "workBasketHearingDate", "Label": "Hearing Date", "DisplayOrder": 14},
   {"LiveFrom": "01/01/2024", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "workBasketHearingDateIssued", "Label": "Hearing Date Issued", "DisplayOrder": 15},
-  {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "ftaCommunicationFilter", "Label": "Fta Com", "DisplayOrder": 30}
+  {"LiveFrom": "01/01/2024", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "workBasketHearingEpimsId", "Label": "Hearing Venue", "DisplayOrder": 16},
+  {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "CaseFieldID": "ftaCommunicationFilter", "Label": "Fta Com", "DisplayOrder": 30}
 ]
