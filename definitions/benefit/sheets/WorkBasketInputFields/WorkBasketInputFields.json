@@ -136,6 +136,6 @@
   {"LiveFrom": "01/01/2024", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "workBasketHearingEpimsId", "Label": "Hearing Venue", "DisplayOrder": 16},
   {"LiveFrom": "31/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "tribunalCommunicationFilter", "Label": "Tribunal Communication Request Status", "DisplayOrder": 29},
   {"LiveFrom": "31/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "CaseFieldID": "tribunalCommunicationFilter", "Label": "Tribunal Communication Request Status", "DisplayOrder": 29},
-  {"LiveFrom": "31/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "tribunalRequest.requestMadeDateTime", "Label": "Tribunal Communication Date", "DisplayOrder": 29},
+  {"LiveFrom": "31/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "tribunalCommunications.requestMadeDateTime", "Label": "Tribunal Communication Date", "DisplayOrder": 29},
   {"LiveFrom": "31/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "CaseFieldID": "tribunalCommunications.requestMadeDateTime", "Label": "Tribunal Communication Date", "DisplayOrder": 29}
 ]
