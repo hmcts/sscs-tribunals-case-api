@@ -15,6 +15,7 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_4;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_POSTCODE;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.NAME;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.PHONE_NUMBER;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.POSTPONEMENT_REQUEST;
 
 import java.util.List;
@@ -24,9 +25,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
 
@@ -197,5 +201,22 @@ public class SorPlaceholderServiceTest {
             Appointee.class.getSimpleName(), null);
 
         assertEquals("BBA3-SUB", placeholders.get(HMC_HEARING_TYPE_LITERAL));
+        assertEquals("0300 123 1142", placeholders.get(PHONE_NUMBER));
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"093,Yes,0300 790 6234", "093,No,0300 131 2850", "001,No,0300 123 1142"})
+    void shouldReturnCorrectPhoneNumberIfNullRpc(String benefitCode, String yesNo, String phoneNumber) {
+        ReflectionTestUtils.setField(sorPlaceholderService, "helplineTelephone", "0300 123 1142");
+        ReflectionTestUtils.setField(sorPlaceholderService, "helplineTelephoneIbc", "0300 131 2850");
+        ReflectionTestUtils.setField(sorPlaceholderService, "helplineTelephoneScotland", "0300 790 6234");
+        caseData.setBenefitCode(benefitCode);
+        caseData.setIsScottishCase(yesNo);
+        caseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder().overrideFields(OverrideFields.builder().hmcHearingType(null).build()).build());
+        caseData.setRegionalProcessingCenter(null);
+        var placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER,
+            Appointee.class.getSimpleName(), null);
+
+        assertEquals(phoneNumber, placeholders.get(PHONE_NUMBER));
     }
 }

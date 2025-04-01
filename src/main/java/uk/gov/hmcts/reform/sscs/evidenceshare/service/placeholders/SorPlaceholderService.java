@@ -20,6 +20,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getA
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +30,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
+import uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants;
 
 @Service
 @Slf4j
@@ -37,6 +39,12 @@ public class SorPlaceholderService {
 
     @Value("${helpline.telephone}")
     private String helplineTelephone;
+
+    @Value("${helpline.telephoneIbc}")
+    private String helplineTelephoneIbc;
+
+    @Value("${helpline.telephoneScotland}")
+    private String helplineTelephoneScotland;
 
     @Autowired
     public SorPlaceholderService(PlaceholderService placeholderService) {
@@ -70,7 +78,14 @@ public class SorPlaceholderService {
         }
 
         RegionalProcessingCenter rpc = caseData.getRegionalProcessingCenter();
-        if (!isNull(rpc)) {
+        if (caseData.isIbcCase()) {
+            placeholders.put(
+                PersonalisationMappingConstants.PHONE_NUMBER,
+                Objects.equals(caseData.getIsScottishCase(), "Yes")
+                    ? helplineTelephoneScotland
+                    : helplineTelephoneIbc
+            );
+        } else {
             placeholders.put(PHONE_NUMBER, determinePhoneNumber(rpc));
         }
 
