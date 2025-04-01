@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMember;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberMedicallyQualified;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -59,19 +60,36 @@ public final class HearingsPanelMapping {
     }
 
     public List<String> getRoleTypes(SscsCaseData caseData) {
-        if (defaultPanelCompEnabled) {
-            String benefitIssueCode = caseData.getBenefitCode() + caseData.getIssueCode();
-            String specialismCount = caseData.getSscsIndustrialInjuriesData().getPanelDoctorSpecialism() != null
-                    ? caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism() != null
-                    ? "2" : "1" : null;
-            String isFqpm =  isYes(caseData.getIsFqpmRequired()) ? "true" : null;
-            PanelCategoryMap panelComp = panelCategoryMapService
-                    .getPanelCategoryMap(benefitIssueCode, specialismCount, isFqpm);
-            log.info("Panel Category Map for Case {}: {}", caseData.getCcdCaseId(), panelComp);
-            return panelComp != null ? panelComp.getJohTiers() : Collections.emptyList();
-        } else {
+        if (!defaultPanelCompEnabled) {
             return BenefitRoleRelationType.findRoleTypesByBenefitCode(caseData.getBenefitCode());
         }
+        if (caseData.getPanelMemberComposition() != null) {
+            return mapPanelMemberCompositionToRoleTypes(caseData.getPanelMemberComposition());
+        }
+        String benefitIssueCode = caseData.getBenefitCode() + caseData.getIssueCode();
+        String specialismCount = caseData.getSscsIndustrialInjuriesData().getPanelDoctorSpecialism() != null
+                ? caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism() != null
+                ? "2" : "1" : null;
+        String isFqpm = isYes(caseData.getIsFqpmRequired()) ? "true" : null;
+        PanelCategoryMap panelComp = panelCategoryMapService
+                .getPanelCategoryMap(benefitIssueCode, specialismCount, isFqpm);
+        log.info("Panel Category Map for Case {}: {}", caseData.getCcdCaseId(), panelComp);
+        return panelComp != null ? panelComp.getJohTiers() : Collections.emptyList();
+    }
+
+    public static List<String> mapPanelMemberCompositionToRoleTypes(PanelMemberComposition panelMemberComposition) {
+        ArrayList<String> roleTypes = new ArrayList<>();
+        roleTypes.add(panelMemberComposition.getPanelCompositionJudge().getHmcReference());
+        if (nonNull(panelMemberComposition.getPanelCompositionMemberMedical1())) {
+            roleTypes.add(panelMemberComposition.getPanelCompositionMemberMedical1().getReference());
+        }
+        if (nonNull(panelMemberComposition.getPanelCompositionMemberMedical2())) {
+            roleTypes.add(panelMemberComposition.getPanelCompositionMemberMedical2().getReference());
+        }
+        if (nonNull(panelMemberComposition.getPanelCompositionDisabilityAndFqMember())) {
+            roleTypes.add(panelMemberComposition.getPanelCompositionDisabilityAndFqMember().getReference());
+        }
+        return roleTypes;
     }
 
     public static List<String> getAuthorisationTypes() {
