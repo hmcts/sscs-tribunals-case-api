@@ -1,0 +1,93 @@
+{
+  "case_details": {
+    "after_submit_callback_response": null,
+    "callback_response_status": null,
+    "callback_response_status_code": null,
+    "case_data": {
+      "otherParties": [
+        {
+          "value": {
+            "name": {
+              "firstName": "Zoe",
+              "lastName": "Butler",
+              "title": "Mrs"
+            },
+            "address": {
+              "line1": "299 Harrow",
+              "town": "The Avenue",
+              "county": "Hatch End",
+              "postcode": "HA5 4QT"
+            }
+          }
+        }
+      ],
+      "appeal": {
+        "appealReasons": {},
+        "appellant": {
+          "address": {
+            "line1": "45 The Road",
+            "town": "Brentwood",
+            "county": "Essex",
+            "postcode": "CF48 2HY"
+          },
+          "contact": {
+            "email": "mail@email.com",
+            "phone": "01234567890"
+          },
+          "identity": {
+            "dob": "1904-03-10",
+            "nino": "BB000000B"
+          },
+          "name": {
+            "firstName": "User",
+            "lastName": "Test",
+            "title": "Mr"
+          },
+          "role": {
+            "name": "Paying parent"
+          }
+        },
+        "rep": {
+          "hasRepresentative": "No"
+        },
+        "benefitType": {
+          "code": "nationalInsuranceCredits"
+        },
+        "hearingType": "oral",
+        "hearingOptions": {
+          "languageInterpreter": "Yes",
+          "other": "No",
+          "wantsSupport": "Yes",
+          "wantsToAttend": "Yes"
+        },
+        "hearingSubtype": {
+          "wantsHearingTypeTelephone": "Yes",
+          "hearingTelephoneNumber": "01234555996",
+          "wantsHearingTypeVideo": "Yes",
+          "hearingVideoEmail": "my@email.com",
+          "wantsHearingTypeFaceToFace": "No"
+        },
+        "mrnDetails": {
+          "mrnDate": "2018-12-09",
+          "dwpIssuingOffice": "TCO Preston Appeals Team"
+        },
+        "signer": null
+      },
+      "caseReference": "SC022/14/12423",
+      "formType": "sscs5"
+    },
+    "case_type_id": "Benefit",
+    "created_date": [
+      2018,
+      7,
+      25,
+      15,
+      49,
+      48,
+      23000000
+    ],
+    "state": "incompleteApplication",
+    "id": "1234567"
+  },
+  "event_id": "validAppeal"
+}

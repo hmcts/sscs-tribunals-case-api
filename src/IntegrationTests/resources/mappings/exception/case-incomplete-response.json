@@ -1,0 +1,120 @@
+{
+  "case_creation_details": {
+    "case_data": {
+      "CaseAccessCategory": "employmentAndSupportAllowance",
+      "caseManagementCategory": {
+        "value": {
+          "code": "ESA",
+          "label": "Employment and Support Allowance"
+        },
+        "list_items": [
+          {
+            "code": "ESA",
+            "label": "Employment and Support Allowance"
+          }
+        ]
+      },
+      "ogdType": "DWP",
+      "appeal": {
+        "mrnDetails": {
+          "dwpIssuingOffice": "Sheffield DRT",
+          "mrnDate": "2018-12-09",
+          "mrnLateReason": null,
+          "mrnMissingReason": null
+        },
+        "appellant": {
+          "name": {
+            "title": "Mr",
+            "firstName": "John",
+            "lastName": null
+          },
+          "address": {},
+          "contact": {
+            "email": null,
+            "phone": null,
+            "mobile": null
+          },
+          "organisation": null,
+          "id": null,
+          "identity": {
+            "dob": null,
+            "nino": null
+          },
+          "confidentialityRequired": null,
+          "isAppointee": "No",
+          "appointee": null,
+          "isAddressSameAsAppointee": null,
+          "role": null
+        },
+        "benefitType": {
+          "code": "ESA",
+          "description": "Employment and Support Allowance"
+        },
+        "hearingSubtype": {},
+        "hearingOptions": {
+          "wantsToAttend": "Yes",
+          "wantsSupport": "No",
+          "languageInterpreter": "No",
+          "languages": null,
+          "arrangements": [],
+          "scheduleHearing": "No"
+        },
+        "appealReasons": null,
+        "rep": {
+          "id": null,
+          "identity": null,
+          "hasRepresentative": "No",
+          "organisation": null,
+          "name": null,
+          "address": null,
+          "contact": null
+        },
+        "signer": null,
+        "hearingType": "oral",
+        "receivedVia": "Paper"
+      },
+      "sscsDocument": [],
+      "subscriptions": {
+        "appellantSubscription": {
+          "wantSmsNotifications": "No",
+          "email": null,
+          "mobile": null,
+          "subscribeEmail": "No",
+          "subscribeSms": "No",
+          "reason": null,
+          "lastLoggedIntoMya": null,
+          "tya": "TYA_RANDOM_NUMBER"
+        },
+        "supporterSubscription": null,
+        "representativeSubscription": null,
+        "appointeeSubscription": null,
+        "jointPartySubscription": null
+      },
+      "evidencePresent": "No",
+      "bulkScanCaseReference": "1234567890",
+      "benefitCode": "051",
+      "caseCode": "051DD",
+      "caseCreated": "2018-01-11",
+      "createdInGapsFrom": "readyToList",
+      "dwpRegionalCentre": "Sheffield DRT",
+      "issueCode": "DD",
+      "linkedCasesBoolean": "No",
+      "formType": "sscs1"
+    },
+    "case_type_id": "Benefit",
+    "event_id": "incompleteApplicationReceived"
+  },
+  "warnings": [
+    "person1_last_name is empty",
+    "person1_address_line1 is empty",
+    "person1_address_line2 is empty",
+    "person1_address_line3 is empty",
+    "person1_postcode is empty",
+    "person1_nino is empty"
+  ],
+  "supplementary_data": {
+    "$set": {
+      "HMCTSServiceId": "BBA3"
+    }
+  }
+}
