@@ -2,11 +2,13 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getBenefitByCodeOrThrowException;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getBenefitOptionalByCode;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.ADDRESS_NAME;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.APPEAL_REF;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.APPELLANT_NAME;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.BENEFIT_NAME_ACRONYM_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.CASE_ID_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.FIRST_TIER_AGENCY_ACRONYM;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.GENERATED_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.HMCTS2;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.HMCTS_IMG;
@@ -24,12 +26,18 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.defaultToEmptyStringIfNull;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.getPostponementRequestStatus;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.truncateAddressLine;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DWP_ACRONYM;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.HMRC_ACRONYM;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBCA_ACRONYM;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.SSCS5;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.SSCS8;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.LetterType.DOCMOSIS;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getAddressPlaceholders;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -66,6 +74,8 @@ public class GenericLetterPlaceholderService {
 
         placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, getBenefitAcronym(caseData));
 
+        placeholders.put(FIRST_TIER_AGENCY_ACRONYM, getFirstTierAgencyAcronym(caseData));
+
         placeholders.put(SSCS_URL_LITERAL, caseData.isIbcCase() ? IBCA_URL : SSCS_URL);
         placeholders.put(GENERATED_DATE_LITERAL, LocalDateTime.now().toLocalDate().toString());
         placeholders.put(IS_REPRESENTATIVE, "No");
@@ -91,17 +101,34 @@ public class GenericLetterPlaceholderService {
         placeholders.put(INFO_REQUEST_DETAIL, caseData.getGenericLetterText());
         placeholders.put(HMCTS2, HMCTS_IMG);
         placeholders.put(CASE_ID_LITERAL, caseData.getCcdCaseId());
-
         placeholders.put(POSTPONEMENT_REQUEST,  getPostponementRequestStatus(caseData));
-
-        placeholderService.buildExcelaAddress(caseData.getIsScottishCase(), placeholders);
-
+      
+        placeholderService.buildExcelaAddress(caseData.isIbcCase(), caseData.getIsScottishCase(), placeholders);
         return placeholders;
     }
 
     private static String getBenefitAcronym(SscsCaseData caseData) {
         Benefit benefit = getBenefitByCodeOrThrowException(caseData.getAppeal().getBenefitType().getCode());
         return benefit.isHasAcronym() ? benefit.getShortName() : benefit.getDescription();
+    }
+
+
+    private static String getFirstTierAgencyAcronym(SscsCaseData caseData) {
+        Optional<Benefit> benefit = getBenefitOptionalByCode(caseData.getAppeal().getBenefitType().getCode());
+        final String type = benefit.isPresent()
+            ? String.valueOf(benefit.get().getSscsType())
+            : String.valueOf(caseData.getFormType());
+        switch (type) {
+            case SSCS5 -> {
+                return HMRC_ACRONYM;
+            }
+            case SSCS8 -> {
+                return IBCA_ACRONYM;
+            }
+            default -> {
+                return DWP_ACRONYM;
+            }
+        }
     }
 
     private static boolean isJointPartyLetter(FurtherEvidenceLetterType letterType) {

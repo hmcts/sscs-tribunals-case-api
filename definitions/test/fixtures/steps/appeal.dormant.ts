@@ -12,7 +12,7 @@ export class AppealDormant extends BaseStep {
   }
 
   async performAppealDormant(caseId: string) {
-    await this.loginUserWithCaseId(credentials.amSuperUser, false, caseId);
+    await this.loginUserWithCaseIdViaCaseList(credentials.amSuperUser, false, caseId);
     await this.homePage.chooseEvent('Appeal dormant');
 
     await this.eventNameAndDescriptionPage.verifyPageContent('Appeal dormant');

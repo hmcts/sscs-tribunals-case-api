@@ -163,7 +163,7 @@ public class IssueFurtherEvidenceServiceIt {
         nameMap.put("name", "TB-SCS-GNO-ENG-00011.doc");
         englishDocs.put(DocumentType.DL16.getValue(), nameMap);
         nameMap = new HashMap<>();
-        nameMap.put("name", "TB-SCS-GNO-ENG-00068.doc");
+        nameMap.put("name", "TB-SCS-GNO-ENG-00068-v2.doc");
         englishDocs.put("d609-97", nameMap);
         nameMap = new HashMap<>();
         nameMap.put("name", "TB-SCS-GNO-ENG-00069.doc");
@@ -177,7 +177,7 @@ public class IssueFurtherEvidenceServiceIt {
         nameMap.put("name", "TB-SCS-GNO-ENG-00011.doc");
         welshDocs.put(DocumentType.DL16.getValue(), nameMap);
         nameMap = new HashMap<>();
-        nameMap.put("name", "TB-SCS-GNO-WEL-00469.docx");
+        nameMap.put("name", "TB-SCS-GNO-WEL-00469-v2.docx");
         welshDocs.put("d609-97", nameMap);
         nameMap = new HashMap<>();
         nameMap.put("name", "TB-SCS-GNO-WEL-00470.docx");

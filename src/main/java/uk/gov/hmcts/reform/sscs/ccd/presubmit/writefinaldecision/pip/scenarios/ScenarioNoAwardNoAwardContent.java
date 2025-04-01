@@ -11,7 +11,7 @@ public class ScenarioNoAwardNoAwardContent extends PipTemplateContent {
 
     public ScenarioNoAwardNoAwardContent(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {
         addComponent(new Paragraph(WriteFinalDecisionComponentId.ALLOWED_OR_REFUSED_PARAGRAPH.name(), getAllowedOrRefusedSentence(writeFinalDecisionTemplateBody.isAllowed())));
-        addComponent(new Paragraph(WriteFinalDecisionComponentId.CONFIRMED_OR_SET_ASIDE_PARAGRAPH.name(), getConfirmedOrSetAsideSentence(writeFinalDecisionTemplateBody.isSetAside(), writeFinalDecisionTemplateBody.getDateOfDecision())));
+        addComponent(new Paragraph(WriteFinalDecisionComponentId.CONFIRMED_OR_SET_ASIDE_PARAGRAPH.name(), getConfirmedOrSetAsideSentence(writeFinalDecisionTemplateBody.isSetAside(), writeFinalDecisionTemplateBody.getDateOfDecision(), writeFinalDecisionTemplateBody.isHmrc(), writeFinalDecisionTemplateBody.isIbca())));
         addComponent(new Paragraph(PipTemplateComponentId.DAILY_LIVING_NO_AWARD_PARAGRAPH.name(), getDailyLivingNoAward(writeFinalDecisionTemplateBody.getAppellantName(), writeFinalDecisionTemplateBody.getStartDate(), writeFinalDecisionTemplateBody.getDailyLivingNumberOfPoints())));
         addDescriptorTableIfPopulated(new DescriptorTable(PipTemplateComponentId.DAILY_LIVING_DESCRIPTORS.name(), writeFinalDecisionTemplateBody.getDailyLivingDescriptors(), false));
         addComponent(new Paragraph(PipTemplateComponentId.MOBILITY_NO_AWARD_PARAGRAPH.name(), getMobilityNoAward(writeFinalDecisionTemplateBody.getAppellantName(), writeFinalDecisionTemplateBody.getStartDate(), writeFinalDecisionTemplateBody.getMobilityNumberOfPoints())));

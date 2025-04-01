@@ -48,6 +48,8 @@ public final class PlaceholderConstants {
     public static final String LETTER_ADDRESS_LINE_4 = "letter_address_line_4";
     public static final String LETTER_ADDRESS_POSTCODE = "letter_address_postcode";
     public static final String BENEFIT_NAME_ACRONYM_LITERAL = "benefit_name_acronym";
+    public static final String BENEFIT_NAME_ACRONYM_LITERAL_WELSH = "benefit_name_acronym_welsh";
+    public static final String FIRST_TIER_AGENCY_ACRONYM = "first_tier_agency_acronym";
     public static final String IS_REPRESENTATIVE = "representative";
     public static final String IS_OTHER_PARTY = "is_other_party";
     public static final String APPELLANT_NAME = "appellant_name";
