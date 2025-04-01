@@ -101,7 +101,7 @@ def secrets = [
         ],
         'am-${env}'  : [
                 secret('am-role-assignment-service-s2s-secret', 'AM_ROLE_ASSIGNMENT_SERVICE_SECRET')
-        ],
+        ]
 ]
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
