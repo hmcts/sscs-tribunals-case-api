@@ -4641,6 +4641,28 @@
     "PageFieldDisplayOrder": 2,
     "PageID": "2.0"
   }
-  
+  ,
+  {
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "ftaCommunicationFilter",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "FieldShowCondition": "ftaRequestType=\"DoNotShow\""
+},
+{
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "tribunalCommunicationFilter",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "FieldShowCondition": "ftaRequestType=\"DoNotShow\""
+}
 
 ]
