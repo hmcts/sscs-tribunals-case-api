@@ -30,7 +30,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
-import uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants;
 
 @Service
 @Slf4j
@@ -80,7 +79,7 @@ public class SorPlaceholderService {
         RegionalProcessingCenter rpc = caseData.getRegionalProcessingCenter();
         if (caseData.isIbcCase()) {
             placeholders.put(
-                PersonalisationMappingConstants.PHONE_NUMBER,
+                PHONE_NUMBER,
                 Objects.equals(caseData.getIsScottishCase(), "Yes")
                     ? helplineTelephoneScotland
                     : helplineTelephoneIbc
