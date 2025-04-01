@@ -273,9 +273,7 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/sscs/controller/FunctionalTestController.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/tyanotifications/utils/GetAllTemplatesFromNotify.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/bulkscan/domain/**," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/bulkscan/bulkscancore/domain/**," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/bulkscan/BulkScanApplication.java," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/bulkscan/config/**,"
+                "src/main/java/uk/gov/hmcts/reform/sscs/bulkscan/bulkscancore/domain/**,"
         property "sonar.host.url", "https://sonar.reform.hmcts.net/"
     }
 }
@@ -446,7 +444,7 @@ dependencies {
     implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBoot.class.package.implementationVersion, {
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
     }
 

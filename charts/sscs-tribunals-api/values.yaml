@@ -11,18 +11,6 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
   autoscaling:
     enabled: false
   keyVaults:
-    sscs-bulk-scan:
-      secrets:
-        - name: sscs-s2s-secret
-          alias: S2S_SECRET
-        - name: idam-sscs-systemupdate-user
-          alias: IDAM_SSCS_SYSTEMUPDATE_USER
-        - name: idam-sscs-systemupdate-password
-          alias: IDAM_SSCS_SYSTEMUPDATE_PASSWORD
-        - name: idam-sscs-oauth2-client-secret
-          alias: IDAM_OAUTH2_CLIENT_SECRET
-        - name: app-insights-connection-string
-          alias: app-insights-connection-string
     sscs:
       resourceGroup: sscs
       secrets:
@@ -101,7 +89,6 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     DOCUMENT_MANAGEMENT_URL: "http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     IDAM_S2S_AUTH: "http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     IDAM_API_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
-    IDAM_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
     IDAM_API_JWK_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net/jwks
     BUNDLE_URL: http://em-ccd-orchestrator-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     DM_GATEWAY_URL: https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net
