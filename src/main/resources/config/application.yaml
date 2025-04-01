@@ -147,7 +147,7 @@ docmosis:
     template:
         english:
             d609-97:
-                name: TB-SCS-GNO-ENG-00068.doc
+                name: TB-SCS-GNO-ENG-00068-v2.doc
             d609-98:
                 name: TB-SCS-GNO-ENG-00069.doc
             dl16:
@@ -162,7 +162,7 @@ docmosis:
                 name: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome-v2.docx
         welsh:
             d609-97:
-                name: TB-SCS-GNO-WEL-00469.docx
+                name: TB-SCS-GNO-WEL-00469-v2.docx
             d609-98:
                 name: TB-SCS-GNO-WEL-00470.docx
             dl16:
