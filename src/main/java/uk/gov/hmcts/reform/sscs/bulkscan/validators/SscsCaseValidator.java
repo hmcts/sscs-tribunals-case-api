@@ -45,6 +45,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FormType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
@@ -619,6 +620,9 @@ public class SscsCaseValidator implements CaseValidator {
                 RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(postCodeOrPort, isIbcOrSscs8);
 
                 if (rpc != null) {
+                    if (isIbcOrSscs8) {
+                        rpc = rpc.toBuilder().hearingRoute(HearingRoute.LIST_ASSIST).build();
+                    }
                     caseData.put("region", rpc.getName());
                     caseData.put("regionalProcessingCenter", rpc);
                 } else if (!isPort) {

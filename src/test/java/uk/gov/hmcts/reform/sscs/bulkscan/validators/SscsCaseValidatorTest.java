@@ -89,6 +89,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FormType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
@@ -1068,16 +1069,17 @@ public class SscsCaseValidatorTest {
     @Test
     public void givenAnAppointee_thenRegionalProcessingCenterIsAlwaysFromTheAppellantsPostcode() {
         Appellant appellant = buildAppellant(true);
-        RegionalProcessingCenter rpc = RegionalProcessingCenter.builder().name("person2_postcode").build();
+        RegionalProcessingCenter rpc = RegionalProcessingCenter.builder().hearingRoute(HearingRoute.LIST_ASSIST)
+            .name("Liverpool").address1("Address 1").build();
         given(regionalProcessingCenterService.getByPostcode(appellant.getAddress().getPostcode(), false)).willReturn(rpc);
 
         CaseResponse response = validator
-            .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS1PE),
+            .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS8),
                 false);
 
         assertEquals(rpc, response.getTransformedCase().get("regionalProcessingCenter"));
         assertEquals(rpc.getName(), response.getTransformedCase().get("region"));
-        assertTrue(response.getWarnings().size() == 0);
+        assertTrue(response.getWarnings().contains("appeal_grounds is empty"));
     }
 
     @Test
