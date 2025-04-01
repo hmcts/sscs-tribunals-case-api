@@ -949,5 +949,4 @@
   {"LiveFrom": "13/03/2025", "ID": "FL_tribunalCommunicationFilter", "ListElementCode": "provideInfoToTribunal", "ListElement": "Provide info to Tribunal"},
   {"LiveFrom": "13/03/2025", "ID": "FL_tribunalCommunicationFilter", "ListElementCode": "awaitingInfoFromTribunal", "ListElement": "Awaiting info from Tribunal"},
   {"LiveFrom": "13/03/2025", "ID": "FL_tribunalCommunicationFilter", "ListElementCode": "infoProvidedFromTribunal", "ListElement": "Info Provided from Tribunal"}
-
 ]
