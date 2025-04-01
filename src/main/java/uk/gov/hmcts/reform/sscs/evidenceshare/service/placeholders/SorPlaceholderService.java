@@ -36,18 +36,25 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
 public class SorPlaceholderService {
     private final PlaceholderService placeholderService;
 
-    @Value("${helpline.telephone}")
-    private String helplineTelephone;
+    private final String helplineTelephone;
 
-    @Value("${helpline.telephoneIbc}")
-    private String helplineTelephoneIbc;
+    private final String helplineTelephoneIbc;
 
-    @Value("${helpline.telephoneScotland}")
-    private String helplineTelephoneScotland;
+    private final String helplineTelephoneScotland;
 
     @Autowired
-    public SorPlaceholderService(PlaceholderService placeholderService) {
+    public SorPlaceholderService(
+        PlaceholderService placeholderService,
+        @Value("${helpline.telephone}")
+        String helplineTelephone,
+        @Value("${helpline.telephoneIbc}")
+        String helplineTelephoneIbc,
+        @Value("${helpline.telephoneScotland}")
+        String helplineTelephoneScotland) {
         this.placeholderService = placeholderService;
+        this.helplineTelephone = helplineTelephone;
+        this.helplineTelephoneIbc = helplineTelephoneIbc;
+        this.helplineTelephoneScotland = helplineTelephoneScotland;
     }
 
     public Map<String, Object> populatePlaceholders(SscsCaseData caseData, FurtherEvidenceLetterType letterType,

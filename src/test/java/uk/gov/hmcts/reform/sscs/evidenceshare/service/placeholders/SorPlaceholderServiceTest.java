@@ -29,7 +29,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
 
@@ -45,7 +44,10 @@ public class SorPlaceholderServiceTest {
 
     @BeforeEach
     void setup() {
-        sorPlaceholderService = new SorPlaceholderService(placeholderService);
+        sorPlaceholderService = new SorPlaceholderService(placeholderService,
+            "0300 123 1142",
+            "0300 131 2850",
+            "0300 790 6234");
         caseData = buildCaseData();
     }
 
@@ -158,7 +160,7 @@ public class SorPlaceholderServiceTest {
     @Test
     void whenNotAHearingPostponementRequest_thenPlaceholderIsEmptyString() {
         Map<String, Object> placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER,
-                Appointee.class.getSimpleName(), null);
+            Appointee.class.getSimpleName(), null);
 
         assertEquals("", placeholders.get(POSTPONEMENT_REQUEST));
     }
@@ -168,7 +170,7 @@ public class SorPlaceholderServiceTest {
         caseData.setPostponementRequest(uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest.builder().actionPostponementRequestSelected(GRANT.getValue()).build());
 
         Map<String, Object> placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER,
-                Appointee.class.getSimpleName(), null);
+            Appointee.class.getSimpleName(), null);
 
         assertEquals("grant", placeholders.get(POSTPONEMENT_REQUEST));
     }
@@ -178,11 +180,11 @@ public class SorPlaceholderServiceTest {
         caseData.setPostponementRequest(uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest.builder().actionPostponementRequestSelected(REFUSE.getValue()).build());
 
         Map<String, Object> placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER,
-                Appointee.class.getSimpleName(), null);
+            Appointee.class.getSimpleName(), null);
 
         assertEquals("refuse", placeholders.get(POSTPONEMENT_REQUEST));
     }
-  
+
     @ParameterizedTest
     @EnumSource(value = HmcHearingType.class, names = {"DIRECTION_HEARINGS", "SUBSTANTIVE"})
     void shouldReturnDirectionHearingPlaceholder(HmcHearingType hmcHearingType) {
@@ -206,9 +208,6 @@ public class SorPlaceholderServiceTest {
     @ParameterizedTest
     @CsvSource(value = {"093,Yes,0300 790 6234", "093,No,0300 131 2850", "001,No,0300 123 1142"})
     void shouldReturnCorrectPhoneNumberIfNullRpc(String benefitCode, String yesNo, String phoneNumber) {
-        ReflectionTestUtils.setField(sorPlaceholderService, "helplineTelephone", "0300 123 1142");
-        ReflectionTestUtils.setField(sorPlaceholderService, "helplineTelephoneIbc", "0300 131 2850");
-        ReflectionTestUtils.setField(sorPlaceholderService, "helplineTelephoneScotland", "0300 790 6234");
         caseData.setBenefitCode(benefitCode);
         caseData.setIsScottishCase(yesNo);
         caseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder().overrideFields(OverrideFields.builder().hmcHearingType(null).build()).build());
