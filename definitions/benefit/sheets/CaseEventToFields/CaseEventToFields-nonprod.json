@@ -41,7 +41,7 @@
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
     "PageID": "1.0",
-    "FieldShowCondition": "ftaRequestType=\"DoNotShow\""
+    "FieldShowCondition": "tribunalRequestType=\"DoNotShow\""
   },
   {
     "CaseEventID": "tribunalCommunication",
@@ -52,7 +52,7 @@
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
     "PageID": "1.0",
-    "FieldShowCondition": "ftaRequestType=\"DoNotShow\""
+    "FieldShowCondition": "tribunalRequestType=\"DoNotShow\""
   },
   {
     "CaseEventID": "ftaCommunication",
