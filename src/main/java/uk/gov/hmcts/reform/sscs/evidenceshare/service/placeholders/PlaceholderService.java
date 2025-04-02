@@ -90,10 +90,6 @@ public class PlaceholderService {
             placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, benefit.isHasAcronym() ? benefit.name() : benefit.getDescription());
             placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL_WELSH, benefit.isHasAcronym() ? benefit.name() : benefit.getWelshDescription());
         }
-        String description = Optional.ofNullable(appeal.getBenefitType())
-            .map(BenefitType::getDescription)
-            .map(String::toUpperCase)
-            .orElseGet(() -> (benefit != null) ? benefit.getDescription().toUpperCase() : StringUtils.EMPTY);
 
         String shouldHideNino = appeal.getBenefitType() != null && Benefit.CHILD_SUPPORT.getShortName().equals(appeal.getBenefitType().getCode()) ? YesNo.YES.getValue() : YesNo.NO.getValue();
 
@@ -109,6 +105,11 @@ public class PlaceholderService {
         if (caseData.isIbcCase()) {
             placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, IBC_ACRONYM);
         }
+        String description = Optional.ofNullable(appeal.getBenefitType())
+            .map(BenefitType::getDescription)
+            .map(String::toUpperCase)
+            .orElseGet(() -> (benefit != null) ? benefit.getDescription().toUpperCase() : StringUtils.EMPTY);
+
         placeholders.put(BENEFIT_TYPE_LITERAL, description);
         placeholders.put(APPELLANT_FULL_NAME_LITERAL, appeal.getAppellant().getName().getAbbreviatedFullName());
         placeholders.put(CASE_ID_LITERAL, caseData.getCcdCaseId());
