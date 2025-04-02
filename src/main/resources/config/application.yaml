@@ -849,9 +849,9 @@ notification:
             other_party:
                 docmosisId: TB-SCS-GNO-ENG-00784.docx
         libertyToApplyGranted:
-            docmosisId: TB-SCS-LET-ENG-Liberty-to-Apply-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-ENG-Liberty-to-Apply-Granted-Refused-v2.docx
         libertyToApplyRefused:
-            docmosisId: TB-SCS-LET-ENG-Liberty-to-Apply-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-ENG-Liberty-to-Apply-Granted-Refused-v2.docx
         sORExtendTime:
             docmosisId: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome.docx
         sORRefused:
@@ -1488,9 +1488,9 @@ notification:
             other_party:
                 docmosisId: TB-SCS-GNO-WEL-00787.docx
         libertyToApplyGranted:
-            docmosisId: TB-SCS-LET-WEL-Liberty-to-Apply-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-WEL-Liberty-to-Apply-Granted-Refused-v2.docx
         libertyToApplyRefused:
-            docmosisId: TB-SCS-LET-WEL-Liberty-to-Apply-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-WEL-Liberty-to-Apply-Granted-Refused-v2.docx
         sORExtendTime:
             docmosisId: TB-SCS-LET-WEL-Statement-Of-Reasons-Outcome.docx
         sORRefused:
