@@ -150,7 +150,7 @@ public class HearingsService {
             HearingRequestPayload hearingPayload = hearingsMapping.buildHearingPayload(wrapper, refData);
             String updatedCaseData = objectMapper.writeValueAsString(caseData);
             if (!originalCaseData.equals(updatedCaseData)) {
-                log.info("Case data has  changed, update required for Case ID {}", caseId);
+                log.info("Case data has  changed, update required for Case ID {}, Case Data Panel Comp: {}", caseId, caseData.getPanelMemberComposition());
             }
             log.debug("Sending Create Hearing Request for Case ID {}", caseId);
             hmcUpdateResponse = hmcHearingApiService.sendCreateHearingRequest(hearingPayload);
