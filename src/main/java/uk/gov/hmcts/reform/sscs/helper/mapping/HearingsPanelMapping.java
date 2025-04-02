@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMember;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberMedicallyQualified;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.BenefitRoleRelationType;
@@ -29,6 +30,7 @@ import uk.gov.hmcts.reform.sscs.model.hmc.reference.RequirementType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.MemberType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelPreference;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
+import uk.gov.hmcts.reform.sscs.reference.data.model.JudicialMemberType;
 import uk.gov.hmcts.reform.sscs.reference.data.model.PanelCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryMapService;
@@ -71,15 +73,22 @@ public final class HearingsPanelMapping {
                 ? caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism() != null
                 ? "2" : "1" : null;
         String isFqpm = isYes(caseData.getIsFqpmRequired()) ? "true" : null;
-        PanelCategoryMap panelComp = panelCategoryMapService
-                .getPanelCategoryMap(benefitIssueCode, specialismCount, isFqpm);
+        PanelCategoryMap panelComp = panelCategoryMapService.getPanelCategoryMap(benefitIssueCode, specialismCount, isFqpm);
+
         log.info("Panel Category Map for Case {}: {}", caseData.getCcdCaseId(), panelComp);
-        return panelComp != null ? panelComp.getJohTiers() : Collections.emptyList();
+        if (panelComp != null) {
+            setPanelMemberComposition(caseData, panelComp.getJohTiers());
+            return panelComp.getJohTiers();
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     public static List<String> mapPanelMemberCompositionToRoleTypes(PanelMemberComposition panelMemberComposition) {
         ArrayList<String> roleTypes = new ArrayList<>();
-        roleTypes.add(panelMemberComposition.getPanelCompositionJudge().getHmcReference());
+        if (nonNull(panelMemberComposition.getPanelCompositionJudge())) {
+            roleTypes.add(panelMemberComposition.getPanelCompositionJudge().getHmcReference());
+        }
         if (nonNull(panelMemberComposition.getPanelCompositionMemberMedical1())) {
             roleTypes.add(panelMemberComposition.getPanelCompositionMemberMedical1().getReference());
         }
@@ -87,9 +96,46 @@ public final class HearingsPanelMapping {
             roleTypes.add(panelMemberComposition.getPanelCompositionMemberMedical2().getReference());
         }
         if (nonNull(panelMemberComposition.getPanelCompositionDisabilityAndFqMember())) {
-            roleTypes.add(panelMemberComposition.getPanelCompositionDisabilityAndFqMember().getReference());
+            roleTypes.addAll(panelMemberComposition.getPanelCompositionDisabilityAndFqMember().stream().map(PanelMemberType::getReference).toList());
         }
         return roleTypes;
+    }
+
+    public static void setPanelMemberComposition(SscsCaseData caseData, List<String> johTiers) {
+        PanelMemberComposition panelMemberComposition = new PanelMemberComposition();
+        for (String johTier : johTiers) {
+            switch (johTier) {
+                case "50":
+                    panelMemberComposition.getPanelCompositionDisabilityAndFqMember().add(PanelMemberType.TRIBUNALS_MEMBER_FINANCIALLY_QUALIFIED);
+                    break;
+                case "58":
+                    if (caseData.getPanelMemberComposition().getPanelCompositionMemberMedical1() != null) {
+                        panelMemberComposition.setPanelCompositionMemberMedical2(PanelMemberType.TRIBUNALS_MEMBER_MEDICAL);
+                    } else {
+                        panelMemberComposition.setPanelCompositionMemberMedical1(PanelMemberType.TRIBUNALS_MEMBER_MEDICAL);
+                    }
+                    break;
+                case "85":
+                    panelMemberComposition.setPanelCompositionJudge(JudicialMemberType.TRIBUNAL_JUDGE);
+                    break;
+                case "74":
+                    panelMemberComposition.setPanelCompositionJudge(JudicialMemberType.REGIONAL_TRIBUNAL_JUDGE);
+                    break;
+                case "69":
+                    if (caseData.getPanelMemberComposition().getPanelCompositionMemberMedical1() != null) {
+                        panelMemberComposition.setPanelCompositionMemberMedical2(PanelMemberType.REGIONAL_MEDICAL_MEMBER);
+                    } else {
+                        panelMemberComposition.setPanelCompositionMemberMedical1(PanelMemberType.REGIONAL_MEDICAL_MEMBER);
+                    }
+                    break;
+                case "44":
+                    panelMemberComposition.getPanelCompositionDisabilityAndFqMember().add(PanelMemberType.TRIBUNALS_MEMBER_DISABILITY);
+                    break;
+                default:
+            }
+
+        }
+        caseData.setPanelMemberComposition(panelMemberComposition);
     }
 
     public static List<String> getAuthorisationTypes() {
