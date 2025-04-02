@@ -109,7 +109,7 @@ public final class HearingsPanelMapping {
                     panelMemberComposition.getPanelCompositionDisabilityAndFqMember().add(PanelMemberType.TRIBUNALS_MEMBER_FINANCIALLY_QUALIFIED);
                     break;
                 case "58":
-                    if (caseData.getPanelMemberComposition().getPanelCompositionMemberMedical1() != null) {
+                    if (panelMemberComposition.getPanelCompositionMemberMedical1() != null) {
                         panelMemberComposition.setPanelCompositionMemberMedical2(PanelMemberType.TRIBUNALS_MEMBER_MEDICAL);
                     } else {
                         panelMemberComposition.setPanelCompositionMemberMedical1(PanelMemberType.TRIBUNALS_MEMBER_MEDICAL);
@@ -122,7 +122,7 @@ public final class HearingsPanelMapping {
                     panelMemberComposition.setPanelCompositionJudge(JudicialMemberType.REGIONAL_TRIBUNAL_JUDGE);
                     break;
                 case "69":
-                    if (caseData.getPanelMemberComposition().getPanelCompositionMemberMedical1() != null) {
+                    if (panelMemberComposition.getPanelCompositionMemberMedical1() != null) {
                         panelMemberComposition.setPanelCompositionMemberMedical2(PanelMemberType.REGIONAL_MEDICAL_MEMBER);
                     } else {
                         panelMemberComposition.setPanelCompositionMemberMedical1(PanelMemberType.REGIONAL_MEDICAL_MEMBER);
