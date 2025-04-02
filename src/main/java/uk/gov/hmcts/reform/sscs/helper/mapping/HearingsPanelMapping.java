@@ -103,6 +103,7 @@ public final class HearingsPanelMapping {
 
     public static void setPanelMemberComposition(SscsCaseData caseData, List<String> johTiers) {
         PanelMemberComposition panelMemberComposition = new PanelMemberComposition();
+        panelMemberComposition.setPanelCompositionDisabilityAndFqMember(new ArrayList<>());
         for (String johTier : johTiers) {
             switch (johTier) {
                 case "50":
