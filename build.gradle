@@ -434,9 +434,9 @@ dependencies {
     testImplementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5-fluent', version: '5.4.3'
 
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.15.2'
-    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '4.1.0'
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.15.2'
-    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '4.1.0'
+    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '4.1.0'
+    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-assertj', version: '4.1.0'
 
     testImplementation group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
 
