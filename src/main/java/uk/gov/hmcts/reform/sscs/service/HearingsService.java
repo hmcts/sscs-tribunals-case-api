@@ -155,7 +155,7 @@ public class HearingsService {
                         Long.parseLong(caseId),
                         EventType.CASE_UPDATED.getCcdType(),
                         "Case Updated",
-                        "Case Updated",
+                        "Case Updated with default panel composition",
                         idamService.getIdamTokens(),
                         caseDetails -> caseDetails.setData(caseData)
                 );
