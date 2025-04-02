@@ -612,4 +612,3 @@ def dbPort = System.env.JOB_SCHEDULER_DB_PORT ?: 5432
 def dbName = System.env.JOB_SCHEDULER_DB_NAME ?: "sscsjobscheduler"
 def dbUser = System.env.JOB_SCHEDULER_DB_USERNAME ?: "sscsjobscheduler"
 def dbPass = System.env.JOB_SCHEDULER_DB_PASSWORD ?: "sscsjobscheduler"
-
