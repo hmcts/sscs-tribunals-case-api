@@ -5,6 +5,7 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberMedicallyQualified.getPanelMemberMedicallyQualified;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsMapping.getSessionCaseCodeMap;
 
@@ -116,7 +117,7 @@ public final class HearingsPanelMapping {
                         panelMemberComposition.setPanelCompositionMemberMedical1(PanelMemberType.TRIBUNALS_MEMBER_MEDICAL);
                     }
                     break;
-                case "85":
+                case "84":
                     panelMemberComposition.setPanelCompositionJudge(JudicialMemberType.TRIBUNAL_JUDGE);
                     break;
                 case "74":
@@ -136,6 +137,8 @@ public final class HearingsPanelMapping {
             }
 
         }
+        //test
+        caseData.setIsFqpmRequired(YES);
         caseData.setPanelMemberComposition(panelMemberComposition);
     }
 
