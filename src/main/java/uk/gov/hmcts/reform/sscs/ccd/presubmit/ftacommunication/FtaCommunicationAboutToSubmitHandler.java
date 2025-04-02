@@ -87,7 +87,7 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
 
             ftaCommunicationFields.setFtaCommunications(ftaComs);
             ftaCommunicationFields.setFtaCommunicationFilter(FtaCommunicationFilter.AWAITING_INFO_FROM_FTA);
-            ftaCommunicationFields.setTribunalCommunicationFilter(TribunalCommunicationFilter.NEW_FTA_FILTER);
+            ftaCommunicationFields.setTribunalCommunicationFilter(TribunalCommunicationFilter.PROVIDE_INFO_TO_TRIBUNAL);
             sscsCaseData.setFtaCommunicationFields(ftaCommunicationFields);
         }
 

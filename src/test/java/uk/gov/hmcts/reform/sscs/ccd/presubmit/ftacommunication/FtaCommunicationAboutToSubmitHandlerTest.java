@@ -115,7 +115,7 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
         
         // Verify the enum values are correctly set
         assertEquals(FtaCommunicationFilter.AWAITING_INFO_FROM_FTA, response.getData().getFtaCommunicationFields().getFtaCommunicationFilter());
-        assertEquals(TribunalCommunicationFilter.NEW_FTA_FILTER, response.getData().getFtaCommunicationFields().getTribunalCommunicationFilter());
+        assertEquals(TribunalCommunicationFilter.PROVIDE_INFO_TO_TRIBUNAL, response.getData().getFtaCommunicationFields().getTribunalCommunicationFilter());
     }
 
     @Test
@@ -179,7 +179,7 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
         
         // Verify the enum values are correctly set
         assertEquals(FtaCommunicationFilter.AWAITING_INFO_FROM_FTA, response.getData().getFtaCommunicationFields().getFtaCommunicationFilter());
-        assertEquals(TribunalCommunicationFilter.NEW_FTA_FILTER, response.getData().getFtaCommunicationFields().getTribunalCommunicationFilter());
+        assertEquals(TribunalCommunicationFilter.PROVIDE_INFO_TO_TRIBUNAL, response.getData().getFtaCommunicationFields().getTribunalCommunicationFilter());
     }
     
     @Test
@@ -215,7 +215,7 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
         
         // Verify the enum values are correctly set
         assertEquals(FtaCommunicationFilter.AWAITING_INFO_FROM_FTA, response.getData().getFtaCommunicationFields().getFtaCommunicationFilter());
-        assertEquals(TribunalCommunicationFilter.NEW_FTA_FILTER, response.getData().getFtaCommunicationFields().getTribunalCommunicationFilter());
+        assertEquals(TribunalCommunicationFilter.PROVIDE_INFO_TO_TRIBUNAL, response.getData().getFtaCommunicationFields().getTribunalCommunicationFilter());
     }
 
     @ParameterizedTest
