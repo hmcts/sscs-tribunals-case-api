@@ -151,6 +151,14 @@ public class HearingsService {
             String updatedCaseData = objectMapper.writeValueAsString(caseData);
             if (!originalCaseData.equals(updatedCaseData)) {
                 log.info("Case data has  changed, update required for Case ID {}, Case Data Panel Comp: {}", caseId, caseData.getPanelMemberComposition());
+                updateCcdCaseService.updateCaseV2(
+                        Long.parseLong(caseId),
+                        EventType.CASE_UPDATED.getCcdType(),
+                        "Case Updated",
+                        "Case Updated",
+                        idamService.getIdamTokens(),
+                        caseDetails -> caseDetails.setData(caseData)
+                );
             }
             log.debug("Sending Create Hearing Request for Case ID {}", caseId);
             hmcUpdateResponse = hmcHearingApiService.sendCreateHearingRequest(hearingPayload);
