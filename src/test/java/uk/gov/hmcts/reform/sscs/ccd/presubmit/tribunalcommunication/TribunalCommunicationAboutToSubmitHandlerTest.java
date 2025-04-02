@@ -10,6 +10,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -142,7 +143,7 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
                         .requestMessage("Past existing Question")
                         .requestDateTime(LocalDateTime.now().minusYears(2))
                         .requestUserName("Past existing user")
-                        .requestResponseDueDate(LocalDateTime.now().minusYears(1))
+                        .requestResponseDueDate(LocalDate.now().minusYears(1))
                         .build()
                 ).build();
         CommunicationRequest tribunalCommunicationFuture = CommunicationRequest.builder().value(
@@ -151,7 +152,7 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
                         .requestMessage("Future existing Question")
                         .requestDateTime(LocalDateTime.now().plusYears(1))
                         .requestUserName("Future existing user")
-                        .requestResponseDueDate(LocalDateTime.now().plusYears(2))
+                        .requestResponseDueDate(LocalDate.now().plusYears(2))
                         .build()
                 ).build();
         List<CommunicationRequest> existingComs = new ArrayList<>(List.of(tribunalCommunicationFuture, tribunalCommunicationPast));

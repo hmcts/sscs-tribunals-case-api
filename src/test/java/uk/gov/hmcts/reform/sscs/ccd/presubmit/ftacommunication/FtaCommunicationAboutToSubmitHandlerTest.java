@@ -152,7 +152,7 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
                 .requestMessage("Past existing Question")
                 .requestDateTime(LocalDateTime.now().minusYears(2))
                 .requestUserName("Past existing user")
-                .requestResponseDueDate(LocalDateTime.now().toLocalDate().minusYears(1))
+                .requestResponseDueDate(LocalDate.now().minusYears(1))
                 .build()
         ).build();
         CommunicationRequest ftaCommunicationFuture = CommunicationRequest.builder().value(
@@ -161,7 +161,7 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
                 .requestMessage("Future existing Question")
                 .requestDateTime(LocalDateTime.now().plusYears(1))
                 .requestUserName("Future existing user")
-                .requestResponseDueDate(LocalDateTime.now().toLocalDate().plusYears(2))
+                .requestResponseDueDate(LocalDate.now().plusYears(2))
                 .build()
         ).build();
         List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunicationFuture, ftaCommunicationPast));
