@@ -11,5 +11,18 @@
     "SecurityClassification": "Public",
     "EventEnablingCondition": "appeal.benefitType.code=\"infectedBloodCompensation\"",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit"
+  },
+  {
+    "LiveFrom": "13/03/2025",
+    "CaseTypeID": "Benefit",
+    "ID": "ftaCommunication",
+    "Name": "FTA Communication",
+    "DisplayOrder": 717,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "ShowEventNotes": "Y",
+    "SecurityClassification": "Public",
+    "EventEnablingCondition": "appeal.benefitType.code=\"infectedBloodCompensation\"",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit"
   }
 ]

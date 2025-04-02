@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -20,9 +21,12 @@ import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final IdamService idamService;
+    private boolean isFtaCommunicationEnabled;
 
     @Autowired
-    public TribunalCommunicationAboutToSubmitHandler(IdamService idamService) {
+    public TribunalCommunicationAboutToSubmitHandler(IdamService idamService,
+        @Value("${feature.fta-communication.enabled}") boolean isFtaCommunicationEnabled) {
+        this.isFtaCommunicationEnabled = isFtaCommunicationEnabled;
         this.idamService = idamService;
     }
 
@@ -46,16 +50,20 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        TribunalCommunicationDetails tribunalCommunicationDetails = Optional.ofNullable(sscsCaseData.getTribunalCommunicationsDetails()).orElse(TribunalCommunicationDetails.builder().build());
-        if (tribunalCommunicationDetails.getTribunalRequestType() == TribunalRequestType.NEW_REQUEST) {
-            String topic = tribunalCommunicationDetails.getTribunalRequestTopic();
-            String question = tribunalCommunicationDetails.getTribunalRequestQuestion();
+        if (!isFtaCommunicationEnabled) {
+            return new PreSubmitCallbackResponse<>(sscsCaseData);
+        }
+
+        FtaCommunicationFields ftaCommunicationFields = Optional.ofNullable(sscsCaseData.getFtaCommunicationFields()).orElse(FtaCommunicationFields.builder().build());
+        if (ftaCommunicationFields.getTribunalRequestType() == TribunalRequestType.NEW_REQUEST) {
+            String topic = ftaCommunicationFields.getTribunalRequestTopic();
+            String question = ftaCommunicationFields.getTribunalRequestQuestion();
             LocalDateTime dueDate = dueDate(LocalDateTime.now());
             final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
 
-            List<TribunalCommunication> tribunalComms = Optional.ofNullable(tribunalCommunicationDetails.getTribunalCommunications()).orElse(new ArrayList<>());
-            tribunalComms.add(TribunalCommunication.builder()
-                    .value(TribunalCommunicationFields.builder()
+            List<CommunicationRequest> tribunalComms = Optional.ofNullable(ftaCommunicationFields.getTribunalCommunications()).orElse(new ArrayList<>());
+            tribunalComms.add(CommunicationRequest.builder()
+                    .value(CommunicationRequestDetails.builder()
                             .requestMessage(question)
                             .requestTopic(topic)
                             .requestDateTime(LocalDateTime.now())
@@ -63,15 +71,18 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
                             .requestResponseDue(dueDate)
                             .build())
                     .build());
-            if (tribunalCommunicationDetails.getTribunalCommunications() != null) {
-                tribunalComms.addAll(tribunalCommunicationDetails.getTribunalCommunications());
+            if (ftaCommunicationFields.getTribunalCommunications() != null) {
+                tribunalComms.addAll(ftaCommunicationFields.getTribunalCommunications());
             }
-            tribunalCommunicationDetails.setTribunalCommunications(tribunalComms);
-            tribunalCommunicationDetails.setTribunalCommunicationFilter(TribunalCommunicationFilter.INFO_REQUEST_FROM_FTA);
-            tribunalCommunicationDetails.setFtaCommunicationFilter(FtaCommunicationFilter.AWAITING_INFO_FROM_TRIBUNAL);
+            ftaCommunicationFields.setTribunalCommunications(tribunalComms);
+            ftaCommunicationFields.setTribunalCommunicationFilter(TribunalCommunicationFilter.INFO_REQUEST_FROM_FTA);
+            ftaCommunicationFields.setFtaCommunicationFilter(FtaCommunicationFilter.AWAITING_INFO_FROM_TRIBUNAL);
             tribunalComms.sort(Comparator.comparing(tribunalComm -> ((TribunalCommunication) tribunalComm).getValue().getRequestDateTime()).reversed());
-            tribunalCommunicationDetails.setTribunalCommunications(tribunalComms);
-            sscsCaseData.setTribunalCommunicationsDetails(tribunalCommunicationDetails);
+            ftaCommunicationFields.setTribunalCommunications(tribunalComms);
+            ftaCommunicationFields.setTribunalRequestTopic(null);
+            ftaCommunicationFields.setTribunalRequestQuestion(null);
+            ftaCommunicationFields.setTribunalRequestType(null);
+            sscsCaseData.setFtaCommunicationFields(ftaCommunicationFields);
         }
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
