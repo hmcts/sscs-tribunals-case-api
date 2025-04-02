@@ -8,7 +8,7 @@
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder" : 1,
     "PageID": "1.0",
-    "PageLabel": "Select Tribunal Communication Type"
+    "PageLabel": "Select Tribunal Communication action"
   },
   {
     "LiveFrom": "18/03/2025",
@@ -75,7 +75,7 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "2.0",
     "PageShowCondition": "ftaRequestType=\"newRequest\"",
-    "PageLabel": "Send a new request"
+    "PageLabel": "Send a FTA Communication Request"
   },
   {
     "CaseEventID": "ftaCommunication",
