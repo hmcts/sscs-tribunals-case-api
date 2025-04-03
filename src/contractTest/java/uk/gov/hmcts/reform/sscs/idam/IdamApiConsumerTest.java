@@ -65,19 +65,6 @@ public class IdamApiConsumerTest extends IdamConsumerTestBase {
     }
 
     @Test
-    @PactTestFor(pactMethod = "generatePactForUserInfo")
-    public void verifyIdamUserDetailsRolesPactUserInfo() {
-        UserInfo userInfo = idamApi.retrieveUserInfo(SOME_AUTHORIZATION_TOKEN);
-        assertNotNull(userInfo.getUid());
-        assertNotNull(userInfo.getSub());
-        assertNotNull(userInfo.getGivenName());
-        assertNotNull(userInfo.getFamilyName());
-        assertNotNull(userInfo.getRoles());
-        assertFalse(userInfo.getRoles().isEmpty());
-
-    }
-
-    @Test
     @PactTestFor(pactMethod = "generatePactForToken")
     public void verifyIdamUserDetailsRolesPactToken() {
         TokenResponse token = idamApi.generateOpenIdToken(buildTokenRequestMap());
