@@ -11,29 +11,13 @@ import au.com.dius.pact.core.model.V4Pact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
-import org.json.JSONException;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.idam.client.models.TokenRequest;
 import uk.gov.hmcts.reform.idam.client.models.TokenResponse;
 
 public class IdamApiConsumerTest extends IdamConsumerTestBase {
-    @Pact(provider = "idamApi_oidc", consumer = "sscs_tribunalsCaseApi")
-    public V4Pact generatePactForUserInfo(PactBuilder builder) throws JSONException {
-        return builder
-            .usingLegacyDsl()
-            .given("userinfo is requested")
-            .uponReceiving("A request for a UserInfo from SSCS Tribunals API")
-            .path("/o/userinfo")
-            .method("GET")
-            .matchHeader(HttpHeaders.AUTHORIZATION, SOME_AUTHORIZATION_TOKEN)
-            .willRespondWith()
-            .status(200)
-            .body(createUserDetailsResponse())
-            .toPact(V4Pact.class);
-    }
 
     @Pact(provider = "idamApi_oidc", consumer = "sscs_tribunalsCaseApi")
     public V4Pact generatePactForToken(PactBuilder builder) {
