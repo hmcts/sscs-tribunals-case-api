@@ -10,12 +10,12 @@ public class SessionHearingArrangement {
     private Boolean requested;
     private String language;
 
+    @JsonCreator
     public SessionHearingArrangement(Boolean requested, String language) {
         this.requested = requested;
         this.language = language;
     }
 
-    @JsonCreator
     public SessionHearingArrangement(Boolean requested) {
         this.requested = requested;
         this.language = null;
