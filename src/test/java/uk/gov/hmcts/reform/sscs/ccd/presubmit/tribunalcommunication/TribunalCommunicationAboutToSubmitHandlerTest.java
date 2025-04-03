@@ -66,7 +66,7 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
     @Test
     public void givenValidTribunalRequest_shouldAddNewCommunicationToList() {
         // Setup Tribunal communication fields
-        String expectedTopic = "Test Topic";
+        CommunicationRequestTopic expectedTopic = CommunicationRequestTopic.APPEAL_TYPE;
         String expectedQuestion = "Test Question";
         String expectedUserName = "Test User";
 
@@ -111,7 +111,7 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
     public void givenFlagOff_shouldDoNothing() {
         List<CommunicationRequest> existingComs = new ArrayList<>();
         FtaCommunicationFields details = FtaCommunicationFields.builder()
-            .tribunalRequestTopic("someTopic")
+            .tribunalRequestTopic(CommunicationRequestTopic.APPEAL_TYPE)
             .tribunalRequestQuestion("someQuestion")
             .tribunalCommunications(existingComs)
             .tribunalRequestType(TribunalRequestType.NEW_REQUEST)
@@ -132,14 +132,14 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
     @Test
     public void givenValidTribunalRequest_shouldAddNewCommunicationToPopulatedList() {
         // Setup Tribunal communication fields
-        String expectedTopic = "Test Topic";
+        CommunicationRequestTopic expectedTopic = CommunicationRequestTopic.APPEAL_TYPE;
         String expectedQuestion = "Test Question";
         String expectedUserName = "Test User";
 
         // Create list of existing communications
         CommunicationRequest tribunalCommunicationPast = CommunicationRequest.builder().value(
                 CommunicationRequestDetails.builder()
-                        .requestTopic("Past existing Topic")
+                        .requestTopic(CommunicationRequestTopic.OTHER_PARTY_PERSONAL_INFORMATION)
                         .requestMessage("Past existing Question")
                         .requestDateTime(LocalDateTime.now().minusYears(2))
                         .requestUserName("Past existing user")
@@ -148,7 +148,7 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
                 ).build();
         CommunicationRequest tribunalCommunicationFuture = CommunicationRequest.builder().value(
                 CommunicationRequestDetails.builder()
-                        .requestTopic("Future existing Topic")
+                        .requestTopic(CommunicationRequestTopic.APPOINTEE_PERSONAL_INFORMATION)
                         .requestMessage("Future existing Question")
                         .requestDateTime(LocalDateTime.now().plusYears(1))
                         .requestUserName("Future existing user")
@@ -196,7 +196,7 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
     @Test
     public void givenNullCommunicationsList_shouldHandleGracefully() {
         // Setup Tribunal communication fields with null communications list
-        String expectedTopic = "Test Topic";
+        CommunicationRequestTopic expectedTopic = CommunicationRequestTopic.APPEAL_TYPE;
         String expectedQuestion = "Test Question";
         String expectedUserName = "Test User";
 

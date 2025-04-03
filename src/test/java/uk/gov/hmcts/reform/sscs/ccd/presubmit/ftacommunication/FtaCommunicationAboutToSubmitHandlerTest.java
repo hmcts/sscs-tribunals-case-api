@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequestDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequestTopic;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationFilter;
@@ -78,7 +79,7 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
     @Test
     public void givenValidFtaRequest_shouldAddNewCommunicationToList() {
         // Setup FTA communication fields
-        String expectedTopic = "Test Topic";
+        CommunicationRequestTopic expectedTopic = CommunicationRequestTopic.APPEAL_TYPE;
         String expectedQuestion = "Test Question";
         String expectedUserName = "Test User";
 
@@ -122,7 +123,7 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
     @Test
     public void givenFlagOff_shouldDoNothing() {
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .ftaRequestTopic("someTopic")
+            .ftaRequestTopic(CommunicationRequestTopic.APPEAL_TYPE)
             .ftaRequestQuestion("someQuestion")
             .ftaCommunications(Collections.emptyList())
             .ftaRequestType(FtaRequestType.NEW_REQUEST)
@@ -141,14 +142,14 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
     @Test
     public void givenValidFtaRequest_shouldAddNewCommunicationToPopulatedList() {
         // Setup FTA communication fields
-        String expectedTopic = "Test Topic";
+        CommunicationRequestTopic expectedTopic = CommunicationRequestTopic.APPEAL_TYPE;
         String expectedQuestion = "Test Question";
         String expectedUserName = "Test User";
 
         // Create list of existing communications
         CommunicationRequest ftaCommunicationPast = CommunicationRequest.builder().value(
             CommunicationRequestDetails.builder()
-                .requestTopic("Past existing Topic")
+                .requestTopic(CommunicationRequestTopic.ISSUING_OFFICE)
                 .requestMessage("Past existing Question")
                 .requestDateTime(LocalDateTime.now().minusYears(2))
                 .requestUserName("Past existing user")
@@ -157,7 +158,7 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
         ).build();
         CommunicationRequest ftaCommunicationFuture = CommunicationRequest.builder().value(
             CommunicationRequestDetails.builder()
-                .requestTopic("Future existing Topic")
+                .requestTopic(CommunicationRequestTopic.OTHER_PARTY_PERSONAL_INFORMATION)
                 .requestMessage("Future existing Question")
                 .requestDateTime(LocalDateTime.now().plusYears(1))
                 .requestUserName("Future existing user")
@@ -205,7 +206,7 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
     @Test
     public void givenNullCommunicationsList_shouldHandleGracefully() {
         // Setup FTA communication fields with null communications list
-        String expectedTopic = "Test Topic";
+        CommunicationRequestTopic expectedTopic = CommunicationRequestTopic.APPEAL_TYPE;
         String expectedQuestion = "Test Question";
         String expectedUserName = "Test User";
 

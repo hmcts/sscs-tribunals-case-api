@@ -63,7 +63,7 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
             .orElse(FtaCommunicationFields.builder().build());
 
         if (ftaCommunicationFields.getFtaRequestType() == FtaRequestType.NEW_REQUEST) {
-            String topic = ftaCommunicationFields.getFtaRequestTopic();
+            CommunicationRequestTopic topic = ftaCommunicationFields.getFtaRequestTopic();
             String question = ftaCommunicationFields.getFtaRequestQuestion();
             List<CommunicationRequest> ftaComms = Optional.ofNullable(ftaCommunicationFields.getFtaCommunications())
                 .orElse(new ArrayList<>());
@@ -72,23 +72,9 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
             addCommunicationRequest(ftaComms, topic, question, userDetails);
             setFieldsForNewRequest(sscsCaseData, ftaCommunicationFields, ftaComms);
         } else if (ftaCommunicationFields.getFtaRequestType() == FtaRequestType.REPLY_TO_FTA_QUERY) {
-            DynamicList ftaRequestDl = ftaCommunicationFields.getFtaRequestNoResponseRadioDl();
-            DynamicListItem chosenFtaRequest = ftaRequestDl.getValue();
-            String chosenFtaRequestId = chosenFtaRequest.getCode();
-            CommunicationRequest communicationRequest = ftaCommunicationFields.getFtaCommunications()
-                .stream()
-                .filter(communicationRequest1 -> communicationRequest1.getId().equals(chosenFtaRequestId))
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("No communication request found with id: " + chosenFtaRequestId));
-            String replyText = ftaCommunicationFields.getFtaRequestNoResponseTextArea();
-            CommunicationRequestReply reply = CommunicationRequestReply.builder()
-                .replyDateTime(LocalDateTime.now())
-                .replyUserName(idamService.getUserDetails(userAuthorisation).getName())
-                .replyMessage(replyText)
-                .build();
-            communicationRequest.getValue().setRequestReply(reply);
+            handleReplyToFtaQuery(ftaCommunicationFields, userAuthorisation, sscsCaseData);
         }
-
+        clearFields(sscsCaseData, ftaCommunicationFields);
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
@@ -103,7 +89,7 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         return dueDate;
     }
 
-    public static void addCommunicationRequest(List<CommunicationRequest> comms, String topic, String question, UserDetails userDetails) {
+    public static void addCommunicationRequest(List<CommunicationRequest> comms, CommunicationRequestTopic topic, String question, UserDetails userDetails) {
         LocalDateTime now = LocalDateTime.now();
         LocalDate dueDate = calculateDueDate(now.toLocalDate());
         comms.add(CommunicationRequest.builder()
@@ -123,10 +109,35 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         communicationFields.setFtaCommunications(comms);
         communicationFields.setTribunalCommunicationFilter(TribunalCommunicationFilter.PROVIDE_INFO_TO_TRIBUNAL);
         communicationFields.setFtaCommunicationFilter(FtaCommunicationFilter.AWAITING_INFO_FROM_FTA);
-        communicationFields.setFtaRequestQuestion(null);
-        communicationFields.setFtaRequestTopic(null);
-        communicationFields.setFtaRequestType(null);
         sscsCaseData.setCommunicationFields(communicationFields);
     }
 
+    private void handleReplyToFtaQuery(FtaCommunicationFields ftaCommunicationFields, String userAuthorisation, SscsCaseData sscsCaseData) {
+        DynamicList ftaRequestDl = ftaCommunicationFields.getFtaRequestNoResponseRadioDl();
+        DynamicListItem chosenFtaRequest = ftaRequestDl.getValue();
+        String chosenFtaRequestId = chosenFtaRequest.getCode();
+        CommunicationRequest communicationRequest = ftaCommunicationFields.getFtaCommunications()
+            .stream()
+            .filter(communicationRequest1 -> communicationRequest1.getId().equals(chosenFtaRequestId))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("No communication request found with id: " + chosenFtaRequestId));
+        String replyText = ftaCommunicationFields.getFtaRequestNoResponseTextArea();
+        CommunicationRequestReply reply = CommunicationRequestReply.builder()
+            .replyDateTime(LocalDateTime.now())
+            .replyUserName(idamService.getUserDetails(userAuthorisation).getName())
+            .replyMessage(replyText)
+            .build();
+        communicationRequest.getValue().setRequestReply(reply);
+        sscsCaseData.setCommunicationFields(ftaCommunicationFields);
+    }
+
+    private void clearFields(SscsCaseData sscsCaseData, FtaCommunicationFields communicationFields) {
+        communicationFields.setFtaRequestQuestion(null);
+        communicationFields.setFtaRequestTopic(null);
+        communicationFields.setFtaRequestType(null);
+        communicationFields.setFtaRequestNoResponseQuery(null);
+        communicationFields.setFtaRequestNoResponseTextArea(null);
+        communicationFields.setFtaRequestNoResponseRadioDl(null);
+        sscsCaseData.setCommunicationFields(communicationFields);
+    }
 }

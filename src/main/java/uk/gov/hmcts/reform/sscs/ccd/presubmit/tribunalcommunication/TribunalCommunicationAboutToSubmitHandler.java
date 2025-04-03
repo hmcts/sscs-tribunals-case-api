@@ -58,7 +58,7 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
             .orElse(FtaCommunicationFields.builder().build());
 
         if (ftaCommunicationFields.getTribunalRequestType() == TribunalRequestType.NEW_REQUEST) {
-            String topic = ftaCommunicationFields.getTribunalRequestTopic();
+            CommunicationRequestTopic topic = ftaCommunicationFields.getTribunalRequestTopic();
             String question = ftaCommunicationFields.getTribunalRequestQuestion();
             List<CommunicationRequest> tribunalComms = Optional.ofNullable(ftaCommunicationFields.getTribunalCommunications())
                 .orElse(new ArrayList<>());

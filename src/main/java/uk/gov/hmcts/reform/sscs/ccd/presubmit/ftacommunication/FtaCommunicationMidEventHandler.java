@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.FtaRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
@@ -54,26 +55,44 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
 
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
-
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
         if (!isFtaCommunicationEnabled) {
-            return new PreSubmitCallbackResponse<>(sscsCaseData);
+            return preSubmitCallbackResponse;
         }
 
-        if (callback.getPageId().equals("4.0")) {
-            FtaCommunicationFields ftaCommunicationFields = Optional.ofNullable(sscsCaseData.getCommunicationFields())
-                .orElse(FtaCommunicationFields.builder().build());
-            DynamicList ftaRequestDl = ftaCommunicationFields.getFtaRequestNoResponseRadioDl();
-            DynamicListItem chosenFtaRequest = ftaRequestDl.getValue();
-            String chosenFtaRequestId = chosenFtaRequest.getCode();
-            CommunicationRequest communicationRequest = ftaCommunicationFields.getFtaCommunications()
-                .stream()
-                .filter(communicationRequest1 -> communicationRequest1.getId().equals(chosenFtaRequestId))
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("No communication request found with id: " + chosenFtaRequestId));
-            String requestQuery = communicationRequest.getValue().getRequestMessage();
-            ftaCommunicationFields.setFtaRequestNoResponseQuery(requestQuery);
+        FtaCommunicationFields ftaCommunicationFields = Optional.ofNullable(sscsCaseData.getCommunicationFields())
+            .orElse(FtaCommunicationFields.builder().build());
+
+        if (callback.getPageId().equals("1.0")) {
+            handleFtaRequestTypeErrors(preSubmitCallbackResponse, ftaCommunicationFields);
+        } else if (callback.getPageId().equals("4.0")) {
+            setQueryForReply(sscsCaseData, ftaCommunicationFields);
         }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
+    }
+
+    private void setQueryForReply(SscsCaseData sscsCaseData, FtaCommunicationFields ftaCommunicationFields) {
+        DynamicList ftaRequestDl = ftaCommunicationFields.getFtaRequestNoResponseRadioDl();
+        DynamicListItem chosenFtaRequest = Optional.ofNullable(ftaRequestDl.getValue())
+            .orElseThrow(() -> new IllegalStateException("No chosen FTA request found"));
+        String chosenFtaRequestId = chosenFtaRequest.getCode();
+        CommunicationRequest communicationRequest = ftaCommunicationFields.getFtaCommunications()
+            .stream()
+            .filter(request -> request.getId().equals(chosenFtaRequestId))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("No communication request found with id: " + chosenFtaRequestId));
+        ftaCommunicationFields.setFtaRequestNoResponseQuery(communicationRequest.getValue().getRequestMessage());
+        sscsCaseData.setCommunicationFields(ftaCommunicationFields);
+    }
+
+    private void handleFtaRequestTypeErrors(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
+                                            FtaCommunicationFields ftaCommunicationFields) {
+        if (FtaRequestType.REPLY_TO_FTA_QUERY.equals(ftaCommunicationFields.getFtaRequestType())) {
+            if (ftaCommunicationFields.getFtaRequestNoResponseRadioDl() == null
+                || ftaCommunicationFields.getFtaRequestNoResponseRadioDl().getListItems().isEmpty()) {
+                preSubmitCallbackResponse.addError("There are no requests to reply to. Please select a different request type.");
+            }
+        }
     }
 }

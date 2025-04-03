@@ -4,10 +4,12 @@ import static java.util.Objects.requireNonNull;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -69,23 +71,26 @@ public class FtaCommunicationAboutToStartHandler implements PreSubmitCallbackHan
         FtaCommunicationFields ftaCommunicationFields = Optional.ofNullable(sscsCaseData.getCommunicationFields())
             .orElse(FtaCommunicationFields.builder().build());
 
-        DynamicList ftaRequestDl = new DynamicList(null, null);
-        List<CommunicationRequest> communicationRequests = ftaCommunicationFields.getFtaCommunications();
-        List<DynamicListItem> dynamicListItems = new ArrayList<>();
-        for (CommunicationRequest communicationRequest : communicationRequests) {
-            if (communicationRequest.getValue().getRequestReply() != null) {
-                continue;
-            }
-            CommunicationRequestDetails value = communicationRequest.getValue();
-            String topic = value.getRequestTopic();
-            LocalDateTime dateTime = value.getRequestDateTime();
-            String userName = value.getRequestUserName();
-            dynamicListItems.add(new DynamicListItem(communicationRequest.getId(), topic + " - " + dateTime + " - " + userName));
-        }
-        ftaRequestDl.setListItems(dynamicListItems);
-        ftaCommunicationFields.setFtaRequestNoResponseRadioDl(ftaRequestDl);
-        sscsCaseData.setCommunicationFields(ftaCommunicationFields);
+        setFtaCommunicationsDynamicList(ftaCommunicationFields, sscsCaseData);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
+    }
+
+    private DynamicListItem getDlItemFromCommunicationRequest(CommunicationRequest communicationRequest) {
+        return new DynamicListItem(communicationRequest.getId(),
+            communicationRequest.getValue().getRequestTopic().getValue() + " - "
+                + communicationRequest.getValue().getRequestDateTime()
+                .format(DateTimeFormatter.ofPattern("dd MMMM yyyy, HH:mm")) + " - "
+                + communicationRequest.getValue().getRequestUserName());
+    }
+
+    private void setFtaCommunicationsDynamicList(FtaCommunicationFields ftaCommunicationFields, SscsCaseData sscsCaseData) {
+        List<CommunicationRequest> ftaCommunicationRequests = ftaCommunicationFields.getFtaCommunications();
+        List<DynamicListItem> dynamicListItems = ftaCommunicationRequests.stream()
+            .filter((communicationRequest -> communicationRequest.getValue().getRequestReply() == null))
+            .map((this::getDlItemFromCommunicationRequest))
+            .collect(Collectors.toList());
+        ftaCommunicationFields.setFtaRequestNoResponseRadioDl(new DynamicList(null, dynamicListItems));
+        sscsCaseData.setCommunicationFields(ftaCommunicationFields);
     }
 }
