@@ -71,6 +71,22 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
             final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
             addCommunicationRequest(ftaComms, topic, question, userDetails);
             setFieldsForNewRequest(sscsCaseData, ftaCommunicationFields, ftaComms);
+        } else if (ftaCommunicationFields.getFtaRequestType() == FtaRequestType.REPLY_TO_FTA_QUERY) {
+            DynamicList ftaRequestDl = ftaCommunicationFields.getFtaRequestNoResponseRadioDl();
+            DynamicListItem chosenFtaRequest = ftaRequestDl.getValue();
+            String chosenFtaRequestId = chosenFtaRequest.getCode();
+            CommunicationRequest communicationRequest = ftaCommunicationFields.getFtaCommunications()
+                .stream()
+                .filter(communicationRequest1 -> communicationRequest1.getId().equals(chosenFtaRequestId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No communication request found with id: " + chosenFtaRequestId));
+            String replyText = ftaCommunicationFields.getFtaRequestNoResponseTextArea();
+            CommunicationRequestReply reply = CommunicationRequestReply.builder()
+                .replyDateTime(LocalDateTime.now())
+                .replyUserName(idamService.getUserDetails(userAuthorisation).getName())
+                .replyMessage(replyText)
+                .build();
+            communicationRequest.getValue().setRequestReply(reply);
         }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);

@@ -67,6 +67,28 @@
   },
   {
     "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "ftaCommunicationFilter",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "FieldShowCondition": "ftaRequestType=\"DoNotShow\""
+  },
+  {
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "tribunalCommunicationFilter",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "FieldShowCondition": "ftaRequestType=\"DoNotShow\""
+  },
+  {
+    "CaseEventID": "ftaCommunication",
     "CaseFieldID": "ftaRequestTopic",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
@@ -89,24 +111,36 @@
   },
   {
     "CaseEventID": "ftaCommunication",
-    "CaseFieldID": "ftaCommunicationFilter",
+    "CaseFieldID": "ftaRequestNoResponseRadioDl",
     "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
+    "DisplayContext": "MANDATORY",
     "LiveFrom": "13/03/2025",
-    "PageDisplayOrder": 1,
+    "PageDisplayOrder": 3,
     "PageFieldDisplayOrder": 1,
-    "PageID": "1.0",
-    "FieldShowCondition": "ftaRequestType=\"DoNotShow\""
+    "PageID": "3.0",
+    "PageShowCondition": "ftaRequestType=\"replyToFtaQuery\"",
+    "PageLabel": "Reply to FTA Query"
   },
   {
     "CaseEventID": "ftaCommunication",
-    "CaseFieldID": "tribunalCommunicationFilter",
+    "CaseFieldID": "ftaRequestNoResponseQuery",
     "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
+    "DisplayContext": "READONLY",
     "LiveFrom": "13/03/2025",
-    "PageDisplayOrder": 1,
+    "PageDisplayOrder": 4,
     "PageFieldDisplayOrder": 1,
-    "PageID": "1.0",
-    "FieldShowCondition": "ftaRequestType=\"DoNotShow\""
+    "PageID": "4.0",
+    "PageShowCondition": "ftaRequestType=\"replyToFtaQuery\"",
+    "PageLabel": "Write a reply to FTA Query"
+  },
+  {
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "ftaRequestNoResponseTextArea",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "4.0"
   }
 ]

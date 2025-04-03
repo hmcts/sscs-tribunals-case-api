@@ -15,5 +15,8 @@
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalCommunicationFilter", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalCommunicationFilter", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalCommunicationFilter", "AccessProfile": "caseworker-sscs-registrar", "CRUD": "CRUD"},
-  {"LiveFrom": "25/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalCommunicationFilter", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CRUD": "CRUD"}
+  {"LiveFrom": "25/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalCommunicationFilter", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "ftaRequestNoResponseRadioDl", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "ftaRequestNoResponseQuery", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "ftaRequestNoResponseTextArea", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"}
 ]
