@@ -449,7 +449,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
     }
 
-    private void validateAppointeeCaseData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
+    private void validateAppointeeCaseData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         Appointee appointeeInfo = sscsCaseData.getAppeal().getAppellant().getAppointee();
         String isAppointee = sscsCaseData.getAppeal().getAppellant().getIsAppointee();
 
@@ -483,7 +483,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         return listOfErrors;
     }
 
-    private void validateRepresentativeNameData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
+    private void validateRepresentativeNameData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         final boolean hasRepresentative = sscsCaseData.isThereARepresentative();
         if (hasRepresentative) {
             Representative representativeInfo = sscsCaseData.getAppeal().getRep();
@@ -496,7 +496,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
     }
 
-    private void validateJointPartyNameData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
+    private void validateJointPartyNameData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         JointParty jointPartyInfo = sscsCaseData.getJointParty();
         final boolean hasJointParty = sscsCaseData.isThereAJointParty();
 
