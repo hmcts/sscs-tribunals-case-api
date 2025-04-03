@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,6 +46,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
@@ -356,6 +358,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getState(), is(State.DORMANT_APPEAL_STATE));
+        assertThat(response.getData().getSchedulingAndListingFields().getHearingRoute(), is(HearingRoute.LIST_ASSIST));
         assertThat(response.getData().getDwpState(), is(FINAL_DECISION_ISSUED));
     }
 
@@ -466,5 +469,23 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
     private SscsDocument buildSscsDocumentWithDocumentType(String documentType) {
         SscsDocumentDetails sscsDocumentDetails = SscsDocumentDetails.builder().documentType(documentType).build();
         return SscsDocument.builder().value(sscsDocumentDetails).build();
+    }
+
+    @Test
+    @Parameters({"LIST_ASSIST", "GAPS", "null"})
+    public void givenSetToDormant_shouldSetHearingTypeFromRpcIfNull(@Nullable HearingRoute hearingRoute) {
+        SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
+        sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(documentLink);
+        sscsFinalDecisionCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice(YES);
+        sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        callback.getCaseDetails().getCaseData().setState(State.VOID_STATE);
+        callback.getCaseDetails().getCaseData().setSchedulingAndListingFields(null);
+        callback.getCaseDetails().getCaseData().setRegionalProcessingCenter(RegionalProcessingCenter.builder().hearingRoute(hearingRoute).build());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getState(), is(State.DORMANT_APPEAL_STATE));
+        assertThat(response.getData().getSchedulingAndListingFields().getHearingRoute(), is(hearingRoute));
+        assertThat(response.getData().getDwpState(), is(FINAL_DECISION_ISSUED));
     }
 }
