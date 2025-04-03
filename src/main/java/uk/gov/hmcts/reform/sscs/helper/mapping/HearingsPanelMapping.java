@@ -20,9 +20,9 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMember;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberCompositionDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberMedicallyQualified;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.BenefitRoleRelationType;
@@ -30,7 +30,6 @@ import uk.gov.hmcts.reform.sscs.model.hmc.reference.RequirementType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.MemberType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelPreference;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
-import uk.gov.hmcts.reform.sscs.reference.data.model.JudicialMemberType;
 import uk.gov.hmcts.reform.sscs.reference.data.model.PanelCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryMapService;
@@ -86,56 +85,44 @@ public final class HearingsPanelMapping {
 
     public static List<String> mapPanelMemberCompositionToRoleTypes(PanelMemberComposition panelMemberComposition) {
         ArrayList<String> roleTypes = new ArrayList<>();
-        if (nonNull(panelMemberComposition.getPanelCompositionJudge())) {
-            roleTypes.add(panelMemberComposition.getPanelCompositionJudge().getHmcReference());
+        if (nonNull(panelMemberComposition.getValue().getPanelCompositionJudge())) {
+            roleTypes.add(panelMemberComposition.getValue().getPanelCompositionJudge());
         }
-        if (nonNull(panelMemberComposition.getPanelCompositionMemberMedical1())) {
-            roleTypes.add(panelMemberComposition.getPanelCompositionMemberMedical1().getReference());
+        if (nonNull(panelMemberComposition.getValue().getPanelCompositionMemberMedical1())) {
+            roleTypes.add(panelMemberComposition.getValue().getPanelCompositionMemberMedical1());
         }
-        if (nonNull(panelMemberComposition.getPanelCompositionMemberMedical2())) {
-            roleTypes.add(panelMemberComposition.getPanelCompositionMemberMedical2().getReference());
+        if (nonNull(panelMemberComposition.getValue().getPanelCompositionMemberMedical2())) {
+            roleTypes.add(panelMemberComposition.getValue().getPanelCompositionMemberMedical2());
         }
-        if (nonNull(panelMemberComposition.getPanelCompositionDisabilityAndFqMember())) {
-            roleTypes.addAll(panelMemberComposition.getPanelCompositionDisabilityAndFqMember().stream().map(PanelMemberType::getReference).toList());
+        if (nonNull(panelMemberComposition.getValue().getPanelCompositionDisabilityAndFqMember())) {
+            roleTypes.addAll(panelMemberComposition.getValue().getPanelCompositionDisabilityAndFqMember().stream().toList());
         }
         return roleTypes;
     }
 
     public static void setPanelMemberComposition(SscsCaseData caseData, List<String> johTiers) {
-        PanelMemberComposition panelMemberComposition = new PanelMemberComposition();
-        panelMemberComposition.setPanelCompositionDisabilityAndFqMember(new ArrayList<>());
+        PanelMemberCompositionDetails panelMemberCompositionDetails = new PanelMemberCompositionDetails();
+        panelMemberCompositionDetails.setPanelCompositionDisabilityAndFqMember(new ArrayList<>());
         for (String johTier : johTiers) {
             switch (johTier) {
-                case "50":
-                    panelMemberComposition.getPanelCompositionDisabilityAndFqMember().add(PanelMemberType.TRIBUNALS_MEMBER_FINANCIALLY_QUALIFIED);
+                case "50", "44":
+                    panelMemberCompositionDetails.getPanelCompositionDisabilityAndFqMember().add(johTier);
                     break;
-                case "58":
-                    if (panelMemberComposition.getPanelCompositionMemberMedical1() != null) {
-                        panelMemberComposition.setPanelCompositionMemberMedical2(PanelMemberType.TRIBUNALS_MEMBER_MEDICAL);
+                case "58", "69":
+                    if (panelMemberCompositionDetails.getPanelCompositionMemberMedical1() != null) {
+                        panelMemberCompositionDetails.setPanelCompositionMemberMedical2(johTier);
                     } else {
-                        panelMemberComposition.setPanelCompositionMemberMedical1(PanelMemberType.TRIBUNALS_MEMBER_MEDICAL);
+                        panelMemberCompositionDetails.setPanelCompositionMemberMedical1(johTier);
                     }
                     break;
-                case "84":
-                    panelMemberComposition.setPanelCompositionJudge(JudicialMemberType.TRIBUNAL_JUDGE);
-                    break;
-                case "74":
-                    panelMemberComposition.setPanelCompositionJudge(JudicialMemberType.REGIONAL_TRIBUNAL_JUDGE);
-                    break;
-                case "69":
-                    if (panelMemberComposition.getPanelCompositionMemberMedical1() != null) {
-                        panelMemberComposition.setPanelCompositionMemberMedical2(PanelMemberType.REGIONAL_MEDICAL_MEMBER);
-                    } else {
-                        panelMemberComposition.setPanelCompositionMemberMedical1(PanelMemberType.REGIONAL_MEDICAL_MEMBER);
-                    }
-                    break;
-                case "44":
-                    panelMemberComposition.getPanelCompositionDisabilityAndFqMember().add(PanelMemberType.TRIBUNALS_MEMBER_DISABILITY);
+                case "84", "74":
+                    panelMemberCompositionDetails.setPanelCompositionJudge(johTier);
                     break;
                 default:
             }
 
         }
+        PanelMemberComposition panelMemberComposition = PanelMemberComposition.builder().value(panelMemberCompositionDetails).build();
         caseData.setPanelMemberComposition(panelMemberComposition);
     }
 
