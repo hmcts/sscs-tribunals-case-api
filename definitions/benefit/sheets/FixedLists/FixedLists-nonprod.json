@@ -3,7 +3,7 @@
   {"LiveFrom": "01/09/2021", "ID": "FL_panelMemberCompositionJudge", "ListElementCode": "74", "ListElement": "Regional Judge"},
   {"LiveFrom": "01/09/2021", "ID": "FL_panelMemberCompositionMedical", "ListElementCode": "58", "ListElement": "Tribunal Member Medical"},
   {"LiveFrom": "01/09/2021", "ID": "FL_panelMemberCompositionMedical", "ListElementCode": "69", "ListElement": "Regional Member Medical"},
-   {"LiveFrom": "01/09/2021", "ID": "FL_panelMemberCompositionTribunalMember", "ListElementCode": "44", "ListElement": "Tribunal Member Disability"},
+  {"LiveFrom": "01/09/2021", "ID": "FL_panelMemberCompositionTribunalMember", "ListElementCode": "44", "ListElement": "Tribunal Member Disability"},
   {"LiveFrom": "01/09/2021", "ID": "FL_panelMemberCompositionTribunalMember", "ListElementCode": "50", "ListElement": "Tribunal Member Financially Qualified"}
 
 ]
