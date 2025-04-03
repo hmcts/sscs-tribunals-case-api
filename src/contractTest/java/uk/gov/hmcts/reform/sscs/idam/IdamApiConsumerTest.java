@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.idam;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 
@@ -19,7 +18,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.idam.client.models.TokenRequest;
 import uk.gov.hmcts.reform.idam.client.models.TokenResponse;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 public class IdamApiConsumerTest extends IdamConsumerTestBase {
     @Pact(provider = "idamApi_oidc", consumer = "sscs_tribunalsCaseApi")
