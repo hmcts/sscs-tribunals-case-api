@@ -413,9 +413,11 @@ tya.evidence.address.scottishPoBoxFeatureEnabled: ${SCOTTISH_PO_BOX_ENABLED:fals
 tya.evidence.address.ibcAddressLine2: HMCTS Infected Blood Compensation Appeals
 tya.evidence.address.ibcAddressLine3: PO Box 13618
 tya.evidence.address.ibcAddressPostcode: CM20 9WX
+tya.evidence.address.telephoneIbc: 0300 131 2850
 
 helpline:
     telephone: 0300 123 1142
+    telephoneIbc: 0300 131 2850
     telephoneScotland: 0300 790 6234
 
 

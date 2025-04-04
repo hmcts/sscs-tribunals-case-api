@@ -29,6 +29,7 @@ public class EvidenceProperties {
         private String scottishPostcode;
         private String telephone;
         private String telephoneWelsh;
+        private String telephoneIbc;
         private boolean scottishPoBoxFeatureEnabled;
         private String ibcAddressLine1;
         private String ibcAddressLine2;

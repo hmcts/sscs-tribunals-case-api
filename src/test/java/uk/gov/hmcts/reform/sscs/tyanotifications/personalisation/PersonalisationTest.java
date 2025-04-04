@@ -211,9 +211,8 @@ public class PersonalisationTest {
     private static final String CITY = "LIVERPOOL";
     private static final String POSTCODE = "L2 5UZ";
     private static final String PHONE = "0300 999 8888";
-    private static final String PHONE_WELSH = "0300 999 9999";
-    private static final String PHONE_IBC = "01274267247";
-    private static final String PHONE_IBC_WELSH = "0300 303 5170";
+    private static final String PHONE_WELSH = "0300 303 5170";
+    private static final String PHONE_IBC = "0300 131 2850";
     private static final String DATE = "2018-07-01T14:01:18.243";
 
     @Mock
@@ -261,6 +260,7 @@ public class PersonalisationTest {
     private final String evidenceAddressScottishPostcode = "scottishPostcode";
     private final String evidenceAddressTelephone = "telephone";
     private final String evidenceAddressTelephoneWelsh = PHONE_WELSH;
+    private final String evidenceAddressTelephoneIbc = PHONE_IBC;
     private final EvidenceProperties.EvidenceAddress evidenceAddress = new EvidenceProperties.EvidenceAddress();
 
     @BeforeEach
@@ -279,6 +279,7 @@ public class PersonalisationTest {
         when(config.getOnlineHearingLink()).thenReturn("http://link.com");
         when(config.getHelplineTelephone()).thenReturn("0300 123 1142");
         when(config.getHelplineTelephoneScotland()).thenReturn("0300 790 6234");
+        when(config.getHelplineTelephoneIbc()).thenReturn("0300 131 2850");
         when(notificationDateConverterUtil.toEmailDate(LocalDate.now().plusDays(1))).thenReturn("1 January 2018");
         when(notificationDateConverterUtil.toEmailDate(LocalDate.now().plusDays(7))).thenReturn("1 February 2018");
         when(notificationDateConverterUtil.toEmailDate(LocalDate.now().plusDays(56))).thenReturn("1 February 2019");
@@ -315,6 +316,7 @@ public class PersonalisationTest {
         evidenceAddress.setScottishPostcode(evidenceAddressScottishPostcode);
         evidenceAddress.setTelephone(evidenceAddressTelephone);
         evidenceAddress.setTelephoneWelsh(evidenceAddressTelephoneWelsh);
+        evidenceAddress.setTelephoneIbc(evidenceAddressTelephoneIbc);
         when(evidenceProperties.getAddress()).thenReturn(evidenceAddress);
 
         Map<String, String> englishMap = getEnglishMap();
@@ -725,7 +727,7 @@ public class PersonalisationTest {
             assertEquals("", result.get(WITH_OPTIONAL_THE));
             assertEquals("", result.get(WITH_OPTIONAL_THE_WELSH));
             assertEquals(PHONE_IBC, result.get(HELPLINE_PHONE_NUMBER));
-            assertEquals(PHONE_IBC_WELSH, result.get(PHONE_NUMBER_WELSH));
+            assertEquals(PHONE_WELSH, result.get(PHONE_NUMBER_WELSH));
             assertEquals(PHONE_IBC, result.get(PHONE_NUMBER));
         } else {
             assertEquals(DWP_ACRONYM, result.get(FIRST_TIER_AGENCY_ACRONYM));
@@ -1706,7 +1708,7 @@ public class PersonalisationTest {
         assertEquals(evidenceAddressCounty, result.get(COUNTY_LITERAL));
         assertEquals(expectedPostcode, result.get(POSTCODE_LITERAL));
         assertEquals(isIbc ? PHONE_IBC : evidenceAddressTelephone, result.get(PHONE_NUMBER));
-        assertEquals(isIbc ? PHONE_IBC_WELSH : evidenceAddressTelephoneWelsh, result.get(PHONE_NUMBER_WELSH));
+        assertEquals(evidenceAddressTelephoneWelsh, result.get(PHONE_NUMBER_WELSH));
     }
 
     @Test
