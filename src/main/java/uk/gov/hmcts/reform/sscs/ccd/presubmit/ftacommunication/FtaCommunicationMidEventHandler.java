@@ -30,6 +30,8 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final boolean isFtaCommunicationEnabled;
+    private final String SELECT_FTA_COMMUNICATION_ACTION_ID = "selectFtaCommunicationAction";
+    private final String SELECT_FTA_REQUEST_ID = "selectFtaRequest";
 
     @Autowired
     public FtaCommunicationMidEventHandler(@Value("${feature.fta-communication.enabled}") boolean isFtaCommunicationEnabled) {
@@ -63,13 +65,13 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
         FtaCommunicationFields ftaCommunicationFields = Optional.ofNullable(sscsCaseData.getCommunicationFields())
             .orElse(FtaCommunicationFields.builder().build());
 
-        if (callback.getPageId().equals("1.0")) {
+        if (callback.getPageId().equals(SELECT_FTA_COMMUNICATION_ACTION_ID)) {
             handleFtaRequestTypeErrors(preSubmitCallbackResponse, ftaCommunicationFields);
-        } else if (callback.getPageId().equals("4.0")) {
+        } else if (callback.getPageId().equals(SELECT_FTA_REQUEST_ID)) {
             setQueryForReply(sscsCaseData, ftaCommunicationFields);
         }
 
-        return new PreSubmitCallbackResponse<>(sscsCaseData);
+        return preSubmitCallbackResponse;
     }
 
     private void setQueryForReply(SscsCaseData sscsCaseData, FtaCommunicationFields ftaCommunicationFields) {
@@ -91,7 +93,7 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
         if (FtaRequestType.REPLY_TO_FTA_QUERY.equals(ftaCommunicationFields.getFtaRequestType())) {
             if (ftaCommunicationFields.getFtaRequestNoResponseRadioDl() == null
                 || ftaCommunicationFields.getFtaRequestNoResponseRadioDl().getListItems().isEmpty()) {
-                preSubmitCallbackResponse.addError("There are no requests to reply to. Please select a different request type.");
+                preSubmitCallbackResponse.addError("There are no requests to reply to. Please select a different communication type.");
             }
         }
     }
