@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.createwelshnotice;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getBenefitOptionalByCode;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.IBCA_REFERENCE_LABEL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.IBCA_REFERENCE_LABEL_WELSH;
@@ -26,6 +27,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.model.docassembly.Respondent;
 import uk.gov.hmcts.reform.sscs.service.FooterDetails;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.WelshFooterService;
@@ -144,7 +146,7 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
             dataMap.put("label_welsh", IBCA_REFERENCE_LABEL_WELSH);
             dataMap.put("nino", caseData.getAppeal().getAppellant().getIdentity().getIbcaReference());
         } else {
-            dataMap.put("label",  NINO_LABEL);
+            dataMap.put("label", NINO_LABEL);
             dataMap.put("label_welsh", NINO_LABEL_WELSH);
             dataMap.put("nino", caseData.getAppeal().getAppellant().getIdentity().getNino());
         }
@@ -161,13 +163,31 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
         dataMap.put("welsh_date_added", LocalDateToWelshStringConverter.convert(dateAdded));
         dataMap.put("welsh_generated_date", LocalDateToWelshStringConverter.convert(LocalDate.now()));
         dataMap.put("should_hide_nino", isBenefitTypeValidToHideNino(caseData.getBenefitType()));
-
+        dataMap.put("respondent", getRespondent(caseData, false));
+        dataMap.put("respondent_welsh", getRespondent(caseData, true));
         return dataMap;
     }
 
     protected boolean isBenefitTypeValidToHideNino(Optional<Benefit> benefitType) {
         return benefitType.filter(benefit -> SscsType.SSCS2.equals(benefit.getSscsType())
             || SscsType.SSCS5.equals(benefit.getSscsType())).isPresent();
+    }
+
+    private String getRespondent(SscsCaseData caseData, boolean isWelsh) {
+        boolean isHmrc = getBenefitOptionalByCode(caseData.getAppeal().getBenefitType().getCode())
+            .map(benefit -> SscsType.SSCS5.equals(benefit.getSscsType()))
+            .orElseGet(() -> FormType.SSCS5.equals(caseData.getFormType()));
+        boolean isDwp = getBenefitOptionalByCode(caseData.getAppeal().getBenefitType().getCode())
+            .map(benefit -> SscsType.SSCS1.equals(benefit.getSscsType()) || SscsType.SSCS2.equals(benefit.getSscsType()))
+            .orElseGet(() -> FormType.SSCS1.equals(caseData.getFormType()) || FormType.SSCS2.equals(caseData.getFormType()));
+        if (isHmrc) {
+            return isWelsh ? Respondent.HMRC_WELSH : Respondent.HMRC;
+        } else if (isDwp) {
+            return isWelsh ? Respondent.DWP_WELSH : Respondent.DWP;
+        } else if (caseData.isIbcCase()) {
+            return isWelsh ? Respondent.IBCA_WELSH : Respondent.IBCA;
+        }
+        return null;
     }
 
     private String buildFullName(SscsCaseData caseData) {

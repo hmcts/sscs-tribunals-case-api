@@ -44,6 +44,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
+import uk.gov.hmcts.reform.sscs.model.docassembly.Respondent;
 import uk.gov.hmcts.reform.sscs.service.FooterDetails;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.WelshFooterService;
@@ -174,8 +175,86 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
         assertEquals(label, placeholders.get("label"));
         assertEquals(labelWelsh, placeholders.get("label_welsh"));
         assertEquals(ref, placeholders.get("nino"));
-
     }
+
+    @Test
+    @Parameters({"ESA", "JSA", "PIP", "DLA", "UC", "carersAllowance", "attendanceAllowance", "bereavementBenefit", "industrialInjuriesDisablement", "maternityAllowance", "socialFund", "incomeSupport", "bereavementSupportPaymentScheme", "industrialDeathBenefit", "pensionCredit", "retirementPension", "childSupport"})
+    public void shouldSetRespondentCorrectlyToDwp(String benefitCode) {
+        byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
+
+        SscsDocument sscsDocument = createSscsDocument();
+        when(pdfStoreService.storeDocument(any(), anyString())).thenReturn(sscsDocument);
+        ArgumentCaptor<Object> capture = ArgumentCaptor.forClass(Object.class);
+        when(docmosisPdfService.createPdf(capture.capture(), any())).thenReturn(expectedPdf);
+        FooterDetails footerDetails = new FooterDetails(DocumentLink.builder().build(), "bundleAddition", "bundleFilename");
+        when(welshFooterService.addFooterToExistingToContentAndCreateNewUrl(any(), any(), any(), any(), any())).thenReturn(footerDetails);
+
+        Callback<SscsCaseData> callback = buildCallback(buildSscsDocuments(DocumentType.DIRECTION_NOTICE),
+            buildSscsWelshDocuments(DocumentType.DIRECTION_NOTICE.getValue()));
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(benefitCode);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertNull(response.getData().getEnglishBodyContent());
+        assertNull(response.getData().getWelshBodyContent());
+        assertEquals(DIRECTION_ISSUED_WELSH.getCcdType(), response.getData().getSscsWelshPreviewNextEvent());
+        assertEquals("No", response.getData().getTranslationWorkOutstanding());
+        assertEquals(ENGLISH_PDF, response.getData().getSscsWelshDocuments().getFirst().getValue().getOriginalDocumentFileName());
+        Map<String, Object> placeholders = (Map<String, Object>) capture.getValue();
+        assertEquals(Respondent.DWP, placeholders.get("respondent"));
+        assertEquals(Respondent.DWP_WELSH, placeholders.get("respondent_welsh"));
+    }
+
+    @Test
+    @Parameters({"taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection", "childBenefit", "thirtyHoursFreeChildcare", "guaranteedMinimumPension", "nationalInsuranceCredits"})
+    public void shouldSetRespondentCorrectlyToHmrc(String benefitCode) {
+        byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
+
+        SscsDocument sscsDocument = createSscsDocument();
+        when(pdfStoreService.storeDocument(any(), anyString())).thenReturn(sscsDocument);
+        ArgumentCaptor<Object> capture = ArgumentCaptor.forClass(Object.class);
+        when(docmosisPdfService.createPdf(capture.capture(), any())).thenReturn(expectedPdf);
+        FooterDetails footerDetails = new FooterDetails(DocumentLink.builder().build(), "bundleAddition", "bundleFilename");
+        when(welshFooterService.addFooterToExistingToContentAndCreateNewUrl(any(), any(), any(), any(), any())).thenReturn(footerDetails);
+
+        Callback<SscsCaseData> callback = buildCallback(buildSscsDocuments(DocumentType.DIRECTION_NOTICE),
+            buildSscsWelshDocuments(DocumentType.DIRECTION_NOTICE.getValue()));
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(benefitCode);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertNull(response.getData().getEnglishBodyContent());
+        assertNull(response.getData().getWelshBodyContent());
+        assertEquals(DIRECTION_ISSUED_WELSH.getCcdType(), response.getData().getSscsWelshPreviewNextEvent());
+        assertEquals("No", response.getData().getTranslationWorkOutstanding());
+        assertEquals(ENGLISH_PDF, response.getData().getSscsWelshDocuments().getFirst().getValue().getOriginalDocumentFileName());
+        Map<String, Object> placeholders = (Map<String, Object>) capture.getValue();
+        assertEquals(Respondent.HMRC, placeholders.get("respondent"));
+        assertEquals(Respondent.HMRC_WELSH, placeholders.get("respondent_welsh"));
+    }
+
+    @Test
+    public void shouldSetRespondentCorrectlyToIbca() {
+        byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
+
+        SscsDocument sscsDocument = createSscsDocument();
+        when(pdfStoreService.storeDocument(any(), anyString())).thenReturn(sscsDocument);
+        ArgumentCaptor<Object> capture = ArgumentCaptor.forClass(Object.class);
+        when(docmosisPdfService.createPdf(capture.capture(), any())).thenReturn(expectedPdf);
+        FooterDetails footerDetails = new FooterDetails(DocumentLink.builder().build(), "bundleAddition", "bundleFilename");
+        when(welshFooterService.addFooterToExistingToContentAndCreateNewUrl(any(), any(), any(), any(), any())).thenReturn(footerDetails);
+
+        Callback<SscsCaseData> callback = buildCallback(buildSscsDocuments(DocumentType.DIRECTION_NOTICE),
+            buildSscsWelshDocuments(DocumentType.DIRECTION_NOTICE.getValue()));
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode("infectedBloodCompensation");
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertNull(response.getData().getEnglishBodyContent());
+        assertNull(response.getData().getWelshBodyContent());
+        assertEquals(DIRECTION_ISSUED_WELSH.getCcdType(), response.getData().getSscsWelshPreviewNextEvent());
+        assertEquals("No", response.getData().getTranslationWorkOutstanding());
+        assertEquals(ENGLISH_PDF, response.getData().getSscsWelshDocuments().getFirst().getValue().getOriginalDocumentFileName());
+        Map<String, Object> placeholders = (Map<String, Object>) capture.getValue();
+        assertEquals(Respondent.IBCA, placeholders.get("respondent"));
+        assertEquals(Respondent.IBCA_WELSH, placeholders.get("respondent_welsh"));
+    }
+
+
 
     private Callback<SscsCaseData> buildCallback(List<SscsDocument> sscsDocuments, List<SscsWelshDocument> welshDocuments) {
 

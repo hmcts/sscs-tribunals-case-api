@@ -24,4 +24,13 @@ public class Respondent {
 
     @JsonIgnore
     public static String IBCA = "Respondent: Infected Blood Compensation Authority";
+    // TODO translate
+    @JsonIgnore
+    public static String HMRC_WELSH = "Respondent: HM Revenue & Customs";
+    // TODO translate
+    @JsonIgnore
+    public static String DWP_WELSH = "Respondent: Secretary of State for Work and Pensions";
+    // TODO translate
+    @JsonIgnore
+    public static String IBCA_WELSH = "Respondent: Infected Blood Compensation Authority";
 }
