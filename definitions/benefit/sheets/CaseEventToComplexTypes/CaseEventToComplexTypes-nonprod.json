@@ -2,9 +2,10 @@
   {
     "CaseEventID": "updateListingRequirements",
     "CaseFieldID": "panelMemberComposition",
-    "ListElementCode": "tribunalOrRegionalJudge",
+    "ListElementCode": "panelCompositionJudge",
     "ID": "updateListingRequirementsTribunalOrRegionalJudge",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "reserveTo.reservedDistrictTribunalJudge != \"Yes\"",
     "LiveFrom": "01/04/2025",
     "FieldDisplayOrder": 2,
     "PageID": "1.0"
