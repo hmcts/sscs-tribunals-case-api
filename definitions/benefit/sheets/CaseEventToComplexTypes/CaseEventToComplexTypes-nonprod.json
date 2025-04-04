@@ -7,7 +7,7 @@
     "DisplayContext": "OPTIONAL",
     "FieldShowCondition": "reserveTo.reservedDistrictTribunalJudge != \"Yes\"",
     "LiveFrom": "01/04/2025",
-    "FieldDisplayOrder": 2,
+    "FieldDisplayOrder": 13,
     "PageID": "1.0"
   },
   {
@@ -17,7 +17,7 @@
     "ID": "updateListingRequirementsPanelCompositionMemberMedical1",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/04/2025",
-    "FieldDisplayOrder": 6,
+    "FieldDisplayOrder": 14,
     "PageID": "1.0"
   },
   {
@@ -25,9 +25,10 @@
     "CaseFieldID": "panelMemberComposition",
     "ListElementCode": "panelCompositionMemberMedical2",
     "ID": "updateListingRequirementsPanelCompositionMemberMedical2",
+    "FieldShowCondition": "panelMemberComposition.panelCompositionMemberMedical2 != \"\"",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/04/2025",
-    "FieldDisplayOrder": 6,
+    "FieldDisplayOrder": 15,
     "PageID": "1.0"
   },
   {
@@ -37,7 +38,7 @@
     "ID": "updateListingRequirementsPanelCompositionDisabilityAndFqMember",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/04/2025",
-    "FieldDisplayOrder": 6,
+    "FieldDisplayOrder": 16,
     "PageID": "1.0"
   }
 ]

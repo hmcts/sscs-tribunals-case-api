@@ -99,23 +99,32 @@
   },
   {
     "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "reserveTo",
-    "ListElementCode": "reservedDistrictTribunalJudge",
-    "ID": "updateListingRequirementsReserveToReservedDistrictTribunalJudge",
+    "CaseFieldID": "overrideFields",
+    "ListElementCode": "appellantHearingChannel",
+    "ID": "updateListingRequirementsOverrideFieldsAppellantHearingChannel",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "15/02/2023",
-    "FieldDisplayOrder": 1,
+    "LiveFrom": "01/07/2022",
+    "FieldDisplayOrder": 2,
     "PageID": "1.0"
   },
   {
     "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "reserveTo",
-    "ListElementCode": "reservedJudge",
-    "ID": "updateListingRequirementsReservedJudge",
+    "CaseFieldID": "overrideFields",
+    "ListElementCode": "hmcHearingType",
+    "ID": "updateListingRequirementsOverrideFieldsHmcHearingType",
     "DisplayContext": "OPTIONAL",
-    "FieldShowCondition": "reserveTo.reservedDistrictTribunalJudge != \"Yes\"",
-    "LiveFrom": "08/02/2023",
-    "FieldDisplayOrder": 2,
+    "LiveFrom": "01/07/2022",
+    "FieldDisplayOrder": 3,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "overrideFields",
+    "ListElementCode": "autoList",
+    "ID": "updateListingRequirementsOverrideFieldsAutoList",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/07/2022",
+    "FieldDisplayOrder": 4,
     "PageID": "1.0"
   },
   {
@@ -125,49 +134,7 @@
     "ID": "updateListingRequirementsOverrideFieldsAppellantInterpreterIsInterpreterWanted",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/07/2022",
-    "FieldDisplayOrder": 4,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "panelMemberExclusions",
-    "ListElementCode": "arePanelMembersExcluded",
-    "ID": "updateListingRequirementsArePanelMembersExclusions",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/02/2023",
-    "FieldDisplayOrder": 1,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "panelMemberExclusions",
-    "ListElementCode": "excludedPanelMembers",
-    "ID": "updateListingRequirementsExcludedPanelMembers",
-    "DisplayContext": "OPTIONAL",
-    "FieldShowCondition": "panelMemberExclusions.arePanelMembersExcluded = \"Yes\"",
-    "LiveFrom": "01/02/2023",
-    "FieldDisplayOrder": 2,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "panelMemberExclusions",
-    "ListElementCode": "arePanelMembersReserved",
-    "ID": "updateListingRequirementsArePanelMembersReserved",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/02/2023",
-    "FieldDisplayOrder": 3,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "panelMemberExclusions",
-    "ListElementCode": "reservedPanelMembers",
-    "ID": "updateListingRequirementsReservedPanelMembers",
-    "DisplayContext": "OPTIONAL",
-    "FieldShowCondition": "panelMemberExclusions.arePanelMembersReserved = \"Yes\"",
-    "LiveFrom": "01/05/2023",
-    "FieldDisplayOrder": 4,
+    "FieldDisplayOrder": 5,
     "PageID": "1.0"
   },
   {
@@ -178,47 +145,7 @@
     "DisplayContext": "OPTIONAL",
     "FieldShowCondition": "overrideFields.appellantInterpreter.isInterpreterWanted = \"Yes\"",
     "LiveFrom": "01/07/2022",
-    "FieldDisplayOrder": 5,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "overrideFields",
-    "ListElementCode": "appellantHearingChannel",
-    "ID": "updateListingRequirementsOverrideFieldsAppellantHearingChannel",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/07/2022",
     "FieldDisplayOrder": 6,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "overrideFields",
-    "ListElementCode": "hmcHearingType",
-    "ID": "updateListingRequirementsOverrideFieldsHmcHearingType",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/07/2022",
-    "FieldDisplayOrder": 7,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "overrideFields",
-    "ListElementCode": "autoList",
-    "ID": "updateListingRequirementsOverrideFieldsAutoList",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/07/2022",
-    "FieldDisplayOrder": 8,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "overrideFields",
-    "ListElementCode": "hearingVenueEpimsIds.value",
-    "ID": "updateListingRequirementsOverrideFieldsHearingVenueEpimsIdsValue",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/07/2022",
-    "FieldDisplayOrder": 9,
     "PageID": "1.0"
   },
   {
@@ -228,7 +155,7 @@
     "ID": "updateListingRequirementsOverrideFieldsHearingWindowFirstDateTimeMustBe",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/07/2022",
-    "FieldDisplayOrder": 11,
+    "FieldDisplayOrder": 7,
     "PageID": "1.0"
   },
   {
@@ -238,7 +165,7 @@
     "ID": "updateListingRequirementsOverrideFieldsHearingWindowDateRangeStart",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/07/2022",
-    "FieldDisplayOrder": 11,
+    "FieldDisplayOrder": 7,
     "PageID": "1.0"
   },
   {
@@ -248,7 +175,80 @@
     "ID": "updateListingRequirementsOverrideFieldsHearingWindowDateRangeEnd",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/07/2022",
+    "FieldDisplayOrder": 9,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "overrideFields",
+    "ListElementCode": "hearingVenueEpimsIds.value",
+    "ID": "updateListingRequirementsOverrideFieldsHearingVenueEpimsIdsValue",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/07/2022",
+    "FieldDisplayOrder": 10,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "reserveTo",
+    "ListElementCode": "reservedDistrictTribunalJudge",
+    "ID": "updateListingRequirementsReserveToReservedDistrictTribunalJudge",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "15/02/2023",
     "FieldDisplayOrder": 11,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "reserveTo",
+    "ListElementCode": "reservedJudge",
+    "ID": "updateListingRequirementsReservedJudge",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "reserveTo.reservedDistrictTribunalJudge != \"Yes\"",
+    "LiveFrom": "08/02/2023",
+    "FieldDisplayOrder": 12,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "panelMemberExclusions",
+    "ListElementCode": "arePanelMembersExcluded",
+    "ID": "updateListingRequirementsArePanelMembersExclusions",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/02/2023",
+    "FieldDisplayOrder": 17,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "panelMemberExclusions",
+    "ListElementCode": "excludedPanelMembers",
+    "ID": "updateListingRequirementsExcludedPanelMembers",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "panelMemberExclusions.arePanelMembersExcluded = \"Yes\"",
+    "LiveFrom": "01/02/2023",
+    "FieldDisplayOrder": 18,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "panelMemberExclusions",
+    "ListElementCode": "arePanelMembersReserved",
+    "ID": "updateListingRequirementsArePanelMembersReserved",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/02/2023",
+    "FieldDisplayOrder": 19,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "panelMemberExclusions",
+    "ListElementCode": "reservedPanelMembers",
+    "ID": "updateListingRequirementsReservedPanelMembers",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "panelMemberExclusions.arePanelMembersReserved = \"Yes\"",
+    "LiveFrom": "01/05/2023",
+    "FieldDisplayOrder": 20,
     "PageID": "1.0"
   },
   {
