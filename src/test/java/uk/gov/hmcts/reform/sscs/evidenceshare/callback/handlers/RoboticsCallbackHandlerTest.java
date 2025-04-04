@@ -329,4 +329,24 @@ public class RoboticsCallbackHandlerTest {
         assertEquals("Case sent to List Assist", summaryCaptor.getValue());
         assertEquals("Updated case with sent to List Assist", descriptionCaptor.getValue());
     }
+
+    @Test
+    public void givenRequestSentToRobotics_andGapSwitchOverFeatureEnabled_andIbcCase_thenDoesNotRunFurther() {
+        ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
+
+        when(caseData.getBenefitCode()).thenReturn("093");
+
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, null);
+        caseDetails.getCaseData().getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.RESEND_CASE_TO_GAPS2, false);
+        handler.handle(SUBMITTED, callback);
+
+        ArgumentCaptor<String> summaryCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> descriptionCaptor = ArgumentCaptor.forClass(String.class);
+        verifyNoInteractions(roboticsService);
+        verify(updateCcdCaseService).triggerCaseEventV2(any(), any(), summaryCaptor.capture(), descriptionCaptor.capture(), any());
+
+        assertEquals("Case sent to List Assist", summaryCaptor.getValue());
+        assertEquals("Updated case with sent to List Assist", descriptionCaptor.getValue());
+    }
 }
