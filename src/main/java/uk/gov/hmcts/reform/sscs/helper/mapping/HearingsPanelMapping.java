@@ -20,7 +20,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMember;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberCompositionDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberMedicallyQualified;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -85,44 +84,43 @@ public final class HearingsPanelMapping {
 
     public static List<String> mapPanelMemberCompositionToRoleTypes(PanelMemberComposition panelMemberComposition) {
         ArrayList<String> roleTypes = new ArrayList<>();
-        if (nonNull(panelMemberComposition.getValue().getPanelCompositionJudge())) {
-            roleTypes.add(panelMemberComposition.getValue().getPanelCompositionJudge());
+        if (nonNull(panelMemberComposition.getPanelCompositionJudge())) {
+            roleTypes.add(panelMemberComposition.getPanelCompositionJudge());
         }
-        if (nonNull(panelMemberComposition.getValue().getPanelCompositionMemberMedical1())) {
-            roleTypes.add(panelMemberComposition.getValue().getPanelCompositionMemberMedical1());
+        if (nonNull(panelMemberComposition.getPanelCompositionMemberMedical1())) {
+            roleTypes.add(panelMemberComposition.getPanelCompositionMemberMedical1());
         }
-        if (nonNull(panelMemberComposition.getValue().getPanelCompositionMemberMedical2())) {
-            roleTypes.add(panelMemberComposition.getValue().getPanelCompositionMemberMedical2());
+        if (nonNull(panelMemberComposition.getPanelCompositionMemberMedical2())) {
+            roleTypes.add(panelMemberComposition.getPanelCompositionMemberMedical2());
         }
-        if (nonNull(panelMemberComposition.getValue().getPanelCompositionDisabilityAndFqMember())) {
-            roleTypes.addAll(panelMemberComposition.getValue().getPanelCompositionDisabilityAndFqMember().stream().toList());
+        if (nonNull(panelMemberComposition.getPanelCompositionDisabilityAndFqMember())) {
+            roleTypes.addAll(panelMemberComposition.getPanelCompositionDisabilityAndFqMember());
         }
         return roleTypes;
     }
 
     public static void setPanelMemberComposition(SscsCaseData caseData, List<String> johTiers) {
-        PanelMemberCompositionDetails panelMemberCompositionDetails = new PanelMemberCompositionDetails();
-        panelMemberCompositionDetails.setPanelCompositionDisabilityAndFqMember(new ArrayList<>());
+        PanelMemberComposition panelMemberComposition = new PanelMemberComposition();
+        panelMemberComposition.setPanelCompositionDisabilityAndFqMember(new ArrayList<>());
         for (String johTier : johTiers) {
             switch (johTier) {
                 case "50", "44":
-                    panelMemberCompositionDetails.getPanelCompositionDisabilityAndFqMember().add(johTier);
+                    panelMemberComposition.getPanelCompositionDisabilityAndFqMember().add(johTier);
                     break;
                 case "58", "69":
-                    if (panelMemberCompositionDetails.getPanelCompositionMemberMedical1() != null) {
-                        panelMemberCompositionDetails.setPanelCompositionMemberMedical2(johTier);
+                    if (panelMemberComposition.getPanelCompositionMemberMedical1() != null) {
+                        panelMemberComposition.setPanelCompositionMemberMedical2(johTier);
                     } else {
-                        panelMemberCompositionDetails.setPanelCompositionMemberMedical1(johTier);
+                        panelMemberComposition.setPanelCompositionMemberMedical1(johTier);
                     }
                     break;
                 case "84", "74":
-                    panelMemberCompositionDetails.setPanelCompositionJudge(johTier);
+                    panelMemberComposition.setPanelCompositionJudge(johTier);
                     break;
                 default:
             }
 
         }
-        PanelMemberComposition panelMemberComposition = PanelMemberComposition.builder().value(panelMemberCompositionDetails).build();
         caseData.setPanelMemberComposition(panelMemberComposition);
     }
 
