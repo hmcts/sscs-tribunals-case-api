@@ -185,7 +185,7 @@ callback.maxRetryAttempts=${CALLBACK_MAX_RETRY_ATTEMPTS:3}
 
 docmosis.template.english.dl6.name=TB-SCS-GNO-ENG-00010.doc
 docmosis.template.english.dl16.name=TB-SCS-GNO-ENG-00011.doc
-docmosis.template.english.d609-97.name=TB-SCS-GNO-ENG-00068-v2.doc
+docmosis.template.english.d609-97.name=TB-SCS-GNO-ENG-00068.doc
 docmosis.template.english.d609-98.name=TB-SCS-GNO-ENG-00069.doc
 docmosis.template.english.generic-letter.name=TB-SCS-LET-ENG-Issue-Generic-Letter.docx
 docmosis.template.english.generic-letter.cover=TB-SCS-LET-ENG-Cover-Sheet.docx
@@ -193,7 +193,7 @@ docmosis.template.english.postHearingAppSorWritten.name=TB-SCS-LET-ENG-Statement
 docmosis.template.english.postHearingAppSorWritten.cover=TB-SCS-GNO-ENG-00012.docx
 docmosis.template.welsh.dl6.name=TB-SCS-GNO-ENG-00010.doc
 docmosis.template.welsh.dl16.name=TB-SCS-GNO-ENG-00011.doc
-docmosis.template.welsh.d609-97.name=TB-SCS-GNO-WEL-00469-v2.docx
+docmosis.template.welsh.d609-97.name=TB-SCS-GNO-WEL-00469.docx
 docmosis.template.welsh.d609-98.name=TB-SCS-GNO-WEL-00470.docx
 docmosis.template.welsh.generic-letter.name=TB-SCS-LET-ENG-Issue-Generic-Letter.docx
 docmosis.template.welsh.generic-letter.cover=TB-SCS-LET-ENG-Cover-Sheet.docx

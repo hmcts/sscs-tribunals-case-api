@@ -16,6 +16,7 @@ public class SessionHearingArrangement {
         this.language = language;
     }
 
+    @JsonCreator
     public SessionHearingArrangement(Boolean requested) {
         this.requested = requested;
         this.language = null;

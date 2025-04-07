@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static java.lang.Character.toLowerCase;
 
-import jakarta.annotation.Nullable;
+import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
