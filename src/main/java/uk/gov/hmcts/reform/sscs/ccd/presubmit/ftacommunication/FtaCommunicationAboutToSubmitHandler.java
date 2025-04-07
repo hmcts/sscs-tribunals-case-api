@@ -107,8 +107,8 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
 
     private void setFieldsForNewRequest(SscsCaseData sscsCaseData, FtaCommunicationFields communicationFields, List<CommunicationRequest> comms) {
         communicationFields.setFtaCommunications(comms);
-        communicationFields.setTribunalCommunicationFilter(TribunalCommunicationFilter.PROVIDE_INFO_TO_TRIBUNAL);
-        communicationFields.setFtaCommunicationFilter(FtaCommunicationFilter.AWAITING_INFO_FROM_FTA);
+        communicationFields.setTribunalCommunicationFilter(TribunalCommunicationFilter.AWAITING_INFO_FROM_FTA);
+        communicationFields.setFtaCommunicationFilter(FtaCommunicationFilter.PROVIDE_INFO_TO_TRIBUNAL);
         sscsCaseData.setCommunicationFields(communicationFields);
     }
 

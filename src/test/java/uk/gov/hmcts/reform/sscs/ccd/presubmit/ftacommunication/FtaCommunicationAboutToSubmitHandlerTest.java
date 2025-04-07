@@ -116,8 +116,8 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
         assertNotNull(addedCom.getRequestDateTime());
 
         // Verify the enum values are correctly set
-        assertEquals(FtaCommunicationFilter.AWAITING_INFO_FROM_FTA, response.getData().getCommunicationFields().getFtaCommunicationFilter());
-        assertEquals(TribunalCommunicationFilter.PROVIDE_INFO_TO_TRIBUNAL, response.getData().getCommunicationFields().getTribunalCommunicationFilter());
+        assertEquals(FtaCommunicationFilter.PROVIDE_INFO_TO_TRIBUNAL, response.getData().getCommunicationFields().getFtaCommunicationFilter());
+        assertEquals(TribunalCommunicationFilter.AWAITING_INFO_FROM_FTA, response.getData().getCommunicationFields().getTribunalCommunicationFilter());
     }
 
     @Test
@@ -199,8 +199,8 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
         assertEquals(ftaCommunicationPast, resultComs.getLast());
 
         // Verify the enum values are correctly set
-        assertEquals(FtaCommunicationFilter.AWAITING_INFO_FROM_FTA, response.getData().getCommunicationFields().getFtaCommunicationFilter());
-        assertEquals(TribunalCommunicationFilter.PROVIDE_INFO_TO_TRIBUNAL, response.getData().getCommunicationFields().getTribunalCommunicationFilter());
+        assertEquals(FtaCommunicationFilter.PROVIDE_INFO_TO_TRIBUNAL, response.getData().getCommunicationFields().getFtaCommunicationFilter());
+        assertEquals(TribunalCommunicationFilter.AWAITING_INFO_FROM_FTA, response.getData().getCommunicationFields().getTribunalCommunicationFilter());
     }
 
     @Test
@@ -235,8 +235,8 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
         assertNotNull(resultComs);
 
         // Verify the enum values are correctly set
-        assertEquals(FtaCommunicationFilter.AWAITING_INFO_FROM_FTA, response.getData().getCommunicationFields().getFtaCommunicationFilter());
-        assertEquals(TribunalCommunicationFilter.PROVIDE_INFO_TO_TRIBUNAL, response.getData().getCommunicationFields().getTribunalCommunicationFilter());
+        assertEquals(FtaCommunicationFilter.PROVIDE_INFO_TO_TRIBUNAL, response.getData().getCommunicationFields().getFtaCommunicationFilter());
+        assertEquals(TribunalCommunicationFilter.AWAITING_INFO_FROM_FTA, response.getData().getCommunicationFields().getTribunalCommunicationFilter());
     }
 
     @ParameterizedTest
