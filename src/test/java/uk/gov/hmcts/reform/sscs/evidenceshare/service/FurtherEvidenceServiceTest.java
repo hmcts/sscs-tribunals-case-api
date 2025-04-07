@@ -10,11 +10,13 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.AUDIO_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DWP_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.JOINT_PARTY_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_PARTY_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_PARTY_REPRESENTATIVE_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.VIDEO_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
@@ -88,8 +90,8 @@ public class FurtherEvidenceServiceTest {
     private List<Pdf> pdfList;
     private List<PdfDocument> pdfDocumentList;
 
-    private final String furtherEvidenceOriginalSenderTemplateName = "TB-SCS-GNO-ENG-00068.doc";
-    private final String furtherEvidenceOriginalSenderWelshTemplateName = "TB-SCS-GNO-WEL-00469.docx";
+    private final String furtherEvidenceOriginalSenderTemplateName = "TB-SCS-GNO-ENG-00068-v2.doc";
+    private final String furtherEvidenceOriginalSenderWelshTemplateName = "TB-SCS-GNO-WEL-00469-v2.docx";
     private final String furtherEvidenceOriginalSenderDocName = "609-97-template (original sender)";
     private final String furtherEvidenceOtherPartiesTemplateName = "TB-SCS-GNO-ENG-00069.doc";
     private final String furtherEvidenceOtherPartiesWelshTemplateName = "TB-SCS-GNO-WEL-00470.docx";
@@ -108,7 +110,7 @@ public class FurtherEvidenceServiceTest {
         nameMap.put("name", "TB-SCS-GNO-ENG-00011.doc");
         englishDocs.put(DocumentType.DL16.getValue(), nameMap);
         nameMap = new HashMap<>();
-        nameMap.put("name", "TB-SCS-GNO-ENG-00068.doc");
+        nameMap.put("name", "TB-SCS-GNO-ENG-00068-v2.doc");
         englishDocs.put("d609-97", nameMap);
         nameMap = new HashMap<>();
         nameMap.put("name", "TB-SCS-GNO-ENG-00069.doc");
@@ -122,7 +124,7 @@ public class FurtherEvidenceServiceTest {
         nameMap.put("name", "TB-SCS-GNO-ENG-00011.doc");
         welshDocs.put(DocumentType.DL16.getValue(), nameMap);
         nameMap = new HashMap<>();
-        nameMap.put("name", "TB-SCS-GNO-WEL-00469.docx");
+        nameMap.put("name", "TB-SCS-GNO-WEL-00469-v2.docx");
         welshDocs.put("d609-97", nameMap);
         nameMap = new HashMap<>();
         nameMap.put("name", "TB-SCS-GNO-WEL-00470.docx");
@@ -739,9 +741,27 @@ public class FurtherEvidenceServiceTest {
                     .documentLink(DocumentLink.builder().documentBinaryUrl("not-original2.com").build())
                     .build()).build();
 
+        SscsDocument videoLinkDoc = SscsDocument
+                .builder()
+                .value(
+                        SscsDocumentDetails
+                                .builder()
+                                .documentType(VIDEO_DOCUMENT.getValue())
+                                .avDocumentLink(DocumentLink.builder().documentBinaryUrl("not-original2.com").build())
+                                .build()).build();
+
+        SscsDocument audioLinkDoc = SscsDocument
+                .builder()
+                .value(
+                        SscsDocumentDetails
+                                .builder()
+                                .documentType(AUDIO_DOCUMENT.getValue())
+                                .avDocumentLink(DocumentLink.builder().documentBinaryUrl("not-original3.com").build())
+                                .build()).build();
+
         SscsCaseData caseData = SscsCaseData
             .builder()
-            .sscsDocument(Arrays.asList(originalDoc, differentTypeDoc, differentLinkDoc))
+            .sscsDocument(Arrays.asList(originalDoc, differentTypeDoc, differentLinkDoc, videoLinkDoc, audioLinkDoc))
             .sscsWelshDocuments(Collections.singletonList(originalWelshDoc))
             .build();
 

@@ -68,17 +68,16 @@ docmosis.convert.endpoint= ${PDF_SERVICE_CONVERT_URL:https://docmosis.aat.platfo
 docmosis.health.endpoint= ${PDF_SERVICE_HEALTH_URL:https://docmosis.aat.platform.hmcts.net/rs/status}
 docmosis.uri=${DOCMOSIS_SERVICE_BASE_URL:https://docmosis.aat.platform.hmcts.net/rs/render}
 
-documents.english.CORRECTION_GRANTED=TB-SCS-GNO-ENG-corrected-decision-notice.docx
+documents.english.CORRECTION_GRANTED=TB-SCS-GNO-ENG-corrected-decision-notice-v2.docx
 documents.english.DIRECTION_ISSUED=TB-SCS-GNO-ENG-directions-notice-v2.docx
 documents.english.SOR_WRITE=TB-SCS-GNO-ENG-sor-directions-notice-v2.docx
-documents.english.DECISION_ISSUED=TB-SCS-GNO-ENG-draft-decision-notice.docx
+documents.english.DECISION_ISSUED=TB-SCS-GNO-ENG-draft-decision-notice-v2.docx
 documents.english.ISSUE_FINAL_DECISION=TB-SCS-GNO-ENG-final-decision-notice-v2.docx
-documents.welsh.CORRECTION_GRANTED=TB-SCS-GNO-ENG-corrected-decision-notice.docx
+documents.welsh.CORRECTION_GRANTED=TB-SCS-GNO-ENG-corrected-decision-notice-v2.docx
 documents.welsh.DIRECTION_ISSUED=TB-SCS-GNO-ENG-directions-notice-v2.docx
 documents.welsh.SOR_WRITE=TB-SCS-GNO-ENG-sor-directions-notice-v2.docx
-documents.welsh.DECISION_ISSUED=TB-SCS-GNO-ENG-draft-decision-notice.docx
+documents.welsh.DECISION_ISSUED=TB-SCS-GNO-ENG-draft-decision-notice-v2.docx
 documents.welsh.ISSUE_FINAL_DECISION=TB-SCS-GNO-ENG-final-decision-notice-v2.docx
-
 document.bilingual.notice.template=TB-SCS-GNO-WEL-00473.docx
 
 evidence.english.template=TB-SCS-GNO-ENG-00012.docx
@@ -186,7 +185,7 @@ callback.maxRetryAttempts=${CALLBACK_MAX_RETRY_ATTEMPTS:3}
 
 docmosis.template.english.dl6.name=TB-SCS-GNO-ENG-00010.doc
 docmosis.template.english.dl16.name=TB-SCS-GNO-ENG-00011.doc
-docmosis.template.english.d609-97.name=TB-SCS-GNO-ENG-00068.doc
+docmosis.template.english.d609-97.name=TB-SCS-GNO-ENG-00068-v2.doc
 docmosis.template.english.d609-98.name=TB-SCS-GNO-ENG-00069.doc
 docmosis.template.english.generic-letter.name=TB-SCS-LET-ENG-Issue-Generic-Letter.docx
 docmosis.template.english.generic-letter.cover=TB-SCS-LET-ENG-Cover-Sheet.docx
@@ -194,7 +193,7 @@ docmosis.template.english.postHearingAppSorWritten.name=TB-SCS-LET-ENG-Statement
 docmosis.template.english.postHearingAppSorWritten.cover=TB-SCS-GNO-ENG-00012.docx
 docmosis.template.welsh.dl6.name=TB-SCS-GNO-ENG-00010.doc
 docmosis.template.welsh.dl16.name=TB-SCS-GNO-ENG-00011.doc
-docmosis.template.welsh.d609-97.name=TB-SCS-GNO-WEL-00469.docx
+docmosis.template.welsh.d609-97.name=TB-SCS-GNO-WEL-00469-v2.docx
 docmosis.template.welsh.d609-98.name=TB-SCS-GNO-WEL-00470.docx
 docmosis.template.welsh.generic-letter.name=TB-SCS-LET-ENG-Issue-Generic-Letter.docx
 docmosis.template.welsh.generic-letter.cover=TB-SCS-LET-ENG-Cover-Sheet.docx

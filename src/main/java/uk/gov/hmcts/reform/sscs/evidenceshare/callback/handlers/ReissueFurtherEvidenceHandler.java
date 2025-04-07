@@ -88,7 +88,7 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
     private AbstractDocument<? extends AbstractDocumentDetails> getSelectedDocumentInUiFromCaseData(SscsCaseData caseData,
                                                                                                     ReissueArtifactUi reissueArtifactUi) {
         return Stream.of(caseData.getSscsDocument(), caseData.getSscsWelshDocuments())
-            .flatMap(documents -> getStreamIfNonNull(documents))
+            .flatMap(this::getStreamIfNonNull)
             .filter(document -> isDocumentSelectedInUiEqualsToStreamDocument(reissueArtifactUi, document))
             .findFirst()
             .orElseThrow(() -> new IllegalStateException(getNoSelectedDocumentErrorMessage(caseData)));
@@ -98,9 +98,10 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
                                                                  AbstractDocument<? extends AbstractDocumentDetails> document) {
         String expectedUrl = reissueArtifactUi.getReissueFurtherEvidenceDocument().getValue().getCode();
 
-        return (document.getValue().getDocumentLink().getDocumentUrl().equals(expectedUrl)
-            || (document.getValue().getEditedDocumentLink() != null
-            && document.getValue().getEditedDocumentLink().getDocumentUrl().equals(expectedUrl)));
+        return (document.getValue().getDocumentLink() != null
+                && document.getValue().getDocumentLink().getDocumentUrl().equals(expectedUrl)
+                || (document.getValue().getEditedDocumentLink() != null
+                && document.getValue().getEditedDocumentLink().getDocumentUrl().equals(expectedUrl)));
     }
 
     private Stream<? extends AbstractDocument<? extends AbstractDocumentDetails>> getStreamIfNonNull(List<? extends AbstractDocument<? extends AbstractDocumentDetails>> documents) {
