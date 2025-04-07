@@ -18,8 +18,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -35,7 +40,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FtaRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
-public class FtaCommunicationMidEventHandlerTest {
+class FtaCommunicationMidEventHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String NO_REQUESTS_ERROR_MESSAGE = "There are no requests to reply to. Please select a different communication type.";
@@ -268,13 +273,14 @@ public class FtaCommunicationMidEventHandlerTest {
         assertEquals("No communication request found with id: " + ftaCommunication1.getId(), exception.getMessage());
     }
 
-    @Test
-    void shouldErrorEmptyResponseAndNoActionNotSelected_whenReplyToFtaQuery() {
+    @ParameterizedTest
+    @MethodSource("generateResponseActionErrorData")
+    void shouldErrorEmptyResponseAndNoActionNotSelected_whenReplyToFtaQuery(String textArea, List<String> noAction) {
         when(callback.getPageId()).thenReturn("replyToFtaQuery");
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .ftaRequestNoResponseTextArea("")
-            .ftaRequestNoResponseNoAction(Collections.emptyList())
+            .ftaRequestNoResponseTextArea(textArea)
+            .ftaRequestNoResponseNoAction(noAction)
             .build();
 
         sscsCaseData.setCommunicationFields(fields);
@@ -283,6 +289,15 @@ public class FtaCommunicationMidEventHandlerTest {
         assertNotNull(response);
         assertEquals(1, response.getErrors().size());
         assertTrue(response.getErrors().contains(PROVIDE_RESPONSE_ERROR_MESSAGE));
+    }
+
+    static Stream<Arguments> generateResponseActionErrorData() {
+        return Stream.of(
+            Arguments.of(null, Collections.emptyList()),
+            Arguments.of("", Collections.emptyList()),
+            Arguments.of(null, null),
+            Arguments.of("", null)
+        );
     }
 
     @Test
@@ -333,6 +348,24 @@ public class FtaCommunicationMidEventHandlerTest {
         assertTrue(response.getErrors().isEmpty());
     }
 
+    @Test
+    void shouldDoNothing_whenNoRequestType() {
+        handler = new FtaCommunicationMidEventHandler(false);
+        CommunicationRequest ftaCommunication1 = buildCommRequest("some message", "some user", -2, -1);
+        CommunicationRequest ftaCommunication2 = buildCommRequest("a message", "a user", 1, 2);
+        List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunication1, ftaCommunication2));
+
+        FtaCommunicationFields fields = FtaCommunicationFields.builder()
+            .ftaCommunications(existingComs)
+            .build();
+
+        sscsCaseData.setCommunicationFields(fields);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNotNull(response);
+        assertTrue(response.getErrors().isEmpty());
+        assertEquals(fields, sscsCaseData.getCommunicationFields());
+    }
 
     private CommunicationRequest buildCommRequest(String message, String username, int requestDateTimeOffset, int responseDueDateOffset) {
         return CommunicationRequest.builder().value(

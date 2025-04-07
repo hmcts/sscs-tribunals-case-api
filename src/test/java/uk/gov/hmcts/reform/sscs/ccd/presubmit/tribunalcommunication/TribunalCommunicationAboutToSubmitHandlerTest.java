@@ -1,12 +1,14 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.tribunalcommunication;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 
@@ -23,7 +25,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 
-public class TribunalCommunicationAboutToSubmitHandlerTest {
+class TribunalCommunicationAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
     TribunalCommunicationAboutToSubmitHandler handler;
@@ -40,7 +42,7 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
     private IdamService idamService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         openMocks(this);
 
         handler = new TribunalCommunicationAboutToSubmitHandler(idamService, true);
@@ -53,18 +55,29 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAValidAboutToSubmitEvent_thenReturnTrue() {
+    void givenAValidAboutToSubmitEvent_thenReturnTrue() {
         assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
     @Test
-    public void throwsExceptionIfItCannotHandleTheAppeal() {
+    void givenAnInvalidAboutToSubmitEvent_thenReturnFalse() {
+        when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
+        assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
+    }
+
+    @Test
+    void givenAValidAboutToStartEvent_thenReturnFalse() {
+        assertFalse(handler.canHandle(ABOUT_TO_START, callback));
+    }
+
+    @Test
+    void throwsExceptionIfItCannotHandle() {
         when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
         assertThrows(IllegalStateException.class, () -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION));
     }
 
     @Test
-    public void givenValidTribunalRequest_shouldAddNewCommunicationToList() {
+    void givenValidTribunalRequest_shouldAddNewCommunicationToList() {
         // Setup Tribunal communication fields
         CommunicationRequestTopic expectedTopic = CommunicationRequestTopic.APPEAL_TYPE;
         String expectedQuestion = "Test Question";
@@ -108,7 +121,7 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenFlagOff_shouldDoNothing() {
+    void givenFlagOff_shouldDoNothing() {
         List<CommunicationRequest> existingComs = new ArrayList<>();
         FtaCommunicationFields details = FtaCommunicationFields.builder()
             .tribunalRequestTopic(CommunicationRequestTopic.APPEAL_TYPE)
@@ -130,7 +143,28 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenValidTribunalRequest_shouldAddNewCommunicationToPopulatedList() {
+    void givenNoRequestType_shouldDoNothing() {
+        List<CommunicationRequest> existingComs = new ArrayList<>();
+        FtaCommunicationFields details = FtaCommunicationFields.builder()
+            .tribunalRequestTopic(CommunicationRequestTopic.APPEAL_TYPE)
+            .tribunalRequestQuestion("someQuestion")
+            .tribunalCommunications(existingComs)
+            .build();
+
+        sscsCaseData.setCommunicationFields(details);
+        handler = new TribunalCommunicationAboutToSubmitHandler(idamService, false);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        List<CommunicationRequest> resultComs = response.getData().getCommunicationFields().getTribunalCommunications();
+        assertEquals(0, resultComs.size());
+        assertNull(response.getData().getCommunicationFields().getTribunalCommunicationFilter());
+        assertNull(response.getData().getCommunicationFields().getFtaCommunicationFilter());
+    }
+
+    @Test
+    void givenValidTribunalRequest_shouldAddNewCommunicationToPopulatedList() {
         // Setup Tribunal communication fields
         CommunicationRequestTopic expectedTopic = CommunicationRequestTopic.APPEAL_TYPE;
         String expectedQuestion = "Test Question";
@@ -194,7 +228,7 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenNullCommunicationsList_shouldHandleGracefully() {
+    void givenNullCommunicationsList_shouldHandleGracefully() {
         // Setup Tribunal communication fields with null communications list
         CommunicationRequestTopic expectedTopic = CommunicationRequestTopic.APPEAL_TYPE;
         String expectedQuestion = "Test Question";

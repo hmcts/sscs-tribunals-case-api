@@ -123,7 +123,7 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
         List<DynamicListItem> dynamicListItems = ftaCommunicationRequests.stream()
             .filter((communicationRequest -> communicationRequest.getValue().getRequestReply() == null))
             .map((this::getDlItemFromCommunicationRequest))
-            .collect(Collectors.toList());
+            .toList();
         ftaCommunicationFields.setFtaRequestNoResponseRadioDl(new DynamicList(null, dynamicListItems));
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
     }

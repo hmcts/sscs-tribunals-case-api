@@ -39,7 +39,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.TribunalCommunicationFilter;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 
-public class FtaCommunicationAboutToSubmitHandlerTest {
+class FtaCommunicationAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
     FtaCommunicationAboutToSubmitHandler handler;
