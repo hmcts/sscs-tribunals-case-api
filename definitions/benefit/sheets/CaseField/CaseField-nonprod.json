@@ -12,5 +12,6 @@
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "ID": "tribunalCommunicationFilter", "Label": "Tribunal Communication", "FieldType": "FixedList", "FieldTypeParameter": "FL_tribunalCommunicationFilter", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "ftaRequestNoResponseRadioDl", "Label": "FTA Requests", "FieldType": "DynamicList", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "ftaRequestNoResponseQuery", "Label": "FTA Request Query", "FieldType": "Text", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "ftaRequestNoResponseTextArea", "Label": "FTA Request Reply", "FieldType": "TextArea", "Max": "500", "SecurityClassification": "PUBLIC"}
+  {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "ftaRequestNoResponseTextArea", "Label": "FTA Request Reply", "FieldType": "TextArea", "Max": "500", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "ftaRequestNoResponseNoAction", "Label": " ", "FieldType": "MultiSelectList", "FieldTypeParameter": "FL_replyNoActionRequired", "SecurityClassification": "PUBLIC"}
 ]

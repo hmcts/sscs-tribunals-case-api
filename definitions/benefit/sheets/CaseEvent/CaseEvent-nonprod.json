@@ -23,7 +23,6 @@
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
     "EventEnablingCondition": "appeal.benefitType.code=\"infectedBloodCompensation\"",
-    "CallBackURLAboutToStartEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToStart",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent"
   }

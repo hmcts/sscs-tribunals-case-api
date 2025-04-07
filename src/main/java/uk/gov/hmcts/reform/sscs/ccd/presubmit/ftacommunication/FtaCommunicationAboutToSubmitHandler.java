@@ -122,12 +122,16 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
             .findFirst()
             .orElseThrow(() -> new IllegalStateException("No communication request found with id: " + chosenFtaRequestId));
         String replyText = ftaCommunicationFields.getFtaRequestNoResponseTextArea();
+        boolean noActionRequired = !ftaCommunicationFields.getFtaRequestNoResponseNoAction().isEmpty();
         CommunicationRequestReply reply = CommunicationRequestReply.builder()
             .replyDateTime(LocalDateTime.now())
             .replyUserName(idamService.getUserDetails(userAuthorisation).getName())
-            .replyMessage(replyText)
+            .replyMessage(noActionRequired ? "No action required" : replyText)
             .build();
         communicationRequest.getValue().setRequestReply(reply);
+        communicationRequest.getValue().setRequestResponseDueDate(null);
+        ftaCommunicationFields.setTribunalCommunicationFilter(null);
+        ftaCommunicationFields.setFtaCommunicationFilter(noActionRequired ? null : FtaCommunicationFilter.INFO_PROVIDED_FROM_TRIBUNAL);
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
     }
 
@@ -138,6 +142,7 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         communicationFields.setFtaRequestNoResponseQuery(null);
         communicationFields.setFtaRequestNoResponseTextArea(null);
         communicationFields.setFtaRequestNoResponseRadioDl(null);
+        communicationFields.setFtaRequestNoResponseNoAction(null);
         sscsCaseData.setCommunicationFields(communicationFields);
     }
 }

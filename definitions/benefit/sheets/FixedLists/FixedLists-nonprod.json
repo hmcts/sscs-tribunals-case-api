@@ -21,5 +21,7 @@
 
   {"LiveFrom": "13/03/2025", "ID": "FL_ftaCommunicationFilter", "ListElementCode": "provideInfoToTribunal", "ListElement": "Provide info to Tribunal"},
   {"LiveFrom": "13/03/2025", "ID": "FL_ftaCommunicationFilter", "ListElementCode": "awaitingInfoFromTribunal", "ListElement": "Awaiting info from Tribunal"},
-  {"LiveFrom": "13/03/2025", "ID": "FL_ftaCommunicationFilter", "ListElementCode": "infoProvidedFromTribunal", "ListElement": "Info Provided from Tribunal"}
+  {"LiveFrom": "13/03/2025", "ID": "FL_ftaCommunicationFilter", "ListElementCode": "infoProvidedFromTribunal", "ListElement": "Info Provided from Tribunal"},
+
+  {"LiveFrom": "13/03/2025", "ID": "FL_replyNoActionRequired", "ListElementCode": "noActionRequired", "ListElement": "No action required"}
 ]

@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,8 +33,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final boolean isFtaCommunicationEnabled;
-    private final String SELECT_FTA_COMMUNICATION_ACTION_ID = "selectFtaCommunicationAction";
-    private final String SELECT_FTA_REQUEST_ID = "selectFtaRequest";
 
     @Autowired
     public FtaCommunicationMidEventHandler(@Value("${feature.fta-communication.enabled}") boolean isFtaCommunicationEnabled) {
@@ -57,21 +58,34 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
 
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
-        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitErrorCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
         if (!isFtaCommunicationEnabled) {
-            return preSubmitCallbackResponse;
+            return preSubmitErrorCallbackResponse;
         }
 
         FtaCommunicationFields ftaCommunicationFields = Optional.ofNullable(sscsCaseData.getCommunicationFields())
             .orElse(FtaCommunicationFields.builder().build());
 
-        if (callback.getPageId().equals(SELECT_FTA_COMMUNICATION_ACTION_ID)) {
-            handleFtaRequestTypeErrors(preSubmitCallbackResponse, ftaCommunicationFields);
-        } else if (callback.getPageId().equals(SELECT_FTA_REQUEST_ID)) {
+        if (callback.getPageId().equals("selectFtaCommunicationAction")) {
+            if (ftaCommunicationFields.getFtaRequestType().equals(FtaRequestType.REPLY_TO_FTA_QUERY)) {
+                setFtaCommunicationsDynamicList(ftaCommunicationFields, sscsCaseData);
+                handleReplyToFtaQueryError(preSubmitErrorCallbackResponse, ftaCommunicationFields);
+            }
+        } else if (callback.getPageId().equals("selectFtaRequest")) {
             setQueryForReply(sscsCaseData, ftaCommunicationFields);
+        } else if (callback.getPageId().equals("replyToFtaQuery")) {
+            String textValue = ftaCommunicationFields.getFtaRequestNoResponseTextArea();
+            List<String> noAction = ftaCommunicationFields.getFtaRequestNoResponseNoAction();
+            if (isEmpty(textValue) && noAction.isEmpty()) {
+                preSubmitErrorCallbackResponse.addError("Please provide a response to the FTA query or select No action required.");
+            }
         }
 
-        return preSubmitCallbackResponse;
+        if (!preSubmitErrorCallbackResponse.getErrors().isEmpty()) {
+            return preSubmitErrorCallbackResponse;
+        }
+
+        return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
     private void setQueryForReply(SscsCaseData sscsCaseData, FtaCommunicationFields ftaCommunicationFields) {
@@ -88,13 +102,30 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
     }
 
-    private void handleFtaRequestTypeErrors(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
+    private void handleReplyToFtaQueryError(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
                                             FtaCommunicationFields ftaCommunicationFields) {
-        if (FtaRequestType.REPLY_TO_FTA_QUERY.equals(ftaCommunicationFields.getFtaRequestType())) {
-            if (ftaCommunicationFields.getFtaRequestNoResponseRadioDl() == null
-                || ftaCommunicationFields.getFtaRequestNoResponseRadioDl().getListItems().isEmpty()) {
-                preSubmitCallbackResponse.addError("There are no requests to reply to. Please select a different communication type.");
-            }
+        if (ftaCommunicationFields.getFtaRequestNoResponseRadioDl() == null
+            || ftaCommunicationFields.getFtaRequestNoResponseRadioDl().getListItems().isEmpty()) {
+            preSubmitCallbackResponse.addError("There are no requests to reply to. Please select a different communication type.");
         }
+    }
+
+
+    private DynamicListItem getDlItemFromCommunicationRequest(CommunicationRequest communicationRequest) {
+        return new DynamicListItem(communicationRequest.getId(),
+            communicationRequest.getValue().getRequestTopic().getValue() + " - "
+                + communicationRequest.getValue().getRequestDateTime()
+                .format(DateTimeFormatter.ofPattern("dd MMMM yyyy, HH:mm")) + " - "
+                + communicationRequest.getValue().getRequestUserName());
+    }
+
+    private void setFtaCommunicationsDynamicList(FtaCommunicationFields ftaCommunicationFields, SscsCaseData sscsCaseData) {
+        List<CommunicationRequest> ftaCommunicationRequests = ftaCommunicationFields.getFtaCommunications();
+        List<DynamicListItem> dynamicListItems = ftaCommunicationRequests.stream()
+            .filter((communicationRequest -> communicationRequest.getValue().getRequestReply() == null))
+            .map((this::getDlItemFromCommunicationRequest))
+            .collect(Collectors.toList());
+        ftaCommunicationFields.setFtaRequestNoResponseRadioDl(new DynamicList(null, dynamicListItems));
+        sscsCaseData.setCommunicationFields(ftaCommunicationFields);
     }
 }

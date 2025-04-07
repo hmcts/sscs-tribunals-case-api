@@ -133,16 +133,27 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "replyToFtaQuery",
     "PageShowCondition": "ftaRequestType=\"replyToFtaQuery\"",
-    "PageLabel": "Write a reply to FTA Query"
+    "PageLabel": "Write a reply to FTA Query",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=replyToFtaQuery"
   },
   {
     "CaseEventID": "ftaCommunication",
     "CaseFieldID": "ftaRequestNoResponseTextArea",
     "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
+    "DisplayContext": "OPTIONAL",
     "LiveFrom": "13/03/2025",
     "PageDisplayOrder": 4,
     "PageFieldDisplayOrder": 2,
+    "PageID": "replyToFtaQuery"
+  },
+  {
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "ftaRequestNoResponseNoAction",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 3,
     "PageID": "replyToFtaQuery"
   }
 ]
