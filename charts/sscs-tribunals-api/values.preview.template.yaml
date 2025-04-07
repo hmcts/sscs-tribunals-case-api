@@ -196,6 +196,14 @@ em-ccdorc:
       CALLBACK_HTTP_SCHEME: https
       CALLBACK_DOMAIN: em-ccdorc-${SERVICE_FQDN}
       LOGGING_LEVEL_UK_GOV_HMCTS_REFORM_EM: DEBUG
+    keyVaults:
+      em-ccdorc:
+        resourceGroup: em-ccdorc
+        secrets:
+          - name: microservicekey-em-ccd-orchestrator
+            alias: S2S_KEY
+          - name: notification-api-key
+            alias: NOTIFICATION_API_KEY
 
 em-stitching:
   enabled: ${PREVIEW_BRANCH_WITH_LOCAL_CCD}
@@ -223,6 +231,14 @@ em-stitching:
         secretRef: postgres
         key: PASSWORD
         disabled: false
+    keyVaults:
+      em-stitching:
+        resourceGroup: em-stitching
+        secrets:
+          - name: docmosis-access-key
+            alias: DOCMOSIS_ACCESS_KEY
+          - name: microservicekey-em-stitching-api
+            alias: S2S_KEY
 
 ccd-case-document-am-api:
   enabled: ${PREVIEW_BRANCH_WITH_LOCAL_CCD}
