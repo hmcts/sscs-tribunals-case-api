@@ -1,12 +1,14 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 
@@ -26,6 +28,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequestDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequestTopic;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationFilter;
@@ -71,9 +75,25 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void throwsExceptionIfItCannotHandleTheAppeal() {
+    public void givenAnInvalidAboutToSubmitEvent_thenReturnFalse() {
+        when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
+        assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
+    }
+
+    @Test
+    public void givenAValidAboutToStartEvent_thenReturnFalse() {
+        assertFalse(handler.canHandle(ABOUT_TO_START, callback));
+    }
+
+    @Test
+    public void throwsExceptionIfItCannotHandleEvent() {
         when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
         assertThrows(IllegalStateException.class, () -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION));
+    }
+
+    @Test
+    public void throwsExceptionIfItCannotHandleCallbackType() {
+        assertThrows(IllegalStateException.class, () -> handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION));
     }
 
     @Test
@@ -239,6 +259,125 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
         assertEquals(TribunalCommunicationFilter.AWAITING_INFO_FROM_FTA, response.getData().getCommunicationFields().getTribunalCommunicationFilter());
     }
 
+    @Test
+    void shouldHandleReplyToFtaQueryWithReplyText() {
+        String chosenFtaRequestId = "1";
+        String replyText = "Reply text";
+        String userName = "Test User";
+
+        CommunicationRequest communicationRequest = CommunicationRequest.builder()
+            .id(chosenFtaRequestId)
+            .value(CommunicationRequestDetails.builder().build())
+            .build();
+        DynamicListItem chosenFtaRequest = new DynamicListItem(chosenFtaRequestId, "item");
+        DynamicList ftaRequestNoResponseRadioDl = new DynamicList(chosenFtaRequest, Collections.singletonList(chosenFtaRequest));
+        FtaCommunicationFields ftaCommunicationFields = FtaCommunicationFields.builder()
+            .ftaRequestNoResponseRadioDl(ftaRequestNoResponseRadioDl)
+            .ftaCommunications(List.of(communicationRequest))
+            .ftaRequestNoResponseTextArea(replyText)
+            .ftaRequestNoResponseNoAction(Collections.emptyList())
+            .ftaRequestType(FtaRequestType.REPLY_TO_FTA_QUERY)
+            .build();
+        sscsCaseData.setCommunicationFields(ftaCommunicationFields);
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().name(userName).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        FtaCommunicationFields fields = response.getData().getCommunicationFields();
+
+        CommunicationRequestDetails request = fields.getFtaCommunications().getFirst().getValue();
+        assertNotNull(request.getRequestReply());
+        assertEquals(replyText, request.getRequestReply().getReplyMessage());
+        assertEquals(userName, request.getRequestReply().getReplyUserName());
+        assertNotNull(request.getRequestReply().getReplyDateTime());
+        assertNull(request.getRequestResponseDueDate());
+        assertEquals(FtaCommunicationFilter.INFO_PROVIDED_FROM_TRIBUNAL, fields.getFtaCommunicationFilter());
+        assertNull(fields.getTribunalCommunicationFilter());
+    }
+
+    @Test
+    void shouldHandleReplyToFtaQueryWithNoActionRequired() {
+        String chosenFtaRequestId = "1";
+        String userName = "Test User";
+
+        CommunicationRequest communicationRequest = CommunicationRequest.builder()
+            .id(chosenFtaRequestId)
+            .value(CommunicationRequestDetails.builder().build())
+            .build();
+
+        DynamicListItem chosenFtaRequest = new DynamicListItem(chosenFtaRequestId, "item");
+        DynamicList ftaRequestNoResponseRadioDl = new DynamicList(chosenFtaRequest, Collections.singletonList(chosenFtaRequest));
+        FtaCommunicationFields ftaCommunicationFields = FtaCommunicationFields.builder()
+            .ftaRequestNoResponseRadioDl(ftaRequestNoResponseRadioDl)
+            .ftaCommunications(List.of(communicationRequest))
+            .ftaRequestNoResponseNoAction(Collections.singletonList("No action required"))
+            .ftaRequestType(FtaRequestType.REPLY_TO_FTA_QUERY)
+            .build();
+        sscsCaseData.setCommunicationFields(ftaCommunicationFields);
+
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().name(userName).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        FtaCommunicationFields fields = response.getData().getCommunicationFields();
+
+        CommunicationRequestDetails request = fields.getFtaCommunications().getFirst().getValue();
+        assertNotNull(request.getRequestReply());
+        assertEquals("No action required", request.getRequestReply().getReplyMessage());
+        assertEquals(userName, request.getRequestReply().getReplyUserName());
+        assertNotNull(request.getRequestReply().getReplyDateTime());
+        assertNull(communicationRequest.getValue().getRequestResponseDueDate());
+        assertNull(fields.getFtaCommunicationFilter());
+        assertNull(fields.getTribunalCommunicationFilter());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenNoCommunicationRequestFound() {
+        String chosenFtaRequestId = "1";
+
+        DynamicListItem chosenFtaRequest = new DynamicListItem(chosenFtaRequestId, "item");
+        DynamicList ftaRequestNoResponseRadioDl = new DynamicList(chosenFtaRequest, Collections.singletonList(chosenFtaRequest));
+        FtaCommunicationFields ftaCommunicationFields = FtaCommunicationFields.builder()
+            .ftaRequestNoResponseRadioDl(ftaRequestNoResponseRadioDl)
+            .ftaCommunications(Collections.emptyList())
+            .ftaRequestNoResponseNoAction(Collections.singletonList("No action required"))
+            .ftaRequestType(FtaRequestType.REPLY_TO_FTA_QUERY)
+            .build();
+        sscsCaseData.setCommunicationFields(ftaCommunicationFields);
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () ->
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION)
+        );
+
+        assertEquals("No communication request found with id: " + chosenFtaRequestId, exception.getMessage());
+    }
+
+    @Test
+    public void shouldClearFieldsAtEndOfEvent() {
+        DynamicListItem dynamicListItem = new DynamicListItem("1", "item");
+        FtaCommunicationFields fields = FtaCommunicationFields.builder()
+            .ftaRequestQuestion("question")
+            .ftaRequestTopic(CommunicationRequestTopic.MRN_REVIEW_DECISION_NOTICE_DETAILS)
+            .ftaRequestNoResponseQuery("query")
+            .ftaRequestNoResponseTextArea("textarea")
+            .ftaRequestNoResponseRadioDl(new DynamicList(dynamicListItem, Collections.singletonList(dynamicListItem)))
+            .ftaRequestNoResponseNoAction(Collections.singletonList("something"))
+            .build();
+        sscsCaseData.setCommunicationFields(fields);
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        FtaCommunicationFields ftaCommunicationFields = response.getData().getCommunicationFields();
+        assertNull(ftaCommunicationFields.getFtaRequestQuestion());
+        assertNull(ftaCommunicationFields.getFtaRequestTopic());
+        assertNull(ftaCommunicationFields.getFtaRequestType());
+        assertNull(ftaCommunicationFields.getFtaRequestNoResponseQuery());
+        assertNull(ftaCommunicationFields.getFtaRequestNoResponseTextArea());
+        assertNull(ftaCommunicationFields.getFtaRequestNoResponseRadioDl());
+        assertNull(ftaCommunicationFields.getFtaRequestNoResponseNoAction());
+    }
+
     @ParameterizedTest
     @MethodSource(value = {"dueDateParameters"})
     public void calculateDueDate_shouldAdjustForWeekends(LocalDate inputDate, LocalDate expectedDueDate) {
@@ -250,39 +389,39 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
 
     @SuppressWarnings("unused")
     private static Object[] dueDateParameters() {
-        return new Object[] {
+        return new Object[]{
             // Normal weekday -> Weekday (2 days later)
-            new Object[] {
+            new Object[]{
                 LocalDate.of(2023, 6, 5), // Monday
                 LocalDate.of(2023, 6, 7)  // Wednesday (2 days later)
             },
             // Normal weekday -> Weekday (2 days later)
-            new Object[] {
+            new Object[]{
                 LocalDate.of(2023, 6, 6), // Tuesday
                 LocalDate.of(2023, 6, 8)  // Thursday (2 days later)
             },
             // Normal weekday -> Weekday (2 days later)
-            new Object[] {
+            new Object[]{
                 LocalDate.of(2023, 6, 7), // Wednesday
                 LocalDate.of(2023, 6, 9)  // Friday (2 days later)
             },
             // Thursday -> Add 2 days = Saturday, should be moved to Monday (4 days later)
-            new Object[] {
+            new Object[]{
                 LocalDate.of(2023, 6, 8), // Thursday
                 LocalDate.of(2023, 6, 12) // Monday (4 days later)
             },
             // Friday -> Add 2 days = Sunday, should be moved to Monday (3 days later)
-            new Object[] {
+            new Object[]{
                 LocalDate.of(2023, 6, 9), // Friday
                 LocalDate.of(2023, 6, 12) // Monday (3 days later)
             },
             // Saturday -> Add 2 days = Monday (normal)
-            new Object[] {
+            new Object[]{
                 LocalDate.of(2023, 6, 10), // Saturday
                 LocalDate.of(2023, 6, 12)  // Monday (2 days later)
             },
             // Sunday -> Add 2 days = Tuesday (normal)
-            new Object[] {
+            new Object[]{
                 LocalDate.of(2023, 6, 11), // Sunday
                 LocalDate.of(2023, 6, 13)  // Tuesday (2 days later)
             }

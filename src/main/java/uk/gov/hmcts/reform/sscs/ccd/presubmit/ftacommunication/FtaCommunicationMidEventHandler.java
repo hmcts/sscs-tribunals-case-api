@@ -1,15 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequest;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequestDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -76,7 +75,7 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
         } else if (callback.getPageId().equals("replyToFtaQuery")) {
             String textValue = ftaCommunicationFields.getFtaRequestNoResponseTextArea();
             List<String> noAction = ftaCommunicationFields.getFtaRequestNoResponseNoAction();
-            if (isEmpty(textValue) && noAction.isEmpty()) {
+            if (StringUtils.isEmpty(textValue) && ObjectUtils.isEmpty(noAction)) {
                 preSubmitErrorCallbackResponse.addError("Please provide a response to the FTA query or select No action required.");
             }
         }
@@ -110,7 +109,6 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
         }
     }
 
-
     private DynamicListItem getDlItemFromCommunicationRequest(CommunicationRequest communicationRequest) {
         return new DynamicListItem(communicationRequest.getId(),
             communicationRequest.getValue().getRequestTopic().getValue() + " - "
@@ -120,7 +118,8 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
     }
 
     private void setFtaCommunicationsDynamicList(FtaCommunicationFields ftaCommunicationFields, SscsCaseData sscsCaseData) {
-        List<CommunicationRequest> ftaCommunicationRequests = ftaCommunicationFields.getFtaCommunications();
+        List<CommunicationRequest> ftaCommunicationRequests = Optional.ofNullable(ftaCommunicationFields.getFtaCommunications())
+            .orElse(Collections.emptyList());
         List<DynamicListItem> dynamicListItems = ftaCommunicationRequests.stream()
             .filter((communicationRequest -> communicationRequest.getValue().getRequestReply() == null))
             .map((this::getDlItemFromCommunicationRequest))

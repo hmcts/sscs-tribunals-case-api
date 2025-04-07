@@ -5,10 +5,12 @@ import static java.util.Objects.requireNonNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -116,13 +118,14 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         DynamicList ftaRequestDl = ftaCommunicationFields.getFtaRequestNoResponseRadioDl();
         DynamicListItem chosenFtaRequest = ftaRequestDl.getValue();
         String chosenFtaRequestId = chosenFtaRequest.getCode();
-        CommunicationRequest communicationRequest = ftaCommunicationFields.getFtaCommunications()
+        CommunicationRequest communicationRequest = Optional.ofNullable(ftaCommunicationFields.getFtaCommunications())
+            .orElse(Collections.emptyList())
             .stream()
             .filter(communicationRequest1 -> communicationRequest1.getId().equals(chosenFtaRequestId))
             .findFirst()
             .orElseThrow(() -> new IllegalStateException("No communication request found with id: " + chosenFtaRequestId));
         String replyText = ftaCommunicationFields.getFtaRequestNoResponseTextArea();
-        boolean noActionRequired = !ftaCommunicationFields.getFtaRequestNoResponseNoAction().isEmpty();
+        boolean noActionRequired = !ObjectUtils.isEmpty(ftaCommunicationFields.getFtaRequestNoResponseNoAction());
         CommunicationRequestReply reply = CommunicationRequestReply.builder()
             .replyDateTime(LocalDateTime.now())
             .replyUserName(idamService.getUserDetails(userAuthorisation).getName())
