@@ -27,8 +27,8 @@ spring:
     datasource:
         driverClassName: org.postgresql.Driver
         url: jdbc:postgresql://${JOB_SCHEDULER_DB_HOST:localhost}:${JOB_SCHEDULER_DB_PORT:5432}/${JOB_SCHEDULER_DB_NAME:sscsjobscheduler}${JOB_SCHEDULER_DB_CONNECTION_OPTIONS:}
-        username: ${JOB_SCHEDULER_DB_USERNAME:sscsjobscheduler}
-        password: ${JOB_SCHEDULER_DB_PASSWORD:sscsjobscheduler}
+        username: ${JOB_SCHEDULER_DB_USERNAME:postgres}
+        password: ${JOB_SCHEDULER_DB_PASSWORD:postgres}
         properties:
             charSet: UTF-8
         tomcat:
@@ -47,8 +47,6 @@ spring:
             remove-abandoned-timeout: 60
             log-abandoned: true
             abandon-when-percentage-full: 0
-
-spring.main.allow-bean-definition-overriding: true  # https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.1-Release-Notes#bean-overriding
 
 springdoc:
     packagesToScan: uk.gov.hmcts.reform.sscs.controller
