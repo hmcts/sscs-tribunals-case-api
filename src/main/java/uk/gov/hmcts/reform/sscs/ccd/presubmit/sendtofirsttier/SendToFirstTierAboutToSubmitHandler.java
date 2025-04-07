@@ -61,6 +61,7 @@ public class SendToFirstTierAboutToSubmitHandler implements PreSubmitCallbackHan
                 SscsUtil.addPanelMembersToExclusions(caseData, false);
                 caseData.setState(State.NOT_LISTABLE);
             } else {
+                SscsUtil.setHearingRouteIfNotSet(caseData);
                 caseData.setState(State.DORMANT_APPEAL_STATE);
             }
         }
