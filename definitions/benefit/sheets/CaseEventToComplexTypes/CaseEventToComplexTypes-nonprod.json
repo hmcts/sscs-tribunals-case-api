@@ -23,22 +23,11 @@
   {
     "CaseEventID": "updateListingRequirements",
     "CaseFieldID": "panelMemberComposition",
-    "ListElementCode": "panelCompositionMemberMedical2",
-    "ID": "updateListingRequirementsPanelCompositionMemberMedical2",
-    "FieldShowCondition": "panelMemberComposition.panelCompositionMemberMedical2 != \"\"",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/04/2025",
-    "FieldDisplayOrder": 15,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "panelMemberComposition",
     "ListElementCode": "panelCompositionDisabilityAndFqMember",
     "ID": "updateListingRequirementsPanelCompositionDisabilityAndFqMember",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/04/2025",
-    "FieldDisplayOrder": 16,
+    "FieldDisplayOrder": 15,
     "PageID": "1.0"
   }
 ]

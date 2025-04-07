@@ -216,7 +216,7 @@
     "ID": "updateListingRequirementsArePanelMembersExclusions",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/02/2023",
-    "FieldDisplayOrder": 17,
+    "FieldDisplayOrder": 16,
     "PageID": "1.0"
   },
   {
@@ -227,7 +227,7 @@
     "DisplayContext": "OPTIONAL",
     "FieldShowCondition": "panelMemberExclusions.arePanelMembersExcluded = \"Yes\"",
     "LiveFrom": "01/02/2023",
-    "FieldDisplayOrder": 18,
+    "FieldDisplayOrder": 17,
     "PageID": "1.0"
   },
   {
@@ -237,7 +237,7 @@
     "ID": "updateListingRequirementsArePanelMembersReserved",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/02/2023",
-    "FieldDisplayOrder": 19,
+    "FieldDisplayOrder": 18,
     "PageID": "1.0"
   },
   {
@@ -248,7 +248,7 @@
     "DisplayContext": "OPTIONAL",
     "FieldShowCondition": "panelMemberExclusions.arePanelMembersReserved = \"Yes\"",
     "LiveFrom": "01/05/2023",
-    "FieldDisplayOrder": 20,
+    "FieldDisplayOrder": 19,
     "PageID": "1.0"
   },
   {
