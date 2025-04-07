@@ -53,7 +53,7 @@ public class FtaCommunicationMidEventHandlerTest {
 
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         openMocks(this);
 
         handler = new FtaCommunicationMidEventHandler(true);
@@ -66,29 +66,29 @@ public class FtaCommunicationMidEventHandlerTest {
     }
 
     @Test
-    public void givenAValidEventMidEvent_thenReturnTrue() {
+    void givenAValidEventMidEvent_thenReturnTrue() {
         assertTrue(handler.canHandle(MID_EVENT, callback));
     }
 
     @Test
-    public void givenAnInvalidEventMidEvent_thenReturnFalse() {
+    void givenAnInvalidEventMidEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
         assertFalse(handler.canHandle(MID_EVENT, callback));
     }
 
     @Test
-    public void givenAValidEventAboutToStart_thenReturnFalse() {
+    void givenAValidEventAboutToStart_thenReturnFalse() {
         assertFalse(handler.canHandle(ABOUT_TO_START, callback));
     }
 
     @Test
-    public void throwsExceptionIfItCannotHandle() {
+    void throwsExceptionIfItCannotHandle() {
         when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
         assertThrows(IllegalStateException.class, () -> handler.handle(MID_EVENT, callback, USER_AUTHORISATION));
     }
 
     @Test
-    public void shouldNotPopulateDl_whenReplyToQueryNotChosen() {
+    void shouldNotPopulateDl_whenReplyToQueryNotChosen() {
         when(callback.getPageId()).thenReturn("selectFtaCommunicationAction");
 
         CommunicationRequest ftaCommunication1 = buildCommRequest("some message", "some user", -2, -1);
@@ -110,7 +110,7 @@ public class FtaCommunicationMidEventHandlerTest {
     }
 
     @Test
-    public void shouldPopulateDl_whenReplyToQueryChosen() {
+    void shouldPopulateDl_whenReplyToQueryChosen() {
         when(callback.getPageId()).thenReturn("selectFtaCommunicationAction");
 
         CommunicationRequest ftaCommunication1 = buildCommRequest("some message", "some user", -2, -1);
@@ -134,7 +134,7 @@ public class FtaCommunicationMidEventHandlerTest {
     }
 
     @Test
-    public void shouldIgnoreRepliedToInDl_whenReplyToQueryChosen() {
+    void shouldIgnoreRepliedToInDl_whenReplyToQueryChosen() {
         when(callback.getPageId()).thenReturn("selectFtaCommunicationAction");
 
         CommunicationRequest ftaCommunication1 = buildCommRequest("some message", "some user", -2, -1);
@@ -162,7 +162,7 @@ public class FtaCommunicationMidEventHandlerTest {
     }
 
     @Test
-    public void shouldErrorOnNoRequests_whenReplyToQueryChosen() {
+    void shouldErrorOnNoRequests_whenReplyToQueryChosen() {
         when(callback.getPageId()).thenReturn("selectFtaCommunicationAction");
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
@@ -184,7 +184,7 @@ public class FtaCommunicationMidEventHandlerTest {
 
 
     @Test
-    public void shouldErrorOnNullRequests_whenReplyToQueryChosen() {
+    void shouldErrorOnNullRequests_whenReplyToQueryChosen() {
         when(callback.getPageId()).thenReturn("selectFtaCommunicationAction");
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
@@ -204,7 +204,7 @@ public class FtaCommunicationMidEventHandlerTest {
     }
 
     @Test
-    public void shouldSetQueryForReply_whenSelectFtaRequest() {
+    void shouldSetQueryForReply_whenSelectFtaRequest() {
         when(callback.getPageId()).thenReturn("selectFtaRequest");
 
         CommunicationRequest ftaCommunication1 = buildCommRequest("some message", "some user", -2, -1);
@@ -228,7 +228,7 @@ public class FtaCommunicationMidEventHandlerTest {
     }
 
     @Test
-    public void shouldThrowIfNoDlItemChosen_whenSelectFtaRequest() {
+    void shouldThrowIfNoDlItemChosen_whenSelectFtaRequest() {
         when(callback.getPageId()).thenReturn("selectFtaRequest");
 
         CommunicationRequest ftaCommunication1 = buildCommRequest("some message", "some user", -2, -1);
@@ -248,7 +248,7 @@ public class FtaCommunicationMidEventHandlerTest {
     }
 
     @Test
-    public void shouldThrowIfDlChosenDoesNotExist_whenSelectFtaRequest() {
+    void shouldThrowIfDlChosenDoesNotExist_whenSelectFtaRequest() {
         when(callback.getPageId()).thenReturn("selectFtaRequest");
 
         CommunicationRequest ftaCommunication1 = buildCommRequest("some message", "some user", -2, -1);
@@ -269,7 +269,7 @@ public class FtaCommunicationMidEventHandlerTest {
     }
 
     @Test
-    public void shouldErrorEmptyResponseAndNoActionNotSelected_whenReplyToFtaQuery() {
+    void shouldErrorEmptyResponseAndNoActionNotSelected_whenReplyToFtaQuery() {
         when(callback.getPageId()).thenReturn("replyToFtaQuery");
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
@@ -286,7 +286,7 @@ public class FtaCommunicationMidEventHandlerTest {
     }
 
     @Test
-    public void shouldErrorNullResponseAndNullNoAction_whenReplyToFtaQuery() {
+    void shouldErrorNullResponseAndNullNoAction_whenReplyToFtaQuery() {
         when(callback.getPageId()).thenReturn("replyToFtaQuery");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -297,7 +297,7 @@ public class FtaCommunicationMidEventHandlerTest {
     }
 
     @Test
-    public void shouldNotErrorWithResponseAndOrNoActionSelected_whenReplyToFtaQuery() {
+    void shouldNotErrorWithResponseAndOrNoActionSelected_whenReplyToFtaQuery() {
         when(callback.getPageId()).thenReturn("replyToFtaQuery");
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
@@ -313,7 +313,7 @@ public class FtaCommunicationMidEventHandlerTest {
     }
 
     @Test
-    public void shouldDoNothing_whenFlagOff() {
+    void shouldDoNothing_whenFlagOff() {
         handler = new FtaCommunicationMidEventHandler(false);
         CommunicationRequest ftaCommunication1 = buildCommRequest("some message", "some user", -2, -1);
         CommunicationRequest ftaCommunication2 = buildCommRequest("a message", "a user", 1, 2);

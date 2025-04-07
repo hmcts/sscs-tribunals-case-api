@@ -57,7 +57,7 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
 
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         openMocks(this);
 
         handler = new FtaCommunicationAboutToSubmitHandler(idamService, true);
@@ -70,34 +70,34 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAValidAboutToSubmitEvent_thenReturnTrue() {
+    void givenAValidAboutToSubmitEvent_thenReturnTrue() {
         assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
     @Test
-    public void givenAnInvalidAboutToSubmitEvent_thenReturnFalse() {
+    void givenAnInvalidAboutToSubmitEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
         assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
     @Test
-    public void givenAValidAboutToStartEvent_thenReturnFalse() {
+    void givenAValidAboutToStartEvent_thenReturnFalse() {
         assertFalse(handler.canHandle(ABOUT_TO_START, callback));
     }
 
     @Test
-    public void throwsExceptionIfItCannotHandleEvent() {
+    void throwsExceptionIfItCannotHandleEvent() {
         when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
         assertThrows(IllegalStateException.class, () -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION));
     }
 
     @Test
-    public void throwsExceptionIfItCannotHandleCallbackType() {
+    void throwsExceptionIfItCannotHandleCallbackType() {
         assertThrows(IllegalStateException.class, () -> handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION));
     }
 
     @Test
-    public void givenValidFtaRequest_shouldAddNewCommunicationToList() {
+    void givenValidFtaRequest_shouldAddNewCommunicationToList() {
         // Setup FTA communication fields
         CommunicationRequestTopic expectedTopic = CommunicationRequestTopic.APPEAL_TYPE;
         String expectedQuestion = "Test Question";
@@ -141,7 +141,7 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenFlagOff_shouldDoNothing() {
+    void givenFlagOff_shouldDoNothing() {
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
             .ftaRequestTopic(CommunicationRequestTopic.APPEAL_TYPE)
             .ftaRequestQuestion("someQuestion")
@@ -160,7 +160,7 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenValidFtaRequest_shouldAddNewCommunicationToPopulatedList() {
+    void givenValidFtaRequest_shouldAddNewCommunicationToPopulatedList() {
         // Setup FTA communication fields
         CommunicationRequestTopic expectedTopic = CommunicationRequestTopic.APPEAL_TYPE;
         String expectedQuestion = "Test Question";
@@ -224,7 +224,7 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenNullCommunicationsList_shouldHandleGracefully() {
+    void givenNullCommunicationsList_shouldHandleGracefully() {
         // Setup FTA communication fields with null communications list
         CommunicationRequestTopic expectedTopic = CommunicationRequestTopic.APPEAL_TYPE;
         String expectedQuestion = "Test Question";
@@ -355,7 +355,7 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void shouldClearFieldsAtEndOfEvent() {
+    void shouldClearFieldsAtEndOfEvent() {
         DynamicListItem dynamicListItem = new DynamicListItem("1", "item");
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
             .ftaRequestQuestion("question")
@@ -380,7 +380,7 @@ public class FtaCommunicationAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @MethodSource(value = {"dueDateParameters"})
-    public void calculateDueDate_shouldAdjustForWeekends(LocalDate inputDate, LocalDate expectedDueDate) {
+    void calculateDueDate_shouldAdjustForWeekends(LocalDate inputDate, LocalDate expectedDueDate) {
 
         LocalDate actualDueDate = FtaCommunicationAboutToSubmitHandler.calculateDueDate(inputDate);
 
