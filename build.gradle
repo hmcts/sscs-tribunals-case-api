@@ -7,7 +7,7 @@ plugins {
     id 'uk.gov.hmcts.java' version '0.12.65'
     id 'com.gorylenko.gradle-git-properties' version '2.5.0'
     id 'com.github.ben-manes.versions' version '0.52.0'
-    id 'org.owasp.dependencycheck' version '12.1.0'
+    id 'org.owasp.dependencycheck' version '12.1.1'
     id 'au.com.dius.pact' version '4.6.17'
     id 'com.github.hmcts.rse-cft-lib' version '0.19.1618'
 }
@@ -433,8 +433,8 @@ dependencies {
 
     testImplementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5-fluent', version: '5.4.3'
 
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.16.1'
-    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.16.1'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.17.0'
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.17.0'
     testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '4.1.0'
     testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-assertj', version: '4.1.0'
 
