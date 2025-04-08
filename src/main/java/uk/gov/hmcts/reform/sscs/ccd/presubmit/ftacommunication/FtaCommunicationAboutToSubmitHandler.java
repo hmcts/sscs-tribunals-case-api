@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.calculateDueDateWorkingDays;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,17 +81,9 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    public static LocalDate calculateDueDate(LocalDate now) {
-        return Stream.iterate(now.plusDays(1), d -> d.plusDays(1))
-            .filter(d -> !(d.getDayOfWeek() == DayOfWeek.SATURDAY || d.getDayOfWeek() == DayOfWeek.SUNDAY))
-            .limit(2)
-            .reduce((first, second) -> second)
-            .orElse(now);
-    }
-
     public static void addCommunicationRequest(List<CommunicationRequest> comms, CommunicationRequestTopic topic, String question, UserDetails userDetails) {
         LocalDateTime now = LocalDateTime.now();
-        LocalDate dueDate = calculateDueDate(now.toLocalDate());
+        LocalDate dueDate = calculateDueDateWorkingDays(now.toLocalDate(), 2);
         comms.add(CommunicationRequest.builder()
             .value(CommunicationRequestDetails.builder()
                 .requestMessage(question)

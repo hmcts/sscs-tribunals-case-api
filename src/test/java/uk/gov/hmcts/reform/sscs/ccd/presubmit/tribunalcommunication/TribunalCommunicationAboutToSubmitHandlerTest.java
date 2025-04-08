@@ -11,6 +11,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.calculateDueDateWorkingDays;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,7 +23,6 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication.FtaCommunicationAboutToSubmitHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 
@@ -116,7 +116,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         assertEquals(expectedUserName, addedCom.getRequestUserName());
         assertNotNull(addedCom.getRequestDateTime());
         assertNotNull(addedCom.getRequestResponseDueDate());
-        LocalDate date = FtaCommunicationAboutToSubmitHandler.calculateDueDate(LocalDate.now());
+        LocalDate date = calculateDueDateWorkingDays(LocalDate.now(), 2);
         assertEquals(date, addedCom.getRequestResponseDueDate());
         assertEquals(date, response.getData().getCommunicationFields().getTribunalResponseDueDate());
         // Verify the enum values are correctly set

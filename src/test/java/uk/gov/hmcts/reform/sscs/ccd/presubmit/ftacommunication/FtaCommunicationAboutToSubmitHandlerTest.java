@@ -11,6 +11,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.calculateDueDateWorkingDays;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -19,8 +20,6 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -133,7 +132,9 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertEquals(expectedQuestion, addedCom.getRequestMessage());
         assertEquals(expectedUserName, addedCom.getRequestUserName());
         assertNotNull(addedCom.getRequestDateTime());
-
+        LocalDate date = calculateDueDateWorkingDays(LocalDate.now(), 2);
+        assertEquals(date, addedCom.getRequestResponseDueDate());
+        assertEquals(date, response.getData().getCommunicationFields().getTribunalResponseDueDate());
         // Verify the enum values are correctly set
         assertNull(response.getData().getCommunicationFields().getInfoRequestFromFta());
         assertEquals(YesNo.YES, response.getData().getCommunicationFields().getAwaitingInfoFromFta());
@@ -463,55 +464,5 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertNull(ftaCommunicationFields.getFtaRequestNoResponseTextArea());
         assertNull(ftaCommunicationFields.getFtaRequestNoResponseRadioDl());
         assertNull(ftaCommunicationFields.getFtaRequestNoResponseNoAction());
-    }
-
-    @ParameterizedTest
-    @MethodSource(value = {"dueDateParameters"})
-    void calculateDueDate_shouldAdjustForWeekends(LocalDate inputDate, LocalDate expectedDueDate) {
-
-        LocalDate actualDueDate = FtaCommunicationAboutToSubmitHandler.calculateDueDate(inputDate);
-
-        assertEquals(expectedDueDate, actualDueDate);
-    }
-
-    @SuppressWarnings("unused")
-    private static Object[] dueDateParameters() {
-        return new Object[]{
-            // Normal weekday -> Weekday (2 days later)
-            new Object[]{
-                LocalDate.of(2023, 6, 5), // Monday
-                LocalDate.of(2023, 6, 7)  // Wednesday (2 days later)
-            },
-            // Normal weekday -> Weekday (2 days later)
-            new Object[]{
-                LocalDate.of(2023, 6, 6), // Tuesday
-                LocalDate.of(2023, 6, 8)  // Thursday (2 days later)
-            },
-            // Normal weekday -> Weekday (2 days later)
-            new Object[]{
-                LocalDate.of(2023, 6, 7), // Wednesday
-                LocalDate.of(2023, 6, 9)  // Friday (2 days later)
-            },
-            // Thursday -> Add 2 working days = Monday (4 days later)
-            new Object[]{
-                LocalDate.of(2023, 6, 8), // Thursday
-                LocalDate.of(2023, 6, 12) // Monday (4 days later)
-            },
-            // Friday -> Add 1 working day = Monday, should be moved to Tuesday (4 days later)
-            new Object[]{
-                LocalDate.of(2023, 6, 9), // Friday
-                LocalDate.of(2023, 6, 13) // Tuesday (4 days later)
-            },
-            // Saturday -> Add 2 working days = Tuesday (normal)
-            new Object[]{
-                LocalDate.of(2023, 6, 10), // Saturday
-                LocalDate.of(2023, 6, 13)  // Tuesday (3 days later)
-            },
-            // Sunday -> Add 2 working days = Tuesday (normal)
-            new Object[]{
-                LocalDate.of(2023, 6, 11), // Sunday
-                LocalDate.of(2023, 6, 13)  // Tuesday (2 days later)
-            }
-        };
     }
 }
