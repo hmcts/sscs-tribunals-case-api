@@ -139,10 +139,14 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
             .orElse(Collections.emptyList())
             .stream()
             .filter((request -> request.getValue().getRequestReply() == null))
+            .sorted(Comparator.comparing(request -> request.getValue().getRequestResponseDueDate()))
             .toList();
         if (requestsWithoutReplies.isEmpty()) {
             ftaCommunicationFields.setInfoRequestFromFta(null);
             ftaCommunicationFields.setAwaitingInfoFromTribunal(null);
+            ftaCommunicationFields.setFtaResponseDueDate(null);
+        } else {
+            ftaCommunicationFields.setFtaResponseDueDate(requestsWithoutReplies.getFirst().getValue().getRequestResponseDueDate());
         }
         if (!noActionRequired) {
             ftaCommunicationFields.setInfoProvidedFromTribunal(YesNo.YES);
