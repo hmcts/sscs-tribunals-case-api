@@ -91,7 +91,7 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
         DynamicListItem chosenFtaRequest = Optional.ofNullable(ftaRequestDl.getValue())
             .orElseThrow(() -> new IllegalStateException("No chosen FTA request found"));
         String chosenFtaRequestId = chosenFtaRequest.getCode();
-        CommunicationRequest communicationRequest = ftaCommunicationFields.getFtaCommunications()
+        CommunicationRequest communicationRequest = ftaCommunicationFields.getTribunalCommunications()
             .stream()
             .filter(request -> request.getId().equals(chosenFtaRequestId))
             .findFirst()
@@ -117,9 +117,9 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
     }
 
     private void setFtaCommunicationsDynamicList(FtaCommunicationFields ftaCommunicationFields, SscsCaseData sscsCaseData) {
-        List<CommunicationRequest> ftaCommunicationRequests = Optional.ofNullable(ftaCommunicationFields.getFtaCommunications())
+        List<CommunicationRequest> tribunalCommunicationRequests = Optional.ofNullable(ftaCommunicationFields.getTribunalCommunications())
             .orElse(Collections.emptyList());
-        List<DynamicListItem> dynamicListItems = ftaCommunicationRequests.stream()
+        List<DynamicListItem> dynamicListItems = tribunalCommunicationRequests.stream()
             .filter((communicationRequest -> communicationRequest.getValue().getRequestReply() == null))
             .map((this::getDlItemFromCommunicationRequest))
             .toList();

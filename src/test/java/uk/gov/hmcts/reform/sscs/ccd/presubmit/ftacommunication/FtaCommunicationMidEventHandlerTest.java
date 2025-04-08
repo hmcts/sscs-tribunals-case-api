@@ -100,7 +100,7 @@ class FtaCommunicationMidEventHandlerTest {
         List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunication1, ftaCommunication2));
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .ftaCommunications(existingComs)
+            .tribunalCommunications(existingComs)
             .ftaRequestType(FtaRequestType.NEW_REQUEST)
             .build();
 
@@ -122,7 +122,7 @@ class FtaCommunicationMidEventHandlerTest {
         List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunication1, ftaCommunication2));
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .ftaCommunications(existingComs)
+            .tribunalCommunications(existingComs)
             .ftaRequestType(FtaRequestType.REPLY_TO_FTA_QUERY)
             .build();
 
@@ -147,7 +147,7 @@ class FtaCommunicationMidEventHandlerTest {
         List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunication1, ftaCommunication2));
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .ftaCommunications(existingComs)
+            .tribunalCommunications(existingComs)
             .ftaRequestType(FtaRequestType.REPLY_TO_FTA_QUERY)
             .build();
 
@@ -170,7 +170,7 @@ class FtaCommunicationMidEventHandlerTest {
         when(callback.getPageId()).thenReturn("selectFtaCommunicationAction");
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .ftaCommunications(Collections.emptyList())
+            .tribunalCommunications(Collections.emptyList())
             .ftaRequestType(FtaRequestType.REPLY_TO_FTA_QUERY)
             .build();
 
@@ -219,7 +219,7 @@ class FtaCommunicationMidEventHandlerTest {
         DynamicList dynamicList = new DynamicList(dlItem1, List.of(dlItem1, dlItem2));
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .ftaCommunications(existingComs)
+            .tribunalCommunications(existingComs)
             .ftaRequestNoResponseRadioDl(dynamicList)
             .build();
 
@@ -241,7 +241,7 @@ class FtaCommunicationMidEventHandlerTest {
         DynamicList dynamicList = new DynamicList(null, Collections.emptyList());
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .ftaCommunications(existingComs)
+            .tribunalCommunications(existingComs)
             .ftaRequestNoResponseRadioDl(dynamicList)
             .build();
 
@@ -262,7 +262,7 @@ class FtaCommunicationMidEventHandlerTest {
         DynamicList dynamicList = new DynamicList(dlItem1, List.of(dlItem1));
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .ftaCommunications(existingComs)
+            .tribunalCommunications(existingComs)
             .ftaRequestNoResponseRadioDl(dynamicList)
             .build();
 
@@ -334,7 +334,7 @@ class FtaCommunicationMidEventHandlerTest {
         List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunication1, ftaCommunication2));
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .ftaCommunications(existingComs)
+            .tribunalCommunications(existingComs)
             .ftaRequestType(FtaRequestType.REPLY_TO_FTA_QUERY)
             .build();
 
@@ -355,7 +355,7 @@ class FtaCommunicationMidEventHandlerTest {
         List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunication1, ftaCommunication2));
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .ftaCommunications(existingComs)
+            .tribunalCommunications(existingComs)
             .build();
 
         sscsCaseData.setCommunicationFields(fields);
