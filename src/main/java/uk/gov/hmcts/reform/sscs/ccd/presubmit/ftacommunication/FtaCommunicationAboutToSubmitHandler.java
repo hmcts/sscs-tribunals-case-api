@@ -135,7 +135,7 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         communicationRequest.getValue().setRequestReply(reply);
         communicationRequest.getValue().setRequestResponseDueDate(null);
 
-        List<CommunicationRequest> requestsWithoutReplies = Optional.ofNullable(ftaCommunicationFields.getFtaCommunications())
+        List<CommunicationRequest> requestsWithoutReplies = Optional.ofNullable(ftaCommunicationFields.getTribunalCommunications())
             .orElse(Collections.emptyList())
             .stream()
             .filter((request -> request.getValue().getRequestReply() == null))

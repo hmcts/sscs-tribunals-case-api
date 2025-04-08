@@ -380,7 +380,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         DynamicList ftaRequestNoResponseRadioDl = new DynamicList(chosenFtaRequest, List.of(chosenFtaRequest, otherFtaRequest));
         FtaCommunicationFields ftaCommunicationFields = FtaCommunicationFields.builder()
             .ftaRequestNoResponseRadioDl(ftaRequestNoResponseRadioDl)
-            .ftaCommunications(List.of(communicationRequest, communicationRequest2))
+            .tribunalCommunications(List.of(communicationRequest, communicationRequest2))
             .ftaRequestNoResponseNoAction(Collections.singletonList("No action required"))
             .ftaRequestType(FtaRequestType.REPLY_TO_FTA_QUERY)
             .build();
@@ -395,7 +395,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
 
         FtaCommunicationFields fields = response.getData().getCommunicationFields();
 
-        CommunicationRequestDetails request = fields.getFtaCommunications().getFirst().getValue();
+        CommunicationRequestDetails request = fields.getTribunalCommunications().getFirst().getValue();
         assertNotNull(request.getRequestReply());
         assertEquals("No action required", request.getRequestReply().getReplyMessage());
         assertEquals(userName, request.getRequestReply().getReplyUserName());
