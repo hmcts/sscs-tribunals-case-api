@@ -194,6 +194,7 @@
     "ListElementCode": "reservedDistrictTribunalJudge",
     "ID": "updateListingRequirementsReserveToReservedDistrictTribunalJudge",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "panelMemberComposition.panelCompositionJudge = \"\"",
     "LiveFrom": "15/02/2023",
     "FieldDisplayOrder": 11,
     "PageID": "1.0"
