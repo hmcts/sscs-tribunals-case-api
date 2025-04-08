@@ -109,8 +109,8 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
 
     private void setFieldsForNewRequest(SscsCaseData sscsCaseData, FtaCommunicationFields communicationFields, List<CommunicationRequest> comms) {
         communicationFields.setFtaCommunications(comms);
-        communicationFields.setTribunalCommunicationFilter(TribunalCommunicationFilter.AWAITING_INFO_FROM_FTA);
-        communicationFields.setFtaCommunicationFilter(FtaCommunicationFilter.PROVIDE_INFO_TO_TRIBUNAL);
+        communicationFields.setAwaitingInfoFromFta(YesNo.YES);
+        communicationFields.setProvideInfoToTribunal(YesNo.YES);
         sscsCaseData.setCommunicationFields(communicationFields);
     }
 
@@ -133,8 +133,19 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
             .build();
         communicationRequest.getValue().setRequestReply(reply);
         communicationRequest.getValue().setRequestResponseDueDate(null);
-        ftaCommunicationFields.setTribunalCommunicationFilter(null);
-        ftaCommunicationFields.setFtaCommunicationFilter(noActionRequired ? null : FtaCommunicationFilter.INFO_PROVIDED_FROM_TRIBUNAL);
+
+        List<CommunicationRequest> requestsWithoutReplies = Optional.ofNullable(ftaCommunicationFields.getFtaCommunications())
+            .orElse(Collections.emptyList())
+            .stream()
+            .filter((request -> request.getValue().getRequestReply() == null))
+            .toList();
+        if (requestsWithoutReplies.isEmpty()) {
+            ftaCommunicationFields.setInfoRequestFromFta(null);
+            ftaCommunicationFields.setAwaitingInfoFromTribunal(null);
+        }
+        if (!noActionRequired) {
+            ftaCommunicationFields.setInfoProvidedFromTribunal(YesNo.YES);
+        }
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
     }
 

@@ -32,10 +32,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationFilter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FtaRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.TribunalCommunicationFilter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 
@@ -136,8 +135,12 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertNotNull(addedCom.getRequestDateTime());
 
         // Verify the enum values are correctly set
-        assertEquals(FtaCommunicationFilter.PROVIDE_INFO_TO_TRIBUNAL, response.getData().getCommunicationFields().getFtaCommunicationFilter());
-        assertEquals(TribunalCommunicationFilter.AWAITING_INFO_FROM_FTA, response.getData().getCommunicationFields().getTribunalCommunicationFilter());
+        assertNull(response.getData().getCommunicationFields().getInfoRequestFromFta());
+        assertEquals(YesNo.YES, response.getData().getCommunicationFields().getAwaitingInfoFromFta());
+        assertNull(response.getData().getCommunicationFields().getInfoProvidedByFta());
+        assertEquals(YesNo.YES, response.getData().getCommunicationFields().getProvideInfoToTribunal());
+        assertNull(response.getData().getCommunicationFields().getAwaitingInfoFromTribunal());
+        assertNull(response.getData().getCommunicationFields().getInfoProvidedFromTribunal());
     }
 
     @Test
@@ -155,8 +158,12 @@ class FtaCommunicationAboutToSubmitHandlerTest {
 
         List<CommunicationRequest> resultComs = response.getData().getCommunicationFields().getFtaCommunications();
         assertEquals(0, resultComs.size());
-        assertNull(response.getData().getCommunicationFields().getFtaCommunicationFilter());
-        assertNull(response.getData().getCommunicationFields().getTribunalCommunicationFilter());
+        assertNull(response.getData().getCommunicationFields().getInfoRequestFromFta());
+        assertNull(response.getData().getCommunicationFields().getAwaitingInfoFromFta());
+        assertNull(response.getData().getCommunicationFields().getInfoProvidedByFta());
+        assertNull(response.getData().getCommunicationFields().getProvideInfoToTribunal());
+        assertNull(response.getData().getCommunicationFields().getAwaitingInfoFromTribunal());
+        assertNull(response.getData().getCommunicationFields().getInfoProvidedFromTribunal());
     }
 
     @Test
@@ -219,8 +226,12 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertEquals(ftaCommunicationPast, resultComs.getLast());
 
         // Verify the enum values are correctly set
-        assertEquals(FtaCommunicationFilter.PROVIDE_INFO_TO_TRIBUNAL, response.getData().getCommunicationFields().getFtaCommunicationFilter());
-        assertEquals(TribunalCommunicationFilter.AWAITING_INFO_FROM_FTA, response.getData().getCommunicationFields().getTribunalCommunicationFilter());
+        assertNull(response.getData().getCommunicationFields().getInfoRequestFromFta());
+        assertEquals(YesNo.YES, response.getData().getCommunicationFields().getAwaitingInfoFromFta());
+        assertNull(response.getData().getCommunicationFields().getInfoProvidedByFta());
+        assertEquals(YesNo.YES, response.getData().getCommunicationFields().getProvideInfoToTribunal());
+        assertNull(response.getData().getCommunicationFields().getAwaitingInfoFromTribunal());
+        assertNull(response.getData().getCommunicationFields().getInfoProvidedFromTribunal());
     }
 
     @Test
@@ -255,8 +266,12 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertNotNull(resultComs);
 
         // Verify the enum values are correctly set
-        assertEquals(FtaCommunicationFilter.PROVIDE_INFO_TO_TRIBUNAL, response.getData().getCommunicationFields().getFtaCommunicationFilter());
-        assertEquals(TribunalCommunicationFilter.AWAITING_INFO_FROM_FTA, response.getData().getCommunicationFields().getTribunalCommunicationFilter());
+        assertNull(response.getData().getCommunicationFields().getInfoRequestFromFta());
+        assertEquals(YesNo.YES, response.getData().getCommunicationFields().getAwaitingInfoFromFta());
+        assertNull(response.getData().getCommunicationFields().getInfoProvidedByFta());
+        assertEquals(YesNo.YES, response.getData().getCommunicationFields().getProvideInfoToTribunal());
+        assertNull(response.getData().getCommunicationFields().getAwaitingInfoFromTribunal());
+        assertNull(response.getData().getCommunicationFields().getInfoProvidedFromTribunal());
     }
 
     @Test
@@ -278,6 +293,8 @@ class FtaCommunicationAboutToSubmitHandlerTest {
             .ftaRequestNoResponseNoAction(Collections.emptyList())
             .ftaRequestType(FtaRequestType.REPLY_TO_FTA_QUERY)
             .build();
+        ftaCommunicationFields.setInfoRequestFromFta(YesNo.YES);
+        ftaCommunicationFields.setAwaitingInfoFromTribunal(YesNo.YES);
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().name(userName).build());
 
@@ -292,8 +309,12 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertEquals(userName, request.getRequestReply().getReplyUserName());
         assertNotNull(request.getRequestReply().getReplyDateTime());
         assertNull(request.getRequestResponseDueDate());
-        assertEquals(FtaCommunicationFilter.INFO_PROVIDED_FROM_TRIBUNAL, fields.getFtaCommunicationFilter());
-        assertNull(fields.getTribunalCommunicationFilter());
+        assertNull(response.getData().getCommunicationFields().getInfoRequestFromFta());
+        assertNull(response.getData().getCommunicationFields().getAwaitingInfoFromFta());
+        assertNull(response.getData().getCommunicationFields().getInfoProvidedByFta());
+        assertNull(response.getData().getCommunicationFields().getProvideInfoToTribunal());
+        assertNull(response.getData().getCommunicationFields().getAwaitingInfoFromTribunal());
+        assertEquals(YesNo.YES, response.getData().getCommunicationFields().getInfoProvidedFromTribunal());
     }
 
     @Test
@@ -314,6 +335,8 @@ class FtaCommunicationAboutToSubmitHandlerTest {
             .ftaRequestNoResponseNoAction(Collections.singletonList("No action required"))
             .ftaRequestType(FtaRequestType.REPLY_TO_FTA_QUERY)
             .build();
+        ftaCommunicationFields.setInfoRequestFromFta(YesNo.YES);
+        ftaCommunicationFields.setAwaitingInfoFromTribunal(YesNo.YES);
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
 
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().name(userName).build());
@@ -329,8 +352,61 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertEquals(userName, request.getRequestReply().getReplyUserName());
         assertNotNull(request.getRequestReply().getReplyDateTime());
         assertNull(communicationRequest.getValue().getRequestResponseDueDate());
-        assertNull(fields.getFtaCommunicationFilter());
-        assertNull(fields.getTribunalCommunicationFilter());
+        assertNull(response.getData().getCommunicationFields().getInfoRequestFromFta());
+        assertNull(response.getData().getCommunicationFields().getAwaitingInfoFromFta());
+        assertNull(response.getData().getCommunicationFields().getInfoProvidedByFta());
+        assertNull(response.getData().getCommunicationFields().getProvideInfoToTribunal());
+        assertNull(response.getData().getCommunicationFields().getAwaitingInfoFromTribunal());
+        assertNull(response.getData().getCommunicationFields().getInfoProvidedFromTribunal());
+    }
+
+    @Test
+    void shouldNotWipeFiltersAfterHandleReplyToFtaQueryWhenRequestNoReplyExists() {
+        String chosenFtaRequestId = "1";
+        String chosenFtaRequestId2 = "2";
+        String userName = "Test User";
+
+        CommunicationRequest communicationRequest = CommunicationRequest.builder()
+            .id(chosenFtaRequestId)
+            .value(CommunicationRequestDetails.builder().build())
+            .build();
+        CommunicationRequest communicationRequest2 = CommunicationRequest.builder()
+            .id(chosenFtaRequestId2)
+            .value(CommunicationRequestDetails.builder().build())
+            .build();
+
+        DynamicListItem chosenFtaRequest = new DynamicListItem(chosenFtaRequestId, "item");
+        DynamicListItem otherFtaRequest =  new DynamicListItem(chosenFtaRequestId2, "item");
+        DynamicList ftaRequestNoResponseRadioDl = new DynamicList(chosenFtaRequest, List.of(chosenFtaRequest, otherFtaRequest));
+        FtaCommunicationFields ftaCommunicationFields = FtaCommunicationFields.builder()
+            .ftaRequestNoResponseRadioDl(ftaRequestNoResponseRadioDl)
+            .ftaCommunications(List.of(communicationRequest, communicationRequest2))
+            .ftaRequestNoResponseNoAction(Collections.singletonList("No action required"))
+            .ftaRequestType(FtaRequestType.REPLY_TO_FTA_QUERY)
+            .build();
+        ftaCommunicationFields.setInfoRequestFromFta(YesNo.YES);
+        ftaCommunicationFields.setAwaitingInfoFromTribunal(YesNo.YES);
+        sscsCaseData.setCommunicationFields(ftaCommunicationFields);
+
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().name(userName).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        FtaCommunicationFields fields = response.getData().getCommunicationFields();
+
+        CommunicationRequestDetails request = fields.getFtaCommunications().getFirst().getValue();
+        assertNotNull(request.getRequestReply());
+        assertEquals("No action required", request.getRequestReply().getReplyMessage());
+        assertEquals(userName, request.getRequestReply().getReplyUserName());
+        assertNotNull(request.getRequestReply().getReplyDateTime());
+        assertNull(communicationRequest.getValue().getRequestResponseDueDate());
+        assertEquals(YesNo.YES, response.getData().getCommunicationFields().getInfoRequestFromFta());
+        assertNull(response.getData().getCommunicationFields().getAwaitingInfoFromFta());
+        assertNull(response.getData().getCommunicationFields().getInfoProvidedByFta());
+        assertNull(response.getData().getCommunicationFields().getProvideInfoToTribunal());
+        assertEquals(YesNo.YES, response.getData().getCommunicationFields().getAwaitingInfoFromTribunal());
+        assertNull(response.getData().getCommunicationFields().getInfoProvidedFromTribunal());
     }
 
     @Test

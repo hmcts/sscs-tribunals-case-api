@@ -73,8 +73,8 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
 
     private void setFieldsForNewRequest(SscsCaseData sscsCaseData, FtaCommunicationFields communicationFields, List<CommunicationRequest> comms) {
         communicationFields.setTribunalCommunications(comms);
-        communicationFields.setTribunalCommunicationFilter(TribunalCommunicationFilter.INFO_REQUEST_FROM_FTA);
-        communicationFields.setFtaCommunicationFilter(FtaCommunicationFilter.AWAITING_INFO_FROM_TRIBUNAL);
+        communicationFields.setInfoRequestFromFta(YesNo.YES);
+        communicationFields.setAwaitingInfoFromTribunal(YesNo.YES);
         communicationFields.setTribunalRequestTopic(null);
         communicationFields.setTribunalRequestQuestion(null);
         communicationFields.setTribunalRequestType(null);

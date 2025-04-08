@@ -1,7 +1,17 @@
 [
-  {"LiveFrom": "31/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "tribunalCommunicationFilter", "Label": "Tribunal Communication", "DisplayOrder": 29},
-  {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "CaseFieldID": "tribunalCommunicationFilter", "Label": "Tribunal Communication", "DisplayOrder": 29},
-  {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "CaseFieldID": "ftaCommunicationFilter", "Label": "FTA Communication", "DisplayOrder": 30},
-  {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-clerk", "CaseFieldID": "ftaCommunicationFilter", "Label": "FTA Communication", "DisplayOrder": 30},
-  {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-registrar", "CaseFieldID": "ftaCommunicationFilter", "Label": "FTA Communication", "DisplayOrder": 30}
+  {"LiveFrom": "31/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "awaitingInfoFromFta", "Label": "Awaiting Info From Fta", "DisplayOrder": 29},
+  {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "CaseFieldID": "awaitingInfoFromFta", "Label": "Awaiting Info From Fta", "DisplayOrder": 29},
+  {"LiveFrom": "31/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "infoProvidedByFta", "Label": "Info Provided By Fta", "DisplayOrder": 30},
+  {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "CaseFieldID": "infoProvidedByFta", "Label": "Info Provided By Fta", "DisplayOrder": 30},
+  {"LiveFrom": "31/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "infoRequestFromFta", "Label": "Info Request From Fta", "DisplayOrder": 31},
+  {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "CaseFieldID": "infoRequestFromFta", "Label": "Info Request From Fta", "DisplayOrder": 31},
+  {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "CaseFieldID": "provideInfoToTribunal", "Label": "Provide Info To Tribunal", "DisplayOrder": 32},
+  {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-clerk", "CaseFieldID": "provideInfoToTribunal", "Label": "Provide Info To Tribunal", "DisplayOrder": 32},
+  {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-registrar", "CaseFieldID": "provideInfoToTribunal", "Label": "Provide Info To Tribunal", "DisplayOrder": 32},
+  {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "CaseFieldID": "awaitingInfoFromTribunal", "Label": "Awaiting Info From Tribunal", "DisplayOrder": 33},
+  {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-clerk", "CaseFieldID": "awaitingInfoFromTribunal", "Label": "Awaiting Info From Tribunal", "DisplayOrder": 33},
+  {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-registrar", "CaseFieldID": "awaitingInfoFromTribunal", "Label": "Awaiting Info From Tribunal", "DisplayOrder": 33},
+  {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "CaseFieldID": "infoProvidedFromTribunal", "Label": "Info Provided From Tribunal", "DisplayOrder": 34},
+  {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "cas4eworker-sscs-clerk", "CaseFieldID": "infoProvidedFromTribunal", "Label": "Info Provided From Tribunal", "DisplayOrder": 34},
+  {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-registrar", "CaseFieldID": "infoProvidedFromTribunal", "Label": "Info Provided From Tribunal", "DisplayOrder": 34}
 ]
