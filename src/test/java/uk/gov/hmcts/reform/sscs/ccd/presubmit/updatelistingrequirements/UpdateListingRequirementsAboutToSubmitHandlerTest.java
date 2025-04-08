@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -41,6 +42,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReserveTo;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -69,6 +71,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     void setUp() {
         sscsCaseData = SscsCaseData.builder()
             .appeal(Appeal.builder().build())
+            .panelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").build())
             .dwpIsOfficerAttending("Yes")
             .build();
     }
@@ -238,9 +241,10 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
             callback,
             USER_AUTHORISATION);
 
-        assertTrue(response.getErrors().isEmpty());
+        assertThat(response.getErrors()).isEmpty();
         JudicialUserBase result = response.getData().getSchedulingAndListingFields().getReserveTo().getReservedJudge();
-        assertNull(result);
+        assertThat(result).isNull();
+        assertThat(response.getData().getPanelMemberComposition().getPanelCompositionJudge()).isEqualTo(null);
     }
 
     @Test
