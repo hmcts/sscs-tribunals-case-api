@@ -28,23 +28,23 @@ import uk.gov.hmcts.reform.sscs.model.hmc.reference.RequirementType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.MemberType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelPreference;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
-import uk.gov.hmcts.reform.sscs.reference.data.model.PanelCategoryMap;
+import uk.gov.hmcts.reform.sscs.reference.data.model.PanelCategory;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
-import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryMapService;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @Slf4j
 @Component
 public final class HearingsPanelMapping {
 
-    private final PanelCategoryMapService panelCategoryMapService;
+    private final PanelCategoryService panelCategoryService;
 
     @Value("${feature.default-panel-comp.enabled}")
     private boolean defaultPanelCompEnabled;
 
-    HearingsPanelMapping(PanelCategoryMapService panelCategoryMapService) {
+    HearingsPanelMapping(PanelCategoryService panelCategoryService) {
 
-        this.panelCategoryMapService = panelCategoryMapService;
+        this.panelCategoryService = panelCategoryService;
     }
 
     public PanelRequirements getPanelRequirements(SscsCaseData caseData,
@@ -65,7 +65,7 @@ public final class HearingsPanelMapping {
                     ? caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism() != null
                     ? "2" : "1" : null;
             String isFqpm =  isYes(caseData.getIsFqpmRequired()) ? "true" : null;
-            PanelCategoryMap panelComp = panelCategoryMapService
+            PanelCategory panelComp = panelCategoryService
                     .getPanelCategoryMap(benefitIssueCode, specialismCount, isFqpm);
             log.info("Panel Category Map for Case {}: {}", caseData.getCcdCaseId(), panelComp);
             return panelComp != null ? panelComp.getJohTiers() : Collections.emptyList();
