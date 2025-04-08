@@ -119,7 +119,7 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         DynamicList ftaRequestDl = ftaCommunicationFields.getFtaRequestNoResponseRadioDl();
         DynamicListItem chosenFtaRequest = ftaRequestDl.getValue();
         String chosenFtaRequestId = chosenFtaRequest.getCode();
-        CommunicationRequest communicationRequest = Optional.ofNullable(ftaCommunicationFields.getFtaCommunications())
+        CommunicationRequest communicationRequest = Optional.ofNullable(ftaCommunicationFields.getTribunalCommunications())
             .orElse(Collections.emptyList())
             .stream()
             .filter(communicationRequest1 -> communicationRequest1.getId().equals(chosenFtaRequestId))
