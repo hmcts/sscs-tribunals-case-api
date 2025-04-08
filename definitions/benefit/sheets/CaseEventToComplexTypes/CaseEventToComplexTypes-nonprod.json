@@ -8,7 +8,8 @@
     "FieldShowCondition": "reserveTo.reservedDistrictTribunalJudge != \"Yes\"",
     "LiveFrom": "01/04/2025",
     "FieldDisplayOrder": 13,
-    "PageID": "1.0"
+    "PageID": "1.0",
+    "RetainHiddenValue": "No"
   },
   {
     "CaseEventID": "updateListingRequirements",
