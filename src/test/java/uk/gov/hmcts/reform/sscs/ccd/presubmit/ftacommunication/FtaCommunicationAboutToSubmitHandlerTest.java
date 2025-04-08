@@ -134,7 +134,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertNotNull(addedCom.getRequestDateTime());
         LocalDate date = calculateDueDateWorkingDays(LocalDate.now(), 2);
         assertEquals(date, addedCom.getRequestResponseDueDate());
-        assertEquals(date, response.getData().getCommunicationFields().getTribunalResponseDueDate());
+        assertEquals(date, response.getData().getCommunicationFields().getFtaResponseDueDate());
         // Verify the enum values are correctly set
         assertNull(response.getData().getCommunicationFields().getInfoRequestFromFta());
         assertEquals(YesNo.YES, response.getData().getCommunicationFields().getAwaitingInfoFromFta());

@@ -101,7 +101,7 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         communicationFields.setFtaCommunications(comms);
         communicationFields.setAwaitingInfoFromFta(YesNo.YES);
         communicationFields.setProvideInfoToTribunal(YesNo.YES);
-        communicationFields.setTribunalResponseDueDate(comms.getFirst().getValue().getRequestResponseDueDate());
+        communicationFields.setFtaResponseDueDate(comms.getFirst().getValue().getRequestResponseDueDate());
         sscsCaseData.setCommunicationFields(communicationFields);
     }
 
