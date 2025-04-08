@@ -29,7 +29,7 @@ import uk.gov.hmcts.reform.sscs.model.hmc.reference.RequirementType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.MemberType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelPreference;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
-import uk.gov.hmcts.reform.sscs.reference.data.model.PanelCategoryMap;
+import uk.gov.hmcts.reform.sscs.reference.data.model.PanelCategory;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
@@ -66,7 +66,7 @@ public final class HearingsPanelMapping {
                     ? caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism() != null
                     ? "2" : "1" : null;
             String isFqpm =  isYes(caseData.getIsFqpmRequired()) ? "true" : null;
-            PanelCategoryMap panelComp = panelCategoryMapService
+            PanelCategory panelComp = panelCategoryService
                     .getPanelCategoryMap(benefitIssueCode, specialismCount, isFqpm);
             log.info("Panel Category Map for Case {}: {}", caseData.getCcdCaseId(), panelComp);
             return panelComp != null ? panelComp.getJohTiers() : Collections.emptyList();
