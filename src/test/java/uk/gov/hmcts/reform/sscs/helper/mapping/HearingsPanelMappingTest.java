@@ -34,7 +34,7 @@ import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.RequirementType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.MemberType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelPreference;
-import uk.gov.hmcts.reform.sscs.reference.data.model.PanelCategoryMap;
+import uk.gov.hmcts.reform.sscs.reference.data.model.PanelCategory;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
@@ -350,9 +350,10 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
     @Test
     void testGetRoles() {
         ReflectionTestUtils.setField(hearingsPanelMapping, "defaultPanelCompEnabled", true);
-        PanelCategoryMap panelCategoryMap = new PanelCategoryMap("022DD",null,null);
-        panelCategoryMap.setJohTiers(new ArrayList<>(List.of(JOH_CODE)));
-        when(panelCategoryMapService.getPanelCategoryMap(any(),any(),any())).thenReturn(panelCategoryMap);
+        PanelCategory panelCategory = new PanelCategory();
+        panelCategory.setBenefitIssueCode("022DD");
+        panelCategory.setJohTiers(new ArrayList<>(List.of(JOH_CODE)));
+        when(panelCategoryService.getPanelCategoryMap(any(),any(),any())).thenReturn(panelCategory);
         List<String> result = hearingsPanelMapping.getRoleTypes(caseData);
         assertThat(result).isNotEmpty();
         assertThat(result.getFirst()).isEqualTo(JOH_CODE);
@@ -366,7 +367,7 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
         caseData.getSscsIndustrialInjuriesData().setSecondPanelDoctorSpecialism("eyeSurgeon");
         caseData.setIsFqpmRequired(YesNo.YES);
         hearingsPanelMapping.getRoleTypes(caseData);
-        verify(panelCategoryMapService).getPanelCategoryMap(any(), eq("2"), eq("true"));
+        verify(panelCategoryService).getPanelCategoryMap(any(), eq("2"), eq("true"));
     }
 
     @DisplayName("getPanelCategoryMap is called with null values for specialism and fqpm when not in case data")
@@ -375,14 +376,14 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
         ReflectionTestUtils.setField(hearingsPanelMapping, "defaultPanelCompEnabled", true);
         caseData.setIsFqpmRequired(YesNo.NO);
         hearingsPanelMapping.getRoleTypes(caseData);
-        verify(panelCategoryMapService).getPanelCategoryMap(any(), eq(null), eq(null));
+        verify(panelCategoryService).getPanelCategoryMap(any(), eq(null), eq(null));
     }
 
     @DisplayName("getRoleTypes does not throw exception when panelCategoryMap is null")
     @Test
     void testGetRolesWithInvalidCode() {
         ReflectionTestUtils.setField(hearingsPanelMapping, "defaultPanelCompEnabled", true);
-        when(panelCategoryMapService.getPanelCategoryMap(any(),any(),any())).thenReturn(null);
+        when(panelCategoryService.getPanelCategoryMap(any(),any(),any())).thenReturn(null);
         assertThatNoException()
                 .isThrownBy(() -> hearingsPanelMapping.getRoleTypes(caseData));
     }
