@@ -99,6 +99,17 @@
     "FieldShowCondition": "tribunalRequestType=\"DoNotShow\""
   },
   {
+    "CaseEventID": "tribunalCommunication",
+    "CaseFieldID": "ftaResponseDueDate",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "FieldShowCondition": "tribunalRequestType=\"DoNotShow\""
+  },
+  {
     "CaseEventID": "ftaCommunication",
     "CaseFieldID": "ftaRequestType",
     "CaseTypeID": "Benefit",
@@ -118,8 +129,8 @@
     "LiveFrom": "13/03/2025",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
-    "PageID": "1.0",
-    "FieldShowCondition": "tribunalRequestType=\"DoNotShow\""
+    "PageID": "selectFtaCommunicationAction",
+    "FieldShowCondition": "ftaRequestType=\"DoNotShow\""
   },
   {
     "CaseEventID": "ftaCommunication",
@@ -129,8 +140,8 @@
     "LiveFrom": "13/03/2025",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
-    "PageID": "1.0",
-    "FieldShowCondition": "tribunalRequestType=\"DoNotShow\""
+    "PageID": "selectFtaCommunicationAction",
+    "FieldShowCondition": "ftaRequestType=\"DoNotShow\""
   },
   {
     "CaseEventID": "ftaCommunication",
@@ -140,8 +151,8 @@
     "LiveFrom": "13/03/2025",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
-    "PageID": "1.0",
-    "FieldShowCondition": "tribunalRequestType=\"DoNotShow\""
+    "PageID": "selectFtaCommunicationAction",
+    "FieldShowCondition": "ftaRequestType=\"DoNotShow\""
   },
   {
     "CaseEventID": "ftaCommunication",
@@ -151,8 +162,8 @@
     "LiveFrom": "13/03/2025",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
-    "PageID": "1.0",
-    "FieldShowCondition": "tribunalRequestType=\"DoNotShow\""
+    "PageID": "selectFtaCommunicationAction",
+    "FieldShowCondition": "ftaRequestType=\"DoNotShow\""
   },
   {
     "CaseEventID": "ftaCommunication",
@@ -162,8 +173,8 @@
     "LiveFrom": "13/03/2025",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
-    "PageID": "1.0",
-    "FieldShowCondition": "tribunalRequestType=\"DoNotShow\""
+    "PageID": "selectFtaCommunicationAction",
+    "FieldShowCondition": "ftaRequestType=\"DoNotShow\""
   },
   {
     "CaseEventID": "ftaCommunication",
@@ -173,8 +184,19 @@
     "LiveFrom": "13/03/2025",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
-    "PageID": "1.0",
-    "FieldShowCondition": "tribunalRequestType=\"DoNotShow\""
+    "PageID": "selectFtaCommunicationAction",
+    "FieldShowCondition": "ftaRequestType=\"DoNotShow\""
+  },
+  {
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "tribunalResponseDueDate",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "selectFtaCommunicationAction",
+    "FieldShowCondition": "ftaRequestType=\"DoNotShow\""
   },
   {
     "CaseEventID": "ftaCommunication",

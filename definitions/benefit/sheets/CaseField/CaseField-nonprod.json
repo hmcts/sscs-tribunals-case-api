@@ -17,5 +17,7 @@
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "ID": "infoRequestFromFta", "Label": "Info request from Fta", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "ID": "provideInfoToTribunal", "Label": "Provide info to Tribunal", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "ID": "awaitingInfoFromTribunal", "Label": "Awaiting info from Tribunal", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "ID": "infoProvidedFromTribunal", "Label": "Info provided from Tribunal", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"}
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "ID": "infoProvidedFromTribunal", "Label": "Info provided from Tribunal", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "10/09/2019", "CaseTypeID": "Benefit", "ID": "tribunalResponseDueDate", "Label": "FTA Communication Request response due date", "FieldType": "Date", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "10/09/2019", "CaseTypeID": "Benefit", "ID": "ftaResponseDueDate", "Label": "Tribunal Communication Request response due date", "FieldType": "Date", "SecurityClassification": "PUBLIC"}
 ]
