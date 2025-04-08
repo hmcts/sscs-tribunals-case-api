@@ -7,8 +7,9 @@
     "DisplayContext": "MANDATORY",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder" : 1,
-    "PageID": "1.0",
-    "PageLabel": "Select Tribunal Communication action"
+    "PageID": "selectTribunalCommunicationAction",
+    "PageLabel": "Select Tribunal Communication action",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=selectTribunalCommunicationAction"
   },
   {
     "LiveFrom": "18/03/2025",
@@ -40,7 +41,7 @@
     "LiveFrom": "13/03/2025",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
-    "PageID": "1.0",
+    "PageID": "selectTribunalCommunicationAction",
     "FieldShowCondition": "tribunalRequestType=\"DoNotShow\""
   },
   {
@@ -51,7 +52,7 @@
     "LiveFrom": "13/03/2025",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
-    "PageID": "1.0",
+    "PageID": "selectTribunalCommunicationAction",
     "FieldShowCondition": "tribunalRequestType=\"DoNotShow\""
   },
   {
@@ -155,5 +156,53 @@
     "PageDisplayOrder": 4,
     "PageFieldDisplayOrder": 3,
     "PageID": "replyToFtaQuery"
+  }
+
+  ,
+  {
+    "CaseEventID": "tribunalCommunication",
+    "CaseFieldID": "tribunalRequestNoResponseRadioDl",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "selectTribunalRequest",
+    "PageShowCondition": "tribunalRequestType=\"replyToTribunalQuery\"",
+    "PageLabel": "Reply to FTA Query",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=selectTribunalRequest"
+  },
+  {
+    "CaseEventID": "tribunalCommunication",
+    "CaseFieldID": "tribunalRequestNoResponseQuery",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "replyToTribunalQuery",
+    "PageShowCondition": "tribunalRequestType=\"replyToTribunalQuery\"",
+    "PageLabel": "Write a reply to tribunal Query",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=replyToTribunalQuery"
+  },
+  {
+    "CaseEventID": "tribunalCommunication",
+    "CaseFieldID": "tribunalRequestNoResponseTextArea",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "replyToTribunalQuery"
+  },
+  {
+    "CaseEventID": "tribunalCommunication",
+    "CaseFieldID": "tribunalRequestNoResponseNoAction",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 3,
+    "PageID": "replyToTribunalQuery"
   }
 ]
