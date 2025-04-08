@@ -336,7 +336,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
             .build();
         ftaCommunicationFields.setInfoRequestFromFta(YesNo.YES);
         ftaCommunicationFields.setAwaitingInfoFromTribunal(YesNo.YES);
-        ftaCommunicationFields.setFtaResponseDueDate(LocalDate.of(1,1,1));
+        ftaCommunicationFields.setTribunalResponseDueDate(LocalDate.of(1,1,1));
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
         String userName = "Test User";
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().name(userName).build());
@@ -358,7 +358,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertNull(response.getData().getCommunicationFields().getProvideInfoToTribunal());
         assertNull(response.getData().getCommunicationFields().getAwaitingInfoFromTribunal());
         assertNull(response.getData().getCommunicationFields().getInfoProvidedFromTribunal());
-        assertNull(response.getData().getCommunicationFields().getFtaResponseDueDate());
+        assertNull(response.getData().getCommunicationFields().getTribunalResponseDueDate());
     }
 
     @Test
@@ -395,7 +395,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
             .build();
         ftaCommunicationFields.setInfoRequestFromFta(YesNo.YES);
         ftaCommunicationFields.setAwaitingInfoFromTribunal(YesNo.YES);
-        ftaCommunicationFields.setFtaResponseDueDate(LocalDate.of(1,1,1));
+        ftaCommunicationFields.setTribunalResponseDueDate(LocalDate.of(1,1,1));
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
         String userName = "Test User";
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().name(userName).build());
@@ -417,7 +417,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertNull(response.getData().getCommunicationFields().getProvideInfoToTribunal());
         assertEquals(YesNo.YES, response.getData().getCommunicationFields().getAwaitingInfoFromTribunal());
         assertNull(response.getData().getCommunicationFields().getInfoProvidedFromTribunal());
-        assertEquals(LocalDate.of(3,3,3), response.getData().getCommunicationFields().getFtaResponseDueDate());
+        assertEquals(LocalDate.of(3,3,3), response.getData().getCommunicationFields().getTribunalResponseDueDate());
     }
 
     @Test
@@ -492,22 +492,22 @@ class FtaCommunicationAboutToSubmitHandlerTest {
                 LocalDate.of(2023, 6, 7), // Wednesday
                 LocalDate.of(2023, 6, 9)  // Friday (2 days later)
             },
-            // Thursday -> Add 2 days = Saturday, should be moved to Monday (4 days later)
+            // Thursday -> Add 2 working days = Monday (4 days later)
             new Object[]{
                 LocalDate.of(2023, 6, 8), // Thursday
                 LocalDate.of(2023, 6, 12) // Monday (4 days later)
             },
-            // Friday -> Add 2 days = Sunday, should be moved to Monday (3 days later)
+            // Friday -> Add 1 working day = Monday, should be moved to Tuesday (4 days later)
             new Object[]{
                 LocalDate.of(2023, 6, 9), // Friday
-                LocalDate.of(2023, 6, 12) // Monday (3 days later)
+                LocalDate.of(2023, 6, 13) // Tuesday (4 days later)
             },
-            // Saturday -> Add 2 days = Monday (normal)
+            // Saturday -> Add 2 working days = Tuesday (normal)
             new Object[]{
                 LocalDate.of(2023, 6, 10), // Saturday
-                LocalDate.of(2023, 6, 12)  // Monday (2 days later)
+                LocalDate.of(2023, 6, 13)  // Tuesday (3 days later)
             },
-            // Sunday -> Add 2 days = Tuesday (normal)
+            // Sunday -> Add 2 working days = Tuesday (normal)
             new Object[]{
                 LocalDate.of(2023, 6, 11), // Sunday
                 LocalDate.of(2023, 6, 13)  // Tuesday (2 days later)

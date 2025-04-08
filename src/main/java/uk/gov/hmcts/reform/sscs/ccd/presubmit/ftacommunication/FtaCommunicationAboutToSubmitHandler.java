@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication;
 
 import static java.util.Objects.requireNonNull;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,14 +83,11 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
     }
 
     public static LocalDate calculateDueDate(LocalDate now) {
-        // 2 working days from now
-        LocalDate dueDate = now.plusDays(2);
-        if (dueDate.getDayOfWeek().getValue() == 6) {
-            dueDate = dueDate.plusDays(2);
-        } else if (dueDate.getDayOfWeek().getValue() == 7) {
-            dueDate = dueDate.plusDays(1);
-        }
-        return dueDate;
+        return Stream.iterate(now.plusDays(1), d -> d.plusDays(1))
+            .filter(d -> !(d.getDayOfWeek() == DayOfWeek.SATURDAY || d.getDayOfWeek() == DayOfWeek.SUNDAY))
+            .limit(2)
+            .reduce((first, second) -> second)
+            .orElse(now);
     }
 
     public static void addCommunicationRequest(List<CommunicationRequest> comms, CommunicationRequestTopic topic, String question, UserDetails userDetails) {
@@ -144,9 +143,9 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         if (requestsWithoutReplies.isEmpty()) {
             ftaCommunicationFields.setInfoRequestFromFta(null);
             ftaCommunicationFields.setAwaitingInfoFromTribunal(null);
-            ftaCommunicationFields.setFtaResponseDueDate(null);
+            ftaCommunicationFields.setTribunalResponseDueDate(null);
         } else {
-            ftaCommunicationFields.setFtaResponseDueDate(requestsWithoutReplies.getFirst().getValue().getRequestResponseDueDate());
+            ftaCommunicationFields.setTribunalResponseDueDate(requestsWithoutReplies.getFirst().getValue().getRequestResponseDueDate());
         }
         if (!noActionRequired) {
             ftaCommunicationFields.setInfoProvidedFromTribunal(YesNo.YES);

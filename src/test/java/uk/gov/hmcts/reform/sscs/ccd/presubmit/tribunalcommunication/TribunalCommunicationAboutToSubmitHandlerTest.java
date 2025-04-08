@@ -22,6 +22,7 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication.FtaCommunicationAboutToSubmitHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 
@@ -114,7 +115,10 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         assertEquals(expectedQuestion, addedCom.getRequestMessage());
         assertEquals(expectedUserName, addedCom.getRequestUserName());
         assertNotNull(addedCom.getRequestDateTime());
-
+        assertNotNull(addedCom.getRequestResponseDueDate());
+        LocalDate date = FtaCommunicationAboutToSubmitHandler.calculateDueDate(LocalDate.now());
+        assertEquals(date, addedCom.getRequestResponseDueDate());
+        assertEquals(date, response.getData().getCommunicationFields().getTribunalResponseDueDate());
         // Verify the enum values are correctly set
         assertEquals(YesNo.YES, response.getData().getCommunicationFields().getInfoRequestFromFta());
         assertNull(response.getData().getCommunicationFields().getAwaitingInfoFromFta());
