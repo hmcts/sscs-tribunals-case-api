@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.calculateDueDateWorkingDays;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 
 @Service
@@ -80,20 +82,9 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    public static LocalDate calculateDueDate(LocalDate now) {
-        // 2 working days from now
-        LocalDate dueDate = now.plusDays(2);
-        if (dueDate.getDayOfWeek().getValue() == 6) {
-            dueDate = dueDate.plusDays(2);
-        } else if (dueDate.getDayOfWeek().getValue() == 7) {
-            dueDate = dueDate.plusDays(1);
-        }
-        return dueDate;
-    }
-
     public static void addCommunicationRequest(List<CommunicationRequest> comms, CommunicationRequestTopic topic, String question, UserDetails userDetails) {
         LocalDateTime now = LocalDateTime.now();
-        LocalDate dueDate = calculateDueDate(now.toLocalDate());
+        LocalDate dueDate = calculateDueDateWorkingDays(now.toLocalDate(), 2);
         comms.add(CommunicationRequest.builder()
             .value(CommunicationRequestDetails.builder()
                 .requestMessage(question)
