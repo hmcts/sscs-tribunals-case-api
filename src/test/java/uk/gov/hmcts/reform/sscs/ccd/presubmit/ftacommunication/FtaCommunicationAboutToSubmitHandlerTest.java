@@ -278,7 +278,6 @@ class FtaCommunicationAboutToSubmitHandlerTest {
     void shouldHandleReplyToFtaQueryWithReplyText() {
         String chosenFtaRequestId = "1";
         String replyText = "Reply text";
-        String userName = "Test User";
 
         CommunicationRequest communicationRequest = CommunicationRequest.builder()
             .id(chosenFtaRequestId)
@@ -296,6 +295,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         ftaCommunicationFields.setInfoRequestFromFta(YesNo.YES);
         ftaCommunicationFields.setAwaitingInfoFromTribunal(YesNo.YES);
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
+        String userName = "Test User";
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().name(userName).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
@@ -320,7 +320,6 @@ class FtaCommunicationAboutToSubmitHandlerTest {
     @Test
     void shouldHandleReplyToFtaQueryWithNoActionRequired() {
         String chosenFtaRequestId = "1";
-        String userName = "Test User";
 
         CommunicationRequest communicationRequest = CommunicationRequest.builder()
             .id(chosenFtaRequestId)
@@ -338,7 +337,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         ftaCommunicationFields.setInfoRequestFromFta(YesNo.YES);
         ftaCommunicationFields.setAwaitingInfoFromTribunal(YesNo.YES);
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
-
+        String userName = "Test User";
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().name(userName).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
@@ -364,7 +363,6 @@ class FtaCommunicationAboutToSubmitHandlerTest {
     void shouldNotWipeFiltersAfterHandleReplyToFtaQueryWhenRequestNoReplyExists() {
         String chosenFtaRequestId = "1";
         String chosenFtaRequestId2 = "2";
-        String userName = "Test User";
 
         CommunicationRequest communicationRequest = CommunicationRequest.builder()
             .id(chosenFtaRequestId)
@@ -387,7 +385,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         ftaCommunicationFields.setInfoRequestFromFta(YesNo.YES);
         ftaCommunicationFields.setAwaitingInfoFromTribunal(YesNo.YES);
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
-
+        String userName = "Test User";
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().name(userName).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
