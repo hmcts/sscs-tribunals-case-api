@@ -27,8 +27,8 @@ spring:
     datasource:
         driverClassName: org.postgresql.Driver
         url: jdbc:postgresql://${JOB_SCHEDULER_DB_HOST:localhost}:${JOB_SCHEDULER_DB_PORT:5432}/${JOB_SCHEDULER_DB_NAME:sscsjobscheduler}${JOB_SCHEDULER_DB_CONNECTION_OPTIONS:}
-        username: ${JOB_SCHEDULER_DB_USERNAME:sscsjobscheduler}
-        password: ${JOB_SCHEDULER_DB_PASSWORD:sscsjobscheduler}
+        username: ${JOB_SCHEDULER_DB_USERNAME:postgres}
+        password: ${JOB_SCHEDULER_DB_PASSWORD:postgres}
         properties:
             charSet: UTF-8
         tomcat:
@@ -47,8 +47,6 @@ spring:
             remove-abandoned-timeout: 60
             log-abandoned: true
             abandon-when-percentage-full: 0
-
-spring.main.allow-bean-definition-overriding: true  # https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.1-Release-Notes#bean-overriding
 
 springdoc:
     packagesToScan: uk.gov.hmcts.reform.sscs.controller
@@ -147,7 +145,7 @@ docmosis:
     template:
         english:
             d609-97:
-                name: TB-SCS-GNO-ENG-00068.doc
+                name: TB-SCS-GNO-ENG-00068-v2.doc
             d609-98:
                 name: TB-SCS-GNO-ENG-00069.doc
             dl16:
@@ -159,10 +157,10 @@ docmosis:
                 name: TB-SCS-LET-ENG-Issue-Generic-Letter.docx
             postHearingAppSorWritten:
                 cover: TB-SCS-GNO-ENG-00012.docx
-                name: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome.docx
+                name: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome-v2.docx
         welsh:
             d609-97:
-                name: TB-SCS-GNO-WEL-00469.docx
+                name: TB-SCS-GNO-WEL-00469-v2.docx
             d609-98:
                 name: TB-SCS-GNO-WEL-00470.docx
             dl16:
@@ -174,7 +172,7 @@ docmosis:
                 name: TB-SCS-LET-ENG-Issue-Generic-Letter.docx
             postHearingAppSorWritten:
                 cover: TB-SCS-GNO-WEL-00479.docx
-                name: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome.docx
+                name: TB-SCS-LET-WEL-Statement-Of-Reasons-Outcome-v2.docx
 
 document:
     bilingual:
@@ -470,11 +468,11 @@ notification:
         sORRequest:
             docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence-v2.docx
         reviewAndSetAside:
-            docmosisId: TB-SCS-LET-ENG-Permission-to-Appeal-Review.docx
+            docmosisId: TB-SCS-LET-ENG-Permission-to-Appeal-Review-v2.docx
         permissionToAppealRefused:
-            docmosisId: TB-SCS-LET-ENG-Permission-to-Appeal-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-ENG-Permission-to-Appeal-Granted-Refused-v2.docx
         permissionToAppealGranted:
-            docmosisId: TB-SCS-LET-ENG-Permission-to-Appeal-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-ENG-Permission-to-Appeal-Granted-Refused-v2.docx
         permissionToAppealRequest:
             docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence-v2.docx
         bundleCreatedForUpperTribunal:
@@ -849,13 +847,13 @@ notification:
             other_party:
                 docmosisId: TB-SCS-GNO-ENG-00784.docx
         libertyToApplyGranted:
-            docmosisId: TB-SCS-LET-ENG-Liberty-to-Apply-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-ENG-Liberty-to-Apply-Granted-Refused-v2.docx
         libertyToApplyRefused:
-            docmosisId: TB-SCS-LET-ENG-Liberty-to-Apply-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-ENG-Liberty-to-Apply-Granted-Refused-v2.docx
         sORExtendTime:
-            docmosisId: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome.docx
+            docmosisId: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome-v2.docx
         sORRefused:
-            docmosisId: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome.docx
+            docmosisId: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome-v2.docx
         paper:
             responseReceived:
                 appellant:
@@ -1109,11 +1107,11 @@ notification:
         sORRequest:
             docmosisId: TB-SCS-LET-WEL-Action-Further-Evidence-v2.docx
         reviewAndSetAside:
-            docmosisId: TB-SCS-LET-WEL-Permission-to-Appeal-Review.docx
+            docmosisId: TB-SCS-LET-WEL-Permission-to-Appeal-Review-v2.docx
         permissionToAppealRefused:
-            docmosisId: TB-SCS-LET-WEL-Permission-to-Appeal-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-WEL-Permission-to-Appeal-Granted-Refused-v2.docx
         permissionToAppealGranted:
-            docmosisId: TB-SCS-LET-WEL-Permission-to-Appeal-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-WEL-Permission-to-Appeal-Granted-Refused-v2.docx
         permissionToAppealRequest:
             docmosisId: TB-SCS-LET-WEL-Action-Further-Evidence-v2.docx
         bundleCreatedForUpperTribunal:
@@ -1488,13 +1486,13 @@ notification:
             other_party:
                 docmosisId: TB-SCS-GNO-WEL-00787.docx
         libertyToApplyGranted:
-            docmosisId: TB-SCS-LET-WEL-Liberty-to-Apply-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-WEL-Liberty-to-Apply-Granted-Refused-v2.docx
         libertyToApplyRefused:
-            docmosisId: TB-SCS-LET-WEL-Liberty-to-Apply-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-WEL-Liberty-to-Apply-Granted-Refused-v2.docx
         sORExtendTime:
-            docmosisId: TB-SCS-LET-WEL-Statement-Of-Reasons-Outcome.docx
+            docmosisId: TB-SCS-LET-WEL-Statement-Of-Reasons-Outcome-v2.docx
         sORRefused:
-            docmosisId: TB-SCS-LET-WEL-Statement-Of-Reasons-Outcome.docx
+            docmosisId: TB-SCS-LET-WEL-Statement-Of-Reasons-Outcome-v2.docx
         paper:
             responseReceived:
                 appellant:
