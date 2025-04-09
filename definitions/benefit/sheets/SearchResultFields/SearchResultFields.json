@@ -48,7 +48,7 @@
   {"LiveFrom": "13/01/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "dwpFurtherEvidenceStates", "Label": "Further evidence state", "DisplayOrder": 4},
   {"LiveFrom": "13/01/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "dwpState", "Label": "State", "DisplayOrder": 5},
   {"LiveFrom": "13/01/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "caseCreated", "Label": "Case created date", "DisplayOrder": 6},
-  {"LiveFrom": "13/01/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "dateSentToDwp", "Label": "FTA referral date", "DisplayOrder": 7, "ResultsOrdering": "1:ASC"},
+  {"LiveFrom": "13/01/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "dateSentToDwp", "Label": "FTA referral date", "DisplayOrder": 7},
   {"LiveFrom": "13/01/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "dwpIsOfficerAttending", "Label": "FTA recommend PO to attend?", "DisplayOrder": 8},
   {"LiveFrom": "13/01/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "tribunalDirectPoToAttend", "Label": "Tribunal direct PO to attend?", "DisplayOrder": 9},
   {"LiveFrom": "13/01/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "poAttendanceConfirmed", "Label": "PO attendance confirmed?", "DisplayOrder": 10},
