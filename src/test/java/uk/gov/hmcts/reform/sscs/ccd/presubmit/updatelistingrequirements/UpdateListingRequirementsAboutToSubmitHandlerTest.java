@@ -1,11 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -71,7 +66,6 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     void setUp() {
         sscsCaseData = SscsCaseData.builder()
             .appeal(Appeal.builder().build())
-            .panelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").build())
             .dwpIsOfficerAttending("Yes")
             .build();
     }
@@ -79,19 +73,19 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     @Test
     void givenValidCallback_thenReturnTrue() {
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
+        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isTrue();
     }
 
     @Test
     void givenInvalidCallbackType_thenReturnFalse() {
-        assertFalse(handler.canHandle(ABOUT_TO_START, callback));
+        assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
     }
 
     @Test
     void givenInvalidEventType_thenReturnFalse() {
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         given(callback.getEvent()).willReturn(EventType.ADD_HEARING);
-        assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
+        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 
     @Test
@@ -107,7 +101,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
             callback,
             USER_AUTHORISATION);
 
-        assertTrue(response.getErrors().isEmpty());
+        assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
@@ -133,11 +127,11 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
             callback,
             USER_AUTHORISATION);
 
-        assertTrue(response.getErrors().isEmpty());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData()).isNotNull();
 
-        assertNotNull(response.getData());
         SscsCaseData caseData = response.getData();
-        assertEquals(UPDATE_HEARING, caseData.getSchedulingAndListingFields().getHearingState());
+        assertThat(caseData.getSchedulingAndListingFields().getHearingState()).isEqualTo(UPDATE_HEARING);
     }
 
     @Test
@@ -163,9 +157,9 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
             callback,
             USER_AUTHORISATION);
 
-        assertEquals(1, response.getErrors().size());
-        assertTrue(response.getErrors().contains("An error occurred during message publish. Please try again."));
-        assertNotNull(response.getData());
+        assertThat(response.getErrors().size()).isEqualTo(1);
+        assertThat(response.getErrors()).contains("An error occurred during message publish. Please try again.");
+        assertThat(response.getData()).isNotNull();
     }
 
     @Test
@@ -181,7 +175,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
             callback,
             USER_AUTHORISATION);
 
-        assertTrue(response.getErrors().isEmpty());
+        assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
@@ -200,7 +194,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
             callback,
             USER_AUTHORISATION);
 
-        assertTrue(response.getErrors().isEmpty());
+        assertThat(response.getErrors()).isEmpty();
     }
 
     @ParameterizedTest
@@ -220,13 +214,14 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
             callback,
             USER_AUTHORISATION);
 
-        assertTrue(response.getErrors().isEmpty());
+        assertThat(response.getErrors()).isEmpty();
         YesNo result = response.getData().getSchedulingAndListingFields().getReserveTo().getReservedDistrictTribunalJudge();
-        assertEquals(reservedDtj, result);
+        assertThat(result).isEqualTo(reservedDtj);
     }
 
     @Test
     void givenReservedDistrictTribunalJudgeIsYesAndReservedJudgeIsNotNull_responseReservedJudgeIsNull() {
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").build());
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
@@ -241,9 +236,9 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
             callback,
             USER_AUTHORISATION);
 
-        assertTrue(response.getErrors().isEmpty());
+        assertThat(response.getErrors()).isEmpty();
         JudicialUserBase result = response.getData().getSchedulingAndListingFields().getReserveTo().getReservedJudge();
-        assertNull(result);
+        assertThat(result).isNull();
         assertThat(response.getData().getPanelMemberComposition().getPanelCompositionJudge()).isEqualTo(null);
     }
 
@@ -261,9 +256,9 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
             callback,
             USER_AUTHORISATION);
 
-        assertTrue(response.getErrors().isEmpty());
-        assertNotNull(response.getData().getAppeal().getHearingSubtype());
-        assertTrue(response.getData().getAppeal().getHearingSubtype().isWantsHearingTypeVideo());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getAppeal().getHearingSubtype()).isNotNull();
+        assertThat(response.getData().getAppeal().getHearingSubtype().isWantsHearingTypeVideo()).isTrue();
     }
 
     @Test
@@ -287,9 +282,9 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
             callback,
             USER_AUTHORISATION);
 
-        assertTrue(response.getErrors().isEmpty());
-        assertNotNull(response.getData().getAppeal().getHearingSubtype());
-        assertTrue(response.getData().getAppeal().getHearingSubtype().isWantsHearingTypeTelephone());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getAppeal().getHearingSubtype()).isNotNull();
+        assertThat(response.getData().getAppeal().getHearingSubtype().isWantsHearingTypeTelephone()).isTrue();
     }
 
     @Test
@@ -314,10 +309,10 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
             callback,
             USER_AUTHORISATION);
 
-        assertTrue(response.getErrors().isEmpty());
-        assertEquals("Yes", response.getData().getAppeal().getHearingOptions().getLanguageInterpreter());
-        assertNotNull(response.getData().getAppeal().getHearingOptions().getLanguages());
-        assertEquals("Arabic", response.getData().getAppeal().getHearingOptions().getLanguages());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo("Yes");
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isNotNull();
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isEqualTo("Arabic");
 
     }
 
@@ -342,9 +337,9 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
             callback,
             USER_AUTHORISATION);
 
-        assertTrue(response.getErrors().isEmpty());
-        assertEquals("Yes", response.getData().getAppeal().getHearingOptions().getLanguageInterpreter());
-        assertNotNull(response.getData().getAppeal().getHearingOptions().getLanguages());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo("Yes");
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isNotNull();
     }
 
     @ParameterizedTest
@@ -370,10 +365,10 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
             callback,
             USER_AUTHORISATION);
 
-        assertTrue(response.getErrors().isEmpty());
-        assertEquals("Yes", response.getData().getAppeal().getHearingOptions().getLanguageInterpreter());
-        assertNotNull(response.getData().getAppeal().getHearingOptions().getLanguages());
-        assertEquals(hmcHearingType, response.getData().getAppeal().getHearingOptions().getHmcHearingType());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo("Yes");
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isNotNull();
+        assertThat(response.getData().getAppeal().getHearingOptions().getHmcHearingType()).isEqualTo(hmcHearingType);
     }
 
     @ParameterizedTest
@@ -393,7 +388,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
             callback,
             USER_AUTHORISATION);
 
-        assertTrue(response.getErrors().isEmpty());
-        assertEquals(hmcHearingType, response.getData().getAppeal().getHearingOptions().getHmcHearingType());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getAppeal().getHearingOptions().getHmcHearingType()).isEqualTo(hmcHearingType);
     }
 }

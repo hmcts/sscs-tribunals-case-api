@@ -61,7 +61,9 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
             if (isYes(callbackReservedDtj)) {
                 caseDataReserveTo.setReservedJudge(null);
-                callbackResponse.getData().getPanelMemberComposition().setPanelCompositionJudge(null);
+                if (callbackResponse.getData().getPanelMemberComposition() != null) {
+                    callbackResponse.getData().getPanelMemberComposition().setPanelCompositionJudge(null);
+                }
             }
         }
 

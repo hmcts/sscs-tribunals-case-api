@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 
@@ -59,6 +60,11 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
             if (isNull(overrideFields) || isNull(overrideFields.getAppellantInterpreter())) {
                 overrideFields = initialiseOverrideFields();
                 schedulingAndListingFields.setOverrideFields(overrideFields);
+            }
+
+            if (sscsCaseData.getPanelMemberComposition() != null
+                    && sscsCaseData.getPanelMemberComposition().getPanelCompositionJudge() != null) {
+                sscsCaseData.setJudgeReserved(YesNo.NO);
             }
             
             HearingInterpreter appellantInterpreter = overrideFields.getAppellantInterpreter();
