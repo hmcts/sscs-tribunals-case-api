@@ -29,6 +29,7 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DWP_ACRONYM;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.HMRC_ACRONYM;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBCA_ACRONYM;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBC_ACRONYM;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.SSCS5;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.SSCS8;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.LetterType.DOCMOSIS;
@@ -72,7 +73,13 @@ public class GenericLetterPlaceholderService {
         String appellantName = caseData.getAppeal().getAppellant().getName().getFullNameNoTitle();
         placeholders.put(APPELLANT_NAME, appellantName);
 
-        placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, getBenefitAcronym(caseData));
+        if (caseData.isIbcCase()) {
+            placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, IBC_ACRONYM);
+            placeholders.put(SSCS_URL_LITERAL, IBCA_URL);
+        } else {
+            placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, getBenefitAcronym(caseData));
+            placeholders.put(SSCS_URL_LITERAL, SSCS_URL);
+        }
 
         placeholders.put(FIRST_TIER_AGENCY_ACRONYM, getFirstTierAgencyAcronym(caseData));
 
