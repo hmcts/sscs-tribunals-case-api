@@ -27,8 +27,8 @@ spring:
     datasource:
         driverClassName: org.postgresql.Driver
         url: jdbc:postgresql://${JOB_SCHEDULER_DB_HOST:localhost}:${JOB_SCHEDULER_DB_PORT:5432}/${JOB_SCHEDULER_DB_NAME:sscsjobscheduler}${JOB_SCHEDULER_DB_CONNECTION_OPTIONS:}
-        username: ${JOB_SCHEDULER_DB_USERNAME:sscsjobscheduler}
-        password: ${JOB_SCHEDULER_DB_PASSWORD:sscsjobscheduler}
+        username: ${JOB_SCHEDULER_DB_USERNAME:postgres}
+        password: ${JOB_SCHEDULER_DB_PASSWORD:postgres}
         properties:
             charSet: UTF-8
         tomcat:
@@ -47,8 +47,6 @@ spring:
             remove-abandoned-timeout: 60
             log-abandoned: true
             abandon-when-percentage-full: 0
-
-spring.main.allow-bean-definition-overriding: true  # https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.1-Release-Notes#bean-overriding
 
 springdoc:
     packagesToScan: uk.gov.hmcts.reform.sscs.controller
@@ -147,7 +145,7 @@ docmosis:
     template:
         english:
             d609-97:
-                name: TB-SCS-GNO-ENG-00068.doc
+                name: TB-SCS-GNO-ENG-00068-v2.doc
             d609-98:
                 name: TB-SCS-GNO-ENG-00069.doc
             dl16:
@@ -159,10 +157,10 @@ docmosis:
                 name: TB-SCS-LET-ENG-Issue-Generic-Letter.docx
             postHearingAppSorWritten:
                 cover: TB-SCS-GNO-ENG-00012.docx
-                name: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome.docx
+                name: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome-v2.docx
         welsh:
             d609-97:
-                name: TB-SCS-GNO-WEL-00469.docx
+                name: TB-SCS-GNO-WEL-00469-v2.docx
             d609-98:
                 name: TB-SCS-GNO-WEL-00470.docx
             dl16:
@@ -174,7 +172,7 @@ docmosis:
                 name: TB-SCS-LET-ENG-Issue-Generic-Letter.docx
             postHearingAppSorWritten:
                 cover: TB-SCS-GNO-WEL-00479.docx
-                name: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome.docx
+                name: TB-SCS-LET-WEL-Statement-Of-Reasons-Outcome-v2.docx
 
 document:
     bilingual:
@@ -470,11 +468,11 @@ notification:
         sORRequest:
             docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence-v2.docx
         reviewAndSetAside:
-            docmosisId: TB-SCS-LET-ENG-Permission-to-Appeal-Review.docx
+            docmosisId: TB-SCS-LET-ENG-Permission-to-Appeal-Review-v2.docx
         permissionToAppealRefused:
-            docmosisId: TB-SCS-LET-ENG-Permission-to-Appeal-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-ENG-Permission-to-Appeal-Granted-Refused-v2.docx
         permissionToAppealGranted:
-            docmosisId: TB-SCS-LET-ENG-Permission-to-Appeal-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-ENG-Permission-to-Appeal-Granted-Refused-v2.docx
         permissionToAppealRequest:
             docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence-v2.docx
         bundleCreatedForUpperTribunal:
@@ -573,7 +571,7 @@ notification:
                 docmosisId: TB-SCS-GNO-ENG-00656.docx
         appealWithdrawn:
             appellant:
-                emailId: 8620e023-f663-477e-a771-9cfad50ee30f
+                emailId: 6919c7bd-96c7-4b6a-8a1d-4f8591a2ca19
                 smsId: 446c7b23-7342-42e1-adff-b4c367e951cb
                 docmosisId: TB-SCS-GNO-ENG-00659.docx
             representative:
@@ -581,7 +579,7 @@ notification:
                 smsId: f59440ee-19ca-4d47-a702-13e9cecaccbd
                 docmosisId: TB-SCS-GNO-ENG-00659.docx
             appointee:
-                emailId: 8620e023-f663-477e-a771-9cfad50ee30f
+                emailId: 6919c7bd-96c7-4b6a-8a1d-4f8591a2ca19
                 smsId: 446c7b23-7342-42e1-adff-b4c367e951cb
                 docmosisId: TB-SCS-GNO-ENG-00659.docx
             joint_party:
@@ -594,11 +592,11 @@ notification:
                 docmosisId: TB-SCS-GNO-ENG-00659.docx
         adminAppealWithdrawn:
             appellant:
-                emailId: 8620e023-f663-477e-a771-9cfad50ee30f
+                emailId: 6919c7bd-96c7-4b6a-8a1d-4f8591a2ca19
                 smsId: 446c7b23-7342-42e1-adff-b4c367e951cb
                 docmosisId: TB-SCS-GNO-ENG-00659.docx
             appointee:
-                emailId: 8620e023-f663-477e-a771-9cfad50ee30f
+                emailId: 6919c7bd-96c7-4b6a-8a1d-4f8591a2ca19
                 smsId: 446c7b23-7342-42e1-adff-b4c367e951cb
                 docmosisId: TB-SCS-GNO-ENG-00659.docx
             representative:
@@ -849,13 +847,13 @@ notification:
             other_party:
                 docmosisId: TB-SCS-GNO-ENG-00784.docx
         libertyToApplyGranted:
-            docmosisId: TB-SCS-LET-ENG-Liberty-to-Apply-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-ENG-Liberty-to-Apply-Granted-Refused-v2.docx
         libertyToApplyRefused:
-            docmosisId: TB-SCS-LET-ENG-Liberty-to-Apply-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-ENG-Liberty-to-Apply-Granted-Refused-v2.docx
         sORExtendTime:
-            docmosisId: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome.docx
+            docmosisId: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome-v2.docx
         sORRefused:
-            docmosisId: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome.docx
+            docmosisId: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome-v2.docx
         paper:
             responseReceived:
                 appellant:
@@ -1109,11 +1107,11 @@ notification:
         sORRequest:
             docmosisId: TB-SCS-LET-WEL-Action-Further-Evidence-v2.docx
         reviewAndSetAside:
-            docmosisId: TB-SCS-LET-WEL-Permission-to-Appeal-Review.docx
+            docmosisId: TB-SCS-LET-WEL-Permission-to-Appeal-Review-v2.docx
         permissionToAppealRefused:
-            docmosisId: TB-SCS-LET-WEL-Permission-to-Appeal-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-WEL-Permission-to-Appeal-Granted-Refused-v2.docx
         permissionToAppealGranted:
-            docmosisId: TB-SCS-LET-WEL-Permission-to-Appeal-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-WEL-Permission-to-Appeal-Granted-Refused-v2.docx
         permissionToAppealRequest:
             docmosisId: TB-SCS-LET-WEL-Action-Further-Evidence-v2.docx
         bundleCreatedForUpperTribunal:
@@ -1212,7 +1210,7 @@ notification:
                 docmosisId: TB-SCS-GNO-WEL-00658.docx
         appealWithdrawn:
             appellant:
-                emailId: 45681209-46d6-4525-89d6-506611e131f9
+                emailId: 7d93adf9-d7ab-4181-a2c5-c2708a203c9d
                 smsId: 0a269295-bf72-4ce1-ad99-9ff616fca0ae
                 docmosisId: TB-SCS-GNO-WEL-00661.docx
             representative:
@@ -1220,7 +1218,7 @@ notification:
                 smsId: 66ff7a2c-7e22-4a2b-9120-00aea140db75
                 docmosisId: TB-SCS-GNO-WEL-00661.docx
             appointee:
-                emailId: 45681209-46d6-4525-89d6-506611e131f9
+                emailId: 7d93adf9-d7ab-4181-a2c5-c2708a203c9d
                 smsId: 0a269295-bf72-4ce1-ad99-9ff616fca0ae
                 docmosisId: TB-SCS-GNO-WEL-00661.docx
             joint_party:
@@ -1233,11 +1231,11 @@ notification:
                 docmosisId: TB-SCS-GNO-WEL-00661.docx
         adminAppealWithdrawn:
             appellant:
-                emailId: 45681209-46d6-4525-89d6-506611e131f9
+                emailId: 7d93adf9-d7ab-4181-a2c5-c2708a203c9d
                 smsId: 0a269295-bf72-4ce1-ad99-9ff616fca0ae
                 docmosisId: TB-SCS-GNO-WEL-00661.docx
             appointee:
-                emailId: 45681209-46d6-4525-89d6-506611e131f9
+                emailId: 7d93adf9-d7ab-4181-a2c5-c2708a203c9d
                 smsId: 0a269295-bf72-4ce1-ad99-9ff616fca0ae
                 docmosisId: TB-SCS-GNO-WEL-00661.docx
             representative:
@@ -1488,13 +1486,13 @@ notification:
             other_party:
                 docmosisId: TB-SCS-GNO-WEL-00787.docx
         libertyToApplyGranted:
-            docmosisId: TB-SCS-LET-WEL-Liberty-to-Apply-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-WEL-Liberty-to-Apply-Granted-Refused-v2.docx
         libertyToApplyRefused:
-            docmosisId: TB-SCS-LET-WEL-Liberty-to-Apply-Granted-Refused.docx
+            docmosisId: TB-SCS-LET-WEL-Liberty-to-Apply-Granted-Refused-v2.docx
         sORExtendTime:
-            docmosisId: TB-SCS-LET-WEL-Statement-Of-Reasons-Outcome.docx
+            docmosisId: TB-SCS-LET-WEL-Statement-Of-Reasons-Outcome-v2.docx
         sORRefused:
-            docmosisId: TB-SCS-LET-WEL-Statement-Of-Reasons-Outcome.docx
+            docmosisId: TB-SCS-LET-WEL-Statement-Of-Reasons-Outcome-v2.docx
         paper:
             responseReceived:
                 appellant:
