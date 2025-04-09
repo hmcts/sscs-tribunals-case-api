@@ -193,6 +193,6 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
-        assertThat(response.getData().getJudgeReserved()).isEqualTo(YesNo.NO);
+        assertThat(response.getData().getSchedulingAndListingFields().getReserveTo().getReservedDistrictTribunalJudge()).isEqualTo(YesNo.NO);
     }
 }
