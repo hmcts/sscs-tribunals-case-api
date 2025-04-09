@@ -353,13 +353,13 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
         PanelCategory panelCategory = new PanelCategory();
         panelCategory.setBenefitIssueCode("022DD");
         panelCategory.setJohTiers(new ArrayList<>(List.of(JOH_CODE)));
-        when(panelCategoryService.getPanelCategoryMap(any(),any(),any())).thenReturn(panelCategory);
+        when(panelCategoryService.getPanelCategory(any(),any(),any())).thenReturn(panelCategory);
         List<String> result = hearingsPanelMapping.getRoleTypes(caseData);
         assertThat(result).isNotEmpty();
         assertThat(result.getFirst()).isEqualTo(JOH_CODE);
     }
 
-    @DisplayName("getPanelCategoryMap is called with correct number of specialisms and fqpm")
+    @DisplayName("getPanelCategory is called with correct number of specialisms and fqpm")
     @Test
     void testGetRolesWithSpecialismAndFqpm() {
         ReflectionTestUtils.setField(hearingsPanelMapping, "defaultPanelCompEnabled", true);
@@ -367,23 +367,23 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
         caseData.getSscsIndustrialInjuriesData().setSecondPanelDoctorSpecialism("eyeSurgeon");
         caseData.setIsFqpmRequired(YesNo.YES);
         hearingsPanelMapping.getRoleTypes(caseData);
-        verify(panelCategoryService).getPanelCategoryMap(any(), eq("2"), eq("true"));
+        verify(panelCategoryService).getPanelCategory(any(), eq("2"), eq("true"));
     }
 
-    @DisplayName("getPanelCategoryMap is called with null values for specialism and fqpm when not in case data")
+    @DisplayName("getPanelCategory is called with null values for specialism and fqpm when not in case data")
     @Test
     void testGetRolesWithNoSpecialismAndFqpm() {
         ReflectionTestUtils.setField(hearingsPanelMapping, "defaultPanelCompEnabled", true);
         caseData.setIsFqpmRequired(YesNo.NO);
         hearingsPanelMapping.getRoleTypes(caseData);
-        verify(panelCategoryService).getPanelCategoryMap(any(), eq(null), eq(null));
+        verify(panelCategoryService).getPanelCategory(any(), eq(null), eq(null));
     }
 
     @DisplayName("getRoleTypes does not throw exception when panelCategoryMap is null")
     @Test
     void testGetRolesWithInvalidCode() {
         ReflectionTestUtils.setField(hearingsPanelMapping, "defaultPanelCompEnabled", true);
-        when(panelCategoryService.getPanelCategoryMap(any(),any(),any())).thenReturn(null);
+        when(panelCategoryService.getPanelCategory(any(),any(),any())).thenReturn(null);
         assertThatNoException()
                 .isThrownBy(() -> hearingsPanelMapping.getRoleTypes(caseData));
     }
