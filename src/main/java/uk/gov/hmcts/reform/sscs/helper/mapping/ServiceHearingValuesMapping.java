@@ -26,12 +26,14 @@ public final class ServiceHearingValuesMapping {
     public static final String BENEFIT = "Benefit";
 
     private final HearingsPanelMapping hearingsPanelMapping;
+    private final PanelCategoryService panelCategoryService;
 
     @Value("${feature.default-panel-comp.enabled}")
     private boolean defaultPanelCompEnabled;
 
-    ServiceHearingValuesMapping(HearingsPanelMapping hearingsPanelMapping) {
+    ServiceHearingValuesMapping(HearingsPanelMapping hearingsPanelMapping, PanelCategoryService panelCategoryService) {
         this.hearingsPanelMapping = hearingsPanelMapping;
+        this.panelCategoryService = panelCategoryService;
     }
 
 
@@ -83,7 +85,7 @@ public final class ServiceHearingValuesMapping {
 
     public Judiciary getJudiciary(@Valid SscsCaseData sscsCaseData, ReferenceDataServiceHolder refData) {
         return Judiciary.builder()
-                .roleType(null)
+                .roleType(panelCategoryService.getRoleTypes(sscsCaseData))
                 .authorisationTypes(HearingsPanelMapping.getAuthorisationTypes())
                 .authorisationSubType(HearingsPanelMapping.getAuthorisationSubTypes())
                 .judiciarySpecialisms(HearingsPanelMapping.getPanelSpecialisms(sscsCaseData, getSessionCaseCodeMap(sscsCaseData, refData)))
