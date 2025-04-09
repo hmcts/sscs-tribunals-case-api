@@ -101,8 +101,6 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
             .build();
         communicationRequest.getValue().setRequestReply(reply);
         communicationRequest.getValue().setRequestResponseDueDate(null);
-        communicationFields.setTribunalCommunicationFilter(noActionRequired ? null : TribunalCommunicationFilter.INFO_PROVIDED_BY_FTA);
-        communicationFields.setFtaCommunicationFilter(null);
         sscsCaseData.setCommunicationFields(communicationFields);
     }
 
