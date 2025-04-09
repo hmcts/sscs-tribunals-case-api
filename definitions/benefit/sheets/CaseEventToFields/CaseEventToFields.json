@@ -239,7 +239,7 @@
     "DisplayContext": "OPTIONAL",
     "FieldShowCondition": "hearingRoute=\"listAssist\"",
     "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 5,
+    "PageFieldDisplayOrder": 6,
     "PageID": "1.0",
     "ShowSummaryChangeOption": "Y"
   },
