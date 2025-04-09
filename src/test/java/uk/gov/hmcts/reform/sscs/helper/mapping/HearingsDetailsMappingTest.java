@@ -151,6 +151,8 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
             .caseData(caseData)
             .build();
 
+        given(hearingsPanelMapping.getPanelRequirements(caseData, refData)).willReturn(PanelRequirements.builder().build());
+
         HearingDetails hearingDetails = hearingsDetailsMapping.buildHearingDetails(wrapper, refData);
 
         assertNotNull(hearingDetails.getHearingType());
@@ -162,6 +164,7 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
         assertNull(hearingDetails.getListingComments());
         assertNull(hearingDetails.getHearingRequester());
         assertNull(hearingDetails.getLeadJudgeContractType());
+        assertNotNull(hearingDetails.getPanelRequirements());
     }
 
     @DisplayName("shouldBeHearingsInWelshFlag Test")
