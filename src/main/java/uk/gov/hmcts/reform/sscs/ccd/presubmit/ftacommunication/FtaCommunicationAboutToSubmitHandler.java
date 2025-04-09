@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
-import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 
 @Service
@@ -100,8 +99,7 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
 
     private void setFieldsForNewRequest(SscsCaseData sscsCaseData, FtaCommunicationFields communicationFields, List<CommunicationRequest> comms) {
         communicationFields.setFtaCommunications(comms);
-        communicationFields.setTribunalCommunicationFilter(TribunalCommunicationFilter.AWAITING_INFO_FROM_FTA);
-        communicationFields.setFtaCommunicationFilter(FtaCommunicationFilter.PROVIDE_INFO_TO_TRIBUNAL);
+        communicationFields.setFtaResponseDueDate(getOldestResponseDate(comms));
         sscsCaseData.setCommunicationFields(communicationFields);
     }
 
@@ -124,8 +122,17 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
             .build();
         communicationRequest.getValue().setRequestReply(reply);
         communicationRequest.getValue().setRequestResponseDueDate(null);
-        ftaCommunicationFields.setTribunalCommunicationFilter(null);
-        ftaCommunicationFields.setFtaCommunicationFilter(noActionRequired ? null : FtaCommunicationFilter.INFO_PROVIDED_FROM_TRIBUNAL);
+
+        List<CommunicationRequest> requestsWithoutReplies = Optional.ofNullable(ftaCommunicationFields.getTribunalCommunications())
+            .orElse(Collections.emptyList())
+            .stream()
+            .filter((request -> request.getValue().getRequestReply() == null))
+            .toList();
+        if (requestsWithoutReplies.isEmpty()) {
+            ftaCommunicationFields.setTribunalResponseDueDate(null);
+        } else {
+            ftaCommunicationFields.setTribunalResponseDueDate(getOldestResponseDate(requestsWithoutReplies));
+        }
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
     }
 
@@ -138,5 +145,15 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         communicationFields.setFtaRequestNoResponseRadioDl(null);
         communicationFields.setFtaRequestNoResponseNoAction(null);
         sscsCaseData.setCommunicationFields(communicationFields);
+    }
+
+    public static LocalDate getOldestResponseDate(List<CommunicationRequest> communicationRequests) {
+        return communicationRequests.stream()
+            .filter(communicationRequest -> communicationRequest.getValue().getRequestReply() == null)
+            .sorted(Comparator.comparing(communicationRequest -> communicationRequest.getValue().getRequestResponseDueDate()))
+            .toList()
+            .getFirst()
+            .getValue()
+            .getRequestResponseDueDate();
     }
 }
