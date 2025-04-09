@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.Judiciary;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.PanelPreference;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.ServiceHearingValues;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 import uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil;
 
@@ -23,8 +24,12 @@ public final class ServiceHearingValuesMapping {
 
     private final HearingsPanelMapping hearingsPanelMapping;
 
-    ServiceHearingValuesMapping(HearingsPanelMapping hearingsPanelMapping) {
+    private final PanelCategoryService panelCategoryService;
+
+
+    ServiceHearingValuesMapping(HearingsPanelMapping hearingsPanelMapping, PanelCategoryService panelCategoryService) {
         this.hearingsPanelMapping = hearingsPanelMapping;
+        this.panelCategoryService = panelCategoryService;
     }
 
 
@@ -76,7 +81,7 @@ public final class ServiceHearingValuesMapping {
 
     public Judiciary getJudiciary(@Valid SscsCaseData sscsCaseData, ReferenceDataServiceHolder refData) {
         return Judiciary.builder()
-                .roleType(null)
+                .roleType(panelCategoryService.getRoleTypes(sscsCaseData))
                 .authorisationTypes(HearingsPanelMapping.getAuthorisationTypes())
                 .authorisationSubType(HearingsPanelMapping.getAuthorisationSubTypes())
                 .judiciarySpecialisms(HearingsPanelMapping.getPanelSpecialisms(sscsCaseData, getSessionCaseCodeMap(sscsCaseData, refData)))

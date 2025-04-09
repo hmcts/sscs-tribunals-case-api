@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.RelatedParty;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingPriority;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
@@ -73,11 +74,14 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
     @Mock
     private HearingsPanelMapping hearingsPanelMapping;
 
+    @Mock
+    private PanelCategoryService panelCategoryService;
+
     private ServiceHearingValuesMapping serviceHearingValuesMapping;
 
     @BeforeEach
     public void setUp() {
-        serviceHearingValuesMapping = new ServiceHearingValuesMapping(hearingsPanelMapping);
+        serviceHearingValuesMapping = new ServiceHearingValuesMapping(hearingsPanelMapping, panelCategoryService);
         caseData = SscsCaseData.builder()
             .ccdCaseId("1234")
             .benefitCode(BENEFIT_CODE)
