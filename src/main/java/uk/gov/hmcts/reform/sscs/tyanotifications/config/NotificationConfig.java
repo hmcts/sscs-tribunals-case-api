@@ -40,6 +40,8 @@ public class NotificationConfig {
     private String myaClaimingExpensesLink;
     @Value("${helpline.telephone}")
     private String helplineTelephone;
+    @Value("${helpline.telephoneIbc}")
+    private String helplineTelephoneIbc;
     @Value("${helpline.telephoneScotland}")
     private String helplineTelephoneScotland;
 
@@ -99,6 +101,10 @@ public class NotificationConfig {
 
     public String getHelplineTelephoneScotland() {
         return helplineTelephoneScotland;
+    }
+
+    public String getHelplineTelephoneIbc() {
+        return helplineTelephoneIbc;
     }
 
     public Template getTemplate(String emailTemplateName, String smsTemplateName, String letterTemplateName,
