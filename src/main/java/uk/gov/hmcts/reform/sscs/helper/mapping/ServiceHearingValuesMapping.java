@@ -5,6 +5,7 @@ import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsMapping.getSession
 import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.Judiciary;
@@ -13,7 +14,7 @@ import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.ServiceHearingValues
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 import uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil;
 
-
+@Slf4j
 public final class ServiceHearingValuesMapping {
 
     public static final String BENEFIT = "Benefit";
@@ -26,7 +27,12 @@ public final class ServiceHearingValuesMapping {
             throws ListingException {
 
         boolean shouldBeAutoListed = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
-
+        int hearingDuration = 0;
+        try {
+            hearingDuration = HearingsDurationMapping.getHearingDuration(caseData, refData);
+        } catch (ListingException e) {
+            log.error("Error getting hearing duration for case ID {}: {}", caseData.getCcdCaseId(), e.getMessage());
+        }
         return ServiceHearingValues.builder()
                 .publicCaseName(HearingsCaseMapping.getPublicCaseName(caseData))
                 .caseDeepLink(HearingsCaseMapping.getCaseDeepLink(caseData, refData))
@@ -39,7 +45,7 @@ public final class ServiceHearingValuesMapping {
                 .caseType(BENEFIT)
                 .caseCategories(HearingsCaseMapping.buildCaseCategories(caseData, refData))
                 .hearingWindow(HearingsWindowMapping.buildHearingWindow(caseData, refData))
-                .duration(HearingsDurationMapping.getHearingDuration(caseData, refData))
+                .duration(hearingDuration)
                 .hearingPriorityType(HearingsDetailsMapping.getHearingPriority(caseData))
                 .numberOfPhysicalAttendees(HearingsNumberAttendeesMapping.getNumberOfPhysicalAttendees(caseData))
                 .hearingInWelshFlag(HearingsDetailsMapping.shouldBeHearingsInWelshFlag())

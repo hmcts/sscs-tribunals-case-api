@@ -11,6 +11,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.calculateDueDateWorkingDays;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -114,10 +115,10 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         assertEquals(expectedQuestion, addedCom.getRequestMessage());
         assertEquals(expectedUserName, addedCom.getRequestUserName());
         assertNotNull(addedCom.getRequestDateTime());
-
-        // Verify the enum values are correctly set
-        assertEquals(TribunalCommunicationFilter.INFO_REQUEST_FROM_FTA, response.getData().getCommunicationFields().getTribunalCommunicationFilter());
-        assertEquals(FtaCommunicationFilter.AWAITING_INFO_FROM_TRIBUNAL, response.getData().getCommunicationFields().getFtaCommunicationFilter());
+        assertNotNull(addedCom.getRequestResponseDueDate());
+        LocalDate date = calculateDueDateWorkingDays(LocalDate.now(), 2);
+        assertEquals(date, addedCom.getRequestResponseDueDate());
+        assertEquals(date, response.getData().getCommunicationFields().getTribunalResponseDueDate());
     }
 
     @Test
@@ -138,8 +139,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
 
         List<CommunicationRequest> resultComs = response.getData().getCommunicationFields().getTribunalCommunications();
         assertEquals(0, resultComs.size());
-        assertNull(response.getData().getCommunicationFields().getTribunalCommunicationFilter());
-        assertNull(response.getData().getCommunicationFields().getFtaCommunicationFilter());
+        assertNull(response.getData().getCommunicationFields().getTribunalResponseDueDate());
     }
 
     @Test
@@ -159,8 +159,6 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
 
         List<CommunicationRequest> resultComs = response.getData().getCommunicationFields().getTribunalCommunications();
         assertEquals(0, resultComs.size());
-        assertNull(response.getData().getCommunicationFields().getTribunalCommunicationFilter());
-        assertNull(response.getData().getCommunicationFields().getFtaCommunicationFilter());
     }
 
     @Test
@@ -221,10 +219,8 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         assertEquals(expectedUserName, addedCom.getRequestUserName());
         assertNotNull(addedCom.getRequestDateTime());
         assertEquals(tribunalCommunicationPast, resultComs.getLast());
-
-        // Verify the enum values are correctly set
-        assertEquals(TribunalCommunicationFilter.INFO_REQUEST_FROM_FTA, response.getData().getCommunicationFields().getTribunalCommunicationFilter());
-        assertEquals(FtaCommunicationFilter.AWAITING_INFO_FROM_TRIBUNAL, response.getData().getCommunicationFields().getFtaCommunicationFilter());
+        assertEquals(calculateDueDateWorkingDays(LocalDate.now(), 2), addedCom.getRequestResponseDueDate());
+        assertEquals(LocalDate.now().minusYears(1), response.getData().getCommunicationFields().getTribunalResponseDueDate());
     }
 
     @Test
@@ -257,9 +253,5 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         List<CommunicationRequest> resultComs = response.getData().getCommunicationFields().getTribunalCommunications();
 
         assertNotNull(resultComs);
-
-        // Verify the enum values are correctly set
-        assertEquals(TribunalCommunicationFilter.INFO_REQUEST_FROM_FTA, response.getData().getCommunicationFields().getTribunalCommunicationFilter());
-        assertEquals(FtaCommunicationFilter.AWAITING_INFO_FROM_TRIBUNAL, response.getData().getCommunicationFields().getFtaCommunicationFilter());
     }
 }

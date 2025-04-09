@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.tribunalcommunication;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication.FtaCommunicationAboutToSubmitHandler.addCommunicationRequest;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication.FtaCommunicationAboutToSubmitHandler.getOldestResponseDate;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -107,11 +108,10 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
 
     private void setFieldsForNewRequest(SscsCaseData sscsCaseData, FtaCommunicationFields communicationFields, List<CommunicationRequest> comms) {
         communicationFields.setTribunalCommunications(comms);
-        communicationFields.setTribunalCommunicationFilter(TribunalCommunicationFilter.INFO_REQUEST_FROM_FTA);
-        communicationFields.setFtaCommunicationFilter(FtaCommunicationFilter.AWAITING_INFO_FROM_TRIBUNAL);
         communicationFields.setTribunalRequestTopic(null);
         communicationFields.setTribunalRequestQuestion(null);
         communicationFields.setTribunalRequestType(null);
+        communicationFields.setTribunalResponseDueDate(getOldestResponseDate(comms));
         sscsCaseData.setCommunicationFields(communicationFields);
     }
 
