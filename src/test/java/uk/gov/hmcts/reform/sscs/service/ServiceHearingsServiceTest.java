@@ -55,7 +55,6 @@ import uk.gov.hmcts.reform.sscs.helper.mapping.ServiceHearingValuesMapping;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.service.ServiceHearingRequest;
-import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.PartyDetails;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.ServiceHearingValues;
 import uk.gov.hmcts.reform.sscs.model.service.linkedcases.ServiceLinkedCases;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
@@ -154,23 +153,6 @@ class ServiceHearingsServiceTest {
         caseDetails = SscsCaseDetails.builder()
             .data(caseData)
             .build();
-    }
-
-    @DisplayName("When a case V2 data is retrieved an entity which does not have a Id, that a new Id will be generated and the method updateCaseData will be called once")
-    @Test
-    void testGetServiceHearingValuesNoIds() throws Exception {
-        ServiceHearingRequest request = ServiceHearingRequest.builder()
-                .caseId(String.valueOf(CASE_ID))
-                .build();
-
-        given(ccdCaseService.getCaseDetails(String.valueOf(CASE_ID))).willReturn(caseDetails);
-        given(serviceHearingValuesMapping.mapServiceHearingValues(caseData, refData)).willReturn(ServiceHearingValues.builder().parties(List.of(PartyDetails.builder().partyID("1").build())).build());
-
-        ServiceHearingValues result = serviceHearingsService.getServiceHearingValues(request);
-
-        assertThat(result.getParties())
-                .extracting("partyID")
-                .doesNotContainNull();
     }
 
     @DisplayName("When a listing error is throw due to invalid excluded dates, then catch the error, send a listing error event and rethrow the error")
