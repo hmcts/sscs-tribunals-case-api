@@ -2,7 +2,9 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.tribunalcommunication;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication.FtaCommunicationAboutToSubmitHandler.addCommunicationRequest;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication.FtaCommunicationAboutToSubmitHandler.getOldestResponseDate;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getCommunicationRequestFromId;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getOldestResponseDate;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getRepliesWithoutReviews;
 
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
@@ -67,18 +69,44 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
             final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
             addCommunicationRequest(tribunalComms, topic, question, userDetails);
             setFieldsForNewRequest(sscsCaseData, ftaCommunicationFields, tribunalComms);
+        } else if (ftaCommunicationFields.getTribunalRequestType().equals(TribunalRequestType.REVIEW_TRIBUNAL_REPLY)) {
+            handleReviewTribunalReply(ftaCommunicationFields, sscsCaseData);
         }
+        clearFields(sscsCaseData, ftaCommunicationFields);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    private void setFieldsForNewRequest(SscsCaseData sscsCaseData, FtaCommunicationFields communicationFields, List<CommunicationRequest> comms) {
-        communicationFields.setTribunalCommunications(comms);
+    private void clearFields(SscsCaseData sscsCaseData, FtaCommunicationFields communicationFields) {
         communicationFields.setTribunalRequestTopic(null);
         communicationFields.setTribunalRequestQuestion(null);
         communicationFields.setTribunalRequestType(null);
+        communicationFields.setTribunalRequestRespondedReply(null);
+        communicationFields.setTribunalRequestRespondedQuery(null);
+        communicationFields.setTribunalRequestRespondedDl(null);
+        communicationFields.setTribunalRequestRespondedActioned(null);
+        sscsCaseData.setCommunicationFields(communicationFields);
+    }
+
+    private void setFieldsForNewRequest(SscsCaseData sscsCaseData, FtaCommunicationFields communicationFields, List<CommunicationRequest> comms) {
+        communicationFields.setTribunalCommunications(comms);
         communicationFields.setTribunalResponseDueDate(getOldestResponseDate(comms));
         sscsCaseData.setCommunicationFields(communicationFields);
+    }
+
+    private void handleReviewTribunalReply(FtaCommunicationFields ftaCommunicationFields, SscsCaseData sscsCaseData) {
+        DynamicList requestDl = ftaCommunicationFields.getTribunalRequestRespondedDl();
+        String chosenFtaRequestId = requestDl.getValue().getCode();
+        CommunicationRequest communicationRequest = getCommunicationRequestFromId(chosenFtaRequestId, ftaCommunicationFields.getTribunalCommunications());
+        communicationRequest.getValue().getRequestReply().setReplyHasBeenActioned(YesNo.YES);
+        List<CommunicationRequest> repliesWithoutReviews = getRepliesWithoutReviews(ftaCommunicationFields.getTribunalCommunications());
+
+        if (repliesWithoutReviews.isEmpty()) {
+            ftaCommunicationFields.setFtaResponseProvidedDate(null);
+        } else {
+            ftaCommunicationFields.setFtaResponseProvidedDate(getOldestResponseDate(repliesWithoutReviews));
+        }
+        sscsCaseData.setCommunicationFields(ftaCommunicationFields);
     }
 }
 

@@ -2,11 +2,15 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.calculateDueDateWorkingDays;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getCommunicationRequestFromId;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getOldestResponseDate;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getOldestResponseProvidedDate;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getRepliesWithoutReviews;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getRequestsWithoutReplies;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -107,32 +111,27 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         DynamicList ftaRequestDl = ftaCommunicationFields.getFtaRequestNoResponseRadioDl();
         DynamicListItem chosenFtaRequest = ftaRequestDl.getValue();
         String chosenFtaRequestId = chosenFtaRequest.getCode();
-        CommunicationRequest communicationRequest = Optional.ofNullable(ftaCommunicationFields.getTribunalCommunications())
-            .orElse(Collections.emptyList())
-            .stream()
-            .filter(communicationRequest1 -> communicationRequest1.getId().equals(chosenFtaRequestId))
-            .findFirst()
-            .orElseThrow(() -> new IllegalStateException("No communication request found with id: " + chosenFtaRequestId));
+        CommunicationRequest communicationRequest = getCommunicationRequestFromId(chosenFtaRequestId, ftaCommunicationFields.getTribunalCommunications());
+
         String replyText = ftaCommunicationFields.getFtaRequestNoResponseTextArea();
         boolean noActionRequired = !ObjectUtils.isEmpty(ftaCommunicationFields.getFtaRequestNoResponseNoAction());
         CommunicationRequestReply reply = CommunicationRequestReply.builder()
             .replyDateTime(LocalDateTime.now())
             .replyUserName(idamService.getUserDetails(userAuthorisation).getName())
             .replyMessage(noActionRequired ? "No action required" : replyText)
+            .replyHasBeenActioned(noActionRequired ? null : YesNo.NO)
             .build();
         communicationRequest.getValue().setRequestReply(reply);
         communicationRequest.getValue().setRequestResponseDueDate(null);
 
-        List<CommunicationRequest> requestsWithoutReplies = Optional.ofNullable(ftaCommunicationFields.getTribunalCommunications())
-            .orElse(Collections.emptyList())
-            .stream()
-            .filter((request -> request.getValue().getRequestReply() == null))
-            .toList();
+        List<CommunicationRequest> requestsWithoutReplies = getRequestsWithoutReplies(ftaCommunicationFields.getTribunalCommunications());
         if (requestsWithoutReplies.isEmpty()) {
             ftaCommunicationFields.setTribunalResponseDueDate(null);
         } else {
             ftaCommunicationFields.setTribunalResponseDueDate(getOldestResponseDate(requestsWithoutReplies));
         }
+        List<CommunicationRequest> repliesWithoutReviews = getRepliesWithoutReviews(ftaCommunicationFields.getTribunalCommunications());
+        ftaCommunicationFields.setFtaResponseProvidedDate(getOldestResponseProvidedDate(repliesWithoutReviews));
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
     }
 
@@ -145,15 +144,5 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         communicationFields.setFtaRequestNoResponseRadioDl(null);
         communicationFields.setFtaRequestNoResponseNoAction(null);
         sscsCaseData.setCommunicationFields(communicationFields);
-    }
-
-    public static LocalDate getOldestResponseDate(List<CommunicationRequest> communicationRequests) {
-        return communicationRequests.stream()
-            .filter(communicationRequest -> communicationRequest.getValue().getRequestReply() == null)
-            .sorted(Comparator.comparing(communicationRequest -> communicationRequest.getValue().getRequestResponseDueDate()))
-            .toList()
-            .getFirst()
-            .getValue()
-            .getRequestResponseDueDate();
     }
 }

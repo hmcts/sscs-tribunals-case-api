@@ -7,10 +7,12 @@
     "DisplayOrder": 1306,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
+    "ShowSummary": "Y",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
     "EventEnablingCondition": "appeal.benefitType.code=\"infectedBloodCompensation\"",
-    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit"
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent"
   },
   {
     "LiveFrom": "13/03/2025",
@@ -20,6 +22,7 @@
     "DisplayOrder": 717,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
+    "ShowSummary": "Y",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
     "EventEnablingCondition": "appeal.benefitType.code=\"infectedBloodCompensation\"",
