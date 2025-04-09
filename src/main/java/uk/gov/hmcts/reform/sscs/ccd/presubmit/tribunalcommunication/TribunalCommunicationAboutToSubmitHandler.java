@@ -3,8 +3,11 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.tribunalcommunication;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication.FtaCommunicationAboutToSubmitHandler.addCommunicationRequest;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -43,6 +46,7 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
                                                           String userAuthorisation) {
 
+        log.info(userAuthorisation + "*!* - TribunalCommunicationAboutToSubmitHandler handle method called");                                                    
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
@@ -54,21 +58,51 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
             return new PreSubmitCallbackResponse<>(sscsCaseData);
         }
 
-        FtaCommunicationFields ftaCommunicationFields = Optional.ofNullable(sscsCaseData.getCommunicationFields())
+        FtaCommunicationFields communicationFields = Optional.ofNullable(sscsCaseData.getCommunicationFields())
             .orElse(FtaCommunicationFields.builder().build());
 
-        if (ftaCommunicationFields.getTribunalRequestType() == TribunalRequestType.NEW_REQUEST) {
-            CommunicationRequestTopic topic = ftaCommunicationFields.getTribunalRequestTopic();
-            String question = ftaCommunicationFields.getTribunalRequestQuestion();
-            List<CommunicationRequest> tribunalComms = Optional.ofNullable(ftaCommunicationFields.getTribunalCommunications())
+        if (communicationFields.getTribunalRequestType() == TribunalRequestType.NEW_REQUEST) {
+            CommunicationRequestTopic topic = communicationFields.getTribunalRequestTopic();
+            String question = communicationFields.getTribunalRequestQuestion();
+            List<CommunicationRequest> tribunalComms = Optional.ofNullable(communicationFields.getTribunalCommunications())
                 .orElse(new ArrayList<>());
 
             final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
             addCommunicationRequest(tribunalComms, topic, question, userDetails);
-            setFieldsForNewRequest(sscsCaseData, ftaCommunicationFields, tribunalComms);
+            setFieldsForNewRequest(sscsCaseData, communicationFields, tribunalComms);
+        }
+        else if (communicationFields.getTribunalRequestType() == TribunalRequestType.REPLY_TO_TRIBUNAL_QUERY) {
+            log.info(userAuthorisation + "*!* - TribunalCommunicationAboutToSubmitHandler handle method called for reply to tribunal query");
+            handleReplyToTribunalQuery(communicationFields, userAuthorisation, sscsCaseData);
         }
 
+        clearFields(sscsCaseData, communicationFields);
+
         return new PreSubmitCallbackResponse<>(sscsCaseData);
+    }
+
+    private void handleReplyToTribunalQuery(FtaCommunicationFields communicationFields, String userAuthorisation, SscsCaseData sscsCaseData) {
+        DynamicList requestDl = communicationFields.getTribunalRequestNoResponseRadioDl();
+        DynamicListItem chosenRequest = requestDl.getValue();
+        String chosenTribunalRequestId = chosenRequest.getCode();
+        CommunicationRequest communicationRequest = Optional.ofNullable(communicationFields.getTribunalCommunications())
+            .orElse(Collections.emptyList())
+            .stream()
+            .filter(communicationRequest1 -> communicationRequest1.getId().equals(chosenTribunalRequestId))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("No communication request found with id: " + chosenTribunalRequestId));
+        String replyText = communicationFields.getTribunalRequestNoResponseTextArea();
+        boolean noActionRequired = !ObjectUtils.isEmpty(communicationFields.getTribunalRequestNoResponseNoAction());
+        CommunicationRequestReply reply = CommunicationRequestReply.builder()
+            .replyDateTime(LocalDateTime.now())
+            .replyUserName(idamService.getUserDetails(userAuthorisation).getName())
+            .replyMessage(noActionRequired ? "No action required" : replyText)
+            .build();
+        communicationRequest.getValue().setRequestReply(reply);
+        communicationRequest.getValue().setRequestResponseDueDate(null);
+        communicationFields.setTribunalCommunicationFilter(noActionRequired ? null : TribunalCommunicationFilter.INFO_PROVIDED_BY_FTA);
+        communicationFields.setFtaCommunicationFilter(null);
+        sscsCaseData.setCommunicationFields(communicationFields);
     }
 
     private void setFieldsForNewRequest(SscsCaseData sscsCaseData, FtaCommunicationFields communicationFields, List<CommunicationRequest> comms) {
@@ -78,6 +112,17 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
         communicationFields.setTribunalRequestTopic(null);
         communicationFields.setTribunalRequestQuestion(null);
         communicationFields.setTribunalRequestType(null);
+        sscsCaseData.setCommunicationFields(communicationFields);
+    }
+
+    private void clearFields(SscsCaseData sscsCaseData, FtaCommunicationFields communicationFields) {
+        communicationFields.setTribunalRequestQuestion(null);
+        communicationFields.setTribunalRequestTopic(null);
+        communicationFields.setTribunalRequestType(null);
+        communicationFields.setTribunalRequestNoResponseQuery(null);
+        communicationFields.setTribunalRequestNoResponseTextArea(null);
+        communicationFields.setTribunalRequestNoResponseRadioDl(null);
+        communicationFields.setTribunalRequestNoResponseNoAction(null);
         sscsCaseData.setCommunicationFields(communicationFields);
     }
 }
