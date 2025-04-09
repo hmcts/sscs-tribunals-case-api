@@ -55,6 +55,7 @@ import uk.gov.hmcts.reform.sscs.helper.mapping.ServiceHearingValuesMapping;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.service.ServiceHearingRequest;
+import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.PartyDetails;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.ServiceHearingValues;
 import uk.gov.hmcts.reform.sscs.model.service.linkedcases.ServiceLinkedCases;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
@@ -193,10 +194,15 @@ class ServiceHearingsServiceTest {
 
         given(ccdCaseService.getCaseDetails(String.valueOf(CASE_ID))).willReturn(caseDetails);
 
-        given(serviceHearingValuesMapping.mapServiceHearingValues(caseData, refData)).willReturn(ServiceHearingValues.builder().build());
-
+        given(serviceHearingValuesMapping
+                .mapServiceHearingValues(caseData, refData))
+                .willReturn(ServiceHearingValues.builder().parties(List.of(PartyDetails.builder().partyID("1234").build())).build());
 
         ServiceHearingValues result = serviceHearingsService.getServiceHearingValues(request);
+
+        assertThat(result.getParties())
+                .extracting("partyID")
+                .doesNotContainNull();
 
         verify(ccdCaseService, never()).updateCaseData(any(SscsCaseData.class), any(EventType.class), anyString(), anyString());
     }
