@@ -307,7 +307,7 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
         SscsCaseData editedCaseData = caseData;
         editedCaseData.setBenefitCode("093");
         editedCaseData.getSchedulingAndListingFields().setOverrideFields(null);
-        final ServiceHearingValues serviceHearingValues = ServiceHearingValuesMapping.mapServiceHearingValues(caseData, refData);
+        final ServiceHearingValues serviceHearingValues = serviceHearingValuesMapping.mapServiceHearingValues(caseData, refData);
         assertEquals(0, serviceHearingValues.getDuration());
 
     }

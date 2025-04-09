@@ -5,8 +5,8 @@ import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsMapping.getSession
 import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
-import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.Judiciary;
