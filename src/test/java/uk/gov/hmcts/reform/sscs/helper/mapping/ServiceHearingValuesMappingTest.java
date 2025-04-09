@@ -74,11 +74,14 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
     @Mock
     private HearingsPanelMapping hearingsPanelMapping;
 
+    @Mock
+    private PanelCategoryService panelCategoryService;
+
     private ServiceHearingValuesMapping serviceHearingValuesMapping;
 
     @BeforeEach
     public void setUp() {
-        serviceHearingValuesMapping = new ServiceHearingValuesMapping(hearingsPanelMapping);
+        serviceHearingValuesMapping = new ServiceHearingValuesMapping(hearingsPanelMapping, panelCategoryService);
         caseData = SscsCaseData.builder()
             .ccdCaseId("1234")
             .benefitCode(BENEFIT_CODE)
