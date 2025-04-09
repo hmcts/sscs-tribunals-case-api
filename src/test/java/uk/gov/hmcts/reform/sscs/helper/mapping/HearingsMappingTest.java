@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.helper.mapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 import org.junit.jupiter.api.DisplayName;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SessionCategory;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.model.HearingWrapper;
+import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDetails;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingRequestPayload;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
@@ -86,11 +88,13 @@ class HearingsMappingTest extends HearingsMappingBase {
             .caseData(caseData)
             .caseData(caseData)
             .build();
+        given(hearingsDetailsMapping.buildHearingDetails(any(HearingWrapper.class), any(ReferenceDataServiceHolder.class)))
+                .willReturn(HearingDetails.builder().build());
         HearingRequestPayload result = hearingsMapping.buildHearingPayload(wrapper, refData);
-
 
         assertThat(result).isNotNull();
         assertThat(result.getRequestDetails()).isNotNull();
+        assertThat(result.getHearingDetails()).isNotNull();
         assertThat(result.getCaseDetails()).isNotNull();
         assertThat(result.getRequestDetails()).isNotNull();
     }
