@@ -13,6 +13,8 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLette
 import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.REPRESENTATIVE_LETTER;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.ADDRESS_NAME;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.APPELLANT_NAME;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.BENEFIT_NAME_ACRONYM_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.FIRST_TIER_AGENCY_ACRONYM;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.IBCA_URL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.INFO_REQUEST_DETAIL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.IS_REPRESENTATIVE;
@@ -26,6 +28,7 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.POSTPONEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.SSCS_URL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.SSCS_URL_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBC_ACRONYM;
 
 import java.util.List;
 import java.util.Map;
@@ -33,10 +36,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
@@ -191,19 +198,20 @@ class GenericLetterPlaceholderServiceTest {
     }
 
     @Test
-    void shouldReturnIbcaUrlForIbcCase() {
+    void shouldReturnIbcaUrlAndAcronymForIbcCase() {
         caseData.setBenefitCode("093");
         Map<String, Object> placeholders = genericLetterPlaceholderService.populatePlaceholders(caseData, APPELLANT_LETTER,
             null);
 
         assertNotNull(placeholders);
+        assertEquals(IBC_ACRONYM, placeholders.get(BENEFIT_NAME_ACRONYM_LITERAL));
         assertEquals(IBCA_URL, placeholders.get(SSCS_URL_LITERAL));
     }
 
     @Test
     public void whenNotAHearingPostponementRequest_thenPlaceholderIsEmptyString() {
         Map<String, Object> placeholders = genericLetterPlaceholderService.populatePlaceholders(caseData, APPELLANT_LETTER,
-                null);
+            null);
 
         assertEquals("", placeholders.get(POSTPONEMENT_REQUEST));
     }
@@ -213,7 +221,7 @@ class GenericLetterPlaceholderServiceTest {
         caseData.setPostponementRequest(uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest.builder().actionPostponementRequestSelected(GRANT.getValue()).build());
 
         Map<String, Object> placeholders = genericLetterPlaceholderService.populatePlaceholders(caseData, APPELLANT_LETTER,
-                null);
+            null);
 
         assertEquals("grant", placeholders.get(POSTPONEMENT_REQUEST));
     }
@@ -223,10 +231,50 @@ class GenericLetterPlaceholderServiceTest {
         caseData.setPostponementRequest(uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest.builder().actionPostponementRequestSelected(REFUSE.getValue()).build());
 
         Map<String, Object> placeholders = genericLetterPlaceholderService.populatePlaceholders(caseData, APPELLANT_LETTER,
-                null);
+            null);
 
         assertEquals("refuse", placeholders.get(POSTPONEMENT_REQUEST));
     }
+
+    @ParameterizedTest
+    @CsvSource({
+        "ESA, DWP",
+        "JSA, DWP",
+        "PIP, DWP",
+        "DLA, DWP",
+        "UC, DWP",
+        "CARERS_ALLOWANCE, DWP",
+        "ATTENDANCE_ALLOWANCE, DWP",
+        "BEREAVEMENT_BENEFIT, DWP",
+        "IIDB, DWP",
+        "MATERNITY_ALLOWANCE, DWP",
+        "SOCIAL_FUND, DWP",
+        "INCOME_SUPPORT, DWP",
+        "BEREAVEMENT_SUPPORT_PAYMENT_SCHEME, DWP",
+        "INDUSTRIAL_DEATH_BENEFIT, DWP",
+        "PENSION_CREDIT, DWP",
+        "RETIREMENT_PENSION, DWP",
+        "CHILD_SUPPORT, DWP",
+        "TAX_CREDIT, HMRC",
+        "GUARDIANS_ALLOWANCE, HMRC",
+        "TAX_FREE_CHILDCARE, HMRC",
+        "HOME_RESPONSIBILITIES_PROTECTION, HMRC",
+        "CHILD_BENEFIT, HMRC",
+        "THIRTY_HOURS_FREE_CHILDCARE, HMRC",
+        "GUARANTEED_MINIMUM_PENSION, HMRC",
+        "NATIONAL_INSURANCE_CREDITS, HMRC",
+        "INFECTED_BLOOD_COMPENSATION, IBCA"
+    })
+    void shouldSetFtaAcronymCorrectly(Benefit benefit, String ftaAcronym) {
+        caseData.getAppeal().setBenefitType(BenefitType.builder()
+            .code(benefit.getShortName())
+            .description(benefit.getDescription())
+            .build());
+        Map<String, Object> placeholders = genericLetterPlaceholderService.populatePlaceholders(caseData, APPELLANT_LETTER,
+            null);
+        assertEquals(ftaAcronym, placeholders.get(FIRST_TIER_AGENCY_ACRONYM));
+    }
+
 
     private static String getApellantName(SscsCaseData caseData) {
         return caseData.getAppeal().getAppellant().getName().getFullNameNoTitle();

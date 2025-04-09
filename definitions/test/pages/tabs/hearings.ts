@@ -30,9 +30,10 @@ export class Hearings {
   }
 
   async verifyHearingStatusSummary(isDirectionHearing: boolean) {
-    await webActions.verifyTextVisibility('WAITING TO BE LISTED');
-    await webActions.verifyTextVisibility(isDirectionHearing ? 'Direction Hearings' : 'Substantive');
-    await webActions.verifyTextVisibility('View or edit');
+    await webActions.verifyTextVisibility('Current and upcoming');
+    await webActions.verifyTextVisibilityFastFail('WAITING TO BE LISTED');
+    await webActions.verifyTextVisibilityFastFail(isDirectionHearing ? 'Direction Hearings' : 'Substantive');
+    await webActions.verifyTextVisibilityFastFail('View or edit');
     await webActions.isLinkClickable('Cancel');
   }
 
@@ -103,9 +104,10 @@ export class Hearings {
   }
 
   async verifyUpdateStatusSummary() {
-    await webActions.verifyTextVisibility('UPDATE REQUESTED');
-    await webActions.verifyTextVisibility('Substantive');
-    await webActions.verifyTextVisibility('View or edit');
+    await webActions.verifyTextVisibility('Current and upcoming');
+    await webActions.verifyTextVisibilityFastFail('UPDATE REQUESTED');
+    await webActions.verifyTextVisibilityFastFail('Substantive');
+    await webActions.verifyTextVisibilityFastFail('View or edit');
     await webActions.isLinkClickable('Cancel');
   }
 }
