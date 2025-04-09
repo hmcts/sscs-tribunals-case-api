@@ -7,7 +7,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication.FtaCommuni
 import java.time.LocalDateTime;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -71,8 +70,7 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
             final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
             addCommunicationRequest(tribunalComms, topic, question, userDetails);
             setFieldsForNewRequest(sscsCaseData, communicationFields, tribunalComms);
-        }
-        else if (communicationFields.getTribunalRequestType() == TribunalRequestType.REPLY_TO_TRIBUNAL_QUERY) {
+        } else if (communicationFields.getTribunalRequestType() == TribunalRequestType.REPLY_TO_TRIBUNAL_QUERY) {
             log.info(userAuthorisation + "*!* - TribunalCommunicationAboutToSubmitHandler handle method called for reply to tribunal query");
             handleReplyToTribunalQuery(communicationFields, userAuthorisation, sscsCaseData);
         }

@@ -96,7 +96,7 @@ public class TribunalCommunicationMidEventHandler implements PreSubmitCallbackHa
             .filter(request -> request.getId().equals(chosenTribunalRequestId))
             .findFirst()
             .orElseThrow(() -> new IllegalStateException("No communication request found with id: " + chosenTribunalRequestId));
-            tribunalCommunicationFields.setTribunalRequestNoResponseQuery(communicationRequest.getValue().getRequestMessage());
+        tribunalCommunicationFields.setTribunalRequestNoResponseQuery(communicationRequest.getValue().getRequestMessage());
         sscsCaseData.setCommunicationFields(tribunalCommunicationFields);
     }
 
@@ -123,7 +123,7 @@ public class TribunalCommunicationMidEventHandler implements PreSubmitCallbackHa
             .filter((communicationRequest -> communicationRequest.getValue().getRequestReply() == null))
             .map((this::getDlItemFromCommunicationRequest))
             .toList();
-            tribunalCommunicationFields.setTribunalRequestNoResponseRadioDl(new DynamicList(null, dynamicListItems));
+        tribunalCommunicationFields.setTribunalRequestNoResponseRadioDl(new DynamicList(null, dynamicListItems));
         sscsCaseData.setCommunicationFields(tribunalCommunicationFields);
     }
 }
