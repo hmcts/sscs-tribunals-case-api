@@ -67,7 +67,7 @@ public final class HearingsPanelMapping {
                     ? "2" : "1" : null;
             String isFqpm =  isYes(caseData.getIsFqpmRequired()) ? "true" : null;
             PanelCategory panelComp = panelCategoryService
-                    .getPanelCategoryMap(benefitIssueCode, specialismCount, isFqpm);
+                    .getPanelCategory(benefitIssueCode, specialismCount, isFqpm);
             log.info("Panel Category Map for Case {}: {}", caseData.getCcdCaseId(), panelComp);
             return panelComp != null ? panelComp.getJohTiers() : Collections.emptyList();
         } else {
