@@ -68,6 +68,7 @@ import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
 @Slf4j
@@ -206,7 +207,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             validateRepresentativeNameData(sscsCaseData, preSubmitCallbackResponse);
             validateJointPartyNameData(sscsCaseData, preSubmitCallbackResponse);
         }
-
+        if (sscsCaseData.isIbcCase()) {
+            SscsUtil.setListAssistRoutes(sscsCaseData);
+        }
         return preSubmitCallbackResponse;
     }
 
