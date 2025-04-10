@@ -48,6 +48,7 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
         openMocks(this);
         handler = new UpdateListingRequirementsAboutToStartHandler(utils);
         ReflectionTestUtils.setField(handler, "isScheduleListingEnabled", true);
+        ReflectionTestUtils.setField(handler, "isDefaultPanelCompEnabled", true);
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).build();
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);

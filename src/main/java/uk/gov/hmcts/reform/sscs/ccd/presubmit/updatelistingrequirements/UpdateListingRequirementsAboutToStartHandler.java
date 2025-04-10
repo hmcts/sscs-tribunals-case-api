@@ -29,6 +29,9 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
     @Value("${feature.snl.enabled}")
     private boolean isScheduleListingEnabled;
 
+    @Value("${feature.default-panel-comp.enabled}")
+    private boolean isDefaultPanelCompEnabled;
+
     private final DynamicListLanguageUtil utils;
 
     @Override
@@ -72,7 +75,7 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
                 overrideFields.setHmcHearingType(sscsCaseData.getHmcHearingType());
             }
 
-            if (sscsCaseData.getPanelMemberComposition() != null
+            if (isDefaultPanelCompEnabled && sscsCaseData.getPanelMemberComposition() != null
                     && sscsCaseData.getPanelMemberComposition().getPanelCompositionJudge() != null) {
                 if (isNull(schedulingAndListingFields.getReserveTo())) {
                     schedulingAndListingFields.setReserveTo(ReserveTo.builder().build());
