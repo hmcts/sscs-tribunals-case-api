@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.sscs.helper.mapping;
 
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsMapping.getSessionCaseCodeMap;
+import static uk.gov.hmcts.reform.sscs.model.hmc.reference.BenefitRoleRelationType.findRoleTypesByBenefitCode;
 
 import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
@@ -25,6 +27,10 @@ public final class ServiceHearingValuesMapping {
     private final HearingsPanelMapping hearingsPanelMapping;
 
     private final PanelCategoryService panelCategoryService;
+
+    @Value("${feature.default-panel-comp.enabled}")
+    private boolean defaultPanelCompEnabled;
+
 
 
     ServiceHearingValuesMapping(HearingsPanelMapping hearingsPanelMapping, PanelCategoryService panelCategoryService) {
@@ -81,7 +87,7 @@ public final class ServiceHearingValuesMapping {
 
     public Judiciary getJudiciary(@Valid SscsCaseData sscsCaseData, ReferenceDataServiceHolder refData) {
         return Judiciary.builder()
-                .roleType(panelCategoryService.getRoleTypes(sscsCaseData))
+                .roleType(defaultPanelCompEnabled ? panelCategoryService.getRoleTypes(sscsCaseData) : findRoleTypesByBenefitCode(sscsCaseData.getBenefitCode()))
                 .authorisationTypes(HearingsPanelMapping.getAuthorisationTypes())
                 .authorisationSubType(HearingsPanelMapping.getAuthorisationSubTypes())
                 .judiciarySpecialisms(HearingsPanelMapping.getPanelSpecialisms(sscsCaseData, getSessionCaseCodeMap(sscsCaseData, refData)))
