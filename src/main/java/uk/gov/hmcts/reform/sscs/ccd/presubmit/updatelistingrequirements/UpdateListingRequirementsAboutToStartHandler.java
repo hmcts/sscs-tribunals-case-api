@@ -14,8 +14,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ReserveTo;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 
@@ -68,6 +70,14 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
             log.info("{} Languages in DynamicList for caseId {}", interpreterLanguages.getListItems().size(), caseId);
             if (isNull(overrideFields.getHmcHearingType())) {
                 overrideFields.setHmcHearingType(sscsCaseData.getHmcHearingType());
+            }
+
+            if (sscsCaseData.getPanelMemberComposition() != null
+                    && sscsCaseData.getPanelMemberComposition().getPanelCompositionJudge() != null) {
+                if (isNull(schedulingAndListingFields.getReserveTo())) {
+                    schedulingAndListingFields.setReserveTo(ReserveTo.builder().build());
+                }
+                schedulingAndListingFields.getReserveTo().setReservedDistrictTribunalJudge(YesNo.NO);
             }
         }
 

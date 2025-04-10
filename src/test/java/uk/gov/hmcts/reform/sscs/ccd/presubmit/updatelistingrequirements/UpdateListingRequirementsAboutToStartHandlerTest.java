@@ -1,9 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -26,7 +23,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 
@@ -57,7 +56,7 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
 
     @Test
     public void givenValidCallback_thenReturnTrue() {
-        assertTrue(handler.canHandle(ABOUT_TO_START, callback));
+        assertThat(handler.canHandle(ABOUT_TO_START, callback)).isTrue();
     }
 
     @Test
@@ -66,7 +65,7 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
         sscsCaseData = CaseDataUtils.buildCaseData();
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        assertEquals(0, response.getErrors().size());
+        assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
@@ -83,10 +82,10 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
 
         HearingInterpreter interpreter = response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter();
 
-        assertEquals(0, response.getErrors().size());
-        assertNotNull(interpreter);
-        assertNotNull(interpreter.getInterpreterLanguage());
-        assertEquals(1, interpreter.getInterpreterLanguage().getListItems().size());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(interpreter).isNotNull();
+        assertThat(interpreter.getInterpreterLanguage()).isNotNull();
+        assertThat(interpreter.getInterpreterLanguage().getListItems().size()).isEqualTo(1);
     }
 
     @Test
@@ -103,10 +102,10 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
 
         HearingInterpreter interpreter = response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter();
 
-        assertEquals(0, response.getErrors().size());
-        assertNotNull(interpreter);
-        assertNotNull(interpreter.getInterpreterLanguage());
-        assertEquals(1, interpreter.getInterpreterLanguage().getListItems().size());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(interpreter).isNotNull();
+        assertThat(interpreter.getInterpreterLanguage()).isNotNull();
+        assertThat(interpreter.getInterpreterLanguage().getListItems().size()).isEqualTo(1);
     }
 
     @Test
@@ -123,10 +122,10 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
 
         HearingInterpreter interpreter = response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter();
 
-        assertEquals(0, response.getErrors().size());
-        assertNotNull(interpreter);
-        assertNotNull(interpreter.getInterpreterLanguage());
-        assertEquals(1, interpreter.getInterpreterLanguage().getListItems().size());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(interpreter).isNotNull();
+        assertThat(interpreter.getInterpreterLanguage()).isNotNull();
+        assertThat(interpreter.getInterpreterLanguage().getListItems().size()).isEqualTo(1);
     }
 
     @Test
@@ -147,11 +146,11 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
 
         HearingInterpreter interpreter = response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter();
 
-        assertEquals(0, response.getErrors().size());
-        assertNotNull(interpreter);
-        assertNotNull(interpreter.getInterpreterLanguage());
-        assertEquals(0, interpreter.getInterpreterLanguage().getListItems().size());
-        assertNull(response.getData().getSchedulingAndListingFields().getOverrideFields().getHmcHearingType());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(interpreter).isNotNull();
+        assertThat(interpreter.getInterpreterLanguage()).isNotNull();
+        assertThat(interpreter.getInterpreterLanguage().getListItems().size()).isEqualTo(0);
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getHmcHearingType()).isNull();
     }
 
     @ParameterizedTest
@@ -165,8 +164,8 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals(0, response.getErrors().size());
-        assertEquals(expectedHearingType, response.getData().getSchedulingAndListingFields().getOverrideFields().getHmcHearingType());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(expectedHearingType).isEqualTo(response.getData().getSchedulingAndListingFields().getOverrideFields().getHmcHearingType());
     }
 
     @Test
@@ -179,7 +178,21 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals(0, response.getErrors().size());
-        assertNull(response.getData().getSchedulingAndListingFields().getOverrideFields().getHmcHearingType());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getHmcHearingType()).isNull();
+    }
+
+    @Test
+    public void setReserveToJudgeToNoIfPanelCompositionJudgeSelected() {
+        sscsCaseData = CaseDataUtils.buildCaseData();
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").build());
+        DynamicList interpreterLanguage = new DynamicList(null, List.of());
+        given(utils.generateInterpreterLanguageFields(any())).willReturn(interpreterLanguage);
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getSchedulingAndListingFields().getReserveTo().getReservedDistrictTribunalJudge()).isEqualTo(YesNo.NO);
     }
 }
