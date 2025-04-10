@@ -89,7 +89,7 @@
     "PageDisplayOrder": 4,
     "PageFieldDisplayOrder": 3,
     "PageID": "replyToTribunalQuery"
-  }
+  },
   {
     "CaseEventID": "tribunalCommunication",
     "CaseFieldID": "tribunalRequestRespondedDl",
@@ -135,10 +135,7 @@
     "PageDisplayOrder": 6,
     "PageFieldDisplayOrder": 3,
     "PageID": "reviewTribunalReply"
-    "PageID": "selectTribunalCommunicationAction",
-    "FieldShowCondition": "tribunalRequestType=\"DoNotShow\""
   },
-
   {
     "CaseEventID": "ftaCommunication",
     "CaseFieldID": "ftaRequestType",
