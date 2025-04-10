@@ -16,9 +16,12 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.calculateDueDateWorkingDays
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -87,23 +90,23 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         // Create empty list of communications
         List<CommunicationRequest> existingComs = new ArrayList<>();
         FtaCommunicationFields details = FtaCommunicationFields.builder()
-                .tribunalRequestTopic(expectedTopic)
-                .tribunalRequestQuestion(expectedQuestion)
-                .tribunalCommunications(existingComs)
-                .tribunalRequestType(TribunalRequestType.NEW_REQUEST)
-                .build();
+            .tribunalRequestTopic(expectedTopic)
+            .tribunalRequestQuestion(expectedQuestion)
+            .tribunalCommunications(existingComs)
+            .tribunalRequestType(TribunalRequestType.NEW_REQUEST)
+            .build();
 
         sscsCaseData.setCommunicationFields(details);
 
         // Mock user details
         UserDetails userDetails = UserDetails.builder()
-                .name(expectedUserName)
-                .build();
+            .name(expectedUserName)
+            .build();
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
 
         // Execute the function
         PreSubmitCallbackResponse<SscsCaseData> response =
-                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         // Verify a new Tribunal communication was added
         List<CommunicationRequest> resultComs = response.getData().getCommunicationFields().getTribunalCommunications();
@@ -170,42 +173,42 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
 
         // Create list of existing communications
         CommunicationRequest tribunalCommunicationPast = CommunicationRequest.builder().value(
-                CommunicationRequestDetails.builder()
-                        .requestTopic(CommunicationRequestTopic.OTHER_PARTY_PERSONAL_INFORMATION)
-                        .requestMessage("Past existing Question")
-                        .requestDateTime(LocalDateTime.now().minusYears(2))
-                        .requestUserName("Past existing user")
-                        .requestResponseDueDate(LocalDate.now().minusYears(1))
-                        .build()
-                ).build();
+            CommunicationRequestDetails.builder()
+                .requestTopic(CommunicationRequestTopic.OTHER_PARTY_PERSONAL_INFORMATION)
+                .requestMessage("Past existing Question")
+                .requestDateTime(LocalDateTime.now().minusYears(2))
+                .requestUserName("Past existing user")
+                .requestResponseDueDate(LocalDate.now().minusYears(1))
+                .build()
+        ).build();
         CommunicationRequest tribunalCommunicationFuture = CommunicationRequest.builder().value(
-                CommunicationRequestDetails.builder()
-                        .requestTopic(CommunicationRequestTopic.APPOINTEE_PERSONAL_INFORMATION)
-                        .requestMessage("Future existing Question")
-                        .requestDateTime(LocalDateTime.now().plusYears(1))
-                        .requestUserName("Future existing user")
-                        .requestResponseDueDate(LocalDate.now().plusYears(2))
-                        .build()
-                ).build();
+            CommunicationRequestDetails.builder()
+                .requestTopic(CommunicationRequestTopic.APPOINTEE_PERSONAL_INFORMATION)
+                .requestMessage("Future existing Question")
+                .requestDateTime(LocalDateTime.now().plusYears(1))
+                .requestUserName("Future existing user")
+                .requestResponseDueDate(LocalDate.now().plusYears(2))
+                .build()
+        ).build();
         List<CommunicationRequest> existingComs = new ArrayList<>(List.of(tribunalCommunicationFuture, tribunalCommunicationPast));
         FtaCommunicationFields details = FtaCommunicationFields.builder()
-                .tribunalRequestTopic(expectedTopic)
-                .tribunalRequestQuestion(expectedQuestion)
-                .tribunalRequestType(TribunalRequestType.NEW_REQUEST)
-                .tribunalCommunications(existingComs)
-                .build();
+            .tribunalRequestTopic(expectedTopic)
+            .tribunalRequestQuestion(expectedQuestion)
+            .tribunalRequestType(TribunalRequestType.NEW_REQUEST)
+            .tribunalCommunications(existingComs)
+            .build();
 
         sscsCaseData.setCommunicationFields(details);
 
         // Mock user details
         UserDetails userDetails = UserDetails.builder()
-                .name(expectedUserName)
-                .build();
+            .name(expectedUserName)
+            .build();
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
 
         // Execute the function
         PreSubmitCallbackResponse<SscsCaseData> response =
-                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         // Verify a new Tribunal communication was added
         List<CommunicationRequest> resultComs = response.getData().getCommunicationFields().getTribunalCommunications();
@@ -231,27 +234,161 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         String expectedUserName = "Test User";
 
         FtaCommunicationFields details = FtaCommunicationFields.builder()
-                .tribunalRequestTopic(expectedTopic)
-                .tribunalRequestQuestion(expectedQuestion)
-                .tribunalRequestType(TribunalRequestType.NEW_REQUEST)
-                .tribunalCommunications(null) // Explicitly set to null
-                .build();
+            .tribunalRequestTopic(expectedTopic)
+            .tribunalRequestQuestion(expectedQuestion)
+            .tribunalRequestType(TribunalRequestType.NEW_REQUEST)
+            .tribunalCommunications(null) // Explicitly set to null
+            .build();
 
         sscsCaseData.setCommunicationFields(details);
 
         // Mock user details
         UserDetails userDetails = UserDetails.builder()
-                .name(expectedUserName)
-                .build();
+            .name(expectedUserName)
+            .build();
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
 
         // Execute the function
         PreSubmitCallbackResponse<SscsCaseData> response =
-                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         // Verify a new Tribunal communication was added
         List<CommunicationRequest> resultComs = response.getData().getCommunicationFields().getTribunalCommunications();
 
         assertNotNull(resultComs);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"NEW_REQUEST", "null"}, nullValues = "null")
+    void shouldClearFieldsAtEndOfEvent(TribunalRequestType requestType) {
+        FtaCommunicationFields communicationFields = FtaCommunicationFields.builder()
+            .tribunalRequestTopic(CommunicationRequestTopic.APPEAL_TYPE)
+            .tribunalRequestQuestion("someQuestion")
+            .tribunalRequestType(requestType)
+            .tribunalRequestRespondedQuery("something")
+            .tribunalRequestRespondedReply("something")
+            .tribunalRequestRespondedDl(new DynamicList(null, Collections.emptyList()))
+            .tribunalRequestRespondedActioned(YesNo.NO)
+            .build();
+        sscsCaseData.setCommunicationFields(communicationFields);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getCommunicationFields().getTribunalRequestTopic());
+        assertNull(response.getData().getCommunicationFields().getTribunalRequestQuestion());
+        assertNull(response.getData().getCommunicationFields().getTribunalRequestType());
+        assertNull(response.getData().getCommunicationFields().getTribunalRequestRespondedQuery());
+        assertNull(response.getData().getCommunicationFields().getTribunalRequestRespondedReply());
+        assertNull(response.getData().getCommunicationFields().getTribunalRequestRespondedDl());
+        assertNull(response.getData().getCommunicationFields().getTribunalRequestRespondedActioned());
+    }
+
+    @Test
+    void shouldHandleReviewTribunalReplyWithNoMoreReviewsNeeded() {
+        CommunicationRequest communicationRequest = CommunicationRequest.builder()
+            .value(CommunicationRequestDetails.builder()
+                .requestReply(CommunicationRequestReply.builder()
+                    .replyHasBeenActioned(YesNo.NO)
+                    .replyDateTime(LocalDateTime.now()).build()).build()).build();
+        DynamicListItem dynamicListItem = new DynamicListItem(communicationRequest.getId(), "item");
+        DynamicList dynamicList = new DynamicList(dynamicListItem, Collections.singletonList(dynamicListItem));
+        FtaCommunicationFields communicationFields = FtaCommunicationFields.builder()
+            .tribunalRequestType(TribunalRequestType.REVIEW_TRIBUNAL_REPLY)
+            .tribunalRequestRespondedDl(dynamicList)
+            .tribunalCommunications(Collections.singletonList(communicationRequest))
+            .ftaResponseProvidedDate(LocalDate.now())
+            .build();
+        sscsCaseData.setCommunicationFields(communicationFields);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        List<CommunicationRequest> resultComs = response.getData().getCommunicationFields().getTribunalCommunications();
+        assertNotNull(resultComs);
+        assertEquals(1, resultComs.size());
+        CommunicationRequestDetails resultCom = resultComs.getFirst().getValue();
+        assertEquals(YesNo.YES, resultCom.getRequestReply().getReplyHasBeenActioned());
+        assertNull(response.getData().getCommunicationFields().getFtaResponseProvidedDate());
+    }
+
+    @Test
+    void shouldHandleReviewTribunalReplyWithOlderReviewStillNeeded() {
+        CommunicationRequest communicationRequest1 = CommunicationRequest.builder()
+            .value(CommunicationRequestDetails.builder()
+                .requestReply(CommunicationRequestReply.builder()
+                    .replyHasBeenActioned(YesNo.NO)
+                    .replyDateTime(LocalDateTime.now().plusYears(1)).build()).build()).build();
+        CommunicationRequest communicationRequest2 = CommunicationRequest.builder()
+            .value(CommunicationRequestDetails.builder()
+                .requestReply(CommunicationRequestReply.builder()
+                    .replyHasBeenActioned(YesNo.NO)
+                    .replyDateTime(LocalDateTime.now()).build()).build()).build();
+        CommunicationRequest communicationRequest3 = CommunicationRequest.builder()
+            .value(CommunicationRequestDetails.builder()
+                .requestReply(CommunicationRequestReply.builder()
+                    .replyHasBeenActioned(YesNo.NO)
+                    .replyDateTime(LocalDateTime.now().minusYears(1)).build()).build()).build();
+        DynamicListItem dynamicListItem1 = new DynamicListItem(communicationRequest1.getId(), "item1");
+        DynamicListItem dynamicListItem2 = new DynamicListItem(communicationRequest2.getId(), "item2");
+        DynamicListItem dynamicListItem3 = new DynamicListItem(communicationRequest3.getId(), "item3");
+        DynamicList dynamicList = new DynamicList(dynamicListItem1, List.of(dynamicListItem1, dynamicListItem2, dynamicListItem3));
+        FtaCommunicationFields communicationFields = FtaCommunicationFields.builder()
+            .tribunalRequestType(TribunalRequestType.REVIEW_TRIBUNAL_REPLY)
+            .tribunalRequestRespondedDl(dynamicList)
+            .tribunalCommunications(List.of(communicationRequest3, communicationRequest2, communicationRequest1))
+            .build();
+        sscsCaseData.setCommunicationFields(communicationFields);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        List<CommunicationRequest> resultComs = response.getData().getCommunicationFields().getTribunalCommunications();
+        assertNotNull(resultComs);
+        assertEquals(3, resultComs.size());
+        assertEquals(YesNo.NO, resultComs.getFirst().getValue().getRequestReply().getReplyHasBeenActioned());
+        assertEquals(YesNo.NO, resultComs.get(1).getValue().getRequestReply().getReplyHasBeenActioned());
+        assertEquals(YesNo.YES, resultComs.getLast().getValue().getRequestReply().getReplyHasBeenActioned());
+        assertEquals(LocalDate.now().minusYears(1), response.getData().getCommunicationFields().getFtaResponseProvidedDate());
+    }
+
+    @Test
+    void shouldHandleReviewTribunalReplyWithNewReviewStillNeeded() {
+        CommunicationRequest communicationRequest1 = CommunicationRequest.builder()
+            .value(CommunicationRequestDetails.builder()
+                .requestReply(CommunicationRequestReply.builder()
+                    .replyHasBeenActioned(YesNo.NO)
+                    .replyDateTime(LocalDateTime.now().plusYears(1)).build()).build()).build();
+        CommunicationRequest communicationRequest2 = CommunicationRequest.builder()
+            .value(CommunicationRequestDetails.builder()
+                .requestReply(CommunicationRequestReply.builder()
+                    .replyHasBeenActioned(YesNo.NO)
+                    .replyDateTime(LocalDateTime.now()).build()).build()).build();
+        CommunicationRequest communicationRequest3 = CommunicationRequest.builder()
+            .value(CommunicationRequestDetails.builder()
+                .requestReply(CommunicationRequestReply.builder()
+                    .replyHasBeenActioned(YesNo.NO)
+                    .replyDateTime(LocalDateTime.now().minusYears(1)).build()).build()).build();
+        DynamicListItem dynamicListItem1 = new DynamicListItem(communicationRequest1.getId(), "item1");
+        DynamicListItem dynamicListItem2 = new DynamicListItem(communicationRequest2.getId(), "item2");
+        DynamicListItem dynamicListItem3 = new DynamicListItem(communicationRequest3.getId(), "item3");
+        DynamicList dynamicList = new DynamicList(dynamicListItem3, List.of(dynamicListItem1, dynamicListItem2, dynamicListItem3));
+        FtaCommunicationFields communicationFields = FtaCommunicationFields.builder()
+            .tribunalRequestType(TribunalRequestType.REVIEW_TRIBUNAL_REPLY)
+            .tribunalRequestRespondedDl(dynamicList)
+            .tribunalCommunications(List.of(communicationRequest1, communicationRequest2, communicationRequest3))
+            .build();
+        sscsCaseData.setCommunicationFields(communicationFields);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        List<CommunicationRequest> resultComs = response.getData().getCommunicationFields().getTribunalCommunications();
+        assertNotNull(resultComs);
+        assertEquals(3, resultComs.size());
+        assertEquals(YesNo.NO, resultComs.getFirst().getValue().getRequestReply().getReplyHasBeenActioned());
+        assertEquals(YesNo.NO, resultComs.get(1).getValue().getRequestReply().getReplyHasBeenActioned());
+        assertEquals(YesNo.YES, resultComs.getLast().getValue().getRequestReply().getReplyHasBeenActioned());
+        assertEquals(LocalDate.now(), response.getData().getCommunicationFields().getFtaResponseProvidedDate());
     }
 }

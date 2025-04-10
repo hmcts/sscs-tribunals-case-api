@@ -1,11 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getCommunicationRequestFromId;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getRequestsWithoutReplies;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getCommunicationRequestFromId;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRequestsWithoutReplies;
 
-import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FtaRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil;
 
 
 @Service
@@ -68,8 +67,7 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
 
         if (callback.getPageId().equals("selectFtaCommunicationAction")) {
             if (ftaCommunicationFields.getFtaRequestType().equals(FtaRequestType.REPLY_TO_FTA_QUERY)) {
-                setFtaCommunicationsDynamicList(ftaCommunicationFields, sscsCaseData);
-                handleReplyToFtaQueryError(preSubmitErrorCallbackResponse, ftaCommunicationFields);
+                setFtaCommunicationsDynamicList(preSubmitErrorCallbackResponse, ftaCommunicationFields, sscsCaseData);
             }
         } else if (callback.getPageId().equals("selectFtaRequest")) {
             setQueryForReply(sscsCaseData, ftaCommunicationFields);
@@ -98,27 +96,15 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
     }
 
-    private void handleReplyToFtaQueryError(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
-                                            FtaCommunicationFields ftaCommunicationFields) {
-        if (ftaCommunicationFields.getFtaRequestNoResponseRadioDl() == null
-            || ftaCommunicationFields.getFtaRequestNoResponseRadioDl().getListItems().isEmpty()) {
-            preSubmitCallbackResponse.addError("There are no requests to reply to. Please select a different communication type.");
-        }
-    }
-
-    private DynamicListItem getDlItemFromCommunicationRequest(CommunicationRequest communicationRequest) {
-        return new DynamicListItem(communicationRequest.getId(),
-            communicationRequest.getValue().getRequestTopic().getValue() + " - "
-                + communicationRequest.getValue().getRequestDateTime()
-                .format(DateTimeFormatter.ofPattern("dd MMMM yyyy, HH:mm")) + " - "
-                + communicationRequest.getValue().getRequestUserName());
-    }
-
-    private void setFtaCommunicationsDynamicList(FtaCommunicationFields ftaCommunicationFields, SscsCaseData sscsCaseData) {
+    private void setFtaCommunicationsDynamicList(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, FtaCommunicationFields ftaCommunicationFields, SscsCaseData sscsCaseData) {
         List<DynamicListItem> dynamicListItems = getRequestsWithoutReplies(ftaCommunicationFields.getTribunalCommunications())
             .stream()
-            .map((this::getDlItemFromCommunicationRequest))
+            .map((CommunicationRequestUtil::getDlItemFromCommunicationRequest))
             .toList();
+        if (dynamicListItems.isEmpty()) {
+            preSubmitCallbackResponse.addError("There are no requests to reply to. Please select a different communication type.");
+            return;
+        }
         ftaCommunicationFields.setFtaRequestNoResponseRadioDl(new DynamicList(null, dynamicListItems));
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
     }

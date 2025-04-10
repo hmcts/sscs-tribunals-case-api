@@ -24,7 +24,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,7 +42,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
@@ -716,54 +714,6 @@ public class SscsUtil {
             .limit(workingDays)
             .reduce((first, second) -> second)
             .orElse(now);
-    }
-
-    public static List<CommunicationRequest> getRepliesWithoutReviews(List<CommunicationRequest> comms) {
-        return Optional.ofNullable(comms)
-            .orElse(Collections.emptyList())
-            .stream()
-            .filter((request -> request.getValue().getRequestReply() != null))
-            .filter((request -> request.getValue().getRequestReply().getReplyHasBeenActioned() == YesNo.NO))
-            .toList();
-    }
-
-    public static LocalDate getOldestResponseDate(List<CommunicationRequest> communicationRequests) {
-        return communicationRequests.stream()
-            .filter(communicationRequest -> communicationRequest.getValue().getRequestReply() == null)
-            .sorted(Comparator.comparing(communicationRequest ->
-                communicationRequest.getValue().getRequestResponseDueDate()))
-            .toList()
-            .getFirst()
-            .getValue()
-            .getRequestResponseDueDate();
-    }
-
-    public static LocalDate getOldestResponseProvidedDate(List<CommunicationRequest> communicationRequests) {
-        return communicationRequests.stream()
-            .filter(communicationRequest -> communicationRequest.getValue().getRequestReply() != null)
-            .sorted(Comparator.comparing(communicationRequest ->
-                communicationRequest.getValue().getRequestReply().getReplyDateTime()))
-            .toList()
-            .getFirst()
-            .getValue()
-            .getRequestReply()
-            .getReplyDateTime()
-            .toLocalDate();
-    }
-
-    public static List<CommunicationRequest> getRequestsWithoutReplies(List<CommunicationRequest> comms) {
-        return Optional.ofNullable(comms).orElse(Collections.emptyList()).stream()
-            .filter((request -> request.getValue().getRequestReply() == null))
-            .toList();
-    }
-
-    public static CommunicationRequest getCommunicationRequestFromId(String id, List<CommunicationRequest> comms) {
-        return Optional.ofNullable(comms)
-            .orElse(Collections.emptyList())
-            .stream()
-            .filter(communicationRequest -> communicationRequest.getId().equals(id))
-            .findFirst()
-            .orElseThrow(() -> new IllegalStateException("No communication request found with id: " + id));
     }
 }
 

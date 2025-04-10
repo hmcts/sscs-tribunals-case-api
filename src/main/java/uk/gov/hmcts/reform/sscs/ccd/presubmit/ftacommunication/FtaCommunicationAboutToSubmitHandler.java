@@ -1,17 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.calculateDueDateWorkingDays;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getCommunicationRequestFromId;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getOldestResponseDate;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getOldestResponseProvidedDate;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getRepliesWithoutReviews;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getRequestsWithoutReplies;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.addCommunicationRequest;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getCommunicationRequestFromId;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getOldestResponseDate;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getOldestResponseProvidedDate;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRepliesWithoutReviews;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRequestsWithoutReplies;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -83,22 +81,6 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         }
         clearFields(sscsCaseData, ftaCommunicationFields);
         return new PreSubmitCallbackResponse<>(sscsCaseData);
-    }
-
-    public static void addCommunicationRequest(List<CommunicationRequest> comms, CommunicationRequestTopic topic, String question, UserDetails userDetails) {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDate dueDate = calculateDueDateWorkingDays(now.toLocalDate(), 2);
-        comms.add(CommunicationRequest.builder()
-            .value(CommunicationRequestDetails.builder()
-                .requestMessage(question)
-                .requestTopic(topic)
-                .requestDateTime(now)
-                .requestUserName(userDetails.getName())
-                .requestResponseDueDate(dueDate)
-                .build())
-            .build());
-        comms.sort(Comparator.comparing(communicationRequest ->
-            ((CommunicationRequest) communicationRequest).getValue().getRequestDateTime()).reversed());
     }
 
     private void setFieldsForNewRequest(SscsCaseData sscsCaseData, FtaCommunicationFields communicationFields, List<CommunicationRequest> comms) {

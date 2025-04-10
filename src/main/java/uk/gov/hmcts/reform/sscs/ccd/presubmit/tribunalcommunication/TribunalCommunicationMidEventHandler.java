@@ -2,16 +2,12 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.tribunalcommunication;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getCommunicationRequestFromId;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getRepliesWithoutReviews;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getCommunicationRequestFromId;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRepliesWithoutReviews;
 
-import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,16 +17,15 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequestDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequestReply;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.FtaRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.TribunalRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil;
 
 
 @Service
@@ -73,8 +68,7 @@ public class TribunalCommunicationMidEventHandler implements PreSubmitCallbackHa
 
         if (callback.getPageId().equals("selectTribunalCommunicationAction")) {
             if (ftaCommunicationFields.getTribunalRequestType().equals(TribunalRequestType.REVIEW_TRIBUNAL_REPLY)) {
-                setFtaRequestRepliesDynamicList(ftaCommunicationFields, sscsCaseData);
-                handleReviewTribunalReplyError(preSubmitErrorCallbackResponse, ftaCommunicationFields);
+                setFtaRequestRepliesDynamicList(preSubmitErrorCallbackResponse, ftaCommunicationFields, sscsCaseData);
             }
         } else if (callback.getPageId().equals("selectTribunalReply")) {
             setQueryReplyForReview(sscsCaseData, ftaCommunicationFields);
@@ -104,27 +98,15 @@ public class TribunalCommunicationMidEventHandler implements PreSubmitCallbackHa
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
     }
 
-    private void handleReviewTribunalReplyError(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
-                                            FtaCommunicationFields ftaCommunicationFields) {
-        if (ftaCommunicationFields.getTribunalRequestRespondedDl() == null
-            || ftaCommunicationFields.getTribunalRequestRespondedDl().getListItems().isEmpty()) {
-            preSubmitCallbackResponse.addError("There are no replies to review. Please select a different communication type.");
-        }
-    }
-
-    private DynamicListItem getDlItemFromCommunicationRequest(CommunicationRequest communicationRequest) {
-        return new DynamicListItem(communicationRequest.getId(),
-            communicationRequest.getValue().getRequestTopic().getValue() + " - "
-                + communicationRequest.getValue().getRequestDateTime()
-                .format(DateTimeFormatter.ofPattern("dd MMMM yyyy, HH:mm")) + " - "
-                + communicationRequest.getValue().getRequestUserName());
-    }
-
-    private void setFtaRequestRepliesDynamicList(FtaCommunicationFields ftaCommunicationFields, SscsCaseData sscsCaseData) {
+    private void setFtaRequestRepliesDynamicList(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, FtaCommunicationFields ftaCommunicationFields, SscsCaseData sscsCaseData) {
         List<DynamicListItem> dynamicListItems = getRepliesWithoutReviews(ftaCommunicationFields.getTribunalCommunications())
             .stream()
-            .map((this::getDlItemFromCommunicationRequest))
+            .map((CommunicationRequestUtil::getDlItemFromCommunicationRequest))
             .toList();
+        if (dynamicListItems.isEmpty()) {
+            preSubmitCallbackResponse.addError("There are no replies to review. Please select a different communication type.");
+            return;
+        }
         ftaCommunicationFields.setTribunalRequestRespondedDl(new DynamicList(null, dynamicListItems));
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
     }

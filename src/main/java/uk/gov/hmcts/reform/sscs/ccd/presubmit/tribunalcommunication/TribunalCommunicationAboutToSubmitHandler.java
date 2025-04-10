@@ -1,10 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.tribunalcommunication;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication.FtaCommunicationAboutToSubmitHandler.addCommunicationRequest;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getCommunicationRequestFromId;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getOldestResponseDate;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getRepliesWithoutReviews;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.addCommunicationRequest;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getCommunicationRequestFromId;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getOldestResponseDate;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getOldestResponseProvidedDate;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRepliesWithoutReviews;
 
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
@@ -60,7 +61,7 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
         FtaCommunicationFields ftaCommunicationFields = Optional.ofNullable(sscsCaseData.getCommunicationFields())
             .orElse(FtaCommunicationFields.builder().build());
 
-        if (ftaCommunicationFields.getTribunalRequestType() == TribunalRequestType.NEW_REQUEST) {
+        if (TribunalRequestType.NEW_REQUEST.equals(ftaCommunicationFields.getTribunalRequestType())) {
             CommunicationRequestTopic topic = ftaCommunicationFields.getTribunalRequestTopic();
             String question = ftaCommunicationFields.getTribunalRequestQuestion();
             List<CommunicationRequest> tribunalComms = Optional.ofNullable(ftaCommunicationFields.getTribunalCommunications())
@@ -69,7 +70,7 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
             final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
             addCommunicationRequest(tribunalComms, topic, question, userDetails);
             setFieldsForNewRequest(sscsCaseData, ftaCommunicationFields, tribunalComms);
-        } else if (ftaCommunicationFields.getTribunalRequestType().equals(TribunalRequestType.REVIEW_TRIBUNAL_REPLY)) {
+        } else if (TribunalRequestType.REVIEW_TRIBUNAL_REPLY.equals(ftaCommunicationFields.getTribunalRequestType())) {
             handleReviewTribunalReply(ftaCommunicationFields, sscsCaseData);
         }
         clearFields(sscsCaseData, ftaCommunicationFields);
@@ -96,7 +97,7 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
 
     private void handleReviewTribunalReply(FtaCommunicationFields ftaCommunicationFields, SscsCaseData sscsCaseData) {
         DynamicList requestDl = ftaCommunicationFields.getTribunalRequestRespondedDl();
-        String chosenFtaRequestId = requestDl.getValue().getCode();
+        String chosenFtaRequestId = Optional.ofNullable(requestDl.getValue()).orElse(new DynamicListItem(null, null)).getCode();
         CommunicationRequest communicationRequest = getCommunicationRequestFromId(chosenFtaRequestId, ftaCommunicationFields.getTribunalCommunications());
         communicationRequest.getValue().getRequestReply().setReplyHasBeenActioned(YesNo.YES);
         List<CommunicationRequest> repliesWithoutReviews = getRepliesWithoutReviews(ftaCommunicationFields.getTribunalCommunications());
@@ -104,7 +105,7 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
         if (repliesWithoutReviews.isEmpty()) {
             ftaCommunicationFields.setFtaResponseProvidedDate(null);
         } else {
-            ftaCommunicationFields.setFtaResponseProvidedDate(getOldestResponseDate(repliesWithoutReviews));
+            ftaCommunicationFields.setFtaResponseProvidedDate(getOldestResponseProvidedDate(repliesWithoutReviews));
         }
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
     }
