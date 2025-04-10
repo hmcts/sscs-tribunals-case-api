@@ -6,10 +6,12 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.calculateDueDateWorkingDays
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,7 +22,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
-import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 
 @Service
@@ -65,7 +66,7 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
             .orElse(FtaCommunicationFields.builder().build());
 
         if (ftaCommunicationFields.getFtaRequestType() == FtaRequestType.NEW_REQUEST) {
-            String topic = ftaCommunicationFields.getFtaRequestTopic();
+            CommunicationRequestTopic topic = ftaCommunicationFields.getFtaRequestTopic();
             String question = ftaCommunicationFields.getFtaRequestQuestion();
             List<CommunicationRequest> ftaComms = Optional.ofNullable(ftaCommunicationFields.getFtaCommunications())
                 .orElse(new ArrayList<>());
@@ -73,12 +74,14 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
             final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
             addCommunicationRequest(ftaComms, topic, question, userDetails);
             setFieldsForNewRequest(sscsCaseData, ftaCommunicationFields, ftaComms);
+        } else if (ftaCommunicationFields.getFtaRequestType() == FtaRequestType.REPLY_TO_FTA_QUERY) {
+            handleReplyToFtaQuery(ftaCommunicationFields, userAuthorisation, sscsCaseData);
         }
-
+        clearFields(sscsCaseData, ftaCommunicationFields);
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    public static void addCommunicationRequest(List<CommunicationRequest> comms, String topic, String question, UserDetails userDetails) {
+    public static void addCommunicationRequest(List<CommunicationRequest> comms, CommunicationRequestTopic topic, String question, UserDetails userDetails) {
         LocalDateTime now = LocalDateTime.now();
         LocalDate dueDate = calculateDueDateWorkingDays(now.toLocalDate(), 2);
         comms.add(CommunicationRequest.builder()
@@ -96,12 +99,61 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
 
     private void setFieldsForNewRequest(SscsCaseData sscsCaseData, FtaCommunicationFields communicationFields, List<CommunicationRequest> comms) {
         communicationFields.setFtaCommunications(comms);
-        communicationFields.setTribunalCommunicationFilter(TribunalCommunicationFilter.AWAITING_INFO_FROM_FTA);
-        communicationFields.setFtaCommunicationFilter(FtaCommunicationFilter.PROVIDE_INFO_TO_TRIBUNAL);
-        communicationFields.setFtaRequestQuestion(null);
-        communicationFields.setFtaRequestTopic(null);
-        communicationFields.setFtaRequestType(null);
+        communicationFields.setFtaResponseDueDate(getOldestResponseDate(comms));
         sscsCaseData.setCommunicationFields(communicationFields);
     }
 
+    private void handleReplyToFtaQuery(FtaCommunicationFields ftaCommunicationFields, String userAuthorisation, SscsCaseData sscsCaseData) {
+        DynamicList ftaRequestDl = ftaCommunicationFields.getFtaRequestNoResponseRadioDl();
+        DynamicListItem chosenFtaRequest = ftaRequestDl.getValue();
+        String chosenFtaRequestId = chosenFtaRequest.getCode();
+        CommunicationRequest communicationRequest = Optional.ofNullable(ftaCommunicationFields.getTribunalCommunications())
+            .orElse(Collections.emptyList())
+            .stream()
+            .filter(communicationRequest1 -> communicationRequest1.getId().equals(chosenFtaRequestId))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("No communication request found with id: " + chosenFtaRequestId));
+        String replyText = ftaCommunicationFields.getFtaRequestNoResponseTextArea();
+        boolean noActionRequired = !ObjectUtils.isEmpty(ftaCommunicationFields.getFtaRequestNoResponseNoAction());
+        CommunicationRequestReply reply = CommunicationRequestReply.builder()
+            .replyDateTime(LocalDateTime.now())
+            .replyUserName(idamService.getUserDetails(userAuthorisation).getName())
+            .replyMessage(noActionRequired ? "No action required" : replyText)
+            .build();
+        communicationRequest.getValue().setRequestReply(reply);
+        communicationRequest.getValue().setRequestResponseDueDate(null);
+
+        List<CommunicationRequest> requestsWithoutReplies = Optional.ofNullable(ftaCommunicationFields.getTribunalCommunications())
+            .orElse(Collections.emptyList())
+            .stream()
+            .filter((request -> request.getValue().getRequestReply() == null))
+            .toList();
+        if (requestsWithoutReplies.isEmpty()) {
+            ftaCommunicationFields.setTribunalResponseDueDate(null);
+        } else {
+            ftaCommunicationFields.setTribunalResponseDueDate(getOldestResponseDate(requestsWithoutReplies));
+        }
+        sscsCaseData.setCommunicationFields(ftaCommunicationFields);
+    }
+
+    private void clearFields(SscsCaseData sscsCaseData, FtaCommunicationFields communicationFields) {
+        communicationFields.setFtaRequestQuestion(null);
+        communicationFields.setFtaRequestTopic(null);
+        communicationFields.setFtaRequestType(null);
+        communicationFields.setFtaRequestNoResponseQuery(null);
+        communicationFields.setFtaRequestNoResponseTextArea(null);
+        communicationFields.setFtaRequestNoResponseRadioDl(null);
+        communicationFields.setFtaRequestNoResponseNoAction(null);
+        sscsCaseData.setCommunicationFields(communicationFields);
+    }
+
+    public static LocalDate getOldestResponseDate(List<CommunicationRequest> communicationRequests) {
+        return communicationRequests.stream()
+            .filter(communicationRequest -> communicationRequest.getValue().getRequestReply() == null)
+            .sorted(Comparator.comparing(communicationRequest -> communicationRequest.getValue().getRequestResponseDueDate()))
+            .toList()
+            .getFirst()
+            .getValue()
+            .getRequestResponseDueDate();
+    }
 }

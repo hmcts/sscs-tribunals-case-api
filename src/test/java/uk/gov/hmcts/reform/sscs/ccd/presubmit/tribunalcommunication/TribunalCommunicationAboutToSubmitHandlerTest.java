@@ -1,14 +1,17 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.tribunalcommunication;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.calculateDueDateWorkingDays;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,7 +26,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 
-public class TribunalCommunicationAboutToSubmitHandlerTest {
+class TribunalCommunicationAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
     TribunalCommunicationAboutToSubmitHandler handler;
@@ -40,7 +43,7 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
     private IdamService idamService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         openMocks(this);
 
         handler = new TribunalCommunicationAboutToSubmitHandler(idamService, true);
@@ -53,20 +56,31 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAValidAboutToSubmitEvent_thenReturnTrue() {
+    void givenAValidAboutToSubmitEvent_thenReturnTrue() {
         assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
     @Test
-    public void throwsExceptionIfItCannotHandleTheAppeal() {
+    void givenAnInvalidAboutToSubmitEvent_thenReturnFalse() {
+        when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
+        assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
+    }
+
+    @Test
+    void givenAValidAboutToStartEvent_thenReturnFalse() {
+        assertFalse(handler.canHandle(ABOUT_TO_START, callback));
+    }
+
+    @Test
+    void throwsExceptionIfItCannotHandle() {
         when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
         assertThrows(IllegalStateException.class, () -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION));
     }
 
     @Test
-    public void givenValidTribunalRequest_shouldAddNewCommunicationToList() {
+    void givenValidTribunalRequest_shouldAddNewCommunicationToList() {
         // Setup Tribunal communication fields
-        String expectedTopic = "Test Topic";
+        CommunicationRequestTopic expectedTopic = CommunicationRequestTopic.APPEAL_TYPE;
         String expectedQuestion = "Test Question";
         String expectedUserName = "Test User";
 
@@ -101,17 +115,17 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
         assertEquals(expectedQuestion, addedCom.getRequestMessage());
         assertEquals(expectedUserName, addedCom.getRequestUserName());
         assertNotNull(addedCom.getRequestDateTime());
-
-        // Verify the enum values are correctly set
-        assertEquals(TribunalCommunicationFilter.INFO_REQUEST_FROM_FTA, response.getData().getCommunicationFields().getTribunalCommunicationFilter());
-        assertEquals(FtaCommunicationFilter.AWAITING_INFO_FROM_TRIBUNAL, response.getData().getCommunicationFields().getFtaCommunicationFilter());
+        assertNotNull(addedCom.getRequestResponseDueDate());
+        LocalDate date = calculateDueDateWorkingDays(LocalDate.now(), 2);
+        assertEquals(date, addedCom.getRequestResponseDueDate());
+        assertEquals(date, response.getData().getCommunicationFields().getTribunalResponseDueDate());
     }
 
     @Test
-    public void givenFlagOff_shouldDoNothing() {
+    void givenFlagOff_shouldDoNothing() {
         List<CommunicationRequest> existingComs = new ArrayList<>();
         FtaCommunicationFields details = FtaCommunicationFields.builder()
-            .tribunalRequestTopic("someTopic")
+            .tribunalRequestTopic(CommunicationRequestTopic.APPEAL_TYPE)
             .tribunalRequestQuestion("someQuestion")
             .tribunalCommunications(existingComs)
             .tribunalRequestType(TribunalRequestType.NEW_REQUEST)
@@ -125,21 +139,39 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
 
         List<CommunicationRequest> resultComs = response.getData().getCommunicationFields().getTribunalCommunications();
         assertEquals(0, resultComs.size());
-        assertNull(response.getData().getCommunicationFields().getTribunalCommunicationFilter());
-        assertNull(response.getData().getCommunicationFields().getFtaCommunicationFilter());
+        assertNull(response.getData().getCommunicationFields().getTribunalResponseDueDate());
     }
 
     @Test
-    public void givenValidTribunalRequest_shouldAddNewCommunicationToPopulatedList() {
+    void givenNoRequestType_shouldDoNothing() {
+        List<CommunicationRequest> existingComs = new ArrayList<>();
+        FtaCommunicationFields details = FtaCommunicationFields.builder()
+            .tribunalRequestTopic(CommunicationRequestTopic.APPEAL_TYPE)
+            .tribunalRequestQuestion("someQuestion")
+            .tribunalCommunications(existingComs)
+            .build();
+
+        sscsCaseData.setCommunicationFields(details);
+        handler = new TribunalCommunicationAboutToSubmitHandler(idamService, false);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        List<CommunicationRequest> resultComs = response.getData().getCommunicationFields().getTribunalCommunications();
+        assertEquals(0, resultComs.size());
+    }
+
+    @Test
+    void givenValidTribunalRequest_shouldAddNewCommunicationToPopulatedList() {
         // Setup Tribunal communication fields
-        String expectedTopic = "Test Topic";
+        CommunicationRequestTopic expectedTopic = CommunicationRequestTopic.APPEAL_TYPE;
         String expectedQuestion = "Test Question";
         String expectedUserName = "Test User";
 
         // Create list of existing communications
         CommunicationRequest tribunalCommunicationPast = CommunicationRequest.builder().value(
                 CommunicationRequestDetails.builder()
-                        .requestTopic("Past existing Topic")
+                        .requestTopic(CommunicationRequestTopic.OTHER_PARTY_PERSONAL_INFORMATION)
                         .requestMessage("Past existing Question")
                         .requestDateTime(LocalDateTime.now().minusYears(2))
                         .requestUserName("Past existing user")
@@ -148,7 +180,7 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
                 ).build();
         CommunicationRequest tribunalCommunicationFuture = CommunicationRequest.builder().value(
                 CommunicationRequestDetails.builder()
-                        .requestTopic("Future existing Topic")
+                        .requestTopic(CommunicationRequestTopic.APPOINTEE_PERSONAL_INFORMATION)
                         .requestMessage("Future existing Question")
                         .requestDateTime(LocalDateTime.now().plusYears(1))
                         .requestUserName("Future existing user")
@@ -187,16 +219,14 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
         assertEquals(expectedUserName, addedCom.getRequestUserName());
         assertNotNull(addedCom.getRequestDateTime());
         assertEquals(tribunalCommunicationPast, resultComs.getLast());
-
-        // Verify the enum values are correctly set
-        assertEquals(TribunalCommunicationFilter.INFO_REQUEST_FROM_FTA, response.getData().getCommunicationFields().getTribunalCommunicationFilter());
-        assertEquals(FtaCommunicationFilter.AWAITING_INFO_FROM_TRIBUNAL, response.getData().getCommunicationFields().getFtaCommunicationFilter());
+        assertEquals(calculateDueDateWorkingDays(LocalDate.now(), 2), addedCom.getRequestResponseDueDate());
+        assertEquals(LocalDate.now().minusYears(1), response.getData().getCommunicationFields().getTribunalResponseDueDate());
     }
 
     @Test
-    public void givenNullCommunicationsList_shouldHandleGracefully() {
+    void givenNullCommunicationsList_shouldHandleGracefully() {
         // Setup Tribunal communication fields with null communications list
-        String expectedTopic = "Test Topic";
+        CommunicationRequestTopic expectedTopic = CommunicationRequestTopic.APPEAL_TYPE;
         String expectedQuestion = "Test Question";
         String expectedUserName = "Test User";
 
@@ -223,9 +253,5 @@ public class TribunalCommunicationAboutToSubmitHandlerTest {
         List<CommunicationRequest> resultComs = response.getData().getCommunicationFields().getTribunalCommunications();
 
         assertNotNull(resultComs);
-
-        // Verify the enum values are correctly set
-        assertEquals(TribunalCommunicationFilter.INFO_REQUEST_FROM_FTA, response.getData().getCommunicationFields().getTribunalCommunicationFilter());
-        assertEquals(FtaCommunicationFilter.AWAITING_INFO_FROM_TRIBUNAL, response.getData().getCommunicationFields().getFtaCommunicationFilter());
     }
 }
