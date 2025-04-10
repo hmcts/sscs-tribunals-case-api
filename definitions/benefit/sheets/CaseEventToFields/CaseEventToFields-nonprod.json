@@ -146,7 +146,7 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "selectTribunalRequest",
     "PageShowCondition": "tribunalRequestType=\"replyToTribunalQuery\"",
-    "PageLabel": "Reply to FTA Query",
+    "PageLabel": "Reply to Tribunal Query",
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=selectTribunalRequest"
   },
   {
@@ -159,7 +159,7 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "replyToTribunalQuery",
     "PageShowCondition": "tribunalRequestType=\"replyToTribunalQuery\"",
-    "PageLabel": "Write a reply to tribunal Query",
+    "PageLabel": "Write a reply to Tribunal Query",
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=replyToTribunalQuery"
   },
   {

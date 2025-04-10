@@ -59,7 +59,6 @@ class FtaCommunicationMidEventHandlerTest {
     @BeforeEach
     void setUp() {
         openMocks(this);
-
         handler = new FtaCommunicationMidEventHandler(true);
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").build();

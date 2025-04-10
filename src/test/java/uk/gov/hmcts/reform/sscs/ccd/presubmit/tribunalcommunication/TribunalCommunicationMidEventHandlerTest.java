@@ -108,7 +108,7 @@ class TribunalCommunicationMidEventHandlerTest {
         
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
             .tribunalRequestType(TribunalRequestType.REPLY_TO_TRIBUNAL_QUERY)
-            .tribunalCommunications(requests)
+            .ftaCommunications(requests)
             .build();
         
         sscsCaseData.setCommunicationFields(fields);
@@ -145,7 +145,7 @@ class TribunalCommunicationMidEventHandlerTest {
         
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
             .tribunalRequestType(TribunalRequestType.REPLY_TO_TRIBUNAL_QUERY)
-            .tribunalCommunications(requests)
+            .ftaCommunications(requests)
             .tribunalRequestNoResponseRadioDl(dynamicList)
             .build();
         

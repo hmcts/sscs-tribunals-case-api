@@ -91,7 +91,7 @@ public class TribunalCommunicationMidEventHandler implements PreSubmitCallbackHa
         DynamicListItem chosenTribunalRequest = Optional.ofNullable(tribunalRequestDl.getValue())
             .orElseThrow(() -> new IllegalStateException("No chosen Tribunal request found"));
         String chosenTribunalRequestId = chosenTribunalRequest.getCode();
-        CommunicationRequest communicationRequest = tribunalCommunicationFields.getTribunalCommunications()
+        CommunicationRequest communicationRequest = tribunalCommunicationFields.getFtaCommunications()
             .stream()
             .filter(request -> request.getId().equals(chosenTribunalRequestId))
             .findFirst()
@@ -117,9 +117,9 @@ public class TribunalCommunicationMidEventHandler implements PreSubmitCallbackHa
     }
 
     private void setTribunalCommunicationsDynamicList(FtaCommunicationFields tribunalCommunicationFields, SscsCaseData sscsCaseData) {
-        List<CommunicationRequest> tribunalCommunicationRequests = Optional.ofNullable(tribunalCommunicationFields.getTribunalCommunications())
+        List<CommunicationRequest> ftaCommunicationRequests = Optional.ofNullable(tribunalCommunicationFields.getFtaCommunications())
             .orElse(Collections.emptyList());
-        List<DynamicListItem> dynamicListItems = tribunalCommunicationRequests.stream()
+        List<DynamicListItem> dynamicListItems = ftaCommunicationRequests.stream()
             .filter((communicationRequest -> communicationRequest.getValue().getRequestReply() == null))
             .map((this::getDlItemFromCommunicationRequest))
             .toList();
