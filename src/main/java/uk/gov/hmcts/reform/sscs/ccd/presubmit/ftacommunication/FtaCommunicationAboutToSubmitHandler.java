@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 
-
 @Service
 @Slf4j
 public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
@@ -67,7 +66,7 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         FtaCommunicationFields ftaCommunicationFields = Optional.ofNullable(sscsCaseData.getCommunicationFields())
             .orElse(FtaCommunicationFields.builder().build());
 
-        if (ftaCommunicationFields.getFtaRequestType() == FtaRequestType.NEW_REQUEST) {
+        if (FtaRequestType.NEW_REQUEST.equals(ftaCommunicationFields.getFtaRequestType())) {
             CommunicationRequestTopic topic = ftaCommunicationFields.getFtaRequestTopic();
             String question = ftaCommunicationFields.getFtaRequestQuestion();
             List<CommunicationRequest> ftaComms = Optional.ofNullable(ftaCommunicationFields.getFtaCommunications())
@@ -76,7 +75,7 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
             final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
             addCommunicationRequest(ftaComms, topic, question, userDetails);
             setFieldsForNewRequest(sscsCaseData, ftaCommunicationFields, ftaComms);
-        } else if (ftaCommunicationFields.getFtaRequestType() == FtaRequestType.REPLY_TO_FTA_QUERY) {
+        } else if (FtaRequestType.REPLY_TO_FTA_QUERY.equals(ftaCommunicationFields.getFtaRequestType())) {
             handleReplyToFtaQuery(ftaCommunicationFields, userAuthorisation, sscsCaseData);
         }
         clearFields(sscsCaseData, ftaCommunicationFields);
@@ -107,11 +106,8 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         communicationRequest.getValue().setRequestResponseDueDate(null);
 
         List<CommunicationRequest> requestsWithoutReplies = getRequestsWithoutReplies(ftaCommunicationFields.getTribunalCommunications());
-        if (requestsWithoutReplies.isEmpty()) {
-            ftaCommunicationFields.setTribunalResponseDueDate(null);
-        } else {
-            ftaCommunicationFields.setTribunalResponseDueDate(getOldestResponseDate(requestsWithoutReplies));
-        }
+        ftaCommunicationFields.setTribunalResponseDueDate(getOldestResponseDate(requestsWithoutReplies));
+
         List<CommunicationRequest> repliesWithoutReviews = getRepliesWithoutReviews(ftaCommunicationFields.getTribunalCommunications());
         ftaCommunicationFields.setFtaResponseProvidedDate(getOldestResponseProvidedDate(repliesWithoutReviews));
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);

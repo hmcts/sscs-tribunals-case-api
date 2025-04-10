@@ -4,12 +4,8 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getCommunicationRequestFromId;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRepliesWithoutReviews;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRequestsWithoutReplies;
 
-import java.util.List;
-import java.util.Optional;
-import lombok.extern.slf4j.Slf4j;
-import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +29,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.TribunalRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
 @Slf4j
@@ -74,19 +69,10 @@ public class TribunalCommunicationMidEventHandler implements PreSubmitCallbackHa
             .orElse(FtaCommunicationFields.builder().build());
 
         if (callback.getPageId().equals("selectTribunalCommunicationAction")) {
-            if (communicationFields.getTribunalRequestType().equals(TribunalRequestType.REVIEW_TRIBUNAL_REPLY)) {
-                setFtaRequestRepliesDynamicList(preSubmitErrorCallbackResponse, communicationFields, sscsCaseData);
-            } else 
             if (communicationFields.getTribunalRequestType().equals(TribunalRequestType.REPLY_TO_TRIBUNAL_QUERY)) {
-                setTribunalCommunicationsDynamicList(communicationFields, sscsCaseData);
-                handleReplyToTribunalQueryError(preSubmitErrorCallbackResponse, communicationFields);
-            }
-        } else if (callback.getPageId().equals("selectTribunalReply")) {
-            setQueryReplyForReview(sscsCaseData, communicationFields);
-        } else if (callback.getPageId().equals("reviewTribunalReply")) {
-            YesNo actioned = communicationFields.getTribunalRequestRespondedActioned();
-            if (isNoOrNull(actioned)) {
-                preSubmitErrorCallbackResponse.addError("Please only select Yes if all actions to the response have been completed.");
+                setTribunalCommunicationsDynamicList(preSubmitErrorCallbackResponse, communicationFields, sscsCaseData);
+            } else if (communicationFields.getTribunalRequestType().equals(TribunalRequestType.REVIEW_TRIBUNAL_REPLY)) {
+                setFtaRequestRepliesDynamicList(preSubmitErrorCallbackResponse, communicationFields, sscsCaseData);
             }
         } else if (callback.getPageId().equals("selectTribunalRequest")) {
             setQueryForReply(sscsCaseData, communicationFields);
@@ -96,6 +82,13 @@ public class TribunalCommunicationMidEventHandler implements PreSubmitCallbackHa
             if (StringUtils.isEmpty(textValue) && ObjectUtils.isEmpty(noAction)) {
                 preSubmitErrorCallbackResponse.addError("Please provide a response to the Tribunal query or select No action required.");
             }
+        } else if (callback.getPageId().equals("selectTribunalReply")) {
+            setQueryReplyForReview(sscsCaseData, communicationFields);
+        } else if (callback.getPageId().equals("reviewTribunalReply")) {
+            YesNo actioned = communicationFields.getTribunalRequestRespondedActioned();
+            if (isNoOrNull(actioned)) {
+                preSubmitErrorCallbackResponse.addError("Please only select Yes if all actions to the response have been completed.");
+            }
         }
 
         if (!preSubmitErrorCallbackResponse.getErrors().isEmpty()) {
@@ -103,6 +96,29 @@ public class TribunalCommunicationMidEventHandler implements PreSubmitCallbackHa
         }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
+    }
+
+    private void setQueryForReply(SscsCaseData sscsCaseData, FtaCommunicationFields communicationFields) {
+        DynamicList tribunalRequestDl = communicationFields.getTribunalRequestNoResponseRadioDl();
+        DynamicListItem chosenTribunalRequest = Optional.ofNullable(tribunalRequestDl.getValue())
+            .orElseThrow(() -> new IllegalStateException("No chosen Tribunal request found"));
+        String chosenTribunalRequestId = chosenTribunalRequest.getCode();
+        CommunicationRequest communicationRequest = getCommunicationRequestFromId(chosenTribunalRequestId, communicationFields.getFtaCommunications());
+        communicationFields.setTribunalRequestNoResponseQuery(communicationRequest.getValue().getRequestMessage());
+        sscsCaseData.setCommunicationFields(communicationFields);
+    }
+
+    private void setTribunalCommunicationsDynamicList(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, FtaCommunicationFields communicationFields, SscsCaseData sscsCaseData) {
+        List<DynamicListItem> dynamicListItems = getRequestsWithoutReplies(communicationFields.getFtaCommunications())
+            .stream()
+            .map((CommunicationRequestUtil::getDlItemFromCommunicationRequest))
+            .toList();
+        if (dynamicListItems.isEmpty()) {
+            preSubmitCallbackResponse.addError("There are no requests to reply to. Please select a different communication type.");
+            return;
+        }
+        communicationFields.setTribunalRequestNoResponseRadioDl(new DynamicList(null, dynamicListItems));
+        sscsCaseData.setCommunicationFields(communicationFields);
     }
 
     private void setQueryReplyForReview(SscsCaseData sscsCaseData, FtaCommunicationFields ftaCommunicationFields) {
@@ -128,46 +144,5 @@ public class TribunalCommunicationMidEventHandler implements PreSubmitCallbackHa
         }
         ftaCommunicationFields.setTribunalRequestRespondedDl(new DynamicList(null, dynamicListItems));
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
-    }
-
-    private void setQueryForReply(SscsCaseData sscsCaseData, FtaCommunicationFields tribunalCommunicationFields) {
-        DynamicList tribunalRequestDl = tribunalCommunicationFields.getTribunalRequestNoResponseRadioDl();
-        DynamicListItem chosenTribunalRequest = Optional.ofNullable(tribunalRequestDl.getValue())
-            .orElseThrow(() -> new IllegalStateException("No chosen Tribunal request found"));
-        String chosenTribunalRequestId = chosenTribunalRequest.getCode();
-        CommunicationRequest communicationRequest = tribunalCommunicationFields.getFtaCommunications()
-            .stream()
-            .filter(request -> request.getId().equals(chosenTribunalRequestId))
-            .findFirst()
-            .orElseThrow(() -> new IllegalStateException("No communication request found with id: " + chosenTribunalRequestId));
-        tribunalCommunicationFields.setTribunalRequestNoResponseQuery(communicationRequest.getValue().getRequestMessage());
-        sscsCaseData.setCommunicationFields(tribunalCommunicationFields);
-    }
-
-    private void handleReplyToTribunalQueryError(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
-                                            FtaCommunicationFields tribunalCommunicationFields) {
-        if (tribunalCommunicationFields.getTribunalRequestNoResponseRadioDl() == null
-            || tribunalCommunicationFields.getTribunalRequestNoResponseRadioDl().getListItems().isEmpty()) {
-            preSubmitCallbackResponse.addError("There are no requests to reply to. Please select a different communication type.");
-        }
-    }
-
-    private DynamicListItem getDlItemFromCommunicationRequest(CommunicationRequest communicationRequest) {
-        return new DynamicListItem(communicationRequest.getId(),
-            communicationRequest.getValue().getRequestTopic().getValue() + " - "
-                + communicationRequest.getValue().getRequestDateTime()
-                .format(DateTimeFormatter.ofPattern("dd MMMM yyyy, HH:mm")) + " - "
-                + communicationRequest.getValue().getRequestUserName());
-    }
-
-    private void setTribunalCommunicationsDynamicList(FtaCommunicationFields tribunalCommunicationFields, SscsCaseData sscsCaseData) {
-        List<CommunicationRequest> ftaCommunicationRequests = Optional.ofNullable(tribunalCommunicationFields.getFtaCommunications())
-            .orElse(Collections.emptyList());
-        List<DynamicListItem> dynamicListItems = ftaCommunicationRequests.stream()
-            .filter((communicationRequest -> communicationRequest.getValue().getRequestReply() == null))
-            .map((this::getDlItemFromCommunicationRequest))
-            .toList();
-        tribunalCommunicationFields.setTribunalRequestNoResponseRadioDl(new DynamicList(null, dynamicListItems));
-        sscsCaseData.setCommunicationFields(tribunalCommunicationFields);
     }
 }
