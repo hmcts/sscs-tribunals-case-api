@@ -43,7 +43,7 @@ class HearingsMappingTest extends HearingsMappingBase {
     private VenueService venueService;
 
     @Mock
-    private  HearingsDetailsMapping hearingsDetailsMapping;
+    private HearingsDetailsMapping hearingsDetailsMapping;
 
     private HearingsMapping hearingsMapping;
 

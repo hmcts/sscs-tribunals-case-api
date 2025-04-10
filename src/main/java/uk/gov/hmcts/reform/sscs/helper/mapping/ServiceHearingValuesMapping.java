@@ -31,8 +31,6 @@ public final class ServiceHearingValuesMapping {
     @Value("${feature.default-panel-comp.enabled}")
     private boolean defaultPanelCompEnabled;
 
-
-
     ServiceHearingValuesMapping(HearingsPanelMapping hearingsPanelMapping, PanelCategoryService panelCategoryService) {
         this.hearingsPanelMapping = hearingsPanelMapping;
         this.panelCategoryService = panelCategoryService;
