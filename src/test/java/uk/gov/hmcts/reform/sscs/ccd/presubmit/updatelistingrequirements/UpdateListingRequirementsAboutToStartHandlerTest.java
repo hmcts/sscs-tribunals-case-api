@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,6 +59,11 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
     @Test
     public void givenValidCallback_thenReturnTrue() {
         assertThat(handler.canHandle(ABOUT_TO_START, callback)).isTrue();
+    }
+
+    @Test
+    void givenInvalidCallbackType_thenReturnFalse() {
+        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 
     @Test
