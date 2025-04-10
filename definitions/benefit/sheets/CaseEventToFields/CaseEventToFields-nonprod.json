@@ -44,17 +44,6 @@
     "PageID": "selectTribunalCommunicationAction",
     "FieldShowCondition": "tribunalRequestType=\"DoNotShow\""
   },
-  {
-    "CaseEventID": "tribunalCommunication",
-    "CaseFieldID": "ftaCommunicationFilter",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "13/03/2025",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 1,
-    "PageID": "selectTribunalCommunicationAction",
-    "FieldShowCondition": "tribunalRequestType=\"DoNotShow\""
-  },
 
   {
     "CaseEventID": "ftaCommunication",
