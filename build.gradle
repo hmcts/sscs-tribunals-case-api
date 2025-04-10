@@ -335,7 +335,7 @@ dependencies {
     implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.5'
     implementation group: 'io.github.openfeign', name: 'feign-hc5', version: '13.5'
     implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
-    implementation group: 'com.squareup.okio', name: 'okio-jvm', version: '3.10.2'
+    implementation group: 'com.squareup.okio', name: 'okio-jvm', version: '3.11.0'
 
     implementation group: 'com.github.hmcts', name: 'auth-checker-lib', version: '3.0.6'
 
