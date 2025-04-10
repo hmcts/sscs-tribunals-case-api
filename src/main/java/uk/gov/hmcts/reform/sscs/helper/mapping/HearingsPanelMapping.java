@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMember;
@@ -36,6 +37,9 @@ public final class HearingsPanelMapping {
 
     private final PanelCategoryService panelCategoryService;
 
+    @Value("${feature.default-panel-comp.enabled}")
+    private boolean defaultPanelCompEnabled;
+
     HearingsPanelMapping(PanelCategoryService panelCategoryService) {
 
         this.panelCategoryService = panelCategoryService;
@@ -44,7 +48,7 @@ public final class HearingsPanelMapping {
     public PanelRequirements getPanelRequirements(SscsCaseData caseData,
                                                          ReferenceDataServiceHolder refData) {
         return PanelRequirements.builder()
-                .roleTypes(panelCategoryService.getRoleTypes(caseData))
+                .roleTypes(defaultPanelCompEnabled ? panelCategoryService.getRoleTypes(caseData) : findRoleTypesByBenefitCode(caseData.getBenefitCode()))
                 .authorisationTypes(getAuthorisationTypes())
                 .authorisationSubTypes(getAuthorisationSubTypes())
                 .panelPreferences(getPanelPreferences(caseData))
