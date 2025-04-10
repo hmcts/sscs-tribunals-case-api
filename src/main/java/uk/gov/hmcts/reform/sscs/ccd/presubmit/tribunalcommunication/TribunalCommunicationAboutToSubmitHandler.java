@@ -45,8 +45,6 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
                                                           String userAuthorisation) {
-
-        log.info(userAuthorisation + "*!* - TribunalCommunicationAboutToSubmitHandler handle method called");                                                    
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
@@ -71,7 +69,6 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
             addCommunicationRequest(tribunalComms, topic, question, userDetails);
             setFieldsForNewRequest(sscsCaseData, communicationFields, tribunalComms);
         } else if (communicationFields.getTribunalRequestType() == TribunalRequestType.REPLY_TO_TRIBUNAL_QUERY) {
-            log.info(userAuthorisation + "*!* - TribunalCommunicationAboutToSubmitHandler handle method called for reply to tribunal query");
             handleReplyToTribunalQuery(communicationFields, userAuthorisation, sscsCaseData);
         }
 
@@ -104,9 +101,6 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
 
     private void setFieldsForNewRequest(SscsCaseData sscsCaseData, FtaCommunicationFields communicationFields, List<CommunicationRequest> comms) {
         communicationFields.setTribunalCommunications(comms);
-        communicationFields.setTribunalRequestTopic(null);
-        communicationFields.setTribunalRequestQuestion(null);
-        communicationFields.setTribunalRequestType(null);
         communicationFields.setTribunalResponseDueDate(getOldestResponseDate(comms));
         sscsCaseData.setCommunicationFields(communicationFields);
     }
