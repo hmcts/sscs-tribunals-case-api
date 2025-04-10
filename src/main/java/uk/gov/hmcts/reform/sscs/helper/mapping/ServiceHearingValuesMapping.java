@@ -9,7 +9,6 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.Judiciary;
@@ -85,7 +84,7 @@ public final class ServiceHearingValuesMapping {
 
     public Judiciary getJudiciary(@Valid SscsCaseData sscsCaseData, ReferenceDataServiceHolder refData) {
         return Judiciary.builder()
-                .roleType(panelCategoryService.getRoleTypes(sscsCaseData))
+                .roleType(defaultPanelCompEnabled ? panelCategoryService.getRoleTypes(sscsCaseData) : findRoleTypesByBenefitCode(sscsCaseData.getBenefitCode()))
                 .authorisationTypes(HearingsPanelMapping.getAuthorisationTypes())
                 .authorisationSubType(HearingsPanelMapping.getAuthorisationSubTypes())
                 .judiciarySpecialisms(HearingsPanelMapping.getPanelSpecialisms(sscsCaseData, getSessionCaseCodeMap(sscsCaseData, refData)))
