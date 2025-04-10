@@ -44,7 +44,52 @@
     "PageFieldDisplayOrder": 2,
     "PageID": "2.0"
   },
-
+  {
+    "CaseEventID": "tribunalCommunication",
+    "CaseFieldID": "tribunalRequestNoResponseRadioDl",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "selectTribunalRequest",
+    "PageShowCondition": "tribunalRequestType=\"replyToTribunalQuery\"",
+    "PageLabel": "Reply to Tribunal Query",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=selectTribunalRequest"
+  },
+  {
+    "CaseEventID": "tribunalCommunication",
+    "CaseFieldID": "tribunalRequestNoResponseQuery",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "replyToTribunalQuery",
+    "PageShowCondition": "tribunalRequestType=\"replyToTribunalQuery\"",
+    "PageLabel": "Write a reply to Tribunal Query",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=replyToTribunalQuery"
+  },
+  {
+    "CaseEventID": "tribunalCommunication",
+    "CaseFieldID": "tribunalRequestNoResponseTextArea",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "replyToTribunalQuery"
+  },
+  {
+    "CaseEventID": "tribunalCommunication",
+    "CaseFieldID": "tribunalRequestNoResponseNoAction",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 3,
+    "PageID": "replyToTribunalQuery"
+  }
   {
     "CaseEventID": "tribunalCommunication",
     "CaseFieldID": "tribunalRequestRespondedDl",
@@ -90,7 +135,10 @@
     "PageDisplayOrder": 6,
     "PageFieldDisplayOrder": 3,
     "PageID": "reviewTribunalReply"
+    "PageID": "selectTribunalCommunicationAction",
+    "FieldShowCondition": "tribunalRequestType=\"DoNotShow\""
   },
+
   {
     "CaseEventID": "ftaCommunication",
     "CaseFieldID": "ftaRequestType",
