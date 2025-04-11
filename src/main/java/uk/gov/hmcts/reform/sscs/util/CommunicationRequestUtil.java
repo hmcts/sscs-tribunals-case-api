@@ -7,6 +7,7 @@ import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequestDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequestTopic;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.idam.UserRole;
@@ -96,13 +98,7 @@ public class CommunicationRequestUtil {
     }
 
     public static DynamicListItem getDlItemFromCommunicationRequest(CommunicationRequest communicationRequest) {
-        return new DynamicListItem(communicationRequest.getId(),
-            MessageFormat.format("{0} - {1} - {2} - {3}",
-                communicationRequest.getValue().getRequestTopic().getValue(),
-                communicationRequest.getValue().getRequestDateTime()
-                    .format(DateTimeFormatter.ofPattern("dd MMMM yyyy, HH:mm")),
-                communicationRequest.getValue().getRequestUserName(),
-                communicationRequest.getValue().getRequestUserRole()));
+        return new DynamicListItem(communicationRequest.getId(), communicationRequest.getValue().toString());
     }
 
     public static String getRoleName(UserDetails userDetails) {
@@ -113,5 +109,27 @@ public class CommunicationRequestUtil {
                 .findFirst())
             .orElse(null);
     }
+
+
+    public static List<CommunicationRequest> getAllRequests(FtaCommunicationFields communicationFields) {
+        List<CommunicationRequest> allRequests = new ArrayList<>();
+        if (communicationFields != null) {
+            Optional.ofNullable(communicationFields.getFtaCommunications())
+                .ifPresent(allRequests::addAll);
+            Optional.ofNullable(communicationFields.getTribunalCommunications())
+                .ifPresent(allRequests::addAll);
+        }
+        allRequests.sort(Comparator.comparing(communicationRequest ->
+            ((CommunicationRequest) communicationRequest).getValue().getRequestDateTime()).reversed());
+        return allRequests;
+    }
+
+    public static void setCommRequestDateFilters(FtaCommunicationFields ftaCommunicationFields) {
+        ftaCommunicationFields.setFtaResponseProvidedDate(getOldestResponseProvidedDate(getRepliesWithoutReviews(ftaCommunicationFields.getTribunalCommunications())));
+        ftaCommunicationFields.setTribunalResponseProvidedDate(getOldestResponseProvidedDate(getRepliesWithoutReviews(ftaCommunicationFields.getFtaCommunications())));
+        ftaCommunicationFields.setFtaResponseDueDate(getOldestResponseDate(getRequestsWithoutReplies(ftaCommunicationFields.getFtaCommunications())));
+        ftaCommunicationFields.setTribunalResponseDueDate(getOldestResponseDate(getRequestsWithoutReplies(ftaCommunicationFields.getTribunalCommunications())));
+    }
+
 }
 

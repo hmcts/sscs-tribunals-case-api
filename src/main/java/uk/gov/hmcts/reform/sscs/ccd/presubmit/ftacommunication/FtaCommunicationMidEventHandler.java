@@ -1,9 +1,13 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getAllRequests;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getCommunicationRequestFromId;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRequestsWithoutReplies;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequest;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequestDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -66,8 +71,10 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
             .orElse(FtaCommunicationFields.builder().build());
 
         if (callback.getPageId().equals("selectFtaCommunicationAction")) {
-            if (ftaCommunicationFields.getFtaRequestType().equals(FtaRequestType.REPLY_TO_FTA_QUERY)) {
+            if (FtaRequestType.REPLY_TO_FTA_QUERY.equals(ftaCommunicationFields.getFtaRequestType())) {
                 setFtaCommunicationsDynamicList(preSubmitErrorCallbackResponse, ftaCommunicationFields, sscsCaseData);
+            } else if (FtaRequestType.DELETE_REQUEST_REPLY.equals(ftaCommunicationFields.getFtaRequestType())) {
+                setRequestToDeleteDynamicList(preSubmitErrorCallbackResponse, ftaCommunicationFields, sscsCaseData);
             }
         } else if (callback.getPageId().equals("selectFtaRequest")) {
             setQueryForReply(sscsCaseData, ftaCommunicationFields);
@@ -77,6 +84,8 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
             if (StringUtils.isEmpty(textValue) && ObjectUtils.isEmpty(noAction)) {
                 preSubmitErrorCallbackResponse.addError("Please provide a response to the FTA query or select No action required.");
             }
+        } else if (callback.getPageId().equals("selectRequestToDelete")) {
+            setRequestReadOnlyForDelete(sscsCaseData, ftaCommunicationFields);
         }
 
         if (!preSubmitErrorCallbackResponse.getErrors().isEmpty()) {
@@ -107,5 +116,30 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
         }
         ftaCommunicationFields.setFtaRequestNoResponseRadioDl(new DynamicList(null, dynamicListItems));
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
+    }
+
+    private void setRequestToDeleteDynamicList(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, FtaCommunicationFields communicationFields, SscsCaseData sscsCaseData) {
+        List<DynamicListItem> dynamicListItems = getAllRequests(communicationFields)
+            .stream()
+            .map((CommunicationRequestUtil::getDlItemFromCommunicationRequest))
+            .toList();
+        if (dynamicListItems.isEmpty()) {
+            preSubmitCallbackResponse.addError("There are no requests to delete. Please select a different communication type.");
+            return;
+        }
+        communicationFields.setDeleteCommRequestRadioDl(new DynamicList(null, dynamicListItems));
+        sscsCaseData.setCommunicationFields(communicationFields);
+    }
+
+    private void setRequestReadOnlyForDelete(SscsCaseData sscsCaseData, FtaCommunicationFields communicationFields) {
+        DynamicList requestDl = communicationFields.getDeleteCommRequestRadioDl();
+        DynamicListItem requestToDelete = Optional.ofNullable(requestDl.getValue())
+            .orElseThrow(() -> new IllegalStateException("No chosen request found"));
+        String requestToDeleteId = requestToDelete.getCode();
+        CommunicationRequestDetails communicationRequest =
+            getCommunicationRequestFromId(requestToDeleteId, getAllRequests(communicationFields)).getValue();
+        communicationFields.setDeleteCommRequestReadOnly(communicationRequest);
+        communicationFields.setDeleteCommRequestTextArea(null);
+        sscsCaseData.setCommunicationFields(communicationFields);
     }
 }
