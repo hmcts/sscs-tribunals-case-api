@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getOldestRe
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getOldestResponseProvidedDate;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRepliesWithoutReviews;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRequestsWithoutReplies;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRoleName;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -96,9 +97,11 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
 
         String replyText = ftaCommunicationFields.getFtaRequestNoResponseTextArea();
         boolean noActionRequired = !ObjectUtils.isEmpty(ftaCommunicationFields.getFtaRequestNoResponseNoAction());
+        UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
         CommunicationRequestReply reply = CommunicationRequestReply.builder()
             .replyDateTime(LocalDateTime.now())
-            .replyUserName(idamService.getUserDetails(userAuthorisation).getName())
+            .replyUserName(userDetails.getName())
+            .replyUserRole(getRoleName(userDetails))
             .replyMessage(noActionRequired ? "No action required" : replyText)
             .replyHasBeenActioned(noActionRequired ? null : YesNo.NO)
             .build();

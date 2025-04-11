@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.idam.UserRole;
 
 class FtaCommunicationAboutToSubmitHandlerTest {
 
@@ -116,6 +117,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         // Mock user details
         UserDetails userDetails = UserDetails.builder()
             .name(expectedUserName)
+            .roles(List.of(UserRole.CTSC_CLERK.getValue()))
             .build();
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
 
@@ -132,6 +134,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertEquals(expectedTopic, addedCom.getRequestTopic());
         assertEquals(expectedQuestion, addedCom.getRequestMessage());
         assertEquals(expectedUserName, addedCom.getRequestUserName());
+        assertEquals(UserRole.CTSC_CLERK.getLabel(), addedCom.getRequestUserRole());
         assertNotNull(addedCom.getRequestDateTime());
         LocalDate date = calculateDueDateWorkingDays(LocalDate.now(), 2);
         assertEquals(date, addedCom.getRequestResponseDueDate());
@@ -195,6 +198,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         // Mock user details
         UserDetails userDetails = UserDetails.builder()
             .name(expectedUserName)
+            .roles(List.of(UserRole.IBCA.getValue()))
             .build();
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
 
@@ -212,6 +216,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertEquals(expectedTopic, addedCom.getRequestTopic());
         assertEquals(expectedQuestion, addedCom.getRequestMessage());
         assertEquals(expectedUserName, addedCom.getRequestUserName());
+        assertEquals(UserRole.IBCA.getLabel(), addedCom.getRequestUserRole());
         assertNotNull(addedCom.getRequestDateTime());
         assertEquals(ftaCommunicationPast, resultComs.getLast());
         assertEquals(calculateDueDateWorkingDays(LocalDate.now(), 2), addedCom.getRequestResponseDueDate());
@@ -236,6 +241,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         // Mock user details
         UserDetails userDetails = UserDetails.builder()
             .name(expectedUserName)
+            .roles(List.of(UserRole.SUPER_USER.getValue()))
             .build();
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
 
@@ -247,6 +253,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         List<CommunicationRequest> resultComs = response.getData().getCommunicationFields().getFtaCommunications();
 
         assertNotNull(resultComs);
+        assertEquals(UserRole.SUPER_USER.getLabel(), resultComs.getFirst().getValue().getRequestUserRole());
     }
 
     @Test
@@ -269,7 +276,8 @@ class FtaCommunicationAboutToSubmitHandlerTest {
             .build();
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
         String userName = "Test User";
-        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().name(userName).build());
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
+            .name(userName).roles(List.of(UserRole.IBCA.getValue())).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -280,6 +288,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertNotNull(request.getRequestReply());
         assertEquals(replyText, request.getRequestReply().getReplyMessage());
         assertEquals(userName, request.getRequestReply().getReplyUserName());
+        assertEquals(UserRole.IBCA.getLabel(), request.getRequestReply().getReplyUserRole());
         assertNotNull(request.getRequestReply().getReplyDateTime());
         assertEquals(YesNo.NO, request.getRequestReply().getReplyHasBeenActioned());
         assertNull(request.getRequestResponseDueDate());
@@ -315,7 +324,8 @@ class FtaCommunicationAboutToSubmitHandlerTest {
             .build();
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
         String userName = "Test User";
-        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().name(userName).build());
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
+            .name(userName).roles(List.of(UserRole.CTSC_CLERK.getValue())).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -326,6 +336,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertNotNull(request.getRequestReply());
         assertEquals(replyText, request.getRequestReply().getReplyMessage());
         assertEquals(userName, request.getRequestReply().getReplyUserName());
+        assertEquals(UserRole.CTSC_CLERK.getLabel(), request.getRequestReply().getReplyUserRole());
         assertNotNull(request.getRequestReply().getReplyDateTime());
         assertEquals(YesNo.NO, request.getRequestReply().getReplyHasBeenActioned());
         assertNull(request.getRequestResponseDueDate());
@@ -361,7 +372,8 @@ class FtaCommunicationAboutToSubmitHandlerTest {
             .build();
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
         String userName = "Test User";
-        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().name(userName).build());
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
+            .name(userName).roles(List.of(UserRole.SUPER_USER.getValue())).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -372,6 +384,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertNotNull(request.getRequestReply());
         assertEquals(replyText, request.getRequestReply().getReplyMessage());
         assertEquals(userName, request.getRequestReply().getReplyUserName());
+        assertEquals(UserRole.SUPER_USER.getLabel(), request.getRequestReply().getReplyUserRole());
         assertNotNull(request.getRequestReply().getReplyDateTime());
         assertEquals(YesNo.NO, request.getRequestReply().getReplyHasBeenActioned());
         assertNull(request.getRequestResponseDueDate());
@@ -398,7 +411,8 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         ftaCommunicationFields.setTribunalResponseDueDate(LocalDate.of(1, 1, 1));
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
         String userName = "Test User";
-        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().name(userName).build());
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
+            .name(userName).roles(List.of(UserRole.TCW.getValue())).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -409,6 +423,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertNotNull(request.getRequestReply());
         assertEquals("No action required", request.getRequestReply().getReplyMessage());
         assertEquals(userName, request.getRequestReply().getReplyUserName());
+        assertEquals(UserRole.TCW.getLabel(), request.getRequestReply().getReplyUserRole());
         assertNotNull(request.getRequestReply().getReplyDateTime());
         assertNull(communicationRequest.getValue().getRequestReply().getReplyHasBeenActioned());
         assertNull(communicationRequest.getValue().getRequestResponseDueDate());

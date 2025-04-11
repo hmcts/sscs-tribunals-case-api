@@ -178,12 +178,13 @@ class CommunicationRequestUtilTest {
                 .requestTopic(communicationRequestTopic)
                 .requestDateTime(LocalDateTime.of(2023, 1, 1, 10, 0))
                 .requestUserName("Test User")
+                .requestUserRole("Test role")
                 .build())
             .build();
 
         DynamicListItem result = CommunicationRequestUtil.getDlItemFromCommunicationRequest(request);
 
         assertEquals("1", result.getCode());
-        assertEquals(communicationRequestTopic.getValue() + " - 01 January 2023, 10:00 - Test User", result.getLabel());
+        assertEquals(communicationRequestTopic.getValue() + " - 01 January 2023, 10:00 - Test User - Test role", result.getLabel());
     }
 }
