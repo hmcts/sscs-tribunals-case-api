@@ -20,6 +20,8 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -482,8 +484,9 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertEquals(LocalDate.of(3, 3, 3), response.getData().getCommunicationFields().getTribunalResponseDueDate());
     }
 
+
     @Test
-    void shouldThrowExceptionWhenNoCommunicationRequestFound() {
+    void shouldThrowExceptionWhenNoCommunicationRequestFoundReply() {
         String chosenFtaRequestId = "1";
 
         DynamicListItem chosenFtaRequest = new DynamicListItem(chosenFtaRequestId, "item");
@@ -501,6 +504,47 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         );
 
         assertEquals("No communication request found with id: " + chosenFtaRequestId, exception.getMessage());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"1, 1, 1", "2, 1, 1", "3, 2, 0"})
+    void shouldHandleDeleteRequestReply(String chosenId, int tribunalCommsSize, int ftaCommsSize) {
+        CommunicationRequest communicationRequest = CommunicationRequest.builder()
+            .id("1")
+            .value(CommunicationRequestDetails.builder().build())
+            .build();
+        CommunicationRequest communicationRequest2 = CommunicationRequest.builder()
+            .id("2")
+            .value(CommunicationRequestDetails.builder().build())
+            .build();
+        CommunicationRequest communicationRequest3 = CommunicationRequest.builder()
+            .id("3")
+            .value(CommunicationRequestDetails.builder().build())
+            .build();
+        DynamicListItem chosenDl = new DynamicListItem(chosenId, "item");
+        DynamicList ftaRequestNoResponseRadioDl = new DynamicList(chosenDl, null);
+        FtaCommunicationFields ftaCommunicationFields = FtaCommunicationFields.builder()
+            .deleteCommRequestRadioDl(ftaRequestNoResponseRadioDl)
+            .tribunalCommunications(List.of(communicationRequest, communicationRequest2))
+            .ftaCommunications(List.of(communicationRequest3))
+            .ftaRequestType(FtaRequestType.DELETE_REQUEST_REPLY)
+            .build();
+        sscsCaseData.setCommunicationFields(ftaCommunicationFields);
+        String userName = "Test User";
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
+            .name(userName).roles(List.of(UserRole.TCW.getValue())).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        FtaCommunicationFields fields = response.getData().getCommunicationFields();
+
+        List<CommunicationRequest> tribunalComms = fields.getTribunalCommunications();
+        List<CommunicationRequest> ftaComms = fields.getFtaCommunications();
+        assertEquals(tribunalCommsSize, tribunalComms.size());
+        assertEquals(ftaCommsSize, ftaComms.size());
+        assertFalse(tribunalComms.stream().map(CommunicationRequest::getId).toList().contains(chosenId));
+        assertFalse(ftaComms.stream().map(CommunicationRequest::getId).toList().contains(chosenId));
     }
 
     @Test

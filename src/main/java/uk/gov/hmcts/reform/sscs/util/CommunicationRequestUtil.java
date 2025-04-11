@@ -41,6 +41,7 @@ public class CommunicationRequestUtil {
     public static LocalDate getOldestResponseDate(List<CommunicationRequest> communicationRequests) {
         List<CommunicationRequest> sortedList = communicationRequests.stream()
             .filter(communicationRequest -> communicationRequest.getValue().getRequestReply() == null)
+            .filter(communicationRequest -> communicationRequest.getValue().getRequestResponseDueDate() != null)
             .sorted(Comparator.comparing(communicationRequest ->
                 communicationRequest.getValue().getRequestResponseDueDate()))
             .toList();
@@ -53,6 +54,7 @@ public class CommunicationRequestUtil {
     public static LocalDate getOldestResponseProvidedDate(List<CommunicationRequest> communicationRequests) {
         List<CommunicationRequest> sortedList = communicationRequests.stream()
             .filter(communicationRequest -> communicationRequest.getValue().getRequestReply() != null)
+            .filter(communicationRequest -> communicationRequest.getValue().getRequestReply().getReplyDateTime() != null)
             .sorted(Comparator.comparing(communicationRequest ->
                 communicationRequest.getValue().getRequestReply().getReplyDateTime()))
             .toList();

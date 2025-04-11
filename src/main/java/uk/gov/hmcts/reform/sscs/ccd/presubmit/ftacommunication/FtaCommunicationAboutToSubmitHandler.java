@@ -4,15 +4,12 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.addCommunicationRequest;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getAllRequests;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getCommunicationRequestFromId;
-import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getOldestResponseDate;
-import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getOldestResponseProvidedDate;
-import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRepliesWithoutReviews;
-import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRequestsWithoutReplies;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRoleName;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.setCommRequestDateFilters;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -113,11 +110,20 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
 
     private void handleDeleteRequestReply(FtaCommunicationFields ftaCommunicationFields) {
         String requestIdToDelete = ftaCommunicationFields.getDeleteCommRequestRadioDl().getValue().getCode();
-        CommunicationRequest communicationRequest = getCommunicationRequestFromId(requestIdToDelete, getAllRequests(ftaCommunicationFields));
-        Optional.ofNullable(ftaCommunicationFields.getFtaCommunications())
-            .ifPresent(communicationRequests -> communicationRequests.remove(communicationRequest));
-        Optional.ofNullable(ftaCommunicationFields.getTribunalCommunications())
-            .ifPresent(communicationRequests -> communicationRequests.remove(communicationRequest));
+        ftaCommunicationFields.setFtaCommunications(
+            Optional.ofNullable(ftaCommunicationFields.getFtaCommunications())
+                .orElse(Collections.emptyList())
+                .stream()
+                .filter(request -> !request.getId().equals(requestIdToDelete))
+                .toList()
+        );
+        ftaCommunicationFields.setTribunalCommunications(
+            Optional.ofNullable(ftaCommunicationFields.getTribunalCommunications())
+                .orElse(Collections.emptyList())
+                .stream()
+                .filter(request -> !request.getId().equals(requestIdToDelete))
+                .toList()
+        );
     }
 
     private void clearFields(FtaCommunicationFields communicationFields) {
