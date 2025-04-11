@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.sscs.model.HearingLocation;
 import uk.gov.hmcts.reform.sscs.model.HearingWrapper;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDetails;
+import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
@@ -83,8 +84,14 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
 
     private SscsCaseData caseData;
 
+    @Mock
+    private HearingsPanelMapping hearingsPanelMapping;
+
+    private HearingsDetailsMapping hearingsDetailsMapping;
+
     @BeforeEach
     void setUp() {
+        hearingsDetailsMapping = new HearingsDetailsMapping(hearingsPanelMapping);
         OverrideFields defaultListingValues = OverrideFields.builder()
             .duration(60)
             .build();
@@ -144,7 +151,9 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
             .caseData(caseData)
             .build();
 
-        HearingDetails hearingDetails = HearingsDetailsMapping.buildHearingDetails(wrapper, refData);
+        given(hearingsPanelMapping.getPanelRequirements(caseData, refData)).willReturn(PanelRequirements.builder().build());
+
+        HearingDetails hearingDetails = hearingsDetailsMapping.buildHearingDetails(wrapper, refData);
 
         assertNotNull(hearingDetails.getHearingType());
         assertNotNull(hearingDetails.getHearingWindow());
