@@ -151,7 +151,7 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
             .caseData(caseData)
             .build();
 
-        given(hearingsPanelMapping.getPanelRequirements(caseData, refData)).willReturn(PanelRequirements.builder().build());
+        given(hearingsPanelMapping.getPanelRequirements(caseData, refData, true)).willReturn(PanelRequirements.builder().build());
 
         HearingDetails hearingDetails = hearingsDetailsMapping.buildHearingDetails(wrapper, refData);
 
