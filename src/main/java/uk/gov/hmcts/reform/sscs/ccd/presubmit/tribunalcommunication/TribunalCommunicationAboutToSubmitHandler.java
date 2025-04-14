@@ -3,10 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.tribunalcommunication;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.addCommunicationRequest;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getCommunicationRequestFromId;
-import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getOldestResponseDate;
-import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getOldestResponseProvidedDate;
-import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRepliesWithoutReviews;
-import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRequestsWithoutReplies;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRoleName;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.setCommRequestDateFilters;
 

@@ -133,7 +133,7 @@ class FtaCommunicationSubmittedHandlerTest {
             .requestUserRole(expectedUserRole)
             .build();
 
-        String expectedNote = "Request deleted: "
+        final String expectedNote = "Request deleted: "
             + requestDetails.toString()
             + "\nReason for deletion: \n"
             + expectedReason;
@@ -233,7 +233,7 @@ class FtaCommunicationSubmittedHandlerTest {
             .build();
 
         sscsCaseData.setCommunicationFields(fields);
-        FeignException exception = assertThrows(FeignException.class, () ->handler.handle(SUBMITTED, callback));
+        FeignException exception = assertThrows(FeignException.class, () -> handler.handle(SUBMITTED, callback));
         assertEquals(errorMessage, exception.getMessage());
 
         verify(mockAppender).doAppend(captorLoggingEvent.capture());
