@@ -112,7 +112,6 @@ public class CommunicationRequestUtil {
             .orElse(null);
     }
 
-
     public static List<CommunicationRequest> getAllRequests(FtaCommunicationFields communicationFields) {
         List<CommunicationRequest> allRequests = new ArrayList<>();
         if (communicationFields != null) {
@@ -127,11 +126,10 @@ public class CommunicationRequestUtil {
     }
 
     public static void setCommRequestDateFilters(FtaCommunicationFields ftaCommunicationFields) {
-        ftaCommunicationFields.setFtaResponseProvidedDate(getOldestResponseProvidedDate(getRepliesWithoutReviews(ftaCommunicationFields.getTribunalCommunications())));
-        ftaCommunicationFields.setTribunalResponseProvidedDate(getOldestResponseProvidedDate(getRepliesWithoutReviews(ftaCommunicationFields.getFtaCommunications())));
         ftaCommunicationFields.setFtaResponseDueDate(getOldestResponseDate(getRequestsWithoutReplies(ftaCommunicationFields.getFtaCommunications())));
         ftaCommunicationFields.setTribunalResponseDueDate(getOldestResponseDate(getRequestsWithoutReplies(ftaCommunicationFields.getTribunalCommunications())));
+        ftaCommunicationFields.setFtaResponseProvidedDate(getOldestResponseProvidedDate(getRepliesWithoutReviews(ftaCommunicationFields.getTribunalCommunications())));
+        ftaCommunicationFields.setTribunalResponseProvidedDate(getOldestResponseProvidedDate(getRepliesWithoutReviews(ftaCommunicationFields.getFtaCommunications())));
     }
-
 }
 

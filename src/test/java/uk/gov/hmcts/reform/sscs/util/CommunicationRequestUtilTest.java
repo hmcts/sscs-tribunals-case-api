@@ -169,6 +169,22 @@ class CommunicationRequestUtilTest {
         assertNotNull(addedRequest.getValue().getRequestResponseDueDate());
     }
 
+    @Test
+    void shouldAddCommunicationRequestNoNameIfNull() {
+        List<CommunicationRequest> comms = new java.util.ArrayList<>();
+        CommunicationRequestTopic topic = CommunicationRequestTopic.MRN_REVIEW_DECISION_NOTICE_DETAILS;
+        String question = "Test question";
+
+        CommunicationRequestUtil.addCommunicationRequest(comms, topic, question, null);
+
+        assertEquals(1, comms.size());
+        CommunicationRequest addedRequest = comms.getFirst();
+        assertEquals(question, addedRequest.getValue().getRequestMessage());
+        assertEquals(topic, addedRequest.getValue().getRequestTopic());
+        assertNull(addedRequest.getValue().getRequestUserName());
+        assertNotNull(addedRequest.getValue().getRequestResponseDueDate());
+    }
+
     @ParameterizedTest
     @EnumSource(value = CommunicationRequestTopic.class)
     void shouldCreateDynamicListItemFromCommunicationRequest(CommunicationRequestTopic communicationRequestTopic) {
@@ -186,5 +202,104 @@ class CommunicationRequestUtilTest {
 
         assertEquals("1", result.getCode());
         assertEquals(communicationRequestTopic.getValue() + " - 01 January 2023, 10:00 - Test User - Test role", result.getLabel());
+    }
+
+    @Test
+    void shouldReturnAllRequestsFromFtaAndTribunalCommunications() {
+        CommunicationRequest ftaRequest = CommunicationRequest.builder()
+            .value(CommunicationRequestDetails.builder()
+                .requestDateTime(LocalDateTime.of(2023, 1, 1, 10, 0))
+                .build())
+            .build();
+
+        CommunicationRequest tribunalRequest = CommunicationRequest.builder()
+            .value(CommunicationRequestDetails.builder()
+                .requestDateTime(LocalDateTime.of(2022, 1, 1, 10, 0))
+                .build())
+            .build();
+
+        FtaCommunicationFields communicationFields = FtaCommunicationFields.builder()
+            .ftaCommunications(List.of(ftaRequest))
+            .tribunalCommunications(List.of(tribunalRequest))
+            .build();
+
+        List<CommunicationRequest> result = CommunicationRequestUtil.getAllRequests(communicationFields);
+
+        assertEquals(2, result.size());
+        assertEquals(ftaRequest, result.get(0)); // Sorted by date descending
+        assertEquals(tribunalRequest, result.get(1));
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenCommunicationFieldsIsNull() {
+        List<CommunicationRequest> result = CommunicationRequestUtil.getAllRequests(null);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenBothFtaAndTribunalCommunicationsAreNull() {
+        FtaCommunicationFields communicationFields = FtaCommunicationFields.builder().build();
+
+        List<CommunicationRequest> result = CommunicationRequestUtil.getAllRequests(communicationFields);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void shouldSetCommRequestDateFiltersCorrectly() {
+        CommunicationRequest requestWithoutReply = CommunicationRequest.builder()
+            .value(CommunicationRequestDetails.builder()
+                .requestResponseDueDate(LocalDate.of(2023, 1, 5))
+                .build())
+            .build();
+        CommunicationRequest requestWithReply = CommunicationRequest.builder()
+            .value(CommunicationRequestDetails.builder()
+                .requestReply(CommunicationRequestReply.builder()
+                    .replyDateTime(LocalDateTime.of(2023, 1, 1, 10, 0))
+                    .replyHasBeenActioned(YesNo.NO)
+                    .build())
+                .build())
+            .build();
+        CommunicationRequest replyWithoutReview = CommunicationRequest.builder()
+            .value(CommunicationRequestDetails.builder()
+                .requestReply(CommunicationRequestReply.builder()
+                    .replyDateTime(LocalDateTime.of(2022, 2, 2, 10, 0))
+                    .replyHasBeenActioned(YesNo.NO)
+                    .build())
+                .build())
+            .build();
+        CommunicationRequest replyWithReview = CommunicationRequest.builder()
+            .value(CommunicationRequestDetails.builder()
+                .requestReply(CommunicationRequestReply.builder()
+                    .replyDateTime(LocalDateTime.of(2022, 3, 3, 10, 0))
+                    .replyHasBeenActioned(YesNo.YES)
+                    .build())
+                .build())
+            .build();
+
+        FtaCommunicationFields communicationFields = FtaCommunicationFields.builder()
+            .ftaCommunications(List.of(replyWithReview, replyWithoutReview, requestWithReply, requestWithoutReply))
+            .tribunalCommunications(List.of(replyWithReview, replyWithoutReview, requestWithReply, requestWithoutReply))
+            .build();
+
+        CommunicationRequestUtil.setCommRequestDateFilters(communicationFields);
+
+        assertEquals(LocalDate.of(2023, 1, 5), communicationFields.getFtaResponseDueDate());
+        assertEquals(LocalDate.of(2023, 1, 5), communicationFields.getTribunalResponseDueDate());
+        assertEquals(LocalDate.of(2022, 2, 2), communicationFields.getTribunalResponseProvidedDate());
+        assertEquals(LocalDate.of(2022, 2, 2), communicationFields.getFtaResponseProvidedDate());
+    }
+
+    @Test
+    void shouldHandleNullFieldsInSetCommRequestDateFilters() {
+        FtaCommunicationFields communicationFields = FtaCommunicationFields.builder().build();
+
+        CommunicationRequestUtil.setCommRequestDateFilters(communicationFields);
+
+        assertNull(communicationFields.getFtaResponseProvidedDate());
+        assertNull(communicationFields.getTribunalResponseProvidedDate());
+        assertNull(communicationFields.getFtaResponseDueDate());
+        assertNull(communicationFields.getTribunalResponseDueDate());
     }
 }
