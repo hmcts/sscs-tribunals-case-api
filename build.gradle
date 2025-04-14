@@ -388,7 +388,7 @@ dependencies {
     implementation group: 'commons-io', name: 'commons-io', version:  versions.commonsio
 
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
-    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.0'
+    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.1'
     implementation group: 'org.apache.pdfbox', name: 'xmpbox', version: '2.0.33'
     implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.33'
     implementation group: 'org.apache.tika', name: 'tika-core', version: '2.9.3'
