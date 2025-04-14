@@ -5,9 +5,6 @@ import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getAllReque
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getCommunicationRequestFromId;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRequestsWithoutReplies;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;

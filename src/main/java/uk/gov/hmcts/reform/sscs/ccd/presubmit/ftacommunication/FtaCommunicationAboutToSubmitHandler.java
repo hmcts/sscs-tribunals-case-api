@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.addCommunicationRequest;
-import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getAllRequests;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getCommunicationRequestFromId;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRoleName;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.setCommRequestDateFilters;
@@ -12,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +21,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
-import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 
 @Service
 @Slf4j
