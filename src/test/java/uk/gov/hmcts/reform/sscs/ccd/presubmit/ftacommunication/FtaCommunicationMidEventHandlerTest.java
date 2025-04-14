@@ -108,6 +108,7 @@ class FtaCommunicationMidEventHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertNotNull(response);
+        assertNull(response.getData().getCommunicationFields().getDeleteCommRequestReadOnly());
         DynamicList dl = response.getData().getCommunicationFields().getFtaRequestNoResponseRadioDl();
         assertNull(dl);
         assertTrue(response.getErrors().isEmpty());
@@ -130,6 +131,7 @@ class FtaCommunicationMidEventHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertNotNull(response);
+        assertNull(response.getData().getCommunicationFields().getDeleteCommRequestReadOnly());
         DynamicList dl = response.getData().getCommunicationFields().getFtaRequestNoResponseRadioDl();
         assertNotNull(dl);
         assertNull(dl.getValue());
@@ -155,6 +157,7 @@ class FtaCommunicationMidEventHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertNotNull(response);
+        assertNull(response.getData().getCommunicationFields().getDeleteCommRequestReadOnly());
         DynamicList dl = response.getData().getCommunicationFields().getFtaRequestNoResponseRadioDl();
         assertNotNull(dl);
         assertNull(dl.getValue());
@@ -178,6 +181,7 @@ class FtaCommunicationMidEventHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertNotNull(response);
+        assertNull(response.getData().getCommunicationFields().getDeleteCommRequestReadOnly());
         DynamicList dl = response.getData().getCommunicationFields().getFtaRequestNoResponseRadioDl();
         assertNull(dl);
         assertEquals(1, response.getErrors().size());
@@ -196,6 +200,7 @@ class FtaCommunicationMidEventHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertNotNull(response);
+        assertNull(response.getData().getCommunicationFields().getDeleteCommRequestReadOnly());
         DynamicList dl = response.getData().getCommunicationFields().getFtaRequestNoResponseRadioDl();
         assertNull(dl);
         assertEquals(1, response.getErrors().size());

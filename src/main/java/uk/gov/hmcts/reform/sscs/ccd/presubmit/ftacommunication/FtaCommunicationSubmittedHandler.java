@@ -6,13 +6,16 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_SEND_TO_INTERL
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import feign.FeignException;
+import java.util.Optional;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequest;
@@ -28,7 +31,7 @@ import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 
 @Component
 @Slf4j
-public class FtaCommunicationSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class FtaCommunicationSubmittedHandler implements CallbackHandler<SscsCaseData> {
 
     private IdamService idamService;
     private AddNoteService addNoteService;
@@ -36,10 +39,10 @@ public class FtaCommunicationSubmittedHandler implements PreSubmitCallbackHandle
     private final boolean isFtaCommunicationEnabled;
 
     @Autowired
-    public FtaCommunicationSubmittedHandler(IdamService idamService,
-                                                AddNoteService addNoteService,
-                                                UpdateCcdCaseService updateCcdCaseService,
-                                                @Value("${feature.fta-communication.enabled}") boolean isFtaCommunicationEnabled) {
+    FtaCommunicationSubmittedHandler(IdamService idamService,
+                                            AddNoteService addNoteService,
+                                            UpdateCcdCaseService updateCcdCaseService,
+                                            @Value("${feature.fta-communication.enabled}") boolean isFtaCommunicationEnabled) {
         this.isFtaCommunicationEnabled = isFtaCommunicationEnabled;
         this.idamService = idamService;
         this.addNoteService = addNoteService;
@@ -56,16 +59,19 @@ public class FtaCommunicationSubmittedHandler implements PreSubmitCallbackHandle
     }
 
     @Override
-    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
+    public void handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
+        CommunicationRequestDetails readOnly = Optional.ofNullable(sscsCaseData.getCommunicationFields())
+            .map(FtaCommunicationFields::getDeleteCommRequestReadOnly)
+            .orElse(null);
 
-        if (!isFtaCommunicationEnabled) {
-            return new PreSubmitCallbackResponse<>(sscsCaseData);
+        if (!isFtaCommunicationEnabled || readOnly == null) {
+            return;
         }
 
         Consumer<SscsCaseDetails> caseDataConsumer = sscsCaseDetails -> {
@@ -75,7 +81,7 @@ public class FtaCommunicationSubmittedHandler implements PreSubmitCallbackHandle
                 + communicationFields.getDeleteCommRequestReadOnly().toString()
                 + "\nReason for deletion: \n"
                 + communicationFields.getDeleteCommRequestTextArea();
-            addNoteService.addNote(userAuthorisation, caseData, note);
+            addNoteService.addNote(idamService.getIdamOauth2Token(), caseData, note);
         };
 
         try {
@@ -89,13 +95,16 @@ public class FtaCommunicationSubmittedHandler implements PreSubmitCallbackHandle
             );
         } catch (FeignException e) {
             log.error(
-                    "{}. CCD response: {}",
-                    String.format("Could not add note from event %s for case %d", EventType.FTA_COMMUNICATION, caseDetails.getId()),
-                    e.responseBody().isPresent() ? e.contentUTF8() : e.getMessage()
+                "{}. CCD response: {}",
+                String.format("Could not add note from event %s for case %d", EventType.FTA_COMMUNICATION, caseDetails.getId()),
+                e.responseBody().isPresent() ? e.contentUTF8() : e.getMessage()
             );
             throw e;
         }
+    }
 
-        return new PreSubmitCallbackResponse<>(sscsCaseData);
+    @Override
+    public DispatchPriority getPriority() {
+        return DispatchPriority.LATEST;
     }
 }
