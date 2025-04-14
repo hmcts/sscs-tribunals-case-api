@@ -104,6 +104,7 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
     }
 
     private void handleReplyToFtaQuery(FtaCommunicationFields ftaCommunicationFields, String userAuthorisation, SscsCaseData sscsCaseData) {
+        log.info("!*!Handling reply to FTA query");
         DynamicList ftaRequestDl = ftaCommunicationFields.getFtaRequestNoResponseRadioDl();
         DynamicListItem chosenFtaRequest = ftaRequestDl.getValue();
         String chosenFtaRequestId = chosenFtaRequest.getCode();
@@ -144,6 +145,9 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         communicationFields.setFtaRequestNoResponseTextArea(null);
         communicationFields.setFtaRequestNoResponseRadioDl(null);
         communicationFields.setFtaRequestNoResponseNoAction(null);
+        communicationFields.setFtaResponseNoResponseTextArea(null);
+        communicationFields.setFtaResponseNoResponseRadioDl(null);
+        communicationFields.setFtaResponseNoResponseNoAction(null);
         sscsCaseData.setCommunicationFields(communicationFields);
     }
 

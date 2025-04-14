@@ -68,6 +68,9 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
             if (ftaCommunicationFields.getFtaRequestType().equals(FtaRequestType.REPLY_TO_FTA_QUERY)) {
                 setFtaCommunicationsDynamicList(ftaCommunicationFields, sscsCaseData);
                 handleReplyToFtaQueryError(preSubmitErrorCallbackResponse, ftaCommunicationFields);
+            } else if (ftaCommunicationFields.getFtaRequestType().equals(FtaRequestType.REVIEW_FTA_REPLY)) {
+                setFtaResponseDynamicList(ftaCommunicationFields, sscsCaseData); // Change it to select only the ones with some response
+                //handleReplyToFtaQueryError(preSubmitErrorCallbackResponse, ftaCommunicationFields);
             }
         } else if (callback.getPageId().equals("selectFtaRequest")) {
             setQueryForReply(sscsCaseData, ftaCommunicationFields);
@@ -124,6 +127,18 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
             .map((this::getDlItemFromCommunicationRequest))
             .toList();
         ftaCommunicationFields.setFtaRequestNoResponseRadioDl(new DynamicList(null, dynamicListItems));
+        sscsCaseData.setCommunicationFields(ftaCommunicationFields);
+    }
+
+
+    private void setFtaResponseDynamicList(FtaCommunicationFields ftaCommunicationFields, SscsCaseData sscsCaseData) {
+        List<CommunicationRequest> tribunalCommunicationRequests = Optional.ofNullable(ftaCommunicationFields.getTribunalCommunications())
+            .orElse(Collections.emptyList());
+        List<DynamicListItem> dynamicListItems = tribunalCommunicationRequests.stream()
+            .filter((communicationRequest -> communicationRequest.getValue().getRequestReply() != null))
+            .map((this::getDlItemFromCommunicationRequest))
+            .toList();
+        ftaCommunicationFields.setFtaResponseNoResponseRadioDl(new DynamicList(null, dynamicListItems));
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
     }
 }
