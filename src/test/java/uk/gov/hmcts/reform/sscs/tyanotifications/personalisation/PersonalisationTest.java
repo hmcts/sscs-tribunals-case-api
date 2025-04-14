@@ -26,7 +26,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.REGULAR;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.HMC_HEARING_TYPE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.SscsCaseDataUtils.getWelshDate;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.CC_DATE_FORMAT;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DWP_ACRONYM;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DWP_FIRST_TIER_AGENCY_GROUP;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DWP_FIRST_TIER_AGENCY_GROUP_WELSH;
