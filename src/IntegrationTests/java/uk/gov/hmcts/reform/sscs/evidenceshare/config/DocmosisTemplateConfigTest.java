@@ -38,7 +38,7 @@ public class DocmosisTemplateConfigTest {
         assertThat("TB-SCS-GNO-ENG-00010.doc").isEqualTo(
             docmosisTemplateConfig.getTemplate()
                 .get(LanguagePreference.ENGLISH).get(DocumentType.DL6.getValue()).get("name"));
-        assertThat("TB-SCS-GNO-WEL-00469.docx").isEqualTo(
+        assertThat("TB-SCS-GNO-WEL-00469-v2.docx").isEqualTo(
             docmosisTemplateConfig.getTemplate().get(LanguagePreference.WELSH).get("d609-97").get(
                 "name"));
 
