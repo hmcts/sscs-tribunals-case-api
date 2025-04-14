@@ -3,6 +3,9 @@ package uk.gov.hmcts.reform.sscs.service;
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper.getHearingId;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import feign.FeignException;
 import java.util.List;
 import java.util.function.Consumer;
@@ -65,6 +68,9 @@ public class HearingsService {
 
     private final HearingsMapping hearingsMapping;
 
+    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+
+
     // Leaving blank for now until a future change is scoped and completed, then we can add the case states back in
     public static final List<State> INVALID_CASE_STATES = List.of();
     private static final Long HEARING_VERSION_NUMBER = 1L;
@@ -74,7 +80,7 @@ public class HearingsService {
             maxAttemptsExpression = "${retry.hearing-response-update.max-retries}",
             backoff = @Backoff(delayExpression = "${retry.hearing-response-update.backoff}"))
     public void processHearingRequest(HearingRequest hearingRequest) throws UnhandleableHearingStateException,
-            UpdateCaseException, ListingException {
+            UpdateCaseException, ListingException, JsonProcessingException {
         log.info("Processing Hearing Request for Case ID {}, Hearing State {} and Route {} and Cancellation Reason {}",
                 hearingRequest.getCcdCaseId(),
                 hearingRequest.getHearingState(),
@@ -85,7 +91,7 @@ public class HearingsService {
     }
 
     public void processHearingWrapper(HearingWrapper wrapper)
-            throws UnhandleableHearingStateException, UpdateCaseException, ListingException {
+            throws UnhandleableHearingStateException, UpdateCaseException, ListingException, JsonProcessingException {
 
         String caseId = wrapper.getCaseData().getCcdCaseId();
         log.info("Processing Hearing Wrapper for Case ID {}, Case State {} and Hearing State {}",
@@ -129,7 +135,7 @@ public class HearingsService {
         return INVALID_CASE_STATES.contains(wrapper.getCaseState());
     }
 
-    private void createHearing(HearingWrapper wrapper) throws UpdateCaseException, ListingException {
+    private void createHearing(HearingWrapper wrapper) throws UpdateCaseException, ListingException, JsonProcessingException {
         SscsCaseData caseData = wrapper.getCaseData();
 
         String caseId = caseData.getCcdCaseId();
@@ -140,7 +146,20 @@ public class HearingsService {
         OverridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData);
 
         if (isNull(hearing)) {
+            String originalCaseData = objectMapper.writeValueAsString(caseData);
             HearingRequestPayload hearingPayload = hearingsMapping.buildHearingPayload(wrapper, refData);
+            String updatedCaseData = objectMapper.writeValueAsString(caseData);
+            if (!originalCaseData.equals(updatedCaseData)) {
+                log.info("Case data has  changed, update required for Case ID {}, Case Data Panel Comp: {}", caseId, caseData.getPanelMemberComposition());
+                updateCcdCaseService.updateCaseV2(
+                        Long.parseLong(caseId),
+                        EventType.CASE_UPDATED.getCcdType(),
+                        "Case Updated",
+                        "Case Updated with default panel composition",
+                        idamService.getIdamTokens(),
+                        caseDetails -> caseDetails.setData(caseData)
+                );
+            }
             log.debug("Sending Create Hearing Request for Case ID {}", caseId);
             hmcUpdateResponse = hmcHearingApiService.sendCreateHearingRequest(hearingPayload);
 
