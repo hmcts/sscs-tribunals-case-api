@@ -45,10 +45,9 @@ public final class HearingsPanelMapping {
         this.panelCategoryService = panelCategoryService;
     }
 
-    public PanelRequirements getPanelRequirements(SscsCaseData caseData,
-                                                         ReferenceDataServiceHolder refData) {
+    public PanelRequirements getPanelRequirements(SscsCaseData caseData, ReferenceDataServiceHolder refData, boolean savePanelComposition) {
         return PanelRequirements.builder()
-                .roleTypes(defaultPanelCompEnabled ? panelCategoryService.getRoleTypes(caseData) : findRoleTypesByBenefitCode(caseData.getBenefitCode()))
+                .roleTypes(defaultPanelCompEnabled ? panelCategoryService.getRoleTypes(caseData, savePanelComposition) : findRoleTypesByBenefitCode(caseData.getBenefitCode()))
                 .authorisationTypes(getAuthorisationTypes())
                 .authorisationSubTypes(getAuthorisationSubTypes())
                 .panelPreferences(getPanelPreferences(caseData))
