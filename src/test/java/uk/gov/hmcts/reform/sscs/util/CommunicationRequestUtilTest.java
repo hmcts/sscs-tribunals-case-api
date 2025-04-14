@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.util;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -35,7 +36,7 @@ class CommunicationRequestUtilTest {
 
         CommunicationRequest requestWithActionedReply = CommunicationRequest.builder()
             .value(CommunicationRequestDetails.builder()
-                .requestReply(CommunicationRequestReply.builder().replyHasBeenActioned(YesNo.YES).build())
+                .requestReply(CommunicationRequestReply.builder().replyHasBeenActioned(YES).build())
                 .build())
             .build();
 
@@ -273,7 +274,7 @@ class CommunicationRequestUtilTest {
             .value(CommunicationRequestDetails.builder()
                 .requestReply(CommunicationRequestReply.builder()
                     .replyDateTime(LocalDateTime.of(2022, 3, 3, 10, 0))
-                    .replyHasBeenActioned(YesNo.YES)
+                    .replyHasBeenActioned(YES)
                     .build())
                 .build())
             .build();
@@ -283,7 +284,7 @@ class CommunicationRequestUtilTest {
             .tribunalCommunications(List.of(replyWithReview, replyWithoutReview, requestWithReply, requestWithoutReply))
             .build();
 
-        CommunicationRequestUtil.setCommRequestDateFilters(communicationFields);
+        CommunicationRequestUtil.setCommRequestFilters(communicationFields);
 
         assertEquals(LocalDate.of(2023, 1, 5), communicationFields.getFtaResponseDueDate());
         assertEquals(LocalDate.of(2023, 1, 5), communicationFields.getTribunalResponseDueDate());
@@ -292,14 +293,75 @@ class CommunicationRequestUtilTest {
     }
 
     @Test
-    void shouldHandleNullFieldsInSetCommRequestDateFilters() {
+    void shouldHandleNullFieldsInsetCommRequestFilters() {
         FtaCommunicationFields communicationFields = FtaCommunicationFields.builder().build();
 
-        CommunicationRequestUtil.setCommRequestDateFilters(communicationFields);
+        CommunicationRequestUtil.setCommRequestFilters(communicationFields);
 
         assertNull(communicationFields.getFtaResponseProvidedDate());
         assertNull(communicationFields.getTribunalResponseProvidedDate());
         assertNull(communicationFields.getFtaResponseDueDate());
         assertNull(communicationFields.getTribunalResponseDueDate());
+    }
+
+    @Test
+    void shouldSetCommRequestYesNoFiltersIfRequired() {
+        CommunicationRequest requestWithoutReply = CommunicationRequest.builder()
+            .value(CommunicationRequestDetails.builder()
+                .requestResponseDueDate(LocalDate.of(2023, 1, 5))
+                .build())
+            .build();
+
+        CommunicationRequest replyWithoutReview = CommunicationRequest.builder()
+            .value(CommunicationRequestDetails.builder()
+                .requestReply(CommunicationRequestReply.builder()
+                    .replyDateTime(LocalDateTime.of(2022, 2, 2, 10, 0))
+                    .replyHasBeenActioned(YesNo.NO)
+                    .build())
+                .build())
+            .build();
+
+        FtaCommunicationFields communicationFields = FtaCommunicationFields.builder()
+            .ftaCommunications(List.of(replyWithoutReview, requestWithoutReply))
+            .tribunalCommunications(List.of(replyWithoutReview, requestWithoutReply))
+            .build();
+
+        CommunicationRequestUtil.setCommRequestFilters(communicationFields);
+        assertEquals(YES, communicationFields.getAwaitingInfoFromFta());
+        assertEquals(YES, communicationFields.getInfoProvidedByFta());
+        assertEquals(YES, communicationFields.getInfoRequestFromFta());
+        assertEquals(YES, communicationFields.getInfoRequestFromTribunal());
+        assertEquals(YES, communicationFields.getAwaitingInfoFromTribunal());
+        assertEquals(YES, communicationFields.getInfoProvidedByTribunal());
+    }
+
+    @Test
+    void shouldWipeCommRequestYesNoFiltersIfRequired() {
+        CommunicationRequest replyWithReview = CommunicationRequest.builder()
+            .value(CommunicationRequestDetails.builder()
+                .requestReply(CommunicationRequestReply.builder()
+                    .replyDateTime(LocalDateTime.of(2022, 2, 2, 10, 0))
+                    .replyHasBeenActioned(YesNo.YES)
+                    .build())
+                .build())
+            .build();
+
+        FtaCommunicationFields communicationFields = FtaCommunicationFields.builder()
+            .ftaCommunications(List.of(replyWithReview))
+            .awaitingInfoFromFta(YES)
+            .infoProvidedByFta(YES)
+            .infoRequestFromFta(YES)
+            .infoRequestFromTribunal(YES)
+            .awaitingInfoFromTribunal(YES)
+            .infoProvidedByTribunal(YES)
+            .build();
+
+        CommunicationRequestUtil.setCommRequestFilters(communicationFields);
+        assertNull(communicationFields.getAwaitingInfoFromFta());
+        assertNull(communicationFields.getInfoProvidedByFta());
+        assertNull(communicationFields.getInfoRequestFromFta());
+        assertNull(communicationFields.getInfoRequestFromTribunal());
+        assertNull(communicationFields.getAwaitingInfoFromTribunal());
+        assertNull(communicationFields.getInfoProvidedByTribunal());
     }
 }

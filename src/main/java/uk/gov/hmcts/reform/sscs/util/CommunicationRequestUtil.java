@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.util;
 
 import static java.util.Objects.isNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.calculateDueDateWorkingDays;
 
 import java.time.LocalDate;
@@ -123,11 +124,46 @@ public class CommunicationRequestUtil {
         return allRequests;
     }
 
-    public static void setCommRequestDateFilters(FtaCommunicationFields ftaCommunicationFields) {
-        ftaCommunicationFields.setFtaResponseDueDate(getOldestResponseDate(getRequestsWithoutReplies(ftaCommunicationFields.getFtaCommunications())));
-        ftaCommunicationFields.setTribunalResponseDueDate(getOldestResponseDate(getRequestsWithoutReplies(ftaCommunicationFields.getTribunalCommunications())));
-        ftaCommunicationFields.setFtaResponseProvidedDate(getOldestResponseProvidedDate(getRepliesWithoutReviews(ftaCommunicationFields.getTribunalCommunications())));
-        ftaCommunicationFields.setTribunalResponseProvidedDate(getOldestResponseProvidedDate(getRepliesWithoutReviews(ftaCommunicationFields.getFtaCommunications())));
+    public static void setCommRequestFilters(FtaCommunicationFields ftaCommunicationFields) {
+        List<CommunicationRequest> ftaCommsWithoutReplies = getRequestsWithoutReplies(ftaCommunicationFields.getFtaCommunications());
+        if (!ftaCommsWithoutReplies.isEmpty()) {
+            ftaCommunicationFields.setFtaResponseDueDate(getOldestResponseDate(ftaCommsWithoutReplies));
+            ftaCommunicationFields.setAwaitingInfoFromFta(YES);
+            ftaCommunicationFields.setInfoRequestFromTribunal(YES);
+        } else {
+            ftaCommunicationFields.setFtaResponseDueDate(null);
+            ftaCommunicationFields.setAwaitingInfoFromFta(null);
+            ftaCommunicationFields.setInfoRequestFromTribunal(null);
+        }
+
+        List<CommunicationRequest> tribunalCommsWithoutReplies = getRequestsWithoutReplies(ftaCommunicationFields.getTribunalCommunications());
+        if (!tribunalCommsWithoutReplies.isEmpty()) {
+            ftaCommunicationFields.setTribunalResponseDueDate(getOldestResponseDate(tribunalCommsWithoutReplies));
+            ftaCommunicationFields.setAwaitingInfoFromTribunal(YES);
+            ftaCommunicationFields.setInfoRequestFromFta(YES);
+        } else {
+            ftaCommunicationFields.setTribunalResponseDueDate(null);
+            ftaCommunicationFields.setAwaitingInfoFromTribunal(null);
+            ftaCommunicationFields.setInfoRequestFromFta(null);
+        }
+
+        List<CommunicationRequest> ftaCommsWithoutReviews = getRepliesWithoutReviews(ftaCommunicationFields.getFtaCommunications());
+        if (!ftaCommsWithoutReviews.isEmpty()) {
+            ftaCommunicationFields.setTribunalResponseProvidedDate(getOldestResponseProvidedDate(ftaCommsWithoutReviews));
+            ftaCommunicationFields.setInfoProvidedByFta(YES);
+        } else {
+            ftaCommunicationFields.setTribunalResponseProvidedDate(null);
+            ftaCommunicationFields.setInfoProvidedByFta(null);
+        }
+
+        List<CommunicationRequest> tribunalCommsWithoutReviews = getRepliesWithoutReviews(ftaCommunicationFields.getTribunalCommunications());
+        if (!tribunalCommsWithoutReviews.isEmpty()) {
+            ftaCommunicationFields.setFtaResponseProvidedDate(getOldestResponseProvidedDate(tribunalCommsWithoutReviews));
+            ftaCommunicationFields.setInfoProvidedByTribunal(YES);
+        } else {
+            ftaCommunicationFields.setFtaResponseProvidedDate(null);
+            ftaCommunicationFields.setInfoProvidedByTribunal(null);
+        }
     }
 }
 

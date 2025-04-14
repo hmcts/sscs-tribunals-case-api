@@ -12,17 +12,6 @@
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=selectTribunalCommunicationAction"
   },
   {
-    "CaseEventID": "tribunalCommunication",
-    "CaseFieldID": "ftaResponseDueDate",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "13/03/2025",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 1,
-    "PageID": "selectTribunalCommunicationAction",
-    "FieldShowCondition": "tribunalRequestType=\"DoNotShow\""
-  },
-  {
     "LiveFrom": "18/03/2025",
     "CaseEventID": "tribunalCommunication",
     "CaseFieldID": "tribunalRequestTopic",
@@ -147,17 +136,6 @@
     "PageID": "selectFtaCommunicationAction",
     "PageLabel": "Select FTA Communication action",
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=selectFtaCommunicationAction"
-  },
-  {
-    "CaseEventID": "ftaCommunication",
-    "CaseFieldID": "tribunalResponseDueDate",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "13/03/2025",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 1,
-    "PageID": "selectFtaCommunicationAction",
-    "FieldShowCondition": "ftaRequestType=\"DoNotShow\""
   },
   {
     "CaseEventID": "ftaCommunication",

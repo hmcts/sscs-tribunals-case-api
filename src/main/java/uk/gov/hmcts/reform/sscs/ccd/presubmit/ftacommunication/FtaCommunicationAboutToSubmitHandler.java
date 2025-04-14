@@ -4,7 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.addCommunicationRequest;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getCommunicationRequestFromId;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRoleName;
-import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.setCommRequestDateFilters;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.setCommRequestFilters;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -79,7 +79,7 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
             handleDeleteRequestReply(ftaCommunicationFields);
         }
         clearFields(ftaCommunicationFields);
-        setCommRequestDateFilters(ftaCommunicationFields);
+        setCommRequestFilters(ftaCommunicationFields);
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
