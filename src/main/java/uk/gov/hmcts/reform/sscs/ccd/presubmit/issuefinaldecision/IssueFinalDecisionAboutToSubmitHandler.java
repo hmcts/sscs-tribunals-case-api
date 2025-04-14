@@ -105,6 +105,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             || State.WITH_DWP.equals(sscsCaseData.getState())))
             && !SscsUtil.isCorrectionInProgress(sscsCaseData, isPostHearingsEnabled)) {
             sscsCaseData.setDwpState(FINAL_DECISION_ISSUED);
+            SscsUtil.setHearingRouteIfNotSet(sscsCaseData);
             sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
         }
 

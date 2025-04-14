@@ -29,14 +29,31 @@ public class EvidenceProperties {
         private String scottishPostcode;
         private String telephone;
         private String telephoneWelsh;
+        private String telephoneIbc;
         private boolean scottishPoBoxFeatureEnabled;
+        private String ibcAddressLine1;
+        private String ibcAddressLine2;
+        private String ibcAddressLine3;
+        private String ibcAddressPostcode;
+
+        public String getLine2(SscsCaseData ccdResponse) {
+            return ccdResponse.isIbcCase() ? getIbcAddressLine2() : getLine2();
+        }
 
         public String getLine3(SscsCaseData ccdResponse) {
-            return "Yes".equalsIgnoreCase(ccdResponse.getIsScottishCase()) && scottishPoBoxFeatureEnabled ? getScottishLine3() : getLine3();
+            if ("Yes".equalsIgnoreCase(ccdResponse.getIsScottishCase()) && scottishPoBoxFeatureEnabled) {
+                return getScottishLine3();
+            } else {
+                return ccdResponse.isIbcCase() ? getIbcAddressLine3() : getLine3();
+            }
         }
 
         public String getPostcode(SscsCaseData ccdResponse) {
-            return "Yes".equalsIgnoreCase(ccdResponse.getIsScottishCase()) && scottishPoBoxFeatureEnabled ? getScottishPostcode() : getPostcode();
+            if ("Yes".equalsIgnoreCase(ccdResponse.getIsScottishCase()) && scottishPoBoxFeatureEnabled) {
+                return getScottishPostcode();
+            } else {
+                return ccdResponse.isIbcCase() ? getIbcAddressPostcode() : getPostcode();
+            }
         }
     }
 }
