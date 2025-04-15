@@ -522,7 +522,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
             .ftaRequestType(FtaRequestType.REVIEW_FTA_REPLY)
             .ftaResponseActioned(YesNo.YES)
             .ftaResponseNoActionedRadioDl(dynamicList)
-            .tribunalCommunications(List.of(
+            .ftaCommunications(List.of(
                 CommunicationRequest.builder()
                     .id("1")
                     .value(CommunicationRequestDetails.builder()
@@ -549,7 +549,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         
         // Then
         assertNotNull(response);
-        assertEquals(YesNo.YES, response.getData().getCommunicationFields().getTribunalCommunications().get(0).getValue().getRequestReply().getReplyHasBeenActioned());
+        assertEquals(YesNo.YES, response.getData().getCommunicationFields().getFtaCommunications().getFirst().getValue().getRequestReply().getReplyHasBeenActioned());
         
         // Verify fields are cleared
         assertNull(response.getData().getCommunicationFields().getFtaRequestQuestion());

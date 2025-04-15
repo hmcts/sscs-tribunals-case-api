@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.addCommunicationRequest;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getCommunicationRequestFromId;
@@ -65,6 +66,8 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
 
         FtaCommunicationFields ftaCommunicationFields = Optional.ofNullable(sscsCaseData.getCommunicationFields())
             .orElse(FtaCommunicationFields.builder().build());
+        final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
+        final String username = isNull(userDetails) ? null : userDetails.getName();
 
         if (FtaRequestType.NEW_REQUEST.equals(ftaCommunicationFields.getFtaRequestType())) {
             CommunicationRequestTopic topic = ftaCommunicationFields.getFtaRequestTopic();
@@ -72,13 +75,12 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
             List<CommunicationRequest> ftaComms = Optional.ofNullable(ftaCommunicationFields.getFtaCommunications())
                 .orElse(new ArrayList<>());
 
-            final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
-            addCommunicationRequest(ftaComms, topic, question, userDetails);
+            addCommunicationRequest(ftaComms, topic, question, username);
             setFieldsForNewRequest(sscsCaseData, ftaCommunicationFields, ftaComms);
         } else if (FtaRequestType.REPLY_TO_FTA_QUERY.equals(ftaCommunicationFields.getFtaRequestType())) {
-            handleReplyToFtaQuery(ftaCommunicationFields, userAuthorisation, sscsCaseData);
+            handleReplyToFtaQuery(ftaCommunicationFields, username, sscsCaseData);
         } else if (ftaCommunicationFields.getFtaRequestType() == FtaRequestType.REVIEW_FTA_REPLY) {
-            handleReviewFtaQuery(ftaCommunicationFields, userAuthorisation, sscsCaseData);
+            handleReviewFtaReply(ftaCommunicationFields, sscsCaseData);
         }
         clearFields(sscsCaseData, ftaCommunicationFields);
         return new PreSubmitCallbackResponse<>(sscsCaseData);
@@ -90,7 +92,7 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         sscsCaseData.setCommunicationFields(communicationFields);
     }
 
-    private void handleReplyToFtaQuery(FtaCommunicationFields ftaCommunicationFields, String userAuthorisation, SscsCaseData sscsCaseData) {
+    private void handleReplyToFtaQuery(FtaCommunicationFields ftaCommunicationFields, String username, SscsCaseData sscsCaseData) {
         DynamicList ftaRequestDl = ftaCommunicationFields.getFtaRequestNoResponseRadioDl();
         DynamicListItem chosenFtaRequest = ftaRequestDl.getValue();
         String chosenFtaRequestId = chosenFtaRequest.getCode();
@@ -100,7 +102,7 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         boolean noActionRequired = !ObjectUtils.isEmpty(ftaCommunicationFields.getFtaRequestNoResponseNoAction());
         CommunicationRequestReply reply = CommunicationRequestReply.builder()
             .replyDateTime(LocalDateTime.now())
-            .replyUserName(idamService.getUserDetails(userAuthorisation).getName())
+            .replyUserName(username)
             .replyMessage(noActionRequired ? "No action required" : replyText)
             .replyHasBeenActioned(noActionRequired ? null : YesNo.NO)
             .build();
@@ -115,21 +117,11 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
     }
 
-    private void handleReviewFtaQuery(FtaCommunicationFields ftaCommunicationFields, String userAuthorisation, SscsCaseData sscsCaseData) {
-        YesNo ftaResponseActioned = ftaCommunicationFields.getFtaResponseActioned();
-        if (ftaResponseActioned == YesNo.YES) {
-            DynamicList ftaRequestDl = ftaCommunicationFields.getFtaResponseNoActionedRadioDl();
-            DynamicListItem chosenFtaRequest = ftaRequestDl.getValue();
-            String chosenFtaRequestId = chosenFtaRequest.getCode();
-            CommunicationRequest communicationRequest = Optional.ofNullable(ftaCommunicationFields.getTribunalCommunications())
-                .orElse(Collections.emptyList())
-                .stream()
-                .filter(communicationRequest1 -> communicationRequest1.getId().equals(chosenFtaRequestId))
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("No communication request found with id: " + chosenFtaRequestId));
-            communicationRequest.getValue().getRequestReply().setReplyHasBeenActioned(YesNo.YES);
-
-        } 
+    private void handleReviewFtaReply(FtaCommunicationFields ftaCommunicationFields, SscsCaseData sscsCaseData) {
+        DynamicList ftaRequestDl = ftaCommunicationFields.getFtaResponseNoActionedRadioDl();
+        String chosenFtaRequestId = Optional.ofNullable(ftaRequestDl.getValue()).orElse(new DynamicListItem(null, null)).getCode();
+        CommunicationRequest communicationRequest = getCommunicationRequestFromId(chosenFtaRequestId, ftaCommunicationFields.getFtaCommunications());
+        communicationRequest.getValue().getRequestReply().setReplyHasBeenActioned(YesNo.YES);
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
     }
 
@@ -141,6 +133,7 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         communicationFields.setFtaRequestNoResponseTextArea(null);
         communicationFields.setFtaRequestNoResponseRadioDl(null);
         communicationFields.setFtaRequestNoResponseNoAction(null);
+        communicationFields.setFtaResponseNoActionedReply(null);
         communicationFields.setFtaResponseNoActionedQuery(null);
         communicationFields.setFtaResponseNoActionedRadioDl(null);
         communicationFields.setFtaResponseActioned(null);

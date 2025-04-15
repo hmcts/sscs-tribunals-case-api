@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 
 class CommunicationRequestUtilTest {
 
@@ -157,9 +156,9 @@ class CommunicationRequestUtilTest {
         List<CommunicationRequest> comms = new java.util.ArrayList<>();
         CommunicationRequestTopic topic = CommunicationRequestTopic.MRN_REVIEW_DECISION_NOTICE_DETAILS;
         String question = "Test question";
-        UserDetails userDetails = UserDetails.builder().name("Test User").build();
+        String username = "Test User";
 
-        CommunicationRequestUtil.addCommunicationRequest(comms, topic, question, userDetails);
+        CommunicationRequestUtil.addCommunicationRequest(comms, topic, question, username);
 
         assertEquals(1, comms.size());
         CommunicationRequest addedRequest = comms.getFirst();

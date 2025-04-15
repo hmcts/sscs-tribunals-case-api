@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.util;
 
-import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.calculateDueDateWorkingDays;
 
 import java.text.MessageFormat;
@@ -17,7 +16,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequestDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequestTopic;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 
 @Slf4j
 public class CommunicationRequestUtil {
@@ -76,7 +74,7 @@ public class CommunicationRequestUtil {
     }
 
 
-    public static void addCommunicationRequest(List<CommunicationRequest> comms, CommunicationRequestTopic topic, String question, UserDetails userDetails) {
+    public static void addCommunicationRequest(List<CommunicationRequest> comms, CommunicationRequestTopic topic, String question, String username) {
         LocalDateTime now = LocalDateTime.now();
         LocalDate dueDate = calculateDueDateWorkingDays(now.toLocalDate(), 2);
         comms.add(CommunicationRequest.builder()
@@ -84,7 +82,7 @@ public class CommunicationRequestUtil {
                 .requestMessage(question)
                 .requestTopic(topic)
                 .requestDateTime(now)
-                .requestUserName(isNull(userDetails) ? null : userDetails.getName())
+                .requestUserName(username)
                 .requestResponseDueDate(dueDate)
                 .build())
             .build());
