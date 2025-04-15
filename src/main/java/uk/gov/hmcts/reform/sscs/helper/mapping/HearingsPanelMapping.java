@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMember;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberMedicallyQualified;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -49,7 +48,7 @@ public final class HearingsPanelMapping {
     public PanelRequirements getPanelRequirements(SscsCaseData caseData,
                                                          ReferenceDataServiceHolder refData) {
         return PanelRequirements.builder()
-                .roleTypes(defaultPanelCompEnabled ? panelCategoryService.getRoleTypes(caseData) : findRoleTypesByBenefitCode(caseData.getBenefitCode()))
+                .roleTypes(defaultPanelCompEnabled ? panelCategoryService.getPanelMemberCompositionRoleTypes(caseData) : findRoleTypesByBenefitCode(caseData.getBenefitCode()))
                 .authorisationTypes(getAuthorisationTypes())
                 .authorisationSubTypes(getAuthorisationSubTypes())
                 .panelPreferences(getPanelPreferences(caseData))
@@ -117,16 +116,6 @@ public final class HearingsPanelMapping {
                 .memberType(MemberType.JOH)
                 .requirementType(requirementType)
                 .build();
-    }
-
-    private static List<String> getPanelComposition(SscsCaseData caseData) {
-        PanelMemberComposition panelComposition = caseData.getPanelMemberComposition();
-        log.info("£££££££ panel Composition {}",panelComposition);
-        if (isNull(panelComposition)) {
-            return findRoleTypesByBenefitCode(caseData.getBenefitCode());
-        } else {
-            return List.of(panelComposition.toString());
-        }
     }
 
     public static List<String> getPanelSpecialisms(@Valid SscsCaseData caseData, SessionCategoryMap sessionCategoryMap) {

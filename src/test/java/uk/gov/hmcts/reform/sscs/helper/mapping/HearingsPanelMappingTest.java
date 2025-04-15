@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Issue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMember;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SessionCategory;
@@ -43,6 +44,8 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
     public static final String JUDGE_ID_JUDGE_ROLE_TYPE = JUDGE_ID + "|" + JUDGE_ROLE_TYPE;
     public static final String IIDB_BENEFIT_CODE = "067";
     public static final String JUDGE_JOH_CODE = "84";
+    public static final String MEMBER_MEDICAL_JOH_CODE = "58";
+
     @Mock
     private SessionCategoryMapService sessionCategoryMaps;
 
@@ -92,11 +95,31 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
     void shouldPopulateRoleTypesFromPanelCategoryServiceWhenFeatureFlagIsEnabled() {
         ReflectionTestUtils.setField(hearingsPanelMapping, "defaultPanelCompEnabled", true);
         when(refData.getSessionCategoryMaps()).thenReturn(sessionCategoryMaps);
-        when(panelCategoryService.getRoleTypes(caseData)).thenReturn(List.of(JUDGE_JOH_CODE));
+        when(panelCategoryService.getPanelMemberCompositionRoleTypes(caseData)).thenReturn(List.of(JUDGE_JOH_CODE));
         PanelRequirements result = hearingsPanelMapping.getPanelRequirements(caseData, refData);
         assertThat(result.getRoleTypes()).isNotEmpty();
         assertThat(result.getRoleTypes()).contains(JUDGE_JOH_CODE);
     }
+
+    @DisplayName("HearingsPanelMapping should use existing panel composition and return role types when feature flag is enabled and panel composition is not null")
+    @Test
+    void givenNonNullPanelCompositionThenReturnPanelComposition() {
+
+        SscsCaseData caseData = SscsCaseData.builder()
+                .panelMemberComposition(PanelMemberComposition.builder()
+                        .panelCompositionJudge(JUDGE_JOH_CODE)
+                        .panelCompositionMemberMedical1(MEMBER_MEDICAL_JOH_CODE)
+                        .build())
+                .build();
+
+        ReflectionTestUtils.setField(hearingsPanelMapping, "defaultPanelCompEnabled", true);
+        when(refData.getSessionCategoryMaps()).thenReturn(sessionCategoryMaps);
+        when(panelCategoryService.getPanelMemberCompositionRoleTypes(caseData)).thenReturn(List.of(JUDGE_JOH_CODE, MEMBER_MEDICAL_JOH_CODE));
+        PanelRequirements result = hearingsPanelMapping.getPanelRequirements(caseData, refData);
+        assertThat(result).isNotNull();
+        assertThat(result.getRoleTypes()).isEqualTo(List.of(JUDGE_JOH_CODE, MEMBER_MEDICAL_JOH_CODE));
+    }
+
 
 
     @DisplayName("getAuthorisationTypes returns an empty list")
@@ -339,5 +362,4 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
         String result = HearingsPanelMapping.getPanelMemberSpecialism(PanelMember.FQPM, null, null);
         assertThat(result).isNull();
     }
-
 }
