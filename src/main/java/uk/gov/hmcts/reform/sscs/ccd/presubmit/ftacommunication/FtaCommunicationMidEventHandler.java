@@ -77,8 +77,7 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
             setQueryForReply(sscsCaseData, ftaCommunicationFields);
         } else if (callback.getPageId().equals("selectFtaReply")) {
             setQueryForReview(sscsCaseData, ftaCommunicationFields);
-        }
-         else if (callback.getPageId().equals("replyToFtaQuery")) {
+        } else if (callback.getPageId().equals("replyToFtaQuery")) {
             String textValue = ftaCommunicationFields.getFtaRequestNoResponseTextArea();
             List<String> noAction = ftaCommunicationFields.getFtaRequestNoResponseNoAction();
             if (StringUtils.isEmpty(textValue) && ObjectUtils.isEmpty(noAction)) {
@@ -158,7 +157,7 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
             .orElse(Collections.emptyList());
         List<DynamicListItem> dynamicListItems = tribunalCommunicationRequests.stream()
             .filter(communicationRequest -> communicationRequest.getValue().getRequestReply() != null)
-            .filter(communicationRequest -> communicationRequest.getValue().getRequestActioned() == null || communicationRequest.getValue().getRequestActioned() == YesNo.NO)
+            .filter(communicationRequest -> communicationRequest.getValue().getRequestReply().getReplyHasBeenActioned() == null || communicationRequest.getValue().getRequestReply().getReplyHasBeenActioned() == YesNo.NO)
             .map((this::getDlItemFromCommunicationRequest))
             .toList();
         ftaCommunicationFields.setFtaResponseNoActionedRadioDl(new DynamicList(null, dynamicListItems));

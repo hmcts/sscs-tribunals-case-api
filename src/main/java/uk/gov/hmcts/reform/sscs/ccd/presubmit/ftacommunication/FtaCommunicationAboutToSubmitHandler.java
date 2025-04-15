@@ -150,7 +150,7 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
                 .filter(communicationRequest1 -> communicationRequest1.getId().equals(chosenFtaRequestId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No communication request found with id: " + chosenFtaRequestId));
-            communicationRequest.getValue().setRequestActioned(YesNo.YES);
+            communicationRequest.getValue().getRequestReply().setReplyHasBeenActioned(YesNo.YES);
 
         } 
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
@@ -164,10 +164,10 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         communicationFields.setFtaRequestNoResponseTextArea(null);
         communicationFields.setFtaRequestNoResponseRadioDl(null);
         communicationFields.setFtaRequestNoResponseNoAction(null);
-        //communicationFields.setFtaResponseNoActionedTextArea(null);
+        communicationFields.setFtaResponseNoActionedQuery(null);
         communicationFields.setFtaResponseNoActionedRadioDl(null);
         communicationFields.setFtaResponseActioned(null);
-        //Some are missing here
+    
         sscsCaseData.setCommunicationFields(communicationFields);
     }
 

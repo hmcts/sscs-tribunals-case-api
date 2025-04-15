@@ -181,8 +181,7 @@
     "PageDisplayOrder": 4,
     "PageFieldDisplayOrder": 3,
     "PageID": "replyToTribunalQuery"
-  }
-,
+  },
   {
     "CaseEventID": "ftaCommunication",
     "CaseFieldID": "ftaResponseNoActionedRadioDl",
@@ -193,7 +192,7 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "selectFtaReply",
     "PageShowCondition": "ftaRequestType=\"reviewFtaReply\"",
-    "PageLabel": "Review FTA Response CF",
+    "PageLabel": "Review FTA Reply",
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=selectFtaReply"
   }
   ,{
@@ -206,7 +205,7 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "reviewFtaReply",
     "PageShowCondition": "ftaRequestType=\"reviewFtaReply\"",
-    "PageLabel": "Review FTA Reply CF",
+    "PageLabel": "FTA Reply",
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=reviewFtaReply"
   },
   {
@@ -219,5 +218,4 @@
     "PageFieldDisplayOrder": 3,
     "PageID": "reviewFtaReply"
   }
-  
 ]
