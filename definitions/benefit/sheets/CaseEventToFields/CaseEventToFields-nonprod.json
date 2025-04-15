@@ -113,7 +113,7 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "replyToFtaQuery",
     "PageShowCondition": "ftaRequestType=\"replyToFtaQuery\"",
-    "PageLabel": "Write a reply to FTA Query",
+    "PageLabel": "Write a reply to FTA Query CF",
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=replyToFtaQuery"
   },
   {
@@ -188,7 +188,7 @@
     "CaseFieldID": "ftaResponseNoResponseRadioDl",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
-    "LiveFrom": "13/03/2025",
+    "LiveFrom": "14/04/2025",
     "PageDisplayOrder": 3,
     "PageFieldDisplayOrder": 1,
     "PageID": "selectFtaReply",
@@ -196,4 +196,28 @@
     "PageLabel": "Review FTA Response CF",
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=selectFtaReply"
   }
+  ,{
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "ftaResponseNoResponseQuery",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "14/04/2025",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "reviewFtaReply",
+    "PageShowCondition": "ftaRequestType=\"reviewFtaReply\"",
+    "PageLabel": "Review FTA Reply CF",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=reviewFtaReply"
+  },
+  {
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "ftaResponseNoResponseActioned",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "14/04/2025",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 3,
+    "PageID": "reviewFtaReply"
+  }
+  
 ]

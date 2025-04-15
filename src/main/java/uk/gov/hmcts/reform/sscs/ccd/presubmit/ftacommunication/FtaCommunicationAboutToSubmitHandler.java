@@ -76,7 +76,9 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
             setFieldsForNewRequest(sscsCaseData, ftaCommunicationFields, ftaComms);
         } else if (ftaCommunicationFields.getFtaRequestType() == FtaRequestType.REPLY_TO_FTA_QUERY) {
             handleReplyToFtaQuery(ftaCommunicationFields, userAuthorisation, sscsCaseData);
-        }
+        } else if (ftaCommunicationFields.getFtaRequestType() == FtaRequestType.REVIEW_FTA_REPLY) {
+            handleReviewFtaQuery(ftaCommunicationFields, userAuthorisation, sscsCaseData);
+        } 
         clearFields(sscsCaseData, ftaCommunicationFields);
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
@@ -104,7 +106,6 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
     }
 
     private void handleReplyToFtaQuery(FtaCommunicationFields ftaCommunicationFields, String userAuthorisation, SscsCaseData sscsCaseData) {
-        log.info("!*!Handling reply to FTA query");
         DynamicList ftaRequestDl = ftaCommunicationFields.getFtaRequestNoResponseRadioDl();
         DynamicListItem chosenFtaRequest = ftaRequestDl.getValue();
         String chosenFtaRequestId = chosenFtaRequest.getCode();
@@ -134,6 +135,24 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         } else {
             ftaCommunicationFields.setTribunalResponseDueDate(getOldestResponseDate(requestsWithoutReplies));
         }
+        sscsCaseData.setCommunicationFields(ftaCommunicationFields);
+    }
+
+    private void handleReviewFtaQuery(FtaCommunicationFields ftaCommunicationFields, String userAuthorisation, SscsCaseData sscsCaseData) {
+        YesNo ftaResponseNoResponseActioned = ftaCommunicationFields.getFtaResponseNoResponseActioned();
+        if (ftaResponseNoResponseActioned == YesNo.YES) {
+            DynamicList ftaRequestDl = ftaCommunicationFields.getFtaResponseNoResponseRadioDl();
+            DynamicListItem chosenFtaRequest = ftaRequestDl.getValue();
+            String chosenFtaRequestId = chosenFtaRequest.getCode();
+            CommunicationRequest communicationRequest = Optional.ofNullable(ftaCommunicationFields.getTribunalCommunications())
+                .orElse(Collections.emptyList())
+                .stream()
+                .filter(communicationRequest1 -> communicationRequest1.getId().equals(chosenFtaRequestId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No communication request found with id: " + chosenFtaRequestId));
+            communicationRequest.getValue().setRequestActioned(YesNo.YES);
+
+        } 
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
     }
 
