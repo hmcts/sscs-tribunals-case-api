@@ -26,6 +26,7 @@ import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.TELEPHONE;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.BENEFIT_CODE_NOT_IN_USE;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.INVALID_BENEFIT_ISSUE_CODE;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.calculateDueDateWorkingDays;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.clearPostponementTransientFields;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.generateUniqueIbcaId;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getIssueFinalDecisionDocumentType;
@@ -49,6 +50,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -927,5 +929,63 @@ class SscsUtilTest {
         assertEquals(1, updatedDocuments.size());
         assertEquals(sscsDocument2.getValue().getDocumentLink().getDocumentUrl(), updatedDocuments.getFirst().getValue().getDocumentLink().getDocumentUrl());
         assertNotEquals(sscsDocument.getValue().getDocumentLink().getDocumentUrl(), updatedDocuments.getFirst().getValue().getDocumentLink().getDocumentUrl());
+    }
+
+    @ParameterizedTest
+    @MethodSource("dueDateParameters")
+    void calculateDueDate_shouldAdjustForWeekends(int workingDays, LocalDate now, LocalDate expected) {
+        LocalDate result = calculateDueDateWorkingDays(now, workingDays);
+        assertEquals(expected, result);
+    }
+
+    @SuppressWarnings("unused")
+    private static Object[] dueDateParameters() {
+        return new Object[]{
+            new Object[]{
+                0,
+                LocalDate.of(2025, 4, 8),
+                LocalDate.of(2025, 4, 8) // Tuesday
+            },
+            new Object[]{
+                1,
+                LocalDate.of(2025, 4, 8),
+                LocalDate.of(2025, 4, 9) // Tuesday -> Wednesday
+            },
+            new Object[]{
+                2,
+                LocalDate.of(2025, 4, 10),
+                LocalDate.of(2025, 4, 14) // Thursday + Fri + skip weekend -> Monday
+            },
+            new Object[]{
+                5,
+                LocalDate.of(2025, 4, 9),
+                LocalDate.of(2025, 4, 16) // Wednesday + 5 working days
+            },
+            new Object[]{
+                2,
+                LocalDate.of(2025, 4, 11),
+                LocalDate.of(2025, 4, 15) // Friday -> Tues
+            },
+            new Object[]{
+                2,
+                LocalDate.of(2025, 4, 12),
+                LocalDate.of(2025, 4, 15) // Saturday -> Tues
+            },
+            new Object[]{
+                2,
+                LocalDate.of(2025, 4, 13),
+                LocalDate.of(2025, 4, 15) // Sunday -> Tues
+            },
+            new Object[]{
+                10,
+                LocalDate.of(2025, 4, 7),
+                LocalDate.of(2025, 4, 21) // Monday + 10 working days
+            },
+            new Object[]{
+                1,
+                LocalDate.of(2025, 4, 12),
+                LocalDate.of(2025, 4, 14) // Saturday -> Monday
+            },
+        };
     }
 }
