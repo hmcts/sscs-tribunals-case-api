@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getAllRequests;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getCommunicationRequestFromId;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRepliesWithoutReviews;
@@ -90,7 +91,7 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
             }
         } else if (callback.getPageId().equals("reviewFtaReply")) {
             YesNo actioned = ftaCommunicationFields.getFtaResponseActioned();
-            if (actioned == null) {
+            if (isNoOrNull(actioned)) {
                 preSubmitErrorCallbackResponse.addError("Please only select Yes if all actions to the response have been completed.");
             }
         } else if (callback.getPageId().equals("selectRequestToDelete")) {
