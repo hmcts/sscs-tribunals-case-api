@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.idam.UserRole;
 
 class TribunalCommunicationAboutToSubmitHandlerTest {
 
@@ -203,6 +204,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         // Mock user details
         UserDetails userDetails = UserDetails.builder()
             .name(expectedUserName)
+            .roles(List.of(UserRole.CTSC_CLERK.getValue()))
             .build();
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
 
@@ -220,6 +222,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         assertEquals(expectedTopic, addedCom.getRequestTopic());
         assertEquals(expectedQuestion, addedCom.getRequestMessage());
         assertEquals(expectedUserName, addedCom.getRequestUserName());
+        assertEquals(UserRole.CTSC_CLERK.getLabel(), addedCom.getRequestUserRole());
         assertNotNull(addedCom.getRequestDateTime());
         assertEquals(tribunalCommunicationPast, resultComs.getLast());
         assertEquals(calculateDueDateWorkingDays(LocalDate.now(), 2), addedCom.getRequestResponseDueDate());
@@ -245,6 +248,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         // Mock user details
         UserDetails userDetails = UserDetails.builder()
             .name(expectedUserName)
+            .roles(List.of(UserRole.IBCA.getValue()))
             .build();
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
 
@@ -256,6 +260,14 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         List<CommunicationRequest> resultComs = response.getData().getCommunicationFields().getTribunalCommunications();
 
         assertNotNull(resultComs);
+        assertEquals(1, resultComs.size());
+
+        CommunicationRequestDetails addedCom = resultComs.getFirst().getValue();
+        assertEquals(expectedTopic, addedCom.getRequestTopic());
+        assertEquals(expectedQuestion, addedCom.getRequestMessage());
+        assertEquals(expectedUserName, addedCom.getRequestUserName());
+        assertEquals(UserRole.IBCA.getLabel(), addedCom.getRequestUserRole());
+        assertNotNull(addedCom.getRequestDateTime());
     }
 
     @Test
@@ -278,7 +290,8 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
             .build();
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
         String userName = "Test User";
-        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().name(userName).build());
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
+            .name(userName).roles(List.of(UserRole.IBCA.getValue())).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -289,6 +302,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         assertNotNull(request.getRequestReply());
         assertEquals(replyText, request.getRequestReply().getReplyMessage());
         assertEquals(userName, request.getRequestReply().getReplyUserName());
+        assertEquals(UserRole.IBCA.getLabel(), request.getRequestReply().getReplyUserRole());
         assertNotNull(request.getRequestReply().getReplyDateTime());
         assertNull(request.getRequestResponseDueDate());
         assertEquals(LocalDate.now(), response.getData().getCommunicationFields().getTribunalResponseProvidedDate());
@@ -323,7 +337,8 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
             .build();
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
         String userName = "Test User";
-        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().name(userName).build());
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
+            .name(userName).roles(List.of(UserRole.CTSC_CLERK.getValue())).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -334,6 +349,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         assertNotNull(request.getRequestReply());
         assertEquals(replyText, request.getRequestReply().getReplyMessage());
         assertEquals(userName, request.getRequestReply().getReplyUserName());
+        assertEquals(UserRole.CTSC_CLERK.getLabel(), request.getRequestReply().getReplyUserRole());
         assertNotNull(request.getRequestReply().getReplyDateTime());
         assertNull(request.getRequestResponseDueDate());
         assertEquals(LocalDate.now(), response.getData().getCommunicationFields().getTribunalResponseProvidedDate());
@@ -368,7 +384,8 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
             .build();
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
         String userName = "Test User";
-        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().name(userName).build());
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
+            .name(userName).roles(List.of(UserRole.SUPER_USER.getValue())).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -379,6 +396,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         assertNotNull(request.getRequestReply());
         assertEquals(replyText, request.getRequestReply().getReplyMessage());
         assertEquals(userName, request.getRequestReply().getReplyUserName());
+        assertEquals(UserRole.SUPER_USER.getLabel(), request.getRequestReply().getReplyUserRole());
         assertNotNull(request.getRequestReply().getReplyDateTime());
         assertNull(request.getRequestResponseDueDate());
         assertEquals(LocalDate.now().minusYears(1), response.getData().getCommunicationFields().getTribunalResponseProvidedDate());
@@ -404,7 +422,8 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         ftaCommunicationFields.setTribunalResponseDueDate(LocalDate.of(1, 1, 1));
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
         String userName = "Test User";
-        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().name(userName).build());
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
+            .name(userName).roles(List.of(UserRole.TCW.getValue())).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -415,6 +434,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         assertNotNull(request.getRequestReply());
         assertEquals("No action required", request.getRequestReply().getReplyMessage());
         assertEquals(userName, request.getRequestReply().getReplyUserName());
+        assertEquals(UserRole.TCW.getLabel(), request.getRequestReply().getReplyUserRole());
         assertNotNull(request.getRequestReply().getReplyDateTime());
         assertNull(communicationRequest.getValue().getRequestReply().getReplyHasBeenActioned());
         assertNull(communicationRequest.getValue().getRequestResponseDueDate());

@@ -23,5 +23,14 @@
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalRequestRespondedReply", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalRequestRespondedActioned", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "ftaResponseProvidedDate", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
-  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalResponseProvidedDate", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"}
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalResponseProvidedDate", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "deleteCommRequestRadioDl", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "deleteCommRequestReadOnly", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "deleteCommRequestTextArea", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "awaitingInfoFromFTA", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "infoProvidedByFTA", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "infoRequestFromFTA", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "infoRequestFromTribunal", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "awaitingInfoFromTribunal", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "infoProvidedByTribunal", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"}
 ]
