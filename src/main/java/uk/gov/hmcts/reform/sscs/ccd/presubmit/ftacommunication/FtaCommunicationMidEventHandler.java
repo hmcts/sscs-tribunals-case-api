@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FtaRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil;
 
@@ -68,14 +69,24 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
         if (callback.getPageId().equals("selectFtaCommunicationAction")) {
             if (ftaCommunicationFields.getFtaRequestType().equals(FtaRequestType.REPLY_TO_FTA_QUERY)) {
                 setFtaCommunicationsDynamicList(preSubmitErrorCallbackResponse, ftaCommunicationFields, sscsCaseData);
+            } else if (ftaCommunicationFields.getFtaRequestType().equals(FtaRequestType.REVIEW_FTA_REPLY)) {
+                setFtaResponseDynamicList(ftaCommunicationFields, sscsCaseData); // Change it to select only the ones with some response
+                //handleReplyToFtaQueryError(preSubmitErrorCallbackResponse, ftaCommunicationFields);
             }
         } else if (callback.getPageId().equals("selectFtaRequest")) {
             setQueryForReply(sscsCaseData, ftaCommunicationFields);
+        } else if (callback.getPageId().equals("selectFtaReply")) {
+            setQueryForReview(sscsCaseData, ftaCommunicationFields);
         } else if (callback.getPageId().equals("replyToFtaQuery")) {
             String textValue = ftaCommunicationFields.getFtaRequestNoResponseTextArea();
             List<String> noAction = ftaCommunicationFields.getFtaRequestNoResponseNoAction();
             if (StringUtils.isEmpty(textValue) && ObjectUtils.isEmpty(noAction)) {
                 preSubmitErrorCallbackResponse.addError("Please provide a response to the FTA query or select No action required.");
+            }
+        } else if (callback.getPageId().equals("reviewFtaReply")) {
+            YesNo actioned = ftaCommunicationFields.getFtaResponseActioned();
+            if (actioned == null) {
+                preSubmitErrorCallbackResponse.addError("Please provide a response to the FTA response actioned");
             }
         }
 
@@ -96,6 +107,20 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
     }
 
+    private void setQueryForReview(SscsCaseData sscsCaseData, FtaCommunicationFields ftaCommunicationFields) {
+        DynamicList ftaRequestDl = ftaCommunicationFields.getFtaResponseNoActionedRadioDl();
+        DynamicListItem chosenFtaRequest = Optional.ofNullable(ftaRequestDl.getValue())
+            .orElseThrow(() -> new IllegalStateException("No chosen FTA request found"));
+        String chosenFtaRequestId = chosenFtaRequest.getCode();
+        CommunicationRequest communicationRequest = ftaCommunicationFields.getTribunalCommunications()
+            .stream()
+            .filter(request -> request.getId().equals(chosenFtaRequestId))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("No communication request found with id: " + chosenFtaRequestId));
+        ftaCommunicationFields.setFtaResponseNoActionedQuery(communicationRequest.getValue().getRequestMessage());
+        sscsCaseData.setCommunicationFields(ftaCommunicationFields);
+    }
+
     private void setFtaCommunicationsDynamicList(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, FtaCommunicationFields ftaCommunicationFields, SscsCaseData sscsCaseData) {
         List<DynamicListItem> dynamicListItems = getRequestsWithoutReplies(ftaCommunicationFields.getTribunalCommunications())
             .stream()
@@ -106,6 +131,19 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
             return;
         }
         ftaCommunicationFields.setFtaRequestNoResponseRadioDl(new DynamicList(null, dynamicListItems));
+        sscsCaseData.setCommunicationFields(ftaCommunicationFields);
+    }
+
+    private void setFtaResponseDynamicList(FtaCommunicationFields ftaCommunicationFields, SscsCaseData sscsCaseData) {
+        List<CommunicationRequest> tribunalCommunicationRequests = Optional.ofNullable(ftaCommunicationFields.getTribunalCommunications())
+            .orElse(Collections.emptyList());
+        List<DynamicListItem> dynamicListItems = tribunalCommunicationRequests.stream()
+            .filter(communicationRequest -> communicationRequest.getValue().getRequestReply() != null)
+            .filter(communicationRequest -> communicationRequest.getValue().getRequestReply().getReplyHasBeenActioned() == null || communicationRequest.getValue().getRequestReply().getReplyHasBeenActioned() == YesNo.NO)
+            .map((this::getDlItemFromCommunicationRequest))
+            .toList();
+        ftaCommunicationFields.setFtaResponseNoActionedRadioDl(new DynamicList(null, dynamicListItems));
+        ftaCommunicationFields.setFtaResponseActioned(null);
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
     }
 }

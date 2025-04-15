@@ -77,6 +77,8 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
             setFieldsForNewRequest(sscsCaseData, ftaCommunicationFields, ftaComms);
         } else if (FtaRequestType.REPLY_TO_FTA_QUERY.equals(ftaCommunicationFields.getFtaRequestType())) {
             handleReplyToFtaQuery(ftaCommunicationFields, userAuthorisation, sscsCaseData);
+        } else if (ftaCommunicationFields.getFtaRequestType() == FtaRequestType.REVIEW_FTA_REPLY) {
+            handleReviewFtaQuery(ftaCommunicationFields, userAuthorisation, sscsCaseData);
         }
         clearFields(sscsCaseData, ftaCommunicationFields);
         return new PreSubmitCallbackResponse<>(sscsCaseData);
@@ -113,6 +115,24 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
     }
 
+    private void handleReviewFtaQuery(FtaCommunicationFields ftaCommunicationFields, String userAuthorisation, SscsCaseData sscsCaseData) {
+        YesNo ftaResponseActioned = ftaCommunicationFields.getFtaResponseActioned();
+        if (ftaResponseActioned == YesNo.YES) {
+            DynamicList ftaRequestDl = ftaCommunicationFields.getFtaResponseNoActionedRadioDl();
+            DynamicListItem chosenFtaRequest = ftaRequestDl.getValue();
+            String chosenFtaRequestId = chosenFtaRequest.getCode();
+            CommunicationRequest communicationRequest = Optional.ofNullable(ftaCommunicationFields.getTribunalCommunications())
+                .orElse(Collections.emptyList())
+                .stream()
+                .filter(communicationRequest1 -> communicationRequest1.getId().equals(chosenFtaRequestId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No communication request found with id: " + chosenFtaRequestId));
+            communicationRequest.getValue().getRequestReply().setReplyHasBeenActioned(YesNo.YES);
+
+        } 
+        sscsCaseData.setCommunicationFields(ftaCommunicationFields);
+    }
+
     private void clearFields(SscsCaseData sscsCaseData, FtaCommunicationFields communicationFields) {
         communicationFields.setFtaRequestQuestion(null);
         communicationFields.setFtaRequestTopic(null);
@@ -121,6 +141,9 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         communicationFields.setFtaRequestNoResponseTextArea(null);
         communicationFields.setFtaRequestNoResponseRadioDl(null);
         communicationFields.setFtaRequestNoResponseNoAction(null);
+        communicationFields.setFtaResponseNoActionedQuery(null);
+        communicationFields.setFtaResponseNoActionedRadioDl(null);
+        communicationFields.setFtaResponseActioned(null);
         sscsCaseData.setCommunicationFields(communicationFields);
     }
 }

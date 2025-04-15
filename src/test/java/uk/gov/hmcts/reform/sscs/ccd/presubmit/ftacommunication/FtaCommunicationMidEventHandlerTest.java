@@ -11,6 +11,8 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -44,6 +46,7 @@ class FtaCommunicationMidEventHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String NO_REQUESTS_ERROR_MESSAGE = "There are no requests to reply to. Please select a different communication type.";
     private static final String PROVIDE_RESPONSE_ERROR_MESSAGE = "Please provide a response to the FTA query or select No action required.";
+    private static final String PROVIDE_RESPONSE_ACTIONED_ERROR_MESSAGE = "Please provide a response to the FTA response actioned";
 
     FtaCommunicationMidEventHandler handler;
 
@@ -359,6 +362,51 @@ class FtaCommunicationMidEventHandlerTest {
         assertNotNull(response);
         assertTrue(response.getErrors().isEmpty());
         assertEquals(fields, sscsCaseData.getCommunicationFields());
+    }
+
+    @Test
+    void shouldErrorWhenNoActionedResponseSelected_whenReviewFtaReply() {
+        when(callback.getPageId()).thenReturn("reviewFtaReply");
+
+        FtaCommunicationFields fields = FtaCommunicationFields.builder()
+            .build();
+
+        sscsCaseData.setCommunicationFields(fields);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNotNull(response);
+        assertEquals(1, response.getErrors().size());
+        assertTrue(response.getErrors().contains(PROVIDE_RESPONSE_ACTIONED_ERROR_MESSAGE));
+    }
+
+    @Test
+    void shouldNotErrorWhenActionedResponseSelected_whenReviewFtaReply() {
+        when(callback.getPageId()).thenReturn("reviewFtaReply");
+
+        FtaCommunicationFields fields = FtaCommunicationFields.builder()
+            .ftaResponseActioned(YES)
+            .build();
+
+        sscsCaseData.setCommunicationFields(fields);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNotNull(response);
+        assertTrue(response.getErrors().isEmpty());
+    }
+
+    @Test
+    void shouldNotErrorWhenActionedNoResponseSelected_whenReviewFtaReply() {
+        when(callback.getPageId()).thenReturn("reviewFtaReply");
+
+        FtaCommunicationFields fields = FtaCommunicationFields.builder()
+            .ftaResponseActioned(NO)
+            .build();
+
+        sscsCaseData.setCommunicationFields(fields);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNotNull(response);
+        assertTrue(response.getErrors().isEmpty());
     }
 
     private CommunicationRequest buildCommRequest(String message, String username, int requestDateTimeOffset, int responseDueDateOffset) {

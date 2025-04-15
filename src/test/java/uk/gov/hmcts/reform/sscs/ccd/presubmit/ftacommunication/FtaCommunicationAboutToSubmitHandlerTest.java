@@ -253,7 +253,6 @@ class FtaCommunicationAboutToSubmitHandlerTest {
     void shouldHandleReplyToFtaQueryWithReplyText() {
         String chosenFtaRequestId = "1";
         String replyText = "Reply text";
-
         CommunicationRequest communicationRequest = CommunicationRequest.builder()
             .id(chosenFtaRequestId)
             .value(CommunicationRequestDetails.builder().build())
@@ -510,5 +509,53 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertNull(ftaCommunicationFields.getFtaRequestNoResponseTextArea());
         assertNull(ftaCommunicationFields.getFtaRequestNoResponseRadioDl());
         assertNull(ftaCommunicationFields.getFtaRequestNoResponseNoAction());
+    }
+
+    @Test
+    public void givenReviewFtaReplyWithActionedYesResponse_thenUpdateRequestAsActioned() {
+        // Given
+        DynamicListItem selectedItem = new DynamicListItem("1", "Request 1");
+        List<DynamicListItem> listItems = Collections.singletonList(selectedItem);
+        DynamicList dynamicList = new DynamicList(selectedItem, listItems);
+        
+        sscsCaseData.setCommunicationFields(FtaCommunicationFields.builder()
+            .ftaRequestType(FtaRequestType.REVIEW_FTA_REPLY)
+            .ftaResponseActioned(YesNo.YES)
+            .ftaResponseNoActionedRadioDl(dynamicList)
+            .tribunalCommunications(List.of(
+                CommunicationRequest.builder()
+                    .id("1")
+                    .value(CommunicationRequestDetails.builder()
+                        .requestMessage("Some message")
+                        .requestTopic(CommunicationRequestTopic.APPEAL_TYPE) // Using an existing enum value
+                        .requestDateTime(LocalDateTime.now())
+                        .requestUserName("Judge")
+                        .requestResponseDueDate(LocalDate.now().plusDays(2))
+                        .requestReply(CommunicationRequestReply.builder()
+                            .replyMessage("Reply message")
+                            .replyDateTime(LocalDateTime.now())
+                            .replyUserName("Tribunal")
+                            .build())
+                        .build())
+                    .build()
+            ))
+            .build());
+        
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().name("Judge").build());
+        when(callback.getEvent()).thenReturn(EventType.FTA_COMMUNICATION);
+        
+        // When
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        
+        // Then
+        assertNotNull(response);
+        assertEquals(YesNo.YES, response.getData().getCommunicationFields().getTribunalCommunications().get(0).getValue().getRequestReply().getReplyHasBeenActioned());
+        
+        // Verify fields are cleared
+        assertNull(response.getData().getCommunicationFields().getFtaRequestQuestion());
+        assertNull(response.getData().getCommunicationFields().getFtaRequestTopic());
+        assertNull(response.getData().getCommunicationFields().getFtaRequestType());
+        assertNull(response.getData().getCommunicationFields().getFtaResponseActioned());
+        assertNull(response.getData().getCommunicationFields().getFtaResponseNoActionedRadioDl());
     }
 }
