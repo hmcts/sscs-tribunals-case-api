@@ -85,7 +85,7 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
                 preSubmitErrorCallbackResponse.addError("Please provide a response to the FTA query or select No action required.");
             }
         } else if (callback.getPageId().equals("reviewFtaReply")) {
-            YesNo actioned = ftaCommunicationFields.getFtaResponseNoResponseActioned();
+            YesNo actioned = ftaCommunicationFields.getFtaResponseActioned();
             if (actioned == null) {
                 preSubmitErrorCallbackResponse.addError("Please provide a response to the FTA response actioned");
             }
@@ -113,7 +113,7 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
     }
 
     private void setQueryForReview(SscsCaseData sscsCaseData, FtaCommunicationFields ftaCommunicationFields) {
-        DynamicList ftaRequestDl = ftaCommunicationFields.getFtaResponseNoResponseRadioDl();
+        DynamicList ftaRequestDl = ftaCommunicationFields.getFtaResponseNoActionedRadioDl();
         DynamicListItem chosenFtaRequest = Optional.ofNullable(ftaRequestDl.getValue())
             .orElseThrow(() -> new IllegalStateException("No chosen FTA request found"));
         String chosenFtaRequestId = chosenFtaRequest.getCode();
@@ -122,7 +122,7 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
             .filter(request -> request.getId().equals(chosenFtaRequestId))
             .findFirst()
             .orElseThrow(() -> new IllegalStateException("No communication request found with id: " + chosenFtaRequestId));
-        ftaCommunicationFields.setFtaResponseNoResponseQuery(communicationRequest.getValue().getRequestMessage());
+        ftaCommunicationFields.setFtaResponseNoActionedQuery(communicationRequest.getValue().getRequestMessage());
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
     }
 
@@ -161,8 +161,8 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
             .filter(communicationRequest -> communicationRequest.getValue().getRequestActioned() == null || communicationRequest.getValue().getRequestActioned() == YesNo.NO)
             .map((this::getDlItemFromCommunicationRequest))
             .toList();
-        ftaCommunicationFields.setFtaResponseNoResponseRadioDl(new DynamicList(null, dynamicListItems));
-        ftaCommunicationFields.setFtaResponseNoResponseActioned(null);
+        ftaCommunicationFields.setFtaResponseNoActionedRadioDl(new DynamicList(null, dynamicListItems));
+        ftaCommunicationFields.setFtaResponseActioned(null);
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
     }
 }

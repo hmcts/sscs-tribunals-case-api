@@ -139,9 +139,9 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
     }
 
     private void handleReviewFtaQuery(FtaCommunicationFields ftaCommunicationFields, String userAuthorisation, SscsCaseData sscsCaseData) {
-        YesNo ftaResponseNoResponseActioned = ftaCommunicationFields.getFtaResponseNoResponseActioned();
-        if (ftaResponseNoResponseActioned == YesNo.YES) {
-            DynamicList ftaRequestDl = ftaCommunicationFields.getFtaResponseNoResponseRadioDl();
+        YesNo ftaResponseActioned = ftaCommunicationFields.getFtaResponseActioned();
+        if (ftaResponseActioned == YesNo.YES) {
+            DynamicList ftaRequestDl = ftaCommunicationFields.getFtaResponseNoActionedRadioDl();
             DynamicListItem chosenFtaRequest = ftaRequestDl.getValue();
             String chosenFtaRequestId = chosenFtaRequest.getCode();
             CommunicationRequest communicationRequest = Optional.ofNullable(ftaCommunicationFields.getTribunalCommunications())
@@ -164,9 +164,10 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         communicationFields.setFtaRequestNoResponseTextArea(null);
         communicationFields.setFtaRequestNoResponseRadioDl(null);
         communicationFields.setFtaRequestNoResponseNoAction(null);
-        communicationFields.setFtaResponseNoResponseTextArea(null);
-        communicationFields.setFtaResponseNoResponseRadioDl(null);
-        communicationFields.setFtaResponseNoResponseNoAction(null);
+        //communicationFields.setFtaResponseNoActionedTextArea(null);
+        communicationFields.setFtaResponseNoActionedRadioDl(null);
+        communicationFields.setFtaResponseActioned(null);
+        //Some are missing here
         sscsCaseData.setCommunicationFields(communicationFields);
     }
 

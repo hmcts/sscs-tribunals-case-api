@@ -185,7 +185,7 @@
 ,
   {
     "CaseEventID": "ftaCommunication",
-    "CaseFieldID": "ftaResponseNoResponseRadioDl",
+    "CaseFieldID": "ftaResponseNoActionedRadioDl",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "14/04/2025",
@@ -198,7 +198,7 @@
   }
   ,{
     "CaseEventID": "ftaCommunication",
-    "CaseFieldID": "ftaResponseNoResponseQuery",
+    "CaseFieldID": "ftaResponseNoActionedQuery",
     "CaseTypeID": "Benefit",
     "DisplayContext": "READONLY",
     "LiveFrom": "14/04/2025",
@@ -211,7 +211,7 @@
   },
   {
     "CaseEventID": "ftaCommunication",
-    "CaseFieldID": "ftaResponseNoResponseActioned",
+    "CaseFieldID": "ftaResponseActioned",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "14/04/2025",
