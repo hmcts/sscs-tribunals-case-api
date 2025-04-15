@@ -253,7 +253,6 @@ class FtaCommunicationAboutToSubmitHandlerTest {
     void shouldHandleReplyToFtaQueryWithReplyText() {
         String chosenFtaRequestId = "1";
         String replyText = "Reply text";
-
         CommunicationRequest communicationRequest = CommunicationRequest.builder()
             .id(chosenFtaRequestId)
             .value(CommunicationRequestDetails.builder().build())

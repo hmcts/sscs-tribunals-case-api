@@ -78,7 +78,7 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
             handleReplyToFtaQuery(ftaCommunicationFields, userAuthorisation, sscsCaseData);
         } else if (ftaCommunicationFields.getFtaRequestType() == FtaRequestType.REVIEW_FTA_REPLY) {
             handleReviewFtaQuery(ftaCommunicationFields, userAuthorisation, sscsCaseData);
-        } 
+        }
         clearFields(sscsCaseData, ftaCommunicationFields);
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
@@ -167,7 +167,6 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         communicationFields.setFtaResponseNoActionedQuery(null);
         communicationFields.setFtaResponseNoActionedRadioDl(null);
         communicationFields.setFtaResponseActioned(null);
-    
         sscsCaseData.setCommunicationFields(communicationFields);
     }
 

@@ -21,5 +21,4 @@
   {"LiveFrom": "14/04/2025", "CaseTypeID": "Benefit", "ID": "ftaResponseNoActionedRadioDl", "Label": "FTA Response to review", "FieldType": "DynamicList", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "14/04/2025", "CaseTypeID": "Benefit", "ID": "ftaResponseNoActionedQuery", "Label": "FTA Request Query RES", "FieldType": "Text", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "14/04/2025", "CaseTypeID": "Benefit", "ID": "ftaResponseActioned", "Label": "FTA Responce Actioned", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"}
-  
 ]
