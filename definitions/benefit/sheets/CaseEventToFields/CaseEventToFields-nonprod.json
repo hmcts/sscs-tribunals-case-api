@@ -21,7 +21,7 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "2.0",
     "PageShowCondition": "tribunalRequestType=\"newRequest\"",
-    "PageLabel": "Send a Tribunal Communication Request"
+    "PageLabel": "Send a Communication Request to the Tribunal"
   },
   {
     "LiveFrom": "18/03/2025",
@@ -102,7 +102,7 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "reviewTribunalReply",
     "PageShowCondition": "tribunalRequestType=\"reviewTribunalReply\"",
-    "PageLabel": "Review the Tribunal reply",
+    "PageLabel": "Review the Tribunal response",
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=reviewTribunalReply"
   },
   {
@@ -147,7 +147,7 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "newFtaRequest",
     "PageShowCondition": "ftaRequestType=\"newRequest\"",
-    "PageLabel": "Send a FTA Communication Request"
+    "PageLabel": "Send a Communication Request to the FTA"
   },
   {
     "CaseEventID": "ftaCommunication",
@@ -228,7 +228,7 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "reviewFtaReply",
     "PageShowCondition": "ftaRequestType=\"reviewFtaReply\"",
-    "PageLabel": "Review the FTA reply",
+    "PageLabel": "Review the FTA response",
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=reviewFtaReply"
   },
   {
