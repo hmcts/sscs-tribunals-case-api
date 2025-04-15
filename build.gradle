@@ -366,7 +366,7 @@ dependencies {
     implementation group: 'com.azure', name: 'azure-core', version: '1.55.3'
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.10'
 
-    implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.7.4'
+    implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.7.5'
 
     implementation group:'org.overviewproject', name: 'mime-types', version: '1.0.4'
 
