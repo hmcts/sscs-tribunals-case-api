@@ -296,7 +296,7 @@ def versions = [
         springsecurity : '6.4.4',
         jackson        : '2.18.3',
         lombok         : '1.18.38',
-        commonsio      : '2.18.0'
+        commonsio      : '2.19.0'
 ]
 
 dependencies {
@@ -388,7 +388,7 @@ dependencies {
     implementation group: 'commons-io', name: 'commons-io', version:  versions.commonsio
 
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
-    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.0'
+    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.1'
     implementation group: 'org.apache.pdfbox', name: 'xmpbox', version: '2.0.33'
     implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.33'
     implementation group: 'org.apache.tika', name: 'tika-core', version: '2.9.3'
@@ -450,7 +450,7 @@ dependencies {
     functionalTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
-    testImplementation platform(group: 'org.junit', name: 'junit-bom', version: '5.12.1')
+    testImplementation platform(group: 'org.junit', name: 'junit-bom', version: '5.12.2')
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter'
     testImplementation group: 'org.junit.vintage', name: 'junit-vintage-engine'
     testImplementation group: 'com.h2database', name: 'h2', version: '2.3.232'
