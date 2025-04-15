@@ -181,9 +181,7 @@ class FtaCommunicationMidEventHandlerTest {
 
         assertNotNull(response);
         DynamicList dl = response.getData().getCommunicationFields().getFtaRequestNoResponseRadioDl();
-        assertNotNull(dl);
-        assertNull(dl.getValue());
-        assertTrue(dl.getListItems().isEmpty());
+        assertNull(dl);
         assertEquals(1, response.getErrors().size());
         assertTrue(response.getErrors().contains(NO_REQUESTS_ERROR_MESSAGE));
     }
@@ -202,9 +200,7 @@ class FtaCommunicationMidEventHandlerTest {
 
         assertNotNull(response);
         DynamicList dl = response.getData().getCommunicationFields().getFtaRequestNoResponseRadioDl();
-        assertNotNull(dl);
-        assertNull(dl.getValue());
-        assertTrue(dl.getListItems().isEmpty());
+        assertNull(dl);
         assertEquals(1, response.getErrors().size());
         assertTrue(response.getErrors().contains(NO_REQUESTS_ERROR_MESSAGE));
     }

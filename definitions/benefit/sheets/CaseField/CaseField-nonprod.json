@@ -9,7 +9,7 @@
   {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "ftaRequestQuestion", "Label": "Request", "FieldType": "TextArea", "Max": "500", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "ftaCommunications", "Label": "FTA Communications", "FieldType": "Collection", "FieldTypeParameter": "ftaCommunicationRequest", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "ftaRequestNoResponseRadioDl", "Label": "FTA Requests", "FieldType": "DynamicList", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "ftaRequestNoResponseQuery", "Label": "FTA Request Query", "FieldType": "Text", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "ftaRequestNoResponseQuery", "Label": "FTA Request Query", "FieldType": "TextArea", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "ftaRequestNoResponseTextArea", "Label": "FTA Request Reply", "FieldType": "TextArea", "Max": "500", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "ftaRequestNoResponseNoAction", "Label": " ", "FieldType": "MultiSelectList", "FieldTypeParameter": "FL_replyNoActionRequired", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "10/09/2019", "CaseTypeID": "Benefit", "ID": "tribunalResponseDueDate", "Label": "Tribunal need to reply by", "FieldType": "Date", "SecurityClassification": "PUBLIC"},
@@ -20,5 +20,12 @@
   {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "tribunalRequestNoResponseNoAction", "Label": " ", "FieldType": "MultiSelectList", "FieldTypeParameter": "FL_replyNoActionRequired", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "14/04/2025", "CaseTypeID": "Benefit", "ID": "ftaResponseNoActionedRadioDl", "Label": "FTA Response to review", "FieldType": "DynamicList", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "14/04/2025", "CaseTypeID": "Benefit", "ID": "ftaResponseNoActionedQuery", "Label": "FTA Request Query RES", "FieldType": "Text", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "14/04/2025", "CaseTypeID": "Benefit", "ID": "ftaResponseNoActionedReply", "Label": "FTA Request Query RES", "FieldType": "Text", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "14/04/2025", "CaseTypeID": "Benefit", "ID": "ftaResponseActioned", "Label": "FTA Responce Actioned", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"}
+  {"LiveFrom": "10/09/2019", "CaseTypeID": "Benefit", "ID": "tribunalResponseProvidedDate", "Label": "Date the Tribunal responded", "FieldType": "Date", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "10/09/2019", "CaseTypeID": "Benefit", "ID": "ftaResponseProvidedDate", "Label": "Date the FTA responded", "FieldType": "Date", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "tribunalRequestRespondedDl", "Label": "Tribunal Requests", "FieldType": "DynamicList", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "tribunalRequestRespondedQuery", "Label": "Tribunal Request Query", "FieldType": "TextArea", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "tribunalRequestRespondedReply", "Label": "Tribunal Request Response", "FieldType": "TextArea", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "tribunalRequestRespondedActioned", "Label": "Are all actions complete?", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"}
 ]
