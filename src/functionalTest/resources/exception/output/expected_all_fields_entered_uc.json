@@ -1,0 +1,204 @@
+{
+  "case_creation_details": {
+    "case_type_id": "Benefit",
+    "event_id": "validAppealCreated",
+    "case_data": {
+      "evidencePresent": "Yes",
+      "caseCode": "001DD",
+      "subscriptions": {
+        "appellantSubscription": {
+          "wantSmsNotifications": "No",
+          "tya": "TYA_RANDOM_NUMBER_APPELLANT",
+          "email": null,
+          "mobile": "07832882849",
+          "subscribeEmail": "No",
+          "subscribeSms": "No",
+          "reason": null,
+          "lastLoggedIntoMya": null
+        },
+        "supporterSubscription": null,
+        "representativeSubscription": {
+          "wantSmsNotifications": "No",
+          "tya": "TYA_RANDOM_NUMBER_REP",
+          "email": null,
+          "mobile": null,
+          "subscribeEmail": "No",
+          "subscribeSms": "No",
+          "reason": null,
+          "lastLoggedIntoMya": null
+        },
+        "appointeeSubscription": null,
+        "jointPartySubscription": null
+      },
+      "formType": "sscs1peu",
+      "dwpRegionalCentre": "Universal Credit",
+      "bulkScanCaseReference": "id",
+      "caseManagementLocation":{
+        "region":"8",
+        "baseLocation":"372653"
+      },
+      "CaseAccessCategory": "universalCredit",
+      "caseManagementCategory": {
+        "value": {
+          "code": "UC",
+          "label": "Universal Credit"
+        },
+        "list_items": [
+          {
+            "code": "UC",
+            "label": "Universal Credit"
+          }
+        ]
+      },
+      "caseNameHmctsInternal": "Frederick Falafel",
+      "caseNameHmctsRestricted": "Frederick Falafel",
+      "caseNamePublic": "Frederick Falafel",
+      "ogdType": "DWP",
+      "appeal": {
+        "mrnDetails": {
+          "dwpIssuingOffice": "Universal Credit",
+          "mrnDate": "MRN_DATE",
+          "mrnLateReason": "see scanned SSCS1 form",
+          "mrnMissingReason": null
+        },
+        "appellant": {
+          "name": {
+            "title": "Dr",
+            "firstName": "Frederick",
+            "lastName": "Falafel"
+          },
+          "address": {
+            "line1": "1 New Street",
+            "line2": "Smallville",
+            "town": "Newbury",
+            "county": "Berkshire",
+            "postcode": "CF48 2HY"
+          },
+          "contact": {
+            "email": null,
+            "phone": "01895733303",
+            "mobile": "07832882849"
+          },
+          "organisation": null,
+          "id": null,
+          "identity": {
+            "dob": "1976-11-11",
+            "nino": "{PERSON1_NINO}"
+          },
+          "isAppointee": "No",
+          "appointee": null,
+          "confidentialityRequired": null,
+          "isAddressSameAsAppointee": null,
+          "role": null
+        },
+        "benefitType": {
+          "code": "UC",
+          "description": "Universal Credit"
+        },
+        "hearingOptions": {
+          "wantsToAttend": "No",
+          "wantsSupport": "Yes",
+          "languageInterpreter": "Yes",
+          "languages": "Spanish",
+          "arrangements": [
+            "hearingLoop"
+          ],
+          "scheduleHearing": "No",
+          "excludeDates": [
+            {
+              "value": {
+                "start": "2030-11-01",
+                "end": null
+              }
+            },
+            {
+              "value": {
+                "start": "2030-12-01",
+                "end": null
+              }
+            }
+          ],
+          "agreeLessNotice": "Yes",
+          "other": "Wheelchair access"
+        },
+        "appealReasons": {
+          "reasons": [
+            {
+              "value": {
+                "reason": null,
+                "description": "see scanned SSCS1 form"
+              }
+            }
+          ]
+        },
+        "rep": {
+          "id": null,
+          "identity": null,
+          "hasRepresentative": "Yes",
+          "organisation": "ABC Advisory Services",
+          "name": {
+            "title": "Mr",
+            "firstName": "Peter",
+            "lastName": "Hyland"
+          },
+          "address": {
+            "line1": "63 Grove Hill Road",
+            "line2": "The Square",
+            "town": "Redhill",
+            "county": "Surrey",
+            "postcode": "RH1 5BT"
+          },
+          "contact": {
+            "email": null,
+            "phone": "02072323231",
+            "mobile": null
+          }
+        },
+        "signer": "Sarah Smith",
+        "hearingType": "paper",
+        "hearingSubtype": {},
+        "receivedVia": "Paper"
+      },
+      "benefitCode": "001",
+      "sscsDocument": [
+        {
+          "value": {
+            "documentType": "appellantEvidence",
+            "documentFileName": "987654321-123456789.pdf",
+            "documentDateAdded": "2019-08-01",
+            "documentLink": {
+              "document_url": "url",
+              "document_binary_url": "binary-url",
+              "document_filename": "987654321-123456789.pdf"
+            }
+          }
+        }
+      ],
+      "processingVenue": "Cardiff",
+      "linkedCasesBoolean": "No",
+      "caseCreated": "2019-08-02",
+      "regionalProcessingCenter": {
+        "faxNumber": "0870 739 4438",
+        "address4": "Newport Road",
+        "phoneNumber": "0300 123 1142",
+        "name": "CARDIFF",
+        "address1": "HM Courts & Tribunals Service",
+        "address2": "Social Security & Child Support Appeals",
+        "address3": "Eastgate House",
+        "postcode": "CF24 0AB",
+        "city": "CARDIFF",
+        "email": "Cardiff_SYA_Respon@justice.gov.uk",
+        "hearingRoute": "gaps"
+      },
+      "createdInGapsFrom": "readyToList",
+      "region": "CARDIFF",
+      "issueCode": "DD"
+    }
+  },
+  "warnings": [],
+  "supplementary_data": {
+    "$set" : {
+      "HMCTSServiceId": "BBA3"
+    }
+  }
+}
