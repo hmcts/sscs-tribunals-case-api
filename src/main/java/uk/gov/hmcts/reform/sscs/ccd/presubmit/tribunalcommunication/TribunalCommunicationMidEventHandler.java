@@ -101,7 +101,7 @@ public class TribunalCommunicationMidEventHandler implements PreSubmitCallbackHa
     private void setQueryForReply(SscsCaseData sscsCaseData, FtaCommunicationFields communicationFields) {
         DynamicList tribunalRequestDl = communicationFields.getTribunalRequestNoResponseRadioDl();
         DynamicListItem chosenTribunalRequest = Optional.ofNullable(tribunalRequestDl.getValue())
-            .orElseThrow(() -> new IllegalStateException("No chosen Tribunal request found"));
+            .orElseThrow(() -> new IllegalStateException("No chosen request found"));
         String chosenTribunalRequestId = chosenTribunalRequest.getCode();
         CommunicationRequest communicationRequest = getCommunicationRequestFromId(chosenTribunalRequestId, communicationFields.getFtaCommunications());
         communicationFields.setTribunalRequestNoResponseQuery(communicationRequest.getValue().getRequestMessage());

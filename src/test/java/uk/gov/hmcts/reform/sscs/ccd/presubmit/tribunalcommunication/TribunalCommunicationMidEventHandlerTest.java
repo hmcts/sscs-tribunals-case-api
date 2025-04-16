@@ -90,6 +90,28 @@ class TribunalCommunicationMidEventHandlerTest {
     }
 
     @Test
+    void shouldNotPopulateDl_whenReviewTribunalReplyNotChosen() {
+        when(callback.getPageId()).thenReturn("selectTribunalCommunicationAction");
+
+        CommunicationRequest ftaCommunication1 = buildCommRequestWithReply();
+        CommunicationRequest ftaCommunication2 = buildCommRequestWithReply();
+        List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunication1, ftaCommunication2));
+
+        FtaCommunicationFields fields = FtaCommunicationFields.builder()
+            .tribunalCommunications(existingComs)
+            .tribunalRequestType(TribunalRequestType.NEW_REQUEST)
+            .build();
+
+        sscsCaseData.setCommunicationFields(fields);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNotNull(response);
+        DynamicList dl = response.getData().getCommunicationFields().getTribunalRequestRespondedDl();
+        assertNull(dl);
+        assertTrue(response.getErrors().isEmpty());
+    }
+
+    @Test
     void givenFeatureToggleDisabled_thenReturnUnchangedResponse() {
         handler = new TribunalCommunicationMidEventHandler(false);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -298,6 +320,23 @@ class TribunalCommunicationMidEventHandlerTest {
     }
 
     @Test
+    void givenSelectTribunalRequestPage_thenThrowIfNoneSelected() {
+        when(callback.getPageId()).thenReturn("selectTribunalRequest");
+
+        DynamicList dynamicList = new DynamicList(null, Collections.emptyList());
+
+        FtaCommunicationFields fields = FtaCommunicationFields.builder()
+            .tribunalCommunications(Collections.emptyList())
+            .tribunalRequestNoResponseRadioDl(dynamicList)
+            .build();
+
+        sscsCaseData.setCommunicationFields(fields);
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+            () -> handler.handle(MID_EVENT, callback, USER_AUTHORISATION));
+        assertEquals("No chosen request found", exception.getMessage());
+    }
+
+    @Test
     void givenReplyToTribunalQueryPage_withEmptyResponseAndNoAction_thenShowError() {
         when(callback.getPageId()).thenReturn("replyToTribunalQuery");
         
@@ -352,13 +391,10 @@ class TribunalCommunicationMidEventHandlerTest {
     void shouldThrowIfNoDlItemChosen_whenSelectTribunalReply() {
         when(callback.getPageId()).thenReturn("selectTribunalReply");
 
-        CommunicationRequest ftaCommunication1 = buildCommRequestWithReply();
-        CommunicationRequest ftaCommunication2 = buildCommRequestWithReply();
-        List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunication1, ftaCommunication2));
         DynamicList dynamicList = new DynamicList(null, Collections.emptyList());
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .tribunalCommunications(existingComs)
+            .tribunalCommunications(Collections.emptyList())
             .tribunalRequestRespondedDl(dynamicList)
             .build();
 
