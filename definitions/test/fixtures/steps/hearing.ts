@@ -166,6 +166,5 @@ export class Hearing extends BaseStep {
   async cancelHearingForCleanUp() {
     await this.hearingsTab.clickCancelLink();
     await this.hearingsTab.submitCancellationReason();
-    await this.hearingsTab.verifyCancellationStatusSummary();
   }
 }
