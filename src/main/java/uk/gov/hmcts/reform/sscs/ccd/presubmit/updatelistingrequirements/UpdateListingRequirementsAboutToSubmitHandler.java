@@ -83,12 +83,18 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             }
         }
 
+        boolean updateToListingRequirementsOccurred = nonNull(caseDataSnlFields.getOverrideFields())
+                || sscsCaseData.getPanelMemberComposition() != callback.getCaseDetails().getCaseData().getPanelMemberComposition();
+        log.info("case data panel comp: {} ********* ",sscsCaseData.getPanelMemberComposition());
+        log.info("############ callback case data panel comp: {}",
+                callback.getCaseDetails().getCaseData().getPanelMemberComposition());
+
         State state = callback.getCaseDetails().getState();
         HearingRoute hearingRoute = caseDataSnlFields.getHearingRoute();
         if (gapsSwitchOverFeature
             && state == State.READY_TO_LIST
             && hearingRoute == LIST_ASSIST
-            && nonNull(caseDataSnlFields.getOverrideFields())) {
+            && updateToListingRequirementsOccurred) {
             String caseId = sscsCaseData.getCcdCaseId();
             log.info("UpdateListingRequirements List Assist request, Update Hearing,"
                     + "amend reasons: {}, for case ID: {}",
