@@ -100,8 +100,9 @@ export class EnhancedConfidentiality extends BaseStep {
       'Request outcome',
       'Refused'
     );
-    await this.homePage.clickAfterTabBtn();
-    await this.homePage.navigateToTab('Hearings');
+    await new Promise((f) => setTimeout(f, 2000)); //Delay required for the Case to be ready
+    await this.homePage.signOut();
+    await new Promise((f) => setTimeout(f, 3000)); //Delay required for the Case to be ready
   }
 
   async uploadSupplementaryCorrespondence(caseId: string) {
@@ -140,4 +141,12 @@ export class EnhancedConfidentiality extends BaseStep {
     );
     await this.documentsTab.verifydueDates('Date added');
   }
+
+  async navigateToHearingTab(caseId: string) {
+
+    await this.loginUserWithCaseId(credentials.hmrcSuperUser, false, caseId);
+    await this.homePage.clickAfterTabBtn();
+    await this.homePage.navigateToTab('Hearings');
+  }
+
 }
