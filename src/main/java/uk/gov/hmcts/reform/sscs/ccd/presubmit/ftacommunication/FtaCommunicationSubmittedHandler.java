@@ -13,21 +13,22 @@ import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequestDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 
 @Component
 @Slf4j
-public class FtaCommunicationSubmittedHandler implements CallbackHandler<SscsCaseData> {
+public class FtaCommunicationSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final DispatchPriority dispatchPriority;
     private final IdamService idamService;
     private final AddNoteService addNoteService;
     private final UpdateCcdCaseService updateCcdCaseService;
@@ -42,7 +43,6 @@ public class FtaCommunicationSubmittedHandler implements CallbackHandler<SscsCas
         this.idamService = idamService;
         this.addNoteService = addNoteService;
         this.updateCcdCaseService = updateCcdCaseService;
-        this.dispatchPriority = DispatchPriority.EARLY;
     }
 
     @Override
@@ -55,7 +55,7 @@ public class FtaCommunicationSubmittedHandler implements CallbackHandler<SscsCas
     }
 
     @Override
-    public void handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
@@ -67,7 +67,7 @@ public class FtaCommunicationSubmittedHandler implements CallbackHandler<SscsCas
             .orElse(null);
 
         if (!isFtaCommunicationEnabled || readOnly == null) {
-            return;
+            return new PreSubmitCallbackResponse<>(sscsCaseData);
         }
 
         Consumer<SscsCaseDetails> caseDataConsumer = sscsCaseDetails -> {
@@ -97,10 +97,6 @@ public class FtaCommunicationSubmittedHandler implements CallbackHandler<SscsCas
             );
             throw e;
         }
-    }
-
-    @Override
-    public DispatchPriority getPriority() {
-        return this.dispatchPriority;
+        return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 }

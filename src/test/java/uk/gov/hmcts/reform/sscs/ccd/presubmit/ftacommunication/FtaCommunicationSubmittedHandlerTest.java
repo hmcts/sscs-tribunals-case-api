@@ -110,12 +110,12 @@ class FtaCommunicationSubmittedHandlerTest {
     @Test
     void throwsExceptionIfItCannotHandleEvent() {
         when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
-        assertThrows(IllegalStateException.class, () -> handler.handle(SUBMITTED, callback));
+        assertThrows(IllegalStateException.class, () -> handler.handle(SUBMITTED, callback, USER_AUTHORISATION));
     }
 
     @Test
     void throwsExceptionIfItCannotHandleCallbackType() {
-        assertThrows(IllegalStateException.class, () -> handler.handle(ABOUT_TO_START, callback));
+        assertThrows(IllegalStateException.class, () -> handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION));
     }
 
     @Test
@@ -150,7 +150,7 @@ class FtaCommunicationSubmittedHandlerTest {
         when(updateCcdCaseService.updateCaseV2(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().id(1L)
             .data(sscsCaseData).build());
 
-        handler.handle(SUBMITTED, callback);
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         verify(idamService).getIdamTokens();
         verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
@@ -179,7 +179,7 @@ class FtaCommunicationSubmittedHandlerTest {
         when(updateCcdCaseService.updateCaseV2(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().id(1L)
             .data(sscsCaseData).build());
 
-        handler.handle(SUBMITTED, callback);
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         verify(idamService, never()).getIdamTokens();
         verify(updateCcdCaseService, never()).updateCaseV2(any(), any(), any(), any(), any(), any());
@@ -208,7 +208,7 @@ class FtaCommunicationSubmittedHandlerTest {
         when(updateCcdCaseService.updateCaseV2(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().id(1L)
             .data(sscsCaseData).build());
         handler = new FtaCommunicationSubmittedHandler(idamService, addNoteService, updateCcdCaseService, false);
-        handler.handle(SUBMITTED, callback);
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         verify(idamService, never()).getIdamTokens();
         verify(updateCcdCaseService, never()).updateCaseV2(any(), any(), any(), any(), any(), any());
@@ -233,7 +233,7 @@ class FtaCommunicationSubmittedHandlerTest {
             .build();
 
         sscsCaseData.setCommunicationFields(fields);
-        FeignException exception = assertThrows(FeignException.class, () -> handler.handle(SUBMITTED, callback));
+        FeignException exception = assertThrows(FeignException.class, () -> handler.handle(SUBMITTED, callback, USER_AUTHORISATION));
         assertEquals(errorMessage, exception.getMessage());
 
         verify(mockAppender).doAppend(captorLoggingEvent.capture());
