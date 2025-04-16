@@ -65,6 +65,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
@@ -1923,4 +1924,22 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         assertThat(response.getErrors().size(), is(0));
     }
 
+    @Test
+    void ifIbcCaseThenSetHearingRouteToListAssist() {
+        sscsCaseData.setBenefitCode(IBCA_BENEFIT_CODE);
+        sscsCaseData.getAppeal().getAppellant().getIdentity().setIbcaReference("IBCA12345");
+        sscsCaseData.getAppeal().getAppellant().getAddress().setInMainlandUk(NO);
+        sscsCaseData.getAppeal().getAppellant().getAddress().setPortOfEntry("GB000434");
+
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().build());
+        sscsCaseData.getAppeal().setMrnDetails(MrnDetails.builder().build());
+        sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder().build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertEquals(HearingRoute.LIST_ASSIST, response.getData().getRegionalProcessingCenter().getHearingRoute());
+        assertEquals(HearingRoute.LIST_ASSIST, response.getData().getSchedulingAndListingFields().getHearingRoute());
+        assertEquals(HearingRoute.LIST_ASSIST, response.getData().getAppeal().getHearingOptions().getHearingRoute());
+    }
 }
