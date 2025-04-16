@@ -3,5 +3,11 @@
   {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "CaseFieldID": "ftaResponseDueDate", "Label": "FTA need to reply by", "DisplayOrder": 29},
   {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "CaseFieldID": "tribunalResponseDueDate", "Label": "Tribunal need to reply by", "DisplayOrder": 30},
   {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-clerk", "CaseFieldID": "tribunalResponseDueDate", "Label": "Tribunal need to reply by", "DisplayOrder": 30},
-  {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-registrar", "CaseFieldID": "tribunalResponseDueDate", "Label": "Tribunal need to reply by", "DisplayOrder": 30}
+  {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-registrar", "CaseFieldID": "tribunalResponseDueDate", "Label": "Tribunal need to reply by", "DisplayOrder": 30},
+
+  {"LiveFrom": "31/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "tribunalResponseProvidedDate", "Label": "Date the Tribunal responded", "DisplayOrder": 31},
+  {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "CaseFieldID": "tribunalResponseProvidedDate", "Label": "Date the Tribunal responded", "DisplayOrder": 31},
+  {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "CaseFieldID": "ftaResponseProvidedDate", "Label": "Date the FTA responded", "DisplayOrder": 32},
+  {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-clerk", "CaseFieldID": "ftaResponseProvidedDate", "Label": "Date the FTA responded", "DisplayOrder": 32},
+  {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-registrar", "CaseFieldID": "ftaResponseProvidedDate", "Label": "Date the FTA responded", "DisplayOrder": 32}
 ]
