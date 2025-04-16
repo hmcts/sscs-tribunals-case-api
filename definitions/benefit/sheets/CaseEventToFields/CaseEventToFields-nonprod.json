@@ -71,14 +71,24 @@
   },
   {
     "CaseEventID": "tribunalCommunication",
-    "CaseFieldID": "tribunalRequestNoResponseNoAction",
+    "CaseFieldID": "tribunalRequestNoResponseNoActionLabel",
     "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
+    "DisplayContext": "READONLY",
     "LiveFrom": "13/03/2025",
     "PageDisplayOrder": 4,
     "PageFieldDisplayOrder": 3,
     "PageID": "replyToTribunalQuery"
   },
+  {
+    "CaseEventID": "tribunalCommunication",
+    "CaseFieldID": "tribunalRequestNoResponseNoAction",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 4,
+    "PageID": "replyToTribunalQuery"
+  }
   {
     "CaseEventID": "tribunalCommunication",
     "CaseFieldID": "tribunalRequestRespondedDl",
@@ -197,12 +207,22 @@
   },
   {
     "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "ftaRequestNoResponseNoActionLabel",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 3,
+    "PageID": "replyToFtaQuery"
+  },
+  {
+    "CaseEventID": "ftaCommunication",
     "CaseFieldID": "ftaRequestNoResponseNoAction",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "13/03/2025",
     "PageDisplayOrder": 4,
-    "PageFieldDisplayOrder": 3,
+    "PageFieldDisplayOrder": 4,
     "PageID": "replyToFtaQuery"
   },
   {
