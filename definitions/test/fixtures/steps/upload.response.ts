@@ -525,4 +525,8 @@ export class UploadResponse extends BaseStep {
       expect(response.status()).toBe(200)
     }
   }
+
+  async navigateToHearingsTab() {
+    await this.homePage.navigateToTab('Hearings');
+  }
 }
