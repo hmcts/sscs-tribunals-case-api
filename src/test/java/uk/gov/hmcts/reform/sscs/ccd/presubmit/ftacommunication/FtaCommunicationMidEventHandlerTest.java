@@ -533,7 +533,7 @@ class FtaCommunicationMidEventHandlerTest {
         when(callback.getPageId()).thenReturn("reviewFtaReply");
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .ftaResponseActioned(YES)
+            .ftaResponseActioned(NO)
             .build();
 
         sscsCaseData.setCommunicationFields(fields);
@@ -734,7 +734,7 @@ class FtaCommunicationMidEventHandlerTest {
                     .requestReply(CommunicationRequestReply.builder()
                         .replyDateTime(LocalDateTime.now())
                         .replyMessage("some reply message")
-                        .replyHasBeenActioned(YesNo.NO)
+                        .replyHasBeenActioned(NO)
                         .build())
                     .build())
             .build();
