@@ -70,6 +70,14 @@ em-ccdorc:
       CCD_DATA_API_URL: http://${SERVICE_NAME}-ccd-data-store-api
       CALLBACK_HTTP_SCHEME: https
       CALLBACK_DOMAIN: em-ccdorc-${SERVICE_FQDN}
+    keyVaults:
+      em-ccdorc:
+        resourceGroup: em-ccdorc
+        secrets:
+          - name: microservicekey-em-ccd-orchestrator
+            alias: S2S_KEY
+          - name: notification-api-key
+            alias: NOTIFICATION_API_KEY
 
 ccd-case-document-am-api:
   enabled: true
@@ -618,7 +626,6 @@ ccd:
       CCD_DEF_EM_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-em-ccd-orchestrator
       CCD_DEF_TRIBUNALS_API_URL: http://${SERVICE_NAME}-java
       CCD_DEF_TYA_NOTIFICATIONS_API_URL: http://${SERVICE_NAME}-tya-notification
-      CCD_DEF_BULK_SCAN_API_URL: http://${SERVICE_NAME}-bulk-scan-api
       CCD_DEF_BULK_SCAN_ORCHESTRATOR_URL: http://${SERVICE_NAME}-bulk-scan-orchestrator
       CCD_DEF_COR_BACKEND_URL: http://${SERVICE_NAME}-ccd-definition-store
       CCD_STORE_BASE_URL: http://${SERVICE_NAME}-ccd-definition-store

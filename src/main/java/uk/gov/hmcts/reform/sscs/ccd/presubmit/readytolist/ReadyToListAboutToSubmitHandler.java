@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.helper.SscsHelper;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingMessagingServiceFactory;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
 @Slf4j
@@ -83,6 +84,11 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
         
         String region = sscsCaseData.getRegion();
 
+        if (sscsCaseData.isIbcCase()) {
+            SscsUtil.setListAssistRoutes(sscsCaseData);
+            return HearingHandler.valueOf(HearingRoute.LIST_ASSIST.name()).handle(sscsCaseData, gapsSwitchOverFeature,
+                hearingMessagingServiceFactory.getMessagingService(HearingRoute.LIST_ASSIST));
+        }
         Map<String, RegionalProcessingCenter> regionalProcessingCenterMap = regionalProcessingCenterService
                 .getRegionalProcessingCenterMap();
 
