@@ -11,16 +11,16 @@ import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @Service
 @Slf4j
-public class UploadDocumentSubmittedCallbackHandler implements CallbackHandler<SscsCaseData> {
-    private final DispatchPriority dispatchPriority;
-
+public class UploadDocumentSubmittedCallbackHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private final UpdateCcdCaseService updateCcdCaseService;
 
     private final IdamService idamService;
@@ -35,7 +35,6 @@ public class UploadDocumentSubmittedCallbackHandler implements CallbackHandler<S
         this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;
         this.isTribunalInternalDocumentsEnabled = isTribunalInternalDocumentsEnabled;
-        this.dispatchPriority = DispatchPriority.EARLY;
     }
 
     @Override
@@ -47,7 +46,7 @@ public class UploadDocumentSubmittedCallbackHandler implements CallbackHandler<S
     }
 
     @Override
-    public void handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
@@ -62,10 +61,6 @@ public class UploadDocumentSubmittedCallbackHandler implements CallbackHandler<S
                 EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), issueToAllParties,
                 issueToAllParties, idamService.getIdamTokens());
         }
-    }
-
-    @Override
-    public DispatchPriority getPriority() {
-        return this.dispatchPriority;
+        return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 }
