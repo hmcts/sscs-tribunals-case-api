@@ -100,6 +100,7 @@ export class EnhancedConfidentiality extends BaseStep {
       'Request outcome',
       'Refused'
     );
+    await this.homePage.clickAfterTabBtn();
     await this.homePage.navigateToTab('Hearings');
   }
 
