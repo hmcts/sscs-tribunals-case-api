@@ -513,18 +513,19 @@ class FtaCommunicationMidEventHandlerTest {
     }
 
     @Test
-    void shouldNotErrorWhenActionedNoResponseSelected_whenReviewFtaReply() {
+    void shouldErrorWhenActionedNoResponseSelected_whenReviewFtaReply() {
         when(callback.getPageId()).thenReturn("reviewFtaReply");
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .ftaResponseActioned(NO)
+            .ftaResponseActioned(YES)
             .build();
 
         sscsCaseData.setCommunicationFields(fields);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertNotNull(response);
-        assertTrue(response.getErrors().isEmpty());
+        assertEquals(1, response.getErrors().size());
+        assertTrue(response.getErrors().contains(PROVIDE_RESPONSE_ACTIONED_ERROR_MESSAGE));
     }
 
     private CommunicationRequest buildCommRequest(String message, String username, int requestDateTimeOffset, int responseDueDateOffset) {
