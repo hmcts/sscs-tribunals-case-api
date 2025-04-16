@@ -27,9 +27,10 @@ import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 @Slf4j
 public class FtaCommunicationSubmittedHandler implements CallbackHandler<SscsCaseData> {
 
-    private IdamService idamService;
-    private AddNoteService addNoteService;
-    private UpdateCcdCaseService updateCcdCaseService;
+    private final DispatchPriority dispatchPriority;
+    private final IdamService idamService;
+    private final AddNoteService addNoteService;
+    private final UpdateCcdCaseService updateCcdCaseService;
     private final boolean isFtaCommunicationEnabled;
 
     @Autowired
@@ -41,6 +42,7 @@ public class FtaCommunicationSubmittedHandler implements CallbackHandler<SscsCas
         this.idamService = idamService;
         this.addNoteService = addNoteService;
         this.updateCcdCaseService = updateCcdCaseService;
+        this.dispatchPriority = DispatchPriority.EARLY;
     }
 
     @Override
@@ -99,6 +101,6 @@ public class FtaCommunicationSubmittedHandler implements CallbackHandler<SscsCas
 
     @Override
     public DispatchPriority getPriority() {
-        return DispatchPriority.LATEST;
+        return this.dispatchPriority;
     }
 }

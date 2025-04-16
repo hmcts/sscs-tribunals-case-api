@@ -257,7 +257,7 @@
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "13/03/2025",
-    "PageDisplayOrder": 6,
+    "PageDisplayOrder": 7,
     "PageFieldDisplayOrder": 1,
     "PageID": "selectRequestToDelete",
     "PageShowCondition": "ftaRequestType=\"deleteRequestReply\"",
@@ -270,7 +270,7 @@
     "CaseTypeID": "Benefit",
     "DisplayContext": "READONLY",
     "LiveFrom": "13/03/2025",
-    "PageDisplayOrder": 7,
+    "PageDisplayOrder": 8,
     "PageFieldDisplayOrder": 1,
     "PageID": "deleteRequest",
     "PageShowCondition": "ftaRequestType=\"deleteRequestReply\"",
@@ -283,7 +283,7 @@
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "13/03/2025",
-    "PageDisplayOrder": 7,
+    "PageDisplayOrder": 8,
     "PageFieldDisplayOrder": 2,
     "PageID": "deleteRequest"
   }

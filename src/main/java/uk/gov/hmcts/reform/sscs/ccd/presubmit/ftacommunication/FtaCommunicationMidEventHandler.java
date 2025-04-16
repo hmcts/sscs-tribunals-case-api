@@ -72,6 +72,7 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
 
         if (callback.getPageId().equals("selectFtaCommunicationAction")) {
             ftaCommunicationFields.setDeleteCommRequestReadOnly(null);
+            ftaCommunicationFields.setDeleteCommRequestTextArea(null);
             if (FtaRequestType.REPLY_TO_FTA_QUERY.equals(ftaCommunicationFields.getFtaRequestType())) {
                 setFtaCommunicationsDynamicList(preSubmitErrorCallbackResponse, ftaCommunicationFields);
             } else if (FtaRequestType.REVIEW_FTA_REPLY.equals(ftaCommunicationFields.getFtaRequestType())) {
