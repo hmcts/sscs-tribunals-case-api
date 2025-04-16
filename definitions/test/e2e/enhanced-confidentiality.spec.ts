@@ -12,8 +12,11 @@ test.describe('Enhanced confidentiality test', async () => {
 
   test.afterEach(
     'Cancel the hearings after test run',
-    async({ hearingSteps }, testInfo) => {
-      (testInfo.title.includes("#executeTearDown")) && await hearingSteps.cancelHearingForCleanUp();
+    async({ hearingSteps, enhancedConfidentialitySteps }, testInfo) => {
+      if(testInfo.title.includes("#executeTearDown")){
+        await enhancedConfidentialitySteps.navigateToHearingTab(caseId);
+        await hearingSteps.cancelHearingForCleanUp();
+      }
     }
   )
 
