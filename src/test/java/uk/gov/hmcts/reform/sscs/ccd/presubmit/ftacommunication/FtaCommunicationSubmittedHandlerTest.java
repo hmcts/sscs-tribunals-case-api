@@ -139,8 +139,8 @@ class FtaCommunicationSubmittedHandlerTest {
             + expectedReason;
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .deleteCommRequestReadOnly(requestDetails)
-            .deleteCommRequestTextArea(expectedReason)
+            .deleteCommRequestReadOnlyStored(requestDetails)
+            .deleteCommRequestTextAreaStored(expectedReason)
             .ftaRequestType(FtaRequestType.DELETE_REQUEST_REPLY)
             .build();
 
@@ -169,7 +169,7 @@ class FtaCommunicationSubmittedHandlerTest {
         String expectedReason = "Some reason to delete";
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .deleteCommRequestTextArea(expectedReason)
+            .deleteCommRequestTextAreaStored(expectedReason)
             .ftaRequestType(FtaRequestType.DELETE_REQUEST_REPLY)
             .build();
 
@@ -197,8 +197,8 @@ class FtaCommunicationSubmittedHandlerTest {
             .build();
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .deleteCommRequestReadOnly(requestDetails)
-            .deleteCommRequestTextArea("expectedReason")
+            .deleteCommRequestReadOnlyStored(requestDetails)
+            .deleteCommRequestTextAreaStored("expectedReason")
             .ftaRequestType(FtaRequestType.DELETE_REQUEST_REPLY)
             .build();
 
@@ -227,8 +227,8 @@ class FtaCommunicationSubmittedHandlerTest {
         logger.addAppender(mockAppender);
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .deleteCommRequestReadOnly(CommunicationRequestDetails.builder().build())
-            .deleteCommRequestTextArea("expectedReason")
+            .deleteCommRequestReadOnlyStored(CommunicationRequestDetails.builder().build())
+            .deleteCommRequestTextAreaStored("expectedReason")
             .ftaRequestType(FtaRequestType.DELETE_REQUEST_REPLY)
             .build();
 

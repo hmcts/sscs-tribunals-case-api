@@ -71,8 +71,6 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
             .orElse(FtaCommunicationFields.builder().build());
 
         if (callback.getPageId().equals("selectFtaCommunicationAction")) {
-            ftaCommunicationFields.setDeleteCommRequestReadOnly(null);
-            ftaCommunicationFields.setDeleteCommRequestTextArea(null);
             if (FtaRequestType.REPLY_TO_FTA_QUERY.equals(ftaCommunicationFields.getFtaRequestType())) {
                 setFtaCommunicationsDynamicList(preSubmitErrorCallbackResponse, ftaCommunicationFields);
             } else if (FtaRequestType.REVIEW_FTA_REPLY.equals(ftaCommunicationFields.getFtaRequestType())) {
@@ -171,6 +169,5 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
         CommunicationRequestDetails communicationRequest =
             getCommunicationRequestFromId(requestToDeleteId, getAllRequests(communicationFields)).getValue();
         communicationFields.setDeleteCommRequestReadOnly(communicationRequest);
-        communicationFields.setDeleteCommRequestTextArea(null);
     }
 }

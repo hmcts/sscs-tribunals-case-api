@@ -33,6 +33,8 @@
   {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "deleteCommRequestRadioDl", "Label": "Communication Requests", "FieldType": "DynamicList", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "deleteCommRequestReadOnly", "Label": "Communication Request", "FieldType": "ftaCommunicationRequest", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "deleteCommRequestTextArea", "Label": "Reason for deleting", "FieldType": "TextArea", "Max": "500", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "deleteCommRequestReadOnlyStored", "Label": " ", "FieldType": "ftaCommunicationRequest", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "deleteCommRequestTextAreaStored", "Label": " ", "FieldType": "TextArea", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "awaitingInfoFromFTA", "Label": "Awaiting Info From FTA", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "infoProvidedByFTA", "Label": "Info Provided By FTA", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "infoRequestFromFTA", "Label": "Info Request From FTA", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},

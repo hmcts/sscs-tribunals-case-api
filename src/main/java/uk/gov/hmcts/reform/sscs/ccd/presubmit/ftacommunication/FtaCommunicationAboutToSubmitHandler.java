@@ -83,6 +83,10 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         }
         clearFields(ftaCommunicationFields);
         setCommRequestFilters(ftaCommunicationFields);
+        ftaCommunicationFields.setDeleteCommRequestReadOnlyStored(ftaCommunicationFields.getDeleteCommRequestReadOnly());
+        ftaCommunicationFields.setDeleteCommRequestTextAreaStored(ftaCommunicationFields.getDeleteCommRequestTextArea());
+        ftaCommunicationFields.setDeleteCommRequestReadOnly(null);
+        ftaCommunicationFields.setDeleteCommRequestTextArea(null);
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }

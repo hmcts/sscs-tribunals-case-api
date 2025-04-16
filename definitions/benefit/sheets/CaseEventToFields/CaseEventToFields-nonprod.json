@@ -88,7 +88,7 @@
     "PageDisplayOrder": 4,
     "PageFieldDisplayOrder": 4,
     "PageID": "replyToTribunalQuery"
-  }
+  },
   {
     "CaseEventID": "tribunalCommunication",
     "CaseFieldID": "tribunalRequestRespondedDl",

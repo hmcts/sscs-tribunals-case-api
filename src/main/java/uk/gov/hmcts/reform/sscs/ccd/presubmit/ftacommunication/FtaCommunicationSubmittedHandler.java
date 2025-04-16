@@ -9,10 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequestDetails;
@@ -63,7 +61,7 @@ public class FtaCommunicationSubmittedHandler implements PreSubmitCallbackHandle
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
         CommunicationRequestDetails readOnly = Optional.ofNullable(sscsCaseData.getCommunicationFields())
-            .map(FtaCommunicationFields::getDeleteCommRequestReadOnly)
+            .map(FtaCommunicationFields::getDeleteCommRequestReadOnlyStored)
             .orElse(null);
 
         if (!isFtaCommunicationEnabled || readOnly == null) {
@@ -74,9 +72,9 @@ public class FtaCommunicationSubmittedHandler implements PreSubmitCallbackHandle
             SscsCaseData caseData = sscsCaseDetails.getData();
             FtaCommunicationFields communicationFields = caseData.getCommunicationFields();
             String note = "Request deleted: "
-                + communicationFields.getDeleteCommRequestReadOnly().toString()
+                + communicationFields.getDeleteCommRequestReadOnlyStored().toString()
                 + "\nReason for deletion: \n"
-                + communicationFields.getDeleteCommRequestTextArea();
+                + communicationFields.getDeleteCommRequestTextAreaStored();
             addNoteService.addNote(idamService.getIdamOauth2Token(), caseData, note);
         };
 

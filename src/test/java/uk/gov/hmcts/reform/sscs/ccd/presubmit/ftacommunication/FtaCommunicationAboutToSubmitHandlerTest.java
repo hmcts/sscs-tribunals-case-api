@@ -527,6 +527,8 @@ class FtaCommunicationAboutToSubmitHandlerTest {
             .deleteCommRequestRadioDl(ftaRequestNoResponseRadioDl)
             .tribunalCommunications(List.of(communicationRequest, communicationRequest2))
             .ftaCommunications(List.of(communicationRequest3))
+            .deleteCommRequestReadOnly(communicationRequest3.getValue())
+            .deleteCommRequestTextArea("delete reason " + chosenId)
             .ftaRequestType(FtaRequestType.DELETE_REQUEST_REPLY)
             .build();
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
@@ -545,6 +547,10 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertEquals(ftaCommsSize, ftaComms.size());
         assertFalse(tribunalComms.stream().map(CommunicationRequest::getId).toList().contains(chosenId));
         assertFalse(ftaComms.stream().map(CommunicationRequest::getId).toList().contains(chosenId));
+        assertEquals(communicationRequest3.getValue(), fields.getDeleteCommRequestReadOnlyStored());
+        assertEquals("delete reason " + chosenId, fields.getDeleteCommRequestTextAreaStored());
+        assertNull(fields.getDeleteCommRequestReadOnly());
+        assertNull(fields.getDeleteCommRequestTextArea());
     }
 
     @Test
