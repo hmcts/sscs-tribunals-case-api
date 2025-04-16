@@ -18,9 +18,7 @@ test.describe(
     test.afterEach(
       'Cancel the hearings after test run',
       async({ hearingSteps }, testInfo) => {
-        if(testInfo.title.includes("#runAfterEach")) {
-          await hearingSteps.cancelHearingForCleanUp();
-        }
+        (testInfo.title.includes("#executeTearDown")) && await hearingSteps.cancelHearingForCleanUp();
       }
     )
 
@@ -35,7 +33,7 @@ test.describe(
       }
     );
 
-    test('Trigger a new hearing for UC case #runAfterEach', async ({
+    test('Trigger a new hearing for UC case #executeTearDown', async ({
       uploadResponseSteps,
       hearingSteps
     }) => {
@@ -44,7 +42,7 @@ test.describe(
       await hearingSteps.verifyHearingIsTriggeredForUCCase(false);
     });
 
-    test('Trigger a new direction hearing via issue direction notice for UC case #runAfterEach', async ({
+    test('Trigger a new direction hearing via issue direction notice for UC case #executeTearDown', async ({
       uploadResponseSteps,
       hearingSteps,
       issueDirectionsNoticeSteps
@@ -63,7 +61,7 @@ test.describe(
       await hearingSteps.verifyHearingIsTriggeredForUCCase(true);
     });
 
-    test('Trigger a new direction hearing via update listing reqs for UC case #runAfterEach', async ({
+    test('Trigger a new direction hearing via update listing reqs for UC case #executeTearDown', async ({
       uploadResponseSteps,
       hearingSteps
     }) => {
@@ -93,7 +91,7 @@ test.describe(
       await hearingSteps.verifyAutoHearingCancellation();
     });
 
-    test('Manually Update an hearing for DLA case #runAfterEach', async ({
+    test('Manually Update an hearing for DLA case #executeTearDown', async ({
       uploadResponseSteps,
       hearingSteps
     }) => {
@@ -104,7 +102,7 @@ test.describe(
       await hearingSteps.verifyUpdatedHearingStatus();
     });
 
-    test('Auto Update an hearing for DLA case #runAfterEach', async ({
+    test('Auto Update an hearing for DLA case #executeTearDown', async ({
       uploadResponseSteps,
       hearingSteps
     }) => {
