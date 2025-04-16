@@ -88,7 +88,6 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     ROLE_ASSIGNMENT_API_URL: "http://am-role-assignment-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     DOCUMENT_MANAGEMENT_URL: "http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     IDAM_S2S_AUTH: "http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
-    BULK_SCAN_URL: "http://sscs-bulk-scan-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     IDAM_API_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
     IDAM_API_JWK_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net/jwks
     BUNDLE_URL: http://em-ccd-orchestrator-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
@@ -112,7 +111,7 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     PDF_SERVICE_BASE_URL: https://docmosis.{{ .Values.global.environment }}.platform.hmcts.net/rs/render
     ROBOTICS_EMAIL_MESSAGE: "Please find attached the robotics json file \nPlease do not respond to this email"
     EMAIL_SERVER_HOST: "mta.reform.hmcts.net"
-    EMAIL_SERVER_PORT: "25"
+    EMAIL_SERVER_PORT: 25
     EMAIL_SMTP_TLS_ENABLED: "true"
     EMAIL_SMTP_SSL_TRUST: "*"
     CALLBACK_MAX_RETRY_ATTEMPTS: 3
@@ -123,6 +122,8 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     RUN_DB_MIGRATION_ON_STARTUP: false
     POST_HEARINGS_FEATURE: true
     POST_HEARINGS_B_FEATURE: true
+    LOGBACK_REQUIRE_ALERT_LEVEL: "false"
+    LOGBACK_REQUIRE_ERROR_CODE: "false"
     DEFAULT_PANEL_COMPOSITION_ENABLED: false
 
     #    hearings=api

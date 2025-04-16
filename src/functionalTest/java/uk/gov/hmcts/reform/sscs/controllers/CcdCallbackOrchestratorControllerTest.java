@@ -62,7 +62,7 @@ public class CcdCallbackOrchestratorControllerTest {
         HttpEntity<String> request = new HttpEntity<String>(jsonCallbackForTest, headers);
         ResponseEntity<String> response = restTemplate.exchange("/send", HttpMethod.POST, request, String.class);
 
-        assertEquals(HttpStatus.OK.value(), response.getStatusCodeValue());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     public String getJsonCallbackForTest(String path) throws IOException {
