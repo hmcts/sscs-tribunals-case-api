@@ -5,11 +5,13 @@ plugins {
     id 'jacoco'
     id 'org.springframework.boot' version '3.4.4'
     id 'uk.gov.hmcts.java' version '0.12.65'
+    id 'io.spring.dependency-management' version '1.1.7'
     id 'com.gorylenko.gradle-git-properties' version '2.5.0'
     id 'com.github.ben-manes.versions' version '0.52.0'
     id 'org.owasp.dependencycheck' version '12.1.1'
     id 'au.com.dius.pact' version '4.6.17'
     id 'com.github.hmcts.rse-cft-lib' version '0.19.1618'
+    id 'info.solidsoft.pitest' version '1.9.11'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -112,6 +114,8 @@ tasks.register('functional', Test) {
     setTestClassesDirs(sourceSets.functionalTest.output.classesDirs)
     setClasspath(sourceSets.functionalTest.runtimeClasspath)
     include "uk/gov/hmcts/reform/sscs/functional/**"
+    include "uk/gov/hmcts/reform/sscs/controllers/**"
+    include "uk/gov/hmcts/reform/sscs/bulkscan/**"
     exclude "uk/gov/hmcts/reform/sscs/smoke/**"
     maxParallelForks = Runtime.runtime.availableProcessors()
 }
@@ -210,6 +214,24 @@ repositories {
     }
 }
 
+project.tasks.named('pitest') {
+    group = "Verification"
+}
+
+pitest {
+    targetClasses = ['uk.gov.hmcts.reform.sscs.*']
+    excludedClasses = [
+            'uk.gov.hmcts.reform.sscs.config.*',
+            'uk.gov.hmcts.reform.sscs.bulkscancore.domain.*',
+            'uk.gov.hmcts.reform.sscs.domain.*',
+            'uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication'
+    ]
+    threads = 10
+    outputFormats = ['XML', 'HTML']
+    timestampedReports = false
+    mutationThreshold = 90
+}
+
 processResources.dependsOn(generateGitProperties)
 
 project.tasks.named('sonarqube') {
@@ -249,7 +271,9 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/sscs/docmosis/config/**," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/EnvironmentPropertiesPrinter.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/controller/FunctionalTestController.java," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/tyanotifications/utils/GetAllTemplatesFromNotify.java,"
+                "src/main/java/uk/gov/hmcts/reform/sscs/tyanotifications/utils/GetAllTemplatesFromNotify.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/bulkscan/domain/**," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/bulkscan/bulkscancore/domain/**,"
         property "sonar.host.url", "https://sonar.reform.hmcts.net/"
     }
 }
@@ -322,7 +346,7 @@ dependencies {
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.5'
 
     implementation group: 'com.google.guava', name: 'guava', version: '33.4.8-jre'
-    implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.28'
+    implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '9.0.0'
 
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.0'
     implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.3'
@@ -354,7 +378,7 @@ dependencies {
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '11.7.1'
     implementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '11.7.1'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6.2.0'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6.2.1'
 
     // sscs-pdf-email-common
     implementation group: 'com.github.sps.junidecode', name: 'junidecode', version: '0.3'
@@ -473,6 +497,17 @@ dependencies {
     cftlibImplementation group: 'org.springframework.boot', name: 'spring-boot-devtools', version: springBoot.class.package.implementationVersion
     cftlibAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
+    implementation group: 'me.xdrop', name: 'fuzzywuzzy', version: '1.4.0'
+    implementation group: 'io.github.openfeign', name: 'feign-jackson', version: '13.3'
+    implementation group: 'com.github.everit-org.json-schema', name: 'org.everit.json.schema', version: '1.14.4'
+    implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
+    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-assertj', version: '3.4.1'
+    testImplementation group: 'org.pitest', name: 'pitest', version: '1.17.0'
+    testImplementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: pitest.pitestVersion.get()
+    testImplementation group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: '0.5'
+    testImplementation group: 'com.typesafe', name: 'config', version: '1.4.3'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.11.0'
+    testImplementation group: 'org.apiguardian', name: 'apiguardian-api', version: '1.1.2'
 }
 
 bootJar {

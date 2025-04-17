@@ -90,7 +90,6 @@ cover.welsh=TB-SCS-LET-WEL-Cover-Letter.docx
 
 
 #BulkScan
-bulk_scan.url=${BULK_SCAN_URL:http://localhost:8090}
 bulk_scan.validateEndpoint=/validate-record
 
 #Management
