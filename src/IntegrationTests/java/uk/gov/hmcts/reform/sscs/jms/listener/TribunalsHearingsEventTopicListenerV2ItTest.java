@@ -91,11 +91,12 @@ public class TribunalsHearingsEventTopicListenerV2ItTest {
     private VenueService venueService;
     @MockitoBean
     private VerbalLanguagesService verbalLanguages;
-
     @MockitoBean
     private HmcHearingApi hearingApi;
     @MockitoBean
     private UpdateCcdCaseService updateCcdCaseService;
+    @MockitoBean
+    private SscsCaseData sscsCaseData;
 
     @Test
     public void testHearingsUpdateCaseV2() throws UpdateCaseException, TribunalsEventProcessingException, GetCaseException {
@@ -130,7 +131,7 @@ public class TribunalsHearingsEventTopicListenerV2ItTest {
             + "  \"hearingRoute\": \"listAssist\",\n"
             + "  \"hearingState\": \"adjournCreateHearing\"\n"
             + "}\n";
-        hearingMessageServiceListener.handleIncomingMessage(deserialize(message), any(SscsCaseData.class));
+        hearingMessageServiceListener.handleIncomingMessage(deserialize(message), createSscsCaseDetails().getData());
 
         verify(ccdCaseService, never()).updateCaseData(any(), any(), any());
 
