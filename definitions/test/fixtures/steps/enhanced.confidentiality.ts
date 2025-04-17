@@ -141,4 +141,11 @@ export class EnhancedConfidentiality extends BaseStep {
     );
     await this.documentsTab.verifydueDates('Date added');
   }
+
+  async loginAndNavigateToHearingsTab(caseId: string) {
+
+    await this.loginUserWithCaseId(credentials.hmrcSuperUser, false, caseId);
+    await this.homePage.clickAfterTabBtn();
+    await this.homePage.navigateToTab('Hearings');
+  }
 }

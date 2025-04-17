@@ -15,6 +15,13 @@ test.describe(
       }
     );
 
+    test.afterEach(
+      'Cancel the hearings after test run',
+      async({ hearingSteps }, testInfo) => {
+        (testInfo.title.includes("#executeTearDown")) && await hearingSteps.cancelHearingForCleanUp();
+      }
+    )
+
     test(
       'Trigger a new hearing & cancellation for DLA case',
       { tag: '@aat-regression' },
@@ -26,7 +33,7 @@ test.describe(
       }
     );
 
-    test('Trigger a new hearing for UC case', async ({
+    test('Trigger a new hearing for UC case #executeTearDown', async ({
       uploadResponseSteps,
       hearingSteps
     }) => {
@@ -35,7 +42,7 @@ test.describe(
       await hearingSteps.verifyHearingIsTriggeredForUCCase(false);
     });
 
-    test('Trigger a new direction hearing via issue direction notice for UC case', async ({
+    test('Trigger a new direction hearing via issue direction notice for UC case #executeTearDown', async ({
       uploadResponseSteps,
       hearingSteps,
       issueDirectionsNoticeSteps
@@ -54,7 +61,7 @@ test.describe(
       await hearingSteps.verifyHearingIsTriggeredForUCCase(true);
     });
 
-    test('Trigger a new direction hearing via update listing reqs for UC case', async ({
+    test('Trigger a new direction hearing via update listing reqs for UC case #executeTearDown', async ({
       uploadResponseSteps,
       hearingSteps
     }) => {
@@ -84,7 +91,7 @@ test.describe(
       await hearingSteps.verifyAutoHearingCancellation();
     });
 
-    test('Manually Update an hearing for DLA case', async ({
+    test('Manually Update an hearing for DLA case #executeTearDown', async ({
       uploadResponseSteps,
       hearingSteps
     }) => {
@@ -95,7 +102,7 @@ test.describe(
       await hearingSteps.verifyUpdatedHearingStatus();
     });
 
-    test('Auto Update an hearing for DLA case', async ({
+    test('Auto Update an hearing for DLA case #executeTearDown', async ({
       uploadResponseSteps,
       hearingSteps
     }) => {
