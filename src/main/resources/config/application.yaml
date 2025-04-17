@@ -690,9 +690,9 @@ notification:
         processAudioVideo:
             docmosisId: TB-SCS-GNO-ENG-00677-v2.docx
         setAsideGranted:
-            docmosisId: TB-SCS-LET-ENG-Set-Aside-Grant-Refused.docx
+            docmosisId: TB-SCS-LET-ENG-Set-Aside-Grant-Refused-v2.docx
         setAsideRefused:
-            docmosisId: TB-SCS-LET-ENG-Set-Aside-Grant-Refused.docx
+            docmosisId: TB-SCS-LET-ENG-Set-Aside-Grant-Refused-v2.docx
         directionIssued:
             appealToProceed:
                 appellant:
