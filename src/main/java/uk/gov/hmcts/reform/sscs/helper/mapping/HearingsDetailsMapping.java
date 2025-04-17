@@ -55,7 +55,7 @@ public final class HearingsDetailsMapping {
         List<String> nonStandardDurationReasons = HearingsDurationMapping.getNonStandardHearingDurationReasons();
         int physicalAttendees = HearingsNumberAttendeesMapping.getNumberOfPhysicalAttendees(caseData, adjournmentInProgress);
         List<HearingLocation> locations = HearingsLocationMapping.getHearingLocations(caseData, refData);
-        PanelRequirements panelRequirements = hearingsPanelMapping.getPanelRequirements(caseData, refData);
+        PanelRequirements panelRequirements = hearingsPanelMapping.getPanelRequirements(caseData, refData, true);
         List<AmendReason> amendReasons = OverridesMapping.getAmendReasonCodes(caseData);
         List<HearingChannel> channels = HearingsChannelMapping.getHearingChannels(caseData, adjournmentInProgress);
         // build hearing details to be used in payload for hmc create / update hearing requests
