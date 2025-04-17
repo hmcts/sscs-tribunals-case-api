@@ -9,6 +9,7 @@ import org.springframework.retry.ExhaustedRetryException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.exception.GetCaseException;
@@ -35,7 +36,7 @@ public class HearingMessageServiceListener {
     private final IdamService idamService;
 
     @Async
-    public void handleIncomingMessage(HearingRequest message) throws TribunalsEventProcessingException, GetCaseException, UpdateCaseException {
+    public void handleIncomingMessage(HearingRequest message, SscsCaseData caseData) throws TribunalsEventProcessingException, GetCaseException, UpdateCaseException {
         if (isNull(message)) {
             throw new TribunalsEventProcessingException("An exception occurred as message did not match format");
         }
@@ -45,7 +46,7 @@ public class HearingMessageServiceListener {
         log.info("Attempting to process hearing event {} from hearings event queue for case ID {}",
                 event, caseId);
         try {
-            hearingsService.processHearingRequest(message);
+            hearingsService.processHearingRequest(message, caseData);
             log.info("Hearing event {} for case ID {} successfully processed", event, caseId);
         } catch (ExhaustedRetryException e) {
             handleException(e.getCause(), caseId);

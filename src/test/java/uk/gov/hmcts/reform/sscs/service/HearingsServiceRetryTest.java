@@ -88,6 +88,9 @@ class HearingsServiceRetryTest {
     @Mock
     private SessionCategoryMapService sessionCategoryMaps;
 
+    @Mock
+    private SscsCaseData sscsCaseData;
+
     @MockitoBean
     private IdamService idamService;
 
@@ -227,7 +230,7 @@ class HearingsServiceRetryTest {
             .build();
 
         assertThatNoException()
-            .isThrownBy(() -> hearingsService.processHearingRequest(hearingRequest));
+            .isThrownBy(() -> hearingsService.processHearingRequest(hearingRequest, sscsCaseData));
 
         verify(ccdCaseService, times(2))
             .updateCaseData(
@@ -269,7 +272,7 @@ class HearingsServiceRetryTest {
             .build();
 
         assertThatExceptionOfType(ExhaustedRetryException.class)
-            .isThrownBy(() -> hearingsService.processHearingRequest(hearingRequest));
+            .isThrownBy(() -> hearingsService.processHearingRequest(hearingRequest, sscsCaseData));
 
         verify(ccdCaseService, times(3))
             .updateCaseData(

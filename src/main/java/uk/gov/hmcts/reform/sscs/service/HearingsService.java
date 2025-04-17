@@ -73,7 +73,7 @@ public class HearingsService {
             retryFor = UpdateCaseException.class,
             maxAttemptsExpression = "${retry.hearing-response-update.max-retries}",
             backoff = @Backoff(delayExpression = "${retry.hearing-response-update.backoff}"))
-    public void processHearingRequest(HearingRequest hearingRequest) throws UnhandleableHearingStateException,
+    public void processHearingRequest(HearingRequest hearingRequest, SscsCaseData caseData) throws UnhandleableHearingStateException,
             UpdateCaseException, ListingException {
         log.info("Processing Hearing Request for Case ID {}, Hearing State {} and Route {} and Cancellation Reason {}",
                 hearingRequest.getCcdCaseId(),
@@ -81,7 +81,7 @@ public class HearingsService {
                 hearingRequest.getHearingRoute(),
                 hearingRequest.getCancellationReason());
 
-        processHearingWrapper(createWrapper(hearingRequest));
+        processHearingWrapper(createWrapper(hearingRequest, caseData));
     }
 
     public void processHearingWrapper(HearingWrapper wrapper)
@@ -282,7 +282,7 @@ public class HearingsService {
         throw new ExhaustedRetryException("Cancellation request Response received, rethrowing exception", exception);
     }
 
-    private HearingWrapper createWrapper(HearingRequest hearingRequest) throws UnhandleableHearingStateException {
+    private HearingWrapper createWrapper(HearingRequest hearingRequest, SscsCaseData caseData) throws UnhandleableHearingStateException {
         if (isNull(hearingRequest.getHearingState())) {
             UnhandleableHearingStateException err = new UnhandleableHearingStateException();
             log.error(err.getMessage(), err);
@@ -300,7 +300,7 @@ public class HearingsService {
         SscsCaseDetails sscsCaseDetails = ccdCaseService.getStartEventResponse(Long.parseLong(hearingRequest.getCcdCaseId()), eventType);
 
         return HearingWrapper.builder()
-                .caseData(sscsCaseDetails.getData())
+                .caseData(caseData)
                 .eventId(sscsCaseDetails.getEventId())
                 .eventToken(sscsCaseDetails.getEventToken())
                 .caseState(State.getById(sscsCaseDetails.getState()))

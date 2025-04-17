@@ -204,7 +204,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()),
                 any(), eq(DocumentType.DECISION_NOTICE), any(), any(), eq(null), eq(null));
-        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()),
+        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(sscsCaseData),
                 eq(CancellationReason.STRUCK_OUT));
         verifyNoMoreInteractions(hearingMessageHelper);
     }

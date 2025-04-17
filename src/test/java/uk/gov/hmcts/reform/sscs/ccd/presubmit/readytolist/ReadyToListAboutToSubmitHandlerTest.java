@@ -138,7 +138,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
     @Test
     public void givenAnRpcUsingListAssist_shouldSuccessfullySendAHearingRequestMessage() {
         buildRegionalProcessingCentreMap(HearingRoute.LIST_ASSIST);
-        when(hearingsMessageService.sendMessage(any())).thenReturn(true);
+        when(hearingsMessageService.sendMessage(any(), any())).thenReturn(true);
 
         handler = new ReadyToListAboutToSubmitHandler(true, regionalProcessingCenterService,
             hearingMessagingServiceFactory);
@@ -160,7 +160,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
     @Test
     public void givenAnIbcCase_shouldSuccessfullySendAHearingRequestMessageWithListAssist() {
         buildRegionalProcessingCentreMap(HearingRoute.LIST_ASSIST);
-        when(hearingsMessageService.sendMessage(any())).thenReturn(true);
+        when(hearingsMessageService.sendMessage(any(),any())).thenReturn(true);
 
         handler = new ReadyToListAboutToSubmitHandler(true, regionalProcessingCenterService,
             hearingMessagingServiceFactory);
@@ -180,7 +180,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
     @Test
     public void givenAnRpcUsingListAssistAndAnExistingGapsCase_shouldResolveToGaps() {
         buildRegionalProcessingCentreMap(HearingRoute.LIST_ASSIST);
-        when(hearingsMessageService.sendMessage(any())).thenReturn(true);
+        when(hearingsMessageService.sendMessage(any(),any())).thenReturn(true);
 
         handler = new ReadyToListAboutToSubmitHandler(true, regionalProcessingCenterService,
             hearingMessagingServiceFactory);
@@ -211,7 +211,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
     @Test
     public void givenAnRpcUsingListAssist_shouldAddErrorIfMessageFailedToSend() {
         buildRegionalProcessingCentreMap(HearingRoute.LIST_ASSIST);
-        when(hearingsMessageService.sendMessage(any())).thenReturn(false);
+        when(hearingsMessageService.sendMessage(any(),any())).thenReturn(false);
 
         handler = new ReadyToListAboutToSubmitHandler(true, regionalProcessingCenterService,
             hearingMessagingServiceFactory);
@@ -236,7 +236,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
     @Test
     public void givenAnRpcUsingListAssistButFeatureDisabled_shouldDoNothing() {
         buildRegionalProcessingCentreMap(HearingRoute.LIST_ASSIST);
-        when(hearingsMessageService.sendMessage(any())).thenReturn(true);
+        when(hearingsMessageService.sendMessage(any(),any())).thenReturn(true);
 
         handler = new ReadyToListAboutToSubmitHandler(false, regionalProcessingCenterService,
             hearingMessagingServiceFactory);
@@ -372,7 +372,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
         verify(hearingsMessageService).sendMessage(HearingRequest.builder(CASE_ID)
             .hearingRoute(HearingRoute.LIST_ASSIST)
             .hearingState(HearingState.CREATE_HEARING)
-            .build());
+            .build(), sscsCaseData);
     }
 
     private void buildRegionalProcessingCentreMap(HearingRoute route) {

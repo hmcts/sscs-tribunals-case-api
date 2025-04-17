@@ -150,7 +150,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
     private void cancelHearing(SscsCaseData sscsCaseData) {
         log.info("Action postponement request: Sending cancel hearing request for case {}", sscsCaseData
             .getCcdCaseId());
-        hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(),
+        hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), sscsCaseData,
             CancellationReason.OTHER);
     }
 
