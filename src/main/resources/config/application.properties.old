@@ -78,7 +78,8 @@ documents.welsh.DIRECTION_ISSUED=TB-SCS-GNO-ENG-directions-notice-v2.docx
 documents.welsh.SOR_WRITE=TB-SCS-GNO-ENG-sor-directions-notice-v2.docx
 documents.welsh.DECISION_ISSUED=TB-SCS-GNO-ENG-draft-decision-notice-v2.docx
 documents.welsh.ISSUE_FINAL_DECISION=TB-SCS-GNO-ENG-final-decision-notice-v2.docx
-document.bilingual.notice.template=TB-SCS-GNO-WEL-00473.docx
+
+document.bilingual.notice.template=TB-SCS-GNO-WEL-00473-v2.docx
 
 evidence.english.template=TB-SCS-GNO-ENG-00012.docx
 evidence.english.hmctsImgVal="[userImage:hmcts.png]"
