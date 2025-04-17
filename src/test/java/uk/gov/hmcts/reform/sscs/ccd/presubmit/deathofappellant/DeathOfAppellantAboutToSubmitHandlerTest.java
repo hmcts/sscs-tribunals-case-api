@@ -127,7 +127,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
         assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION, response.getData().getInterlocReviewState());
         assertNull(response.getData().getDwpUcb());
-        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()),
+        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(sscsCaseData),
                 eq(CancellationReason.PARTY_UNABLE_TO_ATTEND));
         verifyNoMoreInteractions(hearingMessageHelper);
     }

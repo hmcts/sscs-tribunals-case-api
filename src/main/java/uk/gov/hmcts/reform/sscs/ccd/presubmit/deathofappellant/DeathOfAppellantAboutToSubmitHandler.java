@@ -123,7 +123,7 @@ public class DeathOfAppellantAboutToSubmitHandler implements PreSubmitCallbackHa
         if (eligibleForHearingsCancel.test(callback)) {
             log.info("Death of appellant: HearingRoute ListAssist Case ({}). Sending cancellation message",
                     sscsCaseData.getCcdCaseId());
-            hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(),
+            hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), sscsCaseData,
                     CancellationReason.PARTY_UNABLE_TO_ATTEND);
         }
     }

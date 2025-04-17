@@ -18,7 +18,10 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
+import uk.gov.hmcts.reform.sscs.service.CcdCaseService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
@@ -29,6 +32,11 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
     private boolean gapsSwitchOverFeature;
 
     private final ListAssistHearingMessageHelper listAssistHearingMessageHelper;
+    private final CcdCaseService ccdCaseService;
+    private final CcdService ccdService;
+
+    private final UpdateCcdCaseService updateCcdCaseService;
+
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -92,6 +100,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
             boolean messageSuccess = listAssistHearingMessageHelper.sendHearingMessage(
                 caseId,
+                callback.getCaseDetails().getCaseData(),
                 hearingRoute,
                 hearingState,
                 null);

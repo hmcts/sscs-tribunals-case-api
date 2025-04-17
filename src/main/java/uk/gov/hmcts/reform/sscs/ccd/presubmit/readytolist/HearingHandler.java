@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.sscs.model.servicebus.SessionAwareMessagingService;
 
 @Slf4j
 public enum HearingHandler {
+
     GAPS {
         @Override
         public PreSubmitCallbackResponse<SscsCaseData> handle(SscsCaseData sscsCaseData, boolean gapsSwitchOverFeature,
@@ -48,7 +49,7 @@ public enum HearingHandler {
                     HearingRequest.builder(sscsCaseData.getCcdCaseId())
                     .hearingRoute(hearingRoute)
                     .hearingState(hearingState)
-                    .build()
+                    .build(), callbackResponse.getData()
                 );
 
                 if (!messageSuccess) {

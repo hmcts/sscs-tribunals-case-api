@@ -285,7 +285,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(),
+        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), sscsCaseData,
             CancellationReason.OTHER);
         verifyNoMoreInteractions(hearingMessageHelper);
     }

@@ -150,7 +150,7 @@ public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.WITHDRAWN));
+        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(sscsCaseData), eq(CancellationReason.WITHDRAWN));
     }
 
     @Test

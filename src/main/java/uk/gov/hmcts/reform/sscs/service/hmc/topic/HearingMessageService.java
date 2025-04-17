@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
 import uk.gov.hmcts.reform.sscs.model.servicebus.SessionAwareMessagingService;
 import uk.gov.hmcts.reform.sscs.model.servicebus.SessionAwareRequest;
@@ -24,17 +25,16 @@ public class HearingMessageService implements SessionAwareMessagingService {
     private final HearingMessageServiceListener hearingMessageServiceListener;
 
     @Override
-    public boolean sendMessage(SessionAwareRequest message) {
+    public boolean sendMessage(SessionAwareRequest message, SscsCaseData sscsCaseData) {
         try {
             var json = objectMapper.writeValueAsString(message);
             var hearingRequest = objectMapper.readValue(json, HearingRequest.class);
 
-            hearingMessageServiceListener.handleIncomingMessage(hearingRequest);
+            hearingMessageServiceListener.handleIncomingMessage(hearingRequest, sscsCaseData);
             return true;
         } catch (Exception ex) {
             log.error("Unable to send message {}. Cause: {}", message, ex.getMessage(), ex);
             return false;
         }
-
     }
 }

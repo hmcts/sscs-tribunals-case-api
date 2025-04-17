@@ -163,7 +163,7 @@ public class ResendToGapsAboutToSubmitHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(hearingMessageHelper, atLeastOnce()).sendListAssistCancelHearingMessage("1234", CancellationReason.OTHER);
+        verify(hearingMessageHelper, atLeastOnce()).sendListAssistCancelHearingMessage("1234", sscsCaseData, CancellationReason.OTHER);
     }
 
     @Test
@@ -173,7 +173,7 @@ public class ResendToGapsAboutToSubmitHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(hearingMessageHelper, never()).sendListAssistCancelHearingMessage("1234", CancellationReason.OTHER);
+        verify(hearingMessageHelper, never()).sendListAssistCancelHearingMessage("1234", sscsCaseData, CancellationReason.OTHER);
     }
 
     @Test
@@ -183,6 +183,6 @@ public class ResendToGapsAboutToSubmitHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(hearingMessageHelper, never()).sendListAssistCancelHearingMessage("1234", CancellationReason.OTHER);
+        verify(hearingMessageHelper, never()).sendListAssistCancelHearingMessage("1234", sscsCaseData, CancellationReason.OTHER);
     }
 }

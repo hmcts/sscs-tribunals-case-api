@@ -130,7 +130,7 @@ public class TribunalsHearingsEventTopicListenerV2ItTest {
             + "  \"hearingRoute\": \"listAssist\",\n"
             + "  \"hearingState\": \"adjournCreateHearing\"\n"
             + "}\n";
-        hearingMessageServiceListener.handleIncomingMessage(deserialize(message));
+        hearingMessageServiceListener.handleIncomingMessage(deserialize(message), any(SscsCaseData.class));
 
         verify(ccdCaseService, never()).updateCaseData(any(), any(), any());
 

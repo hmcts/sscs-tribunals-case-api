@@ -52,6 +52,9 @@ class TribunalsHearingsEventTopicListenerTest {
     @Mock
     private IdamService idamService;
 
+    @Mock
+    private SscsCaseData sscsCaseData;
+
     private static final String CASE_ID = "1001";
 
     @Test
@@ -59,9 +62,9 @@ class TribunalsHearingsEventTopicListenerTest {
     void whenAValidRequestComesIn_makeSureProcessHearingRequestIsHit() throws Exception {
         HearingRequest hearingRequest = createHearingRequest();
 
-        hearingMessageServiceListener.handleIncomingMessage(hearingRequest);
+        hearingMessageServiceListener.handleIncomingMessage(hearingRequest, sscsCaseData);
 
-        verify(hearingsService, times(1)).processHearingRequest((hearingRequest));
+        verify(hearingsService, times(1)).processHearingRequest((hearingRequest), sscsCaseData);
     }
 
     @ParameterizedTest
@@ -70,9 +73,9 @@ class TribunalsHearingsEventTopicListenerTest {
     void whenAnInvalidRequestComesIn_makeSureExceptionIsThrown(Class<? extends Throwable> throwable) throws Exception {
         HearingRequest hearingRequest = new HearingRequest();
 
-        doThrow(throwable).when(hearingsService).processHearingRequest(hearingRequest);
+        doThrow(throwable).when(hearingsService).processHearingRequest(hearingRequest, sscsCaseData);
 
-        assertThrows(TribunalsEventProcessingException.class, () -> hearingMessageServiceListener.handleIncomingMessage(hearingRequest));
+        assertThrows(TribunalsEventProcessingException.class, () -> hearingMessageServiceListener.handleIncomingMessage(hearingRequest, sscsCaseData));
     }
 
     private static Stream<Arguments> throwableParameters() {
@@ -85,7 +88,7 @@ class TribunalsHearingsEventTopicListenerTest {
     @Test
     @DisplayName("When an null request comes in make sure exception is thrown")
     void whenAnNullRequestComesIn_makeSureExceptionIsThrown() {
-        assertThrows(TribunalsEventProcessingException.class, () -> hearingMessageServiceListener.handleIncomingMessage(null));
+        assertThrows(TribunalsEventProcessingException.class, () -> hearingMessageServiceListener.handleIncomingMessage(null, null));
     }
 
     private HearingRequest createHearingRequest() {
@@ -104,7 +107,7 @@ class TribunalsHearingsEventTopicListenerTest {
 
         doThrow(ListingException.class)
                 .when(hearingsService)
-                .processHearingRequest(hearingRequest);
+                .processHearingRequest(hearingRequest, sscsCaseData);
 
         when(updateCcdCaseService.triggerCaseEventV2(
                 1001L,
@@ -115,6 +118,6 @@ class TribunalsHearingsEventTopicListenerTest {
         )).thenReturn(caseDetails);
 
         verifyNoInteractions(ccdCaseService);
-        assertDoesNotThrow(() -> hearingMessageServiceListener.handleIncomingMessage(hearingRequest));
+        assertDoesNotThrow(() -> hearingMessageServiceListener.handleIncomingMessage(hearingRequest, sscsCaseData));
     }
 }

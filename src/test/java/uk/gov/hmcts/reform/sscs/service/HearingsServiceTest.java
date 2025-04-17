@@ -131,6 +131,9 @@ class HearingsServiceTest {
     @Mock
     private Consumer<SscsCaseDetails> sscsCaseDetailsConsumer;
 
+    @Mock
+    private SscsCaseData sscsCaseData;
+
     @Captor
     private ArgumentCaptor<Consumer<SscsCaseDetails>> caseDataConsumerCaptor;
 
@@ -183,10 +186,9 @@ class HearingsServiceTest {
         names = {"UPDATED_CASE","PARTY_NOTIFIED"})
     void processHearingRequest(HearingState state) {
         given(ccdCaseService.getStartEventResponse(eq(CASE_ID), any())).willReturn(expectedCaseDetails);
-
         request.setHearingState(state);
         assertThatNoException()
-                .isThrownBy(() -> hearingsService.processHearingRequest(request));
+                .isThrownBy(() -> hearingsService.processHearingRequest(request, sscsCaseData));
     }
 
     @DisplayName("When wrapper with a valid Hearing State and Cancellation reason is given addHearingResponse should run without error")
@@ -197,7 +199,7 @@ class HearingsServiceTest {
         request.setHearingState(UPDATED_CASE);
         request.setCancellationReason(OTHER);
         assertThatNoException()
-            .isThrownBy(() -> hearingsService.processHearingRequest(request));
+            .isThrownBy(() -> hearingsService.processHearingRequest(request, sscsCaseData));
     }
 
     @DisplayName("When wrapper with a invalid Hearing State is given addHearingResponse should throw an Unhandled HearingState error")
@@ -206,7 +208,7 @@ class HearingsServiceTest {
     void processHearingRequestInvalidState(HearingState state) {
         request.setHearingState(state);
 
-        UnhandleableHearingStateException thrown = assertThrows(UnhandleableHearingStateException.class, () -> hearingsService.processHearingRequest(request));
+        UnhandleableHearingStateException thrown = assertThrows(UnhandleableHearingStateException.class, () -> hearingsService.processHearingRequest(request, sscsCaseData));
 
         assertThat(thrown.getMessage()).isNotEmpty();
     }

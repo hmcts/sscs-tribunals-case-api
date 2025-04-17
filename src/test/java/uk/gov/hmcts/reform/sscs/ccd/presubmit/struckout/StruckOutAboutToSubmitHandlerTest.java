@@ -105,7 +105,7 @@ public class StruckOutAboutToSubmitHandlerTest {
         assertThat(response.getData().getDirectionDueDate(), is(nullValue()));
         assertThat(response.getData().getPreviousState(), is(HEARING));
         assertThat(response.getData().getDwpState(), is(DwpState.STRIKE_OUT_ACTIONED));
-        verify(listAssistHearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()),
+        verify(listAssistHearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(sscsCaseData),
                 eq(CancellationReason.STRUCK_OUT));
         verifyNoMoreInteractions(listAssistHearingMessageHelper);
     }
