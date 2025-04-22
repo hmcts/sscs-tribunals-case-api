@@ -52,10 +52,9 @@ class TribunalsHearingsEventTopicListenerTest {
     @Mock
     private IdamService idamService;
 
-    @Mock
-    private SscsCaseData sscsCaseData;
-
     private static final String CASE_ID = "1001";
+
+    private final SscsCaseData sscsCaseData = SscsCaseData.builder().build();
 
     @Test
     @DisplayName("When a valid request comes in make sure processHearingRequest is hit")

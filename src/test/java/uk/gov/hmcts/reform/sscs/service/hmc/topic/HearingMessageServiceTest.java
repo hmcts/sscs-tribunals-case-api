@@ -23,12 +23,11 @@ public class HearingMessageServiceTest {
     @Mock
     private HearingMessageServiceListener hearingMessageServiceListener;
 
-    @Mock
-    private SscsCaseData sscsCaseData;
-
     private HearingRequest hearingRequest;
 
     private HearingMessageService hearingMessageService;
+
+    private SscsCaseData sscsCaseData;
 
     @BeforeEach
     public void setUp() {

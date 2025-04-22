@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SessionCategory;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.exception.GetCaseException;
 import uk.gov.hmcts.reform.sscs.exception.TribunalsEventProcessingException;
@@ -95,8 +96,6 @@ public class TribunalsHearingsEventTopicListenerV2ItTest {
     private HmcHearingApi hearingApi;
     @MockitoBean
     private UpdateCcdCaseService updateCcdCaseService;
-    @MockitoBean
-    private SscsCaseData sscsCaseData;
 
     @Test
     public void testHearingsUpdateCaseV2() throws UpdateCaseException, TribunalsEventProcessingException, GetCaseException {
@@ -105,7 +104,6 @@ public class TribunalsHearingsEventTopicListenerV2ItTest {
                 idamService);
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
-        when(ccdCaseService.getStartEventResponse(anyLong(), any())).thenReturn(createSscsCaseDetails());
         when(hearingApi.getHearingsRequest(any(), any(), any(), any(), any(), any(), any()))
             .thenReturn(HearingsGetResponse.builder().build());
 
@@ -131,6 +129,7 @@ public class TribunalsHearingsEventTopicListenerV2ItTest {
             + "  \"hearingRoute\": \"listAssist\",\n"
             + "  \"hearingState\": \"adjournCreateHearing\"\n"
             + "}\n";
+
         hearingMessageServiceListener.handleIncomingMessage(deserialize(message), createSscsCaseDetails().getData());
 
         verify(ccdCaseService, never()).updateCaseData(any(), any(), any());
@@ -147,6 +146,7 @@ public class TribunalsHearingsEventTopicListenerV2ItTest {
                 .processingVenue(PROCESSING_VENUE_1)
                 .benefitCode(BENEFIT_CODE)
                 .issueCode(ISSUE_CODE)
+                .state(State.READY_TO_LIST)
                 .appeal(
                     Appeal.builder().appellant(
                             Appellant.builder()

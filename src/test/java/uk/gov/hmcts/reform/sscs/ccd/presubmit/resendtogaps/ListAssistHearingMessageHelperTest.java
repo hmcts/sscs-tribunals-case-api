@@ -35,8 +35,7 @@ public class ListAssistHearingMessageHelperTest {
     @InjectMocks
     private ListAssistHearingMessageHelper messageHelper;
 
-    @Mock
-    private SscsCaseData sscsCaseData;
+    private final SscsCaseData sscsCaseData = SscsCaseData.builder().build();
 
     private static final String CCD_CASE_ID = "1234";
 

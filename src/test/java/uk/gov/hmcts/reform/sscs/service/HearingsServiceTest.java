@@ -96,13 +96,10 @@ class HearingsServiceTest {
 
     private HearingWrapper wrapper;
     private HearingRequest request;
-    private SscsCaseDetails expectedCaseDetails;
+    private SscsCaseData sscsCaseData;
 
     @Mock
     private HmcHearingApiService hmcHearingApiService;
-
-    @Mock
-    private CcdCaseService ccdCaseService;
 
     @Mock
     private ReferenceDataServiceHolder refData;
@@ -130,9 +127,6 @@ class HearingsServiceTest {
 
     @Mock
     private Consumer<SscsCaseDetails> sscsCaseDetailsConsumer;
-
-    @Mock
-    private SscsCaseData sscsCaseData;
 
     @Captor
     private ArgumentCaptor<Consumer<SscsCaseDetails>> caseDataConsumerCaptor;
@@ -171,12 +165,6 @@ class HearingsServiceTest {
                 .hearingState(CREATE_HEARING)
                 .hearingRoute(LIST_ASSIST)
                 .build();
-
-        expectedCaseDetails = SscsCaseDetails.builder()
-            .data(SscsCaseData.builder()
-                .ccdCaseId(String.valueOf(CASE_ID))
-                .build())
-            .build();
     }
 
     @DisplayName("When wrapper with a valid Hearing State is given addHearingResponse should run without error")

@@ -10,7 +10,6 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getHmcHearingType;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -18,25 +17,15 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
-import uk.gov.hmcts.reform.sscs.service.CcdCaseService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-    @Value("${feature.gaps-switchover.enabled}")
-    private boolean gapsSwitchOverFeature;
 
     private final ListAssistHearingMessageHelper listAssistHearingMessageHelper;
-    private final CcdCaseService ccdCaseService;
-    private final CcdService ccdService;
-
-    private final UpdateCcdCaseService updateCcdCaseService;
-
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -87,8 +76,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
         State state = callback.getCaseDetails().getState();
         HearingRoute hearingRoute = caseDataSnlFields.getHearingRoute();
-        if (gapsSwitchOverFeature
-            && state == State.READY_TO_LIST
+        if (state == State.READY_TO_LIST
             && hearingRoute == LIST_ASSIST
             && nonNull(caseDataSnlFields.getOverrideFields())) {
             String caseId = sscsCaseData.getCcdCaseId();

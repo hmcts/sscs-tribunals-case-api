@@ -26,7 +26,6 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
@@ -92,28 +91,11 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     }
 
     @Test
-    void handleUpdateListingRequirementsNonGapsSwitchOverFeature() {
+    void handleUpdateListingRequirementsSendSuccessful() {
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
         given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
-        ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", false);
-        sscsCaseData = CaseDataUtils.buildCaseData();
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-            ABOUT_TO_SUBMIT,
-            callback,
-            USER_AUTHORISATION);
-
-        assertTrue(response.getErrors().isEmpty());
-    }
-
-    @Test
-    void handleUpdateListingRequirementsGapsSwitchOverFeatureSendSuccessful() {
-        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
-        ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
         sscsCaseData = CaseDataUtils.buildCaseData();
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
@@ -138,12 +120,11 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     }
 
     @Test
-    void handleUpdateListingRequirementsGapsSwitchOverFeatureSendUnsuccessful() {
+    void handleUpdateListingRequirementsSendUnsuccessful() {
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
         given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
-        ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
         sscsCaseData = CaseDataUtils.buildCaseData();
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
@@ -166,12 +147,11 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     }
 
     @Test
-    void handleUpdateListingRequirementsGapsSwitchOverFeatureNoOverrides() {
+    void handleUpdateListingRequirementsNoOverrides() {
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
         given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
-        ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
         sscsCaseData = CaseDataUtils.buildCaseData();
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
             ABOUT_TO_SUBMIT,
@@ -182,12 +162,11 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     }
 
     @Test
-    void handleUpdateListingRequirementsGapsSwitchOverFeatureWrongState() {
+    void handleUpdateListingRequirementsWrongState() {
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
         given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
-        ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
         sscsCaseData = CaseDataUtils.buildCaseData();
 
         given(caseDetails.getState()).willReturn(State.UNKNOWN);
