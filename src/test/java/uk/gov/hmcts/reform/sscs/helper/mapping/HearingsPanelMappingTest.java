@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.TRIBUNALS_MEMBER_FINANCIALLY_QUALIFIED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.TRIBUNALS_MEMBER_MEDICAL;
 
 import java.util.Collections;
 import java.util.List;
@@ -42,6 +44,7 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
     public static final String JUDGE_ROLE_TYPE = "64";
     public static final String JUDGE_ID_JUDGE_ROLE_TYPE = JUDGE_ID + "|" + JUDGE_ROLE_TYPE;
     public static final String IIDB_BENEFIT_CODE = "067";
+    public static final String IBCA_BENEFIT_CODE = "093";
     public static final String JUDGE_JOH_CODE = "84";
     @Mock
     private SessionCategoryMapService sessionCategoryMaps;
@@ -84,7 +87,30 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
         caseData.setBenefitCode(IIDB_BENEFIT_CODE);
         when(refData.getSessionCategoryMaps()).thenReturn(sessionCategoryMaps);
         PanelRequirements result = hearingsPanelMapping.getPanelRequirements(caseData, refData);
-        assertThat(result.getRoleTypes()).contains(PanelMemberType.TRIBUNALS_MEMBER_MEDICAL.getReference());
+        assertThat(result.getRoleTypes()).contains(TRIBUNALS_MEMBER_MEDICAL.getReference());
+    }
+
+    @DisplayName("getRoleTypes returns TRIBUNALS_MEMBER_MEDICAL and TRIBUNALS_MEMBER_FINANCIALLY_QUALIFIED when benefit is IBA and feature flag is disabled")
+    @Test
+    void shouldReturnTribunalsMemberMedicalAndFinancialWhenBenefitIsInfectedBlood() {
+        ReflectionTestUtils.setField(hearingsPanelMapping, "defaultPanelCompEnabled", false);
+        caseData.setBenefitCode(IBCA_BENEFIT_CODE);
+        when(refData.getSessionCategoryMaps()).thenReturn(sessionCategoryMaps);
+        PanelRequirements result = hearingsPanelMapping.getPanelRequirements(caseData, refData);
+        assertThat(result.getRoleTypes()).contains(TRIBUNALS_MEMBER_MEDICAL.getReference());
+        assertThat(result.getRoleTypes()).contains(TRIBUNALS_MEMBER_FINANCIALLY_QUALIFIED.getReference());
+    }
+
+    @DisplayName("getRoleTypes returns TRIBUNALS_MEMBER_MEDICAL and TRIBUNALS_MEMBER_FINANCIALLY_QUALIFIED when benefit is IBA and feature flag is enabled")
+    @Test
+    void shouldReturnTribunalsMemberMedicalAndFinancialWhenBenefitIsInfectedBloodAndFeatureFlagEnabled() {
+        ReflectionTestUtils.setField(hearingsPanelMapping, "defaultPanelCompEnabled", true);
+        caseData.setBenefitCode(IBCA_BENEFIT_CODE);
+        when(refData.getSessionCategoryMaps()).thenReturn(sessionCategoryMaps);
+        when(panelCategoryService.getRoleTypes(caseData)).thenReturn(List.of(TRIBUNALS_MEMBER_MEDICAL.getReference(), TRIBUNALS_MEMBER_FINANCIALLY_QUALIFIED.getReference()));
+        PanelRequirements result = hearingsPanelMapping.getPanelRequirements(caseData, refData);
+        assertThat(result.getRoleTypes()).contains(TRIBUNALS_MEMBER_MEDICAL.getReference());
+        assertThat(result.getRoleTypes()).contains(TRIBUNALS_MEMBER_FINANCIALLY_QUALIFIED.getReference());
     }
 
     @DisplayName("HearingsPanelMapping should call panelCategoryService and return role types when feature flag is enabled")

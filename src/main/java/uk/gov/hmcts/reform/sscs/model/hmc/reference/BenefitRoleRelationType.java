@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.model.hmc.reference;
 
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.IIDB;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.INFECTED_BLOOD_COMPENSATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.TRIBUNALS_MEMBER_FINANCIALLY_QUALIFIED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.TRIBUNALS_MEMBER_MEDICAL;
 
@@ -18,7 +19,8 @@ import lombok.RequiredArgsConstructor;
 public enum BenefitRoleRelationType {
 
     INDUSTRIAL_INJURIES_DISABLEMENT_BENEFIT(IIDB.getBenefitCode(), Arrays.asList(TRIBUNALS_MEMBER_MEDICAL.getReference())),
-    CHILD_SUPPORT_BENEFIT(CHILD_SUPPORT.getBenefitCode(), Arrays.asList(TRIBUNALS_MEMBER_FINANCIALLY_QUALIFIED.getReference()));
+    CHILD_SUPPORT_BENEFIT(CHILD_SUPPORT.getBenefitCode(), Arrays.asList(TRIBUNALS_MEMBER_FINANCIALLY_QUALIFIED.getReference())),
+    INFECTED_BLOOD_COMPENSATION_APPEAL(INFECTED_BLOOD_COMPENSATION.getBenefitCode(), Arrays.asList(TRIBUNALS_MEMBER_FINANCIALLY_QUALIFIED.getReference(), TRIBUNALS_MEMBER_MEDICAL.getReference()));
 
     @JsonValue
     private final String benefitCode;
