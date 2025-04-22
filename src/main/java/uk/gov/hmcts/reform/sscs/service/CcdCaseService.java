@@ -22,8 +22,6 @@ import uk.gov.hmcts.reform.sscs.exception.GetCaseException;
 import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.model.HearingEvent;
-import uk.gov.hmcts.reform.sscs.model.HearingWrapper;
 
 @Slf4j
 @Service
@@ -67,31 +65,6 @@ public class CcdCaseService {
             throw exc;
         }
         return caseDetails;
-    }
-
-    public SscsCaseDetails getStartEventResponse(long caseId, EventType eventType) {
-        IdamTokens idamTokens = idamService.getIdamTokens();
-
-        return ccdService.getCaseForModification(caseId, idamTokens, eventType.getCcdType());
-    }
-
-    public SscsCaseDetails updateCaseData(SscsCaseData caseData, HearingWrapper wrapper, HearingEvent event)
-            throws UpdateCaseException {
-        long caseId = parseCaseId(caseData.getCcdCaseId());
-        IdamTokens idamTokens = idamService.getIdamTokens();
-
-        try {
-            String ccdType = event.getEventType().getCcdType();
-            log.info("Updating case id {} with ccdType {}", caseId, ccdType);
-            return ccdService.updateCase(caseData, caseId, wrapper.getEventId(), wrapper.getEventToken(),
-                    ccdType, event.getSummary(), event.getDescription(), idamTokens);
-        } catch (FeignException e) {
-            UpdateCaseException exc = new UpdateCaseException(
-                    String.format("The case with Case id: %s could not be updated with status %s, %s",
-                            caseId, e.status(), e));
-            log.error(exc.getMessage(), exc);
-            throw exc;
-        }
     }
 
     public SscsCaseDetails updateCaseData(SscsCaseData caseData, EventType event, String summary, String description)

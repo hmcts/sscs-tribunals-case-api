@@ -2,9 +2,7 @@ package uk.gov.hmcts.reform.sscs.jms.listener;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE;
@@ -131,8 +129,6 @@ public class TribunalsHearingsEventTopicListenerV2ItTest {
             + "}\n";
 
         hearingMessageServiceListener.handleIncomingMessage(deserialize(message), createSscsCaseDetails().getData());
-
-        verify(ccdCaseService, never()).updateCaseData(any(), any(), any());
 
         verify(updateCcdCaseService).updateCaseV2(
             eq(Long.parseLong(CASE_ID)), any(), any(), any(), any(), any());

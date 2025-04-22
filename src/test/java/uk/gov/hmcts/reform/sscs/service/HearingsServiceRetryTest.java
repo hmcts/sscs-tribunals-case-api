@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -72,9 +71,6 @@ class HearingsServiceRetryTest {
 
     @MockitoBean
     private HmcHearingApiService hmcHearingApiService;
-
-    @MockitoBean
-    private CcdCaseService ccdCaseService;
 
     @MockitoBean
     private ReferenceDataServiceHolder refData;
@@ -203,13 +199,6 @@ class HearingsServiceRetryTest {
         assertThatNoException()
             .isThrownBy(() -> hearingsService.processHearingRequest(hearingRequest, caseData));
 
-        verify(ccdCaseService, times(2))
-            .updateCaseData(
-                any(SscsCaseData.class),
-                eq(wrapper),
-                any(HearingEvent.class)
-            );
-
         verifyNoMoreInteractions(hmcHearingApiService);
     }
 
@@ -237,12 +226,5 @@ class HearingsServiceRetryTest {
 
         assertThatExceptionOfType(ExhaustedRetryException.class)
             .isThrownBy(() -> hearingsService.processHearingRequest(hearingRequest, caseData));
-
-        verify(ccdCaseService, times(3))
-            .updateCaseData(
-                any(SscsCaseData.class),
-                eq(wrapper),
-                any(HearingEvent.class)
-            );
     }
 }

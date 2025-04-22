@@ -430,7 +430,6 @@ class ProcessHmcMessageServiceTestV2 {
 
     void verifyUpdateCaseDataCalledCorrectlyForHmcStatus(CcdCaseService ccdCaseService, UpdateCcdCaseService updateCcdCaseService,
                                                          SscsCaseData caseData, HmcStatus hmcStatus, HearingGetResponse hearingGetResponse) throws UpdateCaseException {
-        verify(ccdCaseService, never()).updateCaseData(any(), any(), any());
         verify(updateCcdCaseService).updateCaseV2DynamicEvent(any(), any(), captor.capture());
 
         UpdateCcdCaseService.DynamicEventUpdateResult dynamicEventUpdateResult = captor.getValue().apply(SscsCaseDetails.builder().data(caseData).build());
