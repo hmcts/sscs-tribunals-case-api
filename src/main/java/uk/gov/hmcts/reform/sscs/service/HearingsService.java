@@ -75,7 +75,7 @@ public class HearingsService {
             backoff = @Backoff(delayExpression = "${retry.hearing-response-update.backoff}"))
     public void processHearingRequest(HearingRequest hearingRequest, SscsCaseData caseData) throws UnhandleableHearingStateException,
             UpdateCaseException, ListingException {
-        log.info("***************************HS: {}", caseData.getSchedulingAndListingFields().getAmendReasons());
+        log.info("***************************HS: {}", caseData.getSchedulingAndListingFields());
         log.info("Processing Hearing Request for Case ID {}, Hearing State {} and Route {} and Cancellation Reason {}",
                 hearingRequest.getCcdCaseId(),
                 hearingRequest.getHearingState(),
@@ -87,7 +87,7 @@ public class HearingsService {
 
     public void processHearingWrapper(HearingWrapper wrapper)
             throws UnhandleableHearingStateException, UpdateCaseException, ListingException {
-        log.info("***************************ProcessWrapper: {}", wrapper.getCaseData().getSchedulingAndListingFields().getAmendReasons());
+        log.info("***************************ProcessWrapper: {}", wrapper.getCaseData().getSchedulingAndListingFields());
         String caseId = wrapper.getCaseData().getCcdCaseId();
         log.info("Processing Hearing Wrapper for Case ID {}, Case State {} and Hearing State {}",
                 caseId,
@@ -299,7 +299,7 @@ public class HearingsService {
         EventType eventType = HearingsServiceHelper.getCcdEvent(hearingRequest.getHearingState());
         log.info("Getting case details with event {} {}", eventType, eventType.getCcdType());
         SscsCaseDetails sscsCaseDetails = ccdCaseService.getStartEventResponse(Long.parseLong(hearingRequest.getCcdCaseId()), eventType);
-        log.info("***************************CreateWrapper: {}", caseData.getSchedulingAndListingFields().getAmendReasons());
+        log.info("***************************CreateWrapper: {}", caseData.getSchedulingAndListingFields());
         return HearingWrapper.builder()
                 .caseData(caseData)
                 .eventId(sscsCaseDetails.getEventId())

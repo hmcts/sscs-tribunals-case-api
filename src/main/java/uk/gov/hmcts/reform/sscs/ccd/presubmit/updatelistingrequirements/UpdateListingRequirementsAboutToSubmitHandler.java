@@ -98,7 +98,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
             HearingState hearingState = UPDATE_HEARING;
 
-            log.info("***************************ULR: {}", callback.getCaseDetails().getCaseData().getSchedulingAndListingFields().getAmendReasons());
+            log.info("***************************ULR: {}", callback.getCaseDetails().getCaseData().getSchedulingAndListingFields());
 
             boolean messageSuccess = listAssistHearingMessageHelper.sendHearingMessage(
                 caseId,
