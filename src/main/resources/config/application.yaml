@@ -49,7 +49,9 @@ spring:
             abandon-when-percentage-full: 0
 
 springdoc:
-    packagesToScan: uk.gov.hmcts.reform.sscs.controller
+    packagesToScan: uk.gov.hmcts.reform.sscs.controller, uk.gov.hmcts.reform.sscs.bulkscan.controllers
+    api-docs:
+        path: /v3/api-docs
 
 subscriptions:
     mac:
@@ -123,6 +125,15 @@ core_case_data:
         url: ${CORE_CASE_DATA_API_URL:http://localhost:4452}
     caseTypeId: ${CORE_CASE_DATA_CASE_TYPE_ID:Benefit}
     jurisdictionId: ${CORE_CASE_DATA_JURISDICTION_ID:SSCS}
+ccd:
+    case:
+        jurisdiction: SSCS
+        type: Benefit
+        caseCreatedEventId: appealCreated
+        validAppealCreatedEventId: validAppealCreated
+        incompleteApplicationEventId: incompleteApplicationReceived
+        nonCompliantEventId: nonCompliant
+test.url: ${TEST_URL:http://localhost:8008}
 cover:
     english: TB-SCS-LET-ENG-Cover-Letter.docx
     welsh: TB-SCS-LET-WEL-Cover-Letter.docx
@@ -220,8 +231,10 @@ evidenceDescription:
             template:
                 path: /templates/evidenceDescriptionWelsh.html
 feature:
+    uc-office-feature:
+        enabled: ${UC_OFFICE_FEATURE:false}
     case-access-management:
-        enabled: ${CASE_ACCESS_MANAGEMENT_FEATURE:false}
+        enabled: ${CASE_ACCESS_MANAGEMENT_FEATURE:true}
     deleted-redacted-doc:
         enabled: ${DELETED_REDACTED_DOC_ENABLED:false}
     elasticsearch:
@@ -264,7 +277,8 @@ feature:
         enabled: ${HEARINGS_CASE_UPDATE_V2_ENABLED:false}
     fta-communication:
         enabled: ${FTA_COMMUNICATION_ENABLED:true}
-
+    default-panel-comp:
+        enabled: ${DEFAULT_PANEL_COMPOSITION_ENABLED:false}
 
 idam:
     api:
@@ -288,6 +302,7 @@ idam:
         url: ${IDAM_S2S_AUTH:http://localhost:4502}
     url: ${IDAM_API_URL:http://localhost:5062}
 
+allowed-services-for-callback : ccd_data,bulk_scan_processor,bulk_scan_orchestrator,sscs  # comma separated list of service names
 
 judicial-ref:
     api:
@@ -354,7 +369,12 @@ rpc:
     testScotlandPostcode: SC1 1CS
 security:
     authorisedRoles: citizen,caseworker-sscs-systemupdate,caseworker-sscs,caseworker-sscs-anonymouscitizen,caseworker-sscs-callagent,caseworker,caseworker-sscs-dwpresponsewriter,caseworker-sscs-judge,caseworker-sscs-panelmember,caseworker-sscs-registrar,caseworker-sscs-superuser,caseworker-sscs-teamleader,caseworker-sscs-clerk,caseworker-sscs-bulkscan
-
+validation:
+    titles: Cllr,Count,DC,Dr,DS,Insp,Lady,Lord,Miss,Mr & Mrs,Mr,Mrs,Ms,PC,Rev,S/M,Sgt
+postcode-validator:
+    url: ${POSTCODE_VALIDATOR_URL:https://api.postcodes.io/postcodes/{postcode}/validate}
+    enabled: ${POSTCODE_VALIDATOR_ENABLED:true}
+    test-postcodes: ${POSTCODE_VALIDATOR_TEST_POSTCODES:TS1 1ST, TS2 2ST, TS3 3ST}
 ############•••••TYA•••••############
 
 coh:
@@ -1734,6 +1754,8 @@ feign:
 # Document store
 document_management.url: ${DOCUMENT_MANAGEMENT_URL:http://dm-store:5005}
 
+schema.location: /config/schema/sscs-bulk-scan-schema.json
+
 appeal.email.host: ${EMAIL_SERVER_HOST:localhost}
 appeal.email.port: ${EMAIL_SERVER_PORT:1025}
 appeal.email.smtp.tls.enabled: ${EMAIL_SMTP_TLS_ENABLED:true}
@@ -2074,5 +2096,23 @@ job.scheduler:
                 instanceId: AUTO
             jobStore:
                 class: org.quartz.simpl.RAMJobStore
+---
+spring:
+    config:
+        activate:
+            on-profile: dev
+logging.level:
+    org.springframework.web: ${LOG_LEVEL_SPRING_WEB:debug}
+    uk.gov.hmcts.reform.sscs: ${LOG_LEVEL_SSCS:debug}
+    uk.gov.hmcts.reform.sscs.idam.IdamApiClient: DEBUG
+    uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi: DEBUG
+    uk.gov.hmcts.fortifyclient: INFO
 
+feign:
+    client:
+        config:
+            idam-api:
+                loggerLevel: full
+            core-case-data-api:
+                loggerLevel: full
 

@@ -10,6 +10,16 @@ test.describe('Enhanced confidentiality test', async () => {
     test.setTimeout(360000);
   });
 
+  test.afterEach(
+    'Cancel the hearings after test run',
+    async({ hearingSteps, enhancedConfidentialitySteps }, testInfo) => {
+      if(testInfo.title.includes("#executeTearDown")){
+        await enhancedConfidentialitySteps.loginAndNavigateToHearingsTab(caseId);
+        await hearingSteps.cancelHearingForCleanUp();
+      }
+    }
+  )
+
   test('Grant - Confidentiality request & verify bundle with redacted file', async ({
     uploadResponseSteps,
     enhancedConfidentialitySteps,
@@ -30,7 +40,7 @@ test.describe('Enhanced confidentiality test', async () => {
   });
 
   test(
-    'Refuse - confidentiality request for a party on a case',
+    'Refuse - confidentiality request for a party on a case #executeTearDown',
     { tag: ['@preview-regression', '@nightly-pipeline'] },
     async ({ uploadResponseSteps, enhancedConfidentialitySteps, request }) => {
       test.slow();
