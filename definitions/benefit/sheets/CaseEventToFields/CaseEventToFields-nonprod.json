@@ -21,7 +21,7 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "2.0",
     "PageShowCondition": "tribunalRequestType=\"newRequest\"",
-    "PageLabel": "Send a Tribunal Communication Request"
+    "PageLabel": "Send a Communication Request to the Tribunal"
   },
   {
     "LiveFrom": "18/03/2025",
@@ -35,16 +35,106 @@
   },
   {
     "CaseEventID": "tribunalCommunication",
-    "CaseFieldID": "ftaResponseDueDate",
+    "CaseFieldID": "tribunalRequestNoResponseRadioDl",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "selectTribunalRequest",
+    "PageShowCondition": "tribunalRequestType=\"replyToTribunalQuery\"",
+    "PageLabel": "Reply to Tribunal Query",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=selectTribunalRequest"
+  },
+  {
+    "CaseEventID": "tribunalCommunication",
+    "CaseFieldID": "tribunalRequestNoResponseQuery",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "replyToTribunalQuery",
+    "PageShowCondition": "tribunalRequestType=\"replyToTribunalQuery\"",
+    "PageLabel": "Write a reply to Tribunal Query",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=replyToTribunalQuery"
+  },
+  {
+    "CaseEventID": "tribunalCommunication",
+    "CaseFieldID": "tribunalRequestNoResponseTextArea",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "13/03/2025",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 1,
-    "PageID": "selectTribunalCommunicationAction",
-    "FieldShowCondition": "tribunalRequestType=\"DoNotShow\""
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "replyToTribunalQuery"
   },
-
+  {
+    "CaseEventID": "tribunalCommunication",
+    "CaseFieldID": "tribunalRequestNoResponseNoActionLabel",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 3,
+    "PageID": "replyToTribunalQuery"
+  },
+  {
+    "CaseEventID": "tribunalCommunication",
+    "CaseFieldID": "tribunalRequestNoResponseNoAction",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 4,
+    "PageID": "replyToTribunalQuery"
+  },
+  {
+    "CaseEventID": "tribunalCommunication",
+    "CaseFieldID": "tribunalRequestRespondedDl",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 5,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "selectTribunalReply",
+    "PageShowCondition": "tribunalRequestType=\"reviewTribunalReply\"",
+    "PageLabel": "Select a FTA request",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=selectTribunalReply"
+  },
+  {
+    "CaseEventID": "tribunalCommunication",
+    "CaseFieldID": "tribunalRequestRespondedQuery",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 6,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "reviewTribunalReply",
+    "PageShowCondition": "tribunalRequestType=\"reviewTribunalReply\"",
+    "PageLabel": "Review the Tribunal response",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=reviewTribunalReply"
+  },
+  {
+    "CaseEventID": "tribunalCommunication",
+    "CaseFieldID": "tribunalRequestRespondedReply",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 6,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "reviewTribunalReply"
+  },
+  {
+    "CaseEventID": "tribunalCommunication",
+    "CaseFieldID": "tribunalRequestRespondedActioned",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 6,
+    "PageFieldDisplayOrder": 3,
+    "PageID": "reviewTribunalReply"
+  },
   {
     "CaseEventID": "ftaCommunication",
     "CaseFieldID": "ftaRequestType",
@@ -59,17 +149,6 @@
   },
   {
     "CaseEventID": "ftaCommunication",
-    "CaseFieldID": "tribunalResponseDueDate",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "13/03/2025",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 1,
-    "PageID": "selectFtaCommunicationAction",
-    "FieldShowCondition": "ftaRequestType=\"DoNotShow\""
-  },
-  {
-    "CaseEventID": "ftaCommunication",
     "CaseFieldID": "ftaRequestTopic",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
@@ -78,7 +157,7 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "newFtaRequest",
     "PageShowCondition": "ftaRequestType=\"newRequest\"",
-    "PageLabel": "Send a FTA Communication Request"
+    "PageLabel": "Send a Communication Request to the FTA"
   },
   {
     "CaseEventID": "ftaCommunication",
@@ -147,59 +226,49 @@
     "PageID": "replyToFtaQuery"
   },
   {
-    "CaseEventID": "tribunalCommunication",
-    "CaseFieldID": "tribunalRequestNoResponseRadioDl",
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "ftaResponseNoActionedRadioDl",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
-    "LiveFrom": "13/03/2025",
-    "PageDisplayOrder": 3,
+    "LiveFrom": "14/04/2025",
+    "PageDisplayOrder": 5,
     "PageFieldDisplayOrder": 1,
-    "PageID": "selectTribunalRequest",
-    "PageShowCondition": "tribunalRequestType=\"replyToTribunalQuery\"",
-    "PageLabel": "Reply to Tribunal Query",
-    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=selectTribunalRequest"
+    "PageID": "selectFtaReply",
+    "PageShowCondition": "ftaRequestType=\"reviewFtaReply\"",
+    "PageLabel": "Select a Tribunal request",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=selectFtaReply"
   },
   {
-    "CaseEventID": "tribunalCommunication",
-    "CaseFieldID": "tribunalRequestNoResponseQuery",
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "ftaResponseNoActionedQuery",
     "CaseTypeID": "Benefit",
     "DisplayContext": "READONLY",
-    "LiveFrom": "13/03/2025",
-    "PageDisplayOrder": 4,
+    "LiveFrom": "14/04/2025",
+    "PageDisplayOrder": 6,
     "PageFieldDisplayOrder": 1,
-    "PageID": "replyToTribunalQuery",
-    "PageShowCondition": "tribunalRequestType=\"replyToTribunalQuery\"",
-    "PageLabel": "Write a reply to Tribunal Query",
-    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=replyToTribunalQuery"
+    "PageID": "reviewFtaReply",
+    "PageShowCondition": "ftaRequestType=\"reviewFtaReply\"",
+    "PageLabel": "Review the FTA response",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=reviewFtaReply"
   },
   {
-    "CaseEventID": "tribunalCommunication",
-    "CaseFieldID": "tribunalRequestNoResponseTextArea",
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "ftaResponseNoActionedReply",
     "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "13/03/2025",
-    "PageDisplayOrder": 4,
+    "DisplayContext": "READONLY",
+    "LiveFrom": "14/04/2025",
+    "PageDisplayOrder": 6,
     "PageFieldDisplayOrder": 2,
-    "PageID": "replyToTribunalQuery"
+    "PageID": "reviewFtaReply"
   },
   {
-    "CaseEventID": "tribunalCommunication",
-    "CaseFieldID": "tribunalRequestNoResponseNoActionLabel",
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "ftaResponseActioned",
     "CaseTypeID": "Benefit",
-    "DisplayContext": "READONLY",
-    "LiveFrom": "13/03/2025",
-    "PageDisplayOrder": 4,
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "14/04/2025",
+    "PageDisplayOrder": 6,
     "PageFieldDisplayOrder": 3,
-    "PageID": "replyToTribunalQuery"
-  },
-  {
-    "CaseEventID": "tribunalCommunication",
-    "CaseFieldID": "tribunalRequestNoResponseNoAction",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "13/03/2025",
-    "PageDisplayOrder": 4,
-    "PageFieldDisplayOrder": 4,
-    "PageID": "replyToTribunalQuery"
+    "PageID": "reviewFtaReply"
   }
 ]
