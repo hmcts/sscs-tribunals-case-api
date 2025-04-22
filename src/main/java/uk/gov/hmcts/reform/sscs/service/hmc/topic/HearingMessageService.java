@@ -31,6 +31,7 @@ public class HearingMessageService implements SessionAwareMessagingService {
             var hearingRequest = objectMapper.readValue(json, HearingRequest.class);
 
             hearingMessageServiceListener.handleIncomingMessage(hearingRequest, sscsCaseData);
+            log.info("***************************HMS: {}", sscsCaseData.getSchedulingAndListingFields().getAmendReasons());
             return true;
         } catch (Exception ex) {
             log.error("Unable to send message {}. Cause: {}", message, ex.getMessage(), ex);

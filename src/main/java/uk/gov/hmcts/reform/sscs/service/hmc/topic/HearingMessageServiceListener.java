@@ -45,6 +45,7 @@ public class HearingMessageServiceListener {
 
         log.info("Attempting to process hearing event {} from hearings event queue for case ID {}",
                 event, caseId);
+        log.info("***************************HML: {}", caseData.getSchedulingAndListingFields().getAmendReasons());
         try {
             hearingsService.processHearingRequest(message, caseData);
             log.info("Hearing event {} for case ID {} successfully processed", event, caseId);
