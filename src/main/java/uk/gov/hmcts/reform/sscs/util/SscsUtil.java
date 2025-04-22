@@ -715,5 +715,23 @@ public class SscsUtil {
             .reduce((first, second) -> second)
             .orElse(now);
     }
+
+    public static void setListAssistRoutes(SscsCaseData sscsCaseData) {
+        SchedulingAndListingFields schedulingAndListingFields = Optional.ofNullable(sscsCaseData.getSchedulingAndListingFields())
+            .orElse(SchedulingAndListingFields.builder().build());
+        schedulingAndListingFields.setHearingRoute(HearingRoute.LIST_ASSIST);
+        sscsCaseData.setSchedulingAndListingFields(schedulingAndListingFields);
+
+        RegionalProcessingCenter rpc = Optional.ofNullable(sscsCaseData.getRegionalProcessingCenter())
+            .orElse(RegionalProcessingCenter.builder().build());
+        sscsCaseData.setRegionalProcessingCenter(rpc.toBuilder().hearingRoute(HearingRoute.LIST_ASSIST).build());
+
+        Appeal appeal = Optional.ofNullable(sscsCaseData.getAppeal()).orElse(Appeal.builder().build());
+        HearingOptions hearingOptions = Optional.ofNullable(appeal.getHearingOptions())
+            .orElse(HearingOptions.builder().build());
+        hearingOptions.setHearingRoute(HearingRoute.LIST_ASSIST);
+        appeal.setHearingOptions(hearingOptions);
+        sscsCaseData.setAppeal(appeal);
+    }
 }
 

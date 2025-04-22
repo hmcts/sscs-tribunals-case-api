@@ -2,17 +2,20 @@ package uk.gov.hmcts.reform.sscs.helper.mapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 import java.util.Collections;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Issue;
@@ -29,6 +32,7 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.MemberType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelPreference;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
@@ -37,11 +41,24 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
     public static final String JUDGE_ID = "2000";
     public static final String JUDGE_ROLE_TYPE = "64";
     public static final String JUDGE_ID_JUDGE_ROLE_TYPE = JUDGE_ID + "|" + JUDGE_ROLE_TYPE;
+    public static final String IIDB_BENEFIT_CODE = "067";
+    public static final String JUDGE_JOH_CODE = "84";
     @Mock
     private SessionCategoryMapService sessionCategoryMaps;
 
     @Mock
     private ReferenceDataServiceHolder refData;
+
+    @Mock
+    private PanelCategoryService panelCategoryService;
+
+    private HearingsPanelMapping hearingsPanelMapping;
+
+    @BeforeEach
+    public void setUp() {
+        openMocks(this);
+        hearingsPanelMapping = new HearingsPanelMapping(panelCategoryService);
+    }
 
     @DisplayName("When no data is given getPanelRequirements returns the valid but empty PanelRequirements")
     @Test
@@ -50,7 +67,7 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
 
         SscsCaseData caseData = SscsCaseData.builder().build();
 
-        PanelRequirements result = HearingsPanelMapping.getPanelRequirements(caseData, refData);
+        PanelRequirements result = hearingsPanelMapping.getPanelRequirements(caseData, refData);
 
         assertThat(result).isNotNull();
         assertThat(result.getRoleTypes()).isEmpty();
@@ -60,26 +77,27 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
         assertThat(result.getPanelSpecialisms()).isEmpty();
     }
 
-    @DisplayName("getRoleTypes returns an empty list when benefit is not Industrial Injuries Disablement Benefit or CHILD_SUPPORT ")
+    @DisplayName("getRoleTypes returns TRIBUNALS_MEMBER_MEDICAL when benefit is IIDB and feature flag is disabled")
     @Test
-    void shouldReturn_EmptyRoleTypeList_When_Benefit_Not_industrialInjuriesDisablementBenefit_or_ChildSupport() {
-        List<String> result = HearingsPanelMapping.getRoleTypes(Benefit.ATTENDANCE_ALLOWANCE.getBenefitCode());
-        assertThat(result).isEmpty();
+    void shouldReturnTribunalsMemberMedicalWhenBenefitIsIndustrialInjuriesDisablementBenefit() {
+        ReflectionTestUtils.setField(hearingsPanelMapping, "defaultPanelCompEnabled", false);
+        caseData.setBenefitCode(IIDB_BENEFIT_CODE);
+        when(refData.getSessionCategoryMaps()).thenReturn(sessionCategoryMaps);
+        PanelRequirements result = hearingsPanelMapping.getPanelRequirements(caseData, refData);
+        assertThat(result.getRoleTypes()).contains(PanelMemberType.TRIBUNALS_MEMBER_MEDICAL.getReference());
     }
 
-    @DisplayName("getRoleTypes returns PanelMemberType.TRIBUNALS_MEMBER_MEDICAL reference when benefit is Industrial Injuries Disablement Benefit ")
+    @DisplayName("HearingsPanelMapping should call panelCategoryService and return role types when feature flag is enabled")
     @Test
-    void shouldReturn_TribunalsMember_MedicalReference_When_Benefit_is_IndustrialInjuriesDisablementBenefit() {
-        List<String> result = HearingsPanelMapping.getRoleTypes(Benefit.IIDB.getBenefitCode());
-        assertThat(result).contains(PanelMemberType.TRIBUNALS_MEMBER_MEDICAL.getReference());
+    void shouldPopulateRoleTypesFromPanelCategoryServiceWhenFeatureFlagIsEnabled() {
+        ReflectionTestUtils.setField(hearingsPanelMapping, "defaultPanelCompEnabled", true);
+        when(refData.getSessionCategoryMaps()).thenReturn(sessionCategoryMaps);
+        when(panelCategoryService.getRoleTypes(caseData)).thenReturn(List.of(JUDGE_JOH_CODE));
+        PanelRequirements result = hearingsPanelMapping.getPanelRequirements(caseData, refData);
+        assertThat(result.getRoleTypes()).isNotEmpty();
+        assertThat(result.getRoleTypes()).contains(JUDGE_JOH_CODE);
     }
 
-    @DisplayName("getRoleTypes returns PanelMemberType.TRIBUNALS_MEMBER_FINANCIALLY_QUALIFIED reference when benefit is CHILD_SUPPORT ")
-    @Test
-    void shouldReturn_TribunalsMember_Financially_Qualified_When_Benefit_is_ChildSupport() {
-        List<String> result = HearingsPanelMapping.getRoleTypes(Benefit.CHILD_SUPPORT.getBenefitCode());
-        assertThat(result).contains(PanelMemberType.TRIBUNALS_MEMBER_FINANCIALLY_QUALIFIED.getReference());
-    }
 
     @DisplayName("getAuthorisationTypes returns an empty list")
     @Test
@@ -321,4 +339,5 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
         String result = HearingsPanelMapping.getPanelMemberSpecialism(PanelMember.FQPM, null, null);
         assertThat(result).isNull();
     }
+
 }
