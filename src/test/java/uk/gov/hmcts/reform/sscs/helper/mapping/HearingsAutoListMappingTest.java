@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
 import static org.junit.jupiter.params.provider.EnumSource.Mode.INCLUDE;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
@@ -23,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTime;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLinkDetails;
@@ -400,8 +400,10 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
 
     @Test
     void shouldNotAutoListIbcCase() throws ListingException {
-        SscsCaseData caseData = SscsCaseData.builder().build();
-        when(caseData.isIbcCase()).thenReturn(true);
+        SscsCaseData caseData = SscsCaseData
+            .builder()
+            .benefitCode(Benefit.INFECTED_BLOOD_COMPENSATION.getBenefitCode())
+            .build();
 
         assertFalse(HearingsAutoListMapping.shouldBeAutoListed(caseData, refData));
     }
