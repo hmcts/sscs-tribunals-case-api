@@ -73,6 +73,9 @@ class HearingsServiceRetryTest {
     private HmcHearingApiService hmcHearingApiService;
 
     @MockitoBean
+    private CcdCaseService ccdCaseService;
+
+    @MockitoBean
     private ReferenceDataServiceHolder refData;
 
     @MockitoBean
@@ -103,7 +106,7 @@ class HearingsServiceRetryTest {
     private HearingsService hearingsService;
 
     private HearingWrapper wrapper;
-
+    private SscsCaseDetails caseDetails;
     private SscsCaseData caseData;
 
     @BeforeEach
@@ -135,6 +138,11 @@ class HearingsServiceRetryTest {
             sscsCaseDetailsConsumer);
         when(hearingServiceConsumer.getCreateHearingCaseDataConsumer(any(), any())).thenReturn(sscsCaseDataConsumer);
 
+        caseDetails = SscsCaseDetails.builder()
+                .data(caseData)
+                .eventId("EVENT_ID")
+                .eventToken("EVENT_TOKEN")
+                .build();
     }
 
     @DisplayName("When wrapper with a valid HearingResponse is given updateHearingResponse should return updated valid HearingResponse")

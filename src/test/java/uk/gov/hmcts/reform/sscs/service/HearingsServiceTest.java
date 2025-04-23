@@ -96,10 +96,14 @@ class HearingsServiceTest {
 
     private HearingWrapper wrapper;
     private HearingRequest request;
+    private SscsCaseDetails expectedCaseDetails;
     private SscsCaseData sscsCaseData;
 
     @Mock
     private HmcHearingApiService hmcHearingApiService;
+
+    @Mock
+    private CcdCaseService ccdCaseService;
 
     @Mock
     private ReferenceDataServiceHolder refData;
@@ -165,6 +169,12 @@ class HearingsServiceTest {
                 .hearingState(CREATE_HEARING)
                 .hearingRoute(LIST_ASSIST)
                 .build();
+
+        expectedCaseDetails = SscsCaseDetails.builder()
+                .data(SscsCaseData.builder()
+                        .ccdCaseId(String.valueOf(CASE_ID))
+                        .build())
+                .build();
     }
 
     @DisplayName("When wrapper with a valid Hearing State is given addHearingResponse should run without error")
@@ -173,8 +183,8 @@ class HearingsServiceTest {
         value = HearingState.class,
         names = {"UPDATED_CASE","PARTY_NOTIFIED"})
     void processHearingRequest(HearingState state) {
+        given(ccdCaseService.getStartEventResponse(eq(CASE_ID), any())).willReturn(expectedCaseDetails);
         sscsCaseData.setState(State.READY_TO_LIST);
-        assertThat(sscsCaseData.getState()).isEqualTo(State.READY_TO_LIST);
         request.setHearingState(state);
         assertThatNoException()
                 .isThrownBy(() -> hearingsService.processHearingRequest(request, sscsCaseData));
@@ -183,6 +193,7 @@ class HearingsServiceTest {
     @DisplayName("When wrapper with a valid Hearing State and Cancellation reason is given addHearingResponse should run without error")
     @Test
     void processHearingRequest() {
+        given(ccdCaseService.getStartEventResponse(eq(CASE_ID), any())).willReturn(expectedCaseDetails);
         sscsCaseData.setState(State.READY_TO_LIST);
         request.setHearingState(UPDATED_CASE);
         request.setCancellationReason(OTHER);
