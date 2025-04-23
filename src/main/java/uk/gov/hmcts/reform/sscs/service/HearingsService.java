@@ -14,6 +14,7 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -51,6 +52,8 @@ public class HearingsService {
     private static int hearingResponseUpdateMaxRetries;
 
     private final HmcHearingApiService hmcHearingApiService;
+
+    private final CcdCaseService ccdCaseService;
 
     private final ReferenceDataServiceHolder refData;
 
@@ -292,10 +295,13 @@ public class HearingsService {
             cancellationReasons = List.of(hearingRequest.getCancellationReason());
         }
 
+        EventType eventType = HearingsServiceHelper.getCcdEvent(hearingRequest.getHearingState());
+        SscsCaseDetails sscsCaseDetails = ccdCaseService.getStartEventResponse(Long.parseLong(hearingRequest.getCcdCaseId()), eventType);
+
         return HearingWrapper.builder()
                 .caseData(caseData)
                 .eventId(caseData.getCcdCaseId())
-                .caseState(caseData.getState())
+                .caseState(State.getById(sscsCaseDetails.getState()))
                 .hearingState(hearingRequest.getHearingState())
                 .cancellationReasons(cancellationReasons)
                 .build();

@@ -67,6 +67,12 @@ public class CcdCaseService {
         return caseDetails;
     }
 
+    public SscsCaseDetails getStartEventResponse(long caseId, EventType eventType) {
+        IdamTokens idamTokens = idamService.getIdamTokens();
+
+        return ccdService.getCaseForModification(caseId, idamTokens, eventType.getCcdType());
+    }
+
     public SscsCaseDetails updateCaseData(SscsCaseData caseData, EventType event, String summary, String description)
             throws UpdateCaseException {
 
