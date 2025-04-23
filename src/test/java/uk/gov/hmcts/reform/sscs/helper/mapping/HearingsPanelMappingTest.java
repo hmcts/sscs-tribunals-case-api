@@ -38,9 +38,6 @@ import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 class HearingsPanelMappingTest extends HearingsMappingBase {
 
-    public static final String JUDGE_ID = "2000";
-    public static final String JUDGE_ROLE_TYPE = "64";
-    public static final String JUDGE_ID_JUDGE_ROLE_TYPE = JUDGE_ID + "|" + JUDGE_ROLE_TYPE;
     public static final String IIDB_BENEFIT_CODE = "067";
     public static final String JUDGE_JOH_CODE = "84";
     @Mock
@@ -67,7 +64,7 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
 
         SscsCaseData caseData = SscsCaseData.builder().build();
 
-        PanelRequirements result = hearingsPanelMapping.getPanelRequirements(caseData, refData, false);
+        PanelRequirements result = hearingsPanelMapping.getPanelRequirements(caseData, refData);
 
         assertThat(result).isNotNull();
         assertThat(result.getRoleTypes()).isEmpty();
@@ -83,7 +80,7 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
         ReflectionTestUtils.setField(hearingsPanelMapping, "defaultPanelCompEnabled", false);
         caseData.setBenefitCode(IIDB_BENEFIT_CODE);
         when(refData.getSessionCategoryMaps()).thenReturn(sessionCategoryMaps);
-        PanelRequirements result = hearingsPanelMapping.getPanelRequirements(caseData, refData, false);
+        PanelRequirements result = hearingsPanelMapping.getPanelRequirements(caseData, refData);
         assertThat(result.getRoleTypes()).contains(PanelMemberType.TRIBUNALS_MEMBER_MEDICAL.getReference());
     }
 
@@ -92,8 +89,8 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
     void shouldPopulateRoleTypesFromPanelCategoryServiceWhenFeatureFlagIsEnabled() {
         ReflectionTestUtils.setField(hearingsPanelMapping, "defaultPanelCompEnabled", true);
         when(refData.getSessionCategoryMaps()).thenReturn(sessionCategoryMaps);
-        when(panelCategoryService.getRoleTypes(caseData, false)).thenReturn(List.of(JUDGE_JOH_CODE));
-        PanelRequirements result = hearingsPanelMapping.getPanelRequirements(caseData, refData, false);
+        when(panelCategoryService.getRoleTypes(caseData)).thenReturn(List.of(JUDGE_JOH_CODE));
+        PanelRequirements result = hearingsPanelMapping.getPanelRequirements(caseData, refData);
         assertThat(result.getRoleTypes()).isNotEmpty();
         assertThat(result.getRoleTypes()).contains(JUDGE_JOH_CODE);
     }
