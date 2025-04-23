@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
 import static org.junit.jupiter.params.provider.EnumSource.Mode.INCLUDE;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
@@ -395,5 +396,13 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
         boolean result = HearingsAutoListMapping.isMqpmOrFqpm(value);
 
         assertThat(result).isFalse();
+    }
+
+    @Test
+    void shouldNotAutoListIbcCase() throws ListingException {
+        SscsCaseData caseData = SscsCaseData.builder().build();
+        when(caseData.isIbcCase()).thenReturn(true);
+
+        assertFalse(HearingsAutoListMapping.shouldBeAutoListed(caseData, refData));
     }
 }

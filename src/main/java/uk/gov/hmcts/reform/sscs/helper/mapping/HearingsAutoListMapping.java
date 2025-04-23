@@ -33,6 +33,11 @@ public final class HearingsAutoListMapping {
 
     public static boolean shouldBeAutoListed(@Valid SscsCaseData caseData, ReferenceDataServiceHolder refData)
         throws ListingException {
+
+        if (caseData.isIbcCase()) {
+            return false;
+        }
+
         OverrideFields overrideFields = OverridesMapping.getOverrideFields(caseData);
 
         if (nonNull(overrideFields.getAutoList())) {
