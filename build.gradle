@@ -317,7 +317,7 @@ dependencyManagement {
 }
 
 def versions = [
-        springsecurity : '6.4.4',
+        springsecurity : '6.4.5',
         jackson        : '2.18.3',
         lombok         : '1.18.38',
         commonsio      : '2.19.0'
