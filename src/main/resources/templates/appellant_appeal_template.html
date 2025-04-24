@@ -176,7 +176,7 @@
 
         {% if isIbcCase %}
         <div>
-            <dt class="cya-question">Does the appellant live in England, Wales or Scotland?</dt>
+            <dt class="cya-question">Does the appellant live in England, Scotland, Wales or Northern Ireland?</dt>
             <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.appellant.address.inMainlandUk }}</dd>
         </div>
         {% endif %}
@@ -305,6 +305,13 @@
 
             </dd>
         </div>
+
+        {% if isIbcCase %}
+        <div>
+            <dt class="cya-question">Does the representative live in England, Scotland, Wales or Northern Ireland?</dt>
+            <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.appellant.rep.inMainlandUk }}</dd>
+        </div>
+        {% endif %}
 
         <div>
             <dt class="cya-question">Phone number</dt>
