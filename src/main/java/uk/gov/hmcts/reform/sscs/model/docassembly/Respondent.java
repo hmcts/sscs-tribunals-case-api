@@ -26,7 +26,7 @@ public class Respondent {
     public static String IBCA = "Respondent: Infected Blood Compensation Authority";
     // TODO translate
     @JsonIgnore
-    public static String HMRC_WELSH = "Atebydd: Cyllid a Thollau EM";
+    public static String HMRC_WELSH = "Atebydd: Cyllid a Thollau EF";
     // TODO translate
     @JsonIgnore
     public static String DWP_WELSH = "Atebydd: Ysgrifennydd Gwladol dros Waith a Phensiynau";
