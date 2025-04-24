@@ -10,7 +10,7 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.52.0'
     id 'org.owasp.dependencycheck' version '12.1.1'
     id 'au.com.dius.pact' version '4.6.17'
-    id 'com.github.hmcts.rse-cft-lib' version '0.19.1666'
+    id 'com.github.hmcts.rse-cft-lib' version '0.19.1668'
     id 'info.solidsoft.pitest' version '1.15.0'
 }
 
@@ -317,7 +317,7 @@ dependencyManagement {
 }
 
 def versions = [
-        springsecurity : '6.4.4',
+        springsecurity : '6.4.5',
         jackson        : '2.18.3',
         lombok         : '1.18.38',
         commonsio      : '2.19.0'
@@ -378,7 +378,7 @@ dependencies {
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '11.7.2'
     implementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '11.7.2'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6.2.1'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6.2.3'
 
     // sscs-pdf-email-common
     implementation group: 'com.github.sps.junidecode', name: 'junidecode', version: '0.3'

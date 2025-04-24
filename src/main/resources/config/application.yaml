@@ -275,9 +275,10 @@ feature:
         enabled: ${TRIBUNAL_INTERNAL_DOCUMENTS_ENABLED:false}
     hearings-case-updateV2:
         enabled: ${HEARINGS_CASE_UPDATE_V2_ENABLED:false}
+    fta-communication:
+        enabled: ${FTA_COMMUNICATION_ENABLED:true}
     default-panel-comp:
         enabled: ${DEFAULT_PANEL_COMPOSITION_ENABLED:false}
-
 
 idam:
     api:
