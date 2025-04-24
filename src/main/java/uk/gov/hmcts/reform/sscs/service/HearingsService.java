@@ -14,6 +14,7 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -292,9 +293,11 @@ public class HearingsService {
             cancellationReasons = List.of(hearingRequest.getCancellationReason());
         }
 
+        EventType eventType = HearingsServiceHelper.getCcdEvent(hearingRequest.getHearingState());
+
         return HearingWrapper.builder()
                 .caseData(caseData)
-                .eventId(caseData.getCcdCaseId())
+                .eventId(eventType.getCcdType())
                 .caseState(caseState)
                 .hearingState(hearingRequest.getHearingState())
                 .cancellationReasons(cancellationReasons)
