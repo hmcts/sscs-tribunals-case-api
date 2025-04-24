@@ -73,6 +73,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
     private SscsCaseData sscsCaseData;
     private SscsCaseData sscsCaseDataBefore;
+    private final State state = State.HEARING;
 
     @Before
     public void setUp() {
@@ -99,7 +100,8 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
                 .dwpUcb("yes")
                 .build();
         when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
-        when(caseDetailsBefore.getState()).thenReturn(State.HEARING);
+        when(caseDetailsBefore.getState()).thenReturn(state);
+        when(callback.getCaseDetails().getState()).thenReturn(state);
     }
 
     @Test
@@ -127,7 +129,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
         assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION, response.getData().getInterlocReviewState());
         assertNull(response.getData().getDwpUcb());
-        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(sscsCaseData),
+        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(sscsCaseData), eq(state),
                 eq(CancellationReason.PARTY_UNABLE_TO_ATTEND));
         verifyNoMoreInteractions(hearingMessageHelper);
     }

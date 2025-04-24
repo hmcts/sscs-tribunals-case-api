@@ -62,7 +62,7 @@ public class StruckOutAboutToSubmitHandler extends DormantEventsAboutToSubmitHan
             log.info("Strike out case: HearingRoute ListAssist Case ({}). Sending cancellation message",
                     sscsCaseData.getCcdCaseId());
             hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), sscsCaseData,
-                    CancellationReason.STRUCK_OUT);
+                    callback.getCaseDetails().getState(), CancellationReason.STRUCK_OUT);
         }
     }
 

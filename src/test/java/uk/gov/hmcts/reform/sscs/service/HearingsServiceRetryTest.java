@@ -41,6 +41,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SessionCategory;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
 import uk.gov.hmcts.reform.sscs.helper.mapping.HearingsMapping;
@@ -73,9 +74,6 @@ class HearingsServiceRetryTest {
     private HmcHearingApiService hmcHearingApiService;
 
     @MockitoBean
-    private CcdCaseService ccdCaseService;
-
-    @MockitoBean
     private ReferenceDataServiceHolder refData;
 
     @MockitoBean
@@ -106,7 +104,7 @@ class HearingsServiceRetryTest {
     private HearingsService hearingsService;
 
     private HearingWrapper wrapper;
-    private SscsCaseDetails caseDetails;
+
     private SscsCaseData caseData;
 
     @BeforeEach
@@ -137,12 +135,6 @@ class HearingsServiceRetryTest {
         when(hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(any(), any(), anyBoolean())).thenReturn(
             sscsCaseDetailsConsumer);
         when(hearingServiceConsumer.getCreateHearingCaseDataConsumer(any(), any())).thenReturn(sscsCaseDataConsumer);
-
-        caseDetails = SscsCaseDetails.builder()
-                .data(caseData)
-                .eventId("EVENT_ID")
-                .eventToken("EVENT_TOKEN")
-                .build();
     }
 
     @DisplayName("When wrapper with a valid HearingResponse is given updateHearingResponse should return updated valid HearingResponse")
@@ -205,7 +197,7 @@ class HearingsServiceRetryTest {
             .build();
 
         assertThatNoException()
-            .isThrownBy(() -> hearingsService.processHearingRequest(hearingRequest, caseData));
+            .isThrownBy(() -> hearingsService.processHearingRequest(hearingRequest, caseData, State.READY_TO_LIST));
 
         verifyNoMoreInteractions(hmcHearingApiService);
     }
@@ -233,6 +225,6 @@ class HearingsServiceRetryTest {
             .build();
 
         assertThatExceptionOfType(ExhaustedRetryException.class)
-            .isThrownBy(() -> hearingsService.processHearingRequest(hearingRequest, caseData));
+            .isThrownBy(() -> hearingsService.processHearingRequest(hearingRequest, caseData, State.READY_TO_LIST));
     }
 }

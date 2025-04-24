@@ -104,7 +104,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
 
         given(listAssistHearingMessageHelper.sendHearingMessage(
-            anyString(), any(SscsCaseData.class), any(HearingRoute.class), any(HearingState.class), eq(null)))
+            anyString(), any(SscsCaseData.class), any(State.class), any(HearingRoute.class), any(HearingState.class), eq(null)))
             .willReturn(true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
@@ -133,7 +133,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
 
         given(listAssistHearingMessageHelper.sendHearingMessage(
-            anyString(), any(SscsCaseData.class), any(HearingRoute.class), any(HearingState.class), eq(null)))
+            anyString(), any(SscsCaseData.class), any(State.class),  any(HearingRoute.class), any(HearingState.class), eq(null)))
             .willReturn(false);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(

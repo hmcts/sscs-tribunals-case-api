@@ -115,7 +115,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             log.info("Issue Final Decision: HearingRoute ListAssist Case ({}). Sending cancellation message",
                     sscsCaseData.getCcdCaseId());
             hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), sscsCaseData,
-                    CancellationReason.OTHER);
+                    callback.getCaseDetails().getState(), CancellationReason.OTHER);
         }
 
         sscsCaseData.setIssueFinalDecisionDate(LocalDate.now());

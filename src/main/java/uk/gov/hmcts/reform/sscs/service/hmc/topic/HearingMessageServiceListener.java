@@ -36,7 +36,7 @@ public class HearingMessageServiceListener {
     private final IdamService idamService;
 
     @Async
-    public void handleIncomingMessage(HearingRequest message, SscsCaseData caseData) throws TribunalsEventProcessingException, GetCaseException, UpdateCaseException {
+    public void handleIncomingMessage(HearingRequest message, SscsCaseData caseData, State caseState) throws TribunalsEventProcessingException, GetCaseException, UpdateCaseException {
         if (isNull(message)) {
             throw new TribunalsEventProcessingException("An exception occurred as message did not match format");
         }
@@ -46,7 +46,7 @@ public class HearingMessageServiceListener {
         log.info("Attempting to process hearing event {} from hearings event queue for case ID {}",
                 event, caseId);
         try {
-            hearingsService.processHearingRequest(message, caseData);
+            hearingsService.processHearingRequest(message, caseData, caseState);
             log.info("Hearing event {} for case ID {} successfully processed", event, caseId);
         } catch (ExhaustedRetryException e) {
             handleException(e.getCause(), caseId);

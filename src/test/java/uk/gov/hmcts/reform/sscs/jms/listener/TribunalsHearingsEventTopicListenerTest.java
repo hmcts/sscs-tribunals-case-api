@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.exception.TribunalsEventProcessingException;
@@ -61,9 +62,9 @@ class TribunalsHearingsEventTopicListenerTest {
     void whenAValidRequestComesIn_makeSureProcessHearingRequestIsHit() throws Exception {
         HearingRequest hearingRequest = createHearingRequest();
 
-        hearingMessageServiceListener.handleIncomingMessage(hearingRequest, sscsCaseData);
+        hearingMessageServiceListener.handleIncomingMessage(hearingRequest, sscsCaseData, State.READY_TO_LIST);
 
-        verify(hearingsService, times(1)).processHearingRequest((hearingRequest), sscsCaseData);
+        verify(hearingsService, times(1)).processHearingRequest((hearingRequest), sscsCaseData, State.READY_TO_LIST);
     }
 
     @ParameterizedTest
@@ -72,9 +73,9 @@ class TribunalsHearingsEventTopicListenerTest {
     void whenAnInvalidRequestComesIn_makeSureExceptionIsThrown(Class<? extends Throwable> throwable) throws Exception {
         HearingRequest hearingRequest = new HearingRequest();
 
-        doThrow(throwable).when(hearingsService).processHearingRequest(hearingRequest, sscsCaseData);
+        doThrow(throwable).when(hearingsService).processHearingRequest(hearingRequest, sscsCaseData, State.READY_TO_LIST);
 
-        assertThrows(TribunalsEventProcessingException.class, () -> hearingMessageServiceListener.handleIncomingMessage(hearingRequest, sscsCaseData));
+        assertThrows(TribunalsEventProcessingException.class, () -> hearingMessageServiceListener.handleIncomingMessage(hearingRequest, sscsCaseData, State.READY_TO_LIST));
     }
 
     private static Stream<Arguments> throwableParameters() {
@@ -87,7 +88,7 @@ class TribunalsHearingsEventTopicListenerTest {
     @Test
     @DisplayName("When an null request comes in make sure exception is thrown")
     void whenAnNullRequestComesIn_makeSureExceptionIsThrown() {
-        assertThrows(TribunalsEventProcessingException.class, () -> hearingMessageServiceListener.handleIncomingMessage(null, null));
+        assertThrows(TribunalsEventProcessingException.class, () -> hearingMessageServiceListener.handleIncomingMessage(null, null, null));
     }
 
     private HearingRequest createHearingRequest() {
@@ -106,7 +107,7 @@ class TribunalsHearingsEventTopicListenerTest {
 
         doThrow(ListingException.class)
                 .when(hearingsService)
-                .processHearingRequest(hearingRequest, sscsCaseData);
+                .processHearingRequest(hearingRequest, sscsCaseData, State.READY_TO_LIST);
 
         when(updateCcdCaseService.triggerCaseEventV2(
                 1001L,
@@ -117,6 +118,6 @@ class TribunalsHearingsEventTopicListenerTest {
         )).thenReturn(caseDetails);
 
         verifyNoInteractions(ccdCaseService);
-        assertDoesNotThrow(() -> hearingMessageServiceListener.handleIncomingMessage(hearingRequest, sscsCaseData));
+        assertDoesNotThrow(() -> hearingMessageServiceListener.handleIncomingMessage(hearingRequest, sscsCaseData, State.READY_TO_LIST));
     }
 }

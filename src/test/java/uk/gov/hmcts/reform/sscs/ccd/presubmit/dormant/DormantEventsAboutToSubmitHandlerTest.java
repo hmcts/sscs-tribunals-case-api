@@ -105,7 +105,7 @@ public class DormantEventsAboutToSubmitHandlerTest {
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(listAssistHearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(sscsCaseData),
-            eq(cancellationReason));
+            eq(HEARING), eq(cancellationReason));
     }
 
     @Test(expected = IllegalStateException.class)

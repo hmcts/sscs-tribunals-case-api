@@ -11,9 +11,9 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
-import uk.gov.hmcts.reform.sscs.service.CcdCaseService;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingMessagingServiceFactory;
 
 @Slf4j
@@ -22,21 +22,20 @@ import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingMessagingServiceFactory
 public class ListAssistHearingMessageHelper {
 
     private final HearingMessagingServiceFactory hearingMessagingServiceFactory;
-    private final CcdCaseService ccdCaseService;
 
-    public void sendListAssistCancelHearingMessage(final String ccdCaseId, SscsCaseData caseData, CancellationReason cancellationReason) {
-        sendHearingMessage(ccdCaseId, caseData, LIST_ASSIST, CANCEL_HEARING, cancellationReason);
+    public void sendListAssistCancelHearingMessage(final String ccdCaseId, SscsCaseData caseData, State caseState, CancellationReason cancellationReason) {
+        sendHearingMessage(ccdCaseId, caseData, caseState, LIST_ASSIST, CANCEL_HEARING, cancellationReason);
     }
 
-    public void sendListAssistCreateAdjournmentHearingMessage(final String ccdCaseId, SscsCaseData caseData) {
-        sendHearingMessage(ccdCaseId, caseData, LIST_ASSIST, ADJOURN_CREATE_HEARING, null);
+    public void sendListAssistCreateAdjournmentHearingMessage(final String ccdCaseId, SscsCaseData caseData, State caseState) {
+        sendHearingMessage(ccdCaseId, caseData, caseState, LIST_ASSIST, ADJOURN_CREATE_HEARING, null);
     }
 
-    public void sendListAssistCreateHearingMessage(final String ccdCaseId, SscsCaseData caseData) {
-        sendHearingMessage(ccdCaseId, caseData, LIST_ASSIST, CREATE_HEARING, null);
+    public void sendListAssistCreateHearingMessage(final String ccdCaseId, SscsCaseData caseData, State caseState) {
+        sendHearingMessage(ccdCaseId, caseData, caseState, LIST_ASSIST, CREATE_HEARING, null);
     }
 
-    public boolean sendHearingMessage(final String ccdCaseId, SscsCaseData caseData,
+    public boolean sendHearingMessage(final String ccdCaseId, SscsCaseData caseData, State caseState,
         HearingRoute hearingRoute,
         HearingState hearingState,
         CancellationReason cancellationReason) {
@@ -47,6 +46,6 @@ public class ListAssistHearingMessageHelper {
             .build();
         return hearingMessagingServiceFactory
             .getMessagingService(hearingRoute)
-            .sendMessage(hearingRequest, caseData);
+            .sendMessage(hearingRequest, caseData, caseState);
     }
 }

@@ -70,7 +70,7 @@ public class VoidCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
             log.info("Void case: HearingRoute ListAssist Case ({}). Sending cancellation message",
                     sscsCaseData.getCcdCaseId());
             hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), sscsCaseData,
-                    CancellationReason.OTHER);
+                    callback.getCaseDetails().getState(), CancellationReason.OTHER);
         }
     }
 

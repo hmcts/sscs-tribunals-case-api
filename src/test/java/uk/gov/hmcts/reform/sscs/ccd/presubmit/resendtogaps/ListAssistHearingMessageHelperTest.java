@@ -16,6 +16,8 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingMessageService;
@@ -35,6 +37,7 @@ public class ListAssistHearingMessageHelperTest {
     @InjectMocks
     private ListAssistHearingMessageHelper messageHelper;
 
+    private final SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().build();
     private final SscsCaseData sscsCaseData = SscsCaseData.builder().build();
 
     private static final String CCD_CASE_ID = "1234";
@@ -48,8 +51,8 @@ public class ListAssistHearingMessageHelperTest {
     public void shouldSendExpectedCancellationMessage_sessionAwareMessageBus() {
         when(hearingMessagingServiceFactory.getMessagingService(LIST_ASSIST))
             .thenReturn(hearingsMessageService);
-        messageHelper.sendListAssistCancelHearingMessage(CCD_CASE_ID, sscsCaseData, CancellationReason.OTHER);
-        verify(hearingsMessageService).sendMessage(hearingRequestCaptor.capture(), any(SscsCaseData.class));
+        messageHelper.sendListAssistCancelHearingMessage(CCD_CASE_ID, sscsCaseData, State.getById(sscsCaseDetails.getState()), CancellationReason.OTHER);
+        verify(hearingsMessageService).sendMessage(hearingRequestCaptor.capture(), any(SscsCaseData.class), any(State.class));
         assertCancelHearingRequest(hearingRequestCaptor.getValue());
     }
 
@@ -57,8 +60,8 @@ public class ListAssistHearingMessageHelperTest {
     public void shouldSendExpectedCreateMessage_sessionAwareMessageBus() {
         when(hearingMessagingServiceFactory.getMessagingService(LIST_ASSIST))
             .thenReturn(hearingsMessageService);
-        messageHelper.sendListAssistCreateHearingMessage(CCD_CASE_ID, sscsCaseData);
-        verify(hearingsMessageService).sendMessage(hearingRequestCaptor.capture(), any(SscsCaseData.class));
+        messageHelper.sendListAssistCreateHearingMessage(CCD_CASE_ID, sscsCaseData, State.getById(sscsCaseDetails.getState()));
+        verify(hearingsMessageService).sendMessage(hearingRequestCaptor.capture(), any(SscsCaseData.class), any(State.class));
         assertCreateHearingRequest(hearingRequestCaptor.getValue());
     }
 

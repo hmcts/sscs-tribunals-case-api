@@ -51,7 +51,8 @@ public class NotListableAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         if (eligibleForHearingsCancel.test(callback)) {
             log.info("CaseID: {} - Event: {}. HearingRoute is List Assist - Sending cancellation message", sscsCaseData.getCcdCaseId(), callback.getEvent());
-            hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), sscsCaseData, CancellationReason.OTHER);
+            hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), sscsCaseData,
+                    callback.getCaseDetails().getState(), CancellationReason.OTHER);
         }
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);

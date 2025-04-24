@@ -91,7 +91,7 @@ public class DormantEventsAboutToSubmitHandler implements PreSubmitCallbackHandl
             log.info("CaseID: {} - Event: {}. HearingRoute is List Assist - Sending cancellation message",
                     caseID, callback.getEvent());
             clearPostponementTransientFields(caseData);
-            hearingMessageHelper.sendListAssistCancelHearingMessage(caseID, callback.getCaseDetails().getCaseData(), cancellationReason);
+            hearingMessageHelper.sendListAssistCancelHearingMessage(caseID, callback.getCaseDetails().getCaseData(), callback.getCaseDetails().getState(), cancellationReason);
         }
 
         return new PreSubmitCallbackResponse<>(caseData);

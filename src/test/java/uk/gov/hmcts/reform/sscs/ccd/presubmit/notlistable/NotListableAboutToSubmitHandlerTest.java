@@ -100,7 +100,7 @@ public class NotListableAboutToSubmitHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(listAssistHearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(sscsCaseData), eq(CancellationReason.OTHER));
+        verify(listAssistHearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(sscsCaseData), eq(state), eq(CancellationReason.OTHER));
     }
 
     @Test

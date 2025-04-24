@@ -14,7 +14,6 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -53,8 +52,6 @@ public class HearingsService {
 
     private final HmcHearingApiService hmcHearingApiService;
 
-    private final CcdCaseService ccdCaseService;
-
     private final ReferenceDataServiceHolder refData;
 
     private final UpdateCcdCaseService updateCcdCaseService;
@@ -73,7 +70,7 @@ public class HearingsService {
             retryFor = UpdateCaseException.class,
             maxAttemptsExpression = "${retry.hearing-response-update.max-retries}",
             backoff = @Backoff(delayExpression = "${retry.hearing-response-update.backoff}"))
-    public void processHearingRequest(HearingRequest hearingRequest, SscsCaseData caseData) throws UnhandleableHearingStateException,
+    public void processHearingRequest(HearingRequest hearingRequest, SscsCaseData caseData, State caseState) throws UnhandleableHearingStateException,
             UpdateCaseException, ListingException {
         log.info("Processing Hearing Request for Case ID {}, Hearing State {} and Route {} and Cancellation Reason {}",
                 hearingRequest.getCcdCaseId(),
@@ -81,7 +78,7 @@ public class HearingsService {
                 hearingRequest.getHearingRoute(),
                 hearingRequest.getCancellationReason());
 
-        processHearingWrapper(createWrapper(hearingRequest, caseData));
+        processHearingWrapper(createWrapper(hearingRequest, caseData, caseState));
     }
 
     public void processHearingWrapper(HearingWrapper wrapper)
@@ -282,7 +279,7 @@ public class HearingsService {
         throw new ExhaustedRetryException("Cancellation request Response received, rethrowing exception", exception);
     }
 
-    private HearingWrapper createWrapper(HearingRequest hearingRequest, SscsCaseData caseData) throws UnhandleableHearingStateException {
+    private HearingWrapper createWrapper(HearingRequest hearingRequest, SscsCaseData caseData, State caseState) throws UnhandleableHearingStateException {
         if (isNull(hearingRequest.getHearingState())) {
             UnhandleableHearingStateException err = new UnhandleableHearingStateException();
             log.error(err.getMessage(), err);
@@ -295,13 +292,10 @@ public class HearingsService {
             cancellationReasons = List.of(hearingRequest.getCancellationReason());
         }
 
-        EventType eventType = HearingsServiceHelper.getCcdEvent(hearingRequest.getHearingState());
-        SscsCaseDetails sscsCaseDetails = ccdCaseService.getStartEventResponse(Long.parseLong(hearingRequest.getCcdCaseId()), eventType);
-
         return HearingWrapper.builder()
                 .caseData(caseData)
                 .eventId(caseData.getCcdCaseId())
-                .caseState(State.getById(sscsCaseDetails.getState()))
+                .caseState(caseState)
                 .hearingState(hearingRequest.getHearingState())
                 .cancellationReasons(cancellationReasons)
                 .build();

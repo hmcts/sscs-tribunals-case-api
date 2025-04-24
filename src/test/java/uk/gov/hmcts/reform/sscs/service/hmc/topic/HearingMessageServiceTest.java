@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.exception.TribunalsEventProcessingException;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
 
@@ -41,13 +42,13 @@ public class HearingMessageServiceTest {
 
     @Test
     public void shouldSendMessage() throws Exception {
-        assertTrue(hearingMessageService.sendMessage(hearingRequest, sscsCaseData));
-        verify(hearingMessageServiceListener, times(1)).handleIncomingMessage(hearingRequest, sscsCaseData);
+        assertTrue(hearingMessageService.sendMessage(hearingRequest, sscsCaseData, State.READY_TO_LIST));
+        verify(hearingMessageServiceListener, times(1)).handleIncomingMessage(hearingRequest, sscsCaseData, State.READY_TO_LIST);
     }
 
     @Test
     public void shouldNotSendMessage() throws Exception {
-        doThrow(new TribunalsEventProcessingException("error")).when(hearingMessageServiceListener).handleIncomingMessage(any(HearingRequest.class), any(SscsCaseData.class));
-        assertFalse(hearingMessageService.sendMessage(hearingRequest, sscsCaseData));
+        doThrow(new TribunalsEventProcessingException("error")).when(hearingMessageServiceListener).handleIncomingMessage(any(HearingRequest.class), any(SscsCaseData.class), any(State.class));
+        assertFalse(hearingMessageService.sendMessage(hearingRequest, sscsCaseData, State.READY_TO_LIST));
     }
 }

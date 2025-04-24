@@ -80,7 +80,7 @@ public class ResendToGapsAboutToSubmitHandlerTest {
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
+        when(caseDetails.getState()).thenReturn(State.READY_TO_LIST);
 
         when(jsonMapper.map(any())).thenReturn(new JSONObject());
 
@@ -163,7 +163,8 @@ public class ResendToGapsAboutToSubmitHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(hearingMessageHelper, atLeastOnce()).sendListAssistCancelHearingMessage("1234", sscsCaseData, CancellationReason.OTHER);
+        verify(hearingMessageHelper, atLeastOnce()).sendListAssistCancelHearingMessage("1234", sscsCaseData,
+                caseDetails.getState(), CancellationReason.OTHER);
     }
 
     @Test
@@ -173,7 +174,8 @@ public class ResendToGapsAboutToSubmitHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(hearingMessageHelper, never()).sendListAssistCancelHearingMessage("1234", sscsCaseData, CancellationReason.OTHER);
+        verify(hearingMessageHelper, never()).sendListAssistCancelHearingMessage("1234", sscsCaseData,
+                caseDetails.getState(), CancellationReason.OTHER);
     }
 
     @Test
@@ -183,6 +185,7 @@ public class ResendToGapsAboutToSubmitHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(hearingMessageHelper, never()).sendListAssistCancelHearingMessage("1234", sscsCaseData, CancellationReason.OTHER);
+        verify(hearingMessageHelper, never()).sendListAssistCancelHearingMessage("1234", sscsCaseData,
+                caseDetails.getState(), CancellationReason.OTHER);
     }
 }

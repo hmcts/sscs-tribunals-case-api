@@ -103,6 +103,8 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
 
     private SscsDocument document;
 
+    private final State state = State.HEARING;
+
     protected static Validator validator = Validation.byDefaultProvider()
             .configure()
             .messageInterpolator(new ParameterMessageInterpolator())
@@ -185,7 +187,7 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
             .build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        when(caseDetails.getState()).thenReturn(State.HEARING);
+        when(caseDetails.getState()).thenReturn(state);
     }
 
     @Test
@@ -483,7 +485,8 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
-        verify(hearingMessageHelper, times(0)).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()),  eq(sscsCaseData), eq(CancellationReason.OTHER));
+        verify(hearingMessageHelper, times(0)).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()),
+                eq(sscsCaseData), eq(state), eq(CancellationReason.OTHER));
     }
 
     @Test
@@ -519,7 +522,8 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setHearings(List.of(hearing1, hearing2));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
-        verify(hearingMessageHelper, times(0)).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()),  eq(sscsCaseData), eq(CancellationReason.OTHER));
+        verify(hearingMessageHelper, times(0)).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()),
+                eq(sscsCaseData), eq(state), eq(CancellationReason.OTHER));
     }
 
     @Test
@@ -555,7 +559,8 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setHearings(List.of(hearing1, hearing2));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
-        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(sscsCaseData), eq(CancellationReason.OTHER));
+        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(sscsCaseData),
+                eq(state), eq(CancellationReason.OTHER));
     }
 
     @Test
@@ -582,7 +587,8 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setHearings(List.of(hearing));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
-        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()),  eq(sscsCaseData), eq(CancellationReason.OTHER));
+        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()),  eq(sscsCaseData),
+                eq(state), eq(CancellationReason.OTHER));
     }
 
     @Test

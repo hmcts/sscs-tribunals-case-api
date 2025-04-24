@@ -93,8 +93,10 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
             calculateDueDate(sscsCaseData);
 
+
+
             if (sscsCaseData.getAdjournment().getPreviewDocument() != null) {
-                processResponse(sscsCaseData, preSubmitCallbackResponse, documentTranslationStatus);
+                processResponse(sscsCaseData, callback.getCaseDetails().getState(), preSubmitCallbackResponse, documentTranslationStatus);
             } else {
                 preSubmitCallbackResponse.addError("There is no Draft Adjournment Notice on the case so adjournment cannot be issued");
             }
@@ -103,7 +105,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         return preSubmitCallbackResponse;
     }
 
-    private void processResponse(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
+    private void processResponse(SscsCaseData sscsCaseData, State caseState, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
                                  SscsDocumentTranslationStatus documentTranslationStatus) {
         createAdjournmentNoticeFromPreviewDraft(preSubmitCallbackResponse, documentTranslationStatus);
 
@@ -126,7 +128,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
         if (SscsUtil.isSAndLCase(sscsCaseData) && State.READY_TO_LIST.equals(sscsCaseData.getState())) {
             adjournment.setAdjournmentInProgress(YES);
-            hearingMessageHelper.sendListAssistCreateAdjournmentHearingMessage(sscsCaseData.getCcdCaseId(), sscsCaseData);
+            hearingMessageHelper.sendListAssistCreateAdjournmentHearingMessage(sscsCaseData.getCcdCaseId(), sscsCaseData, caseState);
         }
 
 

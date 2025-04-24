@@ -97,6 +97,7 @@ public class StruckOutAboutToSubmitHandlerTest {
     @Test
     public void givenStruckOutEvent_thenDwpStateToStrikeOutActioned() {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getCaseDetails().getState()).thenReturn(HEARING);
         handler = new StruckOutAboutToSubmitHandler(listAssistHearingMessageHelper, true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -106,7 +107,7 @@ public class StruckOutAboutToSubmitHandlerTest {
         assertThat(response.getData().getPreviousState(), is(HEARING));
         assertThat(response.getData().getDwpState(), is(DwpState.STRIKE_OUT_ACTIONED));
         verify(listAssistHearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(sscsCaseData),
-                eq(CancellationReason.STRUCK_OUT));
+                eq(HEARING), eq(CancellationReason.STRUCK_OUT));
         verifyNoMoreInteractions(listAssistHearingMessageHelper);
     }
 }

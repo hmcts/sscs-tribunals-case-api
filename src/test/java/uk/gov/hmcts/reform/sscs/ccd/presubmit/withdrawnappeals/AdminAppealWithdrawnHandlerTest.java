@@ -145,12 +145,14 @@ public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
         when(callback.getEvent()).thenReturn(ADMIN_APPEAL_WITHDRAWN);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+        when(callback.getCaseDetails().getState()).thenReturn(State.READY_TO_LIST);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(caseDetailsBefore.getState()).thenReturn(State.READY_TO_LIST);
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(sscsCaseData), eq(CancellationReason.WITHDRAWN));
+        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(sscsCaseData),
+                eq(State.READY_TO_LIST), eq(CancellationReason.WITHDRAWN));
     }
 
     @Test

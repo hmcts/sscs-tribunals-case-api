@@ -75,7 +75,7 @@ public class AdminAppealWithdrawnHandler implements PreSubmitCallbackHandler<Ssc
             log.info("Admin Appeal Withdrawn: HearingRoute ListAssist Case ({}). Sending cancellation message",
                     sscsCaseData.getCcdCaseId());
             hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), sscsCaseData,
-                    CancellationReason.WITHDRAWN);
+                    callback.getCaseDetails().getState(), CancellationReason.WITHDRAWN);
         }
     }
 

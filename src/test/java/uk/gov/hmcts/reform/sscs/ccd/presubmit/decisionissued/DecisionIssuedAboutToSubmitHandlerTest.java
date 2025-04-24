@@ -191,6 +191,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+        when(callback.getCaseDetails().getState()).thenReturn(HEARING);
         when(caseDetailsBefore.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE).thenReturn(HEARING);
         handler = new DecisionIssuedAboutToSubmitHandler(footerService, hearingMessageHelper, true, false, false);
 
@@ -205,7 +206,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()),
                 any(), eq(DocumentType.DECISION_NOTICE), any(), any(), eq(null), eq(null));
         verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(sscsCaseData),
-                eq(CancellationReason.STRUCK_OUT));
+                eq(HEARING), eq(CancellationReason.STRUCK_OUT));
         verifyNoMoreInteractions(hearingMessageHelper);
     }
 

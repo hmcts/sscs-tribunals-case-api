@@ -99,7 +99,7 @@ public class VoidCaseAboutToSubmitHandlerTest {
         assertNull(response.getData().getInterlocReviewState());
         assertNull(response.getData().getDirectionDueDate());
         verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(sscsCaseData),
-                eq(CancellationReason.OTHER));
+                eq(HEARING), eq(CancellationReason.OTHER));
         verifyNoMoreInteractions(hearingMessageHelper);
     }
 

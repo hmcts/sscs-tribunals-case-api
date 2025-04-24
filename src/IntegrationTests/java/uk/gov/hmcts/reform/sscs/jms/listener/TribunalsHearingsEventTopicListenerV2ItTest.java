@@ -128,7 +128,7 @@ public class TribunalsHearingsEventTopicListenerV2ItTest {
             + "  \"hearingState\": \"adjournCreateHearing\"\n"
             + "}\n";
 
-        hearingMessageServiceListener.handleIncomingMessage(deserialize(message), createSscsCaseDetails().getData());
+        hearingMessageServiceListener.handleIncomingMessage(deserialize(message), createSscsCaseDetails().getData(), State.getById(createSscsCaseDetails().getState()));
 
         verify(updateCcdCaseService).updateCaseV2(
             eq(Long.parseLong(CASE_ID)), any(), any(), any(), any(), any());

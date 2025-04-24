@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST_DIRECTION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.WELSH_TRANSLATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.NOT_LISTABLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
@@ -281,11 +282,12 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     public void givenAGrantedPostponement_shouldSendCancellation() {
         sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
         sscsCaseData.getPostponementRequest().setListingOption(READY_TO_LIST.toString());
+        when(callback.getCaseDetails().getState()).thenReturn(HEARING);
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), sscsCaseData,
+        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), sscsCaseData, HEARING,
             CancellationReason.OTHER);
         verifyNoMoreInteractions(hearingMessageHelper);
     }

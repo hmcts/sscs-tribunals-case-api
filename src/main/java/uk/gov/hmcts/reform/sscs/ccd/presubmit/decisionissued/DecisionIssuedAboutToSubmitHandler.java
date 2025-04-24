@@ -139,7 +139,7 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
         if (eligibleForHearingsCancel.test(callback)) {
             log.info("Issue interlocutory decision: HearingRoute ListAssist Case ({}). Sending cancellation message",
                     sscsCaseData.getCcdCaseId());
-            hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), sscsCaseData,
+            hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), sscsCaseData, callback.getCaseDetails().getState(),
                     CancellationReason.STRUCK_OUT);
         }
     }

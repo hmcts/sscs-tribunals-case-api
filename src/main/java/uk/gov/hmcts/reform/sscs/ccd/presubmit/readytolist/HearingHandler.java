@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
@@ -15,12 +16,12 @@ public enum HearingHandler {
 
     GAPS {
         @Override
-        public PreSubmitCallbackResponse<SscsCaseData> handle(SscsCaseData sscsCaseData, boolean gapsSwitchOverFeature,
+        public PreSubmitCallbackResponse<SscsCaseData> handle(Callback<SscsCaseData> callback,
                                                               SessionAwareMessagingService messagingService) {
-            if (gapsSwitchOverFeature) {
-                sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.GAPS);
-                sscsCaseData.getSchedulingAndListingFields().setHearingState(HearingState.CREATE_HEARING);
-            }
+            SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+            sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.GAPS);
+            sscsCaseData.getSchedulingAndListingFields().setHearingState(HearingState.CREATE_HEARING);
+
             PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
             log.info(String.format("createdInGapsFrom is %s for caseId %s", sscsCaseData.getCreatedInGapsFrom(), sscsCaseData.getCcdCaseId()));
 
@@ -34,37 +35,35 @@ public enum HearingHandler {
     },
     LIST_ASSIST {
         @Override
-        public PreSubmitCallbackResponse<SscsCaseData> handle(SscsCaseData sscsCaseData, boolean gapsSwitchOverFeature,
+        public PreSubmitCallbackResponse<SscsCaseData> handle(Callback<SscsCaseData> callback,
                                                               SessionAwareMessagingService messagingService) {
 
+            SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
             PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-            if (gapsSwitchOverFeature) {
-                log.info(String.format("Handling List Assist request for case ID: %s", sscsCaseData.getCcdCaseId()));
+            log.info(String.format("Handling List Assist request for case ID: %s", sscsCaseData.getCcdCaseId()));
 
-                HearingRoute hearingRoute = HearingRoute.LIST_ASSIST;
-                HearingState hearingState = HearingState.CREATE_HEARING;
+            HearingRoute hearingRoute = HearingRoute.LIST_ASSIST;
+            HearingState hearingState = HearingState.CREATE_HEARING;
 
-                boolean messageSuccess = messagingService.sendMessage(
-                    HearingRequest.builder(sscsCaseData.getCcdCaseId())
-                    .hearingRoute(hearingRoute)
-                    .hearingState(hearingState)
-                    .build(), callbackResponse.getData()
-                );
+            boolean messageSuccess = messagingService.sendMessage(
+                HearingRequest.builder(sscsCaseData.getCcdCaseId())
+                .hearingRoute(hearingRoute)
+                .hearingState(hearingState)
+                .build(), callbackResponse.getData(), callback.getCaseDetails().getState()
+            );
 
-                if (!messageSuccess) {
-                    callbackResponse.addError("An error occurred during message publish. Please try again.");
-                } else {
-                    sscsCaseData.getSchedulingAndListingFields().setHearingRoute(hearingRoute);
-                    sscsCaseData.getSchedulingAndListingFields().setHearingState(hearingState);
-                }
+            if (!messageSuccess) {
+                callbackResponse.addError("An error occurred during message publish. Please try again.");
+            } else {
+                sscsCaseData.getSchedulingAndListingFields().setHearingRoute(hearingRoute);
+                sscsCaseData.getSchedulingAndListingFields().setHearingState(hearingState);
             }
 
             return callbackResponse;
         }
     };
 
-    public abstract PreSubmitCallbackResponse<SscsCaseData> handle(SscsCaseData caseData,
-                                                                   boolean gapsSwitchOverFeature,
+    public abstract PreSubmitCallbackResponse<SscsCaseData> handle(Callback<SscsCaseData> callback,
                                                                    SessionAwareMessagingService messagingService);
 }

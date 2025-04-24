@@ -89,6 +89,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             boolean messageSuccess = listAssistHearingMessageHelper.sendHearingMessage(
                 caseId,
                 callback.getCaseDetails().getCaseData(),
+                callback.getCaseDetails().getState(),
                 hearingRoute,
                 hearingState,
                 null);

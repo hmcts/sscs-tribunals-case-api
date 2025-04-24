@@ -91,7 +91,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         } else if (REFUSE.getValue().equals(actionRequested)) {
             refusePostponement(sscsCaseData);
         } else if (GRANT.getValue().equals(actionRequested)) {
-            grantPostponement(sscsCaseData, response);
+            grantPostponement(sscsCaseData, callback.getCaseDetails().getState(), response);
         } else if (REFUSE_ON_THE_DAY.getValue().equals(actionRequested)) {
             refuseOnTheDay(sscsCaseData);
         } else {
@@ -111,8 +111,8 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         sscsCaseData.getPostponementRequest().setUnprocessedPostponementRequest(NO);
     }
 
-    private void grantPostponement(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
-        cancelHearing(sscsCaseData);
+    private void grantPostponement(SscsCaseData sscsCaseData, State caseState, PreSubmitCallbackResponse<SscsCaseData> response) {
+        cancelHearing(sscsCaseData, caseState);
         postponementRequestService.addCurrentHearingToExcludeDates(response);
         sscsCaseData.setInterlocReferralReason(null);
         sscsCaseData.setInterlocReviewState(null);
@@ -147,10 +147,10 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         sscsCaseData.getPostponementRequest().setUnprocessedPostponementRequest(NO);
     }
 
-    private void cancelHearing(SscsCaseData sscsCaseData) {
+    private void cancelHearing(SscsCaseData sscsCaseData, State caseState) {
         log.info("Action postponement request: Sending cancel hearing request for case {}", sscsCaseData
             .getCcdCaseId());
-        hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), sscsCaseData,
+        hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), sscsCaseData, caseState,
             CancellationReason.OTHER);
     }
 
