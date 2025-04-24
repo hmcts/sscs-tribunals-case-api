@@ -23,7 +23,7 @@ dependencies:
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: xui-webapp.enabled
   - name: ccd
-    version: 9.2.1
+    version: 9.2.2
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: ccd.enabled
     tags:
