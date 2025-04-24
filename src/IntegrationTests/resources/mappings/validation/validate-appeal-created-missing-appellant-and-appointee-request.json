@@ -1,0 +1,84 @@
+{
+  "case_details": {
+    "after_submit_callback_response": null,
+    "callback_response_status": null,
+    "callback_response_status_code": null,
+    "case_data": {
+      "appeal": {
+        "appealReasons": {},
+        "appellant": {
+          "address": {
+            "line1": "45 The Road",
+            "town": "Brentwood",
+            "county": "Essex",
+            "postcode": "CF48 2HY"
+          },
+          "contact": {
+            "email": "mail@email.com",
+            "phone": "01234567890"
+          },
+          "identity": {
+            "dob": "1904-03-10",
+            "nino": "AB 22 55 66 B"
+          },
+          "name": {},
+          "appointee": {
+            "address": {
+              "line1": "45 The Road",
+              "town": "Brentwood",
+              "county": "Essex",
+              "postcode": "CF48 2HY"
+            },
+            "contact": {
+              "email": "mail@email.com",
+              "phone": "01234567890"
+            },
+            "identity": {
+              "dob": "1904-03-10",
+              "nino": "AB 22 55 66 B"
+            },
+            "name": {}
+          }
+        },
+        "rep": {
+          "hasRepresentative": "No"
+        },
+        "benefitType": {
+          "code": "ESA"
+        },
+        "hearingType": "oral",
+        "hearingSubtype": {
+          "wantsHearingTypeTelephone": "No",
+          "wantsHearingTypeVideo": "No",
+          "wantsHearingTypeFaceToFace": "No"
+        },
+        "hearingOptions": {
+          "languageInterpreter": "Yes",
+          "other": "No",
+          "wantsSupport": "Yes",
+          "wantsToAttend": "Yes"
+        },
+        "mrnDetails": {
+          "mrnDate": "2018-12-09",
+          "dwpIssuingOffice": "Balham DRT"
+        },
+        "signer": null
+      },
+      "caseReference": "SC022/14/12423",
+      "formType": null
+    },
+    "case_type_id": "Benefit",
+    "created_date": [
+      2018,
+      7,
+      25,
+      15,
+      49,
+      48,
+      23000000
+    ],
+    "state": "incompleteApplication",
+    "id": "1234567"
+  },
+  "event_id": "validAppeal"
+}
