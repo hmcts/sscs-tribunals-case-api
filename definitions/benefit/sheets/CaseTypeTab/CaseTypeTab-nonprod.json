@@ -1,1 +1,6 @@
-[]
+[
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "tribunal_communications", "TabLabel": "Tribunal Communications", "TabDisplayOrder": 12, "CaseFieldID": "tribunalCommunications", "TabFieldDisplayOrder": 1, "TabShowCondition": "tribunalCommunications=\"*\"", "FieldShowCondition": "tribunalCommunications=\"*\""},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs", "TabID": "tribunal_communications", "TabLabel": "Tribunal Communications", "TabDisplayOrder": 12, "CaseFieldID": "dwpState", "TabFieldDisplayOrder": 2, "FieldShowCondition": "tribunalCommunications=\"DONOTSHOW\""},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "fta_communications", "TabLabel": "FTA Communications", "TabDisplayOrder": 13, "CaseFieldID": "ftaCommunications", "TabFieldDisplayOrder": 1, "TabShowCondition": "ftaCommunications=\"*\"", "FieldShowCondition": "ftaCommunications=\"*\""},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs", "TabID": "fta_communications", "TabLabel": "FTA Communications", "TabDisplayOrder": 13, "CaseFieldID": "dwpState", "TabFieldDisplayOrder": 2, "FieldShowCondition": "ftaCommunications=\"DONOTSHOW\""}
+]
