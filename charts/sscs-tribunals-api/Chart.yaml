@@ -62,7 +62,7 @@ dependencies:
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: aac-manage-case-assignment.enabled
   - name: am-org-role-mapping-service
-    version: 0.0.69
+    version: 0.0.72
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: am-org-role-mapping-service.enabled
   # WA
