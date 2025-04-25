@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getHmcHearingType;
 
