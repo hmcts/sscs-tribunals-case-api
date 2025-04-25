@@ -220,8 +220,6 @@ evidenceDescription:
             template:
                 path: /templates/evidenceDescriptionWelsh.html
 feature:
-    ibc-ni-postcodes:
-        enabled: ${IBC_NI_POSTCODES_FEATURE:false}
     case-access-management:
         enabled: ${CASE_ACCESS_MANAGEMENT_FEATURE:false}
     deleted-redacted-doc:
