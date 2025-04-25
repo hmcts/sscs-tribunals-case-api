@@ -77,31 +77,6 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             }
         }
 
-        State state = callback.getCaseDetails().getState();
-        HearingRoute hearingRoute = caseDataSnlFields.getHearingRoute();
-        if (gapsSwitchOverFeature
-            && state == State.READY_TO_LIST
-            && hearingRoute == LIST_ASSIST
-            && nonNull(caseDataSnlFields.getOverrideFields())) {
-            String caseId = sscsCaseData.getCcdCaseId();
-            log.info("UpdateListingRequirements List Assist request, Update Hearing,"
-                    + "amend reasons: {}, for case ID: {}",
-                caseDataSnlFields.getAmendReasons(), caseId);
-
-            HearingState hearingState = UPDATE_HEARING;
-
-            boolean messageSuccess = listAssistHearingMessageHelper.sendHearingMessage(
-                caseId,
-                hearingRoute,
-                hearingState,
-                null);
-
-            if (messageSuccess) {
-                caseDataSnlFields.setHearingState(hearingState);
-            } else {
-                callbackResponse.addError("An error occurred during message publish. Please try again.");
-            }
-        }
         sscsCaseData.getAppeal()
             .setHearingOptions(Optional.ofNullable(sscsCaseData.getAppeal().getHearingOptions())
                 .map(HearingOptions::toBuilder)
