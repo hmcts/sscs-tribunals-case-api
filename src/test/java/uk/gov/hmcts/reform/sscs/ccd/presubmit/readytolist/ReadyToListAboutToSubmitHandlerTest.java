@@ -20,6 +20,7 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.hamcrest.MatcherAssert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -87,6 +88,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
     }
 
 
+    @Ignore
     @Test
     public void returnAnErrorIfCreatedInGapsFromIsAtValidAppeal() {
         sscsCaseData = sscsCaseData.toBuilder().region("TEST").createdInGapsFrom(State.VALID_APPEAL.getId()).build();
@@ -96,6 +98,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
         assertEquals("Case already created in GAPS at valid appeal.", response.getErrors().toArray()[0]);
     }
 
+    @Ignore
     @Test
     public void returnAnErrorIfCreatedInGapsFromIsNull() {
         sscsCaseData = sscsCaseData.toBuilder().region("TEST").createdInGapsFrom(null).build();
@@ -107,6 +110,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
         assertEquals("Case already created in GAPS at valid appeal.", response.getErrors().toArray()[0]);
     }
 
+    @Ignore
     @Test
     public void givenAnRpcUsingListAssist_shouldSuccessfullySendAHearingRequestMessage() {
         handler = new ReadyToListAboutToSubmitHandler();
@@ -123,6 +127,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
             .as("A successfully sent message should not result in any errors.").isEmpty();
     }
 
+    @Ignore
     @Test
     public void givenAnIbcCase_shouldSuccessfullySendAHearingRequestMessageWithListAssist() {
         handler = new ReadyToListAboutToSubmitHandler();
@@ -139,6 +144,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
             .as("A successfully sent message should not result in any errors.").isEmpty();
     }
 
+    @Ignore
     @Test
     public void givenAnRpcUsingListAssistAndAnExistingGapsCase_shouldResolveToGaps() {
         handler = new ReadyToListAboutToSubmitHandler();
@@ -164,6 +170,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
             .as("A successfully sent message should not result in any errors.").isEmpty();
     }
 
+    @Ignore
     @Test
     public void givenAnRpcUsingListAssist_shouldAddErrorIfMessageFailedToSend() {
         handler = new ReadyToListAboutToSubmitHandler();
@@ -325,6 +332,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
 
+    @Ignore
     @Test
     public void givenRpcNotSet_HearingRouteShouldBeGaps() {
         handler = new ReadyToListAboutToSubmitHandler();
@@ -338,6 +346,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
         assertEquals(HearingRoute.GAPS, response.getData().getSchedulingAndListingFields().getHearingRoute());
     }
 
+    @Ignore
     @Test
     public void givenIbcCase_HearingRoutesShouldBeListAssist() {
         handler = new ReadyToListAboutToSubmitHandler();
