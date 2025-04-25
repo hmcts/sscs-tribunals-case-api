@@ -318,7 +318,7 @@ dependencyManagement {
 
 def versions = [
         springsecurity : '6.4.5',
-        jackson        : '2.18.3',
+        jackson        : '2.19.0',
         lombok         : '1.18.38',
         commonsio      : '2.19.0'
 ]
@@ -411,7 +411,7 @@ dependencies {
 
     implementation group: 'commons-io', name: 'commons-io', version:  versions.commonsio
 
-    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
+    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.5.0'
     implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.1'
     implementation group: 'org.apache.pdfbox', name: 'xmpbox', version: '2.0.33'
     implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.33'
