@@ -67,7 +67,8 @@ public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubm
             } else {
                 callbackResponse.addError("An error occurred during message publish. Please try again.");
             }
+            callbackResponse.getErrors();
         }
-        return new PreSubmitCallbackResponse<>(sscsCaseData);
+        return callbackResponse;
     }
 }

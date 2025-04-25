@@ -5,20 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.VIDEO;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -37,16 +31,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReserveTo;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 
@@ -59,8 +49,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     private Callback<SscsCaseData> callback;
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
-    @Mock
-    private ListAssistHearingMessageHelper listAssistHearingMessageHelper;
+
     @InjectMocks
     private UpdateListingRequirementsAboutToSubmitHandler handler;
 
@@ -107,66 +96,6 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         assertTrue(response.getErrors().isEmpty());
     }
 
-    @Disabled
-    @Test
-    void handleUpdateListingRequirementsGapsSwitchOverFeatureSendSuccessful() {
-        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
-        ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
-        sscsCaseData = CaseDataUtils.buildCaseData();
-        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
-        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
-        sscsCaseData.setCcdCaseId("1234");
-
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-
-        given(listAssistHearingMessageHelper.sendHearingMessage(
-            anyString(), any(HearingRoute.class), any(HearingState.class), eq(null)))
-            .willReturn(true);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-            ABOUT_TO_SUBMIT,
-            callback,
-            USER_AUTHORISATION);
-
-        assertTrue(response.getErrors().isEmpty());
-
-        assertNotNull(response.getData());
-        SscsCaseData caseData = response.getData();
-        assertEquals(UPDATE_HEARING, caseData.getSchedulingAndListingFields().getHearingState());
-    }
-
-    @Disabled
-    @Test
-    void handleUpdateListingRequirementsGapsSwitchOverFeatureSendUnsuccessful() {
-        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
-        ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
-        sscsCaseData = CaseDataUtils.buildCaseData();
-        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
-        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
-        sscsCaseData.setCcdCaseId("1234");
-
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-
-        given(listAssistHearingMessageHelper.sendHearingMessage(
-            anyString(), any(HearingRoute.class), any(HearingState.class), eq(null)))
-            .willReturn(false);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-            ABOUT_TO_SUBMIT,
-            callback,
-            USER_AUTHORISATION);
-
-        assertEquals(1, response.getErrors().size());
-        assertTrue(response.getErrors().contains("An error occurred during message publish. Please try again."));
-        assertNotNull(response.getData());
-    }
-
     @Test
     void handleUpdateListingRequirementsGapsSwitchOverFeatureNoOverrides() {
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
@@ -174,26 +103,6 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
         ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
         sscsCaseData = CaseDataUtils.buildCaseData();
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-            ABOUT_TO_SUBMIT,
-            callback,
-            USER_AUTHORISATION);
-
-        assertTrue(response.getErrors().isEmpty());
-    }
-
-    @Disabled
-    @Test
-    void handleUpdateListingRequirementsGapsSwitchOverFeatureWrongState() {
-        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
-        ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
-        sscsCaseData = CaseDataUtils.buildCaseData();
-
-        given(caseDetails.getState()).willReturn(State.UNKNOWN);
-
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
             ABOUT_TO_SUBMIT,
             callback,
