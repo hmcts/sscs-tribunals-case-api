@@ -72,7 +72,7 @@ import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
-import uk.gov.hmcts.reform.sscs.service.servicebus.TopicConsumer;
+import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
 
 
 @RunWith(JUnitParamsRunner.class)
@@ -136,7 +136,7 @@ public class EvidenceShareServiceIt {
     private RoboticsCallbackHandler roboticsCallbackHandler;
 
     @Autowired
-    private TopicConsumer topicConsumer;
+    private SendCallbackHandler sendCallbackHandler;
 
     @Autowired
     private PdfStoreService pdfStoreService;
@@ -188,7 +188,7 @@ public class EvidenceShareServiceIt {
         when(updateCcdCaseService.updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any(), any())).thenReturn(SscsCaseDetails.builder().build());
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        sendCallbackHandler.handle(sscsCaseDataCallback);
 
         verify(updateCcdCaseService).updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any(), consumerArgumentCaptor.capture());
 
@@ -209,7 +209,7 @@ public class EvidenceShareServiceIt {
         when(updateCcdCaseService.updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any(), any())).thenReturn(SscsCaseDetails.builder().build());
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        sendCallbackHandler.handle(sscsCaseDataCallback);
 
         verify(updateCcdCaseService).updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any(), consumerArgumentCaptor.capture());
         SscsCaseData sscsCaseData = verifySscsCaseData(json);
@@ -242,7 +242,7 @@ public class EvidenceShareServiceIt {
         when(updateCcdCaseService.updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq(documentList), any(), any())).thenReturn(SscsCaseDetails.builder().build());
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        sendCallbackHandler.handle(sscsCaseDataCallback);
 
         Assert.assertEquals(3, documentCaptor.getValue().size());
         Assert.assertEquals("dl16-12345656789.pdf", documentCaptor.getValue().get(0).getName());
@@ -285,7 +285,7 @@ public class EvidenceShareServiceIt {
         when(updateCcdCaseService.updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq(documentList), any(), any())).thenReturn(SscsCaseDetails.builder().build());
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        sendCallbackHandler.handle(sscsCaseDataCallback);
 
         Assert.assertEquals(3, documentCaptor.getValue().size());
         Assert.assertEquals("dl16-12345656789.pdf", documentCaptor.getValue().get(0).getName());
@@ -314,7 +314,7 @@ public class EvidenceShareServiceIt {
         json = json.replace("CREATED_IN_GAPS_FROM", "readyToList");
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        sendCallbackHandler.handle(sscsCaseDataCallback);
 
         verify(emailService).sendEmail(anyLong(), any());
 
@@ -330,7 +330,7 @@ public class EvidenceShareServiceIt {
         json = json.replace("CREATED_IN_GAPS_FROM", "validAppeal");
         Callback<SscsCaseData> callback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(callback);
+        sendCallbackHandler.handle(callback);
 
 
         then(updateCcdCaseService)
@@ -357,7 +357,7 @@ public class EvidenceShareServiceIt {
         json = json.replace("CREATED_IN_GAPS_FROM", "validAppeal");
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        sendCallbackHandler.handle(sscsCaseDataCallback);
 
         verifyNoMoreInteractions(restTemplate);
         verifyNoMoreInteractions(evidenceManagementService);
@@ -376,7 +376,7 @@ public class EvidenceShareServiceIt {
         json = json.replace("CREATED_IN_GAPS_FROM", "readyToList");
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        sendCallbackHandler.handle(sscsCaseDataCallback);
 
         verifyNoMoreInteractions(restTemplate);
         verifyNoMoreInteractions(evidenceManagementService);

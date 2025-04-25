@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingMessageService;
+import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
@@ -24,11 +25,14 @@ public class ReadyToListSubmittedHandler implements PreSubmitCallbackHandler<Ssc
 
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final HearingMessageService hearingsMessageService;
+    private final SendCallbackHandler sendCallbackHandler;
 
     public ReadyToListSubmittedHandler(@Autowired RegionalProcessingCenterService regionalProcessingCenterService,
-                                       @Autowired HearingMessageService hearingsMessageService) {
+                                       @Autowired HearingMessageService hearingsMessageService,
+                                       @Autowired SendCallbackHandler sendCallbackHandler) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.hearingsMessageService = hearingsMessageService;
+        this.sendCallbackHandler = sendCallbackHandler;
     }
 
     @Override
@@ -67,6 +71,8 @@ public class ReadyToListSubmittedHandler implements PreSubmitCallbackHandler<Ssc
                 .map(RegionalProcessingCenter::getHearingRoute)
                 .findFirst().orElse(HearingRoute.GAPS);
 
-        return HearingHandler.valueOf(route.name()).handle(sscsCaseData, hearingsMessageService);
+        var response = HearingHandler.valueOf(route.name()).handle(sscsCaseData, hearingsMessageService);
+        sendCallbackHandler.handle(callback);
+        return response;
     }
 }

@@ -22,21 +22,21 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.service.servicebus.Notification
 @Slf4j
 @Component
 // TODO: ASB - rename and move
-public class TopicConsumer {
+public class SendCallbackHandler {
 
     private final Integer maxRetryAttempts;
     private final CallbackDispatcher<SscsCaseData> dispatcher;
     private final NotificationsMessageProcessor notificationsMessageProcessor;
 
-    public TopicConsumer(@Value("${callback.maxRetryAttempts}") Integer maxRetryAttempts,
-                         CallbackDispatcher<SscsCaseData> dispatcher,
-                         NotificationsMessageProcessor notificationsMessageProcessor) {
+    public SendCallbackHandler(@Value("${callback.maxRetryAttempts}") Integer maxRetryAttempts,
+                               CallbackDispatcher<SscsCaseData> dispatcher,
+                               NotificationsMessageProcessor notificationsMessageProcessor) {
         this.maxRetryAttempts = maxRetryAttempts;
         this.dispatcher = dispatcher;
         this.notificationsMessageProcessor = notificationsMessageProcessor;
     }
 
-    public void onMessage(Callback<SscsCaseData> callback) {
+    public void handle(Callback<SscsCaseData> callback) {
         log.info("Received message for case ID: {}, event: {}", callback.getCaseDetails().getId(), callback.getEvent());
         processEvidenceShareMessageWithRetry(callback, 1);
         notificationsMessageProcessor.processMessage(callback);

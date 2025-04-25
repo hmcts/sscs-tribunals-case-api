@@ -76,7 +76,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
-import uk.gov.hmcts.reform.sscs.service.servicebus.TopicConsumer;
+import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
 
 
 @RunWith(JUnitParamsRunner.class)
@@ -126,7 +126,7 @@ public class IssueFurtherEvidenceServiceIt {
     private IssueFurtherEvidenceHandler handler;
 
     @Autowired
-    private TopicConsumer topicConsumer;
+    private SendCallbackHandler sendCallbackHandler;
 
     @Autowired
     private SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer;
@@ -212,7 +212,7 @@ public class IssueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        sendCallbackHandler.handle(sscsCaseDataCallback);
 
         verify(bulkPrintService).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -251,7 +251,7 @@ public class IssueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        sendCallbackHandler.handle(sscsCaseDataCallback);
 
         verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -294,7 +294,7 @@ public class IssueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        sendCallbackHandler.handle(sscsCaseDataCallback);
 
         verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -337,7 +337,7 @@ public class IssueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        sendCallbackHandler.handle(sscsCaseDataCallback);
 
         verify(bulkPrintService, times(4)).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -390,7 +390,7 @@ public class IssueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        sendCallbackHandler.handle(sscsCaseDataCallback);
 
         verify(bulkPrintService).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -429,7 +429,7 @@ public class IssueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        sendCallbackHandler.handle(sscsCaseDataCallback);
 
         verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -473,7 +473,7 @@ public class IssueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        sendCallbackHandler.handle(sscsCaseDataCallback);
 
         verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -517,7 +517,7 @@ public class IssueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        sendCallbackHandler.handle(sscsCaseDataCallback);
 
         verify(bulkPrintService, times(3)).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -565,7 +565,7 @@ public class IssueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        sendCallbackHandler.handle(sscsCaseDataCallback);
 
         verify(bulkPrintService, times(5)).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -648,7 +648,7 @@ public class IssueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        sendCallbackHandler.handle(sscsCaseDataCallback);
 
         verify(bulkPrintService).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -680,7 +680,7 @@ public class IssueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        sendCallbackHandler.handle(sscsCaseDataCallback);
 
         verifyNoInteractions(bulkPrintService);
     }

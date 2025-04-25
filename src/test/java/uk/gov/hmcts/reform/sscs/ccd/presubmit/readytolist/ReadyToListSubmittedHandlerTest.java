@@ -48,6 +48,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingMessageService;
+import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
 
 @RunWith(JUnitParamsRunner.class)
 public class ReadyToListSubmittedHandlerTest {
@@ -64,6 +65,8 @@ public class ReadyToListSubmittedHandlerTest {
     private RegionalProcessingCenterService regionalProcessingCenterService;
     @Mock
     private HearingMessageService hearingsMessageService;
+    @Mock
+    private SendCallbackHandler sendCallbackHandler;
     private SscsCaseData sscsCaseData;
 
     private static final String CASE_ID = "1234";
@@ -72,7 +75,7 @@ public class ReadyToListSubmittedHandlerTest {
     public void setUp() {
         openMocks(this);
 
-        handler = new ReadyToListSubmittedHandler(regionalProcessingCenterService, hearingsMessageService);
+        handler = new ReadyToListSubmittedHandler(regionalProcessingCenterService, hearingsMessageService, sendCallbackHandler);
 
         when(callback.getEvent()).thenReturn(EventType.READY_TO_LIST);
 
