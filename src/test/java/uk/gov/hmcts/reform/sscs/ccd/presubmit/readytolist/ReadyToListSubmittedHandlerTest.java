@@ -45,10 +45,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
-import uk.gov.hmcts.reform.sscs.model.servicebus.NoOpMessagingService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingMessageService;
-import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingMessagingServiceFactory;
 
 @RunWith(JUnitParamsRunner.class)
 public class ReadyToListSubmittedHandlerTest {

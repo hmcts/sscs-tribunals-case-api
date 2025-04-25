@@ -60,5 +60,5 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
 
     boolean warningsShouldNotBeIgnored(Callback<SscsCaseData> callback) {
         return !callback.isIgnoreWarnings() && !YesNo.YES.equals(callback.getCaseDetails().getCaseData().getIgnoreCallbackWarnings());
-    };
+    }
 }
