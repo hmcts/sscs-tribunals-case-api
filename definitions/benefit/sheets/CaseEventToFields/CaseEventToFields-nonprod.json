@@ -9,7 +9,8 @@
     "PageFieldDisplayOrder": 4,
     "PageID": "1.0",
     "ShowSummaryChangeOption": "Y"
-  }
+  },
+  {
     "LiveFrom": "18/03/2025",
     "CaseEventID": "tribunalCommunication",
     "CaseFieldID": "tribunalRequestType",
