@@ -84,6 +84,7 @@ export class Hearing extends BaseStep {
       hearingTestData.hearingAttendanceValue
     );
     await this.hearingsTab.verifyExpHearingDateIsGenerated('31');
+    await this.hearingsTab.clickBackLink();
   }
 
   async verifyManualHearingCancellation() {
@@ -160,6 +161,10 @@ export class Hearing extends BaseStep {
   async updateListingRequirementsNoChange() {
     await this.homePage.chooseEvent('Update Listing Requirements');
     await this.listingRequirementPage.submitEventNoChange();
+  }
 
+  async cancelHearingForCleanUp() {
+    await this.hearingsTab.clickCancelLink();
+    await this.hearingsTab.submitCancellationReason();
   }
 }
