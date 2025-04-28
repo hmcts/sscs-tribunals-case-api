@@ -7,15 +7,18 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.exception.GetCaseException;
+import uk.gov.hmcts.reform.sscs.exception.TribunalsEventProcessingException;
+import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
-import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingMessageService;
+import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingRequestHandler;
 
 @Slf4j
 public enum HearingHandler {
     GAPS {
         @Override
         public PreSubmitCallbackResponse<SscsCaseData> handle(SscsCaseData sscsCaseData,
-                                                              HearingMessageService messagingService) {
+                                                              HearingRequestHandler hearingRequestHandler) {
             sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.GAPS);
             sscsCaseData.getSchedulingAndListingFields().setHearingState(HearingState.CREATE_HEARING);
             PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
@@ -34,7 +37,7 @@ public enum HearingHandler {
     LIST_ASSIST {
         @Override
         public PreSubmitCallbackResponse<SscsCaseData> handle(SscsCaseData sscsCaseData,
-                                                              HearingMessageService messagingService) {
+                                                              HearingRequestHandler hearingRequestHandler) {
 
             PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
@@ -43,18 +46,17 @@ public enum HearingHandler {
             HearingRoute hearingRoute = HearingRoute.LIST_ASSIST;
             HearingState hearingState = HearingState.CREATE_HEARING;
 
-            boolean messageSuccess = messagingService.sendMessage(
-                    HearingRequest.builder(sscsCaseData.getCcdCaseId())
-                            .hearingRoute(hearingRoute)
-                            .hearingState(hearingState)
-                            .build()
-            );
-
-            if (!messageSuccess) {
-                callbackResponse.addError("An error occurred during message publish. Please try again.");
-            } else {
+            try {
+                hearingRequestHandler.handleHearingRequest(
+                        HearingRequest.builder(sscsCaseData.getCcdCaseId())
+                                .hearingRoute(hearingRoute)
+                                .hearingState(hearingState)
+                                .build()
+                );
                 sscsCaseData.getSchedulingAndListingFields().setHearingRoute(hearingRoute);
                 sscsCaseData.getSchedulingAndListingFields().setHearingState(hearingState);
+            } catch (TribunalsEventProcessingException | GetCaseException | UpdateCaseException e) {
+                callbackResponse.addError("An error occurred during message publish. Please try again.");
             }
 
             return callbackResponse;
@@ -62,5 +64,5 @@ public enum HearingHandler {
     };
 
     public abstract PreSubmitCallbackResponse<SscsCaseData> handle(SscsCaseData caseData,
-                                                                   HearingMessageService messagingService);
+                                                                   HearingRequestHandler hearingRequestHandler);
 }

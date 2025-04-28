@@ -12,14 +12,14 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
-import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingMessageService;
+import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingRequestHandler;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ListAssistHearingMessageHelper {
 
-    private final HearingMessageService hearingsMessageService;
+    private final HearingRequestHandler hearingRequestHandler;
 
     public void sendListAssistCancelHearingMessage(final String ccdCaseId, CancellationReason cancellationReason) {
         sendHearingMessage(ccdCaseId, LIST_ASSIST, CANCEL_HEARING, cancellationReason);
@@ -42,6 +42,13 @@ public class ListAssistHearingMessageHelper {
             .hearingState(hearingState)
             .cancellationReason(cancellationReason)
             .build();
-        return hearingsMessageService.sendMessage(hearingRequest);
+
+        try {
+            hearingRequestHandler.handleHearingRequest(hearingRequest);
+            return true;
+        } catch (Exception ex) {
+            log.error("Unable to handle hearing request {}. Cause: {}", hearingRequest, ex.getMessage(), ex);
+            return false;
+        }
     }
 }

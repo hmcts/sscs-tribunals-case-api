@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
-import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingMessageService;
+import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingRequestHandler;
 import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
@@ -24,14 +24,14 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 public class ReadyToListSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final RegionalProcessingCenterService regionalProcessingCenterService;
-    private final HearingMessageService hearingsMessageService;
+    private final HearingRequestHandler hearingRequestHandler;
     private final SendCallbackHandler sendCallbackHandler;
 
     public ReadyToListSubmittedHandler(@Autowired RegionalProcessingCenterService regionalProcessingCenterService,
-                                       @Autowired HearingMessageService hearingsMessageService,
+                                       @Autowired HearingRequestHandler hearingRequestHandler,
                                        @Autowired SendCallbackHandler sendCallbackHandler) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
-        this.hearingsMessageService = hearingsMessageService;
+        this.hearingRequestHandler = hearingRequestHandler;
         this.sendCallbackHandler = sendCallbackHandler;
     }
 
@@ -54,14 +54,14 @@ public class ReadyToListSubmittedHandler implements PreSubmitCallbackHandler<Ssc
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
         if (!sscsCaseData.isIbcCase() && HearingRoute.GAPS == sscsCaseData.getSchedulingAndListingFields().getHearingRoute()) {
-            return HearingHandler.GAPS.handle(sscsCaseData, hearingsMessageService);
+            return HearingHandler.GAPS.handle(sscsCaseData, hearingRequestHandler);
         }
         
         String region = sscsCaseData.getRegion();
 
         if (sscsCaseData.isIbcCase()) {
             SscsUtil.setListAssistRoutes(sscsCaseData);
-            return HearingHandler.valueOf(HearingRoute.LIST_ASSIST.name()).handle(sscsCaseData, hearingsMessageService);
+            return HearingHandler.valueOf(HearingRoute.LIST_ASSIST.name()).handle(sscsCaseData, hearingRequestHandler);
         }
         Map<String, RegionalProcessingCenter> rpcMap = regionalProcessingCenterService.getRegionalProcessingCenterMap();
 
@@ -71,7 +71,7 @@ public class ReadyToListSubmittedHandler implements PreSubmitCallbackHandler<Ssc
                 .map(RegionalProcessingCenter::getHearingRoute)
                 .findFirst().orElse(HearingRoute.GAPS);
 
-        var response = HearingHandler.valueOf(route.name()).handle(sscsCaseData, hearingsMessageService);
+        var response = HearingHandler.valueOf(route.name()).handle(sscsCaseData, hearingRequestHandler);
         sendCallbackHandler.handle(callback);
         return response;
     }

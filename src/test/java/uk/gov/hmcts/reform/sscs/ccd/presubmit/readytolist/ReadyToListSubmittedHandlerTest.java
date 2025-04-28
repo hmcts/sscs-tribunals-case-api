@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -42,9 +44,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
+import uk.gov.hmcts.reform.sscs.exception.GetCaseException;
+import uk.gov.hmcts.reform.sscs.exception.TribunalsEventProcessingException;
+import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
-import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingMessageService;
+import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingRequestHandler;
 import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
 
 @ExtendWith(MockitoExtension.class)
@@ -56,7 +61,7 @@ public class ReadyToListSubmittedHandlerTest {
     @Mock
     private RegionalProcessingCenterService regionalProcessingCenterService;
     @Mock
-    private HearingMessageService hearingsMessageService;
+    private HearingRequestHandler hearingRequestHandler;
     @Mock
     private SendCallbackHandler sendCallbackHandler;
 
@@ -77,7 +82,7 @@ public class ReadyToListSubmittedHandlerTest {
                 new CaseDetails<>(1234L, "SSCS", RESPONSE_RECEIVED, caseData, now(), "Benefit");
         callback = new Callback<>(caseDetails, empty(), READY_TO_LIST, false);
 
-        handler = new ReadyToListSubmittedHandler(regionalProcessingCenterService, hearingsMessageService, sendCallbackHandler);
+        handler = new ReadyToListSubmittedHandler(regionalProcessingCenterService, hearingRequestHandler, sendCallbackHandler);
     }
 
     @ParameterizedTest
@@ -117,9 +122,10 @@ public class ReadyToListSubmittedHandlerTest {
     }
 
     @Test
-    public void givenAnRpcUsingListAssist_shouldSuccessfullySendAHearingRequestMessage() {
+    public void givenAnRpcUsingListAssist_shouldSuccessfullySendAHearingRequestMessage()
+            throws UpdateCaseException, TribunalsEventProcessingException, GetCaseException {
         buildRegionalProcessingCentreMap(HearingRoute.LIST_ASSIST);
-        when(hearingsMessageService.sendMessage(any())).thenReturn(true);
+        doNothing().when(hearingRequestHandler).handleHearingRequest(any());
         caseData.setRegion("TEST");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
@@ -133,8 +139,9 @@ public class ReadyToListSubmittedHandlerTest {
     }
 
     @Test
-    public void givenAnIbcCase_shouldSuccessfullySendAHearingRequestMessageWithListAssist() {
-        when(hearingsMessageService.sendMessage(any())).thenReturn(true);
+    public void givenAnIbcCase_shouldSuccessfullySendAHearingRequestMessageWithListAssist()
+            throws UpdateCaseException, TribunalsEventProcessingException, GetCaseException {
+        doNothing().when(hearingRequestHandler).handleHearingRequest(any());
         caseData.setBenefitCode("093");
         caseData.setRegion("TEST");
 
@@ -156,7 +163,7 @@ public class ReadyToListSubmittedHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        verifyNoInteractions(hearingsMessageService);
+        verifyNoInteractions(hearingRequestHandler);
         assertEquals(HearingRoute.GAPS, response.getData().getSchedulingAndListingFields().getHearingRoute());
         assertEquals(HearingState.CREATE_HEARING, response.getData().getSchedulingAndListingFields().getHearingState());
         assertThat(response.getErrors())
@@ -164,9 +171,10 @@ public class ReadyToListSubmittedHandlerTest {
     }
 
     @Test
-    public void givenAnRpcUsingListAssist_shouldAddErrorIfMessageFailedToSend() {
+    public void givenAnRpcUsingListAssist_shouldAddErrorIfMessageFailedToSend()
+            throws UpdateCaseException, TribunalsEventProcessingException, GetCaseException {
         buildRegionalProcessingCentreMap(HearingRoute.LIST_ASSIST);
-        when(hearingsMessageService.sendMessage(any())).thenReturn(false);
+        doThrow(UpdateCaseException.class).when(hearingRequestHandler).handleHearingRequest(any());
         caseData.setRegion("TEST");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
@@ -239,14 +247,15 @@ public class ReadyToListSubmittedHandlerTest {
         assertEquals(HearingRoute.LIST_ASSIST, response.getData().getAppeal().getHearingOptions().getHearingRoute());
         assertEquals(HearingRoute.LIST_ASSIST, response.getData().getRegionalProcessingCenter().getHearingRoute());
         PreSubmitCallbackResponse<SscsCaseData> expectedResponse = HearingHandler
-                .valueOf(HearingRoute.LIST_ASSIST.name()).handle(caseData, hearingsMessageService);
+                .valueOf(HearingRoute.LIST_ASSIST.name()).handle(caseData, hearingRequestHandler);
         assertEquals(expectedResponse.getData(), response.getData());
         assertEquals(expectedResponse.getErrors(), response.getErrors());
         assertEquals(expectedResponse.getWarnings(), response.getWarnings());
     }
 
-    private void verifyMessagingServiceCalled() {
-        verify(hearingsMessageService).sendMessage(HearingRequest.builder(CASE_ID)
+    private void verifyMessagingServiceCalled()
+            throws UpdateCaseException, TribunalsEventProcessingException, GetCaseException {
+        verify(hearingRequestHandler).handleHearingRequest(HearingRequest.builder(CASE_ID)
                 .hearingRoute(HearingRoute.LIST_ASSIST)
                 .hearingState(HearingState.CREATE_HEARING)
                 .build());
