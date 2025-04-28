@@ -1,7 +1,7 @@
 apiVersion: v2
 name: sscs-tribunals-api
 home: https://github.com/hmcts/sscs-tribunals-case-api
-version: 0.0.203
+version: 0.0.204
 description: SSCS Tribunals Case API
 maintainers:
   - name: HMCTS SSCS Team
@@ -19,7 +19,7 @@ dependencies:
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: job.enabled
   - name: xui-webapp
-    version: 1.0.18
+    version: 1.0.30
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: xui-webapp.enabled
   - name: ccd
@@ -29,7 +29,7 @@ dependencies:
     tags:
       - sscs-ccd-idam-pr
   - name: sscs-tribunals-frontend
-    version: 0.2.44
+    version: 0.2.47
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: sscs-tribunals-frontend.enabled
   - name: redis
@@ -37,15 +37,15 @@ dependencies:
     repository: "oci://registry-1.docker.io/bitnamicharts"
     condition: redis.enabled
   - name: em-ccdorc
-    version: 2.0.25
+    version: 2.1.0
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: em-ccdorc.enabled
   - name: em-stitching
-    version: 1.0.55
+    version: 1.1.0
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: em-stitching.enabled
   - name: ccd-case-document-am-api
-    version: 1.7.14
+    version: 1.7.16
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: ccd-case-document-am-api.enabled
   - name: servicebus
@@ -67,11 +67,11 @@ dependencies:
     condition: am-org-role-mapping-service.enabled
   # WA
   - name: camunda-bpm
-    version: 0.0.47
+    version: 0.0.48
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: wa.enabled
   - name: wa-task-management-api
-    version: 0.0.53
+    version: 0.1.0
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: wa.enabled
   - name: wa-task-monitor
@@ -79,11 +79,11 @@ dependencies:
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: wa.enabled
   - name: wa-case-event-handler
-    version: 0.0.41
+    version: 0.1.0
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: wa.enabled
   - name: wa-workflow-api
-    version: 0.0.43
+    version: 0.1.1
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: wa.enabled
   #    initiation
