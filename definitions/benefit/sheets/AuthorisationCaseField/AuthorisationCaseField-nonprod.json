@@ -1,7 +1,41 @@
 [
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "functionalTest", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+
   {"LiveFrom": "11/04/2025", "CaseTypeID": "Benefit", "CaseFieldID": "panelMemberComposition", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "11/04/2025", "CaseTypeID": "Benefit", "CaseFieldID": "panelMemberComposition", "AccessProfile": "caseworker-sscs-judge", "CRUD": "CRUD"},
   {"LiveFrom": "11/04/2025", "CaseTypeID": "Benefit", "CaseFieldID": "panelMemberComposition", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
   {"LiveFrom": "11/04/2025", "CaseTypeID": "Benefit", "CaseFieldID": "panelMemberComposition", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"}
+
+  {"LiveFrom": "23/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalRequestType", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalRequestTopic", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalRequestQuestion", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalCommunications", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "ftaRequestType", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "ftaRequestTopic", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "ftaRequestQuestion", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "ftaCommunications", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "ftaRequestNoResponseRadioDl", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "ftaRequestNoResponseQuery", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "ftaRequestNoResponseTextArea", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "ftaRequestNoResponseNoAction", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "ftaRequestNoResponseNoActionLabel", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "ftaResponseDueDate", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalResponseDueDate", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalRequestNoResponseRadioDl", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalRequestNoResponseQuery", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalRequestNoResponseTextArea", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalRequestNoResponseNoAction", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalRequestNoResponseNoActionLabel", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  
+  {"LiveFrom": "14/04/2025", "CaseTypeID": "Benefit", "CaseFieldID": "ftaResponseNoActionedRadioDl", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "14/04/2025", "CaseTypeID": "Benefit", "CaseFieldID": "ftaResponseNoActionedQuery", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "14/04/2025", "CaseTypeID": "Benefit", "CaseFieldID": "ftaResponseNoActionedReply", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "14/04/2025", "CaseTypeID": "Benefit", "CaseFieldID": "ftaResponseActioned", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalRequestRespondedDl", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalRequestRespondedQuery", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalRequestRespondedReply", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalRequestRespondedActioned", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "ftaResponseProvidedDate", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalResponseProvidedDate", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"}
 ]
