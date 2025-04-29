@@ -455,7 +455,7 @@ dependencies {
         exclude group: 'commons-io', module: 'commons-io'
     }
 
-    testImplementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5-fluent', version: '5.4.3'
+    testImplementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5-fluent', version: '5.4.4'
 
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.17.0'
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.17.0'
