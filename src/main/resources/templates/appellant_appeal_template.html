@@ -306,6 +306,13 @@
             </dd>
         </div>
 
+        {% if isIbcCase %}
+        <div>
+            <dt class="cya-question">Does the representative live in England, Scotland, Wales or Northern Ireland?</dt>
+            <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.appellant.address.inMainlandUk }}</dd>
+        </div>
+        {% endif %}
+
         <div>
             <dt class="cya-question">Phone number</dt>
             <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.rep.contact.mobile | default('Not provided') }}</dd>
