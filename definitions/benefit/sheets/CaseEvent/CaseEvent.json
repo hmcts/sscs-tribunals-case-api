@@ -1783,7 +1783,6 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "RetriesTimeoutURLAboutToSubmitEvent": "5,5",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdSubmittedEvent",
-    "RetriesTimeoutURLSubmittedEvent": "10,10",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public"
   },
