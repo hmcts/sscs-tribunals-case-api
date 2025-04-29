@@ -180,7 +180,7 @@
 
         {% if isIbcCase %}
         <div>
-            <dt class="cya-question">A yw'r apelydd yn byw yng Nghymru, Lloegr neu'r Alban?</dt>
+            <dt class="cya-question">Ydych chi'n byw yng Nghymru, Lloegr, Yr Alban neu Ogledd Iwerddon?</dt>
             <dd class="cya-answer">{{ welshInMainlandUk }}</dd>
         </div>
         {% endif %}
@@ -317,6 +317,13 @@
 
             </dd>
         </div>
+
+        {% if isIbcCase %}
+         <div>
+             <dt class="cya-question">A yw eich cynrychiolydd yn byw yng Nghymru, Lloegr, Yr Alban neu Ogledd Iwerddon?</dt>
+             <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.rep.address.inMainlandUk }}</dd>
+         </div>
+         {% endif %}        
 
         <div>
             <dt class="cya-question">Rhif ffôn</dt>
@@ -691,7 +698,7 @@
 
         {% if isIbcCase %}
         <div>
-            <dt class="cya-question">Does the appellant live in England, Wales or Scotland?</dt>
+            <dt class="cya-question">Does the appellant live in England, Scotland, Wales or Northern Ireland?</dt>
             <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.appellant.address.inMainlandUk }}</dd>
         </div>
         {% endif %}
@@ -822,6 +829,13 @@
 
             </dd>
         </div>
+
+        {% if isIbcCase %}
+         <div>
+             <dt class="cya-question">Does the representative live in England, Scotland, Wales or Northern Ireland?</dt>
+             <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.rep.address.inMainlandUk }}</dd>
+         </div>
+         {% endif %}
 
         <div>
             <dt class="cya-question">Phone number</dt>
