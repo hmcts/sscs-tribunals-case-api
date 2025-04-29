@@ -3,7 +3,7 @@ plugins {
     id 'pmd'
     id 'org.sonarqube' version '6.1.0.5360'
     id 'jacoco'
-    id 'org.springframework.boot' version '3.4.4'
+    id 'org.springframework.boot' version '3.4.5'
     id 'uk.gov.hmcts.java' version '0.12.65'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'com.gorylenko.gradle-git-properties' version '2.5.0'
@@ -52,7 +52,7 @@ application {
 }
 
 pmd {
-    toolVersion = "7.12.0"
+    toolVersion = "7.13.0"
     ignoreFailures = true
     sourceSets = [sourceSets.main, sourceSets.test]
     reportsDir = layout.buildDirectory.dir("reports/pmd").get().asFile
@@ -388,7 +388,7 @@ dependencies {
     // sscs-pdf-email-common
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.55.3'
-    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.10'
+    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.11'
 
     implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.7.5'
 
@@ -455,7 +455,7 @@ dependencies {
         exclude group: 'commons-io', module: 'commons-io'
     }
 
-    testImplementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5-fluent', version: '5.4.3'
+    testImplementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5-fluent', version: '5.4.4'
 
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.17.0'
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.17.0'
@@ -501,7 +501,7 @@ dependencies {
     implementation group: 'io.github.openfeign', name: 'feign-jackson', version: '13.6'
     implementation group: 'com.github.everit-org.json-schema', name: 'org.everit.json.schema', version: '1.14.4'
     implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
-    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-assertj', version: '3.4.1'
+    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-assertj', version: '4.1.0'
     testImplementation group: 'org.pitest', name: 'pitest', version: '1.19.1'
     testImplementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: pitest.pitestVersion.get()
     testImplementation group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: '0.5'
