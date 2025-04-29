@@ -144,7 +144,6 @@ public class SubmitAppealTest {
                 "dateSentToDwp",
                 "directionNoticeContent",
                 "dwpDueDate",
-                "dwpState",
                 "hmctsDwpState",
                 "libertyToApply",
                 "libertyToApplyBodyContent",
