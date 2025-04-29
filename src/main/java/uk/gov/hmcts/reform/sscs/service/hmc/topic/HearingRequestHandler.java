@@ -34,7 +34,6 @@ public class HearingRequestHandler {
 
     private final IdamService idamService;
 
-    @Async
     public void handleHearingRequest(HearingRequest message) throws TribunalsEventProcessingException, GetCaseException, UpdateCaseException {
         if (isNull(message)) {
             throw new TribunalsEventProcessingException("An exception occurred as message did not match format");

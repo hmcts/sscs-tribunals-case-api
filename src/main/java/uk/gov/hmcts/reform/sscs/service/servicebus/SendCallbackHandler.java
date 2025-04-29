@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.service.servicebus.Notification
 
 @Slf4j
 @Component
-// TODO: ASB - rename and move
 public class SendCallbackHandler {
 
     private final Integer maxRetryAttempts;
