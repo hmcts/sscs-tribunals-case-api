@@ -195,14 +195,14 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
 
         assertEquals(3, resultComs.size());
 
-        assertEquals(tribunalCommunicationPast, resultComs.getFirst());
+        assertEquals(tribunalCommunicationFuture, resultComs.getFirst());
         CommunicationRequestDetails addedCom = resultComs.get(1).getValue();
         assertEquals(expectedTopic, addedCom.getRequestTopic());
         assertEquals(expectedQuestion, addedCom.getRequestMessage());
         assertEquals(expectedUserName, addedCom.getRequestUserName());
         assertEquals(UserRole.CTSC_CLERK.getLabel(), addedCom.getRequestUserRole());
         assertNotNull(addedCom.getRequestDateTime());
-        assertEquals(tribunalCommunicationFuture, resultComs.getLast());
+        assertEquals(tribunalCommunicationPast, resultComs.getLast());
         assertEquals(calculateDueDateWorkingDays(LocalDate.now(), 2), addedCom.getRequestResponseDueDate());
         assertEquals(LocalDate.now().minusYears(1), response.getData().getCommunicationFields().getTribunalResponseDueDate());
     }

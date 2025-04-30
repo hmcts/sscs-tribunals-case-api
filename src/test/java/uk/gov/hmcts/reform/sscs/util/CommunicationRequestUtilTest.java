@@ -227,8 +227,8 @@ class CommunicationRequestUtilTest {
         List<CommunicationRequest> result = CommunicationRequestUtil.getAllRequests(communicationFields);
 
         assertEquals(2, result.size());
-        assertEquals(tribunalRequest, result.get(0));
-        assertEquals(ftaRequest, result.get(1));
+        assertEquals(ftaRequest, result.get(0));
+        assertEquals(tribunalRequest, result.get(1));
     }
 
     @Test

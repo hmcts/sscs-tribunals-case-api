@@ -94,7 +94,7 @@ public class CommunicationRequestUtil {
                 .build())
             .build());
         comms.sort(Comparator.comparing(communicationRequest ->
-            communicationRequest.getValue().getRequestDateTime()));
+            ((CommunicationRequest) communicationRequest).getValue().getRequestDateTime()).reversed());
     }
 
     public static DynamicListItem getDlItemFromCommunicationRequest(CommunicationRequest communicationRequest) {
@@ -119,7 +119,7 @@ public class CommunicationRequestUtil {
                 .ifPresent(allRequests::addAll);
         }
         allRequests.sort(Comparator.comparing(communicationRequest ->
-            communicationRequest.getValue().getRequestDateTime()));
+            ((CommunicationRequest) communicationRequest).getValue().getRequestDateTime()).reversed());
         return allRequests;
     }
 

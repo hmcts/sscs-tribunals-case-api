@@ -195,14 +195,14 @@ class FtaCommunicationAboutToSubmitHandlerTest {
 
         assertEquals(3, resultComs.size());
 
-        assertEquals(ftaCommunicationPast, resultComs.getFirst());
+        assertEquals(ftaCommunicationFuture, resultComs.getFirst());
         CommunicationRequestDetails addedCom = resultComs.get(1).getValue();
         assertEquals(expectedTopic, addedCom.getRequestTopic());
         assertEquals(expectedQuestion, addedCom.getRequestMessage());
         assertEquals(expectedUserName, addedCom.getRequestUserName());
         assertEquals(UserRole.IBCA.getLabel(), addedCom.getRequestUserRole());
         assertNotNull(addedCom.getRequestDateTime());
-        assertEquals(ftaCommunicationFuture, resultComs.getLast());
+        assertEquals(ftaCommunicationPast, resultComs.getLast());
         assertEquals(calculateDueDateWorkingDays(LocalDate.now(), 2), addedCom.getRequestResponseDueDate());
     }
 
