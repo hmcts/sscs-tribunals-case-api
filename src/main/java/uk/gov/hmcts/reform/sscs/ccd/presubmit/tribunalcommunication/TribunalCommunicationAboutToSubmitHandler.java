@@ -88,6 +88,7 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
             .replyUserRole(getRoleName(userDetails))
             .replyMessage(noActionRequired ? "No action required" : replyText)
             .replyHasBeenActioned(noActionRequired ? null : YesNo.NO)
+            .replyHasBeenActionedByTribunal(noActionRequired ? null : YesNo.NO)
             .build();
         communicationRequest.getValue().setRequestReply(reply);
         communicationRequest.getValue().setRequestResponseDueDate(null);
@@ -112,6 +113,7 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
         String chosenFtaRequestId = Optional.ofNullable(requestDl.getValue()).orElse(new DynamicListItem(null, null)).getCode();
         CommunicationRequest communicationRequest = getCommunicationRequestFromId(chosenFtaRequestId, ftaCommunicationFields.getTribunalCommunications());
         communicationRequest.getValue().getRequestReply().setReplyHasBeenActioned(YesNo.YES);
+        communicationRequest.getValue().getRequestReply().setReplyHasBeenActionedByFta(YesNo.YES);
     }
 }
 
