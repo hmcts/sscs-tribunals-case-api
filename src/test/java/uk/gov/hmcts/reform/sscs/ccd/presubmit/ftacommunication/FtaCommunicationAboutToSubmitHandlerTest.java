@@ -273,7 +273,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertEquals(userName, request.getRequestReply().getReplyUserName());
         assertEquals(UserRole.IBCA.getLabel(), request.getRequestReply().getReplyUserRole());
         assertNotNull(request.getRequestReply().getReplyDateTime());
-        assertEquals(YesNo.NO, request.getRequestReply().getReplyHasBeenActioned());
+        assertEquals(YesNo.NO, request.getRequestReply().getReplyHasBeenActionedByFta());
         assertNull(request.getRequestResponseDueDate());
         assertEquals(LocalDate.now(), response.getData().getCommunicationFields().getTribunalResponseProvidedDate());
     }
@@ -291,7 +291,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
             .id(chosenFtaRequestId)
             .value(CommunicationRequestDetails.builder()
                 .requestReply(CommunicationRequestReply.builder()
-                    .replyHasBeenActioned(YesNo.NO)
+                    .replyHasBeenActionedByTribunal(YesNo.NO)
                     .replyDateTime(LocalDateTime.now().plusYears(1))
                     .build())
                 .build())
@@ -321,7 +321,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertEquals(userName, request.getRequestReply().getReplyUserName());
         assertEquals(UserRole.CTSC_CLERK.getLabel(), request.getRequestReply().getReplyUserRole());
         assertNotNull(request.getRequestReply().getReplyDateTime());
-        assertEquals(YesNo.NO, request.getRequestReply().getReplyHasBeenActioned());
+        assertEquals(YesNo.NO, request.getRequestReply().getReplyHasBeenActionedByFta());
         assertNull(request.getRequestResponseDueDate());
         assertEquals(LocalDate.now(), response.getData().getCommunicationFields().getTribunalResponseProvidedDate());
     }
@@ -339,7 +339,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
             .id(chosenFtaRequestId)
             .value(CommunicationRequestDetails.builder()
                 .requestReply(CommunicationRequestReply.builder()
-                    .replyHasBeenActioned(YesNo.NO)
+                    .replyHasBeenActionedByTribunal(YesNo.NO)
                     .replyDateTime(LocalDateTime.now().minusYears(1))
                     .build())
                 .build())
@@ -369,7 +369,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertEquals(userName, request.getRequestReply().getReplyUserName());
         assertEquals(UserRole.SUPER_USER.getLabel(), request.getRequestReply().getReplyUserRole());
         assertNotNull(request.getRequestReply().getReplyDateTime());
-        assertEquals(YesNo.NO, request.getRequestReply().getReplyHasBeenActioned());
+        assertEquals(YesNo.NO, request.getRequestReply().getReplyHasBeenActionedByFta());
         assertNull(request.getRequestResponseDueDate());
         assertEquals(LocalDate.now().minusYears(1), response.getData().getCommunicationFields().getTribunalResponseProvidedDate());
     }
@@ -408,7 +408,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertEquals(userName, request.getRequestReply().getReplyUserName());
         assertEquals(UserRole.TCW.getLabel(), request.getRequestReply().getReplyUserRole());
         assertNotNull(request.getRequestReply().getReplyDateTime());
-        assertNull(communicationRequest.getValue().getRequestReply().getReplyHasBeenActioned());
+        assertNull(communicationRequest.getValue().getRequestReply().getReplyHasBeenActionedByTribunal());
         assertNull(communicationRequest.getValue().getRequestResponseDueDate());
         assertNull(response.getData().getCommunicationFields().getTribunalResponseDueDate());
         assertNull(response.getData().getCommunicationFields().getFtaResponseProvidedDate());
@@ -596,7 +596,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         
         // Then
         assertNotNull(response);
-        assertEquals(YesNo.YES, response.getData().getCommunicationFields().getFtaCommunications().getFirst().getValue().getRequestReply().getReplyHasBeenActioned());
+        assertEquals(YesNo.YES, response.getData().getCommunicationFields().getFtaCommunications().getFirst().getValue().getRequestReply().getReplyHasBeenActionedByTribunal());
         
         // Verify fields are cleared
         assertNull(response.getData().getCommunicationFields().getCommRequestQuestion());

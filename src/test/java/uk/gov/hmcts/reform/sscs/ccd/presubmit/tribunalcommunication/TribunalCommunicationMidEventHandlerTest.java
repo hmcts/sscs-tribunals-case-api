@@ -481,7 +481,8 @@ class TribunalCommunicationMidEventHandlerTest {
                 .requestReply(CommunicationRequestReply.builder()
                     .replyDateTime(LocalDateTime.now())
                     .replyMessage("some reply message")
-                    .replyHasBeenActioned(YesNo.NO)
+                    .replyHasBeenActionedByFta(YesNo.NO)
+                    .replyHasBeenActionedByTribunal(YesNo.NO)
                     .build())
                 .build())
             .build();
@@ -495,7 +496,8 @@ class TribunalCommunicationMidEventHandlerTest {
                     .requestTopic(CommunicationRequestTopic.APPEAL_TYPE)
                     .requestReply(CommunicationRequestReply.builder()
                         .replyDateTime(LocalDateTime.now())
-                        .replyHasBeenActioned(YesNo.YES)
+                        .replyHasBeenActionedByFta(YesNo.YES)
+                        .replyHasBeenActionedByTribunal(YesNo.YES)
                         .build())
                     .build())
             .build();

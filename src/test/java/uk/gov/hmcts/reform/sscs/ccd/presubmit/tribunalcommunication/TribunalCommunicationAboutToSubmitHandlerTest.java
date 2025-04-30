@@ -299,7 +299,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
             .id(chosenTribunalRequestId)
             .value(CommunicationRequestDetails.builder()
                 .requestReply(CommunicationRequestReply.builder()
-                    .replyHasBeenActioned(YesNo.NO)
+                    .replyHasBeenActionedByFta(YesNo.NO)
                     .replyDateTime(LocalDateTime.now().plusYears(1))
                     .build())
                 .build())
@@ -346,7 +346,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
             .id(chosenTribunalRequestId)
             .value(CommunicationRequestDetails.builder()
                 .requestReply(CommunicationRequestReply.builder()
-                    .replyHasBeenActioned(YesNo.NO)
+                    .replyHasBeenActionedByFta(YesNo.NO)
                     .replyDateTime(LocalDateTime.now().minusYears(1))
                     .build())
                 .build())
@@ -414,7 +414,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         assertEquals(userName, request.getRequestReply().getReplyUserName());
         assertEquals(UserRole.TCW.getLabel(), request.getRequestReply().getReplyUserRole());
         assertNotNull(request.getRequestReply().getReplyDateTime());
-        assertNull(communicationRequest.getValue().getRequestReply().getReplyHasBeenActioned());
+        assertNull(communicationRequest.getValue().getRequestReply().getReplyHasBeenActionedByFta());
         assertNull(communicationRequest.getValue().getRequestResponseDueDate());
         assertNull(response.getData().getCommunicationFields().getFtaResponseDueDate());
         assertNull(response.getData().getCommunicationFields().getTribunalResponseProvidedDate());
@@ -531,7 +531,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         CommunicationRequest communicationRequest = CommunicationRequest.builder()
             .value(CommunicationRequestDetails.builder()
                 .requestReply(CommunicationRequestReply.builder()
-                    .replyHasBeenActioned(YesNo.NO)
+                    .replyHasBeenActionedByFta(YesNo.NO)
                     .replyDateTime(LocalDateTime.now()).build()).build()).build();
         DynamicListItem dynamicListItem = new DynamicListItem(communicationRequest.getId(), "item");
         DynamicList dynamicList = new DynamicList(dynamicListItem, Collections.singletonList(dynamicListItem));
@@ -550,7 +550,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         assertNotNull(resultComs);
         assertEquals(1, resultComs.size());
         CommunicationRequestDetails resultCom = resultComs.getFirst().getValue();
-        assertEquals(YesNo.YES, resultCom.getRequestReply().getReplyHasBeenActioned());
+        assertEquals(YesNo.YES, resultCom.getRequestReply().getReplyHasBeenActionedByFta());
         assertNull(response.getData().getCommunicationFields().getFtaResponseProvidedDate());
     }
 
@@ -559,17 +559,17 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         CommunicationRequest communicationRequest1 = CommunicationRequest.builder()
             .value(CommunicationRequestDetails.builder()
                 .requestReply(CommunicationRequestReply.builder()
-                    .replyHasBeenActioned(YesNo.NO)
+                    .replyHasBeenActionedByFta(YesNo.NO)
                     .replyDateTime(LocalDateTime.now().plusYears(1)).build()).build()).build();
         CommunicationRequest communicationRequest2 = CommunicationRequest.builder()
             .value(CommunicationRequestDetails.builder()
                 .requestReply(CommunicationRequestReply.builder()
-                    .replyHasBeenActioned(YesNo.NO)
+                    .replyHasBeenActionedByFta(YesNo.NO)
                     .replyDateTime(LocalDateTime.now()).build()).build()).build();
         CommunicationRequest communicationRequest3 = CommunicationRequest.builder()
             .value(CommunicationRequestDetails.builder()
                 .requestReply(CommunicationRequestReply.builder()
-                    .replyHasBeenActioned(YesNo.NO)
+                    .replyHasBeenActionedByFta(YesNo.NO)
                     .replyDateTime(LocalDateTime.now().minusYears(1)).build()).build()).build();
         DynamicListItem dynamicListItem1 = new DynamicListItem(communicationRequest1.getId(), "item1");
         DynamicListItem dynamicListItem2 = new DynamicListItem(communicationRequest2.getId(), "item2");
@@ -588,9 +588,9 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         List<CommunicationRequest> resultComs = response.getData().getCommunicationFields().getTribunalCommunications();
         assertNotNull(resultComs);
         assertEquals(3, resultComs.size());
-        assertEquals(YesNo.NO, resultComs.getFirst().getValue().getRequestReply().getReplyHasBeenActioned());
-        assertEquals(YesNo.NO, resultComs.get(1).getValue().getRequestReply().getReplyHasBeenActioned());
-        assertEquals(YesNo.YES, resultComs.getLast().getValue().getRequestReply().getReplyHasBeenActioned());
+        assertEquals(YesNo.NO, resultComs.getFirst().getValue().getRequestReply().getReplyHasBeenActionedByFta());
+        assertEquals(YesNo.NO, resultComs.get(1).getValue().getRequestReply().getReplyHasBeenActionedByFta());
+        assertEquals(YesNo.YES, resultComs.getLast().getValue().getRequestReply().getReplyHasBeenActionedByFta());
         assertEquals(LocalDate.now().minusYears(1), response.getData().getCommunicationFields().getTribunalResponseProvidedDate());
     }
 
@@ -599,17 +599,17 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         CommunicationRequest communicationRequest1 = CommunicationRequest.builder()
             .value(CommunicationRequestDetails.builder()
                 .requestReply(CommunicationRequestReply.builder()
-                    .replyHasBeenActioned(YesNo.NO)
+                    .replyHasBeenActionedByFta(YesNo.NO)
                     .replyDateTime(LocalDateTime.now().plusYears(1)).build()).build()).build();
         CommunicationRequest communicationRequest2 = CommunicationRequest.builder()
             .value(CommunicationRequestDetails.builder()
                 .requestReply(CommunicationRequestReply.builder()
-                    .replyHasBeenActioned(YesNo.NO)
+                    .replyHasBeenActionedByFta(YesNo.NO)
                     .replyDateTime(LocalDateTime.now()).build()).build()).build();
         CommunicationRequest communicationRequest3 = CommunicationRequest.builder()
             .value(CommunicationRequestDetails.builder()
                 .requestReply(CommunicationRequestReply.builder()
-                    .replyHasBeenActioned(YesNo.NO)
+                    .replyHasBeenActionedByFta(YesNo.NO)
                     .replyDateTime(LocalDateTime.now().minusYears(1)).build()).build()).build();
         DynamicListItem dynamicListItem1 = new DynamicListItem(communicationRequest1.getId(), "item1");
         DynamicListItem dynamicListItem2 = new DynamicListItem(communicationRequest2.getId(), "item2");
@@ -628,9 +628,9 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         List<CommunicationRequest> resultComs = response.getData().getCommunicationFields().getTribunalCommunications();
         assertNotNull(resultComs);
         assertEquals(3, resultComs.size());
-        assertEquals(YesNo.NO, resultComs.getFirst().getValue().getRequestReply().getReplyHasBeenActioned());
-        assertEquals(YesNo.NO, resultComs.get(1).getValue().getRequestReply().getReplyHasBeenActioned());
-        assertEquals(YesNo.YES, resultComs.getLast().getValue().getRequestReply().getReplyHasBeenActioned());
+        assertEquals(YesNo.NO, resultComs.getFirst().getValue().getRequestReply().getReplyHasBeenActionedByFta());
+        assertEquals(YesNo.NO, resultComs.get(1).getValue().getRequestReply().getReplyHasBeenActionedByFta());
+        assertEquals(YesNo.YES, resultComs.getLast().getValue().getRequestReply().getReplyHasBeenActionedByFta());
         assertEquals(LocalDate.now(), response.getData().getCommunicationFields().getTribunalResponseProvidedDate());
     }
 }

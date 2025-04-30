@@ -96,7 +96,6 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
             .replyUserName(userDetails.getName())
             .replyUserRole(getRoleName(userDetails))
             .replyMessage(noActionRequired ? "No action required" : replyText)
-            .replyHasBeenActioned(noActionRequired ? null : YesNo.NO)
             .replyHasBeenActionedByFta(noActionRequired ? null : YesNo.NO)
             .build();
         communicationRequest.getValue().setRequestReply(reply);
@@ -107,7 +106,6 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         DynamicList ftaRequestDl = ftaCommunicationFields.getTribunalRequestsDl();
         String chosenFtaRequestId = Optional.ofNullable(ftaRequestDl.getValue()).orElse(new DynamicListItem(null, null)).getCode();
         CommunicationRequest communicationRequest = getCommunicationRequestFromId(chosenFtaRequestId, ftaCommunicationFields.getFtaCommunications());
-        communicationRequest.getValue().getRequestReply().setReplyHasBeenActioned(YesNo.YES);
         communicationRequest.getValue().getRequestReply().setReplyHasBeenActionedByTribunal(YesNo.YES);
     }
 

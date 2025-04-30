@@ -33,7 +33,9 @@ public class CommunicationRequestUtil {
             .orElse(Collections.emptyList())
             .stream()
             .filter((request -> request.getValue().getRequestReply() != null))
-            .filter((request -> request.getValue().getRequestReply().getReplyHasBeenActioned() == YesNo.NO))
+            .filter((request ->
+                request.getValue().getRequestReply().getReplyHasBeenActionedByFta() == YesNo.NO
+                    || request.getValue().getRequestReply().getReplyHasBeenActionedByTribunal() == YesNo.NO))
             .toList();
     }
 

@@ -702,7 +702,8 @@ class FtaCommunicationMidEventHandlerTest {
                     .requestReply(CommunicationRequestReply.builder()
                         .replyDateTime(LocalDateTime.now())
                         .replyMessage("some reply message")
-                        .replyHasBeenActioned(NO)
+                        .replyHasBeenActionedByFta(YesNo.NO)
+                        .replyHasBeenActionedByTribunal(YesNo.NO)
                         .build())
                     .build())
             .build();
@@ -716,7 +717,8 @@ class FtaCommunicationMidEventHandlerTest {
                     .requestTopic(CommunicationRequestTopic.APPEAL_TYPE)
                     .requestReply(CommunicationRequestReply.builder()
                         .replyDateTime(LocalDateTime.now())
-                        .replyHasBeenActioned(YesNo.YES)
+                        .replyHasBeenActionedByFta(YesNo.YES)
+                        .replyHasBeenActionedByTribunal(YesNo.YES)
                         .build())
                     .build())
             .build();

@@ -30,13 +30,17 @@ class CommunicationRequestUtilTest {
     void shouldReturnRepliesWithoutReviews() {
         CommunicationRequest requestWithReply = CommunicationRequest.builder()
             .value(CommunicationRequestDetails.builder()
-                .requestReply(CommunicationRequestReply.builder().replyHasBeenActioned(YesNo.NO).build())
+                .requestReply(CommunicationRequestReply.builder()
+                    .build())
                 .build())
             .build();
 
         CommunicationRequest requestWithActionedReply = CommunicationRequest.builder()
             .value(CommunicationRequestDetails.builder()
-                .requestReply(CommunicationRequestReply.builder().replyHasBeenActioned(YES).build())
+                .requestReply(CommunicationRequestReply.builder()
+                    .replyHasBeenActionedByFta(YesNo.NO)
+                    .replyHasBeenActionedByTribunal(YesNo.NO)
+                    .build())
                 .build())
             .build();
 
@@ -258,7 +262,8 @@ class CommunicationRequestUtilTest {
             .value(CommunicationRequestDetails.builder()
                 .requestReply(CommunicationRequestReply.builder()
                     .replyDateTime(LocalDateTime.of(2023, 1, 1, 10, 0))
-                    .replyHasBeenActioned(YesNo.NO)
+                    .replyHasBeenActionedByFta(YesNo.NO)
+                    .replyHasBeenActionedByTribunal(YesNo.NO)
                     .build())
                 .build())
             .build();
@@ -266,7 +271,8 @@ class CommunicationRequestUtilTest {
             .value(CommunicationRequestDetails.builder()
                 .requestReply(CommunicationRequestReply.builder()
                     .replyDateTime(LocalDateTime.of(2022, 2, 2, 10, 0))
-                    .replyHasBeenActioned(YesNo.NO)
+                    .replyHasBeenActionedByFta(YesNo.NO)
+                    .replyHasBeenActionedByTribunal(YesNo.NO)
                     .build())
                 .build())
             .build();
@@ -274,7 +280,8 @@ class CommunicationRequestUtilTest {
             .value(CommunicationRequestDetails.builder()
                 .requestReply(CommunicationRequestReply.builder()
                     .replyDateTime(LocalDateTime.of(2022, 3, 3, 10, 0))
-                    .replyHasBeenActioned(YES)
+                    .replyHasBeenActionedByFta(YesNo.YES)
+                    .replyHasBeenActionedByTribunal(YesNo.YES)
                     .build())
                 .build())
             .build();
@@ -316,7 +323,8 @@ class CommunicationRequestUtilTest {
             .value(CommunicationRequestDetails.builder()
                 .requestReply(CommunicationRequestReply.builder()
                     .replyDateTime(LocalDateTime.of(2022, 2, 2, 10, 0))
-                    .replyHasBeenActioned(YesNo.NO)
+                    .replyHasBeenActionedByFta(YesNo.NO)
+                    .replyHasBeenActionedByTribunal(YesNo.NO)
                     .build())
                 .build())
             .build();
@@ -341,7 +349,8 @@ class CommunicationRequestUtilTest {
             .value(CommunicationRequestDetails.builder()
                 .requestReply(CommunicationRequestReply.builder()
                     .replyDateTime(LocalDateTime.of(2022, 2, 2, 10, 0))
-                    .replyHasBeenActioned(YesNo.YES)
+                    .replyHasBeenActionedByFta(YesNo.YES)
+                    .replyHasBeenActionedByTribunal(YesNo.YES)
                     .build())
                 .build())
             .build();
