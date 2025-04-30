@@ -24,13 +24,13 @@ import uk.gov.hmcts.reform.sscs.exception.GetCaseException;
 import uk.gov.hmcts.reform.sscs.model.service.ServiceHearingRequest;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.ServiceHearingValues;
 import uk.gov.hmcts.reform.sscs.model.service.linkedcases.ServiceLinkedCases;
-import uk.gov.hmcts.reform.sscs.service.ServiceHearingsService;
+import uk.gov.hmcts.reform.sscs.service.HearingValuesService;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("integration")
-class ServiceHearingsControllerTest {
+class HearingValuesControllerTest {
 
     private static final long CASE_ID = 1625080769409918L;
 
@@ -52,7 +52,7 @@ class ServiceHearingsControllerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    public ServiceHearingsService serviceHearingsService;
+    public HearingValuesService hearingValuesService;
 
 
     @DisplayName("When Authorization and Case ID valid "
@@ -64,7 +64,7 @@ class ServiceHearingsControllerTest {
                 .caseId(String.valueOf(CASE_ID))
                 .build();
 
-        given(serviceHearingsService.getServiceHearingValues(request))
+        given(hearingValuesService.getServiceHearingValues(request))
             .willReturn(ServiceHearingValues.builder()
                 .build());
 
@@ -82,7 +82,7 @@ class ServiceHearingsControllerTest {
                 .caseId(String.valueOf(MISSING_CASE_ID))
                 .build();
 
-        given(serviceHearingsService.getServiceHearingValues(request))
+        given(hearingValuesService.getServiceHearingValues(request))
             .willThrow(GetCaseException.class);
 
         mockMvc.perform(post(SERVICE_HEARING_VALUES_URL)
@@ -100,7 +100,7 @@ class ServiceHearingsControllerTest {
             .hearingId(String.valueOf(HEARING_ID))
             .build();
 
-        given(serviceHearingsService.getServiceLinkedCases(request))
+        given(hearingValuesService.getServiceLinkedCases(request))
             .willReturn(List.of(ServiceLinkedCases.builder()
                 .build()));
 
@@ -119,7 +119,7 @@ class ServiceHearingsControllerTest {
                 .hearingId(String.valueOf(HEARING_ID))
                 .build();
 
-        given(serviceHearingsService.getServiceLinkedCases(request))
+        given(hearingValuesService.getServiceLinkedCases(request))
             .willThrow(GetCaseException.class);
 
         mockMvc.perform(post(SERVICE_LINKED_CASES_URL)
