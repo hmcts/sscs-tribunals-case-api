@@ -103,12 +103,14 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
     }
 
     private void handleReviewFtaReply(FtaCommunicationFields ftaCommunicationFields) {
-        DynamicList ftaRequestDl = ftaCommunicationFields.getTribunalRequestsDl();
-        String chosenFtaRequestId = Optional.ofNullable(ftaRequestDl.getValue()).orElse(new DynamicListItem(null, null)).getCode();
-        CommunicationRequest communicationRequest = getCommunicationRequestFromId(chosenFtaRequestId, ftaCommunicationFields.getFtaCommunications());
-        communicationRequest.getValue().getRequestReply().setReplyHasBeenActionedByTribunal(YesNo.YES);
+        DynamicMixedChoiceList ftaRequestDl = ftaCommunicationFields.getTribunalRequestsToReviewDl();
+        List<DynamicListItem> actionedRequests = Optional.ofNullable(ftaRequestDl.getValue()).orElse(Collections.emptyList());
+        actionedRequests
+            .forEach(request -> {
+                CommunicationRequest communicationRequest = getCommunicationRequestFromId(request.getCode(), ftaCommunicationFields.getFtaCommunications());
+                communicationRequest.getValue().getRequestReply().setReplyHasBeenActionedByTribunal(YesNo.YES);
+            });
     }
-
 
     private void handleDeleteRequestReply(FtaCommunicationFields ftaCommunicationFields) {
         String requestIdToDelete = ftaCommunicationFields.getDeleteCommRequestRadioDl().getValue().getCode();
@@ -136,10 +138,7 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         communicationFields.setCommRequestResponseTextArea(null);
         communicationFields.setFtaRequestsDl(null);
         communicationFields.setCommRequestResponseNoAction(null);
-        communicationFields.setFtaRequestRespondedReply(null);
-        communicationFields.setFtaRequestRespondedQuery(null);
-        communicationFields.setTribunalRequestsDl(null);
-        communicationFields.setCommRequestActioned(null);
+        communicationFields.setTribunalRequestsToReviewDl(null);
         communicationFields.setDeleteCommRequestRadioDl(null);
     }
 }

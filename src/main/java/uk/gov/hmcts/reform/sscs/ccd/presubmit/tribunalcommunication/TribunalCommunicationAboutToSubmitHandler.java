@@ -101,17 +101,17 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
         communicationFields.setCommRequestResponseTextArea(null);
         communicationFields.setFtaRequestsDl(null);
         communicationFields.setCommRequestResponseNoAction(null);
-        communicationFields.setTribunalRequestRespondedReply(null);
-        communicationFields.setTribunalRequestRespondedQuery(null);
-        communicationFields.setTribunalRequestsDl(null);
-        communicationFields.setCommRequestActioned(null);
+        communicationFields.setFtaRequestsToReviewDl(null);
     }
 
     private void handleReviewTribunalReply(FtaCommunicationFields ftaCommunicationFields) {
-        DynamicList requestDl = ftaCommunicationFields.getFtaRequestsDl();
-        String chosenFtaRequestId = Optional.ofNullable(requestDl.getValue()).orElse(new DynamicListItem(null, null)).getCode();
-        CommunicationRequest communicationRequest = getCommunicationRequestFromId(chosenFtaRequestId, ftaCommunicationFields.getTribunalCommunications());
-        communicationRequest.getValue().getRequestReply().setReplyHasBeenActionedByFta(YesNo.YES);
+        DynamicMixedChoiceList tribunalRequestDl = ftaCommunicationFields.getFtaRequestsToReviewDl();
+        List<DynamicListItem> actionedRequests = Optional.ofNullable(tribunalRequestDl.getValue()).orElse(Collections.emptyList());
+        actionedRequests
+            .forEach(request -> {
+                CommunicationRequest communicationRequest = getCommunicationRequestFromId(request.getCode(), ftaCommunicationFields.getTribunalCommunications());
+                communicationRequest.getValue().getRequestReply().setReplyHasBeenActionedByFta(YesNo.YES);
+            });
     }
 }
 
