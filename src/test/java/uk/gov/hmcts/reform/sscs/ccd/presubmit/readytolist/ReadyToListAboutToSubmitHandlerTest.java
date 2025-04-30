@@ -2,25 +2,38 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist;
 
 import static java.time.LocalDateTime.now;
 import static java.util.Optional.empty;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.RESPONSE_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist.ReadyToListAboutToSubmitHandler.EXISTING_HEARING_WARNING;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist.ReadyToListAboutToSubmitHandler.GAPS_CASE_WARNING;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -31,34 +44,50 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.exception.GetCaseException;
+import uk.gov.hmcts.reform.sscs.exception.TribunalsEventProcessingException;
+import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
+import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
+import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
+import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingRequestHandler;
+import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
 
 @ExtendWith(MockitoExtension.class)
 public class ReadyToListAboutToSubmitHandlerTest {
-
+    
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String CASE_ID = "1234";
 
+    @Mock
+    private RegionalProcessingCenterService regionalProcessingCenterService;
+    @Mock
+    private HearingRequestHandler hearingRequestHandler;
+
+    private SscsCaseData caseData;
+    private ReadyToListAboutToSubmitHandler handler;
+
     private Callback<SscsCaseData> callback;
     private CaseDetails<SscsCaseData> caseDetails;
-    private SscsCaseData sscsCaseData;
-
-    private ReadyToListAboutToSubmitHandler handler;
 
     @BeforeEach
     public void setUp() {
-        sscsCaseData = SscsCaseData.builder().ccdCaseId(CASE_ID)
-                .createdInGapsFrom(READY_TO_LIST.getId())
+        caseData = SscsCaseData.builder()
+                .ccdCaseId(CASE_ID)
+                .createdInGapsFrom(State.READY_TO_LIST.getId())
                 .appeal(Appeal.builder().build())
                 .build();
         caseDetails =
-                new CaseDetails<>(1L,null, null, sscsCaseData, null, null);
-        callback = new Callback<>(caseDetails, empty(), EventType.READY_TO_LIST, false);
+                new CaseDetails<>(1234L, "SSCS", RESPONSE_RECEIVED, caseData, now(), "Benefit");
+        callback = new Callback<>(caseDetails, empty(), READY_TO_LIST, false);
 
-        handler = new ReadyToListAboutToSubmitHandler();
+        handler = new ReadyToListAboutToSubmitHandler(regionalProcessingCenterService, hearingRequestHandler);
     }
 
     @ParameterizedTest
@@ -76,7 +105,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
 
     @Test
     public void givenAGapsCaseOnSubmitReturnWarning() {
-        sscsCaseData.setSchedulingAndListingFields(
+        caseData.setSchedulingAndListingFields(
                 SchedulingAndListingFields.builder().hearingRoute(HearingRoute.GAPS).build()
         );
 
@@ -90,10 +119,10 @@ public class ReadyToListAboutToSubmitHandlerTest {
 
     @Test
     public void givenAGapsCaseOnSubmitIgnoreWarningIIgnoreWarningsFieldIsYes() {
-        sscsCaseData.setSchedulingAndListingFields(
+        caseData.setSchedulingAndListingFields(
                 SchedulingAndListingFields.builder().hearingRoute(HearingRoute.GAPS).build()
         );
-        sscsCaseData.setIgnoreCallbackWarnings(YES);
+        caseData.setIgnoreCallbackWarnings(YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT,
                 callback, USER_AUTHORISATION);
@@ -121,9 +150,9 @@ public class ReadyToListAboutToSubmitHandlerTest {
                 .time("12:00")
                 .build()).build();
 
-        sscsCaseData.setHearings(List.of(hearing1, hearing2));
-        sscsCaseData.setRegion("TEST");
-        sscsCaseData.setIgnoreCallbackWarnings(ignoreCallbackWarnings);
+        caseData.setHearings(List.of(hearing1, hearing2));
+        caseData.setRegion("TEST");
+        caseData.setIgnoreCallbackWarnings(ignoreCallbackWarnings);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -137,16 +166,171 @@ public class ReadyToListAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void respondWithNoErrorsIfCreatedFromGapsIsAtReadyToList() {
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+    public void returnAnErrorIfCreatedInGapsFromIsAtValidAppeal() {
+        buildRegionalProcessingCentreMap(HearingRoute.GAPS);
+        caseData.setRegion("TEST");
+        caseData.setCreatedInGapsFrom(State.VALID_APPEAL.getId());
 
-        assertEquals(0, response.getErrors().size());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).contains("Case already created in GAPS at valid appeal.");
+    }
+
+    @Test
+    public void returnAnErrorIfCreatedInGapsFromIsNull() {
+        buildRegionalProcessingCentreMap(HearingRoute.GAPS);
+        caseData.setCreatedInGapsFrom(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).contains("Case already created in GAPS at valid appeal.");
+    }
+
+    @Test
+    public void givenAnRpcUsingListAssist_shouldSuccessfullySendAHearingRequestMessage()
+            throws UpdateCaseException, TribunalsEventProcessingException, GetCaseException {
+        buildRegionalProcessingCentreMap(HearingRoute.LIST_ASSIST);
+        doNothing().when(hearingRequestHandler).handleHearingRequest(any());
+        caseData.setRegion("TEST");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        verifyMessagingServiceCalled();
+        assertEquals(HearingRoute.LIST_ASSIST, response.getData().getSchedulingAndListingFields().getHearingRoute());
+        assertEquals(HearingState.CREATE_HEARING, response.getData().getSchedulingAndListingFields().getHearingState());
+
+        assertThat(response.getErrors())
+                .as("A successfully sent message should not result in any errors.").isEmpty();
+    }
+
+    @Test
+    public void givenAnIbcCase_shouldSuccessfullySendAHearingRequestMessageWithListAssist()
+            throws UpdateCaseException, TribunalsEventProcessingException, GetCaseException {
+        doNothing().when(hearingRequestHandler).handleHearingRequest(any());
+        caseData.setBenefitCode("093");
+        caseData.setRegion("TEST");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        assertEquals(HearingRoute.LIST_ASSIST, response.getData().getSchedulingAndListingFields().getHearingRoute());
+        assertEquals(HearingState.CREATE_HEARING, response.getData().getSchedulingAndListingFields().getHearingState());
+
+        assertThat(response.getErrors())
+                .as("A successfully sent message should not result in any errors.").isEmpty();
+    }
+
+    @Test
+    public void givenAnRpcUsingListAssistAndAnExistingGapsCase_shouldResolveToGaps() {
+        caseData.setSchedulingAndListingFields(
+                SchedulingAndListingFields.builder().hearingRoute(HearingRoute.GAPS).build()
+        );
+        callback = new Callback<>(caseDetails, empty(), READY_TO_LIST, true);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        verifyNoInteractions(hearingRequestHandler);
+        assertEquals(HearingRoute.GAPS, response.getData().getSchedulingAndListingFields().getHearingRoute());
+        assertEquals(HearingState.CREATE_HEARING, response.getData().getSchedulingAndListingFields().getHearingState());
+        assertThat(response.getErrors())
+                .as("A successfully sent message should not result in any errors.").isEmpty();
+    }
+
+    @Test
+    public void givenAnRpcUsingListAssist_shouldAddErrorIfMessageFailedToSend()
+            throws UpdateCaseException, TribunalsEventProcessingException, GetCaseException {
+        buildRegionalProcessingCentreMap(HearingRoute.LIST_ASSIST);
+        doThrow(UpdateCaseException.class).when(hearingRequestHandler).handleHearingRequest(any());
+        caseData.setRegion("TEST");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        verifyMessagingServiceCalled();
+        assertNull(response.getData().getSchedulingAndListingFields().getHearingRoute());
+        assertNull(response.getData().getSchedulingAndListingFields().getHearingState());
+        assertThat(response.getErrors())
+                .as("An unsuccessfully sent message should result in an errors.").hasSize(1);
+        assertThat(response.getErrors()).contains("An error occurred during message publish. Please try again.");
+    }
+
+    @Test
+    public void givenAListAssistCaseIfAHearingExistsInTheFutureAndUserProceedsThenSendAHearingRequestMessage() {
+        Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
+                .hearingDate(LocalDate.now().minusDays(10).toString())
+                .start(now().minusDays(10))
+                .hearingId(String.valueOf(1))
+                .venue(Venue.builder().name("Venue 1").build())
+                .time("12:00")
+                .build()).build();
+        Hearing hearing2 = Hearing.builder().value(HearingDetails.builder()
+                .hearingDate(LocalDate.now().plusDays(5).toString())
+                .start(now().plusDays(5))
+                .hearingId(String.valueOf(1))
+                .venue(Venue.builder().name("Venue 1").build())
+                .time("12:00")
+                .build()).build();
+        caseData.setHearings(List.of(hearing1, hearing2));
+        callback = new Callback<>(caseDetails, empty(), READY_TO_LIST, true);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getWarnings()).isEmpty();
+    }
+
+    @Test
+    public void respondWithNoErrorsIfCreatedFromGapsIsAtReadyToList() {
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
     public void throwsExceptionIfItCannotHandleTheAppeal() {
         callback = new Callback<>(caseDetails, Optional.of(caseDetails), EventType.APPEAL_RECEIVED, false);
 
-        assertThrows(IllegalStateException.class, () -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION));
+        assertThrows(IllegalStateException.class, () -> handler.handle(SUBMITTED, callback, USER_AUTHORISATION));
+    }
+
+    @Test
+    public void givenRpcNotSet_HearingRouteShouldBeGaps() {
+        caseData.setRegion("FakeRegion");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        assertEquals(HearingRoute.GAPS, response.getData().getSchedulingAndListingFields().getHearingRoute());
+    }
+
+    @Test
+    public void givenIbcCase_HearingRoutesShouldBeListAssist() {
+        caseData.setBenefitCode("093");
+        caseData.setRegion("FakeRegion");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED,
+                callback, USER_AUTHORISATION);
+
+        assertEquals(HearingRoute.LIST_ASSIST, response.getData().getSchedulingAndListingFields().getHearingRoute());
+        assertEquals(HearingRoute.LIST_ASSIST, response.getData().getAppeal().getHearingOptions().getHearingRoute());
+        assertEquals(HearingRoute.LIST_ASSIST, response.getData().getRegionalProcessingCenter().getHearingRoute());
+        PreSubmitCallbackResponse<SscsCaseData> expectedResponse = HearingHandler
+                .valueOf(HearingRoute.LIST_ASSIST.name()).handle(caseData, hearingRequestHandler);
+        assertEquals(expectedResponse.getData(), response.getData());
+        assertEquals(expectedResponse.getErrors(), response.getErrors());
+        assertEquals(expectedResponse.getWarnings(), response.getWarnings());
+    }
+
+    private void verifyMessagingServiceCalled()
+            throws UpdateCaseException, TribunalsEventProcessingException, GetCaseException {
+        verify(hearingRequestHandler).handleHearingRequest(HearingRequest.builder(CASE_ID)
+                .hearingRoute(HearingRoute.LIST_ASSIST)
+                .hearingState(HearingState.CREATE_HEARING)
+                .build());
+    }
+
+    private void buildRegionalProcessingCentreMap(HearingRoute route) {
+        Map<String, RegionalProcessingCenter> rpcMap = new HashMap<>();
+        rpcMap.put("SSCS TEST", RegionalProcessingCenter.builder().hearingRoute(route)
+                .name("TEST")
+                .build());
+        when(regionalProcessingCenterService.getRegionalProcessingCenterMap()).thenReturn(rpcMap);
     }
 }
