@@ -31,7 +31,7 @@ import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ServiceHearingsService {
+public class HearingValuesService {
 
     public static final int NUM_CASES_EXPECTED = 1;
 
