@@ -28,9 +28,9 @@
   {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "deleteCommRequestReadOnlyStored", "Label": " ", "FieldType": "ftaCommunicationRequest", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "deleteCommRequestTextAreaStored", "Label": " ", "FieldType": "TextArea", "SecurityClassification": "PUBLIC"},
 
-  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "awaitingInfoFromFta", "Label": "Awaiting Info From FTA", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "infoProvidedByFta", "Label": "Info Provided By FTA", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "infoRequestFromFta", "Label": "Info Request From FTA", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "awaitingInfoFromFTA", "Label": "Awaiting Info From FTA", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "infoProvidedByFTA", "Label": "Info Provided By FTA", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "infoRequestFromFTA", "Label": "Info Request From FTA", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "infoRequestFromTribunal", "Label": "Info Request From Tribunal", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "awaitingInfoFromTribunal", "Label": "Awaiting Info From Tribunal", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "infoProvidedByTribunal", "Label": "Info Provided By Tribunal", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
