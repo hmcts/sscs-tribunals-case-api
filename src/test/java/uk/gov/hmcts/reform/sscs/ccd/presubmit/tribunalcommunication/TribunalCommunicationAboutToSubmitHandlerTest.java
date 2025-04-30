@@ -283,11 +283,11 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         assertEquals(UserRole.IBCA.getLabel(), request.getRequestReply().getReplyUserRole());
         assertNotNull(request.getRequestReply().getReplyDateTime());
         assertNull(request.getRequestResponseDueDate());
-        assertEquals(LocalDate.now(), response.getData().getCommunicationFields().getTribunalResponseProvidedDate());
+        assertEquals(LocalDate.now(), response.getData().getCommunicationFields().getFtaResponseProvidedDate());
     }
 
     @Test
-    void shouldUpdateTribunalResponseProvidedDateOnHandleReplyToTribunalQueryIfExistingInFuture() {
+    void shouldUpdateFtaResponseProvidedDateOnHandleReplyToTribunalQueryIfExistingInFuture() {
         String chosenTribunalRequestId = "1";
         String replyText = "Reply text";
 
@@ -330,11 +330,11 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         assertEquals(UserRole.CTSC_CLERK.getLabel(), request.getRequestReply().getReplyUserRole());
         assertNotNull(request.getRequestReply().getReplyDateTime());
         assertNull(request.getRequestResponseDueDate());
-        assertEquals(LocalDate.now(), response.getData().getCommunicationFields().getTribunalResponseProvidedDate());
+        assertEquals(LocalDate.now(), response.getData().getCommunicationFields().getFtaResponseProvidedDate());
     }
 
     @Test
-    void shouldNotUpdateTribunalResponseProvidedDateOnHandleReplyToTribunalQueryIfExistingInPast() {
+    void shouldNotUpdateFtaResponseProvidedDateOnHandleReplyToTribunalQueryIfExistingInPast() {
         String chosenTribunalRequestId = "1";
         String replyText = "Reply text";
 
@@ -377,7 +377,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         assertEquals(UserRole.SUPER_USER.getLabel(), request.getRequestReply().getReplyUserRole());
         assertNotNull(request.getRequestReply().getReplyDateTime());
         assertNull(request.getRequestResponseDueDate());
-        assertEquals(LocalDate.now().minusYears(1), response.getData().getCommunicationFields().getTribunalResponseProvidedDate());
+        assertEquals(LocalDate.now().minusYears(1), response.getData().getCommunicationFields().getFtaResponseProvidedDate());
     }
 
     @Test
@@ -591,7 +591,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         assertEquals(YesNo.NO, resultComs.getFirst().getValue().getRequestReply().getReplyHasBeenActioned());
         assertEquals(YesNo.NO, resultComs.get(1).getValue().getRequestReply().getReplyHasBeenActioned());
         assertEquals(YesNo.YES, resultComs.getLast().getValue().getRequestReply().getReplyHasBeenActioned());
-        assertEquals(LocalDate.now().minusYears(1), response.getData().getCommunicationFields().getFtaResponseProvidedDate());
+        assertEquals(LocalDate.now().minusYears(1), response.getData().getCommunicationFields().getTribunalResponseProvidedDate());
     }
 
     @Test
@@ -631,6 +631,6 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         assertEquals(YesNo.NO, resultComs.getFirst().getValue().getRequestReply().getReplyHasBeenActioned());
         assertEquals(YesNo.NO, resultComs.get(1).getValue().getRequestReply().getReplyHasBeenActioned());
         assertEquals(YesNo.YES, resultComs.getLast().getValue().getRequestReply().getReplyHasBeenActioned());
-        assertEquals(LocalDate.now(), response.getData().getCommunicationFields().getFtaResponseProvidedDate());
+        assertEquals(LocalDate.now(), response.getData().getCommunicationFields().getTribunalResponseProvidedDate());
     }
 }

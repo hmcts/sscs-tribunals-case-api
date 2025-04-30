@@ -275,11 +275,11 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertNotNull(request.getRequestReply().getReplyDateTime());
         assertEquals(YesNo.NO, request.getRequestReply().getReplyHasBeenActioned());
         assertNull(request.getRequestResponseDueDate());
-        assertEquals(LocalDate.now(), response.getData().getCommunicationFields().getFtaResponseProvidedDate());
+        assertEquals(LocalDate.now(), response.getData().getCommunicationFields().getTribunalResponseProvidedDate());
     }
 
     @Test
-    void shouldUpdateFtaResponseProvidedDateOnHandleReplyToFtaQueryIfExistingInFuture() {
+    void shouldUpdateTribunalResponseProvidedDateOnHandleReplyToFtaQueryIfExistingInFuture() {
         String chosenFtaRequestId = "1";
         String replyText = "Reply text";
 
@@ -323,7 +323,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertNotNull(request.getRequestReply().getReplyDateTime());
         assertEquals(YesNo.NO, request.getRequestReply().getReplyHasBeenActioned());
         assertNull(request.getRequestResponseDueDate());
-        assertEquals(LocalDate.now(), response.getData().getCommunicationFields().getFtaResponseProvidedDate());
+        assertEquals(LocalDate.now(), response.getData().getCommunicationFields().getTribunalResponseProvidedDate());
     }
 
     @Test
@@ -371,7 +371,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertNotNull(request.getRequestReply().getReplyDateTime());
         assertEquals(YesNo.NO, request.getRequestReply().getReplyHasBeenActioned());
         assertNull(request.getRequestResponseDueDate());
-        assertEquals(LocalDate.now().minusYears(1), response.getData().getCommunicationFields().getFtaResponseProvidedDate());
+        assertEquals(LocalDate.now().minusYears(1), response.getData().getCommunicationFields().getTribunalResponseProvidedDate());
     }
 
     @Test

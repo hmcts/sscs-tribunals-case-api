@@ -82,6 +82,7 @@ public class TribunalCommunicationMidEventHandler implements PreSubmitCallbackHa
             return preSubmitErrorCallbackResponse;
         }
 
+        sscsCaseData.setCommunicationFields(communicationFields);
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
