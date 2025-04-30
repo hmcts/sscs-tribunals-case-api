@@ -145,20 +145,7 @@ public class HearingsService {
         OverridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData);
 
         if (isNull(hearing)) {
-            String originalCaseData = objectMapper.writeValueAsString(caseData);
             HearingRequestPayload hearingPayload = hearingsMapping.buildHearingPayload(wrapper, refData);
-            String updatedCaseData = objectMapper.writeValueAsString(caseData);
-            if (!originalCaseData.equals(updatedCaseData)) {
-                log.info("Case data has  changed, update required for Case ID {}, Case Data Panel Comp: {}", caseId, caseData.getPanelMemberComposition());
-                updateCcdCaseService.updateCaseV2(
-                        Long.parseLong(caseId),
-                        EventType.CASE_UPDATED.getCcdType(),
-                        "Case Updated",
-                        "Case Updated with default panel composition",
-                        idamService.getIdamTokens(),
-                        caseDetails -> caseDetails.setData(caseData)
-                );
-            }
             log.debug("Sending Create Hearing Request for Case ID {}", caseId);
             hmcUpdateResponse = hmcHearingApiService.sendCreateHearingRequest(hearingPayload);
 
