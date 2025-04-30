@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.LISTING_ERROR;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.ExhaustedRetryException;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -33,6 +34,7 @@ public class HearingRequestHandler {
 
     private final IdamService idamService;
 
+    @Async
     public void handleHearingRequest(HearingRequest message) throws TribunalsEventProcessingException, GetCaseException, UpdateCaseException {
         if (isNull(message)) {
             throw new TribunalsEventProcessingException("An exception occurred as message did not match format");
