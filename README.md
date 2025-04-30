@@ -102,7 +102,6 @@ You should get a response similar to this:
   {"status":"UP"}
 ```
 
-
 ### Unit tests
 
 To run all unit tests execute the following command:
