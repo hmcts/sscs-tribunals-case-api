@@ -59,7 +59,7 @@ class TribunalCommunicationMidEventHandlerTest {
     @BeforeEach
     void setUp() {
         openMocks(this);
-        handler = new TribunalCommunicationMidEventHandler(true);
+        handler = new TribunalCommunicationMidEventHandler();
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").build();
 
         when(callback.getEvent()).thenReturn(EventType.TRIBUNAL_COMMUNICATION);
@@ -90,10 +90,24 @@ class TribunalCommunicationMidEventHandlerTest {
     }
 
     @Test
-    void givenFeatureToggleDisabled_thenReturnUnchangedResponse() {
-        handler = new TribunalCommunicationMidEventHandler(false);
+    void shouldNotPopulateDl_whenReviewTribunalReplyNotChosen() {
+        when(callback.getPageId()).thenReturn("selectTribunalCommunicationAction");
+
+        CommunicationRequest ftaCommunication1 = buildCommRequestWithReply();
+        CommunicationRequest ftaCommunication2 = buildCommRequestWithReply();
+        List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunication1, ftaCommunication2));
+
+        FtaCommunicationFields fields = FtaCommunicationFields.builder()
+            .tribunalCommunications(existingComs)
+            .tribunalRequestType(TribunalRequestType.NEW_REQUEST)
+            .build();
+
+        sscsCaseData.setCommunicationFields(fields);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-        assertEquals(sscsCaseData, response.getData());
+
+        assertNotNull(response);
+        DynamicList dl = response.getData().getCommunicationFields().getTribunalRequestsDl();
+        assertNull(dl);
         assertTrue(response.getErrors().isEmpty());
     }
 
@@ -114,8 +128,8 @@ class TribunalCommunicationMidEventHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertNotNull(response);
-        assertNull(response.getData().getCommunicationFields().getTribunalRequestNoResponseRadioDl());
-        DynamicList dl = response.getData().getCommunicationFields().getTribunalRequestRespondedDl();
+        assertNull(response.getData().getCommunicationFields().getTribunalRequestsDl());
+        DynamicList dl = response.getData().getCommunicationFields().getFtaRequestsDl();
         assertNotNull(dl);
         assertNull(dl.getValue());
         assertEquals(2, dl.getListItems().size());
@@ -140,7 +154,7 @@ class TribunalCommunicationMidEventHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertNotNull(response);
-        DynamicList dl = response.getData().getCommunicationFields().getTribunalRequestRespondedDl();
+        DynamicList dl = response.getData().getCommunicationFields().getFtaRequestsDl();
         assertNotNull(dl);
         assertNull(dl.getValue());
         assertEquals(1, dl.getListItems().size());
@@ -161,7 +175,7 @@ class TribunalCommunicationMidEventHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertNotNull(response);
-        DynamicList dl = response.getData().getCommunicationFields().getTribunalRequestRespondedDl();
+        DynamicList dl = response.getData().getCommunicationFields().getTribunalRequestsDl();
         assertNull(dl);
         assertTrue(response.getErrors().contains(NO_REPLIES_ERROR_MESSAGE));
     }
@@ -179,7 +193,7 @@ class TribunalCommunicationMidEventHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertNotNull(response);
-        DynamicList dl = response.getData().getCommunicationFields().getTribunalRequestRespondedDl();
+        DynamicList dl = response.getData().getCommunicationFields().getTribunalRequestsDl();
         assertNull(dl);
         assertEquals(1, response.getErrors().size());
         assertTrue(response.getErrors().contains(NO_REPLIES_ERROR_MESSAGE));
@@ -198,7 +212,7 @@ class TribunalCommunicationMidEventHandlerTest {
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
             .tribunalCommunications(existingComs)
-            .tribunalRequestRespondedDl(dynamicList)
+            .ftaRequestsDl(dynamicList)
             .build();
 
         sscsCaseData.setCommunicationFields(fields);
@@ -255,9 +269,9 @@ class TribunalCommunicationMidEventHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
         
         assertTrue(response.getErrors().isEmpty());
-        assertNotNull(response.getData().getCommunicationFields().getTribunalRequestNoResponseRadioDl());
-        assertNull(response.getData().getCommunicationFields().getTribunalRequestRespondedDl());
-        assertFalse(response.getData().getCommunicationFields().getTribunalRequestNoResponseRadioDl().getListItems().isEmpty());
+        assertNotNull(response.getData().getCommunicationFields().getTribunalRequestsDl());
+        assertNull(response.getData().getCommunicationFields().getFtaRequestsDl());
+        assertFalse(response.getData().getCommunicationFields().getTribunalRequestsDl().getListItems().isEmpty());
     }
 
     @Test
@@ -286,7 +300,7 @@ class TribunalCommunicationMidEventHandlerTest {
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
             .tribunalRequestType(TribunalRequestType.REPLY_TO_TRIBUNAL_QUERY)
             .ftaCommunications(requests)
-            .tribunalRequestNoResponseRadioDl(dynamicList)
+            .tribunalRequestsDl(dynamicList)
             .build();
         
         sscsCaseData.setCommunicationFields(fields);
@@ -298,12 +312,29 @@ class TribunalCommunicationMidEventHandlerTest {
     }
 
     @Test
+    void givenSelectTribunalRequestPage_thenThrowIfNoneSelected() {
+        when(callback.getPageId()).thenReturn("selectTribunalRequest");
+
+        DynamicList dynamicList = new DynamicList(null, Collections.emptyList());
+
+        FtaCommunicationFields fields = FtaCommunicationFields.builder()
+            .tribunalCommunications(Collections.emptyList())
+            .tribunalRequestsDl(dynamicList)
+            .build();
+
+        sscsCaseData.setCommunicationFields(fields);
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+            () -> handler.handle(MID_EVENT, callback, USER_AUTHORISATION));
+        assertEquals("No chosen request found", exception.getMessage());
+    }
+
+    @Test
     void givenReplyToTribunalQueryPage_withEmptyResponseAndNoAction_thenShowError() {
         when(callback.getPageId()).thenReturn("replyToTribunalQuery");
         
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
             .tribunalRequestType(TribunalRequestType.REPLY_TO_TRIBUNAL_QUERY)
-            .tribunalRequestNoResponseTextArea("")
+            .commRequestResponseTextArea("")
             .build();
         
         sscsCaseData.setCommunicationFields(fields);
@@ -321,7 +352,7 @@ class TribunalCommunicationMidEventHandlerTest {
         
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
             .tribunalRequestType(TribunalRequestType.REPLY_TO_TRIBUNAL_QUERY)
-            .tribunalRequestNoResponseTextArea("This is a response")
+            .commRequestResponseTextArea("This is a response")
             .build();
         
         sscsCaseData.setCommunicationFields(fields);
@@ -337,8 +368,8 @@ class TribunalCommunicationMidEventHandlerTest {
         
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
             .tribunalRequestType(TribunalRequestType.REPLY_TO_TRIBUNAL_QUERY)
-            .tribunalRequestNoResponseTextArea("")
-            .tribunalRequestNoResponseNoAction(Collections.singletonList("No action required"))
+            .commRequestResponseTextArea("")
+            .commRequestResponseNoAction(Collections.singletonList("No action required"))
             .build();
         
         sscsCaseData.setCommunicationFields(fields);
@@ -352,14 +383,11 @@ class TribunalCommunicationMidEventHandlerTest {
     void shouldThrowIfNoDlItemChosen_whenSelectTribunalReply() {
         when(callback.getPageId()).thenReturn("selectTribunalReply");
 
-        CommunicationRequest ftaCommunication1 = buildCommRequestWithReply();
-        CommunicationRequest ftaCommunication2 = buildCommRequestWithReply();
-        List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunication1, ftaCommunication2));
         DynamicList dynamicList = new DynamicList(null, Collections.emptyList());
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .tribunalCommunications(existingComs)
-            .tribunalRequestRespondedDl(dynamicList)
+            .tribunalCommunications(Collections.emptyList())
+            .ftaRequestsDl(dynamicList)
             .build();
 
         sscsCaseData.setCommunicationFields(fields);
@@ -380,7 +408,7 @@ class TribunalCommunicationMidEventHandlerTest {
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
             .tribunalCommunications(existingComs)
-            .tribunalRequestRespondedDl(dynamicList)
+            .ftaRequestsDl(dynamicList)
             .build();
 
         sscsCaseData.setCommunicationFields(fields);
@@ -395,7 +423,7 @@ class TribunalCommunicationMidEventHandlerTest {
         when(callback.getPageId()).thenReturn("reviewTribunalReply");
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .tribunalRequestRespondedActioned(yesNo)
+            .commRequestActioned(yesNo)
             .build();
 
         sscsCaseData.setCommunicationFields(fields);
@@ -409,7 +437,7 @@ class TribunalCommunicationMidEventHandlerTest {
         when(callback.getPageId()).thenReturn("reviewTribunalReply");
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .tribunalRequestRespondedActioned(YesNo.YES)
+            .commRequestActioned(YesNo.YES)
             .build();
 
         sscsCaseData.setCommunicationFields(fields);
@@ -479,28 +507,5 @@ class TribunalCommunicationMidEventHandlerTest {
                 + ftaCommunication.getValue().getRequestDateTime()
                 .format(DateTimeFormatter.ofPattern("dd MMMM yyyy, HH:mm")) + " - "
                 + ftaCommunication.getValue().getRequestUserName());
-    }
-
-    @Test
-    void shouldDoNothing_whenFlagOff() {
-        when(callback.getPageId()).thenReturn("selectTribunalCommunicationAction");
-
-        CommunicationRequest ftaCommunication1 = buildCommRequestWithReply();
-        CommunicationRequest ftaCommunication2 = buildCommRequestWithReply();
-        List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunication1, ftaCommunication2));
-
-        FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .tribunalCommunications(existingComs)
-            .tribunalRequestType(TribunalRequestType.REVIEW_TRIBUNAL_REPLY)
-            .build();
-
-        sscsCaseData.setCommunicationFields(fields);
-        handler = new TribunalCommunicationMidEventHandler(false);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertNotNull(response);
-        DynamicList dl = response.getData().getCommunicationFields().getTribunalRequestRespondedDl();
-        assertNull(dl);
-        assertTrue(response.getErrors().isEmpty());
     }
 }
