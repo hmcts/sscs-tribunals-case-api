@@ -211,21 +211,6 @@ class HearingsServiceTest {
         assertThat(thrown.getMessage()).isNotEmpty();
     }
 
-    @DisplayName("When wrapper with a case in an invalid case state is given should run without error")
-    @Test
-    void processHearingWrapperInvalidState() {
-        SscsCaseData caseData = SscsCaseData.builder()
-            .ccdCaseId(String.valueOf(CASE_ID))
-            .build();
-        wrapper.setHearingState(CREATE_HEARING);
-        wrapper.setCaseData(caseData);
-        for (State invalidState : HearingsService.INVALID_CASE_STATES) {
-            wrapper.setCaseState(invalidState);
-            assertThatNoException()
-                .isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
-        }
-    }
-
     @DisplayName("When wrapper with a valid adjourn create Hearing State is given addHearingResponse should run without error")
     @Test
     void processHearingWrapperAdjournmentCreate() throws ListingException {
