@@ -155,8 +155,8 @@ class FtaCommunicationSubmittedHandlerTest {
         verify(idamService).getIdamTokens();
         verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
             eq(EventType.CASE_UPDATED.getCcdType()),
-            eq("FTA communications updated"),
-            eq("FTA communication request deleted"),
+            eq("Tribunal/FTA communications updated"),
+            eq("Tribunal/FTA communication deleted"),
             any(), consumerArgumentCaptor.capture());
 
         consumerArgumentCaptor.getValue().accept(SscsCaseDetails.builder().data(sscsCaseData).build());

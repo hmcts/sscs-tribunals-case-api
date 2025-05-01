@@ -99,7 +99,7 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "selectTribunalReply",
     "PageShowCondition": "tribunalRequestType=\"reviewTribunalReply\"",
-    "PageLabel": "Select a FTA request to mark as actioned",
+    "PageLabel": "Select a FTA communication to mark as reviewed",
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=selectTribunalReply"
   },
   {
@@ -202,7 +202,7 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "selectFtaReply",
     "PageShowCondition": "ftaRequestType=\"reviewFtaReply\"",
-    "PageLabel": "Select a Tribunal request to mark as actioned"
+    "PageLabel": "Select a Tribunal communication to mark as reviewed"
   },
   {
     "CaseEventID": "ftaCommunication",
