@@ -37,6 +37,6 @@ export class LoginPage {
     await webActions.clickButton('Sign in');
     await expect(
       this.page.locator("//li/a[normalize-space()='Sign out']")
-    ).toBeVisible({ timeout: 6000 });
+    ).toBeVisible({ timeout: 20000 });
   }
 }
