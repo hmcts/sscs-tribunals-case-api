@@ -191,7 +191,7 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
     @Test
     public void setReserveToJudgeToNoIfPanelCompositionJudgeSelected() {
         sscsCaseData = CaseDataUtils.buildCaseData();
-        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").build());
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge(List.of("84")).build());
         DynamicList interpreterLanguage = new DynamicList(null, List.of());
         given(utils.generateInterpreterLanguageFields(any())).willReturn(interpreterLanguage);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
@@ -208,7 +208,7 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
         ReflectionTestUtils.setField(handler, "isDefaultPanelCompEnabled", false);
         sscsCaseData.getSchedulingAndListingFields().setReserveTo(ReserveTo.builder()
                 .reservedDistrictTribunalJudge(YesNo.YES).build());
-        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").build());
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge(List.of("84")).build());
         DynamicList interpreterLanguage = new DynamicList(null, List.of());
         given(utils.generateInterpreterLanguageFields(any())).willReturn(interpreterLanguage);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);

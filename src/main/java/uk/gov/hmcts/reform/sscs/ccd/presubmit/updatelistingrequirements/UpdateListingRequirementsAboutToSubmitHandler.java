@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getHmcHearingType;
 
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,8 +26,6 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @Slf4j
 @RequiredArgsConstructor
 public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-    @Value("${feature.gaps-switchover.enabled}")
-    private boolean gapsSwitchOverFeature;
 
     @Value("${feature.default-panel-comp.enabled}")
     private boolean isDefaultPanelCompEnabled;
@@ -57,6 +56,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
         ReserveTo callbackReserveTo = callbackResponse.getData().getSchedulingAndListingFields().getReserveTo();
         SchedulingAndListingFields caseDataSnlFields = sscsCaseData.getSchedulingAndListingFields();
+        PanelMemberComposition panelMemberComposition = callbackResponse.getData().getPanelMemberComposition();
 
         if (nonNull(callbackReserveTo)) {
             YesNo callbackReservedDtj = callbackReserveTo.getReservedDistrictTribunalJudge();
@@ -65,8 +65,8 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
             if (isYes(callbackReservedDtj)) {
                 caseDataReserveTo.setReservedJudge(null);
-                if (isDefaultPanelCompEnabled && callbackResponse.getData().getPanelMemberComposition() != null) {
-                    callbackResponse.getData().getPanelMemberComposition().setPanelCompositionJudge(null);
+                if (isDefaultPanelCompEnabled && panelMemberComposition != null) {
+                    panelMemberComposition.setPanelCompositionJudge(null);
                 }
             }
         }
@@ -86,8 +86,17 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
         State state = callback.getCaseDetails().getState();
         HearingRoute hearingRoute = caseDataSnlFields.getHearingRoute();
-        if (gapsSwitchOverFeature
-            && state == State.READY_TO_LIST
+
+        if (panelMemberComposition != null) {
+            List<String> panelCompositionJudge = panelMemberComposition.getPanelCompositionJudge();
+            List<String> panelCompositionMedicalMember = panelMemberComposition.getPanelCompositionMemberMedical1();
+            if (panelCompositionJudge != null && panelCompositionJudge.size() > 1
+                    || panelCompositionMedicalMember != null && panelCompositionMedicalMember.size() > 1) {
+                callbackResponse.addError("More than one judge or medical member selected.");
+            }
+        }
+
+        if (state == State.READY_TO_LIST
             && hearingRoute == LIST_ASSIST
             && nonNull(caseDataSnlFields.getOverrideFields())) {
             String caseId = sscsCaseData.getCcdCaseId();

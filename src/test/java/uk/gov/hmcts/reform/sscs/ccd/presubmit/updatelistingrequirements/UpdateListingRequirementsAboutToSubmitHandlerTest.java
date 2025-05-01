@@ -95,28 +95,11 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     }
 
     @Test
-    void handleUpdateListingRequirementsNonGapsSwitchOverFeature() {
+    void handleUpdateListingRequirementsSendSuccessful() {
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
         given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
-        ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", false);
-        sscsCaseData = CaseDataUtils.buildCaseData();
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-            ABOUT_TO_SUBMIT,
-            callback,
-            USER_AUTHORISATION);
-
-        assertTrue(response.getErrors().isEmpty());
-    }
-
-    @Test
-    void handleUpdateListingRequirementsGapsSwitchOverFeatureSendSuccessful() {
-        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
-        ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
         sscsCaseData = CaseDataUtils.buildCaseData();
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
@@ -141,12 +124,11 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     }
 
     @Test
-    void handleUpdateListingRequirementsGapsSwitchOverFeatureSendUnsuccessful() {
+    void handleUpdateListingRequirementsSendUnsuccessful() {
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
         given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
-        ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
         sscsCaseData = CaseDataUtils.buildCaseData();
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
@@ -169,12 +151,11 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     }
 
     @Test
-    void handleUpdateListingRequirementsGapsSwitchOverFeatureNoOverrides() {
+    void handleUpdateListingRequirementsNoOverrides() {
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
         given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
-        ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
         sscsCaseData = CaseDataUtils.buildCaseData();
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
             ABOUT_TO_SUBMIT,
@@ -185,12 +166,11 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     }
 
     @Test
-    void handleUpdateListingRequirementsGapsSwitchOverFeatureWrongState() {
+    void handleUpdateListingRequirementsWrongState() {
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
         given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
-        ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
         sscsCaseData = CaseDataUtils.buildCaseData();
 
         given(caseDetails.getState()).willReturn(State.UNKNOWN);
@@ -227,7 +207,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @Test
     void givenReservedDistrictTribunalJudgeIsYesAndReservedJudgeIsNotNull_responseReservedJudgeIsNull() {
-        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").build());
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge(List.of("84")).build());
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
@@ -346,6 +326,23 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         assertTrue(response.getErrors().isEmpty());
         assertEquals("Yes", response.getData().getAppeal().getHearingOptions().getLanguageInterpreter());
         assertNotNull(response.getData().getAppeal().getHearingOptions().getLanguages());
+    }
+
+    @Test
+    void givenMoreThanOnePanelCompJudgeSelected_thenReturnError() {
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge(List.of("84","50")).build());
+
+        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
+        given(callback.getCaseDetails()).willReturn(caseDetails);
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+                ABOUT_TO_SUBMIT,
+                callback,
+                USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size()).isEqualTo(1);
+        assertThat(response.getErrors()).contains("More than one judge or medical member selected.");
     }
 
     @ParameterizedTest
