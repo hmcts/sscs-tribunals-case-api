@@ -1,4 +1,10 @@
 [
+  {"LiveFrom": "11/04/2025", "ID": "FL_panelMemberCompositionJudge", "ListElementCode": "84", "ListElement": "Tribunal Judge"},
+  {"LiveFrom": "11/04/2025", "ID": "FL_panelMemberCompositionJudge", "ListElementCode": "74", "ListElement": "Regional Judge"},
+  {"LiveFrom": "11/04/2025", "ID": "FL_panelMemberCompositionMedical", "ListElementCode": "58", "ListElement": "Tribunal Member Medical"},
+  {"LiveFrom": "11/04/2025", "ID": "FL_panelMemberCompositionMedical", "ListElementCode": "69", "ListElement": "Regional Member Medical"},
+  {"LiveFrom": "11/04/2025", "ID": "FL_panelMemberCompositionTribunalMember", "ListElementCode": "44", "ListElement": "Tribunal Member Disability"},
+  {"LiveFrom": "11/04/2025", "ID": "FL_panelMemberCompositionTribunalMember", "ListElementCode": "50", "ListElement": "Tribunal Member Financially Qualified"},
   {"LiveFrom": "18/03/2025", "ID": "FL_tribunalRequestType", "ListElementCode": "newRequest", "ListElement": "New Request"},
   {"LiveFrom": "18/03/2025", "ID": "FL_tribunalRequestType", "ListElementCode": "replyToTribunalQuery", "ListElement": "Reply to Tribunal Query"},
   {"LiveFrom": "18/03/2025", "ID": "FL_tribunalRequestType", "ListElementCode": "reviewTribunalReply", "ListElement": "Review Tribunal Reply"},
