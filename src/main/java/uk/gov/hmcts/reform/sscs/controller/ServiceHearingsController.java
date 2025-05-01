@@ -24,14 +24,15 @@ import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
 import uk.gov.hmcts.reform.sscs.model.service.ServiceHearingRequest;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.ServiceHearingValues;
 import uk.gov.hmcts.reform.sscs.model.service.linkedcases.ServiceLinkedCases;
-import uk.gov.hmcts.reform.sscs.service.HearingValuesService;
+import uk.gov.hmcts.reform.sscs.service.ServiceHearingsService;
 
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-public class HearingValuesController {
+public class ServiceHearingsController {
 
-    private final HearingValuesService hearingValuesService;
+    private final ServiceHearingsService serviceHearingsService;
+
 
     @PostMapping("/serviceHearingValues")
     @Operation(description = "Get Hearing Values for a case")
@@ -53,7 +54,7 @@ public class HearingValuesController {
             log.info("Retrieving case details using Case id : {}, for use in generating Service Hearing Values",
                     request.getCaseId());
 
-            ServiceHearingValues model = hearingValuesService.getServiceHearingValues(request);
+            ServiceHearingValues model = serviceHearingsService.getServiceHearingValues(request);
 
             log.info("serviceHearingValues response {}", model);
 
@@ -85,7 +86,7 @@ public class HearingValuesController {
             log.info("Retrieving case details using Case id : {}, for use in generating Service Linked Cases",
                     request.getCaseId());
 
-            List<ServiceLinkedCases> model = hearingValuesService.getServiceLinkedCases(request);
+            List<ServiceLinkedCases> model = serviceHearingsService.getServiceLinkedCases(request);
 
             return status(HttpStatus.OK).body(model);
         } catch (Exception exc) {
