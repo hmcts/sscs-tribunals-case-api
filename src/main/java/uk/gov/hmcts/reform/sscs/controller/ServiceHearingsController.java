@@ -32,8 +32,7 @@ import uk.gov.hmcts.reform.sscs.service.ServiceHearingsService;
 public class ServiceHearingsController {
 
     private final ServiceHearingsService serviceHearingsService;
-
-
+    
     @PostMapping("/serviceHearingValues")
     @Operation(description = "Get Hearing Values for a case")
     @ApiResponses(value = {
