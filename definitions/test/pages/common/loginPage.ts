@@ -35,6 +35,7 @@ export class LoginPage {
     await webActions.inputField('#username', user.email);
     await webActions.inputField('#password', user.password);
     await webActions.clickButton('Sign in');
+    await webActions.delay(30000);
     await expect(
       this.page.locator("//li/a[normalize-space()='Sign out']")
     ).toBeVisible();
