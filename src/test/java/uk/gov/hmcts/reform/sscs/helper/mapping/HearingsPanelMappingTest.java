@@ -38,9 +38,6 @@ import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 class HearingsPanelMappingTest extends HearingsMappingBase {
 
-    public static final String JUDGE_ID = "2000";
-    public static final String JUDGE_ROLE_TYPE = "64";
-    public static final String JUDGE_ID_JUDGE_ROLE_TYPE = JUDGE_ID + "|" + JUDGE_ROLE_TYPE;
     public static final String IIDB_BENEFIT_CODE = "067";
     public static final String JUDGE_JOH_CODE = "84";
     @Mock

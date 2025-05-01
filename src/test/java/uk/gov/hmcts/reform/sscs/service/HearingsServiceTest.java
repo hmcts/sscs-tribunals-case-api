@@ -45,6 +45,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseManagementLocation;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
@@ -53,6 +54,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Issue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SessionCategory;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -326,6 +328,44 @@ class HearingsServiceTest {
 
         assertThatNoException()
             .isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
+    }
+
+    @DisplayName("When wrapper without panel role types is sent to be processed, then panel composition should be saved to case data")
+    @Test
+    void processHearingWrapperShouldSavePanelComp() throws ListingException {
+        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE,ISSUE_CODE,false,false))
+            .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
+                false,false,SessionCategory.CATEGORY_03,null));
+
+        given(refData.getHearingDurations()).willReturn(hearingDurations);
+        given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
+        given(refData.getVenueService()).willReturn(venueService);
+
+        given(venueService.getEpimsIdForVenue(PROCESSING_VENUE)).willReturn("219164");
+
+        given(hmcHearingApiService.sendCreateHearingRequest(any()))
+                .willReturn(HmcUpdateResponse.builder().build());
+
+        given(hmcHearingApiService.getHearingsRequest(anyString(),eq(null)))
+            .willReturn(HearingsGetResponse.builder().build());
+
+        wrapper.setHearingState(CREATE_HEARING);
+
+        when(hearingsMapping.buildHearingPayload(wrapper, refData)).thenAnswer(answer -> {
+            HearingWrapper wrapper = answer.getArgument(0);
+            wrapper.getCaseData().setPanelMemberComposition(PanelMemberComposition.builder().build());
+            return HearingRequestPayload.builder().build();
+        });
+        assertThatNoException()
+            .isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
+        verify(updateCcdCaseService).updateCaseV2(
+                eq(CASE_ID),
+                eq(EventType.CASE_UPDATED.getCcdType()),
+                eq("Case Updated"),
+                eq("Case Updated with default panel composition"),
+                any(),
+                any()
+        );
     }
 
     @DisplayName("When create Hearing is given and there is already a hearing requested/awaiting listing addHearingResponse should run without error")
