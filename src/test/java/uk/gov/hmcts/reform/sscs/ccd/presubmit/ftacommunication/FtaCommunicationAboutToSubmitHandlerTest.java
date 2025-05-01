@@ -368,7 +368,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
 
     @Test
     void shouldNotWipeFiltersAfterHandleReplyToFtaQueryWhenRequestNoReplyExists() {
-        CommunicationRequest communicationRequest = buildCustomCommRequest( "", "", 0, 0);
+        CommunicationRequest communicationRequest = buildCustomCommRequest("", "", 0, 0);
         CommunicationRequest communicationRequest2 = buildCustomCommRequest("", "", 0, 1);
         CommunicationRequest communicationRequest3 = buildCustomCommRequest("", "", 0, 2);
         DynamicListItem chosenFtaRequest = new DynamicListItem(communicationRequest.getId(), "item");

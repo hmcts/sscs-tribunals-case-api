@@ -36,7 +36,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.TribunalRequestType;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 class TribunalCommunicationMidEventHandlerTest {
 
