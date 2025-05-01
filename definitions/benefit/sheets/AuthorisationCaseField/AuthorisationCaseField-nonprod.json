@@ -3,7 +3,7 @@
   {"LiveFrom": "11/04/2025", "CaseTypeID": "Benefit", "CaseFieldID": "panelMemberComposition", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "11/04/2025", "CaseTypeID": "Benefit", "CaseFieldID": "panelMemberComposition", "AccessProfile": "caseworker-sscs-judge", "CRUD": "CRUD"},
   {"LiveFrom": "11/04/2025", "CaseTypeID": "Benefit", "CaseFieldID": "panelMemberComposition", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
-  {"LiveFrom": "11/04/2025", "CaseTypeID": "Benefit", "CaseFieldID": "panelMemberComposition", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"}
+  {"LiveFrom": "11/04/2025", "CaseTypeID": "Benefit", "CaseFieldID": "panelMemberComposition", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
   {"LiveFrom": "23/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalRequestType", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalRequestTopic", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "tribunalRequestQuestion", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
