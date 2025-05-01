@@ -105,8 +105,8 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private void handleReviewTribunalReply(FtaCommunicationFields ftaCommunicationFields) {
-        DynamicMixedChoiceList tribunalRequestDl = ftaCommunicationFields.getFtaRequestsToReviewDl();
-        List<DynamicListItem> actionedRequests = Optional.ofNullable(tribunalRequestDl.getValue()).orElse(Collections.emptyList());
+        DynamicMixedChoiceList requestDl = ftaCommunicationFields.getFtaRequestsToReviewDl();
+        List<DynamicListItem> actionedRequests = Optional.ofNullable(requestDl.getValue()).orElse(Collections.emptyList());
         actionedRequests
             .forEach(request -> {
                 CommunicationRequest communicationRequest = getCommunicationRequestFromId(request.getCode(), ftaCommunicationFields.getTribunalCommunications());

@@ -2,6 +2,13 @@ package uk.gov.hmcts.reform.sscs.util;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.buildCommRequest;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.buildCommRequestNotActionedResponseDateOffset;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.buildCommRequestWithActionedReply;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.buildCommRequestWithNoActionReply;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.buildCommRequestWithReply;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.buildCommRequestWithoutReply;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.buildCustomCommRequest;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -28,54 +35,38 @@ class CommunicationRequestUtilTest {
 
     @Test
     void shouldReturnRepliesWithoutReviews() {
-        CommunicationRequest requestWithReply = CommunicationRequest.builder()
-            .value(CommunicationRequestDetails.builder()
-                .requestReply(CommunicationRequestReply.builder()
-                    .build())
-                .build())
-            .build();
+        CommunicationRequest requestWithNoActionReply = buildCommRequestWithNoActionReply();
 
-        CommunicationRequest requestWithActionedReply = CommunicationRequest.builder()
-            .value(CommunicationRequestDetails.builder()
-                .requestReply(CommunicationRequestReply.builder()
-                    .replyHasBeenActionedByFta(YesNo.NO)
-                    .replyHasBeenActionedByTribunal(YesNo.NO)
-                    .build())
-                .build())
-            .build();
+        CommunicationRequest requestWithFtaUnactionedReply = buildCommRequestNotActionedResponseDateOffset(0, true);
 
-        CommunicationRequest requestWithNoReply = CommunicationRequest.builder()
-            .value(CommunicationRequestDetails.builder()
-                .build())
-            .build();
+        CommunicationRequest requestWithTribunalUnactionedReply = buildCommRequestNotActionedResponseDateOffset(0, false);
 
-        List<CommunicationRequest> comms = List.of(requestWithReply, requestWithActionedReply, requestWithNoReply);
+        CommunicationRequest requestWithTribunalActionedReply = buildCommRequestWithActionedReply(false);
+
+        CommunicationRequest requestWithFtaActionedReply = buildCommRequestWithActionedReply(true);
+
+        CommunicationRequest requestWithNoReply = buildCommRequestWithoutReply();
+
+        List<CommunicationRequest> comms = List.of(requestWithNoActionReply, requestWithTribunalUnactionedReply,
+            requestWithFtaUnactionedReply, requestWithTribunalActionedReply, requestWithFtaActionedReply, requestWithNoReply);
 
         List<CommunicationRequest> result = CommunicationRequestUtil.getRepliesWithoutReviews(comms);
 
-        assertEquals(1, result.size());
-        assertEquals(requestWithReply, result.getFirst());
+        assertEquals(2, result.size());
+        assertEquals(requestWithTribunalUnactionedReply, result.getFirst());
+        assertEquals(requestWithFtaUnactionedReply, result.getLast());
     }
 
     @Test
     void shouldReturnOldestResponseDate() {
-        CommunicationRequest request1 = CommunicationRequest.builder()
-            .value(CommunicationRequestDetails.builder()
-                .requestResponseDueDate(LocalDate.of(2023, 1, 1))
-                .build())
-            .build();
-
-        CommunicationRequest request2 = CommunicationRequest.builder()
-            .value(CommunicationRequestDetails.builder()
-                .requestResponseDueDate(LocalDate.of(2022, 1, 1))
-                .build())
-            .build();
+        CommunicationRequest request1 = buildCustomCommRequest("", "", 0, 0);
+        CommunicationRequest request2 = buildCustomCommRequest("", "", 0, 1);
 
         List<CommunicationRequest> comms = List.of(request1, request2);
 
         LocalDate result = CommunicationRequestUtil.getOldestResponseDate(comms);
 
-        assertEquals(LocalDate.of(2022, 1, 1), result);
+        assertEquals(LocalDate.now(), result);
     }
 
     @Test
@@ -89,40 +80,21 @@ class CommunicationRequestUtilTest {
 
     @Test
     void shouldReturnOldestResponseProvidedDate() {
-        CommunicationRequest request1 = CommunicationRequest.builder()
-            .value(CommunicationRequestDetails.builder()
-                .requestReply(CommunicationRequestReply.builder()
-                    .replyDateTime(LocalDateTime.of(2023, 1, 1, 10, 0))
-                    .build())
-                .build())
-            .build();
-
-        CommunicationRequest request2 = CommunicationRequest.builder()
-            .value(CommunicationRequestDetails.builder()
-                .requestReply(CommunicationRequestReply.builder()
-                    .replyDateTime(LocalDateTime.of(2022, 1, 1, 10, 0))
-                    .build())
-                .build())
-            .build();
+        CommunicationRequest request1 = buildCommRequestNotActionedResponseDateOffset(0, true);
+        CommunicationRequest request2 = buildCommRequestNotActionedResponseDateOffset(1, true);
 
         List<CommunicationRequest> comms = List.of(request1, request2);
 
         LocalDate result = CommunicationRequestUtil.getOldestResponseProvidedDate(comms);
 
-        assertEquals(LocalDate.of(2022, 1, 1), result);
+        assertEquals(LocalDate.now(), result);
     }
 
     @Test
     void shouldReturnRequestsWithoutReplies() {
-        CommunicationRequest requestWithoutReply = CommunicationRequest.builder()
-            .value(CommunicationRequestDetails.builder().build())
-            .build();
+        CommunicationRequest requestWithoutReply = buildCommRequestWithoutReply();
 
-        CommunicationRequest requestWithReply = CommunicationRequest.builder()
-            .value(CommunicationRequestDetails.builder()
-                .requestReply(CommunicationRequestReply.builder().build())
-                .build())
-            .build();
+        CommunicationRequest requestWithReply = buildCommRequestWithReply();
 
         List<CommunicationRequest> comms = List.of(requestWithoutReply, requestWithReply);
 
@@ -134,14 +106,11 @@ class CommunicationRequestUtilTest {
 
     @Test
     void shouldGetCommunicationRequestById() {
-        CommunicationRequest request = CommunicationRequest.builder()
-            .id("1")
-            .value(CommunicationRequestDetails.builder().build())
-            .build();
+        CommunicationRequest request = buildCommRequest();
 
         List<CommunicationRequest> comms = List.of(request);
 
-        CommunicationRequest result = CommunicationRequestUtil.getCommunicationRequestFromId("1", comms);
+        CommunicationRequest result = CommunicationRequestUtil.getCommunicationRequestFromId(request.getId(), comms);
 
         assertEquals(request, result);
     }
@@ -194,7 +163,6 @@ class CommunicationRequestUtilTest {
     @EnumSource(value = CommunicationRequestTopic.class)
     void shouldCreateDynamicListItemFromCommunicationRequest(CommunicationRequestTopic communicationRequestTopic) {
         CommunicationRequest request = CommunicationRequest.builder()
-            .id("1")
             .value(CommunicationRequestDetails.builder()
                 .requestTopic(communicationRequestTopic)
                 .requestDateTime(LocalDateTime.of(2023, 1, 1, 10, 0))
@@ -205,23 +173,15 @@ class CommunicationRequestUtilTest {
 
         DynamicListItem result = CommunicationRequestUtil.getDlItemFromCommunicationRequest(request);
 
-        assertEquals("1", result.getCode());
+        assertEquals(request.getId(), result.getCode());
         assertEquals(communicationRequestTopic.getValue() + " - 01 January 2023, 10:00 - Test User - Test role", result.getLabel());
     }
 
     @Test
     void shouldReturnAllRequestsFromFtaAndTribunalCommunications() {
-        CommunicationRequest ftaRequest = CommunicationRequest.builder()
-            .value(CommunicationRequestDetails.builder()
-                .requestDateTime(LocalDateTime.of(2023, 1, 1, 10, 0))
-                .build())
-            .build();
+        CommunicationRequest ftaRequest = buildCustomCommRequest("", "", 0, 0);
 
-        CommunicationRequest tribunalRequest = CommunicationRequest.builder()
-            .value(CommunicationRequestDetails.builder()
-                .requestDateTime(LocalDateTime.of(2022, 1, 1, 10, 0))
-                .build())
-            .build();
+        CommunicationRequest tribunalRequest = buildCustomCommRequest("", "", 1, 1);
 
         FtaCommunicationFields communicationFields = FtaCommunicationFields.builder()
             .ftaCommunications(List.of(ftaRequest))
@@ -231,8 +191,8 @@ class CommunicationRequestUtilTest {
         List<CommunicationRequest> result = CommunicationRequestUtil.getAllRequests(communicationFields);
 
         assertEquals(2, result.size());
-        assertEquals(ftaRequest, result.get(0));
-        assertEquals(tribunalRequest, result.get(1));
+        assertEquals(tribunalRequest, result.getFirst());
+        assertEquals(ftaRequest, result.getLast());
     }
 
     @Test
@@ -253,38 +213,14 @@ class CommunicationRequestUtilTest {
 
     @Test
     void shouldSetCommRequestDateFiltersCorrectly() {
-        CommunicationRequest requestWithoutReply = CommunicationRequest.builder()
-            .value(CommunicationRequestDetails.builder()
-                .requestResponseDueDate(LocalDate.of(2023, 1, 5))
-                .build())
-            .build();
-        CommunicationRequest requestWithReply = CommunicationRequest.builder()
-            .value(CommunicationRequestDetails.builder()
-                .requestReply(CommunicationRequestReply.builder()
-                    .replyDateTime(LocalDateTime.of(2023, 1, 1, 10, 0))
-                    .replyHasBeenActionedByFta(YesNo.NO)
-                    .replyHasBeenActionedByTribunal(YesNo.NO)
-                    .build())
-                .build())
-            .build();
-        CommunicationRequest replyWithoutReview = CommunicationRequest.builder()
-            .value(CommunicationRequestDetails.builder()
-                .requestReply(CommunicationRequestReply.builder()
-                    .replyDateTime(LocalDateTime.of(2022, 2, 2, 10, 0))
-                    .replyHasBeenActionedByFta(YesNo.NO)
-                    .replyHasBeenActionedByTribunal(YesNo.NO)
-                    .build())
-                .build())
-            .build();
-        CommunicationRequest replyWithReview = CommunicationRequest.builder()
-            .value(CommunicationRequestDetails.builder()
-                .requestReply(CommunicationRequestReply.builder()
-                    .replyDateTime(LocalDateTime.of(2022, 3, 3, 10, 0))
-                    .replyHasBeenActionedByFta(YesNo.YES)
-                    .replyHasBeenActionedByTribunal(YesNo.YES)
-                    .build())
-                .build())
-            .build();
+        CommunicationRequest requestWithoutReply = buildCommRequestWithoutReply();
+        requestWithoutReply.getValue().setRequestResponseDueDate(LocalDate.of(2023, 1, 5));
+        CommunicationRequest requestWithReply = buildCommRequestWithReply();
+        requestWithReply.getValue().getRequestReply().setReplyDateTime(LocalDateTime.of(2023, 1, 1, 10, 0));
+        CommunicationRequest replyWithoutReview = buildCommRequestWithReply();
+        requestWithReply.getValue().getRequestReply().setReplyDateTime(LocalDateTime.of(2022, 2, 2, 10, 0));
+        CommunicationRequest replyWithReview = buildCommRequestWithActionedReply(true);
+        replyWithReview.getValue().getRequestReply().setReplyDateTime(LocalDateTime.of(2022, 3, 3, 10, 0));
 
         FtaCommunicationFields communicationFields = FtaCommunicationFields.builder()
             .ftaCommunications(List.of(replyWithReview, replyWithoutReview, requestWithReply, requestWithoutReply))
@@ -313,21 +249,11 @@ class CommunicationRequestUtilTest {
 
     @Test
     void shouldSetCommRequestYesNoFiltersIfRequired() {
-        CommunicationRequest requestWithoutReply = CommunicationRequest.builder()
-            .value(CommunicationRequestDetails.builder()
-                .requestResponseDueDate(LocalDate.of(2023, 1, 5))
-                .build())
-            .build();
+        CommunicationRequest requestWithoutReply = buildCommRequestWithoutReply();
+        requestWithoutReply.getValue().setRequestResponseDueDate(LocalDate.of(2023, 1, 5));
 
-        CommunicationRequest replyWithoutReview = CommunicationRequest.builder()
-            .value(CommunicationRequestDetails.builder()
-                .requestReply(CommunicationRequestReply.builder()
-                    .replyDateTime(LocalDateTime.of(2022, 2, 2, 10, 0))
-                    .replyHasBeenActionedByFta(YesNo.NO)
-                    .replyHasBeenActionedByTribunal(YesNo.NO)
-                    .build())
-                .build())
-            .build();
+        CommunicationRequest replyWithoutReview = buildCommRequestWithReply();
+        replyWithoutReview.getValue().getRequestReply().setReplyDateTime(LocalDateTime.of(2022, 2, 2, 10, 0));
 
         FtaCommunicationFields communicationFields = FtaCommunicationFields.builder()
             .ftaCommunications(List.of(replyWithoutReview, requestWithoutReply))
@@ -345,15 +271,7 @@ class CommunicationRequestUtilTest {
 
     @Test
     void shouldWipeCommRequestYesNoFiltersIfRequired() {
-        CommunicationRequest replyWithReview = CommunicationRequest.builder()
-            .value(CommunicationRequestDetails.builder()
-                .requestReply(CommunicationRequestReply.builder()
-                    .replyDateTime(LocalDateTime.of(2022, 2, 2, 10, 0))
-                    .replyHasBeenActionedByFta(YesNo.YES)
-                    .replyHasBeenActionedByTribunal(YesNo.YES)
-                    .build())
-                .build())
-            .build();
+        CommunicationRequest replyWithReview = buildCommRequestWithActionedReply(true);
 
         FtaCommunicationFields communicationFields = FtaCommunicationFields.builder()
             .ftaCommunications(List.of(replyWithReview))

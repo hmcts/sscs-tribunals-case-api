@@ -103,8 +103,8 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
     }
 
     private void handleReviewFtaReply(FtaCommunicationFields ftaCommunicationFields) {
-        DynamicMixedChoiceList ftaRequestDl = ftaCommunicationFields.getTribunalRequestsToReviewDl();
-        List<DynamicListItem> actionedRequests = Optional.ofNullable(ftaRequestDl.getValue()).orElse(Collections.emptyList());
+        DynamicMixedChoiceList requestDl = ftaCommunicationFields.getTribunalRequestsToReviewDl();
+        List<DynamicListItem> actionedRequests = Optional.ofNullable(requestDl.getValue()).orElse(Collections.emptyList());
         actionedRequests
             .forEach(request -> {
                 CommunicationRequest communicationRequest = getCommunicationRequestFromId(request.getCode(), ftaCommunicationFields.getFtaCommunications());
