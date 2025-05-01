@@ -20,6 +20,8 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -37,6 +39,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.idam.UserRole;
 
 class FtaCommunicationAboutToSubmitHandlerTest {
 
@@ -59,7 +62,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
     void setUp() {
         openMocks(this);
 
-        handler = new FtaCommunicationAboutToSubmitHandler(idamService, true);
+        handler = new FtaCommunicationAboutToSubmitHandler(idamService);
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").build();
 
@@ -105,8 +108,8 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         // Create empty list of communications
         List<CommunicationRequest> existingComs = new ArrayList<>();
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .ftaRequestTopic(expectedTopic)
-            .ftaRequestQuestion(expectedQuestion)
+            .commRequestTopic(expectedTopic)
+            .commRequestQuestion(expectedQuestion)
             .ftaCommunications(existingComs)
             .ftaRequestType(FtaRequestType.NEW_REQUEST)
             .build();
@@ -116,6 +119,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         // Mock user details
         UserDetails userDetails = UserDetails.builder()
             .name(expectedUserName)
+            .roles(List.of(UserRole.CTSC_CLERK.getValue()))
             .build();
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
 
@@ -132,28 +136,11 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertEquals(expectedTopic, addedCom.getRequestTopic());
         assertEquals(expectedQuestion, addedCom.getRequestMessage());
         assertEquals(expectedUserName, addedCom.getRequestUserName());
+        assertEquals(UserRole.CTSC_CLERK.getLabel(), addedCom.getRequestUserRole());
         assertNotNull(addedCom.getRequestDateTime());
         LocalDate date = calculateDueDateWorkingDays(LocalDate.now(), 2);
         assertEquals(date, addedCom.getRequestResponseDueDate());
         assertEquals(date, response.getData().getCommunicationFields().getFtaResponseDueDate());
-    }
-
-    @Test
-    void givenFlagOff_shouldDoNothing() {
-        FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .ftaRequestTopic(CommunicationRequestTopic.APPEAL_TYPE)
-            .ftaRequestQuestion("someQuestion")
-            .ftaCommunications(Collections.emptyList())
-            .ftaRequestType(FtaRequestType.NEW_REQUEST)
-            .build();
-        sscsCaseData.setCommunicationFields(fields);
-        handler = new FtaCommunicationAboutToSubmitHandler(idamService, false);
-        PreSubmitCallbackResponse<SscsCaseData> response =
-            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        List<CommunicationRequest> resultComs = response.getData().getCommunicationFields().getFtaCommunications();
-        assertEquals(0, resultComs.size());
-        assertNull(response.getData().getCommunicationFields().getFtaResponseDueDate());
     }
 
     @Test
@@ -184,8 +171,8 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         ).build();
         List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunicationFuture, ftaCommunicationPast));
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .ftaRequestTopic(expectedTopic)
-            .ftaRequestQuestion(expectedQuestion)
+            .commRequestTopic(expectedTopic)
+            .commRequestQuestion(expectedQuestion)
             .ftaCommunications(existingComs)
             .ftaRequestType(FtaRequestType.NEW_REQUEST)
             .build();
@@ -195,6 +182,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         // Mock user details
         UserDetails userDetails = UserDetails.builder()
             .name(expectedUserName)
+            .roles(List.of(UserRole.IBCA.getValue()))
             .build();
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
 
@@ -207,13 +195,14 @@ class FtaCommunicationAboutToSubmitHandlerTest {
 
         assertEquals(3, resultComs.size());
 
-        assertEquals(ftaCommunicationFuture, resultComs.getFirst());
+        assertEquals(ftaCommunicationPast, resultComs.getFirst());
         CommunicationRequestDetails addedCom = resultComs.get(1).getValue();
         assertEquals(expectedTopic, addedCom.getRequestTopic());
         assertEquals(expectedQuestion, addedCom.getRequestMessage());
         assertEquals(expectedUserName, addedCom.getRequestUserName());
+        assertEquals(UserRole.IBCA.getLabel(), addedCom.getRequestUserRole());
         assertNotNull(addedCom.getRequestDateTime());
-        assertEquals(ftaCommunicationPast, resultComs.getLast());
+        assertEquals(ftaCommunicationFuture, resultComs.getLast());
         assertEquals(calculateDueDateWorkingDays(LocalDate.now(), 2), addedCom.getRequestResponseDueDate());
     }
 
@@ -225,8 +214,8 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         String expectedUserName = "Test User";
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .ftaRequestTopic(expectedTopic)
-            .ftaRequestQuestion(expectedQuestion)
+            .commRequestTopic(expectedTopic)
+            .commRequestQuestion(expectedQuestion)
             .ftaCommunications(null) // Explicitly set to null
             .ftaRequestType(FtaRequestType.NEW_REQUEST)
             .build();
@@ -236,6 +225,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         // Mock user details
         UserDetails userDetails = UserDetails.builder()
             .name(expectedUserName)
+            .roles(List.of(UserRole.SUPER_USER.getValue()))
             .build();
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
 
@@ -247,6 +237,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         List<CommunicationRequest> resultComs = response.getData().getCommunicationFields().getFtaCommunications();
 
         assertNotNull(resultComs);
+        assertEquals(UserRole.SUPER_USER.getLabel(), resultComs.getFirst().getValue().getRequestUserRole());
     }
 
     @Test
@@ -258,17 +249,18 @@ class FtaCommunicationAboutToSubmitHandlerTest {
             .value(CommunicationRequestDetails.builder().build())
             .build();
         DynamicListItem chosenFtaRequest = new DynamicListItem(chosenFtaRequestId, "item");
-        DynamicList ftaRequestNoResponseRadioDl = new DynamicList(chosenFtaRequest, Collections.singletonList(chosenFtaRequest));
+        DynamicList ftaRequestsDl = new DynamicList(chosenFtaRequest, Collections.singletonList(chosenFtaRequest));
         FtaCommunicationFields ftaCommunicationFields = FtaCommunicationFields.builder()
-            .ftaRequestNoResponseRadioDl(ftaRequestNoResponseRadioDl)
+            .ftaRequestsDl(ftaRequestsDl)
             .tribunalCommunications(List.of(communicationRequest))
-            .ftaRequestNoResponseTextArea(replyText)
-            .ftaRequestNoResponseNoAction(Collections.emptyList())
+            .commRequestResponseTextArea(replyText)
+            .commRequestResponseNoAction(Collections.emptyList())
             .ftaRequestType(FtaRequestType.REPLY_TO_FTA_QUERY)
             .build();
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
         String userName = "Test User";
-        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().name(userName).build());
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
+            .name(userName).roles(List.of(UserRole.IBCA.getValue())).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -279,14 +271,15 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertNotNull(request.getRequestReply());
         assertEquals(replyText, request.getRequestReply().getReplyMessage());
         assertEquals(userName, request.getRequestReply().getReplyUserName());
+        assertEquals(UserRole.IBCA.getLabel(), request.getRequestReply().getReplyUserRole());
         assertNotNull(request.getRequestReply().getReplyDateTime());
         assertEquals(YesNo.NO, request.getRequestReply().getReplyHasBeenActioned());
         assertNull(request.getRequestResponseDueDate());
-        assertEquals(LocalDate.now(), response.getData().getCommunicationFields().getFtaResponseProvidedDate());
+        assertEquals(LocalDate.now(), response.getData().getCommunicationFields().getTribunalResponseProvidedDate());
     }
 
     @Test
-    void shouldUpdateFtaResponseProvidedDateOnHandleReplyToFtaQueryIfExistingInFuture() {
+    void shouldUpdateTribunalResponseProvidedDateOnHandleReplyToFtaQueryIfExistingInFuture() {
         String chosenFtaRequestId = "1";
         String replyText = "Reply text";
 
@@ -304,17 +297,18 @@ class FtaCommunicationAboutToSubmitHandlerTest {
                 .build())
             .build();
         DynamicListItem chosenFtaRequest = new DynamicListItem(chosenFtaRequestId, "item");
-        DynamicList ftaRequestNoResponseRadioDl = new DynamicList(chosenFtaRequest, Collections.singletonList(chosenFtaRequest));
+        DynamicList ftaRequestsDl = new DynamicList(chosenFtaRequest, Collections.singletonList(chosenFtaRequest));
         FtaCommunicationFields ftaCommunicationFields = FtaCommunicationFields.builder()
-            .ftaRequestNoResponseRadioDl(ftaRequestNoResponseRadioDl)
+            .ftaRequestsDl(ftaRequestsDl)
             .tribunalCommunications(List.of(communicationRequest, communicationRequest2))
-            .ftaRequestNoResponseTextArea(replyText)
-            .ftaRequestNoResponseNoAction(Collections.emptyList())
+            .commRequestResponseTextArea(replyText)
+            .commRequestResponseNoAction(Collections.emptyList())
             .ftaRequestType(FtaRequestType.REPLY_TO_FTA_QUERY)
             .build();
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
         String userName = "Test User";
-        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().name(userName).build());
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
+            .name(userName).roles(List.of(UserRole.CTSC_CLERK.getValue())).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -325,10 +319,11 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertNotNull(request.getRequestReply());
         assertEquals(replyText, request.getRequestReply().getReplyMessage());
         assertEquals(userName, request.getRequestReply().getReplyUserName());
+        assertEquals(UserRole.CTSC_CLERK.getLabel(), request.getRequestReply().getReplyUserRole());
         assertNotNull(request.getRequestReply().getReplyDateTime());
         assertEquals(YesNo.NO, request.getRequestReply().getReplyHasBeenActioned());
         assertNull(request.getRequestResponseDueDate());
-        assertEquals(LocalDate.now(), response.getData().getCommunicationFields().getFtaResponseProvidedDate());
+        assertEquals(LocalDate.now(), response.getData().getCommunicationFields().getTribunalResponseProvidedDate());
     }
 
     @Test
@@ -350,17 +345,18 @@ class FtaCommunicationAboutToSubmitHandlerTest {
                 .build())
             .build();
         DynamicListItem chosenFtaRequest = new DynamicListItem(chosenFtaRequestId, "item");
-        DynamicList ftaRequestNoResponseRadioDl = new DynamicList(chosenFtaRequest, Collections.singletonList(chosenFtaRequest));
+        DynamicList ftaRequestsDl = new DynamicList(chosenFtaRequest, Collections.singletonList(chosenFtaRequest));
         FtaCommunicationFields ftaCommunicationFields = FtaCommunicationFields.builder()
-            .ftaRequestNoResponseRadioDl(ftaRequestNoResponseRadioDl)
+            .ftaRequestsDl(ftaRequestsDl)
             .tribunalCommunications(List.of(communicationRequest, communicationRequest2))
-            .ftaRequestNoResponseTextArea(replyText)
-            .ftaRequestNoResponseNoAction(Collections.emptyList())
+            .commRequestResponseTextArea(replyText)
+            .commRequestResponseNoAction(Collections.emptyList())
             .ftaRequestType(FtaRequestType.REPLY_TO_FTA_QUERY)
             .build();
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
         String userName = "Test User";
-        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().name(userName).build());
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
+            .name(userName).roles(List.of(UserRole.SUPER_USER.getValue())).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -371,10 +367,11 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertNotNull(request.getRequestReply());
         assertEquals(replyText, request.getRequestReply().getReplyMessage());
         assertEquals(userName, request.getRequestReply().getReplyUserName());
+        assertEquals(UserRole.SUPER_USER.getLabel(), request.getRequestReply().getReplyUserRole());
         assertNotNull(request.getRequestReply().getReplyDateTime());
         assertEquals(YesNo.NO, request.getRequestReply().getReplyHasBeenActioned());
         assertNull(request.getRequestResponseDueDate());
-        assertEquals(LocalDate.now().minusYears(1), response.getData().getCommunicationFields().getFtaResponseProvidedDate());
+        assertEquals(LocalDate.now().minusYears(1), response.getData().getCommunicationFields().getTribunalResponseProvidedDate());
     }
 
     @Test
@@ -387,17 +384,18 @@ class FtaCommunicationAboutToSubmitHandlerTest {
             .build();
 
         DynamicListItem chosenFtaRequest = new DynamicListItem(chosenFtaRequestId, "item");
-        DynamicList ftaRequestNoResponseRadioDl = new DynamicList(chosenFtaRequest, Collections.singletonList(chosenFtaRequest));
+        DynamicList ftaRequestsDl = new DynamicList(chosenFtaRequest, Collections.singletonList(chosenFtaRequest));
         FtaCommunicationFields ftaCommunicationFields = FtaCommunicationFields.builder()
-            .ftaRequestNoResponseRadioDl(ftaRequestNoResponseRadioDl)
+            .ftaRequestsDl(ftaRequestsDl)
             .tribunalCommunications(List.of(communicationRequest))
-            .ftaRequestNoResponseNoAction(Collections.singletonList("No action required"))
+            .commRequestResponseNoAction(Collections.singletonList("No action required"))
             .ftaRequestType(FtaRequestType.REPLY_TO_FTA_QUERY)
             .build();
         ftaCommunicationFields.setTribunalResponseDueDate(LocalDate.of(1, 1, 1));
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
         String userName = "Test User";
-        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().name(userName).build());
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
+            .name(userName).roles(List.of(UserRole.TCW.getValue())).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -408,6 +406,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertNotNull(request.getRequestReply());
         assertEquals("No action required", request.getRequestReply().getReplyMessage());
         assertEquals(userName, request.getRequestReply().getReplyUserName());
+        assertEquals(UserRole.TCW.getLabel(), request.getRequestReply().getReplyUserRole());
         assertNotNull(request.getRequestReply().getReplyDateTime());
         assertNull(communicationRequest.getValue().getRequestReply().getReplyHasBeenActioned());
         assertNull(communicationRequest.getValue().getRequestResponseDueDate());
@@ -440,11 +439,11 @@ class FtaCommunicationAboutToSubmitHandlerTest {
             .build();
 
         DynamicListItem chosenFtaRequest = new DynamicListItem(chosenFtaRequestId, "item");
-        DynamicList ftaRequestNoResponseRadioDl = new DynamicList(chosenFtaRequest, List.of(chosenFtaRequest));
+        DynamicList ftaRequestsDl = new DynamicList(chosenFtaRequest, List.of(chosenFtaRequest));
         FtaCommunicationFields ftaCommunicationFields = FtaCommunicationFields.builder()
-            .ftaRequestNoResponseRadioDl(ftaRequestNoResponseRadioDl)
+            .ftaRequestsDl(ftaRequestsDl)
             .tribunalCommunications(List.of(communicationRequest, communicationRequest3, communicationRequest2))
-            .ftaRequestNoResponseNoAction(Collections.singletonList("No action required"))
+            .commRequestResponseNoAction(Collections.singletonList("No action required"))
             .ftaRequestType(FtaRequestType.REPLY_TO_FTA_QUERY)
             .build();
         ftaCommunicationFields.setTribunalResponseDueDate(LocalDate.of(1, 1, 1));
@@ -466,16 +465,17 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertEquals(LocalDate.of(3, 3, 3), response.getData().getCommunicationFields().getTribunalResponseDueDate());
     }
 
+
     @Test
-    void shouldThrowExceptionWhenNoCommunicationRequestFound() {
+    void shouldThrowExceptionWhenNoCommunicationRequestFoundReply() {
         String chosenFtaRequestId = "1";
 
         DynamicListItem chosenFtaRequest = new DynamicListItem(chosenFtaRequestId, "item");
-        DynamicList ftaRequestNoResponseRadioDl = new DynamicList(chosenFtaRequest, Collections.singletonList(chosenFtaRequest));
+        DynamicList ftaRequestsDl = new DynamicList(chosenFtaRequest, Collections.singletonList(chosenFtaRequest));
         FtaCommunicationFields ftaCommunicationFields = FtaCommunicationFields.builder()
-            .ftaRequestNoResponseRadioDl(ftaRequestNoResponseRadioDl)
+            .ftaRequestsDl(ftaRequestsDl)
             .tribunalCommunications(Collections.emptyList())
-            .ftaRequestNoResponseNoAction(Collections.singletonList("No action required"))
+            .commRequestResponseNoAction(Collections.singletonList("No action required"))
             .ftaRequestType(FtaRequestType.REPLY_TO_FTA_QUERY)
             .build();
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);
@@ -487,32 +487,79 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertEquals("No communication request found with id: " + chosenFtaRequestId, exception.getMessage());
     }
 
+    @ParameterizedTest
+    @CsvSource({"1, 1, 1", "2, 1, 1", "3, 2, 0"})
+    void shouldHandleDeleteRequestReply(String chosenId, int tribunalCommsSize, int ftaCommsSize) {
+        CommunicationRequest communicationRequest = CommunicationRequest.builder()
+            .id("1")
+            .value(CommunicationRequestDetails.builder().build())
+            .build();
+        CommunicationRequest communicationRequest2 = CommunicationRequest.builder()
+            .id("2")
+            .value(CommunicationRequestDetails.builder().build())
+            .build();
+        CommunicationRequest communicationRequest3 = CommunicationRequest.builder()
+            .id("3")
+            .value(CommunicationRequestDetails.builder().build())
+            .build();
+        DynamicListItem chosenDl = new DynamicListItem(chosenId, "item");
+        DynamicList ftaRequestsDl = new DynamicList(chosenDl, null);
+        FtaCommunicationFields ftaCommunicationFields = FtaCommunicationFields.builder()
+            .deleteCommRequestRadioDl(ftaRequestsDl)
+            .tribunalCommunications(List.of(communicationRequest, communicationRequest2))
+            .ftaCommunications(List.of(communicationRequest3))
+            .deleteCommRequestReadOnly(communicationRequest3.getValue())
+            .deleteCommRequestTextArea("delete reason " + chosenId)
+            .ftaRequestType(FtaRequestType.DELETE_REQUEST_REPLY)
+            .build();
+        sscsCaseData.setCommunicationFields(ftaCommunicationFields);
+        String userName = "Test User";
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
+            .name(userName).roles(List.of(UserRole.TCW.getValue())).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        FtaCommunicationFields fields = response.getData().getCommunicationFields();
+
+        List<CommunicationRequest> tribunalComms = fields.getTribunalCommunications();
+        List<CommunicationRequest> ftaComms = fields.getFtaCommunications();
+        assertEquals(tribunalCommsSize, tribunalComms.size());
+        assertEquals(ftaCommsSize, ftaComms.size());
+        assertFalse(tribunalComms.stream().map(CommunicationRequest::getId).toList().contains(chosenId));
+        assertFalse(ftaComms.stream().map(CommunicationRequest::getId).toList().contains(chosenId));
+        assertEquals(communicationRequest3.getValue(), fields.getDeleteCommRequestReadOnlyStored());
+        assertEquals("delete reason " + chosenId, fields.getDeleteCommRequestTextAreaStored());
+        assertNull(fields.getDeleteCommRequestReadOnly());
+        assertNull(fields.getDeleteCommRequestTextArea());
+    }
+
     @Test
     void shouldClearFieldsAtEndOfEvent() {
         DynamicListItem dynamicListItem = new DynamicListItem("1", "item");
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .ftaRequestQuestion("question")
-            .ftaRequestTopic(CommunicationRequestTopic.MRN_REVIEW_DECISION_NOTICE_DETAILS)
+            .commRequestQuestion("question")
+            .commRequestTopic(CommunicationRequestTopic.MRN_REVIEW_DECISION_NOTICE_DETAILS)
             .ftaRequestNoResponseQuery("query")
-            .ftaRequestNoResponseTextArea("textarea")
-            .ftaRequestNoResponseRadioDl(new DynamicList(dynamicListItem, Collections.singletonList(dynamicListItem)))
-            .ftaRequestNoResponseNoAction(Collections.singletonList("something"))
+            .commRequestResponseTextArea("textarea")
+            .ftaRequestsDl(new DynamicList(dynamicListItem, Collections.singletonList(dynamicListItem)))
+            .commRequestResponseNoAction(Collections.singletonList("something"))
             .build();
         sscsCaseData.setCommunicationFields(fields);
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         FtaCommunicationFields ftaCommunicationFields = response.getData().getCommunicationFields();
-        assertNull(ftaCommunicationFields.getFtaRequestQuestion());
-        assertNull(ftaCommunicationFields.getFtaRequestTopic());
+        assertNull(ftaCommunicationFields.getCommRequestQuestion());
+        assertNull(ftaCommunicationFields.getCommRequestTopic());
         assertNull(ftaCommunicationFields.getFtaRequestType());
         assertNull(ftaCommunicationFields.getFtaRequestNoResponseQuery());
-        assertNull(ftaCommunicationFields.getFtaRequestNoResponseTextArea());
-        assertNull(ftaCommunicationFields.getFtaRequestNoResponseRadioDl());
-        assertNull(ftaCommunicationFields.getFtaRequestNoResponseNoAction());
+        assertNull(ftaCommunicationFields.getCommRequestResponseTextArea());
+        assertNull(ftaCommunicationFields.getFtaRequestsDl());
+        assertNull(ftaCommunicationFields.getCommRequestResponseNoAction());
     }
 
     @Test
-    public void givenReviewFtaReplyWithActionedYesResponse_thenUpdateRequestAsActioned() {
+    void givenReviewFtaReplyWithActionedYesResponse_thenUpdateRequestAsActioned() {
         // Given
         DynamicListItem selectedItem = new DynamicListItem("1", "Request 1");
         List<DynamicListItem> listItems = Collections.singletonList(selectedItem);
@@ -520,8 +567,8 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         
         sscsCaseData.setCommunicationFields(FtaCommunicationFields.builder()
             .ftaRequestType(FtaRequestType.REVIEW_FTA_REPLY)
-            .ftaResponseActioned(YesNo.YES)
-            .ftaResponseNoActionedRadioDl(dynamicList)
+            .commRequestActioned(YesNo.YES)
+            .tribunalRequestsDl(dynamicList)
             .ftaCommunications(List.of(
                 CommunicationRequest.builder()
                     .id("1")
@@ -552,10 +599,10 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertEquals(YesNo.YES, response.getData().getCommunicationFields().getFtaCommunications().getFirst().getValue().getRequestReply().getReplyHasBeenActioned());
         
         // Verify fields are cleared
-        assertNull(response.getData().getCommunicationFields().getFtaRequestQuestion());
-        assertNull(response.getData().getCommunicationFields().getFtaRequestTopic());
+        assertNull(response.getData().getCommunicationFields().getCommRequestQuestion());
+        assertNull(response.getData().getCommunicationFields().getCommRequestTopic());
         assertNull(response.getData().getCommunicationFields().getFtaRequestType());
-        assertNull(response.getData().getCommunicationFields().getFtaResponseActioned());
-        assertNull(response.getData().getCommunicationFields().getFtaResponseNoActionedRadioDl());
+        assertNull(response.getData().getCommunicationFields().getCommRequestActioned());
+        assertNull(response.getData().getCommunicationFields().getTribunalRequestsDl());
     }
 }
