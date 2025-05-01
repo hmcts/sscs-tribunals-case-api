@@ -62,7 +62,7 @@ import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @ExtendWith(MockitoExtension.class)
-class HearingValuesServiceTest {
+class ServiceHearingsServiceTest {
 
     private static final long CASE_ID = 12345L;
 
@@ -88,7 +88,7 @@ class HearingValuesServiceTest {
     private ServiceHearingValuesMapping serviceHearingValuesMapping;
 
     @InjectMocks
-    private HearingValuesService hearingValuesService;
+    private ServiceHearingsService serviceHearingsService;
 
     private SscsCaseData caseData;
     private SscsCaseDetails caseDetails;
@@ -176,7 +176,7 @@ class HearingValuesServiceTest {
             .caseId(String.valueOf(CASE_ID))
             .build();
 
-        assertThrows(ListingException.class, () -> hearingValuesService.getServiceHearingValues(request));
+        assertThrows(ListingException.class, () -> serviceHearingsService.getServiceHearingValues(request));
 
         verify(ccdCaseService, never()).updateCaseData(any(SscsCaseData.class), eq(UPDATE_CASE_ONLY), anyString(), anyString());
     }
@@ -198,7 +198,7 @@ class HearingValuesServiceTest {
                 .mapServiceHearingValues(caseData, refData))
                 .willReturn(ServiceHearingValues.builder().parties(List.of(PartyDetails.builder().partyID("1234").build())).build());
 
-        ServiceHearingValues result = hearingValuesService.getServiceHearingValues(request);
+        ServiceHearingValues result = serviceHearingsService.getServiceHearingValues(request);
 
         assertThat(result.getParties())
                 .extracting("partyID")
@@ -218,7 +218,7 @@ class HearingValuesServiceTest {
         given(ccdCaseService.getCasesViaElastic(List.of(String.valueOf(CASE_ID)))).willReturn(searchResult);
 
         assertThatExceptionOfType(GetCaseException.class)
-            .isThrownBy(() -> hearingValuesService.getServiceLinkedCases(request));
+            .isThrownBy(() -> serviceHearingsService.getServiceLinkedCases(request));
     }
 
     @Test
@@ -232,7 +232,7 @@ class HearingValuesServiceTest {
                 .data(SscsCaseData.builder()
             .build()).build()));
 
-        List<ServiceLinkedCases> result = hearingValuesService.getServiceLinkedCases(request);
+        List<ServiceLinkedCases> result = serviceHearingsService.getServiceLinkedCases(request);
 
         assertThat(result).isEmpty();
     }
@@ -273,7 +273,7 @@ class HearingValuesServiceTest {
 
         given(ccdCaseService.getCasesViaElastic(List.of(linkedCaseReference))).willReturn(List.of(linkedSscsCaseData));
 
-        List<ServiceLinkedCases> result = hearingValuesService.getServiceLinkedCases(request);
+        List<ServiceLinkedCases> result = serviceHearingsService.getServiceLinkedCases(request);
 
         assertThat(result).hasSize(1);
 
