@@ -324,7 +324,6 @@ export class UploadResponse extends BaseStep {
       false,
       UploadResponse.caseId
     );
-    await this.homePage.goToHomePage(UploadResponse.caseId);
 
     await this.homePage.chooseEvent('Upload response');
     await this.uploadResponsePage.verifyPageContent();
