@@ -39,8 +39,5 @@ export class LoginPage {
     await webActions.clickButton('Sign in');
     await webActions.delay(10000);
     await this.signOutBtn.isVisible();
-    // await expect(
-    //   this.page.locator("//li/a[normalize-space()='Sign out']")
-    // ).toBeVisible();
   }
 }
