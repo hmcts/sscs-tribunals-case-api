@@ -109,6 +109,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 callbackResponse.addError("An error occurred during message publish. Please try again.");
             }
         }
+
         sscsCaseData.getAppeal()
             .setHearingOptions(Optional.ofNullable(sscsCaseData.getAppeal().getHearingOptions())
                 .map(HearingOptions::toBuilder)
