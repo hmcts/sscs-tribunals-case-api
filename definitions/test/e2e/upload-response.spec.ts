@@ -8,7 +8,18 @@ test.describe(
   'Upload response tests',
   { tag: ['@preview-regression', '@nightly-pipeline'] },
   async () => {
-    test('As a caseworker review response submitted with any further info', async ({
+
+    test.afterEach(
+      'Cancel the hearings after test run',
+      async({ hearingSteps, uploadResponseSteps }, testInfo) => {
+        if(testInfo.title.includes("#executeTearDown")) {
+          await uploadResponseSteps.navigateToHearingsTab();
+          await hearingSteps.cancelHearingForCleanUp();
+        } 
+      }
+    )
+
+    test('As a caseworker review response submitted with any further info #executeTearDown', async ({
       uploadResponseSteps,
       request
     }) => {
@@ -17,7 +28,7 @@ test.describe(
       await uploadResponseSteps.performUploadResponseWithFurtherInfoOnAPIPAndReviewResponse();
     });
 
-    test('As a caseworker review response submitted without any further info', async ({
+    test('As a caseworker review response submitted without any further info #executeTearDown', async ({
       uploadResponseSteps,
       request
     }) => {
@@ -26,7 +37,7 @@ test.describe(
       await uploadResponseSteps.performUploadResponseWithoutFurtherInfoOnATaxCredit();
     });
 
-    test('As a caseworker review response submitted for an UC case', async ({
+    test('As a caseworker review response submitted for an UC case #executeTearDown', async ({
       uploadResponseSteps,
       request
     }) => {
@@ -46,7 +57,17 @@ test.describe(
       caseId = await createCaseBasedOnCaseType('PIP');
     });
 
-    test('As a caseworker review PHE response submitted without any further info', async ({
+    test.afterEach(
+      'Cancel the hearings after test run',
+      async({ hearingSteps, uploadResponseSteps }, testInfo) => {
+        if(testInfo.title.includes("#executeTearDown")) {
+          await uploadResponseSteps.navigateToHearingsTab();
+          await hearingSteps.cancelHearingForCleanUp();
+        } 
+      }
+    )
+
+    test('As a caseworker review PHE response submitted without any further info #executeTearDown', async ({
       uploadResponseSteps,
       reviewPHESteps
     }) => {
@@ -68,7 +89,17 @@ test.describe(
       caseId = await createCaseBasedOnCaseType('PIP');
     });
 
-    test('As a caseworker review UCB response submitted without any further info', async ({
+    test.afterEach(
+      'Cancel the hearings after test run',
+      async({ hearingSteps, uploadResponseSteps }, testInfo) => {
+        if(testInfo.title.includes("#executeTearDown")) {
+          await uploadResponseSteps.navigateToHearingsTab();
+          await hearingSteps.cancelHearingForCleanUp();
+        } 
+      }
+    )
+
+    test('As a caseworker review UCB response submitted without any further info #executeTearDown', async ({
       uploadResponseSteps,
       updateUCBSteps
     }) => {

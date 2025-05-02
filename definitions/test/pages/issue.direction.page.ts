@@ -54,7 +54,7 @@ export class IssueDirectionPage {
       issueDirectionsNoticeData.yearLabel
     );
     await webActions.verifyPageLabel(
-      '.form-label[_ngcontent-ng-c823086951]',
+      '[for="reservedToJudgeInterloc"] span',
       issueDirectionsNoticeData.reservedToInterlocLabel
     );
     await webActions.verifyPageLabel(

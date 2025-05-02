@@ -1,0 +1,229 @@
+{
+  "case_creation_details": {
+    "case_data": {
+      "CaseAccessCategory": "employmentAndSupportAllowance",
+      "caseManagementCategory": {
+        "value": {
+          "code": "ESA",
+          "label": "Employment and Support Allowance"
+        },
+        "list_items": [
+          {
+            "code": "ESA",
+            "label": "Employment and Support Allowance"
+          }
+        ]
+      },
+      "caseNameHmctsInternal": "Sarah Smith",
+      "caseNameHmctsRestricted": "Sarah Smith",
+      "caseNamePublic": "Sarah Smith",
+      "ogdType": "DWP",
+      "appeal": {
+        "appealReasons": {
+          "reasons": [
+            {
+              "value": {
+                "description": "see scanned SSCS1 form",
+                "reason": null
+              }
+            }
+          ]
+        },
+        "appellant": {
+          "address": {
+            "county": "Essex",
+            "line1": "109 Drake Close",
+            "line2": "Hutton",
+            "postcode": "SE166RS",
+            "town": "Brentwood"
+          },
+          "appointee": {
+            "id": null,
+            "address": {
+              "county": "Berkshire",
+              "line1": "1 New Street",
+              "line2": "Smallville",
+              "postcode": "CF48 2HY",
+              "town": "Newbury"
+            },
+            "contact": {
+              "email": null,
+              "mobile": "07832882849",
+              "phone": "01895733303"
+            },
+            "organisation": null,
+            "identity": {
+              "dob": "1976-11-11",
+              "nino": "{PERSON1_NINO}"
+            },
+            "name": {
+              "firstName": "Frederick",
+              "lastName": "Falafel",
+              "title": "Dr"
+            }
+          },
+          "contact": {
+            "email": null,
+            "mobile": null,
+            "phone": null
+          },
+          "organisation": null,
+          "id": null,
+          "identity": {
+            "dob": "1979-12-09",
+            "nino": "{PERSON2_NINO}"
+          },
+          "confidentialityRequired": null,
+          "isAddressSameAsAppointee": null,
+          "isAppointee": "Yes",
+          "name": {
+            "firstName": "Sarah",
+            "lastName": "Smith",
+            "title": "Mrs"
+          },
+          "role": null
+        },
+        "benefitType": {
+          "code": "ESA",
+          "description": "Employment and Support Allowance"
+        },
+        "hearingOptions": {
+          "agreeLessNotice": "Yes",
+          "arrangements": [
+            "hearingLoop"
+          ],
+          "excludeDates": [
+            {
+              "value": {
+                "end": null,
+                "start": "2030-11-01"
+              }
+            },
+            {
+              "value": {
+                "end": null,
+                "start": "2030-12-01"
+              }
+            }
+          ],
+          "languageInterpreter": "Yes",
+          "languages": "Spanish",
+          "other": "Wheelchair access",
+          "scheduleHearing": "No",
+          "wantsSupport": "Yes",
+          "wantsToAttend": "No"
+        },
+        "hearingSubtype": {},
+        "hearingType": "paper",
+        "mrnDetails": {
+          "dwpIssuingOffice": "Sheffield DRT",
+          "mrnDate": "2017-06-09",
+          "mrnLateReason": "see scanned SSCS1 form",
+          "mrnMissingReason": null
+        },
+        "receivedVia": "Paper",
+        "rep": {
+          "id": null,
+          "identity":null,
+          "address": {
+            "county": "Surrey",
+            "line1": "63 Grove Hill Road",
+            "line2": "The Square",
+            "postcode": "RH1 5BT",
+            "town": "Redhill"
+          },
+          "contact": {
+            "email": null,
+            "mobile": null,
+            "phone": "02072323231"
+          },
+          "hasRepresentative": "Yes",
+          "name": {
+            "firstName": "Peter",
+            "lastName": "Hyland",
+            "title": "Mr"
+          },
+          "organisation": "ABC Advisory Services"
+        },
+        "signer": "Sarah Smith"
+      },
+      "benefitCode": "051",
+      "bulkScanCaseReference": "id",
+      "caseManagementLocation": {
+        "region":"8",
+        "baseLocation":"372653"
+      },
+      "caseCode": "051DD",
+      "caseCreated": "2019-08-02",
+      "createdInGapsFrom": "readyToList",
+      "dwpRegionalCentre": "Sheffield DRT",
+      "evidencePresent": "Yes",
+      "formType": "sscs1",
+      "interlocReferralReason": "over13months",
+      "issueCode": "DD",
+      "linkedCasesBoolean": "No",
+      "region": "SUTTON",
+      "regionalProcessingCenter": {
+        "address1": "HM Courts & Tribunals Service",
+        "address2": "Social Security & Child Support Appeals",
+        "address3": "Copthall House",
+        "address4": "9 The Pavement, Grove Road",
+        "city": "SUTTON",
+        "email": "Sutton_SYA_Respons@justice.gov.uk",
+        "faxNumber": "0870 739 4229",
+        "name": "SUTTON",
+        "phoneNumber": "0300 123 1142",
+        "postcode": "SM1 1DA",
+        "hearingRoute": "gaps"
+      },
+      "processingVenue": "Cardiff",
+      "sscsDocument": [
+        {
+          "value": {
+            "documentDateAdded": "2019-08-01",
+            "documentFileName": "987654321-123456789.pdf",
+            "documentLink": {
+              "document_binary_url": "binary-url",
+              "document_filename": "987654321-123456789.pdf",
+              "document_url": "url"
+            },
+            "documentType": "appellantEvidence"
+          }
+        }
+      ],
+      "subscriptions": {
+        "appellantSubscription": null,
+        "appointeeSubscription": {
+          "email": null,
+          "lastLoggedIntoMya": null,
+          "mobile": "07832882849",
+          "reason": null,
+          "subscribeEmail": "No",
+          "subscribeSms": "No",
+          "tya": "TYA_RANDOM_NUMBER_APPOINTEE",
+          "wantSmsNotifications": "No"
+        },
+        "jointPartySubscription": null,
+        "representativeSubscription": {
+          "email": null,
+          "lastLoggedIntoMya": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeEmail": "No",
+          "subscribeSms": "No",
+          "tya": "TYA_RANDOM_NUMBER_REP",
+          "wantSmsNotifications": "No"
+        },
+        "supporterSubscription": null
+      }
+    },
+    "case_type_id": "Benefit",
+    "event_id": "nonCompliant"
+  },
+  "warnings": [],
+  "supplementary_data": {
+    "$set" : {
+      "HMCTSServiceId": "BBA3"
+    }
+  }
+}

@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.RelatedParty;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingPriority;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
@@ -70,8 +71,17 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
     private VenueService venueService;
     private SscsCaseData caseData;
 
+    @Mock
+    private HearingsPanelMapping hearingsPanelMapping;
+
+    @Mock
+    private PanelCategoryService panelCategoryService;
+
+    private ServiceHearingValuesMapping serviceHearingValuesMapping;
+
     @BeforeEach
     public void setUp() {
+        serviceHearingValuesMapping = new ServiceHearingValuesMapping(hearingsPanelMapping, panelCategoryService);
         caseData = SscsCaseData.builder()
             .ccdCaseId("1234")
             .benefitCode(BENEFIT_CODE)
@@ -178,7 +188,7 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
             .willReturn("BBA3-002-DD");
 
         // when
-        final ServiceHearingValues serviceHearingValues = ServiceHearingValuesMapping.mapServiceHearingValues(caseData, refData);
+        final ServiceHearingValues serviceHearingValues = serviceHearingValuesMapping.mapServiceHearingValues(caseData, refData);
         final HearingWindow expectedHearingWindow = HearingWindow.builder()
             .dateRangeStart(LocalDate.now().plusDays(DAYS_TO_ADD_HEARING_WINDOW_TODAY))
             .build();
@@ -225,7 +235,7 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
         given(sessionCategoryMaps.getCategorySubTypeValue(sessionCategoryMap))
             .willReturn("BBA3-002-DD");
         // when
-        final ServiceHearingValues serviceHearingValues = ServiceHearingValuesMapping.mapServiceHearingValues(caseData, refData);
+        final ServiceHearingValues serviceHearingValues = serviceHearingValuesMapping.mapServiceHearingValues(caseData, refData);
         //then
         assertThat(serviceHearingValues.getParties())
             .hasSize(4)
@@ -259,7 +269,7 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
         given(sessionCategoryMaps.getCategorySubTypeValue(sessionCategoryMap))
             .willReturn("BBA3-002-DD");
         // when
-        final ServiceHearingValues serviceHearingValues = ServiceHearingValuesMapping.mapServiceHearingValues(caseData, refData);
+        final ServiceHearingValues serviceHearingValues = serviceHearingValuesMapping.mapServiceHearingValues(caseData, refData);
         //then
         assertThat(serviceHearingValues.getParties())
             .filteredOn(partyDetails -> EntityRoleCode.REPRESENTATIVE.getHmcReference().equals(partyDetails.getPartyRole()))
@@ -282,7 +292,7 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
                 .name(Name.builder().firstName("Test").lastName("Test").build())
                 .hearingOptions(null).build());
         editedCaseData.setOtherParties(List.of(otherParty));
-        final ServiceHearingValues serviceHearingValues = ServiceHearingValuesMapping.mapServiceHearingValues(caseData, refData);
+        final ServiceHearingValues serviceHearingValues = serviceHearingValuesMapping.mapServiceHearingValues(caseData, refData);
         assertThat(serviceHearingValues.getParties())
             .filteredOn(partyDetails -> EntityRoleCode.OTHER_PARTY.getHmcReference().equals(partyDetails.getPartyRole()))
             .extracting(PartyDetails::getPartyChannel)
@@ -301,7 +311,7 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
         SscsCaseData editedCaseData = caseData;
         editedCaseData.setBenefitCode("093");
         editedCaseData.getSchedulingAndListingFields().setOverrideFields(null);
-        final ServiceHearingValues serviceHearingValues = ServiceHearingValuesMapping.mapServiceHearingValues(caseData, refData);
+        final ServiceHearingValues serviceHearingValues = serviceHearingValuesMapping.mapServiceHearingValues(caseData, refData);
         assertEquals(0, serviceHearingValues.getDuration());
 
     }
