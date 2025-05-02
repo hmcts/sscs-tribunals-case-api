@@ -708,14 +708,6 @@ public class SscsUtil {
         }
     }
 
-    public static LocalDate calculateDueDateWorkingDays(LocalDate now, int workingDays) {
-        return Stream.iterate(now.plusDays(1), d -> d.plusDays(1))
-            .filter(d -> !(d.getDayOfWeek() == DayOfWeek.SATURDAY || d.getDayOfWeek() == DayOfWeek.SUNDAY))
-            .limit(workingDays)
-            .reduce((first, second) -> second)
-            .orElse(now);
-    }
-
     public static void setListAssistRoutes(SscsCaseData sscsCaseData) {
         SchedulingAndListingFields schedulingAndListingFields = Optional.ofNullable(sscsCaseData.getSchedulingAndListingFields())
             .orElse(SchedulingAndListingFields.builder().build());

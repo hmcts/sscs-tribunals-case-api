@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
@@ -17,7 +19,6 @@ import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.build
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.buildCommRequestWithNoActionReply;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.buildCommRequestWithReply;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.buildCustomCommRequest;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.calculateDueDateWorkingDays;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -45,6 +46,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.idam.UserRole;
+import uk.gov.hmcts.reform.sscs.service.BusinessDaysCalculatorService;
 
 class FtaCommunicationAboutToSubmitHandlerTest {
 
@@ -62,12 +64,15 @@ class FtaCommunicationAboutToSubmitHandlerTest {
     @Mock
     private IdamService idamService;
 
+    @Mock
+    private BusinessDaysCalculatorService businessDaysCalculatorService;
+
 
     @BeforeEach
     void setUp() {
         openMocks(this);
 
-        handler = new FtaCommunicationAboutToSubmitHandler(idamService);
+        handler = new FtaCommunicationAboutToSubmitHandler(idamService, businessDaysCalculatorService);
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").build();
 
@@ -127,7 +132,8 @@ class FtaCommunicationAboutToSubmitHandlerTest {
             .roles(List.of(UserRole.CTSC_CLERK.getValue()))
             .build();
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
-
+        when(businessDaysCalculatorService.getBusinessDay(any(LocalDate.class), anyInt()))
+            .thenReturn(LocalDate.now().plusDays(2));
         // Execute the function
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -143,7 +149,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertEquals(expectedUserName, addedCom.getRequestUserName());
         assertEquals(UserRole.CTSC_CLERK.getLabel(), addedCom.getRequestUserRole());
         assertNotNull(addedCom.getRequestDateTime());
-        LocalDate date = calculateDueDateWorkingDays(LocalDate.now(), 2);
+        LocalDate date = LocalDate.now().plusDays(2);
         assertEquals(date, addedCom.getRequestResponseDueDate());
         assertEquals(date, response.getData().getCommunicationFields().getFtaResponseDueDate());
     }
@@ -173,6 +179,8 @@ class FtaCommunicationAboutToSubmitHandlerTest {
             .roles(List.of(UserRole.IBCA.getValue()))
             .build();
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
+        when(businessDaysCalculatorService.getBusinessDay(any(LocalDate.class), anyInt()))
+            .thenReturn(LocalDate.now().plusDays(2));
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -188,7 +196,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertEquals(UserRole.IBCA.getLabel(), addedCom.getRequestUserRole());
         assertNotNull(addedCom.getRequestDateTime());
         assertEquals(ftaCommunicationPast, resultComs.getLast());
-        assertEquals(calculateDueDateWorkingDays(LocalDate.now(), 2), addedCom.getRequestResponseDueDate());
+        assertEquals(LocalDate.now().plusDays(2), addedCom.getRequestResponseDueDate());
     }
 
     @Test

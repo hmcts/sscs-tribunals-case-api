@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
@@ -14,7 +16,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.buildCommRequest;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.buildCommRequestNotActionedResponseDateOffset;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.buildCustomCommRequest;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.calculateDueDateWorkingDays;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -31,11 +32,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.idam.UserRole;
+import uk.gov.hmcts.reform.sscs.service.BusinessDaysCalculatorService;
 
 class TribunalCommunicationAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
-    TribunalCommunicationAboutToSubmitHandler handler;
+    private TribunalCommunicationAboutToSubmitHandler handler;
 
     private SscsCaseData sscsCaseData;
 
@@ -48,11 +50,14 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
     @Mock
     private IdamService idamService;
 
+    @Mock
+    private BusinessDaysCalculatorService businessDaysCalculatorService;
+
     @BeforeEach
     void setUp() {
         openMocks(this);
 
-        handler = new TribunalCommunicationAboutToSubmitHandler(idamService);
+        handler = new TribunalCommunicationAboutToSubmitHandler(idamService, businessDaysCalculatorService);
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").build();
 
@@ -106,6 +111,8 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
             .name(expectedUserName)
             .build();
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
+        when(businessDaysCalculatorService.getBusinessDay(any(LocalDate.class), anyInt()))
+            .thenReturn(LocalDate.now().plusDays(2));
 
         // Execute the function
         PreSubmitCallbackResponse<SscsCaseData> response =
@@ -122,7 +129,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         assertEquals(expectedUserName, addedCom.getRequestUserName());
         assertNotNull(addedCom.getRequestDateTime());
         assertNotNull(addedCom.getRequestResponseDueDate());
-        LocalDate date = calculateDueDateWorkingDays(LocalDate.now(), 2);
+        LocalDate date = LocalDate.now().plusDays(2);
         assertEquals(date, addedCom.getRequestResponseDueDate());
         assertEquals(date, response.getData().getCommunicationFields().getTribunalResponseDueDate());
     }
@@ -173,6 +180,8 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
             .roles(List.of(UserRole.CTSC_CLERK.getValue()))
             .build();
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
+        when(businessDaysCalculatorService.getBusinessDay(LocalDate.now(), 2))
+            .thenReturn(LocalDate.now().plusDays(2));
 
         // Execute the function
         PreSubmitCallbackResponse<SscsCaseData> response =
@@ -191,7 +200,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         assertEquals(UserRole.CTSC_CLERK.getLabel(), addedCom.getRequestUserRole());
         assertNotNull(addedCom.getRequestDateTime());
         assertEquals(tribunalCommunicationPast, resultComs.getLast());
-        assertEquals(calculateDueDateWorkingDays(LocalDate.now(), 2), addedCom.getRequestResponseDueDate());
+        assertEquals(LocalDate.now().plusDays(2), addedCom.getRequestResponseDueDate());
         assertEquals(LocalDate.now().minusYears(1), response.getData().getCommunicationFields().getTribunalResponseDueDate());
     }
 

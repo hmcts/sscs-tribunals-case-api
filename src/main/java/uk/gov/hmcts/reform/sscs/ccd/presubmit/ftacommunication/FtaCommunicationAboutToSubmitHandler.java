@@ -22,16 +22,20 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.service.BusinessDaysCalculatorService;
 
 @Service
 @Slf4j
 public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final IdamService idamService;
+    private final BusinessDaysCalculatorService businessDaysCalculatorService;
 
     @Autowired
-    public FtaCommunicationAboutToSubmitHandler(IdamService idamService) {
+    public FtaCommunicationAboutToSubmitHandler(IdamService idamService,
+                                                BusinessDaysCalculatorService businessDaysCalculatorService) {
         this.idamService = idamService;
+        this.businessDaysCalculatorService = businessDaysCalculatorService;
     }
 
     @Override
@@ -64,7 +68,8 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
             List<CommunicationRequest> ftaComms = Optional.ofNullable(ftaCommunicationFields.getFtaCommunications())
                 .orElse(new ArrayList<>());
 
-            addCommunicationRequest(ftaComms, topic, question, userDetails);
+            addCommunicationRequest(businessDaysCalculatorService,
+                ftaComms, topic, question, userDetails);
             ftaCommunicationFields.setFtaCommunications(ftaComms);
         } else if (FtaRequestType.REPLY_TO_FTA_QUERY.equals(ftaCommunicationFields.getFtaRequestType())) {
             handleReplyToFtaQuery(ftaCommunicationFields, userDetails);

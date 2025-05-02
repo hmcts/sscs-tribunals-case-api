@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.util;
 
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.calculateDueDateWorkingDays;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.idam.UserRole;
+import uk.gov.hmcts.reform.sscs.service.BusinessDaysCalculatorService;
 
 @Slf4j
 public class CommunicationRequestUtil {
@@ -82,9 +82,9 @@ public class CommunicationRequestUtil {
             .orElseThrow(() -> new IllegalStateException("No communication request found with id: " + id));
     }
 
-    public static void addCommunicationRequest(List<CommunicationRequest> comms, CommunicationRequestTopic topic, String question, UserDetails userDetails) {
+    public static void addCommunicationRequest(BusinessDaysCalculatorService service, List<CommunicationRequest> comms, CommunicationRequestTopic topic, String question, UserDetails userDetails) {
         LocalDateTime now = LocalDateTime.now();
-        LocalDate dueDate = calculateDueDateWorkingDays(now.toLocalDate(), 2);
+        LocalDate dueDate = service.getBusinessDay(now.toLocalDate(), 2);
         comms.add(CommunicationRequest.builder()
             .value(CommunicationRequestDetails.builder()
                 .requestMessage(question)

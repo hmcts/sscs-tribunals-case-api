@@ -19,16 +19,20 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.service.BusinessDaysCalculatorService;
 
 @Service
 @Slf4j
 public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final IdamService idamService;
+    private final BusinessDaysCalculatorService businessDaysCalculatorService;
 
     @Autowired
-    public TribunalCommunicationAboutToSubmitHandler(IdamService idamService) {
+    public TribunalCommunicationAboutToSubmitHandler(IdamService idamService,
+                                                     BusinessDaysCalculatorService businessDaysCalculatorService) {
         this.idamService = idamService;
+        this.businessDaysCalculatorService = businessDaysCalculatorService;
     }
 
     @Override
@@ -60,7 +64,7 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
             List<CommunicationRequest> tribunalComms = Optional.ofNullable(communicationFields.getTribunalCommunications())
                 .orElse(new ArrayList<>());
 
-            addCommunicationRequest(tribunalComms, topic, question, userDetails);
+            addCommunicationRequest(businessDaysCalculatorService, tribunalComms, topic, question, userDetails);
             communicationFields.setTribunalCommunications(tribunalComms);
         } else if (TribunalRequestType.REPLY_TO_TRIBUNAL_QUERY.equals(communicationFields.getTribunalRequestType())) {
             handleReplyToTribunalQuery(communicationFields, userDetails);

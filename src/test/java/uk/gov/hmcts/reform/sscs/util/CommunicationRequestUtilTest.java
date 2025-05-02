@@ -1,6 +1,10 @@
 package uk.gov.hmcts.reform.sscs.util;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.buildCommRequest;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.buildCommRequestNotActionedResponseDateOffset;
@@ -17,13 +21,24 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.service.BusinessDaysCalculatorService;
 
 class CommunicationRequestUtilTest {
+
+    @Mock
+    private BusinessDaysCalculatorService businessDaysCalculatorService;
+
+    @BeforeEach
+    void setUp() {
+        openMocks(this);
+    }
 
     @Test
     void testConstructorIsPrivate() throws NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
@@ -132,8 +147,9 @@ class CommunicationRequestUtilTest {
         CommunicationRequestTopic topic = CommunicationRequestTopic.MRN_REVIEW_DECISION_NOTICE_DETAILS;
         String question = "Test question";
         UserDetails userDetails = UserDetails.builder().name("Test User").build();
-
-        CommunicationRequestUtil.addCommunicationRequest(comms, topic, question, userDetails);
+        when(businessDaysCalculatorService.getBusinessDay(any(LocalDate.class), anyInt())).thenReturn(LocalDate.now());
+        CommunicationRequestUtil.addCommunicationRequest(businessDaysCalculatorService,
+            comms, topic, question, userDetails);
 
         assertEquals(1, comms.size());
         CommunicationRequest addedRequest = comms.getFirst();
@@ -148,8 +164,9 @@ class CommunicationRequestUtilTest {
         List<CommunicationRequest> comms = new java.util.ArrayList<>();
         CommunicationRequestTopic topic = CommunicationRequestTopic.MRN_REVIEW_DECISION_NOTICE_DETAILS;
         String question = "Test question";
-
-        CommunicationRequestUtil.addCommunicationRequest(comms, topic, question, null);
+        when(businessDaysCalculatorService.getBusinessDay(any(LocalDate.class), anyInt())).thenReturn(LocalDate.now());
+        CommunicationRequestUtil.addCommunicationRequest(businessDaysCalculatorService,
+            comms, topic, question, null);
 
         assertEquals(1, comms.size());
         CommunicationRequest addedRequest = comms.getFirst();
