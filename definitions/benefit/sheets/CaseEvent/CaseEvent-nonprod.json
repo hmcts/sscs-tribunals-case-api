@@ -29,5 +29,15 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdSubmittedEvent"
+  },
+  {
+    "LiveFrom": "01/05/2025",
+    "CaseTypeID": "Benefit",
+    "ID": "adminCancelTestHearings",
+    "Name": "Cancel Test Hearings",
+    "DisplayOrder": 10007,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public"
   }
 ]

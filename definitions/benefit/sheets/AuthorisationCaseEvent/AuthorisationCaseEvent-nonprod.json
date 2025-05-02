@@ -9,5 +9,7 @@
   {"LiveFrom": "18/03/2025", "CaseTypeID": "Benefit", "CaseEventID": "tribunalCommunication", "AccessProfile":  "caseworker-sscs-ibcaresponsewriter", "CRUD":  "CRUD"},
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseEventID": "ftaCommunication", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseEventID": "ftaCommunication", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
-  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseEventID": "ftaCommunication", "AccessProfile": "caseworker-sscs-registrar", "CRUD": "CRUD"}
+  {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseEventID": "ftaCommunication", "AccessProfile": "caseworker-sscs-registrar", "CRUD": "CRUD"},
+  {"LiveFrom": "02/12/2024", "CaseTypeID": "Benefit", "CaseEventID": "adminCancelTestHearings", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRU"},
+  {"LiveFrom": "02/12/2024", "CaseTypeID": "Benefit", "CaseEventID": "adminCancelTestHearings", "AccessProfile": "caseworker-sscs", "CRUD": "R"}
 ]
