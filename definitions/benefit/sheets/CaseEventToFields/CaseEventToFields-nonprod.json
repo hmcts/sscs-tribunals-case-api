@@ -14,7 +14,7 @@
   {
     "LiveFrom": "18/03/2025",
     "CaseEventID": "tribunalCommunication",
-    "CaseFieldID": "tribunalRequestTopic",
+    "CaseFieldID": "commRequestTopic",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "PageDisplayOrder": 2,
@@ -26,7 +26,7 @@
   {
     "LiveFrom": "18/03/2025",
     "CaseEventID": "tribunalCommunication",
-    "CaseFieldID": "tribunalRequestQuestion",
+    "CaseFieldID": "commRequestQuestion",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "PageDisplayOrder": 2,
@@ -35,7 +35,7 @@
   },
   {
     "CaseEventID": "tribunalCommunication",
-    "CaseFieldID": "tribunalRequestNoResponseRadioDl",
+    "CaseFieldID": "tribunalRequestsDl",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "13/03/2025",
@@ -61,7 +61,7 @@
   },
   {
     "CaseEventID": "tribunalCommunication",
-    "CaseFieldID": "tribunalRequestNoResponseTextArea",
+    "CaseFieldID": "commRequestResponseTextArea",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "13/03/2025",
@@ -71,7 +71,7 @@
   },
   {
     "CaseEventID": "tribunalCommunication",
-    "CaseFieldID": "tribunalRequestNoResponseNoActionLabel",
+    "CaseFieldID": "communicationNoActionLabel",
     "CaseTypeID": "Benefit",
     "DisplayContext": "READONLY",
     "LiveFrom": "13/03/2025",
@@ -81,7 +81,7 @@
   },
   {
     "CaseEventID": "tribunalCommunication",
-    "CaseFieldID": "tribunalRequestNoResponseNoAction",
+    "CaseFieldID": "commRequestResponseNoAction",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "13/03/2025",
@@ -91,7 +91,7 @@
   },
   {
     "CaseEventID": "tribunalCommunication",
-    "CaseFieldID": "tribunalRequestRespondedDl",
+    "CaseFieldID": "ftaRequestsDl",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "13/03/2025",
@@ -127,7 +127,7 @@
   },
   {
     "CaseEventID": "tribunalCommunication",
-    "CaseFieldID": "tribunalRequestRespondedActioned",
+    "CaseFieldID": "commRequestActioned",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "13/03/2025",
@@ -149,7 +149,7 @@
   },
   {
     "CaseEventID": "ftaCommunication",
-    "CaseFieldID": "ftaRequestTopic",
+    "CaseFieldID": "commRequestTopic",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "13/03/2025",
@@ -161,7 +161,7 @@
   },
   {
     "CaseEventID": "ftaCommunication",
-    "CaseFieldID": "ftaRequestQuestion",
+    "CaseFieldID": "commRequestQuestion",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "13/03/2025",
@@ -171,7 +171,7 @@
   },
   {
     "CaseEventID": "ftaCommunication",
-    "CaseFieldID": "ftaRequestNoResponseRadioDl",
+    "CaseFieldID": "ftaRequestsDl",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "13/03/2025",
@@ -197,7 +197,7 @@
   },
   {
     "CaseEventID": "ftaCommunication",
-    "CaseFieldID": "ftaRequestNoResponseTextArea",
+    "CaseFieldID": "commRequestResponseTextArea",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "13/03/2025",
@@ -207,7 +207,7 @@
   },
   {
     "CaseEventID": "ftaCommunication",
-    "CaseFieldID": "ftaRequestNoResponseNoActionLabel",
+    "CaseFieldID": "communicationNoActionLabel",
     "CaseTypeID": "Benefit",
     "DisplayContext": "READONLY",
     "LiveFrom": "13/03/2025",
@@ -217,7 +217,7 @@
   },
   {
     "CaseEventID": "ftaCommunication",
-    "CaseFieldID": "ftaRequestNoResponseNoAction",
+    "CaseFieldID": "commRequestResponseNoAction",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "13/03/2025",
@@ -227,7 +227,7 @@
   },
   {
     "CaseEventID": "ftaCommunication",
-    "CaseFieldID": "ftaResponseNoActionedRadioDl",
+    "CaseFieldID": "tribunalRequestsDl",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "14/04/2025",
@@ -240,7 +240,7 @@
   },
   {
     "CaseEventID": "ftaCommunication",
-    "CaseFieldID": "ftaResponseNoActionedQuery",
+    "CaseFieldID": "ftaRequestRespondedQuery",
     "CaseTypeID": "Benefit",
     "DisplayContext": "READONLY",
     "LiveFrom": "14/04/2025",
@@ -253,7 +253,7 @@
   },
   {
     "CaseEventID": "ftaCommunication",
-    "CaseFieldID": "ftaResponseNoActionedReply",
+    "CaseFieldID": "ftaRequestRespondedReply",
     "CaseTypeID": "Benefit",
     "DisplayContext": "READONLY",
     "LiveFrom": "14/04/2025",
@@ -263,12 +263,48 @@
   },
   {
     "CaseEventID": "ftaCommunication",
-    "CaseFieldID": "ftaResponseActioned",
+    "CaseFieldID": "commRequestActioned",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "14/04/2025",
     "PageDisplayOrder": 6,
     "PageFieldDisplayOrder": 3,
     "PageID": "reviewFtaReply"
+  },
+  {
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "deleteCommRequestRadioDl",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 7,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "selectRequestToDelete",
+    "PageShowCondition": "ftaRequestType=\"deleteRequestReply\"",
+    "PageLabel": "Select a request/response to delete",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=selectRequestToDelete"
+  },
+  {
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "deleteCommRequestReadOnly",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 8,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "deleteRequest",
+    "PageShowCondition": "ftaRequestType=\"deleteRequestReply\"",
+    "PageLabel": "Delete a request/response",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=deleteRequest"
+  },
+  {
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "deleteCommRequestTextArea",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 8,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "deleteRequest"
   }
 ]

@@ -1,22 +1,19 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.addCommunicationRequest;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getCommunicationRequestFromId;
-import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getOldestResponseDate;
-import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getOldestResponseProvidedDate;
-import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRepliesWithoutReviews;
-import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRequestsWithoutReplies;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRoleName;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.setCommRequestFilters;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -30,13 +27,10 @@ import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 @Slf4j
 public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private IdamService idamService;
-    private final boolean isFtaCommunicationEnabled;
+    private final IdamService idamService;
 
     @Autowired
-    public FtaCommunicationAboutToSubmitHandler(IdamService idamService,
-                                                @Value("${feature.fta-communication.enabled}") boolean isFtaCommunicationEnabled) {
-        this.isFtaCommunicationEnabled = isFtaCommunicationEnabled;
+    public FtaCommunicationAboutToSubmitHandler(IdamService idamService) {
         this.idamService = idamService;
     }
 
@@ -60,83 +54,92 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        if (!isFtaCommunicationEnabled) {
-            return new PreSubmitCallbackResponse<>(sscsCaseData);
-        }
-
         FtaCommunicationFields ftaCommunicationFields = Optional.ofNullable(sscsCaseData.getCommunicationFields())
             .orElse(FtaCommunicationFields.builder().build());
         final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
-        final String username = isNull(userDetails) ? null : userDetails.getName();
 
         if (FtaRequestType.NEW_REQUEST.equals(ftaCommunicationFields.getFtaRequestType())) {
-            CommunicationRequestTopic topic = ftaCommunicationFields.getFtaRequestTopic();
-            String question = ftaCommunicationFields.getFtaRequestQuestion();
+            CommunicationRequestTopic topic = ftaCommunicationFields.getCommRequestTopic();
+            String question = ftaCommunicationFields.getCommRequestQuestion();
             List<CommunicationRequest> ftaComms = Optional.ofNullable(ftaCommunicationFields.getFtaCommunications())
                 .orElse(new ArrayList<>());
 
-            addCommunicationRequest(ftaComms, topic, question, username);
-            setFieldsForNewRequest(sscsCaseData, ftaCommunicationFields, ftaComms);
+            addCommunicationRequest(ftaComms, topic, question, userDetails);
+            ftaCommunicationFields.setFtaCommunications(ftaComms);
         } else if (FtaRequestType.REPLY_TO_FTA_QUERY.equals(ftaCommunicationFields.getFtaRequestType())) {
-            handleReplyToFtaQuery(ftaCommunicationFields, username, sscsCaseData);
+            handleReplyToFtaQuery(ftaCommunicationFields, userDetails);
         } else if (ftaCommunicationFields.getFtaRequestType() == FtaRequestType.REVIEW_FTA_REPLY) {
-            handleReviewFtaReply(ftaCommunicationFields, sscsCaseData);
+            handleReviewFtaReply(ftaCommunicationFields);
+        } else if (FtaRequestType.DELETE_REQUEST_REPLY.equals(ftaCommunicationFields.getFtaRequestType())) {
+            handleDeleteRequestReply(ftaCommunicationFields);
         }
-        clearFields(sscsCaseData, ftaCommunicationFields);
+        clearFields(ftaCommunicationFields);
+        setCommRequestFilters(ftaCommunicationFields);
+        ftaCommunicationFields.setDeleteCommRequestReadOnlyStored(ftaCommunicationFields.getDeleteCommRequestReadOnly());
+        ftaCommunicationFields.setDeleteCommRequestTextAreaStored(ftaCommunicationFields.getDeleteCommRequestTextArea());
+        ftaCommunicationFields.setDeleteCommRequestReadOnly(null);
+        ftaCommunicationFields.setDeleteCommRequestTextArea(null);
+        sscsCaseData.setCommunicationFields(ftaCommunicationFields);
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    private void setFieldsForNewRequest(SscsCaseData sscsCaseData, FtaCommunicationFields communicationFields, List<CommunicationRequest> comms) {
-        communicationFields.setFtaCommunications(comms);
-        communicationFields.setFtaResponseDueDate(getOldestResponseDate(comms));
-        sscsCaseData.setCommunicationFields(communicationFields);
-    }
-
-    private void handleReplyToFtaQuery(FtaCommunicationFields ftaCommunicationFields, String username, SscsCaseData sscsCaseData) {
-        DynamicList ftaRequestDl = ftaCommunicationFields.getFtaRequestNoResponseRadioDl();
+    private void handleReplyToFtaQuery(FtaCommunicationFields ftaCommunicationFields, UserDetails userDetails) {
+        DynamicList ftaRequestDl = ftaCommunicationFields.getFtaRequestsDl();
         DynamicListItem chosenFtaRequest = ftaRequestDl.getValue();
         String chosenFtaRequestId = chosenFtaRequest.getCode();
         CommunicationRequest communicationRequest = getCommunicationRequestFromId(chosenFtaRequestId, ftaCommunicationFields.getTribunalCommunications());
 
-        String replyText = ftaCommunicationFields.getFtaRequestNoResponseTextArea();
-        boolean noActionRequired = !ObjectUtils.isEmpty(ftaCommunicationFields.getFtaRequestNoResponseNoAction());
+        String replyText = ftaCommunicationFields.getCommRequestResponseTextArea();
+        boolean noActionRequired = !ObjectUtils.isEmpty(ftaCommunicationFields.getCommRequestResponseNoAction());
         CommunicationRequestReply reply = CommunicationRequestReply.builder()
             .replyDateTime(LocalDateTime.now())
-            .replyUserName(username)
+            .replyUserName(userDetails.getName())
+            .replyUserRole(getRoleName(userDetails))
             .replyMessage(noActionRequired ? "No action required" : replyText)
             .replyHasBeenActioned(noActionRequired ? null : YesNo.NO)
             .build();
         communicationRequest.getValue().setRequestReply(reply);
         communicationRequest.getValue().setRequestResponseDueDate(null);
-
-        List<CommunicationRequest> requestsWithoutReplies = getRequestsWithoutReplies(ftaCommunicationFields.getTribunalCommunications());
-        ftaCommunicationFields.setTribunalResponseDueDate(getOldestResponseDate(requestsWithoutReplies));
-
-        List<CommunicationRequest> repliesWithoutReviews = getRepliesWithoutReviews(ftaCommunicationFields.getTribunalCommunications());
-        ftaCommunicationFields.setFtaResponseProvidedDate(getOldestResponseProvidedDate(repliesWithoutReviews));
-        sscsCaseData.setCommunicationFields(ftaCommunicationFields);
     }
 
-    private void handleReviewFtaReply(FtaCommunicationFields ftaCommunicationFields, SscsCaseData sscsCaseData) {
-        DynamicList ftaRequestDl = ftaCommunicationFields.getFtaResponseNoActionedRadioDl();
+    private void handleReviewFtaReply(FtaCommunicationFields ftaCommunicationFields) {
+        DynamicList ftaRequestDl = ftaCommunicationFields.getTribunalRequestsDl();
         String chosenFtaRequestId = Optional.ofNullable(ftaRequestDl.getValue()).orElse(new DynamicListItem(null, null)).getCode();
         CommunicationRequest communicationRequest = getCommunicationRequestFromId(chosenFtaRequestId, ftaCommunicationFields.getFtaCommunications());
         communicationRequest.getValue().getRequestReply().setReplyHasBeenActioned(YesNo.YES);
-        sscsCaseData.setCommunicationFields(ftaCommunicationFields);
     }
 
-    private void clearFields(SscsCaseData sscsCaseData, FtaCommunicationFields communicationFields) {
-        communicationFields.setFtaRequestQuestion(null);
-        communicationFields.setFtaRequestTopic(null);
+
+    private void handleDeleteRequestReply(FtaCommunicationFields ftaCommunicationFields) {
+        String requestIdToDelete = ftaCommunicationFields.getDeleteCommRequestRadioDl().getValue().getCode();
+        ftaCommunicationFields.setFtaCommunications(
+            Optional.ofNullable(ftaCommunicationFields.getFtaCommunications())
+                .orElse(Collections.emptyList())
+                .stream()
+                .filter(request -> !request.getId().equals(requestIdToDelete))
+                .toList()
+        );
+        ftaCommunicationFields.setTribunalCommunications(
+            Optional.ofNullable(ftaCommunicationFields.getTribunalCommunications())
+                .orElse(Collections.emptyList())
+                .stream()
+                .filter(request -> !request.getId().equals(requestIdToDelete))
+                .toList()
+        );
+    }
+
+    private void clearFields(FtaCommunicationFields communicationFields) {
+        communicationFields.setCommRequestQuestion(null);
+        communicationFields.setCommRequestTopic(null);
         communicationFields.setFtaRequestType(null);
         communicationFields.setFtaRequestNoResponseQuery(null);
-        communicationFields.setFtaRequestNoResponseTextArea(null);
-        communicationFields.setFtaRequestNoResponseRadioDl(null);
-        communicationFields.setFtaRequestNoResponseNoAction(null);
-        communicationFields.setFtaResponseNoActionedReply(null);
-        communicationFields.setFtaResponseNoActionedQuery(null);
-        communicationFields.setFtaResponseNoActionedRadioDl(null);
-        communicationFields.setFtaResponseActioned(null);
-        sscsCaseData.setCommunicationFields(communicationFields);
+        communicationFields.setCommRequestResponseTextArea(null);
+        communicationFields.setFtaRequestsDl(null);
+        communicationFields.setCommRequestResponseNoAction(null);
+        communicationFields.setFtaRequestRespondedReply(null);
+        communicationFields.setFtaRequestRespondedQuery(null);
+        communicationFields.setTribunalRequestsDl(null);
+        communicationFields.setCommRequestActioned(null);
+        communicationFields.setDeleteCommRequestRadioDl(null);
     }
 }
