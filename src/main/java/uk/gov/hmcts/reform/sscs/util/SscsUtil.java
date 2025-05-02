@@ -19,7 +19,6 @@ import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.TELEPHONE;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.VIDEO;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -29,7 +28,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;

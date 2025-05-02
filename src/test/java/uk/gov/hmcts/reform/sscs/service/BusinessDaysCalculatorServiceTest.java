@@ -60,17 +60,17 @@ class BusinessDaysCalculatorServiceTest {
     @Test
     void shouldReturnCorrectBusinessDayWithLocalDate() {
         LocalDate startDate = LocalDate.of(2024, 12, 23);
-        LocalDate result1 = businessDaysCalculatorService.getBusinessDay(startDate, 1);
-        LocalDate result2 = businessDaysCalculatorService.getBusinessDay(startDate, 2);
-        LocalDate result3 = businessDaysCalculatorService.getBusinessDay(startDate, 3);
-        LocalDate result4 = businessDaysCalculatorService.getBusinessDay(startDate, 4);
-        LocalDate result5 = businessDaysCalculatorService.getBusinessDay(startDate, 5);
 
-        assertEquals(LocalDate.of(2024, 12, 24), result1);
-        assertEquals(LocalDate.of(2024, 12, 27), result2);
-        assertEquals(LocalDate.of(2024, 12, 30), result3);
-        assertEquals(LocalDate.of(2024, 12, 31), result4);
-        assertEquals(LocalDate.of(2025, 1, 1), result5);
+        assertEquals(LocalDate.of(2024, 12, 24),
+            businessDaysCalculatorService.getBusinessDay(startDate, 1));
+        assertEquals(LocalDate.of(2024, 12, 27),
+            businessDaysCalculatorService.getBusinessDay(startDate, 2));
+        assertEquals(LocalDate.of(2024, 12, 30),
+            businessDaysCalculatorService.getBusinessDay(startDate, 3));
+        assertEquals(LocalDate.of(2024, 12, 31),
+            businessDaysCalculatorService.getBusinessDay(startDate, 4));
+        assertEquals(LocalDate.of(2025, 1, 1),
+            businessDaysCalculatorService.getBusinessDay(startDate, 5));
     }
 
     @Test
