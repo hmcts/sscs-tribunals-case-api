@@ -1,13 +1,13 @@
 [
   {
-  "CaseEventID": "incompleteApplicationReceived",
-  "CaseFieldID": "appeal",
-  "ListElementCode": "appellant.address.inMainlandUk",
-  "DisplayContext": "MANDATORY",
-  "FieldShowCondition": "appeal.benefitType.descriptionSelection=\"093\"",
-  "LiveFrom": "01/01/2018",
-  "FieldDisplayOrder": 8,
-  "PageID": "1.0",
-  "EventElementLabel": "Does the appellant live in England, Wales or Scotland?"
+    "CaseEventID": "incompleteApplicationReceived",
+    "CaseFieldID": "appeal",
+    "ListElementCode": "appellant.address.inMainlandUk",
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection=\"093\"",
+    "LiveFrom": "01/01/2018",
+    "FieldDisplayOrder": 8,
+    "PageID": "1.0",
+    "EventElementLabel": "Does the appellant live in England, Wales or Scotland?"
   }
 ]
