@@ -375,8 +375,8 @@ dependencies {
 
 
     implementation group: 'com.mchange', name: 'c3p0', version: '0.10.2'
-    implementation group: 'org.flywaydb', name: 'flyway-core', version: '11.7.2'
-    implementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '11.7.2'
+    implementation group: 'org.flywaydb', name: 'flyway-core', version: '11.8.0'
+    implementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '11.8.0'
 
     implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6.2.4'
 
