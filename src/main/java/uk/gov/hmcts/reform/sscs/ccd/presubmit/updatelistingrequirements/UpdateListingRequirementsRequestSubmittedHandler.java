@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
@@ -19,6 +20,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -46,8 +49,11 @@ public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubm
 
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
+        Optional<CaseDetails<SscsCaseData>> oldCaseData = callback.getCaseDetailsBefore();
+
         boolean updateToListingRequirementsOccurred = nonNull(caseDataSnlFields.getOverrideFields())
                 || sscsCaseData.getPanelMemberComposition() != callback.getCaseDetails().getCaseData().getPanelMemberComposition();
+        log.info("CASE DETAILS BEFORE: {}", oldCaseData);
         log.info("case data panel comp: {} ********* ",sscsCaseData.getPanelMemberComposition());
         log.info("############ callback case data panel comp: {}",
                 callback.getCaseDetails().getCaseData().getPanelMemberComposition());
