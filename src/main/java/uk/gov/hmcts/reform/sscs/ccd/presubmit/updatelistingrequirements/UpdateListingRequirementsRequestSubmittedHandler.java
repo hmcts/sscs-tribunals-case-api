@@ -49,7 +49,11 @@ public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubm
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         Optional<CaseDetails<SscsCaseData>> oldCaseData = callback.getCaseDetailsBefore();
-        log.info("CASE DETAILS BEFORE: {}", oldCaseData);
+
+        if (oldCaseData.isPresent() && oldCaseData.get().getCaseData().getPanelMemberComposition() != null) {
+            log.info("CASE DETAILS BEFORE: {}", oldCaseData.get().getCaseData().getPanelMemberComposition());
+        }
+
 
         boolean updateToListingRequirementsOccurred = nonNull(caseDataSnlFields.getOverrideFields())
                 || sscsCaseData.getPanelMemberComposition() != callback.getCaseDetails().getCaseData().getPanelMemberComposition();
