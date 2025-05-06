@@ -26,18 +26,21 @@ public class SscsPdfService {
     private final PDFServiceClient pdfServiceClient;
     private final CcdPdfService ccdPdfService;
     private final ResourceManager resourceManager;
+    private final boolean isNiPostCodeFeatureEnabled;
 
     @Autowired
     public SscsPdfService(@Value("${appellant.appeal.html.template.path}") String appellantTemplatePath,
                           @Value("${appellant.appeal.html.welsh.template.path}") String appellantWelshTemplatePath,
                           PDFServiceClient pdfServiceClient,
                           CcdPdfService ccdPdfService,
-                          ResourceManager resourceManager) {
+                          ResourceManager resourceManager,
+                          @Value("${feature.ibc-ni-postcodes.enabled}")  boolean isNiPostCodeFeatureEnabled) {
         this.pdfServiceClient = pdfServiceClient;
         this.appellantTemplatePath = appellantTemplatePath;
         this.appellantWelshTemplatePath = appellantWelshTemplatePath;
         this.ccdPdfService = ccdPdfService;
         this.resourceManager = resourceManager;
+        this.isNiPostCodeFeatureEnabled = isNiPostCodeFeatureEnabled;
     }
 
     public SscsCaseData generatePdf(SscsCaseData sscsCaseData, Long caseDetailsId, String documentType, String fileName) {
@@ -64,6 +67,7 @@ public class SscsPdfService {
                 .isSignLanguageInterpreterRequired(sscsCaseData.getAppeal().getHearingOptions().wantsSignLanguageInterpreter())
                 .isHearingLoopRequired(sscsCaseData.getAppeal().getHearingOptions().wantsHearingLoop())
                 .isAccessibleHearingRoomRequired(sscsCaseData.getAppeal().getHearingOptions().wantsAccessibleHearingRoom())
+                .isNiPostCodeFeatureEnabled(isNiPostCodeFeatureEnabled)
                 .currentDate(LocalDate.parse(sscsCaseData.getCaseCreated()))
                 .englishBenefitName(Benefit.getLongBenefitNameDescriptionWithOptionalAcronym(sscsCaseData.getAppeal().getBenefitType().getCode(), true))
                 .repFullName(getRepFullName(sscsCaseData.getAppeal().getRep())).build();
