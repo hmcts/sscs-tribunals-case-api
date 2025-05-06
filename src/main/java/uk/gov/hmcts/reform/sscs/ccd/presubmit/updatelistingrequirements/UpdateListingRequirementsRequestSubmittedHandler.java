@@ -46,9 +46,17 @@ public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubm
 
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
+        boolean updateToListingRequirementsOccurred = nonNull(caseDataSnlFields.getOverrideFields())
+                || sscsCaseData.getPanelMemberComposition() != callback.getCaseDetails().getCaseData().getPanelMemberComposition();
+        log.info("case data panel comp: {} ********* ",sscsCaseData.getPanelMemberComposition());
+        log.info("############ callback case data panel comp: {}",
+                callback.getCaseDetails().getCaseData().getPanelMemberComposition());
+
         State state = callback.getCaseDetails().getState();
         HearingRoute hearingRoute = caseDataSnlFields.getHearingRoute();
-        if (state == State.READY_TO_LIST && hearingRoute == LIST_ASSIST && nonNull(caseDataSnlFields.getOverrideFields())) {
+        if (state == State.READY_TO_LIST
+                && hearingRoute == LIST_ASSIST
+                && updateToListingRequirementsOccurred) {
             String caseId = sscsCaseData.getCcdCaseId();
             log.info("UpdateListingRequirements List Assist request, Update Hearing,"
                             + "amend reasons: {}, for case ID: {}",
