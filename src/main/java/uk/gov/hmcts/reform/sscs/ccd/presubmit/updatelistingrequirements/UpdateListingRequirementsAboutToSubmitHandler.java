@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getHmcHearingType;
 
@@ -17,7 +15,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
@@ -27,8 +24,6 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     @Value("${feature.gaps-switchover.enabled}")
     private boolean gapsSwitchOverFeature;
-
-    private final ListAssistHearingMessageHelper listAssistHearingMessageHelper;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -77,31 +72,6 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             }
         }
 
-        State state = callback.getCaseDetails().getState();
-        HearingRoute hearingRoute = caseDataSnlFields.getHearingRoute();
-        if (gapsSwitchOverFeature
-            && state == State.READY_TO_LIST
-            && hearingRoute == LIST_ASSIST
-            && nonNull(caseDataSnlFields.getOverrideFields())) {
-            String caseId = sscsCaseData.getCcdCaseId();
-            log.info("UpdateListingRequirements List Assist request, Update Hearing,"
-                    + "amend reasons: {}, for case ID: {}",
-                caseDataSnlFields.getAmendReasons(), caseId);
-
-            HearingState hearingState = UPDATE_HEARING;
-
-            boolean messageSuccess = listAssistHearingMessageHelper.sendHearingMessage(
-                caseId,
-                hearingRoute,
-                hearingState,
-                null);
-
-            if (messageSuccess) {
-                caseDataSnlFields.setHearingState(hearingState);
-            } else {
-                callbackResponse.addError("An error occurred during message publish. Please try again.");
-            }
-        }
         sscsCaseData.getAppeal()
             .setHearingOptions(Optional.ofNullable(sscsCaseData.getAppeal().getHearingOptions())
                 .map(HearingOptions::toBuilder)
