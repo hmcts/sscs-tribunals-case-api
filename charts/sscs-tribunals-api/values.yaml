@@ -127,7 +127,6 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     LOGBACK_REQUIRE_ERROR_CODE: "false"
     DEFAULT_PANEL_COMPOSITION_ENABLED: false
 
-
     #    hearings=api
     IDAM_S2S_URL: "http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     CASEWORKER_REF_API_URL: "http://rd-caseworker-ref-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
