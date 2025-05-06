@@ -7,11 +7,13 @@ export class LoginPage {
   readonly page: Page;
   readonly pageTitle: Locator;
   readonly mainPageTitle: Locator;
+  readonly signOutBtn: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.pageTitle = page.locator('h3');
     this.mainPageTitle = page.locator('h1');
+    this.signOutBtn = page.locator("//li/a[normalize-space()='Sign out']");
     webActions = new WebAction(this.page);
   }
 
@@ -35,9 +37,7 @@ export class LoginPage {
     await webActions.inputField('#username', user.email);
     await webActions.inputField('#password', user.password);
     await webActions.clickButton('Sign in');
-    await webActions.delay(15000);
-    await expect(
-      this.page.locator("//li/a[normalize-space()='Sign out']")
-    ).toBeVisible();
+    await webActions.delay(10000);
+    await this.signOutBtn.isVisible();
   }
 }
