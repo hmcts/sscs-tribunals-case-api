@@ -122,9 +122,11 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     RUN_DB_MIGRATION_ON_STARTUP: false
     POST_HEARINGS_FEATURE: true
     POST_HEARINGS_B_FEATURE: true
+    IBC_NI_POSTCODES_FEATURE: true
     LOGBACK_REQUIRE_ALERT_LEVEL: "false"
     LOGBACK_REQUIRE_ERROR_CODE: "false"
     DEFAULT_PANEL_COMPOSITION_ENABLED: false
+
 
     #    hearings=api
     IDAM_S2S_URL: "http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"

@@ -233,6 +233,8 @@ evidenceDescription:
 feature:
     uc-office-feature:
         enabled: ${UC_OFFICE_FEATURE:false}
+    ibc-ni-postcodes:
+         enabled: ${IBC_NI_POSTCODES_FEATURE:false}    
     case-access-management:
         enabled: ${CASE_ACCESS_MANAGEMENT_FEATURE:true}
     deleted-redacted-doc:
