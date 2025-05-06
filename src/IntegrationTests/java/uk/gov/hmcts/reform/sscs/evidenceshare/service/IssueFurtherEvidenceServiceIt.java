@@ -29,6 +29,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -46,7 +47,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
@@ -82,7 +83,6 @@ import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
 
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @TestPropertySource(locations = "classpath:config/application_es_it.properties")
 public class IssueFurtherEvidenceServiceIt {
 
@@ -132,6 +132,9 @@ public class IssueFurtherEvidenceServiceIt {
 
     @Autowired
     private SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer;
+
+    @Autowired
+    private ThreadPoolTaskExecutor executor;
 
     @MockitoBean
     protected AirLookupService airLookupService;
@@ -196,7 +199,7 @@ public class IssueFurtherEvidenceServiceIt {
     }
 
     @Test
-    public void appealWithAppellantAndFurtherEvidenceFromAppellant_shouldSend609_97ToAppellantAndNotSend609_98() throws IOException {
+    public void appealWithAppellantAndFurtherEvidenceFromAppellant_shouldSend609_97ToAppellantAndNotSend609_98() throws IOException, InterruptedException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
@@ -215,6 +218,8 @@ public class IssueFurtherEvidenceServiceIt {
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
         sendCallbackHandler.handle(sscsCaseDataCallback);
+
+        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
         verify(bulkPrintService).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -235,7 +240,7 @@ public class IssueFurtherEvidenceServiceIt {
 
     @Test
     @Parameters({"Rep", "JointParty"})
-    public void appealWithAppellantAndRepFurtherEvidenceFromAppellant_shouldSend609_97ToAppellantAnd609_98ToParty(String party) throws IOException {
+    public void appealWithAppellantAndRepFurtherEvidenceFromAppellant_shouldSend609_97ToAppellantAnd609_98ToParty(String party) throws IOException, InterruptedException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
@@ -254,6 +259,8 @@ public class IssueFurtherEvidenceServiceIt {
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
         sendCallbackHandler.handle(sscsCaseDataCallback);
+
+        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
         verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -278,7 +285,7 @@ public class IssueFurtherEvidenceServiceIt {
     }
 
     @Test
-    public void appealWithAppellantAndRepFurtherEvidenceFromRep_shouldSend609_97ToRepAnd609_98ToAppellant() throws IOException {
+    public void appealWithAppellantAndRepFurtherEvidenceFromRep_shouldSend609_97ToRepAnd609_98ToAppellant() throws IOException, InterruptedException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
@@ -297,6 +304,8 @@ public class IssueFurtherEvidenceServiceIt {
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
         sendCallbackHandler.handle(sscsCaseDataCallback);
+
+        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
         verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -321,7 +330,7 @@ public class IssueFurtherEvidenceServiceIt {
     }
 
     @Test
-    public void appealWithAppellantFurtherEvidenceAndRepFurtherEvidence_shouldSend609_97ToRepAndAppellantAnd609_98ToAppellantAndRep() throws IOException {
+    public void appealWithAppellantFurtherEvidenceAndRepFurtherEvidence_shouldSend609_97ToRepAndAppellantAnd609_98ToAppellantAndRep() throws IOException, InterruptedException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
@@ -340,6 +349,8 @@ public class IssueFurtherEvidenceServiceIt {
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
         sendCallbackHandler.handle(sscsCaseDataCallback);
+
+        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
         verify(bulkPrintService, times(4)).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -374,7 +385,7 @@ public class IssueFurtherEvidenceServiceIt {
     }
 
     @Test
-    public void appealWithFurtherEvidenceFromDwp_shouldNotSend609_97AndSend609_98ToAppellant() throws IOException {
+    public void appealWithFurtherEvidenceFromDwp_shouldNotSend609_97AndSend609_98ToAppellant() throws IOException, InterruptedException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
@@ -393,6 +404,8 @@ public class IssueFurtherEvidenceServiceIt {
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
         sendCallbackHandler.handle(sscsCaseDataCallback);
+
+        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
         verify(bulkPrintService).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -413,7 +426,7 @@ public class IssueFurtherEvidenceServiceIt {
 
     @Test
     @Parameters({"Rep", "JointParty"})
-    public void appealWithRepAndFurtherEvidenceFromDwp_shouldNotSend609_97AndSend609_98ToAppellantAndParty(String party) throws IOException {
+    public void appealWithRepAndFurtherEvidenceFromDwp_shouldNotSend609_97AndSend609_98ToAppellantAndParty(String party) throws IOException, InterruptedException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
@@ -432,6 +445,8 @@ public class IssueFurtherEvidenceServiceIt {
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
         sendCallbackHandler.handle(sscsCaseDataCallback);
+
+        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
         verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -457,7 +472,7 @@ public class IssueFurtherEvidenceServiceIt {
 
     @Test
     @Parameters({"OtherParty", "OtherPartyAppointee"})
-    public void appealWithAppellantAndOtherPartyAndFurtherEvidenceFromOtherParty_shouldSend609_97ToOtherPartyAndSend609_98ToAppellant(String otherPartyType) throws IOException {
+    public void appealWithAppellantAndOtherPartyAndFurtherEvidenceFromOtherParty_shouldSend609_97ToOtherPartyAndSend609_98ToAppellant(String otherPartyType) throws IOException, InterruptedException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
@@ -476,6 +491,8 @@ public class IssueFurtherEvidenceServiceIt {
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
         sendCallbackHandler.handle(sscsCaseDataCallback);
+
+        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
         verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -501,7 +518,7 @@ public class IssueFurtherEvidenceServiceIt {
     }
 
     @Test
-    public void appealWithAppellantAndOtherPartyRepAndFurtherEvidenceFromOtherPartyRep_shouldSend609_97ToOtherPartyRepAndSend609_98ToOtherPartyAndAppellant() throws IOException {
+    public void appealWithAppellantAndOtherPartyRepAndFurtherEvidenceFromOtherPartyRep_shouldSend609_97ToOtherPartyRepAndSend609_98ToOtherPartyAndAppellant() throws IOException, InterruptedException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
@@ -520,6 +537,8 @@ public class IssueFurtherEvidenceServiceIt {
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
         sendCallbackHandler.handle(sscsCaseDataCallback);
+
+        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
         verify(bulkPrintService, times(3)).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -549,7 +568,7 @@ public class IssueFurtherEvidenceServiceIt {
     }
 
     @Test
-    public void appealWithAppellantAndMultipleOtherPartiesAndMultipleFurtherEvidenceFromOtherParties_shouldSend609_97ToOtherPartyRepAndSend609_98ToAllOtherPartiesAndAppellant() throws IOException {
+    public void appealWithAppellantAndMultipleOtherPartiesAndMultipleFurtherEvidenceFromOtherParties_shouldSend609_97ToOtherPartyRepAndSend609_98ToAllOtherPartiesAndAppellant() throws IOException, InterruptedException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
@@ -568,6 +587,8 @@ public class IssueFurtherEvidenceServiceIt {
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
         sendCallbackHandler.handle(sscsCaseDataCallback);
+
+        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
         verify(bulkPrintService, times(5)).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -622,7 +643,7 @@ public class IssueFurtherEvidenceServiceIt {
     }
 
     @Test
-    public void appealWithAppellantAndFurtherEvidenceFromAppellantWithReasonableAdjustment_shouldReloadCaseData() throws IOException {
+    public void appealWithAppellantAndFurtherEvidenceFromAppellantWithReasonableAdjustment_shouldReloadCaseData() throws IOException, InterruptedException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
@@ -652,6 +673,8 @@ public class IssueFurtherEvidenceServiceIt {
 
         sendCallbackHandler.handle(sscsCaseDataCallback);
 
+        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
+
         verify(bulkPrintService).sendToBulkPrint(any(), any(), any(), any(), any());
 
         verify(updateCcdCaseService, times(1)).updateCaseV2(
@@ -663,7 +686,7 @@ public class IssueFurtherEvidenceServiceIt {
     }
 
     @Test
-    public void shouldFailSendingFurtherEvidenceWhenAppellantNameIsMissingAndBulkPrintServiceShouldNotBeInvoked() throws IOException {
+    public void shouldFailSendingFurtherEvidenceWhenAppellantNameIsMissingAndBulkPrintServiceShouldNotBeInvoked() throws IOException, InterruptedException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
@@ -683,6 +706,8 @@ public class IssueFurtherEvidenceServiceIt {
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
         sendCallbackHandler.handle(sscsCaseDataCallback);
+
+        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
         verifyNoInteractions(bulkPrintService);
     }
