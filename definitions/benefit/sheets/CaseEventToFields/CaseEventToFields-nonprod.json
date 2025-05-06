@@ -21,7 +21,8 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "2.0",
     "PageShowCondition": "tribunalRequestType=\"newRequest\"",
-    "PageLabel": "Send a Communication Request to the Tribunal"
+    "PageLabel": "Send a Communication Request to the Tribunal",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=2.0"
   },
   {
     "LiveFrom": "18/03/2025",
@@ -91,7 +92,7 @@
   },
   {
     "CaseEventID": "tribunalCommunication",
-    "CaseFieldID": "ftaRequestsDl",
+    "CaseFieldID": "ftaRequestsToReviewDl",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "13/03/2025",
@@ -99,41 +100,8 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "selectTribunalReply",
     "PageShowCondition": "tribunalRequestType=\"reviewTribunalReply\"",
-    "PageLabel": "Select a FTA request",
+    "PageLabel": "Select an FTA communication to mark as reviewed",
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=selectTribunalReply"
-  },
-  {
-    "CaseEventID": "tribunalCommunication",
-    "CaseFieldID": "tribunalRequestRespondedQuery",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "READONLY",
-    "LiveFrom": "13/03/2025",
-    "PageDisplayOrder": 6,
-    "PageFieldDisplayOrder": 1,
-    "PageID": "reviewTribunalReply",
-    "PageShowCondition": "tribunalRequestType=\"reviewTribunalReply\"",
-    "PageLabel": "Review the Tribunal response",
-    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=reviewTribunalReply"
-  },
-  {
-    "CaseEventID": "tribunalCommunication",
-    "CaseFieldID": "tribunalRequestRespondedReply",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "READONLY",
-    "LiveFrom": "13/03/2025",
-    "PageDisplayOrder": 6,
-    "PageFieldDisplayOrder": 2,
-    "PageID": "reviewTribunalReply"
-  },
-  {
-    "CaseEventID": "tribunalCommunication",
-    "CaseFieldID": "commRequestActioned",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
-    "LiveFrom": "13/03/2025",
-    "PageDisplayOrder": 6,
-    "PageFieldDisplayOrder": 3,
-    "PageID": "reviewTribunalReply"
   },
   {
     "CaseEventID": "ftaCommunication",
@@ -227,7 +195,7 @@
   },
   {
     "CaseEventID": "ftaCommunication",
-    "CaseFieldID": "tribunalRequestsDl",
+    "CaseFieldID": "tribunalRequestsToReviewDl",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "14/04/2025",
@@ -235,41 +203,7 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "selectFtaReply",
     "PageShowCondition": "ftaRequestType=\"reviewFtaReply\"",
-    "PageLabel": "Select a Tribunal request",
-    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=selectFtaReply"
-  },
-  {
-    "CaseEventID": "ftaCommunication",
-    "CaseFieldID": "ftaRequestRespondedQuery",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "READONLY",
-    "LiveFrom": "14/04/2025",
-    "PageDisplayOrder": 6,
-    "PageFieldDisplayOrder": 1,
-    "PageID": "reviewFtaReply",
-    "PageShowCondition": "ftaRequestType=\"reviewFtaReply\"",
-    "PageLabel": "Review the FTA response",
-    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=reviewFtaReply"
-  },
-  {
-    "CaseEventID": "ftaCommunication",
-    "CaseFieldID": "ftaRequestRespondedReply",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "READONLY",
-    "LiveFrom": "14/04/2025",
-    "PageDisplayOrder": 6,
-    "PageFieldDisplayOrder": 2,
-    "PageID": "reviewFtaReply"
-  },
-  {
-    "CaseEventID": "ftaCommunication",
-    "CaseFieldID": "commRequestActioned",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
-    "LiveFrom": "14/04/2025",
-    "PageDisplayOrder": 6,
-    "PageFieldDisplayOrder": 3,
-    "PageID": "reviewFtaReply"
+    "PageLabel": "Select a Tribunal communication to mark as reviewed"
   },
   {
     "CaseEventID": "ftaCommunication",
@@ -277,7 +211,7 @@
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "13/03/2025",
-    "PageDisplayOrder": 7,
+    "PageDisplayOrder": 6,
     "PageFieldDisplayOrder": 1,
     "PageID": "selectRequestToDelete",
     "PageShowCondition": "ftaRequestType=\"deleteRequestReply\"",
@@ -290,7 +224,7 @@
     "CaseTypeID": "Benefit",
     "DisplayContext": "READONLY",
     "LiveFrom": "13/03/2025",
-    "PageDisplayOrder": 8,
+    "PageDisplayOrder": 7,
     "PageFieldDisplayOrder": 1,
     "PageID": "deleteRequest",
     "PageShowCondition": "ftaRequestType=\"deleteRequestReply\"",
@@ -303,7 +237,7 @@
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "13/03/2025",
-    "PageDisplayOrder": 8,
+    "PageDisplayOrder": 7,
     "PageFieldDisplayOrder": 2,
     "PageID": "deleteRequest"
   }
