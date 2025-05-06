@@ -25,6 +25,9 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
     @Value("${feature.gaps-switchover.enabled}")
     private boolean gapsSwitchOverFeature;
 
+    @Value("${feature.default-panel-comp.enabled}")
+    private boolean isDefaultPanelCompEnabled;
+
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
@@ -56,6 +59,9 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
             if (isYes(callbackReservedDtj)) {
                 caseDataReserveTo.setReservedJudge(null);
+                if (isDefaultPanelCompEnabled && callbackResponse.getData().getPanelMemberComposition() != null) {
+                    callbackResponse.getData().getPanelMemberComposition().setPanelCompositionJudge(null);
+                }
             }
         }
 

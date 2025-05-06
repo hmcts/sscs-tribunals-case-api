@@ -1434,13 +1434,13 @@
     "FieldDisplayOrder": 1
   },
   {
-  "CaseEventID": "uploadWelshDocument",
-  "CaseFieldID": "sscsWelshPreviewDocuments",
-  "ListElementCode": "documentLanguage",
-  "ID": "sscsWelshPreviewDocumentsDocumentLanguage",
-  "DisplayContext": "OPTIONAL",
-  "LiveFrom": "01/01/2018",
-  "FieldDisplayOrder": 2
+    "CaseEventID": "uploadWelshDocument",
+    "CaseFieldID": "sscsWelshPreviewDocuments",
+    "ListElementCode": "documentLanguage",
+    "ID": "sscsWelshPreviewDocumentsDocumentLanguage",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "FieldDisplayOrder": 2
   },
   {
     "CaseEventID": "uploadWelshDocument",
