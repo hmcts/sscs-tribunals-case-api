@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getCommunic
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRoleName;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.setCommRequestFilters;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
@@ -64,7 +65,11 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
             List<CommunicationRequest> tribunalComms = Optional.ofNullable(communicationFields.getTribunalCommunications())
                 .orElse(new ArrayList<>());
 
-            addCommunicationRequest(businessDaysCalculatorService, tribunalComms, topic, question, userDetails);
+            try {
+                addCommunicationRequest(businessDaysCalculatorService, tribunalComms, topic, question, userDetails);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             communicationFields.setTribunalCommunications(tribunalComms);
         } else if (TribunalRequestType.REPLY_TO_TRIBUNAL_QUERY.equals(communicationFields.getTribunalRequestType())) {
             handleReplyToTribunalQuery(communicationFields, userDetails);

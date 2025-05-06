@@ -14,6 +14,7 @@ import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.build
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.buildCommRequestWithoutReply;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.buildCustomCommRequest;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
@@ -142,7 +143,7 @@ class CommunicationRequestUtilTest {
     }
 
     @Test
-    void shouldAddCommunicationRequest() {
+    void shouldAddCommunicationRequest() throws IOException {
         List<CommunicationRequest> comms = new java.util.ArrayList<>();
         CommunicationRequestTopic topic = CommunicationRequestTopic.MRN_REVIEW_DECISION_NOTICE_DETAILS;
         String question = "Test question";
@@ -160,7 +161,7 @@ class CommunicationRequestUtilTest {
     }
 
     @Test
-    void shouldAddCommunicationRequestNoNameIfNull() {
+    void shouldAddCommunicationRequestNoNameIfNull() throws IOException {
         List<CommunicationRequest> comms = new java.util.ArrayList<>();
         CommunicationRequestTopic topic = CommunicationRequestTopic.MRN_REVIEW_DECISION_NOTICE_DETAILS;
         String question = "Test question";

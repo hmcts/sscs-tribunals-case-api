@@ -1,84 +1,57 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static java.time.ZonedDateTime.of;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import net.objectlab.kit.datecalc.common.DateCalculator;
 import net.objectlab.kit.datecalc.common.DefaultHolidayCalendar;
 import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.client.CachedHolidayClient;
 
 @Slf4j
 @Service
 public class BusinessDaysCalculatorService {
-    private final OkHttpClient httpClient;
+
+    private final CachedHolidayClient cachedHolidayClient;
 
     @Autowired
-    public BusinessDaysCalculatorService(OkHttpClient httpClient) throws IOException {
-        this.httpClient = httpClient;
-        Set<LocalDate> holidays = fetchUkBankHolidaysFromGovUkApi();
-        initialiseHolidays(holidays);
+    public BusinessDaysCalculatorService(CachedHolidayClient cachedHolidayClient) {
+        this.cachedHolidayClient = cachedHolidayClient;
     }
 
-    public ZonedDateTime getBusinessDay(
-            ZonedDateTime startDateTime, int numberOfBusinessDays) {
+    public ZonedDateTime getBusinessDay(ZonedDateTime startDateTime, int numberOfBusinessDays) throws IOException {
+        initialiseHolidays();
         LocalDate startDate = startDateTime.toLocalDate();
-        DateCalculator<LocalDate> dateCalculator =
-                LocalDateKitCalculatorsFactory.forwardCalculator("UK");
-        dateCalculator.setStartDate(startDate);
-        LocalDate decisionDate =
-                dateCalculator.moveByBusinessDays(numberOfBusinessDays).getCurrentBusinessDate();
-        return of(decisionDate, startDateTime.toLocalTime(), startDateTime.getZone());
+        return calculateBusinessDay(startDate, numberOfBusinessDays, startDateTime);
     }
 
-    public LocalDate getBusinessDay(
-        LocalDate date, int numberOfBusinessDays) {
-        DateCalculator<LocalDate> dateCalculator =
-            LocalDateKitCalculatorsFactory.forwardCalculator("UK");
-        dateCalculator.setStartDate(date);
-        return dateCalculator.moveByBusinessDays(numberOfBusinessDays).getCurrentBusinessDate();
+    public LocalDate getBusinessDay(LocalDate date, int numberOfBusinessDays) throws IOException {
+        initialiseHolidays();
+        return calculateBusinessDay(date, numberOfBusinessDays);
     }
 
-    private Set<LocalDate> fetchUkBankHolidaysFromGovUkApi() throws IOException {
-        String url = "https://www.gov.uk/bank-holidays.json";
-        Request request = new Request.Builder()
-            .url(url)
-            .build();
-
-        try (Response response = httpClient.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                throw new IOException("Response unsuccessful: " + response);
-            }
-
-            Set<LocalDate> holidays = new HashSet<>();
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode root = mapper.readTree(response.body().string());
-
-            JsonNode events = root.path("england-and-wales").path("events");
-            for (JsonNode event : events) {
-                String dateStr = event.path("date").asText();
-                holidays.add(LocalDate.parse(dateStr));
-            }
-
-            return holidays;
-        }
-    }
-
-    private void initialiseHolidays(Set<LocalDate> holidays) {
+    private void initialiseHolidays() throws IOException {
+        Set<LocalDate> holidays = cachedHolidayClient.getHolidays();
         DefaultHolidayCalendar<LocalDate> ukCalendar = new DefaultHolidayCalendar<>();
         ukCalendar.setHolidays(holidays);
-        LocalDateKitCalculatorsFactory.getDefaultInstance()
-            .registerHolidays("UK", ukCalendar);
+        LocalDateKitCalculatorsFactory.getDefaultInstance().registerHolidays("UK", ukCalendar);
+    }
+
+    private ZonedDateTime calculateBusinessDay(LocalDate startDate, int numberOfBusinessDays, ZonedDateTime startDateTime) {
+        return ZonedDateTime.of(
+            calculateBusinessDay(startDate, numberOfBusinessDays),
+            startDateTime.toLocalTime(),
+            startDateTime.getZone()
+        );
+    }
+
+    private LocalDate calculateBusinessDay(LocalDate startDate, int numberOfBusinessDays) {
+        return LocalDateKitCalculatorsFactory.forwardCalculator("UK")
+            .setStartDate(startDate)
+            .moveByBusinessDays(numberOfBusinessDays)
+            .getCurrentBusinessDate();
     }
 }

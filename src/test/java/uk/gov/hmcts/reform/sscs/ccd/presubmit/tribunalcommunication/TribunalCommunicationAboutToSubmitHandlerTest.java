@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.build
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.buildCommRequestNotActionedResponseDateOffset;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.buildCustomCommRequest;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -89,7 +90,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenValidTribunalRequest_shouldAddNewCommunicationToList() {
+    void givenValidTribunalRequest_shouldAddNewCommunicationToList() throws IOException {
         // Setup Tribunal communication fields
         CommunicationRequestTopic expectedTopic = CommunicationRequestTopic.APPEAL_TYPE;
         String expectedQuestion = "Test Question";
@@ -153,7 +154,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenValidTribunalRequest_shouldAddNewCommunicationToPopulatedList() {
+    void givenValidTribunalRequest_shouldAddNewCommunicationToPopulatedList() throws IOException {
         // Setup Tribunal communication fields
         CommunicationRequestTopic expectedTopic = CommunicationRequestTopic.APPEAL_TYPE;
         String expectedQuestion = "Test Question";

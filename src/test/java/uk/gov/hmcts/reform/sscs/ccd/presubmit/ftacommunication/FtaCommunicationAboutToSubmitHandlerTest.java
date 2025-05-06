@@ -20,6 +20,7 @@ import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.build
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.buildCommRequestWithReply;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.buildCustomCommRequest;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -109,7 +110,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenValidFtaRequest_shouldAddNewCommunicationToList() {
+    void givenValidFtaRequest_shouldAddNewCommunicationToList() throws IOException {
         // Setup FTA communication fields
         CommunicationRequestTopic expectedTopic = CommunicationRequestTopic.APPEAL_TYPE;
         String expectedQuestion = "Test Question";
@@ -155,7 +156,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenValidFtaRequest_shouldAddNewCommunicationToPopulatedList() {
+    void givenValidFtaRequest_shouldAddNewCommunicationToPopulatedList() throws IOException {
         CommunicationRequestTopic expectedTopic = CommunicationRequestTopic.APPEAL_TYPE;
         String expectedQuestion = "Test Question";
         String expectedUserName = "Test User";

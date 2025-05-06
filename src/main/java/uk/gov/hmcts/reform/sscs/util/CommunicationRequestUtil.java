@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.util;
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -82,7 +83,7 @@ public class CommunicationRequestUtil {
             .orElseThrow(() -> new IllegalStateException("No communication request found with id: " + id));
     }
 
-    public static void addCommunicationRequest(BusinessDaysCalculatorService service, List<CommunicationRequest> comms, CommunicationRequestTopic topic, String question, UserDetails userDetails) {
+    public static void addCommunicationRequest(BusinessDaysCalculatorService service, List<CommunicationRequest> comms, CommunicationRequestTopic topic, String question, UserDetails userDetails) throws IOException {
         LocalDateTime now = LocalDateTime.now();
         LocalDate dueDate = service.getBusinessDay(now.toLocalDate(), 2);
         comms.add(CommunicationRequest.builder()

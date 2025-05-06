@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getCommunic
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRoleName;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.setCommRequestFilters;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -68,8 +69,12 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
             List<CommunicationRequest> ftaComms = Optional.ofNullable(ftaCommunicationFields.getFtaCommunications())
                 .orElse(new ArrayList<>());
 
-            addCommunicationRequest(businessDaysCalculatorService,
-                ftaComms, topic, question, userDetails);
+            try {
+                addCommunicationRequest(businessDaysCalculatorService,
+                    ftaComms, topic, question, userDetails);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             ftaCommunicationFields.setFtaCommunications(ftaComms);
         } else if (FtaRequestType.REPLY_TO_FTA_QUERY.equals(ftaCommunicationFields.getFtaRequestType())) {
             handleReplyToFtaQuery(ftaCommunicationFields, userDetails);
