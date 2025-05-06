@@ -10,7 +10,7 @@
   {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "ftaRequestNoResponseQuery", "Label": "FTA Request Query", "FieldType": "TextArea", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "14/04/2025", "CaseTypeID": "Benefit", "ID": "tribunalRequestsDl", "Label": "Tribunal Communications", "FieldType": "DynamicList", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "tribunalRequestNoResponseQuery", "Label": "Tribunal Request Query", "FieldType": "TextArea", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "commRequestResponseTextArea", "Label": "Response", "FieldType": "TextArea", "Max": "500", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "commRequestResponseTextArea", "Label": "Reply", "FieldType": "TextArea", "Max": "500", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "commRequestResponseNoAction", "Label": " ", "FieldType": "MultiSelectList", "FieldTypeParameter": "FL_replyNoActionRequired", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "10/09/2019", "CaseTypeID": "Benefit", "ID": "tribunalResponseDueDate", "Label": "Tribunal need to reply by", "FieldType": "Date", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "10/09/2019", "CaseTypeID": "Benefit", "ID": "ftaResponseDueDate", "Label": "FTA need to reply by", "FieldType": "Date", "SecurityClassification": "PUBLIC"},
@@ -32,5 +32,5 @@
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "awaitingInfoFromTribunal", "Label": "Awaiting Info From Tribunal", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "infoProvidedByTribunal", "Label": "Info Provided By Tribunal", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
 
-  {"LiveFrom": "18/06/2019", "CaseTypeID": "Benefit", "ID": "communicationNoActionLabel", "Label": "If you select 'No action required' a reply will not be sent to the FTA and you do not need to enter text into the 'FTA Request Reply' text box", "FieldType": "Label", "SecurityClassification": "PUBLIC"}
+  {"LiveFrom": "18/06/2019", "CaseTypeID": "Benefit", "ID": "communicationNoActionLabel", "Label": "If you select 'No action required' a reply will not be sent and you do not need to enter text into the 'Reply' text box", "FieldType": "Label", "SecurityClassification": "PUBLIC"}
 ]
