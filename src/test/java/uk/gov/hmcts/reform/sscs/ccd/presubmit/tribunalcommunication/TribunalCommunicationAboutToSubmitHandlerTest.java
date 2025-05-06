@@ -180,7 +180,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
             .roles(List.of(UserRole.CTSC_CLERK.getValue()))
             .build();
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
-        when(businessDaysCalculatorService.getBusinessDay(LocalDate.now(), 2))
+        when(businessDaysCalculatorService.getBusinessDay(LocalDate.now(), 14))
             .thenReturn(LocalDate.now().plusDays(2));
 
         // Execute the function

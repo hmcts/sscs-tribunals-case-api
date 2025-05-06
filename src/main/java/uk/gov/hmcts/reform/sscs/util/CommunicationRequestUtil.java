@@ -84,7 +84,7 @@ public class CommunicationRequestUtil {
 
     public static void addCommunicationRequest(BusinessDaysCalculatorService service, List<CommunicationRequest> comms, CommunicationRequestTopic topic, String question, UserDetails userDetails) {
         LocalDateTime now = LocalDateTime.now();
-        LocalDate dueDate = service.getBusinessDay(now.toLocalDate(), 2);
+        LocalDate dueDate = service.getBusinessDay(now.toLocalDate(), 14);
         comms.add(CommunicationRequest.builder()
             .value(CommunicationRequestDetails.builder()
                 .requestMessage(question)
