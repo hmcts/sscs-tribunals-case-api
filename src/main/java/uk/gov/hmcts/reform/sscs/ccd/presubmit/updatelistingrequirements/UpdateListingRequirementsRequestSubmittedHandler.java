@@ -5,7 +5,10 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Slf4j
 @Service
@@ -49,16 +53,15 @@ public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubm
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         Optional<CaseDetails<SscsCaseData>> oldCaseData = callback.getCaseDetailsBefore();
+        log.info("ULR CASE DETAILS old case details: {}", oldCaseData);
 
-        if (oldCaseData.isPresent() && oldCaseData.get().getCaseData().getPanelMemberComposition() != null) {
-            log.info("CASE DETAILS BEFORE: {}", oldCaseData.get().getCaseData().getPanelMemberComposition());
-        }
+        oldCaseData.ifPresent(sscsCaseDataCaseDetails -> log.info("ULR CASE DETAILS BEFORE: {}", sscsCaseDataCaseDetails.getCaseData().getPanelMemberComposition()));
 
 
         boolean updateToListingRequirementsOccurred = nonNull(caseDataSnlFields.getOverrideFields())
                 || sscsCaseData.getPanelMemberComposition() != callback.getCaseDetails().getCaseData().getPanelMemberComposition();
-        log.info("case data panel comp: {} ********* ",sscsCaseData.getPanelMemberComposition());
-        log.info("############ callback case data panel comp: {}",
+        log.info("ULR CASE DETAILS case data panel comp: {} ********* ",sscsCaseData.getPanelMemberComposition());
+        log.info("ULR CASE DETAILS callback case data panel comp: {}",
                 callback.getCaseDetails().getCaseData().getPanelMemberComposition());
 
         State state = callback.getCaseDetails().getState();
