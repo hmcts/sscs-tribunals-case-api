@@ -278,7 +278,6 @@ feature:
     default-panel-comp:
         enabled: ${DEFAULT_PANEL_COMPOSITION_ENABLED:false}
 
-
 idam:
     api:
         url: ${IDAM_API_URL:http://localhost:5062}

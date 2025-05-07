@@ -1,1 +1,15 @@
-[]
+[
+  {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationReply", "ListElementCode": "replyDateTime", "FieldType": "DateTime", "ElementLabel": "Date Of Reply", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationReply", "ListElementCode": "replyUserName", "FieldType": "Text", "ElementLabel": "Reply From Name", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationReply", "ListElementCode": "replyUserRole", "FieldType": "Text", "ElementLabel": "Reply From Role", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationReply", "ListElementCode": "replyMessage", "FieldType": "TextArea", "ElementLabel": "Reply", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationReply", "ListElementCode": "replyHasBeenActionedByTribunal", "FieldType": "YesOrNo", "ElementLabel": "Has the reply been reviewed by the Tribunal?", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationReply", "ListElementCode": "replyHasBeenActionedByFta", "FieldType": "YesOrNo", "ElementLabel": "Has the reply been reviewed by the FTA?", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestDateTime", "FieldType": "DateTime", "ElementLabel": "Date Of Request", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestResponseDueDate", "FieldType": "Date", "ElementLabel": "Reply Due Date", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestUserName", "FieldType": "Text", "ElementLabel": "Request From Name", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestUserRole", "FieldType": "Text", "ElementLabel": "Request From Role", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestTopic", "FieldType": "FixedList", "ElementLabel": "Request Topic", "FieldTypeParameter" : "FL_commRequestTopic", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestMessage", "FieldType": "TextArea", "ElementLabel": "Request", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestReply", "FieldType": "ftaCommunicationReply", "ElementLabel": "Reply", "SecurityClassification": "PUBLIC"}
+]
