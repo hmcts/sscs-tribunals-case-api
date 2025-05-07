@@ -11,5 +11,6 @@
   {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestUserRole", "FieldType": "Text", "ElementLabel": "Request From Role", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestTopic", "FieldType": "FixedList", "ElementLabel": "Request Topic", "FieldTypeParameter" : "FL_commRequestTopic", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestMessage", "FieldType": "TextArea", "ElementLabel": "Request", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestReply", "FieldType": "ftaCommunicationReply", "ElementLabel": "Reply", "SecurityClassification": "PUBLIC"}
+  {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestReply", "FieldType": "ftaCommunicationReply", "ElementLabel": "Reply", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "ID": "address", "ListElementCode": "inMainlandUk", "FieldType": "YesOrNo", "ElementLabel": "Living in England, Scotland, Wales or Northern Ireland", "SecurityClassification": "PUBLIC"}
 ]
