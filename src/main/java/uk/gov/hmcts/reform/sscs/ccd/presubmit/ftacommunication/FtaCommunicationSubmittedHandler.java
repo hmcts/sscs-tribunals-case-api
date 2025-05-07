@@ -78,8 +78,8 @@ public class FtaCommunicationSubmittedHandler implements PreSubmitCallbackHandle
             updateCcdCaseService.updateCaseV2(
                 Long.valueOf(sscsCaseData.getCcdCaseId()),
                 EventType.CASE_UPDATED.getCcdType(),
-                "FTA communications updated",
-                "FTA communication request deleted",
+                "Tribunal/FTA communications updated",
+                "Tribunal/FTA communication deleted",
                 idamService.getIdamTokens(),
                 caseDataConsumer
             );
