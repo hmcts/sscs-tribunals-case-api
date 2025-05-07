@@ -931,5 +931,20 @@
   {"LiveFrom": "01/09/2021", "ID": "FL_uploadRemoveDocumentType", "ListElementCode": "document", "ListElement": "Upload to/remove from Documents tab"},
   {"LiveFrom": "01/09/2021", "ID": "FL_uploadRemoveDocumentType", "ListElementCode": "internalDocument", "ListElement": "Upload to/remove from Tribunal internal documents tab"},
   {"LiveFrom": "01/09/2021", "ID": "FL_moveDocumentTo", "ListElementCode": "internalDocument", "ListElement": "Move document to Tribunal internal documents tab"},
-  {"LiveFrom": "01/09/2021", "ID": "FL_moveDocumentTo", "ListElementCode": "document", "ListElement": "Move document to Documents tab"}
+  {"LiveFrom": "01/09/2021", "ID": "FL_moveDocumentTo", "ListElementCode": "document", "ListElement": "Move document to Documents tab"},
+  {"LiveFrom": "18/03/2025", "ID": "FL_tribunalRequestType", "ListElementCode": "newRequest", "ListElement": "New Request"},
+  {"LiveFrom": "18/03/2025", "ID": "FL_tribunalRequestType", "ListElementCode": "replyToTribunalQuery", "ListElement": "Reply to Tribunal Query"},
+  {"LiveFrom": "18/03/2025", "ID": "FL_tribunalRequestType", "ListElementCode": "reviewTribunalReply", "ListElement": "Review Tribunal Reply"},
+  {"LiveFrom": "13/03/2025", "ID": "FL_ftaRequestType", "ListElementCode": "newRequest", "ListElement": "New Request"},
+  {"LiveFrom": "13/03/2025", "ID": "FL_ftaRequestType", "ListElementCode": "replyToFtaQuery", "ListElement": "Reply to FTA Query"},
+  {"LiveFrom": "13/03/2025", "ID": "FL_ftaRequestType", "ListElementCode": "reviewFtaReply", "ListElement": "Review FTA Reply"},
+  {"LiveFrom": "13/03/2025", "ID": "FL_ftaRequestType", "ListElementCode": "deleteRequestReply", "ListElement": "Delete a request/reply"},
+  {"LiveFrom": "13/03/2025", "ID": "FL_commRequestTopic", "ListElementCode": "appealType", "ListElement": "Appeal Type"},
+  {"LiveFrom": "13/03/2025", "ID": "FL_commRequestTopic", "ListElementCode": "appellantPersonalInfo", "ListElement": "Appellant personal information"},
+  {"LiveFrom": "13/03/2025", "ID": "FL_commRequestTopic", "ListElementCode": "appointeePersonalInfo", "ListElement": "Appointee personal information"},
+  {"LiveFrom": "13/03/2025", "ID": "FL_commRequestTopic", "ListElementCode": "issuingOffice", "ListElement": "Issuing office"},
+  {"LiveFrom": "13/03/2025", "ID": "FL_commRequestTopic", "ListElementCode": "jointPartyPersonalInfo", "ListElement": "Joint party personal information"},
+  {"LiveFrom": "13/03/2025", "ID": "FL_commRequestTopic", "ListElementCode": "mrnDetails", "ListElement": "MRN/Review Decision Notice Details"},
+  {"LiveFrom": "13/03/2025", "ID": "FL_commRequestTopic", "ListElementCode": "otherPartyPersonalInfo", "ListElement": "Other party personal information"},
+  {"LiveFrom": "13/03/2025", "ID": "FL_replyNoActionRequired", "ListElementCode": "noActionRequired", "ListElement": "No action required"}
 ]
