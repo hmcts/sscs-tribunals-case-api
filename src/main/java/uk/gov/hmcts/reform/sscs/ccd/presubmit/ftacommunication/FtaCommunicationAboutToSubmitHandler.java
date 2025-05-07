@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getCommunic
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRoleName;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.setCommRequestFilters;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,16 +23,20 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.service.BusinessDaysCalculatorService;
 
 @Service
 @Slf4j
 public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final IdamService idamService;
+    private final BusinessDaysCalculatorService businessDaysCalculatorService;
 
     @Autowired
-    public FtaCommunicationAboutToSubmitHandler(IdamService idamService) {
+    public FtaCommunicationAboutToSubmitHandler(IdamService idamService,
+                                                BusinessDaysCalculatorService businessDaysCalculatorService) {
         this.idamService = idamService;
+        this.businessDaysCalculatorService = businessDaysCalculatorService;
     }
 
     @Override
@@ -64,7 +69,12 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
             List<CommunicationRequest> ftaComms = Optional.ofNullable(ftaCommunicationFields.getFtaCommunications())
                 .orElse(new ArrayList<>());
 
-            addCommunicationRequest(ftaComms, topic, question, userDetails);
+            try {
+                addCommunicationRequest(businessDaysCalculatorService,
+                    ftaComms, topic, question, userDetails);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             ftaCommunicationFields.setFtaCommunications(ftaComms);
         } else if (FtaRequestType.REPLY_TO_FTA_QUERY.equals(ftaCommunicationFields.getFtaRequestType())) {
             handleReplyToFtaQuery(ftaCommunicationFields, userDetails);
@@ -96,19 +106,21 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
             .replyUserName(userDetails.getName())
             .replyUserRole(getRoleName(userDetails))
             .replyMessage(noActionRequired ? "No action required" : replyText)
-            .replyHasBeenActioned(noActionRequired ? null : YesNo.NO)
+            .replyHasBeenActionedByFta(noActionRequired ? null : YesNo.NO)
             .build();
         communicationRequest.getValue().setRequestReply(reply);
         communicationRequest.getValue().setRequestResponseDueDate(null);
     }
 
     private void handleReviewFtaReply(FtaCommunicationFields ftaCommunicationFields) {
-        DynamicList ftaRequestDl = ftaCommunicationFields.getTribunalRequestsDl();
-        String chosenFtaRequestId = Optional.ofNullable(ftaRequestDl.getValue()).orElse(new DynamicListItem(null, null)).getCode();
-        CommunicationRequest communicationRequest = getCommunicationRequestFromId(chosenFtaRequestId, ftaCommunicationFields.getFtaCommunications());
-        communicationRequest.getValue().getRequestReply().setReplyHasBeenActioned(YesNo.YES);
+        DynamicMixedChoiceList requestDl = ftaCommunicationFields.getTribunalRequestsToReviewDl();
+        List<DynamicListItem> actionedRequests = Optional.ofNullable(requestDl.getValue()).orElse(Collections.emptyList());
+        actionedRequests
+            .forEach(request -> {
+                CommunicationRequest communicationRequest = getCommunicationRequestFromId(request.getCode(), ftaCommunicationFields.getFtaCommunications());
+                communicationRequest.getValue().getRequestReply().setReplyHasBeenActionedByTribunal(YesNo.YES);
+            });
     }
-
 
     private void handleDeleteRequestReply(FtaCommunicationFields ftaCommunicationFields) {
         String requestIdToDelete = ftaCommunicationFields.getDeleteCommRequestRadioDl().getValue().getCode();
@@ -136,10 +148,7 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         communicationFields.setCommRequestResponseTextArea(null);
         communicationFields.setFtaRequestsDl(null);
         communicationFields.setCommRequestResponseNoAction(null);
-        communicationFields.setFtaRequestRespondedReply(null);
-        communicationFields.setFtaRequestRespondedQuery(null);
-        communicationFields.setTribunalRequestsDl(null);
-        communicationFields.setCommRequestActioned(null);
+        communicationFields.setTribunalRequestsToReviewDl(null);
         communicationFields.setDeleteCommRequestRadioDl(null);
     }
 }

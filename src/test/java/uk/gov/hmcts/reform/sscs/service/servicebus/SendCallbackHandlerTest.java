@@ -29,7 +29,7 @@ import uk.gov.hmcts.reform.sscs.service.exceptions.ClientAuthorisationException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.servicebus.NotificationsMessageProcessor;
 
 @RunWith(MockitoJUnitRunner.class)
-public class TopicConsumerTest {
+public class SendCallbackHandlerTest {
 
     private static final Exception EXCEPTION = new RuntimeException("blah");
     private static final int RETRY_THREE_TIMES = 3;
@@ -40,13 +40,13 @@ public class TopicConsumerTest {
     @Mock
     private NotificationsMessageProcessor notificationsMessageProcessor;
 
-    private TopicConsumer topicConsumer;
+    private SendCallbackHandler sendCallbackHandler;
     private Exception exception;
     private Callback<SscsCaseData> callback;
 
     @Before
     public void setup() {
-        topicConsumer = new TopicConsumer(RETRY_THREE_TIMES, dispatcher, notificationsMessageProcessor);
+        sendCallbackHandler = new SendCallbackHandler(RETRY_THREE_TIMES, dispatcher, notificationsMessageProcessor);
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(
             123L,
             "jurisdiction",
@@ -62,21 +62,21 @@ public class TopicConsumerTest {
     public void bulkPrintExceptionWillBeCaught() {
         exception = new BulkPrintException("message", EXCEPTION);
         doThrow(exception).when(dispatcher).handle(any(), any());
-        topicConsumer.onMessage(callback);
+        sendCallbackHandler.handle(callback);
         verify(dispatcher, atLeastOnce()).handle(any(), any());
     }
 
     @Test
     public void givenIssueFurtherEvidenceException_shouldNotRetry() {
         doThrow(IssueFurtherEvidenceException.class).when(dispatcher).handle(any(), any());
-        topicConsumer.onMessage(callback);
+        sendCallbackHandler.handle(callback);
         verify(dispatcher, times(1)).handle(any(), any());
     }
 
     @Test
     public void givenPostIssueFurtherEvidenceTaskException_shouldNotRetry() {
         doThrow(PostIssueFurtherEvidenceTasksException.class).when(dispatcher).handle(any(), any());
-        topicConsumer.onMessage(callback);
+        sendCallbackHandler.handle(callback);
         verify(dispatcher, times(1)).handle(any(), any());
     }
 
@@ -84,7 +84,7 @@ public class TopicConsumerTest {
     public void pdfStoreExceptionWillBeCaught() {
         exception = new PdfStoreException("message", EXCEPTION);
         doThrow(exception).when(dispatcher).handle(any(), any());
-        topicConsumer.onMessage(callback);
+        sendCallbackHandler.handle(callback);
         verify(dispatcher, atLeastOnce()).handle(any(), any());
     }
 
@@ -92,7 +92,7 @@ public class TopicConsumerTest {
     public void dwpAddressLookupExceptionWillBeCaught() {
         exception = new DwpAddressLookupException("message");
         doThrow(exception).when(dispatcher).handle(any(), any());
-        topicConsumer.onMessage(callback);
+        sendCallbackHandler.handle(callback);
         verify(dispatcher, atLeastOnce()).handle(any(), any());
     }
 
@@ -100,7 +100,7 @@ public class TopicConsumerTest {
     public void noMrnDetailsExceptionWillBeCaught() {
         exception = new NoMrnDetailsException(SscsCaseData.builder().ccdCaseId("123").build());
         doThrow(exception).when(dispatcher).handle(any(), any());
-        topicConsumer.onMessage(callback);
+        sendCallbackHandler.handle(callback);
         verify(dispatcher, atLeastOnce()).handle(any(), any());
     }
 
@@ -108,7 +108,7 @@ public class TopicConsumerTest {
     public void unableToContactThirdPartyExceptionWillBeCaught() {
         exception = new UnableToContactThirdPartyException("dm-store", new RuntimeException());
         doThrow(exception).when(dispatcher).handle(any(), any());
-        topicConsumer.onMessage(callback);
+        sendCallbackHandler.handle(callback);
         verify(dispatcher, atLeastOnce()).handle(any(), any());
     }
 
@@ -116,7 +116,7 @@ public class TopicConsumerTest {
     public void nullPointerExceptionWillBeCaught() {
         exception = new NullPointerException();
         doThrow(exception).when(dispatcher).handle(any(), any());
-        topicConsumer.onMessage(callback);
+        sendCallbackHandler.handle(callback);
         verify(dispatcher, atLeast(RETRY_THREE_TIMES)).handle(any(), any());
     }
 
@@ -124,21 +124,21 @@ public class TopicConsumerTest {
     public void clientAuthorisationExceptionWillBeCaught() {
         exception = new ClientAuthorisationException(EXCEPTION);
         doThrow(exception).when(dispatcher).handle(any(), any());
-        topicConsumer.onMessage(callback);
+        sendCallbackHandler.handle(callback);
         verify(dispatcher, atLeast(RETRY_THREE_TIMES)).handle(any(), any());
     }
 
     @Test
     public void handleValidRequest() {
-        topicConsumer.onMessage(callback);
+        sendCallbackHandler.handle(callback);
         verify(dispatcher).handle(any(), any());
     }
 
 
     @Test
     public void shouldProcessMessageForNotifications() {
-        topicConsumer = new TopicConsumer(RETRY_THREE_TIMES, dispatcher, notificationsMessageProcessor);
-        topicConsumer.onMessage(callback);
+        sendCallbackHandler = new SendCallbackHandler(RETRY_THREE_TIMES, dispatcher, notificationsMessageProcessor);
+        sendCallbackHandler.handle(callback);
         verify(notificationsMessageProcessor).processMessage(callback);
     }
 }

@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.service.servicebus.TopicPublisher;
+import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -32,7 +32,7 @@ import uk.gov.hmcts.reform.sscs.service.servicebus.TopicPublisher;
 public class CcdCallbackOrchestratorControllerTest {
 
     @MockitoBean
-    private TopicPublisher topicPublisher;
+    private SendCallbackHandler sendCallbackHandler;
 
     @MockitoBean
     private CcdRequestDetails ccdRequestDetails;
