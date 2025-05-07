@@ -11,12 +11,12 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.buildCommRequestWithActionedReply;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.buildCommRequestWithReply;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.buildCommRequestWithoutReply;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.buildCustomCommRequest;
+import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestTestHelper.dlItemFromCommRequest;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,23 +31,21 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequest;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequestDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequestReply;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequestTopic;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicMixedChoiceList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FtaRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 class FtaCommunicationMidEventHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String NO_REQUESTS_ERROR_MESSAGE = "There are no requests to reply to. Please select a different communication type.";
+    private static final String NO_REQUESTS_DELETE_ERROR_MESSAGE = "There are no requests to delete. Please select a different communication type.";
     private static final String PROVIDE_RESPONSE_ERROR_MESSAGE = "Please provide a response to the FTA query or select No action required.";
-    private static final String PROVIDE_RESPONSE_ACTIONED_ERROR_MESSAGE = "Please only select Yes if all actions to the response have been completed.";
     private static final String NO_REPLIES_ERROR_MESSAGE = "There are no replies to review. Please select a different communication type.";
 
     FtaCommunicationMidEventHandler handler;
@@ -64,7 +62,7 @@ class FtaCommunicationMidEventHandlerTest {
     @BeforeEach
     void setUp() {
         openMocks(this);
-        handler = new FtaCommunicationMidEventHandler(true);
+        handler = new FtaCommunicationMidEventHandler();
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").build();
 
@@ -96,6 +94,25 @@ class FtaCommunicationMidEventHandlerTest {
     }
 
     @Test
+    void shouldDoNothing_whenNoPageId() {
+        when(callback.getPageId()).thenReturn("none");
+        CommunicationRequest ftaCommunication1 = buildCustomCommRequest("some message", "some user", -2, -1);
+        CommunicationRequest ftaCommunication2 = buildCustomCommRequest("a message", "a user", 1, 2);
+        List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunication1, ftaCommunication2));
+
+        FtaCommunicationFields fields = FtaCommunicationFields.builder()
+            .tribunalCommunications(existingComs)
+            .build();
+
+        sscsCaseData.setCommunicationFields(fields);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNotNull(response);
+        assertTrue(response.getErrors().isEmpty());
+        assertEquals(fields, sscsCaseData.getCommunicationFields());
+    }
+
+    @Test
     void shouldPopulateDl_whenReviewFtaReplyChosen() {
         when(callback.getPageId()).thenReturn("selectFtaCommunicationAction");
 
@@ -112,8 +129,8 @@ class FtaCommunicationMidEventHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertNotNull(response);
-        assertNull(response.getData().getCommunicationFields().getFtaRequestNoResponseRadioDl());
-        DynamicList dl = response.getData().getCommunicationFields().getFtaResponseNoActionedRadioDl();
+        assertNull(response.getData().getCommunicationFields().getFtaRequestsDl());
+        DynamicMixedChoiceList dl = response.getData().getCommunicationFields().getTribunalRequestsToReviewDl();
         assertNotNull(dl);
         assertNull(dl.getValue());
         assertEquals(2, dl.getListItems().size());
@@ -125,7 +142,7 @@ class FtaCommunicationMidEventHandlerTest {
         when(callback.getPageId()).thenReturn("selectFtaCommunicationAction");
 
         CommunicationRequest ftaCommunication1 = buildCommRequestWithReply();
-        CommunicationRequest ftaCommunication2 = buildCommRequestWithActionedReply();
+        CommunicationRequest ftaCommunication2 = buildCommRequestWithActionedReply(true);
         CommunicationRequest ftaCommunication3 = buildCommRequestWithoutReply();
         List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunication1, ftaCommunication2, ftaCommunication3));
 
@@ -138,7 +155,7 @@ class FtaCommunicationMidEventHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertNotNull(response);
-        DynamicList dl = response.getData().getCommunicationFields().getFtaResponseNoActionedRadioDl();
+        DynamicMixedChoiceList dl = response.getData().getCommunicationFields().getTribunalRequestsToReviewDl();
         assertNotNull(dl);
         assertNull(dl.getValue());
         assertEquals(1, dl.getListItems().size());
@@ -159,7 +176,7 @@ class FtaCommunicationMidEventHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertNotNull(response);
-        DynamicList dl = response.getData().getCommunicationFields().getFtaResponseNoActionedRadioDl();
+        DynamicList dl = response.getData().getCommunicationFields().getTribunalRequestsDl();
         assertNull(dl);
         assertTrue(response.getErrors().contains(NO_REPLIES_ERROR_MESSAGE));
     }
@@ -177,43 +194,18 @@ class FtaCommunicationMidEventHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertNotNull(response);
-        DynamicList dl = response.getData().getCommunicationFields().getFtaResponseNoActionedRadioDl();
+        DynamicList dl = response.getData().getCommunicationFields().getTribunalRequestsDl();
         assertNull(dl);
         assertEquals(1, response.getErrors().size());
         assertTrue(response.getErrors().contains(NO_REPLIES_ERROR_MESSAGE));
     }
 
     @Test
-    void shouldSetQueryReplyForReviewPage_whenSelectFtaReply() {
-        when(callback.getPageId()).thenReturn("selectFtaReply");
-
-        CommunicationRequest ftaCommunication1 = buildCommRequestWithReply();
-        CommunicationRequest ftaCommunication2 = buildCommRequestWithReply();
-        DynamicListItem dlItem1 = dlItemFromCommRequest(ftaCommunication1);
-        DynamicListItem dlItem2 = dlItemFromCommRequest(ftaCommunication2);
-        List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunication1, ftaCommunication2));
-        DynamicList dynamicList = new DynamicList(dlItem1, List.of(dlItem1, dlItem2));
-
-        FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .ftaCommunications(existingComs)
-            .ftaResponseNoActionedRadioDl(dynamicList)
-            .build();
-
-        sscsCaseData.setCommunicationFields(fields);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertNotNull(response);
-        assertEquals(ftaCommunication1.getValue().getRequestMessage(), response.getData().getCommunicationFields().getFtaResponseNoActionedQuery());
-        assertEquals(ftaCommunication1.getValue().getRequestReply().getReplyMessage(), response.getData().getCommunicationFields().getFtaResponseNoActionedReply());
-        assertTrue(response.getErrors().isEmpty());
-    }
-
-    @Test
     void shouldNotPopulateDl_whenReplyToQueryNotChosen() {
         when(callback.getPageId()).thenReturn("selectFtaCommunicationAction");
 
-        CommunicationRequest ftaCommunication1 = buildCommRequest("some message", "some user", -2, -1);
-        CommunicationRequest ftaCommunication2 = buildCommRequest("a message", "a user", 1, 2);
+        CommunicationRequest ftaCommunication1 = buildCustomCommRequest("some message", "some user", -2, -1);
+        CommunicationRequest ftaCommunication2 = buildCustomCommRequest("a message", "a user", 1, 2);
         List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunication1, ftaCommunication2));
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
@@ -225,7 +217,8 @@ class FtaCommunicationMidEventHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertNotNull(response);
-        DynamicList dl = response.getData().getCommunicationFields().getFtaRequestNoResponseRadioDl();
+        assertNull(response.getData().getCommunicationFields().getDeleteCommRequestReadOnly());
+        DynamicList dl = response.getData().getCommunicationFields().getFtaRequestsDl();
         assertNull(dl);
         assertTrue(response.getErrors().isEmpty());
     }
@@ -234,8 +227,8 @@ class FtaCommunicationMidEventHandlerTest {
     void shouldPopulateDl_whenReplyToQueryChosen() {
         when(callback.getPageId()).thenReturn("selectFtaCommunicationAction");
 
-        CommunicationRequest ftaCommunication1 = buildCommRequest("some message", "some user", -2, -1);
-        CommunicationRequest ftaCommunication2 = buildCommRequest("a message", "a user", 1, 2);
+        CommunicationRequest ftaCommunication1 = buildCustomCommRequest("some message", "some user", -2, -1);
+        CommunicationRequest ftaCommunication2 = buildCustomCommRequest("a message", "a user", 1, 2);
         List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunication1, ftaCommunication2));
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
@@ -247,7 +240,8 @@ class FtaCommunicationMidEventHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertNotNull(response);
-        DynamicList dl = response.getData().getCommunicationFields().getFtaRequestNoResponseRadioDl();
+        assertNull(response.getData().getCommunicationFields().getDeleteCommRequestReadOnly());
+        DynamicList dl = response.getData().getCommunicationFields().getFtaRequestsDl();
         assertNotNull(dl);
         assertNull(dl.getValue());
         assertEquals(2, dl.getListItems().size());
@@ -258,8 +252,8 @@ class FtaCommunicationMidEventHandlerTest {
     void shouldIgnoreRepliedToInDl_whenReplyToQueryChosen() {
         when(callback.getPageId()).thenReturn("selectFtaCommunicationAction");
 
-        CommunicationRequest ftaCommunication1 = buildCommRequest("some message", "some user", -2, -1);
-        CommunicationRequest ftaCommunication2 = buildCommRequest("a message", "a user", 1, 2);
+        CommunicationRequest ftaCommunication1 = buildCustomCommRequest("some message", "some user", -2, -1);
+        CommunicationRequest ftaCommunication2 = buildCustomCommRequest("a message", "a user", 1, 2);
         ftaCommunication2.getValue().setRequestReply(CommunicationRequestReply.builder().build());
         List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunication1, ftaCommunication2));
 
@@ -272,7 +266,8 @@ class FtaCommunicationMidEventHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertNotNull(response);
-        DynamicList dl = response.getData().getCommunicationFields().getFtaRequestNoResponseRadioDl();
+        assertNull(response.getData().getCommunicationFields().getDeleteCommRequestReadOnly());
+        DynamicList dl = response.getData().getCommunicationFields().getFtaRequestsDl();
         assertNotNull(dl);
         assertNull(dl.getValue());
         assertEquals(1, dl.getListItems().size());
@@ -295,12 +290,12 @@ class FtaCommunicationMidEventHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertNotNull(response);
-        DynamicList dl = response.getData().getCommunicationFields().getFtaRequestNoResponseRadioDl();
+        assertNull(response.getData().getCommunicationFields().getDeleteCommRequestReadOnly());
+        DynamicList dl = response.getData().getCommunicationFields().getFtaRequestsDl();
         assertNull(dl);
         assertEquals(1, response.getErrors().size());
         assertTrue(response.getErrors().contains(NO_REQUESTS_ERROR_MESSAGE));
     }
-
 
     @Test
     void shouldErrorOnNullRequests_whenReplyToQueryChosen() {
@@ -314,7 +309,8 @@ class FtaCommunicationMidEventHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertNotNull(response);
-        DynamicList dl = response.getData().getCommunicationFields().getFtaRequestNoResponseRadioDl();
+        assertNull(response.getData().getCommunicationFields().getDeleteCommRequestReadOnly());
+        DynamicList dl = response.getData().getCommunicationFields().getFtaRequestsDl();
         assertNull(dl);
         assertEquals(1, response.getErrors().size());
         assertTrue(response.getErrors().contains(NO_REQUESTS_ERROR_MESSAGE));
@@ -324,8 +320,8 @@ class FtaCommunicationMidEventHandlerTest {
     void shouldSetQueryForReply_whenSelectFtaRequest() {
         when(callback.getPageId()).thenReturn("selectFtaRequest");
 
-        CommunicationRequest ftaCommunication1 = buildCommRequest("some message", "some user", -2, -1);
-        CommunicationRequest ftaCommunication2 = buildCommRequest("a message", "a user", 1, 2);
+        CommunicationRequest ftaCommunication1 = buildCustomCommRequest("some message", "some user", -2, -1);
+        CommunicationRequest ftaCommunication2 = buildCustomCommRequest("a message", "a user", 1, 2);
         DynamicListItem dlItem1 = dlItemFromCommRequest(ftaCommunication1);
         DynamicListItem dlItem2 = dlItemFromCommRequest(ftaCommunication2);
         List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunication1, ftaCommunication2));
@@ -333,7 +329,7 @@ class FtaCommunicationMidEventHandlerTest {
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
             .tribunalCommunications(existingComs)
-            .ftaRequestNoResponseRadioDl(dynamicList)
+            .ftaRequestsDl(dynamicList)
             .build();
 
         sscsCaseData.setCommunicationFields(fields);
@@ -348,14 +344,14 @@ class FtaCommunicationMidEventHandlerTest {
     void shouldThrowIfNoDlItemChosen_whenSelectFtaRequest() {
         when(callback.getPageId()).thenReturn("selectFtaRequest");
 
-        CommunicationRequest ftaCommunication1 = buildCommRequest("some message", "some user", -2, -1);
-        CommunicationRequest ftaCommunication2 = buildCommRequest("a message", "a user", 1, 2);
+        CommunicationRequest ftaCommunication1 = buildCustomCommRequest("some message", "some user", -2, -1);
+        CommunicationRequest ftaCommunication2 = buildCustomCommRequest("a message", "a user", 1, 2);
         List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunication1, ftaCommunication2));
         DynamicList dynamicList = new DynamicList(null, Collections.emptyList());
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
             .tribunalCommunications(existingComs)
-            .ftaRequestNoResponseRadioDl(dynamicList)
+            .ftaRequestsDl(dynamicList)
             .build();
 
         sscsCaseData.setCommunicationFields(fields);
@@ -368,15 +364,15 @@ class FtaCommunicationMidEventHandlerTest {
     void shouldThrowIfDlChosenDoesNotExist_whenSelectFtaRequest() {
         when(callback.getPageId()).thenReturn("selectFtaRequest");
 
-        CommunicationRequest ftaCommunication1 = buildCommRequest("some message", "some user", -2, -1);
-        CommunicationRequest ftaCommunication2 = buildCommRequest("a message", "a user", 1, 2);
+        CommunicationRequest ftaCommunication1 = buildCustomCommRequest("some message", "some user", -2, -1);
+        CommunicationRequest ftaCommunication2 = buildCustomCommRequest("a message", "a user", 1, 2);
         DynamicListItem dlItem1 = dlItemFromCommRequest(ftaCommunication1);
         List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunication2));
         DynamicList dynamicList = new DynamicList(dlItem1, List.of(dlItem1));
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
             .tribunalCommunications(existingComs)
-            .ftaRequestNoResponseRadioDl(dynamicList)
+            .ftaRequestsDl(dynamicList)
             .build();
 
         sscsCaseData.setCommunicationFields(fields);
@@ -391,8 +387,8 @@ class FtaCommunicationMidEventHandlerTest {
         when(callback.getPageId()).thenReturn("replyToFtaQuery");
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .ftaRequestNoResponseTextArea(textArea)
-            .ftaRequestNoResponseNoAction(noAction)
+            .commRequestResponseTextArea(textArea)
+            .commRequestResponseNoAction(noAction)
             .build();
 
         sscsCaseData.setCommunicationFields(fields);
@@ -403,21 +399,12 @@ class FtaCommunicationMidEventHandlerTest {
         assertTrue(response.getErrors().contains(PROVIDE_RESPONSE_ERROR_MESSAGE));
     }
 
-    static Stream<Arguments> generateResponseActionErrorData() {
-        return Stream.of(
-            Arguments.of(null, Collections.emptyList()),
-            Arguments.of("", Collections.emptyList()),
-            Arguments.of(null, null),
-            Arguments.of("", null)
-        );
-    }
-
     @Test
-    void shouldNotErrorWithResponse() {
+    void shouldNotErrorWithResponse_whenReplyToFtaQuery() {
         when(callback.getPageId()).thenReturn("replyToFtaQuery");
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .ftaRequestNoResponseTextArea("some value")
+            .commRequestResponseTextArea("some value")
             .build();
 
         sscsCaseData.setCommunicationFields(fields);
@@ -432,42 +419,21 @@ class FtaCommunicationMidEventHandlerTest {
         when(callback.getPageId()).thenReturn("replyToFtaQuery");
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .ftaRequestNoResponseNoAction(Collections.singletonList("some value"))
+            .commRequestResponseNoAction(Collections.singletonList("some value"))
             .build();
 
         sscsCaseData.setCommunicationFields(fields);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertNotNull(response);
-        assertTrue(response.getErrors().isEmpty());
-    }
-
-    @Test
-    void shouldDoNothing_whenFlagOff() {
-        handler = new FtaCommunicationMidEventHandler(false);
-        CommunicationRequest ftaCommunication1 = buildCommRequest("some message", "some user", -2, -1);
-        CommunicationRequest ftaCommunication2 = buildCommRequest("a message", "a user", 1, 2);
-        List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunication1, ftaCommunication2));
-
-        FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .tribunalCommunications(existingComs)
-            .ftaRequestType(FtaRequestType.REPLY_TO_FTA_QUERY)
-            .build();
-
-        sscsCaseData.setCommunicationFields(fields);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertNotNull(response);
-        DynamicList dl = response.getData().getCommunicationFields().getFtaRequestNoResponseRadioDl();
-        assertNull(dl);
         assertTrue(response.getErrors().isEmpty());
     }
 
     @Test
     void shouldDoNothing_whenNoRequestType() {
-        handler = new FtaCommunicationMidEventHandler(false);
-        CommunicationRequest ftaCommunication1 = buildCommRequest("some message", "some user", -2, -1);
-        CommunicationRequest ftaCommunication2 = buildCommRequest("a message", "a user", 1, 2);
+        when(callback.getPageId()).thenReturn("selectFtaCommunicationAction");
+        CommunicationRequest ftaCommunication1 = buildCustomCommRequest("some message", "some user", -2, -1);
+        CommunicationRequest ftaCommunication2 = buildCustomCommRequest("a message", "a user", 1, 2);
         List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunication1, ftaCommunication2));
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
@@ -483,109 +449,160 @@ class FtaCommunicationMidEventHandlerTest {
     }
 
     @Test
-    void shouldErrorWhenNoActionedResponseSelected_whenReviewFtaReply() {
-        when(callback.getPageId()).thenReturn("reviewFtaReply");
+    void shouldNotPopulateDeleteDl_whenDeleteRequestReplyNotChosen() {
+        when(callback.getPageId()).thenReturn("selectFtaCommunicationAction");
+
+        CommunicationRequest ftaCommunication1 = buildCustomCommRequest("some message", "some user", -2, -1);
+        CommunicationRequest ftaCommunication2 = buildCustomCommRequest("a message", "a user", 1, 2);
+        List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunication1, ftaCommunication2));
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
+            .tribunalCommunications(existingComs)
+            .ftaRequestType(FtaRequestType.NEW_REQUEST)
             .build();
 
         sscsCaseData.setCommunicationFields(fields);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertNotNull(response);
-        assertEquals(1, response.getErrors().size());
-        assertTrue(response.getErrors().contains(PROVIDE_RESPONSE_ACTIONED_ERROR_MESSAGE));
-    }
-
-    @Test
-    void shouldNotErrorWhenActionedResponseSelected_whenReviewFtaReply() {
-        when(callback.getPageId()).thenReturn("reviewFtaReply");
-
-        FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .ftaResponseActioned(YES)
-            .build();
-
-        sscsCaseData.setCommunicationFields(fields);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertNotNull(response);
+        DynamicList dl = response.getData().getCommunicationFields().getDeleteCommRequestRadioDl();
+        assertNull(dl);
         assertTrue(response.getErrors().isEmpty());
     }
 
     @Test
-    void shouldErrorWhenActionedNoResponseSelected_whenReviewFtaReply() {
-        when(callback.getPageId()).thenReturn("reviewFtaReply");
+    void shouldPopulateDeleteDl_whenDeleteRequestReplyChosen() {
+        when(callback.getPageId()).thenReturn("selectFtaCommunicationAction");
+
+        CommunicationRequest ftaCommunication1 = buildCustomCommRequest("some message", "some user", -2, -1);
+        CommunicationRequest ftaCommunication2 = buildCustomCommRequest("a message", "a user", 1, 2);
+        List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunication1, ftaCommunication2));
 
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
-            .ftaResponseActioned(NO)
+            .tribunalCommunications(existingComs)
+            .ftaRequestType(FtaRequestType.DELETE_REQUEST_REPLY)
             .build();
 
         sscsCaseData.setCommunicationFields(fields);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertNotNull(response);
+        DynamicList dl = response.getData().getCommunicationFields().getDeleteCommRequestRadioDl();
+        assertNotNull(dl);
+        assertNull(dl.getValue());
+        assertEquals(2, dl.getListItems().size());
+        assertTrue(response.getErrors().isEmpty());
+    }
+
+    @Test
+    void shouldErrorOnNoRequests_whenDeleteRequestReplyChosen() {
+        when(callback.getPageId()).thenReturn("selectFtaCommunicationAction");
+
+        FtaCommunicationFields fields = FtaCommunicationFields.builder()
+            .tribunalCommunications(Collections.emptyList())
+            .ftaRequestType(FtaRequestType.DELETE_REQUEST_REPLY)
+            .build();
+
+        sscsCaseData.setCommunicationFields(fields);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNotNull(response);
+        DynamicList dl = response.getData().getCommunicationFields().getDeleteCommRequestRadioDl();
+        assertNull(dl);
         assertEquals(1, response.getErrors().size());
-        assertTrue(response.getErrors().contains(PROVIDE_RESPONSE_ACTIONED_ERROR_MESSAGE));
+        assertTrue(response.getErrors().contains(NO_REQUESTS_DELETE_ERROR_MESSAGE));
     }
 
-    private CommunicationRequest buildCommRequest(String message, String username, int requestDateTimeOffset, int responseDueDateOffset) {
-        return CommunicationRequest.builder().value(
-            CommunicationRequestDetails.builder()
-                .requestTopic(CommunicationRequestTopic.APPEAL_TYPE)
-                .requestMessage(message)
-                .requestDateTime(LocalDateTime.now().plusYears(requestDateTimeOffset))
-                .requestUserName(username)
-                .requestResponseDueDate(LocalDate.now().plusYears(responseDueDateOffset))
-                .build()
-        ).build();
-    }
+    @Test
+    void shouldErrorOnNullRequests_whenDeleteRequestReplyChosen() {
+        when(callback.getPageId()).thenReturn("selectFtaCommunicationAction");
 
-    private DynamicListItem dlItemFromCommRequest(CommunicationRequest ftaCommunication) {
-        return new DynamicListItem(ftaCommunication.getId(),
-            ftaCommunication.getValue().getRequestTopic().getValue() + " - "
-                + ftaCommunication.getValue().getRequestDateTime()
-                .format(DateTimeFormatter.ofPattern("dd MMMM yyyy, HH:mm")) + " - "
-                + ftaCommunication.getValue().getRequestUserName());
-    }
-
-
-    private CommunicationRequest buildCommRequestWithoutReply() {
-        return CommunicationRequest.builder().value(
-                CommunicationRequestDetails.builder()
-                    .requestUserName("some user")
-                    .requestDateTime(LocalDateTime.now())
-                    .requestTopic(CommunicationRequestTopic.APPEAL_TYPE)
-                    .build())
+        FtaCommunicationFields fields = FtaCommunicationFields.builder()
+            .ftaRequestType(FtaRequestType.DELETE_REQUEST_REPLY)
             .build();
+
+        sscsCaseData.setCommunicationFields(fields);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNotNull(response);
+        DynamicList dl = response.getData().getCommunicationFields().getDeleteCommRequestRadioDl();
+        assertNull(dl);
+        assertEquals(1, response.getErrors().size());
+        assertTrue(response.getErrors().contains(NO_REQUESTS_DELETE_ERROR_MESSAGE));
     }
 
-    private CommunicationRequest buildCommRequestWithReply() {
-        return CommunicationRequest.builder().value(
-                CommunicationRequestDetails.builder()
-                    .requestUserName("some user")
-                    .requestDateTime(LocalDateTime.now())
-                    .requestTopic(CommunicationRequestTopic.APPEAL_TYPE)
-                    .requestMessage("some request message")
-                    .requestReply(CommunicationRequestReply.builder()
-                        .replyDateTime(LocalDateTime.now())
-                        .replyMessage("some reply message")
-                        .replyHasBeenActioned(NO)
-                        .build())
-                    .build())
+
+    @Test
+    void shouldSetReadOnlyField_whenSelectRequestToDelete() {
+        when(callback.getPageId()).thenReturn("selectRequestToDelete");
+
+        CommunicationRequest ftaCommunication1 = buildCustomCommRequest("some message", "some user", -2, -1);
+        CommunicationRequest ftaCommunication2 = buildCustomCommRequest("a message", "a user", 1, 2);
+        DynamicListItem dlItem1 = dlItemFromCommRequest(ftaCommunication1);
+        DynamicListItem dlItem2 = dlItemFromCommRequest(ftaCommunication2);
+        DynamicList dynamicList = new DynamicList(dlItem1, List.of(dlItem1, dlItem2));
+
+        FtaCommunicationFields fields = FtaCommunicationFields.builder()
+            .tribunalCommunications(List.of(ftaCommunication1))
+            .ftaCommunications(List.of(ftaCommunication2))
+            .deleteCommRequestRadioDl(dynamicList)
             .build();
+
+        sscsCaseData.setCommunicationFields(fields);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNotNull(response);
+        assertEquals(ftaCommunication1.getValue(), response.getData().getCommunicationFields().getDeleteCommRequestReadOnly());
+        assertTrue(response.getErrors().isEmpty());
     }
 
-    private CommunicationRequest buildCommRequestWithActionedReply() {
-        return CommunicationRequest.builder().value(
-                CommunicationRequestDetails.builder()
-                    .requestUserName("some user")
-                    .requestDateTime(LocalDateTime.now())
-                    .requestTopic(CommunicationRequestTopic.APPEAL_TYPE)
-                    .requestReply(CommunicationRequestReply.builder()
-                        .replyDateTime(LocalDateTime.now())
-                        .replyHasBeenActioned(YesNo.YES)
-                        .build())
-                    .build())
+    @Test
+    void shouldThrowIfNoDlItemChosen_whenSelectRequestToDelete() {
+        when(callback.getPageId()).thenReturn("selectRequestToDelete");
+
+        CommunicationRequest ftaCommunication1 = buildCustomCommRequest("some message", "some user", -2, -1);
+        CommunicationRequest ftaCommunication2 = buildCustomCommRequest("a message", "a user", 1, 2);
+        List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunication1, ftaCommunication2));
+        DynamicList dynamicList = new DynamicList(null, Collections.emptyList());
+
+        FtaCommunicationFields fields = FtaCommunicationFields.builder()
+            .tribunalCommunications(existingComs)
+            .deleteCommRequestRadioDl(dynamicList)
             .build();
+
+        sscsCaseData.setCommunicationFields(fields);
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+            () -> handler.handle(MID_EVENT, callback, USER_AUTHORISATION));
+        assertEquals("No chosen request found", exception.getMessage());
+    }
+
+    @Test
+    void shouldThrowIfDlChosenDoesNotExist_whenSelectRequestToDelete() {
+        when(callback.getPageId()).thenReturn("selectRequestToDelete");
+
+        CommunicationRequest ftaCommunication1 = buildCustomCommRequest("some message", "some user", -2, -1);
+        CommunicationRequest ftaCommunication2 = buildCustomCommRequest("a message", "a user", 1, 2);
+        DynamicListItem dlItem1 = dlItemFromCommRequest(ftaCommunication1);
+        List<CommunicationRequest> existingComs = new ArrayList<>(List.of(ftaCommunication2));
+        DynamicList dynamicList = new DynamicList(dlItem1, List.of(dlItem1));
+
+        FtaCommunicationFields fields = FtaCommunicationFields.builder()
+            .ftaCommunications(existingComs)
+            .deleteCommRequestRadioDl(dynamicList)
+            .build();
+
+        sscsCaseData.setCommunicationFields(fields);
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+            () -> handler.handle(MID_EVENT, callback, USER_AUTHORISATION));
+        assertEquals("No communication request found with id: " + ftaCommunication1.getId(), exception.getMessage());
+    }
+
+    static Stream<Arguments> generateResponseActionErrorData() {
+        return Stream.of(
+            Arguments.of(null, Collections.emptyList()),
+            Arguments.of("", Collections.emptyList()),
+            Arguments.of(null, null),
+            Arguments.of("", null)
+        );
     }
 }
