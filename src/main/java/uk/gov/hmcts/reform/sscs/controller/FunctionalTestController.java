@@ -10,18 +10,18 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.service.event.EventPublisher;
+import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
 
 @RestController
 @Slf4j
 @ConditionalOnProperty(prefix = "testing-support", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class FunctionalTestController {
 
-    private final EventPublisher consumer;
+    private final SendCallbackHandler sendCallbackHandler;
     private final SscsCaseCallbackDeserializer mapper;
 
-    public FunctionalTestController(EventPublisher consumer, SscsCaseCallbackDeserializer mapper) {
-        this.consumer = consumer;
+    public FunctionalTestController(SendCallbackHandler sendCallbackHandler, SscsCaseCallbackDeserializer mapper) {
+        this.sendCallbackHandler = sendCallbackHandler;
         this.mapper = mapper;
     }
 
@@ -31,6 +31,6 @@ public class FunctionalTestController {
         Callback<SscsCaseData> callback = mapper.deserialize(message);
         log.info("Sending message for event: {} for case id: {}", callback.getEvent(), callback.getCaseDetails().getId());
 
-        consumer.publishEvent(callback);
+        sendCallbackHandler.handle(callback);
     }
 }
