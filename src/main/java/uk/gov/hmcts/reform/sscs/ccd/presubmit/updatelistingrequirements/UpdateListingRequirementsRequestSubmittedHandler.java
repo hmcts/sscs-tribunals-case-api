@@ -42,22 +42,14 @@ public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubm
                                                           String userAuthorisation) {
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        SchedulingAndListingFields caseDataSnlFields = sscsCaseData.getSchedulingAndListingFields();
 
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        log.info("ULR CASE DETAILS callbackResp {}", callbackResponse.getData().getPanelMemberComposition());
-
         boolean ulrUpdate = callback.getCaseDetailsBefore().isPresent() && callback.getCaseDetailsBefore().get().getCaseData().getPanelMemberComposition() != callback.getCaseDetails().getCaseData().getPanelMemberComposition();
 
-        log.info("ULR CASE DETAILS ULR Update: {}", ulrUpdate);
-
-        callback.getCaseDetailsBefore().ifPresent(sscsCaseDataCaseDetails -> log.info("ULR CASE DETAILS BEFORE: {}", sscsCaseDataCaseDetails.getCaseData().getPanelMemberComposition()));
-
-        SchedulingAndListingFields caseDataSnlFields = sscsCaseData.getSchedulingAndListingFields();
-
         boolean updateToListingRequirementsOccurred = nonNull(caseDataSnlFields.getOverrideFields())
-                || sscsCaseData.getPanelMemberComposition() != callback.getCaseDetails().getCaseData().getPanelMemberComposition();
-        log.info("ULR CASE DETAILS case data panel comp: {} ",sscsCaseData.getPanelMemberComposition());
+                || ulrUpdate;
 
         State state = callback.getCaseDetails().getState();
         HearingRoute hearingRoute = caseDataSnlFields.getHearingRoute();
