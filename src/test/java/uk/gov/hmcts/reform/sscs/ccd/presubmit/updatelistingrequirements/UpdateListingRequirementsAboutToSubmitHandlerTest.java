@@ -148,7 +148,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
         assertThat(response.getErrors()).isEmpty();
         JudicialUserBase result = response.getData().getSchedulingAndListingFields().getReserveTo().getReservedJudge();
-        assertNull(result);
+        assertThat(result).isNull();
         assertThat(response.getData().getPanelMemberComposition().getPanelCompositionJudge()).isEqualTo(null);
     }
 
