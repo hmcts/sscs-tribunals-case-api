@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.sscs.util;
 
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.calculateDueDateWorkingDays;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.idam.UserRole;
+import uk.gov.hmcts.reform.sscs.service.BusinessDaysCalculatorService;
 
 @Slf4j
 public class CommunicationRequestUtil {
@@ -33,7 +34,9 @@ public class CommunicationRequestUtil {
             .orElse(Collections.emptyList())
             .stream()
             .filter((request -> request.getValue().getRequestReply() != null))
-            .filter((request -> request.getValue().getRequestReply().getReplyHasBeenActioned() == YesNo.NO))
+            .filter((request ->
+                request.getValue().getRequestReply().getReplyHasBeenActionedByFta() == YesNo.NO
+                    || request.getValue().getRequestReply().getReplyHasBeenActionedByTribunal() == YesNo.NO))
             .toList();
     }
 
@@ -80,9 +83,9 @@ public class CommunicationRequestUtil {
             .orElseThrow(() -> new IllegalStateException("No communication request found with id: " + id));
     }
 
-    public static void addCommunicationRequest(List<CommunicationRequest> comms, CommunicationRequestTopic topic, String question, UserDetails userDetails) {
+    public static void addCommunicationRequest(BusinessDaysCalculatorService service, List<CommunicationRequest> comms, CommunicationRequestTopic topic, String question, UserDetails userDetails) throws IOException {
         LocalDateTime now = LocalDateTime.now();
-        LocalDate dueDate = calculateDueDateWorkingDays(now.toLocalDate(), 2);
+        LocalDate dueDate = service.getBusinessDay(now.toLocalDate(), 2);
         comms.add(CommunicationRequest.builder()
             .value(CommunicationRequestDetails.builder()
                 .requestMessage(question)
@@ -94,7 +97,7 @@ public class CommunicationRequestUtil {
                 .build())
             .build());
         comms.sort(Comparator.comparing(communicationRequest ->
-            communicationRequest.getValue().getRequestDateTime()));
+            ((CommunicationRequest) communicationRequest).getValue().getRequestDateTime()).reversed());
     }
 
     public static DynamicListItem getDlItemFromCommunicationRequest(CommunicationRequest communicationRequest) {
@@ -119,7 +122,7 @@ public class CommunicationRequestUtil {
                 .ifPresent(allRequests::addAll);
         }
         allRequests.sort(Comparator.comparing(communicationRequest ->
-            communicationRequest.getValue().getRequestDateTime()));
+            ((CommunicationRequest) communicationRequest).getValue().getRequestDateTime()).reversed());
         return allRequests;
     }
 
