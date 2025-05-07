@@ -324,7 +324,6 @@ export class UploadResponse extends BaseStep {
       false,
       UploadResponse.caseId
     );
-    await this.homePage.goToHomePage(UploadResponse.caseId);
 
     await this.homePage.chooseEvent('Upload response');
     await this.uploadResponsePage.verifyPageContent();
@@ -348,7 +347,6 @@ export class UploadResponse extends BaseStep {
       false,
       UploadResponse.caseId
     );
-    await this.homePage.goToHomePage(UploadResponse.caseId);
 
     await this.homePage.chooseEvent('Upload response');
     await this.uploadResponsePage.verifyPageContent();
@@ -524,5 +522,9 @@ export class UploadResponse extends BaseStep {
       )
       expect(response.status()).toBe(200)
     }
+  }
+
+  async navigateToHearingsTab() {
+    await this.homePage.navigateToTab('Hearings');
   }
 }

@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.service.servicebus.TopicPublisher;
+import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
 
 
 @RunWith(SpringRunner.class)
@@ -32,7 +32,7 @@ import uk.gov.hmcts.reform.sscs.service.servicebus.TopicPublisher;
 @EnableFeignClients(basePackageClasses = {IdamApi.class})
 public class CcdCallbackOrchestratorControllerSmokeTest {
     @MockitoBean
-    private TopicPublisher topicPublisher;
+    private SendCallbackHandler sendCallbackHandler;
 
     @MockitoBean
     private CcdRequestDetails ccdRequestDetails;
@@ -62,7 +62,7 @@ public class CcdCallbackOrchestratorControllerSmokeTest {
         HttpEntity<String> request = new HttpEntity<String>(jsonCallbackForTest, headers);
         ResponseEntity<String> response = restTemplate.exchange("/send", HttpMethod.POST, request, String.class);
 
-        assertEquals(HttpStatus.OK.value(), response.getStatusCodeValue());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     public String getJsonCallbackForTest(String path) throws IOException {
