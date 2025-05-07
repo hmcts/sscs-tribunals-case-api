@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -44,21 +45,22 @@ public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubm
                                                           String userAuthorisation) {
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-        SchedulingAndListingFields caseDataSnlFields = sscsCaseData.getSchedulingAndListingFields();
 
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        Optional<CaseDetails<SscsCaseData>> oldCaseData = callback.getCaseDetailsBefore();
-        log.info("ULR CASE DETAILS old case details: {}", oldCaseData);
+        log.info("ULR CASE DETAILS callbackResp {}", callbackResponse.getData().getPanelMemberComposition());
 
-        oldCaseData.ifPresent(sscsCaseDataCaseDetails -> log.info("ULR CASE DETAILS BEFORE: {}", sscsCaseDataCaseDetails.getCaseData().getPanelMemberComposition()));
+        boolean ulrUpdate = callback.getCaseDetailsBefore().isPresent() && callback.getCaseDetailsBefore().get().getCaseData().getPanelMemberComposition() != callback.getCaseDetails().getCaseData().getPanelMemberComposition();
 
+        log.info("ULR CASE DETAILS ULR Update: {}", ulrUpdate);
+
+        callback.getCaseDetailsBefore().ifPresent(sscsCaseDataCaseDetails -> log.info("ULR CASE DETAILS BEFORE: {}", sscsCaseDataCaseDetails.getCaseData().getPanelMemberComposition()));
+
+        SchedulingAndListingFields caseDataSnlFields = sscsCaseData.getSchedulingAndListingFields();
 
         boolean updateToListingRequirementsOccurred = nonNull(caseDataSnlFields.getOverrideFields())
                 || sscsCaseData.getPanelMemberComposition() != callback.getCaseDetails().getCaseData().getPanelMemberComposition();
-        log.info("ULR CASE DETAILS case data panel comp: {} ********* ",sscsCaseData.getPanelMemberComposition());
-        log.info("ULR CASE DETAILS callback case data panel comp: {}",
-                callback.getCaseDetails().getCaseData().getPanelMemberComposition());
+        log.info("ULR CASE DETAILS case data panel comp: {} ",sscsCaseData.getPanelMemberComposition());
 
         State state = callback.getCaseDetails().getState();
         HearingRoute hearingRoute = caseDataSnlFields.getHearingRoute();
