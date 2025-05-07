@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getCommunic
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRoleName;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.setCommRequestFilters;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
@@ -19,16 +20,20 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.service.BusinessDaysCalculatorService;
 
 @Service
 @Slf4j
 public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final IdamService idamService;
+    private final BusinessDaysCalculatorService businessDaysCalculatorService;
 
     @Autowired
-    public TribunalCommunicationAboutToSubmitHandler(IdamService idamService) {
+    public TribunalCommunicationAboutToSubmitHandler(IdamService idamService,
+                                                     BusinessDaysCalculatorService businessDaysCalculatorService) {
         this.idamService = idamService;
+        this.businessDaysCalculatorService = businessDaysCalculatorService;
     }
 
     @Override
@@ -60,7 +65,11 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
             List<CommunicationRequest> tribunalComms = Optional.ofNullable(communicationFields.getTribunalCommunications())
                 .orElse(new ArrayList<>());
 
-            addCommunicationRequest(tribunalComms, topic, question, userDetails);
+            try {
+                addCommunicationRequest(businessDaysCalculatorService, tribunalComms, topic, question, userDetails);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             communicationFields.setTribunalCommunications(tribunalComms);
         } else if (TribunalRequestType.REPLY_TO_TRIBUNAL_QUERY.equals(communicationFields.getTribunalRequestType())) {
             handleReplyToTribunalQuery(communicationFields, userDetails);
@@ -87,7 +96,7 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
             .replyUserName(userDetails.getName())
             .replyUserRole(getRoleName(userDetails))
             .replyMessage(noActionRequired ? "No action required" : replyText)
-            .replyHasBeenActioned(noActionRequired ? null : YesNo.NO)
+            .replyHasBeenActionedByTribunal(noActionRequired ? null : YesNo.NO)
             .build();
         communicationRequest.getValue().setRequestReply(reply);
         communicationRequest.getValue().setRequestResponseDueDate(null);
@@ -101,17 +110,17 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
         communicationFields.setCommRequestResponseTextArea(null);
         communicationFields.setFtaRequestsDl(null);
         communicationFields.setCommRequestResponseNoAction(null);
-        communicationFields.setTribunalRequestRespondedReply(null);
-        communicationFields.setTribunalRequestRespondedQuery(null);
-        communicationFields.setTribunalRequestsDl(null);
-        communicationFields.setCommRequestActioned(null);
+        communicationFields.setFtaRequestsToReviewDl(null);
     }
 
     private void handleReviewTribunalReply(FtaCommunicationFields ftaCommunicationFields) {
-        DynamicList requestDl = ftaCommunicationFields.getFtaRequestsDl();
-        String chosenFtaRequestId = Optional.ofNullable(requestDl.getValue()).orElse(new DynamicListItem(null, null)).getCode();
-        CommunicationRequest communicationRequest = getCommunicationRequestFromId(chosenFtaRequestId, ftaCommunicationFields.getTribunalCommunications());
-        communicationRequest.getValue().getRequestReply().setReplyHasBeenActioned(YesNo.YES);
+        DynamicMixedChoiceList requestDl = ftaCommunicationFields.getFtaRequestsToReviewDl();
+        List<DynamicListItem> actionedRequests = Optional.ofNullable(requestDl.getValue()).orElse(Collections.emptyList());
+        actionedRequests
+            .forEach(request -> {
+                CommunicationRequest communicationRequest = getCommunicationRequestFromId(request.getCode(), ftaCommunicationFields.getTribunalCommunications());
+                communicationRequest.getValue().getRequestReply().setReplyHasBeenActionedByFta(YesNo.YES);
+            });
     }
 }
 

@@ -5,6 +5,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -21,22 +22,22 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.service.servicebus.Notification
 
 @Slf4j
 @Component
-// TODO: ASB - rename and move
-public class TopicConsumer {
+public class SendCallbackHandler {
 
     private final Integer maxRetryAttempts;
     private final CallbackDispatcher<SscsCaseData> dispatcher;
     private final NotificationsMessageProcessor notificationsMessageProcessor;
 
-    public TopicConsumer(@Value("${callback.maxRetryAttempts}") Integer maxRetryAttempts,
-                         CallbackDispatcher<SscsCaseData> dispatcher,
-                         NotificationsMessageProcessor notificationsMessageProcessor) {
+    public SendCallbackHandler(@Value("${callback.maxRetryAttempts}") Integer maxRetryAttempts,
+                               CallbackDispatcher<SscsCaseData> dispatcher,
+                               NotificationsMessageProcessor notificationsMessageProcessor) {
         this.maxRetryAttempts = maxRetryAttempts;
         this.dispatcher = dispatcher;
         this.notificationsMessageProcessor = notificationsMessageProcessor;
     }
 
-    public void onMessage(Callback<SscsCaseData> callback) {
+    @Async
+    public void handle(Callback<SscsCaseData> callback) {
         log.info("Received message for case ID: {}, event: {}", callback.getCaseDetails().getId(), callback.getEvent());
         processEvidenceShareMessageWithRetry(callback, 1);
         notificationsMessageProcessor.processMessage(callback);
