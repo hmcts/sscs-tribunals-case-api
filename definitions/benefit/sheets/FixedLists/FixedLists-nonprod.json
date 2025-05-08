@@ -19,11 +19,5 @@
   {"LiveFrom": "13/03/2025", "ID": "FL_commRequestTopic", "ListElementCode": "jointPartyPersonalInfo", "ListElement": "Joint party personal information"},
   {"LiveFrom": "13/03/2025", "ID": "FL_commRequestTopic", "ListElementCode": "mrnDetails", "ListElement": "MRN/Review Decision Notice Details"},
   {"LiveFrom": "13/03/2025", "ID": "FL_commRequestTopic", "ListElementCode": "otherPartyPersonalInfo", "ListElement": "Other party personal information"},
-  {"LiveFrom": "13/03/2025", "ID": "FL_replyNoActionRequired", "ListElementCode": "noActionRequired", "ListElement": "No action required"},
-  {"LiveFrom": "11/04/2025", "ID": "FL_panelMemberCompositionJudge", "ListElementCode": "84", "ListElement": "Tribunal Judge"},
-  {"LiveFrom": "11/04/2025", "ID": "FL_panelMemberCompositionJudge", "ListElementCode": "74", "ListElement": "Regional Judge"},
-  {"LiveFrom": "11/04/2025", "ID": "FL_panelMemberCompositionMedical", "ListElementCode": "58", "ListElement": "Tribunal Member Medical"},
-  {"LiveFrom": "11/04/2025", "ID": "FL_panelMemberCompositionMedical", "ListElementCode": "69", "ListElement": "Regional Member Medical"},
-  {"LiveFrom": "11/04/2025", "ID": "FL_panelMemberCompositionTribunalMember", "ListElementCode": "44", "ListElement": "Tribunal Member Disability"},
-  {"LiveFrom": "11/04/2025", "ID": "FL_panelMemberCompositionTribunalMember", "ListElementCode": "50", "ListElement": "Tribunal Member Financially Qualified"}
+  {"LiveFrom": "13/03/2025", "ID": "FL_replyNoActionRequired", "ListElementCode": "noActionRequired", "ListElement": "No action required"}
 ]
