@@ -868,7 +868,7 @@ wa-workflow-api:
       POSTGRES_CONNECTION_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
       DB_READER_USERNAME: hmcts
       S2S_SECRET_WORKFLOW_API: ${S2S_SECRET_WORKFLOW_API}
-      TASK_MANAGEMENT_URL: http://{{ .Release.Name }}-wa-task-management-api
+      WA_TASK_MANAGEMENT_API_URL: http://{{ .Release.Name }}-wa-task-management-api
       LAUNCH_DARKLY_SDK_KEY: ${WA_LAUNCH_DARKLY_SDK_KEY}
       SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA: wa_workflow_api
       SPRING_FLYWAY_SCHEMAS: wa_workflow_api
