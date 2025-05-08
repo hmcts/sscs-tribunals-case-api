@@ -274,7 +274,7 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/sscs/tyanotifications/utils/GetAllTemplatesFromNotify.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/bulkscan/domain/**," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/bulkscan/bulkscancore/domain/**," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/updatelistingrequirements/**"
+                "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/updatelistingrequirements/**,"
         property "sonar.host.url", "https://sonar.reform.hmcts.net/"
     }
 }
