@@ -46,17 +46,11 @@ public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubm
 
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        boolean ulrUpdate = callback.getCaseDetailsBefore().isPresent() && callback.getCaseDetailsBefore().get().getCaseData().getPanelMemberComposition() != callback.getCaseDetails().getCaseData().getPanelMemberComposition();
-
-        boolean updateToListingRequirementsOccurred = nonNull(caseDataSnlFields.getOverrideFields())
-                || ulrUpdate;
-
-
         State state = callback.getCaseDetails().getState();
         HearingRoute hearingRoute = caseDataSnlFields.getHearingRoute();
         if (state == State.READY_TO_LIST
                 && hearingRoute == LIST_ASSIST
-                && updateToListingRequirementsOccurred) {
+                && getValidUlrOccurred(callback,caseDataSnlFields)) {
 
             String caseId = sscsCaseData.getCcdCaseId();
             log.info("UpdateListingRequirements List Assist request, Update Hearing,"
@@ -79,5 +73,12 @@ public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubm
             callbackResponse.getErrors();
         }
         return callbackResponse;
+    }
+
+    private boolean getValidUlrOccurred(Callback<SscsCaseData> callback, SchedulingAndListingFields caseDataSnlFields) {
+        boolean ulrUpdate = callback.getCaseDetailsBefore().isPresent()
+                && callback.getCaseDetailsBefore().get().getCaseData().getPanelMemberComposition() != callback.getCaseDetails().getCaseData().getPanelMemberComposition();
+        return nonNull(caseDataSnlFields.getOverrideFields())
+                || ulrUpdate;
     }
 }

@@ -146,7 +146,7 @@ public class UpdateListingRequirementsRequestSubmittedHandlerTest {
     }
 
     @Test
-    void handleUpdateListingRequirementsNoPanelCompositionOrOverrideFieldsShouldNotSendMessage() {
+    void handleUpdateListingRequirementsShouldNotSendMessageWhenNoPanelCompositionOrOverrideFields() {
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
         given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
