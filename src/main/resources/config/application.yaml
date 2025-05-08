@@ -231,6 +231,8 @@ evidenceDescription:
             template:
                 path: /templates/evidenceDescriptionWelsh.html
 feature:
+    ibc-ni-postcodes:
+        enabled: ${IBC_NI_POSTCODES_FEATURE:false}
     uc-office-feature:
         enabled: ${UC_OFFICE_FEATURE:false}
     ibc-ni-postcodes:
