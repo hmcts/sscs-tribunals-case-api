@@ -778,7 +778,7 @@ wa-task-management-api:
         key: PASSWORD
         disabled: false
     environment:
-      CAMUNDA_URL: http://{{ .Release.Name }}-camunda/engine-rest
+      CAMUNDA_URL: https://camunda-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net/engine-rest
       ROLE_ASSIGNMENT_URL: "http://${SERVICE_NAME}-am-role-assignment-service"
       POSTGRES_HOST: sscs-preview.postgres.database.azure.com
       POSTGRES_NAME: "pr-${CHANGE_ID}-cft_task_db"
@@ -800,7 +800,7 @@ wa-task-monitor:
     releaseNameOverride: ${SERVICE_NAME}-wa-task-monitor
     readinessDelay: 90
     environment:
-      CAMUNDA_URL: http://{{ .Release.Name }}-camunda/engine-rest
+      CAMUNDA_URL: https://camunda-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net/engine-rest
       WA_TASK_MANAGEMENT_API_URL: http://{{ .Release.Name }}-wa-task-management-api
       CASE_EVENT_HANDLER_SERVICE_URL: http://{{ .Release.Name }}-wa-case-event-handler
       CCD_SEARCH_URL: http://{{ .Release.Name }}-ccd-data-store-api
@@ -827,7 +827,7 @@ wa-case-event-handler:
         key: PASSWORD
         disabled: false
     environment:
-      CAMUNDA_URL: http://{{ .Release.Name }}-camunda/engine-rest
+      CAMUNDA_URL: https://camunda-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net/engine-rest
       CCD_URL: http://{{ .Release.Name }}-ccd-data-store-api
       CCD_SEARCH_URL: http://{{ .Release.Name }}-ccd-data-store-api
       ROLE_ASSIGNMENT_URL: "http://${SERVICE_NAME}-am-role-assignment-service"
@@ -855,7 +855,7 @@ wa-workflow-api:
         key: PASSWORD
         disabled: false
     environment:
-      CAMUNDA_URL: http://{{ .Release.Name }}-camunda/engine-rest
+      CAMUNDA_URL: https://camunda-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net/engine-rest
       POSTGRES_HOST: sscs-preview.postgres.database.azure.com
       POSTGRES_NAME: "pr-${CHANGE_ID}-wa_workflow_api"
       POSTGRES_USERNAME: hmcts
