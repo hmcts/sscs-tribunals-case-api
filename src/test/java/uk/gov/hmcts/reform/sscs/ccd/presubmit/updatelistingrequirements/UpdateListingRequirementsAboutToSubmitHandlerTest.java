@@ -80,26 +80,10 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     }
 
     @Test
-    void handleUpdateListingRequirementsNonGapsSwitchOverFeature() {
-        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-        ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", false);
-        sscsCaseData = CaseDataUtils.buildCaseData();
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-            ABOUT_TO_SUBMIT,
-            callback,
-            USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-    }
-
-    @Test
     void handleUpdateListingRequirementsGapsSwitchOverFeatureNoOverrides() {
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-        ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
         sscsCaseData = CaseDataUtils.buildCaseData();
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
             ABOUT_TO_SUBMIT,
