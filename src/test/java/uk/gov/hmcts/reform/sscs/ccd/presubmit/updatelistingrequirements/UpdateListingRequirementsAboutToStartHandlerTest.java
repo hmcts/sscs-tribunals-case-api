@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -26,7 +27,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ReserveTo;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 
@@ -49,6 +53,7 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
         openMocks(this);
         handler = new UpdateListingRequirementsAboutToStartHandler(utils);
         ReflectionTestUtils.setField(handler, "isScheduleListingEnabled", true);
+        ReflectionTestUtils.setField(handler, "isDefaultPanelCompEnabled", true);
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).build();
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
@@ -181,5 +186,36 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
 
         assertEquals(0, response.getErrors().size());
         assertNull(response.getData().getSchedulingAndListingFields().getOverrideFields().getHmcHearingType());
+    }
+
+    @Test
+    public void setReserveToJudgeToNoIfPanelCompositionJudgeSelected() {
+        sscsCaseData = CaseDataUtils.buildCaseData();
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").build());
+        DynamicList interpreterLanguage = new DynamicList(null, List.of());
+        given(utils.generateInterpreterLanguageFields(any())).willReturn(interpreterLanguage);
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getSchedulingAndListingFields().getReserveTo().getReservedDistrictTribunalJudge()).isEqualTo(YesNo.NO);
+    }
+
+    @Test
+    public void leaveReserveToJudgeIfDefaultPanelCompDisabled() {
+        sscsCaseData = CaseDataUtils.buildCaseData();
+        ReflectionTestUtils.setField(handler, "isDefaultPanelCompEnabled", false);
+        sscsCaseData.getSchedulingAndListingFields().setReserveTo(ReserveTo.builder()
+                .reservedDistrictTribunalJudge(YesNo.YES).build());
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").build());
+        DynamicList interpreterLanguage = new DynamicList(null, List.of());
+        given(utils.generateInterpreterLanguageFields(any())).willReturn(interpreterLanguage);
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getSchedulingAndListingFields().getReserveTo().getReservedDistrictTribunalJudge()).isEqualTo(YesNo.YES);
     }
 }

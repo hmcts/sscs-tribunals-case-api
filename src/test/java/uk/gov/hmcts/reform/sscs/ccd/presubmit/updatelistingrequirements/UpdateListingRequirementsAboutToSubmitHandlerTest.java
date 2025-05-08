@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReserveTo;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
@@ -53,6 +54,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @BeforeEach
     void setUp() {
+        ReflectionTestUtils.setField(handler, "isDefaultPanelCompEnabled", true);
         sscsCaseData = SscsCaseData.builder()
             .appeal(Appeal.builder().build())
             .dwpIsOfficerAttending("Yes")
@@ -130,6 +132,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @Test
     void givenReservedDistrictTribunalJudgeIsYesAndReservedJudgeIsNotNull_responseReservedJudgeIsNull() {
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").build());
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
@@ -146,6 +149,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         assertThat(response.getErrors()).isEmpty();
         JudicialUserBase result = response.getData().getSchedulingAndListingFields().getReserveTo().getReservedJudge();
         assertThat(result).isNull();
+        assertThat(response.getData().getPanelMemberComposition().getPanelCompositionJudge()).isNull();
     }
 
     @Test
