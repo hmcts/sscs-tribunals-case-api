@@ -36,7 +36,7 @@ export class Hearing extends BaseStep {
       );
       await this.hearingsTab.verifyVenueListForPaperCase(
         hearingTestData.hearingVenueKey,
-        35
+        33
       );
     } else if (caseType === 'dla') {
       await this.hearingsTab.verifyPageContentByKeyValue(

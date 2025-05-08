@@ -188,7 +188,7 @@ docmosis:
 document:
     bilingual:
         notice:
-            template: TB-SCS-GNO-WEL-00473.docx
+            template: TB-SCS-GNO-WEL-00473-v2.docx
     pdf:
         hmctsImgKey: hmcts2
         hmctsImgVal: '[userImage:hmcts.png]'
@@ -848,13 +848,13 @@ notification:
                 docmosisId: TB-SCS-GNO-ENG-00582.docx
         actionHearingRecordingRequest:
             appellant:
-                docmosisId: TB-SCS-GNO-ENG-00760.docx
+                docmosisId: TB-SCS-GNO-ENG-00760-v2.docx
             representative:
-                docmosisId: TB-SCS-GNO-ENG-00760.docx
+                docmosisId: TB-SCS-GNO-ENG-00760-v2.docx
             appointee:
-                docmosisId: TB-SCS-GNO-ENG-00760.docx
+                docmosisId: TB-SCS-GNO-ENG-00760-v2.docx
             joint_party:
-                docmosisId: TB-SCS-GNO-ENG-00760.docx
+                docmosisId: TB-SCS-GNO-ENG-00760-v2.docx
         deathOfAppellant:
             representative:
                 docmosisId: TB-SCS-GNO-ENG-00773.docx
@@ -1487,13 +1487,13 @@ notification:
                 docmosisId: TB-SCS-GNO-WEL-00602.docx
         actionHearingRecordingRequest:
             appellant:
-                docmosisId: TB-SCS-GNO-WEL-00765.docx
+                docmosisId: TB-SCS-GNO-WEL-00765-v2.docx
             representative:
-                docmosisId: TB-SCS-GNO-WEL-00765.docx
+                docmosisId: TB-SCS-GNO-WEL-00765-v2.docx
             appointee:
-                docmosisId: TB-SCS-GNO-WEL-00765.docx
+                docmosisId: TB-SCS-GNO-WEL-00765-v2.docx
             joint_party:
-                docmosisId: TB-SCS-GNO-WEL-00765.docx
+                docmosisId: TB-SCS-GNO-WEL-00765-v2.docx
         deathOfAppellant:
             representative:
                 docmosisId: TB-SCS-GNO-WEL-00774.docx
