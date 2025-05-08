@@ -63,6 +63,11 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             }
         }
 
+        if (isDefaultPanelCompEnabled &&
+                "null".equals(callbackResponse.getData().getPanelMemberComposition().getPanelCompositionMemberMedical1())) {
+            callbackResponse.getData().getPanelMemberComposition().setPanelCompositionMemberMedical1(null);
+        }
+
         OverrideFields overrideFields = caseDataSnlFields.getOverrideFields();
 
         if (nonNull(overrideFields)) {
