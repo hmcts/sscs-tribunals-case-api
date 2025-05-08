@@ -5,6 +5,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
@@ -141,5 +143,23 @@ public class UpdateListingRequirementsRequestSubmittedHandlerTest {
                 USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void handleUpdateListingRequirementsNoPanelCompositionOrOverrideFieldsShouldNotSendMessage() {
+        given(callback.getCaseDetails()).willReturn(caseDetails);
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
+        sscsCaseData = CaseDataUtils.buildCaseData();
+        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
+        sscsCaseData.setCcdCaseId("1234");
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+                SUBMITTED,
+                callback,
+                USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        verify(listAssistHearingMessageHelper, times(0)).sendHearingMessage(
+                anyString(), any(HearingRoute.class), any(HearingState.class), eq(null));
     }
 }
