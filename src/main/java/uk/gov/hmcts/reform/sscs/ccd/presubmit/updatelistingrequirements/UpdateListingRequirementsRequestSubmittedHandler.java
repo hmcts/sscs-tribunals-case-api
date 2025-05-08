@@ -57,6 +57,7 @@ public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubm
         if (state == State.READY_TO_LIST
                 && hearingRoute == LIST_ASSIST
                 && updateToListingRequirementsOccurred) {
+
             String caseId = sscsCaseData.getCcdCaseId();
             log.info("UpdateListingRequirements List Assist request, Update Hearing,"
                             + "amend reasons: {}, for case ID: {}",
