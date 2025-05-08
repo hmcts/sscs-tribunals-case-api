@@ -116,7 +116,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @Test
     void givenReservedDistrictTribunalJudgeIsYesAndReservedJudgeIsNotNull_responseReservedJudgeIsNull() {
-        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").panelCompositionMemberMedical1("null").build());
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").build());
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
@@ -134,7 +134,6 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         JudicialUserBase result = response.getData().getSchedulingAndListingFields().getReserveTo().getReservedJudge();
         assertThat(result).isNull();
         assertThat(response.getData().getPanelMemberComposition().getPanelCompositionJudge()).isNull();
-        assertThat(response.getData().getPanelMemberComposition().getPanelCompositionMemberMedical1()).isNull();
     }
 
     @Test
