@@ -392,7 +392,7 @@ dependencies {
 
     implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.7.5'
 
-    implementation group:'org.overviewproject', name: 'mime-types', version: '1.0.4'
+    implementation group:'org.overviewproject', name: 'mime-types', version: '2.0.0'
 
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
@@ -413,10 +413,10 @@ dependencies {
 
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.5.0'
     implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.1'
-    implementation group: 'org.apache.pdfbox', name: 'xmpbox', version: '2.0.33'
-    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.33'
-    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.9.3'
-    implementation group: 'org.apache.tika', name: 'tika-parsers', version: '2.9.3'
+    implementation group: 'org.apache.pdfbox', name: 'xmpbox', version: '3.0.5'
+    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '3.0.5'
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '3.1.0'
+    implementation group: 'org.apache.tika', name: 'tika-parsers', version: '3.1.0'
 
     implementation group: 'org.json', name: 'json', version: '20250107'
 
