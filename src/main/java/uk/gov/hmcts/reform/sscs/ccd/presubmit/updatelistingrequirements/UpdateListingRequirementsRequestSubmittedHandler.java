@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -24,6 +25,9 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMess
 @Service
 @RequiredArgsConstructor
 public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    @Value("${feature.default-panel-comp.enabled}")
+    private boolean isDefaultPanelCompEnabled;
 
     private final ListAssistHearingMessageHelper listAssistHearingMessageHelper;
 
@@ -76,9 +80,15 @@ public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubm
     }
 
     private boolean getValidUlrOccurred(Callback<SscsCaseData> callback, SchedulingAndListingFields caseDataSnlFields) {
-        boolean ulrUpdate = callback.getCaseDetailsBefore().isPresent()
-                && callback.getCaseDetailsBefore().get().getCaseData().getPanelMemberComposition() != callback.getCaseDetails().getCaseData().getPanelMemberComposition();
-        return nonNull(caseDataSnlFields.getOverrideFields())
-                || ulrUpdate;
+        if (isDefaultPanelCompEnabled) {
+            boolean ulrUpdate = callback.getCaseDetailsBefore().isPresent()
+                    && callback.getCaseDetailsBefore().get().getCaseData().getPanelMemberComposition()
+                    != callback.getCaseDetails().getCaseData().getPanelMemberComposition();
+
+            return nonNull(caseDataSnlFields.getOverrideFields())
+                    || ulrUpdate;
+        } else {
+            return nonNull(caseDataSnlFields.getOverrideFields());
+        }
     }
 }
