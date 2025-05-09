@@ -179,7 +179,7 @@
     "CaseFieldID": "appeal",
     "CaseTypeID": "Benefit",
     "DisplayContext": "READONLY",
-    "FieldShowCondition": "appeal.benefitType.code!=\"childSupport\" AND appeal.benefitType.code!=\"taxCredit\" AND appeal.benefitType.code!=\"guardiansAllowance\" AND appeal.benefitType.code!=\"taxFreeChildcare\" AND appeal.benefitType.code!=\"homeResponsibilitiesProtection\" AND appeal.benefitType.code!=\"childBenefit\" AND appeal.benefitType.code!=\"thirtyHoursFreeChildcare\" AND appeal.benefitType.code!=\"guaranteedMinimumPension\" AND! appeal.benefitType.code!=\"nationalInsuranceCredits\" AND appeal.benefitType.code!=\"infectedBloodCompensation\"",
+    "FieldShowCondition": "appeal.benefitType.code!=\"childSupport\" AND appeal.benefitType.code!=\"taxCredit\" AND appeal.benefitType.code!=\"guardiansAllowance\" AND appeal.benefitType.code!=\"taxFreeChildcare\" AND appeal.benefitType.code!=\"homeResponsibilitiesProtection\" AND appeal.benefitType.code!=\"childBenefit\" AND appeal.benefitType.code!=\"thirtyHoursFreeChildcare\" AND appeal.benefitType.code!=\"guaranteedMinimumPension\" AND appeal.benefitType.code!=\"nationalInsuranceCredits\" AND appeal.benefitType.code!=\"infectedBloodCompensation\"",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 6,
     "PageID": "1.0",
