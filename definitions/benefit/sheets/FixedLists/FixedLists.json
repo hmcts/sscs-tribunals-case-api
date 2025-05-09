@@ -946,5 +946,5 @@
   {"LiveFrom": "13/03/2025", "ID": "FL_commRequestTopic", "ListElementCode": "jointPartyPersonalInfo", "ListElement": "Joint party personal information"},
   {"LiveFrom": "13/03/2025", "ID": "FL_commRequestTopic", "ListElementCode": "mrnDetails", "ListElement": "MRN/Review Decision Notice Details"},
   {"LiveFrom": "13/03/2025", "ID": "FL_commRequestTopic", "ListElementCode": "otherPartyPersonalInfo", "ListElement": "Other party personal information"},
-  {"LiveFrom": "13/03/2025", "ID": "FL_replyNoActionRequired", "ListElementCode": "noActionRequired", "ListElement": "No action required"}
+  {"LiveFrom": "13/03/2025", "ID": "FL_replyNoActionRequired", "ListElementCode": "noActionRequired", "ListElement": "No reply required"}
 ]
