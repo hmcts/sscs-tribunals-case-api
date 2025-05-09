@@ -42,5 +42,17 @@
     "PageID": "1.0",
     "ShowSummaryChangeOption": "Y",
     "FieldShowCondition": "appeal.benefitType.code = \"infectedBloodCompensation\""
+  },
+  {
+    "LiveFrom": "06/10/2022",
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "appeal",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "FieldShowCondition": "isFqpmRequired = \"DONOTSHOW\"",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 6,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "Y"
   }
 ]
