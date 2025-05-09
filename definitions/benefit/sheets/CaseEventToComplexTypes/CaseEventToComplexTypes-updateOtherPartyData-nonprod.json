@@ -10,5 +10,17 @@
     "PageID": "1.0",
     "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodCompensation\"",
     "EventElementLabel": "Does the appellant live in England, Scotland, Wales or Northern Ireland?"
+  },
+  {
+    "CaseEventID": "updateOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "rep.address.inMainlandUk",
+    "ID": "otherPartyRepAddressLivingInTheUk",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "19/11/2020",
+    "FieldDisplayOrder": 71,
+    "PageID": "1.0",
+    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodCompensation\"",
+    "EventElementLabel": "Does the other party representative live in England, Scotland, Wales or Northern Ireland?"
   }
 ]
