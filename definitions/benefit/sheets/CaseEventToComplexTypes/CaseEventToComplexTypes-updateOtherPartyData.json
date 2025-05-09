@@ -134,18 +134,6 @@
   {
     "CaseEventID": "updateOtherPartyData",
     "CaseFieldID": "otherParties",
-    "ListElementCode": "address.inMainlandUk",
-    "ID": "otherPartyAddressLivingInTheUk",
-    "DisplayContext": "MANDATORY",
-    "LiveFrom": "19/11/2020",
-    "FieldDisplayOrder": 12,
-    "PageID": "1.0",
-    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodCompensation\"",
-    "EventElementLabel": "Does the appellant live in England, Wales or Scotland?"
-  },
-  {
-    "CaseEventID": "updateOtherPartyData",
-    "CaseFieldID": "otherParties",
     "ListElementCode": "contact",
     "ID": "otherPartyContact",
     "DisplayContext": "OPTIONAL",
