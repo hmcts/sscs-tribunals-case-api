@@ -87,7 +87,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
         assertEquals(expected, response.getData().getExtensionNextEventDl());
         assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
         assertNull(response.getData().getHmcHearingType());
-        assertEquals(NO, response.getData().getSelectNextHmcHearingType());
+        assertEquals(NO, response.getData().getSscsCaseDataOverflow().getSelectNextHmcHearingType());
     }
 
     @Test
@@ -413,7 +413,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
     @Test
     public void givenNonDefaultSelectHmcHearingTypeNo_whenValueAboutToStart() {
         when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
-        sscsCaseData.setSelectNextHmcHearingType(YES);
+        sscsCaseData.getSscsCaseDataOverflow().setSelectNextHmcHearingType(YES);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(SEND_TO_LISTING.getCode(), SEND_TO_LISTING.getLabel()));
@@ -421,14 +421,14 @@ public class DirectionIssuedAboutToStartHandlerTest {
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getExtensionNextEventDl());
         assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
-        assertEquals(NO, response.getData().getSelectNextHmcHearingType());
+        assertEquals(NO, response.getData().getSscsCaseDataOverflow().getSelectNextHmcHearingType());
         assertNull(response.getData().getHmcHearingType());
     }
 
     @Test
     public void givenNullSelectHmcHearingTypeNo_whenNullAboutToStart() {
         when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
-        sscsCaseData.setSelectNextHmcHearingType(null);
+        sscsCaseData.getSscsCaseDataOverflow().setSelectNextHmcHearingType(null);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(SEND_TO_LISTING.getCode(), SEND_TO_LISTING.getLabel()));
@@ -436,14 +436,14 @@ public class DirectionIssuedAboutToStartHandlerTest {
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getExtensionNextEventDl());
         assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
-        assertEquals(NO, response.getData().getSelectNextHmcHearingType());
+        assertEquals(NO, response.getData().getSscsCaseDataOverflow().getSelectNextHmcHearingType());
         assertNull(response.getData().getHmcHearingType());
     }
 
     @Test
     public void givenMidEvent_ThenDoesNotWipeHmcHearingTypeOrSelect() {
         when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
-        sscsCaseData.setSelectNextHmcHearingType(YES);
+        sscsCaseData.getSscsCaseDataOverflow().setSelectNextHmcHearingType(YES);
         sscsCaseData.setHmcHearingType(HmcHearingType.DIRECTION_HEARINGS);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
         List<DynamicListItem> listOptions = new ArrayList<>();
@@ -452,7 +452,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getExtensionNextEventDl());
         assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
-        assertEquals(YES, response.getData().getSelectNextHmcHearingType());
+        assertEquals(YES, response.getData().getSscsCaseDataOverflow().getSelectNextHmcHearingType());
         assertEquals(HmcHearingType.DIRECTION_HEARINGS, response.getData().getHmcHearingType());
     }
 }
