@@ -54,7 +54,7 @@ public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubm
         HearingRoute hearingRoute = caseDataSnlFields.getHearingRoute();
         if (state == State.READY_TO_LIST
                 && hearingRoute == LIST_ASSIST
-                && getValidUlrOccurred(callback,caseDataSnlFields)) {
+                && shouldSendMessage(callback, caseDataSnlFields)) {
 
             String caseId = sscsCaseData.getCcdCaseId();
             log.info("UpdateListingRequirements List Assist request, Update Hearing,"
@@ -79,14 +79,14 @@ public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubm
         return callbackResponse;
     }
 
-    private boolean getValidUlrOccurred(Callback<SscsCaseData> callback, SchedulingAndListingFields caseDataSnlFields) {
+    private boolean shouldSendMessage(Callback<SscsCaseData> callback, SchedulingAndListingFields caseDataSnlFields) {
         if (isDefaultPanelCompEnabled) {
+
             boolean ulrUpdate = callback.getCaseDetailsBefore().isPresent()
                     && callback.getCaseDetailsBefore().get().getCaseData().getPanelMemberComposition()
                     != callback.getCaseDetails().getCaseData().getPanelMemberComposition();
 
-            return nonNull(caseDataSnlFields.getOverrideFields())
-                    || ulrUpdate;
+            return nonNull(caseDataSnlFields.getOverrideFields()) || ulrUpdate;
         } else {
             return nonNull(caseDataSnlFields.getOverrideFields());
         }
