@@ -72,7 +72,7 @@ public class FtaCommunicationMidEventHandler implements PreSubmitCallbackHandler
             String textValue = ftaCommunicationFields.getCommRequestResponseTextArea();
             List<String> noAction = ftaCommunicationFields.getCommRequestResponseNoAction();
             if (StringUtils.isEmpty(textValue) && ObjectUtils.isEmpty(noAction)) {
-                preSubmitErrorCallbackResponse.addError("Please provide a response to the FTA query or select No action required.");
+                preSubmitErrorCallbackResponse.addError("Please provide a response to the FTA query or select No reply required.");
             }
         }
 

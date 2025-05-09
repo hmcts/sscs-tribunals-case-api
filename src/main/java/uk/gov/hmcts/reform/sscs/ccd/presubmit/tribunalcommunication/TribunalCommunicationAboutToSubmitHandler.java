@@ -95,7 +95,7 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
             .replyDateTime(LocalDateTime.now())
             .replyUserName(userDetails.getName())
             .replyUserRole(getRoleName(userDetails))
-            .replyMessage(noActionRequired ? "No action required" : replyText)
+            .replyMessage(noActionRequired ? "No reply required" : replyText)
             .replyHasBeenActionedByTribunal(noActionRequired ? null : YesNo.NO)
             .build();
         communicationRequest.getValue().setRequestReply(reply);
