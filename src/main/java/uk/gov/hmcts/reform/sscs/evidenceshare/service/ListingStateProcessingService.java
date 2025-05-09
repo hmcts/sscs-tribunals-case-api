@@ -12,13 +12,13 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 
 @Service
-public class PanelCompositionService {
+public class ListingStateProcessingService {
 
     private final IdamService idamService;
     private final UpdateCcdCaseService updateCcdCaseService;
 
     @Autowired
-    public PanelCompositionService(UpdateCcdCaseService updateCcdCaseService, IdamService idamService) {
+    public ListingStateProcessingService(UpdateCcdCaseService updateCcdCaseService, IdamService idamService) {
         this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;
     }

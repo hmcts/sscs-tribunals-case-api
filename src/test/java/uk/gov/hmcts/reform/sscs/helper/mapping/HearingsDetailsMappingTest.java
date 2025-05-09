@@ -43,6 +43,7 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
@@ -86,12 +87,14 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
 
     @Mock
     private HearingsPanelMapping hearingsPanelMapping;
+    @Mock
+    private PanelCompositionService panelCompositionService;
 
     private HearingsDetailsMapping hearingsDetailsMapping;
 
     @BeforeEach
     void setUp() {
-        hearingsDetailsMapping = new HearingsDetailsMapping(hearingsPanelMapping);
+        hearingsDetailsMapping = new HearingsDetailsMapping(hearingsPanelMapping, panelCompositionService);
         OverrideFields defaultListingValues = OverrideFields.builder()
             .duration(60)
             .build();
@@ -151,7 +154,8 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
             .caseData(caseData)
             .build();
 
-        given(hearingsPanelMapping.getPanelRequirements(caseData, refData)).willReturn(PanelRequirements.builder().build());
+        given(hearingsPanelMapping.getPanelRequirements(caseData, refData))
+                .willReturn(PanelRequirements.builder().roleTypes(List.of()).build());
 
         HearingDetails hearingDetails = hearingsDetailsMapping.buildHearingDetails(wrapper, refData);
 

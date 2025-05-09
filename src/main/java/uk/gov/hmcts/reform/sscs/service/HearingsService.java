@@ -66,7 +66,6 @@ public class HearingsService {
     private final HearingsMapping hearingsMapping;
 
     // Leaving blank for now until a future change is scoped and completed, then we can add the case states back in
-    public static final List<State> INVALID_CASE_STATES = List.of();
     private static final Long HEARING_VERSION_NUMBER = 1L;
 
     @Retryable(
@@ -93,13 +92,6 @@ public class HearingsService {
                 wrapper.getCaseState().toString(),
                 wrapper.getHearingState().getState());
 
-        if (caseStatusInvalid(wrapper)) {
-            log.info("Case is in an invalid state for a hearing request. No requests sent to the HMC. Case ID {} and Case State {}",
-                    caseId,
-                    wrapper.getCaseState().toString());
-            return;
-        }
-
         switch (wrapper.getHearingState()) {
             case ADJOURN_CREATE_HEARING -> {
                 wrapper.getCaseData().getAdjournment().setAdjournmentInProgress(YesNo.YES);
@@ -123,10 +115,6 @@ public class HearingsService {
                 throw err;
             }
         }
-    }
-
-    private boolean caseStatusInvalid(HearingWrapper wrapper) {
-        return INVALID_CASE_STATES.contains(wrapper.getCaseState());
     }
 
     private void createHearing(HearingWrapper wrapper) throws UpdateCaseException, ListingException {
@@ -243,7 +231,7 @@ public class HearingsService {
                 event, event.getDescription());
 
         try {
-            boolean isUpdateHearing = HearingState.UPDATE_HEARING.equals(wrapper.getHearingState()) ? true : false;
+            boolean isUpdateHearing = HearingState.UPDATE_HEARING.equals(wrapper.getHearingState());
             Consumer<SscsCaseDetails> caseDataConsumer = hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(response, hearingRequestId, isUpdateHearing);
 
             updateCcdCaseService.updateCaseV2(

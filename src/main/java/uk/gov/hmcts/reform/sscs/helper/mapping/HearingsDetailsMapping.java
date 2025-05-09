@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDetails;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingWindow;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @Slf4j
@@ -38,9 +39,11 @@ import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 public final class HearingsDetailsMapping {
 
     private final HearingsPanelMapping hearingsPanelMapping;
+    private final PanelCompositionService panelCategoryService;
 
-    HearingsDetailsMapping(HearingsPanelMapping hearingsPanelMapping) {
+    HearingsDetailsMapping(HearingsPanelMapping hearingsPanelMapping, PanelCompositionService panelCompositionService) {
         this.hearingsPanelMapping = hearingsPanelMapping;
+        this.panelCategoryService = panelCompositionService;
     }
 
     public HearingDetails buildHearingDetails(HearingWrapper wrapper, ReferenceDataServiceHolder refData) throws ListingException {
@@ -56,6 +59,12 @@ public final class HearingsDetailsMapping {
         int physicalAttendees = HearingsNumberAttendeesMapping.getNumberOfPhysicalAttendees(caseData, adjournmentInProgress);
         List<HearingLocation> locations = HearingsLocationMapping.getHearingLocations(caseData, refData);
         PanelRequirements panelRequirements = hearingsPanelMapping.getPanelRequirements(caseData, refData);
+        if (!panelRequirements.getRoleTypes().isEmpty()) {
+            log.info("Panel Category Map for Case {}: {}", caseData.getCcdCaseId(), panelRequirements.getRoleTypes());
+            caseData.setPanelMemberComposition(
+                    panelCategoryService.getPanelCompositionFromRoleTypes(panelRequirements.getRoleTypes())
+            );
+        }
         List<AmendReason> amendReasons = OverridesMapping.getAmendReasonCodes(caseData);
         List<HearingChannel> channels = HearingsChannelMapping.getHearingChannels(caseData, adjournmentInProgress);
         // build hearing details to be used in payload for hmc create / update hearing requests

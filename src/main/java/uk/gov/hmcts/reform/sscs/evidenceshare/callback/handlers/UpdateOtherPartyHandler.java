@@ -13,18 +13,18 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.evidenceshare.service.PanelCompositionService;
+import uk.gov.hmcts.reform.sscs.evidenceshare.service.ListingStateProcessingService;
 
 
 @Slf4j
 @Service
 public class UpdateOtherPartyHandler implements CallbackHandler<SscsCaseData> {
 
-    private PanelCompositionService panelCompositionService;
+    private final ListingStateProcessingService listingStateProcessingService;
 
     @Autowired
-    public UpdateOtherPartyHandler(PanelCompositionService panelCompositionService) {
-        this.panelCompositionService = panelCompositionService;
+    public UpdateOtherPartyHandler(ListingStateProcessingService listingStateProcessingService) {
+        this.listingStateProcessingService = listingStateProcessingService;
     }
 
     @Override
@@ -45,7 +45,7 @@ public class UpdateOtherPartyHandler implements CallbackHandler<SscsCaseData> {
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        panelCompositionService.processCaseState(callback, callback.getCaseDetails().getCaseData(), callback.getEvent());
+        listingStateProcessingService.processCaseState(callback, callback.getCaseDetails().getCaseData(), callback.getEvent());
     }
 
     @Override
