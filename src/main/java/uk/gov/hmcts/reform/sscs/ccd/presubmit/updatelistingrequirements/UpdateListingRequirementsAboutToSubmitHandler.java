@@ -2,9 +2,12 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getHmcHearingType;
 
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,6 +72,21 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             callbackResponse.getData().getPanelMemberComposition().setPanelCompositionMemberMedical2(null);
         }
 
+        if (isDefaultPanelCompEnabled) {
+            List<String> disabilityAndFqMember = sscsCaseData
+                .getPanelMemberComposition()
+                .getPanelCompDisabilityAndFqm();
+
+            if (nonNull(disabilityAndFqMember) && disabilityAndFqMember.contains(
+                PanelMemberType.TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED.getReference())) {
+                sscsCaseData.setIsFqpmRequired(YES);
+            } else {
+                if (isYes(sscsCaseData.getIsFqpmRequired())) {
+                    sscsCaseData.setIsFqpmRequired(NO);
+                }
+            }
+        }
+
         OverrideFields overrideFields = caseDataSnlFields.getOverrideFields();
 
         if (nonNull(overrideFields)) {
@@ -81,7 +99,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 SscsUtil.updateHearingInterpreter(sscsCaseData, callbackResponse, appellantInterpreter);
             }
         }
-      
+
         sscsCaseData.getAppeal()
             .setHearingOptions(Optional.ofNullable(sscsCaseData.getAppeal().getHearingOptions())
                 .map(HearingOptions::toBuilder)
