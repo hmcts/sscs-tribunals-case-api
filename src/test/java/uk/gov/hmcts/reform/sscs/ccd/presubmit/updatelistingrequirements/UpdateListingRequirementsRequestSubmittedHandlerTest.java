@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
+import static java.time.LocalDateTime.now;
+import static java.util.Optional.empty;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -7,7 +9,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
@@ -40,15 +41,13 @@ public class UpdateListingRequirementsRequestSubmittedHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     @Mock
-    private Callback<SscsCaseData> callback;
-    @Mock
-    private CaseDetails<SscsCaseData> caseDetails;
-    @Mock
     private ListAssistHearingMessageHelper listAssistHearingMessageHelper;
     @InjectMocks
     private UpdateListingRequirementsRequestSubmittedHandler handler;
 
     private SscsCaseData sscsCaseData;
+    private Callback<SscsCaseData> callback;
+    private CaseDetails<SscsCaseData> caseDetails;
 
     @BeforeEach
     void setUp() {
@@ -57,17 +56,21 @@ public class UpdateListingRequirementsRequestSubmittedHandlerTest {
                 .dwpIsOfficerAttending("Yes")
                 .build();
         ReflectionTestUtils.setField(handler, "isDefaultPanelCompEnabled", true);
+
+        caseDetails =
+                new CaseDetails<>(1234L, "SSCS", State.READY_TO_LIST, sscsCaseData, now(), "Benefit");
+
+        callback = new Callback<>(caseDetails, empty(), UPDATE_LISTING_REQUIREMENTS, false);
     }
 
     @Test
     void givenValidCallback_thenReturnTrue() {
-        given(callback.getEvent()).willReturn(UPDATE_LISTING_REQUIREMENTS);
         assertThat(handler.canHandle(SUBMITTED, callback)).isTrue();
     }
 
     @Test
     void givenAInvalidEvent_thenReturnFalse() {
-        when(callback.getEvent()).thenReturn(READY_TO_LIST);
+        callback = new Callback<>(caseDetails, empty(), READY_TO_LIST, false);
         assertThat(handler.canHandle(SUBMITTED, callback)).isFalse();
     }
 
@@ -78,15 +81,9 @@ public class UpdateListingRequirementsRequestSubmittedHandlerTest {
 
     @Test
     void handleUpdateListingRequirementsSendSuccessful() {
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
-        sscsCaseData = CaseDataUtils.buildCaseData();
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
         sscsCaseData.setCcdCaseId("1234");
-
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
 
         given(listAssistHearingMessageHelper.sendHearingMessage(
                 anyString(), any(HearingRoute.class), any(HearingState.class), eq(null)))
@@ -106,15 +103,9 @@ public class UpdateListingRequirementsRequestSubmittedHandlerTest {
 
     @Test
     void handleUpdateListingRequirementsSendUnsuccessful() {
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
-        sscsCaseData = CaseDataUtils.buildCaseData();
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
         sscsCaseData.setCcdCaseId("1234");
-
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
 
         given(listAssistHearingMessageHelper.sendHearingMessage(
                 anyString(), any(HearingRoute.class), any(HearingState.class), eq(null)))
@@ -132,12 +123,10 @@ public class UpdateListingRequirementsRequestSubmittedHandlerTest {
 
     @Test
     void handleUpdateListingRequirementsWrongState() {
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
         sscsCaseData = CaseDataUtils.buildCaseData();
 
-        given(caseDetails.getState()).willReturn(State.UNKNOWN);
+        caseDetails =
+                new CaseDetails<>(1234L, "SSCS", State.UNKNOWN, sscsCaseData, now(), "Benefit");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
                 SUBMITTED,
@@ -149,10 +138,6 @@ public class UpdateListingRequirementsRequestSubmittedHandlerTest {
 
     @Test
     void handleUpdateListingRequirementsShouldNotSendMessageWhenNoPanelCompositionOrOverrideFields() {
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
-        sscsCaseData = CaseDataUtils.buildCaseData();
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
         sscsCaseData.setCcdCaseId("1234");
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
@@ -169,14 +154,10 @@ public class UpdateListingRequirementsRequestSubmittedHandlerTest {
     void isDefaultPanelCompNotEnabledAndPopulatedOverrideFieldsThenReturnTrue() {
         ReflectionTestUtils.setField(handler, "isDefaultPanelCompEnabled", false);
 
-        sscsCaseData = CaseDataUtils.buildCaseData();
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
         sscsCaseData.setCcdCaseId("1234");
 
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
         given(listAssistHearingMessageHelper.sendHearingMessage(
                 anyString(), any(HearingRoute.class), any(HearingState.class), eq(null)))
                 .willReturn(true);
@@ -196,10 +177,6 @@ public class UpdateListingRequirementsRequestSubmittedHandlerTest {
     @Test
     void isDefaultPanelCompNotEnabledAndNoOverRideFieldsThenReturnFalse() {
         ReflectionTestUtils.setField(handler, "isDefaultPanelCompEnabled", false);
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
-        sscsCaseData = CaseDataUtils.buildCaseData();
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
         sscsCaseData.setCcdCaseId("1234");
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
