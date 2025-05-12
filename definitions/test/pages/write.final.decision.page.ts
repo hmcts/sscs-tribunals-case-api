@@ -683,15 +683,15 @@ export class WriteFinalDecisionPages {
       writeFinalDecisionData.endDateLabel
     );
     await webActions.verifyPageLabel(
-      "[for='writeFinalDecisionEndDate-day']",
+      "#day-label-writeFinalDecisionEndDate-day",
       writeFinalDecisionData.dayLabel
     );
     await webActions.verifyPageLabel(
-      "[for='writeFinalDecisionEndDate-month']",
+      "#month-label-writeFinalDecisionEndDate-month",
       writeFinalDecisionData.monthLabel
     );
     await webActions.verifyPageLabel(
-      "[for='writeFinalDecisionEndDate-year']",
+      "#year-label-writeFinalDecisionEndDate-year",
       writeFinalDecisionData.yearLabel
     );
   }
