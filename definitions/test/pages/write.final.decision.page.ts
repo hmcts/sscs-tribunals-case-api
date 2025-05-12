@@ -301,15 +301,15 @@ export class WriteFinalDecisionPages {
       writeFinalDecisionData.dateOfFTADecisionLabel
     );
     await webActions.verifyPageLabel(
-      '#writeFinalDecisionDateOfDecision-day',
+      '#day-label-writeFinalDecisionDateOfDecision-day',
       writeFinalDecisionData.dayLabel
     );
     await webActions.verifyPageLabel(
-      '#writeFinalDecisionDateOfDecision-month',
+      '#month-label-writeFinalDecisionDateOfDecision-month',
       writeFinalDecisionData.monthLabel
     );
     await webActions.verifyPageLabel(
-      '#writeFinalDecisionDateOfDecision-year',
+      '#year-label-writeFinalDecisionDateOfDecision-year',
       writeFinalDecisionData.yearLabel
     );
   }
@@ -648,15 +648,15 @@ export class WriteFinalDecisionPages {
       writeFinalDecisionData.startDateLabel
     );
     await webActions.verifyPageLabel(
-      '#writeFinalDecisionStartDate-day',
+      '#day-label-writeFinalDecisionStartDate-day',
       writeFinalDecisionData.dayLabel
     );
     await webActions.verifyPageLabel(
-      '#writeFinalDecisionStartDate-month',
+      '#month-label-writeFinalDecisionStartDate-month',
       writeFinalDecisionData.monthLabel
     );
     await webActions.verifyPageLabel(
-      '#writeFinalDecisionStartDate-year',
+      '#year-label-writeFinalDecisionStartDate-year',
       writeFinalDecisionData.yearLabel
     );
     await webActions.verifyPageLabel(

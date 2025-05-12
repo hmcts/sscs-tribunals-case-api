@@ -26,15 +26,15 @@ export class DeathOfAppellantPage {
       deathOfAnAppellant.dateOfAppellantDeathTextFieldLabel
     ); //Field Label
     await webAction.verifyPageLabel(
-      '#dateOfAppellantDeath-day',
+      '#day-label-dateOfAppellantDeath-day',
       deathOfAnAppellant.dayAppellantDeathTextFieldLabel
     );
     await webAction.verifyPageLabel(
-      '#dateOfAppellantDeath-month',
+      '#month-label-dateOfAppellantDeath-month',
       deathOfAnAppellant.monthAppellantDeathTextFieldLabel
     );
     await webAction.verifyPageLabel(
-      '#dateOfAppellantDeath-year',
+      '#year-label-dateOfAppellantDeath-year',
       deathOfAnAppellant.yearAppellantDeathTextFieldLabel
     );
     await webAction.verifyPageLabel(
