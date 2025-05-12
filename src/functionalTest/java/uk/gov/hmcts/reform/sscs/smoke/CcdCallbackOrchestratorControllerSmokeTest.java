@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.servicebus.TopicPublisher;
 
 
 @RunWith(SpringRunner.class)
@@ -32,7 +32,7 @@ import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
 @EnableFeignClients(basePackageClasses = {IdamApi.class})
 public class CcdCallbackOrchestratorControllerSmokeTest {
     @MockitoBean
-    private SendCallbackHandler sendCallbackHandler;
+    private TopicPublisher topicPublisher;
 
     @MockitoBean
     private CcdRequestDetails ccdRequestDetails;
