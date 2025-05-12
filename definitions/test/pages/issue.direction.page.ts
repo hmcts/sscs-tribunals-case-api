@@ -42,15 +42,15 @@ export class IssueDirectionPage {
       issueDirectionsNoticeData.dueDateLabel
     );
     await webActions.verifyPageLabel(
-      '#directionDueDate-day',
+      '#day-label-directionDueDate-day',
       issueDirectionsNoticeData.dayLabel
     );
     await webActions.verifyPageLabel(
-      '#directionDueDate-month',
+      '#month-label-directionDueDate-month',
       issueDirectionsNoticeData.monthLabel
     );
     await webActions.verifyPageLabel(
-      '#directionDueDate-year',
+      '#year-label-directionDueDate-year',
       issueDirectionsNoticeData.yearLabel
     );
     await webActions.verifyPageLabel(
