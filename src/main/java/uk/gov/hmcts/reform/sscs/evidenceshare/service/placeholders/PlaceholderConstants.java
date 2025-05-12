@@ -12,6 +12,8 @@ public final class PlaceholderConstants {
     public static final String LABEL = "label";
     public static final String NINO_LABEL = "NI No";
     public static final String IBCA_REFERENCE_LABEL = "IBCA Reference";
+    public static final String NINO_LABEL_WELSH = "Rhif Yswiriant Gwladol";
+    public static final String IBCA_REFERENCE_LABEL_WELSH = "Cyfeirnod IBCA";
     public static final String GENERATED_DATE_LITERAL = "generated_date";
     public static final String WELSH_GENERATED_DATE_LITERAL = "welsh_generated_date";
     public static final String SSCS_URL_LITERAL = "sscs_url";
