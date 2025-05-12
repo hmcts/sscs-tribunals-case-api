@@ -378,7 +378,7 @@ dependencies {
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '11.8.1'
     implementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '11.8.1'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6.2.6'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6.2.7'
 
     // sscs-pdf-email-common
     implementation group: 'com.github.sps.junidecode', name: 'junidecode', version: '0.3'
@@ -502,7 +502,7 @@ dependencies {
     implementation group: 'com.github.everit-org.json-schema', name: 'org.everit.json.schema', version: '1.14.4'
     implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
     testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-assertj', version: '4.1.0'
-    testImplementation group: 'org.pitest', name: 'pitest', version: '1.19.1'
+    testImplementation group: 'org.pitest', name: 'pitest', version: '1.19.2'
     testImplementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: pitest.pitestVersion.get()
     testImplementation group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: '0.5'
     testImplementation group: 'com.typesafe', name: 'config', version: '1.4.3'
