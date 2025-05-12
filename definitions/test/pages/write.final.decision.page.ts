@@ -301,15 +301,15 @@ export class WriteFinalDecisionPages {
       writeFinalDecisionData.dateOfFTADecisionLabel
     );
     await webActions.verifyPageLabel(
-      "[for='writeFinalDecisionDateOfDecision-day']",
+      '#day-label-writeFinalDecisionDateOfDecision-day',
       writeFinalDecisionData.dayLabel
     );
     await webActions.verifyPageLabel(
-      "[for='writeFinalDecisionDateOfDecision-month']",
+      '#month-label-writeFinalDecisionDateOfDecision-month',
       writeFinalDecisionData.monthLabel
     );
     await webActions.verifyPageLabel(
-      "[for='writeFinalDecisionDateOfDecision-year']",
+      '#year-label-writeFinalDecisionDateOfDecision-year',
       writeFinalDecisionData.yearLabel
     );
   }
@@ -648,15 +648,15 @@ export class WriteFinalDecisionPages {
       writeFinalDecisionData.startDateLabel
     );
     await webActions.verifyPageLabel(
-      "[for='writeFinalDecisionStartDate-day']",
+      '#day-label-writeFinalDecisionStartDate-day',
       writeFinalDecisionData.dayLabel
     );
     await webActions.verifyPageLabel(
-      "[for='writeFinalDecisionStartDate-month']",
+      '#month-label-writeFinalDecisionStartDate-month',
       writeFinalDecisionData.monthLabel
     );
     await webActions.verifyPageLabel(
-      "[for='writeFinalDecisionStartDate-year']",
+      '#year-label-writeFinalDecisionStartDate-year',
       writeFinalDecisionData.yearLabel
     );
     await webActions.verifyPageLabel(
@@ -683,15 +683,15 @@ export class WriteFinalDecisionPages {
       writeFinalDecisionData.endDateLabel
     );
     await webActions.verifyPageLabel(
-      "[for='writeFinalDecisionEndDate-day']",
+      "#day-label-writeFinalDecisionEndDate-day",
       writeFinalDecisionData.dayLabel
     );
     await webActions.verifyPageLabel(
-      "[for='writeFinalDecisionEndDate-month']",
+      "#month-label-writeFinalDecisionEndDate-month",
       writeFinalDecisionData.monthLabel
     );
     await webActions.verifyPageLabel(
-      "[for='writeFinalDecisionEndDate-year']",
+      "#year-label-writeFinalDecisionEndDate-year",
       writeFinalDecisionData.yearLabel
     );
   }
