@@ -34,13 +34,10 @@ export class Hearing extends BaseStep {
         hearingTestData.hearingLengthKey,
         hearingTestData.pipHearingLengthValue
       );
-      /* Comment out this code to investigate randomness 
-      of court venue we get back from Common components
-      */
-      // await this.hearingsTab.verifyVenueListForPaperCase(
-      //   hearingTestData.hearingVenueKey,
-      //   33
-      // );
+      await this.hearingsTab.verifyVenueListForPaperCase(
+        hearingTestData.hearingVenueKey,
+        33
+      );
     } else if (caseType === 'dla') {
       await this.hearingsTab.verifyPageContentByKeyValue(
         hearingTestData.hearingLengthKey,
