@@ -34,18 +34,6 @@
   {
     "LiveFrom": "06/10/2022",
     "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "isMedicalMemberRequired",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 7,
-    "PageID": "1.0",
-    "ShowSummaryChangeOption": "Y",
-    "FieldShowCondition": "appeal.benefitType.code = \"infectedBloodCompensation\""
-  },
-  {
-    "LiveFrom": "06/10/2022",
-    "CaseEventID": "updateListingRequirements",
     "CaseFieldID": "appeal",
     "CaseTypeID": "Benefit",
     "DisplayContext": "READONLY",
@@ -54,5 +42,17 @@
     "PageFieldDisplayOrder": 6,
     "PageID": "1.0",
     "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "LiveFrom": "06/10/2022",
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "isMedicalMemberRequired",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 7,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "appeal.benefitType.code = \"infectedBloodCompensation\""
   }
 ]
