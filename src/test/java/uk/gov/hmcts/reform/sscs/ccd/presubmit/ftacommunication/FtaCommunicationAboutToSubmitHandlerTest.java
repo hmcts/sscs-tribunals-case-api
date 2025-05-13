@@ -349,7 +349,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         FtaCommunicationFields ftaCommunicationFields = FtaCommunicationFields.builder()
             .ftaRequestsDl(ftaRequestsDl)
             .tribunalCommunications(List.of(communicationRequest))
-            .commRequestResponseNoAction(Collections.singletonList("No action required"))
+            .commRequestResponseNoAction(Collections.singletonList("No reply required"))
             .ftaRequestType(FtaRequestType.REPLY_TO_FTA_QUERY)
             .build();
         ftaCommunicationFields.setTribunalResponseDueDate(LocalDate.of(1, 1, 1));
@@ -365,7 +365,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
 
         CommunicationRequestDetails request = fields.getTribunalCommunications().getFirst().getValue();
         assertNotNull(request.getRequestReply());
-        assertEquals("No action required", request.getRequestReply().getReplyMessage());
+        assertEquals("No reply required", request.getRequestReply().getReplyMessage());
         assertEquals(userName, request.getRequestReply().getReplyUserName());
         assertEquals(UserRole.TCW.getLabel(), request.getRequestReply().getReplyUserRole());
         assertNotNull(request.getRequestReply().getReplyDateTime());
@@ -385,7 +385,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         FtaCommunicationFields ftaCommunicationFields = FtaCommunicationFields.builder()
             .ftaRequestsDl(ftaRequestsDl)
             .tribunalCommunications(List.of(communicationRequest, communicationRequest3, communicationRequest2))
-            .commRequestResponseNoAction(Collections.singletonList("No action required"))
+            .commRequestResponseNoAction(Collections.singletonList("No reply required"))
             .ftaRequestType(FtaRequestType.REPLY_TO_FTA_QUERY)
             .build();
         ftaCommunicationFields.setTribunalResponseDueDate(LocalDate.of(1, 1, 1));
@@ -400,7 +400,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
 
         CommunicationRequestDetails request = fields.getTribunalCommunications().getFirst().getValue();
         assertNotNull(request.getRequestReply());
-        assertEquals("No action required", request.getRequestReply().getReplyMessage());
+        assertEquals("No reply required", request.getRequestReply().getReplyMessage());
         assertEquals(userName, request.getRequestReply().getReplyUserName());
         assertNotNull(request.getRequestReply().getReplyDateTime());
         assertNull(communicationRequest.getValue().getRequestResponseDueDate());
@@ -417,7 +417,7 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         FtaCommunicationFields ftaCommunicationFields = FtaCommunicationFields.builder()
             .ftaRequestsDl(ftaRequestsDl)
             .tribunalCommunications(Collections.emptyList())
-            .commRequestResponseNoAction(Collections.singletonList("No action required"))
+            .commRequestResponseNoAction(Collections.singletonList("No reply required"))
             .ftaRequestType(FtaRequestType.REPLY_TO_FTA_QUERY)
             .build();
         sscsCaseData.setCommunicationFields(ftaCommunicationFields);

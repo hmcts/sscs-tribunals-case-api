@@ -298,7 +298,7 @@ class TribunalCommunicationMidEventHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
         
         assertFalse(response.getErrors().isEmpty());
-        assertEquals("Please provide a response to the Tribunal query or select No action required.", 
+        assertEquals("Please provide a response to the Tribunal query or select No reply required.", 
                     response.getErrors().iterator().next());
     }
 
@@ -325,7 +325,7 @@ class TribunalCommunicationMidEventHandlerTest {
         FtaCommunicationFields fields = FtaCommunicationFields.builder()
             .tribunalRequestType(TribunalRequestType.REPLY_TO_TRIBUNAL_QUERY)
             .commRequestResponseTextArea("")
-            .commRequestResponseNoAction(Collections.singletonList("No action required"))
+            .commRequestResponseNoAction(Collections.singletonList("No reply required"))
             .build();
         
         sscsCaseData.setCommunicationFields(fields);
