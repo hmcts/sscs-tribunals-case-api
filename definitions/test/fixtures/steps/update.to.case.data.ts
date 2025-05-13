@@ -62,7 +62,7 @@ export class CreateUpdateToCaseDataSteps extends BaseStep {
     await this.appealDetailsTab.verifyAppealDetailsPageContentByKeyValue("County", updateData.appellantDetails.addressDetails.county);
     await this.appealDetailsTab.verifyAppealDetailsPageContentByKeyValue("Postcode", updateData.appellantDetails.addressDetails.postcode);
     await this.appealDetailsTab.verifyAppealDetailsPageContentByKeyValue("Country", updateData.appellantDetails.addressDetails.country);
-    await this.appealDetailsTab.verifyAppealDetailsPageContentByKeyValue("Living in England, Scotland or Wales", updateData.appellantDetails.addressDetails.isLiveInEngland);
+    await this.appealDetailsTab.verifyAppealDetailsPageContentByKeyValue("Living in England, Scotland, Wales or Northern Ireland", updateData.appellantDetails.addressDetails.isLiveInEngland);
 
     await this.appealDetailsTab.verifyAppealDetailsPageContentByKeyValue("Contact Number", updateData.appellantDetails.contactDetails.contactNumber);
     await this.appealDetailsTab.verifyAppealDetailsPageContentByKeyValue("Mobile Number", updateData.appellantDetails.contactDetails.mobileNumber);
