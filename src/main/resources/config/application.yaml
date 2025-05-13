@@ -232,7 +232,7 @@ evidenceDescription:
                 path: /templates/evidenceDescriptionWelsh.html
 feature:
     ibc-ni-postcodes:
-        enabled: ${IBC_NI_POSTCODES_FEATURE:false}
+        enabled: ${IBC_NI_POSTCODES_FEATURE:true}
     uc-office-feature:
         enabled: ${UC_OFFICE_FEATURE:false}    
     case-access-management:
