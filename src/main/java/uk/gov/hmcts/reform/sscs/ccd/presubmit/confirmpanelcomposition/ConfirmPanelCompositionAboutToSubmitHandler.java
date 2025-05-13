@@ -48,26 +48,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandler implements PreSubmitCal
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         if (isDefaultPanelCompEnabled) {
-            List<String> disabilityAndFqMember = Optional.ofNullable(sscsCaseData
-                    .getPanelMemberComposition()
-                    .getPanelCompDisabilityAndFqm())
-                .orElse(new ArrayList<>());
-
-            if (isYes(sscsCaseData.getIsFqpmRequired())) {
-                if (isNull(sscsCaseData.getPanelMemberComposition())) {
-                    sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().build());
-                }
-
-                if (!disabilityAndFqMember.contains(PanelMemberType.TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED.getReference())) {
-                    disabilityAndFqMember.add(PanelMemberType.TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED.getReference());
-                    sscsCaseData.getPanelMemberComposition().setPanelCompDisabilityAndFqm(disabilityAndFqMember);
-                }
-            } else {
-                if (disabilityAndFqMember.contains(PanelMemberType.TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED.getReference())) {
-                    disabilityAndFqMember.remove(PanelMemberType.TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED.getReference());
-                    sscsCaseData.getPanelMemberComposition().setPanelCompDisabilityAndFqm(disabilityAndFqMember);
-                }
-            }
+            setFqpmInPanelMemberComposition(sscsCaseData);
         }
 
         processInterloc(sscsCaseData);
@@ -79,6 +60,30 @@ public class ConfirmPanelCompositionAboutToSubmitHandler implements PreSubmitCal
                 && sscsCaseData.getInterlocReviewState().equals(InterlocReviewState.REVIEW_BY_JUDGE)) {
             sscsCaseData.setInterlocReferralReason(null);
             sscsCaseData.setInterlocReviewState(null);
+        }
+    }
+
+    private void setFqpmInPanelMemberComposition(SscsCaseData sscsCaseData) {
+        List<String> disabilityAndFqMember = Optional.ofNullable(sscsCaseData.getPanelMemberComposition())
+            .map(PanelMemberComposition::getPanelCompDisabilityAndFqm)
+            .orElse(new ArrayList<>());
+
+        boolean isFqpmRequired = isYes(sscsCaseData.getIsFqpmRequired());
+        String fqpmReference = PanelMemberType.TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED.getReference();
+        boolean panelMemberCompositionHasFqpm = disabilityAndFqMember.contains(fqpmReference);
+
+        if (isFqpmRequired && !panelMemberCompositionHasFqpm) {
+            disabilityAndFqMember.add(fqpmReference);
+
+            if (isNull(sscsCaseData.getPanelMemberComposition())) {
+                sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().build());
+            }
+
+            sscsCaseData.getPanelMemberComposition().setPanelCompDisabilityAndFqm(disabilityAndFqMember);
+
+        } else if (!isFqpmRequired && panelMemberCompositionHasFqpm) {
+            disabilityAndFqMember.remove(fqpmReference);
+            sscsCaseData.getPanelMemberComposition().setPanelCompDisabilityAndFqm(disabilityAndFqMember);
         }
     }
 }

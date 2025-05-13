@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getHmcHearingType;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -71,23 +72,6 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             callbackResponse.getData().getPanelMemberComposition().setPanelCompositionMemberMedical2(null);
         }
 
-        if (isDefaultPanelCompEnabled) {
-            PanelMemberComposition panelMemberComposition = Optional.ofNullable(sscsCaseData
-                    .getPanelMemberComposition())
-                .orElse(PanelMemberComposition.builder().build());
-
-            List<String> disabilityAndFqMember = panelMemberComposition.getPanelCompDisabilityAndFqm();
-
-            if (nonNull(disabilityAndFqMember) && disabilityAndFqMember.contains(
-                PanelMemberType.TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED.getReference())) {
-                sscsCaseData.setIsFqpmRequired(YES);
-            } else {
-                if (isYes(sscsCaseData.getIsFqpmRequired())) {
-                    sscsCaseData.setIsFqpmRequired(NO);
-                }
-            }
-        }
-
         OverrideFields overrideFields = caseDataSnlFields.getOverrideFields();
 
         if (nonNull(overrideFields)) {
@@ -107,6 +91,29 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 .orElseGet(HearingOptions::builder)
                 .hmcHearingType(getHmcHearingType(sscsCaseData))
                 .build());
+
+        if (isDefaultPanelCompEnabled) {
+            setFqpmRequired(sscsCaseData);
+        }
+
         return callbackResponse;
+    }
+
+    private void setFqpmRequired(SscsCaseData sscsCaseData) {
+        PanelMemberComposition panelMemberComposition = Optional
+            .ofNullable(sscsCaseData.getPanelMemberComposition())
+            .orElseGet(() -> PanelMemberComposition.builder().build());
+
+        List<String> disabilityAndFqMember = Optional
+            .ofNullable(panelMemberComposition.getPanelCompDisabilityAndFqm())
+            .orElseGet(ArrayList::new);
+
+        String fqpmReference = PanelMemberType.TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED.getReference();
+
+        if (disabilityAndFqMember.contains(fqpmReference)) {
+            sscsCaseData.setIsFqpmRequired(YES);
+        } else if (isYes(sscsCaseData.getIsFqpmRequired())) {
+            sscsCaseData.setIsFqpmRequired(NO);
+        }
     }
 }
