@@ -73,9 +73,11 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
         }
 
         if (isDefaultPanelCompEnabled) {
-            List<String> disabilityAndFqMember = sscsCaseData
-                .getPanelMemberComposition()
-                .getPanelCompDisabilityAndFqm();
+            PanelMemberComposition panelMemberComposition = Optional.ofNullable(sscsCaseData
+                    .getPanelMemberComposition())
+                .orElse(PanelMemberComposition.builder().build());
+
+            List<String> disabilityAndFqMember = panelMemberComposition.getPanelCompDisabilityAndFqm();
 
             if (nonNull(disabilityAndFqMember) && disabilityAndFqMember.contains(
                 PanelMemberType.TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED.getReference())) {
