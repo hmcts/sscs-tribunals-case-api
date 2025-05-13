@@ -43,7 +43,6 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
-import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
@@ -86,7 +85,7 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
 
     @BeforeEach
     void setUp() {
-        hearingsDetailsMapping = new HearingsDetailsMapping(hearingsPanelMapping, panelCompositionService);
+        hearingsDetailsMapping = new HearingsDetailsMapping(hearingsPanelMapping);
         OverrideFields defaultListingValues = OverrideFields.builder()
             .duration(60)
             .build();
