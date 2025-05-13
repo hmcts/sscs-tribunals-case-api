@@ -84,7 +84,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final VenueService venueService;
     private final SessionCategoryMapService categoryMapService;
     private final PanelCategoryService panelCategoryService;
-    private final boolean caseAccessManagementFeature;
     private final PostcodeValidator postcodeValidator = new PostcodeValidator();
     private static ConstraintValidatorContext context;
     @Value("${feature.default-panel-comp.enabled}")
@@ -111,8 +110,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                                     IdamService idamService,
                                     RefDataService refDataService,
                                     VenueService venueService,
-                                    SessionCategoryMapService categoryMapService, PanelCategoryService panelCategoryService,
-                                    @Value("${feature.case-access-management.enabled}")  boolean caseAccessManagementFeature) {
+                                    SessionCategoryMapService categoryMapService, PanelCategoryService panelCategoryService) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
         this.airLookupService = airLookupService;
@@ -120,7 +118,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         this.idamService = idamService;
         this.refDataService = refDataService;
         this.panelCategoryService = panelCategoryService;
-        this.caseAccessManagementFeature = caseAccessManagementFeature;
         this.venueService = venueService;
         this.categoryMapService = categoryMapService;
     }
@@ -362,10 +359,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             response.addWarning("Benefit type code is empty");
             return false;
         } else if (Benefit.findBenefitByShortName(benefitType.getCode()).isEmpty()) {
-            if (!caseAccessManagementFeature) {
-                String validBenefitTypes = Arrays.stream(Benefit.values()).sequential().map(Benefit::getShortName).collect(Collectors.joining(", "));
-                response.addWarning("Benefit type code is invalid, should be one of: " + validBenefitTypes);
-            }
             return false;
         }
         return true;
@@ -409,7 +402,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
             sscsCaseData.setProcessingVenue(venue);
 
-            if (caseAccessManagementFeature && isNotEmpty(venue)) {
+            if (isNotEmpty(venue)) {
                 String venueEpimsId = venueService.getEpimsIdForVenue(venue);
                 CourtVenue courtVenue = refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId);
 
@@ -525,9 +518,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private void updateCaseName(Callback<SscsCaseData> callback, SscsCaseData caseData) {
-        if (!caseAccessManagementFeature) {
-            return;
-        }
 
         final String caseName = getCaseName(caseData.getAppeal().getAppellant());
         CaseDetails<SscsCaseData> oldCaseDetails = callback.getCaseDetailsBefore().orElse(null);
@@ -554,9 +544,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private void updateCaseCategoriesIfBenefitTypeUpdated(Callback<SscsCaseData> callback,
                                                           SscsCaseData sscsCaseData,
                                                           PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if (!caseAccessManagementFeature) {
-            return;
-        }
 
         Optional<Benefit> benefit = sscsCaseData.getBenefitType();
 

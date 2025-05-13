@@ -161,8 +161,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
                 refDataService,
                 venueService,
                 categoryMapService,
-                panelCategoryService,
-                true);
+                panelCategoryService);
 
         lenient().when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
