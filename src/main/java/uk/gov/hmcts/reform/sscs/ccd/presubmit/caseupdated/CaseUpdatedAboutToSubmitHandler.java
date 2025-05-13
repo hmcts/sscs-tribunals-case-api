@@ -62,6 +62,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
@@ -82,9 +83,13 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final RefDataService refDataService;
     private final VenueService venueService;
     private final SessionCategoryMapService categoryMapService;
+    private final PanelCategoryService panelCategoryService;
     private final boolean caseAccessManagementFeature;
     private final PostcodeValidator postcodeValidator = new PostcodeValidator();
     private static ConstraintValidatorContext context;
+    @Value("${feature.default-panel-comp.enabled}")
+    private boolean defaultPanelCompEnabled;
+
 
 
     private static final String WARNING_MESSAGE = "%s has not been provided for the %s, do you want to ignore this warning and proceed?";
@@ -106,7 +111,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                                     IdamService idamService,
                                     RefDataService refDataService,
                                     VenueService venueService,
-                                    SessionCategoryMapService categoryMapService,
+                                    SessionCategoryMapService categoryMapService, PanelCategoryService panelCategoryService,
                                     @Value("${feature.case-access-management.enabled}")  boolean caseAccessManagementFeature) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
@@ -114,6 +119,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.idamService = idamService;
         this.refDataService = refDataService;
+        this.panelCategoryService = panelCategoryService;
         this.caseAccessManagementFeature = caseAccessManagementFeature;
         this.venueService = venueService;
         this.categoryMapService = categoryMapService;
@@ -234,14 +240,21 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
     }
 
-    private void validateBenefitIssueCode(SscsCaseData caseData,
-                                          PreSubmitCallbackResponse<SscsCaseData> response) {
-        boolean isSecondDoctorPresent = isNotBlank(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism());
-        boolean fqpmRequired = isYes(caseData.getIsFqpmRequired());
-
-        if (isNull(categoryMapService.getSessionCategory(caseData.getBenefitCode(), caseData.getIssueCode(),
-                isSecondDoctorPresent, fqpmRequired))) {
-            response.addError("Incorrect benefit/issue code combination");
+    private void validateBenefitIssueCode(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+        if (defaultPanelCompEnabled) {
+            String specialismCount = caseData.getSscsIndustrialInjuriesData().getPanelDoctorSpecialism() != null
+                    ? caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism() != null
+                    ? "2" : "1" : null;
+            String isFqpm = isYes(caseData.getIsFqpmRequired()) ? "true" : null;
+            if (isNull(panelCategoryService.getPanelCategory(caseData.getBenefitCode() + caseData.getIssueCode(), specialismCount, isFqpm))) {
+                response.addError("Incorrect benefit/issue code combination");
+            }
+        } else {
+            boolean isSecondDoctorPresent = isNotBlank(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism());
+            boolean fqpmRequired = isYes(caseData.getIsFqpmRequired());
+            if (isNull(categoryMapService.getSessionCategory(caseData.getBenefitCode(), caseData.getIssueCode(), isSecondDoctorPresent, fqpmRequired))) {
+                response.addError("Incorrect benefit/issue code combination");
+            }
         }
     }
 
