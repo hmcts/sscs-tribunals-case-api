@@ -105,7 +105,7 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
             .replyDateTime(LocalDateTime.now())
             .replyUserName(userDetails.getName())
             .replyUserRole(getRoleName(userDetails))
-            .replyMessage(noActionRequired ? "No action required" : replyText)
+            .replyMessage(noActionRequired ? "No reply required" : replyText)
             .replyHasBeenActionedByFta(noActionRequired ? null : YesNo.NO)
             .build();
         communicationRequest.getValue().setRequestReply(reply);
