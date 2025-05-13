@@ -66,6 +66,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
         if (isDefaultPanelCompEnabled && callbackResponse.getData().getPanelMemberComposition() != null
                 && "NoMedicalMemberRequired".equals(callbackResponse.getData().getPanelMemberComposition().getPanelCompositionMemberMedical1())) {
             callbackResponse.getData().getPanelMemberComposition().setPanelCompositionMemberMedical1(null);
+            callbackResponse.getData().getPanelMemberComposition().setPanelCompositionMemberMedical2(null);
         }
 
         OverrideFields overrideFields = caseDataSnlFields.getOverrideFields();

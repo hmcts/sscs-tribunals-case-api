@@ -126,6 +126,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         assertThat(result).isNull();
         assertThat(response.getData().getPanelMemberComposition().getPanelCompositionJudge()).isNull();
         assertThat(response.getData().getPanelMemberComposition().getPanelCompositionMemberMedical1()).isNull();
+        assertThat(response.getData().getPanelMemberComposition().getPanelCompositionMemberMedical2()).isNull();
     }
 
     @Test
