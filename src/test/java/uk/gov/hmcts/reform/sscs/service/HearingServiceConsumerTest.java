@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Issue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SessionCategory;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -124,11 +125,9 @@ public class HearingServiceConsumerTest {
 
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
 
-        Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(
-            response,
-            HEARING_REQUEST_ID,
-            false
-        );
+        Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = hearingServiceConsumer
+                .getCreateHearingCaseDetailsConsumerV2(
+                        PanelMemberComposition.builder().build(), response,HEARING_REQUEST_ID, false);
         //reset the DLVs
         caseData.getSchedulingAndListingFields().setDefaultListingValues(null);
         caseData.setAdjournment(Adjournment.builder().adjournmentInProgress(adjournmentFlagEnabled ? YES : NO)
@@ -180,11 +179,9 @@ public class HearingServiceConsumerTest {
 
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
 
-        Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(
-            response,
-            HEARING_REQUEST_ID,
-                false
-        );
+        Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = hearingServiceConsumer
+                .getCreateHearingCaseDetailsConsumerV2(
+                        PanelMemberComposition.builder().build(), response, HEARING_REQUEST_ID, false);
         //reset the DLVs
         caseData.getSchedulingAndListingFields().setDefaultListingValues(null);
         caseData.setAdjournment(Adjournment.builder().adjournmentInProgress(adjournmentInProgress ? YES : NO)
@@ -218,11 +215,9 @@ public class HearingServiceConsumerTest {
 
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
 
-        Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(
-            response,
-            HEARING_REQUEST_ID,
-                false
-        );
+        Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = hearingServiceConsumer
+                .getCreateHearingCaseDetailsConsumerV2(
+                        PanelMemberComposition.builder().build(), response, HEARING_REQUEST_ID, false);
         //reset the DLVs
         caseData.getSchedulingAndListingFields().setDefaultListingValues(null);
         RuntimeException re = assertThrows(RuntimeException.class, () -> sscsCaseDetailsConsumer.accept(sscsCaseDetails));
@@ -275,11 +270,9 @@ public class HearingServiceConsumerTest {
         caseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
 
-        Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(
-                response,
-                HEARING_REQUEST_ID,
-                true
-        );
+        Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = hearingServiceConsumer
+                .getCreateHearingCaseDetailsConsumerV2(
+                        PanelMemberComposition.builder().build(), response, HEARING_REQUEST_ID, true);
         sscsCaseDetailsConsumer.accept(sscsCaseDetails);
 
         List<Hearing> hearings = sscsCaseDetails.getData().getHearings();
@@ -314,11 +307,9 @@ public class HearingServiceConsumerTest {
         given(refData.getVenueService()).willReturn(venueService);
         given(venueService.getEpimsIdForVenue(PROCESSING_VENUE)).willReturn("219164");
         given(hearingDurations.getHearingDurationBenefitIssueCodes(caseData)).willReturn(90);
-        Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(
-                response,
-                HEARING_REQUEST_ID,
-                true
-        );
+        Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = hearingServiceConsumer
+                .getCreateHearingCaseDetailsConsumerV2(
+                        PanelMemberComposition.builder().build(), response, HEARING_REQUEST_ID, true);
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
         sscsCaseDetailsConsumer.accept(sscsCaseDetails);
 
