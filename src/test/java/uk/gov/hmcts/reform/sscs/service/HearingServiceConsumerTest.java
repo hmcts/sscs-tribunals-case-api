@@ -178,10 +178,11 @@ public class HearingServiceConsumerTest {
         given(venueService.getEpimsIdForVenue(PROCESSING_VENUE)).willReturn("219164");
 
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
+        var panelMemberComposition = PanelMemberComposition.builder().panelCompositionJudge("58").build();
 
         Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = hearingServiceConsumer
                 .getCreateHearingCaseDetailsConsumerV2(
-                        PanelMemberComposition.builder().build(), response, HEARING_REQUEST_ID, false);
+                        panelMemberComposition, response, HEARING_REQUEST_ID, false);
         //reset the DLVs
         caseData.getSchedulingAndListingFields().setDefaultListingValues(null);
         caseData.setAdjournment(Adjournment.builder().adjournmentInProgress(adjournmentInProgress ? YES : NO)
@@ -189,6 +190,8 @@ public class HearingServiceConsumerTest {
                                     .build());
 
         sscsCaseDetailsConsumer.accept(sscsCaseDetails);
+
+        assertEquals(panelMemberComposition, sscsCaseDetails.getData().getPanelMemberComposition());
         //if the mutator has been applied then a defaultListingValue should have been added
         OverrideFields defaultListingValues = sscsCaseDetails.getData().getSchedulingAndListingFields().getDefaultListingValues();
         assertThat(defaultListingValues).isNotNull();
