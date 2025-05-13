@@ -53,16 +53,14 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
 
     @Mock
     private HearingDurationsService hearingDurations;
-
     @Mock
     private SessionCategoryMapService sessionCategoryMaps;
-
     @Mock
     private ReferenceDataServiceHolder refData;
-
     @Mock
     private VenueService venueService;
-
+    @Mock
+    private HearingsPanelMapping hearingsPanelMapping;
     @Mock
     private RegionalProcessingCenterService regionalProcessingCenterService;
 
@@ -84,12 +82,6 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
         VenueDetails.builder().epimsId(EPIMS_ID_4).build());
 
     private SscsCaseData caseData;
-
-    @Mock
-    private HearingsPanelMapping hearingsPanelMapping;
-    @Mock
-    private PanelCompositionService panelCompositionService;
-
     private HearingsDetailsMapping hearingsDetailsMapping;
 
     @BeforeEach
