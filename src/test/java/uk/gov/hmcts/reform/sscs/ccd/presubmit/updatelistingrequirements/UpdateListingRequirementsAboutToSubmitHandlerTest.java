@@ -138,8 +138,8 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
                 USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
-        assertThat(response.getData().getPanelMemberComposition().panelCompMedical1()).isNull();
-        assertThat(response.getData().getPanelMemberComposition().panelCompMedical2()).isNull();
+        assertThat(response.getData().getPanelMemberComposition().getPanelCompMedical1()).isNull();
+        assertThat(response.getData().getPanelMemberComposition().getPanelCompMedical2()).isNull();
     }
 
     @Test
