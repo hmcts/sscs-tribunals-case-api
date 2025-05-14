@@ -79,7 +79,7 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
         caseData.setBenefitCode(IIDB_BENEFIT_CODE);
         when(refData.getSessionCategoryMaps()).thenReturn(sessionCategoryMaps);
         PanelRequirements result = hearingsPanelMapping.getPanelRequirements(caseData, refData);
-        assertThat(result.getRoleTypes()).contains(PanelMemberType.TRIBUNALS_MEMBER_MEDICAL.getReference());
+        assertThat(result.getRoleTypes()).contains(PanelMemberType.TRIBUNAL_MEMBER_MEDICAL.getReference());
     }
 
     @DisplayName("HearingsPanelMapping should call panelCategoryService and return role types when feature flag is enabled")

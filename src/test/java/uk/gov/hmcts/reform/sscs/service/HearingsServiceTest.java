@@ -216,7 +216,7 @@ class HearingsServiceTest {
         HearingEvent hearingEvent = HearingEvent.ADJOURN_CREATE_HEARING;
         wrapper.setHearingState(ADJOURN_CREATE_HEARING);
         wrapper.setEventId(hearingEvent.getEventType().getCcdType());
-        var panelComposition = PanelMemberComposition.builder().panelCompositionJudge("58").build();
+        var panelComposition = PanelMemberComposition.builder().panelCompJudge("58").build();
         when(hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(
                 eq(panelComposition), any(), any(), anyBoolean())
         ).thenReturn(sscsCaseDetailsConsumer);
@@ -225,7 +225,7 @@ class HearingsServiceTest {
                         .panelRequirements(PanelRequirements.builder().roleTypes(List.of("58"))
                                 .build()).build()).build();
         when(hearingsMapping.buildHearingPayload(any(), any())).thenReturn(hearingPayload);
-        when(panelCompositionService.getPanelCompositionFromRoleTypes(eq(List.of("58"))))
+        when(panelCompositionService.createPanelCompositionFromJohTiers(eq(List.of("58"))))
                 .thenReturn(panelComposition);
 
         assertThatNoException()
@@ -261,7 +261,7 @@ class HearingsServiceTest {
                         .panelRequirements(PanelRequirements.builder().roleTypes(List.of("58"))
                                 .build()).build()).build();
         when(hearingsMapping.buildHearingPayload(any(), any())).thenReturn(hearingPayload);
-        when(panelCompositionService.getPanelCompositionFromRoleTypes(eq(List.of("58"))))
+        when(panelCompositionService.createPanelCompositionFromJohTiers(eq(List.of("58"))))
                 .thenReturn(PanelMemberComposition.builder().build());
 
         given(updateCcdCaseService.updateCaseV2(
@@ -318,7 +318,7 @@ class HearingsServiceTest {
                         .panelRequirements(PanelRequirements.builder().roleTypes(List.of("58"))
                                 .build()).build()).build();
         when(hearingsMapping.buildHearingPayload(any(), any())).thenReturn(hearingPayload);
-        when(panelCompositionService.getPanelCompositionFromRoleTypes(eq(List.of("58"))))
+        when(panelCompositionService.createPanelCompositionFromJohTiers(eq(List.of("58"))))
                 .thenReturn(PanelMemberComposition.builder().build());
 
         assertThatNoException()

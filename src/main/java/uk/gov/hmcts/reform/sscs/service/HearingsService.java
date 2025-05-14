@@ -129,7 +129,7 @@ public class HearingsService {
             log.debug("Sending Create Hearing Request for Case ID {}", caseId);
             hmcUpdateResponse = hmcHearingApiService.sendCreateHearingRequest(hearingPayload);
             wrapper.getCaseData().setPanelMemberComposition(
-                    panelCompositionService.getPanelCompositionFromRoleTypes(
+                    panelCompositionService.createPanelCompositionFromJohTiers(
                             hearingPayload.getHearingDetails().getPanelRequirements().getRoleTypes()));
 
             log.debug("Received Create Hearing Request Response for Case ID {}, Hearing State {} and Response:\n{}",
