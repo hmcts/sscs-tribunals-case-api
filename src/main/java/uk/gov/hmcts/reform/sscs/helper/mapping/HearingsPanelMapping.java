@@ -5,6 +5,7 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberMedicallyQualified.getPanelMemberMedicallyQualified;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsMapping.getSessionCaseCodeMap;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.BenefitRoleRelationType.findRoleTypesByBenefitCode;
 
@@ -21,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMember;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberMedicallyQualified;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SessionCategory;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.RequirementType;
@@ -118,7 +120,7 @@ public final class HearingsPanelMapping {
                 .build();
     }
 
-    public static List<String> getPanelSpecialisms(@Valid SscsCaseData caseData, SessionCategoryMap sessionCategoryMap) {
+    public List<String> getPanelSpecialisms(@Valid SscsCaseData caseData, SessionCategoryMap sessionCategoryMap) {
         List<String> panelSpecialisms = new ArrayList<>();
 
         if (isNull(sessionCategoryMap)) {
@@ -131,11 +133,25 @@ public final class HearingsPanelMapping {
 
         String doctorSpecialism = caseData.getSscsIndustrialInjuriesData().getPanelDoctorSpecialism();
         String doctorSpecialismSecond = caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism();
-        panelSpecialisms = sessionCategoryMap.getCategory().getPanelMembers().stream()
-                .map(panelMember -> getPanelMemberSpecialism(panelMember, doctorSpecialism, doctorSpecialismSecond))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-        return panelSpecialisms;
+        if (defaultPanelCompEnabled) {
+            String specialismCount = caseData.getSscsIndustrialInjuriesData().getPanelDoctorSpecialism() != null
+                    ? caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism() != null
+                    ? "2" : "1" : null;
+            String isFqpm = isYes(caseData.getIsFqpmRequired()) ? "true" : null;
+            panelSpecialisms = SessionCategory.getSessionCategory(panelCategoryService
+                            .getPanelCategory(caseData.getBenefitCode() + caseData.getIssueCode(), specialismCount, isFqpm)
+                            .getCategory()).getPanelMembers().stream()
+                    .map(panelMember -> getPanelMemberSpecialism(panelMember, doctorSpecialism, doctorSpecialismSecond))
+                    .filter(Objects::nonNull)
+                    .toList();
+            return panelSpecialisms;
+        } else {
+            panelSpecialisms = sessionCategoryMap.getCategory().getPanelMembers().stream()
+                    .map(panelMember -> getPanelMemberSpecialism(panelMember, doctorSpecialism, doctorSpecialismSecond))
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+            return panelSpecialisms;
+        }
     }
 
     public static String getPanelMemberSpecialism(PanelMember panelMember,

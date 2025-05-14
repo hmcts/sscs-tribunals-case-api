@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.helper.mapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -31,6 +32,7 @@ import uk.gov.hmcts.reform.sscs.model.hmc.reference.RequirementType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.MemberType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelPreference;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
+import uk.gov.hmcts.reform.sscs.reference.data.model.PanelCategory;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
@@ -58,6 +60,7 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
     public void setUp() {
         openMocks(this);
         hearingsPanelMapping = new HearingsPanelMapping(panelCategoryService);
+        ReflectionTestUtils.setField(hearingsPanelMapping, "defaultPanelCompEnabled", true);
     }
 
     @DisplayName("When no data is given getPanelRequirements returns the valid but empty PanelRequirements")
@@ -233,8 +236,11 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
                 .secondPanelDoctorSpecialism(doctorSpecialismSecond)
                 .build())
             .build();
+        PanelCategory panelCategory = new PanelCategory();
+        panelCategory.setCategory("6");
+        when(panelCategoryService.getPanelCategory(any(), any(), any())).thenReturn(panelCategory);
 
-        List<String> result = HearingsPanelMapping.getPanelSpecialisms(caseData, sessionCategoryMap);
+        List<String> result = hearingsPanelMapping.getPanelSpecialisms(caseData, sessionCategoryMap);
 
         List<String> expectedList = splitCsvParamArray(expected);
         assertThat(result)
@@ -260,8 +266,11 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
                 .panelDoctorSpecialism(doctorSpecialism)
                 .build())
             .build();
+        PanelCategory panelCategory = new PanelCategory();
+        panelCategory.setCategory("5");
+        when(panelCategoryService.getPanelCategory(any(), any(), any())).thenReturn(panelCategory);
 
-        List<String> result = HearingsPanelMapping.getPanelSpecialisms(caseData, sessionCategoryMap);
+        List<String> result = hearingsPanelMapping.getPanelSpecialisms(caseData, sessionCategoryMap);
 
         List<String> expectedList = splitCsvParamArray(expected);
         assertThat(result)
@@ -284,8 +293,10 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
                 .panelDoctorSpecialism("doesntexist")
                 .build())
             .build();
-
-        List<String> result = HearingsPanelMapping.getPanelSpecialisms(caseData, sessionCategoryMap);
+        PanelCategory panelCategory = new PanelCategory();
+        panelCategory.setCategory("5");
+        when(panelCategoryService.getPanelCategory(any(), any(), any())).thenReturn(panelCategory);
+        List<String> result = hearingsPanelMapping.getPanelSpecialisms(caseData, sessionCategoryMap);
 
         List<String> expectedList = Collections.emptyList();
         assertThat(result)
@@ -309,7 +320,7 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
                                             .build())
             .build();
 
-        List<String> result = HearingsPanelMapping.getPanelSpecialisms(caseData, sessionCategoryMap);
+        List<String> result = hearingsPanelMapping.getPanelSpecialisms(caseData, sessionCategoryMap);
 
         List<String> expectedList = Collections.emptyList();
         assertThat(result)
