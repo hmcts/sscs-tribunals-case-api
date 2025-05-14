@@ -128,7 +128,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenNoMedicalMemberRequiredSelected_thenClearMedicalMemberFields(){
+    void givenNoMedicalMemberRequiredSelected_thenClearMedicalMemberFields() {
         sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84")
                 .panelCompositionMemberMedical1("NoMedicalMemberRequired").panelCompositionMemberMedical2("58").build());
 
