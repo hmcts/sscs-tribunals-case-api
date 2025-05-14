@@ -8,6 +8,7 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
@@ -34,6 +35,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpResponseDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.reference.data.model.PanelCategory;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
@@ -58,14 +61,16 @@ public class DwpUploadResponseMidEventHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetailsBefore;
 
+    @Mock
+    private PanelCategoryService panelCategoryService;
+
     private SscsCaseData sscsCaseData;
 
     @Before
     public void setUp() {
         SessionCategoryMapService categoryMapService = new SessionCategoryMapService();
-        handler = new DwpUploadResponseMidEventHandler(categoryMapService);
-
         openMocks(this);
+        handler = new DwpUploadResponseMidEventHandler(categoryMapService, panelCategoryService, true);
 
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
                 .forename("Chris").surname("Davis").build().getFullName());
@@ -114,6 +119,7 @@ public class DwpUploadResponseMidEventHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("childSupportConfidentiality");
         callback.getCaseDetails().getCaseData().setAppendix12Doc(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("b.pdf").documentFilename("b.pdf").build()).build());
         callback.getCaseDetails().getCaseData().getAppendix12Doc().setDocumentLink(DocumentLink.builder().documentUrl("b.pdf").documentFilename("b.pdf").build());
+        when(panelCategoryService.getPanelCategory(any(), any(), any())).thenReturn(new PanelCategory());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -130,6 +136,7 @@ public class DwpUploadResponseMidEventHandlerTest {
 
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("childSupportConfidentiality");
         callback.getCaseDetails().getCaseData().setAppendix12Doc(null);
+        when(panelCategoryService.getPanelCategory(any(), any(), any())).thenReturn(new PanelCategory());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -147,6 +154,7 @@ public class DwpUploadResponseMidEventHandlerTest {
                 .build();
 
         when(callback.getCaseDetails().getCaseData()).thenReturn(sscsCaseData);
+        when(panelCategoryService.getPanelCategory(any(), any(), any())).thenReturn(new PanelCategory());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
         assertEquals(1, response.getErrors().size());
         assertEquals("Please provide other party details", response.getErrors().toArray()[0]);
@@ -156,6 +164,7 @@ public class DwpUploadResponseMidEventHandlerTest {
     public void shouldReturnErrorIfIbcaBenefitCodeSelectedByNonIbcaCase() {
         callback.getCaseDetails().getCaseData().setIssueCode("CE");
         callback.getCaseDetails().getCaseData().setBenefitCode(IBCA_BENEFIT_CODE);
+        when(panelCategoryService.getPanelCategory(any(), any(), any())).thenReturn(new PanelCategory());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
