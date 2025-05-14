@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTime;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLinkDetails;
@@ -395,5 +396,15 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
         boolean result = HearingsAutoListMapping.isMqpmOrFqpm(value);
 
         assertThat(result).isFalse();
+    }
+
+    @Test
+    void shouldNotAutoListIbcCase() throws ListingException {
+        SscsCaseData caseData = SscsCaseData
+            .builder()
+            .benefitCode(Benefit.INFECTED_BLOOD_COMPENSATION.getBenefitCode())
+            .build();
+
+        assertFalse(HearingsAutoListMapping.shouldBeAutoListed(caseData, refData));
     }
 }

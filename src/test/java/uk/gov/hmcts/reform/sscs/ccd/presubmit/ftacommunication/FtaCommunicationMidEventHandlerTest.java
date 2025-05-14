@@ -45,7 +45,7 @@ class FtaCommunicationMidEventHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String NO_REQUESTS_ERROR_MESSAGE = "There are no requests to reply to. Please select a different communication type.";
     private static final String NO_REQUESTS_DELETE_ERROR_MESSAGE = "There are no requests to delete. Please select a different communication type.";
-    private static final String PROVIDE_RESPONSE_ERROR_MESSAGE = "Please provide a response to the FTA query or select No action required.";
+    private static final String PROVIDE_RESPONSE_ERROR_MESSAGE = "Please provide a response to the FTA query or select No reply required.";
     private static final String NO_REPLIES_ERROR_MESSAGE = "There are no replies to review. Please select a different communication type.";
 
     FtaCommunicationMidEventHandler handler;

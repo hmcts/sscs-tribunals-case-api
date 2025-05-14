@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.apache.commons.io.IOUtils;
-import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.Loader;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -153,7 +153,7 @@ public class SscsDocumentServiceTest {
     @Test
     public void resizedPdfReturnsResizedWhenOutsideSizeLimit() throws Exception {
         byte[] pdfContent = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("myPdf.pdf"));
-        when(pdfHelper.scaleToA4(any())).thenReturn(Optional.of(PDDocument.load(pdfContent)));
+        when(pdfHelper.scaleToA4(any())).thenReturn(Optional.of(Loader.loadPDF(pdfContent)));
         Pdf pdf = new Pdf(pdfContent, "file.pdf");
         Optional<Pdf> result = sscsDocumentService.resizedPdf(pdf);
         assertEquals(true, result.isPresent());

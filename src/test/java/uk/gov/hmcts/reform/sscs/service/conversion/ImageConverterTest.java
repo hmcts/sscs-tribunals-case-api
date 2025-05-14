@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.junit.Test;
@@ -33,7 +34,7 @@ public class ImageConverterTest {
         File output = converter.convert(input);
 
         assertEquals(".pdf", output.getName().substring(output.getName().lastIndexOf(".")));
-        try (PDDocument document = PDDocument.load(output)) {
+        try (PDDocument document = Loader.loadPDF(output)) {
             assertEquals(1, document.getPages().getCount());
             assertEquals(PDRectangle.A4.getWidth(), document.getPage(0).getMediaBox().getWidth(), 0);
             assertEquals(PDRectangle.A4.getHeight(), document.getPage(0).getMediaBox().getHeight(), 0);
@@ -46,7 +47,7 @@ public class ImageConverterTest {
         File output = converter.convert(input);
 
         assertEquals(".pdf", output.getName().substring(output.getName().lastIndexOf(".")));
-        try (PDDocument document = PDDocument.load(output)) {
+        try (PDDocument document = Loader.loadPDF(output)) {
             assertEquals(1, document.getPages().getCount());
             assertEquals(PDRectangle.A4.getHeight(), document.getPage(0).getMediaBox().getWidth(), 0);
             assertEquals(PDRectangle.A4.getWidth(), document.getPage(0).getMediaBox().getHeight(), 0);

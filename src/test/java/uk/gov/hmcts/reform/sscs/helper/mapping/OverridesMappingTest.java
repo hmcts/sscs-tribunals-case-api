@@ -104,10 +104,6 @@ class OverridesMappingTest {
         try {
             when(refData.getVenueService()).thenReturn(venueService);
             caseData.setBenefitCode("093");
-            when(refData.getSessionCategoryMaps()).thenReturn(sessionCategoryMaps);
-            when(sessionCategoryMaps.getSessionCategory("093", ISSUE_CODE,false,false))
-                    .thenReturn(new SessionCategoryMap(BenefitCode.IBC, Issue.DD,
-                            false,false,SessionCategory.CATEGORY_01,null));
             OverridesMapping.setOverrideValues(caseData,refData);
             assertNull(caseData.getSchedulingAndListingFields().getOverrideFields().getDuration());
         } catch (ListingException e) {
