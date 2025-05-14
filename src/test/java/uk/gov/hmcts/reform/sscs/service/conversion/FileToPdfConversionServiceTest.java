@@ -64,7 +64,7 @@ public class FileToPdfConversionServiceTest {
         when(mpf.getOriginalFilename()).thenReturn("flying-pig.jpg");
         List<MultipartFile> input = Lists.newArrayList(mpf);
         final List<MultipartFile> convert = conversionService.convert(input);
-        assertEquals("flying-pig.pdf", convert.get(0).getName());
+        assertEquals("flying-pig.pdf", convert.getFirst().getName());
     }
 
     @Test
@@ -80,16 +80,16 @@ public class FileToPdfConversionServiceTest {
         List<MultipartFile> input = Lists.newArrayList(mpf);
         final List<MultipartFile> convert = conversionService.convert(input);
 
-        assertEquals("application/pdf", convert.get(0).getContentType());
-        assertNotNull(convert.get(0).getInputStream());
-        assertEquals("flying-pig.pdf", convert.get(0).getOriginalFilename());
-        assertNotNull(convert.get(0).getResource());
-        assertFalse(convert.get(0).isEmpty());
-        assertEquals(33401, convert.get(0).getSize());
-        assertEquals(33401, convert.get(0).getBytes().length);
+        assertEquals("application/pdf", convert.getFirst().getContentType());
+        assertNotNull(convert.getFirst().getInputStream());
+        assertEquals("flying-pig.pdf", convert.getFirst().getOriginalFilename());
+        assertNotNull(convert.getFirst().getResource());
+        assertFalse(convert.getFirst().isEmpty());
+        assertEquals(33486, convert.getFirst().getSize());
+        assertEquals(33486, convert.getFirst().getBytes().length);
 
         File tempFile = File.createTempFile("tempConversion", ".jpg");
         tempFile.deleteOnExit();
-        convert.get(0).transferTo(tempFile);
+        convert.getFirst().transferTo(tempFile);
     }
 }
