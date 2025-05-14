@@ -26,13 +26,16 @@ public final class ServiceHearingValuesMapping {
 
     private final HearingsPanelMapping hearingsPanelMapping;
 
+    private final HearingsAutoListMapping hearingsAutoListMapping;
+
     private final PanelCategoryService panelCategoryService;
 
     @Value("${feature.default-panel-comp.enabled}")
     private boolean defaultPanelCompEnabled;
 
-    ServiceHearingValuesMapping(HearingsPanelMapping hearingsPanelMapping, PanelCategoryService panelCategoryService) {
+    ServiceHearingValuesMapping(HearingsPanelMapping hearingsPanelMapping, HearingsAutoListMapping hearingsAutoListMapping, PanelCategoryService panelCategoryService) {
         this.hearingsPanelMapping = hearingsPanelMapping;
+        this.hearingsAutoListMapping = hearingsAutoListMapping;
         this.panelCategoryService = panelCategoryService;
     }
 
@@ -40,7 +43,7 @@ public final class ServiceHearingValuesMapping {
     public ServiceHearingValues mapServiceHearingValues(@Valid SscsCaseData caseData, ReferenceDataServiceHolder refData)
             throws ListingException {
 
-        boolean shouldBeAutoListed = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
+        boolean shouldBeAutoListed = hearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
         int hearingDuration = 0;
         try {
             hearingDuration = HearingsDurationMapping.getHearingDuration(caseData, refData);

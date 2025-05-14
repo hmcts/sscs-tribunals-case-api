@@ -41,7 +41,6 @@ import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDetails;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
-import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
@@ -87,11 +86,14 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
     @Mock
     private HearingsPanelMapping hearingsPanelMapping;
 
+    @Mock
+    private HearingsAutoListMapping hearingsAutoListMapping;
+
     private HearingsDetailsMapping hearingsDetailsMapping;
 
     @BeforeEach
     void setUp() {
-        hearingsDetailsMapping = new HearingsDetailsMapping(hearingsPanelMapping);
+        hearingsDetailsMapping = new HearingsDetailsMapping(hearingsPanelMapping, hearingsAutoListMapping);
         OverrideFields defaultListingValues = OverrideFields.builder()
             .duration(60)
             .build();
@@ -112,12 +114,8 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
     @DisplayName("When a valid hearing wrapper is given buildHearingDetails returns the correct Hearing Details")
     @Test
     void buildHearingDetails() throws ListingException {
-        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE, ISSUE_CODE, false, false))
-            .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                false, false, SessionCategory.CATEGORY_03, null));
 
         given(refData.getHearingDurations()).willReturn(hearingDurations);
-        given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
         given(refData.getVenueService()).willReturn(venueService);
 
         OverrideFields defaultListingValues = OverrideFields.builder()
