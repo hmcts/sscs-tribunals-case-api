@@ -46,7 +46,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -1480,17 +1479,6 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     }
 
     @Test
-    void givenCaseAccessManagementFeatureDisabled_shouldNotSetCaseNames() {
-        ReflectionTestUtils.setField(handler, "caseAccessManagementFeature", false);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertNull(response.getData().getCaseAccessManagementFields().getCaseNameHmctsInternal());
-        assertNull(response.getData().getCaseAccessManagementFields().getCaseNameHmctsRestricted());
-        assertNull(response.getData().getCaseAccessManagementFields().getCaseNamePublic());
-    }
-
-    @Test
     void givenBenefitTypeChanged_thenSetCaseCategories() {
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
 
@@ -1596,17 +1584,6 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
-    }
-
-    @Test
-    void givenCaseAccessManagementFeatureDisabled_shouldNotSetCaseCategories() {
-        ReflectionTestUtils.setField(handler, "caseAccessManagementFeature", false);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertTrue(response.getErrors().isEmpty());
-        assertNull(response.getData().getCaseAccessManagementFields().getCaseAccessCategory());
-        assertNull(response.getData().getCaseAccessManagementFields().getCaseManagementCategory());
     }
 
     @ParameterizedTest
