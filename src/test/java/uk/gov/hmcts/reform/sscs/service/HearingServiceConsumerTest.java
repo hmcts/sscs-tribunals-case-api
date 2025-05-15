@@ -191,7 +191,7 @@ public class HearingServiceConsumerTest {
 
         sscsCaseDetailsConsumer.accept(sscsCaseDetails);
 
-        assertEquals(panelMemberComposition, sscsCaseDetails.getData().getPanelComposition());
+        assertEquals(panelMemberComposition, sscsCaseDetails.getData().getPanelMemberComposition());
         //if the mutator has been applied then a defaultListingValue should have been added
         OverrideFields defaultListingValues = sscsCaseDetails.getData().getSchedulingAndListingFields().getDefaultListingValues();
         assertThat(defaultListingValues).isNotNull();

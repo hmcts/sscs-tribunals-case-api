@@ -241,7 +241,7 @@ class HearingsServiceTest {
         );
         SscsCaseData caseData = wrapper.getCaseData();
         assertNull(caseData.getHearings());
-        assertEquals(caseData.getPanelComposition(), panelComposition);
+        assertEquals(caseData.getPanelMemberComposition(), panelComposition);
 
         Consumer<SscsCaseDetails> sscsCaseDataConsumer = caseDataConsumerCaptor.getValue();
         assertThat(sscsCaseDataConsumer).isEqualTo(sscsCaseDetailsConsumer);
