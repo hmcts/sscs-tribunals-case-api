@@ -43,7 +43,7 @@ public class HearingServiceConsumer {
                 } else {
                     OverridesMapping.setDefaultListingValues(sscsCaseDetails.getData(), refData);
                 }
-                sscsCaseDetails.getData().setPanelMemberComposition(panelComposition);
+                sscsCaseDetails.getData().setPanelComposition(panelComposition);
                 updateCaseDataWithHearingResponse(response, hearingRequestId, sscsCaseDetails.getData());
             } catch (ListingException e) {
                 throw new RuntimeException(e);

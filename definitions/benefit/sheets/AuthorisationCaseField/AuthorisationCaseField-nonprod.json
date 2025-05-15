@@ -1,7 +1,7 @@
 [
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "functionalTest", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
-  {"LiveFrom": "11/04/2025", "CaseTypeID": "Benefit", "CaseFieldID": "panelMemberComposition", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
-  {"LiveFrom": "11/04/2025", "CaseTypeID": "Benefit", "CaseFieldID": "panelMemberComposition", "AccessProfile": "caseworker-sscs-judge", "CRUD": "CRUD"},
-  {"LiveFrom": "11/04/2025", "CaseTypeID": "Benefit", "CaseFieldID": "panelMemberComposition", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
-  {"LiveFrom": "11/04/2025", "CaseTypeID": "Benefit", "CaseFieldID": "panelMemberComposition", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"}
+  {"LiveFrom": "11/04/2025", "CaseTypeID": "Benefit", "CaseFieldID": "panelComposition", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "11/04/2025", "CaseTypeID": "Benefit", "CaseFieldID": "panelComposition", "AccessProfile": "caseworker-sscs-judge", "CRUD": "CRUD"},
+  {"LiveFrom": "11/04/2025", "CaseTypeID": "Benefit", "CaseFieldID": "panelComposition", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
+  {"LiveFrom": "11/04/2025", "CaseTypeID": "Benefit", "CaseFieldID": "panelComposition", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"}
 ]

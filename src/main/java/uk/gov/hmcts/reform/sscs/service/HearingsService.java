@@ -128,7 +128,7 @@ public class HearingsService {
             HearingRequestPayload hearingPayload = hearingsMapping.buildHearingPayload(wrapper, refData);
             log.debug("Sending Create Hearing Request for Case ID {}", caseId);
             hmcUpdateResponse = hmcHearingApiService.sendCreateHearingRequest(hearingPayload);
-            wrapper.getCaseData().setPanelMemberComposition(
+            wrapper.getCaseData().setPanelComposition(
                     panelCompositionService.createPanelCompositionFromJohTiers(
                             hearingPayload.getHearingDetails().getPanelRequirements().getRoleTypes()));
 
@@ -235,7 +235,7 @@ public class HearingsService {
         try {
             Consumer<SscsCaseDetails> caseDataMutator = hearingServiceConsumer
                     .getCreateHearingCaseDetailsConsumerV2(
-                            wrapper.getCaseData().getPanelMemberComposition(),
+                            wrapper.getCaseData().getPanelComposition(),
                             response, hearingRequestId, HearingState.UPDATE_HEARING.equals(wrapper.getHearingState())
                     );
 
