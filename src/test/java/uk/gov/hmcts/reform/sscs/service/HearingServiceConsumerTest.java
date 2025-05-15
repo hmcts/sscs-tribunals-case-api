@@ -178,7 +178,7 @@ public class HearingServiceConsumerTest {
         given(venueService.getEpimsIdForVenue(PROCESSING_VENUE)).willReturn("219164");
 
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
-        var panelMemberComposition = PanelMemberComposition.builder().panelCompJudge("58").build();
+        var panelMemberComposition = PanelMemberComposition.builder().panelCompositionJudge("58").build();
 
         Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = hearingServiceConsumer
                 .getCreateHearingCaseDetailsConsumerV2(

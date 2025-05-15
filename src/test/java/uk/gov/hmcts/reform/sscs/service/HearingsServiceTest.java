@@ -216,7 +216,7 @@ class HearingsServiceTest {
         HearingEvent hearingEvent = HearingEvent.ADJOURN_CREATE_HEARING;
         wrapper.setHearingState(ADJOURN_CREATE_HEARING);
         wrapper.setEventId(hearingEvent.getEventType().getCcdType());
-        var panelComposition = PanelMemberComposition.builder().panelCompJudge("58").build();
+        var panelComposition = PanelMemberComposition.builder().panelCompositionJudge("58").build();
         when(hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(
                 eq(panelComposition), any(), any(), anyBoolean())
         ).thenReturn(sscsCaseDetailsConsumer);
