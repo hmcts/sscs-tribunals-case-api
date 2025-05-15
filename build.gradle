@@ -1,7 +1,7 @@
 plugins {
     id 'application'
     id 'pmd'
-    id 'org.sonarqube' version '6.1.0.5360'
+    id 'org.sonarqube' version '6.2.0.5505'
     id 'jacoco'
     id 'org.springframework.boot' version '3.4.5'
     id 'uk.gov.hmcts.java' version '0.12.66'
@@ -502,7 +502,7 @@ dependencies {
     implementation group: 'com.github.everit-org.json-schema', name: 'org.everit.json.schema', version: '1.14.4'
     implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
     testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-assertj', version: '4.1.0'
-    testImplementation group: 'org.pitest', name: 'pitest', version: '1.19.2'
+    testImplementation group: 'org.pitest', name: 'pitest', version: '1.19.3'
     testImplementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: pitest.pitestVersion.get()
     testImplementation group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: '0.5'
     testImplementation group: 'com.typesafe', name: 'config', version: '1.4.3'
