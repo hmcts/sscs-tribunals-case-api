@@ -2,9 +2,12 @@ package uk.gov.hmcts.reform.sscs.helper.mapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
 import static org.junit.jupiter.params.provider.EnumSource.Mode.INCLUDE;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
@@ -18,6 +21,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTime;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
@@ -378,6 +382,27 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
         boolean result = hearingsAutoListMapping.hasMqpmOrFqpm(caseData, refData);
 
         assertThat(result).isFalse();
+    }
+
+    @DisplayName("hasMqpmOrFqpm should return true when default panel comp is enabled and case has medical member")
+    @Test
+    void hasDqpmOrFqpmWithDefaultPanelCompEnabledShouldReturnTrue() throws ListingException {
+
+        ReflectionTestUtils.setField(hearingsAutoListMapping, "defaultPanelCompEnabled", true);
+        when(panelCategoryService.getRoleTypes(eq(caseData))).thenReturn(List.of("58"));
+        boolean result = hearingsAutoListMapping.hasMqpmOrFqpm(caseData, refData);
+
+        assertThat(result).isTrue();
+    }
+
+    @DisplayName("hasMqpmOrFqpm should return false when default panel comp is enabled and case has no roleTypes")
+    @Test
+    void hasDqpmOrFqpmDefaultPanelCompEnabledShouldReturnFalse() throws ListingException {
+
+        ReflectionTestUtils.setField(hearingsAutoListMapping, "defaultPanelCompEnabled", true);
+        when(panelCategoryService.getRoleTypes(eq(caseData))).thenReturn(null);
+        ListingException ex = assertThrows(ListingException.class, () -> hearingsAutoListMapping.hasMqpmOrFqpm(caseData, refData));
+        assertThat(ex).hasMessage("Incorrect benefit/issue code combination");
     }
 
     @DisplayName("When dwpIsOfficerAttending is yes, isPoOfficerAttending return True")
