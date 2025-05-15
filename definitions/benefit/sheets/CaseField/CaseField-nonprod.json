@@ -1,4 +1,4 @@
 [
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "functionalTest", "Label": "From functional test", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "11/04/2025", "CaseTypeID": "Benefit", "ID": "panelComposition", "Label": "Panel Member Composition", "FieldType": "panelComposition", "SecurityClassification": "PUBLIC"}
+  {"LiveFrom": "11/04/2025", "CaseTypeID": "Benefit", "ID": "panelMemberComposition", "Label": "Panel Member Composition", "FieldType": "panelMemberComposition", "SecurityClassification": "PUBLIC"}
 ]
