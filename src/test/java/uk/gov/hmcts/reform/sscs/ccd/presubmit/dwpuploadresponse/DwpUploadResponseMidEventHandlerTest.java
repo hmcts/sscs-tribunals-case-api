@@ -24,6 +24,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -170,5 +171,33 @@ public class DwpUploadResponseMidEventHandlerTest {
 
         assertEquals(1, response.getErrors().size());
         assertTrue(response.getErrors().contains("Please choose a valid benefit code"));
+    }
+
+    @Test
+    public void shouldReturnNoErrorIfBenefitIssueCodeIsValid() {
+        ReflectionTestUtils.setField(handler, "defaultPanelCompEnabled", true);
+        when(panelCategoryService.getPanelCategoryFromCaseData(any())).thenReturn(new PanelCategory());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors(), is(empty()));
+
+    }
+
+    @Test
+    public void shouldReturnErrorIfBenefitIssueCodeIsNotInUse() {
+        ReflectionTestUtils.setField(handler, "defaultPanelCompEnabled", true);
+        when(panelCategoryService.getPanelCategoryFromCaseData(any())).thenReturn(new PanelCategory());
+        sscsCaseData.setBenefitCode("032");
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        assertEquals(1, response.getErrors().size());
+        assertTrue(response.getErrors().contains("The benefit code selected is not in use"));
+    }
+
+    @Test
+    public void shouldReturnErrorIfBenefitIssueCodeIsInvalid() {
+        ReflectionTestUtils.setField(handler, "defaultPanelCompEnabled", true);
+        when(panelCategoryService.getPanelCategoryFromCaseData(any())).thenReturn(null);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        assertEquals(1, response.getErrors().size());
+        assertTrue(response.getErrors().contains("Incorrect benefit/issue code combination"));
     }
 }
