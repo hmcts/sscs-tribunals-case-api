@@ -238,7 +238,7 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
             .build();
         PanelCategory panelCategory = new PanelCategory();
         panelCategory.setCategory("6");
-        when(panelCategoryService.getPanelCategory(any(), any(), any())).thenReturn(panelCategory);
+        when(panelCategoryService.getPanelCategoryFromCaseData(any())).thenReturn(panelCategory);
 
         List<String> result = hearingsPanelMapping.getPanelSpecialisms(caseData, sessionCategoryMap);
 
@@ -268,7 +268,7 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
             .build();
         PanelCategory panelCategory = new PanelCategory();
         panelCategory.setCategory("5");
-        when(panelCategoryService.getPanelCategory(any(), any(), any())).thenReturn(panelCategory);
+        when(panelCategoryService.getPanelCategoryFromCaseData(any())).thenReturn(panelCategory);
 
         List<String> result = hearingsPanelMapping.getPanelSpecialisms(caseData, sessionCategoryMap);
 
@@ -295,7 +295,7 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
             .build();
         PanelCategory panelCategory = new PanelCategory();
         panelCategory.setCategory("5");
-        when(panelCategoryService.getPanelCategory(any(), any(), any())).thenReturn(panelCategory);
+        when(panelCategoryService.getPanelCategoryFromCaseData(any())).thenReturn(panelCategory);
         List<String> result = hearingsPanelMapping.getPanelSpecialisms(caseData, sessionCategoryMap);
 
         List<String> expectedList = Collections.emptyList();

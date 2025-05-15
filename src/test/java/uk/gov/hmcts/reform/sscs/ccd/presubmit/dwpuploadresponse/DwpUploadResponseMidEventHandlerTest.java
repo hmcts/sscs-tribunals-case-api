@@ -119,7 +119,7 @@ public class DwpUploadResponseMidEventHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("childSupportConfidentiality");
         callback.getCaseDetails().getCaseData().setAppendix12Doc(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("b.pdf").documentFilename("b.pdf").build()).build());
         callback.getCaseDetails().getCaseData().getAppendix12Doc().setDocumentLink(DocumentLink.builder().documentUrl("b.pdf").documentFilename("b.pdf").build());
-        when(panelCategoryService.getPanelCategory(any(), any(), any())).thenReturn(new PanelCategory());
+        when(panelCategoryService.getPanelCategoryFromCaseData(any())).thenReturn(new PanelCategory());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -136,7 +136,7 @@ public class DwpUploadResponseMidEventHandlerTest {
 
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("childSupportConfidentiality");
         callback.getCaseDetails().getCaseData().setAppendix12Doc(null);
-        when(panelCategoryService.getPanelCategory(any(), any(), any())).thenReturn(new PanelCategory());
+        when(panelCategoryService.getPanelCategoryFromCaseData(any())).thenReturn(new PanelCategory());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -154,7 +154,7 @@ public class DwpUploadResponseMidEventHandlerTest {
                 .build();
 
         when(callback.getCaseDetails().getCaseData()).thenReturn(sscsCaseData);
-        when(panelCategoryService.getPanelCategory(any(), any(), any())).thenReturn(new PanelCategory());
+        when(panelCategoryService.getPanelCategoryFromCaseData(any())).thenReturn(new PanelCategory());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
         assertEquals(1, response.getErrors().size());
         assertEquals("Please provide other party details", response.getErrors().toArray()[0]);
@@ -164,7 +164,7 @@ public class DwpUploadResponseMidEventHandlerTest {
     public void shouldReturnErrorIfIbcaBenefitCodeSelectedByNonIbcaCase() {
         callback.getCaseDetails().getCaseData().setIssueCode("CE");
         callback.getCaseDetails().getCaseData().setBenefitCode(IBCA_BENEFIT_CODE);
-        when(panelCategoryService.getPanelCategory(any(), any(), any())).thenReturn(new PanelCategory());
+        when(panelCategoryService.getPanelCategoryFromCaseData(any())).thenReturn(new PanelCategory());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
