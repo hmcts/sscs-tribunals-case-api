@@ -239,11 +239,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private void validateBenefitIssueCode(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         if (defaultPanelCompEnabled) {
-            String specialismCount = caseData.getSscsIndustrialInjuriesData().getPanelDoctorSpecialism() != null
-                    ? caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism() != null
-                    ? "2" : "1" : null;
-            String isFqpm = isYes(caseData.getIsFqpmRequired()) ? "true" : null;
-            if (isNull(panelCategoryService.getPanelCategory(caseData.getBenefitCode() + caseData.getIssueCode(), specialismCount, isFqpm))) {
+            if (isNull(panelCategoryService.getPanelCategoryFromCaseData(caseData))) {
                 response.addError("Incorrect benefit/issue code combination");
             }
         } else {

@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isSscs2Case;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.BENEFIT_CODE_NOT_IN_USE;
@@ -103,12 +102,7 @@ public class DwpUploadResponseMidEventHandler implements PreSubmitCallbackHandle
         if (isNull(Benefit.getBenefitFromBenefitCode(sscsCaseData.getBenefitCode()))) {
             preSubmitCallbackResponse.addError(BENEFIT_CODE_NOT_IN_USE);
         }
-        String specialismCount = sscsCaseData.getSscsIndustrialInjuriesData().getPanelDoctorSpecialism() != null
-                ? sscsCaseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism() != null
-                ? "2" : "1" : null;
-        String isFqpm = isYes(sscsCaseData.getIsFqpmRequired()) ? "true" : null;
-        if (isNull(panelCategoryService.getPanelCategory(sscsCaseData.getBenefitCode() +  sscsCaseData.getIssueCode(),
-                specialismCount, isFqpm))) {
+        if (isNull(panelCategoryService.getPanelCategoryFromCaseData(sscsCaseData))) {
             preSubmitCallbackResponse.addError(INVALID_BENEFIT_ISSUE_CODE);
         }
 
