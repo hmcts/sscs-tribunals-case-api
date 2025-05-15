@@ -3,11 +3,15 @@ package uk.gov.hmcts.reform.sscs.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willAnswer;
+import static org.mockito.Mockito.doThrow;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -19,26 +23,11 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseManagementLocation;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Issue;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SessionCategory;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.exception.ListingException;
+import uk.gov.hmcts.reform.sscs.helper.mapping.OverridesMapping;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HmcUpdateResponse;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
-import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
@@ -67,6 +56,9 @@ public class HearingServiceConsumerTest {
 
     @Mock
     private ReferenceDataServiceHolder refData;
+
+    @Mock
+    private OverridesMapping overridesMapping;
 
     @InjectMocks
     private HearingServiceConsumer hearingServiceConsumer;
@@ -101,26 +93,21 @@ public class HearingServiceConsumerTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    public void testCreateHearingCaseDetailsConsumer(boolean adjournmentFlagEnabled) {
+    public void testCreateHearingCaseDetailsConsumer(boolean adjournmentFlagEnabled) throws ListingException {
         setupResponse();
         given(refData.isAdjournmentFlagEnabled()).willReturn(adjournmentFlagEnabled);
-        given(sessionCategoryMaps.getSessionCategory(
-            BENEFIT_CODE,
-            ISSUE_CODE,
-            false,
-            false
-        )).willReturn(new SessionCategoryMap(
-            BenefitCode.PIP_NEW_CLAIM,
-            Issue.DD,
-            false,
-            false,
-            SessionCategory.CATEGORY_03,
-            null
-        ));
-        given(refData.getHearingDurations()).willReturn(hearingDurations);
-        given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
-        given(refData.getVenueService()).willReturn(venueService);
-        given(venueService.getEpimsIdForVenue(PROCESSING_VENUE)).willReturn("219164");
+        willAnswer(invocation -> {
+            SscsCaseData sscsCaseData = (SscsCaseData) invocation.getArguments()[0];
+            sscsCaseData.getSchedulingAndListingFields()
+                    .setDefaultListingValues(OverrideFields.builder()
+                            .autoList(NO)
+                            .hearingWindow(HearingWindow.builder().dateRangeStart(LocalDate.now()).build())
+                            .appellantHearingChannel(HearingChannel.FACE_TO_FACE)
+                            .appellantInterpreter(HearingInterpreter.builder().isInterpreterWanted(NO).build())
+                            .hearingVenueEpimsIds(List.of(CcdValue.<CcdValue<String>>builder().value(CcdValue.<String>builder().value("219164").build()).build()))
+                            .duration(0).build());
+            return sscsCaseData;
+        }).given(overridesMapping).setDefaultListingValues(eq(caseData), eq(refData));
 
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
 
@@ -157,29 +144,23 @@ public class HearingServiceConsumerTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    public void testCreateHearingCaseDetailsConsumerWithAdjournmentFlagEnabled(boolean adjournmentInProgress) {
+    public void testCreateHearingCaseDetailsConsumerWithAdjournmentFlagEnabled(boolean adjournmentInProgress) throws ListingException {
         setupResponse();
         given(refData.isAdjournmentFlagEnabled()).willReturn(true);
-        given(sessionCategoryMaps.getSessionCategory(
-            BENEFIT_CODE,
-            ISSUE_CODE,
-            false,
-            false
-        )).willReturn(new SessionCategoryMap(
-            BenefitCode.PIP_NEW_CLAIM,
-            Issue.DD,
-            false,
-            false,
-            SessionCategory.CATEGORY_03,
-            null
-        ));
-        given(refData.getHearingDurations()).willReturn(hearingDurations);
-        given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
-        given(refData.getVenueService()).willReturn(venueService);
-        given(venueService.getEpimsIdForVenue(PROCESSING_VENUE)).willReturn("219164");
+        willAnswer(invocation -> {
+            SscsCaseData sscsCaseData = (SscsCaseData) invocation.getArguments()[0];
+            sscsCaseData.getSchedulingAndListingFields()
+                    .setDefaultListingValues(OverrideFields.builder()
+                            .autoList(NO)
+                            .hearingWindow(HearingWindow.builder().dateRangeStart(LocalDate.now()).build())
+                            .appellantHearingChannel(HearingChannel.FACE_TO_FACE)
+                            .appellantInterpreter(HearingInterpreter.builder().isInterpreterWanted(NO).build())
+                            .hearingVenueEpimsIds(List.of(CcdValue.<CcdValue<String>>builder().value(CcdValue.<String>builder().value("219164").build()).build()))
+                            .duration(0).build());
+            return sscsCaseData;
+        }).given(overridesMapping).setDefaultListingValues(eq(caseData), eq(refData));
 
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
-
         Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(
             response,
             HEARING_REQUEST_ID,
@@ -212,10 +193,9 @@ public class HearingServiceConsumerTest {
     }
 
     @Test
-    public void testCreateHearingCaseDetailsConsumerWithListingExceptionMessage() {
-        given(refData.getHearingDurations()).willReturn(hearingDurations);
-        given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
-
+    public void testCreateHearingCaseDetailsConsumerWithListingExceptionMessage() throws ListingException {
+        doThrow(new ListingException("Incorrect benefit/issue code combination"))
+                .when(overridesMapping).setDefaultListingValues(eq(caseData), eq(refData));
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
 
         Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(
@@ -296,24 +276,6 @@ public class HearingServiceConsumerTest {
         caseData.setHearings(new ArrayList<>());
         caseData.getHearings().add(Hearing.builder().value(HearingDetails.builder().hearingId(String.valueOf(HEARING_REQUEST_ID)).build()).build());
         given(refData.isAdjournmentFlagEnabled()).willReturn(false);
-        given(sessionCategoryMaps.getSessionCategory(
-                BENEFIT_CODE,
-                ISSUE_CODE,
-                false,
-                false
-        )).willReturn(new SessionCategoryMap(
-                BenefitCode.PIP_NEW_CLAIM,
-                Issue.DD,
-                false,
-                false,
-                SessionCategory.CATEGORY_03,
-                null
-        ));
-        given(refData.getHearingDurations()).willReturn(hearingDurations);
-        given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
-        given(refData.getVenueService()).willReturn(venueService);
-        given(venueService.getEpimsIdForVenue(PROCESSING_VENUE)).willReturn("219164");
-        given(hearingDurations.getHearingDurationBenefitIssueCodes(caseData)).willReturn(90);
         Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(
                 response,
                 HEARING_REQUEST_ID,
