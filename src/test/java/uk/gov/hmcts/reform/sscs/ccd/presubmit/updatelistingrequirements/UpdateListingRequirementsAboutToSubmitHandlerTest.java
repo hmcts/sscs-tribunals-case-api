@@ -110,7 +110,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @Test
     void givenReservedDistrictTribunalJudgeIsYesAndReservedJudgeIsNotNull_responseReservedJudgeAndPanelCompositionJudgeAreNull() {
-        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompJudge("84").panelCompMedical1("NoMedicalMemberRequired").build());
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").panelCompositionMemberMedical1("NoMedicalMemberRequired").build());
         ReserveTo reserveTo = new ReserveTo();
         reserveTo.setReservedDistrictTribunalJudge(YES);
         reserveTo.setReservedJudge(new JudicialUserBase("1", "2"));
@@ -124,13 +124,13 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         assertThat(response.getErrors()).isEmpty();
         JudicialUserBase result = response.getData().getSchedulingAndListingFields().getReserveTo().getReservedJudge();
         assertThat(result).isNull();
-        assertThat(response.getData().getPanelMemberComposition().getPanelCompJudge()).isNull();
+        assertThat(response.getData().getPanelMemberComposition().getPanelCompositionJudge()).isNull();
     }
 
     @Test
     void givenNoMedicalMemberRequiredSelected_thenClearMedicalMemberFields() {
-        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompJudge("84")
-                .panelCompMedical1("NoMedicalMemberRequired").panelCompMedical2("58").build());
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84")
+                .panelCompositionMemberMedical1("NoMedicalMemberRequired").panelCompositionMemberMedical2("58").build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
                 ABOUT_TO_SUBMIT,
@@ -138,8 +138,8 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
                 USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
-        assertThat(response.getData().getPanelMemberComposition().getPanelCompMedical1()).isNull();
-        assertThat(response.getData().getPanelMemberComposition().getPanelCompMedical2()).isNull();
+        assertThat(response.getData().getPanelMemberComposition().getPanelCompositionMemberMedical1()).isNull();
+        assertThat(response.getData().getPanelMemberComposition().getPanelCompositionMemberMedical2()).isNull();
     }
 
     @Test

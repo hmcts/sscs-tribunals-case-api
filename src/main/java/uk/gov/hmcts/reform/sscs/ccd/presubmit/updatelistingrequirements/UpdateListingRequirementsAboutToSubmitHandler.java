@@ -58,15 +58,15 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             if (isYes(callbackReservedDtj)) {
                 caseDataReserveTo.setReservedJudge(null);
                 if (isDefaultPanelCompEnabled && callbackResponse.getData().getPanelMemberComposition() != null) {
-                    callbackResponse.getData().getPanelMemberComposition().setPanelCompJudge(null);
+                    callbackResponse.getData().getPanelMemberComposition().setPanelCompositionJudge(null);
                 }
             }
         }
 
         if (isDefaultPanelCompEnabled && callbackResponse.getData().getPanelMemberComposition() != null
-                && "NoMedicalMemberRequired".equals(callbackResponse.getData().getPanelMemberComposition().getPanelCompMedical1())) {
-            callbackResponse.getData().getPanelMemberComposition().setPanelCompMedical1(null);
-            callbackResponse.getData().getPanelMemberComposition().setPanelCompMedical2(null);
+                && "NoMedicalMemberRequired".equals(callbackResponse.getData().getPanelMemberComposition().getPanelCompositionMemberMedical1())) {
+            callbackResponse.getData().getPanelMemberComposition().setPanelCompositionMemberMedical1(null);
+            callbackResponse.getData().getPanelMemberComposition().setPanelCompositionMemberMedical2(null);
         }
 
         OverrideFields overrideFields = caseDataSnlFields.getOverrideFields();

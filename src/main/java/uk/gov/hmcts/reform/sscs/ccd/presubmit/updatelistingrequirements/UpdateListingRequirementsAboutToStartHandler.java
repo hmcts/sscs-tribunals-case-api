@@ -76,7 +76,7 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
             }
 
             if (isDefaultPanelCompEnabled && sscsCaseData.getPanelMemberComposition() != null
-                    && sscsCaseData.getPanelMemberComposition().getPanelCompJudge() != null) {
+                    && sscsCaseData.getPanelMemberComposition().getPanelCompositionJudge() != null) {
                 if (isNull(schedulingAndListingFields.getReserveTo())) {
                     schedulingAndListingFields.setReserveTo(ReserveTo.builder().build());
                 }
