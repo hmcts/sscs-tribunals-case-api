@@ -83,8 +83,8 @@ public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubm
         if (isDefaultPanelCompEnabled) {
 
             boolean ulrUpdate = callback.getCaseDetailsBefore().isPresent()
-                    && callback.getCaseDetailsBefore().get().getCaseData().getPanelMemberComposition()
-                    != callback.getCaseDetails().getCaseData().getPanelMemberComposition();
+                    && !callback.getCaseDetailsBefore().get().getCaseData().getPanelMemberComposition()
+                    .equals(callback.getCaseDetails().getCaseData().getPanelMemberComposition());
 
             return nonNull(caseDataSnlFields.getOverrideFields()) || ulrUpdate;
         } else {
