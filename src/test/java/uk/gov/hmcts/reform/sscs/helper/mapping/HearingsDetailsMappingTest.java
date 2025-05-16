@@ -81,7 +81,6 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
         VenueDetails.builder().epimsId(EPIMS_ID_4).build());
 
     private SscsCaseData caseData;
-
     private HearingsDetailsMapping hearingsDetailsMapping;
 
     @BeforeEach
