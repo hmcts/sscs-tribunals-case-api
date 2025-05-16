@@ -32,13 +32,13 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
 import uk.gov.hmcts.reform.sscs.service.CcdCaseService;
 import uk.gov.hmcts.reform.sscs.service.HearingsService;
-import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingRequestHandler;
+import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingMessageServiceListener;
 
 @ExtendWith(MockitoExtension.class)
-class HearingRequestHandlerTest {
+class TribunalsHearingsEventTopicListenerTest {
 
     @InjectMocks
-    private HearingRequestHandler hearingRequestHandler;
+    private HearingMessageServiceListener hearingMessageServiceListener;
 
     @Mock
     private HearingsService hearingsService;
@@ -59,7 +59,7 @@ class HearingRequestHandlerTest {
     void whenAValidRequestComesIn_makeSureProcessHearingRequestIsHit() throws Exception {
         HearingRequest hearingRequest = createHearingRequest();
 
-        hearingRequestHandler.handleHearingRequest(hearingRequest);
+        hearingMessageServiceListener.handleIncomingMessage(hearingRequest);
 
         verify(hearingsService, times(1)).processHearingRequest((hearingRequest));
     }
@@ -72,7 +72,7 @@ class HearingRequestHandlerTest {
 
         doThrow(throwable).when(hearingsService).processHearingRequest(hearingRequest);
 
-        assertThrows(TribunalsEventProcessingException.class, () -> hearingRequestHandler.handleHearingRequest(hearingRequest));
+        assertThrows(TribunalsEventProcessingException.class, () -> hearingMessageServiceListener.handleIncomingMessage(hearingRequest));
     }
 
     private static Stream<Arguments> throwableParameters() {
@@ -85,7 +85,7 @@ class HearingRequestHandlerTest {
     @Test
     @DisplayName("When an null request comes in make sure exception is thrown")
     void whenAnNullRequestComesIn_makeSureExceptionIsThrown() {
-        assertThrows(TribunalsEventProcessingException.class, () -> hearingRequestHandler.handleHearingRequest(null));
+        assertThrows(TribunalsEventProcessingException.class, () -> hearingMessageServiceListener.handleIncomingMessage(null));
     }
 
     private HearingRequest createHearingRequest() {
@@ -115,6 +115,6 @@ class HearingRequestHandlerTest {
         )).thenReturn(caseDetails);
 
         verifyNoInteractions(ccdCaseService);
-        assertDoesNotThrow(() -> hearingRequestHandler.handleHearingRequest(hearingRequest));
+        assertDoesNotThrow(() -> hearingMessageServiceListener.handleIncomingMessage(hearingRequest));
     }
 }
