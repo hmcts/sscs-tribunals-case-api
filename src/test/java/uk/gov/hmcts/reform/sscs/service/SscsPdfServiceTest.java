@@ -44,6 +44,8 @@ public class SscsPdfServiceTest {
     @Mock
     ResourceManager resourceManager;
 
+    Boolean isNiPostCodeFeatureEnabled = true;
+
     SscsCaseData caseData = buildCaseData();
 
     ArgumentCaptor<Map> argumentCaptor = ArgumentCaptor.forClass(Map.class);
@@ -51,7 +53,7 @@ public class SscsPdfServiceTest {
     @Before
     public void setup() {
         openMocks(this);
-        service = new SscsPdfService(TEMPLATE_PATH, WELSH_TEMPLATE_PATH, pdfServiceClient, ccdPdfService, resourceManager);
+        service = new SscsPdfService(TEMPLATE_PATH, WELSH_TEMPLATE_PATH, pdfServiceClient, ccdPdfService, resourceManager, isNiPostCodeFeatureEnabled);
     }
 
     @Test
