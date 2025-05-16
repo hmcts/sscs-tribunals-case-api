@@ -34,7 +34,7 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.RelatedParty;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingPriority;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
-import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryService;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
@@ -52,7 +52,8 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
     public static final String APPELLANT_PARTY_ID = "a2b837d5-ee28-4bc9-a3d8-ce2d2de9fb296292997e-14d4-4814-a163-e64018d2c441";
     public static final String REPRESENTATIVE_PARTY_ID = "a2b837d5-ee28-4bc9-a3d8-ce2d2de9fb29";
     public static final String OTHER_PARTY_ID = "4dd6b6fa-6562-4699-8e8b-6c70cf8a333e";
-    private static final SessionCategoryMap sessionCategoryMap = new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
+    private static final SessionCategoryMap sessionCategoryMap =
+            new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
         false, false, SessionCategory.CATEGORY_06, null);
 
     @Mock
@@ -75,13 +76,13 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
     private HearingsPanelMapping hearingsPanelMapping;
 
     @Mock
-    private PanelCategoryService panelCategoryService;
+    private PanelCompositionService panelCompositionService;
 
     private ServiceHearingValuesMapping serviceHearingValuesMapping;
 
     @BeforeEach
     public void setUp() {
-        serviceHearingValuesMapping = new ServiceHearingValuesMapping(hearingsPanelMapping, panelCategoryService);
+        serviceHearingValuesMapping = new ServiceHearingValuesMapping(hearingsPanelMapping, panelCompositionService);
         caseData = SscsCaseData.builder()
             .ccdCaseId("1234")
             .benefitCode(BENEFIT_CODE)

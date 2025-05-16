@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.helper.mapping;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
 
 import java.util.Collections;
 import java.util.List;
@@ -32,15 +31,12 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.MemberType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelPreference;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
-import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryService;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 class HearingsPanelMappingTest extends HearingsMappingBase {
 
-    public static final String JUDGE_ID = "2000";
-    public static final String JUDGE_ROLE_TYPE = "64";
-    public static final String JUDGE_ID_JUDGE_ROLE_TYPE = JUDGE_ID + "|" + JUDGE_ROLE_TYPE;
     public static final String IIDB_BENEFIT_CODE = "067";
     public static final String JUDGE_JOH_CODE = "84";
     @Mock
@@ -50,14 +46,13 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
     private ReferenceDataServiceHolder refData;
 
     @Mock
-    private PanelCategoryService panelCategoryService;
+    private PanelCompositionService panelCompositionService;
 
     private HearingsPanelMapping hearingsPanelMapping;
 
     @BeforeEach
     public void setUp() {
-        openMocks(this);
-        hearingsPanelMapping = new HearingsPanelMapping(panelCategoryService);
+        hearingsPanelMapping = new HearingsPanelMapping(panelCompositionService);
     }
 
     @DisplayName("When no data is given getPanelRequirements returns the valid but empty PanelRequirements")
@@ -84,7 +79,7 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
         caseData.setBenefitCode(IIDB_BENEFIT_CODE);
         when(refData.getSessionCategoryMaps()).thenReturn(sessionCategoryMaps);
         PanelRequirements result = hearingsPanelMapping.getPanelRequirements(caseData, refData);
-        assertThat(result.getRoleTypes()).contains(PanelMemberType.TRIBUNALS_MEMBER_MEDICAL.getReference());
+        assertThat(result.getRoleTypes()).contains(PanelMemberType.TRIBUNAL_MEMBER_MEDICAL.getReference());
     }
 
     @DisplayName("HearingsPanelMapping should call panelCategoryService and return role types when feature flag is enabled")
@@ -92,7 +87,7 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
     void shouldPopulateRoleTypesFromPanelCategoryServiceWhenFeatureFlagIsEnabled() {
         ReflectionTestUtils.setField(hearingsPanelMapping, "defaultPanelCompEnabled", true);
         when(refData.getSessionCategoryMaps()).thenReturn(sessionCategoryMaps);
-        when(panelCategoryService.getRoleTypes(caseData)).thenReturn(List.of(JUDGE_JOH_CODE));
+        when(panelCompositionService.getRoleTypes(caseData)).thenReturn(List.of(JUDGE_JOH_CODE));
         PanelRequirements result = hearingsPanelMapping.getPanelRequirements(caseData, refData);
         assertThat(result.getRoleTypes()).isNotEmpty();
         assertThat(result.getRoleTypes()).contains(JUDGE_JOH_CODE);

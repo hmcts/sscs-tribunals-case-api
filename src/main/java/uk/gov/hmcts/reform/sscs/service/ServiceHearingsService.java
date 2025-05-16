@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.exception.GetCaseException;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
-import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
 import uk.gov.hmcts.reform.sscs.helper.mapping.HearingsCaseMapping;
 import uk.gov.hmcts.reform.sscs.helper.mapping.ServiceHearingValuesMapping;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -48,7 +47,7 @@ public class ServiceHearingsService {
     private final ServiceHearingValuesMapping serviceHearingValuesMapping;
 
     public ServiceHearingValues getServiceHearingValues(ServiceHearingRequest request)
-            throws GetCaseException, UpdateCaseException, ListingException, JsonProcessingException {
+            throws GetCaseException, ListingException, JsonProcessingException {
         SscsCaseDetails caseDetails = ccdCaseService.getCaseDetails(request.getCaseId());
 
         SscsCaseData caseData = caseDetails.getData();
