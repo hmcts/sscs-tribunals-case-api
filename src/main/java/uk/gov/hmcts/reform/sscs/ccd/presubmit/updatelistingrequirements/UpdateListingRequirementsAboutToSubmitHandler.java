@@ -22,8 +22,6 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @Slf4j
 @RequiredArgsConstructor
 public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-    @Value("${feature.gaps-switchover.enabled}")
-    private boolean gapsSwitchOverFeature;
 
     @Value("${feature.default-panel-comp.enabled}")
     private boolean isDefaultPanelCompEnabled;
@@ -65,6 +63,12 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             }
         }
 
+        if (isDefaultPanelCompEnabled && callbackResponse.getData().getPanelMemberComposition() != null
+                && "NoMedicalMemberRequired".equals(callbackResponse.getData().getPanelMemberComposition().getPanelCompositionMemberMedical1())) {
+            callbackResponse.getData().getPanelMemberComposition().setPanelCompositionMemberMedical1(null);
+            callbackResponse.getData().getPanelMemberComposition().setPanelCompositionMemberMedical2(null);
+        }
+
         OverrideFields overrideFields = caseDataSnlFields.getOverrideFields();
 
         if (nonNull(overrideFields)) {
@@ -77,7 +81,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 SscsUtil.updateHearingInterpreter(sscsCaseData, callbackResponse, appellantInterpreter);
             }
         }
-
+      
         sscsCaseData.getAppeal()
             .setHearingOptions(Optional.ofNullable(sscsCaseData.getAppeal().getHearingOptions())
                 .map(HearingOptions::toBuilder)
