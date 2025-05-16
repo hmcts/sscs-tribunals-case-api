@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMember;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberMedicallyQualified;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SessionCategory;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.RequirementType;
@@ -118,7 +119,7 @@ public final class HearingsPanelMapping {
                 .build();
     }
 
-    public static List<String> getPanelSpecialisms(@Valid SscsCaseData caseData, SessionCategoryMap sessionCategoryMap) {
+    public List<String> getPanelSpecialisms(@Valid SscsCaseData caseData, SessionCategoryMap sessionCategoryMap) {
         List<String> panelSpecialisms = new ArrayList<>();
 
         if (isNull(sessionCategoryMap)) {
@@ -131,11 +132,21 @@ public final class HearingsPanelMapping {
 
         String doctorSpecialism = caseData.getSscsIndustrialInjuriesData().getPanelDoctorSpecialism();
         String doctorSpecialismSecond = caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism();
-        panelSpecialisms = sessionCategoryMap.getCategory().getPanelMembers().stream()
-                .map(panelMember -> getPanelMemberSpecialism(panelMember, doctorSpecialism, doctorSpecialismSecond))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-        return panelSpecialisms;
+        if (defaultPanelCompEnabled) {
+            panelSpecialisms = SessionCategory.getSessionCategory(panelCategoryService
+                            .getPanelCategoryFromCaseData(caseData)
+                            .getCategory()).getPanelMembers().stream()
+                    .map(panelMember -> getPanelMemberSpecialism(panelMember, doctorSpecialism, doctorSpecialismSecond))
+                    .filter(Objects::nonNull)
+                    .toList();
+            return panelSpecialisms;
+        } else {
+            panelSpecialisms = sessionCategoryMap.getCategory().getPanelMembers().stream()
+                    .map(panelMember -> getPanelMemberSpecialism(panelMember, doctorSpecialism, doctorSpecialismSecond))
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+            return panelSpecialisms;
+        }
     }
 
     public static String getPanelMemberSpecialism(PanelMember panelMember,

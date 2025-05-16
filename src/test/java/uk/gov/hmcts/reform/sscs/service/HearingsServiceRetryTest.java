@@ -46,6 +46,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
 import uk.gov.hmcts.reform.sscs.helper.mapping.HearingsMapping;
+import uk.gov.hmcts.reform.sscs.helper.mapping.OverridesMapping;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.HearingEvent;
 import uk.gov.hmcts.reform.sscs.model.HearingWrapper;
@@ -105,6 +106,9 @@ class HearingsServiceRetryTest {
 
     @Mock
     private Consumer<SscsCaseData> sscsCaseDataConsumer;
+
+    @MockitoBean
+    private OverridesMapping overridesMapping;
 
     @Autowired
     private HearingsService hearingsService;

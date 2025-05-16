@@ -26,21 +26,27 @@ public final class ServiceHearingValuesMapping {
 
     private final HearingsPanelMapping hearingsPanelMapping;
 
+    private final HearingsAutoListMapping hearingsAutoListMapping;
+
     private final PanelCategoryService panelCategoryService;
+
+    private final HearingsCaseMapping hearingsCaseMapping;
 
     @Value("${feature.default-panel-comp.enabled}")
     private boolean defaultPanelCompEnabled;
 
-    ServiceHearingValuesMapping(HearingsPanelMapping hearingsPanelMapping, PanelCategoryService panelCategoryService) {
+    ServiceHearingValuesMapping(HearingsPanelMapping hearingsPanelMapping, HearingsAutoListMapping hearingsAutoListMapping, PanelCategoryService panelCategoryService, HearingsCaseMapping hearingsCaseMapping) {
         this.hearingsPanelMapping = hearingsPanelMapping;
+        this.hearingsAutoListMapping = hearingsAutoListMapping;
         this.panelCategoryService = panelCategoryService;
+        this.hearingsCaseMapping = hearingsCaseMapping;
     }
 
 
     public ServiceHearingValues mapServiceHearingValues(@Valid SscsCaseData caseData, ReferenceDataServiceHolder refData)
             throws ListingException {
 
-        boolean shouldBeAutoListed = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
+        boolean shouldBeAutoListed = hearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
         int hearingDuration = 0;
         try {
             hearingDuration = HearingsDurationMapping.getHearingDuration(caseData, refData);
@@ -57,7 +63,7 @@ public final class ServiceHearingValuesMapping {
                 .autoListFlag(shouldBeAutoListed)
                 .hearingType(HearingsDetailsMapping.getHearingType(caseData))
                 .caseType(BENEFIT)
-                .caseCategories(HearingsCaseMapping.buildCaseCategories(caseData, refData))
+                .caseCategories(hearingsCaseMapping.buildCaseCategories(caseData, refData))
                 .hearingWindow(HearingsWindowMapping.buildHearingWindow(caseData, refData))
                 .duration(hearingDuration)
                 .hearingPriorityType(HearingsDetailsMapping.getHearingPriority(caseData))
@@ -88,7 +94,7 @@ public final class ServiceHearingValuesMapping {
                 .roleType(defaultPanelCompEnabled ? panelCategoryService.getRoleTypes(sscsCaseData) : findRoleTypesByBenefitCode(sscsCaseData.getBenefitCode()))
                 .authorisationTypes(HearingsPanelMapping.getAuthorisationTypes())
                 .authorisationSubType(HearingsPanelMapping.getAuthorisationSubTypes())
-                .judiciarySpecialisms(HearingsPanelMapping.getPanelSpecialisms(sscsCaseData, getSessionCaseCodeMap(sscsCaseData, refData)))
+                .judiciarySpecialisms(hearingsPanelMapping.getPanelSpecialisms(sscsCaseData, getSessionCaseCodeMap(sscsCaseData, refData)))
                 .judiciaryPreferences(getPanelPreferences())
                 .build();
     }

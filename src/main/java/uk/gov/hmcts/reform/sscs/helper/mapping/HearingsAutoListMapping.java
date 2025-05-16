@@ -4,16 +4,23 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.TRIBUNALS_MEMBER_FINANCIALLY_QUALIFIED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.TRIBUNALS_MEMBER_MEDICAL;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsCaseMapping.shouldBeAdditionalSecurityFlag;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsMapping.getSessionCaseCodeMap;
 import static uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper.checkBenefitIssueCode;
+import static uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper.checkBenefitIssueCodeV2;
 import static uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil.isInterpreterRequired;
 
 import jakarta.validation.Valid;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
@@ -22,16 +29,25 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 import uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil;
 
+@Slf4j
+@Service
 public final class HearingsAutoListMapping {
 
-    private HearingsAutoListMapping() {
+    private final PanelCategoryService panelCategoryService;
 
+    @Value("${feature.default-panel-comp.enabled}")
+    private boolean defaultPanelCompEnabled;
+
+
+    HearingsAutoListMapping(PanelCategoryService panelCategoryService) {
+        this.panelCategoryService = panelCategoryService;
     }
 
-    public static boolean shouldBeAutoListed(@Valid SscsCaseData caseData, ReferenceDataServiceHolder refData)
+    public boolean shouldBeAutoListed(@Valid SscsCaseData caseData, ReferenceDataServiceHolder refData)
         throws ListingException {
 
         OverrideFields overrideFields = OverridesMapping.getOverrideFields(caseData);
@@ -87,13 +103,17 @@ public final class HearingsAutoListMapping {
         return isBlank(caseData.getDwpResponseDate());
     }
 
-    public static boolean hasMqpmOrFqpm(@Valid SscsCaseData caseData, ReferenceDataServiceHolder refData) throws ListingException {
-        SessionCategoryMap sessionCategoryMap = getSessionCaseCodeMap(caseData, refData);
-
-        checkBenefitIssueCode(sessionCategoryMap);
-
-        return sessionCategoryMap.getCategory().getPanelMembers().stream()
-                .anyMatch(HearingsAutoListMapping::isMqpmOrFqpm);
+    public boolean hasMqpmOrFqpm(@Valid SscsCaseData caseData, ReferenceDataServiceHolder refData) throws ListingException {
+        if (defaultPanelCompEnabled) {
+            List<String> johTiers = panelCategoryService.getRoleTypes(caseData);
+            checkBenefitIssueCodeV2(johTiers);
+            return johTiers.contains(TRIBUNALS_MEMBER_MEDICAL.getReference()) || johTiers.contains(TRIBUNALS_MEMBER_FINANCIALLY_QUALIFIED.getReference());
+        } else {
+            SessionCategoryMap sessionCategoryMap = getSessionCaseCodeMap(caseData, refData);
+            checkBenefitIssueCode(sessionCategoryMap);
+            return sessionCategoryMap.getCategory().getPanelMembers().stream()
+                    .anyMatch(HearingsAutoListMapping::isMqpmOrFqpm);
+        }
     }
 
     public static boolean isMqpmOrFqpm(PanelMember panelMember) {
