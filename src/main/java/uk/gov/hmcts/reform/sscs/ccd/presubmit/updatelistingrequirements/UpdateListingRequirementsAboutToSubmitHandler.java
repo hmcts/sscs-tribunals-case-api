@@ -93,7 +93,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 .build());
 
         if (isDefaultPanelCompEnabled) {
-            setFqpmRequired(sscsCaseData);
+            setFqpmRequired(callbackResponse.getData());
         }
 
         return callbackResponse;
@@ -105,10 +105,10 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             .orElseGet(() -> PanelMemberComposition.builder().build());
 
         List<String> disabilityAndFqMember = Optional
-            .ofNullable(panelMemberComposition.getPanelCompDisabilityAndFqm())
+            .ofNullable(panelMemberComposition.getPanelCompositionDisabilityAndFqMember())
             .orElseGet(ArrayList::new);
 
-        String fqpmReference = PanelMemberType.TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED.getReference();
+        String fqpmReference = PanelMemberType.TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED.toRef();
 
         if (disabilityAndFqMember.contains(fqpmReference)) {
             sscsCaseData.setIsFqpmRequired(YES);

@@ -268,8 +268,8 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     @Test
     void givenPanelMemberCompositionHasFqpm_thenIsFqpmRequiredIsYes() {
         sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
-            .panelCompDisabilityAndFqm(List.of(
-                PanelMemberType.TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED.getReference()))
+            .panelCompositionDisabilityAndFqMember(List.of(
+                PanelMemberType.TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED.toRef()))
             .build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
@@ -282,10 +282,10 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenIsFqpmRequiredIsYesAndNoPanelMemberCompositionFqpm_thenUpdateIsFqpmRequiredToNo() {
+    void givenIsFqpmRequiredIsYesAndNoFqpmInPanelMemberComposition_thenUpdateIsFqpmRequiredToNo() {
         sscsCaseData.setIsFqpmRequired(YES);
         sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
-            .panelCompDisabilityAndFqm(Collections.emptyList())
+            .panelCompositionDisabilityAndFqMember(Collections.emptyList())
             .build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
