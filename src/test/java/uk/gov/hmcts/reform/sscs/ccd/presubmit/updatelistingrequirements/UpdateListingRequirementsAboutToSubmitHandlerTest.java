@@ -6,9 +6,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_LISTING_REQUIREMENTS;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.VIDEO;
 
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +34,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReserveTo;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -260,5 +263,37 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
         assertThat(response.getErrors()).isEmpty();
         assertThat(hmcHearingType).isEqualTo(response.getData().getAppeal().getHearingOptions().getHmcHearingType());
+    }
+
+    @Test
+    void givenPanelMemberCompositionHasFqpm_thenIsFqpmRequiredIsYes() {
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
+            .panelCompositionDisabilityAndFqMember(List.of(
+                PanelMemberType.TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED.toRef()))
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getIsFqpmRequired()).isEqualTo(YES);
+    }
+
+    @Test
+    void givenIsFqpmRequiredIsYesAndNoFqpmInPanelMemberComposition_thenUpdateIsFqpmRequiredToNo() {
+        sscsCaseData.setIsFqpmRequired(YES);
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
+            .panelCompositionDisabilityAndFqMember(Collections.emptyList())
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getIsFqpmRequired()).isEqualTo(NO);
     }
 }

@@ -117,6 +117,7 @@ tasks.register('functional', Test) {
     include "uk/gov/hmcts/reform/sscs/controllers/**"
     include "uk/gov/hmcts/reform/sscs/bulkscan/**"
     exclude "uk/gov/hmcts/reform/sscs/smoke/**"
+    jvmArgs = ['-XX:-TieredCompilation', '-XX:+UseSerialGC']
     maxParallelForks = Runtime.runtime.availableProcessors()
 }
 
