@@ -50,6 +50,9 @@ public class SscsUtil {
 
     private static final String ID_FORMAT = "%s_%s";
 
+    public static final String CATEGORY_TYPE_TEMPLATE = "%s-%03d";
+    public static final String CATEGORY_SUBTYPE_TEMPLATE = "%s%s";
+
     private SscsUtil() {
         //
     }
@@ -683,11 +686,11 @@ public class SscsUtil {
     }
 
     public static String getCategoryTypeValue(SscsCaseData sscsCaseData) {
-        return String.format("%s-%03d", "BBA3", BenefitCode.getBenefitCode(sscsCaseData.getBenefitCode()).getCcdReference());
+        return String.format(CATEGORY_TYPE_TEMPLATE, "BBA3", BenefitCode.getBenefitCode(sscsCaseData.getBenefitCode()).getCcdReference());
     }
 
     public static String getCategorySubTypeValue(SscsCaseData sscsCaseData) {
-        return String.format("%s%s", getCategoryTypeValue(sscsCaseData), Issue.valueOf(sscsCaseData.getIssueCode()).name());
+        return String.format(CATEGORY_SUBTYPE_TEMPLATE, getCategoryTypeValue(sscsCaseData), Issue.valueOf(sscsCaseData.getIssueCode()).name());
     }
 
 }

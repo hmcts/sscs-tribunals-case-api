@@ -20,6 +20,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
@@ -368,6 +369,27 @@ class HearingsCaseMappingTest extends HearingsMappingBase {
                 .issueCode(ISSUE_CODE)
                 .build();
 
+        List<CaseCategory> result = hearingsCaseMapping.buildCaseCategories(caseData, refData);
+
+        assertThat(result)
+                .extracting("categoryType", "categoryValue", "categoryParent")
+                .as("Case sub type categories should have a parent set.")
+                .contains(tuple(CASE_TYPE, parentValue, null), tuple(CASE_SUBTYPE, subTypeValue, parentValue));
+    }
+
+
+    @DisplayName("When give a valid benefit code and issue code, and defaultPaanelCompEnabled,"
+            + "buildCaseCategories returns a valid case Category and  case subcategory")
+    @Test
+    void buildCaseCategoriesDefaultPanelCompEnabled() throws ListingException {
+        String parentValue = "BBA3-002";
+        String subTypeValue = "BBA3-002DD";
+
+        SscsCaseData caseData = SscsCaseData.builder()
+                .benefitCode(BENEFIT_CODE)
+                .issueCode(ISSUE_CODE)
+                .build();
+        ReflectionTestUtils.setField(hearingsCaseMapping, "defaultPanelCompEnabled", true);
         List<CaseCategory> result = hearingsCaseMapping.buildCaseCategories(caseData, refData);
 
         assertThat(result)
