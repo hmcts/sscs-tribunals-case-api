@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsCaseMapping.shouldBeAdditionalSecurityFlag;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsMapping.getSessionCaseCodeMap;
 import static uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper.checkBenefitIssueCode;
+import static uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper.checkBenefitIssueCodeV2;
 import static uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil.isInterpreterRequired;
 
 import jakarta.validation.Valid;
@@ -105,22 +106,14 @@ public final class HearingsAutoListMapping {
     public boolean hasMqpmOrFqpm(@Valid SscsCaseData caseData, ReferenceDataServiceHolder refData) throws ListingException {
         if (defaultPanelCompEnabled) {
             List<String> johTiers = panelCategoryService.getRoleTypes(caseData);
-            if (isNull(johTiers)) {
-                log.error("sessionCaseCode is null. The benefit/issue code is probably an incorrect combination"
-                        + " and cannot be mapped to a session code. Refer to the panel-category-map.json file"
-                        + " for the correct combinations.");
-
-                throw new ListingException("Incorrect benefit/issue code combination");
-            }
+            checkBenefitIssueCodeV2(johTiers);
             return johTiers.contains(TRIBUNALS_MEMBER_MEDICAL.getReference()) || johTiers.contains(TRIBUNALS_MEMBER_FINANCIALLY_QUALIFIED.getReference());
+        } else {
+            SessionCategoryMap sessionCategoryMap = getSessionCaseCodeMap(caseData, refData);
+            checkBenefitIssueCode(sessionCategoryMap);
+            return sessionCategoryMap.getCategory().getPanelMembers().stream()
+                    .anyMatch(HearingsAutoListMapping::isMqpmOrFqpm);
         }
-
-        SessionCategoryMap sessionCategoryMap = getSessionCaseCodeMap(caseData, refData);
-
-        checkBenefitIssueCode(sessionCategoryMap);
-
-        return sessionCategoryMap.getCategory().getPanelMembers().stream()
-                .anyMatch(HearingsAutoListMapping::isMqpmOrFqpm);
     }
 
     public static boolean isMqpmOrFqpm(PanelMember panelMember) {

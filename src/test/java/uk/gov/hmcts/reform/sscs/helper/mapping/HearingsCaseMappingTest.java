@@ -13,6 +13,7 @@ import static uk.gov.hmcts.reform.sscs.model.hmc.reference.CaseCategoryType.CASE
 
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -39,6 +40,7 @@ import uk.gov.hmcts.reform.sscs.model.HearingWrapper;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.CaseCategory;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.CaseDetails;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 import uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil;
@@ -49,6 +51,16 @@ class HearingsCaseMappingTest extends HearingsMappingBase {
 
     @Mock
     private ReferenceDataServiceHolder refData;
+
+    @Mock
+    private PanelCategoryService panelCategoryService;
+
+    private HearingsCaseMapping hearingsCaseMapping;
+
+    @BeforeEach
+    void setUp() {
+        hearingsCaseMapping = new HearingsCaseMapping(panelCategoryService);
+    }
 
     @DisplayName("When a valid hearing wrapper is given buildHearingCaseDetails returns the correct Hearing Case Details")
     @Test
@@ -99,7 +111,7 @@ class HearingsCaseMappingTest extends HearingsMappingBase {
             .caseData(caseData)
             .build();
 
-        CaseDetails caseDetails = HearingsCaseMapping.buildHearingCaseDetails(wrapper, refData);
+        CaseDetails caseDetails = hearingsCaseMapping.buildHearingCaseDetails(wrapper, refData);
 
         assertNotNull(caseDetails.getCaseId());
         assertNotNull(caseDetails.getCaseDeepLink());
@@ -356,7 +368,7 @@ class HearingsCaseMappingTest extends HearingsMappingBase {
                 .issueCode(ISSUE_CODE)
                 .build();
 
-        List<CaseCategory> result = HearingsCaseMapping.buildCaseCategories(caseData, refData);
+        List<CaseCategory> result = hearingsCaseMapping.buildCaseCategories(caseData, refData);
 
         assertThat(result)
                 .extracting("categoryType", "categoryValue", "categoryParent")

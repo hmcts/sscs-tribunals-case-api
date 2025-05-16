@@ -30,13 +30,16 @@ public final class ServiceHearingValuesMapping {
 
     private final PanelCategoryService panelCategoryService;
 
+    private final HearingsCaseMapping hearingsCaseMapping;
+
     @Value("${feature.default-panel-comp.enabled}")
     private boolean defaultPanelCompEnabled;
 
-    ServiceHearingValuesMapping(HearingsPanelMapping hearingsPanelMapping, HearingsAutoListMapping hearingsAutoListMapping, PanelCategoryService panelCategoryService) {
+    ServiceHearingValuesMapping(HearingsPanelMapping hearingsPanelMapping, HearingsAutoListMapping hearingsAutoListMapping, PanelCategoryService panelCategoryService, HearingsCaseMapping hearingsCaseMapping) {
         this.hearingsPanelMapping = hearingsPanelMapping;
         this.hearingsAutoListMapping = hearingsAutoListMapping;
         this.panelCategoryService = panelCategoryService;
+        this.hearingsCaseMapping = hearingsCaseMapping;
     }
 
 
@@ -60,7 +63,7 @@ public final class ServiceHearingValuesMapping {
                 .autoListFlag(shouldBeAutoListed)
                 .hearingType(HearingsDetailsMapping.getHearingType(caseData))
                 .caseType(BENEFIT)
-                .caseCategories(HearingsCaseMapping.buildCaseCategories(caseData, refData))
+                .caseCategories(hearingsCaseMapping.buildCaseCategories(caseData, refData))
                 .hearingWindow(HearingsWindowMapping.buildHearingWindow(caseData, refData))
                 .duration(hearingDuration)
                 .hearingPriorityType(HearingsDetailsMapping.getHearingPriority(caseData))
