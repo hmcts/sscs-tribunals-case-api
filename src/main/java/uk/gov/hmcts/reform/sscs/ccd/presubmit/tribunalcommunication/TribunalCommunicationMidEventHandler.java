@@ -65,7 +65,7 @@ public class TribunalCommunicationMidEventHandler implements PreSubmitCallbackHa
             String textValue = communicationFields.getCommRequestResponseTextArea();
             List<String> noAction = communicationFields.getCommRequestResponseNoAction();
             if (StringUtils.isEmpty(textValue) && ObjectUtils.isEmpty(noAction)) {
-                preSubmitErrorCallbackResponse.addError("Please provide a response to the Tribunal query or select No action required.");
+                preSubmitErrorCallbackResponse.addError("Please provide a response to the Tribunal query or select No reply required.");
             }
         }
 
