@@ -4,6 +4,7 @@ import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.*;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
@@ -22,7 +23,7 @@ public class PdfWatermarker {
     private static final float margin = 45f;
 
     public byte[] shrinkAndWatermarkPdf(byte[] input, String leftText, String rightText) throws Exception {
-        try (PDDocument document = PDDocument.load(input)) {
+        try (PDDocument document = Loader.loadPDF(input)) {
             document.setAllSecurityToBeRemoved(true);
             int count = 1;
             for (PDPage page : document.getPages()) {
