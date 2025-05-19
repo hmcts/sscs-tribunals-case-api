@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
 import static org.junit.jupiter.params.provider.EnumSource.Mode.INCLUDE;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
@@ -43,6 +43,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SessionCategory;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
+import uk.gov.hmcts.reform.sscs.reference.data.model.PanelCategory;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryService;
 
@@ -389,7 +390,10 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
     void hasDqpmOrFqpmWithDefaultPanelCompEnabledShouldReturnTrue() throws ListingException {
 
         ReflectionTestUtils.setField(hearingsAutoListMapping, "defaultPanelCompEnabled", true);
-        when(panelCategoryService.getRoleTypes(eq(caseData))).thenReturn(List.of("58"));
+
+        PanelCategory panelCategory = new PanelCategory();
+        panelCategory.setJohTiers(List.of("58"));
+        when(panelCategoryService.getPanelCategoryFromCaseData(any())).thenReturn(panelCategory);
         boolean result = hearingsAutoListMapping.hasMqpmOrFqpm(caseData, refData);
 
         assertThat(result).isTrue();
@@ -400,7 +404,9 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
     void hasDqpmOrFqpmWithDefaultPanelCompEnabledAndFqpmShouldReturnTrue() throws ListingException {
 
         ReflectionTestUtils.setField(hearingsAutoListMapping, "defaultPanelCompEnabled", true);
-        when(panelCategoryService.getRoleTypes(eq(caseData))).thenReturn(List.of("50"));
+        PanelCategory panelCategory = new PanelCategory();
+        panelCategory.setJohTiers(List.of("50"));
+        when(panelCategoryService.getPanelCategoryFromCaseData(any())).thenReturn(panelCategory);
         boolean result = hearingsAutoListMapping.hasMqpmOrFqpm(caseData, refData);
 
         assertThat(result).isTrue();
@@ -411,7 +417,7 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
     void hasDqpmOrFqpmDefaultPanelCompEnabledShouldReturnFalse() throws ListingException {
 
         ReflectionTestUtils.setField(hearingsAutoListMapping, "defaultPanelCompEnabled", true);
-        when(panelCategoryService.getRoleTypes(eq(caseData))).thenReturn(null);
+        when(panelCategoryService.getPanelCategoryFromCaseData(any())).thenReturn(null);
         ListingException ex = assertThrows(ListingException.class, () -> hearingsAutoListMapping.hasMqpmOrFqpm(caseData, refData));
         assertThat(ex).hasMessage("Incorrect benefit/issue code combination");
     }

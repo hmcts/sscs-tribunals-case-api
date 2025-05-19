@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.HearingWrapper;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.CaseCategory;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.CaseDetails;
+import uk.gov.hmcts.reform.sscs.reference.data.model.PanelCategory;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
@@ -96,8 +97,8 @@ public final class HearingsCaseMapping {
         throws ListingException {
         List<CaseCategory> categories = new ArrayList<>();
         if (defaultPanelCompEnabled) {
-            List<String> johTiers = panelCategoryService.getRoleTypes(caseData);
-            checkBenefitIssueCodeV2(johTiers);
+            PanelCategory panelCategory = panelCategoryService.getPanelCategoryFromCaseData(caseData);
+            checkBenefitIssueCodeV2(panelCategory);
             categories.addAll(getCaseTypesV2(caseData));
             categories.addAll(getCaseSubTypesV2(caseData));
         } else {
