@@ -153,7 +153,7 @@ public final class HearingsServiceHelper {
 
     public static void checkBenefitIssueCodeV2(List<String> johTiers) throws ListingException {
         log.info("checkBenefitIssueCodeV2 for {}", johTiers);
-        if (isNull(johTiers)) {
+        if (isNull(johTiers) || johTiers.isEmpty()) {
             log.error("sessionCaseCode is null. The benefit/issue code is probably an incorrect combination"
                     + " and cannot be mapped to a session code. Refer to the panel-category-map.json file"
                     + " for the correct combinations.");
