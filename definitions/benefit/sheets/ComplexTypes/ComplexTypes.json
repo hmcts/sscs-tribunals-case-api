@@ -544,7 +544,6 @@
   {"LiveFrom": "18/10/2024", "ID": "hearingOutcomeValue", "ListElementCode": "hearingOutcomeId", "FieldType": "FixedList", "FieldTypeParameter": "FL_caseOutcome", "ElementLabel": "Hearing Outcome", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/10/2024", "ID": "hearingOutcomeValue", "ListElementCode": "didPoAttendHearing", "FieldType": "YesOrNo", "ElementLabel": "Did PO Attend?", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/10/2024", "ID": "hearingOutcomeValue", "ListElementCode": "completedHearings", "FieldType": "DynamicList", "ElementLabel": "Hearing", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationReply", "ListElementCode": "replyDateTime", "FieldType": "DateTime", "ElementLabel": "Date Of Reply", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationReply", "ListElementCode": "replyUserName", "FieldType": "Text", "ElementLabel": "Reply From Name", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationReply", "ListElementCode": "replyUserRole", "FieldType": "Text", "ElementLabel": "Reply From Role", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationReply", "ListElementCode": "replyMessage", "FieldType": "TextArea", "ElementLabel": "Reply", "SecurityClassification": "PUBLIC"},
