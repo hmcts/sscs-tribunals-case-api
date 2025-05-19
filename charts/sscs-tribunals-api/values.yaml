@@ -166,7 +166,7 @@ am-org-role-mapping-service:
 em-stitching:
   enabled: false
 wa:
-  enabled: false
+  enabled: true
   taskBatchCron:
     enabled: false
   reconfigurationBatchCron:
