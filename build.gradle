@@ -375,8 +375,8 @@ dependencies {
 
 
     implementation group: 'com.mchange', name: 'c3p0', version: '0.10.2'
-    implementation group: 'org.flywaydb', name: 'flyway-core', version: '11.8.1'
-    implementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '11.8.1'
+    implementation group: 'org.flywaydb', name: 'flyway-core', version: '11.8.2'
+    implementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '11.8.2'
 
     implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'd4a7247'
     
@@ -428,7 +428,7 @@ dependencies {
 
     //evidence-share depenedencies
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '8.0.2'
-    implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '5.0.3'
+    implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '5.0.4'
     // Remove this dependency once the secure doc-store is in use
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.8.0'
