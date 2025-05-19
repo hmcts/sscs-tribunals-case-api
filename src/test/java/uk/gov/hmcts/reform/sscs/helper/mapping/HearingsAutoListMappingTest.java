@@ -395,6 +395,17 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
         assertThat(result).isTrue();
     }
 
+    @DisplayName("hasMqpmOrFqpm should return true when default panel comp is enabled and case has fqpm")
+    @Test
+    void hasDqpmOrFqpmWithDefaultPanelCompEnabledAndFqpmShouldReturnTrue() throws ListingException {
+
+        ReflectionTestUtils.setField(hearingsAutoListMapping, "defaultPanelCompEnabled", true);
+        when(panelCategoryService.getRoleTypes(eq(caseData))).thenReturn(List.of("50"));
+        boolean result = hearingsAutoListMapping.hasMqpmOrFqpm(caseData, refData);
+
+        assertThat(result).isTrue();
+    }
+
     @DisplayName("hasMqpmOrFqpm should return false when default panel comp is enabled and case has no roleTypes")
     @Test
     void hasDqpmOrFqpmDefaultPanelCompEnabledShouldReturnFalse() throws ListingException {
