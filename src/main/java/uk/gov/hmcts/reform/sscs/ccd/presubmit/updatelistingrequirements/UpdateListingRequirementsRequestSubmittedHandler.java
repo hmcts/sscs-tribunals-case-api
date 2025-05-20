@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
@@ -16,7 +15,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -85,11 +83,6 @@ public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubm
         if (isDefaultPanelCompEnabled) {
 
             boolean validUlrFieldsUpdated;
-
-//            boolean cechk = isNull(callback.getCaseDetailsBefore().get().getCaseData().getPanelMemberComposition());
-//            PanelMemberComposition panelMemberCompositionBefore = callback.getCaseDetailsBefore().get().getCaseData().getPanelMemberComposition();
-            PanelMemberComposition panelMemberComposition = callback.getCaseDetails().getCaseData().getPanelMemberComposition();
-
 
             if (!callback.getCaseDetailsBefore().isPresent()) {
                 validUlrFieldsUpdated = false;

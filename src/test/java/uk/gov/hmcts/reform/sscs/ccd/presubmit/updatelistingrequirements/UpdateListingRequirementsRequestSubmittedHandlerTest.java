@@ -16,6 +16,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_LISTING_REQUI
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
 
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,8 +36,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
-
-import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 public class UpdateListingRequirementsRequestSubmittedHandlerTest {
@@ -258,16 +257,16 @@ public class UpdateListingRequirementsRequestSubmittedHandlerTest {
 
     @Test
     void whenCaseDetailsBeforePanelCompositionIsNullAndCaseDetailsPanelCompositionIsNotNullThenSendMessage() {
+        sscsCaseData.setCcdCaseId("1234");
+        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").build());
+
         SscsCaseData sscsCaseDataBefore = SscsCaseData.builder()
                 .appeal(Appeal.builder().build())
                 .ccdCaseId("1234")
                 .dwpIsOfficerAttending("Yes")
                 .panelMemberComposition(null)
                 .build();
-
-        sscsCaseData.setCcdCaseId("1234");
-        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
-        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").build());
 
         Optional<CaseDetails<SscsCaseData>> caseDetailsBefore =
                 Optional.of(new CaseDetails<>(1234L, "SSCS", State.READY_TO_LIST, sscsCaseDataBefore, now(), "Benefit"));
