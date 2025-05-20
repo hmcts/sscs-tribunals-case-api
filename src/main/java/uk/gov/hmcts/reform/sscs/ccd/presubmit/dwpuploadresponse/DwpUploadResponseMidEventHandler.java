@@ -98,11 +98,11 @@ public class DwpUploadResponseMidEventHandler implements PreSubmitCallbackHandle
         }
     }
 
-    private void validateBenefitIssueCodeV2(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if (isNull(Benefit.getBenefitFromBenefitCode(sscsCaseData.getBenefitCode()))) {
+    private void validateBenefitIssueCodeV2(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        if (isNull(Benefit.getBenefitFromBenefitCode(caseData.getBenefitCode()))) {
             preSubmitCallbackResponse.addError(BENEFIT_CODE_NOT_IN_USE);
         }
-        if (isNull(panelCategoryService.getPanelCategoryFromCaseData(sscsCaseData))) {
+        if (!panelCategoryService.isBenefitIssueCodeValid(caseData.getBenefitCode() + caseData.getIssueCode())) {
             preSubmitCallbackResponse.addError(INVALID_BENEFIT_ISSUE_CODE);
         }
 

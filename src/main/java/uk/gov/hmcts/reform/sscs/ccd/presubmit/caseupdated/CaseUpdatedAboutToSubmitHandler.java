@@ -243,7 +243,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private void validateBenefitIssueCode(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         if (defaultPanelCompEnabled) {
-            if (isNull(panelCategoryService.getPanelCategoryFromCaseData(caseData))) {
+            if (!panelCategoryService.isBenefitIssueCodeValid(caseData.getBenefitCode() + caseData.getIssueCode())) {
                 response.addError("Incorrect benefit/issue code combination");
             }
         } else {
