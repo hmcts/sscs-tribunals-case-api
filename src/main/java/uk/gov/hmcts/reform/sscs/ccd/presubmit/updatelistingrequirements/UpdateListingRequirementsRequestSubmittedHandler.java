@@ -82,22 +82,22 @@ public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubm
     private boolean shouldSendMessage(Callback<SscsCaseData> callback, SchedulingAndListingFields caseDataSnlFields) {
         if (isDefaultPanelCompEnabled) {
 
-            boolean validUlrFieldsUpdated;
+            boolean panelMemberCompositionUpdated;
 
             if (!callback.getCaseDetailsBefore().isPresent()) {
-                validUlrFieldsUpdated = false;
+                panelMemberCompositionUpdated = false;
             } else if (!nonNull(callback.getCaseDetailsBefore().get().getCaseData().getPanelMemberComposition())
                     && nonNull(callback.getCaseDetails().getCaseData().getPanelMemberComposition())) {
-                validUlrFieldsUpdated = true;
+                panelMemberCompositionUpdated = true;
             } else if (nonNull(callback.getCaseDetailsBefore().get().getCaseData().getPanelMemberComposition())
                     && !callback.getCaseDetailsBefore().get().getCaseData().getPanelMemberComposition()
                     .equals(callback.getCaseDetails().getCaseData().getPanelMemberComposition())) {
-                validUlrFieldsUpdated = true;
+                panelMemberCompositionUpdated = true;
             } else {
-                validUlrFieldsUpdated = false;
+                panelMemberCompositionUpdated = false;
             }
 
-            return nonNull(caseDataSnlFields.getOverrideFields()) || validUlrFieldsUpdated;
+            return nonNull(caseDataSnlFields.getOverrideFields()) || panelMemberCompositionUpdated;
         } else {
             return nonNull(caseDataSnlFields.getOverrideFields());
         }
