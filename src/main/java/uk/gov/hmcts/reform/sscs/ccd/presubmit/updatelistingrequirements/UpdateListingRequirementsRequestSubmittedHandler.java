@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
@@ -82,19 +83,19 @@ public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubm
     private boolean shouldSendMessage(Callback<SscsCaseData> callback, SchedulingAndListingFields caseDataSnlFields) {
         if (isDefaultPanelCompEnabled) {
 
-            boolean panelMemberCompositionUpdated;
+            CaseDetails<SscsCaseData> caseDetailsBefore = callback.getCaseDetailsBefore().orElse(null);
 
-            if (!callback.getCaseDetailsBefore().isPresent()) {
-                panelMemberCompositionUpdated = false;
-            } else if (!nonNull(callback.getCaseDetailsBefore().get().getCaseData().getPanelMemberComposition())
+            boolean panelMemberCompositionUpdated = false;
+
+            if (nonNull(caseDetailsBefore)
+                    && !nonNull(caseDetailsBefore.getCaseData().getPanelMemberComposition())
                     && nonNull(callback.getCaseDetails().getCaseData().getPanelMemberComposition())) {
                 panelMemberCompositionUpdated = true;
-            } else if (nonNull(callback.getCaseDetailsBefore().get().getCaseData().getPanelMemberComposition())
+            } else if (nonNull(caseDetailsBefore)
+                    && nonNull(caseDetailsBefore.getCaseData().getPanelMemberComposition())
                     && !callback.getCaseDetailsBefore().get().getCaseData().getPanelMemberComposition()
                     .equals(callback.getCaseDetails().getCaseData().getPanelMemberComposition())) {
                 panelMemberCompositionUpdated = true;
-            } else {
-                panelMemberCompositionUpdated = false;
             }
 
             return nonNull(caseDataSnlFields.getOverrideFields()) || panelMemberCompositionUpdated;
