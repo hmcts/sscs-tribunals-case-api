@@ -1,4 +1,5 @@
 [
   {"LiveFrom": "01/01/2018", "ID": "address", "ListElementCode": "inMainlandUk", "FieldType": "YesOrNo", "ElementLabel": "Living in England, Scotland or Wales", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestReply", "FieldType": "ftaCommunicationReply", "ElementLabel": "Reply", "SecurityClassification": "PUBLIC"}
+  {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestReply", "FieldType": "ftaCommunicationReply", "ElementLabel": "Reply", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationReply", "ListElementCode": "replyDateTime", "FieldType": "DateTime", "ElementLabel": "Date Of Reply", "SecurityClassification": "PUBLIC"}
 ]
