@@ -153,7 +153,6 @@ public final class HearingsServiceHelper {
     }
 
     public static void checkBenefitIssueCodeV2(PanelCategory panelCategory) throws ListingException {
-        log.info("checkBenefitIssueCodeV2 for {}", panelCategory);
         if (isNull(panelCategory)) {
             log.error("sessionCaseCode is null. The benefit/issue code is probably an incorrect combination"
                     + " and cannot be mapped to a session code. Refer to the panel-category-map.json file"
