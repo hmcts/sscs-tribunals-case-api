@@ -7,7 +7,7 @@ maintainers:
   - name: HMCTS SSCS Team
 dependencies:
   - name: postgresql
-    version: 1.1.0g
+    version: 1.1.0
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: postgresql.enabled
   - name: java
