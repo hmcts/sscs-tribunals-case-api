@@ -30,10 +30,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
+
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 public class UpdateListingRequirementsRequestSubmittedHandlerTest {
@@ -80,7 +83,7 @@ public class UpdateListingRequirementsRequestSubmittedHandlerTest {
     }
 
     @Test
-    void handleUpdateListingRequirementsSendSuccessful() {
+    void handleUpdateListingRequirementsSendSuccessfulWithOverrideFields() {
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
         sscsCaseData.setCcdCaseId("1234");
@@ -99,6 +102,44 @@ public class UpdateListingRequirementsRequestSubmittedHandlerTest {
         assertThat(response.getData()).isNotNull();
         SscsCaseData caseData = response.getData();
         assertThat(UPDATE_HEARING).isEqualTo(caseData.getSchedulingAndListingFields().getHearingState());
+        verify(listAssistHearingMessageHelper, times(1)).sendHearingMessage(
+                anyString(), any(HearingRoute.class), any(HearingState.class), eq(null));
+    }
+
+    @Test
+    void handleUpdateListingRequirementsSendSuccessfulWithPanelComposition() {
+        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").panelCompositionMemberMedical1("58").build());
+        sscsCaseData.setCcdCaseId("1234");
+
+        SscsCaseData sscsCaseDataBefore = SscsCaseData.builder()
+                .appeal(Appeal.builder().build())
+                .ccdCaseId("1234")
+                .dwpIsOfficerAttending("Yes")
+                .panelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").build())
+                .build();
+
+        Optional<CaseDetails<SscsCaseData>> caseDetailsBefore =
+                Optional.of(new CaseDetails<>(1234L, "SSCS", State.READY_TO_LIST, sscsCaseDataBefore, now(), "Benefit"));
+
+        given(listAssistHearingMessageHelper.sendHearingMessage(
+                anyString(), any(HearingRoute.class), any(HearingState.class), eq(null)))
+                .willReturn(true);
+
+        callback = new Callback<>(caseDetails, caseDetailsBefore, UPDATE_LISTING_REQUIREMENTS, false);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+                SUBMITTED,
+                callback,
+                USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+
+        assertThat(response.getData()).isNotNull();
+        SscsCaseData caseData = response.getData();
+        assertThat(UPDATE_HEARING).isEqualTo(caseData.getSchedulingAndListingFields().getHearingState());
+        verify(listAssistHearingMessageHelper, times(1)).sendHearingMessage(
+                anyString(), any(HearingRoute.class), any(HearingState.class), eq(null));
     }
 
     @Test
@@ -186,6 +227,63 @@ public class UpdateListingRequirementsRequestSubmittedHandlerTest {
 
         assertThat(response.getErrors()).isEmpty();
         verify(listAssistHearingMessageHelper, times(0)).sendHearingMessage(
+                anyString(), any(HearingRoute.class), any(HearingState.class), eq(null));
+    }
+
+    @Test
+    void whenCaseDetailsBeforePanelCompositionIsNullThenDoNotThrowErrorOrSendMessage() {
+        SscsCaseData sscsCaseDataBefore = SscsCaseData.builder()
+                .appeal(Appeal.builder().build())
+                .ccdCaseId("1234")
+                .dwpIsOfficerAttending("Yes")
+                .panelMemberComposition(null)
+                .build();
+
+        sscsCaseData.setCcdCaseId("1234");
+        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
+
+        Optional<CaseDetails<SscsCaseData>> caseDetailsBefore =
+                Optional.of(new CaseDetails<>(1234L, "SSCS", State.READY_TO_LIST, sscsCaseDataBefore, now(), "Benefit"));
+
+        callback = new Callback<>(caseDetails, caseDetailsBefore, UPDATE_LISTING_REQUIREMENTS, false);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+                SUBMITTED,
+                callback,
+                USER_AUTHORISATION);
+        assertThat(response.getErrors()).isEmpty();
+        verify(listAssistHearingMessageHelper, times(0)).sendHearingMessage(
+                anyString(), any(HearingRoute.class), any(HearingState.class), eq(null));
+    }
+
+    @Test
+    void whenCaseDetailsBeforePanelCompositionIsNullAndCaseDetailsPanelCompositionIsNotNullThenSendMessage() {
+        SscsCaseData sscsCaseDataBefore = SscsCaseData.builder()
+                .appeal(Appeal.builder().build())
+                .ccdCaseId("1234")
+                .dwpIsOfficerAttending("Yes")
+                .panelMemberComposition(null)
+                .build();
+
+        sscsCaseData.setCcdCaseId("1234");
+        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").build());
+
+        Optional<CaseDetails<SscsCaseData>> caseDetailsBefore =
+                Optional.of(new CaseDetails<>(1234L, "SSCS", State.READY_TO_LIST, sscsCaseDataBefore, now(), "Benefit"));
+
+        callback = new Callback<>(caseDetails, caseDetailsBefore, UPDATE_LISTING_REQUIREMENTS, false);
+
+        given(listAssistHearingMessageHelper.sendHearingMessage(
+                anyString(), any(HearingRoute.class), any(HearingState.class), eq(null)))
+                .willReturn(true);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+                SUBMITTED,
+                callback,
+                USER_AUTHORISATION);
+        assertThat(response.getErrors()).isEmpty();
+        verify(listAssistHearingMessageHelper, times(1)).sendHearingMessage(
                 anyString(), any(HearingRoute.class), any(HearingState.class), eq(null));
     }
 }
