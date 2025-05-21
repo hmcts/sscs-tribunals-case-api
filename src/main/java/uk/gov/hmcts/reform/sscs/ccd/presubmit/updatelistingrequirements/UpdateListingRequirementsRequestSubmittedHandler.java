@@ -80,12 +80,12 @@ public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubm
         return callbackResponse;
     }
 
-    private boolean shouldSendHmcRequest(Callback<SscsCaseData> callback, SchedulingAndListingFields caseDataSnlFields) {
+    private boolean shouldSendHmcRequest(Callback<SscsCaseData> callback, SchedulingAndListingFields snlFields) {
         if (isDefaultPanelCompEnabled && callback.getCaseDetailsBefore().isPresent()
                 &&!Objects.equals(callback.getCaseDetailsBefore().get().getCaseData().getPanelMemberComposition(),
-                    callback.getCaseDetails().getCaseData().getPanelMemberComposition())) {
+                callback.getCaseDetails().getCaseData().getPanelMemberComposition())) {
             return true;
         }
-        return nonNull(caseDataSnlFields.getOverrideFields());
+        return nonNull(snlFields.getOverrideFields());
     }
 }
