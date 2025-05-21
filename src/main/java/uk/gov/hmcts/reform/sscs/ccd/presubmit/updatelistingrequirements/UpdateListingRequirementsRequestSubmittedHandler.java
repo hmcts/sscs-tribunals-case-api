@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
 
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
@@ -55,7 +55,7 @@ public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubm
         HearingRoute hearingRoute = caseDataSnlFields.getHearingRoute();
         if (state == State.READY_TO_LIST
                 && hearingRoute == LIST_ASSIST
-                && shouldSendMessage(callback, caseDataSnlFields)) {
+                && shouldSendHmcRequest(callback, caseDataSnlFields)) {
 
             String caseId = sscsCaseData.getCcdCaseId();
             log.info("UpdateListingRequirements List Assist request, Update Hearing,"
@@ -80,27 +80,13 @@ public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubm
         return callbackResponse;
     }
 
-    private boolean shouldSendMessage(Callback<SscsCaseData> callback, SchedulingAndListingFields caseDataSnlFields) {
-        if (isDefaultPanelCompEnabled) {
-
-            CaseDetails<SscsCaseData> caseDetailsBefore = callback.getCaseDetailsBefore().orElse(null);
-
-            boolean panelMemberCompositionUpdated = false;
-
-            if (nonNull(caseDetailsBefore)
-                    && !nonNull(caseDetailsBefore.getCaseData().getPanelMemberComposition())
-                    && nonNull(callback.getCaseDetails().getCaseData().getPanelMemberComposition())) {
-                panelMemberCompositionUpdated = true;
-            } else if (nonNull(caseDetailsBefore)
-                    && nonNull(caseDetailsBefore.getCaseData().getPanelMemberComposition())
-                    && !callback.getCaseDetailsBefore().get().getCaseData().getPanelMemberComposition()
-                    .equals(callback.getCaseDetails().getCaseData().getPanelMemberComposition())) {
-                panelMemberCompositionUpdated = true;
-            }
-
-            return nonNull(caseDataSnlFields.getOverrideFields()) || panelMemberCompositionUpdated;
-        } else {
-            return nonNull(caseDataSnlFields.getOverrideFields());
+    private boolean shouldSendHmcRequest(Callback<SscsCaseData> callback, SchedulingAndListingFields caseDataSnlFields) {
+        if (isDefaultPanelCompEnabled && callback.getCaseDetailsBefore().isPresent()) {
+                if (!Objects.equals(callback.getCaseDetailsBefore().get().getCaseData().getPanelMemberComposition(),
+                        callback.getCaseDetails().getCaseData().getPanelMemberComposition())) {
+                    return true;
+                }
         }
+        return nonNull(caseDataSnlFields.getOverrideFields());
     }
 }
