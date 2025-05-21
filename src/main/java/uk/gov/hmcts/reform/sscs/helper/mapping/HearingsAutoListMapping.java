@@ -4,8 +4,9 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.TRIBUNALS_MEMBER_FINANCIALLY_QUALIFIED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.TRIBUNALS_MEMBER_MEDICAL;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.REGIONAL_MEDICAL_MEMBER;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.TRIBUNAL_MEMBER_MEDICAL;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsCaseMapping.shouldBeAdditionalSecurityFlag;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsMapping.getSessionCaseCodeMap;
@@ -28,9 +29,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMember;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
-import uk.gov.hmcts.reform.sscs.reference.data.model.PanelCategory;
+import uk.gov.hmcts.reform.sscs.reference.data.model.DefaultPanelComposition;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
-import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryService;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 import uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil;
 
@@ -38,14 +39,14 @@ import uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil;
 @Service
 public final class HearingsAutoListMapping {
 
-    private final PanelCategoryService panelCategoryService;
+    private final PanelCompositionService panelCompositionService;
 
     @Value("${feature.default-panel-comp.enabled}")
     private boolean defaultPanelCompEnabled;
 
 
-    HearingsAutoListMapping(PanelCategoryService panelCategoryService) {
-        this.panelCategoryService = panelCategoryService;
+    HearingsAutoListMapping(PanelCompositionService panelCompositionService) {
+        this.panelCompositionService = panelCompositionService;
     }
 
     public boolean shouldBeAutoListed(@Valid SscsCaseData caseData, ReferenceDataServiceHolder refData)
@@ -106,10 +107,12 @@ public final class HearingsAutoListMapping {
 
     public boolean hasMqpmOrFqpm(@Valid SscsCaseData caseData, ReferenceDataServiceHolder refData) throws ListingException {
         if (defaultPanelCompEnabled) {
-            PanelCategory panelCategory = panelCategoryService.getPanelCategoryFromCaseData(caseData);
+            DefaultPanelComposition panelCategory = panelCompositionService.getDefaultPanelComposition(caseData);
             checkBenefitIssueCodeV2(panelCategory);
             List<String> johTiers = panelCategory.getJohTiers();
-            return johTiers.contains(TRIBUNALS_MEMBER_MEDICAL.getReference()) || johTiers.contains(TRIBUNALS_MEMBER_FINANCIALLY_QUALIFIED.getReference());
+            return johTiers.contains(TRIBUNAL_MEMBER_MEDICAL.getReference())
+                    || johTiers.contains(REGIONAL_MEDICAL_MEMBER.getReference())
+                    || johTiers.contains(TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED.getReference());
         } else {
             SessionCategoryMap sessionCategoryMap = getSessionCaseCodeMap(caseData, refData);
             checkBenefitIssueCode(sessionCategoryMap);

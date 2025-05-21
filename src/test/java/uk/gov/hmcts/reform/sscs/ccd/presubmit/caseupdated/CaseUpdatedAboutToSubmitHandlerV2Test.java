@@ -86,7 +86,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
-import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryService;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
@@ -136,7 +136,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     private SessionCategoryMapService categoryMapService;
 
     @Mock
-    private PanelCategoryService panelCategoryService;
+    private PanelCompositionService panelCompositionService;
 
     private AssociatedCaseLinkHelper associatedCaseLinkHelper;
 
@@ -161,7 +161,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
                 refDataService,
                 venueService,
                 categoryMapService,
-                panelCategoryService,
+                panelCompositionService,
                 true
                 );
 

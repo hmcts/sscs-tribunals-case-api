@@ -62,7 +62,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
-import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryService;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
@@ -84,7 +84,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final VenueService venueService;
     private final SessionCategoryMapService categoryMapService;
     private final boolean caseAccessManagementFeature;
-    private final PanelCategoryService panelCategoryService;
+    private final PanelCompositionService panelCompositionService;
     private final PostcodeValidator postcodeValidator = new PostcodeValidator();
     private static ConstraintValidatorContext context;
     @Value("${feature.default-panel-comp.enabled}")
@@ -112,7 +112,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                                     RefDataService refDataService,
                                     VenueService venueService,
                                     SessionCategoryMapService categoryMapService,
-                                    PanelCategoryService panelCategoryService,
+                                    PanelCompositionService panelCompositionService,
                                     @Value("${feature.case-access-management.enabled}")  boolean caseAccessManagementFeature) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
@@ -121,7 +121,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         this.idamService = idamService;
         this.refDataService = refDataService;
         this.caseAccessManagementFeature = caseAccessManagementFeature;
-        this.panelCategoryService = panelCategoryService;
+        this.panelCompositionService = panelCompositionService;
         this.venueService = venueService;
         this.categoryMapService = categoryMapService;
     }
@@ -243,7 +243,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private void validateBenefitIssueCode(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         if (defaultPanelCompEnabled) {
-            if (!panelCategoryService.isBenefitIssueCodeValid(caseData.getBenefitCode() + caseData.getIssueCode())) {
+            if (!panelCompositionService.isBenefitIssueCodeValid(caseData.getBenefitCode(), caseData.getIssueCode())) {
                 response.addError("Incorrect benefit/issue code combination");
             }
         } else {

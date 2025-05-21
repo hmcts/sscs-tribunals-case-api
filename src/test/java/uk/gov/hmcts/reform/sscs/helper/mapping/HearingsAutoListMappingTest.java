@@ -43,21 +43,21 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SessionCategory;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
-import uk.gov.hmcts.reform.sscs.reference.data.model.PanelCategory;
+import uk.gov.hmcts.reform.sscs.reference.data.model.DefaultPanelComposition;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
-import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryService;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 
 class HearingsAutoListMappingTest extends HearingsMappingBase {
 
     private SscsCaseData caseData;
     @Mock
-    private PanelCategoryService panelCategoryService;
+    private PanelCompositionService panelCompositionService;
 
     private HearingsAutoListMapping hearingsAutoListMapping;
 
     @BeforeEach
     void setUp() {
-        hearingsAutoListMapping = new HearingsAutoListMapping(panelCategoryService);
+        hearingsAutoListMapping = new HearingsAutoListMapping(panelCompositionService);
         caseData = SscsCaseData.builder()
             .benefitCode(BENEFIT_CODE)
             .issueCode(ISSUE_CODE)
@@ -387,13 +387,13 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
 
     @DisplayName("hasMqpmOrFqpm should return true when default panel comp is enabled and case has medical member")
     @Test
-    void hasDqpmOrFqpmWithDefaultPanelCompEnabledShouldReturnTrue() throws ListingException {
+    void hasMqpmOrFqpmWithDefaultPanelCompEnabledShouldReturnTrue() throws ListingException {
 
         ReflectionTestUtils.setField(hearingsAutoListMapping, "defaultPanelCompEnabled", true);
 
-        PanelCategory panelCategory = new PanelCategory();
-        panelCategory.setJohTiers(List.of("58"));
-        when(panelCategoryService.getPanelCategoryFromCaseData(any())).thenReturn(panelCategory);
+        DefaultPanelComposition panelComposition = new DefaultPanelComposition();
+        panelComposition.setJohTiers(List.of("58"));
+        when(panelCompositionService.getDefaultPanelComposition(any())).thenReturn(panelComposition);
         boolean result = hearingsAutoListMapping.hasMqpmOrFqpm(caseData, refData);
 
         assertThat(result).isTrue();
@@ -401,12 +401,25 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
 
     @DisplayName("hasMqpmOrFqpm should return true when default panel comp is enabled and case has fqpm")
     @Test
-    void hasDqpmOrFqpmWithDefaultPanelCompEnabledAndFqpmShouldReturnTrue() throws ListingException {
+    void hasMqpmOrFqpmOrFqpmWithDefaultPanelCompEnabledAndFqpmShouldReturnTrue() throws ListingException {
 
         ReflectionTestUtils.setField(hearingsAutoListMapping, "defaultPanelCompEnabled", true);
-        PanelCategory panelCategory = new PanelCategory();
-        panelCategory.setJohTiers(List.of("50"));
-        when(panelCategoryService.getPanelCategoryFromCaseData(any())).thenReturn(panelCategory);
+        DefaultPanelComposition panelComposition = new DefaultPanelComposition();
+        panelComposition.setJohTiers(List.of("50"));
+        when(panelCompositionService.getDefaultPanelComposition(any())).thenReturn(panelComposition);
+        boolean result = hearingsAutoListMapping.hasMqpmOrFqpm(caseData, refData);
+
+        assertThat(result).isTrue();
+    }
+
+    @DisplayName("hasMqpmOrFqpm should return true when default panel comp is enabled and case has regional medical member")
+    @Test
+    void hasMqpmOrFqpmWithDefaultPanelCompEnabledAndRegionalMedicalMemberShouldReturnTrue() throws ListingException {
+
+        ReflectionTestUtils.setField(hearingsAutoListMapping, "defaultPanelCompEnabled", true);
+        DefaultPanelComposition panelComposition = new DefaultPanelComposition();
+        panelComposition.setJohTiers(List.of("69"));
+        when(panelCompositionService.getDefaultPanelComposition(any())).thenReturn(panelComposition);
         boolean result = hearingsAutoListMapping.hasMqpmOrFqpm(caseData, refData);
 
         assertThat(result).isTrue();
@@ -414,10 +427,10 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
 
     @DisplayName("hasMqpmOrFqpm should return false when default panel comp is enabled and case has no roleTypes")
     @Test
-    void hasDqpmOrFqpmDefaultPanelCompEnabledShouldReturnFalse() throws ListingException {
+    void hasMqpmOrFqpmDefaultPanelCompEnabledShouldReturnFalse() throws ListingException {
 
         ReflectionTestUtils.setField(hearingsAutoListMapping, "defaultPanelCompEnabled", true);
-        when(panelCategoryService.getPanelCategoryFromCaseData(any())).thenReturn(null);
+        when(panelCompositionService.getDefaultPanelComposition(any())).thenReturn(null);
         ListingException ex = assertThrows(ListingException.class, () -> hearingsAutoListMapping.hasMqpmOrFqpm(caseData, refData));
         assertThat(ex).hasMessage("Incorrect benefit/issue code combination");
     }

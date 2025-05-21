@@ -41,9 +41,9 @@ import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.HearingWrapper;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.CaseCategory;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.CaseDetails;
-import uk.gov.hmcts.reform.sscs.reference.data.model.PanelCategory;
+import uk.gov.hmcts.reform.sscs.reference.data.model.DefaultPanelComposition;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
-import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryService;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 import uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil;
@@ -56,13 +56,13 @@ class HearingsCaseMappingTest extends HearingsMappingBase {
     private ReferenceDataServiceHolder refData;
 
     @Mock
-    private PanelCategoryService panelCategoryService;
+    private PanelCompositionService panelCompositionService;
 
     private HearingsCaseMapping hearingsCaseMapping;
 
     @BeforeEach
     void setUp() {
-        hearingsCaseMapping = new HearingsCaseMapping(panelCategoryService);
+        hearingsCaseMapping = new HearingsCaseMapping(panelCompositionService);
     }
 
     @DisplayName("When a valid hearing wrapper is given buildHearingCaseDetails returns the correct Hearing Case Details")
@@ -392,7 +392,7 @@ class HearingsCaseMappingTest extends HearingsMappingBase {
                 .issueCode(ISSUE_CODE)
                 .build();
         ReflectionTestUtils.setField(hearingsCaseMapping, "defaultPanelCompEnabled", true);
-        given(panelCategoryService.getPanelCategoryFromCaseData(eq(caseData))).willReturn(new PanelCategory());
+        given(panelCompositionService.getDefaultPanelComposition(eq(caseData))).willReturn(new DefaultPanelComposition());
         List<CaseCategory> result = hearingsCaseMapping.buildCaseCategories(caseData, refData);
 
         assertThat(result)

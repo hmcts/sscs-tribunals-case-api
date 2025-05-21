@@ -32,9 +32,9 @@ import uk.gov.hmcts.reform.sscs.model.hmc.reference.RequirementType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.MemberType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelPreference;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
-import uk.gov.hmcts.reform.sscs.reference.data.model.PanelCategory;
+import uk.gov.hmcts.reform.sscs.reference.data.model.DefaultPanelComposition;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
-import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryService;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
@@ -52,14 +52,14 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
     private ReferenceDataServiceHolder refData;
 
     @Mock
-    private PanelCategoryService panelCategoryService;
+    private PanelCompositionService panelCompositionService;
 
     private HearingsPanelMapping hearingsPanelMapping;
 
     @BeforeEach
     public void setUp() {
         openMocks(this);
-        hearingsPanelMapping = new HearingsPanelMapping(panelCategoryService);
+        hearingsPanelMapping = new HearingsPanelMapping(panelCompositionService);
         ReflectionTestUtils.setField(hearingsPanelMapping, "defaultPanelCompEnabled", true);
     }
 
@@ -87,15 +87,15 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
         caseData.setBenefitCode(IIDB_BENEFIT_CODE);
         when(refData.getSessionCategoryMaps()).thenReturn(sessionCategoryMaps);
         PanelRequirements result = hearingsPanelMapping.getPanelRequirements(caseData, refData);
-        assertThat(result.getRoleTypes()).contains(PanelMemberType.TRIBUNALS_MEMBER_MEDICAL.getReference());
+        assertThat(result.getRoleTypes()).contains(PanelMemberType.TRIBUNAL_MEMBER_MEDICAL.getReference());
     }
 
-    @DisplayName("HearingsPanelMapping should call panelCategoryService and return role types when feature flag is enabled")
+    @DisplayName("HearingsPanelMapping should call panelCompositionService and return role types when feature flag is enabled")
     @Test
-    void shouldPopulateRoleTypesFromPanelCategoryServiceWhenFeatureFlagIsEnabled() {
+    void shouldPopulateRoleTypesFromPanelCompositionServiceWhenFeatureFlagIsEnabled() {
         ReflectionTestUtils.setField(hearingsPanelMapping, "defaultPanelCompEnabled", true);
         when(refData.getSessionCategoryMaps()).thenReturn(sessionCategoryMaps);
-        when(panelCategoryService.getRoleTypes(caseData)).thenReturn(List.of(JUDGE_JOH_CODE));
+        when(panelCompositionService.getRoleTypes(caseData)).thenReturn(List.of(JUDGE_JOH_CODE));
         PanelRequirements result = hearingsPanelMapping.getPanelRequirements(caseData, refData);
         assertThat(result.getRoleTypes()).isNotEmpty();
         assertThat(result.getRoleTypes()).contains(JUDGE_JOH_CODE);
@@ -236,9 +236,9 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
                 .secondPanelDoctorSpecialism(doctorSpecialismSecond)
                 .build())
             .build();
-        PanelCategory panelCategory = new PanelCategory();
-        panelCategory.setCategory("6");
-        when(panelCategoryService.getPanelCategoryFromCaseData(any())).thenReturn(panelCategory);
+        DefaultPanelComposition panelComposition = new DefaultPanelComposition();
+        panelComposition.setCategory("6");
+        when(panelCompositionService.getDefaultPanelComposition(any())).thenReturn(panelComposition);
 
         List<String> result = hearingsPanelMapping.getPanelSpecialisms(caseData, sessionCategoryMap);
 
@@ -266,9 +266,9 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
                 .panelDoctorSpecialism(doctorSpecialism)
                 .build())
             .build();
-        PanelCategory panelCategory = new PanelCategory();
-        panelCategory.setCategory("5");
-        when(panelCategoryService.getPanelCategoryFromCaseData(any())).thenReturn(panelCategory);
+        DefaultPanelComposition panelComposition = new DefaultPanelComposition();
+        panelComposition.setCategory("5");
+        when(panelCompositionService.getDefaultPanelComposition(any())).thenReturn(panelComposition);
 
         List<String> result = hearingsPanelMapping.getPanelSpecialisms(caseData, sessionCategoryMap);
 
@@ -293,9 +293,9 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
                 .panelDoctorSpecialism("doesntexist")
                 .build())
             .build();
-        PanelCategory panelCategory = new PanelCategory();
-        panelCategory.setCategory("5");
-        when(panelCategoryService.getPanelCategoryFromCaseData(any())).thenReturn(panelCategory);
+        DefaultPanelComposition panelComposition = new DefaultPanelComposition();
+        panelComposition.setCategory("5");
+        when(panelCompositionService.getDefaultPanelComposition(any())).thenReturn(panelComposition);
         List<String> result = hearingsPanelMapping.getPanelSpecialisms(caseData, sessionCategoryMap);
 
         List<String> expectedList = Collections.emptyList();

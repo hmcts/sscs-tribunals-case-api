@@ -29,27 +29,27 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.MemberType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelPreference;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
-import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryService;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @Slf4j
 @Component
 public final class HearingsPanelMapping {
 
-    private final PanelCategoryService panelCategoryService;
+    private final PanelCompositionService panelCompositionService;
 
     @Value("${feature.default-panel-comp.enabled}")
     private boolean defaultPanelCompEnabled;
 
-    HearingsPanelMapping(PanelCategoryService panelCategoryService) {
+    HearingsPanelMapping(PanelCompositionService panelCompositionService) {
 
-        this.panelCategoryService = panelCategoryService;
+        this.panelCompositionService = panelCompositionService;
     }
 
     public PanelRequirements getPanelRequirements(SscsCaseData caseData,
                                                          ReferenceDataServiceHolder refData) {
         return PanelRequirements.builder()
-                .roleTypes(defaultPanelCompEnabled ? panelCategoryService.getRoleTypes(caseData) : findRoleTypesByBenefitCode(caseData.getBenefitCode()))
+                .roleTypes(defaultPanelCompEnabled ? panelCompositionService.getRoleTypes(caseData) : findRoleTypesByBenefitCode(caseData.getBenefitCode()))
                 .authorisationTypes(getAuthorisationTypes())
                 .authorisationSubTypes(getAuthorisationSubTypes())
                 .panelPreferences(getPanelPreferences(caseData))
@@ -133,8 +133,8 @@ public final class HearingsPanelMapping {
         String doctorSpecialism = caseData.getSscsIndustrialInjuriesData().getPanelDoctorSpecialism();
         String doctorSpecialismSecond = caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism();
         if (defaultPanelCompEnabled) {
-            panelSpecialisms = SessionCategory.getSessionCategory(panelCategoryService
-                            .getPanelCategoryFromCaseData(caseData)
+            panelSpecialisms = SessionCategory.getSessionCategory(panelCompositionService
+                            .getDefaultPanelComposition(caseData)
                             .getCategory()).getPanelMembers().stream()
                     .map(panelMember -> getPanelMemberSpecialism(panelMember, doctorSpecialism, doctorSpecialismSecond))
                     .filter(Objects::nonNull)

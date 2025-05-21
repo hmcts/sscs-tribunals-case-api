@@ -26,8 +26,8 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingSubChannel;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HmcUpdateResponse;
+import uk.gov.hmcts.reform.sscs.reference.data.model.DefaultPanelComposition;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
-import uk.gov.hmcts.reform.sscs.reference.data.model.PanelCategory;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 
 @Slf4j
@@ -152,7 +152,7 @@ public final class HearingsServiceHelper {
         }
     }
 
-    public static void checkBenefitIssueCodeV2(PanelCategory panelCategory) throws ListingException {
+    public static void checkBenefitIssueCodeV2(DefaultPanelComposition panelCategory) throws ListingException {
         if (isNull(panelCategory)) {
             log.error("sessionCaseCode is null. The benefit/issue code is probably an incorrect combination"
                     + " and cannot be mapped to a session code. Refer to the panel-category-map.json file"

@@ -36,7 +36,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpResponseDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCategoryService;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
@@ -62,7 +62,7 @@ public class DwpUploadResponseMidEventHandlerTest {
     private CaseDetails<SscsCaseData> caseDetailsBefore;
 
     @Mock
-    private PanelCategoryService panelCategoryService;
+    private PanelCompositionService panelCompositionService;
 
     private SscsCaseData sscsCaseData;
 
@@ -70,7 +70,7 @@ public class DwpUploadResponseMidEventHandlerTest {
     public void setUp() {
         SessionCategoryMapService categoryMapService = new SessionCategoryMapService();
         openMocks(this);
-        handler = new DwpUploadResponseMidEventHandler(categoryMapService, panelCategoryService, true);
+        handler = new DwpUploadResponseMidEventHandler(categoryMapService, panelCompositionService, true);
 
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
                 .forename("Chris").surname("Davis").build().getFullName());
@@ -119,7 +119,7 @@ public class DwpUploadResponseMidEventHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("childSupportConfidentiality");
         callback.getCaseDetails().getCaseData().setAppendix12Doc(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("b.pdf").documentFilename("b.pdf").build()).build());
         callback.getCaseDetails().getCaseData().getAppendix12Doc().setDocumentLink(DocumentLink.builder().documentUrl("b.pdf").documentFilename("b.pdf").build());
-        when(panelCategoryService.isBenefitIssueCodeValid(any())).thenReturn(true);
+        when(panelCompositionService.isBenefitIssueCodeValid(any(), any())).thenReturn(true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -136,7 +136,7 @@ public class DwpUploadResponseMidEventHandlerTest {
 
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("childSupportConfidentiality");
         callback.getCaseDetails().getCaseData().setAppendix12Doc(null);
-        when(panelCategoryService.isBenefitIssueCodeValid(any())).thenReturn(true);
+        when(panelCompositionService.isBenefitIssueCodeValid(any(), any())).thenReturn(true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -154,7 +154,7 @@ public class DwpUploadResponseMidEventHandlerTest {
                 .build();
 
         when(callback.getCaseDetails().getCaseData()).thenReturn(sscsCaseData);
-        when(panelCategoryService.isBenefitIssueCodeValid(any())).thenReturn(true);
+        when(panelCompositionService.isBenefitIssueCodeValid(any(), any())).thenReturn(true);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
         assertEquals(1, response.getErrors().size());
         assertEquals("Please provide other party details", response.getErrors().toArray()[0]);
@@ -164,7 +164,7 @@ public class DwpUploadResponseMidEventHandlerTest {
     public void shouldReturnErrorIfIbcaBenefitCodeSelectedByNonIbcaCase() {
         callback.getCaseDetails().getCaseData().setIssueCode("CE");
         callback.getCaseDetails().getCaseData().setBenefitCode(IBCA_BENEFIT_CODE);
-        when(panelCategoryService.isBenefitIssueCodeValid(any())).thenReturn(true);
+        when(panelCompositionService.isBenefitIssueCodeValid(any(), any())).thenReturn(true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -175,7 +175,7 @@ public class DwpUploadResponseMidEventHandlerTest {
     @Test
     public void shouldReturnNoErrorIfBenefitIssueCodeIsValid() {
         ReflectionTestUtils.setField(handler, "defaultPanelCompEnabled", true);
-        when(panelCategoryService.isBenefitIssueCodeValid(any())).thenReturn(true);
+        when(panelCompositionService.isBenefitIssueCodeValid(any(), any())).thenReturn(true);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors(), is(empty()));
 
@@ -184,7 +184,7 @@ public class DwpUploadResponseMidEventHandlerTest {
     @Test
     public void shouldReturnErrorIfBenefitIssueCodeIsNotInUse() {
         ReflectionTestUtils.setField(handler, "defaultPanelCompEnabled", true);
-        when(panelCategoryService.isBenefitIssueCodeValid(any())).thenReturn(true);
+        when(panelCompositionService.isBenefitIssueCodeValid(any(), any())).thenReturn(true);
         sscsCaseData.setBenefitCode("032");
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
         assertEquals(1, response.getErrors().size());
@@ -194,7 +194,7 @@ public class DwpUploadResponseMidEventHandlerTest {
     @Test
     public void shouldReturnErrorIfBenefitIssueCodeIsInvalid() {
         ReflectionTestUtils.setField(handler, "defaultPanelCompEnabled", true);
-        when(panelCategoryService.isBenefitIssueCodeValid(any())).thenReturn(false);
+        when(panelCompositionService.isBenefitIssueCodeValid(any(), any())).thenReturn(false);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
         assertEquals(1, response.getErrors().size());
         assertTrue(response.getErrors().contains("Incorrect benefit/issue code combination"));
