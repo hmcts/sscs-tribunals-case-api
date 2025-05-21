@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
@@ -53,9 +54,9 @@ public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubm
 
         State state = callback.getCaseDetails().getState();
         HearingRoute hearingRoute = caseDataSnlFields.getHearingRoute();
-        if (state == State.READY_TO_LIST
-                && hearingRoute == LIST_ASSIST
-                && shouldSendHmcRequest(callback, caseDataSnlFields)) {
+        if (state == State.READY_TO_LIST && hearingRoute == LIST_ASSIST
+                && shouldSendHmcRequest(sscsCaseData, callback.getCaseDetailsBefore().orElse(null),
+                caseDataSnlFields)) {
 
             String caseId = sscsCaseData.getCcdCaseId();
             log.info("UpdateListingRequirements List Assist request, Update Hearing,"
@@ -80,10 +81,11 @@ public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubm
         return callbackResponse;
     }
 
-    private boolean shouldSendHmcRequest(Callback<SscsCaseData> callback, SchedulingAndListingFields snlFields) {
-        if (isDefaultPanelCompEnabled && callback.getCaseDetailsBefore().isPresent()
-                && !Objects.equals(callback.getCaseDetailsBefore().get().getCaseData().getPanelMemberComposition(),
-                callback.getCaseDetails().getCaseData().getPanelMemberComposition())) {
+    private boolean shouldSendHmcRequest(SscsCaseData caseData, CaseDetails<SscsCaseData> caseDetailsBefore,
+                                         SchedulingAndListingFields snlFields) {
+        if (isDefaultPanelCompEnabled && nonNull(caseDetailsBefore)
+                && !Objects.equals(caseDetailsBefore.getCaseData().getPanelMemberComposition(),
+                caseData.getPanelMemberComposition())) {
             return true;
         }
         return nonNull(snlFields.getOverrideFields());
