@@ -38,9 +38,9 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 
 @RunWith(JUnitParamsRunner.class)
-public class PanelCompositionServiceTest {
+public class ListingStateProcessingServiceTest {
 
-    private PanelCompositionService panelCompositionService;
+    private ListingStateProcessingService listingStateProcessingService;
     private SscsCaseData sscsCaseData;
 
     @Mock
@@ -62,7 +62,7 @@ public class PanelCompositionServiceTest {
     @Before
     public void setup() {
         openMocks(this);
-        panelCompositionService = new PanelCompositionService(updateCcdCaseService, idamService);
+        listingStateProcessingService = new ListingStateProcessingService(updateCcdCaseService, idamService);
         sscsCaseData = buildCaseData("Bloggs");
         sscsCaseData.setCcdCaseId("1");
         sscsCaseData.getAppeal().getAppellant().getIdentity().setNino("789123");
@@ -77,7 +77,7 @@ public class PanelCompositionServiceTest {
     public void givenResponseReceivedCase_thenInterLocReviewIsNone() {
         sscsCaseData.setState(State.RESPONSE_RECEIVED);
         when(caseDetails.getState()).thenReturn(sscsCaseData.getState());
-        panelCompositionService.processCaseState(callback,sscsCaseData, EventType.CONFIRM_PANEL_COMPOSITION);
+        listingStateProcessingService.processCaseState(callback,sscsCaseData, EventType.CONFIRM_PANEL_COMPOSITION);
 
         verify(updateCcdCaseService).updateCaseV2(
                 anyLong(),
@@ -96,13 +96,13 @@ public class PanelCompositionServiceTest {
     public void givenDormantCase_caseShouldNotUpdate() {
         sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
         when(caseDetails.getState()).thenReturn(sscsCaseData.getState());
-        panelCompositionService.processCaseState(callback,sscsCaseData, EventType.CONFIRM_PANEL_COMPOSITION);
+        listingStateProcessingService.processCaseState(callback,sscsCaseData, EventType.CONFIRM_PANEL_COMPOSITION);
         verify(updateCcdCaseService, never()).updateCase(any(), any(), anyString(), anyString(), anyString(), any());
     }
 
     @Test
     public void givenNonDormantCase_caseShouldUpdate() {
-        panelCompositionService.processCaseState(callback,sscsCaseData, EventType.CONFIRM_PANEL_COMPOSITION);
+        listingStateProcessingService.processCaseState(callback,sscsCaseData, EventType.CONFIRM_PANEL_COMPOSITION);
         verify(updateCcdCaseService, times(1)).triggerCaseEventV2(any(), any(), anyString(), anyString(), any());
     }
 
@@ -116,7 +116,7 @@ public class PanelCompositionServiceTest {
             .build();
         sscsCaseData.setOtherParties(Collections.singletonList(otherParty));
         sscsCaseData.setIsFqpmRequired(YesNo.YES);
-        panelCompositionService.processCaseState(callback,sscsCaseData, EventType.UPDATE_OTHER_PARTY_DATA);
+        listingStateProcessingService.processCaseState(callback,sscsCaseData, EventType.UPDATE_OTHER_PARTY_DATA);
 
         verify(updateCcdCaseService).updateCaseV2(
                 anyLong(),
