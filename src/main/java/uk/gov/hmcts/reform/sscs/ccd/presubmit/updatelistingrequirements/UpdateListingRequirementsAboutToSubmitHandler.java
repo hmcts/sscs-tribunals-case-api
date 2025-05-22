@@ -82,7 +82,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 SscsUtil.updateHearingInterpreter(sscsCaseData, callbackResponse, appellantInterpreter);
             }
         }
-
+      
         sscsCaseData.getAppeal()
             .setHearingOptions(Optional.ofNullable(sscsCaseData.getAppeal().getHearingOptions())
                 .map(HearingOptions::toBuilder)
