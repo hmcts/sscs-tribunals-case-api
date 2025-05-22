@@ -4,6 +4,14 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsAutoListMapping.shouldBeAutoListed;
+import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsChannelMapping.getHearingChannels;
+import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsDurationMapping.getHearingDuration;
+import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsDurationMapping.getNonStandardHearingDurationReasons;
+import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsLocationMapping.getHearingLocations;
+import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsNumberAttendeesMapping.getNumberOfPhysicalAttendees;
+import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsWindowMapping.buildHearingWindow;
+import static uk.gov.hmcts.reform.sscs.helper.mapping.OverridesMapping.getAmendReasonCodes;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingPriority.STANDARD;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingPriority.URGENT;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getHmcHearingType;
@@ -16,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCasePanelMembersExcluded;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTime;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AmendReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Entity;
@@ -25,12 +32,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Party;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
-import uk.gov.hmcts.reform.sscs.model.HearingLocation;
 import uk.gov.hmcts.reform.sscs.model.HearingWrapper;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDetails;
-import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingWindow;
-import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
-import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @Slf4j
@@ -48,36 +51,25 @@ public final class HearingsDetailsMapping {
         SscsCaseData caseData = wrapper.getCaseData();
         boolean adjournmentInProgress = refData.isAdjournmentFlagEnabled()
                 && isYes(caseData.getAdjournment().getAdjournmentInProgress());
-        // collect hearing details values from case and ref data
-        boolean autoListed = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
-        HearingWindow window = HearingsWindowMapping.buildHearingWindow(caseData, refData);
-        int duration = HearingsDurationMapping.getHearingDuration(caseData, refData);
-        List<String> nonStandardDurationReasons = HearingsDurationMapping.getNonStandardHearingDurationReasons();
-        int physicalAttendees = HearingsNumberAttendeesMapping.getNumberOfPhysicalAttendees(caseData, adjournmentInProgress);
-        List<HearingLocation> locations = HearingsLocationMapping.getHearingLocations(caseData, refData);
-        PanelRequirements panelRequirements = hearingsPanelMapping.getPanelRequirements(caseData, refData);
-        List<AmendReason> amendReasons = OverridesMapping.getAmendReasonCodes(caseData);
-        List<HearingChannel> channels = HearingsChannelMapping.getHearingChannels(caseData, adjournmentInProgress);
-        // build hearing details to be used in payload for hmc create / update hearing requests
         return HearingDetails.builder()
-                .autolistFlag(autoListed)
+                .autolistFlag(shouldBeAutoListed(caseData, refData))
                 .hearingType(getHearingType(caseData))
-                .hearingWindow(window)
-                .duration(duration)
-                .nonStandardHearingDurationReasons(nonStandardDurationReasons)
+                .hearingWindow(buildHearingWindow(caseData, refData))
+                .duration(getHearingDuration(caseData, refData))
+                .nonStandardHearingDurationReasons(getNonStandardHearingDurationReasons())
                 .hearingPriorityType(getHearingPriority(caseData))
-                .numberOfPhysicalAttendees(physicalAttendees)
+                .numberOfPhysicalAttendees(getNumberOfPhysicalAttendees(caseData, adjournmentInProgress))
                 .hearingInWelshFlag(shouldBeHearingsInWelshFlag())
-                .hearingLocations(locations)
+                .hearingLocations(getHearingLocations(caseData, refData))
                 .facilitiesRequired(getFacilitiesRequired())
                 .listingComments(getListingComments(caseData))
                 .hearingRequester(getHearingRequester())
                 .privateHearingRequiredFlag(isPrivateHearingRequired())
                 .leadJudgeContractType(getLeadJudgeContractType())
-                .panelRequirements(panelRequirements)
+                .panelRequirements(hearingsPanelMapping.getPanelRequirements(caseData, refData))
                 .hearingIsLinkedFlag(isCaseLinked(caseData))
-                .amendReasonCodes(amendReasons)
-                .hearingChannels(channels)
+                .amendReasonCodes(getAmendReasonCodes(caseData))
+                .hearingChannels(getHearingChannels(caseData, adjournmentInProgress))
                 .build();
     }
 

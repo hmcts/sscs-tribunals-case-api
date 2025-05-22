@@ -1,12 +1,16 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
+import static java.time.LocalDateTime.now;
+import static java.util.Optional.empty;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_LISTING_REQUIREMENTS;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.VIDEO;
 
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +19,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -30,10 +33,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReserveTo;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,27 +46,29 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    @Mock
-    private Callback<SscsCaseData> callback;
-    @Mock
-    private CaseDetails<SscsCaseData> caseDetails;
-
     @InjectMocks
     private UpdateListingRequirementsAboutToSubmitHandler handler;
 
     private SscsCaseData sscsCaseData;
+    private Callback<SscsCaseData> callback;
+    private CaseDetails<SscsCaseData> caseDetails;
 
     @BeforeEach
     void setUp() {
+        ReflectionTestUtils.setField(handler, "isDefaultPanelCompEnabled", true);
         sscsCaseData = SscsCaseData.builder()
             .appeal(Appeal.builder().build())
             .dwpIsOfficerAttending("Yes")
             .build();
+
+        caseDetails =
+                new CaseDetails<>(1234L, "SSCS", State.READY_TO_LIST, sscsCaseData, now(), "Benefit");
+
+        callback = new Callback<>(caseDetails, empty(), UPDATE_LISTING_REQUIREMENTS, false);
     }
 
     @Test
     void givenValidCallback_thenReturnTrue() {
-        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT,callback)).isTrue();
     }
 
@@ -72,33 +79,12 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @Test
     void givenInvalidEventType_thenReturnFalse() {
-        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-        given(callback.getEvent()).willReturn(EventType.ADD_HEARING);
+        callback = new Callback<>(caseDetails, empty(), EventType.ADD_HEARING, false);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 
     @Test
-    void handleUpdateListingRequirementsNonGapsSwitchOverFeature() {
-        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-        ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", false);
-        sscsCaseData = CaseDataUtils.buildCaseData();
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-            ABOUT_TO_SUBMIT,
-            callback,
-            USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-    }
-
-    @Test
-    void handleUpdateListingRequirementsGapsSwitchOverFeatureNoOverrides() {
-        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-        ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
-        sscsCaseData = CaseDataUtils.buildCaseData();
+    void handleUpdateListingRequirementsNoOverrides() {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
             ABOUT_TO_SUBMIT,
             callback,
@@ -111,9 +97,6 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     @EnumSource(value = YesNo.class)
     @NullSource
     void reservedDistrictTribunalJudge_savesSelectionToCaseData(YesNo reservedDtj) {
-        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
         ReserveTo reserveTo = new ReserveTo();
         reserveTo.setReservedDistrictTribunalJudge(reservedDtj);
         sscsCaseData.getSchedulingAndListingFields().setReserveTo(reserveTo);
@@ -129,10 +112,8 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenReservedDistrictTribunalJudgeIsYesAndReservedJudgeIsNotNull_responseReservedJudgeIsNull() {
-        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+    void givenReservedDistrictTribunalJudgeIsYesAndReservedJudgeIsNotNull_responseReservedJudgeAndPanelCompositionJudgeAreNull() {
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").panelCompositionMemberMedical1("NoMedicalMemberRequired").build());
         ReserveTo reserveTo = new ReserveTo();
         reserveTo.setReservedDistrictTribunalJudge(YES);
         reserveTo.setReservedJudge(new JudicialUserBase("1", "2"));
@@ -146,14 +127,26 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         assertThat(response.getErrors()).isEmpty();
         JudicialUserBase result = response.getData().getSchedulingAndListingFields().getReserveTo().getReservedJudge();
         assertThat(result).isNull();
+        assertThat(response.getData().getPanelMemberComposition().getPanelCompositionJudge()).isNull();
+    }
+
+    @Test
+    void givenNoMedicalMemberRequiredSelected_thenClearMedicalMemberFields() {
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84")
+                .panelCompositionMemberMedical1("NoMedicalMemberRequired").panelCompositionMemberMedical2("58").build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+                ABOUT_TO_SUBMIT,
+                callback,
+                USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getPanelMemberComposition().getPanelCompositionMemberMedical1()).isNull();
+        assertThat(response.getData().getPanelMemberComposition().getPanelCompositionMemberMedical2()).isNull();
     }
 
     @Test
     void givenHearingChannelIsNotNull_thenReturnHearingSubtype() {
-        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().appellantHearingChannel(VIDEO).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
@@ -175,10 +168,6 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
         sscsCaseData.getAppeal().setHearingSubtype(hearingSubType);
 
-        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().appellantHearingChannel(null).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
@@ -193,10 +182,6 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @Test
     void givenAppellantInterpreterIsNotNull_thenReturnLanguageInterpreterOnCaseData() {
-        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-
         DynamicListItem interpreterLanguageItem = new DynamicListItem("test", "Arabic");
         DynamicList interpreterLanguage = new DynamicList(interpreterLanguageItem, List.of());
 
@@ -221,10 +206,6 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @Test
     void givenAppellantInterpreterIsNull_thenDoNotUpdateCaseDataInterpreter() {
-        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
             .appellantInterpreter(null)
             .build());
@@ -247,10 +228,6 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     @ParameterizedTest
     @EnumSource(value = HmcHearingType.class, names = {"SUBSTANTIVE", "DIRECTION_HEARINGS"})
     void givenHmcHearingTypeIsNotNull_thenUpdateToNonNullHearingOptions(HmcHearingType hmcHearingType) {
-        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
             .appellantInterpreter(null)
             .hmcHearingType(hmcHearingType)
@@ -275,10 +252,6 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     @ParameterizedTest
     @EnumSource(value = HmcHearingType.class, names = {"SUBSTANTIVE", "DIRECTION_HEARINGS"})
     void givenHmcHearingTypeIsNotNull_thenUpdateToNullHearingOptions(HmcHearingType hmcHearingType) {
-        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
             .hmcHearingType(hmcHearingType)
             .build());
@@ -290,5 +263,37 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
         assertThat(response.getErrors()).isEmpty();
         assertThat(hmcHearingType).isEqualTo(response.getData().getAppeal().getHearingOptions().getHmcHearingType());
+    }
+
+    @Test
+    void givenPanelMemberCompositionHasFqpm_thenIsFqpmRequiredIsYes() {
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
+            .panelCompositionDisabilityAndFqMember(List.of(
+                PanelMemberType.TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED.toRef()))
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getIsFqpmRequired()).isEqualTo(YES);
+    }
+
+    @Test
+    void givenIsFqpmRequiredIsYesAndNoFqpmInPanelMemberComposition_thenUpdateIsFqpmRequiredToNo() {
+        sscsCaseData.setIsFqpmRequired(YES);
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
+            .panelCompositionDisabilityAndFqMember(Collections.emptyList())
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getIsFqpmRequired()).isEqualTo(NO);
     }
 }

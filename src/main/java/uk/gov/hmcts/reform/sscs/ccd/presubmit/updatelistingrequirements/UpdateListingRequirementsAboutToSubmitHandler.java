@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getHmcHearingType;
 
@@ -22,8 +24,8 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @Slf4j
 @RequiredArgsConstructor
 public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-    @Value("${feature.gaps-switchover.enabled}")
-    private boolean gapsSwitchOverFeature;
+    @Value("${feature.default-panel-comp.enabled}")
+    private boolean isDefaultPanelCompEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -56,7 +58,16 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
             if (isYes(callbackReservedDtj)) {
                 caseDataReserveTo.setReservedJudge(null);
+                if (isDefaultPanelCompEnabled && callbackResponse.getData().getPanelMemberComposition() != null) {
+                    callbackResponse.getData().getPanelMemberComposition().setPanelCompositionJudge(null);
+                }
             }
+        }
+
+        if (isDefaultPanelCompEnabled && callbackResponse.getData().getPanelMemberComposition() != null
+                && "NoMedicalMemberRequired".equals(callbackResponse.getData().getPanelMemberComposition().getPanelCompositionMemberMedical1())) {
+            callbackResponse.getData().getPanelMemberComposition().setPanelCompositionMemberMedical1(null);
+            callbackResponse.getData().getPanelMemberComposition().setPanelCompositionMemberMedical2(null);
         }
 
         OverrideFields overrideFields = caseDataSnlFields.getOverrideFields();
@@ -71,13 +82,30 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 SscsUtil.updateHearingInterpreter(sscsCaseData, callbackResponse, appellantInterpreter);
             }
         }
-
+      
         sscsCaseData.getAppeal()
             .setHearingOptions(Optional.ofNullable(sscsCaseData.getAppeal().getHearingOptions())
                 .map(HearingOptions::toBuilder)
                 .orElseGet(HearingOptions::builder)
                 .hmcHearingType(getHmcHearingType(sscsCaseData))
                 .build());
+
+        if (isDefaultPanelCompEnabled) {
+            setFqpmRequired(callbackResponse.getData());
+        }
+
         return callbackResponse;
+    }
+
+    private void setFqpmRequired(SscsCaseData sscsCaseData) {
+        PanelMemberComposition panelMemberComposition = Optional
+            .ofNullable(sscsCaseData.getPanelMemberComposition())
+            .orElseGet(() -> PanelMemberComposition.builder().build());
+
+        if (panelMemberComposition.hasFqpm()) {
+            sscsCaseData.setIsFqpmRequired(YES);
+        } else if (isYes(sscsCaseData.getIsFqpmRequired())) {
+            sscsCaseData.setIsFqpmRequired(NO);
+        }
     }
 }
