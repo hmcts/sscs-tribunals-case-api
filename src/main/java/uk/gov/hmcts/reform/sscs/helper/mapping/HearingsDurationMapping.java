@@ -4,7 +4,6 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType.NON_STANDARD;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType.STANDARD;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
-import static uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil.isInterpreterRequired;
 
 import java.util.Collections;
 import java.util.List;
@@ -44,13 +43,13 @@ public final class HearingsDurationMapping {
         // if no adjournment in progress, we first try to set the override value if present
         if (nonNull(overrideDuration) && overrideDuration >= MIN_HEARING_DURATION) {
             log.info("Hearing Duration for Case ID {} set as existing Override Field value {}", caseId, overrideDuration);
-            return handleStandardDuration(caseData, overrideDuration);
+            return overrideDuration;
         }
         Integer defaultListingDuration = OverridesMapping.getDefaultListingValues(caseData).getDuration();
         // or we set based on existing S&L default listing value for duration if present
         if (nonNull(defaultListingDuration) && defaultListingDuration >= MIN_HEARING_DURATION) {
             log.info("Hearing Duration for Case ID {} set as existing defaultListingDuration value {}", caseId, defaultListingDuration);
-            return handleStandardDuration(caseData, defaultListingDuration);
+            return defaultListingDuration;
         }
         if (caseData.isIbcCase()) {
             throw new ListingException("Hearing duration is required to list case");
@@ -72,7 +71,7 @@ public final class HearingsDurationMapping {
         if (nonNull(existingDuration) && durationType == STANDARD) {
             log.debug("existingDuration with STANDARD for caseId={}", caseData.getCcdCaseId());
             existingDuration = handleAdjournmentHearingType(caseData, hearingDurationsService, existingDuration);
-            return handleStandardDuration(caseData, existingDuration);
+            return existingDuration;
         }
 
         Integer nextDuration = caseData.getAdjournment().getNextHearingListingDuration();
@@ -98,17 +97,6 @@ public final class HearingsDurationMapping {
         return duration;
     }
 
-    private static Integer handleStandardDuration(SscsCaseData caseData, Integer duration) {
-        if (duration == null) {
-            return null;
-        }
-        if (isYes(caseData.getAppeal().getHearingOptions().getWantsToAttend())
-                && isInterpreterRequired(caseData)) {
-            // if interpreter, add 30 minutes to existing duration
-            return duration + MIN_HEARING_DURATION;
-        }
-        return duration;
-    }
 
     private static Integer handleNonStandardDuration(SscsCaseData caseData, Integer duration) {
         if (duration == null) {
