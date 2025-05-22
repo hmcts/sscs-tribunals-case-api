@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
+import static java.time.LocalDateTime.now;
+import static java.util.Optional.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -9,19 +11,18 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.RESPONSE_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 
 import java.util.Collections;
 import java.util.function.Consumer;
-import junitparams.JUnitParamsRunner;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
@@ -36,17 +37,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
+@ExtendWith(MockitoExtension.class)
+public class ListingStateProcessingServiceTest {
 
-@RunWith(JUnitParamsRunner.class)
-public class PanelCompositionServiceTest {
-
-    private PanelCompositionService panelCompositionService;
+    private ListingStateProcessingService listingStateProcessingService;
     private SscsCaseData sscsCaseData;
-
-    @Mock
     private CaseDetails<SscsCaseData> caseDetails;
-
-    @Mock
     private Callback<SscsCaseData> callback;
 
     @Mock
@@ -59,25 +55,29 @@ public class PanelCompositionServiceTest {
     private ArgumentCaptor<Consumer<SscsCaseDetails>> consumerArgumentCaptor;
 
 
-    @Before
+    @BeforeEach
     public void setup() {
-        openMocks(this);
-        panelCompositionService = new PanelCompositionService(updateCcdCaseService, idamService);
+        listingStateProcessingService = new ListingStateProcessingService(updateCcdCaseService, idamService);
         sscsCaseData = buildCaseData("Bloggs");
         sscsCaseData.setCcdCaseId("1");
         sscsCaseData.getAppeal().getAppellant().getIdentity().setNino("789123");
         sscsCaseData.setDirectionDueDate("11/01/2023");
         sscsCaseData.setState(State.APPEAL_CREATED);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
+        caseDetails = new CaseDetails<>(
+                1234L, "SSCS", sscsCaseData.getState(), sscsCaseData, now(), "Benefit"
+        );
+        callback = new Callback<>(caseDetails, empty(), EventType.READY_TO_LIST, false);
     }
 
     @Test
     public void givenResponseReceivedCase_thenInterLocReviewIsNone() {
-        sscsCaseData.setState(State.RESPONSE_RECEIVED);
-        when(caseDetails.getState()).thenReturn(sscsCaseData.getState());
-        panelCompositionService.processCaseState(callback,sscsCaseData, EventType.CONFIRM_PANEL_COMPOSITION);
+        sscsCaseData.setState(RESPONSE_RECEIVED);
+        caseDetails = new CaseDetails<>(
+                1234L, "SSCS", RESPONSE_RECEIVED, sscsCaseData, now(), "Benefit"
+        );
+        callback = new Callback<>(caseDetails, empty(), EventType.READY_TO_LIST, false);
+
+        listingStateProcessingService.processCaseState(callback,sscsCaseData, EventType.CONFIRM_PANEL_COMPOSITION);
 
         verify(updateCcdCaseService).updateCaseV2(
                 anyLong(),
@@ -95,14 +95,13 @@ public class PanelCompositionServiceTest {
     @Test
     public void givenDormantCase_caseShouldNotUpdate() {
         sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
-        when(caseDetails.getState()).thenReturn(sscsCaseData.getState());
-        panelCompositionService.processCaseState(callback,sscsCaseData, EventType.CONFIRM_PANEL_COMPOSITION);
+        listingStateProcessingService.processCaseState(callback,sscsCaseData, EventType.CONFIRM_PANEL_COMPOSITION);
         verify(updateCcdCaseService, never()).updateCase(any(), any(), anyString(), anyString(), anyString(), any());
     }
 
     @Test
     public void givenNonDormantCase_caseShouldUpdate() {
-        panelCompositionService.processCaseState(callback,sscsCaseData, EventType.CONFIRM_PANEL_COMPOSITION);
+        listingStateProcessingService.processCaseState(callback,sscsCaseData, EventType.CONFIRM_PANEL_COMPOSITION);
         verify(updateCcdCaseService, times(1)).triggerCaseEventV2(any(), any(), anyString(), anyString(), any());
     }
 
@@ -116,7 +115,7 @@ public class PanelCompositionServiceTest {
             .build();
         sscsCaseData.setOtherParties(Collections.singletonList(otherParty));
         sscsCaseData.setIsFqpmRequired(YesNo.YES);
-        panelCompositionService.processCaseState(callback,sscsCaseData, EventType.UPDATE_OTHER_PARTY_DATA);
+        listingStateProcessingService.processCaseState(callback,sscsCaseData, EventType.UPDATE_OTHER_PARTY_DATA);
 
         verify(updateCcdCaseService).updateCaseV2(
                 anyLong(),
