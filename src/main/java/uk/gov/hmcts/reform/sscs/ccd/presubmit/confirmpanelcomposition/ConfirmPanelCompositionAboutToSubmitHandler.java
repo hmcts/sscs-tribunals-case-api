@@ -44,7 +44,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandler implements PreSubmitCal
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         if (isDefaultPanelCompEnabled) {
-            setFqpmInPanelMemberComposition(sscsCaseData);
+            syncUpdateListingRequirements(sscsCaseData);
         }
 
         processInterloc(sscsCaseData);
@@ -59,7 +59,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandler implements PreSubmitCal
         }
     }
 
-    private void setFqpmInPanelMemberComposition(SscsCaseData sscsCaseData) {
+    private void syncUpdateListingRequirements(SscsCaseData sscsCaseData) {
         if (isNull(sscsCaseData.getPanelMemberComposition())) {
             sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().build());
         }
@@ -71,6 +71,14 @@ public class ConfirmPanelCompositionAboutToSubmitHandler implements PreSubmitCal
             sscsCaseData.getPanelMemberComposition().addFqpm();
         } else if (!isFqpmRequired && hasFqpm) {
             sscsCaseData.getPanelMemberComposition().removeFqpm();
+        }
+      
+        if (sscsCaseData.isIbcCase()) {
+            if (isYes(sscsCaseData.getIsMedicalMemberRequired())) {
+                sscsCaseData.getPanelMemberComposition().updateToTribunalMedicalMember();
+            } else {
+                sscsCaseData.getPanelMemberComposition().clearMedicalMembers();
+            }
         }
     }
 }
