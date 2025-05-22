@@ -699,6 +699,10 @@ sscs-tribunals-frontend:
           - sscs-redis-connection-string
 
 redis:
+  serviceAccount:
+    create: false
+    name: "sscs"
+    automountServiceAccountToken: true
   enabled: true
   replica:
     replicaCount: 0
