@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getHmcHearingType;
 
@@ -22,7 +24,6 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @Slf4j
 @RequiredArgsConstructor
 public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-
     @Value("${feature.default-panel-comp.enabled}")
     private boolean isDefaultPanelCompEnabled;
 
@@ -81,13 +82,30 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 SscsUtil.updateHearingInterpreter(sscsCaseData, callbackResponse, appellantInterpreter);
             }
         }
-      
+
         sscsCaseData.getAppeal()
             .setHearingOptions(Optional.ofNullable(sscsCaseData.getAppeal().getHearingOptions())
                 .map(HearingOptions::toBuilder)
                 .orElseGet(HearingOptions::builder)
                 .hmcHearingType(getHmcHearingType(sscsCaseData))
                 .build());
+
+        if (isDefaultPanelCompEnabled) {
+            setFqpmRequired(callbackResponse.getData());
+        }
+
         return callbackResponse;
+    }
+
+    private void setFqpmRequired(SscsCaseData sscsCaseData) {
+        PanelMemberComposition panelMemberComposition = Optional
+            .ofNullable(sscsCaseData.getPanelMemberComposition())
+            .orElseGet(() -> PanelMemberComposition.builder().build());
+
+        if (panelMemberComposition.hasFqpm()) {
+            sscsCaseData.setIsFqpmRequired(YES);
+        } else if (isYes(sscsCaseData.getIsFqpmRequired())) {
+            sscsCaseData.setIsFqpmRequired(NO);
+        }
     }
 }
