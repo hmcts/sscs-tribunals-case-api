@@ -22,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
@@ -37,6 +38,9 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String FQPM = PanelMemberType.TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED.toRef();
+    private static final String TRIBUNAL_MEDICAL_MEMBER_REF = PanelMemberType.TRIBUNAL_MEMBER_MEDICAL.toRef();
+    private static final String REGIONAL_MEDICAL_MEMBER_REF = PanelMemberType.REGIONAL_MEDICAL_MEMBER.toRef();
+    private static final String IBCA_BENEFIT_CODE = Benefit.INFECTED_BLOOD_COMPENSATION.getBenefitCode();
 
     @InjectMocks
     private ConfirmPanelCompositionAboutToSubmitHandler handler;
@@ -153,6 +157,33 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
 
         assertThat(response.getData().getPanelMemberComposition().getPanelCompositionDisabilityAndFqMember())
             .doesNotContain(FQPM);
+    }
+
+    @Test
+    public void givenMedicalMemberRequiredNoOnIbcaCase_thenPanelMemberCompositionMedicalMembersAreNull() {
+        sscsCaseData.setBenefitCode(IBCA_BENEFIT_CODE);
+        sscsCaseData.setIsMedicalMemberRequired(NO);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getPanelMemberComposition().getPanelCompositionMemberMedical1()).isNull();
+        assertThat(response.getData().getPanelMemberComposition().getPanelCompositionMemberMedical2()).isNull();
+    }
+
+    @Test
+    public void givenMedicalMemberRequiredYesOnIbcaCase_thenPanelMemberCompositionHasMedicalMember() {
+        sscsCaseData.setBenefitCode(IBCA_BENEFIT_CODE);
+        sscsCaseData.setIsMedicalMemberRequired(YES);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        List<String> medicalMembers = new ArrayList<>();
+        medicalMembers.add(response.getData().getPanelMemberComposition().getPanelCompositionMemberMedical1());
+        medicalMembers.add(response.getData().getPanelMemberComposition().getPanelCompositionMemberMedical2());
+
+        assertThat(medicalMembers).containsAnyOf(TRIBUNAL_MEDICAL_MEMBER_REF, REGIONAL_MEDICAL_MEMBER_REF);
     }
 
 }

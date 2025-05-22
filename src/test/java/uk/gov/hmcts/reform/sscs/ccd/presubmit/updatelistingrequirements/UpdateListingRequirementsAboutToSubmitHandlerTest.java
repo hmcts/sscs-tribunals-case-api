@@ -24,6 +24,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
@@ -45,6 +46,8 @@ import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
+    private static final String REGIONAL_MEDICAL_MEMBER_REF = PanelMemberType.REGIONAL_MEDICAL_MEMBER.toRef();
+    private static final String IBCA_BENEFIT_CODE = Benefit.INFECTED_BLOOD_COMPENSATION.getBenefitCode();
 
     @InjectMocks
     private UpdateListingRequirementsAboutToSubmitHandler handler;
@@ -295,5 +298,39 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
         assertThat(response.getErrors()).isEmpty();
         assertThat(response.getData().getIsFqpmRequired()).isEqualTo(NO);
+    }
+
+    @Test
+    void givenPanelMemberCompositionHasMedicalMemberOnIbcaCase_thenUpdateIsMedicalMemberRequiredToYes() {
+        sscsCaseData.setBenefitCode(IBCA_BENEFIT_CODE);
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
+            .panelCompositionMemberMedical1("notMedicalMember")
+            .panelCompositionMemberMedical2(REGIONAL_MEDICAL_MEMBER_REF)
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getIsMedicalMemberRequired()).isEqualTo(YES);
+    }
+
+    @Test
+    void givenPanelMemberCompositionHasNoMedicalMemberOnIbcaCase_thenUpdateIsMedicalMemberRequiredToNo() {
+        sscsCaseData.setBenefitCode(IBCA_BENEFIT_CODE);
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
+            .panelCompositionMemberMedical1("notMedicalMember")
+            .panelCompositionMemberMedical2(null)
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getIsMedicalMemberRequired()).isEqualTo(NO);
     }
 }

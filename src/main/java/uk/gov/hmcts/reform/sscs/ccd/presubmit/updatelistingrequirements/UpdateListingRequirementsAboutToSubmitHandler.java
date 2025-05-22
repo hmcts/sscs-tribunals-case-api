@@ -91,13 +91,13 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 .build());
 
         if (isDefaultPanelCompEnabled) {
-            setFqpmRequired(callbackResponse.getData());
+            syncConfirmPanelComposition(callbackResponse.getData());
         }
 
         return callbackResponse;
     }
 
-    private void setFqpmRequired(SscsCaseData sscsCaseData) {
+    private void syncConfirmPanelComposition(SscsCaseData sscsCaseData) {
         PanelMemberComposition panelMemberComposition = Optional
             .ofNullable(sscsCaseData.getPanelMemberComposition())
             .orElseGet(() -> PanelMemberComposition.builder().build());
@@ -106,6 +106,11 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             sscsCaseData.setIsFqpmRequired(YES);
         } else if (isYes(sscsCaseData.getIsFqpmRequired())) {
             sscsCaseData.setIsFqpmRequired(NO);
+        }
+
+        if (sscsCaseData.isIbcCase()) {
+            sscsCaseData.setIsMedicalMemberRequired(
+                (sscsCaseData.getPanelMemberComposition().hasMedicalMember()) ? YES : NO);
         }
     }
 }
