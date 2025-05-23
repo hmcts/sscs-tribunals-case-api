@@ -787,20 +787,20 @@ class DirectionIssuedAboutToSubmitHandlerTest {
     @Test
     void willWipeHmcHearingTypeIfSelectNextHmcHearingTypeIsNull() {
         when(caseDetails.getState()).thenReturn(State.READY_TO_LIST);
-        sscsCaseData.setSelectNextHmcHearingType(null);
+        sscsCaseData.getExtendedSscsCaseData().setSelectNextHmcHearingType(null);
         sscsCaseData.setHmcHearingType(HmcHearingType.SUBSTANTIVE);
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNull(response.getData().getSelectNextHmcHearingType());
+        assertNull(response.getData().getExtendedSscsCaseData().getSelectNextHmcHearingType());
     }
 
     @Test
     void willWipeHmcHearingTypeIfSelectNextHmcHearingTypeIsNo() {
         when(caseDetails.getState()).thenReturn(State.READY_TO_LIST);
-        sscsCaseData.setSelectNextHmcHearingType(NO);
+        sscsCaseData.getExtendedSscsCaseData().setSelectNextHmcHearingType(NO);
         sscsCaseData.setHmcHearingType(HmcHearingType.SUBSTANTIVE);
         sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().hmcHearingType(HmcHearingType.SUBSTANTIVE).build());
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(NO, response.getData().getSelectNextHmcHearingType());
+        assertEquals(NO, response.getData().getExtendedSscsCaseData().getSelectNextHmcHearingType());
         assertNull(response.getData().getAppeal().getHearingOptions().getHmcHearingType());
     }
 
@@ -808,11 +808,11 @@ class DirectionIssuedAboutToSubmitHandlerTest {
     @EnumSource(value = HmcHearingType.class, names = {"SUBSTANTIVE", "DIRECTION_HEARINGS"})
     void willSetHmcHearingTypeInHearingOptionsNullIfselectNextHmcHearingTypeIsYes(HmcHearingType hmcHearingType) {
         when(caseDetails.getState()).thenReturn(State.READY_TO_LIST);
-        sscsCaseData.setSelectNextHmcHearingType(YES);
+        sscsCaseData.getExtendedSscsCaseData().setSelectNextHmcHearingType(YES);
         sscsCaseData.setHmcHearingType(hmcHearingType);
         sscsCaseData.getAppeal().setHearingOptions(null);
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(YES, response.getData().getSelectNextHmcHearingType());
+        assertEquals(YES, response.getData().getExtendedSscsCaseData().getSelectNextHmcHearingType());
         assertEquals(hmcHearingType, response.getData().getHmcHearingType());
         assertEquals(hmcHearingType, response.getData().getAppeal().getHearingOptions().getHmcHearingType());
         assertEquals(HearingOptions.builder().hmcHearingType(hmcHearingType).build(), response.getData().getAppeal().getHearingOptions());
@@ -822,11 +822,11 @@ class DirectionIssuedAboutToSubmitHandlerTest {
     @EnumSource(value = HmcHearingType.class, names = {"SUBSTANTIVE", "DIRECTION_HEARINGS"})
     void willSetTypeOfHearingInHearingOptionsNotNullIfSelectNextTypeOfHearingIsYes(HmcHearingType hmcHearingType) {
         when(caseDetails.getState()).thenReturn(State.READY_TO_LIST);
-        sscsCaseData.setSelectNextHmcHearingType(YES);
+        sscsCaseData.getExtendedSscsCaseData().setSelectNextHmcHearingType(YES);
         sscsCaseData.setHmcHearingType(hmcHearingType);
         sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().agreeLessNotice("string").build());
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(YES, response.getData().getSelectNextHmcHearingType());
+        assertEquals(YES, response.getData().getExtendedSscsCaseData().getSelectNextHmcHearingType());
         assertEquals(hmcHearingType, response.getData().getHmcHearingType());
         assertEquals(hmcHearingType, response.getData().getAppeal().getHearingOptions().getHmcHearingType());
         HearingOptions expectedHearingOptions = HearingOptions.builder().agreeLessNotice("string").hmcHearingType(hmcHearingType).build();

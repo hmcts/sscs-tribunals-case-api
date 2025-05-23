@@ -99,8 +99,6 @@ am-org-role-mapping-service:
             alias: app-insights-connection-string
           - name: am-org-role-mapping-service-s2s-secret
             alias: AM_ORG_ROLE_MAPPING_SERVICE_SECRET
-          - name: role-assignment-service-LD-SDK-KEY
-            alias: LD_SDK_KEY
           - name: orm-IDAM-CLIENT-ID
             alias: ORM_IDAM_CLIENT_ID
           - name: orm-IDAM-CLIENT-SECRET
@@ -120,7 +118,6 @@ am-org-role-mapping-service:
       JUDICIAL_REF_APP_URL: http://rd-judicial-api-aat.service.core-compute-aat.internal
       ROLE_ASSIGNMENT_APP_URL: ${SERVICE_NAME}-am-role-assignment-service
       JUDICIAL_BOOKING_APP_URL: http://am-judicial-booking-service-aat.service.core-compute-aat.internal
-      LAUNCH_DARKLY_ENV: pr
       AMQP_SHARED_ACCESS_KEY_NAME: RootManageSharedAccessKey
       AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
       CRD_SUBSCRIPTION_NAME: "{{ .Release.Name}}-servicebus-crd-topic"
@@ -134,10 +131,10 @@ am-org-role-mapping-service:
       ORG_ROLE_MAPPING_DB_USERNAME: hmcts
       ORG_ROLE_MAPPING_DB_PORT: 5432
       ORG_ROLE_MAPPING_DB_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
-      RUN_LD_ON_STARTUP: true
       TESTING_SUPPORT_ENABLED: true
       JUDICIAL_REF_APP_V2_ACTIVE: true
       JUDICIAL_REF_APP_V2_FILTER_AUTHS_BY_APP_ID: true
+      ORM_ENV: pr
 
 aac-manage-case-assignment:
   enabled: true
@@ -358,11 +355,9 @@ ccd:
       environment:
         ROLE_ASSIGNMENT_DB_USERNAME: hmcts
         ROLE_ASSIGNMENT_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
+        ORM_ENV: pr
+        CCD_DATA_STORE_URL: http://${SERVICE_NAME}-ccd-data-store-api
       keyVaults:
-        am:
-          secrets:
-            - name: role-assignment-service-LD-SDK-KEY
-              alias: LD_SDK_KEY
       secrets:
         ROLE_ASSIGNMENT_DB_PASSWORD:
           secretRef: postgres
