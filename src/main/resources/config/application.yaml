@@ -49,7 +49,9 @@ spring:
             abandon-when-percentage-full: 0
 
 springdoc:
-    packagesToScan: uk.gov.hmcts.reform.sscs.controller
+    packagesToScan: uk.gov.hmcts.reform.sscs.controller, uk.gov.hmcts.reform.sscs.bulkscan.controllers
+    api-docs:
+        path: /v3/api-docs
 
 subscriptions:
     mac:
@@ -123,6 +125,15 @@ core_case_data:
         url: ${CORE_CASE_DATA_API_URL:http://localhost:4452}
     caseTypeId: ${CORE_CASE_DATA_CASE_TYPE_ID:Benefit}
     jurisdictionId: ${CORE_CASE_DATA_JURISDICTION_ID:SSCS}
+ccd:
+    case:
+        jurisdiction: SSCS
+        type: Benefit
+        caseCreatedEventId: appealCreated
+        validAppealCreatedEventId: validAppealCreated
+        incompleteApplicationEventId: incompleteApplicationReceived
+        nonCompliantEventId: nonCompliant
+test.url: ${TEST_URL:http://localhost:8008}
 cover:
     english: TB-SCS-LET-ENG-Cover-Letter.docx
     welsh: TB-SCS-LET-WEL-Cover-Letter.docx
@@ -177,7 +188,7 @@ docmosis:
 document:
     bilingual:
         notice:
-            template: TB-SCS-GNO-WEL-00473.docx
+            template: TB-SCS-GNO-WEL-00473-v2.docx
     pdf:
         hmctsImgKey: hmcts2
         hmctsImgVal: '[userImage:hmcts.png]'
@@ -220,8 +231,10 @@ evidenceDescription:
             template:
                 path: /templates/evidenceDescriptionWelsh.html
 feature:
+    uc-office-feature:
+        enabled: ${UC_OFFICE_FEATURE:false}
     case-access-management:
-        enabled: ${CASE_ACCESS_MANAGEMENT_FEATURE:false}
+        enabled: ${CASE_ACCESS_MANAGEMENT_FEATURE:true}
     deleted-redacted-doc:
         enabled: ${DELETED_REDACTED_DOC_ENABLED:false}
     elasticsearch:
@@ -262,7 +275,8 @@ feature:
         enabled: ${TRIBUNAL_INTERNAL_DOCUMENTS_ENABLED:false}
     hearings-case-updateV2:
         enabled: ${HEARINGS_CASE_UPDATE_V2_ENABLED:false}
-
+    default-panel-comp:
+        enabled: ${DEFAULT_PANEL_COMPOSITION_ENABLED:false}
 
 idam:
     api:
@@ -286,6 +300,7 @@ idam:
         url: ${IDAM_S2S_AUTH:http://localhost:4502}
     url: ${IDAM_API_URL:http://localhost:5062}
 
+allowed-services-for-callback : ccd_data,bulk_scan_processor,bulk_scan_orchestrator,sscs  # comma separated list of service names
 
 judicial-ref:
     api:
@@ -352,7 +367,12 @@ rpc:
     testScotlandPostcode: SC1 1CS
 security:
     authorisedRoles: citizen,caseworker-sscs-systemupdate,caseworker-sscs,caseworker-sscs-anonymouscitizen,caseworker-sscs-callagent,caseworker,caseworker-sscs-dwpresponsewriter,caseworker-sscs-judge,caseworker-sscs-panelmember,caseworker-sscs-registrar,caseworker-sscs-superuser,caseworker-sscs-teamleader,caseworker-sscs-clerk,caseworker-sscs-bulkscan
-
+validation:
+    titles: Cllr,Count,DC,Dr,DS,Insp,Lady,Lord,Miss,Mr & Mrs,Mr,Mrs,Ms,PC,Rev,S/M,Sgt
+postcode-validator:
+    url: ${POSTCODE_VALIDATOR_URL:https://api.postcodes.io/postcodes/{postcode}/validate}
+    enabled: ${POSTCODE_VALIDATOR_ENABLED:true}
+    test-postcodes: ${POSTCODE_VALIDATOR_TEST_POSTCODES:TS1 1ST, TS2 2ST, TS3 3ST}
 ############•••••TYA•••••############
 
 coh:
@@ -413,9 +433,11 @@ tya.evidence.address.scottishPoBoxFeatureEnabled: ${SCOTTISH_PO_BOX_ENABLED:fals
 tya.evidence.address.ibcAddressLine2: HMCTS Infected Blood Compensation Appeals
 tya.evidence.address.ibcAddressLine3: PO Box 13618
 tya.evidence.address.ibcAddressPostcode: CM20 9WX
+tya.evidence.address.telephoneIbc: 0300 131 2850
 
 helpline:
     telephone: 0300 123 1142
+    telephoneIbc: 0300 131 2850
     telephoneScotland: 0300 790 6234
 
 
@@ -436,7 +458,7 @@ notification:
                 docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused-v2.docx
             docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused-v2.docx
         correctionRequest:
-            docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence-v2.docx
+            docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence-v3.docx
         correctionGranted:
             appellant:
                 docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused-v2.docx
@@ -462,11 +484,11 @@ notification:
                 docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused-v2.docx
             docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused-v2.docx
         setAsideRequest:
-            docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence-v2.docx
+            docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence-v3.docx
         libertyToApplyRequest:
-            docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence-v2.docx
+            docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence-v3.docx
         sORRequest:
-            docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence-v2.docx
+            docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence-v3.docx
         reviewAndSetAside:
             docmosisId: TB-SCS-LET-ENG-Permission-to-Appeal-Review-v2.docx
         permissionToAppealRefused:
@@ -474,7 +496,7 @@ notification:
         permissionToAppealGranted:
             docmosisId: TB-SCS-LET-ENG-Permission-to-Appeal-Granted-Refused-v2.docx
         permissionToAppealRequest:
-            docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence-v2.docx
+            docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence-v3.docx
         bundleCreatedForUpperTribunal:
             docmosisId: TB-SCS-LET-ENG-Share-with-Upper-Tribunal.docx
         jointPartyAdded:
@@ -573,44 +595,44 @@ notification:
             appellant:
                 emailId: 6919c7bd-96c7-4b6a-8a1d-4f8591a2ca19
                 smsId: 446c7b23-7342-42e1-adff-b4c367e951cb
-                docmosisId: TB-SCS-GNO-ENG-00659.docx
+                docmosisId: TB-SCS-GNO-ENG-00659-v2.docx
             representative:
                 emailId: e29a2275-553f-4e70-97f4-2994c095f281
                 smsId: f59440ee-19ca-4d47-a702-13e9cecaccbd
-                docmosisId: TB-SCS-GNO-ENG-00659.docx
+                docmosisId: TB-SCS-GNO-ENG-00659-v2.docx
             appointee:
                 emailId: 6919c7bd-96c7-4b6a-8a1d-4f8591a2ca19
                 smsId: 446c7b23-7342-42e1-adff-b4c367e951cb
-                docmosisId: TB-SCS-GNO-ENG-00659.docx
+                docmosisId: TB-SCS-GNO-ENG-00659-v2.docx
             joint_party:
                 emailId: 6ce5e7b0-b94f-4f6e-878b-012ec0ee17d1
                 smsId: c4db4fca-6876-4130-b4eb-09e900ae45a8
-                docmosisId: TB-SCS-GNO-ENG-00659.docx
+                docmosisId: TB-SCS-GNO-ENG-00659-v2.docx
             other_party:
                 emailId: e29a2275-553f-4e70-97f4-2994c095f281
                 smsId: f59440ee-19ca-4d47-a702-13e9cecaccbd
-                docmosisId: TB-SCS-GNO-ENG-00659.docx
+                docmosisId: TB-SCS-GNO-ENG-00659-v2.docx
         adminAppealWithdrawn:
             appellant:
                 emailId: 6919c7bd-96c7-4b6a-8a1d-4f8591a2ca19
                 smsId: 446c7b23-7342-42e1-adff-b4c367e951cb
-                docmosisId: TB-SCS-GNO-ENG-00659.docx
+                docmosisId: TB-SCS-GNO-ENG-00659-v2.docx
             appointee:
                 emailId: 6919c7bd-96c7-4b6a-8a1d-4f8591a2ca19
                 smsId: 446c7b23-7342-42e1-adff-b4c367e951cb
-                docmosisId: TB-SCS-GNO-ENG-00659.docx
+                docmosisId: TB-SCS-GNO-ENG-00659-v2.docx
             representative:
                 emailId: e29a2275-553f-4e70-97f4-2994c095f281
                 smsId: f59440ee-19ca-4d47-a702-13e9cecaccbd
-                docmosisId: TB-SCS-GNO-ENG-00659.docx
+                docmosisId: TB-SCS-GNO-ENG-00659-v2.docx
             joint_party:
                 emailId: 6ce5e7b0-b94f-4f6e-878b-012ec0ee17d1
                 smsId: c4db4fca-6876-4130-b4eb-09e900ae45a8
-                docmosisId: TB-SCS-GNO-ENG-00659.docx
+                docmosisId: TB-SCS-GNO-ENG-00659-v2.docx
             other_party:
                 emailId: e29a2275-553f-4e70-97f4-2994c095f281
                 smsId: f59440ee-19ca-4d47-a702-13e9cecaccbd
-                docmosisId: TB-SCS-GNO-ENG-00659.docx
+                docmosisId: TB-SCS-GNO-ENG-00659-v2.docx
         subscriptionCreated:
             appellant:
                 smsId: 7397a76f-14cb-468c-b1a7-0570940ead91
@@ -682,17 +704,6 @@ notification:
                     docmosisId: TB-SCS-GNO-ENG-00551-v2.docx
                 other_party:
                     docmosisId: TB-SCS-GNO-ENG-00551-v2.docx
-            provideInformation:
-                appellant:
-                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
-                appointee:
-                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
-                representative:
-                    docmosisId: TB-SCS-GNO-ENG-00089.docx
-                joint_party:
-                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
-                other_party:
-                    docmosisId: TB-SCS-GNO-ENG-00089.docx
             grantExtension:
                 appellant:
                     docmosisId: TB-SCS-GNO-ENG-00556-v2.docx
@@ -766,6 +777,28 @@ notification:
                     docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
                 other_party:
                     docmosisId: TB-SCS-GNO-ENG-00089.docx
+            provideInformation:
+                appellant:
+                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
+                appointee:
+                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
+                representative:
+                    docmosisId: TB-SCS-GNO-ENG-00089.docx
+                joint_party:
+                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
+                other_party:
+                    docmosisId: TB-SCS-GNO-ENG-00089.docx
+            issueAndSendToAdmin:
+                appellant:
+                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
+                appointee:
+                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
+                representative:
+                    docmosisId: TB-SCS-GNO-ENG-00089.docx
+                joint_party:
+                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
+                other_party:
+                    docmosisId: TB-SCS-GNO-ENG-00089.docx
         actionPostponementRequest:
             appellant:
               docmosisId: TB-SCS-LET-ENG-Action-Postponement-Request-v2.docx
@@ -826,13 +859,13 @@ notification:
                 docmosisId: TB-SCS-GNO-ENG-00582.docx
         actionHearingRecordingRequest:
             appellant:
-                docmosisId: TB-SCS-GNO-ENG-00760.docx
+                docmosisId: TB-SCS-GNO-ENG-00760-v2.docx
             representative:
-                docmosisId: TB-SCS-GNO-ENG-00760.docx
+                docmosisId: TB-SCS-GNO-ENG-00760-v2.docx
             appointee:
-                docmosisId: TB-SCS-GNO-ENG-00760.docx
+                docmosisId: TB-SCS-GNO-ENG-00760-v2.docx
             joint_party:
-                docmosisId: TB-SCS-GNO-ENG-00760.docx
+                docmosisId: TB-SCS-GNO-ENG-00760-v2.docx
         deathOfAppellant:
             representative:
                 docmosisId: TB-SCS-GNO-ENG-00773.docx
@@ -845,7 +878,7 @@ notification:
                 docmosisId: TB-SCS-GNO-ENG-00773.docx
         updateOtherPartyData:
             other_party:
-                docmosisId: TB-SCS-GNO-ENG-00784.docx
+                docmosisId: TB-SCS-GNO-ENG-00784-v2.docx
         libertyToApplyGranted:
             docmosisId: TB-SCS-LET-ENG-Liberty-to-Apply-Granted-Refused-v2.docx
         libertyToApplyRefused:
@@ -1212,44 +1245,44 @@ notification:
             appellant:
                 emailId: 7d93adf9-d7ab-4181-a2c5-c2708a203c9d
                 smsId: 0a269295-bf72-4ce1-ad99-9ff616fca0ae
-                docmosisId: TB-SCS-GNO-WEL-00661.docx
+                docmosisId: TB-SCS-GNO-WEL-00661-v2.docx
             representative:
                 emailId: 31ed3c24-0fc8-45a7-8071-4f27f4009634
                 smsId: 66ff7a2c-7e22-4a2b-9120-00aea140db75
-                docmosisId: TB-SCS-GNO-WEL-00661.docx
+                docmosisId: TB-SCS-GNO-WEL-00661-v2.docx
             appointee:
                 emailId: 7d93adf9-d7ab-4181-a2c5-c2708a203c9d
                 smsId: 0a269295-bf72-4ce1-ad99-9ff616fca0ae
-                docmosisId: TB-SCS-GNO-WEL-00661.docx
+                docmosisId: TB-SCS-GNO-WEL-00661-v2.docx
             joint_party:
                 emailId: 3a43dc4c-80d8-4bce-8290-26c08bfc0ef8
                 smsId: d43edb04-7563-406d-9d5a-a82ac983c065
-                docmosisId: TB-SCS-GNO-WEL-00661.docx
+                docmosisId: TB-SCS-GNO-WEL-00661-v2.docx
             other_party:
                 emailId: 31ed3c24-0fc8-45a7-8071-4f27f4009634
                 smsId: 66ff7a2c-7e22-4a2b-9120-00aea140db75
-                docmosisId: TB-SCS-GNO-WEL-00661.docx
+                docmosisId: TB-SCS-GNO-WEL-00661-v2.docx
         adminAppealWithdrawn:
             appellant:
                 emailId: 7d93adf9-d7ab-4181-a2c5-c2708a203c9d
                 smsId: 0a269295-bf72-4ce1-ad99-9ff616fca0ae
-                docmosisId: TB-SCS-GNO-WEL-00661.docx
+                docmosisId: TB-SCS-GNO-WEL-00661-v2.docx
             appointee:
                 emailId: 7d93adf9-d7ab-4181-a2c5-c2708a203c9d
                 smsId: 0a269295-bf72-4ce1-ad99-9ff616fca0ae
-                docmosisId: TB-SCS-GNO-WEL-00661.docx
+                docmosisId: TB-SCS-GNO-WEL-00661-v2.docx
             representative:
                 emailId: 31ed3c24-0fc8-45a7-8071-4f27f4009634
                 smsId: 66ff7a2c-7e22-4a2b-9120-00aea140db75
-                docmosisId: TB-SCS-GNO-WEL-00661.docx
+                docmosisId: TB-SCS-GNO-WEL-00661-v2.docx
             joint_party:
                 emailId: 3a43dc4c-80d8-4bce-8290-26c08bfc0ef8
                 smsId: d43edb04-7563-406d-9d5a-a82ac983c065
-                docmosisId: TB-SCS-GNO-WEL-00661.docx
+                docmosisId: TB-SCS-GNO-WEL-00661-v2.docx
             other_party:
                 emailId: 31ed3c24-0fc8-45a7-8071-4f27f4009634
                 smsId: 66ff7a2c-7e22-4a2b-9120-00aea140db75
-                docmosisId: TB-SCS-GNO-WEL-00661.docx
+                docmosisId: TB-SCS-GNO-WEL-00661-v2.docx
         subscriptionCreated:
             appellant:
                 smsId: 7397a76f-14cb-468c-b1a7-0570940ead91
@@ -1322,6 +1355,17 @@ notification:
                 other_party:
                     docmosisId: TB-SCS-GNO-WEL-00590-v2.docx
             provideInformation:
+                appellant:
+                    docmosisId: TB-SCS-GNO-WEL-00468-v2.docx
+                appointee:
+                    docmosisId: TB-SCS-GNO-WEL-00468-v2.docx
+                representative:
+                    docmosisId: TB-SCS-GNO-WEL-00472.docx
+                joint_party:
+                    docmosisId: TB-SCS-GNO-WEL-00468-v2.docx
+                other_party:
+                    docmosisId: TB-SCS-GNO-WEL-00472.docx
+            issueAndSendToAdmin:
                 appellant:
                     docmosisId: TB-SCS-GNO-WEL-00468-v2.docx
                 appointee:
@@ -1465,13 +1509,13 @@ notification:
                 docmosisId: TB-SCS-GNO-WEL-00602.docx
         actionHearingRecordingRequest:
             appellant:
-                docmosisId: TB-SCS-GNO-WEL-00765.docx
+                docmosisId: TB-SCS-GNO-WEL-00765-v2.docx
             representative:
-                docmosisId: TB-SCS-GNO-WEL-00765.docx
+                docmosisId: TB-SCS-GNO-WEL-00765-v2.docx
             appointee:
-                docmosisId: TB-SCS-GNO-WEL-00765.docx
+                docmosisId: TB-SCS-GNO-WEL-00765-v2.docx
             joint_party:
-                docmosisId: TB-SCS-GNO-WEL-00765.docx
+                docmosisId: TB-SCS-GNO-WEL-00765-v2.docx
         deathOfAppellant:
             representative:
                 docmosisId: TB-SCS-GNO-WEL-00774.docx
@@ -1484,7 +1528,7 @@ notification:
                 docmosisId: TB-SCS-GNO-WEL-00774.docx
         updateOtherPartyData:
             other_party:
-                docmosisId: TB-SCS-GNO-WEL-00787.docx
+                docmosisId: TB-SCS-GNO-WEL-00787-v2.docx
         libertyToApplyGranted:
             docmosisId: TB-SCS-LET-WEL-Liberty-to-Apply-Granted-Refused-v2.docx
         libertyToApplyRefused:
@@ -1729,6 +1773,8 @@ feign:
 
 # Document store
 document_management.url: ${DOCUMENT_MANAGEMENT_URL:http://dm-store:5005}
+
+schema.location: /config/schema/sscs-bulk-scan-schema.json
 
 appeal.email.host: ${EMAIL_SERVER_HOST:localhost}
 appeal.email.port: ${EMAIL_SERVER_PORT:1025}
@@ -2070,5 +2116,23 @@ job.scheduler:
                 instanceId: AUTO
             jobStore:
                 class: org.quartz.simpl.RAMJobStore
+---
+spring:
+    config:
+        activate:
+            on-profile: dev
+logging.level:
+    org.springframework.web: ${LOG_LEVEL_SPRING_WEB:debug}
+    uk.gov.hmcts.reform.sscs: ${LOG_LEVEL_SSCS:debug}
+    uk.gov.hmcts.reform.sscs.idam.IdamApiClient: DEBUG
+    uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi: DEBUG
+    uk.gov.hmcts.fortifyclient: INFO
 
+feign:
+    client:
+        config:
+            idam-api:
+                loggerLevel: full
+            core-case-data-api:
+                loggerLevel: full
 
