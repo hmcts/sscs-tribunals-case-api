@@ -155,6 +155,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
+        assertThat(response.getData().getPanelMemberComposition().getPanelCompositionDisabilityAndFqMember()).isNotNull();
         assertThat(response.getData().getPanelMemberComposition().getPanelCompositionDisabilityAndFqMember())
             .doesNotContain(FQPM);
     }
