@@ -706,17 +706,6 @@ notification:
                     docmosisId: TB-SCS-GNO-ENG-00551-v2.docx
                 other_party:
                     docmosisId: TB-SCS-GNO-ENG-00551-v2.docx
-            provideInformation:
-                appellant:
-                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
-                appointee:
-                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
-                representative:
-                    docmosisId: TB-SCS-GNO-ENG-00089.docx
-                joint_party:
-                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
-                other_party:
-                    docmosisId: TB-SCS-GNO-ENG-00089.docx
             grantExtension:
                 appellant:
                     docmosisId: TB-SCS-GNO-ENG-00556-v2.docx
@@ -780,6 +769,28 @@ notification:
                 other_party:
                     docmosisId: TB-SCS-GNO-ENG-00639-v2.docx
             refuseHearingRecordingRequest:
+                appellant:
+                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
+                appointee:
+                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
+                representative:
+                    docmosisId: TB-SCS-GNO-ENG-00089.docx
+                joint_party:
+                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
+                other_party:
+                    docmosisId: TB-SCS-GNO-ENG-00089.docx
+            provideInformation:
+                appellant:
+                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
+                appointee:
+                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
+                representative:
+                    docmosisId: TB-SCS-GNO-ENG-00089.docx
+                joint_party:
+                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
+                other_party:
+                    docmosisId: TB-SCS-GNO-ENG-00089.docx
+            issueAndSendToAdmin:
                 appellant:
                     docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
                 appointee:
@@ -1346,6 +1357,17 @@ notification:
                 other_party:
                     docmosisId: TB-SCS-GNO-WEL-00590-v2.docx
             provideInformation:
+                appellant:
+                    docmosisId: TB-SCS-GNO-WEL-00468-v2.docx
+                appointee:
+                    docmosisId: TB-SCS-GNO-WEL-00468-v2.docx
+                representative:
+                    docmosisId: TB-SCS-GNO-WEL-00472.docx
+                joint_party:
+                    docmosisId: TB-SCS-GNO-WEL-00468-v2.docx
+                other_party:
+                    docmosisId: TB-SCS-GNO-WEL-00472.docx
+            issueAndSendToAdmin:
                 appellant:
                     docmosisId: TB-SCS-GNO-WEL-00468-v2.docx
                 appointee:
