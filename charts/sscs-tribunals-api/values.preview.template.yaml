@@ -702,6 +702,10 @@ sscs-tribunals-frontend:
 
 redis:
   enabled: true
+  serviceAccount:
+    create: false
+    name: "sscs"
+    automountServiceAccountToken: true
   replica:
     replicaCount: 0
   cluster:
