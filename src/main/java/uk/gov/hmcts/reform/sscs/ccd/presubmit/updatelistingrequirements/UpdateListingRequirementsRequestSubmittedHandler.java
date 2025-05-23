@@ -5,12 +5,15 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
 
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
@@ -24,6 +27,9 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMess
 @Service
 @RequiredArgsConstructor
 public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    @Value("${feature.default-panel-comp.enabled}")
+    private boolean isDefaultPanelCompEnabled;
 
     private final ListAssistHearingMessageHelper listAssistHearingMessageHelper;
 
@@ -48,7 +54,10 @@ public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubm
 
         State state = callback.getCaseDetails().getState();
         HearingRoute hearingRoute = caseDataSnlFields.getHearingRoute();
-        if (state == State.READY_TO_LIST && hearingRoute == LIST_ASSIST && nonNull(caseDataSnlFields.getOverrideFields())) {
+        if (state == State.READY_TO_LIST && hearingRoute == LIST_ASSIST
+                && shouldSendHmcRequest(sscsCaseData, callback.getCaseDetailsBefore().orElse(null),
+                caseDataSnlFields)) {
+
             String caseId = sscsCaseData.getCcdCaseId();
             log.info("UpdateListingRequirements List Assist request, Update Hearing,"
                             + "amend reasons: {}, for case ID: {}",
@@ -70,5 +79,15 @@ public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubm
             callbackResponse.getErrors();
         }
         return callbackResponse;
+    }
+
+    private boolean shouldSendHmcRequest(SscsCaseData caseData, CaseDetails<SscsCaseData> caseDetailsBefore,
+                                         SchedulingAndListingFields snlFields) {
+        if (isDefaultPanelCompEnabled && nonNull(caseDetailsBefore)
+                && !Objects.equals(caseDetailsBefore.getCaseData().getPanelMemberComposition(),
+                caseData.getPanelMemberComposition())) {
+            return true;
+        }
+        return nonNull(snlFields.getOverrideFields());
     }
 }
