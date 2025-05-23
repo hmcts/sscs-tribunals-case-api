@@ -38,7 +38,6 @@
   {"LiveFrom": "01/01/2018", "ID": "address", "ListElementCode": "county", "FieldType": "Text", "ElementLabel": "County", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "address", "ListElementCode": "postcode", "FieldType": "Text", "ElementLabel": "Postcode", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "address", "ListElementCode": "country", "FieldType": "Text", "ElementLabel": "Country", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "01/01/2018", "ID": "address", "ListElementCode": "inMainlandUk", "FieldType": "YesOrNo", "ElementLabel": "Living in England, Scotland or Wales", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "address", "ListElementCode": "portOfEntry", "FieldType": "Text", "ElementLabel": "Port of Entry Code", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "address", "ListElementCode": "ukPortOfEntryList", "FieldType": "DynamicList", "ElementLabel": "Port of Entry", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "identity", "ListElementCode": "dob", "FieldType": "Date", "ElementLabel": "Date of birth", "SecurityClassification": "PUBLIC"},
@@ -545,7 +544,6 @@
   {"LiveFrom": "18/10/2024", "ID": "hearingOutcomeValue", "ListElementCode": "hearingOutcomeId", "FieldType": "FixedList", "FieldTypeParameter": "FL_caseOutcome", "ElementLabel": "Hearing Outcome", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/10/2024", "ID": "hearingOutcomeValue", "ListElementCode": "didPoAttendHearing", "FieldType": "YesOrNo", "ElementLabel": "Did PO Attend?", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/10/2024", "ID": "hearingOutcomeValue", "ListElementCode": "completedHearings", "FieldType": "DynamicList", "ElementLabel": "Hearing", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationReply", "ListElementCode": "replyDateTime", "FieldType": "DateTime", "ElementLabel": "Date Of Reply", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationReply", "ListElementCode": "replyUserName", "FieldType": "Text", "ElementLabel": "Reply From Name", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationReply", "ListElementCode": "replyUserRole", "FieldType": "Text", "ElementLabel": "Reply From Role", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationReply", "ListElementCode": "replyMessage", "FieldType": "TextArea", "ElementLabel": "Reply", "SecurityClassification": "PUBLIC"},
@@ -556,6 +554,5 @@
   {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestUserName", "FieldType": "Text", "ElementLabel": "Request From Name", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestUserRole", "FieldType": "Text", "ElementLabel": "Request From Role", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestTopic", "FieldType": "FixedList", "ElementLabel": "Request Topic", "FieldTypeParameter" : "FL_commRequestTopic", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestMessage", "FieldType": "TextArea", "ElementLabel": "Request", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestReply", "FieldType": "ftaCommunicationReply", "ElementLabel": "Reply", "SecurityClassification": "PUBLIC"}
+  {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestMessage", "FieldType": "TextArea", "ElementLabel": "Request", "SecurityClassification": "PUBLIC"}
 ]
