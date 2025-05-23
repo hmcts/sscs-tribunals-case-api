@@ -74,9 +74,13 @@ public class ConfirmPanelCompositionAboutToSubmitHandler implements PreSubmitCal
         }
       
         if (sscsCaseData.isIbcCase()) {
-            if (isYes(sscsCaseData.getIsMedicalMemberRequired())) {
-                sscsCaseData.getPanelMemberComposition().updateToTribunalMedicalMember();
-            } else {
+            if (isYes(sscsCaseData.getIsMedicalMemberRequired())
+                && !sscsCaseData.getPanelMemberComposition().hasMedicalMember()) {
+
+                sscsCaseData.getPanelMemberComposition()
+                    .setPanelCompositionMemberMedical1(PanelMemberType.TRIBUNAL_MEMBER_MEDICAL.toRef());
+
+            } else if (!isYes(sscsCaseData.getIsMedicalMemberRequired())) {
                 sscsCaseData.getPanelMemberComposition().clearMedicalMembers();
             }
         }

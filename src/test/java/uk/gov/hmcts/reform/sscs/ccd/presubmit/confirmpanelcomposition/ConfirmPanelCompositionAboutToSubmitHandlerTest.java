@@ -50,7 +50,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
     private CaseDetails<SscsCaseData> caseDetails;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         ReflectionTestUtils.setField(handler, "isDefaultPanelCompEnabled", true);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").build();
         caseDetails = new CaseDetails<>(
@@ -65,7 +65,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAValidAboutToSubmitEvent_thenReturnTrue() {
+    void givenAValidAboutToSubmitEvent_thenReturnTrue() {
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isTrue();
     }
 
@@ -75,13 +75,13 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void throwsExceptionIfItCannotHandleTheAppeal() {
+    void throwsExceptionIfItCannotHandleTheAppeal() {
         callback = new Callback<>(caseDetails, empty(), EventType.CASE_UPDATED, false);
         assertThatIllegalStateException().isThrownBy(() -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION));
     }
 
     @Test
-    public void givenFqpmRequiredNull_thenNoChange() {
+    void givenFqpmRequiredNull_thenNoChange() {
         sscsCaseData.setIsFqpmRequired(null);
         sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.NONE);
@@ -95,7 +95,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @EnumSource(value = YesNo.class, names = {"YES", "NO"})
-    public void givenFqpmRequiredYesOrNoAndInterlocByJudge_thenClearInterloc(YesNo isFqpmRequired) {
+    void givenFqpmRequiredYesOrNoAndInterlocByJudge_thenClearInterloc(YesNo isFqpmRequired) {
         sscsCaseData.setIsFqpmRequired(isFqpmRequired);
         sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.NONE);
@@ -109,7 +109,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @EnumSource(value = YesNo.class, names = {"YES", "NO"})
-    public void givenFqpmRequiredYesOrNoAndNoInterlocByJudge_thenInterlocNotChanged(YesNo isFqpmRequired) {
+    void givenFqpmRequiredYesOrNoAndNoInterlocByJudge_thenInterlocNotChanged(YesNo isFqpmRequired) {
         sscsCaseData.setIsFqpmRequired(isFqpmRequired);
         sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.NONE);
@@ -122,7 +122,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenNoFqpmRequiredSet_thenInterlocNotChanged() {
+    void givenNoFqpmRequiredSet_thenInterlocNotChanged() {
         sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.NONE);
 
@@ -134,7 +134,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenFqpmRequiredSet_thenUpdateFqpmInPanelMemberComposition() {
+    void givenFqpmRequiredSet_thenUpdateFqpmInPanelMemberComposition() {
         sscsCaseData.setIsFqpmRequired(YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response =
@@ -145,7 +145,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenFqpmRequiredNo_thenPanelMemberCompositionHasNoFqpm() {
+    void givenFqpmRequiredNo_thenPanelMemberCompositionHasNoFqpm() {
         sscsCaseData.setIsFqpmRequired(NO);
         sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
             .panelCompositionDisabilityAndFqMember(new ArrayList<>(
@@ -161,7 +161,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenMedicalMemberRequiredNoOnIbcaCase_thenPanelMemberCompositionMedicalMembersAreNull() {
+    void givenMedicalMemberRequiredNoOnIbcaCase_thenPanelMemberCompositionMedicalMembersAreNull() {
         sscsCaseData.setBenefitCode(IBCA_BENEFIT_CODE);
         sscsCaseData.setIsMedicalMemberRequired(NO);
 
@@ -173,7 +173,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenMedicalMemberRequiredYesOnIbcaCase_thenPanelMemberCompositionHasMedicalMember() {
+    void givenMedicalMemberRequiredYesOnIbcaCase_thenPanelMemberCompositionHasMedicalMember() {
         sscsCaseData.setBenefitCode(IBCA_BENEFIT_CODE);
         sscsCaseData.setIsMedicalMemberRequired(YES);
 
@@ -188,7 +188,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenMedicalMemberRequiredYesOnNonIbcaCase_thenMedicalMemberOnPanelMemberCompositionIsUnchanged() {
+    void givenMedicalMemberRequiredYesOnNonIbcaCase_thenMedicalMemberOnPanelMemberCompositionIsUnchanged() {
         sscsCaseData.setBenefitCode(Benefit.PIP.getBenefitCode());
         sscsCaseData.setIsMedicalMemberRequired(YES);
         sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
