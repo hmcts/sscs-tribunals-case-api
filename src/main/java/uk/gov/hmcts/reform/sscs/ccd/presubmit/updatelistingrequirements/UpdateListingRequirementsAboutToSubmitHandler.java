@@ -64,10 +64,13 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             }
         }
 
-        if (isDefaultPanelCompEnabled && callbackResponse.getData().getPanelMemberComposition() != null
+        if (isDefaultPanelCompEnabled) {
+            if (callbackResponse.getData().getPanelMemberComposition() != null
                 && "NoMedicalMemberRequired".equals(callbackResponse.getData().getPanelMemberComposition().getPanelCompositionMemberMedical1())) {
-            callbackResponse.getData().getPanelMemberComposition().setPanelCompositionMemberMedical1(null);
-            callbackResponse.getData().getPanelMemberComposition().setPanelCompositionMemberMedical2(null);
+                callbackResponse.getData().getPanelMemberComposition().clearMedicalMembers();
+            }
+
+            syncConfirmPanelComposition(callbackResponse.getData());
         }
 
         OverrideFields overrideFields = caseDataSnlFields.getOverrideFields();
@@ -89,10 +92,6 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 .orElseGet(HearingOptions::builder)
                 .hmcHearingType(getHmcHearingType(sscsCaseData))
                 .build());
-
-        if (isDefaultPanelCompEnabled) {
-            syncConfirmPanelComposition(callbackResponse.getData());
-        }
 
         return callbackResponse;
     }
