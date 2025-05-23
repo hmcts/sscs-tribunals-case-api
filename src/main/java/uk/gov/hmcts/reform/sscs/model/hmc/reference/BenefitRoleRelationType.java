@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.sscs.model.hmc.reference;
 
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.IIDB;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.TRIBUNALS_MEMBER_FINANCIALLY_QUALIFIED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.TRIBUNALS_MEMBER_MEDICAL;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.TRIBUNAL_MEMBER_MEDICAL;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.ArrayList;
@@ -17,8 +17,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum BenefitRoleRelationType {
 
-    INDUSTRIAL_INJURIES_DISABLEMENT_BENEFIT(IIDB.getBenefitCode(), Arrays.asList(TRIBUNALS_MEMBER_MEDICAL.getReference())),
-    CHILD_SUPPORT_BENEFIT(CHILD_SUPPORT.getBenefitCode(), Arrays.asList(TRIBUNALS_MEMBER_FINANCIALLY_QUALIFIED.getReference()));
+    INDUSTRIAL_INJURIES_DISABLEMENT_BENEFIT(IIDB.getBenefitCode(), Arrays.asList(TRIBUNAL_MEMBER_MEDICAL.getReference())),
+    CHILD_SUPPORT_BENEFIT(CHILD_SUPPORT.getBenefitCode(), Arrays.asList(TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED.getReference()));
 
     @JsonValue
     private final String benefitCode;
