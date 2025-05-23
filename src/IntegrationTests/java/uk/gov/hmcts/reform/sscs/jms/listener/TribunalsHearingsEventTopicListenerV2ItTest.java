@@ -56,7 +56,7 @@ import uk.gov.hmcts.reform.sscs.service.HearingsService;
 import uk.gov.hmcts.reform.sscs.service.HmcHearingApi;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
-import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingRequestHandler;
+import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingMessageServiceListener;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @ExtendWith(SpringExtension.class)
@@ -64,11 +64,11 @@ import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("integration")
 @TestPropertySource(locations = "classpath:config/application_it_updateCaseV2.properties")
-public class HearingRequestHandlerIT {
+public class TribunalsHearingsEventTopicListenerV2ItTest {
     private static final String CASE_ID = "1234123412341234";
     private static final String PROCESSING_VENUE_1 = "Cardiff";
 
-    private HearingRequestHandler hearingRequestHandler;
+    private HearingMessageServiceListener hearingMessageServiceListener;
 
     @Autowired
     private ObjectMapper mapper;
@@ -100,7 +100,7 @@ public class HearingRequestHandlerIT {
     @Test
     public void testHearingsUpdateCaseV2() throws UpdateCaseException, TribunalsEventProcessingException, GetCaseException {
 
-        hearingRequestHandler = new HearingRequestHandler(hearingsService, updateCcdCaseService,
+        hearingMessageServiceListener = new HearingMessageServiceListener(hearingsService, updateCcdCaseService,
                 idamService);
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -130,7 +130,7 @@ public class HearingRequestHandlerIT {
             + "  \"hearingRoute\": \"listAssist\",\n"
             + "  \"hearingState\": \"adjournCreateHearing\"\n"
             + "}\n";
-        hearingRequestHandler.handleHearingRequest(deserialize(message));
+        hearingMessageServiceListener.handleIncomingMessage(deserialize(message));
 
         verify(ccdCaseService, never()).updateCaseData(any(), any(), any());
 

@@ -26,7 +26,7 @@ import uk.gov.hmcts.reform.sscs.service.HearingsService;
  * This class replaces an ASB queue implementation that used to listen for messages from the Tribunals API
  * sent to the SSCS Hearings API. It is now a direct call inside the Tribunals API from the HearingMessageService.
  */
-public class HearingRequestHandler {
+public class HearingMessageServiceListener {
 
     private final HearingsService hearingsService;
 
@@ -35,7 +35,7 @@ public class HearingRequestHandler {
     private final IdamService idamService;
 
     @Async
-    public void handleHearingRequest(HearingRequest message) throws TribunalsEventProcessingException, GetCaseException, UpdateCaseException {
+    public void handleIncomingMessage(HearingRequest message) throws TribunalsEventProcessingException, GetCaseException, UpdateCaseException {
         if (isNull(message)) {
             throw new TribunalsEventProcessingException("An exception occurred as message did not match format");
         }

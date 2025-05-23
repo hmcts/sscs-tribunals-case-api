@@ -29,7 +29,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
@@ -46,7 +45,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
@@ -74,7 +72,7 @@ import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
-import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.servicebus.TopicConsumer;
 
 
 @RunWith(JUnitParamsRunner.class)
@@ -138,16 +136,13 @@ public class EvidenceShareServiceIt {
     private RoboticsCallbackHandler roboticsCallbackHandler;
 
     @Autowired
-    private SendCallbackHandler sendCallbackHandler;
+    private TopicConsumer topicConsumer;
 
     @Autowired
     private PdfStoreService pdfStoreService;
 
     @Autowired
     private SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer;
-
-    @Autowired
-    private ThreadPoolTaskExecutor executor;
 
     @Captor
     ArgumentCaptor<ArrayList<Pdf>> documentCaptor;
@@ -180,7 +175,7 @@ public class EvidenceShareServiceIt {
     }
 
     @Test
-    public void givenDigitalCaseWithMrnDateWithin30Days_shouldGenerateDL6TemplateAndAndAddToCaseInCcdAndSendToRoboticsAndBulkPrintInCorrectOrder() throws IOException, InterruptedException {
+    public void givenDigitalCaseWithMrnDateWithin30Days_shouldGenerateDL6TemplateAndAndAddToCaseInCcdAndSendToRoboticsAndBulkPrintInCorrectOrder() throws IOException {
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource("evidenceshare/validAppealCreatedCallbackWithMrn.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
@@ -193,9 +188,7 @@ public class EvidenceShareServiceIt {
         when(updateCcdCaseService.updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any(), any())).thenReturn(SscsCaseDetails.builder().build());
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
-
-        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
+        topicConsumer.onMessage(sscsCaseDataCallback);
 
         verify(updateCcdCaseService).updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any(), consumerArgumentCaptor.capture());
 
@@ -204,7 +197,7 @@ public class EvidenceShareServiceIt {
     }
 
     @Test
-    public void givenDigitalCaseWithMrnDateOlderThan30Days_shouldGenerateDL16TemplateAndAndAddToCaseInCcdAndTriggerSentToDwpEvent() throws IOException, InterruptedException {
+    public void givenDigitalCaseWithMrnDateOlderThan30Days_shouldGenerateDL16TemplateAndAndAddToCaseInCcdAndTriggerSentToDwpEvent() throws IOException {
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource("evidenceshare/validAppealCreatedCallbackWithMrn.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
@@ -216,9 +209,7 @@ public class EvidenceShareServiceIt {
         when(updateCcdCaseService.updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any(), any())).thenReturn(SscsCaseDetails.builder().build());
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
-
-        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
+        topicConsumer.onMessage(sscsCaseDataCallback);
 
         verify(updateCcdCaseService).updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any(), consumerArgumentCaptor.capture());
         SscsCaseData sscsCaseData = verifySscsCaseData(json);
@@ -226,7 +217,7 @@ public class EvidenceShareServiceIt {
     }
 
     @Test
-    public void givenNonDigitalCaseAndSecureDocstoreOff_shouldGenerateDlDocumentTemplateAndAndAddToCaseInCcdAndSendToRoboticsAndBulkPrint() throws IOException, InterruptedException {
+    public void givenNonDigitalCaseAndSecureDocstoreOff_shouldGenerateDlDocumentTemplateAndAndAddToCaseInCcdAndSendToRoboticsAndBulkPrint() throws IOException {
         //FIXME: Remove this test once secureDocStoreEnabled feature switched on
         ReflectionTestUtils.setField(pdfStoreService, "secureDocStoreEnabled", false);
 
@@ -251,9 +242,7 @@ public class EvidenceShareServiceIt {
         when(updateCcdCaseService.updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq(documentList), any(), any())).thenReturn(SscsCaseDetails.builder().build());
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
-
-        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
+        topicConsumer.onMessage(sscsCaseDataCallback);
 
         Assert.assertEquals(3, documentCaptor.getValue().size());
         Assert.assertEquals("dl16-12345656789.pdf", documentCaptor.getValue().get(0).getName());
@@ -272,7 +261,7 @@ public class EvidenceShareServiceIt {
     }
 
     @Test
-    public void givenNonDigitalCaseAndSecureDocStoreOn_shouldGenerateDlDocumentTemplateAndAndAddToCaseInCcdAndSendToRoboticsAndBulkPrint() throws IOException, InterruptedException {
+    public void givenNonDigitalCaseAndSecureDocStoreOn_shouldGenerateDlDocumentTemplateAndAndAddToCaseInCcdAndSendToRoboticsAndBulkPrint() throws IOException {
         ReflectionTestUtils.setField(pdfStoreService, "secureDocStoreEnabled", true);
 
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
@@ -296,9 +285,7 @@ public class EvidenceShareServiceIt {
         when(updateCcdCaseService.updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq(documentList), any(), any())).thenReturn(SscsCaseDetails.builder().build());
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
-
-        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
+        topicConsumer.onMessage(sscsCaseDataCallback);
 
         Assert.assertEquals(3, documentCaptor.getValue().size());
         Assert.assertEquals("dl16-12345656789.pdf", documentCaptor.getValue().get(0).getName());
@@ -317,7 +304,7 @@ public class EvidenceShareServiceIt {
     }
 
     @Test
-    public void givenDigitalCaseInReadyToListState_shouldSendToRoboticsAndUpdateDwpOffice() throws IOException, InterruptedException {
+    public void givenDigitalCaseInReadyToListState_shouldSendToRoboticsAndUpdateDwpOffice() throws IOException {
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource("evidenceshare/validAppealCreatedCallbackWithMrn.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
@@ -327,9 +314,7 @@ public class EvidenceShareServiceIt {
         json = json.replace("CREATED_IN_GAPS_FROM", "readyToList");
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
-
-        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
+        topicConsumer.onMessage(sscsCaseDataCallback);
 
         verify(emailService).sendEmail(anyLong(), any());
 
@@ -338,16 +323,15 @@ public class EvidenceShareServiceIt {
 
     @Test
     public void appealWithNoMrnDate_shouldNotGenerateTemplateOrAddToCcdAndShouldUpdateCaseWithSecondaryState()
-            throws IOException, InterruptedException {
+        throws IOException {
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource("evidenceshare/validAppealCreatedCallback.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = json.replace("CREATED_IN_GAPS_FROM", "validAppeal");
         Callback<SscsCaseData> callback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(callback);
+        topicConsumer.onMessage(callback);
 
-        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
         then(updateCcdCaseService)
             .should(times(1))
@@ -365,7 +349,7 @@ public class EvidenceShareServiceIt {
     }
 
     @Test
-    public void nonReceivedViaPaper_shouldNotBeBulkPrintedAndStateShouldBeUpdated() throws IOException, InterruptedException {
+    public void nonReceivedViaPaper_shouldNotBeBulkPrintedAndStateShouldBeUpdated() throws IOException {
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource("evidenceshare/validAppealCreatedCallback.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
@@ -373,9 +357,7 @@ public class EvidenceShareServiceIt {
         json = json.replace("CREATED_IN_GAPS_FROM", "validAppeal");
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
-
-        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
+        topicConsumer.onMessage(sscsCaseDataCallback);
 
         verifyNoMoreInteractions(restTemplate);
         verifyNoMoreInteractions(evidenceManagementService);
@@ -387,16 +369,14 @@ public class EvidenceShareServiceIt {
     }
 
     @Test
-    public void givenADigitalCase_shouldNotBeBulkPrintedAndStateShouldBeUpdatedAndNotSentToRobotics() throws IOException, InterruptedException {
+    public void givenADigitalCase_shouldNotBeBulkPrintedAndStateShouldBeUpdatedAndNotSentToRobotics() throws IOException {
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource("evidenceshare/validAppealCreatedCallback.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = json.replace("CREATED_IN_GAPS_FROM", "readyToList");
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
-
-        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
+        topicConsumer.onMessage(sscsCaseDataCallback);
 
         verifyNoMoreInteractions(restTemplate);
         verifyNoMoreInteractions(evidenceManagementService);

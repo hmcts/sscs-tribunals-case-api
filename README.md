@@ -39,6 +39,36 @@ Once the application running locally, please make sure
 1. Your local CCD is up and running with subscription id "7S9MxdSBpt"
 2. Execute ./gradlew --info smoke
 
+## Running tribunals with hearings enabled
+If you need to test Tribunals with HMC Hearings you must carry out the following steps:
+1. First you need to create a pull request on github for your branch
+2. The branch should have the labels: `enable_keep_helm`, `pr-values:hearings`
+3. Pipeline will generate and upload CCD Definition file to AAT CCD. 
+4. You can optionally generate the definition file locally using below commands (4120 represents the Pull request number):
+    ```bash
+    ./bin/create-xlsx.sh benefit dev pr true 4120
+    ```
+5. The callbacks for the CaseEvents must match the service ingress values within your PR's preview chart. Here is an example of a callback URL for a tribunals PR with an id of 4120:
+    ```
+    https://sscs-tribunals-api-pr-4120.preview.platform.hmcts.net/ccdAboutToSubmit
+    ```
+6. Once definition is successfully uploaded to AAT by pipeline or manually, you will need to create a service bus subscription for the HMC hearings topic on AAT. In the Azure portal go to `hmc-servicebus-aat` and create a subscription for the `hmc-to-cft-aat` topic,
+   name it in this format:
+
+    ```text
+    hmc-to-sscs-subscription-pr-XXXX
+    ```
+
+7. And on that subscription create a Correlation filters with these values:
+    ```text
+    hmctsServiceId:BBA3
+    hmctsDeploymentId:deployment-sscs-tribunals-api-pr-xxxx
+    ```
+
+Once this is done you should be able to deploy to preview with hearings enabled.
+
+> Note: When you are finished with preview testing, remember to delete the uploaded CCD definition from AAT and the subscription created on hmc-to-cft-aat.  ccd-def-cleanup should delete the ccd def file you uploaded, given the enable_keep_helm label is not on your PR.
+
 ### Running in Docker(Work in progress...)
 Create the image of the application by executing the following command:
 
