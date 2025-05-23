@@ -448,9 +448,9 @@ dependencies {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
     }
 
-    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.2'
-    testImplementation group: 'io.rest-assured', name: 'xml-path', version: '5.5.2'
-    testImplementation group: 'io.rest-assured', name: 'json-path', version: '5.5.2'
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.5'
+    testImplementation group: 'io.rest-assured', name: 'xml-path', version: '5.5.5'
+    testImplementation group: 'io.rest-assured', name: 'json-path', version: '5.5.5'
     testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.8', classifier: 'all', {
         exclude group: 'commons-io', module: 'commons-io'
     }
