@@ -212,7 +212,7 @@ export class UpdateOtherPartyData extends BaseStep {
     await this.otherPartyDetailsTab.verifyPageContentByKeyValue('Town', addUpdateOtherPartyData.updateOtherPartyDataAddressTown);
     await this.otherPartyDetailsTab.verifyPageContentByKeyValue('Postcode', addUpdateOtherPartyData.updateOtherPartyDataAddressPostCode);
     await this.otherPartyDetailsTab.verifyPageContentByKeyValue('Country', addUpdateOtherPartyData.updateOtherPartyDataAddressCountry);
-    await this.otherPartyDetailsTab.verifyPageContentByKeyValue('Living in England, Scotland or Wales', addUpdateOtherPartyData.updateOtherPartyDataLivingInUK);
+    await this.otherPartyDetailsTab.verifyPageContentByKeyValue('Living in England, Scotland, Wales or Northern Ireland', addUpdateOtherPartyData.updateOtherPartyDataLivingInUK);
 
     await this.page.getByRole('row', { name: 'Confidentiality Required No', exact: true }).locator(`//tr[.='Confidentiality RequiredNo']`); // couldn't use the same method as other options for these 2 lines 58, 59
     await this.page.getByRole('row', { name: 'Unacceptable Customer Behaviour No', exact: true }).locator(`//span[.='Unacceptable Customer Behaviour']`);
