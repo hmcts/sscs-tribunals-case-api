@@ -46,7 +46,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
-import uk.gov.hmcts.reform.sscs.evidenceshare.service.PanelCompositionService;
+import uk.gov.hmcts.reform.sscs.evidenceshare.service.ListingStateProcessingService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
@@ -76,7 +76,7 @@ public class UpdateOtherPartyHandlerTest {
     public void setUp() {
         openMocks(this);
 
-        handler = new UpdateOtherPartyHandler(new PanelCompositionService(updateCcdCaseService, idamService));
+        handler = new UpdateOtherPartyHandler(new ListingStateProcessingService(updateCcdCaseService, idamService));
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").build();
 

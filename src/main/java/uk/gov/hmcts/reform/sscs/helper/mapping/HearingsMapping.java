@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.helper.mapping;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
-import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsCaseMapping.buildHearingCaseDetails;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsPartiesMapping.buildHearingPartiesDetails;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsRequestMapping.buildHearingRequestDetails;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.EntityRoleCode.APPELLANT;
@@ -34,8 +33,11 @@ public final class HearingsMapping {
 
     private final HearingsDetailsMapping hearingsDetailsMapping;
 
-    HearingsMapping(HearingsDetailsMapping hearingsDetailsMapping) {
+    private final HearingsCaseMapping hearingsCaseMapping;
+
+    HearingsMapping(HearingsDetailsMapping hearingsDetailsMapping, HearingsCaseMapping hearingsCaseMapping) {
         this.hearingsDetailsMapping = hearingsDetailsMapping;
+        this.hearingsCaseMapping = hearingsCaseMapping;
     }
 
     public HearingRequestPayload buildHearingPayload(HearingWrapper wrapper, ReferenceDataServiceHolder refData)
@@ -43,7 +45,7 @@ public final class HearingsMapping {
         return HearingRequestPayload.builder()
                 .requestDetails(buildHearingRequestDetails(wrapper))
                 .hearingDetails(hearingsDetailsMapping.buildHearingDetails(wrapper, refData))
-                .caseDetails(buildHearingCaseDetails(wrapper, refData))
+                .caseDetails(hearingsCaseMapping.buildHearingCaseDetails(wrapper, refData))
                 .partiesDetails(buildHearingPartiesDetails(wrapper, refData))
                 .build();
     }

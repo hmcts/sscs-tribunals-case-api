@@ -39,8 +39,11 @@ public final class HearingsDetailsMapping {
 
     private final HearingsPanelMapping hearingsPanelMapping;
 
-    HearingsDetailsMapping(HearingsPanelMapping hearingsPanelMapping) {
+    private final HearingsAutoListMapping hearingsAutoListMapping;
+
+    HearingsDetailsMapping(HearingsPanelMapping hearingsPanelMapping, HearingsAutoListMapping hearingsAutoListMapping) {
         this.hearingsPanelMapping = hearingsPanelMapping;
+        this.hearingsAutoListMapping = hearingsAutoListMapping;
     }
 
     public HearingDetails buildHearingDetails(HearingWrapper wrapper, ReferenceDataServiceHolder refData) throws ListingException {
@@ -49,7 +52,7 @@ public final class HearingsDetailsMapping {
         boolean adjournmentInProgress = refData.isAdjournmentFlagEnabled()
                 && isYes(caseData.getAdjournment().getAdjournmentInProgress());
         // collect hearing details values from case and ref data
-        boolean autoListed = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
+        boolean autoListed = hearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
         HearingWindow window = HearingsWindowMapping.buildHearingWindow(caseData, refData);
         int duration = HearingsDurationMapping.getHearingDuration(caseData, refData);
         List<String> nonStandardDurationReasons = HearingsDurationMapping.getNonStandardHearingDurationReasons();
