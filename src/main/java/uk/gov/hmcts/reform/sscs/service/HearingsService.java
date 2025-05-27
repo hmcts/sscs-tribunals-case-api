@@ -174,7 +174,7 @@ public class HearingsService {
                 .getSchedulingAndListingFields()
                 .getOverrideFields()
                 .getDuration();
-        boolean isMultipleOfFive = duration == null || duration % 5 == 0;
+        boolean isMultipleOfFive = isNull(duration) || duration % 5 == 0;
         if (!isMultipleOfFive) {
             throw new ListingException("Listing duration must be multiple of 5.0 minutes");
         }
