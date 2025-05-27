@@ -60,8 +60,6 @@ public class HearingsService {
     private final HearingServiceConsumer hearingServiceConsumer;
     private final HearingsMapping hearingsMapping;
     private final PanelCompositionService panelCompositionService;
-
-
     private final OverridesMapping overridesMapping;
 
     // Leaving blank for now until a future change is scoped and completed, then we can add the case states back in

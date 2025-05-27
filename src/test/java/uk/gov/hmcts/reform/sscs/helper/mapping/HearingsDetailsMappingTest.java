@@ -81,8 +81,6 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
 
     private SscsCaseData caseData;
 
-
-
     @Mock
     private HearingsAutoListMapping hearingsAutoListMapping;
 
