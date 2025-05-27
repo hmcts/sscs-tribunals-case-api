@@ -289,11 +289,6 @@ public class HearingServiceConsumerTest {
         caseData.setHearings(new ArrayList<>());
         caseData.getHearings().add(Hearing.builder().value(HearingDetails.builder().hearingId(String.valueOf(HEARING_REQUEST_ID)).build()).build());
         given(refData.isAdjournmentFlagEnabled()).willReturn(false);
-        given(refData.getHearingDurations()).willReturn(hearingDurations);
-        given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
-        given(refData.getVenueService()).willReturn(venueService);
-        given(venueService.getEpimsIdForVenue(PROCESSING_VENUE)).willReturn("219164");
-        given(hearingDurations.getHearingDurationBenefitIssueCodes(caseData)).willReturn(90);
         Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = hearingServiceConsumer
                 .getCreateHearingCaseDetailsConsumerV2(
                         PanelMemberComposition.builder().build(), response, HEARING_REQUEST_ID, true);
