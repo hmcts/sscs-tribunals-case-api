@@ -54,7 +54,8 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
     public static final String APPELLANT_PARTY_ID = "a2b837d5-ee28-4bc9-a3d8-ce2d2de9fb296292997e-14d4-4814-a163-e64018d2c441";
     public static final String REPRESENTATIVE_PARTY_ID = "a2b837d5-ee28-4bc9-a3d8-ce2d2de9fb29";
     public static final String OTHER_PARTY_ID = "4dd6b6fa-6562-4699-8e8b-6c70cf8a333e";
-    private static final SessionCategoryMap sessionCategoryMap = new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
+    private static final SessionCategoryMap sessionCategoryMap =
+            new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
         false, false, SessionCategory.CATEGORY_06, null);
 
     @Mock

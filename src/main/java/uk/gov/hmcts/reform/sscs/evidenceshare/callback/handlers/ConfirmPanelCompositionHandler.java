@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.service.ListingStateProcessingServ
 @Service
 public class ConfirmPanelCompositionHandler implements CallbackHandler<SscsCaseData> {
 
-    private ListingStateProcessingService listingStateProcessingService;
+    private final ListingStateProcessingService listingStateProcessingService;
 
     @Autowired
     public ConfirmPanelCompositionHandler(ListingStateProcessingService listingStateProcessingService) {

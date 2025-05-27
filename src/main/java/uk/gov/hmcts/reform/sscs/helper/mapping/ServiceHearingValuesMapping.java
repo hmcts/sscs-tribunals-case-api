@@ -82,8 +82,6 @@ public final class ServiceHearingValuesMapping {
                 .caseFlags(PartyFlagsMapping.getCaseFlags(caseData))
                 .hmctsServiceID(refData.getSscsServiceCode())
                 .hearingChannels(HearingsChannelMapping.getHearingChannels(caseData))
-                .screenFlow(null)
-                .vocabulary(null)
                 .caseInterpreterRequiredFlag(HearingChannelUtil.isInterpreterRequired(caseData))
                 .panelRequirements(hearingsPanelMapping.getPanelRequirements(caseData, refData))
                 .build();
@@ -91,7 +89,10 @@ public final class ServiceHearingValuesMapping {
 
     public Judiciary getJudiciary(@Valid SscsCaseData sscsCaseData, ReferenceDataServiceHolder refData) {
         return Judiciary.builder()
-                .roleType(defaultPanelCompEnabled ? panelCompositionService.getRoleTypes(sscsCaseData) : findRoleTypesByBenefitCode(sscsCaseData.getBenefitCode()))
+                .roleType(defaultPanelCompEnabled
+                        ? panelCompositionService.getRoleTypes(sscsCaseData)
+                        : findRoleTypesByBenefitCode(sscsCaseData.getBenefitCode())
+                )
                 .authorisationTypes(HearingsPanelMapping.getAuthorisationTypes())
                 .authorisationSubType(HearingsPanelMapping.getAuthorisationSubTypes())
                 .judiciarySpecialisms(hearingsPanelMapping.getPanelSpecialisms(sscsCaseData, getSessionCaseCodeMap(sscsCaseData, refData)))

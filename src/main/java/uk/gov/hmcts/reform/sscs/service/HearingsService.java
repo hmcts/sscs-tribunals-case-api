@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingRequestPayload;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HmcUpdateResponse;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @Slf4j
@@ -52,23 +53,18 @@ public class HearingsService {
     private static int hearingResponseUpdateMaxRetries;
 
     private final HmcHearingApiService hmcHearingApiService;
-
     private final CcdCaseService ccdCaseService;
-
     private final ReferenceDataServiceHolder refData;
-
     private final UpdateCcdCaseService updateCcdCaseService;
-
     private final IdamService idamService;
-
     private final HearingServiceConsumer hearingServiceConsumer;
-
     private final HearingsMapping hearingsMapping;
+    private final PanelCompositionService panelCompositionService;
+
 
     private final OverridesMapping overridesMapping;
 
     // Leaving blank for now until a future change is scoped and completed, then we can add the case states back in
-    public static final List<State> INVALID_CASE_STATES = List.of();
     private static final Long HEARING_VERSION_NUMBER = 1L;
 
     @Retryable(
@@ -95,13 +91,6 @@ public class HearingsService {
                 wrapper.getCaseState().toString(),
                 wrapper.getHearingState().getState());
 
-        if (caseStatusInvalid(wrapper)) {
-            log.info("Case is in an invalid state for a hearing request. No requests sent to the HMC. Case ID {} and Case State {}",
-                    caseId,
-                    wrapper.getCaseState().toString());
-            return;
-        }
-
         switch (wrapper.getHearingState()) {
             case ADJOURN_CREATE_HEARING -> {
                 wrapper.getCaseData().getAdjournment().setAdjournmentInProgress(YesNo.YES);
@@ -127,10 +116,6 @@ public class HearingsService {
         }
     }
 
-    private boolean caseStatusInvalid(HearingWrapper wrapper) {
-        return INVALID_CASE_STATES.contains(wrapper.getCaseState());
-    }
-
     private void createHearing(HearingWrapper wrapper) throws UpdateCaseException, ListingException {
         SscsCaseData caseData = wrapper.getCaseData();
 
@@ -145,6 +130,9 @@ public class HearingsService {
             HearingRequestPayload hearingPayload = hearingsMapping.buildHearingPayload(wrapper, refData);
             log.debug("Sending Create Hearing Request for Case ID {}", caseId);
             hmcUpdateResponse = hmcHearingApiService.sendCreateHearingRequest(hearingPayload);
+            wrapper.getCaseData().setPanelMemberComposition(
+                    panelCompositionService.createPanelCompositionFromJohTiers(
+                            hearingPayload.getHearingDetails().getPanelRequirements().getRoleTypes()));
 
             log.debug("Received Create Hearing Request Response for Case ID {}, Hearing State {} and Response:\n{}",
                     caseId,
@@ -218,7 +206,7 @@ public class HearingsService {
         // TODO process hearing response
     }
 
-    protected void hearingResponseUpdate(HearingWrapper wrapper, HmcUpdateResponse response) throws UpdateCaseException, ListingException {
+    protected void hearingResponseUpdate(HearingWrapper wrapper, HmcUpdateResponse response) throws UpdateCaseException {
         SscsCaseData caseData = wrapper.getCaseData();
         Long hearingRequestId = response.getHearingRequestId();
         String caseId = caseData.getCcdCaseId();
@@ -240,13 +228,18 @@ public class HearingsService {
                 event.getEventType().getCcdType());
     }
 
-    private void updateCaseWithHearingResponseV2(HearingWrapper wrapper, HmcUpdateResponse response, Long hearingRequestId, HearingEvent event, String caseId) throws UpdateCaseException, ListingException {
+    private void updateCaseWithHearingResponseV2(HearingWrapper wrapper, HmcUpdateResponse response,
+                                                 Long hearingRequestId, HearingEvent event,
+                                                 String caseId) throws UpdateCaseException {
         log.info("Updating case with hearing response using updateCaseDataV2 for event {} description {}",
                 event, event.getDescription());
 
         try {
-            boolean isUpdateHearing = HearingState.UPDATE_HEARING.equals(wrapper.getHearingState()) ? true : false;
-            Consumer<SscsCaseDetails> caseDataConsumer = hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(response, hearingRequestId, isUpdateHearing);
+            Consumer<SscsCaseDetails> caseDataMutator = hearingServiceConsumer
+                    .getCreateHearingCaseDetailsConsumerV2(
+                            wrapper.getCaseData().getPanelMemberComposition(),
+                            response, hearingRequestId, HearingState.UPDATE_HEARING.equals(wrapper.getHearingState())
+                    );
 
             updateCcdCaseService.updateCaseV2(
                     Long.parseLong(caseId),
@@ -254,7 +247,7 @@ public class HearingsService {
                     event.getSummary(),
                     event.getDescription(),
                     idamService.getIdamTokens(),
-                    caseDataConsumer
+                    caseDataMutator
             );
             log.info("Case Updated using updateCaseDataV2 with Hearing Response for Case ID {}, Hearing ID {}, Hearing State {} and CCD Event {}",
                     caseId,

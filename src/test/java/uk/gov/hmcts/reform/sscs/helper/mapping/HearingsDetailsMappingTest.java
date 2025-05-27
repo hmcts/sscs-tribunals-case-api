@@ -51,16 +51,14 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
 
     @Mock
     private HearingDurationsService hearingDurations;
-
     @Mock
     private SessionCategoryMapService sessionCategoryMaps;
-
     @Mock
     private ReferenceDataServiceHolder refData;
-
     @Mock
     private VenueService venueService;
-
+    @Mock
+    private HearingsPanelMapping hearingsPanelMapping;
     @Mock
     private RegionalProcessingCenterService regionalProcessingCenterService;
 
@@ -83,8 +81,7 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
 
     private SscsCaseData caseData;
 
-    @Mock
-    private HearingsPanelMapping hearingsPanelMapping;
+
 
     @Mock
     private HearingsAutoListMapping hearingsAutoListMapping;
@@ -149,7 +146,8 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
             .caseData(caseData)
             .build();
 
-        given(hearingsPanelMapping.getPanelRequirements(caseData, refData)).willReturn(PanelRequirements.builder().build());
+        given(hearingsPanelMapping.getPanelRequirements(caseData, refData))
+                .willReturn(PanelRequirements.builder().roleTypes(List.of()).build());
 
         HearingDetails hearingDetails = hearingsDetailsMapping.buildHearingDetails(wrapper, refData);
 

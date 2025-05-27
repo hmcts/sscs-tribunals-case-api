@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
@@ -29,7 +30,10 @@ public class HearingServiceConsumer {
 
     }
 
-    public Consumer<SscsCaseDetails> getCreateHearingCaseDetailsConsumerV2(HmcUpdateResponse response, Long hearingRequestId, boolean isUpdateHearing) {
+    public Consumer<SscsCaseDetails> getCreateHearingCaseDetailsConsumerV2(PanelMemberComposition panelComposition,
+                                                                           HmcUpdateResponse response,
+                                                                           Long hearingRequestId,
+                                                                           boolean isUpdateHearing) {
         return sscsCaseDetails -> {
             try {
                 if (isUpdateHearing) {
@@ -39,12 +43,12 @@ public class HearingServiceConsumer {
                 } else {
                     overridesMapping.setDefaultListingValues(sscsCaseDetails.getData(), refData);
                 }
+                sscsCaseDetails.getData().setPanelMemberComposition(panelComposition);
                 updateCaseDataWithHearingResponse(response, hearingRequestId, sscsCaseDetails.getData());
             } catch (ListingException e) {
                 throw new RuntimeException(e);
             }
         };
-
     }
 
     private void updateCaseDataWithHearingResponse(HmcUpdateResponse response, Long hearingRequestId, SscsCaseData caseData) {
