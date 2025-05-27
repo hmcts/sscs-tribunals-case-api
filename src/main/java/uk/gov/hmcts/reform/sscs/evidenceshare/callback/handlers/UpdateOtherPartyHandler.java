@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.service.ListingStateProcessingServ
 @Service
 public class UpdateOtherPartyHandler implements CallbackHandler<SscsCaseData> {
 
-    private ListingStateProcessingService listingStateProcessingService;
+    private final ListingStateProcessingService listingStateProcessingService;
 
     @Autowired
     public UpdateOtherPartyHandler(ListingStateProcessingService listingStateProcessingService) {
