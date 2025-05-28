@@ -42,7 +42,7 @@ public final class ServiceHearingValuesMapping {
             throws ListingException {
 
         boolean shouldBeAutoListed = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
-        int hearingDuration = 0;
+        Integer hearingDuration = 0;
         try {
             hearingDuration = HearingsDurationMapping.getHearingDuration(caseData, refData);
         } catch (ListingException e) {
