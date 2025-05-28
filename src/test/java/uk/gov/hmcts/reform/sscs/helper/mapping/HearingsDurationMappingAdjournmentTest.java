@@ -78,7 +78,7 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
     }
 
     @DisplayName("When adjournment flag is enabled but getHearingDurationAdjournment returns null "
-        + "uses default hearing duration")
+        + "getHearingDuration should also return null")
     @Test
     void getHearingDurationAdjournmentReturnsNullWithFeatureFlagEnabled() throws ListingException {
         OverrideFields defaultListingValues = OverrideFields.builder()
@@ -111,7 +111,7 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
             refData
         );
 
-        assertThat(result).isEqualTo(HearingsDurationMapping.DURATION_DEFAULT);
+        assertThat(result).isEqualTo(null);
     }
 
     @DisplayName("When a valid duration is given but adjournCaseDurationUnits is not provided "
