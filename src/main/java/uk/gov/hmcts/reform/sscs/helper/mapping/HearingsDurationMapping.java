@@ -61,7 +61,7 @@ public final class HearingsDurationMapping {
             log.info("Hearing Duration for Case ID {} set as Benefit Code value {}", caseId, duration);
             return duration;
         }
-        log.debug("Hearing Duration for Case ID {} set as default value null", caseId);
+        log.info("Hearing Duration for Case ID {} set as default value null", caseId);
         return null;
     }
 
