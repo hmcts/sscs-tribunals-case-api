@@ -60,7 +60,7 @@ public class HearingsService {
     private final HearingServiceConsumer hearingServiceConsumer;
     private final HearingsMapping hearingsMapping;
     private final PanelCompositionService panelCompositionService;
-
+    private final OverridesMapping overridesMapping;
 
     // Leaving blank for now until a future change is scoped and completed, then we can add the case states back in
     private static final Long HEARING_VERSION_NUMBER = 1L;
@@ -122,7 +122,7 @@ public class HearingsService {
         CaseHearing hearing = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse);
         HmcUpdateResponse hmcUpdateResponse;
 
-        OverridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData);
+        overridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData);
 
         if (isNull(hearing)) {
             HearingRequestPayload hearingPayload = hearingsMapping.buildHearingPayload(wrapper, refData);
@@ -167,7 +167,7 @@ public class HearingsService {
 
     private void updateHearing(HearingWrapper wrapper) throws UpdateCaseException, ListingException {
         if (isNull(wrapper.getCaseData().getSchedulingAndListingFields().getOverrideFields())) {
-            OverridesMapping.setOverrideValues(wrapper.getCaseData(), refData);
+            overridesMapping.setOverrideValues(wrapper.getCaseData(), refData);
         }
         Integer duration = wrapper
                 .getCaseData()
