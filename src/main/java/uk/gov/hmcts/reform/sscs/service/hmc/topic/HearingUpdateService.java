@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service.hmc.topic;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.HEARING_DATE_ISSUED;
 import static uk.gov.hmcts.reform.sscs.helper.service.CaseHearingLocationHelper.mapVenueDetailsToVenue;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus.LISTED;
@@ -92,7 +93,7 @@ public class HearingUpdateService {
         }
         List<String> panelMemberIds = hearingDaySchedule.getPanelMemberIds();
 
-        if (isPostHearingsEnabled && nonNull(panelMemberIds)) {
+        if (isPostHearingsEnabled && !isEmpty(panelMemberIds)) {
             JudicialUserPanel panel = JudicialUserPanel.builder()
                     .assignedTo(judicialRefDataService.getJudicialUserFromPersonalCode(hearingDaySchedule.getHearingJudgeId()))
                     .panelMembers(panelMemberIds.stream().map(id -> new CollectionItem<>(id, judicialRefDataService.getJudicialUserFromPersonalCode(id))).toList())
