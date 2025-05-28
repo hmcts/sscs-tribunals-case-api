@@ -55,6 +55,7 @@ public class HearingRequestHandler {
     }
 
     private void handleException(Throwable throwable, String caseId) throws GetCaseException, UpdateCaseException, TribunalsEventProcessingException {
+        log.info("exception of type {} for case ID {}: {}", throwable.getClass(), caseId, throwable.getMessage());
         if (throwable instanceof ListingException listingException) {
             log.error("Listing exception found, Summary: {}", listingException.getSummary(), listingException);
 
