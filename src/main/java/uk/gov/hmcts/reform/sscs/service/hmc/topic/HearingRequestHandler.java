@@ -70,7 +70,7 @@ public class HearingRequestHandler {
             log.info("Triggered case event V2. Listing Error handled. State is now {}.", State.LISTING_ERROR);
 
         } else if (throwable instanceof ResponseStatusException responseException) {
-            log.error("Response status exception found, Summary: {}", responseException.getMessage());
+            log.error("Response status exception found, Summary: {}", responseException.toString());
 
             log.info("Pre calling trigger Case Event V2 for handling Listing Error for case id: {}", caseId);
             updateCcdCaseService.triggerCaseEventV2(
