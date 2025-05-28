@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMember;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
@@ -109,10 +110,8 @@ public final class HearingsAutoListMapping {
         if (defaultPanelCompEnabled) {
             DefaultPanelComposition panelCategory = panelCompositionService.getDefaultPanelComposition(caseData);
             checkBenefitIssueCodeV2(panelCategory);
-            List<String> johTiers = panelCategory.getJohTiers();
-            return johTiers.contains(TRIBUNAL_MEMBER_MEDICAL.getReference())
-                    || johTiers.contains(REGIONAL_MEDICAL_MEMBER.getReference())
-                    || johTiers.contains(TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED.getReference());
+            List<PanelMemberType> panelMembers = List.of(TRIBUNAL_MEMBER_MEDICAL, REGIONAL_MEDICAL_MEMBER, TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED);
+            return panelCategory.containsAnyPanelMembers(panelMembers);
         } else {
             SessionCategoryMap sessionCategoryMap = getSessionCaseCodeMap(caseData, refData);
             checkBenefitIssueCode(sessionCategoryMap);
