@@ -107,6 +107,7 @@ public class DwpUploadResponseMidEventHandler implements PreSubmitCallbackHandle
         }
         if (!panelCompositionService.isBenefitIssueCodeValid(caseData.getBenefitCode(), caseData.getIssueCode())) {
             errors.add(INVALID_BENEFIT_ISSUE_CODE);
+            log.info("invalid benefit issue code {} for case id {}", caseData.getBenefitCode() + caseData.getIssueCode(), caseData.getCcdCaseId());
         }
         return errors;
     }
