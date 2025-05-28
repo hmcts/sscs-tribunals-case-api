@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.ExhaustedRetryException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
@@ -67,6 +68,19 @@ public class HearingRequestHandler {
                     listingException.getDescription(),
                     idamService.getIdamTokens());
             log.info("Triggered case event V2. Listing Error handled. State is now {}.", State.LISTING_ERROR);
+
+        } else if (throwable instanceof ResponseStatusException responseException) {
+            log.error("Response status exception found, Summary: {}", responseException.getMessage());
+
+            log.info("Pre calling trigger Case Event V2 for handling Listing Error for case id: {}", caseId);
+            updateCcdCaseService.triggerCaseEventV2(
+                    Long.parseLong(caseId),
+                    LISTING_ERROR.getCcdType(),
+                    "Listing Exception",
+                    "Listing Exception",
+                    idamService.getIdamTokens());
+            log.info("Triggered case event V2. Listing Error handled. State is now {}.", State.LISTING_ERROR);
+
         } else if (throwable instanceof Exception exception) {
             throw new TribunalsEventProcessingException("An exception occurred whilst processing hearing event", exception);
         }
