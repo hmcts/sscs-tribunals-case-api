@@ -263,7 +263,6 @@
   {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "TabID": "eventHistory_superuser", "TabLabel": "History", "TabDisplayOrder": 2, "CaseFieldID": "interlocReviewState", "TabFieldDisplayOrder": 6},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "eventHistory_superuser", "TabLabel": "History", "TabDisplayOrder": 2, "CaseFieldID": "dwpFurtherEvidenceStates", "TabFieldDisplayOrder": 7},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "eventHistory_superuser", "TabLabel": "History", "TabDisplayOrder": 2, "CaseFieldID": "caseHistory", "TabFieldDisplayOrder": 8},
-  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "elements_and_issues", "TabLabel": "Elements and issues", "TabDisplayOrder": 24, "CaseFieldID": "elementsDisputedList", "TabFieldDisplayOrder": 2, "FieldShowCondition": "elementsDisputedGeneral =\"DUMMY\""},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "elements_and_issues", "TabLabel": "Elements and issues", "TabDisplayOrder": 24, "CaseFieldID": "isConfidentialCaseLabel", "TabFieldDisplayOrder": 1, "TabShowCondition": "elementsDisputedList=\"*\"", "FieldShowCondition": "isConfidentialCase =\"Yes\""},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "elements_and_issues", "TabLabel": "Elements and issues", "TabDisplayOrder": 24, "CaseFieldID": "elementsDisputedGeneral", "TabFieldDisplayOrder": 2},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "elements_and_issues", "TabLabel": "Elements and issues", "TabDisplayOrder": 24, "CaseFieldID": "elementsDisputedSanctions", "TabFieldDisplayOrder": 3},
@@ -273,6 +272,7 @@
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "elements_and_issues", "TabLabel": "Elements and issues", "TabDisplayOrder": 24, "CaseFieldID": "elementsDisputedChildElement", "TabFieldDisplayOrder": 7},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "elements_and_issues", "TabLabel": "Elements and issues", "TabDisplayOrder": 24, "CaseFieldID": "elementsDisputedChildDisabled", "TabFieldDisplayOrder": 8},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "elements_and_issues", "TabLabel": "Elements and issues", "TabDisplayOrder": 24, "CaseFieldID": "elementsDisputedLimitedWork", "TabFieldDisplayOrder": 9},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "elements_and_issues", "TabLabel": "Elements and issues", "TabDisplayOrder": 24, "CaseFieldID": "elementsDisputedList", "TabFieldDisplayOrder": 10, "FieldShowCondition": "elementsDisputedGeneral =\"DUMMY\""},
 
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "fta_po_details", "TabLabel": "FTA PO Details", "TabDisplayOrder": 25, "CaseFieldID": "presentingOfficersDetails", "TabFieldDisplayOrder": 1},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs", "TabID": "fta_po_details", "TabLabel": "FTA PO Details", "TabDisplayOrder": 21, "CaseFieldID": "presentingOfficersHearingLink", "TabFieldDisplayOrder": 2},
