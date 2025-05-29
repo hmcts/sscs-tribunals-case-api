@@ -62,7 +62,7 @@ public final class HearingsDurationMapping {
             return duration;
         }
         log.info("Hearing Duration cannot be mapped for case ID {}", caseId);
-        throw new ListingException("Hearing Duration for Case ID " + caseId + " is null");
+        throw new ListingException("Hearing Duration cannot be mapped for case ID " + caseId);
     }
 
     public static Integer getHearingDurationAdjournment(SscsCaseData caseData, HearingDurationsService hearingDurationsService) throws ListingException {
