@@ -1,7 +1,7 @@
 apiVersion: v2
 name: sscs-tribunals-api
 home: https://github.com/hmcts/sscs-tribunals-case-api
-version: 0.0.208
+version: 0.0.210
 description: SSCS Tribunals Case API
 maintainers:
   - name: HMCTS SSCS Team
@@ -29,7 +29,7 @@ dependencies:
     tags:
       - sscs-ccd-idam-pr
   - name: sscs-tribunals-frontend
-    version: 0.2.51
+    version: 0.2.53
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: sscs-tribunals-frontend.enabled
   - name: redis
@@ -45,7 +45,7 @@ dependencies:
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: em-stitching.enabled
   - name: ccd-case-document-am-api
-    version: 1.7.16
+    version: 1.7.17
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: ccd-case-document-am-api.enabled
   - name: servicebus
@@ -113,7 +113,7 @@ dependencies:
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: wa.enabled
   - name: sscs-cron-trigger
-    version: 0.0.19
+    version: 0.0.20
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: wa.enabled
   - name: ccd-def-cleanup

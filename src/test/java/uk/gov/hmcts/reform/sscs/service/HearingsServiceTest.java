@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.sscs.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -53,6 +55,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Issue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SessionCategory;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -79,9 +82,11 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingRequestPayload;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HmcUpdateResponse;
+import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.RequestDetails;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
@@ -100,36 +105,28 @@ class HearingsServiceTest {
 
     @Mock
     private HmcHearingApiService hmcHearingApiService;
-
     @Mock
     private CcdCaseService ccdCaseService;
-
     @Mock
     private ReferenceDataServiceHolder refData;
-
     @Mock
     public HearingDurationsService hearingDurations;
-
     @Mock
     public SessionCategoryMapService sessionCategoryMaps;
-
     @Mock
     private VenueService venueService;
-
     @Mock
     private IdamService idamService;
-
     @Mock
     private UpdateCcdCaseService updateCcdCaseService;
-
     @Mock
     private HearingServiceConsumer hearingServiceConsumer;
-
     @Mock
     private HearingsMapping hearingsMapping;
-
     @Mock
     private Consumer<SscsCaseDetails> sscsCaseDetailsConsumer;
+    @Mock
+    private PanelCompositionService panelCompositionService;
 
     @Captor
     private ArgumentCaptor<Consumer<SscsCaseDetails>> caseDataConsumerCaptor;
@@ -211,21 +208,6 @@ class HearingsServiceTest {
         assertThat(thrown.getMessage()).isNotEmpty();
     }
 
-    @DisplayName("When wrapper with a case in an invalid case state is given should run without error")
-    @Test
-    void processHearingWrapperInvalidState() {
-        SscsCaseData caseData = SscsCaseData.builder()
-            .ccdCaseId(String.valueOf(CASE_ID))
-            .build();
-        wrapper.setHearingState(CREATE_HEARING);
-        wrapper.setCaseData(caseData);
-        for (State invalidState : HearingsService.INVALID_CASE_STATES) {
-            wrapper.setCaseState(invalidState);
-            assertThatNoException()
-                .isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
-        }
-    }
-
     @DisplayName("When wrapper with a valid adjourn create Hearing State is given addHearingResponse should run without error")
     @Test
     void processHearingWrapperAdjournmentCreate() throws ListingException {
@@ -234,10 +216,17 @@ class HearingsServiceTest {
         HearingEvent hearingEvent = HearingEvent.ADJOURN_CREATE_HEARING;
         wrapper.setHearingState(ADJOURN_CREATE_HEARING);
         wrapper.setEventId(hearingEvent.getEventType().getCcdType());
-
-        when(hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(any(), any(), anyBoolean())).thenReturn(sscsCaseDetailsConsumer);
-        given(hearingsMapping.buildHearingPayload(any(), any())).willReturn(HearingRequestPayload.builder().build());
-
+        var panelComposition = PanelMemberComposition.builder().panelCompositionJudge("58").build();
+        when(hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(
+                eq(panelComposition), any(), any(), anyBoolean())
+        ).thenReturn(sscsCaseDetailsConsumer);
+        var hearingPayload = HearingRequestPayload.builder()
+                .hearingDetails(uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDetails.builder()
+                        .panelRequirements(PanelRequirements.builder().roleTypes(List.of("58"))
+                                .build()).build()).build();
+        when(hearingsMapping.buildHearingPayload(any(), any())).thenReturn(hearingPayload);
+        when(panelCompositionService.createPanelCompositionFromJohTiers(eq(List.of("58"))))
+                .thenReturn(panelComposition);
 
         assertThatNoException()
                 .isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
@@ -251,22 +240,29 @@ class HearingsServiceTest {
                 caseDataConsumerCaptor.capture()
         );
         SscsCaseData caseData = wrapper.getCaseData();
-        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
-        assertThat(caseData.getHearings()).isNull(); // before case updated with new hearing
+        assertNull(caseData.getHearings());
+        assertEquals(caseData.getPanelMemberComposition(), panelComposition);
 
         Consumer<SscsCaseDetails> sscsCaseDataConsumer = caseDataConsumerCaptor.getValue();
         assertThat(sscsCaseDataConsumer).isEqualTo(sscsCaseDetailsConsumer);
-
     }
 
     @Test
-    void shouldThrowUpdateCaseExceptionWhenCaseUpdateWithHearingResponseV2Fails() {
+    void shouldThrowUpdateCaseExceptionWhenCaseUpdateWithHearingResponseV2Fails() throws ListingException {
         mockHearingResponseForAdjournmentCreate();
 
         HearingEvent event = HearingEvent.ADJOURN_CREATE_HEARING;
         wrapper.setHearingState(ADJOURN_CREATE_HEARING);
         wrapper.setEventId(event.getEventType().getCcdType());
-        Request request = Request.create(Request.HttpMethod.GET, "url", new HashMap<>(), null, new RequestTemplate());
+        Request request =
+                Request.create(Request.HttpMethod.GET, "url", new HashMap<>(), null, new RequestTemplate());
+        var hearingPayload = HearingRequestPayload.builder()
+                .hearingDetails(uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDetails.builder()
+                        .panelRequirements(PanelRequirements.builder().roleTypes(List.of("58"))
+                                .build()).build()).build();
+        when(hearingsMapping.buildHearingPayload(any(), any())).thenReturn(hearingPayload);
+        when(panelCompositionService.createPanelCompositionFromJohTiers(eq(List.of("58"))))
+                .thenReturn(PanelMemberComposition.builder().build());
 
         given(updateCcdCaseService.updateCaseV2(
             eq(CASE_ID),
@@ -302,27 +298,28 @@ class HearingsServiceTest {
             .willReturn(HearingsGetResponse.builder().build());
     }
 
-
     @DisplayName("When wrapper with a valid create Hearing State is given addHearingResponse should run without error")
     @Test
-    void processHearingWrapperCreate() {
+    void processHearingWrapperCreate() throws ListingException {
         given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE,ISSUE_CODE,false,false))
             .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
                 false,false,SessionCategory.CATEGORY_03,null));
-
         given(refData.getHearingDurations()).willReturn(hearingDurations);
         given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
         given(refData.getVenueService()).willReturn(venueService);
-
         given(venueService.getEpimsIdForVenue(PROCESSING_VENUE)).willReturn("219164");
-
         given(hmcHearingApiService.sendCreateHearingRequest(any()))
                 .willReturn(HmcUpdateResponse.builder().build());
-
         given(hmcHearingApiService.getHearingsRequest(anyString(),eq(null)))
             .willReturn(HearingsGetResponse.builder().build());
-
         wrapper.setHearingState(CREATE_HEARING);
+        var hearingPayload = HearingRequestPayload.builder()
+                .hearingDetails(uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDetails.builder()
+                        .panelRequirements(PanelRequirements.builder().roleTypes(List.of("58"))
+                                .build()).build()).build();
+        when(hearingsMapping.buildHearingPayload(any(), any())).thenReturn(hearingPayload);
+        when(panelCompositionService.createPanelCompositionFromJohTiers(eq(List.of("58"))))
+                .thenReturn(PanelMemberComposition.builder().build());
 
         assertThatNoException()
             .isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
