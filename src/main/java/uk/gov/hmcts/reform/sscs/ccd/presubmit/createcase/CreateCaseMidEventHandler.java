@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Entity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -78,6 +79,7 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
         }
 
         errorResponse.addWarnings(validateIbcaReference(caseData.getAppeal().getAppellant()));
+        errorResponse.addWarnings(validateMrnDetails(caseData.getAppeal()));
 
         return errorResponse;
     }
@@ -89,6 +91,15 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
             validationWarnings.add(IBCA_REFERENCE_EMPTY_ERROR);
         } else if (!IBCA_REFERENCE_REGEX.matcher(appellant.getIdentity().getIbcaReference()).find()) {
             validationWarnings.add(IBCA_REFERENCE_VALIDATION_ERROR);
+        }
+
+        return validationWarnings;
+    }
+
+    private Collection<String> validateMrnDetails(Appeal appeal) {
+        Set<String> validationWarnings = new HashSet<>();
+        if (isEmpty(appeal.getMrnDetails())) {
+            validationWarnings.add("MRN details are mandatory");
         }
 
         return validationWarnings;
