@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.helper.mapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
 import org.junit.jupiter.api.DisplayName;
@@ -46,6 +47,7 @@ class HearingsDurationMappingTest extends HearingsMappingBase {
     void testIbcCaseHearingDurationNotSet() throws ListingException {
         caseData.setBenefitCode("093");
         given(refData.getHearingDurations()).willReturn(hearingDurations);
+        given(hearingDurations.getHearingDurationBenefitIssueCodes(eq(caseData))).willReturn(null);
         ListingException exception = assertThrows(ListingException.class, () ->
                 HearingsDurationMapping.getHearingDuration(caseData, refData)
         );
