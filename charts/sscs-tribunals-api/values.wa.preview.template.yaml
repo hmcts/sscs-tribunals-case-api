@@ -795,6 +795,7 @@ wa-task-management-api:
       WA_SYSTEM_USERNAME: ${WA_SYSTEM_USERNAME}
       WA_SYSTEM_PASSWORD: ${WA_SYSTEM_PASSWORD}
       ALLOWED_CASE_TYPES: "benefit"
+      MANDATORY_TASK_FIELD_CHECK_ENABLED: true
 
 wa-task-monitor:
   java:
