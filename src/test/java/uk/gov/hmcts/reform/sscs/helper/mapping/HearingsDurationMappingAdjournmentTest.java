@@ -79,7 +79,7 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
     }
 
     @DisplayName("When adjournment flag is enabled but getHearingDurationAdjournment returns null "
-        + "getHearingDuration should also return null")
+        + "getHearingDuration should throw a ListingException")
     @Test
     void getHearingDurationAdjournmentReturnsNullWithFeatureFlagEnabled() throws ListingException {
         OverrideFields defaultListingValues = OverrideFields.builder()
