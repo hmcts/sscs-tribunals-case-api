@@ -180,7 +180,11 @@
 
         {% if isIbcCase %}
         <div>
-            <dt class="cya-question">A yw'r apelydd yn byw yng Nghymru, Lloegr neu'r Alban?</dt>
+            {% if PdfWrapper.isNiPostCodeFeatureEnabled %}
+                <dt class="cya-question">Ydych chi'n byw yng Nghymru, Lloegr, Yr Alban neu Ogledd Iwerddon?</dt>
+            {% else %}
+                <dt class="cya-question">A yw'r apelydd yn byw yng Nghymru, Lloegr neu'r Alban?</dt>
+            {% endif %}
             <dd class="cya-answer">{{ welshInMainlandUk }}</dd>
         </div>
         {% endif %}
@@ -317,6 +321,17 @@
 
             </dd>
         </div>
+
+        {% if isIbcCase %}
+         <div>
+            {% if PdfWrapper.isNiPostCodeFeatureEnabled %}
+                <dt class="cya-question">A yw eich cynrychiolydd yn byw yng Nghymru, Lloegr, Yr Alban neu Ogledd Iwerddon?</dt>
+            {% else %}
+                <dt class="cya-question">A yw eich cynrychiolydd yn byw yng Nghymru, Lloegr neu'r Alban?</dt>
+            {% endif %}
+             <dd class="cya-answer">{{ welshRepInMainlandUk }}</dd>
+         </div>
+         {% endif %}
 
         <div>
             <dt class="cya-question">Rhif ffôn</dt>
@@ -691,7 +706,11 @@
 
         {% if isIbcCase %}
         <div>
-            <dt class="cya-question">Does the appellant live in England, Wales or Scotland?</dt>
+            {% if PdfWrapper.isNiPostCodeFeatureEnabled %}
+                <dt class="cya-question">Does the appellant live in England, Scotland, Wales or Northern Ireland?</dt>
+            {% else %}
+                <dt class="cya-question">Does the appellant live in England, Wales or Scotland?</dt>
+            {% endif %}
             <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.appellant.address.inMainlandUk }}</dd>
         </div>
         {% endif %}
@@ -822,6 +841,17 @@
 
             </dd>
         </div>
+
+        {% if isIbcCase %}
+         <div>
+            {% if PdfWrapper.isNiPostCodeFeatureEnabled %}
+                <dt class="cya-question">Does the representative live in England, Scotland, Wales or Northern Ireland?</dt>
+            {% else %}
+                <dt class="cya-question">Does the representative live in England, Wales or Scotland?</dt>
+            {% endif %}
+             <dd class="cya-answer">{{ PdfWrapper.sscsCaseData.appeal.rep.address.inMainlandUk }}</dd>
+         </div>
+         {% endif %}
 
         <div>
             <dt class="cya-question">Phone number</dt>

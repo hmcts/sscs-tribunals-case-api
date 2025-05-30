@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -26,26 +26,29 @@ public class SscsPdfService {
     private final PDFServiceClient pdfServiceClient;
     private final CcdPdfService ccdPdfService;
     private final ResourceManager resourceManager;
+    private final boolean isNiPostCodeFeatureEnabled;
 
     @Autowired
     public SscsPdfService(@Value("${appellant.appeal.html.template.path}") String appellantTemplatePath,
                           @Value("${appellant.appeal.html.welsh.template.path}") String appellantWelshTemplatePath,
                           PDFServiceClient pdfServiceClient,
                           CcdPdfService ccdPdfService,
-                          ResourceManager resourceManager) {
+                          ResourceManager resourceManager,
+                          @Value("${feature.ibc-ni-postcodes.enabled}") boolean isNiPostCodeFeatureEnabled) {
         this.pdfServiceClient = pdfServiceClient;
         this.appellantTemplatePath = appellantTemplatePath;
         this.appellantWelshTemplatePath = appellantWelshTemplatePath;
         this.ccdPdfService = ccdPdfService;
         this.resourceManager = resourceManager;
+        this.isNiPostCodeFeatureEnabled = isNiPostCodeFeatureEnabled;
     }
 
     public SscsCaseData generatePdf(SscsCaseData sscsCaseData, Long caseDetailsId, String documentType, String fileName) {
         byte[] pdf = generatePdf(sscsCaseData, caseDetailsId);
 
         log.info("Case {} PDF successfully created for benefit type {}",
-                caseDetailsId,
-                sscsCaseData.getAppeal().getBenefitType().getCode());
+            caseDetailsId,
+            sscsCaseData.getAppeal().getBenefitType().getCode());
         SscsDocumentTranslationStatus documentTranslationStatus = sscsCaseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
         return ccdPdfService.updateDoc(fileName, pdf, caseDetailsId, sscsCaseData, documentType, documentTranslationStatus);
     }
@@ -59,29 +62,30 @@ public class SscsPdfService {
         }
 
         PdfWrapper pdfWrapper = PdfWrapper.builder()
-                .sscsCaseData(sscsCaseData)
-                .ccdCaseId(caseDetailsId)
-                .isSignLanguageInterpreterRequired(sscsCaseData.getAppeal().getHearingOptions().wantsSignLanguageInterpreter())
-                .isHearingLoopRequired(sscsCaseData.getAppeal().getHearingOptions().wantsHearingLoop())
-                .isAccessibleHearingRoomRequired(sscsCaseData.getAppeal().getHearingOptions().wantsAccessibleHearingRoom())
-                .currentDate(LocalDate.parse(sscsCaseData.getCaseCreated()))
-                .englishBenefitName(Benefit.getLongBenefitNameDescriptionWithOptionalAcronym(sscsCaseData.getAppeal().getBenefitType().getCode(), true))
-                .repFullName(getRepFullName(sscsCaseData.getAppeal().getRep())).build();
+            .sscsCaseData(sscsCaseData)
+            .ccdCaseId(caseDetailsId)
+            .isSignLanguageInterpreterRequired(sscsCaseData.getAppeal().getHearingOptions().wantsSignLanguageInterpreter())
+            .isHearingLoopRequired(sscsCaseData.getAppeal().getHearingOptions().wantsHearingLoop())
+            .isAccessibleHearingRoomRequired(sscsCaseData.getAppeal().getHearingOptions().wantsAccessibleHearingRoom())
+            .isNiPostCodeFeatureEnabled(isNiPostCodeFeatureEnabled)
+            .currentDate(LocalDate.parse(sscsCaseData.getCaseCreated()))
+            .englishBenefitName(Benefit.getLongBenefitNameDescriptionWithOptionalAcronym(sscsCaseData.getAppeal().getBenefitType().getCode(), true))
+            .repFullName(getRepFullName(sscsCaseData.getAppeal().getRep())).build();
 
         Map<String, Object> placeholders = new HashMap<>();
         placeholders.put("PdfWrapper", pdfWrapper);
         if (sscsCaseData.isLanguagePreferenceWelsh()) {
             placeholders.put("appellant_identity_dob",
-                    LocalDateToWelshStringConverter.convert(sscsCaseData.getAppeal().getAppellant().getIdentity().getDob()));
+                LocalDateToWelshStringConverter.convert(sscsCaseData.getAppeal().getAppellant().getIdentity().getDob()));
 
             final Appointee appointee = sscsCaseData.getAppeal().getAppellant().getAppointee();
             String appellantDob = isNotEmpty(appointee) && isNotEmpty(appointee.getIdentity()) && isNotEmpty(appointee.getIdentity().getDob())
-                    ? LocalDateToWelshStringConverter.convert(appointee.getIdentity().getDob()) : "";
+                ? LocalDateToWelshStringConverter.convert(appointee.getIdentity().getDob()) : "";
             placeholders.put("appellant_appointee_identity_dob", appellantDob);
 
             if (sscsCaseData.getAppeal().getMrnDetails() != null && sscsCaseData.getAppeal().getMrnDetails().getMrnDate() != null) {
                 placeholders.put("date_of_decision",
-                        LocalDateToWelshStringConverter.convert(sscsCaseData.getAppeal().getMrnDetails().getMrnDate()));
+                    LocalDateToWelshStringConverter.convert(sscsCaseData.getAppeal().getMrnDetails().getMrnDate()));
             }
 
             List<String> welshExcludesDates = new ArrayList<>();
@@ -95,12 +99,18 @@ public class SscsPdfService {
             placeholders.put("welshCurrentDate", LocalDateToWelshStringConverter.convert(sscsCaseData.getCaseCreated()));
             placeholders.put("welshBenefitType", Benefit.getLongBenefitNameDescriptionWithOptionalAcronym(sscsCaseData.getAppeal().getBenefitType().getCode(), false));
             placeholders.put("welshEvidencePresent",
-                    sscsCaseData.getEvidencePresent() != null && sscsCaseData.getEvidencePresent().equalsIgnoreCase(
-                            "Yes") ? "ydw" : "nac ydw");
-            placeholders.put("welshWantsToAttend", sscsCaseData.getAppeal().getHearingOptions().getWantsToAttend().equalsIgnoreCase(
+                sscsCaseData.getEvidencePresent() != null && sscsCaseData.getEvidencePresent().equalsIgnoreCase(
                     "Yes") ? "ydw" : "nac ydw");
+            placeholders.put("welshWantsToAttend", sscsCaseData.getAppeal().getHearingOptions().getWantsToAttend().equalsIgnoreCase(
+                "Yes") ? "ydw" : "nac ydw");
             placeholders.put("welshInMainlandUk",
-                    YES.equals(sscsCaseData.getAppeal().getAppellant().getAddress().getInMainlandUk()) ? "ydw" : "nac ydw");
+                NO.equals(sscsCaseData.getAppeal().getAppellant().getAddress().getInMainlandUk()) ? "nac ydw" : "ydw");
+            YesNo repInMainlandUk = Optional.ofNullable(sscsCaseData.getAppeal().getRep())
+                .map(Entity::getAddress)
+                .map(Address::getInMainlandUk)
+                .orElse(null);
+            placeholders.put("welshRepInMainlandUk",
+                NO.equals(repInMainlandUk) ? "nac ydw" : "ydw");
         }
         return pdfServiceClient.generateFromHtml(template, placeholders);
     }
