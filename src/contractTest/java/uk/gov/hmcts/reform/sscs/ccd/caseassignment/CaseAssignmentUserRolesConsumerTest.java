@@ -60,6 +60,9 @@ public class CaseAssignmentUserRolesConsumerTest {
                 .matchQuery("case_ids", caseId)
                 .willRespondWith()
                 .status(200)
+                .matchHeader(org.apache.http.HttpHeaders.CONTENT_TYPE,
+                        "application/hal\\+json",
+                        "application/hal+json")
                 .body(generateResponse())
                 .toPact(V4Pact.class);
     }
