@@ -1,7 +1,7 @@
 apiVersion: v2
 name: sscs-tribunals-api
 home: https://github.com/hmcts/sscs-tribunals-case-api
-version: 0.0.211
+version: 0.0.212
 description: SSCS Tribunals Case API
 maintainers:
   - name: HMCTS SSCS Team
@@ -75,7 +75,7 @@ dependencies:
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: wa.enabled
   - name: wa-task-monitor
-    version: ~0.0.36
+    version: ~0.1.0
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: wa.enabled
   - name: wa-case-event-handler
@@ -88,24 +88,24 @@ dependencies:
     condition: wa.enabled
   #    initiation
   - name: wa-task-batch-service
-    version: ~0.0.24
+    version: ~0.1.0
     repository: 'oci://hmctspublic.azurecr.io/helm'
     alias: wa-initiation-batch
     condition: wa.taskBatchCron.enabled
   #    reconfiguration
   - name: wa-task-batch-service
-    version: ~0.0.24
+    version: ~0.1.0
     repository: 'oci://hmctspublic.azurecr.io/helm'
     alias: wa-reconfiguration-batch
     condition: wa.reconfigurationBatchCron.enabled
   #    termination
   - name: wa-task-batch-service
-    version: ~0.0.24
+    version: ~0.1.0
     repository: 'oci://hmctspublic.azurecr.io/helm'
     alias: wa-termination-batch
     condition: wa.terminationBatchCron.enabled
   - name: wa-message-cron-service
-    version: ~0.0.13
+    version: ~0.0.15
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: wa.enabled
   - name: ccd-message-publisher
