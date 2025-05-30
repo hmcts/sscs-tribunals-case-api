@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getHmcHearingType;
 
@@ -22,7 +24,6 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @Slf4j
 @RequiredArgsConstructor
 public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-
     @Value("${feature.default-panel-comp.enabled}")
     private boolean isDefaultPanelCompEnabled;
 
@@ -63,10 +64,13 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             }
         }
 
-        if (isDefaultPanelCompEnabled && callbackResponse.getData().getPanelMemberComposition() != null
+        if (isDefaultPanelCompEnabled) {
+            if (callbackResponse.getData().getPanelMemberComposition() != null
                 && "NoMedicalMemberRequired".equals(callbackResponse.getData().getPanelMemberComposition().getPanelCompositionMemberMedical1())) {
-            callbackResponse.getData().getPanelMemberComposition().setPanelCompositionMemberMedical1(null);
-            callbackResponse.getData().getPanelMemberComposition().setPanelCompositionMemberMedical2(null);
+                callbackResponse.getData().getPanelMemberComposition().clearMedicalMembers();
+            }
+
+            syncConfirmPanelComposition(callbackResponse.getData());
         }
 
         OverrideFields overrideFields = caseDataSnlFields.getOverrideFields();
@@ -88,6 +92,24 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 .orElseGet(HearingOptions::builder)
                 .hmcHearingType(getHmcHearingType(sscsCaseData))
                 .build());
+
         return callbackResponse;
+    }
+
+    private void syncConfirmPanelComposition(SscsCaseData sscsCaseData) {
+        PanelMemberComposition panelMemberComposition = Optional
+            .ofNullable(sscsCaseData.getPanelMemberComposition())
+            .orElseGet(() -> PanelMemberComposition.builder().build());
+
+        if (panelMemberComposition.hasFqpm()) {
+            sscsCaseData.setIsFqpmRequired(YES);
+        } else if (isYes(sscsCaseData.getIsFqpmRequired())) {
+            sscsCaseData.setIsFqpmRequired(NO);
+        }
+
+        if (sscsCaseData.isIbcCase()) {
+            sscsCaseData.setIsMedicalMemberRequired(
+                (sscsCaseData.getPanelMemberComposition().hasMedicalMember()) ? YES : NO);
+        }
     }
 }
