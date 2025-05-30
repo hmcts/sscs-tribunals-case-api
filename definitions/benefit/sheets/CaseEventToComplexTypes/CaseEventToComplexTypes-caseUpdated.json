@@ -268,7 +268,7 @@
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 16,
     "PageID": "1.0",
-    "EventElementLabel": "Does the appellant live in England, Wales or Scotland?"
+    "EventElementLabel": "Does the appellant live in England, Scotland, Wales or Northern Ireland?"
   },
   {
     "CaseEventID": "caseUpdated",
@@ -936,7 +936,7 @@
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 65,
     "PageID": "1.0",
-    "EventElementLabel": "Does the representative live in England, Wales or Scotland?"
+    "EventElementLabel": "Does the representative live in England, Scotland, Wales or Northern Ireland?"
   },
   {
     "CaseEventID": "caseUpdated",
