@@ -71,7 +71,7 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
 
         errorResponse.addErrors(validateAddress(caseData.getAppeal().getAppellant()));
 
-        if (isYes(caseData.getAppeal().getRep().getHasRepresentative())
+        if (!isEmpty(caseData.getAppeal().getRep()) && isYes(caseData.getAppeal().getRep().getHasRepresentative())
                 && (isEmpty(caseData.getAppeal().getRep().getAddress())
                 || isEmpty(caseData.getAppeal().getRep().getAddress().getInMainlandUk()))) {
             errorResponse.addError("You must enter Living in the UK for the representative");
