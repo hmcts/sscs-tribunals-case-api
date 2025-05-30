@@ -35,13 +35,16 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 
 public class UpdateListingRequirementsAboutToStartHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     @Mock
-    DynamicListLanguageUtil utils;
+    private DynamicListLanguageUtil utils;
+    @Mock
+    private PanelCompositionService panelCompositionService;
 
     private UpdateListingRequirementsAboutToStartHandler handler;
     private SscsCaseData sscsCaseData;
@@ -49,8 +52,7 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
 
     @BeforeEach
     public void setUp() {
-        openMocks(this);
-        handler = new UpdateListingRequirementsAboutToStartHandler(utils);
+        handler = new UpdateListingRequirementsAboutToStartHandler(panelCompositionService, utils);
         ReflectionTestUtils.setField(handler, "isScheduleListingEnabled", true);
         ReflectionTestUtils.setField(handler, "isDefaultPanelCompEnabled", true);
 

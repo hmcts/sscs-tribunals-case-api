@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 
 @Service
@@ -26,12 +27,10 @@ import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 @RequiredArgsConstructor
 public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    @Value("${feature.snl.enabled}")
-    private boolean isScheduleListingEnabled;
-
     @Value("${feature.default-panel-comp.enabled}")
     private boolean isDefaultPanelCompEnabled;
 
+    private final PanelCompositionService panelCompositionService;
     private final DynamicListLanguageUtil utils;
 
     @Override
@@ -40,7 +39,7 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_START)
-            && (callback.getEvent() == EventType.UPDATE_LISTING_REQUIREMENTS);
+                && (callback.getEvent() == EventType.UPDATE_LISTING_REQUIREMENTS);
     }
 
     @Override
@@ -53,35 +52,39 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
 
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        if (isScheduleListingEnabled) {
-            String caseId = sscsCaseData.getCcdCaseId();
+        String caseId = sscsCaseData.getCcdCaseId();
 
-            log.info("Handling override fields update listing requirements event for caseId {}", caseId);
+        log.info("Handling override fields update listing requirements event for caseId {}", caseId);
 
-            SchedulingAndListingFields schedulingAndListingFields = sscsCaseData.getSchedulingAndListingFields();
-            OverrideFields overrideFields = schedulingAndListingFields.getOverrideFields();
+        SchedulingAndListingFields schedulingAndListingFields = sscsCaseData.getSchedulingAndListingFields();
+        OverrideFields overrideFields = schedulingAndListingFields.getOverrideFields();
 
-            if (isNull(overrideFields) || isNull(overrideFields.getAppellantInterpreter())) {
-                overrideFields = initialiseOverrideFields();
-                schedulingAndListingFields.setOverrideFields(overrideFields);
+        if (isNull(overrideFields) || isNull(overrideFields.getAppellantInterpreter())) {
+            overrideFields = initialiseOverrideFields();
+            schedulingAndListingFields.setOverrideFields(overrideFields);
+        }
+
+        HearingInterpreter appellantInterpreter = overrideFields.getAppellantInterpreter();
+        DynamicList interpreterLanguages = utils.generateInterpreterLanguageFields(appellantInterpreter.getInterpreterLanguage());
+        appellantInterpreter.setInterpreterLanguage(interpreterLanguages);
+
+        log.info("{} Languages in DynamicList for caseId {}", interpreterLanguages.getListItems().size(), caseId);
+        if (isNull(overrideFields.getHmcHearingType())) {
+            overrideFields.setHmcHearingType(sscsCaseData.getHmcHearingType());
+        }
+
+        if (isNull(sscsCaseData.getPanelMemberComposition()) || sscsCaseData.getPanelMemberComposition().isEmpty()) {
+            sscsCaseData.setPanelMemberComposition(
+                    panelCompositionService.createPanelComposition(sscsCaseData)
+            );
+        }
+
+        if (isDefaultPanelCompEnabled && sscsCaseData.getPanelMemberComposition() != null
+                && sscsCaseData.getPanelMemberComposition().getPanelCompositionJudge() != null) {
+            if (isNull(schedulingAndListingFields.getReserveTo())) {
+                schedulingAndListingFields.setReserveTo(ReserveTo.builder().build());
             }
-            
-            HearingInterpreter appellantInterpreter = overrideFields.getAppellantInterpreter();
-            DynamicList interpreterLanguages = utils.generateInterpreterLanguageFields(appellantInterpreter.getInterpreterLanguage());
-            appellantInterpreter.setInterpreterLanguage(interpreterLanguages);
-
-            log.info("{} Languages in DynamicList for caseId {}", interpreterLanguages.getListItems().size(), caseId);
-            if (isNull(overrideFields.getHmcHearingType())) {
-                overrideFields.setHmcHearingType(sscsCaseData.getHmcHearingType());
-            }
-
-            if (isDefaultPanelCompEnabled && sscsCaseData.getPanelMemberComposition() != null
-                    && sscsCaseData.getPanelMemberComposition().getPanelCompositionJudge() != null) {
-                if (isNull(schedulingAndListingFields.getReserveTo())) {
-                    schedulingAndListingFields.setReserveTo(ReserveTo.builder().build());
-                }
-                schedulingAndListingFields.getReserveTo().setReservedDistrictTribunalJudge(YesNo.NO);
-            }
+            schedulingAndListingFields.getReserveTo().setReservedDistrictTribunalJudge(YesNo.NO);
         }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
