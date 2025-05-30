@@ -42,6 +42,7 @@ java:
     HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "${SERVICE_NAME}-hmcsb-sscs"
     HMC_HEARINGS_TOPIC_NAMESPACE: "hmc-servicebus-aat"
     HMC_DEPLOYMENT_ID: "sscs-${CHANGE_ID}"
+    IBC_NI_POSTCODES_FEATURE: true
 
 am-org-role-mapping-service:
   enabled: true
@@ -665,6 +666,7 @@ sscs-tribunals-frontend:
       SERVICES_IDAM_LOGIN_URL: https://idam-web-public.aat.platform.hmcts.net/login
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       UV_THREADPOOL_SIZE: 64
+      IBC_NI_POSTCODES_FEATURE: true
     keyVaults:
       sscs:
         secrets:
