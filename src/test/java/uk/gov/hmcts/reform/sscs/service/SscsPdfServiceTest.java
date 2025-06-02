@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.openMocks;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 
@@ -44,6 +45,8 @@ public class SscsPdfServiceTest {
     @Mock
     ResourceManager resourceManager;
 
+    Boolean isNiPostCodeFeatureEnabled = true;
+
     SscsCaseData caseData = buildCaseData();
 
     ArgumentCaptor<Map> argumentCaptor = ArgumentCaptor.forClass(Map.class);
@@ -51,7 +54,7 @@ public class SscsPdfServiceTest {
     @Before
     public void setup() {
         openMocks(this);
-        service = new SscsPdfService(TEMPLATE_PATH, WELSH_TEMPLATE_PATH, pdfServiceClient, ccdPdfService, resourceManager);
+        service = new SscsPdfService(TEMPLATE_PATH, WELSH_TEMPLATE_PATH, pdfServiceClient, ccdPdfService, resourceManager, isNiPostCodeFeatureEnabled);
     }
 
     @Test
@@ -68,6 +71,7 @@ public class SscsPdfServiceTest {
         caseData.getAppeal().getAppellant().getIdentity().setDob("2000-12-31");
         caseData.getAppeal().getAppellant().getAppointee().getIdentity().setDob("1995-12-31");
         caseData.getAppeal().getAppellant().getAddress().setInMainlandUk(YES);
+        caseData.getAppeal().getRep().getAddress().setInMainlandUk(YES);
         caseData.setCaseCreated("2020-12-31");
         caseData.getAppeal().getBenefitType().setCode(benefitCode);
         service.generatePdf(caseData, 1L, "appellantEvidence", "fileName");
@@ -88,6 +92,28 @@ public class SscsPdfServiceTest {
         assertEquals("nac ydw", argumentCaptor.getValue().get("welshEvidencePresent"));
         assertEquals("ydw", argumentCaptor.getValue().get("welshWantsToAttend"));
         assertEquals("ydw", argumentCaptor.getValue().get("welshInMainlandUk"));
+        assertEquals("ydw", argumentCaptor.getValue().get("welshRepInMainlandUk"));
+    }
+
+    @Test
+    public void createValidWelshPdfNotInMainlandUk() {
+        byte[] expected = {};
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
+        caseData.setLanguagePreferenceWelsh("Yes");
+        caseData.getAppeal().getAppellant().getIdentity().setDob("2000-12-31");
+        caseData.getAppeal().getAppellant().getAppointee().getIdentity().setDob("1995-12-31");
+        caseData.getAppeal().getAppellant().getAddress().setInMainlandUk(NO);
+        caseData.getAppeal().getRep().getAddress().setInMainlandUk(NO);
+        caseData.setCaseCreated("2020-12-31");
+        caseData.getAppeal().getBenefitType().setCode("infectedBloodCompensation");
+        service.generatePdf(caseData, 1L, "appellantEvidence", "fileName");
+
+        verify(pdfServiceClient).generateFromHtml(any(), argumentCaptor.capture());
+        verify(ccdPdfService).updateDoc(eq("fileName"), any(), eq(1L), any(), eq("appellantEvidence"),
+            eq(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED));
+
+        assertEquals("nac ydw", argumentCaptor.getValue().get("welshInMainlandUk"));
+        assertEquals("nac ydw", argumentCaptor.getValue().get("welshRepInMainlandUk"));
     }
 
 
@@ -111,7 +137,6 @@ public class SscsPdfServiceTest {
 
         assertEquals(expectedEnglishBenefitName, ((PdfWrapper) argumentCaptor.getValue().get("PdfWrapper")).getEnglishBenefitName());
         assertEquals(caseData, ((PdfWrapper) argumentCaptor.getValue().get("PdfWrapper")).getSscsCaseData());
-
     }
 
     @Test
