@@ -147,7 +147,9 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
     }
 
     private void clearAdjournmentTransientFields(SscsCaseData caseData) {
-        caseData.setAdjournment(Adjournment.builder().build());
+        caseData.setAdjournment(Adjournment.builder()
+                .adjournmentInProgress(caseData.getAdjournment().getAdjournmentInProgress())
+                .build());
     }
 
     private void calculateDueDate(SscsCaseData sscsCaseData) {
