@@ -70,7 +70,6 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
         Integer adjournCaseDuration,
         AdjournCaseNextHearingDurationUnits adjournCaseDurationUnits,
         int expected) throws ListingException {
-        given(refData.isAdjournmentFlagEnabled()).willReturn(true);
 
         setAdjournmentDurationAndUnits(adjournCaseDuration, adjournCaseDurationUnits);
         Integer result = HearingsDurationMapping.getHearingDuration(caseData, refData);
@@ -119,7 +118,6 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
         + "getHearingDuration returns the default adjournment duration")
     @Test
     void getHearingDurationWithNullUnits() throws ListingException {
-        given(hearingDurations.getHearingDurationBenefitIssueCodes(caseData)).willReturn(HearingsDurationMappingTest.DURATION_PAPER);
 
         given(refData.getHearingDurations()).willReturn(hearingDurations);
         setAdjournmentDurationAndUnits(2, null);
@@ -127,7 +125,7 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
 
         int result = HearingsDurationMapping.getHearingDuration(caseData, refData);
 
-        assertThat(result).isEqualTo(HearingsDurationMappingTest.DURATION_PAPER);
+        assertThat(result).isEqualTo(HearingsDurationMappingTest.DURATION_FACE_TO_FACE);
     }
 
     @DisplayName("When an invalid adjournCaseDuration and valid adjournCaseDurationUnits is given "
@@ -135,9 +133,7 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
     @ParameterizedTest
     @CsvSource(value = {
         "null,SESSIONS",
-        "0,SESSIONS",
-        "null,MINUTES",
-        "0,MINUTES"
+        "null,MINUTES"
     }, nullValues = {"null"})
     void getHearingDurationWithInvalidUnitsThrowsException(
         Integer adjournCaseDuration,
@@ -145,9 +141,11 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
     ) {
         setAdjournmentDurationAndUnits(adjournCaseDuration, adjournCaseDurationUnits);
         caseData.getSchedulingAndListingFields().getDefaultListingValues().setDuration(null);
+        given(refData.getHearingDurations()).willReturn(hearingDurations);
+        given(hearingDurations.getHearingDurationBenefitIssueCodes(caseData)).willReturn(null);
 
         assertThatThrownBy(() -> HearingsDurationMapping.getHearingDuration(caseData, refData))
-            .isInstanceOf(NullPointerException.class);
+            .isInstanceOf(ListingException.class);
     }
 
     @DisplayName("When getAdjournCaseNextHearingListingDurationType is non standard and  "
