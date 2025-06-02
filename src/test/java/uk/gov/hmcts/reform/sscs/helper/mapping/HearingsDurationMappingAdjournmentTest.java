@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.helper.mapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits.SESSIONS;
 
@@ -185,13 +186,7 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
         adjournment.setTypeOfHearing(AdjournCaseTypeOfHearing.PAPER);
         adjournment.setTypeOfNextHearing(AdjournCaseTypeOfHearing.PAPER);
 
-        HearingDuration duration = new HearingDuration();
-        duration.setBenefitCode(BenefitCode.PIP_NEW_CLAIM);
-        duration.setIssue(Issue.DD);
-        List<HearingDuration> durationsList = new ArrayList<>();
-        durationsList.add(duration);
-        refData.getHearingDurations().setHearingDurations(durationsList);
-
+        given(hearingDurations.getHearingDurationBenefitIssueCodes(eq(caseData))).willReturn(45);
         Integer result = HearingsDurationMapping.getHearingDurationAdjournment(caseData, refData.getHearingDurations());
 
         assertThat(result).isEqualTo(45);
