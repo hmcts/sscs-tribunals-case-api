@@ -45,14 +45,7 @@ public final class HearingsDurationMapping {
             log.info("Hearing Duration for Case ID {} set as existing Override Field value {}", caseId, overrideDuration);
             return overrideDuration;
         }
-        log.info("Default listing values for case ID {}: {}", caseId, caseData.getSchedulingAndListingFields().getDefaultListingValues());
-        Integer defaultListingDuration = OverridesMapping.getDefaultListingValues(caseData).getDuration();
-        log.info("defaultListingDuration result is {}", OverridesMapping.getDefaultListingValues(caseData));
-        // or we set based on existing S&L default listing value for duration if present
-        if (nonNull(defaultListingDuration) && defaultListingDuration >= MIN_HEARING_DURATION) {
-            log.info("Hearing Duration for Case ID {} set as existing defaultListingDuration value {}", caseId, defaultListingDuration);
-            return defaultListingDuration;
-        }
+
         if (caseData.isIbcCase()) {
             throw new ListingException("Hearing duration is required to list case");
         }
