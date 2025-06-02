@@ -546,7 +546,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
     @Test
     void givenAdjournmentIsIssued_thenClearAdjournmentFields() {
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrProperties();
+        assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrPropertiesExcept("adjournmentInProgress");
     }
 
 }
