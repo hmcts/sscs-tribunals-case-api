@@ -31,9 +31,9 @@ public final class HearingsDurationMapping {
         HearingDurationsService hearingDurationsService = refData.getHearingDurations();
         String caseId = caseData.getCcdCaseId();
         boolean adjournmentInProgress = isYes(caseData.getAdjournment().getAdjournmentInProgress());
-        log.info("Adjournment in progress: {}", adjournmentInProgress);
         // adjournment values take precedence over override fields if adjournment in progress
         if (adjournmentInProgress) {
+            log.info("Adjournment {}", caseData.getAdjournment());
             duration = getHearingDurationAdjournment(caseData, hearingDurationsService);
             if (nonNull(duration)) {
                 log.info("Hearing Duration for Case ID {} set as Adjournment value {}", caseId, duration);
