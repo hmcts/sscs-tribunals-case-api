@@ -62,6 +62,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         sscsCaseData = SscsCaseData.builder()
             .appeal(Appeal.builder().build())
             .dwpIsOfficerAttending("Yes")
+            .panelMemberComposition(PanelMemberComposition.builder().build())
             .build();
 
         caseDetails =
