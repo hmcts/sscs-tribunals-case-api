@@ -584,6 +584,21 @@ class SscsUtilTest {
 
 
     @Test
+    void shouldPopulateIbcaFieldsOnHandleIbcaCaseWithMrnDetails() {
+        final SscsCaseData sscsCaseData = SscsCaseData.builder()
+            .appeal(Appeal.builder().build())
+            .regionalProcessingCenter(RegionalProcessingCenter.builder().build())
+            .build();
+
+        handleIbcaCase(sscsCaseData);
+
+        assertThat(sscsCaseData.getAppeal().getHearingOptions().getHearingRoute()).isEqualTo(LIST_ASSIST);
+        assertThat(sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice()).isEqualTo("IBCA");
+        assertThat(sscsCaseData.getRegionalProcessingCenter().getHearingRoute()).isEqualTo(LIST_ASSIST);
+    }
+
+
+    @Test
     void shouldPopulateIbcaFieldsOnHandleIbcaCaseWithHearingOptions() {
         final SscsCaseData sscsCaseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
