@@ -13,6 +13,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -65,22 +66,26 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
     }
 
     @Test
+    @DisplayName("Return true if about to submit event is valid")
     void givenAValidAboutToSubmitEvent_thenReturnTrue() {
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isTrue();
     }
 
     @Test
+    @DisplayName("Return false if callback type is invalid")
     void givenInvalidCallbackType_thenReturnFalse() {
         assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
     }
 
     @Test
+    @DisplayName("Throw exception if cannot handle")
     void throwsExceptionIfItCannotHandleTheAppeal() {
         callback = new Callback<>(caseDetails, empty(), EventType.CASE_UPDATED, false);
         assertThatIllegalStateException().isThrownBy(() -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION));
     }
 
     @Test
+    @DisplayName("No interlock change if FQPM required is null")
     void givenFqpmRequiredNull_thenNoChange() {
         sscsCaseData.setIsFqpmRequired(null);
         sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE);
@@ -94,6 +99,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
     }
 
     @ParameterizedTest
+    @DisplayName("Clear interlock if FQPM Required is set and interlock is reviewed by judge")
     @EnumSource(value = YesNo.class, names = {"YES", "NO"})
     void givenFqpmRequiredYesOrNoAndInterlocByJudge_thenClearInterloc(YesNo isFqpmRequired) {
         sscsCaseData.setIsFqpmRequired(isFqpmRequired);
@@ -108,6 +114,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
     }
 
     @ParameterizedTest
+    @DisplayName("Interlock shouldn't change if FQPM Required is set but interlock is not reviewed by judge")
     @EnumSource(value = YesNo.class, names = {"YES", "NO"})
     void givenFqpmRequiredYesOrNoAndNoInterlocByJudge_thenInterlocNotChanged(YesNo isFqpmRequired) {
         sscsCaseData.setIsFqpmRequired(isFqpmRequired);
@@ -122,6 +129,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
     }
 
     @Test
+    @DisplayName("No interlock change if FQPM required is not set")
     void givenNoFqpmRequiredSet_thenInterlocNotChanged() {
         sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.NONE);
@@ -134,8 +142,22 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
     }
 
     @Test
+    @DisplayName("Panel member composition shouldn't change if FQPM Required is set but panel member composition is null")
+    void givenFqpmRequiredSetAndPanelMemberCompositionIsNull_thenPanelMemberCompositionShouldNotChange() {
+        sscsCaseData.setIsFqpmRequired(YES);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getPanelMemberComposition()).isNull();
+    }
+
+    @Test
+    @DisplayName("If panel member composition is set and FQPM Required is yes, "
+        + "then panel member composition should contain FQPM")
     void givenFqpmRequiredSet_thenUpdateFqpmInPanelMemberComposition() {
         sscsCaseData.setIsFqpmRequired(YES);
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -145,6 +167,8 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
     }
 
     @Test
+    @DisplayName("If panel member composition is set and FQPM Required is no, "
+        + "then panel member composition should not contain FQPM")
     void givenFqpmRequiredNo_thenPanelMemberCompositionHasNoFqpm() {
         sscsCaseData.setIsFqpmRequired(NO);
         sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
@@ -161,9 +185,26 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
     }
 
     @Test
+    @DisplayName("If Medical Member Required is no on an IBCA case, then Panel member composition should be null")
+    void givenMedicalMemberRequiredNoOnIbcaCaseAndPanelMemberCompositionIsNull_thenPanelMemberCompositionIsNull() {
+        sscsCaseData.setBenefitCode(IBCA_BENEFIT_CODE);
+        sscsCaseData.setIsMedicalMemberRequired(NO);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getPanelMemberComposition()).isNull();
+    }
+
+    @Test
+    @DisplayName("If Medical Member Required is no on an IBCA case and Panel Member Composition is set, "
+        + "then Medical Members should be null on Panel Member Composition")
     void givenMedicalMemberRequiredNoOnIbcaCase_thenPanelMemberCompositionMedicalMembersAreNull() {
         sscsCaseData.setBenefitCode(IBCA_BENEFIT_CODE);
         sscsCaseData.setIsMedicalMemberRequired(NO);
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
+            .panelCompositionMemberMedical2("Member one")
+            .build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -173,9 +214,12 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
     }
 
     @Test
+    @DisplayName("At least one Medical member should be tribunal or regional medical member on "
+        + "panel member composition if Medical Member Required is yes on an IBCA case and Panel Member Composition is set")
     void givenMedicalMemberRequiredYesOnIbcaCase_thenPanelMemberCompositionHasMedicalMember() {
         sscsCaseData.setBenefitCode(IBCA_BENEFIT_CODE);
         sscsCaseData.setIsMedicalMemberRequired(YES);
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -188,6 +232,8 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
     }
 
     @Test
+    @DisplayName("Medical members on panel member composition should not change if Medical Member Required "
+        + "is set on a non IBCA case")
     void givenMedicalMemberRequiredYesOnNonIbcaCase_thenMedicalMemberOnPanelMemberCompositionIsUnchanged() {
         sscsCaseData.setBenefitCode(Benefit.PIP.getBenefitCode());
         sscsCaseData.setIsMedicalMemberRequired(YES);

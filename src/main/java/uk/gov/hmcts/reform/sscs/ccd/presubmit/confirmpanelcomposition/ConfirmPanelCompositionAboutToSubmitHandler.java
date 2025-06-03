@@ -60,28 +60,26 @@ public class ConfirmPanelCompositionAboutToSubmitHandler implements PreSubmitCal
     }
 
     private void syncUpdateListingRequirements(SscsCaseData sscsCaseData) {
-        if (isNull(sscsCaseData.getPanelMemberComposition())) {
-            sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().build());
-        }
+        if (!isNull(sscsCaseData.getPanelMemberComposition())) {
+            boolean isFqpmRequired = isYes(sscsCaseData.getIsFqpmRequired());
+            boolean hasFqpm = sscsCaseData.getPanelMemberComposition().hasFqpm();
 
-        boolean isFqpmRequired = isYes(sscsCaseData.getIsFqpmRequired());
-        boolean hasFqpm = sscsCaseData.getPanelMemberComposition().hasFqpm();
+            if (isFqpmRequired && !hasFqpm) {
+                sscsCaseData.getPanelMemberComposition().addFqpm();
+            } else if (!isFqpmRequired && hasFqpm) {
+                sscsCaseData.getPanelMemberComposition().removeFqpm();
+            }
 
-        if (isFqpmRequired && !hasFqpm) {
-            sscsCaseData.getPanelMemberComposition().addFqpm();
-        } else if (!isFqpmRequired && hasFqpm) {
-            sscsCaseData.getPanelMemberComposition().removeFqpm();
-        }
-      
-        if (sscsCaseData.isIbcCase()) {
-            if (isYes(sscsCaseData.getIsMedicalMemberRequired())
-                && !sscsCaseData.getPanelMemberComposition().hasMedicalMember()) {
+            if (sscsCaseData.isIbcCase()) {
+                if (isYes(sscsCaseData.getIsMedicalMemberRequired())
+                    && !sscsCaseData.getPanelMemberComposition().hasMedicalMember()) {
 
-                sscsCaseData.getPanelMemberComposition()
-                    .setPanelCompositionMemberMedical1(PanelMemberType.TRIBUNAL_MEMBER_MEDICAL.toRef());
+                    sscsCaseData.getPanelMemberComposition()
+                        .setPanelCompositionMemberMedical1(PanelMemberType.TRIBUNAL_MEMBER_MEDICAL.toRef());
 
-            } else if (!isYes(sscsCaseData.getIsMedicalMemberRequired())) {
-                sscsCaseData.getPanelMemberComposition().clearMedicalMembers();
+                } else if (!isYes(sscsCaseData.getIsMedicalMemberRequired())) {
+                    sscsCaseData.getPanelMemberComposition().clearMedicalMembers();
+                }
             }
         }
     }
