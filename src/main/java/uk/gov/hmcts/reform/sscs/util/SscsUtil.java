@@ -61,6 +61,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.InternalCaseDocumentData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Issue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.JudicialUserPanel;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LibertyToApplyActions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PermissionToAppealActions;
@@ -545,7 +546,9 @@ public class SscsUtil {
         } else {
             caseData.getAppeal().setHearingOptions(HearingOptions.builder().hearingRoute(LIST_ASSIST).build());
         }
-        caseData.getAppeal().getMrnDetails().setDwpIssuingOffice("IBCA");
+        MrnDetails mrnDetails = Optional.ofNullable(caseData.getAppeal().getMrnDetails()).orElse(MrnDetails.builder().build());
+        mrnDetails.setDwpIssuingOffice("IBCA");
+        caseData.getAppeal().setMrnDetails(mrnDetails);
         if (caseData.getRegionalProcessingCenter() != null) {
             RegionalProcessingCenter listAssistRegionalProcessingCenter = caseData.getRegionalProcessingCenter()
                 .toBuilder()
