@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 import lombok.RequiredArgsConstructor;
@@ -73,14 +74,16 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
             overrideFields.setHmcHearingType(sscsCaseData.getHmcHearingType());
         }
 
-        if (isNull(sscsCaseData.getPanelMemberComposition()) || sscsCaseData.getPanelMemberComposition().isEmpty()) {
-            sscsCaseData.setPanelMemberComposition(
-                    panelCompositionService.createPanelComposition(sscsCaseData)
-            );
+        if (isDefaultPanelCompEnabled) {
+            if (isNull(sscsCaseData.getPanelMemberComposition()) || sscsCaseData.getPanelMemberComposition().isEmpty()) {
+                sscsCaseData.setPanelMemberComposition(
+                        panelCompositionService.createPanelComposition(sscsCaseData)
+                );
+            }
         }
 
-        if (isDefaultPanelCompEnabled && sscsCaseData.getPanelMemberComposition() != null
-                && sscsCaseData.getPanelMemberComposition().getPanelCompositionJudge() != null) {
+        if (isDefaultPanelCompEnabled && nonNull(sscsCaseData.getPanelMemberComposition())
+                && nonNull(sscsCaseData.getPanelMemberComposition().getPanelCompositionJudge())) {
             if (isNull(schedulingAndListingFields.getReserveTo())) {
                 schedulingAndListingFields.setReserveTo(ReserveTo.builder().build());
             }
