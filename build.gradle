@@ -406,7 +406,7 @@ dependencies {
     implementation group: 'org.springframework', name: 'spring-jms'
     implementation group: 'com.azure', name: 'azure-servicebus-jms', version: '2.0.0'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-job-scheduler', version: '2.0.0'
+    implementation group: 'com.github.hmcts', name: 'sscs-job-scheduler', version: '2e60d11'
     implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.5.0'
     implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.2.1-RELEASE'
     implementation group: 'org.commonmark', name: 'commonmark', version: '0.24.0'
