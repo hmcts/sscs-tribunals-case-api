@@ -10,7 +10,7 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.52.0'
     id 'org.owasp.dependencycheck' version '12.1.1'
     id 'au.com.dius.pact' version '4.6.17'
-    id 'com.github.hmcts.rse-cft-lib' version '0.19.1701'
+    id 'com.github.hmcts.rse-cft-lib' version '0.19.1734'
     id 'info.solidsoft.pitest' version '1.15.0'
 }
 
@@ -204,7 +204,9 @@ repositories {
 
     mavenLocal()
     mavenCentral()
-
+    maven {
+        url 'https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1'
+    }
     // jitpack should be last resort
     // see: https://github.com/jitpack/jitpack.io/issues/1939
     maven { url 'https://jitpack.io' }
