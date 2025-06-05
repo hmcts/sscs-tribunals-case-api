@@ -4,13 +4,17 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper.checkBenefitIssueCode;
+import static uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper.checkBenefitIssueCodeV2;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.CaseCategoryType.CASE_SUBTYPE;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.CaseCategoryType.CASE_TYPE;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getCategorySubTypeValue;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getCategoryTypeValue;
 import static uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil.isInterpreterRequired;
 
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
@@ -20,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.model.HearingWrapper;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.CaseCategory;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.CaseDetails;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @RestController
@@ -28,10 +33,16 @@ public final class HearingsCaseMapping {
 
     public static final String CASE_DETAILS_URL = "%s/cases/case-details/%s";
 
-    private HearingsCaseMapping() {
+    @Value("${feature.default-panel-comp.enabled}")
+    private boolean defaultPanelCompEnabled;
+
+    private final PanelCompositionService panelCompositionService;
+
+    HearingsCaseMapping(PanelCompositionService panelCompositionService) {
+        this.panelCompositionService = panelCompositionService;
     }
 
-    public static CaseDetails buildHearingCaseDetails(HearingWrapper wrapper, ReferenceDataServiceHolder refData)
+    public CaseDetails buildHearingCaseDetails(HearingWrapper wrapper, ReferenceDataServiceHolder refData)
         throws ListingException {
 
         SscsCaseData caseData = wrapper.getCaseData();
@@ -81,16 +92,19 @@ public final class HearingsCaseMapping {
                 .anyMatch(o -> isYes(o.getUnacceptableCustomerBehaviour()));
     }
 
-    public static List<CaseCategory> buildCaseCategories(SscsCaseData caseData, ReferenceDataServiceHolder refData)
+    public List<CaseCategory> buildCaseCategories(SscsCaseData caseData, ReferenceDataServiceHolder refData)
         throws ListingException {
-
-        SessionCategoryMap sessionCategoryMap = HearingsMapping.getSessionCaseCodeMap(caseData, refData);
-
-        checkBenefitIssueCode(sessionCategoryMap);
-
         List<CaseCategory> categories = new ArrayList<>();
-        categories.addAll(getCaseTypes(sessionCategoryMap, refData));
-        categories.addAll(getCaseSubTypes(sessionCategoryMap, refData));
+        if (defaultPanelCompEnabled) {
+            checkBenefitIssueCodeV2(panelCompositionService.isBenefitIssueCodeValid(caseData.getBenefitCode(), caseData.getIssueCode()));
+            categories.addAll(getCaseTypesV2(caseData));
+            categories.addAll(getCaseSubTypesV2(caseData));
+        } else {
+            SessionCategoryMap sessionCategoryMap = HearingsMapping.getSessionCaseCodeMap(caseData, refData);
+            checkBenefitIssueCode(sessionCategoryMap);
+            categories.addAll(getCaseTypes(sessionCategoryMap, refData));
+            categories.addAll(getCaseSubTypes(sessionCategoryMap, refData));
+        }
 
         return categories;
     }
@@ -111,6 +125,25 @@ public final class HearingsCaseMapping {
                 .categoryType(CASE_SUBTYPE)
                 .categoryParent(refData.getSessionCategoryMaps().getCategoryTypeValue(sessionCaseCode))
                 .categoryValue(refData.getSessionCategoryMaps().getCategorySubTypeValue(sessionCaseCode))
+                .build());
+        return categories;
+    }
+
+    public static List<CaseCategory> getCaseTypesV2(SscsCaseData caseData) {
+        List<CaseCategory> categories = new ArrayList<>();
+        categories.add(CaseCategory.builder()
+                .categoryType(CASE_TYPE)
+                .categoryValue(getCategoryTypeValue(caseData))
+                .build());
+        return categories;
+    }
+
+    public static List<CaseCategory> getCaseSubTypesV2(SscsCaseData caseData) {
+        List<CaseCategory> categories = new ArrayList<>();
+        categories.add(CaseCategory.builder()
+                .categoryType(CASE_SUBTYPE)
+                .categoryParent(getCategoryTypeValue(caseData))
+                .categoryValue(getCategorySubTypeValue(caseData))
                 .build());
         return categories;
     }

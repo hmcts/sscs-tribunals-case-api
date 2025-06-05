@@ -150,4 +150,14 @@ public final class HearingsServiceHelper {
             throw new ListingException("Incorrect benefit/issue code combination");
         }
     }
+
+    public static void checkBenefitIssueCodeV2(Boolean validIssueBenefit) throws ListingException {
+        if (!validIssueBenefit) {
+            log.error("sessionCaseCode is null. The benefit/issue code is probably an incorrect combination"
+                    + " and cannot be mapped to a session code. Refer to the panel-category-map.json file"
+                    + " for the correct combinations.");
+
+            throw new ListingException("Incorrect benefit/issue code combination");
+        }
+    }
 }

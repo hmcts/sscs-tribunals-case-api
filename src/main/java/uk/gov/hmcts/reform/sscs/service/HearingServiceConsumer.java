@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 @SuppressWarnings({"PMD.ExcessiveImports", "PMD.UnusedFormalParameter", "PMD.TooManyMethods", "AvoidThrowingRawExceptionTypes"})
 public class HearingServiceConsumer {
     private final ReferenceDataServiceHolder refData;
-
+    private final OverridesMapping overridesMapping;
 
     public Consumer<SscsCaseData> getCreateHearingCaseDataConsumer(HmcUpdateResponse response, Long hearingRequestId) {
         return sscsCaseData -> updateCaseDataWithHearingResponse(response, hearingRequestId, sscsCaseData);
@@ -38,10 +38,10 @@ public class HearingServiceConsumer {
             try {
                 if (isUpdateHearing) {
                     if (isNull(sscsCaseDetails.getData().getSchedulingAndListingFields().getOverrideFields())) {
-                        OverridesMapping.setOverrideValues(sscsCaseDetails.getData(), refData);
+                        overridesMapping.setOverrideValues(sscsCaseDetails.getData(), refData);
                     }
                 } else {
-                    OverridesMapping.setDefaultListingValues(sscsCaseDetails.getData(), refData);
+                    overridesMapping.setDefaultListingValues(sscsCaseDetails.getData(), refData);
                 }
                 sscsCaseDetails.getData().setPanelMemberComposition(panelComposition);
                 updateCaseDataWithHearingResponse(response, hearingRequestId, sscsCaseDetails.getData());
