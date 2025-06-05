@@ -111,7 +111,7 @@ public final class HearingsAutoListMapping {
             DefaultPanelComposition panelCategory = panelCompositionService.getDefaultPanelComposition(caseData);
             checkBenefitIssueCodeV2(panelCompositionService.isBenefitIssueCodeValid(caseData.getBenefitCode(), caseData.getIssueCode()));
             List<PanelMemberType> panelMembers = List.of(TRIBUNAL_MEMBER_MEDICAL, REGIONAL_MEDICAL_MEMBER, TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED);
-            return panelCategory.containsAnyPanelMembers(panelMembers);
+            return panelCategory != null && panelCategory.containsAnyPanelMembers(panelMembers);
         } else {
             SessionCategoryMap sessionCategoryMap = getSessionCaseCodeMap(caseData, refData);
             checkBenefitIssueCode(sessionCategoryMap);
