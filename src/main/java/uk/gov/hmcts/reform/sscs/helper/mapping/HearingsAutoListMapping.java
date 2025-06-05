@@ -109,7 +109,7 @@ public final class HearingsAutoListMapping {
     public boolean hasMqpmOrFqpm(@Valid SscsCaseData caseData, ReferenceDataServiceHolder refData) throws ListingException {
         if (defaultPanelCompEnabled) {
             DefaultPanelComposition panelCategory = panelCompositionService.getDefaultPanelComposition(caseData);
-            checkBenefitIssueCodeV2(panelCategory);
+            checkBenefitIssueCodeV2(panelCompositionService.isBenefitIssueCodeValid(caseData.getBenefitCode(), caseData.getIssueCode()));
             List<PanelMemberType> panelMembers = List.of(TRIBUNAL_MEMBER_MEDICAL, REGIONAL_MEDICAL_MEMBER, TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED);
             return panelCategory.containsAnyPanelMembers(panelMembers);
         } else {
