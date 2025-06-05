@@ -394,6 +394,7 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
         DefaultPanelComposition panelComposition = new DefaultPanelComposition();
         panelComposition.setJohTiers(List.of("58"));
         when(panelCompositionService.getDefaultPanelComposition(any())).thenReturn(panelComposition);
+        when(panelCompositionService.isBenefitIssueCodeValid(any(), any())).thenReturn(true);
         boolean result = hearingsAutoListMapping.hasMqpmOrFqpm(caseData, refData);
 
         assertThat(result).isTrue();
@@ -407,6 +408,7 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
         DefaultPanelComposition panelComposition = new DefaultPanelComposition();
         panelComposition.setJohTiers(List.of("50"));
         when(panelCompositionService.getDefaultPanelComposition(any())).thenReturn(panelComposition);
+        when(panelCompositionService.isBenefitIssueCodeValid(any(), any())).thenReturn(true);
         boolean result = hearingsAutoListMapping.hasMqpmOrFqpm(caseData, refData);
 
         assertThat(result).isTrue();
@@ -420,6 +422,7 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
         DefaultPanelComposition panelComposition = new DefaultPanelComposition();
         panelComposition.setJohTiers(List.of("69"));
         when(panelCompositionService.getDefaultPanelComposition(any())).thenReturn(panelComposition);
+        when(panelCompositionService.isBenefitIssueCodeValid(any(), any())).thenReturn(true);
         boolean result = hearingsAutoListMapping.hasMqpmOrFqpm(caseData, refData);
 
         assertThat(result).isTrue();
