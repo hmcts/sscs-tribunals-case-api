@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.CaseCategoryType.CASE_SUBTYPE;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.CaseCategoryType.CASE_TYPE;
@@ -41,7 +41,6 @@ import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.HearingWrapper;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.CaseCategory;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.CaseDetails;
-import uk.gov.hmcts.reform.sscs.reference.data.model.DefaultPanelComposition;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
@@ -392,7 +391,8 @@ class HearingsCaseMappingTest extends HearingsMappingBase {
                 .issueCode(ISSUE_CODE)
                 .build();
         ReflectionTestUtils.setField(hearingsCaseMapping, "defaultPanelCompEnabled", true);
-        given(panelCompositionService.getDefaultPanelComposition(eq(caseData))).willReturn(new DefaultPanelComposition());
+        given(panelCompositionService.isBenefitIssueCodeValid(any(), any())).willReturn(true);
+
         List<CaseCategory> result = hearingsCaseMapping.buildCaseCategories(caseData, refData);
 
         assertThat(result)
