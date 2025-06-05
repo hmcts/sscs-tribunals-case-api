@@ -16,7 +16,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
-import static uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil.isInterpreterRequired;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -188,6 +187,16 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
         Adjournment adjournment = sscsCaseData.getAdjournment();
         YesNo interpreterRequired = adjournment.getInterpreterRequired();
+        YesNo caseDataInterpreter = null;
+        if (nonNull(hearingOptions.getLanguageInterpreter())) {
+            caseDataInterpreter = hearingOptions.getLanguageInterpreter().equalsIgnoreCase("yes") ? YES : NO;
+        }
+        if (nonNull(interpreterRequired) && nonNull(caseDataInterpreter)
+                && caseDataInterpreter != interpreterRequired
+                && nonNull(sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues())) {
+            sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues()
+                    .setDuration(hearingDurationsService.getHearingDurationBenefitIssueCodes(sscsCaseData));
+        }
         if (nonNull(interpreterRequired) && isYes(interpreterRequired)) {
             DynamicList interpreterLanguage = adjournment.getInterpreterLanguage();
             hearingOptions.setLanguages(nonNull(interpreterLanguage.getValue()) ? interpreterLanguage.getValue().getLabel() : NO.getValue());
@@ -228,7 +237,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         return Arrays.stream(HearingChannel.values())
             .filter(hearingChannel -> caseData.getAdjournment().getTypeOfNextHearing().getHearingChannel().getValueTribunals().equalsIgnoreCase(
                 hearingChannel.getValueTribunals()))
-            .findFirst().orElse(HearingChannel.PAPER);
+            .findFirst().orElse(PAPER);
     }
 
     private void updatePanelMembers(SscsCaseData caseData) {
@@ -313,7 +322,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
                 if (hearingChannel.getValueTribunals().equalsIgnoreCase(PAPER.getValueTribunals())) {
                     appeal.setHearingType(PAPER.getValueTribunals());
                 } else {
-                    appeal.setHearingType(uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.ORAL.getValue());
+                    appeal.setHearingType(HearingType.ORAL.getValue());
                 }
             }
         }
@@ -328,12 +337,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             if (nonNull(defaultListingValues)) {
                 Integer existingDuration = caseData.getSchedulingAndListingFields().getDefaultListingValues().getDuration();
                 if (nonNull(existingDuration)) {
-                    if (isYes(caseData.getAppeal().getHearingOptions().getWantsToAttend())
-                            && isInterpreterRequired(caseData)) {
-                        return existingDuration + MIN_HEARING_DURATION;
-                    } else {
-                        return existingDuration;
-                    }
+                    return existingDuration;
                 }
             }
         }
