@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.sscs.model.hmc.reference.RequirementType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.MemberType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelPreference;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
+import uk.gov.hmcts.reform.sscs.reference.data.model.DefaultPanelComposition;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
@@ -131,9 +132,12 @@ public final class HearingsPanelMapping {
         String doctorSpecialism = caseData.getSscsIndustrialInjuriesData().getPanelDoctorSpecialism();
         String doctorSpecialismSecond = caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism();
         if (defaultPanelCompEnabled) {
-            panelSpecialisms = SessionCategory.getSessionCategory(panelCompositionService
-                            .getDefaultPanelComposition(caseData)
-                            .getCategory()).getPanelMembers().stream()
+            DefaultPanelComposition panelComposition = panelCompositionService.getDefaultPanelComposition(caseData);
+            if (isNull(panelComposition)) {
+                return panelSpecialisms;
+            }
+            panelSpecialisms = SessionCategory.getSessionCategory(
+                    panelComposition.getCategory()).getPanelMembers().stream()
                     .map(panelMember -> getPanelMemberSpecialism(panelMember, doctorSpecialism, doctorSpecialismSecond))
                     .filter(Objects::nonNull)
                     .toList();
