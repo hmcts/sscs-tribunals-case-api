@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
+import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
@@ -25,6 +26,8 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
     @Value("${feature.default-panel-comp.enabled}")
     private boolean isDefaultPanelCompEnabled;
+
+    private final HearingDurationsService hearingDurationsService;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -77,8 +80,16 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 SscsUtil.updateHearingChannel(sscsCaseData, hearingChannel);
             }
             HearingInterpreter appellantInterpreter = overrideFields.getAppellantInterpreter();
+            Optional<HearingOptions> hearingOptions = Optional.ofNullable(sscsCaseData.getAppeal().getHearingOptions());
+            String caseInterpreter = hearingOptions.isPresent() ? hearingOptions.get().getLanguageInterpreter() : null;
+            boolean updateDuration = nonNull(caseInterpreter) && nonNull(appellantInterpreter) && YesNo.isYes(caseInterpreter) != YesNo.isYes(appellantInterpreter.getIsInterpreterWanted());
             if (nonNull(appellantInterpreter)) {
                 SscsUtil.updateHearingInterpreter(sscsCaseData, callbackResponse, appellantInterpreter);
+            }
+            if (updateDuration && nonNull(sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues())) {
+                sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues().setDuration(
+                        hearingDurationsService.getHearingDurationBenefitIssueCodes(sscsCaseData)
+                );
             }
         }
       
