@@ -3,9 +3,13 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 import static java.time.LocalDateTime.now;
 import static java.util.Optional.empty;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_LISTING_REQUIREMENTS;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.VIDEO;
 
@@ -17,6 +21,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -37,11 +42,15 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
+import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 
 @ExtendWith(MockitoExtension.class)
 class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
+
+    @Mock
+    private HearingDurationsService hearingDurationsService;
 
     @InjectMocks
     private UpdateListingRequirementsAboutToSubmitHandler handler;
@@ -220,6 +229,48 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         assertThat(response.getErrors()).isEmpty();
         assertThat("Yes").isEqualTo(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter());
         assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isNotNull();
+    }
+
+    @Test
+    void givenAppellantInterpreterHasChanged_thenUpdateCaseDataDefaultDuration() {
+        sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder()
+                .duration(60)
+                .build());
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder()
+            .languageInterpreter("No")
+            .build());
+        DynamicListItem interpreterLanguageItem = new DynamicListItem("arabic", "Arabic");
+        DynamicList interpreterLanguage = new DynamicList(interpreterLanguageItem, List.of());
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
+                .appellantInterpreter(HearingInterpreter.builder().isInterpreterWanted(YES).interpreterLanguage(interpreterLanguage).build())
+                .build());
+
+        when(hearingDurationsService.getHearingDurationBenefitIssueCodes(eq(sscsCaseData))).thenReturn(90);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat("Yes").isEqualTo(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter());
+        assertThat(response.getData().getSchedulingAndListingFields().getDefaultListingValues().getDuration()).isEqualTo(90);
+    }
+
+    @Test
+    void givenAppellantInterpreterHasNotChanged_thenDoNotUpdateCaseDataDefaultDuration() {
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder()
+            .languageInterpreter("No")
+            .build());
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
+                .appellantInterpreter(HearingInterpreter.builder().isInterpreterWanted(NO).build())
+                .build());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+        verifyNoInteractions(hearingDurationsService);
+        assertThat(response.getErrors()).isEmpty();
     }
 
     @ParameterizedTest

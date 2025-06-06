@@ -62,8 +62,7 @@ public class HearingServiceConsumer {
         HearingsServiceHelper.updateHearingId(hearing, response);
         HearingsServiceHelper.updateVersionNumber(hearing, response);
 
-        if (refData.isAdjournmentFlagEnabled()
-                && YesNo.isYes(caseData.getAdjournment().getAdjournmentInProgress())) {
+        if (YesNo.isYes(caseData.getAdjournment().getAdjournmentInProgress())) {
             log.debug("Case Updated with AdjournmentInProgress to NO for Case ID {}", caseData.getCcdCaseId());
             caseData.getAdjournment().setAdjournmentInProgress(YesNo.NO);
         }

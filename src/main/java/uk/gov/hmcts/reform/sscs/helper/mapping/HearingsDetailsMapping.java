@@ -49,8 +49,7 @@ public final class HearingsDetailsMapping {
     public HearingDetails buildHearingDetails(HearingWrapper wrapper, ReferenceDataServiceHolder refData) throws ListingException {
         // get case data and set adjournmentInProgress flag for use in downstream method calls
         SscsCaseData caseData = wrapper.getCaseData();
-        boolean adjournmentInProgress = refData.isAdjournmentFlagEnabled()
-                && isYes(caseData.getAdjournment().getAdjournmentInProgress());
+        boolean adjournmentInProgress = isYes(caseData.getAdjournment().getAdjournmentInProgress());
         return HearingDetails.builder()
                 .autolistFlag(shouldBeAutoListed(caseData, refData))
                 .hearingType(getHearingType(caseData))
