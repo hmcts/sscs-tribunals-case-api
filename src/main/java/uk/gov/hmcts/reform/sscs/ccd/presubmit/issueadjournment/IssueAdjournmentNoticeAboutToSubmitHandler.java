@@ -187,11 +187,9 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
         Adjournment adjournment = sscsCaseData.getAdjournment();
         YesNo interpreterRequired = adjournment.getInterpreterRequired();
-        YesNo caseDataInterpreter = null;
-        if (nonNull(hearingOptions.getLanguageInterpreter())) {
-            caseDataInterpreter = hearingOptions.getLanguageInterpreter().equalsIgnoreCase("yes") ? YES : NO;
-        }
-        if (nonNull(interpreterRequired) && nonNull(caseDataInterpreter)
+        YesNo caseDataInterpreter = isNull(hearingOptions.getLanguageInterpreter()) ? NO
+                : hearingOptions.getLanguageInterpreter().equalsIgnoreCase("yes") ? YES : NO;;
+        if (nonNull(interpreterRequired)
                 && caseDataInterpreter != interpreterRequired
                 && nonNull(sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues())) {
             sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues()
