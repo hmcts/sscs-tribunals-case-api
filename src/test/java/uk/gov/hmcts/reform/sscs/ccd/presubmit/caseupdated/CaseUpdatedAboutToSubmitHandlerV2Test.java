@@ -1991,20 +1991,4 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getData().getSchedulingAndListingFields().getDefaultListingValues().getDuration(), is(45));
     }
-
-    @Test
-    void shouldNotUpdateDefaultDurationWhenResponseIsNull() {
-        sscsCaseDataBefore.setBenefitCode("002");
-        sscsCaseData.setBenefitCode("002");
-        sscsCaseDataBefore.setIssueCode("DD");
-        sscsCaseData.setIssueCode("OX");
-        sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder().duration(45).build());
-        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().build());
-        sscsCaseDataBefore.getAppeal().setHearingOptions(HearingOptions.builder().build());
-        when(referenceDataServiceHolder.getHearingDurations()).thenReturn(hearingDurationsService);
-        when(hearingDurationsService.getHearingDurationBenefitIssueCodes(eq(sscsCaseData))).thenReturn(null);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertThat(response.getErrors().size(), is(0));
-        assertThat(response.getData().getSchedulingAndListingFields().getDefaultListingValues().getDuration(), is(45));
-    }
 }

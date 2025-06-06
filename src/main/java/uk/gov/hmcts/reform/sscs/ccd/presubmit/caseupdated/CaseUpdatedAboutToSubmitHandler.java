@@ -614,10 +614,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             String benefitIssueCurrent = sscsCaseData.getBenefitCode() + sscsCaseData.getIssueCode();
             if (!Objects.equals(interpreterBefore, interpreterCurrent) || !Objects.equals(benefitIssueBefore, benefitIssueCurrent)) {
                 HearingDurationsService hearingDurationsService = refData.getHearingDurations();
-                Integer duration = hearingDurationsService.getHearingDurationBenefitIssueCodes(sscsCaseData);
-                if (duration != null) {
-                    sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues().setDuration(duration);
-                }
+                sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues()
+                        .setDuration(hearingDurationsService.getHearingDurationBenefitIssueCodes(sscsCaseData));
             }
         }
     }
