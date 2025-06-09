@@ -71,12 +71,14 @@ public final class OverridesMapping {
         //this is NOT being set in the consumer during V2 process
         OverrideFields defaultListingValues = caseData.getSchedulingAndListingFields().getDefaultListingValues();
 
-        OverrideFields defaultOverrideValues = getOverrideFieldValues(caseData, refData);
-        caseData.getSchedulingAndListingFields().setDefaultListingValues(defaultOverrideValues);
+        if (isNull(defaultListingValues) || defaultListingValues.isAllNull()) {
+            OverrideFields defaultOverrideValues = getOverrideFieldValues(caseData, refData);
+            caseData.getSchedulingAndListingFields().setDefaultListingValues(defaultOverrideValues);
 
-        log.debug("Default Override Listing Values set to {} for Case ID {}",
-                defaultOverrideValues,
-                caseData.getCcdCaseId());
+            log.debug("Default Override Listing Values set to {} for Case ID {}",
+                    defaultOverrideValues,
+                    caseData.getCcdCaseId());
+        }
     }
 
     public static void setOverrideValues(SscsCaseData caseData, ReferenceDataServiceHolder refData)
