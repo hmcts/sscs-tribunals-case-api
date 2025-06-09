@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.helper.mapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits.SESSIONS;
@@ -78,7 +79,7 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
     }
 
     @DisplayName("When adjournment flag is enabled but getHearingDurationAdjournment returns null "
-        + "uses default hearing duration")
+        + "getHearingDuration should throw a ListingException")
     @Test
     void getHearingDurationAdjournmentReturnsNullWithFeatureFlagEnabled() throws ListingException {
         OverrideFields defaultListingValues = OverrideFields.builder()
@@ -106,12 +107,10 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
         Integer durationAdjourned = HearingsDurationMapping.getHearingDurationAdjournment(caseData, refData.getHearingDurations());
         assertThat(durationAdjourned).isNull();
 
-        Integer result = HearingsDurationMapping.getHearingDuration(
-            caseData,
-            refData
-        );
-
-        assertThat(result).isEqualTo(HearingsDurationMapping.DURATION_DEFAULT);
+        assertThrows(ListingException.class, () -> HearingsDurationMapping.getHearingDuration(
+                caseData,
+                refData
+        ));
     }
 
     @DisplayName("When a valid duration is given but adjournCaseDurationUnits is not provided "

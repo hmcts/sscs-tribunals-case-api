@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.helper.mapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
 import org.junit.jupiter.api.DisplayName;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
@@ -46,6 +48,7 @@ class HearingsDurationMappingTest extends HearingsMappingBase {
     void testIbcCaseHearingDurationNotSet() throws ListingException {
         caseData.setBenefitCode("093");
         given(refData.getHearingDurations()).willReturn(hearingDurations);
+        given(hearingDurations.getHearingDurationBenefitIssueCodes(eq(caseData))).willReturn(null);
         ListingException exception = assertThrows(ListingException.class, () ->
                 HearingsDurationMapping.getHearingDuration(caseData, refData)
         );
@@ -60,6 +63,27 @@ class HearingsDurationMappingTest extends HearingsMappingBase {
                 HearingsDurationMapping.getHearingDurationAdjournment(caseData, refData.getHearingDurations())
         );
         assertThat(exception.getMessage()).isEqualTo("Hearing duration is required to list case");
+    }
+
+    @DisplayName("When hearing duration is not set throw listing exception")
+    @Test
+    void testCaseHearingDurationNotSet() throws ListingException {
+        given(refData.getHearingDurations()).willReturn(hearingDurations);
+        given(hearingDurations.getHearingDurationBenefitIssueCodes(eq(caseData))).willReturn(null);
+
+        ListingException exception = assertThrows(ListingException.class, () ->
+                HearingsDurationMapping.getHearingDuration(caseData, refData)
+        );
+        assertThat(exception.getMessage()).isEqualTo("Hearing duration is required to list case");
+    }
+
+    @DisplayName("When hearing duration is set return the existing duration")
+    @Test
+    void testCaseHearingDurationSet() throws ListingException {
+        given(refData.getHearingDurations()).willReturn(hearingDurations);
+        caseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder().duration(60).build());
+        Integer duration = HearingsDurationMapping.getHearingDuration(caseData, refData);
+        assertThat(duration).isEqualTo(60);
     }
 
     @DisplayName("When an invalid adjournCaseDuration and adjournCaseDurationUnits is given and overrideDuration "
