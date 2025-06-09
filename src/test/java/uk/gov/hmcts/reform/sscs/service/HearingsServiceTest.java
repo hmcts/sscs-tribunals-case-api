@@ -454,4 +454,32 @@ class HearingsServiceTest {
         assertThrows(ListingException.class, () -> hearingsService.processHearingWrapper(wrapper));
     }
 
+    @DisplayName("When wrapper with a valid create Hearing State is given and hearing duration is multiple of five or null then updateHearing should run without error")
+    @ParameterizedTest
+    @CsvSource(value = {
+        "null",
+        "25",
+        "60"
+    }, nullValues = "null")
+    void testGetServiceHearingValueWithListingDurationAsNullOrMultipleOfFive(Integer hearingDuration) throws Exception {
+
+        given(hearingsMapping.buildHearingPayload(any(), any())).willReturn(HearingRequestPayload.builder().build());
+
+        given(hmcHearingApiService.sendUpdateHearingRequest(any(HearingRequestPayload.class), anyString()))
+                .willReturn(HmcUpdateResponse.builder().build());
+
+        wrapper.setHearingState(UPDATE_HEARING);
+        wrapper.getCaseData()
+                .setHearings(Collections.singletonList(Hearing.builder()
+                        .value(HearingDetails.builder()
+                                .hearingId(String.valueOf(HEARING_REQUEST_ID))
+                                .build())
+                        .build()));
+        wrapper.getCaseData().getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().duration(hearingDuration).build());
+
+
+        assertThatNoException().isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
+    }
+
+
 }
