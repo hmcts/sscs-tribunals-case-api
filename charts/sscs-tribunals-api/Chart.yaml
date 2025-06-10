@@ -15,8 +15,8 @@ dependencies:
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: java.enabled
   - name: job
-    version: 2.1.2
-    repository: https://hmctspublic.azurecr.io/helm/v1/repo/
+    version: 2.2.0
+    repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: job.enabled
   - name: xui-webapp
     version: 1.0.18
