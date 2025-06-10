@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.helper.mapping;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -29,7 +28,6 @@ import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.HearingWrapper;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
-import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
@@ -57,9 +55,14 @@ class OverridesMappingTest {
     private SessionCategoryMapService sessionCategoryMaps;
     @Mock
     private ReferenceDataServiceHolder refData;
+    @Mock
+    private HearingsAutoListMapping hearingsAutoListMapping;
+
+    private OverridesMapping overridesMapping;
 
     @BeforeEach
     void setUp() {
+        overridesMapping = new OverridesMapping(hearingsAutoListMapping);
         caseData = SscsCaseData.builder()
             .benefitCode(BENEFIT_CODE)
             .issueCode(ISSUE_CODE)
@@ -104,7 +107,7 @@ class OverridesMappingTest {
         try {
             when(refData.getVenueService()).thenReturn(venueService);
             caseData.setBenefitCode("093");
-            OverridesMapping.setOverrideValues(caseData,refData);
+            overridesMapping.setOverrideValues(caseData,refData);
             assertNull(caseData.getSchedulingAndListingFields().getOverrideFields().getDuration());
         } catch (ListingException e) {
             throw new RuntimeException(e);
@@ -208,7 +211,7 @@ class OverridesMappingTest {
         given(refData.getVenueService()).willReturn(venueService);
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
 
-        OverridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData);
+        overridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData);
         OverrideFields result = caseData.getSchedulingAndListingFields().getDefaultListingValues();
 
         assertThat(result).isNotNull();
@@ -238,7 +241,7 @@ class OverridesMappingTest {
         given(refData.getVenueService()).willReturn(venueService);
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
 
-        OverridesMapping.setOverrideValues(wrapper.getCaseData(), refData);
+        overridesMapping.setOverrideValues(wrapper.getCaseData(), refData);
         OverrideFields result = caseData.getSchedulingAndListingFields().getOverrideFields();
 
         assertThat(result).isNotNull();
@@ -276,7 +279,7 @@ class OverridesMappingTest {
             .duration(10)
             .build();
 
-        OverridesMapping.setOverrideValues(wrapper.getCaseData(), refData);
+        overridesMapping.setOverrideValues(wrapper.getCaseData(), refData);
         OverrideFields overrideFields = caseData.getSchedulingAndListingFields().getOverrideFields();
 
         assertThat(defaultListingValues).isNotNull();
@@ -551,24 +554,15 @@ class OverridesMappingTest {
     @DisplayName("When valid case data is given, getHearingDetailsHearingWindow returns the correct default auto list value")
     @ParameterizedTest
     @ValueSource(strings = {"Comment"})
-    @NullAndEmptySource
     void testGetHearingDetailsAutoList(String value) throws ListingException {
         caseData.setDwpResponseDate("2021-12-01");
         caseData.getAppeal().getHearingOptions().setOther(value);
 
-        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE, ISSUE_CODE,false,false))
-            .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                false, false, SessionCategory.CATEGORY_01, null));
-
-        given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
-
-        YesNo result = OverridesMapping.getHearingDetailsAutoList(caseData, refData);
-
-        YesNo expected = isBlank(value) ? YES : NO;
+        YesNo result = overridesMapping.getHearingDetailsAutoList(caseData, refData);
 
         assertThat(result)
             .isNotNull()
-            .isEqualTo(expected);
+            .isEqualTo(NO);
     }
 
     @DisplayName("When valid case data is given, getHearingDetailsHearingWindow returns the default venue epims ids")

@@ -1,19 +1,26 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isSscs2Case;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.BENEFIT_CODE_NOT_IN_USE;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.INVALID_BENEFIT_ISSUE_CODE;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.validateBenefitIssueCode;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 
 
@@ -25,6 +32,9 @@ public class DwpUploadResponseMidEventHandler implements PreSubmitCallbackHandle
     public static final String APPENDIX_12_DOC_NOT_FOR_SSCS5_CONFIDENTIALITY = "An Appendix 12 document cannot be uploaded with Confidentiality documents";
 
     protected final SessionCategoryMapService categoryMapService;
+    private final PanelCompositionService panelCompositionService;
+    @Value("${feature.default-panel-comp.enabled}")
+    private boolean defaultPanelCompEnabled;
 
 
     @Override
@@ -48,7 +58,11 @@ public class DwpUploadResponseMidEventHandler implements PreSubmitCallbackHandle
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        validateBenefitIssueCode(sscsCaseData, response, categoryMapService);
+        if (defaultPanelCompEnabled) {
+            response.addErrors(validateBenefitIssueCodeV2(sscsCaseData));
+        } else {
+            validateBenefitIssueCode(sscsCaseData, response, categoryMapService);
+        }
         validatePostponementRequests(sscsCaseData, response);
         forceToAddOtherPartyOnSscs2Case(sscsCaseData, response);
         validateBenefitCode(sscsCaseData, response);
@@ -84,5 +98,17 @@ public class DwpUploadResponseMidEventHandler implements PreSubmitCallbackHandle
         if (!IBCA_BENEFIT_CODE.equals(benefit.getBenefitCode()) && IBCA_BENEFIT_CODE.equals(sscsCaseData.getBenefitCode())) {
             preSubmitCallbackResponse.addError("Please choose a valid benefit code");
         }
+    }
+
+    private List<String> validateBenefitIssueCodeV2(SscsCaseData caseData) {
+        List<String> errors = new ArrayList<>();
+        if (isNull(Benefit.getBenefitFromBenefitCode(caseData.getBenefitCode()))) {
+            errors.add(BENEFIT_CODE_NOT_IN_USE);
+        }
+        if (!panelCompositionService.isBenefitIssueCodeValid(caseData.getBenefitCode(), caseData.getIssueCode())) {
+            errors.add(INVALID_BENEFIT_ISSUE_CODE);
+            log.info("invalid benefit issue code {} for case id {}", caseData.getBenefitCode() + caseData.getIssueCode(), caseData.getCcdCaseId());
+        }
+        return errors;
     }
 }

@@ -86,6 +86,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
@@ -134,6 +135,9 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     @Mock
     private SessionCategoryMapService categoryMapService;
 
+    @Mock
+    private PanelCompositionService panelCompositionService;
+
     private AssociatedCaseLinkHelper associatedCaseLinkHelper;
 
     private CaseUpdatedAboutToSubmitHandler handler;
@@ -157,7 +161,9 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
                 refDataService,
                 venueService,
                 categoryMapService,
-                true);
+                panelCompositionService,
+                true
+                );
 
         lenient().when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);

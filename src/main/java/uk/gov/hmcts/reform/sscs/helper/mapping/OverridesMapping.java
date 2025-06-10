@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AmendReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
@@ -35,10 +36,14 @@ import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 import uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil;
 
 @Slf4j
+@Service
 public final class OverridesMapping {
 
-    private OverridesMapping() {
+    private final HearingsAutoListMapping hearingsAutoListMapping;
 
+    OverridesMapping(HearingsAutoListMapping hearingsAutoListMapping) {
+
+        this.hearingsAutoListMapping = hearingsAutoListMapping;
     }
 
     public static OverrideFields getDefaultListingValues(@Valid SscsCaseData caseData) {
@@ -65,7 +70,7 @@ public final class OverridesMapping {
                 .orElse(Collections.emptyList());
     }
 
-    public static void setDefaultListingValues(SscsCaseData caseData, ReferenceDataServiceHolder refData)
+    public void setDefaultListingValues(SscsCaseData caseData, ReferenceDataServiceHolder refData)
             throws ListingException {
 
         //this is NOT being set in the consumer during V2 process
@@ -81,7 +86,7 @@ public final class OverridesMapping {
         }
     }
 
-    public static void setOverrideValues(SscsCaseData caseData, ReferenceDataServiceHolder refData)
+    public void setOverrideValues(SscsCaseData caseData, ReferenceDataServiceHolder refData)
             throws ListingException {
 
         OverrideFields overrideFields = getOverrideFieldValues(caseData, refData);
@@ -93,7 +98,7 @@ public final class OverridesMapping {
                 caseData.getCcdCaseId());
     }
 
-    private static OverrideFields getOverrideFieldValues(SscsCaseData caseData, ReferenceDataServiceHolder refData)
+    private  OverrideFields getOverrideFieldValues(SscsCaseData caseData, ReferenceDataServiceHolder refData)
             throws ListingException {
 
         // get case data from hearing wrapper and required appeal fields
@@ -190,9 +195,9 @@ public final class OverridesMapping {
                 .build();
     }
 
-    public static YesNo getHearingDetailsAutoList(@Valid SscsCaseData caseData, ReferenceDataServiceHolder refData)
+    public YesNo getHearingDetailsAutoList(@Valid SscsCaseData caseData, ReferenceDataServiceHolder refData)
             throws ListingException {
-        return HearingsAutoListMapping.shouldBeAutoListed(caseData, refData) ? YesNo.YES : YesNo.NO;
+        return hearingsAutoListMapping.shouldBeAutoListed(caseData, refData) ? YesNo.YES : YesNo.NO;
     }
 
     public static List<CcdValue<CcdValue<String>>> getHearingDetailsLocations(
