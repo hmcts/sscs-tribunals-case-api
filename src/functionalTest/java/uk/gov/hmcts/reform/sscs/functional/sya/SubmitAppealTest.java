@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.functional.sya;
 
 import static io.restassured.RestAssured.baseURI;
-import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_CCD;
@@ -141,7 +141,10 @@ public class SubmitAppealTest {
                 "correctionGenerateNotice",
                 "generateNotice",
                 "dateAdded",
+                "dateSentToDwp",
                 "directionNoticeContent",
+                "dwpDueDate",
+                "hmctsDwpState",
                 "libertyToApply",
                 "libertyToApplyBodyContent",
                 "libertyToApplyGenerateNotice",

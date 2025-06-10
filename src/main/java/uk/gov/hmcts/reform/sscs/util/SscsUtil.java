@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.util;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.function.Predicate.not;
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
@@ -11,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.managedocuments.UploadDocumentMidEventHandler.getDocumentIdFromUrl;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.FACE_TO_FACE;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.NOT_ATTENDING;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
@@ -49,12 +51,15 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InternalCaseDocumentData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.JudicialUserPanel;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LibertyToApplyActions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PermissionToAppealActions;
@@ -135,12 +140,15 @@ public class SscsUtil {
             panelMemberExclusions = PanelMemberExclusions.builder().build();
             caseData.getSchedulingAndListingFields().setPanelMemberExclusions(panelMemberExclusions);
         }
-        JudicialUserPanel panel = caseData.getLatestHearing().getValue().getPanel();
 
-        if (nonNull(panel)) {
-            setAdjournmentPanelMembersExclusions(panelMemberExclusions,
-                panel.getAllPanelMembers(),
-                arePanelMembersReserved ? AdjournCasePanelMembersExcluded.RESERVED : AdjournCasePanelMembersExcluded.YES);
+        if (caseData.getLatestHearing() != null) {
+            JudicialUserPanel panel = caseData.getLatestHearing().getValue().getPanel();
+
+            if (nonNull(panel)) {
+                setAdjournmentPanelMembersExclusions(panelMemberExclusions,
+                    panel.getAllPanelMembers(),
+                    arePanelMembersReserved ? AdjournCasePanelMembersExcluded.RESERVED : AdjournCasePanelMembersExcluded.YES);
+            }
         }
     }
 
@@ -209,25 +217,67 @@ public class SscsUtil {
                                                          DocumentLink documentLink,
                                                          DocumentType documentType,
                                                          EventType eventType) {
+        addDocumentToDocumentTabAndBundle(footerService, caseData, documentLink, documentType, eventType, false);
+    }
+
+
+    public static void addDocumentToDocumentTabAndBundle(FooterService footerService,
+                                                         SscsCaseData caseData,
+                                                         DocumentLink documentLink,
+                                                         DocumentType documentType,
+                                                         EventType eventType,
+                                                         boolean shouldBeIssued) {
         if (nonNull(documentLink)) {
             String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
             SscsDocumentTranslationStatus documentTranslationStatus = getDocumentTranslationStatus(caseData);
 
             footerService.createFooterAndAddDocToCase(documentLink, caseData, documentType, now,
-                null, null, documentTranslationStatus, eventType);
+                null, null, documentTranslationStatus, eventType, shouldBeIssued);
 
             updateTranslationStatus(caseData, documentTranslationStatus);
         }
     }
 
     public static void addDocumentToCaseDataDocuments(SscsCaseData caseData, SscsDocument sscsDocument) {
-        List<SscsDocument> documents = new ArrayList<>();
-        documents.add(sscsDocument);
-
-        if (caseData.getSscsDocument() != null) {
-            documents.addAll(caseData.getSscsDocument());
-        }
+        List<SscsDocument> documents = new ArrayList<>(emptyIfNull(caseData.getSscsDocument()));
+        documents.addFirst(sscsDocument);
         caseData.setSscsDocument(documents);
+    }
+
+    public static void removeDocumentFromCaseDataDocuments(SscsCaseData caseData, SscsDocument sscsDocument) {
+        List<SscsDocument> caseDocuments = new ArrayList<>(emptyIfNull(caseData.getSscsDocument()));
+        caseDocuments = removeDocumentFromDocList(getDocumentIdFromUrl(sscsDocument), caseDocuments);
+        caseData.setSscsDocument(caseDocuments);
+    }
+
+    public static void addDocumentToCaseDataInternalDocuments(SscsCaseData caseData, SscsDocument sscsDocument) {
+        if (!isNull(sscsDocument.getValue().getDocumentFileName()) && sscsDocument.getValue().getDocumentFileName().startsWith("Addition ")) {
+            String[] splitFileName = sscsDocument.getValue().getDocumentFileName().split("- ");
+            String newFileName = String.join(" ", Arrays.copyOfRange(splitFileName, 1, splitFileName.length));
+            sscsDocument.getValue().setDocumentFileName(newFileName);
+        }
+        sscsDocument.getValue().setBundleAddition(null);
+        sscsDocument.getValue().setEvidenceIssued(null);
+        InternalCaseDocumentData internalCaseDocumentData = Optional.ofNullable(caseData.getInternalCaseDocumentData())
+            .orElse(InternalCaseDocumentData.builder().build());
+        List<SscsDocument> documents = new ArrayList<>(emptyIfNull(internalCaseDocumentData.getSscsInternalDocument()));
+        documents.addFirst(sscsDocument);
+        internalCaseDocumentData.setSscsInternalDocument(documents);
+        caseData.setInternalCaseDocumentData(internalCaseDocumentData);
+    }
+
+    public static void removeDocumentFromCaseDataInternalDocuments(SscsCaseData caseData, SscsDocument sscsDocument) {
+        InternalCaseDocumentData internalCaseDocumentData = Optional.ofNullable(caseData.getInternalCaseDocumentData())
+            .orElse(InternalCaseDocumentData.builder().build());
+        List<SscsDocument> caseDocuments = new ArrayList<>(emptyIfNull(internalCaseDocumentData.getSscsInternalDocument()));
+        caseDocuments = removeDocumentFromDocList(getDocumentIdFromUrl(sscsDocument), caseDocuments);
+        internalCaseDocumentData.setSscsInternalDocument(caseDocuments);
+        caseData.setInternalCaseDocumentData(internalCaseDocumentData);
+    }
+
+    private static List<SscsDocument> removeDocumentFromDocList(String docId, List<SscsDocument> caseDocuments) {
+        return caseDocuments.stream()
+            .filter(doc -> !getDocumentIdFromUrl(doc).equalsIgnoreCase(docId)).toList();
     }
 
     public static DocumentType getPostHearingReviewDocumentType(PostHearing postHearing, boolean isPostHearingsEnabled) {
@@ -491,7 +541,9 @@ public class SscsUtil {
         } else {
             caseData.getAppeal().setHearingOptions(HearingOptions.builder().hearingRoute(LIST_ASSIST).build());
         }
-        caseData.getAppeal().getMrnDetails().setDwpIssuingOffice("IBCA");
+        MrnDetails mrnDetails = Optional.ofNullable(caseData.getAppeal().getMrnDetails()).orElse(MrnDetails.builder().build());
+        mrnDetails.setDwpIssuingOffice("IBCA");
+        caseData.getAppeal().setMrnDetails(mrnDetails);
         if (caseData.getRegionalProcessingCenter() != null) {
             RegionalProcessingCenter listAssistRegionalProcessingCenter = caseData.getRegionalProcessingCenter()
                 .toBuilder()
@@ -627,7 +679,7 @@ public class SscsUtil {
                 postHearing.getPermissionToAppeal().setRequestFormat(null);
                 docGen.setPermissionToAppealBodyContent(null);
             }
-            default -> {
+            case null, default -> {
             }
         }
     }
@@ -643,6 +695,36 @@ public class SscsUtil {
             .map(SchedulingAndListingFields::getOverrideFields)
             .map(OverrideFields::getHmcHearingType)
             .orElse(sscsCaseData.getHmcHearingType());
+    }
+
+    public static void setHearingRouteIfNotSet(SscsCaseData sscsCaseData) {
+        SchedulingAndListingFields schedulingAndListingFields =
+            Optional.ofNullable(sscsCaseData.getSchedulingAndListingFields())
+                .orElse(SchedulingAndListingFields.builder().build());
+        if (isNull(schedulingAndListingFields.getHearingRoute())) {
+            HearingRoute hearingRoute = Optional.ofNullable(sscsCaseData.getRegionalProcessingCenter())
+                .orElse(RegionalProcessingCenter.builder().build()).getHearingRoute();
+            schedulingAndListingFields.setHearingRoute(hearingRoute);
+            sscsCaseData.setSchedulingAndListingFields(schedulingAndListingFields);
+        }
+    }
+
+    public static void setListAssistRoutes(SscsCaseData sscsCaseData) {
+        SchedulingAndListingFields schedulingAndListingFields = Optional.ofNullable(sscsCaseData.getSchedulingAndListingFields())
+            .orElse(SchedulingAndListingFields.builder().build());
+        schedulingAndListingFields.setHearingRoute(HearingRoute.LIST_ASSIST);
+        sscsCaseData.setSchedulingAndListingFields(schedulingAndListingFields);
+
+        RegionalProcessingCenter rpc = Optional.ofNullable(sscsCaseData.getRegionalProcessingCenter())
+            .orElse(RegionalProcessingCenter.builder().build());
+        sscsCaseData.setRegionalProcessingCenter(rpc.toBuilder().hearingRoute(HearingRoute.LIST_ASSIST).build());
+
+        Appeal appeal = Optional.ofNullable(sscsCaseData.getAppeal()).orElse(Appeal.builder().build());
+        HearingOptions hearingOptions = Optional.ofNullable(appeal.getHearingOptions())
+            .orElse(HearingOptions.builder().build());
+        hearingOptions.setHearingRoute(HearingRoute.LIST_ASSIST);
+        appeal.setHearingOptions(hearingOptions);
+        sscsCaseData.setAppeal(appeal);
     }
 }
 

@@ -33,13 +33,13 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.HearingLocation;
 import uk.gov.hmcts.reform.sscs.model.HearingWrapper;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDetails;
+import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
@@ -52,16 +52,14 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
 
     @Mock
     private HearingDurationsService hearingDurations;
-
     @Mock
     private SessionCategoryMapService sessionCategoryMaps;
-
     @Mock
     private ReferenceDataServiceHolder refData;
-
     @Mock
     private VenueService venueService;
-
+    @Mock
+    private HearingsPanelMapping hearingsPanelMapping;
     @Mock
     private RegionalProcessingCenterService regionalProcessingCenterService;
 
@@ -83,10 +81,12 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
         VenueDetails.builder().epimsId(EPIMS_ID_4).build());
 
     private SscsCaseData caseData;
+  
+    private HearingsDetailsMapping hearingsDetailsMapping;
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(HearingsDetailsMapping.class, "isDirectionHearingsEnabled", true);
+        hearingsDetailsMapping = new HearingsDetailsMapping(hearingsPanelMapping);
         OverrideFields defaultListingValues = OverrideFields.builder()
             .duration(60)
             .build();
@@ -146,7 +146,10 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
             .caseData(caseData)
             .build();
 
-        HearingDetails hearingDetails = HearingsDetailsMapping.buildHearingDetails(wrapper, refData);
+        given(hearingsPanelMapping.getPanelRequirements(caseData, refData))
+                .willReturn(PanelRequirements.builder().roleTypes(List.of()).build());
+
+        HearingDetails hearingDetails = hearingsDetailsMapping.buildHearingDetails(wrapper, refData);
 
         assertNotNull(hearingDetails.getHearingType());
         assertNotNull(hearingDetails.getHearingWindow());
@@ -223,15 +226,6 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
         boolean result = HearingsDetailsMapping.isCaseLinked(caseData);
 
         assertThat(result).isFalse();
-    }
-
-    @DisplayName("Hearing type should be substantive if directions hearing flag is off.")
-    @Test
-    void getHearingTypeDirectionHearingsFlagOff() {
-        ReflectionTestUtils.setField(HearingsDetailsMapping.class, "isDirectionHearingsEnabled", false);
-        HmcHearingType result = HearingsDetailsMapping.getHearingType(caseData);
-
-        assertThat(result).isEqualTo(HmcHearingType.SUBSTANTIVE);
     }
 
     @DisplayName("Hearing type should be substantive if hmcHearingType is null.")

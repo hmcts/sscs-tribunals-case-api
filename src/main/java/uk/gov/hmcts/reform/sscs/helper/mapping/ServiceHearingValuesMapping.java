@@ -1,32 +1,53 @@
 package uk.gov.hmcts.reform.sscs.helper.mapping;
 
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsMapping.getSessionCaseCodeMap;
+import static uk.gov.hmcts.reform.sscs.model.hmc.reference.BenefitRoleRelationType.findRoleTypesByBenefitCode;
 
 import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.Judiciary;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.PanelPreference;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.ServiceHearingValues;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 import uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil;
 
-
+@Component
+@Slf4j
 public final class ServiceHearingValuesMapping {
 
     public static final String BENEFIT = "Benefit";
 
-    private ServiceHearingValuesMapping() {
+    private final HearingsPanelMapping hearingsPanelMapping;
+
+    private final PanelCompositionService panelCategoryService;
+
+    @Value("${feature.default-panel-comp.enabled}")
+    private boolean defaultPanelCompEnabled;
+
+    ServiceHearingValuesMapping(HearingsPanelMapping hearingsPanelMapping,
+                                PanelCompositionService panelCompositionService) {
+        this.hearingsPanelMapping = hearingsPanelMapping;
+        this.panelCategoryService = panelCompositionService;
     }
 
 
-    public static ServiceHearingValues mapServiceHearingValues(@Valid SscsCaseData caseData, ReferenceDataServiceHolder refData)
+    public ServiceHearingValues mapServiceHearingValues(@Valid SscsCaseData caseData, ReferenceDataServiceHolder refData)
             throws ListingException {
 
         boolean shouldBeAutoListed = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
-
+        int hearingDuration = 0;
+        try {
+            hearingDuration = HearingsDurationMapping.getHearingDuration(caseData, refData);
+        } catch (ListingException e) {
+            log.error("Error getting hearing duration for case ID {}: {}", caseData.getCcdCaseId(), e.getMessage());
+        }
         return ServiceHearingValues.builder()
                 .publicCaseName(HearingsCaseMapping.getPublicCaseName(caseData))
                 .caseDeepLink(HearingsCaseMapping.getCaseDeepLink(caseData, refData))
@@ -39,7 +60,7 @@ public final class ServiceHearingValuesMapping {
                 .caseType(BENEFIT)
                 .caseCategories(HearingsCaseMapping.buildCaseCategories(caseData, refData))
                 .hearingWindow(HearingsWindowMapping.buildHearingWindow(caseData, refData))
-                .duration(HearingsDurationMapping.getHearingDuration(caseData, refData))
+                .duration(hearingDuration)
                 .hearingPriorityType(HearingsDetailsMapping.getHearingPriority(caseData))
                 .numberOfPhysicalAttendees(HearingsNumberAttendeesMapping.getNumberOfPhysicalAttendees(caseData))
                 .hearingInWelshFlag(HearingsDetailsMapping.shouldBeHearingsInWelshFlag())
@@ -56,16 +77,17 @@ public final class ServiceHearingValuesMapping {
                 .caseFlags(PartyFlagsMapping.getCaseFlags(caseData))
                 .hmctsServiceID(refData.getSscsServiceCode())
                 .hearingChannels(HearingsChannelMapping.getHearingChannels(caseData))
-                .screenFlow(null)
-                .vocabulary(null)
                 .caseInterpreterRequiredFlag(HearingChannelUtil.isInterpreterRequired(caseData))
-                .panelRequirements(HearingsPanelMapping.getPanelRequirements(caseData, refData))
+                .panelRequirements(hearingsPanelMapping.getPanelRequirements(caseData, refData))
                 .build();
     }
 
-    public static Judiciary getJudiciary(@Valid SscsCaseData sscsCaseData, ReferenceDataServiceHolder refData) {
+    public Judiciary getJudiciary(@Valid SscsCaseData sscsCaseData, ReferenceDataServiceHolder refData) {
         return Judiciary.builder()
-                .roleType(HearingsPanelMapping.getRoleTypes(sscsCaseData.getBenefitCode()))
+                .roleType(defaultPanelCompEnabled
+                        ? panelCategoryService.getRoleTypes(sscsCaseData)
+                        : findRoleTypesByBenefitCode(sscsCaseData.getBenefitCode())
+                )
                 .authorisationTypes(HearingsPanelMapping.getAuthorisationTypes())
                 .authorisationSubType(HearingsPanelMapping.getAuthorisationSubTypes())
                 .judiciarySpecialisms(HearingsPanelMapping.getPanelSpecialisms(sscsCaseData, getSessionCaseCodeMap(sscsCaseData, refData)))

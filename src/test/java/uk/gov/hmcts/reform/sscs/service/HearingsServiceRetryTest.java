@@ -22,7 +22,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.retry.ExhaustedRetryException;
@@ -45,6 +44,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
+import uk.gov.hmcts.reform.sscs.helper.mapping.HearingsMapping;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.HearingEvent;
 import uk.gov.hmcts.reform.sscs.model.HearingWrapper;
@@ -54,6 +54,7 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.HmcUpdateResponse;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
@@ -74,30 +75,27 @@ class HearingsServiceRetryTest {
 
     @MockitoBean
     private HmcHearingApiService hmcHearingApiService;
-
     @MockitoBean
     private CcdCaseService ccdCaseService;
-
     @MockitoBean
     private ReferenceDataServiceHolder refData;
-
     @MockitoBean
     private HearingDurationsService hearingDurations;
+    @MockitoBean
+    private IdamService idamService;
+    @MockitoBean
+    private UpdateCcdCaseService updateCcdCaseService;
+    @MockitoBean
+    private HearingServiceConsumer hearingServiceConsumer;
+    @MockitoBean
+    private Consumer<SscsCaseDetails> sscsCaseDetailsConsumer;
+    @MockitoBean
+    private HearingsMapping hearingsMapping;
+    @MockitoBean
+    private PanelCompositionService panelCompositionService;
 
     @Mock
     private SessionCategoryMapService sessionCategoryMaps;
-
-    @MockitoBean
-    private IdamService idamService;
-
-    @MockitoBean
-    private UpdateCcdCaseService updateCcdCaseService;
-
-    @MockitoBean
-    private HearingServiceConsumer hearingServiceConsumer;
-
-    @MockitoBean
-    private Consumer<SscsCaseDetails> sscsCaseDetailsConsumer;
 
     @Mock
     private Consumer<SscsCaseData> sscsCaseDataConsumer;
@@ -111,7 +109,6 @@ class HearingsServiceRetryTest {
 
     @BeforeEach
     void setup() {
-        MockitoAnnotations.openMocks(this);
         SscsCaseData caseData = SscsCaseData.builder()
             .ccdCaseId(String.valueOf(CASE_ID))
             .benefitCode(BENEFIT_CODE)
@@ -140,8 +137,8 @@ class HearingsServiceRetryTest {
             .eventToken(EVENT_TOKEN)
             .build();
 
-        when(hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(any(), any(), anyBoolean())).thenReturn(
-            sscsCaseDetailsConsumer);
+        when(hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(any(), any(), any(), anyBoolean()))
+                .thenReturn(sscsCaseDetailsConsumer);
         when(hearingServiceConsumer.getCreateHearingCaseDataConsumer(any(), any())).thenReturn(sscsCaseDataConsumer);
 
     }
@@ -180,7 +177,6 @@ class HearingsServiceRetryTest {
                 any()
         );
     }
-
 
     @Disabled
     @DisplayName("When ccdCaseService throws UpdateCaseException, hearingResponseUpdate should retry "

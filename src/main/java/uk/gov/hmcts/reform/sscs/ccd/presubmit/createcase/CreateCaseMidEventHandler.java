@@ -57,8 +57,12 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
         PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
 
         if (NO.equals(caseData.getAppeal().getAppellant().getAddress().getInMainlandUk())) {
-            final String selectedPortOfEntryLocationCode = caseData.getAppeal().getAppellant().getAddress().getUkPortOfEntryList().getValue().getCode();
-            caseData.getAppeal().getAppellant().getAddress().setPortOfEntry(selectedPortOfEntryLocationCode);
+            if (caseData.getAppeal().getAppellant().getAddress().getUkPortOfEntryList() == null) {
+                errorResponse.addError("A port of entry must be selected if the appellant does not live in England, Wales or Scotland");
+            } else {
+                final String selectedPortOfEntryLocationCode = caseData.getAppeal().getAppellant().getAddress().getUkPortOfEntryList().getValue().getCode();
+                caseData.getAppeal().getAppellant().getAddress().setPortOfEntry(selectedPortOfEntryLocationCode);
+            }
         }
 
         if (callback.getEvent() == EventType.CASE_UPDATED && caseData.getRegionalProcessingCenter() != null && HearingRoute.GAPS.equals(caseData.getRegionalProcessingCenter().getHearingRoute())) {
@@ -67,7 +71,7 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
 
         errorResponse.addErrors(validateAddress(caseData.getAppeal().getAppellant()));
 
-        if (isYes(caseData.getAppeal().getRep().getHasRepresentative())
+        if (!isEmpty(caseData.getAppeal().getRep()) && isYes(caseData.getAppeal().getRep().getHasRepresentative())
                 && (isEmpty(caseData.getAppeal().getRep().getAddress())
                 || isEmpty(caseData.getAppeal().getRep().getAddress().getInMainlandUk()))) {
             errorResponse.addError("You must enter Living in the UK for the representative");

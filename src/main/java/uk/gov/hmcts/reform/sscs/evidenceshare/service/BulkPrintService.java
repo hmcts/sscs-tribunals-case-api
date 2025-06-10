@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,8 +110,8 @@ public class BulkPrintService implements PrintService {
             PDDocument bundledLetter;
 
             try {
-                bundledLetter = PDDocument.load(letter);
-                PDDocument loadDoc = PDDocument.load(coverSheet);
+                bundledLetter = Loader.loadPDF(letter);
+                PDDocument loadDoc = Loader.loadPDF(coverSheet);
 
                 final PDFMergerUtility merger = new PDFMergerUtility();
                 merger.appendDocument(bundledLetter, loadDoc);

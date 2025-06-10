@@ -42,19 +42,19 @@ export class IssueDirectionPage {
       issueDirectionsNoticeData.dueDateLabel
     );
     await webActions.verifyPageLabel(
-      "[for='directionDueDate-day']",
+      '#day-label-directionDueDate-day',
       issueDirectionsNoticeData.dayLabel
     );
     await webActions.verifyPageLabel(
-      "[for='directionDueDate-month']",
+      '#month-label-directionDueDate-month',
       issueDirectionsNoticeData.monthLabel
     );
     await webActions.verifyPageLabel(
-      "[for='directionDueDate-year']",
+      '#year-label-directionDueDate-year',
       issueDirectionsNoticeData.yearLabel
     );
     await webActions.verifyPageLabel(
-      '.form-label[_ngcontent-ng-c823086951]',
+      '[for="reservedToJudgeInterloc"] span',
       issueDirectionsNoticeData.reservedToInterlocLabel
     );
     await webActions.verifyPageLabel(
@@ -69,6 +69,18 @@ export class IssueDirectionPage {
       "[for='generateNotice_No']",
       issueDirectionsNoticeData.noNoticeLabel
     );
+    await webActions.verifyPageLabel(
+      '#selectNextHmcHearingType legend > .form-label',
+      issueDirectionsNoticeData.selectNextHearingTypeLabel
+    );
+    await webActions.verifyPageLabel(
+      "[for='selectNextHmcHearingType_Yes']",
+      issueDirectionsNoticeData.yesNoticeLabel
+    );
+    await webActions.verifyPageLabel(
+      "[for='selectNextHmcHearingType_No']",
+      issueDirectionsNoticeData.noNoticeLabel
+    );
   }
 
   async selectDirectionType(optionVal: string) {
@@ -77,6 +89,18 @@ export class IssueDirectionPage {
 
   async selectHearingOption(optionVal: string) {
     await webActions.chooseOptionByLabel('#prePostHearing', optionVal);
+  }
+
+  async shouldSelectNextHearingType(boolVal: boolean) {
+    await webActions.clickElementById(
+      boolVal ? '#selectNextHmcHearingType_Yes' : '#selectNextHmcHearingType_No'
+    );
+  }
+
+  async selectDirectionHearingType(boolVal: boolean) {
+    await webActions.clickElementById(
+      boolVal ? '#hmcHearingType-BBA3-DIR' : '#hmcHearingType-BBA3-SUB'
+    );
   }
 
   async chooseRecipients(optionVal: string) {
@@ -216,6 +240,27 @@ export class IssueDirectionPage {
     await this.chooseNoticeType('#generateNotice_Yes');
     await this.enterDirectionDueDate();
     await this.enterNoticeContent(true);
+    await this.confirmSubmission();
+    await this.verifyDocumentTitle(docTitle);
+    await this.confirmSubmission();
+  }
+
+  async submitIssueDirectionDirectionHearing(
+    hearingOption: string,
+    directionType: string,
+    docTitle: string,
+    directionHearing: boolean
+  ): Promise<void> {
+    await this.verifyPageContent();
+    await this.selectHearingOption(hearingOption);
+    await this.selectDirectionType(directionType);
+    await this.chooseRecipients('#confidentialityType-general');
+    await this.chooseNoticeType('#generateNotice_Yes');
+    await this.enterDirectionDueDate();
+    await this.enterNoticeContent(true);
+    await this.shouldSelectNextHearingType(true);
+    await this.confirmSubmission();
+    await this.selectDirectionHearingType(directionHearing);
     await this.confirmSubmission();
     await this.verifyDocumentTitle(docTitle);
     await this.confirmSubmission();

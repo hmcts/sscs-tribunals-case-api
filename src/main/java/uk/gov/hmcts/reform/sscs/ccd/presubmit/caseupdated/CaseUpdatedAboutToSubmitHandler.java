@@ -68,6 +68,7 @@ import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
 @Slf4j
@@ -206,7 +207,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             validateRepresentativeNameData(sscsCaseData, preSubmitCallbackResponse);
             validateJointPartyNameData(sscsCaseData, preSubmitCallbackResponse);
         }
-
+        if (sscsCaseData.isIbcCase()) {
+            SscsUtil.setListAssistRoutes(sscsCaseData);
+        }
         return preSubmitCallbackResponse;
     }
 
@@ -449,7 +452,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
     }
 
-    private void validateAppointeeCaseData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
+    private void validateAppointeeCaseData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         Appointee appointeeInfo = sscsCaseData.getAppeal().getAppellant().getAppointee();
         String isAppointee = sscsCaseData.getAppeal().getAppellant().getIsAppointee();
 
@@ -483,7 +486,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         return listOfErrors;
     }
 
-    private void validateRepresentativeNameData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
+    private void validateRepresentativeNameData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         final boolean hasRepresentative = sscsCaseData.isThereARepresentative();
         if (hasRepresentative) {
             Representative representativeInfo = sscsCaseData.getAppeal().getRep();
@@ -496,7 +499,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
     }
 
-    private void validateJointPartyNameData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
+    private void validateJointPartyNameData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         JointParty jointPartyInfo = sscsCaseData.getJointParty();
         final boolean hasJointParty = sscsCaseData.isThereAJointParty();
 

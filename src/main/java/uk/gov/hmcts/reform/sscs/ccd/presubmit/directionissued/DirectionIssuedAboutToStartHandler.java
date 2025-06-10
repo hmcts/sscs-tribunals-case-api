@@ -22,8 +22,6 @@ import uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil;
 @Service
 public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private final boolean isPostHearingsEnabled;
-    @Value("${feature.direction-hearings.enabled}")
-    private boolean isDirectionHearingsEnabled;
 
     public DirectionIssuedAboutToStartHandler(@Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
         this.isPostHearingsEnabled = isPostHearingsEnabled;
@@ -55,8 +53,8 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
 
         clearFields(sscsCaseData);
         setPartiesToSendLetter(sscsCaseData);
-        if (isDirectionHearingsEnabled && callbackType.equals(CallbackType.ABOUT_TO_START)) {
-            sscsCaseData.setSelectNextHmcHearingType(NO);
+        if (callbackType.equals(CallbackType.ABOUT_TO_START)) {
+            sscsCaseData.getExtendedSscsCaseData().setSelectNextHmcHearingType(NO);
             sscsCaseData.setHmcHearingType(null);
         }
         return new PreSubmitCallbackResponse<>(sscsCaseData);
