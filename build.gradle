@@ -418,7 +418,7 @@ dependencies {
     implementation group: 'org.apache.tika', name: 'tika-core', version: '3.1.0'
     implementation group: 'org.apache.tika', name: 'tika-parsers', version: '3.1.0'
 
-    implementation group: 'org.json', name: 'json', version: '20250107'
+    implementation group: 'org.json', name: 'json', version: '20250517'
 
     implementation group: 'com.opencsv', name: 'opencsv', version: '5.11'
 
