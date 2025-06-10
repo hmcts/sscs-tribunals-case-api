@@ -52,18 +52,15 @@ public final class HearingsDurationMapping {
             log.info("Hearing Duration for Case ID {} set as existing defaultListingDuration value {}", caseId, defaultListingDuration);
             return handleStandardDuration(caseData, defaultListingDuration);
         }
-        if (caseData.isIbcCase()) {
-            throw new ListingException("Hearing duration is required to list case");
-        }
+
         // otherwise we set duration based on existing duration values ref data json
         duration = hearingDurationsService.getHearingDurationBenefitIssueCodes(caseData);
         if (nonNull(duration)) {
-            log.debug("Hearing Duration for Case ID {} set as Benefit Code value {}", caseId, duration);
+            log.info("Hearing Duration for Case ID {} set as Benefit Code value {}", caseId, duration);
             return duration;
         }
-        // else return default value (60)
-        log.debug("Hearing Duration for Case ID {} set as default value {}", caseId, DURATION_DEFAULT);
-        return DURATION_DEFAULT;
+        log.info("Hearing Duration cannot be mapped for case ID {}", caseId);
+        throw new ListingException("Hearing duration is required to list case");
     }
 
     public static Integer getHearingDurationAdjournment(SscsCaseData caseData, HearingDurationsService hearingDurationsService) throws ListingException {
