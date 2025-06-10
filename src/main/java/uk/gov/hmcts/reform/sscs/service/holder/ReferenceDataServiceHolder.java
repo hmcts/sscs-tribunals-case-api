@@ -49,9 +49,6 @@ public class ReferenceDataServiceHolder {
     @Value("${sscs.serviceCode}")
     private String sscsServiceCode;
 
-    @Value("${flags.adjournment.enabled}")
-    private boolean adjournmentFlagEnabled; // TODO SSCS-10951
-
     @Value("${flags.postHearings.enabled}")
     private boolean isPostHearingsEnabled;
 
