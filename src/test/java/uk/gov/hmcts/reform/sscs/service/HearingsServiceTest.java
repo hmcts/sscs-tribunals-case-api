@@ -13,6 +13,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.ADJOURN_CREATE_HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.CANCEL_HEARING;
@@ -216,6 +217,7 @@ class HearingsServiceTest {
         HearingEvent hearingEvent = HearingEvent.ADJOURN_CREATE_HEARING;
         wrapper.setHearingState(ADJOURN_CREATE_HEARING);
         wrapper.setEventId(hearingEvent.getEventType().getCcdType());
+        wrapper.getCaseData().getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
         var panelComposition = PanelMemberComposition.builder().panelCompositionJudge("58").build();
         when(hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(
                 eq(panelComposition), any(), any(), anyBoolean())
@@ -250,7 +252,7 @@ class HearingsServiceTest {
     @Test
     void shouldThrowUpdateCaseExceptionWhenCaseUpdateWithHearingResponseV2Fails() throws ListingException {
         mockHearingResponseForAdjournmentCreate();
-
+        wrapper.getCaseData().getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
         HearingEvent event = HearingEvent.ADJOURN_CREATE_HEARING;
         wrapper.setHearingState(ADJOURN_CREATE_HEARING);
         wrapper.setEventId(event.getEventType().getCcdType());
@@ -263,7 +265,6 @@ class HearingsServiceTest {
         when(hearingsMapping.buildHearingPayload(any(), any())).thenReturn(hearingPayload);
         when(panelCompositionService.createPanelCompositionFromJohTiers(eq(List.of("58"))))
                 .thenReturn(PanelMemberComposition.builder().build());
-
         given(updateCcdCaseService.updateCaseV2(
             eq(CASE_ID),
             eq(event.getEventType().getCcdType()),
@@ -452,5 +453,33 @@ class HearingsServiceTest {
 
         assertThrows(ListingException.class, () -> hearingsService.processHearingWrapper(wrapper));
     }
+
+    @DisplayName("When wrapper with a valid create Hearing State is given and hearing duration is multiple of five or null then updateHearing should run without error")
+    @ParameterizedTest
+    @CsvSource(value = {
+        "null",
+        "25",
+        "60"
+    }, nullValues = "null")
+    void testGetServiceHearingValueWithListingDurationAsNullOrMultipleOfFive(Integer hearingDuration) throws Exception {
+
+        given(hearingsMapping.buildHearingPayload(any(), any())).willReturn(HearingRequestPayload.builder().build());
+
+        given(hmcHearingApiService.sendUpdateHearingRequest(any(HearingRequestPayload.class), anyString()))
+                .willReturn(HmcUpdateResponse.builder().build());
+
+        wrapper.setHearingState(UPDATE_HEARING);
+        wrapper.getCaseData()
+                .setHearings(Collections.singletonList(Hearing.builder()
+                        .value(HearingDetails.builder()
+                                .hearingId(String.valueOf(HEARING_REQUEST_ID))
+                                .build())
+                        .build()));
+        wrapper.getCaseData().getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().duration(hearingDuration).build());
+
+
+        assertThatNoException().isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
+    }
+
 
 }

@@ -562,5 +562,6 @@
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "infoRequestFromTribunal", "Label": "Info Request From Tribunal", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "awaitingInfoFromTribunal", "Label": "Awaiting Info From Tribunal", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "infoProvidedByTribunal", "Label": "Info Provided By Tribunal", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "18/06/2019", "CaseTypeID": "Benefit", "ID": "communicationNoActionLabel", "Label": "If you select 'No reply required' a reply will not be sent and you do not need to enter text into the 'Reply' text box", "FieldType": "Label", "SecurityClassification": "PUBLIC"}
+  {"LiveFrom": "18/06/2019", "CaseTypeID": "Benefit", "ID": "communicationNoActionLabel", "Label": "If you select 'No reply required' a reply will not be sent and you do not need to enter text into the 'Reply' text box", "FieldType": "Label", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "29/05/2025", "CaseTypeID": "Benefit", "ID": "interpreterDurationLabel", "Label": "If an interpreter is needed for the next hearing, please add an extra 30 minutes to the duration.", "FieldType": "Label", "SecurityClassification": "PUBLIC"}
 ]
