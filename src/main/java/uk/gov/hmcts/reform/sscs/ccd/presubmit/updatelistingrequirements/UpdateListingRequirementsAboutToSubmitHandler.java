@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getHmcHearingType;
 
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -80,11 +81,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 SscsUtil.updateHearingChannel(sscsCaseData, hearingChannel);
             }
             HearingInterpreter appellantInterpreter = overrideFields.getAppellantInterpreter();
-            Optional<HearingOptions> hearingOptions = Optional.ofNullable(sscsCaseData.getAppeal().getHearingOptions());
-            String caseInterpreter = hearingOptions.isPresent() && nonNull(hearingOptions.get().getLanguageInterpreter())
-                    ? hearingOptions.get().getLanguageInterpreter()
-                    : "No";
-            boolean updateDuration = nonNull(caseInterpreter) && nonNull(appellantInterpreter) && YesNo.isYes(caseInterpreter) != YesNo.isYes(appellantInterpreter.getIsInterpreterWanted());
+            boolean updateDuration = updateHearingDuration(sscsCaseData, callback.getCaseDetailsBefore());
             if (nonNull(appellantInterpreter)) {
                 SscsUtil.updateHearingInterpreter(sscsCaseData, callbackResponse, appellantInterpreter);
             }
@@ -102,5 +99,27 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 .hmcHearingType(getHmcHearingType(sscsCaseData))
                 .build());
         return callbackResponse;
+    }
+
+    private boolean updateHearingDuration(SscsCaseData sscsCaseData, Optional<CaseDetails<SscsCaseData>> sscsCaseDataBefore) {
+        if (nonNull(sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getDuration())) {
+            return false;
+        }
+        boolean channelUpdated = false;
+        if (sscsCaseDataBefore.isPresent()) {
+            OverrideFields overrideFieldsBefore = sscsCaseDataBefore.get().getCaseData().getSchedulingAndListingFields().getOverrideFields();
+            if (nonNull(overrideFieldsBefore)) {
+                HearingChannel channelBefore = overrideFieldsBefore.getAppellantHearingChannel();
+                HearingChannel channelCurrent = sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getAppellantHearingChannel();
+                channelUpdated = !Objects.equals(channelBefore, channelCurrent);
+            }
+        }
+        HearingInterpreter appellantInterpreter = sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter();
+        Optional<HearingOptions> hearingOptions = Optional.ofNullable(sscsCaseData.getAppeal().getHearingOptions());
+        String caseInterpreter = hearingOptions.isPresent() && nonNull(hearingOptions.get().getLanguageInterpreter())
+                ? hearingOptions.get().getLanguageInterpreter()
+                : "No";
+        boolean updateDuration = nonNull(appellantInterpreter) && YesNo.isYes(caseInterpreter) != YesNo.isYes(appellantInterpreter.getIsInterpreterWanted());
+        return channelUpdated || updateDuration;
     }
 }
