@@ -33,7 +33,7 @@ test.describe(
       }
     );
 
-    test('Trigger a new hearing for UC case #executeTearDown', async ({
+    test('Trigger a new hearing for UC case #executeTearDown', {tag: '@fix-nightly'}, async ({
       uploadResponseSteps,
       hearingSteps
     }) => {
@@ -42,7 +42,7 @@ test.describe(
       await hearingSteps.verifyHearingIsTriggeredForUCCase(false);
     });
 
-    test('Trigger a new direction hearing via issue direction notice for UC case #executeTearDown', async ({
+    test('Trigger a new direction hearing via issue direction notice for UC case #executeTearDown', {tag: '@fix-nightly'}, async ({
       uploadResponseSteps,
       hearingSteps,
       issueDirectionsNoticeSteps
@@ -61,7 +61,7 @@ test.describe(
       await hearingSteps.verifyHearingIsTriggeredForUCCase(true);
     });
 
-    test('Trigger a new direction hearing via update listing reqs for UC case #executeTearDown', async ({
+    test('Trigger a new direction hearing via update listing reqs for UC case #executeTearDown', {tag: '@fix-nightly'}, async ({
       uploadResponseSteps,
       hearingSteps
     }) => {
@@ -91,7 +91,7 @@ test.describe(
       await hearingSteps.verifyAutoHearingCancellation();
     });
 
-    test('Manually Update an hearing for DLA case #executeTearDown', async ({
+    test('Manually Update an hearing for DLA case #executeTearDown',  {tag: '@fix-nightly'}, async ({
       uploadResponseSteps,
       hearingSteps
     }) => {
