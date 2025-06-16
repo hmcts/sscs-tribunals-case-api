@@ -12,7 +12,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils;
 import helper.EnvironmentProfileValueSource;
 import io.restassured.RestAssured;
 import java.io.File;
@@ -24,6 +23,7 @@ import java.util.List;
 import java.util.Objects;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.awaitility.core.ConditionFactory;
 import org.junit.ClassRule;
