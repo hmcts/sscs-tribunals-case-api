@@ -1,6 +1,7 @@
 import { WebAction } from '../common/web.action';
 import { Page } from '@playwright/test';
 import updateNotListableData from './content/update.not.listable_en.json';
+import dateUtilsComponent from '../utils/DateUtilsComponent';
 
 let webActions: WebAction;
 
@@ -70,12 +71,13 @@ export class UpdateNotListablePage {
   }
 
   async newDueDateRequired() {
+
     await this.page.waitForTimeout(3000);
     await this.page.click('#updateNotListableSetNewDueDate_Yes');
     await this.page.waitForTimeout(3000);
     await webActions.inputField('#updateNotListableDueDate-day', '13');
     await webActions.inputField('#updateNotListableDueDate-month', '01');
-    await webActions.inputField('#updateNotListableDueDate-year', '2026');
+    await webActions.inputField('#updateNotListableDueDate-year', String(dateUtilsComponent.getNextYear()));
     await this.page.waitForTimeout(3000);
     await this.page.click('#updateNotListableSetNewDueDate_Yes');
     await this.page.waitForTimeout(3000);
