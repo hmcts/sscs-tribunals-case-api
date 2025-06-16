@@ -74,8 +74,8 @@ export class UpdateNotListablePage {
     await this.page.click('#updateNotListableSetNewDueDate_Yes');
     await this.page.waitForTimeout(3000);
     await webActions.inputField('#updateNotListableDueDate-day', '13');
-    await webActions.inputField('#updateNotListableDueDate-month', '06');
-    await webActions.inputField('#updateNotListableDueDate-year', '2025');
+    await webActions.inputField('#updateNotListableDueDate-month', '01');
+    await webActions.inputField('#updateNotListableDueDate-year', '2026');
     await this.page.waitForTimeout(3000);
     await this.page.click('#updateNotListableSetNewDueDate_Yes');
     await this.page.waitForTimeout(3000);
