@@ -104,7 +104,7 @@ public class UploadDocumentAboutToSubmitHandler implements PreSubmitCallbackHand
     }
 
     private void processSelectedDocuments(SscsCaseData sscsCaseData, InternalCaseDocumentData internalCaseDocumentData, boolean moveToInternal, List<DynamicListItem> selectedOptions, List<SscsDocument> docList, PreSubmitCallbackResponse<SscsCaseData> errorResponse, List<String> documentTypeList) {
-        docList.forEach(doc -> log.info("Doclist Item: {}", doc.toString()));
+        docList.forEach(doc -> log.info("Doclist Item: {}", doc.getValue().toString()));
         for (DynamicListItem doc : selectedOptions) {
             log.info("selectedDoc: {}", doc);
             docList.stream()
