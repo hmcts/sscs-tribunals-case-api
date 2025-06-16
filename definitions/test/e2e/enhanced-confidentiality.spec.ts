@@ -41,7 +41,7 @@ test.describe('Enhanced confidentiality test', async () => {
 
   test(
     'Refuse - confidentiality request for a party on a case #executeTearDown',
-    { tag: ['@preview-regression', '@nightly-pipeline', '@fix-nightly'] },
+    { tag: ['@preview-regression', '@nightly-pipeline'] },
     async ({ uploadResponseSteps, enhancedConfidentialitySteps, request }) => {
       test.slow();
       await uploadResponseSteps.checkHmcEnvironment(request);
