@@ -37,7 +37,7 @@ test.describe(
       await uploadResponseSteps.performUploadResponseWithoutFurtherInfoOnATaxCredit();
     });
 
-    test('As a caseworker review response submitted for an UC case #executeTearDown', async ({
+    test('As a caseworker review response submitted for an UC case #executeTearDown',  {tag: '@fix-nightly'}, async ({
       uploadResponseSteps,
       request
     }) => {
