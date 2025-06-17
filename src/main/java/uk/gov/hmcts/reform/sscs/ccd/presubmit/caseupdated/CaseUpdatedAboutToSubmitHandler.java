@@ -217,7 +217,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             SscsUtil.setListAssistRoutes(sscsCaseData);
         }
 
-        OverrideFields overrideFields = Optional.of(sscsCaseData.getSchedulingAndListingFields().getOverrideFields()).orElse(OverrideFields.builder().build());
+        OverrideFields overrideFields = Optional.ofNullable(sscsCaseData.getSchedulingAndListingFields().getOverrideFields()).orElse(OverrideFields.builder().build());
         if (!isNull(sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues())
             && isNull(overrideFields.getDuration())) {
             calculateDefaultDuration(sscsCaseData, caseDetailsBefore);

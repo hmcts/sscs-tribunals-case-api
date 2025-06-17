@@ -77,6 +77,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
@@ -211,6 +212,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
                         )
                         .build()
                 )
+                .schedulingAndListingFields(SchedulingAndListingFields.builder().build())
                 .benefitCode("002")
                 .issueCode("DD")
                 .isFqpmRequired(NO)
