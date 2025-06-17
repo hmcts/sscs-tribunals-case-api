@@ -48,6 +48,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -216,7 +217,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             SscsUtil.setListAssistRoutes(sscsCaseData);
         }
 
-        if (!isNull(sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues())) {
+        OverrideFields overrideFields = Optional.of(sscsCaseData.getSchedulingAndListingFields().getOverrideFields()).orElse(OverrideFields.builder().build());
+        if (!isNull(sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues())
+            && isNull(overrideFields.getDuration())) {
             calculateDefaultDuration(sscsCaseData, caseDetailsBefore);
         }
         return preSubmitCallbackResponse;
