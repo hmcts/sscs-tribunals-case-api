@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
@@ -86,7 +87,11 @@ public final class HearingsDurationMapping {
         Adjournment adjournment = caseData.getAdjournment();
         if (!adjournment.getTypeOfHearing().equals(adjournment.getTypeOfNextHearing())) {
             // update override value here otherwise it will not be correctly amended when change of hearing type
-            caseData.getSchedulingAndListingFields().getOverrideFields().setDuration(duration);
+            if (nonNull(caseData.getSchedulingAndListingFields().getOverrideFields())) {
+                caseData.getSchedulingAndListingFields().getOverrideFields().setDuration(duration);
+            } else {
+                caseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().duration(duration).build());
+            }
         }
         return duration;
     }
