@@ -37,7 +37,7 @@ import uk.gov.hmcts.reform.sscs.jobscheduler.services.quartz.JobMapping;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SpringBootContextRoot.class)
-@TestPropertySource(locations = "classpath:config/application_it.properties")
+@TestPropertySource(locations = "classpath:config/application_jobsched_it.properties")
 @ActiveProfiles("integration")
 public class ApplicationTest {
 
