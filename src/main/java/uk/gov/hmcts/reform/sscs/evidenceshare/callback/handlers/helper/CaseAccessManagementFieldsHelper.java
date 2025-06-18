@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.helper;
 
-import static com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.StringUtils.isNotBlank;
 import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getBenefitOptionalByCode;
 
 import lombok.extern.slf4j.Slf4j;
