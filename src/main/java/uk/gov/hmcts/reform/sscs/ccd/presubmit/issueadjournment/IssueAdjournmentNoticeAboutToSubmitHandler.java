@@ -24,6 +24,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -188,8 +189,10 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         Adjournment adjournment = sscsCaseData.getAdjournment();
         YesNo interpreterRequired = adjournment.getInterpreterRequired();
         YesNo caseDataInterpreter = isNull(hearingOptions.getLanguageInterpreter()) ? NO
-                : hearingOptions.getLanguageInterpreter().equalsIgnoreCase("yes") ? YES : NO;;
-        if (nonNull(interpreterRequired)
+                : hearingOptions.getLanguageInterpreter().equalsIgnoreCase("yes") ? YES : NO;
+        OverrideFields overrideFields = Optional.ofNullable(sscsCaseData.getSchedulingAndListingFields().getOverrideFields()).orElse(OverrideFields.builder().build());
+        if (isNull(overrideFields.getDuration())
+                && nonNull(interpreterRequired)
                 && caseDataInterpreter != interpreterRequired
                 && nonNull(sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues())) {
             sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues()
