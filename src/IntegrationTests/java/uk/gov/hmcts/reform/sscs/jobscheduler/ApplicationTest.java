@@ -20,9 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.gov.hmcts.reform.idam.client.IdamApi;
 import uk.gov.hmcts.reform.sscs.jobscheduler.model.Job;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobExecutor;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobPayloadDeserializer;
@@ -37,7 +37,6 @@ import uk.gov.hmcts.reform.sscs.jobscheduler.services.quartz.JobMapping;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SpringBootContextRoot.class)
-@TestPropertySource(locations = "classpath:config/application_jobsched_it.properties")
 @ActiveProfiles("integration")
 public class ApplicationTest {
 
@@ -53,6 +52,9 @@ public class ApplicationTest {
 
     @Autowired
     private JobRemover jobRemover;
+
+    @MockitoBean
+    private IdamApi idamApi;
 
     @MockitoBean
     private JobPayloadSerializer<TestPayload> jobPayloadSerializer;
