@@ -24,7 +24,7 @@
     "CaseFieldID": "sscsDocument",
     "ListElementCode": "documentLink",
     "ID": "sscsDocumentLink",
-    "DisplayContext": "OPTIONAL",
+    "DisplayContext": "MANDATORY",
     "LiveFrom": "17/06/2025",
     "FieldDisplayOrder": 3,
     "PageID": "moveDocuments"
@@ -204,7 +204,7 @@
     "CaseFieldID": "sscsInternalDocument",
     "ListElementCode": "documentLink",
     "ID": "sscsDocumentLink",
-    "DisplayContext": "OPTIONAL",
+    "DisplayContext": "MANDATORY",
     "LiveFrom": "17/06/2025",
     "FieldDisplayOrder": 3,
     "PageID": "moveDocuments"
