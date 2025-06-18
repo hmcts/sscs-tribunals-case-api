@@ -72,12 +72,14 @@ export class UpdateNotListablePage {
 
   async newDueDateRequired() {
 
+    const nextYear =  await dateUtilsComponent.getNextYear();
+
     await this.page.waitForTimeout(3000);
     await this.page.click('#updateNotListableSetNewDueDate_Yes');
     await this.page.waitForTimeout(3000);
     await webActions.inputField('#updateNotListableDueDate-day', '13');
     await webActions.inputField('#updateNotListableDueDate-month', '01');
-    await webActions.inputField('#updateNotListableDueDate-year', String(dateUtilsComponent.getNextYear()));
+    await webActions.inputField('#updateNotListableDueDate-year', String(nextYear));
     await this.page.waitForTimeout(3000);
     await this.page.click('#updateNotListableSetNewDueDate_Yes');
     await this.page.waitForTimeout(3000);
