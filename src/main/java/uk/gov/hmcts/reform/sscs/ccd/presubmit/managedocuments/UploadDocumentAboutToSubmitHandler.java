@@ -66,7 +66,6 @@ public class UploadDocumentAboutToSubmitHandler implements PreSubmitCallbackHand
         if (!isTribunalInternalDocumentsEnabled) {
             return new PreSubmitCallbackResponse<>(sscsCaseData);
         }
-        log.info("sscsCaseDataInternalDocuments: {}", sscsCaseData.getInternalCaseDocumentData());
 
         InternalCaseDocumentData internalCaseDocumentData = Optional.ofNullable(sscsCaseData.getInternalCaseDocumentData())
             .orElse(InternalCaseDocumentData.builder().build());
@@ -104,9 +103,7 @@ public class UploadDocumentAboutToSubmitHandler implements PreSubmitCallbackHand
     }
 
     private void processSelectedDocuments(SscsCaseData sscsCaseData, InternalCaseDocumentData internalCaseDocumentData, boolean moveToInternal, List<DynamicListItem> selectedOptions, List<SscsDocument> docList, PreSubmitCallbackResponse<SscsCaseData> errorResponse, List<String> documentTypeList) {
-        docList.forEach(doc -> log.info("Doclist Item: {}", doc.getValue()));
         for (DynamicListItem doc : selectedOptions) {
-            log.info("selectedDoc: {}", doc);
             docList.stream()
                 .filter(d -> getDocumentIdFromUrl(d).equalsIgnoreCase(doc.getCode()))
                 .findFirst()
