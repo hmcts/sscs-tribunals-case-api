@@ -1,3 +1,6 @@
+import uk.gov.hmcts.rse.AuthMode
+import java.nio.charset.StandardCharsets
+
 plugins {
     id 'application'
     id 'pmd'
@@ -187,17 +190,9 @@ dependencyCheck {
     // range of 7-10 fails the build, anything lower and it doesn't fail the build
     failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild', 'true') == 'true' ? 7.0 : 11
     suppressionFile = 'config/owasp/suppressions.xml'
-
     nvd.validForHours = 24
-
-    analyzers {
-        retirejs {
-            enabled = false
-        }
-        ossIndex {
-            enabled = false
-        }
-    }
+    analyzers.retirejs.enabled = false
+    analyzers.ossIndex.enabled = false
 }
 
 repositories {
@@ -307,13 +302,28 @@ tasks.register('runGitPreCommitTasks') {
 
 dependencyManagement {
     dependencies {
-        //CVE-2022-25857
+        //CVE-2022-1471, CVE-2022-38749, CVE-2022-38750, CVE-2022-38751, CVE-2022-38752, CVE-2022-41854, CVE-2022-25857
         dependencySet(group: 'org.yaml', version: '2.4') {
             entry 'snakeyaml'
         }
 
         imports {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:2024.0.1"
+        }
+
+        // CVE-2023-1370
+        dependency group: 'net.minidev', name: 'json-smart', version: '2.5.1'
+
+        // CVE-2023-6378, CVE-2023-6481
+        dependencySet(group: 'ch.qos.logback', version: '1.5.6') {
+            entry 'logback-core'
+            entry 'logback-classic'
+        }
+
+        // CVE-2021-25122, CVE-2021-41079, CVE-2021-42340, CVE-2022-29885, CVE-2022-42252, CVE-2022-45143, CVE-2023-44487, CVE-2023-46589, CVE-2020-9484, CVE-2021-25329, CVE-2022-23181, CVE-2021-30640, CVE-2022-34305, CVE-2023-41080, CVE-2021-33037, CVE-2023-42795, CVE-2023-45648, CVE-2024-21733, CVE-2023-28708, CVE-2021-43980
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.86') {
+            entry 'tomcat-embed-core'
+            entry 'tomcat-embed-websocket'
         }
     }
 }
@@ -486,6 +496,26 @@ dependencies {
     integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     testImplementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+
+    implementation group: 'com.github.hmcts', name: 'reform-api-standards', version: '0.5.2', {
+        exclude group: 'com.google.guava', module: 'guava'
+    }
+
+    implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'
+
+    implementation group: 'org.springframework', name: 'spring-context-support', version: '6.2.0'
+
+    implementation group: 'org.springframework', name: 'spring-tx', version: '6.2.0'
+
+    testImplementation group: 'com.github.tomakehurst', name: 'wiremock-standalone', version: '3.0.1'
+    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.11.0'
+
+    integrationTestImplementation sourceSets.main.runtimeClasspath
+    integrationTestImplementation sourceSets.test.runtimeClasspath
+
+    // CVE-2023-2976, CVE-2020-8908
+    checkstyle group: 'com.puppycrawl.tools', name: 'checkstyle', version: checkstyle.toolVersion
+    checkstyle group: 'com.google.guava', name: 'guava', version: '32.1.1-jre'
 }
 
 bootJar {
@@ -542,7 +572,7 @@ tasks.register('generateXls', Exec) {
 bootWithCCD {
     group 'application'
     dependsOn generateXls
-    authMode = uk.gov.hmcts.rse.AuthMode.Local
+    authMode = AuthMode.Local
 
     doFirst() {
         if (!project.file('./.aat-env').exists()) {
@@ -551,7 +581,7 @@ bootWithCCD {
                     commandLine 'az', 'keyvault', 'secret', 'show', '--vault-name', 'sscs-aat', '-o', 'tsv', '--query', 'value', '--name', 'sscs-tribunals-case-api-dot-env'
                     standardOutput = os
                 }
-                project.file('./.aat-env').write(new String(os.toString().replace('\n', '').decodeBase64(), java.nio.charset.StandardCharsets.UTF_8))
+                project.file('./.aat-env').write(new String(os.toString().replace('\n', '').decodeBase64(), StandardCharsets.UTF_8))
             }
         }
 
@@ -575,7 +605,7 @@ bootWithCCD {
         File logfile = new File('gradle-build.log')
         logfile << it
     }
-    ] as org.gradle.api.logging.StandardOutputListener
+    ] as StandardOutputListener
 
     logging.addStandardOutputListener(fileLogger)
 
@@ -588,31 +618,30 @@ bootWithCCD {
     }
 }
 
-
-task yarnInstall(type:Exec) {
+tasks.register('yarnInstall', Exec) {
     workingDir = file("${project.projectDir}/definitions/test")
     commandLine 'yarn', 'install'
 }
 
-task runE2eTests(type: Exec) {
+tasks.register('runE2eTests', Exec) {
     dependsOn yarnInstall
     workingDir = file("${project.projectDir}/definitions/test")
     commandLine 'yarn', 'test:' + System.getenv('ENVIRONMENT')
 }
 
-task runE2eTestsNightly(type: Exec) {
+tasks.register('runE2eTestsNightly', Exec) {
     dependsOn yarnInstall
     workingDir = file("${project.projectDir}/definitions/test")
     commandLine 'yarn', 'test:nightly'
 }
 
-task runAccessibilityTestsNightly(type: Exec) {
+tasks.register('runAccessibilityTestsNightly', Exec) {
     dependsOn yarnInstall
     workingDir = file("${project.projectDir}/definitions/test")
     commandLine 'yarn', 'test:accessibility'
 }
 
-task highLevelDataSetup(type: JavaExec) {
+tasks.register('highLevelDataSetup', JavaExec) {
     mainClass = "uk.gov.hmcts.reform.sscs.config.HighLevelDataSetupApp"
     classpath += sourceSets.main.runtimeClasspath
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
