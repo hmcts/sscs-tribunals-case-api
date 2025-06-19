@@ -11,9 +11,13 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_LISTING_REQUIREMENTS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.FACE_TO_FACE;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.VIDEO;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -274,6 +278,55 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
             USER_AUTHORISATION);
         verifyNoInteractions(hearingDurationsService);
         assertThat(response.getErrors()).isEmpty();
+    }
+
+
+    @Test
+    void updateHearingDuration_shouldUpdateDurationWhenChannelHasChanged() {
+        ReflectionTestUtils.setField(handler, "isHearingDurationEnabled", true);
+        sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder()
+                .duration(60)
+                .build());
+        SscsCaseData caseDataBefore = SscsCaseData.builder().schedulingAndListingFields(SchedulingAndListingFields.builder()
+                .overrideFields(OverrideFields.builder().appellantHearingChannel(FACE_TO_FACE).build()).build()).build();
+        CaseDetails caseDetailsBefore = new CaseDetails<SscsCaseData>(33333333L, "", State.READY_TO_LIST, caseDataBefore, LocalDateTime.now(), "Benefit");
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().appellantHearingChannel(PAPER).build());
+
+        when(hearingDurationsService.getHearingDurationBenefitIssueCodes(eq(sscsCaseData))).thenReturn(30);
+        CaseDetails caseDetails = new CaseDetails<>(3333333L, "", State.READY_TO_LIST, sscsCaseData, LocalDateTime.now(), "Benefit");
+        callback = new Callback<>(caseDetails, Optional.of(caseDetailsBefore), UPDATE_LISTING_REQUIREMENTS, false);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+                ABOUT_TO_SUBMIT,
+                callback,
+                USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getSchedulingAndListingFields().getDefaultListingValues().getDuration()).isEqualTo(30);
+    }
+
+    @Test
+    void updateHearingDuration_shouldNotUpdateDurationWhenChannelHasNotChanged() {
+        ReflectionTestUtils.setField(handler, "isHearingDurationEnabled", true);
+        sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder()
+                .duration(60)
+                .build());
+        SscsCaseData caseDataBefore = SscsCaseData.builder().schedulingAndListingFields(SchedulingAndListingFields.builder()
+                .overrideFields(OverrideFields.builder().appellantHearingChannel(FACE_TO_FACE).build()).build()).build();
+        CaseDetails caseDetailsBefore = new CaseDetails<SscsCaseData>(33333333L, "", State.READY_TO_LIST, caseDataBefore, LocalDateTime.now(), "Benefit");
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().appellantHearingChannel(FACE_TO_FACE).build());
+
+        CaseDetails caseDetails = new CaseDetails<>(3333333L, "", State.READY_TO_LIST, sscsCaseData, LocalDateTime.now(), "Benefit");
+        callback = new Callback<>(caseDetails, Optional.of(caseDetailsBefore), UPDATE_LISTING_REQUIREMENTS, false);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+                ABOUT_TO_SUBMIT,
+                callback,
+                USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getSchedulingAndListingFields().getDefaultListingValues().getDuration()).isEqualTo(60);
+        verifyNoInteractions(hearingDurationsService);
     }
 
     @ParameterizedTest
