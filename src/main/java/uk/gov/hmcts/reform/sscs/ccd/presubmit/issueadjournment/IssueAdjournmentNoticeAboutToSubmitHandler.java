@@ -16,6 +16,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
+import static uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil.isInterpreterRequired;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -28,6 +29,7 @@ import java.util.Optional;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -55,6 +57,8 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final HearingDurationsService hearingDurationsService;
     private final VenueService venueService;
+    @Value("${feature.hearing-duration.enabled}")
+    private boolean isHearingDurationEnabled;
 
 
     private static final int DURATION_SESSIONS_MULTIPLIER = 165;
@@ -188,15 +192,17 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
         Adjournment adjournment = sscsCaseData.getAdjournment();
         YesNo interpreterRequired = adjournment.getInterpreterRequired();
-        YesNo caseDataInterpreter = isNull(hearingOptions.getLanguageInterpreter()) ? NO
-                : hearingOptions.getLanguageInterpreter().equalsIgnoreCase("yes") ? YES : NO;
-        OverrideFields overrideFields = Optional.ofNullable(sscsCaseData.getSchedulingAndListingFields().getOverrideFields()).orElse(OverrideFields.builder().build());
-        if (isNull(overrideFields.getDuration())
-                && nonNull(interpreterRequired)
-                && caseDataInterpreter != interpreterRequired
-                && nonNull(sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues())) {
-            sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues()
-                    .setDuration(hearingDurationsService.getHearingDurationBenefitIssueCodes(sscsCaseData));
+        if (isHearingDurationEnabled) {
+            YesNo caseDataInterpreter = isNull(hearingOptions.getLanguageInterpreter()) ? NO
+                    : hearingOptions.getLanguageInterpreter().equalsIgnoreCase("yes") ? YES : NO;
+            OverrideFields overrideFields = Optional.ofNullable(sscsCaseData.getSchedulingAndListingFields().getOverrideFields()).orElse(OverrideFields.builder().build());
+            if (isNull(overrideFields.getDuration())
+                    && nonNull(interpreterRequired)
+                    && caseDataInterpreter != interpreterRequired
+                    && nonNull(sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues())) {
+                sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues()
+                        .setDuration(hearingDurationsService.getHearingDurationBenefitIssueCodes(sscsCaseData));
+            }
         }
         if (nonNull(interpreterRequired) && isYes(interpreterRequired)) {
             DynamicList interpreterLanguage = adjournment.getInterpreterLanguage();
@@ -338,7 +344,12 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             if (nonNull(defaultListingValues)) {
                 Integer existingDuration = caseData.getSchedulingAndListingFields().getDefaultListingValues().getDuration();
                 if (nonNull(existingDuration)) {
-                    return existingDuration;
+                    if (!isHearingDurationEnabled  && isYes(caseData.getAppeal().getHearingOptions().getWantsToAttend())
+                            && isInterpreterRequired(caseData)) {
+                        return existingDuration + MIN_HEARING_DURATION;
+                    } else {
+                        return existingDuration;
+                    }
                 }
             }
         }

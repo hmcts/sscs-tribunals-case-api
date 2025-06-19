@@ -89,6 +89,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final PostcodeValidator postcodeValidator = new PostcodeValidator();
     private static ConstraintValidatorContext context;
     private final ReferenceDataServiceHolder refData;
+    @Value("${feature.hearing-duration.enabled}")
+    private boolean isHearingDurationEnabled;
+
 
 
     private static final String WARNING_MESSAGE = "%s has not been provided for the %s, do you want to ignore this warning and proceed?";
@@ -216,11 +219,12 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (sscsCaseData.isIbcCase()) {
             SscsUtil.setListAssistRoutes(sscsCaseData);
         }
-
-        OverrideFields overrideFields = Optional.ofNullable(sscsCaseData.getSchedulingAndListingFields().getOverrideFields()).orElse(OverrideFields.builder().build());
-        if (!isNull(sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues())
-            && isNull(overrideFields.getDuration())) {
-            calculateDefaultDuration(sscsCaseData, caseDetailsBefore);
+        if (isHearingDurationEnabled) {
+            OverrideFields overrideFields = Optional.ofNullable(sscsCaseData.getSchedulingAndListingFields().getOverrideFields()).orElse(OverrideFields.builder().build());
+            if (!isNull(sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues())
+                    && isNull(overrideFields.getDuration())) {
+                calculateDefaultDuration(sscsCaseData, caseDetailsBefore);
+            }
         }
         return preSubmitCallbackResponse;
     }

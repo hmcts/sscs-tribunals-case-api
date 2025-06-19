@@ -1958,6 +1958,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     @Test
     void shouldUpdateDefaultDurationWhenInterpreterUpdated() {
+        ReflectionTestUtils.setField(handler, "isHearingDurationEnabled", true);
         sscsCaseDataBefore.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("No").build());
         sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("Yes").build());
         sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder().duration(30).build());
@@ -1981,6 +1982,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     @Test
     void shouldUpdateDefaultDurationWhenBenefitIssueUpdated() {
+        ReflectionTestUtils.setField(handler, "isHearingDurationEnabled", true);
         sscsCaseDataBefore.setBenefitCode("002");
         sscsCaseData.setBenefitCode("016");
         sscsCaseDataBefore.setIssueCode("DD");
