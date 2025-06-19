@@ -164,7 +164,7 @@
     "CaseFieldID": "sscsDocument",
     "ListElementCode": "originalSenderOtherPartyId",
     "ID": "sscsDocumentOriginalSenderOtherPartyId",
-    "DisplayContext": "OPTIONAL",
+    "DisplayContext": "READONLY",
     "LiveFrom": "17/06/2025",
     "FieldDisplayOrder": 18,
     "PageID": "moveDocuments"
@@ -344,7 +344,7 @@
     "CaseFieldID": "sscsInternalDocument",
     "ListElementCode": "originalSenderOtherPartyId",
     "ID": "sscsDocumentOriginalSenderOtherPartyId",
-    "DisplayContext": "OPTIONAL",
+    "DisplayContext": "READONLY",
     "LiveFrom": "17/06/2025",
     "FieldDisplayOrder": 18,
     "PageID": "moveDocuments"
