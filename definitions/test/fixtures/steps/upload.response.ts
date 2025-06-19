@@ -39,7 +39,6 @@ export class UploadResponse extends BaseStep {
     try {
       await this.homePage.navigateToTab('Summary');
       await this.summaryTab.verifyPresenceOfText('Ready to list');
-      await this.homePage.clickBeforeTabBtn();
       await this.homePage.navigateToTab('History');
       await Promise.all(
         historyLinks.map((linkName) => this.verifyHistoryTabLink(linkName))
@@ -48,7 +47,6 @@ export class UploadResponse extends BaseStep {
       await this.homePage.reloadPage();
       await this.homePage.navigateToTab('Summary');
       await this.summaryTab.verifyPresenceOfText('Ready to list');
-      await this.homePage.clickBeforeTabBtn();
       await this.homePage.navigateToTab('History');
       await Promise.all(
         historyLinks.map((linkName) => this.verifyHistoryTabLink(linkName))
