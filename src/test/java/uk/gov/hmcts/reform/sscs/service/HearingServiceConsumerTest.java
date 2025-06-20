@@ -104,7 +104,6 @@ public class HearingServiceConsumerTest {
     @ValueSource(booleans = {true, false})
     public void testCreateHearingCaseDetailsConsumer(boolean adjournmentFlagEnabled) {
         setupResponse();
-        given(refData.isAdjournmentFlagEnabled()).willReturn(adjournmentFlagEnabled);
         given(sessionCategoryMaps.getSessionCategory(
             BENEFIT_CODE,
             ISSUE_CODE,
@@ -158,7 +157,6 @@ public class HearingServiceConsumerTest {
     @ValueSource(booleans = {true, false})
     public void testCreateHearingCaseDetailsConsumerWithAdjournmentFlagEnabled(boolean adjournmentInProgress) {
         setupResponse();
-        given(refData.isAdjournmentFlagEnabled()).willReturn(true);
         given(sessionCategoryMaps.getSessionCategory(
             BENEFIT_CODE,
             ISSUE_CODE,
@@ -291,7 +289,6 @@ public class HearingServiceConsumerTest {
 
         caseData.setHearings(new ArrayList<>());
         caseData.getHearings().add(Hearing.builder().value(HearingDetails.builder().hearingId(String.valueOf(HEARING_REQUEST_ID)).build()).build());
-        given(refData.isAdjournmentFlagEnabled()).willReturn(false);
         given(sessionCategoryMaps.getSessionCategory(
                 BENEFIT_CODE,
                 ISSUE_CODE,

@@ -279,6 +279,8 @@ feature:
         enabled: ${HEARINGS_CASE_UPDATE_V2_ENABLED:false}
     default-panel-comp:
         enabled: ${DEFAULT_PANEL_COMPOSITION_ENABLED:false}
+    hearing-duration:
+        enabled: ${HEARING_DURATION_ENABLED:false}
 
 idam:
     api:
