@@ -48,7 +48,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -226,38 +225,6 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
 
         assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo(YES.getValue());
         assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isEqualTo(SPANISH);
-    }
-
-    @DisplayName("Given an adjournment event where language interpreter has been selected, and default listing"
-            + "values is present on case, then update the duration.")
-    @Test
-    void givenAdjournmentEventWithLanguageInterpreterUpdatedAndDefaultListingValues_UpdateDefaultDuration() {
-        sscsCaseData.getAdjournment().setInterpreterRequired(YES);
-        sscsCaseData.getAdjournment().setInterpreterLanguage(new DynamicList(SPANISH));
-        sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder().duration(60).build());
-        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder()
-            .languageInterpreter(NO.getValue())
-            .build());
-        when(hearingDurationsService.getHearingDurationBenefitIssueCodes(eq(sscsCaseData))).thenReturn(90);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getSchedulingAndListingFields().getDefaultListingValues().getDuration()).isEqualTo(90);
-    }
-
-    @DisplayName("Given an adjournment event where language interpreter has been selected but case already has interpreter"
-            + "then do not update default duration.")
-    @Test
-    void givenAdjournmentEventWithLanguageInterpreterUnchangedAndDefaultListingValues_DoNotUpdateDefaultDuration() {
-        sscsCaseData.getAdjournment().setInterpreterRequired(YES);
-        sscsCaseData.getAdjournment().setInterpreterLanguage(new DynamicList(SPANISH));
-        sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder().duration(90).build());
-        sscsCaseData.getAppeal().setHearingOptions(
-                HearingOptions.builder().languageInterpreter(YES.getValue()).languages(SPANISH).build());
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        verifyNoInteractions(hearingDurationsService);
-        assertThat(response.getData().getSchedulingAndListingFields().getDefaultListingValues().getDuration()).isEqualTo(90);
     }
 
     @DisplayName("Given an adjournment event with language interpreter required and interpreter language set, "

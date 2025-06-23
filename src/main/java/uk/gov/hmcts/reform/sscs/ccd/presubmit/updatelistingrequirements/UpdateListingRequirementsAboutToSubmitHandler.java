@@ -5,7 +5,6 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getHmcHearingType;
 
-import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +16,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
-import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
@@ -27,11 +25,6 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
     @Value("${feature.default-panel-comp.enabled}")
     private boolean isDefaultPanelCompEnabled;
-
-    @Value("${feature.hearing-duration.enabled}")
-    private boolean isHearingDurationEnabled;
-
-    private final HearingDurationsService hearingDurationsService;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -84,14 +77,8 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 SscsUtil.updateHearingChannel(sscsCaseData, hearingChannel);
             }
             HearingInterpreter appellantInterpreter = overrideFields.getAppellantInterpreter();
-            boolean updateDuration = isHearingDurationEnabled && updateHearingDuration(sscsCaseData, callback.getCaseDetailsBefore());
             if (nonNull(appellantInterpreter)) {
                 SscsUtil.updateHearingInterpreter(sscsCaseData, callbackResponse, appellantInterpreter);
-            }
-            if (updateDuration && nonNull(sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues())) {
-                sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues().setDuration(
-                        hearingDurationsService.getHearingDurationBenefitIssueCodes(sscsCaseData)
-                );
             }
         }
       
@@ -102,27 +89,5 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 .hmcHearingType(getHmcHearingType(sscsCaseData))
                 .build());
         return callbackResponse;
-    }
-
-    private boolean updateHearingDuration(SscsCaseData sscsCaseData, Optional<CaseDetails<SscsCaseData>> sscsCaseDataBefore) {
-        if (nonNull(sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getDuration())) {
-            return false;
-        }
-        boolean channelUpdated = false;
-        if (sscsCaseDataBefore.isPresent()) {
-            OverrideFields overrideFieldsBefore = sscsCaseDataBefore.get().getCaseData().getSchedulingAndListingFields().getOverrideFields();
-            if (nonNull(overrideFieldsBefore)) {
-                HearingChannel channelBefore = overrideFieldsBefore.getAppellantHearingChannel();
-                HearingChannel channelCurrent = sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getAppellantHearingChannel();
-                channelUpdated = !Objects.equals(channelBefore, channelCurrent);
-            }
-        }
-        HearingInterpreter appellantInterpreter = sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter();
-        Optional<HearingOptions> hearingOptions = Optional.ofNullable(sscsCaseData.getAppeal().getHearingOptions());
-        String caseInterpreter = hearingOptions.isPresent() && nonNull(hearingOptions.get().getLanguageInterpreter())
-                ? hearingOptions.get().getLanguageInterpreter()
-                : "No";
-        boolean updateDuration = nonNull(appellantInterpreter) && YesNo.isYes(caseInterpreter) != YesNo.isYes(appellantInterpreter.getIsInterpreterWanted());
-        return channelUpdated || updateDuration;
     }
 }

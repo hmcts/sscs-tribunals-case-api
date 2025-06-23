@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournment;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
@@ -100,7 +99,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerMainTest extends IssueAdj
         var adjournment = sscsCaseData.getAdjournment();
         adjournment.setNextHearingListingDuration(60);
         adjournment.setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.STANDARD);
-        when(hearingDurationsService.getHearingDurationBenefitIssueCodes(eq(sscsCaseData))).thenReturn(45);
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         var schedulingAndListingFields = response.getData().getSchedulingAndListingFields();

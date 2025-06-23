@@ -48,7 +48,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -63,14 +62,12 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
-import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
-import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
@@ -88,10 +85,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final boolean caseAccessManagementFeature;
     private final PostcodeValidator postcodeValidator = new PostcodeValidator();
     private static ConstraintValidatorContext context;
-    private final ReferenceDataServiceHolder refData;
-    @Value("${feature.hearing-duration.enabled}")
-    private boolean isHearingDurationEnabled;
-
 
 
     private static final String WARNING_MESSAGE = "%s has not been provided for the %s, do you want to ignore this warning and proceed?";
@@ -114,8 +107,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                                     RefDataService refDataService,
                                     VenueService venueService,
                                     SessionCategoryMapService categoryMapService,
-                                    @Value("${feature.case-access-management.enabled}")  boolean caseAccessManagementFeature,
-                                    ReferenceDataServiceHolder refData) {
+                                    @Value("${feature.case-access-management.enabled}")  boolean caseAccessManagementFeature) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
         this.airLookupService = airLookupService;
@@ -125,7 +117,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         this.caseAccessManagementFeature = caseAccessManagementFeature;
         this.venueService = venueService;
         this.categoryMapService = categoryMapService;
-        this.refData = refData;
     }
 
     @Override
@@ -218,13 +209,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
         if (sscsCaseData.isIbcCase()) {
             SscsUtil.setListAssistRoutes(sscsCaseData);
-        }
-        if (isHearingDurationEnabled) {
-            OverrideFields overrideFields = Optional.ofNullable(sscsCaseData.getSchedulingAndListingFields().getOverrideFields()).orElse(OverrideFields.builder().build());
-            if (!isNull(sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues())
-                    && isNull(overrideFields.getDuration())) {
-                calculateDefaultDuration(sscsCaseData, caseDetailsBefore);
-            }
         }
         return preSubmitCallbackResponse;
     }
@@ -610,20 +594,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             }
 
             return sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
-        }
-    }
-
-    private void calculateDefaultDuration(SscsCaseData sscsCaseData, Optional<CaseDetails<SscsCaseData>> caseDetailsBefore) {
-        if (caseDetailsBefore.isPresent()) {
-            String interpreterBefore = caseDetailsBefore.get().getCaseData().getAppeal().getHearingOptions().getLanguageInterpreter();
-            String interpreterCurrent = sscsCaseData.getAppeal().getHearingOptions().getLanguageInterpreter();
-            String benefitIssueBefore = caseDetailsBefore.get().getCaseData().getBenefitCode() + caseDetailsBefore.get().getCaseData().getIssueCode();
-            String benefitIssueCurrent = sscsCaseData.getBenefitCode() + sscsCaseData.getIssueCode();
-            if (!Objects.equals(interpreterBefore, interpreterCurrent) || !Objects.equals(benefitIssueBefore, benefitIssueCurrent)) {
-                HearingDurationsService hearingDurationsService = refData.getHearingDurations();
-                sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues()
-                        .setDuration(hearingDurationsService.getHearingDurationBenefitIssueCodes(sscsCaseData));
-            }
         }
     }
 }

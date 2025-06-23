@@ -25,11 +25,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -57,8 +55,6 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final HearingDurationsService hearingDurationsService;
     private final VenueService venueService;
-    @Value("${feature.hearing-duration.enabled}")
-    private boolean isHearingDurationEnabled;
 
 
     private static final int DURATION_SESSIONS_MULTIPLIER = 165;
@@ -192,18 +188,6 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
         Adjournment adjournment = sscsCaseData.getAdjournment();
         YesNo interpreterRequired = adjournment.getInterpreterRequired();
-        if (isHearingDurationEnabled) {
-            YesNo caseDataInterpreter = isNull(hearingOptions.getLanguageInterpreter()) ? NO
-                    : hearingOptions.getLanguageInterpreter().equalsIgnoreCase("yes") ? YES : NO;
-            OverrideFields overrideFields = Optional.ofNullable(sscsCaseData.getSchedulingAndListingFields().getOverrideFields()).orElse(OverrideFields.builder().build());
-            if (isNull(overrideFields.getDuration())
-                    && nonNull(interpreterRequired)
-                    && caseDataInterpreter != interpreterRequired
-                    && nonNull(sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues())) {
-                sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues()
-                        .setDuration(hearingDurationsService.getHearingDurationBenefitIssueCodes(sscsCaseData));
-            }
-        }
         if (nonNull(interpreterRequired) && isYes(interpreterRequired)) {
             DynamicList interpreterLanguage = adjournment.getInterpreterLanguage();
             hearingOptions.setLanguages(nonNull(interpreterLanguage.getValue()) ? interpreterLanguage.getValue().getLabel() : NO.getValue());
@@ -244,7 +228,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         return Arrays.stream(HearingChannel.values())
             .filter(hearingChannel -> caseData.getAdjournment().getTypeOfNextHearing().getHearingChannel().getValueTribunals().equalsIgnoreCase(
                 hearingChannel.getValueTribunals()))
-            .findFirst().orElse(PAPER);
+            .findFirst().orElse(HearingChannel.PAPER);
     }
 
     private void updatePanelMembers(SscsCaseData caseData) {
@@ -329,7 +313,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
                 if (hearingChannel.getValueTribunals().equalsIgnoreCase(PAPER.getValueTribunals())) {
                     appeal.setHearingType(PAPER.getValueTribunals());
                 } else {
-                    appeal.setHearingType(HearingType.ORAL.getValue());
+                    appeal.setHearingType(uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.ORAL.getValue());
                 }
             }
         }
@@ -344,7 +328,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             if (nonNull(defaultListingValues)) {
                 Integer existingDuration = caseData.getSchedulingAndListingFields().getDefaultListingValues().getDuration();
                 if (nonNull(existingDuration)) {
-                    if (!isHearingDurationEnabled  && isYes(caseData.getAppeal().getHearingOptions().getWantsToAttend())
+                    if (isYes(caseData.getAppeal().getHearingOptions().getWantsToAttend())
                             && isInterpreterRequired(caseData)) {
                         return existingDuration + MIN_HEARING_DURATION;
                     } else {
