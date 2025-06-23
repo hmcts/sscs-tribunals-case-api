@@ -90,8 +90,10 @@ public class FormTypeValidatorTest {
 
         CaseResponse response = validator.validate("caseId", exceptionRecord);
         assertEquals(2, response.getErrors().size());
-        assertEquals("#: extraneous key [invalid_key] is not permitted", response.getErrors().get(0));
-        assertEquals("#: extraneous key [invalid_key2] is not permitted", response.getErrors().get(1));
+        assertEquals("$: property 'invalid_key' is not defined in the schema and the schema does not allow additional properties",
+            response.getErrors().get(0));
+        assertEquals("$: property 'invalid_key2' is not defined in the schema and the schema does not allow additional properties",
+            response.getErrors().get(1));
     }
 
 

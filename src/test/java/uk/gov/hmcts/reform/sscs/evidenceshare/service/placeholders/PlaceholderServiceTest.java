@@ -43,11 +43,13 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderHelper.buildCaseDataWithoutBenefitType;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
-import org.joda.time.DateTimeUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -70,6 +72,7 @@ public class PlaceholderServiceTest {
 
     private SscsCaseData caseData;
 
+    private Clock fixedClock;
     private String now;
     private String welshDate;
 
@@ -83,12 +86,12 @@ public class PlaceholderServiceTest {
 
     @BeforeEach
     public void setup() {
-        DateTimeUtils.setCurrentMillisFixed(1550000000000L);
-
-        now = (DateTimeFormatter.ISO_LOCAL_DATE).format(LocalDateTime.now());
+        fixedClock = Clock.fixed(Instant.ofEpochMilli(1550000000000L), ZoneId.systemDefault());
+        LocalDateTime fixedNow = LocalDateTime.now(fixedClock);
+        now = (DateTimeFormatter.ISO_LOCAL_DATE).format(fixedNow);
         welshDate = "2001-12-02";
         caseData = buildCaseData();
-        service = new PlaceholderService(pdfDocumentConfig, exelaAddressConfig, false);
+        service = new PlaceholderService(pdfDocumentConfig, exelaAddressConfig, false, fixedClock);
         placeholders = new HashMap<>();
 
         given(pdfDocumentConfig.getHmctsImgKey()).willReturn("hmctsKey");
@@ -335,7 +338,7 @@ public class PlaceholderServiceTest {
 
     @Test
     public void givenAScottishCase_thenPopulateThePlaceholders() {
-        service = new PlaceholderService(pdfDocumentConfig, exelaAddressConfig, true);
+        service = new PlaceholderService(pdfDocumentConfig, exelaAddressConfig, true, fixedClock);
         given(exelaAddressConfig.getScottishAddressLine2()).willReturn("Scottish line 2");
         given(exelaAddressConfig.getScottishPostcode()).willReturn("Scottish postcode");
         given(exelaAddressConfig.getAddressLine1()).willReturn("Line 1");

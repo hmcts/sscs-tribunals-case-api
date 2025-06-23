@@ -43,6 +43,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBC_
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.LetterType.PLACEHOLDER_SERVICE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getAddressPlaceholders;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
@@ -70,14 +71,17 @@ public class PlaceholderService {
     private final PdfDocumentConfig pdfDocumentConfig;
     private final ExelaAddressConfig exelaAddressConfig;
     private final boolean scottishPoBoxEnabled;
+    private final Clock clock;
 
     @Autowired
     public PlaceholderService(PdfDocumentConfig pdfDocumentConfig,
                               ExelaAddressConfig exelaAddressConfig,
-                              @Value("${feature.scottish-po-box.enabled}") boolean scottishPoBoxEnabled) {
+                              @Value("${feature.scottish-po-box.enabled}") boolean scottishPoBoxEnabled,
+                              Clock clock) {
         this.pdfDocumentConfig = pdfDocumentConfig;
         this.exelaAddressConfig = exelaAddressConfig;
         this.scottishPoBoxEnabled = scottishPoBoxEnabled;
+        this.clock = clock;
     }
 
     public void build(SscsCaseData caseData, Map<String, Object> placeholders, Address address, String caseCreatedDate) {
@@ -117,7 +121,7 @@ public class PlaceholderService {
         placeholders.put(NINO_LITERAL, ninoLiteral);
         placeholders.put(LABEL, caseData.isIbcCase() ? IBCA_REFERENCE_LABEL : NINO_LABEL);
         placeholders.put(SSCS_URL_LITERAL, caseData.isIbcCase() ? IBCA_URL : SSCS_URL);
-        placeholders.put(GENERATED_DATE_LITERAL, LocalDateTime.now().toLocalDate().toString());
+        placeholders.put(GENERATED_DATE_LITERAL, LocalDateTime.now(clock).toLocalDate().toString());
         placeholders.put(pdfDocumentConfig.getHmctsImgKey(), pdfDocumentConfig.getHmctsImgVal());
         if (caseData.isLanguagePreferenceWelsh()) {
             if (caseCreatedDate != null) {
@@ -125,7 +129,7 @@ public class PlaceholderService {
                         LocalDateToWelshStringConverter.convert(caseCreatedDate));
             }
             placeholders.put(WELSH_GENERATED_DATE_LITERAL,
-                    LocalDateToWelshStringConverter.convert(LocalDateTime.now().toLocalDate()));
+                    LocalDateToWelshStringConverter.convert(LocalDateTime.now(clock).toLocalDate()));
             placeholders.put(pdfDocumentConfig.getHmctsWelshImgKey(), pdfDocumentConfig.getHmctsWelshImgVal());
         }
         placeholders.put(SC_NUMBER_LITERAL, defaultToEmptyStringIfNull(caseData.getCaseReference()));

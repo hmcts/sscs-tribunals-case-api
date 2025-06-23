@@ -25,11 +25,13 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_POSTCODE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.SSCS_URL_LITERAL;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
-import org.joda.time.DateTimeUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -68,6 +70,7 @@ public class PlaceholderServiceIt {
     private static final String PHONE = "0123456789";
 
     private SscsCaseData caseData;
+    private Clock fixedClock;
     private String now;
 
     @Autowired
@@ -79,8 +82,9 @@ public class PlaceholderServiceIt {
 
     @Before
     public void setup() {
-        DateTimeUtils.setCurrentMillisFixed(1550000000000L);
-        now = (DateTimeFormatter.ISO_LOCAL_DATE).format(LocalDateTime.now());
+        fixedClock = Clock.fixed(Instant.ofEpochMilli(1550000000000L), ZoneId.systemDefault());
+        LocalDateTime fixedNow = LocalDateTime.now(fixedClock);
+        now = DateTimeFormatter.ISO_LOCAL_DATE.format(fixedNow);
     }
 
     @Test
