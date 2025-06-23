@@ -48,7 +48,6 @@ class HearingsDurationMappingTest extends HearingsMappingBase {
     void testIbcCaseHearingDurationNotSet() throws ListingException {
         caseData.setBenefitCode("093");
         given(refData.getHearingDurations()).willReturn(hearingDurations);
-        given(hearingDurations.getHearingDurationBenefitIssueCodes(eq(caseData))).willReturn(null);
         ListingException exception = assertThrows(ListingException.class, () ->
                 HearingsDurationMapping.getHearingDuration(caseData, refData)
         );
