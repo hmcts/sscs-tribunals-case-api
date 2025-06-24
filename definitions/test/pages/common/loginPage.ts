@@ -26,7 +26,7 @@ export class LoginPage {
   }
 
   async goToCase(caseId: string): Promise<void> {
-    await this.page.goto(`/cases/case-details/${caseId}`);
+    await this.page.goto(`/cases/case-details/${caseId}#Summary`);
   }
 
   async verifySuccessfulLoginForUser(
