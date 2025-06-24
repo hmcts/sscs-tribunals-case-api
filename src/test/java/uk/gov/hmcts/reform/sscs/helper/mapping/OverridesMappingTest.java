@@ -104,7 +104,7 @@ class OverridesMappingTest {
         try {
             when(refData.getVenueService()).thenReturn(venueService);
             caseData.setBenefitCode("093");
-            OverridesMapping.setOverrideValues(caseData,refData);
+            OverridesMapping.setOverrideValues(caseData,refData, true);
             assertNull(caseData.getSchedulingAndListingFields().getOverrideFields().getDuration());
         } catch (ListingException e) {
             throw new RuntimeException(e);
@@ -208,7 +208,7 @@ class OverridesMappingTest {
         given(refData.getVenueService()).willReturn(venueService);
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
 
-        OverridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData);
+        OverridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData, true);
         OverrideFields result = caseData.getSchedulingAndListingFields().getDefaultListingValues();
 
         assertThat(result).isNotNull();
@@ -238,7 +238,7 @@ class OverridesMappingTest {
         given(refData.getVenueService()).willReturn(venueService);
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
 
-        OverridesMapping.setOverrideValues(wrapper.getCaseData(), refData);
+        OverridesMapping.setOverrideValues(wrapper.getCaseData(), refData, true);
         OverrideFields result = caseData.getSchedulingAndListingFields().getOverrideFields();
 
         assertThat(result).isNotNull();
@@ -276,7 +276,7 @@ class OverridesMappingTest {
             .duration(10)
             .build();
 
-        OverridesMapping.setOverrideValues(wrapper.getCaseData(), refData);
+        OverridesMapping.setOverrideValues(wrapper.getCaseData(), refData, true);
         OverrideFields overrideFields = caseData.getSchedulingAndListingFields().getOverrideFields();
 
         assertThat(defaultListingValues).isNotNull();

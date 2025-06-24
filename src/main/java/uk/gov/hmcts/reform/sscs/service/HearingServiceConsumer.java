@@ -5,6 +5,7 @@ import static java.util.Objects.isNull;
 import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
@@ -23,6 +24,10 @@ import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 @SuppressWarnings({"PMD.ExcessiveImports", "PMD.UnusedFormalParameter", "PMD.TooManyMethods", "AvoidThrowingRawExceptionTypes"})
 public class HearingServiceConsumer {
     private final ReferenceDataServiceHolder refData;
+    @Value("${feature.hearing-duration.enabled}")
+    private boolean isHearingDurationEnabled;
+
+
 
 
     public Consumer<SscsCaseData> getCreateHearingCaseDataConsumer(HmcUpdateResponse response, Long hearingRequestId) {
@@ -38,10 +43,10 @@ public class HearingServiceConsumer {
             try {
                 if (isUpdateHearing) {
                     if (isNull(sscsCaseDetails.getData().getSchedulingAndListingFields().getOverrideFields())) {
-                        OverridesMapping.setOverrideValues(sscsCaseDetails.getData(), refData);
+                        OverridesMapping.setOverrideValues(sscsCaseDetails.getData(), refData, isHearingDurationEnabled);
                     }
                 } else {
-                    OverridesMapping.setDefaultListingValues(sscsCaseDetails.getData(), refData);
+                    OverridesMapping.setDefaultListingValues(sscsCaseDetails.getData(), refData, isHearingDurationEnabled);
                 }
                 sscsCaseDetails.getData().setPanelMemberComposition(panelComposition);
                 updateCaseDataWithHearingResponse(response, hearingRequestId, sscsCaseDetails.getData());
