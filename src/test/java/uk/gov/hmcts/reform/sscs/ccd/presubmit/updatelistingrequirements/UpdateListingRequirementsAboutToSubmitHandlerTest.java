@@ -3,13 +3,21 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 import static java.time.LocalDateTime.now;
 import static java.util.Optional.empty;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_LISTING_REQUIREMENTS;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.FACE_TO_FACE;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.VIDEO;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +25,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -33,10 +42,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReserveTo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
+import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 
 @ExtendWith(MockitoExtension.class)
 class UpdateListingRequirementsAboutToSubmitHandlerTest {
@@ -45,6 +56,10 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @InjectMocks
     private UpdateListingRequirementsAboutToSubmitHandler handler;
+
+    @Mock
+    private HearingDurationsService hearingDurationsService;
+
 
     private SscsCaseData sscsCaseData;
     private Callback<SscsCaseData> callback;
@@ -56,7 +71,8 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         sscsCaseData = SscsCaseData.builder()
             .appeal(Appeal.builder().build())
             .dwpIsOfficerAttending("Yes")
-            .build();
+                .schedulingAndListingFields(SchedulingAndListingFields.builder().build())
+                .build();
 
         caseDetails =
                 new CaseDetails<>(1234L, "SSCS", State.READY_TO_LIST, sscsCaseData, now(), "Benefit");
@@ -220,6 +236,99 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         assertThat(response.getErrors()).isEmpty();
         assertThat("Yes").isEqualTo(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter());
         assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isNotNull();
+    }
+
+    @Test
+    void givenAppellantInterpreterHasChanged_thenUpdateCaseDataOverrideDuration() {
+        ReflectionTestUtils.setField(handler, "isHearingDurationEnabled", true);
+        sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder()
+                .duration(60)
+                .build());
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder()
+                .languageInterpreter("No")
+                .build());
+        DynamicListItem interpreterLanguageItem = new DynamicListItem("arabic", "Arabic");
+        DynamicList interpreterLanguage = new DynamicList(interpreterLanguageItem, List.of());
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
+                .appellantInterpreter(HearingInterpreter.builder().isInterpreterWanted(YES).interpreterLanguage(interpreterLanguage).build())
+                .build());
+
+        when(hearingDurationsService.getHearingDurationBenefitIssueCodes(eq(sscsCaseData))).thenReturn(90);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+                ABOUT_TO_SUBMIT,
+                callback,
+                USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat("Yes").isEqualTo(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter());
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getDuration()).isEqualTo(90);
+    }
+
+    @Test
+    void givenAppellantInterpreterHasNotChanged_thenDoNotUpdateCaseDataOverrideDuration() {
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder()
+                .languageInterpreter("No")
+                .build());
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
+                .appellantInterpreter(HearingInterpreter.builder().isInterpreterWanted(NO).build())
+                .build());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+                ABOUT_TO_SUBMIT,
+                callback,
+                USER_AUTHORISATION);
+        verifyNoInteractions(hearingDurationsService);
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getDuration()).isNull();
+    }
+
+
+    @Test
+    void updateHearingDuration_shouldUpdateDurationWhenChannelHasChanged() {
+        ReflectionTestUtils.setField(handler, "isHearingDurationEnabled", true);
+        sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder()
+                .duration(60)
+                .build());
+        SscsCaseData caseDataBefore = SscsCaseData.builder().schedulingAndListingFields(SchedulingAndListingFields.builder()
+                .overrideFields(OverrideFields.builder().appellantHearingChannel(FACE_TO_FACE).build()).build()).build();
+        CaseDetails caseDetailsBefore = new CaseDetails<SscsCaseData>(33333333L, "", State.READY_TO_LIST, caseDataBefore, LocalDateTime.now(), "Benefit");
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().appellantHearingChannel(PAPER).build());
+
+        when(hearingDurationsService.getHearingDurationBenefitIssueCodes(eq(sscsCaseData))).thenReturn(30);
+        CaseDetails caseDetails = new CaseDetails<>(3333333L, "", State.READY_TO_LIST, sscsCaseData, LocalDateTime.now(), "Benefit");
+        callback = new Callback<>(caseDetails, Optional.of(caseDetailsBefore), UPDATE_LISTING_REQUIREMENTS, false);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+                ABOUT_TO_SUBMIT,
+                callback,
+                USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getDuration()).isEqualTo(30);
+    }
+
+    @Test
+    void updateHearingDuration_shouldNotUpdateDurationWhenChannelHasNotChanged() {
+        ReflectionTestUtils.setField(handler, "isHearingDurationEnabled", true);
+        sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder()
+                .duration(60)
+                .build());
+        SscsCaseData caseDataBefore = SscsCaseData.builder().schedulingAndListingFields(SchedulingAndListingFields.builder()
+                .overrideFields(OverrideFields.builder().appellantHearingChannel(FACE_TO_FACE).build()).build()).build();
+        CaseDetails caseDetailsBefore = new CaseDetails<SscsCaseData>(33333333L, "", State.READY_TO_LIST, caseDataBefore, LocalDateTime.now(), "Benefit");
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().appellantHearingChannel(FACE_TO_FACE).build());
+
+        CaseDetails caseDetails = new CaseDetails<>(3333333L, "", State.READY_TO_LIST, sscsCaseData, LocalDateTime.now(), "Benefit");
+        callback = new Callback<>(caseDetails, Optional.of(caseDetailsBefore), UPDATE_LISTING_REQUIREMENTS, false);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+                ABOUT_TO_SUBMIT,
+                callback,
+                USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getDuration()).isNull();
+        verifyNoInteractions(hearingDurationsService);
     }
 
     @ParameterizedTest
