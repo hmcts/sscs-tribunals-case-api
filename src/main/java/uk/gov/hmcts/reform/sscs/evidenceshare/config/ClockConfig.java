@@ -8,6 +8,6 @@ import org.springframework.context.annotation.Configuration;
 public class ClockConfig {
     @Bean
     public Clock clock() {
-        return Clock.systemDefaultZone(); // or Clock.systemUTC()
+        return Clock.systemDefaultZone();
     }
 }
