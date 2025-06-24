@@ -15,9 +15,6 @@ import static uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.USER_AUTH_T
 import static uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.USER_ID;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import java.time.Clock;
-import java.time.Instant;
-import java.time.ZoneId;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.After;
 import org.junit.Before;
@@ -69,8 +66,6 @@ public abstract class BaseTest {
 
     protected IdamTokens idamTokens;
 
-    private Clock fixedClock;
-
     static {
         wiremockPort = TestSocketUtils.findAvailableTcpPort();
         System.setProperty("core_case_data.api.url", "http://localhost:" + wiremockPort);
@@ -80,7 +75,6 @@ public abstract class BaseTest {
     public void setUp() {
         ccdServer = new WireMockRule(wiremockPort);
         ccdServer.start();
-        fixedClock = Clock.fixed(Instant.ofEpochMilli(1542820369000L), ZoneId.systemDefault());
         idamTokens = IdamTokens.builder().idamOauth2Token(USER_AUTH_TOKEN).serviceAuthorization(SERVICE_AUTH_TOKEN).userId(USER_ID).build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
     }

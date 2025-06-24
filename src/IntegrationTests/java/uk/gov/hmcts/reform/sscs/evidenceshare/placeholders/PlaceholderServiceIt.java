@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.placeholders;
 
-import static java.time.Instant.now;
 import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.APPELLANT_FULL_NAME_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.BENEFIT_TYPE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.CASE_CREATED_DATE_LITERAL;
@@ -27,11 +25,8 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_POSTCODE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.SSCS_URL_LITERAL;
 
-import java.time.Clock;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
@@ -73,7 +68,6 @@ public class PlaceholderServiceIt {
     private static final String PHONE = "0123456789";
 
     private SscsCaseData caseData;
-    private Clock fixedClock;
     private String now;
 
     @Autowired
@@ -82,18 +76,10 @@ public class PlaceholderServiceIt {
     @MockitoBean
     protected AirLookupService airLookupService;
 
-    @MockitoBean
-    private Clock clock;
-
 
     @Before
     public void setup() {
-        Instant fixedInstant = Instant.ofEpochMilli(1550000000000L);
-        fixedClock = Clock.fixed(fixedInstant, ZoneId.systemDefault());
-        LocalDateTime fixedNow = LocalDateTime.now(fixedClock);
-        now = DateTimeFormatter.ISO_LOCAL_DATE.format(fixedNow);
-        when(clock.instant()).thenReturn(fixedInstant);
-        when(clock.getZone()).thenReturn(ZoneId.systemDefault());
+        now = DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.now());
     }
 
     @Test
