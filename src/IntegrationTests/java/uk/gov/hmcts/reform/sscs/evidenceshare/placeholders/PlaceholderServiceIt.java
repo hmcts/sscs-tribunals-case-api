@@ -26,7 +26,6 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.SSCS_URL_LITERAL;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
