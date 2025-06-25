@@ -5,6 +5,7 @@ import static uk.gov.hmcts.reform.sscs.bulkscan.helper.OcrDataBuilder.build;
 import static uk.gov.hmcts.reform.sscs.bulkscan.helper.SscsDataHelper.getValidationStatus;
 import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.getField;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.networknt.schema.JsonSchema;
@@ -28,7 +29,9 @@ import uk.gov.hmcts.reform.sscs.domain.CaseResponse;
 public class FormTypeValidator {
 
     private final SscsJsonExtractor sscsJsonExtractor;
-    private final ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
+    private final ObjectMapper mapper = new ObjectMapper()
+        .findAndRegisterModules()
+        .setSerializationInclusion(JsonInclude.Include.NON_NULL);
     private final JsonSchema sscs1Schema = tryLoadSscsSchema("/config/schema/sscs-bulk-scan-schema.json");
     private final JsonSchema sscs2Schema = tryLoadSscsSchema("/config/schema/sscs2-bulk-scan-schema.json");
     private final JsonSchema sscs5Schema = tryLoadSscsSchema("/config/schema/sscs5-bulk-scan-schema.json");
