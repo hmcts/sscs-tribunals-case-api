@@ -28,7 +28,7 @@ import uk.gov.hmcts.reform.sscs.domain.CaseResponse;
 public class FormTypeValidator {
 
     private final SscsJsonExtractor sscsJsonExtractor;
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
     private final JsonSchema sscs1Schema = tryLoadSscsSchema("/config/schema/sscs-bulk-scan-schema.json");
     private final JsonSchema sscs2Schema = tryLoadSscsSchema("/config/schema/sscs2-bulk-scan-schema.json");
     private final JsonSchema sscs5Schema = tryLoadSscsSchema("/config/schema/sscs5-bulk-scan-schema.json");
