@@ -300,14 +300,14 @@ tasks.register('runGitPreCommitTasks') {
 dependencyManagement {
     dependencies {
         imports {
-            mavenBom "org.springframework.cloud:spring-cloud-dependencies:2025.0.0"
+            mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.0.0'
         }
     }
 }
 
 def versions = [
         springboot     : springBoot.class.package.implementationVersion,
-        springsecurity : '6.4.5',
+        springsecurity : '6.5.1',
         jackson        : '2.19.0',
         lombok         : '1.18.38',
         commonsio      : '2.19.0',
@@ -335,7 +335,7 @@ dependencies {
     implementation group: 'org.springframework', name: 'spring-context-support'
     implementation group: 'org.springframework', name: 'spring-tx'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
-    implementation group: 'org.springframework.retry', name: 'spring-retry', version: '2.0.11'
+    implementation group: 'org.springframework.retry', name: 'spring-retry', version: '2.0.12'
 
     implementation group: 'io.github.openfeign', name: 'feign-hc5', version: versions.openfeign
     implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: versions.openfeign
