@@ -188,34 +188,13 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
         assertThat(result).isEqualTo(45);
     }
 
-    @DisplayName("When typeOfHearing is not equal to nextTypeOfHearing "
-        + "getHearingDurationAdjournment returns duration based on benefit code")
+    @DisplayName("When a adjournment hearing has an override, use that value")
     @Test
-    void getHearingDurationAdjournment_nextTypeOfHearing() throws ListingException {
-        given(refData.getHearingDurations()).willReturn(hearingDurations);
-
-        setAdjournmentDurationAndUnits(null, SESSIONS);
-
+    void getHearingDurationAdjournmentWithOverride_ReturnOverride() throws ListingException {
         Adjournment adjournment = caseData.getAdjournment();
-
         adjournment.setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.STANDARD);
-        adjournment.setTypeOfHearing(AdjournCaseTypeOfHearing.PAPER);
-        adjournment.setTypeOfNextHearing(AdjournCaseTypeOfHearing.FACE_TO_FACE);
-
         caseData.getSchedulingAndListingFields().getDefaultListingValues().setDuration(30);
-        caseData.getSchedulingAndListingFields().getOverrideFields().setDuration(30);
-
-        HearingDuration duration = new HearingDuration();
-        duration.setBenefitCode(BenefitCode.PIP_NEW_CLAIM);
-        duration.setIssue(Issue.DD);
-        duration.setDurationInterpreter(45);
-        duration.setDurationPaper(30);
-        duration.setDurationFaceToFace(60);
-        List<HearingDuration> durationsList = new ArrayList<>();
-        durationsList.add(duration);
-        refData.getHearingDurations().setHearingDurations(durationsList);
-
-        given(hearingDurations.getHearingDurationBenefitIssueCodes(caseData)).willReturn(60);
+        caseData.getSchedulingAndListingFields().getOverrideFields().setDuration(60);
 
         Integer result = HearingsDurationMapping.getHearingDurationAdjournment(caseData, refData.getHearingDurations(), true);
 
