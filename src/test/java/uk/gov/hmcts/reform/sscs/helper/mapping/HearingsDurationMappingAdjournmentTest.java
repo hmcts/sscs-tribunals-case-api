@@ -3,8 +3,11 @@ package uk.gov.hmcts.reform.sscs.helper.mapping;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits.SESSIONS;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing.FACE_TO_FACE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing.PAPER;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -183,22 +186,61 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
         adjournment.setTypeOfHearing(AdjournCaseTypeOfHearing.PAPER);
         adjournment.setTypeOfNextHearing(AdjournCaseTypeOfHearing.PAPER);
 
-        Integer result = HearingsDurationMapping.getHearingDurationAdjournment(caseData, refData.getHearingDurations(), true);
+        Integer result = HearingsDurationMapping.getHearingDurationAdjournment(caseData, refData.getHearingDurations(), false);
 
         assertThat(result).isEqualTo(45);
     }
 
-    @DisplayName("When a adjournment hearing has an override, use that value")
+    @DisplayName("When a adjournment hearing has an interpreter, use interpreter value from hearingDuration")
     @Test
-    void getHearingDurationAdjournmentWithOverride_ReturnOverride() throws ListingException {
+    void getHearingDurationAdjournmentWithInterpreter_ReturnInterpreterValue() throws ListingException {
         Adjournment adjournment = caseData.getAdjournment();
         adjournment.setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.STANDARD);
-        caseData.getSchedulingAndListingFields().getDefaultListingValues().setDuration(30);
-        caseData.getSchedulingAndListingFields().getOverrideFields().setDuration(60);
+        adjournment.setInterpreterRequired(YesNo.YES);
+        adjournment.setTypeOfNextHearing(FACE_TO_FACE);
+        HearingDuration hearingDuration = new HearingDuration();
+        hearingDuration.setDurationInterpreter(90);
+        hearingDuration.setDurationFaceToFace(60);
+        given(refData.getHearingDurations()).willReturn(hearingDurations);
+        given(hearingDurations.getHearingDuration(eq(caseData.getBenefitCode()), eq(caseData.getIssueCode()))).willReturn(hearingDuration);
+
+        Integer result = HearingsDurationMapping.getHearingDurationAdjournment(caseData, refData.getHearingDurations(), true);
+
+        assertThat(result).isEqualTo(90);
+    }
+
+    @DisplayName("When a adjournment hearing does not have interpreter, use face to face value from hearingDuration")
+    @Test
+    void getHearingDurationAdjournmentWithoutInterpreter_ReturnFaceToFaceValue() throws ListingException {
+        Adjournment adjournment = caseData.getAdjournment();
+        adjournment.setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.STANDARD);
+        adjournment.setInterpreterRequired(YesNo.NO);
+        adjournment.setTypeOfNextHearing(FACE_TO_FACE);
+        HearingDuration hearingDuration = new HearingDuration();
+        hearingDuration.setDurationInterpreter(90);
+        hearingDuration.setDurationFaceToFace(60);
+        given(refData.getHearingDurations()).willReturn(hearingDurations);
+        given(hearingDurations.getHearingDuration(eq(caseData.getBenefitCode()), eq(caseData.getIssueCode()))).willReturn(hearingDuration);
 
         Integer result = HearingsDurationMapping.getHearingDurationAdjournment(caseData, refData.getHearingDurations(), true);
 
         assertThat(result).isEqualTo(60);
+    }
+
+    @DisplayName("When a adjournment hearing has an override, use that value")
+    @Test
+    void getHearingDurationAdjournmentWithPaperHearing_ReturnPaperValue() throws ListingException {
+        Adjournment adjournment = caseData.getAdjournment();
+        adjournment.setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.STANDARD);
+        adjournment.setTypeOfNextHearing(PAPER);
+        HearingDuration hearingDuration = new HearingDuration();
+        hearingDuration.setDurationPaper(30);
+        given(refData.getHearingDurations()).willReturn(hearingDurations);
+        given(hearingDurations.getHearingDuration(eq(caseData.getBenefitCode()), eq(caseData.getIssueCode()))).willReturn(hearingDuration);
+
+        Integer result = HearingsDurationMapping.getHearingDurationAdjournment(caseData, refData.getHearingDurations(), true);
+
+        assertThat(result).isEqualTo(30);
     }
 
 }

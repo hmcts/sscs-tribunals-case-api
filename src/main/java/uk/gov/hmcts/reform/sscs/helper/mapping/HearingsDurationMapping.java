@@ -11,10 +11,12 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
+import uk.gov.hmcts.reform.sscs.reference.data.model.HearingDuration;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
@@ -73,9 +75,12 @@ public final class HearingsDurationMapping {
     public static Integer getHearingDurationAdjournment(SscsCaseData caseData, HearingDurationsService hearingDurationsService, boolean isHearingDurationEnabled) throws ListingException {
         AdjournCaseNextHearingDurationType durationType = caseData.getAdjournment().getNextHearingListingDurationType();
         if (isHearingDurationEnabled && durationType == STANDARD) {
-            OverrideFields overrideFields = OverridesMapping.getOverrideFields(caseData);
-            if (nonNull(overrideFields.getDuration())) {
-                return overrideFields.getDuration();
+            HearingDuration hearingDuration = hearingDurationsService.getHearingDuration(caseData.getBenefitCode(), caseData.getIssueCode());
+            if (caseData.getAdjournment().getTypeOfNextHearing().equals(AdjournCaseTypeOfHearing.PAPER)) {
+                return hearingDuration.getDurationPaper();
+            }
+            if (nonNull(hearingDuration.getDurationFaceToFace())) {
+                return YesNo.isYes(caseData.getAdjournment().getInterpreterRequired()) ? hearingDuration.getDurationInterpreter() : hearingDuration.getDurationFaceToFace();
             }
         }
         Integer existingDuration = OverridesMapping.getDefaultListingValues(caseData).getDuration();
