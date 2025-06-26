@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
@@ -71,6 +72,12 @@ public final class HearingsDurationMapping {
 
     public static Integer getHearingDurationAdjournment(SscsCaseData caseData, HearingDurationsService hearingDurationsService, boolean isHearingDurationEnabled) throws ListingException {
         AdjournCaseNextHearingDurationType durationType = caseData.getAdjournment().getNextHearingListingDurationType();
+        if (isHearingDurationEnabled && durationType == STANDARD) {
+            OverrideFields overrideFields = OverridesMapping.getOverrideFields(caseData);
+            if (nonNull(overrideFields.getDuration())) {
+                return overrideFields.getDuration();
+            }
+        }
         Integer existingDuration = OverridesMapping.getDefaultListingValues(caseData).getDuration();
         if (nonNull(existingDuration) && durationType == STANDARD) {
             log.debug("existingDuration with STANDARD for caseId={}", caseData.getCcdCaseId());

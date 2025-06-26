@@ -326,12 +326,18 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         AdjournCaseNextHearingDurationType durationType = caseData.getAdjournment().getNextHearingListingDurationType();
 
         if (STANDARD.equals(durationType)) {
+            if (isHearingDurationEnabled) {
+                Integer duration = hearingDurationsService.getHearingDurationBenefitIssueCodes(caseData);
+                if (nonNull(duration)) {
+                    return duration;
+                }
+            }
             OverrideFields defaultListingValues = caseData.getSchedulingAndListingFields().getDefaultListingValues();
 
             if (nonNull(defaultListingValues)) {
                 Integer existingDuration = caseData.getSchedulingAndListingFields().getDefaultListingValues().getDuration();
                 if (nonNull(existingDuration)) {
-                    if (!isHearingDurationEnabled && isYes(caseData.getAppeal().getHearingOptions().getWantsToAttend())
+                    if (isYes(caseData.getAppeal().getHearingOptions().getWantsToAttend())
                             && isInterpreterRequired(caseData)) {
                         return existingDuration + MIN_HEARING_DURATION;
                     } else {
