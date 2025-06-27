@@ -6,7 +6,7 @@ plugins {
     id 'pmd'
     id 'org.sonarqube' version '6.2.0.5505'
     id 'jacoco'
-    id 'org.springframework.boot' version '3.4.5'
+    id 'org.springframework.boot' version '3.5.3'
     id 'uk.gov.hmcts.java' version '0.12.66'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'com.gorylenko.gradle-git-properties' version '2.5.0'
@@ -330,7 +330,7 @@ dependencyManagement {
 
 def versions = [
         springboot     : springBoot.class.package.implementationVersion,
-        springsecurity : '6.4.5',
+        springsecurity : '6.5.1',
         jackson        : '2.19.0',
         lombok         : '1.18.38',
         commonsio      : '2.19.0',
@@ -356,7 +356,7 @@ dependencies {
 
     implementation group: 'org.springframework', name: 'spring-jms'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
-    implementation group: 'org.springframework.retry', name: 'spring-retry', version: '2.0.11'
+    implementation group: 'org.springframework.retry', name: 'spring-retry', version: '2.0.12'
 
     implementation group: 'io.github.openfeign', name: 'feign-hc5', version: versions.openfeign
     implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: versions.openfeign
@@ -502,9 +502,9 @@ dependencies {
 
     implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'
 
-    implementation group: 'org.springframework', name: 'spring-context-support', version: '6.2.0'
+    implementation group: 'org.springframework', name: 'spring-context-support', version: '6.2.8'
 
-    implementation group: 'org.springframework', name: 'spring-tx', version: '6.2.0'
+    implementation group: 'org.springframework', name: 'spring-tx', version: '6.2.8'
 
     testImplementation group: 'com.github.tomakehurst', name: 'wiremock-standalone', version: '3.0.1'
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.11.0'
