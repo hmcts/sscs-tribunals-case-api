@@ -38,7 +38,7 @@ test.describe('Urgent hearing test', async () => {
 
   test(
     'Error scenario - Upload encrypted/corrupted file in Action further evidence event',
-    { tag: ['@preview-regression', '@nightly-pipeline-wip'] },
+    { tag: ['@preview-regression', '@nightly-pipeline'] },
     async ({ urgentHearingSteps }) => {
       test.slow();
       await urgentHearingSteps.uploadEncryptedFiles(caseId);
