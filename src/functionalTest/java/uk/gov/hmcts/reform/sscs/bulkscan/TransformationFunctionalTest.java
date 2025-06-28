@@ -97,7 +97,7 @@ public class TransformationFunctionalTest extends BaseFunctionalTest {
 
         assertThat(errorResponse.getList("errors"))
             .hasSize(1)
-            .containsOnly("#: extraneous key [first_name] is not permitted");
+            .containsOnly("$: property 'first_name' is not defined in the schema and the schema does not allow additional properties");
         assertThat(errorResponse.getList("warnings")).isEmpty();
         assertThat(errorResponse.getMap("")).containsOnlyKeys("errors", "warnings");
     }

@@ -16,7 +16,6 @@ import static uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.USER_ID;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.joda.time.DateTimeUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -76,7 +75,6 @@ public abstract class BaseTest {
     public void setUp() {
         ccdServer = new WireMockRule(wiremockPort);
         ccdServer.start();
-        DateTimeUtils.setCurrentMillisFixed(1542820369000L);
         idamTokens = IdamTokens.builder().idamOauth2Token(USER_AUTH_TOKEN).serviceAuthorization(SERVICE_AUTH_TOKEN).userId(USER_ID).build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
     }
