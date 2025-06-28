@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCasePanelMembersExcluded;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTime;
@@ -41,6 +42,8 @@ import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 public final class HearingsDetailsMapping {
 
     private final HearingsPanelMapping hearingsPanelMapping;
+    @Value("${feature.hearing-duration.enabled}")
+    private boolean isHearingDurationEnabled;
 
     HearingsDetailsMapping(HearingsPanelMapping hearingsPanelMapping) {
         this.hearingsPanelMapping = hearingsPanelMapping;
@@ -49,13 +52,12 @@ public final class HearingsDetailsMapping {
     public HearingDetails buildHearingDetails(HearingWrapper wrapper, ReferenceDataServiceHolder refData) throws ListingException {
         // get case data and set adjournmentInProgress flag for use in downstream method calls
         SscsCaseData caseData = wrapper.getCaseData();
-        boolean adjournmentInProgress = refData.isAdjournmentFlagEnabled()
-                && isYes(caseData.getAdjournment().getAdjournmentInProgress());
+        boolean adjournmentInProgress = isYes(caseData.getAdjournment().getAdjournmentInProgress());
         return HearingDetails.builder()
                 .autolistFlag(shouldBeAutoListed(caseData, refData))
                 .hearingType(getHearingType(caseData))
                 .hearingWindow(buildHearingWindow(caseData, refData))
-                .duration(getHearingDuration(caseData, refData))
+                .duration(getHearingDuration(caseData, refData, isHearingDurationEnabled))
                 .nonStandardHearingDurationReasons(getNonStandardHearingDurationReasons())
                 .hearingPriorityType(getHearingPriority(caseData))
                 .numberOfPhysicalAttendees(getNumberOfPhysicalAttendees(caseData, adjournmentInProgress))

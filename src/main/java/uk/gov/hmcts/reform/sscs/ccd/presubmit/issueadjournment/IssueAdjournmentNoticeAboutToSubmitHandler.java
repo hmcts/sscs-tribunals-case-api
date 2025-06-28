@@ -28,6 +28,7 @@ import java.util.Objects;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -62,6 +63,8 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
     private static final int MIN_HEARING_DURATION = 30;
     private static final int MIN_HEARING_SESSION_DURATION = 1;
     private static final int FIRST_AVAILABLE_DATE_DAYS = 14;
+    @Value("${feature.hearing-duration.enabled}")
+    private boolean isHearingDurationEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -323,6 +326,12 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         AdjournCaseNextHearingDurationType durationType = caseData.getAdjournment().getNextHearingListingDurationType();
 
         if (STANDARD.equals(durationType)) {
+            if (isHearingDurationEnabled) {
+                Integer duration = hearingDurationsService.getHearingDurationBenefitIssueCodes(caseData);
+                if (nonNull(duration)) {
+                    return duration;
+                }
+            }
             OverrideFields defaultListingValues = caseData.getSchedulingAndListingFields().getDefaultListingValues();
 
             if (nonNull(defaultListingValues)) {

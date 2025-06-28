@@ -11,9 +11,12 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
+import uk.gov.hmcts.reform.sscs.reference.data.model.HearingDuration;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
@@ -27,14 +30,14 @@ public final class HearingsDurationMapping {
     private HearingsDurationMapping() {
     }
 
-    public static Integer getHearingDuration(SscsCaseData caseData, ReferenceDataServiceHolder refData) throws ListingException {
+    public static Integer getHearingDuration(SscsCaseData caseData, ReferenceDataServiceHolder refData, boolean isHearingDurationEnabled) throws ListingException {
         Integer duration;
         HearingDurationsService hearingDurationsService = refData.getHearingDurations();
         String caseId = caseData.getCcdCaseId();
-        boolean adjournmentInProgress = refData.isAdjournmentFlagEnabled() && isYes(caseData.getAdjournment().getAdjournmentInProgress());
+        boolean adjournmentInProgress = isYes(caseData.getAdjournment().getAdjournmentInProgress());
         // adjournment values take precedence over override fields if adjournment in progress
         if (adjournmentInProgress) {
-            duration = getHearingDurationAdjournment(caseData, hearingDurationsService);
+            duration = getHearingDurationAdjournment(caseData, hearingDurationsService, isHearingDurationEnabled);
             if (nonNull(duration)) {
                 log.info("Hearing Duration for Case ID {} set as Adjournment value {}", caseId, duration);
                 return duration;
@@ -44,13 +47,13 @@ public final class HearingsDurationMapping {
         // if no adjournment in progress, we first try to set the override value if present
         if (nonNull(overrideDuration) && overrideDuration >= MIN_HEARING_DURATION) {
             log.info("Hearing Duration for Case ID {} set as existing Override Field value {}", caseId, overrideDuration);
-            return handleStandardDuration(caseData, overrideDuration);
+            return isHearingDurationEnabled ? overrideDuration : handleStandardDuration(caseData, overrideDuration);
         }
         Integer defaultListingDuration = OverridesMapping.getDefaultListingValues(caseData).getDuration();
         // or we set based on existing S&L default listing value for duration if present
         if (nonNull(defaultListingDuration) && defaultListingDuration >= MIN_HEARING_DURATION) {
             log.info("Hearing Duration for Case ID {} set as existing defaultListingDuration value {}", caseId, defaultListingDuration);
-            return handleStandardDuration(caseData, defaultListingDuration);
+            return isHearingDurationEnabled ? defaultListingDuration : handleStandardDuration(caseData, defaultListingDuration);
         }
         if (caseData.isIbcCase()) {
             throw new ListingException("Hearing duration is required to list case");
@@ -58,21 +61,33 @@ public final class HearingsDurationMapping {
         // otherwise we set duration based on existing duration values ref data json
         duration = hearingDurationsService.getHearingDurationBenefitIssueCodes(caseData);
         if (nonNull(duration)) {
-            log.debug("Hearing Duration for Case ID {} set as Benefit Code value {}", caseId, duration);
+            log.info("Hearing Duration for Case ID {} set as Benefit Code value {}", caseId, duration);
             return duration;
         }
-        // else return default value (60)
+        if (isHearingDurationEnabled) {
+            log.info("Hearing Duration cannot be mapped for case ID {}", caseId);
+            throw new ListingException("Hearing duration is required to list case");
+        }
         log.debug("Hearing Duration for Case ID {} set as default value {}", caseId, DURATION_DEFAULT);
         return DURATION_DEFAULT;
     }
 
-    public static Integer getHearingDurationAdjournment(SscsCaseData caseData, HearingDurationsService hearingDurationsService) throws ListingException {
+    public static Integer getHearingDurationAdjournment(SscsCaseData caseData, HearingDurationsService hearingDurationsService, boolean isHearingDurationEnabled) throws ListingException {
         AdjournCaseNextHearingDurationType durationType = caseData.getAdjournment().getNextHearingListingDurationType();
+        if (isHearingDurationEnabled && durationType == STANDARD) {
+            HearingDuration hearingDuration = hearingDurationsService.getHearingDuration(caseData.getBenefitCode(), caseData.getIssueCode());
+            if (caseData.getAdjournment().getTypeOfNextHearing().equals(AdjournCaseTypeOfHearing.PAPER)) {
+                return hearingDuration.getDurationPaper();
+            }
+            if (nonNull(hearingDuration.getDurationFaceToFace())) {
+                return YesNo.isYes(caseData.getAdjournment().getInterpreterRequired()) ? hearingDuration.getDurationInterpreter() : hearingDuration.getDurationFaceToFace();
+            }
+        }
         Integer existingDuration = OverridesMapping.getDefaultListingValues(caseData).getDuration();
         if (nonNull(existingDuration) && durationType == STANDARD) {
             log.debug("existingDuration with STANDARD for caseId={}", caseData.getCcdCaseId());
             existingDuration = handleAdjournmentHearingType(caseData, hearingDurationsService, existingDuration);
-            return handleStandardDuration(caseData, existingDuration);
+            return isHearingDurationEnabled ? existingDuration : handleStandardDuration(caseData, existingDuration);
         }
 
         Integer nextDuration = caseData.getAdjournment().getNextHearingListingDuration();

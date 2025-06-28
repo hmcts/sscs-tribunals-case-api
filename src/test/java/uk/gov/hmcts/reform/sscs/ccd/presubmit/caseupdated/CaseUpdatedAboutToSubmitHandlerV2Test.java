@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
@@ -15,6 +16,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -73,6 +75,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -86,12 +89,14 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
+import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
+import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
@@ -144,6 +149,15 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     private Appeal appeal;
 
+    @Mock
+    private ReferenceDataServiceHolder referenceDataServiceHolder;
+
+    @Mock
+    private HearingDurationsService hearingDurationsService;
+
+
+
+
     @BeforeEach
     void setUp() {
         associatedCaseLinkHelper = new AssociatedCaseLinkHelper(ccdService, idamService, updateCcdCaseService);
@@ -157,7 +171,8 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
                 refDataService,
                 venueService,
                 categoryMapService,
-                true);
+                true,
+                referenceDataServiceHolder);
 
         lenient().when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -1942,4 +1957,47 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         assertEquals(HearingRoute.LIST_ASSIST, response.getData().getSchedulingAndListingFields().getHearingRoute());
         assertEquals(HearingRoute.LIST_ASSIST, response.getData().getAppeal().getHearingOptions().getHearingRoute());
     }
+
+    @Test
+    void shouldUpdateDurationWhenInterpreterUpdated() {
+        ReflectionTestUtils.setField(handler, "isHearingDurationEnabled", true);
+        sscsCaseDataBefore.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("No").build());
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("Yes").build());
+        sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder().duration(30).build());
+        when(referenceDataServiceHolder.getHearingDurations()).thenReturn(hearingDurationsService);
+        when(hearingDurationsService.getHearingDurationBenefitIssueCodes(eq(sscsCaseData))).thenReturn(60);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getDuration(), is(60));
+    }
+
+    @Test
+    void shouldNotUpdateDefaultDurationWhenNoUpdateIsMade() {
+        ReflectionTestUtils.setField(handler, "isHearingDurationEnabled", true);
+        sscsCaseDataBefore.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("Yes").build());
+        sscsCaseDataBefore.setBenefitCode("002");
+        sscsCaseDataBefore.setIssueCode("DD");
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("Yes").build());
+        sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder().duration(60).build());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        verify(hearingDurationsService, times(0)).getHearingDurationBenefitIssueCodes(eq(sscsCaseData));
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getDuration(), nullValue());
+    }
+
+    @Test
+    void shouldUpdateDefaultDurationWhenBenefitIssueUpdated() {
+        ReflectionTestUtils.setField(handler, "isHearingDurationEnabled", true);
+        sscsCaseDataBefore.setBenefitCode("002");
+        sscsCaseData.setBenefitCode("016");
+        sscsCaseDataBefore.setIssueCode("DD");
+        sscsCaseData.setIssueCode("ON");
+        sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder().duration(60).build());
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().build());
+        sscsCaseDataBefore.getAppeal().setHearingOptions(HearingOptions.builder().build());
+        when(referenceDataServiceHolder.getHearingDurations()).thenReturn(hearingDurationsService);
+        when(hearingDurationsService.getHearingDurationBenefitIssueCodes(eq(sscsCaseData))).thenReturn(45);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getDuration(), is(45));
+    }
+
 }
