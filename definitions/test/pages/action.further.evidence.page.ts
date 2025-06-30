@@ -145,7 +145,7 @@ export class ActionFurtherEvidencePage {
   async verifyEncryptedFileErrorMsg(): Promise<void> {
     await webActions.verifyElementVisibility('#error-summary-title');
     await webActions.verifyElementVisibility('span.error-message')
-    await webActions.verifyTextVisibility('Error Uploading File');
+    await webActions.verifyTextVisibility('Your upload file is password protected.');
   }
 
   async verifyCorruptedFileErrorMsg(): Promise<void> {
