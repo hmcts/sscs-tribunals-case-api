@@ -44,10 +44,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Entity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -210,7 +212,31 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (sscsCaseData.isIbcCase()) {
             SscsUtil.setListAssistRoutes(sscsCaseData);
         }
+        updateOverrideFields(sscsCaseData, caseDetailsBefore);
         return preSubmitCallbackResponse;
+    }
+
+    private void updateOverrideFields(SscsCaseData sscsCaseData, Optional<CaseDetails<SscsCaseData>> caseDetailsBefore) {
+        if (isNull(sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues()) || caseDetailsBefore.isEmpty()) {
+            return;
+        }
+        OverrideFields overrideFields = Optional.ofNullable(sscsCaseData.getSchedulingAndListingFields().getOverrideFields())
+                .orElse(OverrideFields.builder().build());
+        String languageInterpreter = sscsCaseData.getAppeal().getHearingOptions().getLanguageInterpreter();
+        String languageInterpreterBefore = caseDetailsBefore.get().getCaseData().getAppeal().getHearingOptions().getLanguageInterpreter();
+
+        if (!Objects.equals(languageInterpreterBefore, languageInterpreter)) {
+            DynamicList languageList = sscsCaseData.getAppeal().getHearingOptions().getLanguagesList();
+            DynamicList overrideList = null;
+            if (nonNull(sscsCaseData.getAppeal().getHearingOptions().getLanguages())) {
+                overrideList = new DynamicList(languageList.getValue(), languageList.getListItems());
+            }
+            HearingInterpreter hearingInterpreter = HearingInterpreter.builder()
+                    .isInterpreterWanted(YesNo.valueOf(languageInterpreter.toUpperCase()))
+                    .interpreterLanguage(overrideList).build();
+            overrideFields.setAppellantInterpreter(hearingInterpreter);
+        }
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
     }
 
     private void updateLanguage(SscsCaseData sscsCaseData) {
