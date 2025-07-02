@@ -80,14 +80,13 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
                         panelCompositionService.createPanelComposition(sscsCaseData)
                 );
             }
-        }
-
-        if (isDefaultPanelCompEnabled && nonNull(sscsCaseData.getPanelMemberComposition())
-                && nonNull(sscsCaseData.getPanelMemberComposition().getPanelCompositionJudge())) {
-            if (isNull(schedulingAndListingFields.getReserveTo())) {
-                schedulingAndListingFields.setReserveTo(ReserveTo.builder().build());
+            if (nonNull(sscsCaseData.getPanelMemberComposition())
+                    && nonNull(sscsCaseData.getPanelMemberComposition().getPanelCompositionJudge())) {
+                if (isNull(schedulingAndListingFields.getReserveTo())) {
+                    schedulingAndListingFields.setReserveTo(ReserveTo.builder().build());
+                }
+                schedulingAndListingFields.getReserveTo().setReservedDistrictTribunalJudge(YesNo.NO);
             }
-            schedulingAndListingFields.getReserveTo().setReservedDistrictTribunalJudge(YesNo.NO);
         }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
