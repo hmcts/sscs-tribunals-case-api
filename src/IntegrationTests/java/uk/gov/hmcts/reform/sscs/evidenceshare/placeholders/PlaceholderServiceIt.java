@@ -25,11 +25,10 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_POSTCODE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.SSCS_URL_LITERAL;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
-import org.joda.time.DateTimeUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -79,8 +78,7 @@ public class PlaceholderServiceIt {
 
     @Before
     public void setup() {
-        DateTimeUtils.setCurrentMillisFixed(1550000000000L);
-        now = (DateTimeFormatter.ISO_LOCAL_DATE).format(LocalDateTime.now());
+        now = DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.now());
     }
 
     @Test
