@@ -347,15 +347,16 @@ public class OcrValidationTest  {
             .andExpect(jsonPath("$.status").value("ERRORS"))
             .andExpect(jsonPath("$.warnings", hasSize(0)))
             .andExpect(jsonPath("$.errors", hasSize(9)))
-            .andExpect(jsonPath("$.errors", containsInAnyOrder("#: extraneous key [person1_child_maintenance_number] is not permitted",
-                "#: extraneous key [other_party_last_name] is not permitted",
-                "#: extraneous key [other_party_first_name] is not permitted",
-                "#: extraneous key [other_party_title] is not permitted",
-                "#: extraneous key [is_paying_parent] is not permitted",
-                "#: extraneous key [other_party_address_line1] is not permitted",
-                "#: extraneous key [other_party_address_line2] is not permitted",
-                "#: extraneous key [other_party_postcode] is not permitted",
-                "#: extraneous key [is_other_party_address_known] is not permitted")));
+            .andExpect(jsonPath("$.errors", containsInAnyOrder(
+                "$: property 'person1_child_maintenance_number' is not defined in the schema and the schema does not allow additional properties",
+                "$: property 'other_party_last_name' is not defined in the schema and the schema does not allow additional properties",
+                "$: property 'other_party_first_name' is not defined in the schema and the schema does not allow additional properties",
+                "$: property 'other_party_title' is not defined in the schema and the schema does not allow additional properties",
+                "$: property 'is_paying_parent' is not defined in the schema and the schema does not allow additional properties",
+                "$: property 'other_party_address_line1' is not defined in the schema and the schema does not allow additional properties",
+                "$: property 'other_party_address_line2' is not defined in the schema and the schema does not allow additional properties",
+                "$: property 'other_party_postcode' is not defined in the schema and the schema does not allow additional properties",
+                "$: property 'is_other_party_address_known' is not defined in the schema and the schema does not allow additional properties")));
     }
 
     @Test
