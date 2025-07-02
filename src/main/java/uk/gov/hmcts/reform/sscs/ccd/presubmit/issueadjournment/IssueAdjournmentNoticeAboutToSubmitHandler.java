@@ -337,7 +337,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             if (nonNull(defaultListingValues)) {
                 Integer existingDuration = caseData.getSchedulingAndListingFields().getDefaultListingValues().getDuration();
                 if (nonNull(existingDuration)) {
-                    if (isYes(caseData.getAppeal().getHearingOptions().getWantsToAttend())
+                    if (!isHearingDurationEnabled && isYes(caseData.getAppeal().getHearingOptions().getWantsToAttend())
                             && isInterpreterRequired(caseData)) {
                         return existingDuration + MIN_HEARING_DURATION;
                     } else {
