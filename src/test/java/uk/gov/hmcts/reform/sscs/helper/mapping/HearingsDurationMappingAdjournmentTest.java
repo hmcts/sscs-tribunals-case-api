@@ -204,6 +204,8 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
         HearingDuration hearingDuration = new HearingDuration();
         hearingDuration.setDurationInterpreter(90);
         hearingDuration.setDurationFaceToFace(60);
+
+        caseData.getSchedulingAndListingFields().getOverrideFields().setDuration(null);
         given(refData.getHearingDurations()).willReturn(hearingDurations);
         given(hearingDurations.getHearingDuration(eq(caseData.getBenefitCode()), eq(caseData.getIssueCode()))).willReturn(hearingDuration);
 
@@ -223,6 +225,7 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
         HearingDuration hearingDuration = new HearingDuration();
         hearingDuration.setDurationInterpreter(90);
         hearingDuration.setDurationFaceToFace(60);
+        caseData.getSchedulingAndListingFields().getOverrideFields().setDuration(null);
         given(refData.getHearingDurations()).willReturn(hearingDurations);
         given(hearingDurations.getHearingDuration(eq(caseData.getBenefitCode()), eq(caseData.getIssueCode()))).willReturn(hearingDuration);
 
@@ -241,6 +244,7 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
         adjournment.setInterpreterRequired(NO);
         HearingDuration hearingDuration = new HearingDuration();
         hearingDuration.setDurationPaper(30);
+        caseData.getSchedulingAndListingFields().getOverrideFields().setDuration(null);
         given(refData.getHearingDurations()).willReturn(hearingDurations);
         given(hearingDurations.getHearingDuration(eq(caseData.getBenefitCode()), eq(caseData.getIssueCode()))).willReturn(hearingDuration);
 
@@ -260,6 +264,7 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
         adjournment.setInterpreterRequired(NO);
         HearingDuration hearingDuration = new HearingDuration();
         hearingDuration.setDurationPaper(null);
+        caseData.getSchedulingAndListingFields().getOverrideFields().setDuration(null);
         given(refData.getHearingDurations()).willReturn(hearingDurations);
         given(hearingDurations.getHearingDuration(eq(caseData.getBenefitCode()), eq(caseData.getIssueCode()))).willReturn(hearingDuration);
         assertThatThrownBy(() -> HearingsDurationMapping.getHearingDurationAdjournment(caseData, refData.getHearingDurations(), true))
@@ -275,6 +280,7 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
         adjournment.setTypeOfHearing(FACE_TO_FACE);
         adjournment.setInterpreterRequired(NO);
         caseData.getSchedulingAndListingFields().getDefaultListingValues().setDuration(30);
+        caseData.getSchedulingAndListingFields().getOverrideFields().setDuration(null);
         HearingDuration hearingDuration = new HearingDuration();
         hearingDuration.setDurationPaper(60);
         given(refData.getHearingDurations()).willReturn(hearingDurations);
@@ -283,7 +289,7 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
         assertThat(result).isEqualTo(60);
     }
 
-    @DisplayName("When a adjournment hearing has an override, use the override and not config value")
+    @DisplayName("When a adjournment hearing has an override, and the channel has not changed, use the override and not config value")
     @Test
     void getHearingDurationAdjournmentHasOverride_ReturnOverride() throws ListingException {
         Adjournment adjournment = caseData.getAdjournment();

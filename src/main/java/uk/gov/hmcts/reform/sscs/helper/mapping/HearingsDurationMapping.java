@@ -84,13 +84,14 @@ public final class HearingsDurationMapping {
                     : YesNo.isYes(caseData.getAdjournment().getInterpreterRequired())
                     ? hearingDuration.getDurationInterpreter()
                     : hearingDuration.getDurationFaceToFace();
-            if (hasInterpreterOrChannelChanged(caseData)
-                    && isNull(duration)) {
+            boolean hasInterpreterChannelChanged = hasInterpreterOrChannelChanged(caseData);
+            if (hasInterpreterChannelChanged && isNull(duration)) {
                 throw new ListingException("Hearing duration is required to list case");
-            }
-            Integer overrideDuration = OverridesMapping.getOverrideFields(caseData).getDuration();
-            if (nonNull(overrideDuration) && overrideDuration >= MIN_HEARING_DURATION) {
-                return overrideDuration;
+            } else if (!hasInterpreterChannelChanged) {
+                Integer overrideDuration = OverridesMapping.getOverrideFields(caseData).getDuration();
+                if (nonNull(overrideDuration) && overrideDuration >= MIN_HEARING_DURATION) {
+                    return overrideDuration;
+                }
             }
             return duration;
         }
