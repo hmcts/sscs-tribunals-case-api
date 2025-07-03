@@ -103,8 +103,13 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
                 .build())
             .schedulingAndListingFields(slFields)
             .build();
+        caseData.getAdjournment().setTypeOfHearing(FACE_TO_FACE);
+        caseData.getAdjournment().setTypeOfNextHearing(FACE_TO_FACE);
+        caseData.getAdjournment().setInterpreterRequired(NO);
 
         given(refData.getHearingDurations()).willReturn(hearingDurations);
+        given(hearingDurations.getHearingDuration(eq(caseData.getBenefitCode()), eq(caseData.getIssueCode())))
+                .willReturn(new HearingDuration());
 
         given(hearingDurations.getHearingDurationBenefitIssueCodes(caseData)).willReturn(null);
 

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
@@ -58,6 +59,8 @@ class HearingsDurationMappingTest extends HearingsMappingBase {
     @Test
     void testIbcCaseHearingDurationAdjournmentNotSet() throws ListingException {
         caseData.setBenefitCode("093");
+        given(refData.getHearingDurations()).willReturn(hearingDurations);
+        caseData.getAdjournment().setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.NON_STANDARD);
         ListingException exception = assertThrows(ListingException.class, () ->
                 HearingsDurationMapping.getHearingDurationAdjournment(caseData, refData.getHearingDurations(), true)
         );
