@@ -5,6 +5,6 @@
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_judge", "TabLabel": "Listing Requirements", "TabDisplayOrder": 25, "CaseFieldID": "panelMemberComposition", "TabFieldDisplayOrder": 4},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_clerk", "TabLabel": "Listing Requirements", "TabDisplayOrder": 25, "CaseFieldID": "panelMemberComposition", "TabFieldDisplayOrder": 4},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_registrar", "TabLabel": "Listing Requirements", "TabDisplayOrder": 25, "CaseFieldID": "panelMemberComposition", "TabFieldDisplayOrder": 4},
-  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_superuser", "TabLabel": "Listing Requirements", "TabDisplayOrder": 25, "CaseFieldID": "panelMemberComposition", "TabFieldDisplayOrder": 4}
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "listing_requirements_superuser", "TabLabel": "Listing Requirements", "TabDisplayOrder": 25, "CaseFieldID": "panelMemberComposition", "TabFieldDisplayOrder": 6}
 
 ]
