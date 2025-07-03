@@ -9,13 +9,14 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType.NON_STANDARD;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType.STANDARD;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.ADJOURNMENT_NOTICE_ISSUED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getDurationForAdjournment;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.hasInterpreterOrChannelChanged;
 import static uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil.isInterpreterRequired;
 
 import jakarta.validation.ConstraintViolation;
@@ -38,6 +39,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.helper.mapping.OverridesMapping;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
@@ -325,12 +327,20 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
     private Integer handleHearingDuration(SscsCaseData caseData) {
         AdjournCaseNextHearingDurationType durationType = caseData.getAdjournment().getNextHearingListingDurationType();
 
-        if (STANDARD.equals(durationType)) {
+        if (!NON_STANDARD.equals(durationType)) {
             if (isHearingDurationEnabled) {
-                Integer duration = hearingDurationsService.getHearingDurationBenefitIssueCodes(caseData);
-                if (nonNull(duration)) {
-                    return duration;
+                Integer duration = getDurationForAdjournment(caseData, hearingDurationsService);
+                boolean hasInterpreterChannelChanged = hasInterpreterOrChannelChanged(caseData);
+                if (hasInterpreterChannelChanged && isNull(duration)) {
+                    return null;
+                } else if (!hasInterpreterChannelChanged) {
+                    Integer overrideDuration = OverridesMapping.getOverrideFields(caseData).getDuration();
+                    if (nonNull(overrideDuration) && overrideDuration >= MIN_HEARING_DURATION) {
+                        return overrideDuration;
+                    }
                 }
+                return duration;
+
             }
             OverrideFields defaultListingValues = caseData.getSchedulingAndListingFields().getDefaultListingValues();
 

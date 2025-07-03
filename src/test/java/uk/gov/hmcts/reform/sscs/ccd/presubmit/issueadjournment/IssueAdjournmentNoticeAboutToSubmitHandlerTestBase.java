@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournment;
 
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
@@ -42,6 +43,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.reference.data.model.HearingDuration;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
@@ -158,6 +160,15 @@ abstract class IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
         sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(YES);
 
         return handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+    }
+
+    protected void setupHearingDurationValues() {
+        HearingDuration hearingDuration = new HearingDuration();
+        hearingDuration.setDurationPaper(30);
+        hearingDuration.setDurationInterpreter(90);
+        hearingDuration.setDurationFaceToFace(60);
+        when(hearingDurationsService.getHearingDuration(eq(sscsCaseData.getBenefitCode()), eq(sscsCaseData.getIssueCode()))).thenReturn(hearingDuration);
+
     }
 
 }

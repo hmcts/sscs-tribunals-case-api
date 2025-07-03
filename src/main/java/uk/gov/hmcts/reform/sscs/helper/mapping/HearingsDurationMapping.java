@@ -4,22 +4,19 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType.NON_STANDARD;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType.STANDARD;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing.PAPER;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getDurationForAdjournment;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.hasInterpreterOrChannelChanged;
 import static uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil.isInterpreterRequired;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
-import uk.gov.hmcts.reform.sscs.reference.data.model.HearingDuration;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
@@ -78,12 +75,7 @@ public final class HearingsDurationMapping {
     public static Integer getHearingDurationAdjournment(SscsCaseData caseData, HearingDurationsService hearingDurationsService, boolean isHearingDurationEnabled) throws ListingException {
         AdjournCaseNextHearingDurationType durationType = caseData.getAdjournment().getNextHearingListingDurationType();
         if (isHearingDurationEnabled && !NON_STANDARD.equals(durationType)) {
-            HearingDuration hearingDuration = hearingDurationsService.getHearingDuration(caseData.getBenefitCode(), caseData.getIssueCode());
-            Integer duration = caseData.getAdjournment().getTypeOfNextHearing().equals(PAPER)
-                    ? hearingDuration.getDurationPaper()
-                    : YesNo.isYes(caseData.getAdjournment().getInterpreterRequired())
-                    ? hearingDuration.getDurationInterpreter()
-                    : hearingDuration.getDurationFaceToFace();
+            Integer duration = getDurationForAdjournment(caseData, hearingDurationsService);
             boolean hasInterpreterChannelChanged = hasInterpreterOrChannelChanged(caseData);
             if (hasInterpreterChannelChanged && isNull(duration)) {
                 throw new ListingException("Hearing duration is required to list case");
@@ -112,16 +104,6 @@ public final class HearingsDurationMapping {
         }
         log.debug("getHearingDurationBenefitIssueCodes for caseId={}", caseData.getCcdCaseId());
         return hearingDurationsService.getHearingDurationBenefitIssueCodes(caseData);
-    }
-
-    private static boolean hasInterpreterOrChannelChanged(SscsCaseData caseData) {
-        boolean channelChanged = (caseData.getAdjournment().getTypeOfHearing().equals(PAPER)
-                && !caseData.getAdjournment().getTypeOfNextHearing().equals(PAPER))
-                || (caseData.getAdjournment().getTypeOfNextHearing().equals(PAPER) && !caseData.getAdjournment().getTypeOfHearing().equals(PAPER));
-        HearingOptions hearingOptions = Optional.ofNullable(caseData.getAppeal().getHearingOptions()).orElse(HearingOptions.builder().build());
-        String languageInterpreter = Optional.ofNullable(hearingOptions.getLanguageInterpreter()).orElse("NO");
-        boolean interpreterChanged = nonNull(caseData.getAdjournment().getInterpreterRequired()) && !caseData.getAdjournment().getInterpreterRequired().equals(YesNo.valueOf(languageInterpreter.toUpperCase()));
-        return channelChanged || interpreterChanged;
     }
 
     private static Integer handleAdjournmentHearingType(SscsCaseData caseData, HearingDurationsService durationsService, Integer duration) {
