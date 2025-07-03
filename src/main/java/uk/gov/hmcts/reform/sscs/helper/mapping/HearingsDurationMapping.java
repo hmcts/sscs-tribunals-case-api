@@ -4,6 +4,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType.NON_STANDARD;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType.STANDARD;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing.PAPER;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil.isInterpreterRequired;
 
@@ -13,7 +14,6 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -79,7 +79,7 @@ public final class HearingsDurationMapping {
         AdjournCaseNextHearingDurationType durationType = caseData.getAdjournment().getNextHearingListingDurationType();
         if (isHearingDurationEnabled && durationType == STANDARD) {
             HearingDuration hearingDuration = hearingDurationsService.getHearingDuration(caseData.getBenefitCode(), caseData.getIssueCode());
-            Integer duration = caseData.getAdjournment().getTypeOfNextHearing().equals(AdjournCaseTypeOfHearing.PAPER)
+            Integer duration = caseData.getAdjournment().getTypeOfNextHearing().equals(PAPER)
                     ? hearingDuration.getDurationPaper()
                     : YesNo.isYes(caseData.getAdjournment().getInterpreterRequired())
                     ? hearingDuration.getDurationInterpreter()
@@ -115,7 +115,9 @@ public final class HearingsDurationMapping {
     }
 
     private static boolean hasInterpreterOrChannelChanged(SscsCaseData caseData) {
-        boolean channelChanged = !caseData.getAdjournment().getTypeOfHearing().equals(caseData.getAdjournment().getTypeOfNextHearing());
+        boolean channelChanged = (caseData.getAdjournment().getTypeOfHearing().equals(PAPER)
+                && !caseData.getAdjournment().getTypeOfNextHearing().equals(PAPER))
+                || (caseData.getAdjournment().getTypeOfNextHearing().equals(PAPER) && !caseData.getAdjournment().getTypeOfHearing().equals(PAPER));
         HearingOptions hearingOptions = Optional.ofNullable(caseData.getAppeal().getHearingOptions()).orElse(HearingOptions.builder().build());
         String languageInterpreter = Optional.ofNullable(hearingOptions.getLanguageInterpreter()).orElse("NO");
         boolean interpreterChanged = !caseData.getAdjournment().getInterpreterRequired().equals(YesNo.valueOf(languageInterpreter.toUpperCase()));
