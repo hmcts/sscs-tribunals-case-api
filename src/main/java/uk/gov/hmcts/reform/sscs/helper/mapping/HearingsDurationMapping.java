@@ -88,6 +88,10 @@ public final class HearingsDurationMapping {
                     && isNull(duration)) {
                 throw new ListingException("Hearing duration is required to list case");
             }
+            Integer overrideDuration = OverridesMapping.getOverrideFields(caseData).getDuration();
+            if (nonNull(overrideDuration) && overrideDuration >= MIN_HEARING_DURATION) {
+                return overrideDuration;
+            }
             return duration;
         }
         Integer existingDuration = OverridesMapping.getDefaultListingValues(caseData).getDuration();

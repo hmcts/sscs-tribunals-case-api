@@ -283,4 +283,21 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
         assertThat(result).isEqualTo(60);
     }
 
+    @DisplayName("When a adjournment hearing has an override, use the override and not config value")
+    @Test
+    void getHearingDurationAdjournmentHasOverride_ReturnOverride() throws ListingException {
+        Adjournment adjournment = caseData.getAdjournment();
+        adjournment.setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.STANDARD);
+        adjournment.setTypeOfNextHearing(FACE_TO_FACE);
+        adjournment.setTypeOfHearing(FACE_TO_FACE);
+        adjournment.setInterpreterRequired(NO);
+        caseData.getSchedulingAndListingFields().getOverrideFields().setDuration(75);
+        HearingDuration hearingDuration = new HearingDuration();
+        hearingDuration.setDurationFaceToFace(60);
+        given(refData.getHearingDurations()).willReturn(hearingDurations);
+        given(hearingDurations.getHearingDuration(eq(caseData.getBenefitCode()), eq(caseData.getIssueCode()))).willReturn(hearingDuration);
+        Integer result = HearingsDurationMapping.getHearingDurationAdjournment(caseData, refData.getHearingDurations(), true);
+        assertThat(result).isEqualTo(75);
+    }
+
 }
