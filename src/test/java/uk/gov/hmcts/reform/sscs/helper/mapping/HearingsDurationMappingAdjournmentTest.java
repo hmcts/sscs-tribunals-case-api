@@ -8,6 +8,7 @@ import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits.SESSIONS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing.FACE_TO_FACE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing.PAPER;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -198,6 +199,8 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
         adjournment.setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.STANDARD);
         adjournment.setInterpreterRequired(YesNo.YES);
         adjournment.setTypeOfNextHearing(FACE_TO_FACE);
+        adjournment.setTypeOfHearing(FACE_TO_FACE);
+
         HearingDuration hearingDuration = new HearingDuration();
         hearingDuration.setDurationInterpreter(90);
         hearingDuration.setDurationFaceToFace(60);
@@ -214,8 +217,9 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
     void getHearingDurationAdjournmentWithoutInterpreter_ReturnFaceToFaceValue() throws ListingException {
         Adjournment adjournment = caseData.getAdjournment();
         adjournment.setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.STANDARD);
-        adjournment.setInterpreterRequired(YesNo.NO);
+        adjournment.setInterpreterRequired(NO);
         adjournment.setTypeOfNextHearing(FACE_TO_FACE);
+        adjournment.setTypeOfHearing(FACE_TO_FACE);
         HearingDuration hearingDuration = new HearingDuration();
         hearingDuration.setDurationInterpreter(90);
         hearingDuration.setDurationFaceToFace(60);
@@ -227,12 +231,14 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
         assertThat(result).isEqualTo(60);
     }
 
-    @DisplayName("When a adjournment hearing has an override, use that value")
+    @DisplayName("When a adjournment hearing is to be a paper hearing, use paper value from hearingDuration")
     @Test
     void getHearingDurationAdjournmentWithPaperHearing_ReturnPaperValue() throws ListingException {
         Adjournment adjournment = caseData.getAdjournment();
         adjournment.setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.STANDARD);
         adjournment.setTypeOfNextHearing(PAPER);
+        adjournment.setTypeOfHearing(FACE_TO_FACE);
+        adjournment.setInterpreterRequired(NO);
         HearingDuration hearingDuration = new HearingDuration();
         hearingDuration.setDurationPaper(30);
         given(refData.getHearingDurations()).willReturn(hearingDurations);
@@ -241,6 +247,40 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
         Integer result = HearingsDurationMapping.getHearingDurationAdjournment(caseData, refData.getHearingDurations(), true);
 
         assertThat(result).isEqualTo(30);
+    }
+
+    @DisplayName("When a adjournment hearing is changed from paper to face to face, and there is no value in the config, "
+            + "return a listing error")
+    @Test
+    void getHearingDurationAdjournmentChangedFomPaperToFaceToFaceAndNoValueInConfig_ReturnError() {
+        Adjournment adjournment = caseData.getAdjournment();
+        adjournment.setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.STANDARD);
+        adjournment.setTypeOfNextHearing(PAPER);
+        adjournment.setTypeOfHearing(FACE_TO_FACE);
+        adjournment.setInterpreterRequired(NO);
+        HearingDuration hearingDuration = new HearingDuration();
+        hearingDuration.setDurationPaper(null);
+        given(refData.getHearingDurations()).willReturn(hearingDurations);
+        given(hearingDurations.getHearingDuration(eq(caseData.getBenefitCode()), eq(caseData.getIssueCode()))).willReturn(hearingDuration);
+        assertThatThrownBy(() -> HearingsDurationMapping.getHearingDurationAdjournment(caseData, refData.getHearingDurations(), true))
+                .isInstanceOf(ListingException.class);
+    }
+
+    @DisplayName("When a adjournment hearing changes from paper to face to face, use face to face value from hearingDuration")
+    @Test
+    void getHearingDurationAdjournmentChangedFomPaperToFaceToFace_ReturnFaceToFaceValue() throws ListingException {
+        Adjournment adjournment = caseData.getAdjournment();
+        adjournment.setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.STANDARD);
+        adjournment.setTypeOfNextHearing(PAPER);
+        adjournment.setTypeOfHearing(FACE_TO_FACE);
+        adjournment.setInterpreterRequired(NO);
+        caseData.getSchedulingAndListingFields().getDefaultListingValues().setDuration(30);
+        HearingDuration hearingDuration = new HearingDuration();
+        hearingDuration.setDurationPaper(60);
+        given(refData.getHearingDurations()).willReturn(hearingDurations);
+        given(hearingDurations.getHearingDuration(eq(caseData.getBenefitCode()), eq(caseData.getIssueCode()))).willReturn(hearingDuration);
+        Integer result = HearingsDurationMapping.getHearingDurationAdjournment(caseData, refData.getHearingDurations(), true);
+        assertThat(result).isEqualTo(60);
     }
 
 }
