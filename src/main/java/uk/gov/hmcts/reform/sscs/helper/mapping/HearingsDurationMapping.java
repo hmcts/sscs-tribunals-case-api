@@ -77,7 +77,7 @@ public final class HearingsDurationMapping {
 
     public static Integer getHearingDurationAdjournment(SscsCaseData caseData, HearingDurationsService hearingDurationsService, boolean isHearingDurationEnabled) throws ListingException {
         AdjournCaseNextHearingDurationType durationType = caseData.getAdjournment().getNextHearingListingDurationType();
-        if (isHearingDurationEnabled && durationType == STANDARD) {
+        if (isHearingDurationEnabled && !NON_STANDARD.equals(durationType)) {
             HearingDuration hearingDuration = hearingDurationsService.getHearingDuration(caseData.getBenefitCode(), caseData.getIssueCode());
             Integer duration = caseData.getAdjournment().getTypeOfNextHearing().equals(PAPER)
                     ? hearingDuration.getDurationPaper()

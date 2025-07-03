@@ -239,7 +239,7 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
     @Test
     void getHearingDurationAdjournmentWithPaperHearing_ReturnPaperValue() throws ListingException {
         Adjournment adjournment = caseData.getAdjournment();
-        adjournment.setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.STANDARD);
+        adjournment.setNextHearingListingDurationType(null);
         adjournment.setTypeOfNextHearing(PAPER);
         adjournment.setTypeOfHearing(FACE_TO_FACE);
         adjournment.setInterpreterRequired(NO);
@@ -257,7 +257,7 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
     @DisplayName("When a adjournment hearing is changed from paper to face to face, and there is no value in the config, "
             + "return a listing error")
     @Test
-    void getHearingDurationAdjournmentChangedFomPaperToFaceToFaceAndNoValueInConfig_ReturnError() {
+    void getHearingDurationAdjournmentChangedFromPaperToFaceToFaceAndNoValueInConfig_ReturnError() {
         Adjournment adjournment = caseData.getAdjournment();
         adjournment.setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.STANDARD);
         adjournment.setTypeOfNextHearing(PAPER);
@@ -274,7 +274,7 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
 
     @DisplayName("When a adjournment hearing changes from paper to face to face, use face to face value from hearingDuration")
     @Test
-    void getHearingDurationAdjournmentChangedFomPaperToFaceToFace_ReturnFaceToFaceValue() throws ListingException {
+    void getHearingDurationAdjournmentChangedFromPaperToFaceToFace_ReturnFaceToFaceValue() throws ListingException {
         Adjournment adjournment = caseData.getAdjournment();
         adjournment.setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.STANDARD);
         adjournment.setTypeOfNextHearing(PAPER);
