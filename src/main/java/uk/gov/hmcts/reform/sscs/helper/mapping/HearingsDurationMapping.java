@@ -120,7 +120,7 @@ public final class HearingsDurationMapping {
                 || (caseData.getAdjournment().getTypeOfNextHearing().equals(PAPER) && !caseData.getAdjournment().getTypeOfHearing().equals(PAPER));
         HearingOptions hearingOptions = Optional.ofNullable(caseData.getAppeal().getHearingOptions()).orElse(HearingOptions.builder().build());
         String languageInterpreter = Optional.ofNullable(hearingOptions.getLanguageInterpreter()).orElse("NO");
-        boolean interpreterChanged = !caseData.getAdjournment().getInterpreterRequired().equals(YesNo.valueOf(languageInterpreter.toUpperCase()));
+        boolean interpreterChanged = nonNull(caseData.getAdjournment().getInterpreterRequired()) && !caseData.getAdjournment().getInterpreterRequired().equals(YesNo.valueOf(languageInterpreter.toUpperCase()));
         return channelChanged || interpreterChanged;
     }
 
