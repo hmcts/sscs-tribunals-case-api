@@ -120,6 +120,7 @@ public class HearingRequestHandlerIT {
             HearingRoute.LIST_ASSIST).build());
         when(refData.getVenueService()).thenReturn(venueService);
         when(venueService.getActiveRegionalEpimsIdsForRpc(any())).thenReturn(List.of(VenueDetails.builder().epimsId("1").build()));
+        when(venueService.getEpimsIdForVenue(any())).thenReturn("1");
         when(refData.getVerbalLanguages()).thenReturn(verbalLanguages);
         when(verbalLanguages.getVerbalLanguage(any())).thenReturn(Language.builder().reference("LANG").build());
         HmcUpdateResponse response = HmcUpdateResponse.builder().hearingRequestId(22L).build();

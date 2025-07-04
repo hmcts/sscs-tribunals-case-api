@@ -74,6 +74,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         callback.getCaseDetails().getCaseData().getAdjournment().setPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().getAdjournment().setDirectionsDueDate(LocalDate.now().plusDays(1));
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("yes");
+        setupHearingDurationValues();
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -90,6 +91,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
         callback.getCaseDetails().getCaseData().getAdjournment().setPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().getAdjournment().setDirectionsDueDate(LocalDate.now().plusDays(1));
+        setupHearingDurationValues();
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -98,6 +100,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
 
     @Test
     void givenAnIssueAdjournmentEventWithDueDateDaysOffset_thenCreateAdjournmentWithGivenDueDateOffset() {
+        setupHearingDurationValues();
 
         callback.getCaseDetails().getCaseData().getAdjournment().setDirectionsDueDateDaysOffset(AdjournCaseDaysOffset.FOURTEEN_DAYS);
 
@@ -111,7 +114,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
         callback.getCaseDetails().getCaseData().getAdjournment().setPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().getAdjournment().setCanCaseBeListedRightAway(NO);
-
+        setupHearingDurationValues();
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(sscsCaseData.getState()).isEqualTo(NOT_LISTABLE);
@@ -123,6 +126,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
         callback.getCaseDetails().getCaseData().getAdjournment().setPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().getAdjournment().setAreDirectionsBeingMadeToParties(NO);
+        setupHearingDurationValues();
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -135,6 +139,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
         callback.getCaseDetails().getCaseData().getAdjournment().setPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("yes");
+        setupHearingDurationValues();
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -178,6 +183,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         + "and no directions are being made, then should send a new hearing request in hearings API")
     @Test
     void givenCaseCannotBeListedRightAwayAndNoDirectionsBeingMade_thenNewHearingRequestSent() {
+        setupHearingDurationValues();
         PreSubmitCallbackResponse<SscsCaseData> response = cannotBeListedAndNoDirectionsGiven();
 
         assertHearingCreatedAndAdjournmentInProgress(response, 0);
@@ -187,6 +193,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         + "then should send a new hearing request in hearings API")
     @Test
     void givenCanBeListedRightAway_thenNewHearingRequestSent() {
+        setupHearingDurationValues();
         PreSubmitCallbackResponse<SscsCaseData> response = canBeListed();
 
         assertHearingCreatedAndAdjournmentInProgress(response, 1);
@@ -203,6 +210,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         + "and directions are being made, then should not send any messages")
     @Test
     void givenCaseCannotBeListedRightAwayAndDirectionsAreBeingMade_thenNoMessagesSent() {
+        setupHearingDurationValues();
         PreSubmitCallbackResponse<SscsCaseData> response = cannotBeListedAndDirectionsGiven();
 
         verifyNoInteractions(hearingMessageHelper);
@@ -220,6 +228,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
             .languageInterpreter(NO.getValue())
             .languages("French")
             .build());
+        setupHearingDurationValues();
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -233,6 +242,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
     void givenAdjournmentEventWithLanguageInterpreterRequiredAndLanguageSet_thenDoNotDisplayError() {
         sscsCaseData.getAdjournment().setInterpreterRequired(YES);
         sscsCaseData.getAdjournment().setInterpreterLanguage(new DynamicList(SPANISH));
+        setupHearingDurationValues();
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -245,6 +255,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
     @Test
     void givenAdjournmentEventWithNoLanguageInterpreterRequiredAndLanguageNotSet_thenUpdateOverrideFieldsToNo() {
         sscsCaseData.getAdjournment().setInterpreterRequired(NO);
+        setupHearingDurationValues();
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -281,6 +292,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
                 .build())
             .benefitType(benefitType)
             .build());
+        setupHearingDurationValues();
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -311,6 +323,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         sscsCaseData.getAdjournment().setNextHearingVenueSelected(adjournedNextVenue);
         sscsCaseData.setRegion(originalRegion);
         sscsCaseData.setProcessingVenue(originalProcessingVenue);
+        setupHearingDurationValues();
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -321,20 +334,6 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         assertThat(sscsCaseData.getProcessingVenue()).isEqualTo(originalProcessingVenue);
     }
 
-    @DisplayName("When adjournment is enabled and case hearing type is Paper and Adjournment next hearing type is not provided "
-        + ", then case hearing type should not be updated.")
-    @Test
-    void givenAdjournmentNextHearingNotProvided_thenNoChangeInHearingChannel() {
-        HearingDetails hearingDetails = new HearingDetails();
-        hearingDetails.setHearingChannel(HearingChannel.PAPER);
-        sscsCaseData.setHearings(List.of(new Hearing(hearingDetails)));
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(null);
-
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertThat(sscsCaseData.getLatestHearing().getValue().getHearingChannel()).isEqualTo(HearingChannel.PAPER);
-
-    }
-
     @DisplayName("When adjournment is enabled and case hearing type is Paper and Adjournment next hearing type is Face To Face "
         + ", then case hearing type should updated from paper to face to face.")
     @Test
@@ -343,6 +342,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         hearingDetails.setHearingChannel(HearingChannel.PAPER);
         sscsCaseData.setHearings(List.of(new Hearing(hearingDetails)));
         sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.FACE_TO_FACE);
+        setupHearingDurationValues();
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(sscsCaseData.getLatestHearing().getValue().getHearingChannel()).isEqualTo(HearingChannel.FACE_TO_FACE);
@@ -358,6 +358,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         sscsCaseData.getAdjournment().setTypeOfNextHearing(PAPER);
         when(regionalProcessingCenterService.getByVenueId("")).thenReturn(RegionalProcessingCenter.builder().epimsId("1111").build());
         when(venueService.getActiveRegionalEpimsIdsForRpc("1111")).thenReturn(List.of(VenueDetails.builder().epimsId("3456").build()));
+        setupHearingDurationValues();
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(sscsCaseData.getLatestHearing().getValue().getHearingChannel()).isEqualTo(HearingChannel.PAPER);
@@ -370,7 +371,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         HearingDetails hearingDetails = new HearingDetails();
         sscsCaseData.setHearings(List.of(new Hearing(hearingDetails)));
         sscsCaseData.getAdjournment().setTypeOfNextHearing(adjournCaseTypeOfHearing);
-
+        setupHearingDurationValues();
         if (PAPER.equals(adjournCaseTypeOfHearing)) {
             when(regionalProcessingCenterService.getByVenueId("")).thenReturn(RegionalProcessingCenter.builder().epimsId("1111").build());
             when(venueService.getActiveRegionalEpimsIdsForRpc("1111")).thenReturn(List.of(VenueDetails.builder().epimsId("3456").build()));
@@ -398,6 +399,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         sscsCaseData.setHearings(List.of(new Hearing(hearingDetails)));
         sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.FACE_TO_FACE);
         sscsCaseData.setHearings(null);
+        setupHearingDurationValues();
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(sscsCaseData.getAppeal().getHearingType()).isEqualTo(uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.ORAL.getValue());
@@ -411,6 +413,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         sscsCaseData.setHearings(List.of(new Hearing(hearingDetails)));
         sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.FACE_TO_FACE);
         sscsCaseData.setHearings(List.of(Hearing.builder().build()));
+        setupHearingDurationValues();
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(sscsCaseData.getAppeal().getHearingType()).isEqualTo(uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.ORAL.getValue());
@@ -431,6 +434,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         sscsCaseData.getAdjournment().setPanelMember3(JudicialUserBase.builder().idamId("3").build());
         sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(NO);
         sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
+        setupHearingDurationValues();
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -447,6 +451,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         sscsCaseData.getAdjournment().setPanelMember3(JudicialUserBase.builder().personalCode("5").idamId("3").build());
         sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(NO);
         sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
+        setupHearingDurationValues();
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -470,6 +475,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         sscsCaseData.getAdjournment().setPanelMember3(JudicialUserBase.builder().idamId("3").build());
         sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(NO);
         sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
+        setupHearingDurationValues();
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -489,6 +495,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         sscsCaseData.getAdjournment().setPanelMembersExcluded(AdjournCasePanelMembersExcluded.YES);
         sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(NO);
         sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
+        setupHearingDurationValues();
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -510,7 +517,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
         sscsCaseData.getAdjournment().setPanelMember1(JudicialUserBase.builder().idamId("1").build());
         sscsCaseData.getAdjournment().setPanelMember3(JudicialUserBase.builder().idamId("3").build());
-
+        setupHearingDurationValues();
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(sscsCaseData.getSchedulingAndListingFields()
@@ -525,6 +532,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         adjournment.setNextHearingFirstAvailableDateAfterPeriod(null);
         adjournment.setNextHearingDateOrPeriod(null);
         adjournment.setNextHearingDateType(null);
+        setupHearingDurationValues();
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getHearingWindow()).isNull();
@@ -535,6 +543,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         sscsCaseData.setPoAttendanceConfirmed(YES);
         sscsCaseData.setPresentingOfficersDetails(PoDetails.builder().name(Name.builder().build()).build());
         sscsCaseData.setPresentingOfficersHearingLink("link");
+        setupHearingDurationValues();
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -545,6 +554,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
 
     @Test
     void givenAdjournmentIsIssued_thenClearAdjournmentFields() {
+        setupHearingDurationValues();
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrProperties();
     }

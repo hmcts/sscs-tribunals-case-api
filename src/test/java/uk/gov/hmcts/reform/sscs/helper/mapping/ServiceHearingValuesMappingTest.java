@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.EntityRoleCode;
@@ -180,6 +181,7 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
     @Test
     void shouldMapServiceHearingValuesSuccessfully() throws ListingException {
         // given
+        ReflectionTestUtils.setField(serviceHearingValuesMapping, "isHearingDurationEnabled", true);
         given(refData.getVenueService()).willReturn(venueService);
         given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE, ISSUE_CODE,true,false))
             .willReturn(sessionCategoryMap);
@@ -195,7 +197,7 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
             .build();
         //then
         assertFalse(serviceHearingValues.isAutoListFlag());
-        assertEquals(60, serviceHearingValues.getDuration());
+        assertEquals(30, serviceHearingValues.getDuration());
         assertEquals(HmcHearingType.SUBSTANTIVE, serviceHearingValues.getHearingType());
         assertEquals(BENEFIT, serviceHearingValues.getCaseType());
         assertThat(serviceHearingValues.getCaseCategories())
@@ -303,6 +305,7 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
     @Test
     void shouldGetHearingDurationZeroIfListingExceptionThrownForGetHearingDurationIbc() throws ListingException {
         given(refData.getVenueService()).willReturn(venueService);
+        given(refData.getHearingDurations()).willReturn(hearingDurations);
         given(sessionCategoryMaps.getSessionCategory("093", ISSUE_CODE,true,false))
             .willReturn(sessionCategoryMap);
         given(sessionCategoryMaps.getCategoryTypeValue(sessionCategoryMap))

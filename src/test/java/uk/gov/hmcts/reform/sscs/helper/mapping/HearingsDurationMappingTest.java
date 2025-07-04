@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.helper.mapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
 import org.junit.jupiter.api.DisplayName;
@@ -9,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
@@ -36,7 +39,7 @@ class HearingsDurationMappingTest extends HearingsMappingBase {
         caseData.getAppeal().getHearingOptions().setWantsToAttend("Yes");
         caseData.getSchedulingAndListingFields().getOverrideFields().setDuration(overrideDuration);
 
-        int result = HearingsDurationMapping.getHearingDuration(caseData, refData);
+        int result = HearingsDurationMapping.getHearingDuration(caseData, refData, true);
 
         assertThat(result).isEqualTo(expectedResult);
     }
@@ -47,7 +50,7 @@ class HearingsDurationMappingTest extends HearingsMappingBase {
         caseData.setBenefitCode("093");
         given(refData.getHearingDurations()).willReturn(hearingDurations);
         ListingException exception = assertThrows(ListingException.class, () ->
-                HearingsDurationMapping.getHearingDuration(caseData, refData)
+                HearingsDurationMapping.getHearingDuration(caseData, refData, true)
         );
         assertThat(exception.getMessage()).isEqualTo("Hearing duration is required to list case");
     }
@@ -56,10 +59,33 @@ class HearingsDurationMappingTest extends HearingsMappingBase {
     @Test
     void testIbcCaseHearingDurationAdjournmentNotSet() throws ListingException {
         caseData.setBenefitCode("093");
+        given(refData.getHearingDurations()).willReturn(hearingDurations);
+        caseData.getAdjournment().setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.NON_STANDARD);
         ListingException exception = assertThrows(ListingException.class, () ->
-                HearingsDurationMapping.getHearingDurationAdjournment(caseData, refData.getHearingDurations())
+                HearingsDurationMapping.getHearingDurationAdjournment(caseData, refData.getHearingDurations(), true)
         );
         assertThat(exception.getMessage()).isEqualTo("Hearing duration is required to list case");
+    }
+
+    @DisplayName("When hearing duration is not set throw listing exception")
+    @Test
+    void testCaseHearingDurationNotSet() throws ListingException {
+        given(refData.getHearingDurations()).willReturn(hearingDurations);
+        given(hearingDurations.getHearingDurationBenefitIssueCodes(eq(caseData))).willReturn(null);
+
+        ListingException exception = assertThrows(ListingException.class, () ->
+                HearingsDurationMapping.getHearingDuration(caseData, refData, true)
+        );
+        assertThat(exception.getMessage()).isEqualTo("Hearing duration is required to list case");
+    }
+
+    @DisplayName("When hearing duration is set return the existing duration")
+    @Test
+    void testCaseHearingDurationSet() throws ListingException {
+        given(refData.getHearingDurations()).willReturn(hearingDurations);
+        caseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder().duration(60).build());
+        Integer duration = HearingsDurationMapping.getHearingDuration(caseData, refData, true);
+        assertThat(duration).isEqualTo(60);
     }
 
     @DisplayName("When an invalid adjournCaseDuration and adjournCaseDurationUnits is given and overrideDuration "
@@ -69,7 +95,7 @@ class HearingsDurationMappingTest extends HearingsMappingBase {
         caseData.getAppeal().getHearingOptions().setWantsToAttend("Yes");
         caseData.getSchedulingAndListingFields().getOverrideFields().setDuration(DURATION_FACE_TO_FACE);
 
-        int result = HearingsDurationMapping.getHearingDuration(caseData, refData);
+        int result = HearingsDurationMapping.getHearingDuration(caseData, refData, true);
 
         assertThat(result).isEqualTo(DURATION_FACE_TO_FACE);
     }

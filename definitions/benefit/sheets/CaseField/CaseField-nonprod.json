@@ -1,3 +1,4 @@
 [
-  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "functionalTest", "Label": "From functional test", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"}
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "functionalTest", "Label": "From functional test", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "29/05/2025", "CaseTypeID": "Benefit", "ID": "interpreterDurationLabel", "Label": "If an interpreter is needed for the next hearing, please add an extra 30 minutes to the duration.", "FieldType": "Label", "SecurityClassification": "PUBLIC"}
 ]

@@ -16,6 +16,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getDurationForAdjournment;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.hasInterpreterOrChannelChanged;
 import static uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil.isInterpreterRequired;
 
 import jakarta.validation.ConstraintViolation;
@@ -28,6 +30,7 @@ import java.util.Objects;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -37,6 +40,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.helper.mapping.OverridesMapping;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
@@ -62,6 +66,8 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
     private static final int MIN_HEARING_DURATION = 30;
     private static final int MIN_HEARING_SESSION_DURATION = 1;
     private static final int FIRST_AVAILABLE_DATE_DAYS = 14;
+    @Value("${feature.hearing-duration.enabled}")
+    private boolean isHearingDurationEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -322,13 +328,27 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
     private Integer handleHearingDuration(SscsCaseData caseData) {
         AdjournCaseNextHearingDurationType durationType = caseData.getAdjournment().getNextHearingListingDurationType();
 
-        if (STANDARD.equals(durationType)) {
+        if (isHearingDurationEnabled ? !NON_STANDARD.equals(durationType) : STANDARD.equals(durationType)) {
+            if (isHearingDurationEnabled) {
+                Integer duration = getDurationForAdjournment(caseData, hearingDurationsService);
+                boolean hasInterpreterChannelChanged = hasInterpreterOrChannelChanged(caseData);
+                if (hasInterpreterChannelChanged && isNull(duration)) {
+                    return null;
+                } else if (!hasInterpreterChannelChanged) {
+                    Integer overrideDuration = OverridesMapping.getOverrideFields(caseData).getDuration();
+                    if (nonNull(overrideDuration) && overrideDuration >= MIN_HEARING_DURATION) {
+                        return overrideDuration;
+                    }
+                }
+                return duration;
+
+            }
             OverrideFields defaultListingValues = caseData.getSchedulingAndListingFields().getDefaultListingValues();
 
             if (nonNull(defaultListingValues)) {
                 Integer existingDuration = caseData.getSchedulingAndListingFields().getDefaultListingValues().getDuration();
                 if (nonNull(existingDuration)) {
-                    if (isYes(caseData.getAppeal().getHearingOptions().getWantsToAttend())
+                    if (!isHearingDurationEnabled && isYes(caseData.getAppeal().getHearingOptions().getWantsToAttend())
                             && isInterpreterRequired(caseData)) {
                         return existingDuration + MIN_HEARING_DURATION;
                     } else {

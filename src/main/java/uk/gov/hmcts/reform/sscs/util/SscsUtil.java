@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCasePanelMembersExcluded;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
@@ -79,6 +80,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
+import uk.gov.hmcts.reform.sscs.reference.data.model.HearingDuration;
+import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
@@ -726,5 +729,26 @@ public class SscsUtil {
         appeal.setHearingOptions(hearingOptions);
         sscsCaseData.setAppeal(appeal);
     }
+
+    public static Integer getDurationForAdjournment(SscsCaseData sscsCaseData, HearingDurationsService hearingDurationsService) {
+        HearingDuration hearingDuration = hearingDurationsService.getHearingDuration(sscsCaseData.getBenefitCode(), sscsCaseData.getIssueCode());
+        Integer duration = sscsCaseData.getAdjournment().getTypeOfNextHearing().equals(AdjournCaseTypeOfHearing.PAPER)
+                ? hearingDuration.getDurationPaper()
+                : YesNo.isYes(sscsCaseData.getAdjournment().getInterpreterRequired())
+                ? hearingDuration.getDurationInterpreter()
+                : hearingDuration.getDurationFaceToFace();
+        return duration;
+    }
+
+    public static boolean hasInterpreterOrChannelChanged(SscsCaseData caseData) {
+        boolean channelChanged = (caseData.getAdjournment().getTypeOfHearing().equals(AdjournCaseTypeOfHearing.PAPER)
+                && !caseData.getAdjournment().getTypeOfNextHearing().equals(AdjournCaseTypeOfHearing.PAPER))
+                || (caseData.getAdjournment().getTypeOfNextHearing().equals(AdjournCaseTypeOfHearing.PAPER) && !caseData.getAdjournment().getTypeOfHearing().equals(AdjournCaseTypeOfHearing.PAPER));
+        HearingOptions hearingOptions = Optional.ofNullable(caseData.getAppeal().getHearingOptions()).orElse(HearingOptions.builder().build());
+        String languageInterpreter = Optional.ofNullable(hearingOptions.getLanguageInterpreter()).orElse("NO");
+        boolean interpreterChanged = nonNull(caseData.getAdjournment().getInterpreterRequired()) && !caseData.getAdjournment().getInterpreterRequired().equals(YesNo.valueOf(languageInterpreter.toUpperCase()));
+        return channelChanged || interpreterChanged;
+    }
+
 }
 
