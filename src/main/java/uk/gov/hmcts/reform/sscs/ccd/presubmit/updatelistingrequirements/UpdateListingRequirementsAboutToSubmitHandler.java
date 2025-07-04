@@ -118,7 +118,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             channelUpdated = !Objects.equals(channelBefore, channelCurrent);
         }
         HearingInterpreter appellantInterpreter = sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter();
-        if (nonNull(appellantInterpreter)) {
+        if (nonNull(appellantInterpreter.getIsInterpreterWanted())) {
             Optional<HearingOptions> hearingOptions = Optional.ofNullable(sscsCaseData.getAppeal().getHearingOptions());
             String caseInterpreter = hearingOptions.isPresent() && nonNull(hearingOptions.get().getLanguageInterpreter())
                     ? hearingOptions.get().getLanguageInterpreter()
