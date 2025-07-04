@@ -292,7 +292,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         SscsCaseData caseDataBefore = SscsCaseData.builder().schedulingAndListingFields(SchedulingAndListingFields.builder()
                 .overrideFields(OverrideFields.builder().appellantHearingChannel(FACE_TO_FACE).build()).build()).build();
         CaseDetails caseDetailsBefore = new CaseDetails<SscsCaseData>(33333333L, "", State.READY_TO_LIST, caseDataBefore, LocalDateTime.now(), "Benefit");
-        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().appellantHearingChannel(PAPER).build());
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().appellantInterpreter(HearingInterpreter.builder().build()).appellantHearingChannel(PAPER).build());
 
         when(hearingDurationsService.getHearingDurationBenefitIssueCodes(eq(sscsCaseData))).thenReturn(30);
         CaseDetails caseDetails = new CaseDetails<>(3333333L, "", State.READY_TO_LIST, sscsCaseData, LocalDateTime.now(), "Benefit");
@@ -316,7 +316,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         SscsCaseData caseDataBefore = SscsCaseData.builder().schedulingAndListingFields(SchedulingAndListingFields.builder()
                 .overrideFields(OverrideFields.builder().appellantHearingChannel(FACE_TO_FACE).build()).build()).build();
         CaseDetails caseDetailsBefore = new CaseDetails<SscsCaseData>(33333333L, "", State.READY_TO_LIST, caseDataBefore, LocalDateTime.now(), "Benefit");
-        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().appellantHearingChannel(FACE_TO_FACE).build());
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().appellantInterpreter(HearingInterpreter.builder().build()).appellantHearingChannel(FACE_TO_FACE).build());
 
         CaseDetails caseDetails = new CaseDetails<>(3333333L, "", State.READY_TO_LIST, sscsCaseData, LocalDateTime.now(), "Benefit");
         callback = new Callback<>(caseDetails, Optional.of(caseDetailsBefore), UPDATE_LISTING_REQUIREMENTS, false);
