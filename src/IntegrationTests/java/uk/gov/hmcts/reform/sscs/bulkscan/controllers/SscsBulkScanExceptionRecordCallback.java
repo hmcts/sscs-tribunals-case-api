@@ -192,7 +192,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         // Then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
         assertThat(result.getBody().errors)
-            .containsOnly("#: extraneous key [invalid_key] is not permitted");
+            .containsOnly("$: property 'invalid_key' is not defined in the schema and the schema does not allow additional properties");
 
         verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
@@ -459,7 +459,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
         assertThat(result.getBody().errors)
-            .containsOnly("#: extraneous key [invalid_key] is not permitted");
+            .containsOnly("$: property 'invalid_key' is not defined in the schema and the schema does not allow additional properties");
 
         verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }

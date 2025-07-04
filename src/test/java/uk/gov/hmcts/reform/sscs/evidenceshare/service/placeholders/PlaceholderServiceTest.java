@@ -43,11 +43,10 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderHelper.buildCaseDataWithoutBenefitType;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
-import org.joda.time.DateTimeUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -83,9 +82,7 @@ public class PlaceholderServiceTest {
 
     @BeforeEach
     public void setup() {
-        DateTimeUtils.setCurrentMillisFixed(1550000000000L);
-
-        now = (DateTimeFormatter.ISO_LOCAL_DATE).format(LocalDateTime.now());
+        now = (DateTimeFormatter.ISO_LOCAL_DATE).format(LocalDate.now());
         welshDate = "2001-12-02";
         caseData = buildCaseData();
         service = new PlaceholderService(pdfDocumentConfig, exelaAddressConfig, false);
