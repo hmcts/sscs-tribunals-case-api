@@ -110,6 +110,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             return false;
         }
         boolean channelUpdated = false;
+        boolean interpreterUpdated = false;
         if (sscsCaseDataBefore.isPresent()) {
             OverrideFields overrideFieldsBefore = sscsCaseDataBefore.get().getCaseData().getSchedulingAndListingFields().getOverrideFields();
             HearingChannel channelBefore = nonNull(overrideFieldsBefore) ? overrideFieldsBefore.getAppellantHearingChannel() : null;
@@ -117,11 +118,13 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             channelUpdated = !Objects.equals(channelBefore, channelCurrent);
         }
         HearingInterpreter appellantInterpreter = sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter();
-        Optional<HearingOptions> hearingOptions = Optional.ofNullable(sscsCaseData.getAppeal().getHearingOptions());
-        String caseInterpreter = hearingOptions.isPresent() && nonNull(hearingOptions.get().getLanguageInterpreter())
-                ? hearingOptions.get().getLanguageInterpreter()
-                : "No";
-        boolean interpreterUpdated = nonNull(appellantInterpreter) && YesNo.isYes(caseInterpreter) != YesNo.isYes(appellantInterpreter.getIsInterpreterWanted());
+        if (nonNull(appellantInterpreter)) {
+            Optional<HearingOptions> hearingOptions = Optional.ofNullable(sscsCaseData.getAppeal().getHearingOptions());
+            String caseInterpreter = hearingOptions.isPresent() && nonNull(hearingOptions.get().getLanguageInterpreter())
+                    ? hearingOptions.get().getLanguageInterpreter()
+                    : "No";
+            interpreterUpdated = nonNull(appellantInterpreter) && YesNo.isYes(caseInterpreter) != YesNo.isYes(appellantInterpreter.getIsInterpreterWanted());
+        }
         return channelUpdated || interpreterUpdated;
     }
 }
