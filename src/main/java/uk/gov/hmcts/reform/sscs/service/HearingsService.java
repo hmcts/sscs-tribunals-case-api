@@ -51,6 +51,8 @@ public class HearingsService {
 
     @Value("${retry.hearing-response-update.max-retries}")
     private static int hearingResponseUpdateMaxRetries;
+    @Value("${feature.default-panel-comp.enabled}")
+    private boolean integratedListAssistEnabled;
 
     private final HmcHearingApiService hmcHearingApiService;
     private final CcdCaseService ccdCaseService;
@@ -128,9 +130,12 @@ public class HearingsService {
             HearingRequestPayload hearingPayload = hearingsMapping.buildHearingPayload(wrapper, refData);
             log.debug("Sending Create Hearing Request for Case ID {}", caseId);
             hmcUpdateResponse = hmcHearingApiService.sendCreateHearingRequest(hearingPayload);
-            wrapper.getCaseData().setPanelMemberComposition(
-                    panelCompositionService.createPanelCompositionFromJohTiers(
-                            hearingPayload.getHearingDetails().getPanelRequirements().getRoleTypes()));
+            if (integratedListAssistEnabled) {
+                wrapper.getCaseData().setPanelMemberComposition(
+                        panelCompositionService.createPanelCompositionFromJohTiers(
+                                hearingPayload.getHearingDetails().getPanelRequirements().getRoleTypes()));
+            }
+
 
             log.debug("Received Create Hearing Request Response for Case ID {}, Hearing State {} and Response:\n{}",
                     caseId,

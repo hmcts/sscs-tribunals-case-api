@@ -42,6 +42,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
@@ -136,6 +137,7 @@ class HearingsServiceTest {
 
     @BeforeEach
     void setup() {
+        ReflectionTestUtils.setField(hearingsService, "integratedListAssistEnabled", false);
         SscsCaseData caseData = SscsCaseData.builder()
             .ccdCaseId(String.valueOf(CASE_ID))
             .benefitCode(BENEFIT_CODE)
@@ -211,6 +213,7 @@ class HearingsServiceTest {
     @DisplayName("When wrapper with a valid adjourn create Hearing State is given addHearingResponse should run without error")
     @Test
     void processHearingWrapperAdjournmentCreate() throws ListingException {
+        ReflectionTestUtils.setField(hearingsService, "integratedListAssistEnabled", true);
         mockHearingResponseForAdjournmentCreate();
 
         HearingEvent hearingEvent = HearingEvent.ADJOURN_CREATE_HEARING;
@@ -261,8 +264,6 @@ class HearingsServiceTest {
                         .panelRequirements(PanelRequirements.builder().roleTypes(List.of("58"))
                                 .build()).build()).build();
         when(hearingsMapping.buildHearingPayload(any(), any())).thenReturn(hearingPayload);
-        when(panelCompositionService.createPanelCompositionFromJohTiers(eq(List.of("58"))))
-                .thenReturn(PanelMemberComposition.builder().build());
 
         given(updateCcdCaseService.updateCaseV2(
             eq(CASE_ID),
@@ -318,8 +319,6 @@ class HearingsServiceTest {
                         .panelRequirements(PanelRequirements.builder().roleTypes(List.of("58"))
                                 .build()).build()).build();
         when(hearingsMapping.buildHearingPayload(any(), any())).thenReturn(hearingPayload);
-        when(panelCompositionService.createPanelCompositionFromJohTiers(eq(List.of("58"))))
-                .thenReturn(PanelMemberComposition.builder().build());
 
         assertThatNoException()
             .isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
