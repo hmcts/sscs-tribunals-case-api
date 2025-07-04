@@ -46,7 +46,7 @@ import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
-    private static final String REGIONAL_MEDICAL_MEMBER_REF = PanelMemberType.REGIONAL_MEDICAL_MEMBER.toRef();
+    private static final String TRIBUNAL_MEDICAL_MEMBER_REF = PanelMemberType.TRIBUNAL_MEMBER_MEDICAL.toRef();
     private static final String IBCA_BENEFIT_CODE = Benefit.INFECTED_BLOOD_COMPENSATION.getBenefitCode();
 
     @InjectMocks
@@ -306,7 +306,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         sscsCaseData.setBenefitCode(IBCA_BENEFIT_CODE);
         sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
             .panelCompositionMemberMedical1("notMedicalMember")
-            .panelCompositionMemberMedical2(REGIONAL_MEDICAL_MEMBER_REF)
+            .panelCompositionMemberMedical2(TRIBUNAL_MEDICAL_MEMBER_REF)
             .build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
@@ -339,8 +339,8 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     void givenUpdatedMedicalMemberOnPanelMemberCompositionOnNonIbcaCase_thenIsMedicalMemberRequiredNotChanged() {
         sscsCaseData.setBenefitCode(Benefit.PIP.getBenefitCode());
         sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
-            .panelCompositionMemberMedical1("notMedicalMember")
-            .panelCompositionMemberMedical2(REGIONAL_MEDICAL_MEMBER_REF)
+            .panelCompositionMemberMedical1(TRIBUNAL_MEDICAL_MEMBER_REF)
+            .panelCompositionMemberMedical2(null)
             .build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
