@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getHmcHearingType;
 
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
+import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
@@ -25,6 +28,11 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
     @Value("${feature.default-panel-comp.enabled}")
     private boolean isDefaultPanelCompEnabled;
+    @Value("${feature.hearing-duration.enabled}")
+    private boolean isHearingDurationEnabled;
+
+    private final HearingDurationsService hearingDurationsService;
+
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -76,9 +84,15 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             if (nonNull(hearingChannel)) {
                 SscsUtil.updateHearingChannel(sscsCaseData, hearingChannel);
             }
+            boolean updateDuration = isHearingDurationEnabled && updateHearingDuration(sscsCaseData, callback.getCaseDetailsBefore());
             HearingInterpreter appellantInterpreter = overrideFields.getAppellantInterpreter();
             if (nonNull(appellantInterpreter)) {
                 SscsUtil.updateHearingInterpreter(sscsCaseData, callbackResponse, appellantInterpreter);
+            }
+            if (updateDuration) {
+                sscsCaseData.getSchedulingAndListingFields().getOverrideFields().setDuration(
+                        hearingDurationsService.getHearingDurationBenefitIssueCodes(sscsCaseData)
+                );
             }
         }
       
@@ -89,5 +103,28 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 .hmcHearingType(getHmcHearingType(sscsCaseData))
                 .build());
         return callbackResponse;
+    }
+
+    private boolean updateHearingDuration(SscsCaseData sscsCaseData, Optional<CaseDetails<SscsCaseData>> sscsCaseDataBefore) {
+        if (nonNull(sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getDuration()) || isNull(sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues())) {
+            return false;
+        }
+        boolean channelUpdated = false;
+        boolean interpreterUpdated = false;
+        if (sscsCaseDataBefore.isPresent()) {
+            OverrideFields overrideFieldsBefore = sscsCaseDataBefore.get().getCaseData().getSchedulingAndListingFields().getOverrideFields();
+            HearingChannel channelBefore = nonNull(overrideFieldsBefore) ? overrideFieldsBefore.getAppellantHearingChannel() : null;
+            HearingChannel channelCurrent = sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getAppellantHearingChannel();
+            channelUpdated = !Objects.equals(channelBefore, channelCurrent);
+        }
+        HearingInterpreter appellantInterpreter = sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter();
+        if (nonNull(appellantInterpreter.getIsInterpreterWanted())) {
+            Optional<HearingOptions> hearingOptions = Optional.ofNullable(sscsCaseData.getAppeal().getHearingOptions());
+            String caseInterpreter = hearingOptions.isPresent() && nonNull(hearingOptions.get().getLanguageInterpreter())
+                    ? hearingOptions.get().getLanguageInterpreter()
+                    : "No";
+            interpreterUpdated = nonNull(appellantInterpreter) && YesNo.isYes(caseInterpreter) != YesNo.isYes(appellantInterpreter.getIsInterpreterWanted());
+        }
+        return channelUpdated || interpreterUpdated;
     }
 }

@@ -62,6 +62,9 @@ public class HearingsService {
     private final HearingServiceConsumer hearingServiceConsumer;
     private final HearingsMapping hearingsMapping;
     private final PanelCompositionService panelCompositionService;
+    @Value("${feature.hearing-duration.enabled}")
+    private boolean isHearingDurationEnabled;
+
 
 
     // Leaving blank for now until a future change is scoped and completed, then we can add the case states back in
@@ -124,7 +127,7 @@ public class HearingsService {
         CaseHearing hearing = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse);
         HmcUpdateResponse hmcUpdateResponse;
 
-        OverridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData);
+        OverridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData, isHearingDurationEnabled);
 
         if (isNull(hearing)) {
             HearingRequestPayload hearingPayload = hearingsMapping.buildHearingPayload(wrapper, refData);
@@ -172,14 +175,14 @@ public class HearingsService {
 
     private void updateHearing(HearingWrapper wrapper) throws UpdateCaseException, ListingException {
         if (isNull(wrapper.getCaseData().getSchedulingAndListingFields().getOverrideFields())) {
-            OverridesMapping.setOverrideValues(wrapper.getCaseData(), refData);
+            OverridesMapping.setOverrideValues(wrapper.getCaseData(), refData, isHearingDurationEnabled);
         }
         Integer duration = wrapper
                 .getCaseData()
                 .getSchedulingAndListingFields()
                 .getOverrideFields()
                 .getDuration();
-        boolean isMultipleOfFive = duration % 5 == 0;
+        boolean isMultipleOfFive = isHearingDurationEnabled ?  isNull(duration) || duration % 5 == 0 : duration % 5 == 0;
         if (!isMultipleOfFive) {
             throw new ListingException("Listing duration must be multiple of 5.0 minutes");
         }
