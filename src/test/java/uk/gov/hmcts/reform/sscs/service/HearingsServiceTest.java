@@ -379,7 +379,7 @@ class HearingsServiceTest {
                             .hearingVenueEpimsIds(List.of(CcdValue.<CcdValue<String>>builder().value(CcdValue.<String>builder().value("219164").build()).build()))
                             .duration(0).build());
             return sscsCaseData;
-        }).given(overridesMapping).setOverrideValues(eq(wrapper.getCaseData()), eq(refData));
+        }).given(overridesMapping).setOverrideValues(eq(wrapper.getCaseData()), eq(refData), eq(false));
 
 
         given(hearingsMapping.buildHearingPayload(any(), any())).willReturn(HearingRequestPayload.builder().build());

@@ -112,7 +112,6 @@ public class HearingServiceConsumerTest {
     @ValueSource(booleans = {true, false})
     public void testCreateHearingCaseDetailsConsumer(boolean adjournmentFlagEnabled) throws ListingException {
         setupResponse();
-        given(refData.isAdjournmentFlagEnabled()).willReturn(adjournmentFlagEnabled);
         willAnswer(invocation -> {
             SscsCaseData sscsCaseData = (SscsCaseData) invocation.getArguments()[0];
             sscsCaseData.getSchedulingAndListingFields()
@@ -124,7 +123,7 @@ public class HearingServiceConsumerTest {
                             .hearingVenueEpimsIds(List.of(CcdValue.<CcdValue<String>>builder().value(CcdValue.<String>builder().value("219164").build()).build()))
                             .duration(0).build());
             return sscsCaseData;
-        }).given(overridesMapping).setDefaultListingValues(eq(caseData), eq(refData));
+        }).given(overridesMapping).setDefaultListingValues(eq(caseData), eq(refData), eq(false));
 
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
 
@@ -161,7 +160,6 @@ public class HearingServiceConsumerTest {
     @ValueSource(booleans = {true, false})
     public void testCreateHearingCaseDetailsConsumerWithAdjournmentFlagEnabled(boolean adjournmentInProgress) throws ListingException {
         setupResponse();
-        given(refData.isAdjournmentFlagEnabled()).willReturn(true);
         willAnswer(invocation -> {
             SscsCaseData sscsCaseData = (SscsCaseData) invocation.getArguments()[0];
             sscsCaseData.getSchedulingAndListingFields()
@@ -173,7 +171,7 @@ public class HearingServiceConsumerTest {
                             .hearingVenueEpimsIds(List.of(CcdValue.<CcdValue<String>>builder().value(CcdValue.<String>builder().value("219164").build()).build()))
                             .duration(0).build());
             return sscsCaseData;
-        }).given(overridesMapping).setDefaultListingValues(eq(caseData), eq(refData));
+        }).given(overridesMapping).setDefaultListingValues(eq(caseData), eq(refData), eq(false));
 
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
         var panelMemberComposition = PanelMemberComposition.builder().panelCompositionJudge("58").build();
@@ -212,7 +210,7 @@ public class HearingServiceConsumerTest {
     @Test
     public void testCreateHearingCaseDetailsConsumerWithListingExceptionMessage() throws ListingException {
         doThrow(new ListingException("Incorrect benefit/issue code combination"))
-                .when(overridesMapping).setDefaultListingValues(eq(caseData), eq(refData));
+                .when(overridesMapping).setDefaultListingValues(eq(caseData), eq(refData), eq(false));
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
 
         Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = hearingServiceConsumer
@@ -287,10 +285,6 @@ public class HearingServiceConsumerTest {
         setupResponse();
 
         caseData.setHearings(new ArrayList<>());
-        caseData.getHearings().add(Hearing.builder().value(HearingDetails.builder().hearingId(String.valueOf(HEARING_REQUEST_ID)).build()).build());
-        given(refData.getVenueService()).willReturn(venueService);
-        given(venueService.getEpimsIdForVenue(PROCESSING_VENUE)).willReturn("219164");
-        given(hearingDurations.getHearingDurationBenefitIssueCodes(caseData)).willReturn(90);
         Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = hearingServiceConsumer
                 .getCreateHearingCaseDetailsConsumerV2(
                         PanelMemberComposition.builder().build(), response, HEARING_REQUEST_ID, true);

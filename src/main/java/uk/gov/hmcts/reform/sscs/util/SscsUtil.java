@@ -741,6 +741,8 @@ public class SscsUtil {
 
     public static String getCategorySubTypeValue(SscsCaseData sscsCaseData) {
         return String.format(CATEGORY_SUBTYPE_TEMPLATE, getCategoryTypeValue(sscsCaseData), Issue.valueOf(sscsCaseData.getIssueCode()).name());
+    }
+
     public static Integer getDurationForAdjournment(SscsCaseData sscsCaseData, HearingDurationsService hearingDurationsService) {
         HearingDuration hearingDuration = hearingDurationsService.getHearingDuration(sscsCaseData.getBenefitCode(), sscsCaseData.getIssueCode());
         Integer duration = sscsCaseData.getAdjournment().getTypeOfNextHearing().equals(AdjournCaseTypeOfHearing.PAPER)
