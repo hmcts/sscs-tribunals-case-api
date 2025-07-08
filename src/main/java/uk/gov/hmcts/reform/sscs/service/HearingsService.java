@@ -16,6 +16,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -134,11 +135,10 @@ public class HearingsService {
             log.debug("Sending Create Hearing Request for Case ID {}", caseId);
             hmcUpdateResponse = hmcHearingApiService.sendCreateHearingRequest(hearingPayload);
             if (integratedListAssistEnabled) {
-                wrapper.getCaseData().setPanelMemberComposition(
-                        panelCompositionService.createPanelCompositionFromJohTiers(
-                                hearingPayload.getHearingDetails().getPanelRequirements().getRoleTypes()));
+                var johTiers = hearingPayload.getHearingDetails().getPanelRequirements().getRoleTypes();
+                log.info("Saving JOH tiers ({}) onto the case ({})", johTiers, caseId);
+                wrapper.getCaseData().setPanelMemberComposition(new PanelMemberComposition(johTiers));
             }
-
 
             log.debug("Received Create Hearing Request Response for Case ID {}, Hearing State {} and Response:\n{}",
                     caseId,

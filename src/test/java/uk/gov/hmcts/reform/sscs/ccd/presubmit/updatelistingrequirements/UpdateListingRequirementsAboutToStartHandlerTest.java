@@ -201,14 +201,13 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
     public void whenPanelCompositionIsEmptyOrNull_thenPopulatePanelCompositionWithDefaultValues() {
         DynamicList interpreterLanguage = new DynamicList(null, List.of());
         given(utils.generateInterpreterLanguageFields(any())).willReturn(interpreterLanguage);
-
-        PanelMemberComposition defaultPanelMemberComposition = PanelMemberComposition.builder().panelCompositionJudge("84")
-                .panelCompositionDisabilityAndFqMember(List.of("50")).build();
-        given(panelCompositionService.createPanelComposition(any())).willReturn(defaultPanelMemberComposition);
+        var johTiers = List.of("50", "84");
+        PanelMemberComposition defaultPanelMemberComposition = new PanelMemberComposition(johTiers);
+        given(panelCompositionService.getDefaultJohTiers(any())).willReturn(johTiers);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        verify(panelCompositionService, times(1)).createPanelComposition(any());
+        verify(panelCompositionService, times(1)).getDefaultJohTiers(any());
 
         assertThat(response.getData().getPanelMemberComposition()).isEqualTo(defaultPanelMemberComposition);
     }
@@ -217,21 +216,16 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
     public void whenPanelCompositionExists_thenUseExistingValues() {
         DynamicList interpreterLanguage = new DynamicList(null, List.of());
         given(utils.generateInterpreterLanguageFields(any())).willReturn(interpreterLanguage);
-
-        PanelMemberComposition defaultPanelMemberComposition = PanelMemberComposition.builder().panelCompositionJudge("84")
-                .panelCompositionDisabilityAndFqMember(List.of("50")).build();
-        given(panelCompositionService.createPanelComposition(any())).willReturn(defaultPanelMemberComposition);
-
         sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("22")
                 .panelCompositionMemberMedical1("58").panelCompositionDisabilityAndFqMember(null).build());
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        var response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         verifyNoInteractions(panelCompositionService);
 
-        assertThat(response.getData().getPanelMemberComposition().getPanelCompositionJudge()).isEqualTo("22");
-        assertThat(response.getData().getPanelMemberComposition().getPanelCompositionMemberMedical1()).isEqualTo("58");
-        assertThat(response.getData().getPanelMemberComposition().getPanelCompositionDisabilityAndFqMember()).isNull();
+        assertEquals("22", response.getData().getPanelMemberComposition().getPanelCompositionJudge());
+        assertEquals("58", response.getData().getPanelMemberComposition().getPanelCompositionMemberMedical1());
+        assertNull(response.getData().getPanelMemberComposition().getPanelCompositionDisabilityAndFqMember());
 
     }
 }

@@ -237,8 +237,6 @@ class HearingsServiceTest {
                         .panelRequirements(PanelRequirements.builder().roleTypes(List.of("58"))
                                 .build()).build()).build();
         when(hearingsMapping.buildHearingPayload(any(), any())).thenReturn(hearingPayload);
-        when(panelCompositionService.createPanelCompositionFromJohTiers(eq(List.of("58"))))
-                .thenReturn(panelComposition);
 
         assertThatNoException()
                 .isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));

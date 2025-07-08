@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReserveTo;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -76,9 +77,9 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
 
         if (isDefaultPanelCompEnabled) {
             if (isNull(sscsCaseData.getPanelMemberComposition()) || sscsCaseData.getPanelMemberComposition().isEmpty()) {
-                sscsCaseData.setPanelMemberComposition(
-                        panelCompositionService.createPanelComposition(sscsCaseData)
-                );
+                var johTiers = panelCompositionService.getDefaultJohTiers(sscsCaseData);
+                sscsCaseData.setPanelMemberComposition(new PanelMemberComposition(johTiers));
+                log.info("Setting default JOH tiers ({}) on case ({})", johTiers, caseId);
             }
             if (nonNull(sscsCaseData.getPanelMemberComposition())
                     && nonNull(sscsCaseData.getPanelMemberComposition().getPanelCompositionJudge())) {
