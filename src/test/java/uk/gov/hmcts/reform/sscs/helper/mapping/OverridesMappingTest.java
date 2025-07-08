@@ -107,7 +107,7 @@ class OverridesMappingTest {
         try {
             when(refData.getVenueService()).thenReturn(venueService);
             caseData.setBenefitCode("093");
-            overridesMapping.setOverrideValues(caseData,refData);
+            overridesMapping.setOverrideValues(caseData,refData, true);
             assertNull(caseData.getSchedulingAndListingFields().getOverrideFields().getDuration());
         } catch (ListingException e) {
             throw new RuntimeException(e);
@@ -211,7 +211,7 @@ class OverridesMappingTest {
         given(refData.getVenueService()).willReturn(venueService);
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
 
-        overridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData);
+        overridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData, true);
         OverrideFields result = caseData.getSchedulingAndListingFields().getDefaultListingValues();
 
         assertThat(result).isNotNull();
@@ -241,7 +241,7 @@ class OverridesMappingTest {
         given(refData.getVenueService()).willReturn(venueService);
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
 
-        overridesMapping.setOverrideValues(wrapper.getCaseData(), refData);
+        overridesMapping.setOverrideValues(wrapper.getCaseData(), refData, true);
         OverrideFields result = caseData.getSchedulingAndListingFields().getOverrideFields();
 
         assertThat(result).isNotNull();
@@ -278,8 +278,7 @@ class OverridesMappingTest {
             .appellantHearingChannel(HearingChannel.TELEPHONE)
             .duration(10)
             .build();
-
-        overridesMapping.setOverrideValues(wrapper.getCaseData(), refData);
+        overridesMapping.setOverrideValues(wrapper.getCaseData(), refData, true);
         OverrideFields overrideFields = caseData.getSchedulingAndListingFields().getOverrideFields();
 
         assertThat(defaultListingValues).isNotNull();

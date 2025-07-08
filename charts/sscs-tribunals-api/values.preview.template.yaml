@@ -65,6 +65,7 @@ java:
     TRIBUNAL_INTERNAL_DOCUMENTS_ENABLED: true
     IBC_NI_POSTCODES_FEATURE: true
     DEFAULT_PANEL_COMPOSITION_ENABLED: true
+    HEARING_DURATION_ENABLED: true
   secrets:
     JOB_SCHEDULER_DB_PASSWORD:
       secretRef: postgres
@@ -641,7 +642,6 @@ ccd:
 
   ccd-api-gateway-web:
     nodejs:
-      image: hmctspublic.azurecr.io/ccd/api-gateway-web:prod-66a4048-20250203150702
       imagePullPolicy: Always
       environment:
         ADDRESS_LOOKUP_TOKEN: ${ADDRESS_LOOKUP_TOKEN}

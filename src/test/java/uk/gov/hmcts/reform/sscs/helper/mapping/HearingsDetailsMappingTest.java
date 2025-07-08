@@ -483,7 +483,6 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
     @DisplayName("When a case has been adjourned and a different venue has been selected, return the new venue")
     @Test
     void getHearingLocationsAdjournmentNewVenue() throws ListingException {
-        given(refData.isAdjournmentFlagEnabled()).willReturn(true);
         caseData.getAdjournment().setAdjournmentInProgress(YesNo.YES);
 
         given(refData.getVenueService()).willReturn(venueService);
@@ -500,7 +499,6 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
     @DisplayName("When a case has been adjourned and the same venue has been selected, return the same venue")
     @Test
     void getHearingLocationsAdjournmentSameVenue() throws ListingException {
-        given(refData.isAdjournmentFlagEnabled()).willReturn(true);
         caseData.getAdjournment().setAdjournmentInProgress(YesNo.YES);
 
         given(venueService.getEpimsIdForVenueId(EPIMS_ID_1)).willReturn(EPIMS_ID_2);
@@ -537,7 +535,6 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
         given(venueService.getEpimsIdForVenue(caseData.getProcessingVenue())).willReturn(EPIMS_ID_1);
         given(refData.getVenueService()).willReturn(venueService);
 
-        given(refData.isAdjournmentFlagEnabled()).willReturn(false); //TODO: remove flag
 
         checkHearingLocationResults(HearingsLocationMapping.getHearingLocations(caseData, refData),
             EPIMS_ID_1);

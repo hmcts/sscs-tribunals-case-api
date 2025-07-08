@@ -117,7 +117,7 @@ public final class HearingsLocationMapping {
 
     private static List<HearingLocation> getAdjournedLocations(SscsCaseData caseData,
                                                                ReferenceDataServiceHolder refData) throws ListingException {
-        if (refData.isAdjournmentFlagEnabled() && isYes(caseData.getAdjournment().getAdjournmentInProgress())) {
+        if (isYes(caseData.getAdjournment().getAdjournmentInProgress())) {
             List<String> epimsIds;
 
             Adjournment adjournment = caseData.getAdjournment();
