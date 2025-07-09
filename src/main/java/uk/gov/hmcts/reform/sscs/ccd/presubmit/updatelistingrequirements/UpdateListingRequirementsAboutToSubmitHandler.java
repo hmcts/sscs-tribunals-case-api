@@ -79,7 +79,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
         OverrideFields overrideFields = caseDataSnlFields.getOverrideFields();
 
-        if (nonNull(overrideFields)) {
+        if (nonNull(overrideFields) && !overrideFields.isAllNull()) {
             HearingChannel hearingChannel = overrideFields.getAppellantHearingChannel();
             if (nonNull(hearingChannel)) {
                 SscsUtil.updateHearingChannel(sscsCaseData, hearingChannel);
