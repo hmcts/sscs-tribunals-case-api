@@ -59,13 +59,15 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
         ReserveTo caseDataReserveTo = caseDataSnlFields.getReserveTo();
         if (nonNull(caseDataReserveTo) && isYes(caseDataReserveTo.getReservedDistrictTribunalJudge())) {
             caseDataReserveTo.setReservedJudge(null);
-            if (isDefaultPanelCompEnabled) {
+            if (isDefaultPanelCompEnabled && nonNull(sscsCaseData.getPanelMemberComposition())) {
                 sscsCaseData.getPanelMemberComposition().setPanelCompositionJudge(null);
             }
         }
 
-        if (isDefaultPanelCompEnabled && "NoMedicalMemberRequired"
-                .equals(sscsCaseData.getPanelMemberComposition().getPanelCompositionMemberMedical1())) {
+        if (isDefaultPanelCompEnabled && nonNull(sscsCaseData.getPanelMemberComposition())
+                && "NoMedicalMemberRequired".equals(
+                        sscsCaseData.getPanelMemberComposition().getPanelCompositionMemberMedical1()
+        )) {
             sscsCaseData.getPanelMemberComposition().setPanelCompositionMemberMedical1(null);
             sscsCaseData.getPanelMemberComposition().setPanelCompositionMemberMedical2(null);
         }
