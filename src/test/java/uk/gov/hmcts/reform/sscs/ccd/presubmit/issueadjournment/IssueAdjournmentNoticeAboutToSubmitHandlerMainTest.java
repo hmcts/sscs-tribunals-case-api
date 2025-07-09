@@ -10,9 +10,11 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
@@ -20,6 +22,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingPeriod;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -32,6 +36,9 @@ import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingDuration;
 
 public class IssueAdjournmentNoticeAboutToSubmitHandlerMainTest extends IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
+    @Mock
+    private CaseDetails<SscsCaseData> caseDetailsBefore;
+
 
     @BeforeEach
     void setUpMocks() {
@@ -143,13 +150,22 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerMainTest extends IssueAdj
     @Test
     void givenStandardDurationSelectedAndInterpreterUpdated_ShouldUpdateOverride() {
         sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder().duration(90).build());
-        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("YES").build());
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().duration(90).build());
         var adjournment = sscsCaseData.getAdjournment();
         adjournment.setTypeOfHearing(FACE_TO_FACE);
         adjournment.setTypeOfNextHearing(FACE_TO_FACE);
         adjournment.setInterpreterRequired(NO);
         adjournment.setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.STANDARD);
         setupHearingDurationValues();
+
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+        var sscsCaseDataBefore = SscsCaseData.builder()
+                .ccdCaseId("ccdId")
+                .appeal(Appeal.builder().hearingOptions(HearingOptions.builder().languageInterpreter("YES").build()).build())
+                .dwpUcb("yes")
+                .build();
+        when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
+
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
