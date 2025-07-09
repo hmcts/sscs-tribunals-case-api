@@ -6,16 +6,19 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDuration
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType.STANDARD;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getDurationForAdjournment;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.hasInterpreterOrChannelChanged;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.hasChannelChanged;
 import static uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil.isInterpreterRequired;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
@@ -76,7 +79,7 @@ public final class HearingsDurationMapping {
         AdjournCaseNextHearingDurationType durationType = caseData.getAdjournment().getNextHearingListingDurationType();
         if (isHearingDurationEnabled && !NON_STANDARD.equals(durationType)) {
             Integer duration = getDurationForAdjournment(caseData, hearingDurationsService);
-            boolean hasInterpreterChannelChanged = hasInterpreterOrChannelChanged(caseData);
+            boolean hasInterpreterChannelChanged = hasChannelChanged(caseData) || hasInterpreterChanged(caseData);
             if (hasInterpreterChannelChanged && isNull(duration)) {
                 throw new ListingException("Hearing duration is required to list case");
             } else if (!hasInterpreterChannelChanged) {
@@ -142,6 +145,13 @@ public final class HearingsDurationMapping {
 
         return DURATION_DEFAULT;
     }
+
+    private static boolean hasInterpreterChanged(SscsCaseData caseData) {
+        HearingOptions hearingOptions = Optional.ofNullable(caseData.getAppeal().getHearingOptions()).orElse(HearingOptions.builder().build());
+        String languageInterpreter = Optional.ofNullable(hearingOptions.getLanguageInterpreter()).orElse("NO");
+        return nonNull(caseData.getAdjournment().getInterpreterRequired()) && !caseData.getAdjournment().getInterpreterRequired().equals(YesNo.valueOf(languageInterpreter.toUpperCase()));
+    }
+
 
     public static List<String> getNonStandardHearingDurationReasons() {
         // TODO Future Work

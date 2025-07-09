@@ -740,15 +740,10 @@ public class SscsUtil {
         return duration;
     }
 
-    public static boolean hasInterpreterOrChannelChanged(SscsCaseData caseData) {
-        boolean channelChanged = (caseData.getAdjournment().getTypeOfHearing().equals(AdjournCaseTypeOfHearing.PAPER)
+    public static boolean hasChannelChanged(SscsCaseData caseData) {
+        return (caseData.getAdjournment().getTypeOfHearing().equals(AdjournCaseTypeOfHearing.PAPER)
                 && !caseData.getAdjournment().getTypeOfNextHearing().equals(AdjournCaseTypeOfHearing.PAPER))
                 || (caseData.getAdjournment().getTypeOfNextHearing().equals(AdjournCaseTypeOfHearing.PAPER) && !caseData.getAdjournment().getTypeOfHearing().equals(AdjournCaseTypeOfHearing.PAPER));
-        HearingOptions hearingOptions = Optional.ofNullable(caseData.getAppeal().getHearingOptions()).orElse(HearingOptions.builder().build());
-        String languageInterpreter = Optional.ofNullable(hearingOptions.getLanguageInterpreter()).orElse("NO");
-        boolean interpreterChanged = nonNull(caseData.getAdjournment().getInterpreterRequired()) && !caseData.getAdjournment().getInterpreterRequired().equals(YesNo.valueOf(languageInterpreter.toUpperCase()));
-        return channelChanged || interpreterChanged;
     }
-
 }
 
