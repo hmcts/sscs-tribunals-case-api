@@ -69,7 +69,7 @@ public class FormTypeValidator {
                 case SSCS2 -> validateSchema(sscs2Schema, jsonNode);
                 case SSCS5 -> validateSchema(sscs5Schema, jsonNode);
                 case SSCS1U, SSCS1, SSCS1PE, SSCS1PEU -> validateSchema(sscs1Schema, jsonNode);
-                default -> null;
+                case SSCS8, UNKNOWN -> null;
             };
         }
 
