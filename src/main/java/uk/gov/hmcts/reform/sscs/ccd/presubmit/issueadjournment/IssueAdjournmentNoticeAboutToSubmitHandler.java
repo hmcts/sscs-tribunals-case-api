@@ -18,7 +18,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getDurationForAdjournment;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.hasChannelChanged;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.hasChannelChangedForAdjournment;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.hasInterpreterChangedForAdjournment;
 import static uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil.isInterpreterRequired;
 
 import jakarta.validation.ConstraintViolation;
@@ -333,7 +334,10 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         if (isHearingDurationEnabled ? !NON_STANDARD.equals(durationType) : STANDARD.equals(durationType)) {
             if (isHearingDurationEnabled) {
                 Integer duration = getDurationForAdjournment(caseData, hearingDurationsService);
-                boolean hasInterpreterChannelChanged = hasChannelChanged(caseData) || hasInterpreterChanged(caseData, oldCaseDetails);
+                HearingOptions hearingOptions = nonNull(oldCaseDetails)
+                        ? ofNullable(oldCaseDetails.getCaseData().getAppeal().getHearingOptions()).orElse(HearingOptions.builder().build())
+                        : HearingOptions.builder().build();
+                boolean hasInterpreterChannelChanged = hasChannelChangedForAdjournment(caseData) || hasInterpreterChangedForAdjournment(caseData, hearingOptions);
                 if (hasInterpreterChannelChanged && isNull(duration)) {
                     return null;
                 } else if (!hasInterpreterChannelChanged) {
@@ -405,16 +409,6 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
                 hearingWindow.setDateRangeStart(LocalDate.now().plusDays(after));
             }
         }
-    }
-
-    private static boolean hasInterpreterChanged(SscsCaseData caseData, CaseDetails<SscsCaseData> oldCaseDetails) {
-        boolean interpreterChanged = false;
-        if (nonNull(oldCaseDetails)) {
-            HearingOptions hearingOptions = ofNullable(oldCaseDetails.getCaseData().getAppeal().getHearingOptions()).orElse(HearingOptions.builder().build());
-            String languageInterpreter = ofNullable(hearingOptions.getLanguageInterpreter()).orElse("NO");
-            interpreterChanged = nonNull(caseData.getAdjournment().getInterpreterRequired()) && !caseData.getAdjournment().getInterpreterRequired().equals(YesNo.valueOf(languageInterpreter.toUpperCase()));
-        }
-        return interpreterChanged;
     }
 
 }
