@@ -140,19 +140,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
     }
 
     @Test
-    @DisplayName("If Panel member composition doesn't exist, then setting FQPM shouldn't create it")
-    void givenFqpmRequiredSetAndPanelMemberCompositionIsNull_thenPanelMemberCompositionShouldNotChange() {
-        sscsCaseData.setIsFqpmRequired(YES);
-
-        PreSubmitCallbackResponse<SscsCaseData> response =
-            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getPanelMemberComposition()).isNull();
-    }
-
-    @Test
-    @DisplayName("If panel member composition exists and FQPM Required is set to yes, "
-        + "then panel member composition should contain FQPM")
+    @DisplayName("If FQPM Required is set to yes, then panel member composition should contain FQPM")
     void givenFqpmRequiredSet_thenUpdateFqpmInPanelMemberComposition() {
         sscsCaseData.setIsFqpmRequired(YES);
         sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().build());
@@ -165,8 +153,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
     }
 
     @Test
-    @DisplayName("If panel member composition exists and FQPM Required is no, "
-        + "then panel member composition should not contain FQPM")
+    @DisplayName("If FQPM Required is no, then panel member composition should not contain FQPM")
     void givenFqpmRequiredNo_thenPanelMemberCompositionHasNoFqpm() {
         sscsCaseData.setIsFqpmRequired(NO);
         sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
@@ -183,20 +170,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
     }
 
     @Test
-    @DisplayName("If Panel member composition doesn't exist, then setting Medical member required shouldn't create it")
-    void givenMedicalMemberRequiredIsSetAndPanelMemberCompositionIsNullOnIbcaCase_thenPanelMemberCompositionShouldNotChange() {
-        sscsCaseData.setBenefitCode(IBCA_BENEFIT_CODE);
-        sscsCaseData.setIsMedicalMemberRequired(NO);
-
-        PreSubmitCallbackResponse<SscsCaseData> response =
-            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getPanelMemberComposition()).isNull();
-    }
-
-    @Test
-    @DisplayName("If no Medical Member Required on an IBCA case and Panel Member Composition exists, "
-        + "then Medical Members should be null on Panel Member Composition")
+    @DisplayName("If no Medical Member Required on an IBCA case, then Medical Members should be null on Panel Member Composition")
     void givenMedicalMemberRequiredNoOnIbcaCase_thenPanelMemberCompositionMedicalMembersAreNull() {
         sscsCaseData.setBenefitCode(IBCA_BENEFIT_CODE);
         sscsCaseData.setIsMedicalMemberRequired(NO);
@@ -213,7 +187,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
 
     @Test
     @DisplayName("At least one Medical member should be tribunal or regional medical member on "
-        + "panel member composition if Medical Member Required is yes on an IBCA case and Panel Member Composition exists")
+        + "panel member composition if Medical Member Required is yes on an IBCA case")
     void givenMedicalMemberRequiredYesOnIbcaCase_thenPanelMemberCompositionHasMedicalMember() {
         sscsCaseData.setBenefitCode(IBCA_BENEFIT_CODE);
         sscsCaseData.setIsMedicalMemberRequired(YES);

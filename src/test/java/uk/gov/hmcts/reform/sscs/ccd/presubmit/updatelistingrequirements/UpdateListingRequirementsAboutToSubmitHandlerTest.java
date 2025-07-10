@@ -378,7 +378,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenPanelMemberCompositionHasFqpm_thenIsFqpmRequiredIsYes() {
+    void givenPanelMemberCompositionHasFqpm_thenUpdateIsFqpmRequiredToYes() {
         sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
             .panelCompositionDisabilityAndFqMember(List.of(
                 PanelMemberType.TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED.toRef()))
@@ -394,7 +394,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenIsFqpmRequiredIsYesAndNoFqpmInPanelMemberComposition_thenUpdateIsFqpmRequiredToNo() {
+    void givenNoFqpmIsSetInPanelMemberComposition_thenUpdateIsFqpmRequiredToNo() {
         sscsCaseData.setIsFqpmRequired(YES);
         sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
             .panelCompositionDisabilityAndFqMember(Collections.emptyList())
