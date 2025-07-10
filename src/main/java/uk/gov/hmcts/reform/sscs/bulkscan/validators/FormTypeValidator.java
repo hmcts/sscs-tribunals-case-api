@@ -13,7 +13,6 @@ import com.networknt.schema.JsonSchema;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
 import com.networknt.schema.ValidationMessage;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -97,7 +96,7 @@ public class FormTypeValidator {
                 return null;
             }
             return factory.getSchema(inputStream);
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("Failed to load or parse schema: {}", schemaLocation, e);
             return null;
         }
