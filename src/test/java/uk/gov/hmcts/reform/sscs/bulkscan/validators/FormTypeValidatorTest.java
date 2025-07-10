@@ -207,7 +207,15 @@ public class FormTypeValidatorTest {
     @Test
     public void shouldReturnNullWhenSchemaFileIsMissing() {
         FormTypeValidator validator = new FormTypeValidator(mockExtractor);
-        JsonSchema schema = invokeTryLoadSscsSchema(validator, "/nonexistent-schema.json");
+        JsonSchema schema = invokeTryLoadSscsSchema(validator, "/nonexistent_schema.json");
+
+        assertThat(schema).isNull();
+    }
+
+    @Test
+    public void shouldReturnNullWhenSchemaFileIsMalformed() {
+        FormTypeValidator validator = new FormTypeValidator(mockExtractor);
+        JsonSchema schema = invokeTryLoadSscsSchema(validator, "/schema/malformed_schema.json");
 
         assertThat(schema).isNull();
     }
