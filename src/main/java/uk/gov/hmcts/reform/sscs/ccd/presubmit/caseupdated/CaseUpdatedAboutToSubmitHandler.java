@@ -62,6 +62,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
@@ -83,8 +84,12 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final VenueService venueService;
     private final SessionCategoryMapService categoryMapService;
     private final boolean caseAccessManagementFeature;
+    private final PanelCompositionService panelCompositionService;
     private final PostcodeValidator postcodeValidator = new PostcodeValidator();
     private static ConstraintValidatorContext context;
+    @Value("${feature.default-panel-comp.enabled}")
+    private boolean defaultPanelCompEnabled;
+
 
 
     private static final String WARNING_MESSAGE = "%s has not been provided for the %s, do you want to ignore this warning and proceed?";
@@ -107,6 +112,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                                     RefDataService refDataService,
                                     VenueService venueService,
                                     SessionCategoryMapService categoryMapService,
+                                    PanelCompositionService panelCompositionService,
                                     @Value("${feature.case-access-management.enabled}")  boolean caseAccessManagementFeature) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
@@ -115,6 +121,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         this.idamService = idamService;
         this.refDataService = refDataService;
         this.caseAccessManagementFeature = caseAccessManagementFeature;
+        this.panelCompositionService = panelCompositionService;
         this.venueService = venueService;
         this.categoryMapService = categoryMapService;
     }
@@ -234,14 +241,17 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
     }
 
-    private void validateBenefitIssueCode(SscsCaseData caseData,
-                                          PreSubmitCallbackResponse<SscsCaseData> response) {
-        boolean isSecondDoctorPresent = isNotBlank(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism());
-        boolean fqpmRequired = isYes(caseData.getIsFqpmRequired());
-
-        if (isNull(categoryMapService.getSessionCategory(caseData.getBenefitCode(), caseData.getIssueCode(),
-                isSecondDoctorPresent, fqpmRequired))) {
-            response.addError("Incorrect benefit/issue code combination");
+    private void validateBenefitIssueCode(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+        if (defaultPanelCompEnabled) {
+            if (!panelCompositionService.isBenefitIssueCodeValid(caseData.getBenefitCode(), caseData.getIssueCode())) {
+                response.addError("Incorrect benefit/issue code combination");
+            }
+        } else {
+            boolean isSecondDoctorPresent = isNotBlank(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism());
+            boolean fqpmRequired = isYes(caseData.getIsFqpmRequired());
+            if (isNull(categoryMapService.getSessionCategory(caseData.getBenefitCode(), caseData.getIssueCode(), isSecondDoctorPresent, fqpmRequired))) {
+                response.addError("Incorrect benefit/issue code combination");
+            }
         }
     }
 

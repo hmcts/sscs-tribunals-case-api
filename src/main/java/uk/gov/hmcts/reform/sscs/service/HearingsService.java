@@ -62,6 +62,7 @@ public class HearingsService {
     private final HearingServiceConsumer hearingServiceConsumer;
     private final HearingsMapping hearingsMapping;
     private final PanelCompositionService panelCompositionService;
+    private final OverridesMapping overridesMapping;
     @Value("${feature.hearing-duration.enabled}")
     private boolean isHearingDurationEnabled;
 
@@ -126,8 +127,7 @@ public class HearingsService {
         HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseId, null);
         CaseHearing hearing = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse);
         HmcUpdateResponse hmcUpdateResponse;
-
-        OverridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData, isHearingDurationEnabled);
+        overridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData, isHearingDurationEnabled);
 
         if (isNull(hearing)) {
             HearingRequestPayload hearingPayload = hearingsMapping.buildHearingPayload(wrapper, refData);
@@ -175,7 +175,7 @@ public class HearingsService {
 
     private void updateHearing(HearingWrapper wrapper) throws UpdateCaseException, ListingException {
         if (isNull(wrapper.getCaseData().getSchedulingAndListingFields().getOverrideFields())) {
-            OverridesMapping.setOverrideValues(wrapper.getCaseData(), refData, isHearingDurationEnabled);
+            overridesMapping.setOverrideValues(wrapper.getCaseData(), refData, isHearingDurationEnabled);
         }
         Integer duration = wrapper
                 .getCaseData()
