@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournment;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod.PROVIDE_DATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod.PROVIDE_PERIOD;
@@ -27,7 +28,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -410,8 +410,8 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
     private static boolean hasInterpreterChanged(SscsCaseData caseData, CaseDetails<SscsCaseData> oldCaseDetails) {
         boolean interpreterChanged = false;
         if (nonNull(oldCaseDetails)) {
-            HearingOptions hearingOptions = Optional.ofNullable(oldCaseDetails.getCaseData().getAppeal().getHearingOptions()).orElse(HearingOptions.builder().build());
-            String languageInterpreter = Optional.ofNullable(hearingOptions.getLanguageInterpreter()).orElse("NO");
+            HearingOptions hearingOptions = ofNullable(oldCaseDetails.getCaseData().getAppeal().getHearingOptions()).orElse(HearingOptions.builder().build());
+            String languageInterpreter = ofNullable(hearingOptions.getLanguageInterpreter()).orElse("NO");
             interpreterChanged = nonNull(caseData.getAdjournment().getInterpreterRequired()) && !caseData.getAdjournment().getInterpreterRequired().equals(YesNo.valueOf(languageInterpreter.toUpperCase()));
         }
         return interpreterChanged;
