@@ -4,7 +4,6 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
-import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsAutoListMapping.shouldBeAutoListed;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsChannelMapping.getHearingChannels;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsDurationMapping.getHearingDuration;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsDurationMapping.getNonStandardHearingDurationReasons;
@@ -45,8 +44,11 @@ public final class HearingsDetailsMapping {
     @Value("${feature.hearing-duration.enabled}")
     private boolean isHearingDurationEnabled;
 
-    HearingsDetailsMapping(HearingsPanelMapping hearingsPanelMapping) {
+    private final HearingsAutoListMapping hearingsAutoListMapping;
+
+    HearingsDetailsMapping(HearingsPanelMapping hearingsPanelMapping, HearingsAutoListMapping hearingsAutoListMapping) {
         this.hearingsPanelMapping = hearingsPanelMapping;
+        this.hearingsAutoListMapping = hearingsAutoListMapping;
     }
 
     public HearingDetails buildHearingDetails(HearingWrapper wrapper, ReferenceDataServiceHolder refData) throws ListingException {
@@ -54,7 +56,7 @@ public final class HearingsDetailsMapping {
         SscsCaseData caseData = wrapper.getCaseData();
         boolean adjournmentInProgress = isYes(caseData.getAdjournment().getAdjournmentInProgress());
         return HearingDetails.builder()
-                .autolistFlag(shouldBeAutoListed(caseData, refData))
+                .autolistFlag(hearingsAutoListMapping.shouldBeAutoListed(caseData, refData))
                 .hearingType(getHearingType(caseData))
                 .hearingWindow(buildHearingWindow(caseData, refData))
                 .duration(getHearingDuration(caseData, refData, isHearingDurationEnabled))
