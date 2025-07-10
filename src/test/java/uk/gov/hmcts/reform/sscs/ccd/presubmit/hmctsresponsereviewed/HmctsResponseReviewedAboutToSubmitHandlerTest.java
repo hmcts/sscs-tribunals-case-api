@@ -45,6 +45,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -60,6 +61,8 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
     @Mock
     private CaseDetails<SscsCaseData> caseDetailsBefore;
+    @Mock
+    private PanelCompositionService panelCompositionService;
 
     private SscsCaseData sscsCaseData;
 
@@ -69,7 +72,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     public void setUp() {
         openMocks(this);
         DwpDocumentService dwpDocumentService = new DwpDocumentService();
-        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService);
+        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompositionService, true);
 
         when(callback.getEvent()).thenReturn(EventType.HMCTS_RESPONSE_REVIEWED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);

@@ -134,7 +134,6 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     @Mock
     private SessionCategoryMapService categoryMapService;
-
     @Mock
     private PanelCompositionService panelCompositionService;
 
@@ -162,8 +161,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
                 venueService,
                 categoryMapService,
                 panelCompositionService,
-                true
-                );
+                true);
 
         lenient().when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
