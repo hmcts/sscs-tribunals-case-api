@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getHmcHearingType;
 
@@ -71,10 +73,12 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             }
         }
 
-        if (isDefaultPanelCompEnabled && callbackResponse.getData().getPanelMemberComposition() != null
-                && "NoMedicalMemberRequired".equals(callbackResponse.getData().getPanelMemberComposition().getPanelCompositionMemberMedical1())) {
-            callbackResponse.getData().getPanelMemberComposition().setPanelCompositionMemberMedical1(null);
-            callbackResponse.getData().getPanelMemberComposition().setPanelCompositionMemberMedical2(null);
+        if (isDefaultPanelCompEnabled && callbackResponse.getData().getPanelMemberComposition() != null) {
+            if ("NoMedicalMemberRequired".equals(callbackResponse.getData().getPanelMemberComposition().getPanelCompositionMemberMedical1())) {
+                callbackResponse.getData().getPanelMemberComposition().clearMedicalMembers();
+            }
+
+            syncConfirmPanelComposition(callbackResponse.getData());
         }
 
         OverrideFields overrideFields = caseDataSnlFields.getOverrideFields();
@@ -126,5 +130,16 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             interpreterUpdated = nonNull(appellantInterpreter) && YesNo.isYes(caseInterpreter) != YesNo.isYes(appellantInterpreter.getIsInterpreterWanted());
         }
         return channelUpdated || interpreterUpdated;
+    }
+
+    private void syncConfirmPanelComposition(SscsCaseData sscsCaseData) {
+        PanelMemberComposition panelMemberComposition = sscsCaseData.getPanelMemberComposition();
+
+        sscsCaseData.setIsFqpmRequired(panelMemberComposition.hasFqpm() ? YES : NO);
+
+        if (sscsCaseData.isIbcCase()) {
+            sscsCaseData.setIsMedicalMemberRequired(
+                panelMemberComposition.hasMedicalMember() ? YES : NO);
+        }
     }
 }
