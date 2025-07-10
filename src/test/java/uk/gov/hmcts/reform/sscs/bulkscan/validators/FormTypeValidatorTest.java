@@ -1,14 +1,18 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.validators;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static uk.gov.hmcts.reform.sscs.bulkscan.helper.OcrDataBuilderTest.buildScannedValidationOcrData;
 
+import com.networknt.schema.JsonSchema;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
+import org.mockito.Mockito;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.ExceptionRecord;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.OcrDataField;
 import uk.gov.hmcts.reform.sscs.bulkscan.json.SscsJsonExtractor;
@@ -18,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.domain.CaseResponse;
 public class FormTypeValidatorTest {
     final SscsJsonExtractor sscsJsonExtractor = new SscsJsonExtractor();
     final FormTypeValidator validator = new FormTypeValidator(sscsJsonExtractor);
+    private final SscsJsonExtractor mockExtractor = Mockito.mock(SscsJsonExtractor.class);
 
     @Test
     public void givenNewFieldsInV2OfTheForm_thenNoErrorsAreGiven() {
@@ -197,5 +202,23 @@ public class FormTypeValidatorTest {
         pairs.put("is_benefit_type_guaranteed_minimum_pension", false);
         pairs.put("is_benefit_type_national_insurance_credits", false);
         return pairs;
+    }
+
+    @Test
+    public void shouldReturnNullWhenSchemaFileIsMissing() {
+        FormTypeValidator validator = new FormTypeValidator(mockExtractor);
+        JsonSchema schema = invokeTryLoadSscsSchema(validator, "/nonexistent-schema.json");
+
+        assertThat(schema).isNull();
+    }
+
+    private JsonSchema invokeTryLoadSscsSchema(FormTypeValidator validator, String path) {
+        try {
+            Method method = FormTypeValidator.class.getDeclaredMethod("tryLoadSscsSchema", String.class);
+            method.setAccessible(true);
+            return (JsonSchema) method.invoke(validator, path);
+        } catch (Exception e) {
+            throw new RuntimeException("Error invoking tryLoadSscsSchema", e);
+        }
     }
 }
