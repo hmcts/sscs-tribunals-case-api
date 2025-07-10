@@ -11,6 +11,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE;
@@ -20,11 +21,13 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.CANCEL_HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.CREATE_HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATED_CASE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason.OTHER;
 
 import feign.FeignException;
 import feign.Request;
 import feign.RequestTemplate;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,19 +50,19 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseManagementLocation;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Issue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingWindow;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SessionCategory;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -70,6 +73,7 @@ import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.exception.UnhandleableHearingStateException;
 import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
 import uk.gov.hmcts.reform.sscs.helper.mapping.HearingsMapping;
+import uk.gov.hmcts.reform.sscs.helper.mapping.OverridesMapping;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.HearingEvent;
@@ -86,7 +90,7 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HmcUpdateResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.RequestDetails;
-import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
+import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
@@ -132,6 +136,9 @@ class HearingsServiceTest {
 
     @Captor
     private ArgumentCaptor<Consumer<SscsCaseDetails>> caseDataConsumerCaptor;
+
+    @Mock
+    private OverridesMapping overridesMapping;
 
     @InjectMocks
     private HearingsService hearingsService;
@@ -283,16 +290,6 @@ class HearingsServiceTest {
 
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
 
-        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE, ISSUE_CODE, false, false))
-            .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                                               false, false, SessionCategory.CATEGORY_03, null));
-
-        given(refData.getHearingDurations()).willReturn(hearingDurations);
-        given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
-        given(refData.getVenueService()).willReturn(venueService);
-
-        given(venueService.getEpimsIdForVenue(PROCESSING_VENUE)).willReturn("219164");
-
         given(hmcHearingApiService.sendCreateHearingRequest(any()))
                 .willReturn(HmcUpdateResponse.builder().hearingRequestId(123L).versionNumber(1234L).status(HmcStatus.HEARING_REQUESTED).build());
 
@@ -303,13 +300,6 @@ class HearingsServiceTest {
     @DisplayName("When wrapper with a valid create Hearing State is given addHearingResponse should run without error")
     @Test
     void processHearingWrapperCreate() throws ListingException {
-        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE,ISSUE_CODE,false,false))
-            .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                false,false,SessionCategory.CATEGORY_03,null));
-        given(refData.getHearingDurations()).willReturn(hearingDurations);
-        given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
-        given(refData.getVenueService()).willReturn(venueService);
-        given(venueService.getEpimsIdForVenue(PROCESSING_VENUE)).willReturn("219164");
         given(hmcHearingApiService.sendCreateHearingRequest(any()))
                 .willReturn(HmcUpdateResponse.builder().build());
         given(hmcHearingApiService.getHearingsRequest(anyString(),eq(null)))
@@ -328,13 +318,6 @@ class HearingsServiceTest {
     @DisplayName("When create Hearing is given and there is already a hearing requested/awaiting listing addHearingResponse should run without error")
     @Test
     void processHearingWrapperCreateExistingHearing() throws GetHearingException {
-        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE,ISSUE_CODE,false,false))
-                .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                        false,false,SessionCategory.CATEGORY_03,null));
-        given(refData.getVenueService()).willReturn(venueService);
-        given(refData.getHearingDurations()).willReturn(hearingDurations);
-        given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
-
         var details = uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDetails.builder().build();
         RequestDetails requestDetails = RequestDetails.builder().versionNumber(2L).build();
         HearingGetResponse hearingGetResponse = HearingGetResponse.builder()
@@ -364,12 +347,6 @@ class HearingsServiceTest {
 
     @Test
     void processHearingWrapperCreateExistingHearingWhenHearingDoesntExists() throws GetHearingException {
-        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE,ISSUE_CODE,false,false))
-            .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                                               false,false,SessionCategory.CATEGORY_03,null));
-        given(refData.getVenueService()).willReturn(venueService);
-        given(refData.getHearingDurations()).willReturn(hearingDurations);
-        given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
         given(hmcHearingApiService.getHearingRequest(anyString())).willThrow(new GetHearingException(""));
         HearingsGetResponse hearingsGetResponse = HearingsGetResponse.builder()
             .caseHearings(List.of(CaseHearing.builder()
@@ -391,16 +368,19 @@ class HearingsServiceTest {
     @DisplayName("When wrapper with a valid create Hearing State is given addHearingResponse should run without error")
     @Test
     void processHearingWrapperUpdate() throws ListingException {
-        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE,ISSUE_CODE,false,false))
-            .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                false,false,SessionCategory.CATEGORY_03,null));
+        willAnswer(invocation -> {
+            SscsCaseData sscsCaseData = (SscsCaseData) invocation.getArguments()[0];
+            sscsCaseData.getSchedulingAndListingFields()
+                    .setOverrideFields(OverrideFields.builder()
+                            .autoList(NO)
+                            .hearingWindow(HearingWindow.builder().dateRangeStart(LocalDate.now()).build())
+                            .appellantHearingChannel(HearingChannel.FACE_TO_FACE)
+                            .appellantInterpreter(HearingInterpreter.builder().isInterpreterWanted(NO).build())
+                            .hearingVenueEpimsIds(List.of(CcdValue.<CcdValue<String>>builder().value(CcdValue.<String>builder().value("219164").build()).build()))
+                            .duration(0).build());
+            return sscsCaseData;
+        }).given(overridesMapping).setOverrideValues(eq(wrapper.getCaseData()), eq(refData), eq(false));
 
-        given(refData.getHearingDurations()).willReturn(hearingDurations);
-        given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
-
-        given(venueService.getEpimsIdForVenue(PROCESSING_VENUE)).willReturn("219164");
-
-        given(refData.getVenueService()).willReturn(venueService);
 
         given(hearingsMapping.buildHearingPayload(any(), any())).willReturn(HearingRequestPayload.builder().build());
 

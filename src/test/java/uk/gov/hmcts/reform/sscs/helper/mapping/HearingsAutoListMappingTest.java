@@ -2,9 +2,12 @@ package uk.gov.hmcts.reform.sscs.helper.mapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
 import static org.junit.jupiter.params.provider.EnumSource.Mode.INCLUDE;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
@@ -17,6 +20,8 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTime;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
@@ -38,14 +43,21 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SessionCategory;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
+import uk.gov.hmcts.reform.sscs.reference.data.model.DefaultPanelComposition;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 
 class HearingsAutoListMappingTest extends HearingsMappingBase {
 
     private SscsCaseData caseData;
+    @Mock
+    private PanelCompositionService panelCompositionService;
+
+    private HearingsAutoListMapping hearingsAutoListMapping;
 
     @BeforeEach
     void setUp() {
+        hearingsAutoListMapping = new HearingsAutoListMapping(panelCompositionService);
         caseData = SscsCaseData.builder()
             .benefitCode(BENEFIT_CODE)
             .issueCode(ISSUE_CODE)
@@ -77,7 +89,7 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
 
         given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
 
-        boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
+        boolean result = hearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
 
         assertThat(result).isTrue();
     }
@@ -91,7 +103,7 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
 
         given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
         caseData.setDwpResponseDate(null);
-        boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
+        boolean result = hearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
         assertThat(result).isFalse();
     }
 
@@ -104,7 +116,7 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
                         .build())
                 .build()));
 
-        boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
+        boolean result = hearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
 
         assertThat(result).isFalse();
     }
@@ -128,7 +140,7 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
 
         given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
 
-        boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
+        boolean result = hearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
 
         assertFalse(result);
     }
@@ -140,7 +152,7 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
             .autoList(YES)
             .build());
 
-        boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
+        boolean result = hearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
 
         assertThat(result).isTrue();
     }
@@ -152,7 +164,7 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
             .autoList(NO)
             .build());
 
-        boolean result = HearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
+        boolean result = hearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
 
         assertThat(result).isFalse();
     }
@@ -353,7 +365,7 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
 
         caseData.getAppeal().getHearingOptions().setOther("Test");
 
-        boolean result = HearingsAutoListMapping.hasMqpmOrFqpm(caseData, refData);
+        boolean result = hearingsAutoListMapping.hasMqpmOrFqpm(caseData, refData);
 
         assertThat(result).isTrue();
     }
@@ -368,9 +380,62 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
 
         given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
 
-        boolean result = HearingsAutoListMapping.hasMqpmOrFqpm(caseData, refData);
+        boolean result = hearingsAutoListMapping.hasMqpmOrFqpm(caseData, refData);
 
         assertThat(result).isFalse();
+    }
+
+    @DisplayName("hasMqpmOrFqpm should return true when default panel comp is enabled and case has medical member")
+    @Test
+    void hasMqpmOrFqpmWithDefaultPanelCompEnabledShouldReturnTrue() throws ListingException {
+
+        ReflectionTestUtils.setField(hearingsAutoListMapping, "defaultPanelCompEnabled", true);
+
+        DefaultPanelComposition panelComposition = new DefaultPanelComposition();
+        panelComposition.setJohTiers(List.of("58"));
+        when(panelCompositionService.getDefaultPanelComposition(any())).thenReturn(panelComposition);
+        when(panelCompositionService.isBenefitIssueCodeValid(any(), any())).thenReturn(true);
+        boolean result = hearingsAutoListMapping.hasMqpmOrFqpm(caseData, refData);
+
+        assertThat(result).isTrue();
+    }
+
+    @DisplayName("hasMqpmOrFqpm should return true when default panel comp is enabled and case has fqpm")
+    @Test
+    void hasMqpmOrFqpmOrFqpmWithDefaultPanelCompEnabledAndFqpmShouldReturnTrue() throws ListingException {
+
+        ReflectionTestUtils.setField(hearingsAutoListMapping, "defaultPanelCompEnabled", true);
+        DefaultPanelComposition panelComposition = new DefaultPanelComposition();
+        panelComposition.setJohTiers(List.of("50"));
+        when(panelCompositionService.getDefaultPanelComposition(any())).thenReturn(panelComposition);
+        when(panelCompositionService.isBenefitIssueCodeValid(any(), any())).thenReturn(true);
+        boolean result = hearingsAutoListMapping.hasMqpmOrFqpm(caseData, refData);
+
+        assertThat(result).isTrue();
+    }
+
+    @DisplayName("hasMqpmOrFqpm should return true when default panel comp is enabled and case has regional medical member")
+    @Test
+    void hasMqpmOrFqpmWithDefaultPanelCompEnabledAndRegionalMedicalMemberShouldReturnTrue() throws ListingException {
+
+        ReflectionTestUtils.setField(hearingsAutoListMapping, "defaultPanelCompEnabled", true);
+        DefaultPanelComposition panelComposition = new DefaultPanelComposition();
+        panelComposition.setJohTiers(List.of("69"));
+        when(panelCompositionService.getDefaultPanelComposition(any())).thenReturn(panelComposition);
+        when(panelCompositionService.isBenefitIssueCodeValid(any(), any())).thenReturn(true);
+        boolean result = hearingsAutoListMapping.hasMqpmOrFqpm(caseData, refData);
+
+        assertThat(result).isTrue();
+    }
+
+    @DisplayName("hasMqpmOrFqpm should return false when default panel comp is enabled and case has no roleTypes")
+    @Test
+    void hasMqpmOrFqpmDefaultPanelCompEnabledShouldReturnFalse() throws ListingException {
+
+        ReflectionTestUtils.setField(hearingsAutoListMapping, "defaultPanelCompEnabled", true);
+        when(panelCompositionService.getDefaultPanelComposition(any())).thenReturn(null);
+        ListingException ex = assertThrows(ListingException.class, () -> hearingsAutoListMapping.hasMqpmOrFqpm(caseData, refData));
+        assertThat(ex).hasMessage("Incorrect benefit/issue code combination");
     }
 
     @DisplayName("When dwpIsOfficerAttending is yes, isPoOfficerAttending return True")
@@ -405,6 +470,6 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
             .benefitCode(Benefit.INFECTED_BLOOD_COMPENSATION.getBenefitCode())
             .build();
 
-        assertFalse(HearingsAutoListMapping.shouldBeAutoListed(caseData, refData));
+        assertFalse(hearingsAutoListMapping.shouldBeAutoListed(caseData, refData));
     }
 }
