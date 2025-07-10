@@ -1,2 +1,57 @@
 [
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "panelMemberComposition",
+    "ListElementCode": "panelCompositionJudge",
+    "ID": "updateListingRequirementsPanelCompositionJudge",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "reserveTo.reservedDistrictTribunalJudge != \"Yes\"",
+    "LiveFrom": "11/04/2025",
+    "FieldDisplayOrder": 13,
+    "PageID": "1.0",
+    "RetainHiddenValue": "No"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "panelMemberComposition",
+    "ListElementCode": "panelCompositionMemberMedical1",
+    "ID": "updateListingRequirementsPanelCompositionMemberMedical1",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "11/04/2025",
+    "FieldDisplayOrder": 14,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "panelMemberComposition",
+    "ListElementCode": "panelCompositionMemberMedical2",
+    "ID": "updateListingRequirementsPanelCompositionMemberMedical2",
+    "FieldShowCondition": "panelMemberComposition.panelCompositionMemberMedical2 = \"DUMMY_VALUE_TO_HIDE_FIELD\"",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "11/04/2025",
+    "FieldDisplayOrder": 15,
+    "PageID": "1.0",
+    "RetainHiddenValue": "Yes"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "panelMemberComposition",
+    "ListElementCode": "panelCompositionDisabilityAndFqMember",
+    "ID": "updateListingRequirementsPanelCompositionDisabilityAndFqMember",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "11/04/2025",
+    "FieldDisplayOrder": 16,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "overrideFields",
+    "ListElementCode": "updateListingRequirementsInterpreterDurationLabel",
+    "ID": "updateListingRequirementsDurationLabel",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "29/05/2025",
+    "FieldDisplayOrder": 2,
+    "FieldShowCondition": "overrideFields.duration != \"\"",
+    "PageID": "1.0"
+  }
 ]

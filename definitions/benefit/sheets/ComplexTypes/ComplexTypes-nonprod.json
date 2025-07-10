@@ -1,2 +1,3 @@
 [
+  {"LiveFrom": "29/05/2025", "ID": "overrideFields", "ListElementCode": "updateListingRequirementsInterpreterDurationLabel", "FieldType": "Label", "ElementLabel": "If an interpreter is needed for the next hearing, please add an extra 30 minutes to the duration.", "FieldShowCondition": "updateListingRequirementsInterpreterDurationLabel=\"DUMMY_VALUE_TO_HIDE_FIELD\"" , "SecurityClassification": "PUBLIC"}
 ]
