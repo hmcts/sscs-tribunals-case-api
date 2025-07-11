@@ -90,6 +90,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
+import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
@@ -142,6 +143,9 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     @Mock
     private PanelCompositionService panelCompositionService;
 
+    @Mock
+    private HearingDurationsService hearingDurationsService;
+
     private AssociatedCaseLinkHelper associatedCaseLinkHelper;
 
     private CaseUpdatedAboutToSubmitHandler handler;
@@ -166,6 +170,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
                 venueService,
                 categoryMapService,
                 panelCompositionService,
+                hearingDurationsService,
                 true
                 );
 
@@ -1936,6 +1941,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     @Test
     void shouldUpdateOverrideInterpreterWhenInterpreterUpdated() {
+        ReflectionTestUtils.setField(handler, "isHearingDurationEnabled", true);
         sscsCaseDataBefore.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("No").build());
         sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("Yes").languages("Arabic").build());
         sscsCaseData.getAppeal().getHearingOptions().setLanguagesList(new DynamicList(new DynamicListItem("Arabic", "Arabic"), Collections.emptyList()));
@@ -1948,6 +1954,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     @Test
     void shouldNotUpdateOverrideInterpreterWhenInterpreterNotUpdated() {
+        ReflectionTestUtils.setField(handler, "isHearingDurationEnabled", true);
         sscsCaseDataBefore.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("No").build());
         sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("No").build());
         sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder().duration(60).build());
@@ -1958,6 +1965,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     @Test
     void shouldNotUpdateOverrideWhenDefaultListingValuesIsNull() {
+        ReflectionTestUtils.setField(handler, "isHearingDurationEnabled", true);
         sscsCaseDataBefore.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("No").build());
         sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("Yes").build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);

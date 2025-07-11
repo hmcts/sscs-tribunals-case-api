@@ -64,6 +64,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
+import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
@@ -85,12 +86,15 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final RefDataService refDataService;
     private final VenueService venueService;
     private final SessionCategoryMapService categoryMapService;
+    private final HearingDurationsService hearingDurationsService;
     private final boolean caseAccessManagementFeature;
     private final PanelCompositionService panelCompositionService;
     private final PostcodeValidator postcodeValidator = new PostcodeValidator();
     private static ConstraintValidatorContext context;
     @Value("${feature.default-panel-comp.enabled}")
     private boolean defaultPanelCompEnabled;
+    @Value("${feature.hearing-duration.enabled}")
+    private boolean isHearingDurationEnabled;
 
 
 
@@ -115,6 +119,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                                     VenueService venueService,
                                     SessionCategoryMapService categoryMapService,
                                     PanelCompositionService panelCompositionService,
+                                    HearingDurationsService hearingDurationsService,
                                     @Value("${feature.case-access-management.enabled}")  boolean caseAccessManagementFeature) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
@@ -122,6 +127,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.idamService = idamService;
         this.refDataService = refDataService;
+        this.hearingDurationsService = hearingDurationsService;
         this.caseAccessManagementFeature = caseAccessManagementFeature;
         this.panelCompositionService = panelCompositionService;
         this.venueService = venueService;
@@ -219,7 +225,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (sscsCaseData.isIbcCase()) {
             SscsUtil.setListAssistRoutes(sscsCaseData);
         }
-        updateOverrideFields(sscsCaseData, caseDetailsBefore);
+        if (isHearingDurationEnabled) {
+            updateOverrideFields(sscsCaseData, caseDetailsBefore);
+        }
         return preSubmitCallbackResponse;
     }
 
@@ -229,21 +237,36 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
         OverrideFields overrideFields = Optional.ofNullable(sscsCaseData.getSchedulingAndListingFields().getOverrideFields())
                 .orElse(OverrideFields.builder().build());
-        String languageInterpreter = sscsCaseData.getAppeal().getHearingOptions().getLanguageInterpreter();
-        String languageInterpreterBefore = caseDetailsBefore.get().getCaseData().getAppeal().getHearingOptions().getLanguageInterpreter();
-
-        if (!Objects.equals(languageInterpreterBefore, languageInterpreter)) {
-            DynamicList languageList = sscsCaseData.getAppeal().getHearingOptions().getLanguagesList();
-            DynamicList overrideList = null;
-            if (nonNull(sscsCaseData.getAppeal().getHearingOptions().getLanguages())) {
-                overrideList = new DynamicList(languageList.getValue(), languageList.getListItems());
-            }
-            HearingInterpreter hearingInterpreter = HearingInterpreter.builder()
-                    .isInterpreterWanted(YesNo.valueOf(languageInterpreter.toUpperCase()))
-                    .interpreterLanguage(overrideList).build();
-            overrideFields.setAppellantInterpreter(hearingInterpreter);
+        HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
+        if (nonNull(hearingOptions) && hasInterpreterChanged(sscsCaseData, caseDetailsBefore.get())) {
+            updateOverrideInterpreter(hearingOptions, overrideFields);
+            updateOverrideDuration(sscsCaseData, overrideFields);
         }
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
+    }
+
+    private boolean hasInterpreterChanged(SscsCaseData sscsCaseData, CaseDetails<SscsCaseData> caseDetailsBefore) {
+        String languageInterpreter = sscsCaseData.getAppeal().getHearingOptions().getLanguageInterpreter();
+        String languageInterpreterBefore = caseDetailsBefore.getCaseData().getAppeal().getHearingOptions().getLanguageInterpreter();
+        return !Objects.equals(languageInterpreterBefore, languageInterpreter);
+    }
+
+    private void updateOverrideInterpreter(HearingOptions hearingOptions, OverrideFields overrideFields) {
+        String languageInterpreter = hearingOptions.getLanguageInterpreter();
+        DynamicList languageList = hearingOptions.getLanguagesList();
+        DynamicList overrideList = null;
+        if (nonNull(hearingOptions.getLanguages())) {
+            overrideList = new DynamicList(languageList.getValue(), languageList.getListItems());
+        }
+        HearingInterpreter hearingInterpreter = HearingInterpreter.builder()
+                .isInterpreterWanted(YesNo.valueOf(languageInterpreter.toUpperCase()))
+                .interpreterLanguage(overrideList).build();
+        overrideFields.setAppellantInterpreter(hearingInterpreter);
+    }
+
+    private void updateOverrideDuration(SscsCaseData sscsCaseData, OverrideFields overrideFields) {
+        Integer duration = hearingDurationsService.getHearingDurationBenefitIssueCodes(sscsCaseData);
+        overrideFields.setDuration(duration);
     }
 
     private void updateLanguage(SscsCaseData sscsCaseData) {
