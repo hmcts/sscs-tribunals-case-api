@@ -5,6 +5,7 @@ import static java.util.Objects.isNull;
 import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
@@ -23,7 +24,9 @@ import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 @SuppressWarnings({"PMD.ExcessiveImports", "PMD.UnusedFormalParameter", "PMD.TooManyMethods", "AvoidThrowingRawExceptionTypes"})
 public class HearingServiceConsumer {
     private final ReferenceDataServiceHolder refData;
-
+    private final OverridesMapping overridesMapping;
+    @Value("${feature.hearing-duration.enabled}")
+    private boolean isHearingDurationEnabled;
 
     public Consumer<SscsCaseData> getCreateHearingCaseDataConsumer(HmcUpdateResponse response, Long hearingRequestId) {
         return sscsCaseData -> updateCaseDataWithHearingResponse(response, hearingRequestId, sscsCaseData);
@@ -38,10 +41,10 @@ public class HearingServiceConsumer {
             try {
                 if (isUpdateHearing) {
                     if (isNull(sscsCaseDetails.getData().getSchedulingAndListingFields().getOverrideFields())) {
-                        OverridesMapping.setOverrideValues(sscsCaseDetails.getData(), refData);
+                        overridesMapping.setOverrideValues(sscsCaseDetails.getData(), refData, isHearingDurationEnabled);
                     }
                 } else {
-                    OverridesMapping.setDefaultListingValues(sscsCaseDetails.getData(), refData);
+                    overridesMapping.setDefaultListingValues(sscsCaseDetails.getData(), refData, isHearingDurationEnabled);
                 }
                 sscsCaseDetails.getData().setPanelMemberComposition(panelComposition);
                 updateCaseDataWithHearingResponse(response, hearingRequestId, sscsCaseDetails.getData());
@@ -62,8 +65,7 @@ public class HearingServiceConsumer {
         HearingsServiceHelper.updateHearingId(hearing, response);
         HearingsServiceHelper.updateVersionNumber(hearing, response);
 
-        if (refData.isAdjournmentFlagEnabled()
-                && YesNo.isYes(caseData.getAdjournment().getAdjournmentInProgress())) {
+        if (YesNo.isYes(caseData.getAdjournment().getAdjournmentInProgress())) {
             log.debug("Case Updated with AdjournmentInProgress to NO for Case ID {}", caseData.getCcdCaseId());
             caseData.getAdjournment().setAdjournmentInProgress(YesNo.NO);
         }

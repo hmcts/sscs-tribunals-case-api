@@ -51,6 +51,8 @@ public class HearingsService {
 
     @Value("${retry.hearing-response-update.max-retries}")
     private static int hearingResponseUpdateMaxRetries;
+    @Value("${feature.default-panel-comp.enabled}")
+    private boolean integratedListAssistEnabled;
 
     private final HmcHearingApiService hmcHearingApiService;
     private final CcdCaseService ccdCaseService;
@@ -60,6 +62,10 @@ public class HearingsService {
     private final HearingServiceConsumer hearingServiceConsumer;
     private final HearingsMapping hearingsMapping;
     private final PanelCompositionService panelCompositionService;
+    private final OverridesMapping overridesMapping;
+    @Value("${feature.hearing-duration.enabled}")
+    private boolean isHearingDurationEnabled;
+
 
 
     // Leaving blank for now until a future change is scoped and completed, then we can add the case states back in
@@ -121,16 +127,18 @@ public class HearingsService {
         HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseId, null);
         CaseHearing hearing = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse);
         HmcUpdateResponse hmcUpdateResponse;
-
-        OverridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData);
+        overridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData, isHearingDurationEnabled);
 
         if (isNull(hearing)) {
             HearingRequestPayload hearingPayload = hearingsMapping.buildHearingPayload(wrapper, refData);
             log.debug("Sending Create Hearing Request for Case ID {}", caseId);
             hmcUpdateResponse = hmcHearingApiService.sendCreateHearingRequest(hearingPayload);
-            wrapper.getCaseData().setPanelMemberComposition(
-                    panelCompositionService.createPanelCompositionFromJohTiers(
-                            hearingPayload.getHearingDetails().getPanelRequirements().getRoleTypes()));
+            if (integratedListAssistEnabled) {
+                wrapper.getCaseData().setPanelMemberComposition(
+                        panelCompositionService.createPanelCompositionFromJohTiers(
+                                hearingPayload.getHearingDetails().getPanelRequirements().getRoleTypes()));
+            }
+
 
             log.debug("Received Create Hearing Request Response for Case ID {}, Hearing State {} and Response:\n{}",
                     caseId,
@@ -167,14 +175,14 @@ public class HearingsService {
 
     private void updateHearing(HearingWrapper wrapper) throws UpdateCaseException, ListingException {
         if (isNull(wrapper.getCaseData().getSchedulingAndListingFields().getOverrideFields())) {
-            OverridesMapping.setOverrideValues(wrapper.getCaseData(), refData);
+            overridesMapping.setOverrideValues(wrapper.getCaseData(), refData, isHearingDurationEnabled);
         }
         Integer duration = wrapper
                 .getCaseData()
                 .getSchedulingAndListingFields()
                 .getOverrideFields()
                 .getDuration();
-        boolean isMultipleOfFive = duration % 5 == 0;
+        boolean isMultipleOfFive = isHearingDurationEnabled ?  isNull(duration) || duration % 5 == 0 : duration % 5 == 0;
         if (!isMultipleOfFive) {
             throw new ListingException("Listing duration must be multiple of 5.0 minutes");
         }
