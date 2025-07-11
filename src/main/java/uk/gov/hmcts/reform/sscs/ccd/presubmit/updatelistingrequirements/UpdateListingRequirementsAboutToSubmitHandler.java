@@ -77,7 +77,9 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
         }
 
         if (isDefaultPanelCompEnabled && callbackResponse.getData().getPanelMemberComposition() != null) {
-            if ("NoMedicalMemberRequired".equals(callbackResponse.getData().getPanelMemberComposition().getPanelCompositionMemberMedical1())) {
+            if ("NoMedicalMemberRequired".equals(
+                    callbackResponse.getData().getPanelMemberComposition().getPanelCompositionMemberMedical1()
+            )) {
                 callbackResponse.getData().getPanelMemberComposition().clearMedicalMembers();
             }
 

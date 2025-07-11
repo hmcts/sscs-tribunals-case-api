@@ -84,11 +84,10 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final VenueService venueService;
     private final SessionCategoryMapService categoryMapService;
     private final PanelCompositionService panelCompositionService;
-    private final boolean integratedListAssistEnabled;
     private final PostcodeValidator postcodeValidator = new PostcodeValidator();
+    private final boolean integratedListAssistEnabled;
+
     private static ConstraintValidatorContext context;
-
-
     private static final String WARNING_MESSAGE = "%s has not been provided for the %s, do you want to ignore this warning and proceed?";
 
     private static final String ERROR_MESSAGE = "%s has not been provided for the %s";
@@ -119,9 +118,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         this.idamService = idamService;
         this.refDataService = refDataService;
         this.panelCompositionService = panelCompositionService;
-        this.integratedListAssistEnabled = integratedListAssistEnabled;
         this.venueService = venueService;
         this.categoryMapService = categoryMapService;
+        this.integratedListAssistEnabled = integratedListAssistEnabled;
     }
 
     @Override
@@ -362,8 +361,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             response.addWarning("Benefit type code is empty");
             return false;
         } else if (Benefit.findBenefitByShortName(benefitType.getCode()).isEmpty()) {
-            String validBenefitTypes = Arrays.stream(Benefit.values()).sequential().map(Benefit::getShortName).collect(Collectors.joining(", "));
-            response.addWarning("Benefit type code is invalid, should be one of: " + validBenefitTypes);
             return false;
         }
         return true;

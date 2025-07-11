@@ -12,6 +12,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_LISTING_REQUIREMENTS;
@@ -37,6 +38,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.ReserveTo;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.reference.data.model.DefaultPanelComposition;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 
@@ -54,9 +56,9 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
 
     @BeforeEach
     public void setUp() {
-        openMocks(this);
         handler = new UpdateListingRequirementsAboutToStartHandler(panelCompositionService, utils);
         ReflectionTestUtils.setField(handler, "isDefaultPanelCompEnabled", true);
+        when(panelCompositionService.getDefaultPanelComposition(any())).thenReturn(new DefaultPanelComposition());
 
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).build();
 
@@ -202,14 +204,16 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
         DynamicList interpreterLanguage = new DynamicList(null, List.of());
         given(utils.generateInterpreterLanguageFields(any())).willReturn(interpreterLanguage);
         var johTiers = List.of("50", "84");
-        PanelMemberComposition defaultPanelMemberComposition = new PanelMemberComposition(johTiers);
-        given(panelCompositionService.getDefaultJohTiers(any())).willReturn(johTiers);
+        var defaultPanelComposition = new DefaultPanelComposition(sscsCaseData);
+        defaultPanelComposition.setJohTiers(johTiers);
+        PanelMemberComposition panelMemberComposition = new PanelMemberComposition(johTiers);
+        given(panelCompositionService.getDefaultPanelComposition(any())).willReturn(defaultPanelComposition);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        verify(panelCompositionService, times(1)).getDefaultJohTiers(any());
+        verify(panelCompositionService, times(1)).getDefaultPanelComposition(any());
 
-        assertThat(response.getData().getPanelMemberComposition()).isEqualTo(defaultPanelMemberComposition);
+        assertThat(response.getData().getPanelMemberComposition()).isEqualTo(panelMemberComposition);
     }
 
     @Test

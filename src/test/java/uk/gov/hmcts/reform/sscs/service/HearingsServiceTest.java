@@ -228,13 +228,13 @@ class HearingsServiceTest {
         wrapper.setHearingState(ADJOURN_CREATE_HEARING);
         wrapper.setEventId(hearingEvent.getEventType().getCcdType());
         wrapper.getCaseData().getAdjournment().setNextHearingDateType(FIRST_AVAILABLE_DATE);
-        var panelComposition = PanelMemberComposition.builder().panelCompositionJudge("58").build();
+        var panelComposition = new PanelMemberComposition(List.of("84"));
         when(hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(
                 eq(panelComposition), any(), any(), anyBoolean())
         ).thenReturn(sscsCaseDetailsConsumer);
         var hearingPayload = HearingRequestPayload.builder()
                 .hearingDetails(uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDetails.builder()
-                        .panelRequirements(PanelRequirements.builder().roleTypes(List.of("58"))
+                        .panelRequirements(PanelRequirements.builder().roleTypes(List.of("84"))
                                 .build()).build()).build();
         when(hearingsMapping.buildHearingPayload(any(), any())).thenReturn(hearingPayload);
 

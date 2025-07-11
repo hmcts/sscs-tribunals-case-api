@@ -67,7 +67,8 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
         }
 
         HearingInterpreter appellantInterpreter = overrideFields.getAppellantInterpreter();
-        DynamicList interpreterLanguages = utils.generateInterpreterLanguageFields(appellantInterpreter.getInterpreterLanguage());
+        DynamicList interpreterLanguages =
+                utils.generateInterpreterLanguageFields(appellantInterpreter.getInterpreterLanguage());
         appellantInterpreter.setInterpreterLanguage(interpreterLanguages);
 
         log.info("{} Languages in DynamicList for caseId {}", interpreterLanguages.getListItems().size(), caseId);
@@ -76,8 +77,9 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
         }
 
         if (isDefaultPanelCompEnabled) {
-            if (isNull(sscsCaseData.getPanelMemberComposition()) || sscsCaseData.getPanelMemberComposition().isEmpty()) {
-                var johTiers = panelCompositionService.getDefaultJohTiers(sscsCaseData);
+            if (isNull(sscsCaseData.getPanelMemberComposition())
+                    || sscsCaseData.getPanelMemberComposition().isEmpty()) {
+                var johTiers = panelCompositionService.getDefaultPanelComposition(sscsCaseData).getJohTiers();
                 sscsCaseData.setPanelMemberComposition(new PanelMemberComposition(johTiers));
                 log.info("Setting default JOH tiers ({}) on case ({})", johTiers, caseId);
             }
