@@ -56,6 +56,8 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
 
     @BeforeEach
     public void setUp() {
+
+        openMocks(this);
         handler = new UpdateListingRequirementsAboutToStartHandler(panelCompositionService, utils);
         ReflectionTestUtils.setField(handler, "isDefaultPanelCompEnabled", true);
         when(panelCompositionService.getDefaultPanelComposition(any())).thenReturn(new DefaultPanelComposition());
