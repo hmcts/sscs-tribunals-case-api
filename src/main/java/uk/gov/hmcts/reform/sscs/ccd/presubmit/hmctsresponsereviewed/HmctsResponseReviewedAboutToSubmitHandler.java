@@ -10,12 +10,14 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 
 
@@ -23,11 +25,19 @@ import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 @Slf4j
 public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     implements PreSubmitCallbackHandler<SscsCaseData> {
+
     private final DwpDocumentService dwpDocumentService;
+    private final PanelCompositionService panelCompositionService;
+    private final boolean integratedListAssistEnabled;
 
     @Autowired
-    public HmctsResponseReviewedAboutToSubmitHandler(DwpDocumentService dwpDocumentService) {
+    public HmctsResponseReviewedAboutToSubmitHandler(DwpDocumentService dwpDocumentService,
+                                                     PanelCompositionService panelCompositionService,
+                                                     @Value("${feature.default-panel-comp.enabled}")
+                                                     boolean integratedListAssistEnabled) {
         this.dwpDocumentService = dwpDocumentService;
+        this.panelCompositionService = panelCompositionService;
+        this.integratedListAssistEnabled = integratedListAssistEnabled;
     }
 
     @Override
@@ -54,13 +64,10 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
             new PreSubmitCallbackResponse<>(sscsCaseData);
 
         if (sscsCaseData.isIbcCase()) {
-            final String benefitCode = sscsCaseData.getBenefitCodeIbcaOnly();
-            sscsCaseData.setBenefitCode(benefitCode);
-
-            final String issueCode = sscsCaseData.getIssueCodeIbcaOnly();
-            sscsCaseData.setIssueCode(issueCode);
-
+            sscsCaseData.setBenefitCode(sscsCaseData.getBenefitCodeIbcaOnly());
             sscsCaseData.setBenefitCodeIbcaOnly(null);
+
+            sscsCaseData.setIssueCode(sscsCaseData.getIssueCodeIbcaOnly());
             sscsCaseData.setIssueCodeIbcaOnly(null);
         }
 
@@ -73,6 +80,11 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
         }
 
         validateInterlocReferralReason(sscsCaseData, preSubmitCallbackResponse);
+        var caseDetailsBefore = callback.getCaseDetailsBefore().orElse(null);
+        if (integratedListAssistEnabled && nonNull(caseDetailsBefore)) {
+            sscsCaseData.setPanelMemberComposition(panelCompositionService
+                    .resetPanelCompositionIfStale(sscsCaseData, caseDetailsBefore.getCaseData()));
+        }
 
         return preSubmitCallbackResponse;
     }
