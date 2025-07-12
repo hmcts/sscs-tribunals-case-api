@@ -80,9 +80,10 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
         }
 
         validateInterlocReferralReason(sscsCaseData, preSubmitCallbackResponse);
-        if (integratedListAssistEnabled && callback.getCaseDetailsBefore().isPresent()) {
+        var caseDetailsBefore = callback.getCaseDetailsBefore().orElse(null);
+        if (integratedListAssistEnabled && nonNull(caseDetailsBefore)) {
             sscsCaseData.setPanelMemberComposition(panelCompositionService
-                    .resetPanelCompositionIfStale(sscsCaseData, callback.getCaseDetailsBefore().get().getCaseData()));
+                    .resetPanelCompositionIfStale(sscsCaseData, caseDetailsBefore.getCaseData()));
         }
 
         return preSubmitCallbackResponse;
