@@ -241,6 +241,7 @@ sonarqube {
         property "sonar.projectKey", "SSCSTCA"
         property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.outputLocation}"
         property "sonar.exclusions", "**/CreateCaseException.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/amendspecialism/AmendSpecialismAboutToSubmitHandler.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/domain/**," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/evidenceshare/domain/**," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/TribunalsCaseApiApplication.java," +
