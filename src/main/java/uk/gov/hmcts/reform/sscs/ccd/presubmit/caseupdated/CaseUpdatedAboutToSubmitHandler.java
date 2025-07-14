@@ -248,7 +248,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private boolean hasInterpreterChanged(SscsCaseData sscsCaseData, CaseDetails<SscsCaseData> caseDetailsBefore) {
         String languageInterpreter = sscsCaseData.getAppeal().getHearingOptions().getLanguageInterpreter();
         String languageInterpreterBefore = caseDetailsBefore.getCaseData().getAppeal().getHearingOptions().getLanguageInterpreter();
-        return !Objects.equals(languageInterpreterBefore, languageInterpreter);
+        String languageBefore = caseDetailsBefore.getCaseData().getAppeal().getHearingOptions().getLanguages();
+        String language = sscsCaseData.getAppeal().getHearingOptions().getLanguages();
+        return !Objects.equals(languageInterpreterBefore, languageInterpreter) || !Objects.equals(languageBefore, language);
     }
 
     private void updateOverrideInterpreter(HearingOptions hearingOptions, OverrideFields overrideFields) {
