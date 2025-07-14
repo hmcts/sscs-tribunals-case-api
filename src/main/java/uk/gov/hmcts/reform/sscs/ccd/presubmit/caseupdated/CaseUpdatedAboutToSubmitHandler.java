@@ -238,19 +238,27 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         OverrideFields overrideFields = Optional.ofNullable(sscsCaseData.getSchedulingAndListingFields().getOverrideFields())
                 .orElse(OverrideFields.builder().build());
         HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
-        if (nonNull(hearingOptions) && hasInterpreterChanged(sscsCaseData, caseDetailsBefore.get())) {
-            updateOverrideInterpreter(hearingOptions, overrideFields);
-            updateOverrideDuration(sscsCaseData, overrideFields);
+        if (nonNull(hearingOptions)) {
+            if (hasInterpreterChanged(sscsCaseData, caseDetailsBefore.get())) {
+                updateOverrideInterpreter(hearingOptions, overrideFields);
+                updateOverrideDuration(sscsCaseData, overrideFields);
+            } else if (hasLanguageChanged(sscsCaseData, caseDetailsBefore.get())) {
+                updateOverrideInterpreter(hearingOptions, overrideFields);
+            }
+            sscsCaseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
         }
-        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
     }
 
     private boolean hasInterpreterChanged(SscsCaseData sscsCaseData, CaseDetails<SscsCaseData> caseDetailsBefore) {
         String languageInterpreter = sscsCaseData.getAppeal().getHearingOptions().getLanguageInterpreter();
         String languageInterpreterBefore = caseDetailsBefore.getCaseData().getAppeal().getHearingOptions().getLanguageInterpreter();
+        return !Objects.equals(languageInterpreterBefore, languageInterpreter);
+    }
+
+    private boolean hasLanguageChanged(SscsCaseData sscsCaseData, CaseDetails<SscsCaseData> caseDetailsBefore) {
         String languageBefore = caseDetailsBefore.getCaseData().getAppeal().getHearingOptions().getLanguages();
         String language = sscsCaseData.getAppeal().getHearingOptions().getLanguages();
-        return !Objects.equals(languageInterpreterBefore, languageInterpreter) || !Objects.equals(languageBefore, language);
+        return !Objects.equals(languageBefore, language);
     }
 
     private void updateOverrideInterpreter(HearingOptions hearingOptions, OverrideFields overrideFields) {

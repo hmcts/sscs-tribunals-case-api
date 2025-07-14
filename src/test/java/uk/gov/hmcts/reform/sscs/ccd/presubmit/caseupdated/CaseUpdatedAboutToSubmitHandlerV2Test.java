@@ -1953,6 +1953,25 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     }
 
     @Test
+    void shouldUpdateOverrideLanguageAndKeepDuration_WhenOnlyLanguageUpdated() {
+        ReflectionTestUtils.setField(handler, "isHearingDurationEnabled", true);
+        sscsCaseDataBefore.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("Yes").languages("Spanish").build());
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("Yes").languages("Arabic").build());
+        sscsCaseData.getAppeal().getHearingOptions().setLanguagesList(new DynamicList(new DynamicListItem("Arabic", "Arabic"), Collections.emptyList()));
+        sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder()
+                .appellantInterpreter(HearingInterpreter.builder().isInterpreterWanted(YES).build()).build());
+        DynamicList languagesList = new DynamicList(new DynamicListItem("Spanish", "Spanish"), Collections.emptyList());
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().duration(95)
+                .appellantInterpreter(HearingInterpreter.builder().isInterpreterWanted(YES).interpreterLanguage(languagesList).build()).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter().getIsInterpreterWanted(), is(YES));
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter().getInterpreterLanguage().getValue().getCode(), is("Arabic"));
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getDuration(), is(95));
+
+    }
+
+    @Test
     void shouldNotUpdateOverrideInterpreterWhenInterpreterNotUpdated() {
         ReflectionTestUtils.setField(handler, "isHearingDurationEnabled", true);
         sscsCaseDataBefore.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("No").build());
