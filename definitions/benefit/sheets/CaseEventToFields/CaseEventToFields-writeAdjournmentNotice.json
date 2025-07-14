@@ -185,6 +185,18 @@
   },
   {
     "CaseEventID": "adjournCase",
+    "CaseFieldID": "interpreterDurationLabel",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "FieldShowCondition": "adjournCaseNextHearingListingDurationType = \"nonStandardTimeSlot\"",
+    "LiveFrom": "29/05/2025",
+    "PageDisplayOrder": 11,
+    "PageFieldDisplayOrder": 3,
+    "PageID": "nextHearingListingDuration",
+    "PageLabel": "How long should the next hearing be listed for?"
+  },
+  {
+    "CaseEventID": "adjournCase",
     "CaseFieldID": "adjournCaseNextHearingListingDurationUnits",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
