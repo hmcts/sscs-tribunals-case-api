@@ -70,6 +70,8 @@ public class EvidenceUploadController {
         return uploadEvidence(() -> evidenceUploadService.uploadDraftEvidence(identifier, file));
     }
 
+    // Suppressing FP https://sonarsource.atlassian.net/browse/SONARJAVA-5092
+    @SuppressWarnings("squid:S6863")
     private ResponseEntity<Evidence> uploadEvidence(Supplier<Optional<Evidence>> uploadEvidence) {
         try {
             Optional<Evidence> evidenceOptional = uploadEvidence.get();

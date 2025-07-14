@@ -6,6 +6,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsWindowMapping.DAYS_TO_ADD_HEARING_WINDOW_TODAY;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.CaseCategoryType.CASE_SUBTYPE;
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.EntityRoleCode;
@@ -29,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.CaseFlags;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.PartyDetails;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.PartyFlags;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.ServiceHearingValues;
+import uk.gov.hmcts.reform.sscs.model.single.hearing.CaseCategory;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingWindow;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.RelatedParty;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingPriority;
@@ -78,11 +81,17 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
     @Mock
     private PanelCompositionService panelCompositionService;
 
+    @Mock
+    private HearingsAutoListMapping hearingsAutoListMapping;
+
+    @Mock
+    private HearingsCaseMapping hearingsCaseMapping;
+
     private ServiceHearingValuesMapping serviceHearingValuesMapping;
 
     @BeforeEach
     public void setUp() {
-        serviceHearingValuesMapping = new ServiceHearingValuesMapping(hearingsPanelMapping, panelCompositionService);
+        serviceHearingValuesMapping = new ServiceHearingValuesMapping(hearingsPanelMapping, hearingsAutoListMapping, panelCompositionService, hearingsCaseMapping);
         caseData = SscsCaseData.builder()
             .ccdCaseId("1234")
             .benefitCode(BENEFIT_CODE)
@@ -180,13 +189,15 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
     @Test
     void shouldMapServiceHearingValuesSuccessfully() throws ListingException {
         // given
+        ReflectionTestUtils.setField(serviceHearingValuesMapping, "isHearingDurationEnabled", true);
         given(refData.getVenueService()).willReturn(venueService);
-        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE, ISSUE_CODE,true,false))
-            .willReturn(sessionCategoryMap);
-        given(sessionCategoryMaps.getCategoryTypeValue(sessionCategoryMap))
-            .willReturn("BBA3-002");
-        given(sessionCategoryMaps.getCategorySubTypeValue(sessionCategoryMap))
-            .willReturn("BBA3-002-DD");
+
+        List<CaseCategory> caseCategories = Arrays.asList(
+                CaseCategory.builder().categoryType(CASE_TYPE).categoryValue("BBA3-002").build(),
+                CaseCategory.builder().categoryType(CASE_SUBTYPE).categoryValue("BBA3-002-DD").build()
+        );
+
+        given(hearingsCaseMapping.buildCaseCategories(eq(caseData), eq(refData))).willReturn(caseCategories);
 
         // when
         final ServiceHearingValues serviceHearingValues = serviceHearingValuesMapping.mapServiceHearingValues(caseData, refData);
@@ -195,7 +206,7 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
             .build();
         //then
         assertFalse(serviceHearingValues.isAutoListFlag());
-        assertEquals(60, serviceHearingValues.getDuration());
+        assertEquals(30, serviceHearingValues.getDuration());
         assertEquals(HmcHearingType.SUBSTANTIVE, serviceHearingValues.getHearingType());
         assertEquals(BENEFIT, serviceHearingValues.getCaseType());
         assertThat(serviceHearingValues.getCaseCategories())
@@ -229,12 +240,6 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
         // given
         caseData.setDwpIsOfficerAttending(YesNo.YES.getValue());
         given(refData.getVenueService()).willReturn(venueService);
-        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE, ISSUE_CODE,true,false))
-            .willReturn(sessionCategoryMap);
-        given(sessionCategoryMaps.getCategoryTypeValue(sessionCategoryMap))
-            .willReturn("BBA3-002");
-        given(sessionCategoryMaps.getCategorySubTypeValue(sessionCategoryMap))
-            .willReturn("BBA3-002-DD");
         // when
         final ServiceHearingValues serviceHearingValues = serviceHearingValuesMapping.mapServiceHearingValues(caseData, refData);
         //then
@@ -263,12 +268,6 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
         // given
 
         given(refData.getVenueService()).willReturn(venueService);
-        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE, ISSUE_CODE,true,false))
-            .willReturn(sessionCategoryMap);
-        given(sessionCategoryMaps.getCategoryTypeValue(sessionCategoryMap))
-            .willReturn("BBA3-002");
-        given(sessionCategoryMaps.getCategorySubTypeValue(sessionCategoryMap))
-            .willReturn("BBA3-002-DD");
         // when
         final ServiceHearingValues serviceHearingValues = serviceHearingValuesMapping.mapServiceHearingValues(caseData, refData);
         //then
@@ -281,12 +280,6 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
     @Test
     void shouldNotThrowErrorWhenOtherPartyHearingOptionsNull() throws ListingException {
         given(refData.getVenueService()).willReturn(venueService);
-        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE, ISSUE_CODE,true,false))
-            .willReturn(sessionCategoryMap);
-        given(sessionCategoryMaps.getCategoryTypeValue(sessionCategoryMap))
-            .willReturn("BBA3-002");
-        given(sessionCategoryMaps.getCategorySubTypeValue(sessionCategoryMap))
-            .willReturn("BBA3-002-DD");
         SscsCaseData editedCaseData = caseData;
         CcdValue<OtherParty> otherParty = new CcdValue<>(
             OtherParty.builder()
@@ -303,12 +296,6 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
     @Test
     void shouldGetHearingDurationZeroIfListingExceptionThrownForGetHearingDurationIbc() throws ListingException {
         given(refData.getVenueService()).willReturn(venueService);
-        given(sessionCategoryMaps.getSessionCategory("093", ISSUE_CODE,true,false))
-            .willReturn(sessionCategoryMap);
-        given(sessionCategoryMaps.getCategoryTypeValue(sessionCategoryMap))
-            .willReturn("BBA3-008");
-        given(sessionCategoryMaps.getCategorySubTypeValue(sessionCategoryMap))
-            .willReturn("BBA3-008-DD");
         SscsCaseData editedCaseData = caseData;
         editedCaseData.setBenefitCode("093");
         editedCaseData.getSchedulingAndListingFields().setOverrideFields(null);
