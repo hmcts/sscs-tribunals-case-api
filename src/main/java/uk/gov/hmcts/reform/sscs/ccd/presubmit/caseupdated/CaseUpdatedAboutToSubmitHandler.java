@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -225,9 +226,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (sscsCaseData.isIbcCase()) {
             SscsUtil.setListAssistRoutes(sscsCaseData);
         }
-        if (isHearingDurationEnabled) {
-            updateOverrideFields(sscsCaseData, caseDetailsBefore);
-        }
+        updateOverrideFields(sscsCaseData, caseDetailsBefore);
         return preSubmitCallbackResponse;
     }
 
@@ -235,7 +234,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (isNull(sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues()) || caseDetailsBefore.isEmpty()) {
             return;
         }
-        OverrideFields overrideFields = Optional.ofNullable(sscsCaseData.getSchedulingAndListingFields().getOverrideFields())
+        OverrideFields overrideFields = ofNullable(sscsCaseData.getSchedulingAndListingFields().getOverrideFields())
                 .orElse(OverrideFields.builder().build());
         HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
         if (nonNull(hearingOptions)) {
@@ -251,12 +250,16 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private boolean hasInterpreterChanged(SscsCaseData sscsCaseData, CaseDetails<SscsCaseData> caseDetailsBefore) {
         String languageInterpreter = sscsCaseData.getAppeal().getHearingOptions().getLanguageInterpreter();
-        String languageInterpreterBefore = caseDetailsBefore.getCaseData().getAppeal().getHearingOptions().getLanguageInterpreter();
+        HearingOptions hearingOptionsBefore = ofNullable(caseDetailsBefore.getCaseData().getAppeal().getHearingOptions())
+                .orElse(HearingOptions.builder().build());
+        String languageInterpreterBefore = hearingOptionsBefore.getLanguageInterpreter();
         return !Objects.equals(languageInterpreterBefore, languageInterpreter);
     }
 
     private boolean hasLanguageChanged(SscsCaseData sscsCaseData, CaseDetails<SscsCaseData> caseDetailsBefore) {
-        String languageBefore = caseDetailsBefore.getCaseData().getAppeal().getHearingOptions().getLanguages();
+        HearingOptions hearingOptionsBefore = ofNullable(caseDetailsBefore.getCaseData().getAppeal().getHearingOptions())
+                .orElse(HearingOptions.builder().build());
+        String languageBefore = hearingOptionsBefore.getLanguages();
         String language = sscsCaseData.getAppeal().getHearingOptions().getLanguages();
         return !Objects.equals(languageBefore, language);
     }
@@ -654,7 +657,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             return sscsCaseData.getAppeal().getAppellant().getAddress().getPortOfEntry();
         } else {
             if (YES.getValue().equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAppointee())) {
-                return Optional.ofNullable(sscsCaseData.getAppeal().getAppellant().getAppointee())
+                return ofNullable(sscsCaseData.getAppeal().getAppellant().getAppointee())
                         .map(Appointee::getAddress)
                         .map(Address::getPostcode)
                         .map(String::trim)
