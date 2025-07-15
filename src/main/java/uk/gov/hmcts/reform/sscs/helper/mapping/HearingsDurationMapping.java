@@ -6,15 +6,18 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDuration
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType.STANDARD;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getDurationForAdjournment;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.hasInterpreterOrChannelChanged;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.hasChannelChangedForAdjournment;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.hasInterpreterChangedForAdjournment;
 import static uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil.isInterpreterRequired;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
@@ -76,7 +79,8 @@ public final class HearingsDurationMapping {
         AdjournCaseNextHearingDurationType durationType = caseData.getAdjournment().getNextHearingListingDurationType();
         if (isHearingDurationEnabled && !NON_STANDARD.equals(durationType)) {
             Integer duration = getDurationForAdjournment(caseData, hearingDurationsService);
-            boolean hasInterpreterChannelChanged = hasInterpreterOrChannelChanged(caseData);
+            HearingOptions hearingOptions = Optional.ofNullable(caseData.getAppeal().getHearingOptions()).orElse(HearingOptions.builder().build());
+            boolean hasInterpreterChannelChanged = hasChannelChangedForAdjournment(caseData) || hasInterpreterChangedForAdjournment(caseData, hearingOptions);
             if (hasInterpreterChannelChanged && isNull(duration)) {
                 throw new ListingException("Hearing duration is required to list case");
             } else if (!hasInterpreterChannelChanged) {

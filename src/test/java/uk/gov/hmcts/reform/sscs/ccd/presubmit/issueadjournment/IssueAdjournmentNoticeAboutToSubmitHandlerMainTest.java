@@ -10,7 +10,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -22,7 +21,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingPeriod;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -33,12 +31,6 @@ import uk.gov.hmcts.reform.sscs.reference.data.model.HearingDuration;
 
 public class IssueAdjournmentNoticeAboutToSubmitHandlerMainTest extends IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
 
-    @BeforeEach
-    void setUpMocks() {
-        when(callback.getEvent()).thenReturn(EventType.ISSUE_ADJOURNMENT_NOTICE);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-    }
 
     @DisplayName("Given an adjournment event with language interpreter required and case has existing interpreter, "
         + "then overwrite existing interpreter in hearing options")
@@ -143,13 +135,15 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerMainTest extends IssueAdj
     @Test
     void givenStandardDurationSelectedAndInterpreterUpdated_ShouldUpdateOverride() {
         sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder().duration(90).build());
-        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("YES").build());
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().duration(90).build());
         var adjournment = sscsCaseData.getAdjournment();
         adjournment.setTypeOfHearing(FACE_TO_FACE);
         adjournment.setTypeOfNextHearing(FACE_TO_FACE);
         adjournment.setInterpreterRequired(NO);
         adjournment.setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.STANDARD);
         setupHearingDurationValues();
+
+
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
