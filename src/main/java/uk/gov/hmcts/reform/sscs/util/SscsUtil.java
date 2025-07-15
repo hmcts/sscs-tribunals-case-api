@@ -746,12 +746,11 @@ public class SscsUtil {
 
     public static Integer getDurationForAdjournment(SscsCaseData sscsCaseData, HearingDurationsService hearingDurationsService) {
         HearingDuration hearingDuration = hearingDurationsService.getHearingDuration(sscsCaseData.getBenefitCode(), sscsCaseData.getIssueCode());
-        Integer duration = sscsCaseData.getAdjournment().getTypeOfNextHearing().equals(AdjournCaseTypeOfHearing.PAPER)
+        return AdjournCaseTypeOfHearing.PAPER.equals(sscsCaseData.getAdjournment().getTypeOfNextHearing())
                 ? hearingDuration.getDurationPaper()
                 : YesNo.isYes(sscsCaseData.getAdjournment().getInterpreterRequired())
                 ? hearingDuration.getDurationInterpreter()
                 : hearingDuration.getDurationFaceToFace();
-        return duration;
     }
 
     public static boolean hasChannelChangedForAdjournment(SscsCaseData caseData) {
