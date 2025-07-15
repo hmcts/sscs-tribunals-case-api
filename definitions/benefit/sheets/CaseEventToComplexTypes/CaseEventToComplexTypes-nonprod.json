@@ -54,16 +54,5 @@
     "LiveFrom": "11/04/2025",
     "FieldDisplayOrder": 16,
     "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "overrideFields",
-    "ListElementCode": "updateListingRequirementsInterpreterDurationLabel",
-    "ID": "updateListingRequirementsDurationLabel",
-    "DisplayContext": "READONLY",
-    "LiveFrom": "29/05/2025",
-    "FieldDisplayOrder": 2,
-    "FieldShowCondition": "overrideFields.duration != \"\"",
-    "PageID": "1.0"
   }
 ]
