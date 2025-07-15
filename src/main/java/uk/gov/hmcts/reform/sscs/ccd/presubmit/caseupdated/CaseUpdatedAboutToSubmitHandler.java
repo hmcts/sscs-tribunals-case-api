@@ -94,8 +94,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private static ConstraintValidatorContext context;
     @Value("${feature.default-panel-comp.enabled}")
     private boolean defaultPanelCompEnabled;
-    @Value("${feature.hearing-duration.enabled}")
-    private boolean isHearingDurationEnabled;
 
 
 
