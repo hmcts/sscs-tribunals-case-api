@@ -1,4 +1,3 @@
 [
-  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "functionalTest", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
-  {"LiveFrom": "29/05/2025", "CaseTypeID": "Benefit", "CaseFieldID": "interpreterDurationLabel", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"}
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "functionalTest", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"}
 ]
