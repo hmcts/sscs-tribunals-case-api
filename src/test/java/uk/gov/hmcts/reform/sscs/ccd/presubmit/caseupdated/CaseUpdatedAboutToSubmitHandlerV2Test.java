@@ -1941,7 +1941,6 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     @Test
     void shouldUpdateOverrideInterpreterWhenInterpreterUpdated() {
-        ReflectionTestUtils.setField(handler, "isHearingDurationEnabled", true);
         sscsCaseDataBefore.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("No").build());
         sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("Yes").languages("Arabic").build());
         sscsCaseData.getAppeal().getHearingOptions().setLanguagesList(new DynamicList(new DynamicListItem("Arabic", "Arabic"), Collections.emptyList()));
@@ -1954,7 +1953,6 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     @Test
     void shouldUpdateOverrideLanguageAndKeepDuration_WhenOnlyLanguageUpdated() {
-        ReflectionTestUtils.setField(handler, "isHearingDurationEnabled", true);
         sscsCaseDataBefore.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("Yes").languages("Spanish").build());
         sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("Yes").languages("Arabic").build());
         sscsCaseData.getAppeal().getHearingOptions().setLanguagesList(new DynamicList(new DynamicListItem("Arabic", "Arabic"), Collections.emptyList()));
@@ -1973,7 +1971,6 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     @Test
     void shouldNotUpdateOverrideInterpreterWhenInterpreterNotUpdated() {
-        ReflectionTestUtils.setField(handler, "isHearingDurationEnabled", true);
         sscsCaseDataBefore.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("No").build());
         sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("No").build());
         sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder().duration(60).build());
@@ -1984,7 +1981,6 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     @Test
     void shouldNotUpdateOverrideWhenDefaultListingValuesIsNull() {
-        ReflectionTestUtils.setField(handler, "isHearingDurationEnabled", true);
         sscsCaseDataBefore.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("No").build());
         sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("Yes").build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
