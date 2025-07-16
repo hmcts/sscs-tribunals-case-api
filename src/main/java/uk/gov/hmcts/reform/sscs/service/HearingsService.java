@@ -174,6 +174,9 @@ public class HearingsService {
     }
 
     private void updateHearing(HearingWrapper wrapper) throws UpdateCaseException, ListingException {
+        SscsCaseData caseData = wrapper.getCaseData();
+        String caseId = caseData.getCcdCaseId();
+
         if (isNull(wrapper.getCaseData().getSchedulingAndListingFields().getOverrideFields())) {
             overridesMapping.setOverrideValues(wrapper.getCaseData(), refData, isHearingDurationEnabled);
         }
@@ -186,6 +189,15 @@ public class HearingsService {
         if (!isMultipleOfFive) {
             throw new ListingException("Listing duration must be multiple of 5.0 minutes");
         }
+
+        HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseId, null);
+        CaseHearing hearing = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse);
+
+        hearingResponseUpdate(wrapper, HmcUpdateResponse.builder()
+                .hearingRequestId(hearing.getHearingId())
+                .versionNumber(getHearingVersionNumber(hearing))
+                .status(hearing.getHmcStatus())
+                .build());
 
         HearingRequestPayload hearingPayload = hearingsMapping.buildHearingPayload(wrapper, refData);
         String hearingId = getHearingId(wrapper);
