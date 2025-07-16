@@ -16,6 +16,7 @@ import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.VIDEO;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +32,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
@@ -41,6 +43,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReserveTo;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -53,6 +56,8 @@ import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
+    private static final String TRIBUNAL_MEDICAL_MEMBER_REF = PanelMemberType.TRIBUNAL_MEMBER_MEDICAL.toRef();
+    private static final String IBCA_BENEFIT_CODE = Benefit.INFECTED_BLOOD_COMPENSATION.getBenefitCode();
 
     @InjectMocks
     private UpdateListingRequirementsAboutToSubmitHandler handler;
@@ -71,8 +76,9 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         sscsCaseData = SscsCaseData.builder()
             .appeal(Appeal.builder().build())
             .dwpIsOfficerAttending("Yes")
-                .schedulingAndListingFields(SchedulingAndListingFields.builder().build())
-                .build();
+            .schedulingAndListingFields(SchedulingAndListingFields.builder().build())
+            .panelMemberComposition(PanelMemberComposition.builder().build())
+            .build();
 
         caseDetails =
                 new CaseDetails<>(1234L, "SSCS", State.READY_TO_LIST, sscsCaseData, now(), "Benefit");
@@ -369,5 +375,88 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
         assertThat(response.getErrors()).isEmpty();
         assertThat(hmcHearingType).isEqualTo(response.getData().getAppeal().getHearingOptions().getHmcHearingType());
+    }
+
+    @Test
+    void givenPanelMemberCompositionHasFqpm_thenUpdateIsFqpmRequiredToYes() {
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
+            .panelCompositionDisabilityAndFqMember(List.of(
+                PanelMemberType.TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED.toRef()))
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getIsFqpmRequired()).isEqualTo(YES);
+    }
+
+    @Test
+    void givenNoFqpmIsSetInPanelMemberComposition_thenUpdateIsFqpmRequiredToNo() {
+        sscsCaseData.setIsFqpmRequired(YES);
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
+            .panelCompositionDisabilityAndFqMember(Collections.emptyList())
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getIsFqpmRequired()).isEqualTo(NO);
+    }
+
+    @Test
+    void givenPanelMemberCompositionHasMedicalMemberOnIbcaCase_thenUpdateIsMedicalMemberRequiredToYes() {
+        sscsCaseData.setBenefitCode(IBCA_BENEFIT_CODE);
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
+            .panelCompositionMemberMedical1(null)
+            .panelCompositionMemberMedical2(TRIBUNAL_MEDICAL_MEMBER_REF)
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getIsMedicalMemberRequired()).isEqualTo(YES);
+    }
+
+    @Test
+    void givenPanelMemberCompositionHasNoMedicalMemberOnIbcaCase_thenUpdateIsMedicalMemberRequiredToNo() {
+        sscsCaseData.setBenefitCode(IBCA_BENEFIT_CODE);
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
+            .panelCompositionMemberMedical1(null)
+            .panelCompositionMemberMedical2(null)
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getIsMedicalMemberRequired()).isEqualTo(NO);
+    }
+
+    @Test
+    void givenUpdatedMedicalMemberOnPanelMemberCompositionOnNonIbcaCase_thenIsMedicalMemberRequiredNotChanged() {
+        sscsCaseData.setBenefitCode(Benefit.PIP.getBenefitCode());
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
+            .panelCompositionMemberMedical1(TRIBUNAL_MEDICAL_MEMBER_REF)
+            .panelCompositionMemberMedical2(null)
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getIsMedicalMemberRequired()).isNull();
     }
 }
