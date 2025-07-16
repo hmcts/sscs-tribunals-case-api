@@ -33,9 +33,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
-
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -367,7 +366,7 @@ class HearingsServiceTest {
             .isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
     }
 
-    @Ignore
+    @Disabled
     @DisplayName("When wrapper with a valid create Hearing State is given addHearingResponse should run without error")
     @Test
     void processHearingWrapperUpdate() throws ListingException {
@@ -436,7 +435,7 @@ class HearingsServiceTest {
         assertThrows(ListingException.class, () -> hearingsService.processHearingWrapper(wrapper));
     }
 
-    @Ignore
+    @Disabled
     @DisplayName("When wrapper with a valid create Hearing State is given and hearing duration is multiple of five or null then updateHearing should run without error")
     @ParameterizedTest
     @CsvSource(value = {
