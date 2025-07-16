@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper.getHearingId;
 
 import feign.FeignException;
@@ -15,6 +16,7 @@ import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -191,13 +193,20 @@ public class HearingsService {
         }
 
         HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseId, null);
+        log.info("xx case {} hearingsGetResponse {}", caseId, hearingsGetResponse);
         CaseHearing hearing = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse);
+        log.info("xx case {} hearing {}", caseId, hearing);
 
-        hearingResponseUpdate(wrapper, HmcUpdateResponse.builder()
-                .hearingRequestId(hearing.getHearingId())
-                .versionNumber(getHearingVersionNumber(hearing))
-                .status(hearing.getHmcStatus())
-                .build());
+        Hearing caseDataHearing = caseData.getLatestHearing();
+        log.info("xx case {} ccd hearing {}", caseId, caseDataHearing);
+        boolean equalHearingVersion = nonNull(hearing)
+                && caseDataHearing.getValue().getVersionNumber().equals(hearing.getRequestVersion());
+        log.info("xx case {} version number equal: {}", caseId, equalHearingVersion);
+
+        if (!equalHearingVersion && nonNull(hearing)
+                && caseDataHearing.getValue().getHearingId().equals(caseDataHearing.getValue().getHearingId())) {
+            caseData.getLatestHearing().getValue().setVersionNumber(hearing.getRequestVersion());
+        }
 
         HearingRequestPayload hearingPayload = hearingsMapping.buildHearingPayload(wrapper, refData);
         String hearingId = getHearingId(wrapper);
