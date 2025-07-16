@@ -68,11 +68,6 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
             if (isYes(callbackReservedDtj)) {
                 caseDataReserveTo.setReservedJudge(null);
-                if (isDefaultPanelCompEnabled && callbackResponse.getData().getPanelMemberComposition() != null) {
-                    callbackResponse.getData().getPanelMemberComposition().setPanelCompositionJudge(null);
-                    callbackResponse.getData().getPanelMemberComposition()
-                            .setDistrictTribunalJudge(DISTRICT_TRIBUNAL_JUDGE.getReference());
-                }
             }
         }
 
@@ -81,6 +76,14 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                     callbackResponse.getData().getPanelMemberComposition().getPanelCompositionMemberMedical1()
             )) {
                 callbackResponse.getData().getPanelMemberComposition().clearMedicalMembers();
+            }
+
+            if (nonNull(callbackReserveTo) && isYes(callbackReserveTo.getReservedDistrictTribunalJudge())) {
+                callbackResponse.getData().getPanelMemberComposition().setPanelCompositionJudge(null);
+                callbackResponse.getData().getPanelMemberComposition()
+                        .setDistrictTribunalJudge(DISTRICT_TRIBUNAL_JUDGE.getReference());
+            } else {
+                callbackResponse.getData().getPanelMemberComposition().setDistrictTribunalJudge(null);
             }
 
             syncConfirmPanelComposition(callbackResponse.getData());
