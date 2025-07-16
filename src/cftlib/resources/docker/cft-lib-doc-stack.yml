@@ -12,7 +12,7 @@ services:
       SERVER_PORT: 5005
       IDAM_SUPERUSER_EMAIL:
       GOV_NOTIFY_API_KEY:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://shared-database-pg12:5432/evidence
+      SPRING_DATASOURCE_URL: jdbc:postgresql://shared-database-pg:5432/evidence
       SPRING_DATASOURCE_USERNAME: "postgres"
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       ENABLE_AZURE_STORAGE_CONTAINER: "false"
