@@ -26,6 +26,7 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -49,6 +50,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
@@ -62,15 +64,22 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     public static final int NEW_OTHER_PARTY_RESPONSE_DUE_DAYS = 14;
     private final DwpDocumentService dwpDocumentService;
     private final AddNoteService addNoteService;
+    private final PanelCompositionService panelCompositionService;
+    private final boolean integratedListAssistEnabled;
     private final AddedDocumentsUtil addedDocumentsUtil;
     private static final Enum<EventType> EVENT_TYPE = EventType.DWP_UPLOAD_RESPONSE;
 
 
     @Autowired
     public DwpUploadResponseAboutToSubmitHandler(DwpDocumentService dwpDocumentService, AddNoteService addNoteService,
-                                                 AddedDocumentsUtil addedDocumentsUtil) {
+                                                 AddedDocumentsUtil addedDocumentsUtil,
+                                                 PanelCompositionService panelCompositionService,
+                                                 @Value("${feature.default-panel-comp.enabled}")
+                                                 boolean integratedListAssistEnabled) {
         this.dwpDocumentService = dwpDocumentService;
         this.addNoteService = addNoteService;
+        this.panelCompositionService = panelCompositionService;
+        this.integratedListAssistEnabled = integratedListAssistEnabled;
         this.addedDocumentsUtil = addedDocumentsUtil;
     }
 
@@ -136,7 +145,11 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         }
         sscsCaseData.setDirectionDueDate(getUpdatedDirectionDueDate(sscsCaseData));
         updateBenefitType(sscsCaseData);
-
+        var caseDetailsBefore = callback.getCaseDetailsBefore().orElse(null);
+        if (integratedListAssistEnabled && nonNull(caseDetailsBefore)) {
+            sscsCaseData.setPanelMemberComposition(panelCompositionService
+                    .resetPanelCompositionIfStale(sscsCaseData, caseDetailsBefore.getCaseData()));
+        }
         return preSubmitCallbackResponse;
     }
 
