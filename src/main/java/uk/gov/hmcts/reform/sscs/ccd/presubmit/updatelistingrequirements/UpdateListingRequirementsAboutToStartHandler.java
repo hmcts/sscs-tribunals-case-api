@@ -29,11 +29,11 @@ import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 @RequiredArgsConstructor
 public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    @Value("${feature.default-panel-comp.enabled}")
-    private boolean isDefaultPanelCompEnabled;
-
     private final PanelCompositionService panelCompositionService;
     private final DynamicListLanguageUtil utils;
+
+    @Value("${feature.default-panel-comp.enabled}")
+    private final boolean isDefaultPanelCompEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
