@@ -16,7 +16,6 @@ import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
