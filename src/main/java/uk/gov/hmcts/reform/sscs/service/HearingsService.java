@@ -205,7 +205,8 @@ public class HearingsService {
         boolean equalHearingId = caseDataHearing.getHearingId().equals(hearing.getHearingId().toString());
         log.info("xx case {} version number equal: {}, hearing id equal: {}", caseId, equalHearingVersion, equalHearingId);
 
-        if (equalHearingVersion && equalHearingId) {
+        if (!equalHearingVersion && equalHearingId) {
+            log.info("xx case {} setting ccd hearing version number to {}", caseId, hmcHearingVersionId);
             caseData.getLatestHearing().getValue().setVersionNumber(hmcHearingVersionId);
         }
 
