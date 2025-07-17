@@ -208,6 +208,9 @@ public class HearingsService {
         if (!equalHearingVersion && equalHearingId) {
             log.info("xx case {} setting ccd hearing version number to {}", caseId, hmcHearingVersionId);
             caseData.getLatestHearing().getValue().setVersionNumber(hmcHearingVersionId);
+        } else {
+            log.info("xx case {} not setting hearing version number, it is {}",
+                    caseId, caseData.getLatestHearing().getValue().getVersionNumber());
         }
 
         HearingRequestPayload hearingPayload = hearingsMapping.buildHearingPayload(wrapper, refData);
