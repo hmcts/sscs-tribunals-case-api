@@ -178,8 +178,8 @@ public class HearingsService {
         SscsCaseData caseData = wrapper.getCaseData();
         String caseId = caseData.getCcdCaseId();
 
-        if (isNull(wrapper.getCaseData().getSchedulingAndListingFields().getOverrideFields())) {
-            overridesMapping.setOverrideValues(wrapper.getCaseData(), refData, isHearingDurationEnabled);
+        if (isNull(caseData.getSchedulingAndListingFields().getOverrideFields())) {
+            overridesMapping.setOverrideValues(caseData, refData, isHearingDurationEnabled);
         }
         Integer duration = wrapper
                 .getCaseData()
@@ -201,6 +201,12 @@ public class HearingsService {
         if (!ccdVersionId.equals(hmcHearingVersionId) && caseDataHearing.getHearingId().equals(hearing.getHearingId().toString())) {
             log.info("Setting case {} hearing version number to {} on ccd for hearing id {}", caseId, hmcHearingVersionId, caseDataHearing.getHearingId());
             caseData.getLatestHearing().getValue().setVersionNumber(hmcHearingVersionId);
+        }
+
+        if (hmcHearingVersionId.equals(ccdVersionId)) {
+            log.info("xx case {} now make the opposite of this throw an error", caseId);
+        } else {
+            log.info("xx case {} fail {}", caseId, ccdVersionId);
         }
 
         HearingRequestPayload hearingPayload = hearingsMapping.buildHearingPayload(wrapper, refData);
