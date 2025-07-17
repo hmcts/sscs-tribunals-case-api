@@ -192,25 +192,15 @@ public class HearingsService {
         }
 
         HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseId, null);
-        log.info("xx case {} hearingsGetResponse {}", caseId, hearingsGetResponse);
         CaseHearing hearing = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse);
-        log.info("xx case {} hearing {}", caseId, hearing);
         Long hmcHearingVersionId = getHearingVersionNumber(hearing);
-        log.info("xx case {} hmc hearing id: {}", caseId, hmcHearingVersionId);
 
         HearingDetails caseDataHearing = caseData.getLatestHearing().getValue();
         Long ccdVersionId = caseDataHearing.getVersionNumber();
-        log.info("xx case {} ccd hearing {}", caseId, caseDataHearing);
-        boolean equalHearingVersion = ccdVersionId.equals(hmcHearingVersionId);
-        boolean equalHearingId = caseDataHearing.getHearingId().equals(hearing.getHearingId().toString());
-        log.info("xx case {} version number equal: {}, hearing id equal: {}", caseId, equalHearingVersion, equalHearingId);
 
-        if (!equalHearingVersion && equalHearingId) {
-            log.info("xx case {} setting ccd hearing version number to {}", caseId, hmcHearingVersionId);
+        if (!ccdVersionId.equals(hmcHearingVersionId) && caseDataHearing.getHearingId().equals(hearing.getHearingId().toString())) {
+            log.info("Setting case {} hearing version number to {} on ccd for hearing id {}", caseId, hmcHearingVersionId, caseDataHearing.getHearingId());
             caseData.getLatestHearing().getValue().setVersionNumber(hmcHearingVersionId);
-        } else {
-            log.info("xx case {} not setting hearing version number, it is {}",
-                    caseId, caseData.getLatestHearing().getValue().getVersionNumber());
         }
 
         HearingRequestPayload hearingPayload = hearingsMapping.buildHearingPayload(wrapper, refData);
