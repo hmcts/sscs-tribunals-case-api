@@ -202,11 +202,11 @@ public class HearingsService {
         HearingDetails caseDataHearing = caseData.getLatestHearing().getValue();
         log.info("xx case {} ccd hearing {}", caseId, caseDataHearing);
         boolean equalHearingVersion = caseDataHearing.getVersionNumber().equals(hmcHearingVersionId);
-        log.info("xx case {} version number equal: {}", caseId, equalHearingVersion);
+        boolean equalHearingId = caseDataHearing.getHearingId().equals(hearing.getHearingId());
+        log.info("xx case {} version number equal: {}, hearing id equal: {}", caseId, equalHearingVersion, equalHearingId);
 
-        if (!equalHearingVersion && nonNull(hearing)
-                && caseDataHearing.getHearingId().equals(hearing.getHearingId())) {
-            caseData.getLatestHearing().getValue().setVersionNumber(hearing.getRequestVersion());
+        if (equalHearingVersion && equalHearingId) {
+            caseData.getLatestHearing().getValue().setVersionNumber(hmcHearingVersionId);
         }
 
         HearingRequestPayload hearingPayload = hearingsMapping.buildHearingPayload(wrapper, refData);
