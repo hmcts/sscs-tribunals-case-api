@@ -17,6 +17,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -196,15 +197,16 @@ public class HearingsService {
         log.info("xx case {} hearingsGetResponse {}", caseId, hearingsGetResponse);
         CaseHearing hearing = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse);
         log.info("xx case {} hearing {}", caseId, hearing);
+        Long hmcHearingVersionId = getHearingVersionNumber(hearing);
+        log.info("xx case {} hmc hearing id: {}", caseId, hmcHearingVersionId);
 
-        Hearing caseDataHearing = caseData.getLatestHearing();
+        HearingDetails caseDataHearing = caseData.getLatestHearing().getValue();
         log.info("xx case {} ccd hearing {}", caseId, caseDataHearing);
-        boolean equalHearingVersion = nonNull(hearing)
-                && caseDataHearing.getValue().getVersionNumber().equals(hearing.getRequestVersion());
+        boolean equalHearingVersion = caseDataHearing.getVersionNumber().equals(hmcHearingVersionId);
         log.info("xx case {} version number equal: {}", caseId, equalHearingVersion);
 
         if (!equalHearingVersion && nonNull(hearing)
-                && caseDataHearing.getValue().getHearingId().equals(caseDataHearing.getValue().getHearingId())) {
+                && caseDataHearing.getHearingId().equals(hearing.getHearingId())) {
             caseData.getLatestHearing().getValue().setVersionNumber(hearing.getRequestVersion());
         }
 
