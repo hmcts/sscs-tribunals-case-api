@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper.getHearingId;
 
 import feign.FeignException;
@@ -193,20 +194,15 @@ public class HearingsService {
 
         HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseId, null);
         CaseHearing hearing = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse);
-        Long hmcHearingVersionId = getHearingVersionNumber(hearing);
+        if (nonNull(hearing)) {
+            Long hmcHearingVersionId = getHearingVersionNumber(hearing);
+            HearingDetails caseDataHearing = caseData.getLatestHearing().getValue();
+            Long ccdVersionId = caseDataHearing.getVersionNumber();
 
-        HearingDetails caseDataHearing = caseData.getLatestHearing().getValue();
-        Long ccdVersionId = caseDataHearing.getVersionNumber();
-
-        if (!ccdVersionId.equals(hmcHearingVersionId) && caseDataHearing.getHearingId().equals(hearing.getHearingId().toString())) {
-            log.info("Setting case {} hearing version number to {} on ccd for hearing id {}", caseId, hmcHearingVersionId, caseDataHearing.getHearingId());
-            caseData.getLatestHearing().getValue().setVersionNumber(hmcHearingVersionId);
-        }
-
-        if (hmcHearingVersionId.equals(caseData.getLatestHearing().getValue().getVersionNumber())) {
-            log.info("xx case {} now make the opposite of this throw an error", caseId);
-        } else {
-            log.info("xx case {} fail {}", caseId, ccdVersionId);
+            if (!ccdVersionId.equals(hmcHearingVersionId) && caseDataHearing.getHearingId().equals(hearing.getHearingId().toString())) {
+                log.info("Setting case {} hearing version number to {} on ccd for hearing id {}", caseId, hmcHearingVersionId, caseDataHearing.getHearingId());
+                caseData.getLatestHearing().getValue().setVersionNumber(hmcHearingVersionId);
+            }
         }
 
         HearingRequestPayload hearingPayload = hearingsMapping.buildHearingPayload(wrapper, refData);
