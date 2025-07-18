@@ -23,6 +23,7 @@ import static uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil.getIndividualP
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
@@ -304,8 +305,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
     void getIndividualInterpreterLanguageWhenHearingOptionsNull() throws InvalidMappingException {
 
         String individualInterpreterLanguage = HearingsPartiesMapping.getIndividualInterpreterLanguage(
-                null, null, refData, null,
-                false);
+                null, null, refData, null);
 
         assertThat(individualInterpreterLanguage).isNull();
     }
@@ -313,10 +313,10 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
     @DisplayName("When HearingOption is Null and adjournLanguage is provided then return adjournLanguage")
     @Test
     void getIndividualInterpreterLanguageWhenHearingOptionsNullAndAdjournLanguageProvided() throws InvalidMappingException {
-
+        DynamicList languages = new DynamicList(new DynamicListItem("TestLanguage", "TestLanguage"), Collections.emptyList());
+        Adjournment adjournment = Adjournment.builder().adjournmentInProgress(YES).interpreterRequired(YES).interpreterLanguage(languages).build();
         String individualInterpreterLanguage = HearingsPartiesMapping.getIndividualInterpreterLanguage(
-                null, null, refData, "TestLanguage",
-                true);
+                null, null, refData, adjournment);
 
         assertThat(individualInterpreterLanguage).isEqualTo("TestLanguage");
     }
@@ -357,8 +357,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
                 HearingSubtype.builder().hearingVideoEmail("email@email.com").build(),
                 null,
                 refData,
-                null,
-                false);
+                null);
 
         assertThat(partiesDetails.stream().filter(o -> PARTY_ID.substring(0,15).equalsIgnoreCase(o.getPartyID())).findFirst()).isPresent();
 
@@ -418,8 +417,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
                 hearingSubtype,
                 null,
                 refData,
-                null,
-                false);
+                null);
 
         assertThat(partiesDetails.stream().filter(o -> PARTY_ID.substring(0,15).equalsIgnoreCase(o.getPartyID())).findFirst()).isPresent();
 
@@ -465,8 +463,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
                 HearingSubtype.builder().hearingVideoEmail("email@email.com").build(),
                 null,
                 refData,
-                null,
-                false);
+                null);
 
         PartyDetails partyDetails = partiesDetails.stream().filter(o -> PARTY_ID.substring(0,15).equalsIgnoreCase(o.getPartyID())).findFirst().orElse(
                 null);
@@ -498,8 +495,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
                 PARTY_ID,
                 null,
                 refData,
-                null,
-                false);
+                null);
 
         assertThat(partyDetails.getPartyID()).isNotNull();
         assertThat(partyDetails.getPartyType()).isNotNull();
@@ -622,7 +618,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
                 .languages(lang)
                 .build();
 
-        String result = HearingsPartiesMapping.getIndividualInterpreterLanguage(hearingOptions, null, refData, null, false);
+        String result = HearingsPartiesMapping.getIndividualInterpreterLanguage(hearingOptions, null, refData, null);
         assertThat(result).isEqualTo(expected);
     }
 
@@ -641,7 +637,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
                 .languages(value)
                 .build();
 
-        assertThat(HearingsPartiesMapping.getIndividualInterpreterLanguage(hearingOptions, null, refData, null, false)).isNull();
+        assertThat(HearingsPartiesMapping.getIndividualInterpreterLanguage(hearingOptions, null, refData, null)).isNull();
     }
 
     @DisplayName("When a invalid sign language is given getIndividualInterpreterLanguage should not throw an exception")
@@ -659,7 +655,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
                 .signLanguageType(value)
                 .build();
 
-        assertThat(HearingsPartiesMapping.getIndividualInterpreterLanguage(hearingOptions, null, refData, null, false)).isNull();
+        assertThat(HearingsPartiesMapping.getIndividualInterpreterLanguage(hearingOptions, null, refData, null)).isNull();
     }
 
     @DisplayName("When a valid sign language is given getIndividualInterpreterLanguage should return correct hmcReference")
@@ -680,7 +676,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
                 .signLanguageType(signLang)
                 .build();
 
-        String result = HearingsPartiesMapping.getIndividualInterpreterLanguage(hearingOptions, null, refData, null, false);
+        String result = HearingsPartiesMapping.getIndividualInterpreterLanguage(hearingOptions, null, refData, null);
         assertThat(result).isEqualTo(expected);
     }
 
@@ -700,7 +696,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
                         .interpreterLanguage(new DynamicList(new DynamicListItem("test", "Test Language"),List.of()))
                         .build())
                 .build();
-        String result = HearingsPartiesMapping.getIndividualInterpreterLanguage(hearingOptions, overrideFields, refData, null, false);
+        String result = HearingsPartiesMapping.getIndividualInterpreterLanguage(hearingOptions, overrideFields, refData, null);
         assertThat(result).isEqualTo("test");
     }
 
@@ -719,7 +715,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
                         .interpreterLanguage(new DynamicList(new DynamicListItem("test", "Test Language"),List.of()))
                         .build())
                 .build();
-        String result = HearingsPartiesMapping.getIndividualInterpreterLanguage(hearingOptions, overrideFields, refData, null, false);
+        String result = HearingsPartiesMapping.getIndividualInterpreterLanguage(hearingOptions, overrideFields, refData, null);
         assertThat(result).isNull();
     }
 
@@ -742,7 +738,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
                         .interpreterLanguage(new DynamicList(new DynamicListItem("test", "Test Language"),List.of()))
                         .build())
                 .build();
-        String result = HearingsPartiesMapping.getIndividualInterpreterLanguage(hearingOptions, overrideFields, refData, null, false);
+        String result = HearingsPartiesMapping.getIndividualInterpreterLanguage(hearingOptions, overrideFields, refData, null);
         assertThat(result).isEqualTo("ach");
     }
 
@@ -762,7 +758,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
         OverrideFields overrideFields = OverrideFields.builder()
                 .appellantInterpreter(null)
                 .build();
-        String result = HearingsPartiesMapping.getIndividualInterpreterLanguage(hearingOptions, overrideFields, refData, null, false);
+        String result = HearingsPartiesMapping.getIndividualInterpreterLanguage(hearingOptions, overrideFields, refData, null);
         assertThat(result).isEqualTo("ach");
     }
 

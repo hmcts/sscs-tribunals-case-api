@@ -86,27 +86,16 @@ public final class HearingsPartiesMapping {
                             null,
                             null,
                             refData,
-                            null,
-                            false));
+                            null));
         }
 
         OverrideFields overrideFields = OverridesMapping.getOverrideFields(caseData);
 
-        String adjournLanguageRef = Optional.of(caseData)
-                .filter(caseD -> isYes(caseD.getAdjournment().getInterpreterRequired()))
-                .map(SscsCaseData::getAdjournment)
-                .map(Adjournment::getInterpreterLanguage)
-                .map(DynamicList::getValue)
-                .map(DynamicListItem::getCode)
-                .filter(StringUtils::isNotBlank)
-                .orElse(null);
-
-        boolean adjournmentInProgress = nonNull(caseData.getAdjournment()) && nonNull(caseData.getAdjournment().getAdjournmentInProgress())
-                && caseData.getAdjournment().getAdjournmentInProgress().toBoolean();
+        Adjournment adjournment = caseData.getAdjournment();
 
         partiesDetails.addAll(buildHearingPartiesPartyDetails(
                 appellant, appeal.getRep(), appeal.getHearingOptions(),
-                appeal.getHearingSubtype(), overrideFields, refData, adjournLanguageRef, adjournmentInProgress));
+                appeal.getHearingSubtype(), overrideFields, refData, adjournment));
 
         List<CcdValue<OtherParty>> otherParties = caseData.getOtherParties();
 
@@ -115,7 +104,7 @@ public final class HearingsPartiesMapping {
                 OtherParty otherParty = ccdOtherParty.getValue();
                 partiesDetails.addAll(buildHearingPartiesPartyDetails(
                         otherParty, otherParty.getRep(), otherParty.getHearingOptions(),
-                        otherParty.getHearingSubtype(), null, refData, null, false));
+                        otherParty.getHearingSubtype(), null, refData, null));
             }
         }
 
@@ -128,7 +117,7 @@ public final class HearingsPartiesMapping {
                                                                      HearingSubtype hearingSubtype,
                                                                      OverrideFields overrideFields,
                                                                      ReferenceDataServiceHolder refData,
-                                                                     String adjournLanguage, boolean adjournmentInProgress)
+                                                                     Adjournment adjournment)
             throws ListingException {
 
         List<PartyDetails> partyDetails = new ArrayList<>();
@@ -138,8 +127,7 @@ public final class HearingsPartiesMapping {
                 party.getId(),
                 overrideFields,
                 refData,
-                adjournLanguage,
-                adjournmentInProgress));
+                adjournment));
 
         if (nonNull(party.getAppointee()) && isYes(party.getIsAppointee())) {
             partyDetails.add(createHearingPartyDetails(party.getAppointee(),
@@ -148,7 +136,7 @@ public final class HearingsPartiesMapping {
                     party.getId(),
                     null,
                     refData,
-                    null, false));
+                    null));
         }
 
         if (nonNull(rep) && isYes(rep.getHasRepresentative())) {
@@ -158,7 +146,7 @@ public final class HearingsPartiesMapping {
                     party.getId(),
                     null,
                     refData,
-                    adjournLanguage, adjournmentInProgress));
+                    adjournment));
         }
 
         return partyDetails;
@@ -170,7 +158,7 @@ public final class HearingsPartiesMapping {
                                                          String partyId,
                                                          OverrideFields overrideFields,
                                                          ReferenceDataServiceHolder refData,
-                                                         String adjournLanguage, boolean adjournmentInProgress)
+                                                         Adjournment adjournment)
             throws ListingException {
 
         PartyDetails.PartyDetailsBuilder partyDetails = PartyDetails.builder();
@@ -184,8 +172,7 @@ public final class HearingsPartiesMapping {
                 partyId,
                 overrideFields,
                 refData,
-                adjournLanguage,
-                adjournmentInProgress));
+                adjournment));
         partyDetails.partyChannelSubType(getPartyChannelSubType());
         partyDetails.unavailabilityDayOfWeek(getPartyUnavailabilityDayOfWeek());
         partyDetails.unavailabilityRanges(getPartyUnavailabilityRange(hearingOptions));
@@ -221,14 +208,14 @@ public final class HearingsPartiesMapping {
                                                               String partyId,
                                                               OverrideFields overrideFields,
                                                               ReferenceDataServiceHolder refData,
-                                                              String adjournLanguage, boolean adjournmentInProgress)
+                                                              Adjournment adjournment)
             throws ListingException {
 
         return IndividualDetails.builder()
                 .firstName(getIndividualFirstName(entity))
                 .lastName(getIndividualLastName(entity))
                 .preferredHearingChannel(HearingChannelUtil.getIndividualPreferredHearingChannel(hearingSubtype, hearingOptions, overrideFields))
-                .interpreterLanguage(getIndividualInterpreterLanguage(hearingOptions, overrideFields, refData, adjournLanguage, adjournmentInProgress))
+                .interpreterLanguage(getIndividualInterpreterLanguage(hearingOptions, overrideFields, refData, adjournment))
                 .reasonableAdjustments(HearingsAdjustmentMapping.getIndividualsAdjustments(hearingOptions))
                 .vulnerableFlag(isIndividualVulnerableFlag())
                 .vulnerabilityDetails(getIndividualVulnerabilityDetails())
@@ -279,10 +266,16 @@ public final class HearingsPartiesMapping {
     public static String getIndividualInterpreterLanguage(HearingOptions hearingOptions,
                                                           OverrideFields overrideFields,
                                                           ReferenceDataServiceHolder refData,
-                                                          String adjournLanguage, boolean adjournmentInProgress) {
+                                                          Adjournment adjournment) {
 
-        if (adjournmentInProgress) {
-            return adjournLanguage;
+        if (nonNull(adjournment) && YesNo.isYes(adjournment.getAdjournmentInProgress())) {
+            return Optional.of(adjournment)
+                    .filter(adj -> isYes(adj.getInterpreterRequired()))
+                    .map(Adjournment::getInterpreterLanguage)
+                    .map(DynamicList::getValue)
+                    .map(DynamicListItem::getCode)
+                    .filter(StringUtils::isNotBlank)
+                    .orElse(null);
         }
 
         if (nonNull(overrideFields)
