@@ -527,6 +527,7 @@
     "DisplayOrder": 370,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "EventEnablingCondition": "appeal.benefitType.code=\"industrialInjuriesDisablement\" OR appeal.benefitType.code=\"industrialDeathBenefit\"",
     "SecurityClassification": "Public",
     "Publish": "N",
