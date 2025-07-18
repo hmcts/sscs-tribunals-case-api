@@ -203,7 +203,7 @@ public class HearingsService {
             caseData.getLatestHearing().getValue().setVersionNumber(hmcHearingVersionId);
         }
 
-        if (hmcHearingVersionId.equals(ccdVersionId)) {
+        if (hmcHearingVersionId.equals(caseData.getLatestHearing().getValue().getVersionNumber())) {
             log.info("xx case {} now make the opposite of this throw an error", caseId);
         } else {
             log.info("xx case {} fail {}", caseId, ccdVersionId);
