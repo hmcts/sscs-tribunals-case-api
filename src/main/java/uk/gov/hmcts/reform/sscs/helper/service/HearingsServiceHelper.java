@@ -113,7 +113,9 @@ public final class HearingsServiceHelper {
 
     public static boolean isCaseHearingRequestedOrAwaitingListing(HmcStatus hmcStatus) {
         return HmcStatus.HEARING_REQUESTED == hmcStatus
-            || HmcStatus.AWAITING_LISTING == hmcStatus;
+            || HmcStatus.AWAITING_LISTING == hmcStatus
+                || HmcStatus.UPDATE_REQUESTED == hmcStatus
+                || HmcStatus.UPDATE_SUBMITTED == hmcStatus;
     }
 
     public static HearingChannel getHearingSubChannel(HearingGetResponse hearingGetResponse) {
