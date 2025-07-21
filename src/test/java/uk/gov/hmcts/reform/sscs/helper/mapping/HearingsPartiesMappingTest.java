@@ -321,6 +321,16 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
         assertThat(individualInterpreterLanguage).isEqualTo("TestLanguage");
     }
 
+    @DisplayName("When HearingOption is Null and adjournLanguage is null then return null")
+    @Test
+    void getIndividualInterpreterLanguageWhenHearingOptionsNullAndAdjournLanguageNull() throws InvalidMappingException {
+        Adjournment adjournment = Adjournment.builder().adjournmentInProgress(YES).interpreterRequired(NO).build();
+        String individualInterpreterLanguage = HearingsPartiesMapping.getIndividualInterpreterLanguage(
+                null, null, refData, adjournment);
+
+        assertThat(individualInterpreterLanguage).isNull();
+    }
+
     @DisplayName("buildHearingPartiesPartyDetails when Appointee is not null Parameterised Tests")
     @ParameterizedTest
     @CsvSource(value = {
