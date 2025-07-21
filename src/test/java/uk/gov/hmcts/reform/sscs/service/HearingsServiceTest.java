@@ -34,7 +34,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -90,6 +89,7 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingRequestPayload;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HmcUpdateResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
+import uk.gov.hmcts.reform.sscs.model.single.hearing.PartyDetails;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.RequestDetails;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
@@ -366,7 +366,6 @@ class HearingsServiceTest {
             .isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
     }
 
-    @Disabled
     @DisplayName("When wrapper with a valid create Hearing State is given addHearingResponse should run without error")
     @Test
     void processHearingWrapperUpdate() throws ListingException {
@@ -435,7 +434,6 @@ class HearingsServiceTest {
         assertThrows(ListingException.class, () -> hearingsService.processHearingWrapper(wrapper));
     }
 
-    @Disabled
     @DisplayName("When wrapper with a valid create Hearing State is given and hearing duration is multiple of five or null then updateHearing should run without error")
     @ParameterizedTest
     @CsvSource(value = {
@@ -458,9 +456,19 @@ class HearingsServiceTest {
                         .build()))
                 .build();
 
+        HearingGetResponse hearingGetResponse = HearingGetResponse.builder()
+                .requestDetails(RequestDetails.builder().hearingRequestId(String.valueOf((HEARING_REQUEST_ID))).build())
+                .hearingDetails(uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDetails.builder().build())
+                .caseDetails(CaseDetails.builder().build())
+                .hearingResponse(HearingResponse.builder().build())
+                .partyDetails(List.of(PartyDetails.builder().build()))
+                .build();
+
         given(hmcHearingApiService.getHearingsRequest(anyString(),eq(null)))
                 .willReturn(hearingsGetResponse);
 
+
+        given(hmcHearingApiService.getHearingRequest(anyString())).willReturn(hearingGetResponse);
         wrapper.setHearingState(CREATE_HEARING);
 
         wrapper.setHearingState(UPDATE_HEARING);
@@ -468,12 +476,58 @@ class HearingsServiceTest {
                 .setHearings(Collections.singletonList(Hearing.builder()
                         .value(HearingDetails.builder()
                                 .hearingId(String.valueOf(HEARING_REQUEST_ID))
+                                .versionNumber(1L)
                                 .build())
                         .build()));
         wrapper.getCaseData().getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().duration(hearingDuration).build());
 
 
         assertThatNoException().isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
+    }
+
+
+    @DisplayName("renae")
+    @Test
+    void shouldUpdateHearingRequestVersionDuringUpdateHearingIfOutOfDateWithHmcRequestVersion() throws Exception {
+        given(hearingsMapping.buildHearingPayload(any(), any())).willReturn(HearingRequestPayload.builder().build());
+        given(hmcHearingApiService.sendUpdateHearingRequest(any(HearingRequestPayload.class), anyString()))
+                .willReturn(HmcUpdateResponse.builder().build());
+
+        HearingsGetResponse hearingsGetResponse = HearingsGetResponse.builder()
+                .caseHearings(List.of(CaseHearing.builder()
+                        .hearingId(HEARING_REQUEST_ID)
+                        .hmcStatus(HmcStatus.HEARING_REQUESTED)
+                        .requestVersion(1L)
+                        .build()))
+                .build();
+
+        HearingGetResponse hearingGetResponse = HearingGetResponse.builder()
+                .requestDetails(RequestDetails.builder().hearingRequestId(String.valueOf((HEARING_REQUEST_ID))).build())
+                .hearingDetails(uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDetails.builder().build())
+                .caseDetails(CaseDetails.builder().build())
+                .hearingResponse(HearingResponse.builder().build())
+                .partyDetails(List.of(PartyDetails.builder().build()))
+                .build();
+
+        given(hmcHearingApiService.getHearingsRequest(anyString(),eq(null)))
+                .willReturn(hearingsGetResponse);
+
+
+        given(hmcHearingApiService.getHearingRequest(anyString())).willReturn(hearingGetResponse);
+        wrapper.setHearingState(CREATE_HEARING);
+
+        wrapper.setHearingState(UPDATE_HEARING);
+        wrapper.getCaseData()
+                .setHearings(Collections.singletonList(Hearing.builder()
+                        .value(HearingDetails.builder()
+                                .hearingId(String.valueOf(HEARING_REQUEST_ID))
+                                .versionNumber(5L)
+                                .build())
+                        .build()));
+        wrapper.getCaseData().getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().duration(Integer.valueOf("30")).build());
+
+        assertThatNoException().isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
+        assertThat(wrapper.getCaseData().getHearings().get(0).getValue().equals(1L));
     }
 
 

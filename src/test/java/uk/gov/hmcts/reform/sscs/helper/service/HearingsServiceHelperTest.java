@@ -235,7 +235,7 @@ class HearingsServiceHelperTest {
     @EnumSource(
         value = HmcStatus.class,
         mode = EnumSource.Mode.INCLUDE,
-        names = {"HEARING_REQUESTED", "AWAITING_LISTING"})
+        names = {"HEARING_REQUESTED", "AWAITING_LISTING", "UPDATE_SUBMITTED", "UPDATE_REQUESTED"})
     void testIsCaseHearingRequestedOrAwaitingListing(HmcStatus value) {
         boolean result = HearingsServiceHelper.isCaseHearingRequestedOrAwaitingListing(value);
 
