@@ -294,6 +294,26 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
 
     }
 
+    @DisplayName("When a panel composition has no session category then return empty list.")
+    @Test
+    void testWhenEmptyPanelCompositionSessionCategoryReturnAnEmptyList() {
+        SessionCategoryMap sessionCategoryMap = new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
+                false, false, SessionCategory.CATEGORY_05, null
+        );
+
+        SscsCaseData caseData = SscsCaseData.builder()
+                .benefitCode(BENEFIT_CODE)
+                .issueCode(ISSUE_CODE)
+                .build();
+        DefaultPanelComposition panelComposition = new DefaultPanelComposition();
+        when(panelCompositionService.getDefaultPanelComposition(any())).thenReturn(panelComposition);
+        List<String> result = hearingsPanelMapping.getPanelSpecialisms(caseData, sessionCategoryMap);
+
+        List<String> expectedList = Collections.emptyList();
+        assertThat(result)
+                .containsExactlyInAnyOrderElementsOf(expectedList);
+    }
+
     @DisplayName("When a case benefit is CHILD_SUPPORT then return empty list.")
     @Test
     void testWhenAnCaseBenefitChildSupportReturnAnEmptyList() {
