@@ -64,6 +64,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerMainTest extends IssueAdj
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo(NO.getValue());
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter().getIsInterpreterWanted()).isEqualTo(NO);
     }
 
     @DisplayName("Given an adjournment event with language interpreter required and interpreter language set, "
