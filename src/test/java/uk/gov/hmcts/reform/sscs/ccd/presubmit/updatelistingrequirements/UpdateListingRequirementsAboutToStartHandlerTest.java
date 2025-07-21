@@ -203,7 +203,7 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
         DynamicList interpreterLanguage = new DynamicList(null, List.of());
         given(utils.generateInterpreterLanguageFields(any())).willReturn(interpreterLanguage);
         var johTiers = List.of("50", "84");
-        var defaultPanelComposition = new DefaultPanelComposition(sscsCaseData);
+        var defaultPanelComposition = new DefaultPanelComposition(sscsCaseData.getIssueCode(), sscsCaseData);
         defaultPanelComposition.setJohTiers(johTiers);
         given(panelCompositionService.getDefaultPanelComposition(any())).willReturn(defaultPanelComposition);
 
