@@ -102,20 +102,25 @@ public final class HearingsServiceHelper {
     }
 
     @Nullable
-    public static CaseHearing findExistingRequestedHearings(HearingsGetResponse hearingsGetResponse) {
+    public static CaseHearing findExistingRequestedHearings(HearingsGetResponse hearingsGetResponse, boolean isUpdateHearing) {
         return Optional.ofNullable(hearingsGetResponse)
             .map(HearingsGetResponse::getCaseHearings)
             .orElse(Collections.emptyList()).stream()
-            .filter(caseHearing -> isCaseHearingRequestedOrAwaitingListing(caseHearing.getHmcStatus()))
+            .filter(caseHearing -> isCaseHearingRequestedOrAwaitingListing(caseHearing.getHmcStatus(), isUpdateHearing))
             .min(Comparator.comparing(CaseHearing::getHearingRequestDateTime))
             .orElse(null);
     }
 
-    public static boolean isCaseHearingRequestedOrAwaitingListing(HmcStatus hmcStatus) {
-        return HmcStatus.HEARING_REQUESTED == hmcStatus
-            || HmcStatus.AWAITING_LISTING == hmcStatus
-                || HmcStatus.UPDATE_REQUESTED == hmcStatus
-                || HmcStatus.UPDATE_SUBMITTED == hmcStatus;
+    public static boolean isCaseHearingRequestedOrAwaitingListing(HmcStatus hmcStatus, boolean isUpdateHearing) {
+        if (isUpdateHearing) {
+            return HmcStatus.HEARING_REQUESTED == hmcStatus
+                    || HmcStatus.AWAITING_LISTING == hmcStatus
+                    || HmcStatus.UPDATE_REQUESTED == hmcStatus
+                    || HmcStatus.UPDATE_SUBMITTED == hmcStatus;
+        } else {
+            return HmcStatus.HEARING_REQUESTED == hmcStatus
+                    || HmcStatus.AWAITING_LISTING == hmcStatus;
+        }
     }
 
     public static HearingChannel getHearingSubChannel(HearingGetResponse hearingGetResponse) {

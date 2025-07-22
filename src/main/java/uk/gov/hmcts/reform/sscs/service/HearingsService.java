@@ -127,7 +127,7 @@ public class HearingsService {
 
         String caseId = caseData.getCcdCaseId();
         HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseId, null);
-        CaseHearing hearing = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse);
+        CaseHearing hearing = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse, false);
         HmcUpdateResponse hmcUpdateResponse;
         overridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData, isHearingDurationEnabled);
 
@@ -193,7 +193,7 @@ public class HearingsService {
         }
 
         HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseId, null);
-        CaseHearing hearing = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse);
+        CaseHearing hearing = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse, true);
         if (nonNull(hearing)) {
             Long hmcHearingVersionId = getHearingVersionNumber(hearing);
             HearingDetails caseDataHearing = caseData.getLatestHearing().getValue();
@@ -203,6 +203,9 @@ public class HearingsService {
                 log.info("Setting case {} hearing version number to {} on ccd for hearing id {}", caseId, hmcHearingVersionId, caseDataHearing.getHearingId());
                 caseData.getLatestHearing().getValue().setVersionNumber(hmcHearingVersionId);
             }
+
+            log.info("Case id: {}, hmc hearing request version: {}, cc hearing request version: {}",
+                    caseId, hmcHearingVersionId, caseData.getLatestHearing().getValue().getVersionNumber());
         }
 
         HearingRequestPayload hearingPayload = hearingsMapping.buildHearingPayload(wrapper, refData);

@@ -486,9 +486,13 @@ class HearingsServiceTest {
     }
 
 
-    @DisplayName("renae")
-    @Test
-    void shouldUpdateHearingRequestVersionDuringUpdateHearingIfOutOfDateWithHmcRequestVersion() throws Exception {
+    @DisplayName("When wrapper has a hearing request version different to the hmc request version then updateHearing should run without error")
+    @ParameterizedTest
+    @EnumSource(
+            value = HmcStatus.class,
+            mode = EnumSource.Mode.INCLUDE,
+            names = {"HEARING_REQUESTED", "AWAITING_LISTING", "UPDATE_SUBMITTED", "UPDATE_REQUESTED"})
+    void shouldUpdateHearingRequestVersionDuringUpdateHearingIfOutOfDateWithHmcRequestVersion(HmcStatus hmcStatus) throws Exception {
         given(hearingsMapping.buildHearingPayload(any(), any())).willReturn(HearingRequestPayload.builder().build());
         given(hmcHearingApiService.sendUpdateHearingRequest(any(HearingRequestPayload.class), anyString()))
                 .willReturn(HmcUpdateResponse.builder().build());
@@ -496,13 +500,13 @@ class HearingsServiceTest {
         HearingsGetResponse hearingsGetResponse = HearingsGetResponse.builder()
                 .caseHearings(List.of(CaseHearing.builder()
                         .hearingId(HEARING_REQUEST_ID)
-                        .hmcStatus(HmcStatus.HEARING_REQUESTED)
+                        .hmcStatus(hmcStatus)
                         .requestVersion(1L)
                         .build()))
                 .build();
 
         HearingGetResponse hearingGetResponse = HearingGetResponse.builder()
-                .requestDetails(RequestDetails.builder().hearingRequestId(String.valueOf((HEARING_REQUEST_ID))).build())
+                .requestDetails(RequestDetails.builder().versionNumber(1L).build())
                 .hearingDetails(uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDetails.builder().build())
                 .caseDetails(CaseDetails.builder().build())
                 .hearingResponse(HearingResponse.builder().build())
@@ -511,11 +515,7 @@ class HearingsServiceTest {
 
         given(hmcHearingApiService.getHearingsRequest(anyString(),eq(null)))
                 .willReturn(hearingsGetResponse);
-
-
         given(hmcHearingApiService.getHearingRequest(anyString())).willReturn(hearingGetResponse);
-        wrapper.setHearingState(CREATE_HEARING);
-
         wrapper.setHearingState(UPDATE_HEARING);
         wrapper.getCaseData()
                 .setHearings(Collections.singletonList(Hearing.builder()
@@ -525,10 +525,7 @@ class HearingsServiceTest {
                                 .build())
                         .build()));
         wrapper.getCaseData().getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().duration(Integer.valueOf("30")).build());
-
         assertThatNoException().isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
-        assertThat(wrapper.getCaseData().getHearings().get(0).getValue().equals(1L));
+        assertThat(wrapper.getCaseData().getHearings().getFirst().getValue().getVersionNumber()).isEqualTo(1L);
     }
-
-
 }
