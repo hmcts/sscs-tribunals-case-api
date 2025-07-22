@@ -4,6 +4,7 @@ import static java.time.LocalDateTime.now;
 import static java.util.Optional.empty;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CONFIRM_PANEL_COMPOSITION;
@@ -140,10 +141,22 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
     }
 
     @Test
+    @DisplayName("If panel composition is null or empty, then no updates are made")
+    void givenPanelCompositionEmpty_thenNoUpdatesAreMade() {
+        sscsCaseData.setIsFqpmRequired(YES);
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getPanelMemberComposition().getPanelCompositionDisabilityAndFqMember());
+    }
+
+    @Test
     @DisplayName("If FQPM Required is set to yes, then panel member composition should contain FQPM")
     void givenFqpmRequiredSet_thenUpdateFqpmInPanelMemberComposition() {
         sscsCaseData.setIsFqpmRequired(YES);
-        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().build());
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -191,7 +204,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
     void givenMedicalMemberRequiredYesOnIbcaCase_thenPanelMemberCompositionHasMedicalMember() {
         sscsCaseData.setBenefitCode(IBCA_BENEFIT_CODE);
         sscsCaseData.setIsMedicalMemberRequired(YES);
-        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().build());
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
