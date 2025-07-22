@@ -204,7 +204,7 @@ public class HearingsService {
                 caseData.getLatestHearing().getValue().setVersionNumber(hmcHearingVersionId);
             }
 
-            log.info("Case id: {}, hmc hearing request version: {}, cc hearing request version: {}",
+            log.info("Case id: {}, hmc hearing request version: {}, ccd case data hearing request version: {}",
                     caseId, hmcHearingVersionId, caseData.getLatestHearing().getValue().getVersionNumber());
         }
 

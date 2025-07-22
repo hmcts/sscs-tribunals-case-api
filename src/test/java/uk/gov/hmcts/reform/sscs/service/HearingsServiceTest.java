@@ -486,7 +486,7 @@ class HearingsServiceTest {
     }
 
 
-    @DisplayName("When wrapper has a hearing request version different to the hmc request version then updateHearing should run without error")
+    @DisplayName("When wrapper has a hearing request version different to the hmc request version then updateHearing should sync request version")
     @ParameterizedTest
     @EnumSource(
             value = HmcStatus.class,
