@@ -62,16 +62,15 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     private static final String TRIBUNAL_MEDICAL_MEMBER_REF = PanelMemberType.TRIBUNAL_MEMBER_MEDICAL.toRef();
     private static final String IBCA_BENEFIT_CODE = Benefit.INFECTED_BLOOD_COMPENSATION.getBenefitCode();
 
-    @InjectMocks
-    private UpdateListingRequirementsAboutToSubmitHandler handler;
-
     @Mock
     private HearingDurationsService hearingDurationsService;
-
 
     private SscsCaseData sscsCaseData;
     private Callback<SscsCaseData> callback;
     private CaseDetails<SscsCaseData> caseDetails;
+
+    @InjectMocks
+    private UpdateListingRequirementsAboutToSubmitHandler handler;
 
     @BeforeEach
     void setUp() {

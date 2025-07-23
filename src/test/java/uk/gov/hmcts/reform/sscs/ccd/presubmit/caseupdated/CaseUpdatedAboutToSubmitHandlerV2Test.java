@@ -17,7 +17,6 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -61,12 +60,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLinkDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseManagementLocation;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DateRange;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
@@ -84,8 +84,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.AssociatedCaseLinkHelper;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
@@ -113,30 +111,20 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     private CaseDetails<SscsCaseData> caseDetailsBefore;
 
     @Mock
-    private CcdService ccdService;
-    @Mock
-    private UpdateCcdCaseService updateCcdCaseService;
-
-    @Mock
     private RegionalProcessingCenterService regionalProcessingCenterService;
-
     @Mock
     private AirLookupService airLookupService;
-
     @Mock
     private IdamService idamService;
-
     @Mock
     private RefDataService refDataService;
-
     @Mock
     private VenueService venueService;
-
     @Mock
     private SessionCategoryMapService categoryMapService;
     @Mock
     private PanelCompositionService panelCompositionService;
-
+    @Mock
     private AssociatedCaseLinkHelper associatedCaseLinkHelper;
 
     private CaseUpdatedAboutToSubmitHandler handler;
@@ -149,7 +137,6 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     @BeforeEach
     void setUp() {
-        associatedCaseLinkHelper = new AssociatedCaseLinkHelper(ccdService, idamService, updateCcdCaseService);
         handler = new CaseUpdatedAboutToSubmitHandler(
                 regionalProcessingCenterService,
                 associatedCaseLinkHelper,
@@ -248,13 +235,15 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         caseDetailsBefore =
                 new CaseDetails<>(1234L, "SSCS", HEARING, sscsCaseDataBefore, now(), "Benefit");
         callback = new Callback<>(caseDetails, Optional.of(caseDetailsBefore), CASE_UPDATED, true);
-
+        lenient().when(associatedCaseLinkHelper.linkCaseByNino(eq(sscsCaseData), eq(Optional.of(caseDetailsBefore))))
+                .thenReturn(sscsCaseData);
         lenient().when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
         lenient().when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                 .roles(List.of(SUPER_USER.getValue()))
                 .build());
-        lenient().when(categoryMapService.getSessionCategory(any(String.class), any(String.class), any(boolean.class),
-                any(boolean.class))).thenReturn(new SessionCategoryMap(PIP_NEW_CLAIM, AT, true, true));
+        lenient().when(categoryMapService.getSessionCategory(
+                any(String.class), any(String.class), any(boolean.class), any(boolean.class))
+        ).thenReturn(new SessionCategoryMap(PIP_NEW_CLAIM, AT, true, true));
         appeal = callback.getCaseDetails().getCaseData().getAppeal();
     }
 
@@ -687,47 +676,33 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
                 .address(Address.builder().line1("Line1").line2("Line2").postcode("CM120NS").build())
                 .identity(Identity.builder().nino("AB223344B").dob("1995-12-20").build())
                 .isAppointee("Yes")
-                .appointee(
-                        Appointee.builder()
-                                .address(Address.builder()
-                                        .line1("123 the Street")
-                                        .postcode("CM120NS")
-                                        .build()
-                                )
-                                .build()
-                )
+                .appointee(Appointee.builder()
+                        .address(Address.builder().line1("123 the Street").postcode("CM120NS").build()).build())
                 .build();
-        SscsCaseDetails matchingCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().ccdCaseId("12345678").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
-        SscsCaseDetails matchingCase2 = SscsCaseDetails.builder().id(56765676L).data(SscsCaseData.builder().ccdCaseId("56765676").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
-        List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
-        matchedByNinoCases.add(matchingCase1);
-        matchedByNinoCases.add(matchingCase2);
-
-        when(ccdService.findCaseBy(anyString(), anyString(), any())).thenReturn(matchedByNinoCases);
+        SscsCaseDetails matchingCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder()
+                .ccdCaseId("12345678").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
+        SscsCaseDetails matchingCase2 = SscsCaseDetails.builder().id(56765676L).data(SscsCaseData.builder()
+                .ccdCaseId("56765676").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
+        List<CaseLink> matchedByNinoCases = new ArrayList<>();
+        matchedByNinoCases.add(CaseLink.builder().value(
+                CaseLinkDetails.builder().caseReference(matchingCase1.getId().toString()).build()).build());
+        matchedByNinoCases.add(CaseLink.builder().value(
+                CaseLinkDetails.builder().caseReference(matchingCase2.getId().toString()).build()).build());
+        sscsCaseData.setAssociatedCase(matchedByNinoCases);
+        sscsCaseData.setLinkedCasesBoolean("Yes");
+        lenient().when(associatedCaseLinkHelper.linkCaseByNino(eq(sscsCaseData), eq(Optional.of(caseDetailsBefore))))
+                .thenReturn(sscsCaseData);
         callback.getCaseDetails().getCaseData().setCaseCode("002DD");
         callback.getCaseDetails().getCaseData().getAppeal().setAppellant(appellant);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verifyUpdateCcdCaseServiceIsCalledWithExpectedValues(updateCcdCaseService, matchingCase1, matchingCase2);
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(2, response.getData().getAssociatedCase().size());
         assertEquals("Yes", response.getData().getLinkedCasesBoolean());
-        assertEquals("56765676", response.getData().getAssociatedCase().get(0).getValue().getCaseReference());
-        assertEquals("12345678", response.getData().getAssociatedCase().get(1).getValue().getCaseReference());
-
-        assertEquals("Yes", matchingCase1.getData().getLinkedCasesBoolean());
-        assertEquals("ccdId", matchingCase1.getData().getAssociatedCase().get(0).getValue().getCaseReference());
-
-        assertEquals("Yes", matchingCase2.getData().getLinkedCasesBoolean());
-        assertEquals("ccdId", matchingCase2.getData().getAssociatedCase().get(0).getValue().getCaseReference());
-    }
-
-    void verifyUpdateCcdCaseServiceIsCalledWithExpectedValues(UpdateCcdCaseService updateCcdCaseService, SscsCaseDetails matchingCase1, SscsCaseDetails matchingCase2) {
-        verify(updateCcdCaseService).updateCaseV2(eq(12345678L), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class), caseDetailsCaptor.capture());
-        caseDetailsCaptor.getValue().accept(matchingCase1);
-
-        verify(updateCcdCaseService).updateCaseV2(eq(56765676L), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class), caseDetailsCaptor.capture());
-        caseDetailsCaptor.getValue().accept(matchingCase2);
+        assertEquals("12345678",
+                response.getData().getAssociatedCase().getFirst().getValue().getCaseReference());
+        assertEquals("56765676",
+                response.getData().getAssociatedCase().getLast().getValue().getCaseReference());
     }
 
     @ParameterizedTest
@@ -1428,17 +1403,18 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         appeal.getAppellant().setName(new Name("", "New", "Name"));
         appeal.getAppellant().getAddress().setPostcode("Postcode");
         appeal.getAppellant().setIdentity(new Identity("1", "Nino"));
-
         sscsCaseData.setBenefitCode("001");
         sscsCaseData.setIssueCode("DD");
 
-        IdamTokens idamTokens = IdamTokens.builder().build();
-        when(idamService.getIdamTokens()).thenReturn(idamTokens);
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals("New Name", response.getData().getCaseAccessManagementFields().getCaseNameHmctsInternal());
-        assertEquals("New Name", response.getData().getCaseAccessManagementFields().getCaseNameHmctsRestricted());
-        assertEquals("New Name", response.getData().getCaseAccessManagementFields().getCaseNamePublic());
+        assertEquals("New Name",
+                response.getData().getCaseAccessManagementFields().getCaseNameHmctsInternal());
+        assertEquals("New Name",
+                response.getData().getCaseAccessManagementFields().getCaseNameHmctsRestricted());
+        assertEquals("New Name",
+                response.getData().getCaseAccessManagementFields().getCaseNamePublic());
     }
 
     @Test
@@ -1495,8 +1471,9 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         sscsCaseDataBefore.getCaseAccessManagementFields().setCategories(Benefit.ESA);
         sscsCaseDataBefore = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder()
                         .benefitType(BenefitType.builder().code("PIP").build())
-                        .appellant(Appellant.builder().address(Address.builder().postcode("CM120NS").line1("123 Street").build()).build()).build())
-                .build();
+                        .appellant(Appellant.builder()
+                                .address(Address.builder().postcode("CM120NS").line1("123 Street").build()).build()
+                        ).build()).build();
         BenefitType benefitType = BenefitType.builder().code("").description("").build();
         sscsCaseData.setAppeal(Appeal.builder()
                 .benefitType(benefitType)
@@ -1510,8 +1487,12 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         caseDetailsBefore =
                 new CaseDetails<>(1234L, "SSCS", HEARING, sscsCaseDataBefore, now(), "Benefit");
         callback = new Callback<>(caseDetails, Optional.of(caseDetailsBefore), CASE_UPDATED, true);
-        callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(new BenefitType("", "", null));
-        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIdentity(new Identity("1", "Nino"));
+        callback.getCaseDetails().getCaseData().getAppeal()
+                .setBenefitType(new BenefitType("", "", null));
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant()
+                .setIdentity(new Identity("1", "Nino"));
+        lenient().when(associatedCaseLinkHelper.linkCaseByNino(eq(sscsCaseData), eq(Optional.of(caseDetailsBefore))))
+                .thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(1, response.getErrors().size());
@@ -1895,6 +1876,8 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     @Test
     void shouldNotSetPanelMemberComposition() {
+        lenient().when(associatedCaseLinkHelper.linkCaseByNino(eq(sscsCaseData), eq(empty())))
+                .thenReturn(sscsCaseData);
         callback = new Callback<>(caseDetails, empty(), CASE_UPDATED, true);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);

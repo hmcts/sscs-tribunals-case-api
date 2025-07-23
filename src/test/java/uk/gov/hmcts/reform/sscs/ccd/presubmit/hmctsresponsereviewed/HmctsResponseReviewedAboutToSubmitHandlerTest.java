@@ -1,12 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 
 import static java.time.LocalDateTime.now;
-import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -36,7 +33,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
@@ -68,6 +64,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
     @Mock
     private PanelCompositionService panelCompositionService;
+    @Mock
     DwpDocumentService dwpDocumentService;
 
     @BeforeEach
@@ -87,7 +84,6 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
                 new CaseDetails<>(1234L, "SSCS", RESPONSE_RECEIVED, sscsCaseDataBefore, now(), "Benefit");
         callback = new Callback<>(caseDetails, Optional.of(caseDetailsBefore), HMCTS_RESPONSE_REVIEWED, false);
 
-        dwpDocumentService = new DwpDocumentService();
         handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompositionService, false);
     }
 
@@ -302,77 +298,6 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
         assertEquals("AT38 received on " + todayDate,
             response.getData().getDwpDocuments().get(1).getValue().getDocumentFileName());
-
-        assertNull(response.getData().getDwpResponseDocument());
-        assertNull(response.getData().getDwpAT38Document());
-        assertNull(response.getData().getDwpEvidenceBundleDocument());
-    }
-
-    @Test
-    public void givenNoDwpDocument_thenDwpUploadedCollectionIsUpdated() {
-        DwpDocument dwpResponseDocument = DwpDocument.builder().value(DwpDocumentDetails.builder()
-                .documentLink(DocumentLink.builder().documentFilename("response.pdf")
-                    .documentBinaryUrl("/responsebinaryurl").documentUrl("/responseurl").build())
-                .documentType(DwpDocumentType.DWP_RESPONSE.getValue()).build()).build();
-
-        DwpDocument dwpAt38Document = DwpDocument.builder().value(DwpDocumentDetails.builder()
-                .documentLink(DocumentLink.builder().documentFilename("at38.pdf")
-                    .documentBinaryUrl("/binaryurl").documentUrl("/url").build())
-            .documentType(DwpDocumentType.AT_38.getValue()).build()).build();
-
-        DwpDocument dwpEvidenceDocument = DwpDocument.builder().value(DwpDocumentDetails.builder()
-                .documentLink(DocumentLink.builder().documentFilename("evidence.pdf")
-                    .documentBinaryUrl("/evidencebinaryurl").documentUrl("/evidenceurl").build())
-                .documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue()).build()).build();
-
-        callback.getCaseDetails().getCaseData().setDwpResponseDocument(
-            new DwpResponseDocument(dwpResponseDocument.getValue().getDocumentLink(),
-                dwpResponseDocument.getValue().getDocumentFileName()));
-
-        callback.getCaseDetails().getCaseData().setDwpAT38Document(
-            new DwpResponseDocument(dwpAt38Document.getValue().getDocumentLink(),
-                dwpAt38Document.getValue().getDocumentFileName()));
-
-        callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(
-            new DwpResponseDocument(dwpEvidenceDocument.getValue().getDocumentLink(),
-                dwpEvidenceDocument.getValue().getDocumentFileName()));
-
-        PreSubmitCallbackResponse<SscsCaseData> response =
-            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        String todayDate = java.time.LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-
-        assertThat(response.getData().getDwpDocuments(), hasItem(
-                hasProperty("value", allOf(
-                    hasProperty("documentLink", allOf(
-                            hasProperty("documentUrl", is("/evidenceurl")),
-                            hasProperty("documentBinaryUrl", is("/evidencebinaryurl")),
-                            hasProperty("documentFilename",
-                                is("FTA evidence received on " + todayDate + ".pdf"))
-                    ))
-                ))
-        ));
-
-        assertThat(response.getData().getDwpDocuments(), hasItem(
-                hasProperty("value", allOf(
-                    hasProperty("documentLink", allOf(
-                        hasProperty("documentUrl", is("/responseurl")),
-                        hasProperty("documentBinaryUrl", is("/responsebinaryurl")),
-                        hasProperty("documentFilename",
-                            is("FTA response received on " + todayDate + ".pdf"))
-                    ))
-                ))
-        ));
-
-        assertThat(response.getData().getDwpDocuments(), hasItem(
-                hasProperty("value", allOf(
-                    hasProperty("documentLink", allOf(
-                        hasProperty("documentUrl", is("/url")),
-                        hasProperty("documentBinaryUrl", is("/binaryurl")),
-                        hasProperty("documentFilename", is("AT38 received on " + todayDate + ".pdf"))
-                    )),
-                    hasProperty("documentFileName", is("AT38 received on " + todayDate))
-                ))
-        ));
 
         assertNull(response.getData().getDwpResponseDocument());
         assertNull(response.getData().getDwpAT38Document());

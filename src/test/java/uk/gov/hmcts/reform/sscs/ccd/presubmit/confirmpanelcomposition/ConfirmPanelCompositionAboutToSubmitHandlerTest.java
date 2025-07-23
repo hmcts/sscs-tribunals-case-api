@@ -53,13 +53,8 @@ public class ConfirmPanelCompositionAboutToSubmitHandlerTest {
     void setUp() {
         ReflectionTestUtils.setField(handler, "isDefaultPanelCompEnabled", true);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").build();
-        caseDetails = new CaseDetails<>(
-            1234L,
-            "SSCS",
-            State.READY_TO_LIST,
-            sscsCaseData,
-            now(),
-            "Benefit");
+        caseDetails =
+                new CaseDetails<>(1234L, "SSCS", State.READY_TO_LIST, sscsCaseData, now(), "Benefit");
 
         callback = new Callback<>(caseDetails, empty(), CONFIRM_PANEL_COMPOSITION, false);
     }

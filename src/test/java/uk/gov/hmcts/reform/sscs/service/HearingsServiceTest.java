@@ -91,13 +91,12 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.HmcUpdateResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.RequestDetails;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
-import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
-import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @ExtendWith(MockitoExtension.class)
 class HearingsServiceTest {
+
     private static final long HEARING_REQUEST_ID = 12345;
     private static final long CASE_ID = 1625080769409918L;
     private static final String BENEFIT_CODE = "002";
@@ -116,11 +115,7 @@ class HearingsServiceTest {
     @Mock
     private ReferenceDataServiceHolder refData;
     @Mock
-    public HearingDurationsService hearingDurations;
-    @Mock
     public SessionCategoryMapService sessionCategoryMaps;
-    @Mock
-    private VenueService venueService;
     @Mock
     private IdamService idamService;
     @Mock
@@ -131,12 +126,8 @@ class HearingsServiceTest {
     private HearingsMapping hearingsMapping;
     @Mock
     private Consumer<SscsCaseDetails> sscsCaseDetailsConsumer;
-    @Mock
-    private PanelCompositionService panelCompositionService;
-
     @Captor
     private ArgumentCaptor<Consumer<SscsCaseDetails>> caseDataConsumerCaptor;
-
     @Mock
     private OverridesMapping overridesMapping;
 

@@ -42,12 +42,11 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
 
     public static final String IIDB_BENEFIT_CODE = "067";
     public static final String JUDGE_JOH_CODE = "84";
+
     @Mock
     private SessionCategoryMapService sessionCategoryMaps;
-
     @Mock
     private ReferenceDataServiceHolder refData;
-
     @Mock
     private PanelCompositionService panelCompositionService;
 
