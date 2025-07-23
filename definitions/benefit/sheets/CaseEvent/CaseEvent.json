@@ -519,20 +519,6 @@
     "Publish": "N"
   },
   {
-    "LiveFrom": "24/03/2022",
-    "CaseTypeID": "Benefit",
-    "ID": "panelDoctorSpecialismAmend",
-    "Name": "Amend panel doctor specialism",
-    "Description": "Ability to amend panel doctor specialism",
-    "DisplayOrder": 370,
-    "PreConditionState(s)": "*",
-    "PostConditionState": "*",
-    "EventEnablingCondition": "appeal.benefitType.code=\"industrialInjuriesDisablement\" OR appeal.benefitType.code=\"industrialDeathBenefit\"",
-    "SecurityClassification": "Public",
-    "Publish": "N",
-    "ShowEventNotes": "N"
-  },
-  {
     "LiveFrom": "01/01/2018",
     "CaseTypeID": "Benefit",
     "ID": "appealCreated",
