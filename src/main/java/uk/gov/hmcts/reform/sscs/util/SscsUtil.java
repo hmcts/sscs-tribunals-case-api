@@ -755,9 +755,14 @@ public class SscsUtil {
     }
 
     public static boolean hasChannelChangedForAdjournment(SscsCaseData caseData) {
-        return (caseData.getAdjournment().getTypeOfHearing().equals(AdjournCaseTypeOfHearing.PAPER)
-                && !caseData.getAdjournment().getTypeOfNextHearing().equals(AdjournCaseTypeOfHearing.PAPER))
-                || (caseData.getAdjournment().getTypeOfNextHearing().equals(AdjournCaseTypeOfHearing.PAPER) && !caseData.getAdjournment().getTypeOfHearing().equals(AdjournCaseTypeOfHearing.PAPER));
+
+        if (YesNo.NO.equals(caseData.getAdjournment().getGenerateNotice())) {
+            return (HearingType.ORAL.getValue().equals(caseData.getAppeal().getHearingType()) && AdjournCaseTypeOfHearing.PAPER.equals(caseData.getAdjournment().getTypeOfNextHearing()))
+                    || (HearingType.PAPER.getValue().equals(caseData.getAppeal().getHearingType()) && !AdjournCaseTypeOfHearing.PAPER.equals(caseData.getAdjournment().getTypeOfNextHearing()));
+        }
+        return (AdjournCaseTypeOfHearing.PAPER.equals(caseData.getAdjournment().getTypeOfHearing())
+                && !AdjournCaseTypeOfHearing.PAPER.equals(caseData.getAdjournment().getTypeOfNextHearing()))
+                || (AdjournCaseTypeOfHearing.PAPER.equals(caseData.getAdjournment().getTypeOfNextHearing()) && !AdjournCaseTypeOfHearing.PAPER.equals(caseData.getAdjournment().getTypeOfHearing()));
     }
 
     public static boolean hasInterpreterChangedForAdjournment(SscsCaseData caseData, HearingOptions hearingOptions) {
