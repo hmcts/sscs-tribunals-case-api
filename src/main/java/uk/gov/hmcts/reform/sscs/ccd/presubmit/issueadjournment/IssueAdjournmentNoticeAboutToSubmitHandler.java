@@ -337,7 +337,10 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
                 HearingOptions hearingOptions = nonNull(oldCaseDetails)
                         ? ofNullable(oldCaseDetails.getCaseData().getAppeal().getHearingOptions()).orElse(HearingOptions.builder().build())
                         : HearingOptions.builder().build();
-                boolean hasInterpreterChannelChanged = hasChannelChangedForAdjournment(caseData) || hasInterpreterChangedForAdjournment(caseData, hearingOptions);
+                String hearingType = nonNull(oldCaseDetails)
+                        ? oldCaseDetails.getCaseData().getAppeal().getHearingType()
+                        : null;
+                boolean hasInterpreterChannelChanged = hasChannelChangedForAdjournment(caseData, hearingType) || hasInterpreterChangedForAdjournment(caseData, hearingOptions);
                 if (hasInterpreterChannelChanged && isNull(duration)) {
                     return null;
                 } else if (!hasInterpreterChannelChanged) {
