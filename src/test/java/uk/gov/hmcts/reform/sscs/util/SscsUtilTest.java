@@ -952,7 +952,8 @@ class SscsUtilTest {
                 .typeOfHearing(AdjournCaseTypeOfHearing.PAPER)
                 .typeOfNextHearing(AdjournCaseTypeOfHearing.FACE_TO_FACE).build();
         caseData.setAdjournment(adjournment);
-        assertTrue(SscsUtil.hasChannelChangedForAdjournment(caseData));
+        String hearingType = null;
+        assertTrue(SscsUtil.hasChannelChangedForAdjournment(caseData, hearingType));
     }
 
     @Test
@@ -961,30 +962,31 @@ class SscsUtilTest {
                 .typeOfHearing(AdjournCaseTypeOfHearing.FACE_TO_FACE)
                 .typeOfNextHearing(AdjournCaseTypeOfHearing.FACE_TO_FACE).build();
         caseData.setAdjournment(adjournment);
-        assertFalse(SscsUtil.hasChannelChangedForAdjournment(caseData));
+        String hearingType = null;
+        assertFalse(SscsUtil.hasChannelChangedForAdjournment(caseData, hearingType));
     }
 
     @Test
     void testInterpreterChannelChangePaperToOral_ForNonGeneratedAdjournment() {
         Adjournment adjournment = Adjournment.builder().generateNotice(YesNo.NO).typeOfNextHearing(AdjournCaseTypeOfHearing.PAPER).build();
-        caseData.setAppeal(Appeal.builder().hearingType(HearingType.ORAL.getValue()).build());
         caseData.setAdjournment(adjournment);
-        assertTrue(SscsUtil.hasChannelChangedForAdjournment(caseData));
+        String hearingType = "oral";
+        assertTrue(SscsUtil.hasChannelChangedForAdjournment(caseData, hearingType));
     }
 
     @Test
     void testInterpreterChannelChangeInPersonToPaper_ForNonGeneratedAdjournment() {
         Adjournment adjournment = Adjournment.builder().generateNotice(YesNo.NO).typeOfNextHearing(AdjournCaseTypeOfHearing.FACE_TO_FACE).build();
-        caseData.setAppeal(Appeal.builder().hearingType(HearingType.PAPER.getValue()).build());
         caseData.setAdjournment(adjournment);
-        assertTrue(SscsUtil.hasChannelChangedForAdjournment(caseData));
+        String hearingType = "paper";
+        assertTrue(SscsUtil.hasChannelChangedForAdjournment(caseData, hearingType));
     }
 
     @Test
     void testNoInterpreterChannelChange_ForNonGeneratedAdjournment() {
         Adjournment adjournment = Adjournment.builder().generateNotice(YesNo.NO).typeOfNextHearing(AdjournCaseTypeOfHearing.FACE_TO_FACE).build();
-        caseData.setAppeal(Appeal.builder().hearingType(HearingType.ORAL.getValue()).build());
         caseData.setAdjournment(adjournment);
-        assertFalse(SscsUtil.hasChannelChangedForAdjournment(caseData));
+        String hearingType = "oral";
+        assertFalse(SscsUtil.hasChannelChangedForAdjournment(caseData, hearingType));
     }
 }

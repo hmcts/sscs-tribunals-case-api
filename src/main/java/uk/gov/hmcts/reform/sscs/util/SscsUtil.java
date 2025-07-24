@@ -746,7 +746,7 @@ public class SscsUtil {
 
     public static Integer getDurationForAdjournment(SscsCaseData sscsCaseData, HearingDurationsService hearingDurationsService) {
         HearingDuration hearingDuration = hearingDurationsService.getHearingDuration(sscsCaseData.getBenefitCode(), sscsCaseData.getIssueCode());
-        Integer duration = sscsCaseData.getAdjournment().getTypeOfNextHearing().equals(AdjournCaseTypeOfHearing.PAPER)
+        Integer duration = AdjournCaseTypeOfHearing.PAPER.equals(sscsCaseData.getAdjournment().getTypeOfNextHearing())
                 ? hearingDuration.getDurationPaper()
                 : YesNo.isYes(sscsCaseData.getAdjournment().getInterpreterRequired())
                 ? hearingDuration.getDurationInterpreter()
@@ -754,11 +754,11 @@ public class SscsUtil {
         return duration;
     }
 
-    public static boolean hasChannelChangedForAdjournment(SscsCaseData caseData) {
+    public static boolean hasChannelChangedForAdjournment(SscsCaseData caseData, String hearingType) {
 
         if (YesNo.NO.equals(caseData.getAdjournment().getGenerateNotice())) {
-            return (HearingType.ORAL.getValue().equals(caseData.getAppeal().getHearingType()) && AdjournCaseTypeOfHearing.PAPER.equals(caseData.getAdjournment().getTypeOfNextHearing()))
-                    || (HearingType.PAPER.getValue().equals(caseData.getAppeal().getHearingType()) && !AdjournCaseTypeOfHearing.PAPER.equals(caseData.getAdjournment().getTypeOfNextHearing()));
+            return (HearingType.ORAL.getValue().equals(hearingType) && AdjournCaseTypeOfHearing.PAPER.equals(caseData.getAdjournment().getTypeOfNextHearing()))
+                    || (HearingType.PAPER.getValue().equals(hearingType) && !AdjournCaseTypeOfHearing.PAPER.equals(caseData.getAdjournment().getTypeOfNextHearing()));
         }
         return (AdjournCaseTypeOfHearing.PAPER.equals(caseData.getAdjournment().getTypeOfHearing())
                 && !AdjournCaseTypeOfHearing.PAPER.equals(caseData.getAdjournment().getTypeOfNextHearing()))
