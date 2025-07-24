@@ -16,6 +16,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -40,7 +41,6 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingRequestPayload;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HmcUpdateResponse;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
-import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @Slf4j
@@ -61,7 +61,6 @@ public class HearingsService {
     private final IdamService idamService;
     private final HearingServiceConsumer hearingServiceConsumer;
     private final HearingsMapping hearingsMapping;
-    private final PanelCompositionService panelCompositionService;
     private final OverridesMapping overridesMapping;
     @Value("${feature.hearing-duration.enabled}")
     private boolean isHearingDurationEnabled;
@@ -133,30 +132,23 @@ public class HearingsService {
             HearingRequestPayload hearingPayload = hearingsMapping.buildHearingPayload(wrapper, refData);
             log.debug("Sending Create Hearing Request for Case ID {}", caseId);
             hmcUpdateResponse = hmcHearingApiService.sendCreateHearingRequest(hearingPayload);
+
             if (integratedListAssistEnabled) {
-                wrapper.getCaseData().setPanelMemberComposition(
-                        panelCompositionService.createPanelCompositionFromJohTiers(
-                                hearingPayload.getHearingDetails().getPanelRequirements().getRoleTypes()));
+                var johTiers = hearingPayload.getHearingDetails().getPanelRequirements().getRoleTypes();
+                log.info("Saving JOH tiers ({}) onto the case ({})", johTiers, caseId);
+                wrapper.getCaseData().setPanelMemberComposition(new PanelMemberComposition(johTiers));
             }
-
-
             log.debug("Received Create Hearing Request Response for Case ID {}, Hearing State {} and Response:\n{}",
-                    caseId,
-                    wrapper.getHearingState().getState(),
-                    hmcUpdateResponse.toString());
+                    caseId, wrapper.getHearingState().getState(), hmcUpdateResponse.toString());
         } else {
             hmcUpdateResponse = HmcUpdateResponse.builder()
                     .hearingRequestId(hearing.getHearingId())
                     .versionNumber(getHearingVersionNumber(hearing))
                     .status(hearing.getHmcStatus())
                     .build();
-
-            log.debug("Existing hearing found, skipping Create Hearing Request for Case ID {}, Hearing State {}, Hearing version {} and "
-                            + "Hearing Id {}",
-                    caseId,
-                    hearing.getHmcStatus(),
-                    hearing.getRequestVersion(),
-                    hearing.getHearingId());
+            log.debug("Existing hearing found, skipping Create Hearing Request for Case ID {}, Hearing State {},"
+                            + "Hearing version {} and Hearing Id {}",
+                    caseId, hearing.getHmcStatus(), hearing.getRequestVersion(), hearing.getHearingId());
         }
 
         hearingResponseUpdate(wrapper, hmcUpdateResponse);

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode.PIP_NEW_CLAIM;
 
 import java.util.Collections;
 import java.util.List;
@@ -41,12 +42,11 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
 
     public static final String IIDB_BENEFIT_CODE = "067";
     public static final String JUDGE_JOH_CODE = "84";
+
     @Mock
     private SessionCategoryMapService sessionCategoryMaps;
-
     @Mock
     private ReferenceDataServiceHolder refData;
-
     @Mock
     private PanelCompositionService panelCompositionService;
 
@@ -219,22 +219,20 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
         "null,carer,2",
     }, nullValues = {"null"})
     void testGetPanelSpecialisms(String doctorSpecialism, String doctorSpecialismSecond, String expected) {
-        SessionCategoryMap sessionCategoryMap = new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-            true, false, SessionCategory.CATEGORY_06, null
-        );
 
-        SscsCaseData caseData = SscsCaseData.builder()
-            .benefitCode(BENEFIT_CODE)
-            .issueCode(ISSUE_CODE)
-            .sscsIndustrialInjuriesData(SscsIndustrialInjuriesData.builder()
-                .panelDoctorSpecialism(doctorSpecialism)
-                .secondPanelDoctorSpecialism(doctorSpecialismSecond)
-                .build())
-            .build();
         DefaultPanelComposition panelComposition = new DefaultPanelComposition();
         panelComposition.setCategory("6");
+        panelComposition.setJohTiers(List.of("58"));
         when(panelCompositionService.getDefaultPanelComposition(any())).thenReturn(panelComposition);
 
+        SessionCategoryMap sessionCategoryMap = new SessionCategoryMap(
+                PIP_NEW_CLAIM, Issue.DD, true, false, SessionCategory.CATEGORY_06, null
+        );
+        SscsCaseData caseData = SscsCaseData.builder()
+            .benefitCode(BENEFIT_CODE).issueCode(ISSUE_CODE)
+            .sscsIndustrialInjuriesData(SscsIndustrialInjuriesData.builder()
+                .panelDoctorSpecialism(doctorSpecialism).secondPanelDoctorSpecialism(doctorSpecialismSecond).build())
+            .build();
         List<String> result = hearingsPanelMapping.getPanelSpecialisms(caseData, sessionCategoryMap);
 
         List<String> expectedList = splitCsvParamArray(expected);
@@ -250,21 +248,17 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
     }, nullValues = {"null"})
     void testGetPanelSpecialisms(String doctorSpecialism, String expected) {
 
-        SessionCategoryMap sessionCategoryMap = new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-            false, false, SessionCategory.CATEGORY_05, null
-        );
-
-        SscsCaseData caseData = SscsCaseData.builder()
-            .benefitCode(BENEFIT_CODE)
-            .issueCode(ISSUE_CODE)
-            .sscsIndustrialInjuriesData(SscsIndustrialInjuriesData.builder()
-                .panelDoctorSpecialism(doctorSpecialism)
-                .build())
-            .build();
         DefaultPanelComposition panelComposition = new DefaultPanelComposition();
         panelComposition.setCategory("5");
+        panelComposition.setJohTiers(List.of("58"));
         when(panelCompositionService.getDefaultPanelComposition(any())).thenReturn(panelComposition);
 
+        var sscsIiData =
+                SscsIndustrialInjuriesData.builder().panelDoctorSpecialism(doctorSpecialism).build();
+        SscsCaseData caseData = SscsCaseData.builder()
+                .benefitCode(BENEFIT_CODE).issueCode(ISSUE_CODE).sscsIndustrialInjuriesData(sscsIiData).build();
+        SessionCategoryMap sessionCategoryMap = new SessionCategoryMap(
+                PIP_NEW_CLAIM, Issue.DD, false, false, SessionCategory.CATEGORY_05, null);
         List<String> result = hearingsPanelMapping.getPanelSpecialisms(caseData, sessionCategoryMap);
 
         List<String> expectedList = splitCsvParamArray(expected);
@@ -277,7 +271,7 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
     @Test
     void testWhenAnCaseHasAnNullDoctorSpecialismReturnAnEmptyList() {
 
-        SessionCategoryMap sessionCategoryMap = new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
+        SessionCategoryMap sessionCategoryMap = new SessionCategoryMap(PIP_NEW_CLAIM, Issue.DD,
             false, false, SessionCategory.CATEGORY_05, null
         );
 
