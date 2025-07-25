@@ -89,6 +89,7 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingRequestPayload;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HmcUpdateResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
+import uk.gov.hmcts.reform.sscs.model.single.hearing.PartyDetails;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.RequestDetails;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
@@ -436,11 +437,35 @@ class HearingsServiceTest {
         given(hmcHearingApiService.sendUpdateHearingRequest(any(HearingRequestPayload.class), anyString()))
                 .willReturn(HmcUpdateResponse.builder().build());
 
+        HearingsGetResponse hearingsGetResponse = HearingsGetResponse.builder()
+                .caseHearings(List.of(CaseHearing.builder()
+                        .hearingId(HEARING_REQUEST_ID)
+                        .hmcStatus(HmcStatus.HEARING_REQUESTED)
+                        .requestVersion(1L)
+                        .build()))
+                .build();
+
+        HearingGetResponse hearingGetResponse = HearingGetResponse.builder()
+                .requestDetails(RequestDetails.builder().hearingRequestId(String.valueOf((HEARING_REQUEST_ID))).build())
+                .hearingDetails(uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDetails.builder().build())
+                .caseDetails(CaseDetails.builder().build())
+                .hearingResponse(HearingResponse.builder().build())
+                .partyDetails(List.of(PartyDetails.builder().build()))
+                .build();
+
+        given(hmcHearingApiService.getHearingsRequest(anyString(),eq(null)))
+                .willReturn(hearingsGetResponse);
+
+
+        given(hmcHearingApiService.getHearingRequest(anyString())).willReturn(hearingGetResponse);
+        wrapper.setHearingState(CREATE_HEARING);
+
         wrapper.setHearingState(UPDATE_HEARING);
         wrapper.getCaseData()
                 .setHearings(Collections.singletonList(Hearing.builder()
                         .value(HearingDetails.builder()
                                 .hearingId(String.valueOf(HEARING_REQUEST_ID))
+                                .versionNumber(1L)
                                 .build())
                         .build()));
         wrapper.getCaseData().getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().duration(hearingDuration).build());
@@ -450,4 +475,46 @@ class HearingsServiceTest {
     }
 
 
+    @DisplayName("When wrapper has a hearing request version different to the hmc request version then updateHearing should sync request version")
+    @ParameterizedTest
+    @EnumSource(
+            value = HmcStatus.class,
+            mode = EnumSource.Mode.INCLUDE,
+            names = {"HEARING_REQUESTED", "AWAITING_LISTING", "UPDATE_SUBMITTED", "UPDATE_REQUESTED"})
+    void shouldUpdateHearingRequestVersionDuringUpdateHearingIfOutOfDateWithHmcRequestVersion(HmcStatus hmcStatus) throws Exception {
+        given(hearingsMapping.buildHearingPayload(any(), any())).willReturn(HearingRequestPayload.builder().build());
+        given(hmcHearingApiService.sendUpdateHearingRequest(any(HearingRequestPayload.class), anyString()))
+                .willReturn(HmcUpdateResponse.builder().build());
+
+        HearingsGetResponse hearingsGetResponse = HearingsGetResponse.builder()
+                .caseHearings(List.of(CaseHearing.builder()
+                        .hearingId(HEARING_REQUEST_ID)
+                        .hmcStatus(hmcStatus)
+                        .requestVersion(1L)
+                        .build()))
+                .build();
+
+        HearingGetResponse hearingGetResponse = HearingGetResponse.builder()
+                .requestDetails(RequestDetails.builder().versionNumber(1L).build())
+                .hearingDetails(uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDetails.builder().build())
+                .caseDetails(CaseDetails.builder().build())
+                .hearingResponse(HearingResponse.builder().build())
+                .partyDetails(List.of(PartyDetails.builder().build()))
+                .build();
+
+        given(hmcHearingApiService.getHearingsRequest(anyString(),eq(null)))
+                .willReturn(hearingsGetResponse);
+        given(hmcHearingApiService.getHearingRequest(anyString())).willReturn(hearingGetResponse);
+        wrapper.setHearingState(UPDATE_HEARING);
+        wrapper.getCaseData()
+                .setHearings(Collections.singletonList(Hearing.builder()
+                        .value(HearingDetails.builder()
+                                .hearingId(String.valueOf(HEARING_REQUEST_ID))
+                                .versionNumber(5L)
+                                .build())
+                        .build()));
+        wrapper.getCaseData().getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().duration(Integer.valueOf("30")).build());
+        assertThatNoException().isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
+        assertThat(wrapper.getCaseData().getHearings().getFirst().getValue().getVersionNumber()).isEqualTo(1L);
+    }
 }
