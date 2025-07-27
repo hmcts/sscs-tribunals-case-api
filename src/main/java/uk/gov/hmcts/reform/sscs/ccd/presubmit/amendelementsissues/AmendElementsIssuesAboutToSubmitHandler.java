@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.amendelementsissues;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,7 @@ public class AmendElementsIssuesAboutToSubmitHandler extends ResponseEventsAbout
         this.integratedListAssistEnabled = integratedListAssistEnabled;
     }
 
+
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
@@ -55,6 +57,11 @@ public class AmendElementsIssuesAboutToSubmitHandler extends ResponseEventsAbout
         if (integratedListAssistEnabled) {
             caseData.setPanelMemberComposition(panelCompositionService
                     .resetPanelCompIfElementsChanged(caseData, callback.getCaseDetailsBefore()));
+        }
+        var caseDetailsBefore = callback.getCaseDetailsBefore().orElse(null);
+        if(integratedListAssistEnabled && nonNull(caseDetailsBefore)) {
+            caseData.setPanelMemberComposition(panelCompositionService
+                    .resetPanelCompIfElementsChanged(caseData, caseDetailsBefore.getCaseData()));
         }
         return preSubmitCallbackResponse;
     }
