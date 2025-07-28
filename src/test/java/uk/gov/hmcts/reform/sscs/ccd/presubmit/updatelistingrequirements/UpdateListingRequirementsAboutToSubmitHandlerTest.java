@@ -3,6 +3,9 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 import static java.time.LocalDateTime.now;
 import static java.util.Optional.empty;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -59,16 +62,15 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     private static final String TRIBUNAL_MEDICAL_MEMBER_REF = PanelMemberType.TRIBUNAL_MEMBER_MEDICAL.toRef();
     private static final String IBCA_BENEFIT_CODE = Benefit.INFECTED_BLOOD_COMPENSATION.getBenefitCode();
 
-    @InjectMocks
-    private UpdateListingRequirementsAboutToSubmitHandler handler;
-
     @Mock
     private HearingDurationsService hearingDurationsService;
-
 
     private SscsCaseData sscsCaseData;
     private Callback<SscsCaseData> callback;
     private CaseDetails<SscsCaseData> caseDetails;
+
+    @InjectMocks
+    private UpdateListingRequirementsAboutToSubmitHandler handler;
 
     @BeforeEach
     void setUp() {
@@ -132,21 +134,45 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @Test
     void givenReservedDistrictTribunalJudgeIsYesAndReservedJudgeIsNotNull_responseReservedJudgeAndPanelCompositionJudgeAreNull() {
-        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").panelCompositionMemberMedical1("NoMedicalMemberRequired").build());
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
+                .panelCompositionJudge("84").panelCompositionMemberMedical1("NoMedicalMemberRequired").build());
         ReserveTo reserveTo = new ReserveTo();
         reserveTo.setReservedDistrictTribunalJudge(YES);
         reserveTo.setReservedJudge(new JudicialUserBase("1", "2"));
         sscsCaseData.getSchedulingAndListingFields().setReserveTo(reserveTo);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-            ABOUT_TO_SUBMIT,
-            callback,
-            USER_AUTHORISATION);
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
-        JudicialUserBase result = response.getData().getSchedulingAndListingFields().getReserveTo().getReservedJudge();
-        assertThat(result).isNull();
-        assertThat(response.getData().getPanelMemberComposition().getPanelCompositionJudge()).isNull();
+        assertNull(response.getData().getSchedulingAndListingFields().getReserveTo().getReservedJudge());
+        assertNull(response.getData().getPanelMemberComposition().getPanelCompositionJudge());
+        assertEquals(PanelMemberType.DISTRICT_TRIBUNAL_JUDGE.getReference(),
+                response.getData().getPanelMemberComposition().getDistrictTribunalJudge());
+    }
+
+    @Test
+    void givenReservedDistrictTribunalJudgeIsNoAndReservedJudgeIsNotNull_panelCompositionDtjIsNull() {
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").build());
+        ReserveTo reserveTo = new ReserveTo();
+        reserveTo.setReservedDistrictTribunalJudge(NO);
+        sscsCaseData.getSchedulingAndListingFields().setReserveTo(reserveTo);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertNotNull(response.getData().getPanelMemberComposition().getPanelCompositionJudge());
+        assertNull(response.getData().getPanelMemberComposition().getDistrictTribunalJudge());
+    }
+
+    @Test
+    void givenReservedReservedJudgeIsNull_panelCompositionDtjIsNull() {
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").build());
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertNotNull(response.getData().getPanelMemberComposition().getPanelCompositionJudge());
+        assertNull(response.getData().getPanelMemberComposition().getDistrictTribunalJudge());
     }
 
     @Test
