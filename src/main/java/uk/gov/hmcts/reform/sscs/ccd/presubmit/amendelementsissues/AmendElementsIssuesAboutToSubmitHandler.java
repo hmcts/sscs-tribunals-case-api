@@ -30,7 +30,6 @@ public class AmendElementsIssuesAboutToSubmitHandler extends ResponseEventsAbout
         this.integratedListAssistEnabled = integratedListAssistEnabled;
     }
 
-
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
@@ -59,7 +58,7 @@ public class AmendElementsIssuesAboutToSubmitHandler extends ResponseEventsAbout
                     .resetPanelCompIfElementsChanged(caseData, callback.getCaseDetailsBefore()));
         }
         var caseDetailsBefore = callback.getCaseDetailsBefore().orElse(null);
-        if(integratedListAssistEnabled && nonNull(caseDetailsBefore)) {
+        if (integratedListAssistEnabled && nonNull(caseDetailsBefore)) {
             caseData.setPanelMemberComposition(panelCompositionService
                     .resetPanelCompIfElementsChanged(caseData, caseDetailsBefore.getCaseData()));
         }
