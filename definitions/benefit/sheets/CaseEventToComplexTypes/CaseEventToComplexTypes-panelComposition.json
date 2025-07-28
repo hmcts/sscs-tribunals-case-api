@@ -19,7 +19,7 @@
     "FieldShowCondition": "panelMemberComposition.districtTribunalJudge = \"DUMMY_VALUE_TO_HIDE_FIELD\"",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "11/04/2025",
-    "FieldDisplayOrder": 15,
+    "FieldDisplayOrder": 2,
     "PageID": "1.0",
     "RetainHiddenValue": "Yes"
   },
@@ -30,7 +30,7 @@
     "ID": "updateListingRequirementsPanelCompositionMemberMedical1",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "11/04/2025",
-    "FieldDisplayOrder": 2,
+    "FieldDisplayOrder": 3,
     "PageID": "1.0"
   },
   {
@@ -41,7 +41,7 @@
     "FieldShowCondition": "panelMemberComposition.panelCompositionMemberMedical2 = \"DUMMY_VALUE_TO_HIDE_FIELD\"",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "11/04/2025",
-    "FieldDisplayOrder": 3,
+    "FieldDisplayOrder": 4,
     "PageID": "1.0",
     "RetainHiddenValue": "Yes"
   },
@@ -52,7 +52,7 @@
     "ID": "updateListingRequirementsPanelCompositionDisabilityAndFqMember",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "11/04/2025",
-    "FieldDisplayOrder": 4,
+    "FieldDisplayOrder": 5,
     "PageID": "1.0"
   }
 ]
