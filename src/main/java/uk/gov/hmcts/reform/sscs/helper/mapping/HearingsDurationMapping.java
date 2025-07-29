@@ -80,7 +80,8 @@ public final class HearingsDurationMapping {
         if (isHearingDurationEnabled && !NON_STANDARD.equals(durationType)) {
             Integer duration = getDurationForAdjournment(caseData, hearingDurationsService);
             HearingOptions hearingOptions = Optional.ofNullable(caseData.getAppeal().getHearingOptions()).orElse(HearingOptions.builder().build());
-            boolean hasInterpreterChannelChanged = hasChannelChangedForAdjournment(caseData) || hasInterpreterChangedForAdjournment(caseData, hearingOptions);
+            String hearingType = caseData.getAppeal().getHearingType();
+            boolean hasInterpreterChannelChanged = hasChannelChangedForAdjournment(caseData, hearingType) || hasInterpreterChangedForAdjournment(caseData, hearingOptions);
             if (hasInterpreterChannelChanged && isNull(duration)) {
                 throw new ListingException("Hearing duration is required to list case");
             } else if (!hasInterpreterChannelChanged) {
