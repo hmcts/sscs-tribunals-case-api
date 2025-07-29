@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.amendelementsissues;
 
-import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +39,8 @@ public class AmendElementsIssuesAboutToSubmitHandler extends ResponseEventsAbout
     }
 
     @Override
-    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
+                                                          String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
@@ -52,10 +52,9 @@ public class AmendElementsIssuesAboutToSubmitHandler extends ResponseEventsAbout
 
         setCaseCode(preSubmitCallbackResponse, callback);
 
-        var caseDetailsBefore = callback.getCaseDetailsBefore().orElse(null);
-        if (integratedListAssistEnabled && nonNull(caseDetailsBefore)) {
+        if (integratedListAssistEnabled) {
             caseData.setPanelMemberComposition(panelCompositionService
-                    .resetPanelCompIfElementsChanged(caseData, caseDetailsBefore.getCaseData()));
+                    .resetPanelCompIfElementsChanged(caseData, callback.getCaseDetailsBefore()));
         }
         return preSubmitCallbackResponse;
     }

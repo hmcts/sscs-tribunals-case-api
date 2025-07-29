@@ -82,13 +82,23 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTestV2 {
 
     private static final String NO = "No";
     public static final String[] IGNORED_PATHS = {
+        "elementsDisputedGeneral",
+        "elementsDisputedSanctions",
+        "elementsDisputedOverpayment",
+        "elementsDisputedHousing",
+        "elementsDisputedChildCare",
+        "elementsDisputedCare",
+        "elementsDisputedChildElement",
+        "elementsDisputedChildDisabled",
+        "elementsDisputedLimitedWork",
         "jointPartyId",
         "appeal.appellant.appointee.id",
         "appeal.appellant.id",
         "appeal.rep.id",
         "subscriptions.appellantSubscription.tya",
         "subscriptions.appointeeSubscription.tya",
-        "subscriptions.representativeSubscription.tya"};
+        "subscriptions.representativeSubscription.tya"
+    };
 
     private RegionalProcessingCenter regionalProcessingCenter;
 

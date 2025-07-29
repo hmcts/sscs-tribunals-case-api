@@ -101,7 +101,7 @@ public class AmendElementsIssuesAboutToSubmitHandlerTest {
     @Test
     public void givenCaseDetailsBeforeExist_thenSetPanelComposition() {
         var panelComposition = new PanelMemberComposition(List.of("84"));
-        when(panelCompositionService.resetPanelCompIfElementsChanged(eq(sscsCaseData), eq(sscsCaseData)))
+        when(panelCompositionService.resetPanelCompIfElementsChanged(eq(sscsCaseData), eq(Optional.of(caseDetails))))
                 .thenReturn(panelComposition);
         callback = new Callback<>(caseDetails, Optional.of(caseDetails), AMEND_ELEMENTS_ISSUES, false);
         handler = new AmendElementsIssuesAboutToSubmitHandler(panelCompositionService, true);

@@ -215,9 +215,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (sscsCaseData.isIbcCase()) {
             SscsUtil.setListAssistRoutes(sscsCaseData);
         }
-        if (integratedListAssistEnabled && caseDetailsBefore.isPresent()) {
+        if (integratedListAssistEnabled) {
             sscsCaseData.setPanelMemberComposition(panelCompositionService
-                    .resetPanelCompositionIfStale(sscsCaseData, caseDetailsBefore.get().getCaseData()));
+                    .resetPanelCompositionIfStale(sscsCaseData, caseDetailsBefore));
         }
         return preSubmitCallbackResponse;
     }
