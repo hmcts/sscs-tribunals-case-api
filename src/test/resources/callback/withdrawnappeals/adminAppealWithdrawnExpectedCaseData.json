@@ -232,14 +232,5 @@
   "libertyToApplyBodyContent": null,
   "directionNoticeContent": null,
   "signedBy": null,
-  "signedRole": null,
-  "elementsDisputedGeneral": [],
-  "elementsDisputedSanctions": [],
-  "elementsDisputedOverpayment": [],
-  "elementsDisputedHousing": [],
-  "elementsDisputedChildCare": [],
-  "elementsDisputedCare": [],
-  "elementsDisputedChildElement": [],
-  "elementsDisputedChildDisabled": [],
-  "elementsDisputedLimitedWork": []
+  "signedRole": null
 }
