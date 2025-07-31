@@ -1,0 +1,14 @@
+{
+     "johJudgeField": "Tribunal or Regional Judge",
+     "johJudgeValue": "Tribunal Judge",
+     "johRegionalJudgeValue": "Regional Judge",
+     "johMedicalMemField": "Tribunal or Regional Medical member",
+     "johMedicalMemValue": "Tribunal Member Medical",
+     "johRegionalMemField": "Regional Member Medical",
+     "johTribunalDisabilityMemField": "Tribunal member Disability or Financial",
+     "johTribunalDisabilityMemValue": "Tribunal Member Disability",
+     "durationField": "Duration of the hearing",
+     "overrideDurationValue": "90",
+     "interpreterField": "Interpreter Language",
+     "interpreterValue": "Dutch"
+}     
