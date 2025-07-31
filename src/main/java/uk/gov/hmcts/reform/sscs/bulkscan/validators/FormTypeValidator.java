@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.validators;
 
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.FORM_TYPE;
 import static uk.gov.hmcts.reform.sscs.bulkscan.helper.OcrDataBuilder.build;
 import static uk.gov.hmcts.reform.sscs.bulkscan.helper.SscsDataHelper.getValidationStatus;
@@ -62,13 +63,13 @@ public class FormTypeValidator {
         JsonNode jsonNode = mapper.valueToTree(build(exceptionRecord.getOcrDataFields()));
         Set<ValidationMessage> validationErrors = null;
 
-        if (formType != null && formType.equals(FormType.SSCS2)) {
-            validationErrors = sscs2Schema.validate(jsonNode);
-        } else if (formType != null && formType.equals(FormType.SSCS5)) {
-            validationErrors = sscs5Schema.validate(jsonNode);
-        } else if (formType != null && (formType.equals(FormType.SSCS1U) || formType.equals(FormType.SSCS1)
-            || formType.equals(FormType.SSCS1PE) || formType.equals(FormType.SSCS1PEU))) {
-            validationErrors = sscs1Schema.validate(jsonNode);
+        if (formType != null) {
+            validationErrors = switch (formType) {
+                case SSCS2 -> validateSchema(sscs2Schema, jsonNode);
+                case SSCS5 -> validateSchema(sscs5Schema, jsonNode);
+                case SSCS1U, SSCS1, SSCS1PE, SSCS1PEU -> validateSchema(sscs1Schema, jsonNode);
+                case SSCS8, UNKNOWN -> null;
+            };
         }
 
         if (validationErrors != null && !validationErrors.isEmpty()) {
@@ -83,10 +84,22 @@ public class FormTypeValidator {
             .status(getValidationStatus(errors, null)).build();
     }
 
+    private Set<ValidationMessage> validateSchema(JsonSchema sscsSchema, JsonNode jsonNode) {
+        return (sscsSchema != null) ? sscsSchema.validate(jsonNode) : null;
+    }
+
     private synchronized JsonSchema tryLoadSscsSchema(String schemaLocation) {
         JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7);
-        InputStream inputStream = getClass().getResourceAsStream(schemaLocation);
-        return factory.getSchema(inputStream);
+        try (InputStream inputStream = getClass().getResourceAsStream(schemaLocation)) {
+            if (isNull(inputStream)) {
+                log.error("Schema not found: {}", schemaLocation);
+                return null;
+            }
+            return factory.getSchema(inputStream);
+        } catch (Exception e) {
+            log.error("Failed to load or parse schema: {}", schemaLocation, e);
+            return null;
+        }
     }
 
     public String getFormType(String caseId, ExceptionRecord exceptionRecord) {
