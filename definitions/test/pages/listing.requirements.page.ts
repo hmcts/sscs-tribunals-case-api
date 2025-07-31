@@ -11,8 +11,8 @@ export class ListingRequirementPage {
     webAction = new WebAction(this.page);
   }
 
-  async updateHearingValues() {
-    await webAction.inputField('#overrideFields_duration', '120');
+  async updateHearingValues(addDuration: boolean = false) {
+    if(addDuration) await webAction.inputField('#overrideFields_duration', '120');
     await webAction.clickElementById(
       '#overrideFields_appellantInterpreter_isInterpreterWanted_Yes'
     );
@@ -21,7 +21,7 @@ export class ListingRequirementPage {
       'Dutch'
     );
     await webAction.clickElementById('#overrideFields_autoList_Yes');
-    await webAction.clickButton('Continue');
+    if(addDuration) await webAction.clickButton('Continue');
   }
 
   async setAutolistOverrideValue(selection: boolean) {
@@ -42,6 +42,13 @@ export class ListingRequirementPage {
     await webAction.clickSubmitButton();
     await webAction.verifyElementVisibility("#field-trigger-summary");
     await webAction.clickSubmitButton();
+  }
+
+  async amendJoH() {
+    await webAction.clickElementById('#panelMemberComposition_panelCompositionJudge-74');
+    await webAction.clickElementById('#panelMemberComposition_panelCompositionMemberMedical1-69');
+    await webAction.unCheckAnCheckBox('#panelMemberComposition_panelCompositionDisabilityAndFqMember-44');
+    await webAction.clickButton('Continue');
   }
 
   async submitEventNoChange() {
