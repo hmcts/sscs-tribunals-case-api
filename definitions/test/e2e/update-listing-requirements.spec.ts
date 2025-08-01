@@ -9,8 +9,8 @@ test.describe('Update listing requirement test', async () => {
       caseId = await createCaseBasedOnCaseType('PIP');
     });
 
-    test('PIP Case - Update & Verify Joh Tiers/Duration', { tag: '@nightly-pipeline' }, async ({ uploadResponseSteps, updateListingRequirementSteps }) => {
-        await uploadResponseSteps.performUploadResponseWithFurtherInfoOnAPIPAndReviewResponse(caseId);
+    test('PIP Case - Update & Verify Joh Tiers/Duration', { tag: '@nightly-pipeline' }, async ({ updateListingRequirementSteps }) => {
+        await updateListingRequirementSteps.performUploadResponse(caseId);
         await updateListingRequirementSteps.updateAndVerifyJoHTiers();
     });
 });
