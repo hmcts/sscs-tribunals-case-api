@@ -10,8 +10,6 @@ test.describe('Update listing requirement test', async () => {
     });
 
     test('PIP Case - Update & Verify Joh Tiers/Duration', { tag: '@nightly-pipeline' }, async ({ updateListingRequirementSteps }) => {
-
-
         await updateListingRequirementSteps.performUploadResponse(caseId);
         await updateListingRequirementSteps.updateAndVerifyJoHTiers();
     });
