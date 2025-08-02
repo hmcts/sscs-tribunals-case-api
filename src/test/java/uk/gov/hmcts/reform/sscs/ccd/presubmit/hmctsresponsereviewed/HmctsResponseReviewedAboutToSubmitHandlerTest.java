@@ -432,7 +432,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     public void shouldResetPanelComposition() {
         handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompositionService, true);
         var panelComposition = new PanelMemberComposition(List.of("84"));
-        when(panelCompositionService.resetPanelCompositionIfStale(sscsCaseData, sscsCaseDataBefore))
+        when(panelCompositionService.resetPanelCompositionIfStale(sscsCaseData, Optional.of(caseDetailsBefore)))
                 .thenReturn(panelComposition);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);

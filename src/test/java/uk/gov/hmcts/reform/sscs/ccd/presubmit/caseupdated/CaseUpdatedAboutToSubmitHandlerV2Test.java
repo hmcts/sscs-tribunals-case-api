@@ -1889,7 +1889,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     @Test
     void shouldSetPanelMemberComposition() {
         var panelMemberComposition = new PanelMemberComposition(List.of("84"));
-        when(panelCompositionService.resetPanelCompositionIfStale(sscsCaseData, sscsCaseDataBefore))
+        when(panelCompositionService.resetPanelCompositionIfStale(sscsCaseData, Optional.of(caseDetailsBefore)))
                 .thenReturn(panelMemberComposition);
         when(panelCompositionService.isBenefitIssueCodeValid(any(), any())).thenReturn(true);
         handler = new CaseUpdatedAboutToSubmitHandler(

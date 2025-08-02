@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.amendspecialism;
 
-import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 import lombok.extern.slf4j.Slf4j;
@@ -47,10 +46,9 @@ public class AmendSpecialismAboutToSubmitHandler implements PreSubmitCallbackHan
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         var preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
-        var caseDetailsBefore = callback.getCaseDetailsBefore().orElse(null);
-        if (integratedListAssistEnabled && nonNull(caseDetailsBefore)) {
+        if (integratedListAssistEnabled) {
             caseData.setPanelMemberComposition(panelCompositionService
-                    .resetPanelCompositionIfStale(caseData, caseDetailsBefore.getCaseData()));
+                    .resetPanelCompositionIfStale(caseData, callback.getCaseDetailsBefore()));
             log.info("PanelComposition set to ({}) for case id {}",
                     callback.getCaseDetails().getId(), caseData.getPanelMemberComposition());
         }
