@@ -9,6 +9,7 @@ import { VoidCase } from './void.case';
 const responseReviewedTestData = require('../../pages/content/response.reviewed_en.json');
 const uploadResponseTestdata = require('../../pages/content/upload.response_en.json');
 const ucbTestData = require('../../pages/content/update.ucb_en.json');
+const listingRequirementsTestData = require('../../pages/content/listing.requirements.json');
 
 export class UploadResponse extends BaseStep {
   private static caseId: string;
@@ -56,8 +57,7 @@ export class UploadResponse extends BaseStep {
     }
   }
 
-  async performUploadResponseWithFurtherInfoOnAPIPAndReviewResponse() {
-    let pipCaseId = await createCaseBasedOnCaseType('PIP');
+  async performUploadResponseWithFurtherInfoOnAPIPAndReviewResponse(pipCaseId: string) {
     await this.uploadResponseWithFurtherInfoAsDwpCaseWorker(pipCaseId);
     await this.homePage.clickSignOut();
 
@@ -74,7 +74,23 @@ export class UploadResponse extends BaseStep {
     await this.checkYourAnswersPage.confirmAndSignOut();
 
     await this.validateHistory(pipCaseId);
-    // await performAppealDormantOnCase(pipCaseId);
+
+    await this.homePage.navigateToTab('Listing Requirements').catch(async () => {
+      await this.page.locator('button.mat-tab-header-pagination-after').click();
+      await this.homePage.navigateToTab('Listing Requirements');
+    });
+    await this.listingRequirementsTab.verifyContentByKeyValueForASpan(
+      listingRequirementsTestData.johJudgeField,
+      listingRequirementsTestData.johJudgeValue
+    );
+    await this.listingRequirementsTab.verifyContentByKeyValueForASpan(
+      listingRequirementsTestData.johMedicalMemField,
+      listingRequirementsTestData.johMedicalMemValue
+    );
+    await this.listingRequirementsTab.verifyContentByKeyValueForASpan(
+      listingRequirementsTestData.johTribunalDisabilityMemField,
+      listingRequirementsTestData.johTribunalDisabilityMemValue
+    );
   }
 
   async performUploadResponseWithPHEOnAPIPAndReviewResponse(caseId: string) {
@@ -201,7 +217,15 @@ export class UploadResponse extends BaseStep {
     await this.checkYourAnswersPage.confirmAndSignOut();
 
     await this.validateHistory(taxCaseId);
-    // await performAppealDormantOnCase(taxCaseId);
+
+    await this.homePage.navigateToTab('Listing Requirements').catch(async () => {
+      await this.page.locator('button.mat-tab-header-pagination-after').click();
+      await this.homePage.navigateToTab('Listing Requirements');
+    });
+    await this.listingRequirementsTab.verifyContentByKeyValueForASpan(
+      listingRequirementsTestData.johJudgeField,
+      listingRequirementsTestData.johJudgeValue
+    );
   }
 
   async performUploadResponseOnAUniversalCredit(
@@ -255,7 +279,19 @@ export class UploadResponse extends BaseStep {
     }
 
     await this.validateHistory(ucCaseId, needsToLogin);
-    // await performAppealDormantOnCase(ucCaseId);
+
+    await this.homePage.navigateToTab('Listing Requirements').catch(async () => {
+      await this.page.locator('button.mat-tab-header-pagination-after').click();
+      await this.homePage.navigateToTab('Listing Requirements');
+    });
+    await this.listingRequirementsTab.verifyContentByKeyValueForASpan(
+      listingRequirementsTestData.johJudgeField,
+      listingRequirementsTestData.johJudgeValue
+    );
+    await this.listingRequirementsTab.verifyContentByKeyValueForASpan(
+      listingRequirementsTestData.johMedicalMemField,
+      listingRequirementsTestData.johMedicalMemValue
+    );
   }
 
   async performUploadResponseOnAUniversalCreditWithJP(ucCaseId: string) {
@@ -296,7 +332,6 @@ export class UploadResponse extends BaseStep {
     await this.checkYourAnswersPage.confirmAndSignOut();
 
     await this.validateHistory(ucCaseId);
-    // await performAppealDormantOnCase(ucCaseId);
   }
 
   async verifyErrorsScenariosInUploadResponse() {

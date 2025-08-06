@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.DISTRICT_TRIBUNAL_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
@@ -67,15 +68,22 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
             if (isYes(callbackReservedDtj)) {
                 caseDataReserveTo.setReservedJudge(null);
-                if (isDefaultPanelCompEnabled && callbackResponse.getData().getPanelMemberComposition() != null) {
-                    callbackResponse.getData().getPanelMemberComposition().setPanelCompositionJudge(null);
-                }
             }
         }
 
         if (isDefaultPanelCompEnabled && callbackResponse.getData().getPanelMemberComposition() != null) {
-            if ("NoMedicalMemberRequired".equals(callbackResponse.getData().getPanelMemberComposition().getPanelCompositionMemberMedical1())) {
+            if ("NoMedicalMemberRequired".equals(
+                    callbackResponse.getData().getPanelMemberComposition().getPanelCompositionMemberMedical1()
+            )) {
                 callbackResponse.getData().getPanelMemberComposition().clearMedicalMembers();
+            }
+
+            if (nonNull(callbackReserveTo) && isYes(callbackReserveTo.getReservedDistrictTribunalJudge())) {
+                callbackResponse.getData().getPanelMemberComposition().setPanelCompositionJudge(null);
+                callbackResponse.getData().getPanelMemberComposition()
+                        .setDistrictTribunalJudge(DISTRICT_TRIBUNAL_JUDGE.getReference());
+            } else {
+                callbackResponse.getData().getPanelMemberComposition().setDistrictTribunalJudge(null);
             }
 
             syncConfirmPanelComposition(callbackResponse.getData());
@@ -127,7 +135,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             String caseInterpreter = hearingOptions.isPresent() && nonNull(hearingOptions.get().getLanguageInterpreter())
                     ? hearingOptions.get().getLanguageInterpreter()
                     : "No";
-            interpreterUpdated = nonNull(appellantInterpreter) && YesNo.isYes(caseInterpreter) != YesNo.isYes(appellantInterpreter.getIsInterpreterWanted());
+            interpreterUpdated = YesNo.isYes(caseInterpreter) != YesNo.isYes(appellantInterpreter.getIsInterpreterWanted());
         }
         return channelUpdated || interpreterUpdated;
     }

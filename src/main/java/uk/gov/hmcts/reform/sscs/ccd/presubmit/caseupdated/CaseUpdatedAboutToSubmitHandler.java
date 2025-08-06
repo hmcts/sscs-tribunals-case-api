@@ -88,15 +88,11 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final VenueService venueService;
     private final SessionCategoryMapService categoryMapService;
     private final HearingDurationsService hearingDurationsService;
-    private final boolean caseAccessManagementFeature;
     private final PanelCompositionService panelCompositionService;
     private final PostcodeValidator postcodeValidator = new PostcodeValidator();
+    private final boolean integratedListAssistEnabled;
+
     private static ConstraintValidatorContext context;
-    @Value("${feature.default-panel-comp.enabled}")
-    private boolean defaultPanelCompEnabled;
-
-
-
     private static final String WARNING_MESSAGE = "%s has not been provided for the %s, do you want to ignore this warning and proceed?";
 
     private static final String ERROR_MESSAGE = "%s has not been provided for the %s";
@@ -119,7 +115,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                                     SessionCategoryMapService categoryMapService,
                                     PanelCompositionService panelCompositionService,
                                     HearingDurationsService hearingDurationsService,
-                                    @Value("${feature.case-access-management.enabled}")  boolean caseAccessManagementFeature) {
+                                    @Value("${feature.default-panel-comp.enabled}")
+                                    boolean integratedListAssistEnabled) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
         this.airLookupService = airLookupService;
@@ -127,10 +124,10 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         this.idamService = idamService;
         this.refDataService = refDataService;
         this.hearingDurationsService = hearingDurationsService;
-        this.caseAccessManagementFeature = caseAccessManagementFeature;
         this.panelCompositionService = panelCompositionService;
         this.venueService = venueService;
         this.categoryMapService = categoryMapService;
+        this.integratedListAssistEnabled = integratedListAssistEnabled;
     }
 
     @Override
@@ -143,7 +140,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     @Override
-    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
+                                                          String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
@@ -225,6 +223,10 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             SscsUtil.setListAssistRoutes(sscsCaseData);
         }
         updateOverrideFields(sscsCaseData, caseDetailsBefore);
+        if (integratedListAssistEnabled && caseDetailsBefore.isPresent()) {
+            sscsCaseData.setPanelMemberComposition(panelCompositionService
+                    .resetPanelCompositionIfStale(sscsCaseData, caseDetailsBefore.get().getCaseData()));
+        }
         return preSubmitCallbackResponse;
     }
 
@@ -302,7 +304,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private void validateBenefitIssueCode(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> response) {
-        if (defaultPanelCompEnabled) {
+        if (integratedListAssistEnabled) {
             if (!panelCompositionService.isBenefitIssueCodeValid(caseData.getBenefitCode(), caseData.getIssueCode())) {
                 response.addError("Incorrect benefit/issue code combination");
             }
@@ -419,10 +421,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             response.addWarning("Benefit type code is empty");
             return false;
         } else if (Benefit.findBenefitByShortName(benefitType.getCode()).isEmpty()) {
-            if (!caseAccessManagementFeature) {
-                String validBenefitTypes = Arrays.stream(Benefit.values()).sequential().map(Benefit::getShortName).collect(Collectors.joining(", "));
-                response.addWarning("Benefit type code is invalid, should be one of: " + validBenefitTypes);
-            }
             return false;
         }
         return true;
@@ -466,7 +464,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
             sscsCaseData.setProcessingVenue(venue);
 
-            if (caseAccessManagementFeature && isNotEmpty(venue)) {
+            if (isNotEmpty(venue)) {
                 String venueEpimsId = venueService.getEpimsIdForVenue(venue);
                 CourtVenue courtVenue = refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId);
 
@@ -582,10 +580,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private void updateCaseName(Callback<SscsCaseData> callback, SscsCaseData caseData) {
-        if (!caseAccessManagementFeature) {
-            return;
-        }
-
         final String caseName = getCaseName(caseData.getAppeal().getAppellant());
         CaseDetails<SscsCaseData> oldCaseDetails = callback.getCaseDetailsBefore().orElse(null);
 
@@ -611,10 +605,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private void updateCaseCategoriesIfBenefitTypeUpdated(Callback<SscsCaseData> callback,
                                                           SscsCaseData sscsCaseData,
                                                           PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if (!caseAccessManagementFeature) {
-            return;
-        }
-
         Optional<Benefit> benefit = sscsCaseData.getBenefitType();
 
         CaseDetails<SscsCaseData> oldCaseDetails = callback.getCaseDetailsBefore().orElse(null);

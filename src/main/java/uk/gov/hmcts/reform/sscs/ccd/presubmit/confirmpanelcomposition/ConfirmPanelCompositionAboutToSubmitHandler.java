@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.confirmpanelcomposition;
 
-import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Service
 @Slf4j
 public class ConfirmPanelCompositionAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
     @Value("${feature.default-panel-comp.enabled}")
     private boolean isDefaultPanelCompEnabled;
 
@@ -61,7 +62,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandler implements PreSubmitCal
     }
 
     private void syncUpdateListingRequirements(SscsCaseData sscsCaseData) {
-        if (!isNull(sscsCaseData.getPanelMemberComposition())) {
+        if (nonNull(sscsCaseData.getPanelMemberComposition()) && !sscsCaseData.getPanelMemberComposition().isEmpty()) {
             boolean isFqpmRequired = isYes(sscsCaseData.getIsFqpmRequired());
 
             if (isFqpmRequired) {
