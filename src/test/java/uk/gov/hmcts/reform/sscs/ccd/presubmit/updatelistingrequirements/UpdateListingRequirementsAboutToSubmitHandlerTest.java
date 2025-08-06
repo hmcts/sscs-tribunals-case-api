@@ -74,7 +74,6 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(handler, "isDefaultPanelCompEnabled", true);
         sscsCaseData = SscsCaseData.builder()
             .appeal(Appeal.builder().build())
             .dwpIsOfficerAttending("Yes")
@@ -282,15 +281,12 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         DynamicListItem interpreterLanguageItem = new DynamicListItem("arabic", "Arabic");
         DynamicList interpreterLanguage = new DynamicList(interpreterLanguageItem, List.of());
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
-                .appellantInterpreter(HearingInterpreter.builder().isInterpreterWanted(YES).interpreterLanguage(interpreterLanguage).build())
+                .appellantInterpreter(HearingInterpreter.builder()
+                        .isInterpreterWanted(YES).interpreterLanguage(interpreterLanguage).build())
                 .build());
-
         when(hearingDurationsService.getHearingDurationBenefitIssueCodes(eq(sscsCaseData))).thenReturn(90);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-                ABOUT_TO_SUBMIT,
-                callback,
-                USER_AUTHORISATION);
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
         assertThat("Yes").isEqualTo(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter());
