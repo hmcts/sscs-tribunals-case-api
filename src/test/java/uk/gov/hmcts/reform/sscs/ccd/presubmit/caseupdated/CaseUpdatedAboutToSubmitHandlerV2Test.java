@@ -1961,6 +1961,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
                 venueService,
                 categoryMapService,
                 panelCompositionService,
+                hearingDurationsService,
                 true);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
