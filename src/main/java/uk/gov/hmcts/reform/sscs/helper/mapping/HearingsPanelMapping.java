@@ -133,7 +133,7 @@ public final class HearingsPanelMapping {
         String doctorSpecialismSecond = caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism();
         if (defaultPanelCompEnabled) {
             DefaultPanelComposition panelComposition = panelCompositionService.getDefaultPanelComposition(caseData);
-            if (isNull(panelComposition) || isNull(panelComposition.getCategory())) {
+            if (isNull(panelComposition.getCategory())) {
                 return panelSpecialisms;
             }
             panelSpecialisms = SessionCategory.getSessionCategory(
