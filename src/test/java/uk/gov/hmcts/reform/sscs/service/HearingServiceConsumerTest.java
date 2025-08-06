@@ -123,7 +123,7 @@ public class HearingServiceConsumerTest {
                             .hearingVenueEpimsIds(List.of(CcdValue.<CcdValue<String>>builder().value(CcdValue.<String>builder().value("219164").build()).build()))
                             .duration(0).build());
             return sscsCaseData;
-        }).given(overridesMapping).setDefaultListingValues(eq(caseData), eq(refData), eq(false));
+        }).given(overridesMapping).setDefaultListingValues(eq(caseData), eq(refData));
 
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
 
@@ -171,7 +171,7 @@ public class HearingServiceConsumerTest {
                             .hearingVenueEpimsIds(List.of(CcdValue.<CcdValue<String>>builder().value(CcdValue.<String>builder().value("219164").build()).build()))
                             .duration(0).build());
             return sscsCaseData;
-        }).given(overridesMapping).setDefaultListingValues(eq(caseData), eq(refData), eq(false));
+        }).given(overridesMapping).setDefaultListingValues(eq(caseData), eq(refData));
 
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
         var panelMemberComposition = PanelMemberComposition.builder().panelCompositionJudge("58").build();
@@ -210,7 +210,7 @@ public class HearingServiceConsumerTest {
     @Test
     public void testCreateHearingCaseDetailsConsumerWithListingExceptionMessage() throws ListingException {
         doThrow(new ListingException("Incorrect benefit/issue code combination"))
-                .when(overridesMapping).setDefaultListingValues(eq(caseData), eq(refData), eq(false));
+                .when(overridesMapping).setDefaultListingValues(eq(caseData), eq(refData));
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
 
         Consumer<SscsCaseDetails> sscsCaseDetailsConsumer = hearingServiceConsumer

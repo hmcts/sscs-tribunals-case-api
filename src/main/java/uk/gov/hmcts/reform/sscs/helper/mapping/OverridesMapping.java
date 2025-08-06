@@ -70,14 +70,14 @@ public final class OverridesMapping {
                 .orElse(Collections.emptyList());
     }
   
-    public void setDefaultListingValues(SscsCaseData caseData, ReferenceDataServiceHolder refData, boolean isHearingDurationEnabled)
+    public void setDefaultListingValues(SscsCaseData caseData, ReferenceDataServiceHolder refData)
             throws ListingException {
 
         //this is NOT being set in the consumer during V2 process
         OverrideFields defaultListingValues = caseData.getSchedulingAndListingFields().getDefaultListingValues();
 
         if (isNull(defaultListingValues) || defaultListingValues.isAllNull()) {
-            OverrideFields defaultOverrideValues = getOverrideFieldValues(caseData, refData, isHearingDurationEnabled);
+            OverrideFields defaultOverrideValues = getOverrideFieldValues(caseData, refData);
             caseData.getSchedulingAndListingFields().setDefaultListingValues(defaultOverrideValues);
 
             log.debug("Default Override Listing Values set to {} for Case ID {}",
@@ -86,10 +86,10 @@ public final class OverridesMapping {
         }
     }
   
-    public void setOverrideValues(SscsCaseData caseData, ReferenceDataServiceHolder refData, boolean isHearingDurationEnabled)
+    public void setOverrideValues(SscsCaseData caseData, ReferenceDataServiceHolder refData)
             throws ListingException {
 
-        OverrideFields overrideFields = getOverrideFieldValues(caseData, refData, isHearingDurationEnabled);
+        OverrideFields overrideFields = getOverrideFieldValues(caseData, refData);
         caseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
         caseData.getSchedulingAndListingFields().getOverrideFields().setHearingWindow(overrideFields.getHearingWindow());
 
@@ -98,14 +98,14 @@ public final class OverridesMapping {
                 caseData.getCcdCaseId());
     }
 
-    private OverrideFields getOverrideFieldValues(SscsCaseData caseData, ReferenceDataServiceHolder refData, boolean isHearingDurationEnabled)
+    private OverrideFields getOverrideFieldValues(SscsCaseData caseData, ReferenceDataServiceHolder refData)
             throws ListingException {
 
         // get case data from hearing wrapper and required appeal fields
         Appeal appeal = caseData.getAppeal();
         HearingSubtype subtype = appeal.getHearingSubtype();
         HearingOptions options = appeal.getHearingOptions();
-        Integer duration = caseData.isIbcCase() ? null : HearingsDurationMapping.getHearingDuration(caseData, refData, isHearingDurationEnabled);
+        Integer duration = caseData.isIbcCase() ? null : HearingsDurationMapping.getHearingDuration(caseData, refData);
         HearingInterpreter interpreter = getAppellantInterpreter(appeal, refData);
         HearingChannel channel = HearingChannelUtil.getIndividualPreferredHearingChannel(subtype, options, null);
         HearingWindow hearingWindow = getHearingDetailsHearingWindow(caseData, refData);

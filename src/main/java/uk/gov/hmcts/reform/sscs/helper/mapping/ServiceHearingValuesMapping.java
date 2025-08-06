@@ -34,10 +34,6 @@ public final class ServiceHearingValuesMapping {
 
     @Value("${feature.default-panel-comp.enabled}")
     private boolean defaultPanelCompEnabled;
-  
-    @Value("${feature.hearing-duration.enabled}")
-    private boolean isHearingDurationEnabled;
-
 
     ServiceHearingValuesMapping(HearingsPanelMapping hearingsPanelMapping, HearingsAutoListMapping hearingsAutoListMapping, PanelCompositionService panelCompositionService, HearingsCaseMapping hearingsCaseMapping) {
         this.hearingsPanelMapping = hearingsPanelMapping;
@@ -53,7 +49,7 @@ public final class ServiceHearingValuesMapping {
         boolean shouldBeAutoListed = hearingsAutoListMapping.shouldBeAutoListed(caseData, refData);
         int hearingDuration = 0;
         try {
-            hearingDuration = HearingsDurationMapping.getHearingDuration(caseData, refData, isHearingDurationEnabled);
+            hearingDuration = HearingsDurationMapping.getHearingDuration(caseData, refData);
         } catch (ListingException e) {
             log.error("Error getting hearing duration for case ID {}: {}", caseData.getCcdCaseId(), e.getMessage());
         }

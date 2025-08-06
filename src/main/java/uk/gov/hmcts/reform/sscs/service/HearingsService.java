@@ -64,9 +64,6 @@ public class HearingsService {
     private final HearingServiceConsumer hearingServiceConsumer;
     private final HearingsMapping hearingsMapping;
     private final OverridesMapping overridesMapping;
-    @Value("${feature.hearing-duration.enabled}")
-    private boolean isHearingDurationEnabled;
-
 
 
     // Leaving blank for now until a future change is scoped and completed, then we can add the case states back in
@@ -128,7 +125,7 @@ public class HearingsService {
         HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseId, null);
         CaseHearing hearing = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse, false);
         HmcUpdateResponse hmcUpdateResponse;
-        overridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData, isHearingDurationEnabled);
+        overridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData);
 
         if (isNull(hearing)) {
             HearingRequestPayload hearingPayload = hearingsMapping.buildHearingPayload(wrapper, refData);
@@ -172,7 +169,7 @@ public class HearingsService {
         String caseId = caseData.getCcdCaseId();
 
         if (isNull(caseData.getSchedulingAndListingFields().getOverrideFields())) {
-            overridesMapping.setOverrideValues(caseData, refData, isHearingDurationEnabled);
+            overridesMapping.setOverrideValues(caseData, refData);
         }
         Integer duration = wrapper
                 .getCaseData()
