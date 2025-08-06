@@ -125,7 +125,8 @@ public final class HearingsPanelMapping {
         String doctorSpecialism = caseData.getSscsIndustrialInjuriesData().getPanelDoctorSpecialism();
         String doctorSpecialismSecond = caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism();
         panelSpecialisms = SessionCategory.getSessionCategory(
-                panelComposition.getCategory()).getPanelMembers().stream()
+                panelComposition.getCategory())
+                .getPanelMembers().stream()
                 .map(panelMember -> getPanelMemberSpecialism(panelMember, doctorSpecialism, doctorSpecialismSecond))
                 .filter(Objects::nonNull)
                 .toList();

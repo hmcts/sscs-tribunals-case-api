@@ -27,13 +27,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Issue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SessionCategory;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
@@ -47,9 +44,7 @@ import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
 import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HmcUpdateResponse;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
-import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
-import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.CcdCaseService;
 import uk.gov.hmcts.reform.sscs.service.HearingsService;
@@ -80,8 +75,6 @@ public class HearingRequestHandlerIT {
     @MockitoBean
     private CcdCaseService ccdCaseService;
     @MockitoBean
-    public SessionCategoryMapService sessionCategoryMaps;
-    @MockitoBean
     private ReferenceDataServiceHolder refData;
     @MockitoBean
     private HearingDurationsService hearingDurationsService;
@@ -107,13 +100,6 @@ public class HearingRequestHandlerIT {
         when(ccdCaseService.getStartEventResponse(anyLong(), any())).thenReturn(createSscsCaseDetails());
         when(hearingApi.getHearingsRequest(any(), any(), any(), any(), any(), any(), any()))
             .thenReturn(HearingsGetResponse.builder().build());
-
-        when(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE, ISSUE_CODE, false, false))
-            .thenReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                                               false, false, SessionCategory.CATEGORY_06, null
-            ));
-
-        when(refData.getSessionCategoryMaps()).thenReturn(sessionCategoryMaps);
         when(refData.getHearingDurations()).thenReturn(hearingDurationsService);
         when(refData.getRegionalProcessingCenterService()).thenReturn(regionalProcessingCenterService);
         when(regionalProcessingCenterService.getByPostcode(any(), anyBoolean())).thenReturn(RegionalProcessingCenter.builder().hearingRoute(
