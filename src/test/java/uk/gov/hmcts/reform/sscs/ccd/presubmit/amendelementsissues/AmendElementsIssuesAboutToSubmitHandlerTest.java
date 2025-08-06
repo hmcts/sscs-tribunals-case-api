@@ -54,7 +54,7 @@ public class AmendElementsIssuesAboutToSubmitHandlerTest {
                 new CaseDetails<>(1234L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
         callback = new Callback<>(caseDetails, empty(), AMEND_ELEMENTS_ISSUES, false);
 
-        handler = new AmendElementsIssuesAboutToSubmitHandler(panelCompositionService, false);
+        handler = new AmendElementsIssuesAboutToSubmitHandler(panelCompositionService);
     }
 
     @Test
@@ -104,7 +104,7 @@ public class AmendElementsIssuesAboutToSubmitHandlerTest {
         when(panelCompositionService.resetPanelCompIfElementsChanged(eq(sscsCaseData), eq(Optional.of(caseDetails))))
                 .thenReturn(panelComposition);
         callback = new Callback<>(caseDetails, Optional.of(caseDetails), AMEND_ELEMENTS_ISSUES, false);
-        handler = new AmendElementsIssuesAboutToSubmitHandler(panelCompositionService, true);
+        handler = new AmendElementsIssuesAboutToSubmitHandler(panelCompositionService);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(panelComposition, response.getData().getPanelMemberComposition());

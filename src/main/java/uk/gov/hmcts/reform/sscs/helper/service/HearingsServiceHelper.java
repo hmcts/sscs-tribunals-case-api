@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingSubChannel;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HmcUpdateResponse;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
-import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 
 @Slf4j
 public final class HearingsServiceHelper {
@@ -148,22 +147,11 @@ public final class HearingsServiceHelper {
         return hearingSubChannel.map(HearingSubChannel::getHearingChannel).orElse(null);
     }
 
-    public static void checkBenefitIssueCode(SessionCategoryMap sessionCategoryMap) throws ListingException {
-        if (isNull(sessionCategoryMap)) {
-            log.error("sessionCaseCode is null. The benefit/issue code is probably an incorrect combination"
-                          + " and cannot be mapped to a session code. Refer to the session-category-map.json file"
-                          + " for the correct combinations.");
-
-            throw new ListingException("Incorrect benefit/issue code combination");
-        }
-    }
-
-    public static void checkBenefitIssueCodeV2(Boolean validIssueBenefit) throws ListingException {
+    public static void checkBenefitIssueCode(Boolean validIssueBenefit) throws ListingException {
         if (!validIssueBenefit) {
             log.error("sessionCaseCode is null. The benefit/issue code is probably an incorrect combination"
                     + " and cannot be mapped to a session code. Refer to the panel-category-map.json file"
                     + " for the correct combinations.");
-
             throw new ListingException("Incorrect benefit/issue code combination");
         }
     }

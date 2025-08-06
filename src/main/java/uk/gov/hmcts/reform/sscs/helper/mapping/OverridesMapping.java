@@ -109,7 +109,7 @@ public final class OverridesMapping {
         HearingInterpreter interpreter = getAppellantInterpreter(appeal, refData);
         HearingChannel channel = HearingChannelUtil.getIndividualPreferredHearingChannel(subtype, options, null);
         HearingWindow hearingWindow = getHearingDetailsHearingWindow(caseData, refData);
-        YesNo autoList = getHearingDetailsAutoList(caseData, refData);
+        YesNo autoList = getHearingDetailsAutoList(caseData);
         List<CcdValue<CcdValue<String>>> venueEpimsIds = getHearingDetailsLocations(caseData, refData);
 
         return OverrideFields.builder()
@@ -195,9 +195,9 @@ public final class OverridesMapping {
                 .build();
     }
 
-    public YesNo getHearingDetailsAutoList(@Valid SscsCaseData caseData, ReferenceDataServiceHolder refData)
+    public YesNo getHearingDetailsAutoList(@Valid SscsCaseData caseData)
             throws ListingException {
-        return hearingsAutoListMapping.shouldBeAutoListed(caseData, refData) ? YesNo.YES : YesNo.NO;
+        return hearingsAutoListMapping.shouldBeAutoListed(caseData) ? YesNo.YES : YesNo.NO;
     }
 
     public static List<CcdValue<CcdValue<String>>> getHearingDetailsLocations(
