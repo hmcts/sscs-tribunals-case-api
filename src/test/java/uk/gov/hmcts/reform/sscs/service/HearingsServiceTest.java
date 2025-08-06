@@ -137,7 +137,6 @@ class HearingsServiceTest {
 
     @BeforeEach
     void setup() {
-        ReflectionTestUtils.setField(hearingsService, "integratedListAssistEnabled", false);
         SscsCaseData caseData = SscsCaseData.builder()
             .ccdCaseId(String.valueOf(CASE_ID))
             .benefitCode(BENEFIT_CODE)
@@ -213,9 +212,7 @@ class HearingsServiceTest {
     @DisplayName("When wrapper with a valid adjourn create Hearing State is given addHearingResponse should run without error")
     @Test
     void processHearingWrapperAdjournmentCreate() throws ListingException {
-        ReflectionTestUtils.setField(hearingsService, "integratedListAssistEnabled", true);
         mockHearingResponseForAdjournmentCreate();
-
         HearingEvent hearingEvent = HearingEvent.ADJOURN_CREATE_HEARING;
         wrapper.setHearingState(ADJOURN_CREATE_HEARING);
         wrapper.setEventId(hearingEvent.getEventType().getCcdType());
@@ -277,12 +274,10 @@ class HearingsServiceTest {
     }
 
     private void mockHearingResponseForAdjournmentCreate() {
-
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
-
         given(hmcHearingApiService.sendCreateHearingRequest(any()))
-                .willReturn(HmcUpdateResponse.builder().hearingRequestId(123L).versionNumber(1234L).status(HmcStatus.HEARING_REQUESTED).build());
-
+                .willReturn(HmcUpdateResponse.builder()
+                        .hearingRequestId(123L).versionNumber(1234L).status(HmcStatus.HEARING_REQUESTED).build());
         given(hmcHearingApiService.getHearingsRequest(anyString(), eq(null)))
             .willReturn(HearingsGetResponse.builder().build());
     }

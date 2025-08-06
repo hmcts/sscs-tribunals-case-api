@@ -24,8 +24,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.NOT_ATTENDING;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.TELEPHONE;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.BENEFIT_CODE_NOT_IN_USE;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.INVALID_BENEFIT_ISSUE_CODE;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.clearPostponementTransientFields;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.generateUniqueIbcaId;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getIssueFinalDecisionDocumentType;
@@ -37,7 +35,6 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getWriteFinalDecisionDocume
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleIbcaCase;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.updateHearingChannel;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.updateHearingInterpreter;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.validateBenefitIssueCode;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -99,14 +96,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
-import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @ExtendWith(MockitoExtension.class)
 class SscsUtilTest {
-    public static final String UNEXPECTED_POST_HEARING_REVIEW_TYPE_AND_ACTION = "getting the document type has an unexpected postHearingReviewType and action";
-
-    private SessionCategoryMapService categoryMapService = new SessionCategoryMapService();
     private PostHearing postHearing;
     private SscsCaseData caseData;
 
@@ -120,12 +113,8 @@ class SscsUtilTest {
 
     @BeforeEach
     void setUp() {
-        postHearing = PostHearing.builder()
-            .correction(Correction.builder()
-                .isCorrectionFinalDecisionInProgress(YesNo.NO)
-                .build())
-            .build();
-
+        postHearing = PostHearing.builder().correction(Correction.builder()
+                .isCorrectionFinalDecisionInProgress(YesNo.NO).build()).build();
         caseData = new SscsCaseData();
         caseData.setPostHearing(postHearing);
     }
@@ -321,35 +310,6 @@ class SscsUtilTest {
         assertNull(sscsCaseData.getPostponement().getUnprocessedPostponement());
         assertNull(sscsCaseData.getPostponementRequest().getUnprocessedPostponementRequest());
         assertNull(sscsCaseData.getPostponementRequest().getActionPostponementRequestSelected());
-    }
-
-    @Test
-    void givenCorrectIssueAndBenefitCode_dontAddErrorToResponse() {
-        SscsCaseData sscsCaseData = SscsCaseData.builder().benefitCode("002").issueCode("DD").build();
-        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
-        validateBenefitIssueCode(sscsCaseData, response, categoryMapService);
-
-        assertThat(response.getErrors()).isEmpty();
-    }
-
-    @Test
-    void givenWrongIssueAndBenefitCode_addErrorToResponse() {
-        SscsCaseData sscsCaseData = SscsCaseData.builder().benefitCode("002").issueCode("XA").build();
-        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
-        validateBenefitIssueCode(sscsCaseData, response, categoryMapService);
-
-        assertThat(response.getErrors()).hasSize(1);
-        assertThat(response.getErrors()).contains(INVALID_BENEFIT_ISSUE_CODE);
-    }
-
-    @Test
-    void givenLegacyBenefitCode_addErrorToResponse() {
-        SscsCaseData sscsCaseData = SscsCaseData.builder().benefitCode("032").issueCode("CR").build();
-        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
-        validateBenefitIssueCode(sscsCaseData, response, categoryMapService);
-
-        assertThat(response.getErrors()).hasSize(1);
-        assertThat(response.getErrors()).contains(BENEFIT_CODE_NOT_IN_USE);
     }
 
     @Test

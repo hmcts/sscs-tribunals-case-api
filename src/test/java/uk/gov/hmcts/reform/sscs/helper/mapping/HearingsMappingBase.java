@@ -5,30 +5,23 @@ import java.util.Arrays;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
-import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
-@ExtendWith(MockitoExtension.class)
 public class HearingsMappingBase {
 
     public static final String CASE_CREATED = "2022-04-01";
 
     @Mock
     public HearingDurationsService hearingDurations;
-
-    @Mock
-    public SessionCategoryMapService sessionCategoryMaps;
 
     @Mock
     public VerbalLanguagesService verbalLanguages;
@@ -66,10 +59,6 @@ public class HearingsMappingBase {
     public static final String EX_UI_URL = "http://localhost:3455";
 
     public static final int DURATION_FACE_TO_FACE = 60;
-
-    public static final int DURATION_INTERPRETER = 75;
-
-    public static final int DURATION_PAPER = 40;
 
     @BeforeEach
     public void setUpCaseData() {

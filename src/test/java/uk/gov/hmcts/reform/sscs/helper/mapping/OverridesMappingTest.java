@@ -557,7 +557,7 @@ class OverridesMappingTest {
         caseData.setDwpResponseDate("2021-12-01");
         caseData.getAppeal().getHearingOptions().setOther(value);
 
-        YesNo result = overridesMapping.getHearingDetailsAutoList(caseData, refData);
+        YesNo result = overridesMapping.getHearingDetailsAutoList(caseData);
 
         assertThat(result)
             .isNotNull()

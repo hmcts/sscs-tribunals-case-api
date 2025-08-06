@@ -5,17 +5,13 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberMedicallyQualified.getPanelMemberMedicallyQualified;
-import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsMapping.getSessionCaseCodeMap;
-import static uk.gov.hmcts.reform.sscs.model.hmc.reference.BenefitRoleRelationType.findRoleTypesByBenefitCode;
 
 import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMember;
@@ -29,9 +25,7 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.MemberType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelPreference;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
 import uk.gov.hmcts.reform.sscs.reference.data.model.DefaultPanelComposition;
-import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
-import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @Slf4j
 @Component
@@ -39,20 +33,17 @@ public final class HearingsPanelMapping {
 
     private final PanelCompositionService panelCompositionService;
 
-    @Value("${feature.default-panel-comp.enabled}")
-    private boolean defaultPanelCompEnabled;
-
     HearingsPanelMapping(PanelCompositionService panelCompositionService) {
         this.panelCompositionService = panelCompositionService;
     }
 
-    public PanelRequirements getPanelRequirements(SscsCaseData caseData, ReferenceDataServiceHolder refData) {
+    public PanelRequirements getPanelRequirements(SscsCaseData caseData) {
         return PanelRequirements.builder()
-                .roleTypes(defaultPanelCompEnabled ? panelCompositionService.getRoleTypes(caseData) : findRoleTypesByBenefitCode(caseData.getBenefitCode()))
+                .roleTypes(panelCompositionService.getRoleTypes(caseData))
                 .authorisationTypes(getAuthorisationTypes())
                 .authorisationSubTypes(getAuthorisationSubTypes())
                 .panelPreferences(getPanelPreferences(caseData))
-                .panelSpecialisms(getPanelSpecialisms(caseData, getSessionCaseCodeMap(caseData, refData)))
+                .panelSpecialisms(getPanelSpecialisms(caseData))
                 .build();
     }
 
@@ -118,37 +109,28 @@ public final class HearingsPanelMapping {
                 .build();
     }
 
-    public List<String> getPanelSpecialisms(@Valid SscsCaseData caseData, SessionCategoryMap sessionCategoryMap) {
+    public List<String> getPanelSpecialisms(@Valid SscsCaseData caseData) {
         List<String> panelSpecialisms = new ArrayList<>();
 
-        if (isNull(sessionCategoryMap)) {
-            return panelSpecialisms;
-        }
         // if benefit is child support specialism should be empty
         if (isNotBlank(caseData.getBenefitCode()) && caseData.getBenefitCode().equals(CHILD_SUPPORT.getBenefitCode())) {
             return panelSpecialisms;
         }
 
-        String doctorSpecialism = caseData.getSscsIndustrialInjuriesData().getPanelDoctorSpecialism();
-        String doctorSpecialismSecond = caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism();
-        if (defaultPanelCompEnabled) {
-            DefaultPanelComposition panelComposition = panelCompositionService.getDefaultPanelComposition(caseData);
-            if (isNull(panelComposition.getCategory())) {
-                return panelSpecialisms;
-            }
-            panelSpecialisms = SessionCategory.getSessionCategory(
-                    panelComposition.getCategory()).getPanelMembers().stream()
-                    .map(panelMember -> getPanelMemberSpecialism(panelMember, doctorSpecialism, doctorSpecialismSecond))
-                    .filter(Objects::nonNull)
-                    .toList();
-            return panelSpecialisms;
-        } else {
-            panelSpecialisms = sessionCategoryMap.getCategory().getPanelMembers().stream()
-                    .map(panelMember -> getPanelMemberSpecialism(panelMember, doctorSpecialism, doctorSpecialismSecond))
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
+        DefaultPanelComposition panelComposition = panelCompositionService.getDefaultPanelComposition(caseData);
+        if (isNull(panelComposition.getCategory())) {
             return panelSpecialisms;
         }
+
+        String doctorSpecialism = caseData.getSscsIndustrialInjuriesData().getPanelDoctorSpecialism();
+        String doctorSpecialismSecond = caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism();
+        panelSpecialisms = SessionCategory.getSessionCategory(
+                panelComposition.getCategory()).getPanelMembers().stream()
+                .map(panelMember -> getPanelMemberSpecialism(panelMember, doctorSpecialism, doctorSpecialismSecond))
+                .filter(Objects::nonNull)
+                .toList();
+        return panelSpecialisms;
+
     }
 
     public static String getPanelMemberSpecialism(PanelMember panelMember,
