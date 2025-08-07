@@ -84,7 +84,8 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         caseDetails =
                 new CaseDetails<>(1234L, "SSCS", State.READY_TO_LIST, sscsCaseData, now(), "Benefit");
 
-        callback = new Callback<>(caseDetails, empty(), UPDATE_LISTING_REQUIREMENTS, false);
+        callback =
+                new Callback<>(caseDetails, Optional.of(caseDetails), UPDATE_LISTING_REQUIREMENTS, false);
     }
 
     @Test

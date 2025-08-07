@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.helper.mapping;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMember;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
@@ -99,15 +97,5 @@ public final class HearingsAutoListMapping {
         return nonNull(panelCategory) && panelCategory.containsAnyPanelMembers(
                 List.of(TRIBUNAL_MEMBER_MEDICAL, REGIONAL_MEDICAL_MEMBER, TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED)
         );
-    }
-
-    public static boolean isMqpmOrFqpm(PanelMember panelMember) {
-        if (isNull(panelMember)) {
-            return false;
-        }
-        return switch (panelMember) {
-            case MQPM1, MQPM2, FQPM -> true;
-            default -> false;
-        };
     }
 }
