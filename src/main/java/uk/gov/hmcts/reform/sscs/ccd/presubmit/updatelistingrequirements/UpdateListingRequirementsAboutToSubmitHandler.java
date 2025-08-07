@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static java.util.Objects.requireNonNullElse;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.DISTRICT_TRIBUNAL_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
@@ -59,30 +60,26 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         SchedulingAndListingFields caseDataSnlFields = sscsCaseData.getSchedulingAndListingFields();
-        ReserveTo caseDataReserveTo = caseDataSnlFields.getReserveTo();
-        if (nonNull(caseDataReserveTo) && isYes(caseDataReserveTo.getReservedDistrictTribunalJudge())) {
-            caseDataReserveTo.setReservedJudge(null);
-            if (isDefaultPanelCompEnabled && nonNull(sscsCaseData.getPanelMemberComposition())) {
-                sscsCaseData.getPanelMemberComposition().setPanelCompositionJudge(null);
-            }
+        var reservedDtj =
+                ofNullable(caseDataSnlFields.getReserveTo()).orElse(new ReserveTo()).getReservedDistrictTribunalJudge();
+        if (isYes(reservedDtj)) {
+            caseDataSnlFields.getReserveTo().setReservedJudge(null);
         }
 
-        if (isDefaultPanelCompEnabled && nonNull(sscsCaseData.getPanelMemberComposition())
-                && "NoMedicalMemberRequired".equals(
-                        sscsCaseData.getPanelMemberComposition().getPanelCompositionMemberMedical1()
-        )) {
-                callbackResponse.getData().getPanelMemberComposition().clearMedicalMembers();
+        if (isDefaultPanelCompEnabled && nonNull(sscsCaseData.getPanelMemberComposition())) {
+            if ("NoMedicalMemberRequired"
+                    .equals(sscsCaseData.getPanelMemberComposition().getPanelCompositionMemberMedical1())) {
+                sscsCaseData.getPanelMemberComposition().clearMedicalMembers();
             }
 
-            if (nonNull(callbackReserveTo) && isYes(callbackReserveTo.getReservedDistrictTribunalJudge())) {
-                callbackResponse.getData().getPanelMemberComposition().setPanelCompositionJudge(null);
-                callbackResponse.getData().getPanelMemberComposition()
+            if (isYes(reservedDtj)) {
+                sscsCaseData.getPanelMemberComposition().setPanelCompositionJudge(null);
+                sscsCaseData.getPanelMemberComposition()
                         .setDistrictTribunalJudge(DISTRICT_TRIBUNAL_JUDGE.getReference());
             } else {
-                callbackResponse.getData().getPanelMemberComposition().setDistrictTribunalJudge(null);
+                sscsCaseData.getPanelMemberComposition().setDistrictTribunalJudge(null);
             }
-
-            syncConfirmPanelComposition(callbackResponse.getData());
+            syncConfirmPanelComposition(sscsCaseData);
         }
 
         OverrideFields overrideFields = caseDataSnlFields.getOverrideFields();
@@ -99,9 +96,8 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 SscsUtil.updateHearingInterpreter(sscsCaseData, callbackResponse, appellantInterpreter);
             }
             if (updateDuration) {
-                sscsCaseData.getSchedulingAndListingFields().getOverrideFields().setDuration(
-                        hearingDurationsService.getHearingDurationBenefitIssueCodes(sscsCaseData)
-                );
+                caseDataSnlFields.getOverrideFields()
+                        .setDuration(hearingDurationsService.getHearingDurationBenefitIssueCodes(sscsCaseData));
             }
         }
       
