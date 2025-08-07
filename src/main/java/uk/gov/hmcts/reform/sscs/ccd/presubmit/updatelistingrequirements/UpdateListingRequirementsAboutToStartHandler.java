@@ -79,8 +79,7 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
             log.info("Setting default JOH tiers ({}) on case ({})", johTiers, caseId);
         }
 
-        if (nonNull(sscsCaseData.getPanelMemberComposition())
-                && nonNull(sscsCaseData.getPanelMemberComposition().getPanelCompositionJudge())) {
+        if (nonNull(sscsCaseData.getPanelMemberComposition().getPanelCompositionJudge())) {
             if (isNull(schedulingAndListingFields.getReserveTo())) {
                 schedulingAndListingFields.setReserveTo(ReserveTo.builder().build());
             }
