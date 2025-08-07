@@ -1,15 +1,29 @@
 import { BaseStep } from './base';
 import { Page } from '@playwright/test';
 import { credentials } from '../../config/config';
+import { StepsHelper } from '../../helpers/stepsHelper';
 
 const listingRequirementsTestData = require('../../pages/content/listing.requirements.json');
+const uploadResponseTestdata = require('../../pages/content/upload.response_en.json');
 
 export class UpdateListingRequirement extends BaseStep {
   readonly page: Page;
+  protected stepsHelper: StepsHelper;
 
   constructor(page) {
     super(page);
     this.page = page;
+    this.stepsHelper = new StepsHelper(this.page);
+  }
+
+  async performUploadResponse(caseId) {
+
+    await this.loginUserWithCaseId(credentials.hmrcSuperUser, false, caseId);
+    await this.stepsHelper.uploadResponseHelper(
+      uploadResponseTestdata.pipIssueCode,
+      'No'
+    );
+    await this.checkYourAnswersPage.confirmSubmission();
   }
 
   async updateAndVerifyJoHTiers() {
