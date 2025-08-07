@@ -3,6 +3,9 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 import static java.time.LocalDateTime.now;
 import static java.util.Optional.empty;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -16,6 +19,7 @@ import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.VIDEO;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +35,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
@@ -41,6 +46,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReserveTo;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -53,17 +59,18 @@ import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
-
-    @InjectMocks
-    private UpdateListingRequirementsAboutToSubmitHandler handler;
+    private static final String TRIBUNAL_MEDICAL_MEMBER_REF = PanelMemberType.TRIBUNAL_MEMBER_MEDICAL.toRef();
+    private static final String IBCA_BENEFIT_CODE = Benefit.INFECTED_BLOOD_COMPENSATION.getBenefitCode();
 
     @Mock
     private HearingDurationsService hearingDurationsService;
 
-
     private SscsCaseData sscsCaseData;
     private Callback<SscsCaseData> callback;
     private CaseDetails<SscsCaseData> caseDetails;
+
+    @InjectMocks
+    private UpdateListingRequirementsAboutToSubmitHandler handler;
 
     @BeforeEach
     void setUp() {
@@ -71,8 +78,9 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         sscsCaseData = SscsCaseData.builder()
             .appeal(Appeal.builder().build())
             .dwpIsOfficerAttending("Yes")
-                .schedulingAndListingFields(SchedulingAndListingFields.builder().build())
-                .build();
+            .schedulingAndListingFields(SchedulingAndListingFields.builder().build())
+            .panelMemberComposition(PanelMemberComposition.builder().build())
+            .build();
 
         caseDetails =
                 new CaseDetails<>(1234L, "SSCS", State.READY_TO_LIST, sscsCaseData, now(), "Benefit");
@@ -126,21 +134,45 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @Test
     void givenReservedDistrictTribunalJudgeIsYesAndReservedJudgeIsNotNull_responseReservedJudgeAndPanelCompositionJudgeAreNull() {
-        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").panelCompositionMemberMedical1("NoMedicalMemberRequired").build());
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
+                .panelCompositionJudge("84").panelCompositionMemberMedical1("NoMedicalMemberRequired").build());
         ReserveTo reserveTo = new ReserveTo();
         reserveTo.setReservedDistrictTribunalJudge(YES);
         reserveTo.setReservedJudge(new JudicialUserBase("1", "2"));
         sscsCaseData.getSchedulingAndListingFields().setReserveTo(reserveTo);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-            ABOUT_TO_SUBMIT,
-            callback,
-            USER_AUTHORISATION);
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
-        JudicialUserBase result = response.getData().getSchedulingAndListingFields().getReserveTo().getReservedJudge();
-        assertThat(result).isNull();
-        assertThat(response.getData().getPanelMemberComposition().getPanelCompositionJudge()).isNull();
+        assertNull(response.getData().getSchedulingAndListingFields().getReserveTo().getReservedJudge());
+        assertNull(response.getData().getPanelMemberComposition().getPanelCompositionJudge());
+        assertEquals(PanelMemberType.DISTRICT_TRIBUNAL_JUDGE.getReference(),
+                response.getData().getPanelMemberComposition().getDistrictTribunalJudge());
+    }
+
+    @Test
+    void givenReservedDistrictTribunalJudgeIsNoAndReservedJudgeIsNotNull_panelCompositionDtjIsNull() {
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").build());
+        ReserveTo reserveTo = new ReserveTo();
+        reserveTo.setReservedDistrictTribunalJudge(NO);
+        sscsCaseData.getSchedulingAndListingFields().setReserveTo(reserveTo);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertNotNull(response.getData().getPanelMemberComposition().getPanelCompositionJudge());
+        assertNull(response.getData().getPanelMemberComposition().getDistrictTribunalJudge());
+    }
+
+    @Test
+    void givenReservedReservedJudgeIsNull_panelCompositionDtjIsNull() {
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").build());
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertNotNull(response.getData().getPanelMemberComposition().getPanelCompositionJudge());
+        assertNull(response.getData().getPanelMemberComposition().getDistrictTribunalJudge());
     }
 
     @Test
@@ -369,5 +401,88 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
         assertThat(response.getErrors()).isEmpty();
         assertThat(hmcHearingType).isEqualTo(response.getData().getAppeal().getHearingOptions().getHmcHearingType());
+    }
+
+    @Test
+    void givenPanelMemberCompositionHasFqpm_thenUpdateIsFqpmRequiredToYes() {
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
+            .panelCompositionDisabilityAndFqMember(List.of(
+                PanelMemberType.TRIBUNAL_MEMBER_FINANCIALLY_QUALIFIED.toRef()))
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getIsFqpmRequired()).isEqualTo(YES);
+    }
+
+    @Test
+    void givenNoFqpmIsSetInPanelMemberComposition_thenUpdateIsFqpmRequiredToNo() {
+        sscsCaseData.setIsFqpmRequired(YES);
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
+            .panelCompositionDisabilityAndFqMember(Collections.emptyList())
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getIsFqpmRequired()).isEqualTo(NO);
+    }
+
+    @Test
+    void givenPanelMemberCompositionHasMedicalMemberOnIbcaCase_thenUpdateIsMedicalMemberRequiredToYes() {
+        sscsCaseData.setBenefitCode(IBCA_BENEFIT_CODE);
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
+            .panelCompositionMemberMedical1(null)
+            .panelCompositionMemberMedical2(TRIBUNAL_MEDICAL_MEMBER_REF)
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getIsMedicalMemberRequired()).isEqualTo(YES);
+    }
+
+    @Test
+    void givenPanelMemberCompositionHasNoMedicalMemberOnIbcaCase_thenUpdateIsMedicalMemberRequiredToNo() {
+        sscsCaseData.setBenefitCode(IBCA_BENEFIT_CODE);
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
+            .panelCompositionMemberMedical1(null)
+            .panelCompositionMemberMedical2(null)
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getIsMedicalMemberRequired()).isEqualTo(NO);
+    }
+
+    @Test
+    void givenUpdatedMedicalMemberOnPanelMemberCompositionOnNonIbcaCase_thenIsMedicalMemberRequiredNotChanged() {
+        sscsCaseData.setBenefitCode(Benefit.PIP.getBenefitCode());
+        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder()
+            .panelCompositionMemberMedical1(TRIBUNAL_MEDICAL_MEMBER_REF)
+            .panelCompositionMemberMedical2(null)
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getIsMedicalMemberRequired()).isNull();
     }
 }

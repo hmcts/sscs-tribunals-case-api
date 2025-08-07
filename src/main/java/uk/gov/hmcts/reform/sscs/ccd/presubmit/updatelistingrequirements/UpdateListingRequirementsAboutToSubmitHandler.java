@@ -4,6 +4,9 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.DISTRICT_TRIBUNAL_JUDGE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getHmcHearingType;
 
@@ -68,13 +71,23 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 && "NoMedicalMemberRequired".equals(
                         sscsCaseData.getPanelMemberComposition().getPanelCompositionMemberMedical1()
         )) {
-            sscsCaseData.getPanelMemberComposition().setPanelCompositionMemberMedical1(null);
-            sscsCaseData.getPanelMemberComposition().setPanelCompositionMemberMedical2(null);
+                callbackResponse.getData().getPanelMemberComposition().clearMedicalMembers();
+            }
+
+            if (nonNull(callbackReserveTo) && isYes(callbackReserveTo.getReservedDistrictTribunalJudge())) {
+                callbackResponse.getData().getPanelMemberComposition().setPanelCompositionJudge(null);
+                callbackResponse.getData().getPanelMemberComposition()
+                        .setDistrictTribunalJudge(DISTRICT_TRIBUNAL_JUDGE.getReference());
+            } else {
+                callbackResponse.getData().getPanelMemberComposition().setDistrictTribunalJudge(null);
+            }
+
+            syncConfirmPanelComposition(callbackResponse.getData());
         }
 
         OverrideFields overrideFields = caseDataSnlFields.getOverrideFields();
 
-        if (nonNull(overrideFields)) {
+        if (nonNull(overrideFields) && !overrideFields.isAllNull()) {
             HearingChannel hearingChannel = overrideFields.getAppellantHearingChannel();
             if (nonNull(hearingChannel)) {
                 SscsUtil.updateHearingChannel(sscsCaseData, hearingChannel);
@@ -125,5 +138,16 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             interpreterUpdated = isYes(caseInterpreter) != isYes(appellantInterpreter.getIsInterpreterWanted());
         }
         return channelUpdated || interpreterUpdated;
+    }
+
+    private void syncConfirmPanelComposition(SscsCaseData sscsCaseData) {
+        PanelMemberComposition panelMemberComposition = sscsCaseData.getPanelMemberComposition();
+
+        sscsCaseData.setIsFqpmRequired(panelMemberComposition.hasFqpm() ? YES : NO);
+
+        if (sscsCaseData.isIbcCase()) {
+            sscsCaseData.setIsMedicalMemberRequired(
+                panelMemberComposition.hasMedicalMember() ? YES : NO);
+        }
     }
 }

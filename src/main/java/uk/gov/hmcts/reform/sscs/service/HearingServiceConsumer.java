@@ -24,11 +24,9 @@ import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 @SuppressWarnings({"PMD.ExcessiveImports", "PMD.UnusedFormalParameter", "PMD.TooManyMethods", "AvoidThrowingRawExceptionTypes"})
 public class HearingServiceConsumer {
     private final ReferenceDataServiceHolder refData;
+    private final OverridesMapping overridesMapping;
     @Value("${feature.hearing-duration.enabled}")
     private boolean isHearingDurationEnabled;
-
-
-
 
     public Consumer<SscsCaseData> getCreateHearingCaseDataConsumer(HmcUpdateResponse response, Long hearingRequestId) {
         return sscsCaseData -> updateCaseDataWithHearingResponse(response, hearingRequestId, sscsCaseData);
@@ -43,10 +41,10 @@ public class HearingServiceConsumer {
             try {
                 if (isUpdateHearing) {
                     if (isNull(sscsCaseDetails.getData().getSchedulingAndListingFields().getOverrideFields())) {
-                        OverridesMapping.setOverrideValues(sscsCaseDetails.getData(), refData, isHearingDurationEnabled);
+                        overridesMapping.setOverrideValues(sscsCaseDetails.getData(), refData, isHearingDurationEnabled);
                     }
                 } else {
-                    OverridesMapping.setDefaultListingValues(sscsCaseDetails.getData(), refData, isHearingDurationEnabled);
+                    overridesMapping.setDefaultListingValues(sscsCaseDetails.getData(), refData, isHearingDurationEnabled);
                 }
                 sscsCaseDetails.getData().setPanelMemberComposition(panelComposition);
                 updateCaseDataWithHearingResponse(response, hearingRequestId, sscsCaseDetails.getData());

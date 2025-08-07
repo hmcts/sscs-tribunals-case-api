@@ -49,6 +49,7 @@ import { AccessibilitySteps } from '../fixtures/steps/accessibilitySteps';
 import { CreateUpdateToCaseDataSteps } from '../fixtures/steps/update.to.case.data';
 import { GenerateAppealPdfSteps } from '../fixtures/steps/generate.appeal.pdf';
 import { ManageDocuments } from '../fixtures/steps/manage.documents';
+import { UpdateListingRequirement } from '../fixtures/steps/update.listing.requirements'; 
 
 type MyStepsFixtures = {
   addNoteSteps: Note;
@@ -101,6 +102,7 @@ type MyStepsFixtures = {
   accessibilitySteps: AccessibilitySteps;
   createUpdateToCaseDataSteps: CreateUpdateToCaseDataSteps;
   generateAppealPdfSteps: GenerateAppealPdfSteps;
+  updateListingRequirementSteps: UpdateListingRequirement;
 };
 
 export const test = stepsFactory.extend<MyStepsFixtures>({
@@ -401,4 +403,8 @@ export const test = stepsFactory.extend<MyStepsFixtures>({
     const generateAppealPdfSteps = new GenerateAppealPdfSteps(page);
     await use(generateAppealPdfSteps);
   },
+  updateListingRequirementSteps: async ({ page }, use) => {
+    const updateListingRequirementSteps = new UpdateListingRequirement(page);
+    await use(updateListingRequirementSteps);
+  }
 });
