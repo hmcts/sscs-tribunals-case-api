@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.helper.mapping;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits.SESSIONS;
@@ -112,6 +113,7 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
                 .willReturn(new HearingDuration());
 
         given(hearingDurations.getHearingDurationBenefitIssueCodes(caseData)).willReturn(null);
+        given(hearingDurations.addExtraTimeIfNeeded(any(), any(), any(), any())).willReturn(null);
 
         Integer durationAdjourned = HearingsDurationMapping.getHearingDurationAdjournment(caseData, refData.getHearingDurations(), true);
         assertThat(durationAdjourned).isNull();
@@ -214,6 +216,7 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
         caseData.getSchedulingAndListingFields().getOverrideFields().setDuration(null);
         given(refData.getHearingDurations()).willReturn(hearingDurations);
         given(hearingDurations.getHearingDuration(eq(caseData.getBenefitCode()), eq(caseData.getIssueCode()))).willReturn(hearingDuration);
+        given(hearingDurations.addExtraTimeIfNeeded(any(), any(), any(), any())).willReturn(hearingDuration.getDurationInterpreter());
 
         Integer result = HearingsDurationMapping.getHearingDurationAdjournment(caseData, refData.getHearingDurations(), true);
 
@@ -234,6 +237,7 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
         caseData.getSchedulingAndListingFields().getOverrideFields().setDuration(null);
         given(refData.getHearingDurations()).willReturn(hearingDurations);
         given(hearingDurations.getHearingDuration(eq(caseData.getBenefitCode()), eq(caseData.getIssueCode()))).willReturn(hearingDuration);
+        given(hearingDurations.addExtraTimeIfNeeded(any(), any(), any(), any())).willReturn(hearingDuration.getDurationFaceToFace());
 
         Integer result = HearingsDurationMapping.getHearingDurationAdjournment(caseData, refData.getHearingDurations(), true);
 
