@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.helper.mapping;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberMedicallyQualified.getPanelMemberMedicallyQualified;
 
@@ -10,14 +8,12 @@ import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMember;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberMedicallyQualified;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SessionCategory;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.RequirementType;
@@ -112,41 +108,23 @@ public final class HearingsPanelMapping {
     public List<String> getPanelSpecialisms(@Valid SscsCaseData caseData) {
         List<String> panelSpecialisms = new ArrayList<>();
 
-        // if benefit is child support specialism should be empty
-        if (isNotBlank(caseData.getBenefitCode()) && caseData.getBenefitCode().equals(CHILD_SUPPORT.getBenefitCode())) {
+        if (CHILD_SUPPORT.getBenefitCode().equals(caseData.getBenefitCode())) {
             return panelSpecialisms;
         }
 
-        DefaultPanelComposition panelComposition = panelCompositionService.getDefaultPanelComposition(caseData);
-        if (isNull(panelComposition.getCategory())) {
-            return panelSpecialisms;
-        }
+        DefaultPanelComposition defaultPanelComposition = panelCompositionService.getDefaultPanelComposition(caseData);
+        PanelMemberComposition panelComposition = new PanelMemberComposition(defaultPanelComposition.getJohTiers());
 
-        String doctorSpecialism = caseData.getSscsIndustrialInjuriesData().getPanelDoctorSpecialism();
-        String doctorSpecialismSecond = caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism();
-        panelSpecialisms = SessionCategory.getSessionCategory(
-                panelComposition.getCategory())
-                .getPanelMembers().stream()
-                .map(panelMember -> getPanelMemberSpecialism(panelMember, doctorSpecialism, doctorSpecialismSecond))
-                .filter(Objects::nonNull)
-                .toList();
+        if (nonNull(panelComposition.getPanelCompositionMemberMedical1())) {
+            panelSpecialisms.add(getReference(caseData.getSscsIndustrialInjuriesData().getPanelDoctorSpecialism()));
+        }
+        if (nonNull(panelComposition.getPanelCompositionMemberMedical2())) {
+            panelSpecialisms
+                    .add(getReference(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism()));
+        }
         return panelSpecialisms;
-
     }
 
-    public static String getPanelMemberSpecialism(PanelMember panelMember,
-                                                  String doctorSpecialism, String doctorSpecialismSecond) {
-        switch (panelMember) {
-            case FQPM:
-                return null;
-            case MQPM1:
-                return getReference(doctorSpecialism);
-            case MQPM2:
-                return getReference(doctorSpecialismSecond);
-            default:
-                return panelMember.getReference();
-        }
-    }
 
     public static String getReference(String panelMemberSubtypeCcdRef) {
         PanelMemberMedicallyQualified subType = getPanelMemberMedicallyQualified(panelMemberSubtypeCcdRef);

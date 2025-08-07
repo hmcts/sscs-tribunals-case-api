@@ -13,12 +13,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMember;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -210,26 +208,23 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
     @DisplayName("When a case is given with a second doctor getPanelRequirements returns the valid PanelRequirements")
     @ParameterizedTest
     @CsvSource(value = {
-        "cardiologist,eyeSurgeon,1|3",
-        "null,carer,2",
+        "cardiologist,eyeSurgeon,58|58,1|3",
+        "carer,null,58,2",
     }, nullValues = {"null"})
-    void testGetPanelSpecialisms(String doctorSpecialism, String doctorSpecialismSecond, String expected) {
+    void testGetPanelSpecialisms(String doctorSpecialism, String secondSpecialism, String johTiers, String expected) {
         DefaultPanelComposition panelComposition = new DefaultPanelComposition();
-        panelComposition.setCategory("6");
-        panelComposition.setJohTiers(List.of("58"));
+        panelComposition.setJohTiers(splitCsvParamArray(johTiers));
         when(panelCompositionService.getDefaultPanelComposition(any())).thenReturn(panelComposition);
         SscsCaseData caseData = SscsCaseData.builder()
             .benefitCode(BENEFIT_CODE).issueCode(ISSUE_CODE)
             .sscsIndustrialInjuriesData(SscsIndustrialInjuriesData.builder()
-                .panelDoctorSpecialism(doctorSpecialism).secondPanelDoctorSpecialism(doctorSpecialismSecond).build())
+                .panelDoctorSpecialism(doctorSpecialism).secondPanelDoctorSpecialism(secondSpecialism).build())
             .build();
 
         List<String> result = hearingsPanelMapping.getPanelSpecialisms(caseData);
 
         List<String> expectedList = splitCsvParamArray(expected);
-        assertThat(result)
-            .containsExactlyInAnyOrderElementsOf(expectedList);
-
+        assertThat(result).containsExactlyInAnyOrderElementsOf(expectedList);
     }
 
     @DisplayName("When a case is given with no second doctor getPanelRequirements returns the valid PanelRequirements")
@@ -250,9 +245,7 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
         List<String> result = hearingsPanelMapping.getPanelSpecialisms(caseData);
 
         List<String> expectedList = splitCsvParamArray(expected);
-        assertThat(result)
-            .containsExactlyInAnyOrderElementsOf(expectedList);
-
+        assertThat(result).containsExactlyInAnyOrderElementsOf(expectedList);
     }
 
     @DisplayName("When an case has a null doctor specialism return an empty list.")
@@ -301,28 +294,4 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
         List<String> expectedList = Collections.emptyList();
         assertThat(result).containsExactlyInAnyOrderElementsOf(expectedList);
     }
-
-
-    @DisplayName("When a non doctor panel member is given getPanelMemberSpecialism returns the valid reference")
-    @ParameterizedTest
-    @EnumSource(
-        value = PanelMember.class,
-        mode = EnumSource.Mode.EXCLUDE,
-        names = {"FQPM", "MQPM1", "MQPM2"}
-    )
-    void testGetPanelMemberSpecialism(PanelMember value) {
-        // added FQPM to the exclude list because LA is not currently set up to handle specialism for this type.
-        String result = HearingsPanelMapping.getPanelMemberSpecialism(value, null, null);
-
-        assertThat(result).isEqualTo(value.getReference());
-    }
-
-    @DisplayName("When the Panel Member is type FQPM, then return null for specialism")
-    @Test
-    void testGivenFqpmPanelMemberThenReturnNullForSpecialism() {
-        // LA is not currently set up to handle specialism for FQPM panel members.
-        String result = HearingsPanelMapping.getPanelMemberSpecialism(PanelMember.FQPM, null, null);
-        assertThat(result).isNull();
-    }
-
 }

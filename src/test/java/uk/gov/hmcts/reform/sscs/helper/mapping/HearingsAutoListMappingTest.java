@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
-import static org.junit.jupiter.params.provider.EnumSource.Mode.INCLUDE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -18,9 +16,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -38,7 +34,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMember;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
@@ -373,31 +368,6 @@ class HearingsAutoListMappingTest extends HearingsMappingBase {
         ListingException ex =
                 assertThrows(ListingException.class,() -> hearingsAutoListMapping.hasMqpmOrFqpm(caseData));
         assertThat(ex).hasMessage("Incorrect benefit/issue code combination");
-    }
-
-    @DisplayName("When dwpIsOfficerAttending is yes, isPoOfficerAttending return True")
-    @ParameterizedTest
-    @EnumSource(
-            value = PanelMember.class,
-            names = {"FQPM", "MQPM1", "MQPM2"},
-            mode = INCLUDE)
-    void testIsMqpmOrFqpm(PanelMember value) {
-        boolean result = HearingsAutoListMapping.isMqpmOrFqpm(value);
-
-        assertTrue(result);
-    }
-
-    @DisplayName("When dwpIsOfficerAttending is No or blank, isPoOfficerAttending return False")
-    @ParameterizedTest
-    @EnumSource(
-            value = PanelMember.class,
-            names = {"FQPM", "MQPM1", "MQPM2"},
-            mode = EXCLUDE)
-    @NullSource
-    void testIsMqpmOrFqpmNot(PanelMember value) {
-        boolean result = HearingsAutoListMapping.isMqpmOrFqpm(value);
-
-        assertFalse(result);
     }
 
     @Test
