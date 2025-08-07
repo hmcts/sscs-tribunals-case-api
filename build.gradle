@@ -443,18 +443,18 @@ dependencies {
 
     testImplementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5-fluent', version: '5.5'
 
-    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '4.1.0'
-    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-assertj', version: '4.1.0'
+    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '4.1.1'
+    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-assertj', version: '4.1.1'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.3'
     testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.3.0'
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.17.0'
-    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.17.0'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.18.0'
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.18.0'
     testImplementation group: 'com.github.tomakehurst', name: 'wiremock-standalone', version: '3.0.1'
-    testImplementation group: 'org.wiremock.integrations', name: 'wiremock-spring-boot', version: '3.9.0'
+    testImplementation group: 'org.wiremock.integrations', name: 'wiremock-spring-boot', version: '3.10.0'
     testImplementation group: 'pl.pragmatists', name: 'JUnitParams', version: '1.1.1'
 
     testImplementation group: 'org.apiguardian', name: 'apiguardian-api', version: '1.1.2'
-    testImplementation platform(group: 'org.junit', name: 'junit-bom', version: '5.12.2')
+    testImplementation platform(group: 'org.junit', name: 'junit-bom', version: '5.13.4')
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter'
     testImplementation group: 'org.junit.vintage', name: 'junit-vintage-engine'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api'
