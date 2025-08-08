@@ -48,17 +48,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsIndustrialInjuriesData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.exception.GetCaseException;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.helper.mapping.ServiceHearingValuesMapping;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.service.ServiceHearingRequest;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.PartyDetails;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.ServiceHearingValues;
 import uk.gov.hmcts.reform.sscs.model.service.linkedcases.ServiceLinkedCases;
-import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @ExtendWith(MockitoExtension.class)
@@ -67,23 +63,9 @@ class ServiceHearingsServiceTest {
     private static final long CASE_ID = 12345L;
 
     @Mock
-    private SessionCategoryMapService sessionCategoryMaps;
-
-    @Mock
-    private VenueService venueService;
-
-    @Mock
     private ReferenceDataServiceHolder refData;
-
     @Mock
     private CcdCaseService ccdCaseService;
-
-    @Mock
-    private UpdateCcdCaseService updateCcdCaseService;
-
-    @Mock
-    private IdamService idamService;
-
     @Mock
     private ServiceHearingValuesMapping serviceHearingValuesMapping;
 
@@ -92,12 +74,9 @@ class ServiceHearingsServiceTest {
 
     private SscsCaseData caseData;
     private SscsCaseDetails caseDetails;
-    private IdamTokens idamTokens;
-
 
     @BeforeEach
     void setup() {
-        idamTokens = IdamTokens.builder().build();
         caseData = SscsCaseData.builder()
             .ccdCaseId(String.valueOf(CASE_ID))
             .benefitCode(BENEFIT_CODE)
@@ -285,8 +264,6 @@ class ServiceHearingsServiceTest {
 
         assertThat(result.get(0)).isEqualTo(expected);
     }
-
-
 
     private static Stream<Arguments> invalidCasesParameters() {
         return Stream.of(

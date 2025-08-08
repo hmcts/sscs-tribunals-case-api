@@ -13,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
@@ -106,7 +105,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     private AddedDocumentsUtil addedDocumentsUtil;
     private AddNoteService addNoteService;
 
-    private DwpUploadResponseAboutToSubmitHandler dwpUploadResponseAboutToSubmitHandler;
+    private DwpUploadResponseAboutToSubmitHandler handler;
 
     @BeforeEach
     public void setUp() {
@@ -134,26 +133,27 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         addedDocumentsUtil = new AddedDocumentsUtil(false);
         dwpDocumentService = new DwpDocumentService();
         addNoteService = new AddNoteService(userDetailsService);
-        dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
-                addNoteService, addedDocumentsUtil, panelCompositionService, false);
+        handler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
+                addNoteService, addedDocumentsUtil, panelCompositionService);
     }
 
     @Test
     public void givenADwpUploadResponseEvent_thenReturnTrue() {
-        assertTrue(dwpUploadResponseAboutToSubmitHandler.canHandle(ABOUT_TO_SUBMIT, callback));
+        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
     @Test
     public void givenANonDwpUploadResponseEvent_thenReturnFalse() {
         callback = new Callback<>(caseDetails, Optional.of(caseDetailsBefore), APPEAL_RECEIVED, false);
 
-        assertFalse(dwpUploadResponseAboutToSubmitHandler.canHandle(ABOUT_TO_SUBMIT, callback));
-
+        assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
     @Test
     public void givenADwpUploadResponseEvent_thenSetCaseCode() {
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
         assertEquals("022CC", response.getData().getCaseCode());
         assertEquals(LocalDate.now().toString(), response.getData().getDwpResponseDate());
     }
@@ -161,19 +161,19 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenADwpUploadResponseEventWithEmptyBenefitCode_displayAnError() {
         callback.getCaseDetails().getCaseData().setBenefitCode(null);
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
-
-        for (String error : response.getErrors()) {
-            assertEquals("Benefit code cannot be empty", error);
-        }
+        response.getErrors()
+                .forEach(error -> assertEquals("Benefit code cannot be empty", error));
     }
 
     @Test
     public void givenADwpUploadResponseEventWithEmptyIssueCode_displayAnError() {
         callback.getCaseDetails().getCaseData().setIssueCode(null);
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
 
@@ -185,7 +185,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenADwpUploadResponseEventWithEmptyDwpResponseDoc_displayAnError() {
         callback.getCaseDetails().getCaseData().setDwpResponseDocument(null);
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
 
@@ -195,7 +195,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenADwpUploadResponseEventWithEmptyDwpEvidenceBundle_displayAnError() {
         callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(null);
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
 
@@ -206,7 +206,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     public void givenADwpUploadResponseEventWithDwpFurtherInfoIsNo_assertNoErrors() {
         callback.getCaseDetails().getCaseData().setDwpFurtherInfo("No");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
         assertEquals(NO, response.getData().getHasUnprocessedAudioVideoEvidence());
@@ -215,14 +215,14 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenADwpUploadResponseEventWithExistingAudioVideoEvidence_assertFlagIsSet() {
         callback.getCaseDetails().getCaseData().setAudioVideoEvidence(List.of(AudioVideoEvidence.builder().build()));
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(YES, response.getData().getHasUnprocessedAudioVideoEvidence());
     }
 
     @Test
     public void givenADwpUploadResponseEventWithIssueCodeSetToDD_displayAnError() {
         callback.getCaseDetails().getCaseData().setIssueCode("DD");
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
 
@@ -289,7 +289,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("Edited reason");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getDwpEvidenceBundleDocument());
         assertNull(response.getData().getDwpEditedEvidenceBundleDocument());
@@ -356,7 +356,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData.setCaseCode("001");
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("uc").build());
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("US", response.getData().getIssueCode());
         assertEquals("001", response.getData().getBenefitCode());
@@ -373,7 +373,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData.setElementsDisputedList(elementList);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("uc").build());
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("UM", response.getData().getIssueCode());
         assertEquals("001", response.getData().getBenefitCode());
@@ -403,7 +403,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
                 ).build());
         callback.getCaseDetails().getCaseData().setDwpFurtherInfo("No");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("reviewByJudge", response.getData().getSelectWhoReviewsCase().getValue().getCode());
         assertEquals(PHE_REQUEST, response.getData().getInterlocReferralReason());
@@ -412,7 +412,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("Referred to interloc for review by judge - PHE request", response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
         assertEquals(LocalDate.now(), response.getData().getInterlocReferralDate());
 
-        dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
 
     @Test
@@ -439,7 +439,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         DynamicListItem reviewByJudgeItem = new DynamicListItem("reviewByJudge", null);
         sscsCaseData.setSelectWhoReviewsCase(new DynamicList(reviewByJudgeItem, null));
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("reviewByJudge", response.getData().getSelectWhoReviewsCase().getValue().getCode());
         assertEquals(PHE_REQUEST, response.getData().getInterlocReferralReason());
@@ -472,7 +472,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         callback.getCaseDetails().getCaseData().setDwpFurtherInfo("Yes");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getSelectWhoReviewsCase());
         assertEquals(PHE_REQUEST, response.getData().getInterlocReferralReason());
@@ -494,7 +494,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
                                 .build()
                 ).build());
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
 
@@ -515,7 +515,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
                                 .build()
                 ).build());
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
 
@@ -532,7 +532,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         callback.getCaseDetails().getCaseData().setDwpDocuments(dwpResponseDocuments);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(4, response.getData().getDwpDocuments().size());
 
@@ -562,7 +562,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpResponseDocument(dwpResponseDocument);
         callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(dwpResponseDocument);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getDwpDocuments());
     }
@@ -578,7 +578,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     public void givenUcbSelectedAndNoUcbDocument_displayAnError() {
         sscsCaseData.setDwpUcb(YES.getValue());
         sscsCaseData.setDwpUcbEvidenceDocument(null);
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(1));
         assertThat(response.getErrors().iterator().next(), is("Please upload a UCB document"));
@@ -588,7 +588,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     public void givenUcbSelectedIsNo_thenTheFieldsAreCleared() {
         sscsCaseData.setDwpUcb(NO.getValue());
         sscsCaseData.setDwpUcbEvidenceDocument(getPdfDocument().getDocumentLink());
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));
         assertThat(sscsCaseData.getDwpUcb(), is(nullValue()));
@@ -600,7 +600,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     public void givenUcbSelectedAndUploadedUcbDoc_thenNoErrors() {
         sscsCaseData.setDwpUcb(YES.getValue());
         sscsCaseData.setDwpUcbEvidenceDocument(getPdfDocument().getDocumentLink());
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));
         assertThat(sscsCaseData.getDwpUcb(), is(YES.getValue()));
@@ -618,7 +618,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData.setDwpUploadAudioVideoEvidence(Collections
                 .singletonList(AudioVideoEvidence.builder().value(audioVideoEvidenceDetails).build()));
 
-        dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData);
+        handler.handleAudioVideoDocuments(sscsCaseData);
 
         assertNull(callback.getCaseDetails().getCaseData().getDwpUploadAudioVideoEvidence());
         assertEquals(1, callback.getCaseDetails().getCaseData().getAudioVideoEvidence().size());
@@ -640,7 +640,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData.setDwpUploadAudioVideoEvidence(Collections
                 .singletonList(AudioVideoEvidence.builder().value(audioVideoEvidenceDetails).build()));
 
-        dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData);
+        handler.handleAudioVideoDocuments(sscsCaseData);
 
         assertNull(callback.getCaseDetails().getCaseData().getDwpUploadAudioVideoEvidence());
         assertEquals(1, callback.getCaseDetails().getCaseData().getAudioVideoEvidence().size());
@@ -656,14 +656,14 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @Test
     public void givenHandleNullAudioVideoDocuments_thenNoAudioVideoList() {
-        dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData);
+        handler.handleAudioVideoDocuments(sscsCaseData);
         assertNull(sscsCaseData.getAudioVideoEvidence());
     }
 
     @Test
     public void givenHandleEmptyAudioVideoDocuments_thenNoAudioVideoList() {
         sscsCaseData.setDwpUploadAudioVideoEvidence(Collections.emptyList());
-        dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData);
+        handler.handleAudioVideoDocuments(sscsCaseData);
         assertNull(sscsCaseData.getAudioVideoEvidence());
     }
 
@@ -683,7 +683,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData.setDwpUploadAudioVideoEvidence(new ArrayList<>(
                 Arrays.asList(AudioVideoEvidence.builder().value(audioVideoEvidenceDetails).build())));
 
-        dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData);
+        handler.handleAudioVideoDocuments(sscsCaseData);
 
         assertNull(callback.getCaseDetails().getCaseData().getDwpUploadAudioVideoEvidence());
         assertEquals(2, callback.getCaseDetails().getCaseData().getAudioVideoEvidence().size());
@@ -703,7 +703,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         sscsCaseData.setDwpEditedEvidenceReason("phme");
 
-        dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData);
+        handler.handleAudioVideoDocuments(sscsCaseData);
 
         assertNull(callback.getCaseDetails().getCaseData().getDwpUploadAudioVideoEvidence());
         assertEquals(1, callback.getCaseDetails().getCaseData().getAudioVideoEvidence().size());
@@ -735,7 +735,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
 
-        dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData);
+        handler.handleAudioVideoDocuments(sscsCaseData);
 
         assertNull(callback.getCaseDetails().getCaseData().getDwpUploadAudioVideoEvidence());
         assertEquals(2, callback.getCaseDetails().getCaseData().getAudioVideoEvidence().size());
@@ -745,8 +745,8 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @Test
     public void givenAudioVideoDocuments_shouldComputeCorrectAudioVideoTotals() throws JsonProcessingException {
-        dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
-            new AddNoteService(userDetailsService), new AddedDocumentsUtil(true), panelCompositionService, false);
+        handler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
+            new AddNoteService(userDetailsService), new AddedDocumentsUtil(true), panelCompositionService);
 
         List<AudioVideoEvidence> audioVideoEvidence = new ArrayList<>();
 
@@ -781,7 +781,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         sscsCaseData.setDwpUploadAudioVideoEvidence(audioVideoEvidence);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT,
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT,
             callback, USER_AUTHORISATION);
 
         Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
@@ -795,8 +795,8 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @Test
     public void givenPreExistingAudioVideoDocuments_shouldComputeCorrectAudioVideoTotalsForAvAddedThisEvent() throws JsonProcessingException {
-        dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
-            new AddNoteService(userDetailsService), new AddedDocumentsUtil(true), panelCompositionService, false);
+        handler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
+            new AddNoteService(userDetailsService), new AddedDocumentsUtil(true), panelCompositionService);
 
         List<AudioVideoEvidence> newAudioVideoEvidence = new ArrayList<>();
 
@@ -834,7 +834,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData.setDwpUploadAudioVideoEvidence(newAudioVideoEvidence);
         sscsCaseData.setAudioVideoEvidence(existingAudioVideoEvidence);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT,
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT,
             callback, USER_AUTHORISATION);
 
         Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
@@ -847,15 +847,15 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @Test
     public void givenNoNewAudioVideoDocuments_shouldStillClearAddedDocuments() {
-        dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
-            new AddNoteService(userDetailsService), new AddedDocumentsUtil(true), panelCompositionService, false);
+        handler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
+            new AddNoteService(userDetailsService), new AddedDocumentsUtil(true), panelCompositionService);
 
         sscsCaseData.setDwpUploadAudioVideoEvidence(new ArrayList<>());
         sscsCaseData.setWorkAllocationFields(WorkAllocationFields.builder()
             .addedDocuments("{audioEvidence=1}")
             .build());
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT,
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT,
             callback, USER_AUTHORISATION);
 
         org.assertj.core.api.Assertions.assertThat(response.getData().getWorkAllocationFields().getAddedDocuments())
@@ -870,7 +870,8 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(new DwpResponseDocument(null, null));
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason(null);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertTrue(response.getErrors().isEmpty());
     }
@@ -885,7 +886,8 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         sscsCaseData.setDwpUploadAudioVideoEvidence(audioVideoList);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
 
@@ -906,14 +908,16 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         sscsCaseData.setDwpUploadAudioVideoEvidence(audioVideoList);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
     }
 
     @Test
     public void givenADwpUploadResponseEventWithAvFileAndNoRip1Document_thenDoNotDisplayAnError() {
-        AudioVideoEvidenceDetails audioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
+        AudioVideoEvidenceDetails audioVideoEvidenceDetails =
+                AudioVideoEvidenceDetails.builder().documentLink(DocumentLink.builder()
                 .documentUrl("/url").documentBinaryUrl("/url/binary").documentFilename("filename.mp4").build())
                 .rip1Document(null).build();
 
@@ -922,7 +926,8 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         sscsCaseData.setDwpUploadAudioVideoEvidence(audioVideoList);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
 
@@ -952,23 +957,25 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
                                 .build()
                 ).build());
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(2, response.getData().getDwpDocuments().size());
     }
 
     private DwpResponseDocument getMovieDocument() {
-        return DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("0101").documentFilename("movie.mov").build()).build();
+        return DwpResponseDocument.builder().documentLink(DocumentLink.builder()
+                .documentUrl("0101").documentFilename("movie.mov").build()).build();
     }
 
     private DwpResponseDocument getPdfDocument() {
-        return DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("0101").documentFilename("a.pdf").build()).build();
+        return DwpResponseDocument.builder().documentLink(DocumentLink.builder()
+                .documentUrl("0101").documentFilename("a.pdf").build()).build();
     }
 
     @Test
     public void dwpResponseDocument_mustBeAPdf() {
         callback.getCaseDetails().getCaseData().setDwpResponseDocument(getMovieDocument());
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(1));
         assertThat(response.getErrors().iterator().next(), is("FTA response document must be a PDF."));
     }
@@ -976,7 +983,9 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void dwpEvidenceBundleDocument_mustBeAPdf() {
         callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(getMovieDocument());
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        var  response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
         assertThat(response.getErrors().size(), is(1));
         assertThat(response.getErrors().iterator().next(), is("FTA evidence bundle must be a PDF."));
     }
@@ -984,7 +993,9 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void at38_mustBeAPdf() {
         callback.getCaseDetails().getCaseData().setDwpAT38Document(getMovieDocument());
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
         assertThat(response.getErrors().size(), is(1));
         assertThat(response.getErrors().iterator().next(), is("FTA AT38 document must be a PDF."));
     }
@@ -994,7 +1005,9 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(getPdfDocument());
         callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(getMovieDocument());
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
         assertThat(response.getErrors().size(), is(1));
         assertThat(response.getErrors().iterator().next(), is("FTA edited response document must be a PDF."));
     }
@@ -1004,7 +1017,9 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
         callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(getPdfDocument());
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(getMovieDocument());
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
         assertThat(response.getErrors().size(), is(1));
         assertThat(response.getErrors().iterator().next(), is("FTA edited evidence bundle must be a PDF."));
     }
@@ -1015,7 +1030,9 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(getPdfDocument());
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(getPdfDocument());
         callback.getCaseDetails().getCaseData().setAppendix12Doc(getMovieDocument());
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
         assertThat(response.getErrors().size(), is(1));
         assertThat(response.getErrors().iterator().next(), is("Appendix 12 document must be a PDF."));
     }
@@ -1024,7 +1041,8 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     public void ucbEvidenceDocument_mustBeAPdf() {
         sscsCaseData.setDwpUcb(YES.getValue());
         sscsCaseData.setDwpUcbEvidenceDocument(getMovieDocument().getDocumentLink());
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(1));
         assertThat(response.getErrors().iterator().next(), is("UCB document must be a PDF."));
@@ -1032,17 +1050,14 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @Test
     public void givenADwpUploadResponseEventPhmeChildSupportThenErrorAdded() {
-
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName())
                 .description(Benefit.CHILD_SUPPORT.getDescription()).build());
         sscsCaseData.setDwpEditedResponseDocument(getPdfDocument());
         sscsCaseData.setDwpEditedEvidenceBundleDocument(getPdfDocument());
         sscsCaseData.setDwpEditedEvidenceReason("phme");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler
-                .handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().iterator().next(),
                 is("Potential harmful evidence is not a valid selection for child support cases"));
@@ -1050,9 +1065,6 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @Test
     public void givenADwpUploadResponseEventChildSupConfNonChildSupportThenNoErrorAdded() {
-
-        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-
         callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder()
                 .code(Benefit.PENSION_CREDIT.getShortName())
                 .description(Benefit.PENSION_CREDIT.getDescription()).build());
@@ -1060,7 +1072,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(getPdfDocument());
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("childSupportConfidentiality");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler
+        PreSubmitCallbackResponse<SscsCaseData> response = handler
                 .handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().iterator().next(),
@@ -1069,17 +1081,14 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @Test
     public void givenADwpUploadResponseEventPhmeNonChildSupportThenNoErrorAdded() {
-
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.PENSION_CREDIT.getShortName())
                 .description(Benefit.PENSION_CREDIT.getDescription()).build());
         sscsCaseData.setDwpEditedResponseDocument(getPdfDocument());
         sscsCaseData.setDwpEditedEvidenceBundleDocument(getPdfDocument());
         sscsCaseData.setDwpEditedEvidenceReason("phme");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler
-                .handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
     }
@@ -1095,7 +1104,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData.setDwpEditedEvidenceBundleDocument(getPdfDocument());
         sscsCaseData.setDwpEditedEvidenceReason("childSupportConfidentiality");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler
+        PreSubmitCallbackResponse<SscsCaseData> response = handler
                 .handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
@@ -1111,7 +1120,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         otherPartyList.add(ccdValue);
         sscsCaseData.setOtherParties(otherPartyList);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(1));
         assertThat(response.getWarnings().size(), is(0));
@@ -1124,7 +1133,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData.setBenefitCode("001");
         sscsCaseDataBefore.setBenefitCode("022");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getWarnings().size(), is(1));
@@ -1138,7 +1147,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData.setBenefitCode(childSupportBenefitCode);
         sscsCaseDataBefore.setBenefitCode("022");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getWarnings().size(), is(0));
@@ -1150,7 +1159,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData.setBenefitCode("001");
         sscsCaseDataBefore.setBenefitCode("001");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getWarnings().size(), is(0));
@@ -1161,7 +1170,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData.setOtherParties(Arrays.asList(buildOtherParty(ID_2), buildOtherParty(ID_1)));
         sscsCaseData.getAppeal().getBenefitType().setCode("childSupport");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(YesNo.YES.getValue(), response.getData().getOtherPartyUcb());
     }
 
@@ -1171,7 +1180,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             buildOtherPartyWithAppointeeAndRep(null, null, null)));
         sscsCaseData.getAppeal().getBenefitType().setCode("childSupport");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         Assertions.assertThat(response.getData().getOtherParties())
             .hasSize(1)
@@ -1192,7 +1201,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             buildOtherPartyWithAppointeeAndRep(null, null, null)));
         sscsCaseData.getAppeal().getBenefitType().setCode("childSupport");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         Assertions.assertThat(response.getData().getOtherParties())
             .hasSize(3)
@@ -1227,7 +1236,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             buildOtherPartyWithAppointeeAndRep(null, null, null)));
         sscsCaseData.getAppeal().getBenefitType().setCode("childSupport");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         Assertions.assertThat(response.getData().getOtherParties())
             .hasSize(3)
@@ -1261,7 +1270,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             buildOtherParty(null)));
         sscsCaseData.getAppeal().getBenefitType().setCode("childSupport");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         Assertions.assertThat(response.getData().getOtherParties())
             .hasSize(3)
@@ -1316,7 +1325,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData.setDwpEditedResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("a.pdf").documentFilename("a.pdf").build()).build());
         sscsCaseData.setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("a.pdf").documentFilename("a.pdf").build()).build());
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getWarnings().size(), is(0));
@@ -1344,7 +1353,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         CaseDetails<SscsCaseData> ibcaCaseDetailsBefore = new CaseDetails<>(1234L, "SSCS", WITH_DWP, caseDataBefore, now(), "Benefit");
         Callback<SscsCaseData> ibcaCallback = new Callback<>(ibcaCaseDetails, Optional.of(ibcaCaseDetailsBefore), DWP_UPLOAD_RESPONSE, false);
 
-        var response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, ibcaCallback, USER_AUTHORISATION);
+        var response = handler.handle(ABOUT_TO_SUBMIT, ibcaCallback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getWarnings().size(), is(0));
@@ -1362,7 +1371,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequired(YES).build());
         sscsCaseData.setIsConfidentialCase(YES);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(1));
         assertTrue(response.getErrors().contains("Appellant requires confidentiality, upload edited and unedited responses"));
@@ -1386,7 +1395,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData.setDwpEditedResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("a.pdf").documentFilename("a.pdf").build()).build());
         sscsCaseData.setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("a.pdf").documentFilename("a.pdf").build()).build());
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getWarnings().size(), is(0));
@@ -1407,7 +1416,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         otherPartyList.add(ccdValue);
         sscsCaseData.setOtherParties(otherPartyList);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(1));
         assertTrue(response.getErrors().contains("Other Party requires confidentiality, upload edited and unedited responses"));
@@ -1429,7 +1438,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         otherPartyList.add(ccdValue);
         sscsCaseData.setOtherParties(otherPartyList);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(2));
         assertTrue(response.getErrors().contains("Appellant requires confidentiality, upload edited and unedited responses"));
@@ -1447,7 +1456,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(shortName).build());
         sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequired(NO).build());
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getWarnings().size(), is(0));
@@ -1462,7 +1471,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData.setBenefitCode(sscs5BenefitCode);
         sscsCaseDataBefore.setBenefitCode("022");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getWarnings().size(), is(0));
@@ -1475,7 +1484,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData.setBenefitCode("001");
         sscsCaseDataBefore.setBenefitCode(sscs5BenefitCode);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(1));
         assertThat(response.getWarnings().size(), is(0));
@@ -1489,7 +1498,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData.setBenefitCode(sscs5BenefitCode);
         sscsCaseDataBefore.setBenefitCode("022");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(1));
         assertThat(response.getWarnings().size(), is(0));
@@ -1500,7 +1509,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     public void givenDynamicDwpStateHasBeenChosen_thenSetDwpState() {
         sscsCaseData.setDynamicDwpState(new DynamicList("Withdrawn"));
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getDwpState(), is(DwpState.WITHDRAWN));
         assertNull(response.getData().getDynamicDwpState());
@@ -1508,10 +1517,9 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @Test
     public void shouldNotSetPanelComposition() {
-        var response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getPanelMemberComposition());
-        verifyNoInteractions(panelCompositionService);
     }
 
     @Test
@@ -1519,10 +1527,10 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         var panelComposition = new PanelMemberComposition(List.of("84"));
         when(panelCompositionService.resetPanelCompositionIfStale(eq(sscsCaseData), eq(Optional.of(caseDetailsBefore))))
                 .thenReturn(panelComposition);
-        dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(
-                dwpDocumentService, addNoteService, addedDocumentsUtil, panelCompositionService, true
-        );
-        var response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        handler = new DwpUploadResponseAboutToSubmitHandler(
+                dwpDocumentService, addNoteService, addedDocumentsUtil, panelCompositionService);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(panelComposition, response.getData().getPanelMemberComposition());
     }

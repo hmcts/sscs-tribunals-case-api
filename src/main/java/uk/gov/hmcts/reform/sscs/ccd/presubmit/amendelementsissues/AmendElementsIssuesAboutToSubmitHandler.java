@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.amendelementsissues;
 import static java.util.Objects.requireNonNull;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -20,13 +19,9 @@ public class AmendElementsIssuesAboutToSubmitHandler extends ResponseEventsAbout
         implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final PanelCompositionService panelCompositionService;
-    private final boolean integratedListAssistEnabled;
 
-    public AmendElementsIssuesAboutToSubmitHandler(PanelCompositionService panelCompositionService,
-                                                   @Value("${feature.default-panel-comp.enabled}")
-                                                   boolean integratedListAssistEnabled) {
+    public AmendElementsIssuesAboutToSubmitHandler(PanelCompositionService panelCompositionService) {
         this.panelCompositionService = panelCompositionService;
-        this.integratedListAssistEnabled = integratedListAssistEnabled;
     }
 
     @Override
@@ -49,13 +44,10 @@ public class AmendElementsIssuesAboutToSubmitHandler extends ResponseEventsAbout
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
         log.info("Setting case code for case id {}", callback.getCaseDetails().getId());
-
         setCaseCode(preSubmitCallbackResponse, callback);
 
-        if (integratedListAssistEnabled) {
-            caseData.setPanelMemberComposition(panelCompositionService
-                    .resetPanelCompIfElementsChanged(caseData, callback.getCaseDetailsBefore()));
-        }
+        caseData.setPanelMemberComposition(panelCompositionService
+                .resetPanelCompIfElementsChanged(caseData, callback.getCaseDetailsBefore()));
         return preSubmitCallbackResponse;
     }
 }

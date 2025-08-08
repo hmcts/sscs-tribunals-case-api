@@ -4,7 +4,6 @@ import static java.util.Objects.requireNonNull;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -19,14 +18,10 @@ import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 public class AmendSpecialismAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final PanelCompositionService panelCompositionService;
-    private final boolean integratedListAssistEnabled;
 
     @Autowired
-    public AmendSpecialismAboutToSubmitHandler(PanelCompositionService panelCompositionService,
-                                                     @Value("${feature.default-panel-comp.enabled}")
-                                                     boolean integratedListAssistEnabled) {
+    public AmendSpecialismAboutToSubmitHandler(PanelCompositionService panelCompositionService) {
         this.panelCompositionService = panelCompositionService;
-        this.integratedListAssistEnabled = integratedListAssistEnabled;
     }
 
     @Override
@@ -39,19 +34,19 @@ public class AmendSpecialismAboutToSubmitHandler implements PreSubmitCallbackHan
     }
 
     @Override
-    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
-
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
+                                                          String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         var preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
-        if (integratedListAssistEnabled) {
-            caseData.setPanelMemberComposition(panelCompositionService
-                    .resetPanelCompositionIfStale(caseData, callback.getCaseDetailsBefore()));
-            log.info("PanelComposition set to ({}) for case id {}",
-                    callback.getCaseDetails().getId(), caseData.getPanelMemberComposition());
-        }
+
+        caseData.setPanelMemberComposition(panelCompositionService
+                .resetPanelCompositionIfStale(caseData, callback.getCaseDetailsBefore()));
+        log.info("PanelComposition set to ({}) for case id {}",
+                callback.getCaseDetails().getId(), caseData.getPanelMemberComposition());
+
         return preSubmitCallbackResponse;
     }
 }
