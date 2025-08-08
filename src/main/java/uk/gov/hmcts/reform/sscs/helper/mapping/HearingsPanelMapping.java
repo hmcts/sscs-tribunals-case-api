@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.helper.mapping;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static org.apache.commons.collections4.CollectionUtils.addIgnoreNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberMedicallyQualified.getPanelMemberMedicallyQualified;
 
@@ -20,7 +22,6 @@ import uk.gov.hmcts.reform.sscs.model.hmc.reference.RequirementType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.MemberType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelPreference;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
-import uk.gov.hmcts.reform.sscs.reference.data.model.DefaultPanelComposition;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 
 @Slf4j
@@ -112,15 +113,20 @@ public final class HearingsPanelMapping {
             return panelSpecialisms;
         }
 
-        DefaultPanelComposition defaultPanelComposition = panelCompositionService.getDefaultPanelComposition(caseData);
-        PanelMemberComposition panelComposition = new PanelMemberComposition(defaultPanelComposition.getJohTiers());
+        PanelMemberComposition panelComposition = caseData.getPanelMemberComposition();
+        if (isNull(panelComposition) || panelComposition.isEmpty()) {
+            panelComposition = new PanelMemberComposition(
+                    panelCompositionService.getDefaultPanelComposition(caseData).getJohTiers()
+            );
+        }
 
         if (nonNull(panelComposition.getPanelCompositionMemberMedical1())) {
-            panelSpecialisms.add(getReference(caseData.getSscsIndustrialInjuriesData().getPanelDoctorSpecialism()));
+            addIgnoreNull(panelSpecialisms,
+                    getReference(caseData.getSscsIndustrialInjuriesData().getPanelDoctorSpecialism()));
         }
         if (nonNull(panelComposition.getPanelCompositionMemberMedical2())) {
-            panelSpecialisms
-                    .add(getReference(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism()));
+            addIgnoreNull(panelSpecialisms,
+                    getReference(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism()));
         }
         return panelSpecialisms;
     }
