@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.helper.mapping;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static org.apache.commons.collections4.CollectionUtils.addIgnoreNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberMedicallyQualified.getPanelMemberMedicallyQualified;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsMapping.getSessionCaseCodeMap;
@@ -129,11 +130,12 @@ public final class HearingsPanelMapping {
         }
 
         if (nonNull(panelComposition.getPanelCompositionMemberMedical1())) {
-            panelSpecialisms.add(getReference(caseData.getSscsIndustrialInjuriesData().getPanelDoctorSpecialism()));
+            addIgnoreNull(panelSpecialisms,
+                    getReference(caseData.getSscsIndustrialInjuriesData().getPanelDoctorSpecialism()));
         }
         if (nonNull(panelComposition.getPanelCompositionMemberMedical2())) {
-            panelSpecialisms
-                    .add(getReference(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism()));
+            addIgnoreNull(panelSpecialisms,
+                    getReference(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism()));
         }
         return panelSpecialisms;
     }

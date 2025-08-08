@@ -220,6 +220,7 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
     @CsvSource(value = {
         "cardiologist,eyeSurgeon,58|58,1|3",
         "carer,null,58,2",
+        "null,null,58,|",
     }, nullValues = {"null"})
     void testGetPanelSpecialisms(String doctorSpecialism, String secondSpecialism, String johTiers, String expected) {
         DefaultPanelComposition panelComposition = new DefaultPanelComposition();
@@ -280,6 +281,7 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
         DefaultPanelComposition panelComposition = new DefaultPanelComposition();
         panelComposition.setCategory("5");
         when(panelCompositionService.getDefaultPanelComposition(any())).thenReturn(panelComposition);
+
         List<String> result = hearingsPanelMapping.getPanelSpecialisms(caseData, sessionCategoryMap);
 
         List<String> expectedList = Collections.emptyList();
