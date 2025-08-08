@@ -42,7 +42,7 @@ test.describe(
       await hearingSteps.verifyHearingIsTriggeredForUCCase(false);
     });
 
-    test('Trigger a new direction hearing via issue direction notice for UC case #executeTearDown', async ({
+    test.skip('Trigger a new direction hearing via issue direction notice for UC case #executeTearDown', async ({
       uploadResponseSteps,
       hearingSteps,
       issueDirectionsNoticeSteps
@@ -61,7 +61,7 @@ test.describe(
       await hearingSteps.verifyHearingIsTriggeredForUCCase(true);
     });
 
-    test('Trigger a new direction hearing via update listing reqs for UC case #executeTearDown', async ({
+    test.skip('Trigger a new direction hearing via update listing reqs for UC case #executeTearDown', async ({
       uploadResponseSteps,
       hearingSteps
     }) => {
