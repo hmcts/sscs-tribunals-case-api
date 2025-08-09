@@ -39,7 +39,7 @@ class HearingsDurationMappingTest extends HearingsMappingBase {
         caseData.getAppeal().getHearingOptions().setWantsToAttend("Yes");
         caseData.getSchedulingAndListingFields().getOverrideFields().setDuration(overrideDuration);
 
-        int result = HearingsDurationMapping.getHearingDuration(caseData, refData, true);
+        int result = HearingsDurationMapping.getHearingDuration(caseData, refData);
 
         assertThat(result).isEqualTo(expectedResult);
     }
@@ -50,7 +50,7 @@ class HearingsDurationMappingTest extends HearingsMappingBase {
         caseData.setBenefitCode("093");
         given(refData.getHearingDurations()).willReturn(hearingDurations);
         ListingException exception = assertThrows(ListingException.class, () ->
-                HearingsDurationMapping.getHearingDuration(caseData, refData, true)
+                HearingsDurationMapping.getHearingDuration(caseData, refData)
         );
         assertThat(exception.getMessage()).isEqualTo("Hearing duration is required to list case");
     }
@@ -62,7 +62,7 @@ class HearingsDurationMappingTest extends HearingsMappingBase {
         given(refData.getHearingDurations()).willReturn(hearingDurations);
         caseData.getAdjournment().setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.NON_STANDARD);
         ListingException exception = assertThrows(ListingException.class, () ->
-                HearingsDurationMapping.getHearingDurationAdjournment(caseData, refData.getHearingDurations(), true)
+                HearingsDurationMapping.getHearingDurationAdjournment(caseData, refData.getHearingDurations())
         );
         assertThat(exception.getMessage()).isEqualTo("Hearing duration is required to list case");
     }
@@ -74,7 +74,7 @@ class HearingsDurationMappingTest extends HearingsMappingBase {
         given(hearingDurations.getHearingDurationBenefitIssueCodes(eq(caseData))).willReturn(null);
 
         ListingException exception = assertThrows(ListingException.class, () ->
-                HearingsDurationMapping.getHearingDuration(caseData, refData, true)
+                HearingsDurationMapping.getHearingDuration(caseData, refData)
         );
         assertThat(exception.getMessage()).isEqualTo("Hearing duration is required to list case");
     }
@@ -84,7 +84,7 @@ class HearingsDurationMappingTest extends HearingsMappingBase {
     void testCaseHearingDurationSet() throws ListingException {
         given(refData.getHearingDurations()).willReturn(hearingDurations);
         caseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder().duration(60).build());
-        Integer duration = HearingsDurationMapping.getHearingDuration(caseData, refData, true);
+        Integer duration = HearingsDurationMapping.getHearingDuration(caseData, refData);
         assertThat(duration).isEqualTo(60);
     }
 
@@ -95,7 +95,7 @@ class HearingsDurationMappingTest extends HearingsMappingBase {
         caseData.getAppeal().getHearingOptions().setWantsToAttend("Yes");
         caseData.getSchedulingAndListingFields().getOverrideFields().setDuration(DURATION_FACE_TO_FACE);
 
-        int result = HearingsDurationMapping.getHearingDuration(caseData, refData, true);
+        int result = HearingsDurationMapping.getHearingDuration(caseData, refData);
 
         assertThat(result).isEqualTo(DURATION_FACE_TO_FACE);
     }
