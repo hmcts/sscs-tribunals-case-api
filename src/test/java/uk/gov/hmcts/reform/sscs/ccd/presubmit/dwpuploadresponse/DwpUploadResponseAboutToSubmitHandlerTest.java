@@ -1517,7 +1517,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void shouldSetPanelComposition() {
         var panelComposition = new PanelMemberComposition(List.of("84"));
-        when(panelCompositionService.resetPanelCompositionIfStale(eq(sscsCaseData), eq(sscsCaseDataBefore)))
+        when(panelCompositionService.resetPanelCompositionIfStale(eq(sscsCaseData), eq(Optional.of(caseDetailsBefore))))
                 .thenReturn(panelComposition);
         dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(
                 dwpDocumentService, addNoteService, addedDocumentsUtil, panelCompositionService, true
