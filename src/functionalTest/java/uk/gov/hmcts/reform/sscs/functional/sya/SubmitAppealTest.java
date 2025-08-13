@@ -4,6 +4,7 @@ import static io.restassured.RestAssured.baseURI;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SYA_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseDataV2;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_CCD;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_CCD_CHILD_SUPPORT;
@@ -14,8 +15,6 @@ import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_WITH_INTERLOC_CCD;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
@@ -189,7 +188,7 @@ public class SubmitAppealTest {
     }
 
     @Test
-    public void appealShouldCreateDuplicateAndLinked() throws InterruptedException, JsonProcessingException {
+    public void appealShouldCreateDuplicateAndLinked() throws InterruptedException {
         //SscsCaseDetails caseDetails = ccdService.createCase(caseData, SYA_APPEAL_CREATED.getCcdType(), "Appeal created summary", "Appeal created description", idamTokens);
 
         SyaJsonMessageSerializer syaJsonMessageSerializer = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS;
@@ -216,7 +215,7 @@ public class SubmitAppealTest {
         //SscsCaseDetails sscsCaseDetails = submitHelper.findCaseInCcd(id, idamTokens);
         SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(id, idamTokens);
 
-        SscsCaseData caseData = new ObjectMapper().readValue(body, SscsCaseData.class);
+        SscsCaseData caseData = convertSyaToCcdCaseDataV2(wrapper, true, SscsCaseData.builder().build());
         SscsCaseDetails firstCaseDetails = ccdService.createCase(
             caseData,
             SYA_APPEAL_CREATED.getCcdType(),
