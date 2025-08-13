@@ -263,9 +263,9 @@ public class SubmitAppealTest {
         SscsCaseDetails secondCaseSscsCaseDetails = ccdService.getByCaseId(secondCaseDetails.getId(), idamTokens);
 
         //if (secondCaseSscsCaseDetails.getData().getAssociatedCase() == null) {
-            //Give time for evidence share to create associated case link
+        //    //Give time for evidence share to create associated case link
         //    Thread.sleep(5000L);
-            //secondCaseSscsCaseDetails = submitHelper.findCaseInCcd(secondCaseId, idamTokens);
+        //    secondCaseSscsCaseDetails = submitHelper.findCaseInCcd(secondCaseId, idamTokens);
         //    secondCaseSscsCaseDetails = ccdService.getByCaseId(secondCaseId, idamTokens);
         //}
         if (secondCaseSscsCaseDetails.getData().getAssociatedCase() == null) {
@@ -278,7 +278,7 @@ public class SubmitAppealTest {
 
         log.info("Duplicate case {} has been found", secondCaseSscsCaseDetails.getId());
 
-        assertEquals( "Associated case: ", 1, secondCaseSscsCaseDetails.getData().getAssociatedCase().size());
+        assertEquals("Associated case: ", 1, secondCaseSscsCaseDetails.getData().getAssociatedCase().size());
         assertEquals("Yes", secondCaseSscsCaseDetails.getData().getLinkedCasesBoolean());
         log.info(secondCaseSscsCaseDetails.toString());
 
