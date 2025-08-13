@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.functional.sya;
 import static io.restassured.RestAssured.baseURI;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.Assert.assertEquals;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SYA_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_CCD;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_CCD_CHILD_SUPPORT;
@@ -13,6 +14,8 @@ import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_WITH_INTERLOC_CCD;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
@@ -31,6 +34,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
@@ -185,7 +189,9 @@ public class SubmitAppealTest {
     }
 
     @Test
-    public void appealShouldCreateDuplicateAndLinked() throws InterruptedException {
+    public void appealShouldCreateDuplicateAndLinked() throws InterruptedException, JsonProcessingException {
+        //SscsCaseDetails caseDetails = ccdService.createCase(caseData, SYA_APPEAL_CREATED.getCcdType(), "Appeal created summary", "Appeal created description", idamTokens);
+
         SyaJsonMessageSerializer syaJsonMessageSerializer = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS;
         String body = syaJsonMessageSerializer.getSerializedMessage();
         String nino = submitHelper.getRandomNino();
@@ -210,7 +216,16 @@ public class SubmitAppealTest {
         //SscsCaseDetails sscsCaseDetails = submitHelper.findCaseInCcd(id, idamTokens);
         SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(id, idamTokens);
 
-        log.info(String.format("SYA created with CCD ID %s", id));
+        SscsCaseData caseData = new ObjectMapper().readValue(body, SscsCaseData.class);
+        SscsCaseDetails firstCaseDetails = ccdService.createCase(
+            caseData,
+            SYA_APPEAL_CREATED.getCcdType(),
+            "Appeal created summary",
+            "Appeal created description",
+            idamTokens);
+
+        log.info("SYA created with CCD ID {}", id);
+        log.info("First SYA case created with CCD ID {}", firstCaseDetails.getId());
         assertEquals("validAppeal", sscsCaseDetails.getState());
 
         //create a case with different mrn date
@@ -225,14 +240,14 @@ public class SubmitAppealTest {
             .header("Content-Type", "application/json");
 
         // Give ES time to index
-        Thread.sleep(3000L);
+        //Thread.sleep(3000L);
 
         response = httpRequest.post("/appeals");
 
         response.then().statusCode(HttpStatus.SC_CREATED);
 
         final Long secondCaseId = getCcdIdFromLocationHeader(response.getHeader("Location"));
-        log.info("Duplicate case " + secondCaseId);
+        log.info("Duplicate case {}", secondCaseId);
         //SscsCaseDetails secondCaseSscsCaseDetails = submitHelper.findCaseInCcd(secondCaseId, idamTokens);
         SscsCaseDetails secondCaseSscsCaseDetails = ccdService.getByCaseId(secondCaseId, idamTokens);
 
@@ -243,7 +258,7 @@ public class SubmitAppealTest {
             secondCaseSscsCaseDetails = ccdService.getByCaseId(secondCaseId, idamTokens);
         }
 
-        log.info("Duplicate case " + secondCaseSscsCaseDetails.getId() + " has been found");
+        log.info("Duplicate case {} has been found", secondCaseSscsCaseDetails.getId());
 
         assertEquals(1, secondCaseSscsCaseDetails.getData().getAssociatedCase().size());
         assertEquals("Yes", secondCaseSscsCaseDetails.getData().getLinkedCasesBoolean());
@@ -255,7 +270,7 @@ public class SubmitAppealTest {
                 .header("Content-Type", "application/json");
 
         // Give ES time to index
-        Thread.sleep(5000L);
+        //Thread.sleep(5000L);
 
         response = httpRequest.post("/appeals");
 
