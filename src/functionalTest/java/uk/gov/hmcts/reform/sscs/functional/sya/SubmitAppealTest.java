@@ -38,6 +38,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.service.v2.SubmitAppealService;
 import uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer;
 
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
@@ -63,6 +64,9 @@ public class SubmitAppealTest {
 
     @Autowired
     private CcdService ccdService;
+
+    @Autowired
+    private SubmitAppealService submitAppealService;
 
     private IdamTokens idamTokens;
 
@@ -212,16 +216,17 @@ public class SubmitAppealTest {
         //response.then().statusCode(HttpStatus.SC_CREATED);
 
         //final Long id = getCcdIdFromLocationHeader(response.getHeader("Location"));
+        final Long id = submitAppealService.submitAppeal(wrapper1, idamTokens.getIdamOauth2Token());
         //SscsCaseDetails sscsCaseDetails = submitHelper.findCaseInCcd(id, idamTokens);
-        //SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(id, idamTokens);
+        SscsCaseDetails firstCaseDetails = ccdService.getByCaseId(id, idamTokens);
 
-        SscsCaseData caseData = convertSyaToCcdCaseDataV2(wrapper1, true, SscsCaseData.builder().build());
-        SscsCaseDetails firstCaseDetails = ccdService.createCase(
-            caseData,
-            SYA_APPEAL_CREATED.getCcdType(),
-            "Appeal created summary",
-            "Appeal created description",
-            idamTokens);
+        //SscsCaseData caseData = convertSyaToCcdCaseDataV2(wrapper1, true, SscsCaseData.builder().build());
+        //SscsCaseDetails firstCaseDetails = ccdService.createCase(
+        //    caseData,
+        //    SYA_APPEAL_CREATED.getCcdType(),
+        //    "Appeal created summary",
+        //    "Appeal created description",
+        //    idamTokens);
 
         //log.info("SYA created with CCD ID {}", id);
         log.info("First SYA case created with CCD ID {}", firstCaseDetails.getId());
