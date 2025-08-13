@@ -32,6 +32,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -57,6 +58,9 @@ public class SubmitAppealTest {
 
     @Autowired
     private IdamService idamService;
+
+    @Autowired
+    private CcdService ccdService;
 
     private IdamTokens idamTokens;
 
@@ -203,7 +207,8 @@ public class SubmitAppealTest {
         response.then().statusCode(HttpStatus.SC_CREATED);
 
         final Long id = getCcdIdFromLocationHeader(response.getHeader("Location"));
-        SscsCaseDetails sscsCaseDetails = submitHelper.findCaseInCcd(id, idamTokens);
+        //SscsCaseDetails sscsCaseDetails = submitHelper.findCaseInCcd(id, idamTokens);
+        SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(id, idamTokens);
 
         log.info(String.format("SYA created with CCD ID %s", id));
         assertEquals("validAppeal", sscsCaseDetails.getState());
@@ -228,12 +233,14 @@ public class SubmitAppealTest {
 
         final Long secondCaseId = getCcdIdFromLocationHeader(response.getHeader("Location"));
         log.info("Duplicate case " + secondCaseId);
-        SscsCaseDetails secondCaseSscsCaseDetails = submitHelper.findCaseInCcd(secondCaseId, idamTokens);
+        //SscsCaseDetails secondCaseSscsCaseDetails = submitHelper.findCaseInCcd(secondCaseId, idamTokens);
+        SscsCaseDetails secondCaseSscsCaseDetails = ccdService.getByCaseId(secondCaseId, idamTokens);
 
         if (secondCaseSscsCaseDetails.getData().getAssociatedCase() == null) {
             //Give time for evidence share to create associated case link
             Thread.sleep(5000L);
-            secondCaseSscsCaseDetails = submitHelper.findCaseInCcd(secondCaseId, idamTokens);
+            //secondCaseSscsCaseDetails = submitHelper.findCaseInCcd(secondCaseId, idamTokens);
+            secondCaseSscsCaseDetails = ccdService.getByCaseId(secondCaseId, idamTokens);
         }
 
         log.info("Duplicate case " + secondCaseSscsCaseDetails.getId() + " has been found");
