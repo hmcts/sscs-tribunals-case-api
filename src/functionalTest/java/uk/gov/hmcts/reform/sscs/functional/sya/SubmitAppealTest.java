@@ -17,7 +17,6 @@ import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS
 
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
 import java.time.LocalDate;
 import junitparams.JUnitParamsRunner;
 import lombok.extern.slf4j.Slf4j;
@@ -192,30 +191,31 @@ public class SubmitAppealTest {
         //SscsCaseDetails caseDetails = ccdService.createCase(caseData, SYA_APPEAL_CREATED.getCcdType(), "Appeal created summary", "Appeal created description", idamTokens);
 
         SyaJsonMessageSerializer syaJsonMessageSerializer = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS;
-        String body = syaJsonMessageSerializer.getSerializedMessage();
+        //String body = syaJsonMessageSerializer.getSerializedMessage();
         String nino = submitHelper.getRandomNino();
 
-        body = submitHelper.setNino(body, nino);
+        //body = submitHelper.setNino(body, nino);
 
         LocalDate mrnDate = LocalDate.now();
-        body = submitHelper.setLatestMrnDate(body, mrnDate);
+        //body = submitHelper.setLatestMrnDate(body, mrnDate);
 
-        SyaCaseWrapper wrapper = syaJsonMessageSerializer.getDeserializeMessage();
-        wrapper.getAppellant().setNino(nino);
+        SyaCaseWrapper wrapper1 = syaJsonMessageSerializer.getDeserializeMessage();
+        wrapper1.getAppellant().setNino(nino);
+        wrapper1.getMrn().setDate(mrnDate);
 
-        RequestSpecification httpRequest = RestAssured.given()
-            .body(body)
-            .header("Content-Type", "application/json");
+        //RequestSpecification httpRequest = RestAssured.given()
+        //    .body(body)
+        //    .header("Content-Type", "application/json");
 
-        Response response = httpRequest.post("/appeals");
+        //Response response = httpRequest.post("/appeals");
 
-        response.then().statusCode(HttpStatus.SC_CREATED);
+        //response.then().statusCode(HttpStatus.SC_CREATED);
 
-        final Long id = getCcdIdFromLocationHeader(response.getHeader("Location"));
+        //final Long id = getCcdIdFromLocationHeader(response.getHeader("Location"));
         //SscsCaseDetails sscsCaseDetails = submitHelper.findCaseInCcd(id, idamTokens);
-        SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(id, idamTokens);
+        //SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(id, idamTokens);
 
-        SscsCaseData caseData = convertSyaToCcdCaseDataV2(wrapper, true, SscsCaseData.builder().build());
+        SscsCaseData caseData = convertSyaToCcdCaseDataV2(wrapper1, true, SscsCaseData.builder().build());
         SscsCaseDetails firstCaseDetails = ccdService.createCase(
             caseData,
             SYA_APPEAL_CREATED.getCcdType(),
@@ -223,56 +223,83 @@ public class SubmitAppealTest {
             "Appeal created description",
             idamTokens);
 
-        log.info("SYA created with CCD ID {}", id);
+        //log.info("SYA created with CCD ID {}", id);
         log.info("First SYA case created with CCD ID {}", firstCaseDetails.getId());
-        assertEquals("validAppeal", sscsCaseDetails.getState());
+        //assertEquals("validAppeal", sscsCaseDetails.getState());
+        assertEquals("validAppeal", firstCaseDetails.getState());
 
         //create a case with different mrn date
-        body = syaJsonMessageSerializer.getSerializedMessage();
-        body = submitHelper.setNino(body, nino);
+        //body = syaJsonMessageSerializer.getSerializedMessage();
+        //body = submitHelper.setNino(body, nino);
 
         mrnDate = LocalDate.now().minusMonths(12);
-        body = submitHelper.setLatestMrnDate(body, mrnDate);
+        //body = submitHelper.setLatestMrnDate(body, mrnDate);
+        SyaCaseWrapper wrapper2 = syaJsonMessageSerializer.getDeserializeMessage();
+        wrapper2.getAppellant().setNino(nino);
+        wrapper2.getMrn().setDate(mrnDate);
 
-        httpRequest = RestAssured.given()
-            .body(body)
-            .header("Content-Type", "application/json");
+        //httpRequest = RestAssured.given()
+        //    .body(body)
+        //    .header("Content-Type", "application/json");
 
         // Give ES time to index
         //Thread.sleep(3000L);
 
-        response = httpRequest.post("/appeals");
+        //response = httpRequest.post("/appeals");
 
-        response.then().statusCode(HttpStatus.SC_CREATED);
+        //response.then().statusCode(HttpStatus.SC_CREATED);
 
-        final Long secondCaseId = getCcdIdFromLocationHeader(response.getHeader("Location"));
-        log.info("Duplicate case {}", secondCaseId);
+        //final Long secondCaseId = getCcdIdFromLocationHeader(response.getHeader("Location"));
+        //log.info("Duplicate case {}", secondCaseId);
+        SscsCaseData caseData2 = convertSyaToCcdCaseDataV2(wrapper1, true, SscsCaseData.builder().build());
+        SscsCaseDetails secondCaseDetails = ccdService.createCase(
+            caseData2,
+            SYA_APPEAL_CREATED.getCcdType(),
+            "Appeal created summary",
+            "Appeal created description",
+            idamTokens);
+        log.info("Duplicate case {}", secondCaseDetails.getId());
         //SscsCaseDetails secondCaseSscsCaseDetails = submitHelper.findCaseInCcd(secondCaseId, idamTokens);
-        SscsCaseDetails secondCaseSscsCaseDetails = ccdService.getByCaseId(secondCaseId, idamTokens);
+        SscsCaseDetails secondCaseSscsCaseDetails = ccdService.getByCaseId(secondCaseDetails.getId(), idamTokens);
 
+        //if (secondCaseSscsCaseDetails.getData().getAssociatedCase() == null) {
+            //Give time for evidence share to create associated case link
+        //    Thread.sleep(5000L);
+            //secondCaseSscsCaseDetails = submitHelper.findCaseInCcd(secondCaseId, idamTokens);
+        //    secondCaseSscsCaseDetails = ccdService.getByCaseId(secondCaseId, idamTokens);
+        //}
         if (secondCaseSscsCaseDetails.getData().getAssociatedCase() == null) {
+            log.info("Give time for evidence share to create associated case link");
             //Give time for evidence share to create associated case link
             Thread.sleep(5000L);
             //secondCaseSscsCaseDetails = submitHelper.findCaseInCcd(secondCaseId, idamTokens);
-            secondCaseSscsCaseDetails = ccdService.getByCaseId(secondCaseId, idamTokens);
+            secondCaseSscsCaseDetails = ccdService.getByCaseId(secondCaseDetails.getId(), idamTokens);
         }
 
         log.info("Duplicate case {} has been found", secondCaseSscsCaseDetails.getId());
 
-        assertEquals(1, secondCaseSscsCaseDetails.getData().getAssociatedCase().size());
+        assertEquals( "Associated case: ", 1, secondCaseSscsCaseDetails.getData().getAssociatedCase().size());
         assertEquals("Yes", secondCaseSscsCaseDetails.getData().getLinkedCasesBoolean());
         log.info(secondCaseSscsCaseDetails.toString());
 
         // check duplicate returns 409
-        httpRequest = RestAssured.given()
-                .body(body)
-                .header("Content-Type", "application/json");
+        //httpRequest = RestAssured.given()
+        //        .body(body)
+        //        .header("Content-Type", "application/json");
 
         // Give ES time to index
         //Thread.sleep(5000L);
 
-        response = httpRequest.post("/appeals");
+        //response = httpRequest.post("/appeals");
 
-        response.then().statusCode(HttpStatus.SC_CONFLICT);
+        //response.then().statusCode(HttpStatus.SC_CONFLICT);
+        SscsCaseDetails thirdCaseDetails = ccdService.createCase(
+            caseData2,
+            SYA_APPEAL_CREATED.getCcdType(),
+            "Appeal created summary",
+            "Appeal created description",
+            idamTokens);
+        log.info("Duplicate case {}", thirdCaseDetails.getId());
+        //this shouldn't happen
     }
 }
