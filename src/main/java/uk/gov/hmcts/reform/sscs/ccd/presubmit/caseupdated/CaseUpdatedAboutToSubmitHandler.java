@@ -238,6 +238,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                 .orElse(OverrideFields.builder().build());
         HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
         if (nonNull(hearingOptions)) {
+            if (isYes(hearingOptions.getLanguageInterpreter()) && isNull(hearingOptions.getLanguages())) {
+                return;
+            }
             if (hasInterpreterChanged(sscsCaseData, caseDetailsBefore.get())) {
                 updateOverrideInterpreter(hearingOptions, overrideFields);
                 updateOverrideDuration(sscsCaseData, overrideFields);
