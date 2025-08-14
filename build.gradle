@@ -368,7 +368,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'pdf-service-client', version: '8.0.2'
     implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '5.0.4'
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.3'
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6.3.8'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6.3.9'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.9'
 
     implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.2.1-RELEASE'
@@ -414,8 +414,8 @@ dependencies {
     implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.1'
     implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '3.0.5'
     implementation group: 'org.apache.pdfbox', name: 'xmpbox', version: '3.0.5'
-    implementation group: 'org.apache.tika', name: 'tika-core', version: '3.1.0'
-    implementation group: 'org.apache.tika', name: 'tika-parsers', version: '3.1.0'
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '3.2.2'
+    implementation group: 'org.apache.tika', name: 'tika-parsers', version: '3.2.2'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '11.0.8'
 
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok

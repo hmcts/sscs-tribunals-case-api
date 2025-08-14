@@ -143,12 +143,13 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                 sscsCaseData.setDwpDueDate(null);
             }
         }
+
         sscsCaseData.setDirectionDueDate(getUpdatedDirectionDueDate(sscsCaseData));
         updateBenefitType(sscsCaseData);
-        var caseDetailsBefore = callback.getCaseDetailsBefore().orElse(null);
-        if (integratedListAssistEnabled && nonNull(caseDetailsBefore)) {
+
+        if (integratedListAssistEnabled) {
             sscsCaseData.setPanelMemberComposition(panelCompositionService
-                    .resetPanelCompositionIfStale(sscsCaseData, caseDetailsBefore.getCaseData()));
+                    .resetPanelCompositionIfStale(sscsCaseData, callback.getCaseDetailsBefore()));
         }
         return preSubmitCallbackResponse;
     }
