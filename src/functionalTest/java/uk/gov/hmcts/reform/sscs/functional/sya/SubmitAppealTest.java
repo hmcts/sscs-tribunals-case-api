@@ -192,7 +192,8 @@ public class SubmitAppealTest {
 
     @Test
     public void appealShouldCreateDuplicateAndLinked() throws InterruptedException {
-        String nino = submitHelper.getRandomNino();
+        //String nino = submitHelper.getRandomNino();
+        String nino = "Z2ZZNCIWW";
         log.info("Random NINO: {}", nino);
         LocalDate mrnDate = LocalDate.now();
         log.info("MRN date: {}",mrnDate);
