@@ -191,35 +191,17 @@ public class SubmitAppealTest {
 
     @Test
     public void appealShouldCreateDuplicateAndLinked() throws InterruptedException {
-        //SscsCaseDetails caseDetails = ccdService.createCase(caseData, SYA_APPEAL_CREATED.getCcdType(), "Appeal created summary", "Appeal created description", idamTokens);
-
-        SyaJsonMessageSerializer syaJsonMessageSerializer = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS;
-        //String body = syaJsonMessageSerializer.getSerializedMessage();
         String nino = submitHelper.getRandomNino();
-
-        //body = submitHelper.setNino(body, nino);
-
+        log.info("Random NINO: {}", nino);
         LocalDate mrnDate = LocalDate.now();
-        //body = submitHelper.setLatestMrnDate(body, mrnDate);
+        log.info("MRN date: {}",mrnDate);
 
-        SyaCaseWrapper wrapper1 = syaJsonMessageSerializer.getDeserializeMessage();
-        wrapper1.getAppellant().setNino(nino);
-        wrapper1.getMrn().setDate(mrnDate);
+        SyaCaseWrapper wrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS.getDeserializeMessage();
+        wrapper.getAppellant().setNino(nino);
+        wrapper.getMrn().setDate(mrnDate);
 
-        //RequestSpecification httpRequest = RestAssured.given()
-        //    .body(body)
-        //    .header("Content-Type", "application/json");
-
-        //Response response = httpRequest.post("/appeals");
-
-        //response.then().statusCode(HttpStatus.SC_CREATED);
-
-        //final Long id = getCcdIdFromLocationHeader(response.getHeader("Location"));
-        //final Long id = submitAppealService.submitAppeal(wrapper1, idamTokens.getIdamOauth2Token());
-        //SscsCaseDetails sscsCaseDetails = submitHelper.findCaseInCcd(id, idamTokens);
-        //SscsCaseDetails firstCaseDetails = ccdService.getByCaseId(id, idamTokens);
-
-        SscsCaseData caseData = convertSyaToCcdCaseDataV2(wrapper1, true, SscsCaseData.builder().build());
+        SscsCaseData caseData = convertSyaToCcdCaseDataV2(wrapper, true, SscsCaseData.builder().build());
+        log.info("Appeal created: {}", caseData.getAppeal());
         SscsCaseDetails firstCaseDetails = ccdService.createCase(
             caseData,
             VALID_APPEAL_CREATED.getCcdType(),
@@ -227,35 +209,15 @@ public class SubmitAppealTest {
             "Appeal created description",
             idamTokens);
 
-        //log.info("SYA created with CCD ID {}", id);
         log.info("First SYA case created with CCD ID {}", firstCaseDetails.getId());
-        //assertEquals("validAppeal", sscsCaseDetails.getState());
         assertEquals("validAppeal", firstCaseDetails.getState());
 
-        //create a case with different mrn date
-        //body = syaJsonMessageSerializer.getSerializedMessage();
-        //body = submitHelper.setNino(body, nino);
-
         mrnDate = LocalDate.now().minusMonths(12);
-        //body = submitHelper.setLatestMrnDate(body, mrnDate);
-        SyaCaseWrapper wrapper2 = syaJsonMessageSerializer.getDeserializeMessage();
-        wrapper2.getAppellant().setNino(nino);
-        wrapper2.getMrn().setDate(mrnDate);
+        wrapper.getMrn().setDate(mrnDate);
+        log.info("New MRN date: {}", mrnDate);
 
-        //httpRequest = RestAssured.given()
-        //    .body(body)
-        //    .header("Content-Type", "application/json");
-
-        // Give ES time to index
-        //Thread.sleep(3000L);
-
-        //response = httpRequest.post("/appeals");
-
-        //response.then().statusCode(HttpStatus.SC_CREATED);
-
-        //final Long secondCaseId = getCcdIdFromLocationHeader(response.getHeader("Location"));
-        //log.info("Duplicate case {}", secondCaseId);
-        SscsCaseData caseData2 = convertSyaToCcdCaseDataV2(wrapper1, true, SscsCaseData.builder().build());
+        SscsCaseData caseData2 = convertSyaToCcdCaseDataV2(wrapper, true, SscsCaseData.builder().build());
+        log.info("Appeal created: {}", caseData2.getAppeal());
         SscsCaseDetails secondCaseDetails = ccdService.createCase(
             caseData2,
             VALID_APPEAL_CREATED.getCcdType(),
@@ -263,26 +225,18 @@ public class SubmitAppealTest {
             "Appeal created description",
             idamTokens);
         log.info("Duplicate case {}", secondCaseDetails.getId());
-        //SscsCaseDetails secondCaseSscsCaseDetails = submitHelper.findCaseInCcd(secondCaseId, idamTokens);
         SscsCaseDetails secondCaseSscsCaseDetails = ccdService.getByCaseId(secondCaseDetails.getId(), idamTokens);
 
-        //if (secondCaseSscsCaseDetails.getData().getAssociatedCase() == null) {
-        //    //Give time for evidence share to create associated case link
-        //    Thread.sleep(5000L);
-        //    secondCaseSscsCaseDetails = submitHelper.findCaseInCcd(secondCaseId, idamTokens);
-        //    secondCaseSscsCaseDetails = ccdService.getByCaseId(secondCaseId, idamTokens);
-        //}
         if (secondCaseSscsCaseDetails.getData().getAssociatedCase() == null) {
             log.info("Give time for evidence share to create associated case link");
             //Give time for evidence share to create associated case link
             Thread.sleep(5000L);
-            //secondCaseSscsCaseDetails = submitHelper.findCaseInCcd(secondCaseId, idamTokens);
             secondCaseSscsCaseDetails = ccdService.getByCaseId(secondCaseDetails.getId(), idamTokens);
         }
 
         log.info("Duplicate case {} has been found", secondCaseSscsCaseDetails.getId());
 
-        assertEquals("Associated case: ", 1, secondCaseSscsCaseDetails.getData().getAssociatedCase().size());
+        assertEquals("Number of associated cases doesn't match", 1, secondCaseSscsCaseDetails.getData().getAssociatedCase().size());
         assertEquals("Yes", secondCaseSscsCaseDetails.getData().getLinkedCasesBoolean());
         log.info(secondCaseSscsCaseDetails.toString());
 
@@ -303,7 +257,7 @@ public class SubmitAppealTest {
             "Appeal created summary",
             "Appeal created description",
             idamTokens);
-        log.info("Duplicate case {}", thirdCaseDetails.getId());
+        log.info("Second duplicate case {}", thirdCaseDetails.getId());
         //this should give an error
     }
 }
