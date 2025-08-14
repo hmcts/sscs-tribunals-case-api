@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.AMEND_SPECIALISM;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
@@ -43,7 +42,7 @@ class AmendSpecialismAboutToSubmitHandlerTest {
         caseData = SscsCaseData.builder().ccdCaseId("ccdId").build();
         caseDetails =
                 new CaseDetails<>(1234L, "SSCS", VALID_APPEAL, caseData, now(), "Benefit");
-        handler = new AmendSpecialismAboutToSubmitHandler(panelCompositionService, true);
+        handler = new AmendSpecialismAboutToSubmitHandler(panelCompositionService);
     }
 
     @Test
@@ -58,20 +57,6 @@ class AmendSpecialismAboutToSubmitHandlerTest {
         var callback = new Callback<>(caseDetails, empty(), READY_TO_LIST, false);
 
         assertFalse(handler.canHandle(CallbackType.ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
-    public void shouldNotSetPanelMemberComposition() {
-        var callback = new Callback<>(caseDetails, empty(), AMEND_SPECIALISM, false);
-        handler = new AmendSpecialismAboutToSubmitHandler(panelCompositionService, false);
-
-        var response =
-                handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, "Bearer token");
-
-        assertNotNull(response);
-        verifyNoInteractions(panelCompositionService);
-        assertEquals(caseData, response.getData());
-        assertTrue(response.getErrors().isEmpty());
     }
 
     @Test

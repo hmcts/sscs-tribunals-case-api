@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
-import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
@@ -27,19 +26,12 @@ public class ReferenceDataServiceHolder {
 
     @Autowired
     private final HearingDurationsService hearingDurations;
-
-    @Autowired
-    private final SessionCategoryMapService sessionCategoryMaps;
-
     @Autowired
     private final VerbalLanguagesService verbalLanguages;
-
     @Autowired
     private final SignLanguagesService signLanguages;
-
     @Autowired
     private final RegionalProcessingCenterService regionalProcessingCenterService;
-
     @Autowired
     private final VenueService venueService;
 
