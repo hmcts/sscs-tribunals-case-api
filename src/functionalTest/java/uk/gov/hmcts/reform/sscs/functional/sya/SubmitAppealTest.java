@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.sscs.functional.sya;
 
 import static io.restassured.RestAssured.baseURI;
+import static java.util.Objects.isNull;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseDataV2;
@@ -193,7 +195,7 @@ public class SubmitAppealTest {
     @Test
     public void appealShouldCreateDuplicateAndLinked() throws InterruptedException {
         //String nino = submitHelper.getRandomNino();
-        String nino = "Z2ZZNCIWW";
+        String nino = "RJ370538D";
         log.info("Random NINO: {}", nino);
         LocalDate mrnDate = LocalDate.now();
         log.info("MRN date: {}",mrnDate);
@@ -201,6 +203,7 @@ public class SubmitAppealTest {
         SyaCaseWrapper wrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS.getDeserializeMessage();
         wrapper.getAppellant().setNino(nino);
         wrapper.getMrn().setDate(mrnDate);
+        wrapper.getAppellant().setLastName("Bjarnison");
 
         SscsCaseData caseData = convertSyaToCcdCaseDataV2(wrapper, true, SscsCaseData.builder().build());
         log.info("Appeal created: {}", caseData.getAppeal());
@@ -229,7 +232,7 @@ public class SubmitAppealTest {
         log.info("Duplicate case {}", secondCaseDetails.getId());
         SscsCaseDetails secondCaseSscsCaseDetails = ccdService.getByCaseId(secondCaseDetails.getId(), idamTokens);
 
-        if (secondCaseSscsCaseDetails.getData().getAssociatedCase() == null) {
+        if (isNull(secondCaseSscsCaseDetails.getData().getAssociatedCase())) {
             log.info("Give time for evidence share to create associated case link");
             //Give time for evidence share to create associated case link
             Thread.sleep(5000L);
@@ -238,6 +241,7 @@ public class SubmitAppealTest {
 
         log.info("Duplicate case {} has been found", secondCaseSscsCaseDetails.getId());
 
+        assertNotNull(secondCaseSscsCaseDetails.getData().getAssociatedCase());
         assertEquals("Number of associated cases doesn't match", 1, secondCaseSscsCaseDetails.getData().getAssociatedCase().size());
         assertEquals("Yes", secondCaseSscsCaseDetails.getData().getLinkedCasesBoolean());
         log.info(secondCaseSscsCaseDetails.toString());
