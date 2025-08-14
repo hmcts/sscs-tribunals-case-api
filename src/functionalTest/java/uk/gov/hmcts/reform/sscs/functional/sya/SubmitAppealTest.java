@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.functional.sya;
 import static io.restassured.RestAssured.baseURI;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseDataV2;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN;
@@ -258,6 +259,7 @@ public class SubmitAppealTest {
             "Appeal created description",
             idamTokens);
         log.info("Second duplicate case {}", thirdCaseDetails.getId());
-        //this should give an error
+        //the second duplicate with the same details shouldn't be created
+        assertNull("Appeal shouldn't be created", thirdCaseDetails.getId());
     }
 }
