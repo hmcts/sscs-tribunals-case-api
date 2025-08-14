@@ -24,6 +24,8 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
+      "benefitCode": "051",
+      "issueCode": "DD",
       "generatedNino": "JT 12 34 56 D",
       "adjournCasePreviewDocument" : {
         "document_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c",

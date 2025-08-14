@@ -31,8 +31,6 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
     @Value("${feature.default-panel-comp.enabled}")
     private boolean isDefaultPanelCompEnabled;
-    @Value("${feature.hearing-duration.enabled}")
-    private boolean isHearingDurationEnabled;
 
     private final HearingDurationsService hearingDurationsService;
 
@@ -96,7 +94,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             if (nonNull(hearingChannel)) {
                 SscsUtil.updateHearingChannel(sscsCaseData, hearingChannel);
             }
-            boolean updateDuration = isHearingDurationEnabled && updateHearingDuration(sscsCaseData, callback.getCaseDetailsBefore());
+            boolean updateDuration = updateHearingDuration(sscsCaseData, callback.getCaseDetailsBefore());
             HearingInterpreter appellantInterpreter = overrideFields.getAppellantInterpreter();
             if (nonNull(appellantInterpreter)) {
                 SscsUtil.updateHearingInterpreter(sscsCaseData, callbackResponse, appellantInterpreter);

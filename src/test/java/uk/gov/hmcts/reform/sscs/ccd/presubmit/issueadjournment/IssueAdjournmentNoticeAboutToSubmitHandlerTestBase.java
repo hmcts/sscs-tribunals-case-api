@@ -93,7 +93,7 @@ abstract class IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
 
     @BeforeEach
     protected void setUp() {
-        handler = new IssueAdjournmentNoticeAboutToSubmitHandler(footerService, validator, hearingMessageHelper, airLookupService, regionalProcessingCenterService, hearingDurationsService, venueService, true);
+        handler = new IssueAdjournmentNoticeAboutToSubmitHandler(footerService, validator, hearingMessageHelper, airLookupService, regionalProcessingCenterService, hearingDurationsService, venueService);
 
         List<SscsDocument> documentList = new ArrayList<>();
 

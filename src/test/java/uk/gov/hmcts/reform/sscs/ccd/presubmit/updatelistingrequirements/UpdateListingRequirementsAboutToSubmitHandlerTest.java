@@ -272,7 +272,6 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @Test
     void givenAppellantInterpreterHasChanged_thenUpdateCaseDataOverrideDuration() {
-        ReflectionTestUtils.setField(handler, "isHearingDurationEnabled", true);
         sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder()
                 .duration(60)
                 .build());
@@ -317,7 +316,6 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @Test
     void updateHearingDuration_shouldUpdateDurationWhenChannelHasChanged() {
-        ReflectionTestUtils.setField(handler, "isHearingDurationEnabled", true);
         sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder()
                 .duration(60)
                 .build());
@@ -341,7 +339,6 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @Test
     void updateHearingDuration_shouldNotUpdateDurationWhenChannelHasNotChanged() {
-        ReflectionTestUtils.setField(handler, "isHearingDurationEnabled", true);
         sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder()
                 .duration(60)
                 .build());
