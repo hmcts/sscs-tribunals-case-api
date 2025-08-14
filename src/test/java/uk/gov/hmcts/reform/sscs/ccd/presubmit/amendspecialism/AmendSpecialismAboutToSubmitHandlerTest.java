@@ -63,6 +63,7 @@ class AmendSpecialismAboutToSubmitHandlerTest {
     @Test
     public void shouldNotSetPanelMemberComposition() {
         var callback = new Callback<>(caseDetails, empty(), AMEND_SPECIALISM, false);
+        handler = new AmendSpecialismAboutToSubmitHandler(panelCompositionService, false);
 
         var response =
                 handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, "Bearer token");
@@ -77,7 +78,7 @@ class AmendSpecialismAboutToSubmitHandlerTest {
     public void shouldResetPanelComposition() {
         var callback = new Callback<>(caseDetails, Optional.of(caseDetails), AMEND_SPECIALISM, false);
         var panelComposition = new PanelMemberComposition(List.of("84"));
-        when(panelCompositionService.resetPanelCompositionIfStale(eq(caseData), eq(caseData)))
+        when(panelCompositionService.resetPanelCompositionIfStale(eq(caseData), eq(Optional.of(caseDetails))))
                 .thenReturn(panelComposition);
 
         var response =
