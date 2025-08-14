@@ -195,7 +195,7 @@ public class SubmitAppealTest {
     @Test
     public void appealShouldCreateDuplicateAndLinked() throws InterruptedException {
         //String nino = submitHelper.getRandomNino();
-        String nino = "RJ370538D";
+        String nino = "TG746360C";
         log.info("Random NINO: {}", nino);
         LocalDate mrnDate = LocalDate.now();
         log.info("MRN date: {}",mrnDate);
@@ -203,7 +203,7 @@ public class SubmitAppealTest {
         SyaCaseWrapper wrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS.getDeserializeMessage();
         wrapper.getAppellant().setNino(nino);
         wrapper.getMrn().setDate(mrnDate);
-        wrapper.getAppellant().setLastName("Bjarnison");
+        wrapper.getAppellant().setLastName("Ugirgo");
 
         SscsCaseData caseData = convertSyaToCcdCaseDataV2(wrapper, true, SscsCaseData.builder().build());
         log.info("Appeal created: {}", caseData.getAppeal());
@@ -235,13 +235,13 @@ public class SubmitAppealTest {
         if (isNull(secondCaseSscsCaseDetails.getData().getAssociatedCase())) {
             log.info("Give time for evidence share to create associated case link");
             //Give time for evidence share to create associated case link
-            Thread.sleep(5000L);
+            Thread.sleep(5000);
             secondCaseSscsCaseDetails = ccdService.getByCaseId(secondCaseDetails.getId(), idamTokens);
         }
 
-        log.info("Duplicate case {} has been found", secondCaseSscsCaseDetails.getId());
+        log.info("Duplicate case {} has been created", secondCaseSscsCaseDetails.getId());
 
-        assertNotNull(secondCaseSscsCaseDetails.getData().getAssociatedCase());
+        assertNotNull("AssociatedCase was not created", secondCaseSscsCaseDetails.getData().getAssociatedCase());
         assertEquals("Number of associated cases doesn't match", 1, secondCaseSscsCaseDetails.getData().getAssociatedCase().size());
         assertEquals("Yes", secondCaseSscsCaseDetails.getData().getLinkedCasesBoolean());
         log.info(secondCaseSscsCaseDetails.toString());
