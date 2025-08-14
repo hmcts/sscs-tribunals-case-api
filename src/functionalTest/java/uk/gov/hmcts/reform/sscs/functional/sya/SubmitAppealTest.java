@@ -5,6 +5,9 @@ import static java.util.Objects.isNull;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseDataV2;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_CCD;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_CCD_CHILD_SUPPORT;
@@ -32,12 +35,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceBase;
 import uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer;
 
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
@@ -64,8 +67,8 @@ public class SubmitAppealTest {
     @Autowired
     private CcdService ccdService;
 
-    @Autowired
-    private SubmitAppealServiceBase submitAppealServiceBase;
+    //@Autowired
+    //private SubmitAppealService submitAppealService;
 
     private IdamTokens idamTokens;
 
@@ -202,19 +205,15 @@ public class SubmitAppealTest {
         wrapper.getMrn().setDate(mrnDate);
         wrapper.getAppellant().setLastName("Bjarnison");
 
-        Long caseId = submitAppealServiceBase.submitAppeal(wrapper, idamTokens.getIdamOauth2Token());
-        SscsCaseDetails firstCaseDetails = ccdService.getByCaseId(caseId, idamTokens);
-        //SscsCaseData caseData = convertSyaToCcdCaseDataV2(wrapper, true, SscsCaseData.builder().build());
-        //log.info("Appeal created: {}", caseData.getAppeal());
-        //SscsCaseDetails firstCaseDetails = ccdService.createCase(
-        //    caseData,
-        //    VALID_APPEAL_CREATED.getCcdType(),
-        //    "Appeal created summary",
-        //    "Appeal created description",
-        //    idamTokens);
+        SscsCaseData caseData = convertSyaToCcdCaseDataV2(wrapper, true, SscsCaseData.builder().build());
+        log.info("Appeal created: {}", caseData.getAppeal());
+        SscsCaseDetails firstCaseDetails = ccdService.createCase(
+            caseData,
+            VALID_APPEAL_CREATED.getCcdType(),
+            "Appeal created summary",
+            "Appeal created description",
+            idamTokens);
 
-        //log.info("First SYA case created with CCD ID {}", firstCaseDetails.getId());
-        //assertEquals("validAppeal", firstCaseDetails.getState());
         log.info("First SYA case created with CCD ID {}", firstCaseDetails.getId());
         assertEquals("validAppeal", firstCaseDetails.getState());
 
@@ -222,16 +221,14 @@ public class SubmitAppealTest {
         wrapper.getMrn().setDate(mrnDate);
         log.info("New MRN date: {}", mrnDate);
 
-        Long secondCaseId = submitAppealServiceBase.submitAppeal(wrapper, idamTokens.getIdamOauth2Token());
-        SscsCaseDetails secondCaseDetails = ccdService.getByCaseId(secondCaseId, idamTokens);
-        //SscsCaseData caseData2 = convertSyaToCcdCaseDataV2(wrapper, true, SscsCaseData.builder().build());
-        //log.info("Appeal created: {}", caseData2.getAppeal());
-        //SscsCaseDetails secondCaseDetails = ccdService.createCase(
-        //    caseData2,
-        //    VALID_APPEAL_CREATED.getCcdType(),
-        //    "Appeal created summary",
-        //    "Appeal created description",
-        //    idamTokens);
+        SscsCaseData caseData2 = convertSyaToCcdCaseDataV2(wrapper, true, SscsCaseData.builder().build());
+        log.info("Appeal created: {}", caseData2.getAppeal());
+        SscsCaseDetails secondCaseDetails = ccdService.createCase(
+            caseData2,
+            VALID_APPEAL_CREATED.getCcdType(),
+            "Appeal created summary",
+            "Appeal created description",
+            idamTokens);
         log.info("Duplicate case {}", secondCaseDetails.getId());
         SscsCaseDetails secondCaseSscsCaseDetails = ccdService.getByCaseId(secondCaseDetails.getId(), idamTokens);
 
@@ -260,17 +257,14 @@ public class SubmitAppealTest {
         //response = httpRequest.post("/appeals");
 
         //response.then().statusCode(HttpStatus.SC_CONFLICT);
-        //SscsCaseDetails thirdCaseDetails = ccdService.createCase(
-        //    caseData2,
-        //    VALID_APPEAL_CREATED.getCcdType(),
-        //    "Appeal created summary",
-        //    "Appeal created description",
-        //    idamTokens);
-        //log.info("Second duplicate case {}", thirdCaseDetails.getId());
+        SscsCaseDetails thirdCaseDetails = ccdService.createCase(
+            caseData2,
+            VALID_APPEAL_CREATED.getCcdType(),
+            "Appeal created summary",
+            "Appeal created description",
+            idamTokens);
+        log.info("Second duplicate case {}", thirdCaseDetails.getId());
         //the second duplicate with the same details shouldn't be created
-        //assertNull("Appeal shouldn't be created", thirdCaseDetails.getId());
-        log.info("Submitting second duplicate case");
-        Long thirdCaseId = submitAppealServiceBase.submitAppeal(wrapper, idamTokens.getIdamOauth2Token());
-        log.info("Second duplicate case id {}", thirdCaseId);
+        assertNull("Appeal shouldn't be created", thirdCaseDetails.getId());
     }
 }
