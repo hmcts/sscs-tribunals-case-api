@@ -305,6 +305,6 @@ public class SubmitAppealTest {
             "Appeal created description",
             idamTokens);
         log.info("Duplicate case {}", thirdCaseDetails.getId());
-        //this shouldn't happen
+        //this should give an error
     }
 }
