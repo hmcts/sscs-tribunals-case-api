@@ -309,6 +309,7 @@ public final class HearingsPartiesMapping {
         if (isYes(hearingOptions.getLanguageInterpreter())) {
             String verbalLanguage = hearingOptions.getLanguages();
             language = refData.getVerbalLanguages().getVerbalLanguage(verbalLanguage);
+            language = isNull(language) ? refData.getSignLanguages().getSignLanguage(verbalLanguage) : language;
             if (isNull(language)) {
                 log.warn("The language {} cannot be mapped", verbalLanguage);
             }
