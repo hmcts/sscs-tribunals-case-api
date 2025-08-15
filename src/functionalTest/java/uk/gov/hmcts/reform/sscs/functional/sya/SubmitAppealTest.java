@@ -38,7 +38,10 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
+import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
+import uk.gov.hmcts.reform.sscs.service.VenueService;
 import uk.gov.hmcts.reform.sscs.service.v2.SubmitAppealService;
 import uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer;
 
@@ -69,12 +72,12 @@ public class SubmitAppealTest {
     @Autowired
     private SubmitAppealService submitAppealService;
 
-    //@Autowired
-    //private VenueService venueService;
-    //@Autowired
-    //private RegionalProcessingCenterService regionalProcessingCenterService;
-    //@Autowired
-    //private AirLookupService airLookupService;
+    @Autowired
+    private VenueService venueService;
+    @Autowired
+    private RegionalProcessingCenterService regionalProcessingCenterService;
+    @Autowired
+    private AirLookupService airLookupService;
     @Autowired
     private RefDataService refDataService;
 
