@@ -384,6 +384,7 @@ class OverridesMappingTest {
             .willReturn(null);
 
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
+        given(refData.getSignLanguages()).willReturn(signLanguages);
 
         assertThatExceptionOfType(InvalidMappingException.class).isThrownBy(() -> OverridesMapping.getAppellantInterpreter(appeal, refData));
     }
