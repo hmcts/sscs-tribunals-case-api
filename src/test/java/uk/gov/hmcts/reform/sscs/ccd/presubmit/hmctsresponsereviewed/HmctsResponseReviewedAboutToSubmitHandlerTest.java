@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
@@ -84,7 +83,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
                 new CaseDetails<>(1234L, "SSCS", RESPONSE_RECEIVED, sscsCaseDataBefore, now(), "Benefit");
         callback = new Callback<>(caseDetails, Optional.of(caseDetailsBefore), HMCTS_RESPONSE_REVIEWED, false);
 
-        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompositionService, false);
+        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompositionService);
     }
 
     @Test
@@ -421,18 +420,10 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void shouldNotResetPanelComposition() {
-        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertNull(response.getData().getPanelMemberComposition());
-        verifyNoInteractions(panelCompositionService);
-    }
-
-    @Test
     public void shouldResetPanelComposition() {
-        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompositionService, true);
+        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompositionService);
         var panelComposition = new PanelMemberComposition(List.of("84"));
-        when(panelCompositionService.resetPanelCompositionIfStale(sscsCaseData, sscsCaseDataBefore))
+        when(panelCompositionService.resetPanelCompositionIfStale(sscsCaseData, Optional.of(caseDetailsBefore)))
                 .thenReturn(panelComposition);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);

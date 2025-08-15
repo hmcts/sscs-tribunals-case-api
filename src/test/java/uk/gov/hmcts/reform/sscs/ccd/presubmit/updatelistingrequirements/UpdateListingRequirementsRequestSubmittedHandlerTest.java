@@ -23,7 +23,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
@@ -53,15 +52,9 @@ public class UpdateListingRequirementsRequestSubmittedHandlerTest {
 
     @BeforeEach
     void setUp() {
-        sscsCaseData = SscsCaseData.builder()
-                .appeal(Appeal.builder().build())
-                .dwpIsOfficerAttending("Yes")
-                .build();
-        ReflectionTestUtils.setField(handler, "isDefaultPanelCompEnabled", true);
-
+        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).dwpIsOfficerAttending("Yes").build();
         caseDetails =
                 new CaseDetails<>(1234L, "SSCS", State.READY_TO_LIST, sscsCaseData, now(), "Benefit");
-
         callback = new Callback<>(caseDetails, empty(), UPDATE_LISTING_REQUIREMENTS, false);
     }
 
@@ -178,45 +171,6 @@ public class UpdateListingRequirementsRequestSubmittedHandlerTest {
 
     @Test
     void handleUpdateListingRequirementsShouldNotSendMessageWhenNoPanelCompositionOrOverrideFields() {
-        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
-        sscsCaseData.setCcdCaseId("1234");
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-                SUBMITTED,
-                callback,
-                USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-        verify(listAssistHearingMessageHelper, times(0)).sendHearingMessage(
-                anyString(), any(HearingRoute.class), any(HearingState.class), eq(null));
-    }
-
-    @Test
-    void isDefaultPanelCompNotEnabledAndPopulatedOverrideFieldsThenReturnTrue() {
-        ReflectionTestUtils.setField(handler, "isDefaultPanelCompEnabled", false);
-
-        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
-        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
-        sscsCaseData.setCcdCaseId("1234");
-
-        given(listAssistHearingMessageHelper.sendHearingMessage(
-                anyString(), any(HearingRoute.class), any(HearingState.class), eq(null)))
-                .willReturn(true);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-                SUBMITTED,
-                callback,
-                USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-        verify(listAssistHearingMessageHelper, times(1)).sendHearingMessage(
-                anyString(), any(HearingRoute.class), any(HearingState.class), eq(null));
-        assertThat(response.getData()).isNotNull();
-        assertThat(UPDATE_HEARING).isEqualTo(response.getData().getSchedulingAndListingFields().getHearingState());
-    }
-
-    @Test
-    void isDefaultPanelCompNotEnabledAndNoOverRideFieldsThenReturnFalse() {
-        ReflectionTestUtils.setField(handler, "isDefaultPanelCompEnabled", false);
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
         sscsCaseData.setCcdCaseId("1234");
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(

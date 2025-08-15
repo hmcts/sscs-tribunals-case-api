@@ -26,7 +26,6 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -65,7 +64,6 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     private final DwpDocumentService dwpDocumentService;
     private final AddNoteService addNoteService;
     private final PanelCompositionService panelCompositionService;
-    private final boolean integratedListAssistEnabled;
     private final AddedDocumentsUtil addedDocumentsUtil;
     private static final Enum<EventType> EVENT_TYPE = EventType.DWP_UPLOAD_RESPONSE;
 
@@ -73,13 +71,10 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     @Autowired
     public DwpUploadResponseAboutToSubmitHandler(DwpDocumentService dwpDocumentService, AddNoteService addNoteService,
                                                  AddedDocumentsUtil addedDocumentsUtil,
-                                                 PanelCompositionService panelCompositionService,
-                                                 @Value("${feature.default-panel-comp.enabled}")
-                                                 boolean integratedListAssistEnabled) {
+                                                 PanelCompositionService panelCompositionService) {
         this.dwpDocumentService = dwpDocumentService;
         this.addNoteService = addNoteService;
         this.panelCompositionService = panelCompositionService;
-        this.integratedListAssistEnabled = integratedListAssistEnabled;
         this.addedDocumentsUtil = addedDocumentsUtil;
     }
 
@@ -143,16 +138,15 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                 sscsCaseData.setDwpDueDate(null);
             }
         }
+
         sscsCaseData.setDirectionDueDate(getUpdatedDirectionDueDate(sscsCaseData));
         updateBenefitType(sscsCaseData);
-        var caseDetailsBefore = callback.getCaseDetailsBefore().orElse(null);
-        if (integratedListAssistEnabled && nonNull(caseDetailsBefore)) {
-            sscsCaseData.setPanelMemberComposition(panelCompositionService
-                    .resetPanelCompositionIfStale(sscsCaseData, caseDetailsBefore.getCaseData()));
-        }
+
+        sscsCaseData.setPanelMemberComposition(panelCompositionService
+                .resetPanelCompositionIfStale(sscsCaseData, callback.getCaseDetailsBefore()));
+
         return preSubmitCallbackResponse;
     }
-
 
     private void updateBenefitType(SscsCaseData caseData) {
         String benefitCode = caseData.getBenefitCode();
@@ -390,5 +384,4 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                                 .build()
                 ).build());
     }
-
 }

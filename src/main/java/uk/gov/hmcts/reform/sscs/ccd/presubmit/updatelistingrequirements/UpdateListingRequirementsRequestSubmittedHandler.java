@@ -8,7 +8,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -16,7 +15,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -27,9 +25,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMess
 @Service
 @RequiredArgsConstructor
 public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-
-    @Value("${feature.default-panel-comp.enabled}")
-    private boolean isDefaultPanelCompEnabled;
 
     private final ListAssistHearingMessageHelper listAssistHearingMessageHelper;
 
@@ -46,7 +41,6 @@ public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubm
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType,
                                                           Callback<SscsCaseData> callback,
                                                           String userAuthorisation) {
-
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         SchedulingAndListingFields caseDataSnlFields = sscsCaseData.getSchedulingAndListingFields();
 
@@ -62,16 +56,14 @@ public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubm
                             + "amend reasons: {}, for case ID: {}",
                     caseDataSnlFields.getAmendReasons(), caseId);
 
-            HearingState hearingState = UPDATE_HEARING;
-
             boolean messageSuccess = listAssistHearingMessageHelper.sendHearingMessage(
                     caseId,
                     hearingRoute,
-                    hearingState,
+                    UPDATE_HEARING,
                     null);
 
             if (messageSuccess) {
-                caseDataSnlFields.setHearingState(hearingState);
+                caseDataSnlFields.setHearingState(UPDATE_HEARING);
             } else {
                 callbackResponse.addError("An error occurred during message publish. Please try again.");
             }
@@ -82,11 +74,7 @@ public class UpdateListingRequirementsRequestSubmittedHandler implements PreSubm
 
     private boolean shouldSendHmcRequest(SscsCaseData caseData, CaseDetails<SscsCaseData> caseDetailsBefore,
                                          SchedulingAndListingFields snlFields) {
-        if (isDefaultPanelCompEnabled && nonNull(caseDetailsBefore)
-                && !Objects.equals(caseDetailsBefore.getCaseData().getPanelMemberComposition(),
-                caseData.getPanelMemberComposition())) {
-            return true;
-        }
-        return nonNull(snlFields.getOverrideFields());
+        return (nonNull(caseDetailsBefore) && !Objects.equals(caseData.getPanelMemberComposition(),
+                caseDetailsBefore.getCaseData().getPanelMemberComposition())) || nonNull(snlFields.getOverrideFields());
     }
 }
