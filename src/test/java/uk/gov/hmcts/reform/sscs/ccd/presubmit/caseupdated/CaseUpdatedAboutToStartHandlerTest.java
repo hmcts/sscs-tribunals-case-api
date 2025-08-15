@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
+import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
@@ -50,6 +51,9 @@ class CaseUpdatedAboutToStartHandlerTest {
 
     @Mock
     private VerbalLanguagesService verbalLanguagesService;
+
+    @Mock
+    private SignLanguagesService signLanguagesService;
 
     @InjectMocks
     private CaseUpdatedAboutToStartHandler handler;
@@ -224,6 +228,7 @@ class CaseUpdatedAboutToStartHandlerTest {
         given(dynamicListLanguageUtil.generateInterpreterLanguageFields(any())).willReturn(list);
         given(dynamicListLanguageUtil.getLanguageDynamicListItem(any())).willReturn(item);
         given(verbalLanguagesService.getVerbalLanguage(any())).willReturn(null);
+        given(signLanguagesService.getSignLanguage(any())).willReturn(null);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
