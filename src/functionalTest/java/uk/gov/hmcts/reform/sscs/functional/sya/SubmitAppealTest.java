@@ -35,9 +35,13 @@ import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.client.RefDataApi;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.service.RefDataService;
+import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
+import uk.gov.hmcts.reform.sscs.service.VenueService;
 import uk.gov.hmcts.reform.sscs.service.v2.SubmitAppealService;
 import uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer;
 
@@ -69,6 +73,18 @@ public class SubmitAppealTest {
     private SubmitAppealService submitAppealService;
 
     private IdamTokens idamTokens;
+
+    @Autowired
+    private VenueService venueService;
+
+    @Autowired
+    private RefDataApi refDataApi;
+
+    @Autowired
+    private VenueDataLoader venueDataLoader;
+
+    @Autowired
+    private RefDataService refDataService;
 
     @Before
     public void setup() {
