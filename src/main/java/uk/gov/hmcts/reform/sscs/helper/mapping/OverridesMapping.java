@@ -173,6 +173,7 @@ public final class OverridesMapping {
         if (YesNo.isYes(hearingOptions.getLanguageInterpreter())) {
             String verbalLanguage = hearingOptions.getLanguages();
             Language language = refData.getVerbalLanguages().getVerbalLanguage(verbalLanguage);
+            language = isNull(language) ? refData.getSignLanguages().getSignLanguage(verbalLanguage) : language;
 
             if (isNull(language)) {
                 throw new InvalidMappingException(String.format("The language %s cannot be mapped", verbalLanguage));
