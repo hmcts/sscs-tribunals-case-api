@@ -733,7 +733,11 @@ public class SscsUtil {
                 : YesNo.isYes(sscsCaseData.getAdjournment().getInterpreterRequired())
                 ? hearingDuration.getDurationInterpreter()
                 : hearingDuration.getDurationFaceToFace();
-        return duration;
+        if (!AdjournCaseTypeOfHearing.PAPER.equals(sscsCaseData.getAdjournment().getTypeOfNextHearing())) {
+            return hearingDurationsService.addExtraTimeIfNeeded(duration, hearingDuration.getBenefitCode(), hearingDuration.getIssue(), sscsCaseData.getIssueCodesForAllElementsDisputed());
+        } else {
+            return duration;
+        }
     }
 
     public static boolean hasChannelChangedForAdjournment(SscsCaseData caseData, String hearingType) {
