@@ -206,7 +206,6 @@ public class SubmitAppealTest {
         wrapper.getAppellant().setLastName("Ugirgo");
 
         SscsCaseData caseData = convertSyaToCcdCaseDataV2(wrapper, true, SscsCaseData.builder().build());
-        log.info("Appeal created: {}", caseData.getAppeal());
         SscsCaseDetails firstCaseDetails = ccdService.createCase(
             caseData,
             VALID_APPEAL_CREATED.getCcdType(),
@@ -222,7 +221,6 @@ public class SubmitAppealTest {
         log.info("New MRN date: {}", mrnDate);
 
         SscsCaseData caseData2 = convertSyaToCcdCaseDataV2(wrapper, true, SscsCaseData.builder().build());
-        log.info("Appeal created: {}", caseData2.getAppeal());
         SscsCaseDetails secondCaseDetails = ccdService.createCase(
             caseData2,
             VALID_APPEAL_CREATED.getCcdType(),
