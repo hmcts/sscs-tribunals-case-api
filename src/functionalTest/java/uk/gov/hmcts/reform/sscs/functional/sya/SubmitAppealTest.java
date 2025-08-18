@@ -27,21 +27,21 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.client.RefDataApi;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
-import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
-import uk.gov.hmcts.reform.sscs.service.VenueService;
 import uk.gov.hmcts.reform.sscs.service.v2.SubmitAppealService;
 import uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer;
 
@@ -74,16 +74,7 @@ public class SubmitAppealTest {
 
     private IdamTokens idamTokens;
 
-    @Autowired
-    private VenueService venueService;
-
-    @Autowired
-    private RefDataApi refDataApi;
-
-    @Autowired
-    private VenueDataLoader venueDataLoader;
-
-    @Autowired
+    @MockitoBean
     private RefDataService refDataService;
 
     @Before
@@ -209,15 +200,17 @@ public class SubmitAppealTest {
     @Test
     public void appealShouldCreateDuplicateAndLinked() throws InterruptedException {
         //String nino = submitHelper.getRandomNino();
-        String nino = "LN770744D";
-        log.info("Random NINO: {}", nino);
+        String nino = "HP116411B";
         LocalDate mrnDate = LocalDate.now();
-        log.info("MRN date: {}",mrnDate);
+        String lastName = "Kirk";
+        log.info("Last name: {}, NINO: {}, MRN date: {}",lastName, nino, mrnDate);
+        Mockito.when(refDataService.getCourtVenueRefDataByEpimsId("239985")).thenReturn(
+            CourtVenue.builder().courtStatus("Open").build());
 
         SyaCaseWrapper wrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS.getDeserializeMessage();
         wrapper.getAppellant().setNino(nino);
         wrapper.getMrn().setDate(mrnDate);
-        wrapper.getAppellant().setLastName("Kharn");
+        wrapper.getAppellant().setLastName(lastName);
 
         //SscsCaseData caseData = convertSyaToCcdCaseDataV2(wrapper, true, SscsCaseData.builder().build());
         //SscsCaseDetails firstCaseDetails = ccdService.createCase(
@@ -226,6 +219,7 @@ public class SubmitAppealTest {
         //    "Appeal created summary",
         //    "Appeal created description",
         //    idamTokens);
+
         Long firstCaseId = submitAppealService.submitAppeal(wrapper, idamTokens.getIdamOauth2Token());
         log.info("First SYA case created with CCD ID {}", firstCaseId);
         SscsCaseDetails firstCaseCaseDetails = ccdService.getByCaseId(firstCaseId, idamTokens);
