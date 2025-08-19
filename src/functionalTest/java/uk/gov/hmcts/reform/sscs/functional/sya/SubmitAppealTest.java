@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.functional.sya;
 import static io.restassured.RestAssured.baseURI;
 import static java.util.Objects.isNull;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -36,6 +37,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.exception.DuplicateCaseException;
@@ -214,15 +216,22 @@ public class SubmitAppealTest {
         log.info("First SYA case created with CCD ID {}", firstCaseId);
         SscsCaseDetails firstCaseDetails = ccdService.getByCaseId(firstCaseId, idamTokens);
 
-        //assertEquals("Case has incorrect state!", "validAppeal", firstCaseDetails.getState());
+        assertThat(firstCaseDetails.getState()).isIn(State.VALID_APPEAL.getId(), State.WITH_DWP.getId());
 
         mrnDate = LocalDate.now().minusMonths(12);
         wrapper.getMrn().setDate(mrnDate);
-        log.info("New MRN date: {}", mrnDate);
 
         Long secondCaseId = submitAppealService.submitAppeal(wrapper, idamTokens.getIdamOauth2Token());
-        log.info("Duplicate SYA case created with CCD ID {}", secondCaseId);
+        log.info("Duplicate SYA case created with CCD ID {} and MRN date {}", secondCaseId, mrnDate);
         SscsCaseDetails secondCaseDetails = ccdService.getByCaseId(secondCaseId, idamTokens);
+
+        log.info("Resubmitting case with id {} for second time", secondCaseDetails.getId());
+        try {
+            Long thirdCaseId = submitAppealService.submitAppeal(wrapper, idamTokens.getIdamOauth2Token());
+            fail("Duplicate case was created with ID: " + thirdCaseId);
+        } catch (DuplicateCaseException exception) {
+            log.info("True duplicate was caught");
+        }
 
         if (isNull(secondCaseDetails.getData().getAssociatedCase())) {
             log.info("Give time for evidence share to create associated case link");
@@ -235,14 +244,6 @@ public class SubmitAppealTest {
             secondCaseDetails.getId(), secondCaseDetails.getData().getAssociatedCase());
         assertEquals("Number of associated cases doesn't match!", 1, secondCaseDetails.getData().getAssociatedCase().size());
         assertEquals("Yes", secondCaseDetails.getData().getLinkedCasesBoolean());
-
-        log.info("Resubmitting case with id {} for second time", secondCaseDetails.getId());
-        try {
-            Long thirdCaseId = submitAppealService.submitAppeal(wrapper, idamTokens.getIdamOauth2Token());
-            fail("Duplicate case was created with ID: " + thirdCaseId);
-        } catch (DuplicateCaseException exception) {
-            log.info("True duplicate was not created");
-        }
 
         fail("Fail duplicate test to see log");
     }
