@@ -6,6 +6,7 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_CCD;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_CCD_CHILD_SUPPORT;
@@ -239,5 +240,7 @@ public class SubmitAppealTest {
         log.info("Submitting case with id {} a second time", secondCaseDetails.getId());
         assertThatThrownBy(() -> submitAppealService.submitAppeal(wrapper,  idamTokens.getIdamOauth2Token()))
             .isInstanceOf(DuplicateCaseException.class);
+
+        fail("Failing test");
     }
 }
