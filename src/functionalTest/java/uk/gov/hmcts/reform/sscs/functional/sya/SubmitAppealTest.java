@@ -3,9 +3,9 @@ package uk.gov.hmcts.reform.sscs.functional.sya;
 import static io.restassured.RestAssured.baseURI;
 import static java.util.Objects.isNull;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_CCD;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_CCD_CHILD_SUPPORT;
@@ -202,7 +202,7 @@ public class SubmitAppealTest {
     public void appealShouldCreateDuplicateAndLinked() throws InterruptedException {
         String nino = submitHelper.getRandomNino();
         LocalDate mrnDate = LocalDate.now();
-        log.info("NINO: {}, MRN date: {}", nino, mrnDate);
+        log.info("Generated NINO: {}, MRN date: {}", nino, mrnDate);
         Mockito.when(refDataService.getCourtVenueRefDataByEpimsId("239985")).thenReturn(
             CourtVenue.builder().courtStatus("Open").regionId("5").build());
 
@@ -221,7 +221,7 @@ public class SubmitAppealTest {
         log.info("New MRN date: {}", mrnDate);
 
         Long secondCaseId = submitAppealService.submitAppeal(wrapper, idamTokens.getIdamOauth2Token());
-        log.info("Second SYA case created with CCD ID {}", secondCaseId);
+        log.info("Duplicate SYA case created with CCD ID {}", secondCaseId);
         SscsCaseDetails secondCaseDetails = ccdService.getByCaseId(secondCaseId, idamTokens);
 
         if (isNull(secondCaseDetails.getData().getAssociatedCase())) {
@@ -230,14 +230,20 @@ public class SubmitAppealTest {
             secondCaseDetails = ccdService.getByCaseId(secondCaseDetails.getId(), idamTokens);
         }
 
-        log.info("Duplicate case {} has been created", secondCaseDetails.getId());
-
         assertNotNull("AssociatedCase was not created!", secondCaseDetails.getData().getAssociatedCase());
+        log.info("Duplicate case with reference {} is associated with cases: {}",
+            secondCaseDetails.getId(), secondCaseDetails.getData().getAssociatedCase());
         assertEquals("Number of associated cases doesn't match!", 1, secondCaseDetails.getData().getAssociatedCase().size());
         assertEquals("Yes", secondCaseDetails.getData().getLinkedCasesBoolean());
 
-        log.info("Submitting case with id {} a second time", secondCaseDetails.getId());
-        assertThatThrownBy(() -> submitAppealService.submitAppeal(wrapper,  idamTokens.getIdamOauth2Token()))
-            .isInstanceOf(DuplicateCaseException.class);
+        log.info("Resubmitting case with id {} for second time", secondCaseDetails.getId());
+        try {
+            Long thirdCaseId = submitAppealService.submitAppeal(wrapper, idamTokens.getIdamOauth2Token());
+            fail("Duplicate case was created with ID: " + thirdCaseId);
+        } catch (DuplicateCaseException exception) {
+            log.info("True duplicate was not created");
+        }
+
+        fail("Fail duplicate test to see log");
     }
 }
