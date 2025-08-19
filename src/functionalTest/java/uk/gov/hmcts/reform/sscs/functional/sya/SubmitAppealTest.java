@@ -265,8 +265,7 @@ public class SubmitAppealTest {
 
         response.then().statusCode(HttpStatus.SC_CONFLICT);
 
-        final Long thirdCaseId = getCcdIdFromLocationHeader(response.getHeader("Location"));
-        log.info("True duplicate was rejected {}", thirdCaseId);
+        log.info("True duplicate was rejected");
 
         fail("Fail duplicate test to see log");
     }
