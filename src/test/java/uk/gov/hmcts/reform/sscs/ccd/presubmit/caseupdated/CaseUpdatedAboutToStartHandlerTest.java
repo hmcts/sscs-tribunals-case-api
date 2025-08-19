@@ -217,6 +217,28 @@ class CaseUpdatedAboutToStartHandlerTest {
     }
 
     @Test
+    void givenThatOriginalLanguageFieldIsSignLanguage_thenSetDynamicListInitialValue() {
+        sscsCaseData = CaseDataUtils.buildCaseData();
+        sscsCaseData.getAppeal().getHearingOptions().setLanguages("British Sign Language (BSL)");
+
+        DynamicListItem item = new DynamicListItem("bfi", "British Sign Language (BSL)");
+        DynamicList list = new DynamicList(null, List.of(item));
+
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(dynamicListLanguageUtil.generateInterpreterLanguageFields(any())).willReturn(list);
+        given(dynamicListLanguageUtil.getLanguageDynamicListItem(any())).willReturn(item);
+        given(verbalLanguagesService.getVerbalLanguage(any())).willReturn(null);
+        given(signLanguagesService.getSignLanguage(any())).willReturn(new Language("bfi", "British Sign Language (BSL)"));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
+
+        assertThat(response.getErrors().size()).isEqualTo(0);
+        assertThat(hearingOptions.getLanguagesList()).isNotNull();
+        assertThat(hearingOptions.getLanguagesList().getValue().getLabel()).isEqualTo("British Sign Language (BSL)");
+    }
+
+    @Test
     void givenThatOriginalLanguageFieldIsNonEmptyandInvalid_thenSetDynamicListInitialValue() {
         sscsCaseData = CaseDataUtils.buildCaseData();
         sscsCaseData.getAppeal().getHearingOptions().setLanguages("Wales");
