@@ -230,27 +230,25 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             if (isYes(hearingOptions.getLanguageInterpreter()) && isNull(hearingOptions.getLanguages())) {
                 return;
             }
-            if (hasInterpreterChanged(sscsCaseData, caseDetailsBefore.get())) {
+            HearingOptions hearingOptionsBefore = ofNullable(caseDetailsBefore.get().getCaseData().getAppeal().getHearingOptions())
+                    .orElse(HearingOptions.builder().build());
+            if (hasInterpreterChanged(sscsCaseData, hearingOptionsBefore)) {
                 updateOverrideInterpreter(hearingOptions, overrideFields);
                 updateOverrideDuration(sscsCaseData, overrideFields);
-            } else if (hasLanguageChanged(sscsCaseData, caseDetailsBefore.get())) {
+            } else if (hasLanguageChanged(sscsCaseData, hearingOptionsBefore)) {
                 updateOverrideInterpreter(hearingOptions, overrideFields);
             }
             sscsCaseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
         }
     }
 
-    private boolean hasInterpreterChanged(SscsCaseData sscsCaseData, CaseDetails<SscsCaseData> caseDetailsBefore) {
+    private boolean hasInterpreterChanged(SscsCaseData sscsCaseData, HearingOptions hearingOptionsBefore) {
         String languageInterpreter = sscsCaseData.getAppeal().getHearingOptions().getLanguageInterpreter();
-        HearingOptions hearingOptionsBefore = ofNullable(caseDetailsBefore.getCaseData().getAppeal().getHearingOptions())
-                .orElse(HearingOptions.builder().build());
         String languageInterpreterBefore = hearingOptionsBefore.getLanguageInterpreter();
         return !Objects.equals(languageInterpreterBefore, languageInterpreter);
     }
 
-    private boolean hasLanguageChanged(SscsCaseData sscsCaseData, CaseDetails<SscsCaseData> caseDetailsBefore) {
-        HearingOptions hearingOptionsBefore = ofNullable(caseDetailsBefore.getCaseData().getAppeal().getHearingOptions())
-                .orElse(HearingOptions.builder().build());
+    private boolean hasLanguageChanged(SscsCaseData sscsCaseData, HearingOptions hearingOptionsBefore) {
         String languageBefore = hearingOptionsBefore.getLanguages();
         String language = sscsCaseData.getAppeal().getHearingOptions().getLanguages();
         return !Objects.equals(languageBefore, language);
@@ -259,13 +257,13 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private void updateOverrideInterpreter(HearingOptions hearingOptions, OverrideFields overrideFields) {
         String languageInterpreter = hearingOptions.getLanguageInterpreter();
         DynamicList languageList = hearingOptions.getLanguagesList();
-        DynamicList overrideList = null;
+        DynamicList overrideLanguageList = null;
         if (nonNull(hearingOptions.getLanguages())) {
-            overrideList = new DynamicList(languageList.getValue(), languageList.getListItems());
+            overrideLanguageList = new DynamicList(languageList.getValue(), languageList.getListItems());
         }
         HearingInterpreter hearingInterpreter = HearingInterpreter.builder()
                 .isInterpreterWanted(YesNo.valueOf(languageInterpreter.toUpperCase()))
-                .interpreterLanguage(overrideList).build();
+                .interpreterLanguage(overrideLanguageList).build();
         overrideFields.setAppellantInterpreter(hearingInterpreter);
     }
 
