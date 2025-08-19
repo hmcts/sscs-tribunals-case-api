@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.sscs.functional.sya;
 
+import helper.NinoGenerator;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ThreadLocalRandom;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -39,16 +39,7 @@ public class SubmitHelper {
     }
 
     public String getRandomNino() {
-        char first = randomChar("ABCEGHJKLMNPRSTWXYZ");
-        char second = randomChar("ABCEGHJKLMNPRSTWXYZ");
-        String digits = RandomStringUtils.secure().next(6, false, true);
-        char suffix = randomChar("ABCD");
-
-        return "" + first + second + digits + suffix;
-    }
-
-    private char randomChar(String pool) {
-        return pool.charAt(ThreadLocalRandom.current().nextInt(pool.length()));
+        return NinoGenerator.getRandomNino();
     }
 
     public String setBenefitCode(String body, String benefitCode) {
