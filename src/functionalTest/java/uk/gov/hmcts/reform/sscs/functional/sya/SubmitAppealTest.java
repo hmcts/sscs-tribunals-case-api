@@ -220,10 +220,16 @@ public class SubmitAppealTest {
         response.then().statusCode(HttpStatus.SC_CREATED);
 
         final Long firstCaseId = getCcdIdFromLocationHeader(response.getHeader("Location"));
-        SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(firstCaseId, idamTokens);
+        //SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(firstCaseId, idamTokens);
 
-        log.info("First SYA case created with CCD ID {}", firstCaseId);
-        assertEquals(State.VALID_APPEAL.getId(), sscsCaseDetails.getState());
+        //log.info("First SYA case created with CCD ID {}", firstCaseId);
+        //assertEquals(State.VALID_APPEAL.getId(), sscsCaseDetails.getState());
+
+        submitHelper.defaultAwait().untilAsserted(() -> {
+            SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(firstCaseId, idamTokens);
+            log.info("First SYA case created with CCD ID {}", firstCaseId);
+            assertEquals(State.VALID_APPEAL.getId(), sscsCaseDetails.getState());
+        });
 
         //create a case with different mrn date
         body = syaJsonMessageSerializer.getSerializedMessage();
@@ -242,19 +248,26 @@ public class SubmitAppealTest {
 
         final Long secondCaseId = getCcdIdFromLocationHeader(response.getHeader("Location"));
         log.info("Duplicate SYA case created with CCD ID {} and MRN date {}", secondCaseId, mrnDate);
-        SscsCaseDetails secondCaseDetails = ccdService.getByCaseId(secondCaseId, idamTokens);
+        //SscsCaseDetails secondCaseDetails = ccdService.getByCaseId(secondCaseId, idamTokens);
 
-        if (secondCaseDetails.getData().getAssociatedCase() == null) {
-            //Give time for evidence share to create associated case link
-            Thread.sleep(5000);
-            secondCaseDetails = ccdService.getByCaseId(secondCaseId, idamTokens);
-        }
+        //if (secondCaseDetails.getData().getAssociatedCase() == null) {
+        //    //Give time for evidence share to create associated case link
+        //    Thread.sleep(5000);
+        //    secondCaseDetails = ccdService.getByCaseId(secondCaseId, idamTokens);
+        //}
 
-        assertNotNull("AssociatedCase was not created!", secondCaseDetails.getData().getAssociatedCase());
-        log.info("Duplicate case with reference {} is associated with cases: {}",
-            secondCaseId, secondCaseDetails.getData().getAssociatedCase());
-        assertEquals("Number of associated cases doesn't match!", 1, secondCaseDetails.getData().getAssociatedCase().size());
-        assertEquals("Yes", secondCaseDetails.getData().getLinkedCasesBoolean());
+        submitHelper.defaultAwait().untilAsserted(() -> {
+            SscsCaseDetails secondCaseDetails = ccdService.getByCaseId(secondCaseId, idamTokens);
+            assertNotNull("AssociatedCase was not created!", secondCaseDetails.getData().getAssociatedCase());
+            assertEquals("Number of associated cases doesn't match!", 1, secondCaseDetails.getData().getAssociatedCase().size());
+            assertEquals("Yes", secondCaseDetails.getData().getLinkedCasesBoolean());
+        });
+
+        //assertNotNull("AssociatedCase was not created!", secondCaseDetails.getData().getAssociatedCase());
+        //log.info("Duplicate case with reference {} is associated with cases: {}",
+        //    secondCaseId, secondCaseDetails.getData().getAssociatedCase());
+        //assertEquals("Number of associated cases doesn't match!", 1, secondCaseDetails.getData().getAssociatedCase().size());
+        //assertEquals("Yes", secondCaseDetails.getData().getLinkedCasesBoolean());
 
         // check duplicate returns 409
         httpRequest = RestAssured.given()

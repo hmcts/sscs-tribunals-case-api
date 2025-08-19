@@ -1,9 +1,13 @@
 package uk.gov.hmcts.reform.sscs.functional.sya;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
+
 import helper.NinoGenerator;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ThreadLocalRandom;
+import org.awaitility.core.ConditionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -48,5 +52,11 @@ public class SubmitHelper {
 
     public String setDwpIssuingOffice(String body, String dwpIssuingOffice) {
         return body.replace("MRN_DWP_ISSUING_OFFICE", dwpIssuingOffice);
+    }
+
+    protected ConditionFactory defaultAwait() {
+        return await()
+            .atMost(15, SECONDS)
+            .pollInterval(2, SECONDS);
     }
 }
