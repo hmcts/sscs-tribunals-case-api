@@ -225,14 +225,6 @@ public class SubmitAppealTest {
         log.info("Duplicate SYA case created with CCD ID {} and MRN date {}", secondCaseId, mrnDate);
         SscsCaseDetails secondCaseDetails = ccdService.getByCaseId(secondCaseId, idamTokens);
 
-        log.info("Resubmitting case with id {} for second time", secondCaseDetails.getId());
-        try {
-            Long thirdCaseId = submitAppealService.submitAppeal(wrapper, idamTokens.getIdamOauth2Token());
-            fail("Duplicate case was created with ID: " + thirdCaseId);
-        } catch (DuplicateCaseException exception) {
-            log.info("True duplicate was caught");
-        }
-
         if (isNull(secondCaseDetails.getData().getAssociatedCase())) {
             log.info("Give time for evidence share to create associated case link");
             Thread.sleep(5000);
@@ -244,6 +236,14 @@ public class SubmitAppealTest {
             secondCaseDetails.getId(), secondCaseDetails.getData().getAssociatedCase());
         assertEquals("Number of associated cases doesn't match!", 1, secondCaseDetails.getData().getAssociatedCase().size());
         assertEquals("Yes", secondCaseDetails.getData().getLinkedCasesBoolean());
+
+        log.info("Resubmitting case with id {} for second time", secondCaseDetails.getId());
+        try {
+            Long thirdCaseId = submitAppealService.submitAppeal(wrapper, idamTokens.getIdamOauth2Token());
+            fail("Duplicate case was created with ID: " + thirdCaseId);
+        } catch (DuplicateCaseException exception) {
+            log.info("True duplicate was caught");
+        }
 
         fail("Fail duplicate test to see log");
     }
