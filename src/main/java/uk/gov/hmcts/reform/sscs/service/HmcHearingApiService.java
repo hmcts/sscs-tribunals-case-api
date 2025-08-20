@@ -2,10 +2,13 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Objects.isNull;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.sscs.exception.GetHearingException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -30,6 +33,7 @@ public class HmcHearingApiService {
     @Value("${core_case_data.api.url:#{null}}")
     private String dataStoreUrl;
 
+    @Retryable(retryFor = {ResponseStatusException.class, FeignException.FeignServerException.class})
     public HearingGetResponse getHearingRequest(String hearingId) throws GetHearingException {
         log.info("Sending Get Hearing Request for Hearing ID {}, {}, {}", hearingId, roleAssignmentUrl, dataStoreUrl);
         HearingGetResponse hearingResponse = hmcHearingApi.getHearingRequest(
@@ -94,6 +98,7 @@ public class HmcHearingApiService {
                 hearingPayload);
     }
 
+    @Retryable(retryFor = {ResponseStatusException.class, FeignException.FeignServerException.class})
     public HearingsGetResponse getHearingsRequest(String caseId, HmcStatus hmcStatus) {
         log.info("Sending Get Hearings Request for Case ID {}, {}, {}", caseId, roleAssignmentUrl, dataStoreUrl);
         return hmcHearingApi.getHearingsRequest(
