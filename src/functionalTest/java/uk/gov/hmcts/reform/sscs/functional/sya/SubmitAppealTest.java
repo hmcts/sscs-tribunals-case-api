@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.sscs.functional.sya;
 
 import static io.restassured.RestAssured.baseURI;
-import static java.util.Objects.isNull;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -214,30 +212,42 @@ public class SubmitAppealTest {
 
         Long firstCaseId = submitAppealService.submitAppeal(wrapper, idamTokens.getIdamOauth2Token());
         log.info("First SYA case created with CCD ID {}", firstCaseId);
-        SscsCaseDetails firstCaseDetails = ccdService.getByCaseId(firstCaseId, idamTokens);
 
-        assertThat(firstCaseDetails.getState()).isIn(State.VALID_APPEAL.getId(), State.WITH_DWP.getId());
+        submitHelper.defaultAwait().untilAsserted(() -> {
+            SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(firstCaseId, idamTokens);
+            log.info("First SYA case created with CCD ID {}", firstCaseId);
+            assertEquals(State.WITH_DWP.getId(), sscsCaseDetails.getState());
+        });
 
         mrnDate = LocalDate.now().minusMonths(12);
         wrapper.getMrn().setDate(mrnDate);
 
         Long secondCaseId = submitAppealService.submitAppeal(wrapper, idamTokens.getIdamOauth2Token());
         log.info("Duplicate SYA case created with CCD ID {} and MRN date {}", secondCaseId, mrnDate);
-        SscsCaseDetails secondCaseDetails = ccdService.getByCaseId(secondCaseId, idamTokens);
+        submitHelper.defaultAwait().untilAsserted(() -> {
+            SscsCaseDetails secondCaseDetails = ccdService.getByCaseId(secondCaseId, idamTokens);
+            assertNotNull("AssociatedCase was not created!", secondCaseDetails.getData().getAssociatedCase());
+            log.info("Duplicate case with reference {} is associated with cases: {}",
+                secondCaseDetails.getId(), secondCaseDetails.getData().getAssociatedCase());
+            assertEquals("Number of associated cases doesn't match!",
+                1, secondCaseDetails.getData().getAssociatedCase().size());
+            assertEquals("Yes", secondCaseDetails.getData().getLinkedCasesBoolean());
+        });
+        //SscsCaseDetails secondCaseDetails = ccdService.getByCaseId(secondCaseId, idamTokens);
 
-        if (isNull(secondCaseDetails.getData().getAssociatedCase())) {
-            log.info("Give time for evidence share to create associated case link");
-            Thread.sleep(5000);
-            secondCaseDetails = ccdService.getByCaseId(secondCaseDetails.getId(), idamTokens);
-        }
+        //if (isNull(secondCaseDetails.getData().getAssociatedCase())) {
+        //   log.info("Give time for evidence share to create associated case link");
+        //    Thread.sleep(5000);
+        //    secondCaseDetails = ccdService.getByCaseId(secondCaseDetails.getId(), idamTokens);
+        //}
 
-        assertNotNull("AssociatedCase was not created!", secondCaseDetails.getData().getAssociatedCase());
-        log.info("Duplicate case with reference {} is associated with cases: {}",
-            secondCaseDetails.getId(), secondCaseDetails.getData().getAssociatedCase());
-        assertEquals("Number of associated cases doesn't match!", 1, secondCaseDetails.getData().getAssociatedCase().size());
-        assertEquals("Yes", secondCaseDetails.getData().getLinkedCasesBoolean());
+        //assertNotNull("AssociatedCase was not created!", secondCaseDetails.getData().getAssociatedCase());
+        //log.info("Duplicate case with reference {} is associated with cases: {}",
+        //    secondCaseDetails.getId(), secondCaseDetails.getData().getAssociatedCase());
+        //assertEquals("Number of associated cases doesn't match!", 1, secondCaseDetails.getData().getAssociatedCase().size());
+        //assertEquals("Yes", secondCaseDetails.getData().getLinkedCasesBoolean());
 
-        log.info("Resubmitting case with id {} for second time", secondCaseDetails.getId());
+        log.info("Resubmitting case with id {} for second time", secondCaseId);
         try {
             Long thirdCaseId = submitAppealService.submitAppeal(wrapper, idamTokens.getIdamOauth2Token());
             fail("Duplicate case was created with ID: " + thirdCaseId);
