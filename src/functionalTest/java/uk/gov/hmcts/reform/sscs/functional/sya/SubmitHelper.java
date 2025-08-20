@@ -2,7 +2,10 @@ package uk.gov.hmcts.reform.sscs.functional.sya;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS;
 
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ThreadLocalRandom;
@@ -52,6 +55,17 @@ public class SubmitHelper {
 
     public String setDwpIssuingOffice(String body, String dwpIssuingOffice) {
         return body.replace("MRN_DWP_ISSUING_OFFICE", dwpIssuingOffice);
+    }
+
+    protected Response submitAppeal(String nino, LocalDate mrnDate) {
+        String body = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS.getSerializedMessage();
+        body = setNino(body, nino);
+        body = setLatestMrnDate(body, mrnDate);
+
+        return RestAssured.given()
+            .header("Content-Type", "application/json")
+            .body(body)
+            .post("/appeals");
     }
 
     protected ConditionFactory defaultAwait() {
