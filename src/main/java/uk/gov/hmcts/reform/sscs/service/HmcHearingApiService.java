@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Objects.isNull;
 
-import feign.FeignException;
+import feign.FeignException.FeignServerException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,7 +33,7 @@ public class HmcHearingApiService {
     @Value("${core_case_data.api.url:#{null}}")
     private String dataStoreUrl;
 
-    @Retryable(retryFor = {ResponseStatusException.class, FeignException.FeignServerException.class})
+    @Retryable(retryFor = {ResponseStatusException.class, FeignServerException.class})
     public HearingGetResponse getHearingRequest(String hearingId) throws GetHearingException {
         log.info("Sending Get Hearing Request for Hearing ID {}, {}, {}", hearingId, roleAssignmentUrl, dataStoreUrl);
         HearingGetResponse hearingResponse = hmcHearingApi.getHearingRequest(
@@ -98,7 +98,7 @@ public class HmcHearingApiService {
                 hearingPayload);
     }
 
-    @Retryable(retryFor = {ResponseStatusException.class, FeignException.FeignServerException.class})
+    @Retryable(retryFor = {ResponseStatusException.class, FeignServerException.class})
     public HearingsGetResponse getHearingsRequest(String caseId, HmcStatus hmcStatus) {
         log.info("Sending Get Hearings Request for Case ID {}, {}, {}", caseId, roleAssignmentUrl, dataStoreUrl);
         return hmcHearingApi.getHearingsRequest(
