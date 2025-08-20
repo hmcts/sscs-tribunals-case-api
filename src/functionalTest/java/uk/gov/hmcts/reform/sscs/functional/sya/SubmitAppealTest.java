@@ -31,7 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -40,8 +39,6 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.service.RefDataService;
-import uk.gov.hmcts.reform.sscs.service.v2.SubmitAppealService;
 import uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer;
 
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
@@ -68,13 +65,7 @@ public class SubmitAppealTest {
     @Autowired
     private CcdService ccdService;
 
-    @Autowired
-    private SubmitAppealService submitAppealService;
-
     private IdamTokens idamTokens;
-
-    @MockitoBean
-    private RefDataService refDataService;
 
     @Before
     public void setup() {
