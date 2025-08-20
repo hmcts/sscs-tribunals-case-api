@@ -43,7 +43,7 @@ public class SubmitHelper {
     }
 
     public String getRandomNino() {
-        return RandomStringUtils.random(9, true, true).toUpperCase();
+        return RandomStringUtils.secure().next(9, true, true).toUpperCase();
     }
 
     public String setBenefitCode(String body, String benefitCode) {
