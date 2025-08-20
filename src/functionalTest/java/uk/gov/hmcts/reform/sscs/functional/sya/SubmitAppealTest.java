@@ -35,7 +35,6 @@ import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -61,9 +60,6 @@ public class SubmitAppealTest {
 
     @Autowired
     private IdamService idamService;
-
-    @Autowired
-    private CcdService ccdService;
 
     private IdamTokens idamTokens;
 
@@ -212,7 +208,7 @@ public class SubmitAppealTest {
         final Long firstCaseId = getCcdIdFromLocationHeader(response.getHeader("Location"));
 
         submitHelper.defaultAwait().untilAsserted(() -> {
-            SscsCaseDetails firstCaseDetails = ccdService.getByCaseId(firstCaseId, idamTokens);
+            SscsCaseDetails firstCaseDetails = submitHelper.findCaseInCcd(firstCaseId, idamTokens);
             log.info("First SYA case created with CCD ID {}", firstCaseId);
             assertEquals(State.WITH_DWP.getId(),firstCaseDetails.getState());
         });
@@ -236,7 +232,7 @@ public class SubmitAppealTest {
         log.info("Duplicate SYA case created with CCD ID {} and MRN date {}", secondCaseId, mrnDate);
 
         submitHelper.defaultAwait().untilAsserted(() -> {
-            SscsCaseDetails secondCaseDetails = ccdService.getByCaseId(secondCaseId, idamTokens);
+            SscsCaseDetails secondCaseDetails = submitHelper.findCaseInCcd(secondCaseId, idamTokens);
             assertNotNull("AssociatedCase was not created!", secondCaseDetails.getData().getAssociatedCase());
             log.info("Duplicate case with reference {} is associated with cases: {}", secondCaseDetails.getId(), secondCaseDetails.getData().getAssociatedCase());
             assertEquals("Number of associated cases doesn't match!", 1, secondCaseDetails.getData().getAssociatedCase().size());
