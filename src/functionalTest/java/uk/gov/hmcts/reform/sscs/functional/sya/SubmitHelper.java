@@ -43,16 +43,7 @@ public class SubmitHelper {
     }
 
     public String getRandomNino() {
-        char first = randomChar("ABCEGHJKLMNPRSTWXYZ");
-        char second = randomChar("ABCEGHJKLMNPRSTWXYZ");
-        String digits = RandomStringUtils.secure().next(6, false, true);
-        char suffix = randomChar("ABCD");
-
-        return "" + first + second + digits + suffix;
-    }
-
-    private char randomChar(String pool) {
-        return pool.charAt(ThreadLocalRandom.current().nextInt(pool.length()));
+        return RandomStringUtils.random(9, true, true).toUpperCase();
     }
 
     public String setBenefitCode(String body, String benefitCode) {
