@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS
 
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import java.time.LocalDate;
 import junitparams.JUnitParamsRunner;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,6 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,10 +38,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
-import uk.gov.hmcts.reform.sscs.exception.DuplicateCaseException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.v2.SubmitAppealService;
 import uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer;
@@ -199,61 +197,72 @@ public class SubmitAppealTest {
     }
 
     @Test
-    public void appealShouldCreateDuplicateAndLinked() throws InterruptedException {
+    public void appealShouldCreateDuplicateAndLinked() {
+        SyaJsonMessageSerializer syaJsonMessageSerializer = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS;
+        String body = syaJsonMessageSerializer.getSerializedMessage();
         String nino = submitHelper.getRandomNino();
+
+        body = submitHelper.setNino(body, nino);
+
         LocalDate mrnDate = LocalDate.now();
-        log.info("Generated NINO: {}, MRN date: {}", nino, mrnDate);
-        Mockito.when(refDataService.getCourtVenueRefDataByEpimsId("239985")).thenReturn(
-            CourtVenue.builder().courtStatus("Open").regionId("5").build());
+        body = submitHelper.setLatestMrnDate(body, mrnDate);
 
-        SyaCaseWrapper wrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS.getDeserializeMessage();
+        SyaCaseWrapper wrapper = syaJsonMessageSerializer.getDeserializeMessage();
         wrapper.getAppellant().setNino(nino);
-        wrapper.getMrn().setDate(mrnDate);
+        log.info("Generated NINO: {}, MRN date: {}", nino, mrnDate);
 
-        Long firstCaseId = submitAppealService.submitAppeal(wrapper, idamTokens.getIdamOauth2Token());
-        log.info("First SYA case created with CCD ID {}", firstCaseId);
+        RequestSpecification httpRequest = RestAssured.given()
+            .body(body)
+            .header("Content-Type", "application/json");
+
+        Response response = httpRequest.post("/appeals");
+
+        response.then().statusCode(HttpStatus.SC_CREATED);
+        final Long firstCaseId = getCcdIdFromLocationHeader(response.getHeader("Location"));
 
         submitHelper.defaultAwait().untilAsserted(() -> {
-            SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(firstCaseId, idamTokens);
+            SscsCaseDetails firstCaseDetails = ccdService.getByCaseId(firstCaseId, idamTokens);
             log.info("First SYA case created with CCD ID {}", firstCaseId);
-            assertEquals(State.WITH_DWP.getId(), sscsCaseDetails.getState());
+            assertEquals(State.WITH_DWP.getId(),firstCaseDetails.getState());
         });
 
-        mrnDate = LocalDate.now().minusMonths(12);
-        wrapper.getMrn().setDate(mrnDate);
+        //create a case with different mrn date
+        body = syaJsonMessageSerializer.getSerializedMessage();
+        body = submitHelper.setNino(body, nino);
 
-        Long secondCaseId = submitAppealService.submitAppeal(wrapper, idamTokens.getIdamOauth2Token());
+        mrnDate = LocalDate.now().minusMonths(12);
+        body = submitHelper.setLatestMrnDate(body, mrnDate);
+
+        httpRequest = RestAssured.given()
+            .body(body)
+            .header("Content-Type", "application/json");
+
+        response = httpRequest.post("/appeals");
+
+        response.then().statusCode(HttpStatus.SC_CREATED);
+
+        final Long secondCaseId = getCcdIdFromLocationHeader(response.getHeader("Location"));
         log.info("Duplicate SYA case created with CCD ID {} and MRN date {}", secondCaseId, mrnDate);
+
         submitHelper.defaultAwait().untilAsserted(() -> {
             SscsCaseDetails secondCaseDetails = ccdService.getByCaseId(secondCaseId, idamTokens);
             assertNotNull("AssociatedCase was not created!", secondCaseDetails.getData().getAssociatedCase());
-            log.info("Duplicate case with reference {} is associated with cases: {}",
-                secondCaseDetails.getId(), secondCaseDetails.getData().getAssociatedCase());
-            assertEquals("Number of associated cases doesn't match!",
-                1, secondCaseDetails.getData().getAssociatedCase().size());
+            log.info("Duplicate case with reference {} is associated with cases: {}", secondCaseDetails.getId(), secondCaseDetails.getData().getAssociatedCase());
+            assertEquals("Number of associated cases doesn't match!", 1, secondCaseDetails.getData().getAssociatedCase().size());
             assertEquals("Yes", secondCaseDetails.getData().getLinkedCasesBoolean());
         });
-        //SscsCaseDetails secondCaseDetails = ccdService.getByCaseId(secondCaseId, idamTokens);
 
-        //if (isNull(secondCaseDetails.getData().getAssociatedCase())) {
-        //   log.info("Give time for evidence share to create associated case link");
-        //    Thread.sleep(5000);
-        //    secondCaseDetails = ccdService.getByCaseId(secondCaseDetails.getId(), idamTokens);
-        //}
+        log.info("Resubmitting case with nino {} and mrn date {} for second time", nino, mrnDate);
+        // check duplicate returns 409
+        httpRequest = RestAssured.given()
+            .body(body)
+            .header("Content-Type", "application/json");
 
-        //assertNotNull("AssociatedCase was not created!", secondCaseDetails.getData().getAssociatedCase());
-        //log.info("Duplicate case with reference {} is associated with cases: {}",
-        //    secondCaseDetails.getId(), secondCaseDetails.getData().getAssociatedCase());
-        //assertEquals("Number of associated cases doesn't match!", 1, secondCaseDetails.getData().getAssociatedCase().size());
-        //assertEquals("Yes", secondCaseDetails.getData().getLinkedCasesBoolean());
+        response = httpRequest.post("/appeals");
 
-        log.info("Resubmitting case with id {} for second time", secondCaseId);
-        try {
-            Long thirdCaseId = submitAppealService.submitAppeal(wrapper, idamTokens.getIdamOauth2Token());
-            fail("Duplicate case was created with ID: " + thirdCaseId);
-        } catch (DuplicateCaseException exception) {
-            log.info("True duplicate was caught");
-        }
+        response.then().statusCode(HttpStatus.SC_CONFLICT);
+
+        log.info("True duplicate was rejected");
 
         fail("Fail duplicate test to see log");
     }
