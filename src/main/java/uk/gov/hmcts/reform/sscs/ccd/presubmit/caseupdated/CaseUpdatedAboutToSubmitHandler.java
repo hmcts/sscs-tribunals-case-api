@@ -213,7 +213,10 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (sscsCaseData.isIbcCase()) {
             SscsUtil.setListAssistRoutes(sscsCaseData);
         }
-        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(updateOverrideFields(sscsCaseData, caseDetailsBefore));
+        OverrideFields updatedOverrideFields = updateOverrideFields(sscsCaseData, caseDetailsBefore);
+        if (!updatedOverrideFields.isAllNull()) {
+            sscsCaseData.getSchedulingAndListingFields().setOverrideFields(updatedOverrideFields);
+        }
         sscsCaseData.setPanelMemberComposition(panelCompositionService
                 .resetPanelCompositionIfStale(sscsCaseData, caseDetailsBefore));
         return preSubmitCallbackResponse;
