@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournment;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -137,7 +138,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerMainTest extends IssueAdj
         adjournment.setTypeOfNextHearing(FACE_TO_FACE);
         adjournment.setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.STANDARD);
         setupHearingDurationValues();
-
+        when(hearingDurationsService.addExtraTimeIfNeeded(any(), any(), any(), any())).thenReturn(90);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         var schedulingAndListingFields = response.getData().getSchedulingAndListingFields();
@@ -159,8 +160,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerMainTest extends IssueAdj
         adjournment.setInterpreterRequired(NO);
         adjournment.setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.STANDARD);
         setupHearingDurationValues();
-
-
+        when(hearingDurationsService.addExtraTimeIfNeeded(any(), any(), any(), any())).thenReturn(60);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -184,6 +184,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerMainTest extends IssueAdj
         hearingDuration.setDurationPaper(30);
         hearingDuration.setDurationFaceToFace(null);
         when(hearingDurationsService.getHearingDuration(eq(sscsCaseData.getBenefitCode()), eq(sscsCaseData.getIssueCode()))).thenReturn(hearingDuration);
+        when(hearingDurationsService.addExtraTimeIfNeeded(any(), any(), any(), any())).thenReturn(null);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
