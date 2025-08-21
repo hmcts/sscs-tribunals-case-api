@@ -1875,7 +1875,8 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         sscsCaseDataBefore.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("No").build());
         sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("Yes").build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields(), nullValue());
+        OverrideFields overrideFields = response.getData().getSchedulingAndListingFields().getOverrideFields();
+        assertThat(overrideFields.isAllNull(), is(true));
     }
 
     @Test

@@ -213,23 +213,20 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (sscsCaseData.isIbcCase()) {
             SscsUtil.setListAssistRoutes(sscsCaseData);
         }
-        updateOverrideFields(sscsCaseData, caseDetailsBefore);
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(updateOverrideFields(sscsCaseData, caseDetailsBefore));
         sscsCaseData.setPanelMemberComposition(panelCompositionService
                 .resetPanelCompositionIfStale(sscsCaseData, caseDetailsBefore));
         return preSubmitCallbackResponse;
     }
 
-    private void updateOverrideFields(SscsCaseData sscsCaseData, Optional<CaseDetails<SscsCaseData>> caseDetailsBefore) {
-        if (isNull(sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues()) || caseDetailsBefore.isEmpty()) {
-            return;
-        }
+    private OverrideFields updateOverrideFields(SscsCaseData sscsCaseData, Optional<CaseDetails<SscsCaseData>> caseDetailsBefore) {
         OverrideFields overrideFields = ofNullable(sscsCaseData.getSchedulingAndListingFields().getOverrideFields())
                 .orElse(OverrideFields.builder().build());
+        if (isNull(sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues()) || caseDetailsBefore.isEmpty()) {
+            return overrideFields;
+        }
         HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
         if (nonNull(hearingOptions)) {
-            if (isYes(hearingOptions.getLanguageInterpreter()) && isNull(hearingOptions.getLanguages())) {
-                return;
-            }
             HearingOptions hearingOptionsBefore = ofNullable(caseDetailsBefore.get().getCaseData().getAppeal().getHearingOptions())
                     .orElse(HearingOptions.builder().build());
             if (hasInterpreterChanged(sscsCaseData, hearingOptionsBefore)) {
@@ -238,8 +235,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             } else if (hasLanguageChanged(sscsCaseData, hearingOptionsBefore)) {
                 updateOverrideInterpreter(hearingOptions, overrideFields);
             }
-            sscsCaseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
         }
+        return overrideFields;
     }
 
     private boolean hasInterpreterChanged(SscsCaseData sscsCaseData, HearingOptions hearingOptionsBefore) {
