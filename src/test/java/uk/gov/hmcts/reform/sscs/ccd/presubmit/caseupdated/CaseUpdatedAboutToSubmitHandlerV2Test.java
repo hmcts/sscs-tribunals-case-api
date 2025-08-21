@@ -1865,7 +1865,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         sscsCaseDataBefore.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("No").build());
         sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("No").build());
         sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder().duration(60).build());
-        sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder().build());
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter(), nullValue());
     }
@@ -1875,8 +1875,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         sscsCaseDataBefore.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("No").build());
         sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("Yes").build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        OverrideFields overrideFields = response.getData().getSchedulingAndListingFields().getOverrideFields();
-        assertThat(overrideFields.isAllNull(), is(true));
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields(), nullValue());
     }
 
     @Test
