@@ -2,28 +2,23 @@ package uk.gov.hmcts.reform.sscs.helper.mapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode.PIP_NEW_CLAIM;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.TRIBUNAL_MEMBER_MEDICAL;
 
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Issue;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMember;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SessionCategory;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsIndustrialInjuriesData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
@@ -33,20 +28,14 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.MemberType;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelPreference;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
 import uk.gov.hmcts.reform.sscs.reference.data.model.DefaultPanelComposition;
-import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
-import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
-import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
+@ExtendWith(MockitoExtension.class)
 class HearingsPanelMappingTest extends HearingsMappingBase {
 
     public static final String IIDB_BENEFIT_CODE = "067";
     public static final String JUDGE_JOH_CODE = "84";
 
-    @Mock
-    private SessionCategoryMapService sessionCategoryMaps;
-    @Mock
-    private ReferenceDataServiceHolder refData;
     @Mock
     private PanelCompositionService panelCompositionService;
 
@@ -55,17 +44,16 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
     @BeforeEach
     public void setUp() {
         hearingsPanelMapping = new HearingsPanelMapping(panelCompositionService);
-        ReflectionTestUtils.setField(hearingsPanelMapping, "defaultPanelCompEnabled", true);
     }
 
     @DisplayName("When no data is given getPanelRequirements returns the valid but empty PanelRequirements")
     @Test
     void testGetPanelRequirements() {
-        given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
-
         SscsCaseData caseData = SscsCaseData.builder().build();
+        when(panelCompositionService.getDefaultPanelComposition(any()))
+                .thenReturn(new DefaultPanelComposition(ISSUE_CODE, caseData));
 
-        PanelRequirements result = hearingsPanelMapping.getPanelRequirements(caseData, refData);
+        PanelRequirements result = hearingsPanelMapping.getPanelRequirements(caseData);
 
         assertThat(result).isNotNull();
         assertThat(result.getRoleTypes()).isEmpty();
@@ -78,20 +66,25 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
     @DisplayName("getRoleTypes returns TRIBUNALS_MEMBER_MEDICAL when benefit is IIDB and feature flag is disabled")
     @Test
     void shouldReturnTribunalsMemberMedicalWhenBenefitIsIndustrialInjuriesDisablementBenefit() {
-        ReflectionTestUtils.setField(hearingsPanelMapping, "defaultPanelCompEnabled", false);
         caseData.setBenefitCode(IIDB_BENEFIT_CODE);
-        when(refData.getSessionCategoryMaps()).thenReturn(sessionCategoryMaps);
-        PanelRequirements result = hearingsPanelMapping.getPanelRequirements(caseData, refData);
+        when(panelCompositionService.getDefaultPanelComposition(any()))
+                .thenReturn(new DefaultPanelComposition(ISSUE_CODE, caseData));
+        when(panelCompositionService.getRoleTypes(any())).thenReturn(List.of(TRIBUNAL_MEMBER_MEDICAL.getReference()));
+
+        PanelRequirements result = hearingsPanelMapping.getPanelRequirements(caseData);
+
         assertThat(result.getRoleTypes()).contains(PanelMemberType.TRIBUNAL_MEMBER_MEDICAL.getReference());
     }
 
     @DisplayName("HearingsPanelMapping should call panelCompositionService and return role types when feature flag is enabled")
     @Test
     void shouldPopulateRoleTypesFromPanelCompositionServiceWhenFeatureFlagIsEnabled() {
-        ReflectionTestUtils.setField(hearingsPanelMapping, "defaultPanelCompEnabled", true);
-        when(refData.getSessionCategoryMaps()).thenReturn(sessionCategoryMaps);
         when(panelCompositionService.getRoleTypes(caseData)).thenReturn(List.of(JUDGE_JOH_CODE));
-        PanelRequirements result = hearingsPanelMapping.getPanelRequirements(caseData, refData);
+        when(panelCompositionService.getDefaultPanelComposition(any()))
+                .thenReturn(new DefaultPanelComposition(ISSUE_CODE, caseData));
+
+        PanelRequirements result = hearingsPanelMapping.getPanelRequirements(caseData);
+
         assertThat(result.getRoleTypes()).isNotEmpty();
         assertThat(result.getRoleTypes()).contains(JUDGE_JOH_CODE);
     }
@@ -215,30 +208,24 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
     @DisplayName("When a case is given with a second doctor getPanelRequirements returns the valid PanelRequirements")
     @ParameterizedTest
     @CsvSource(value = {
-        "cardiologist,eyeSurgeon,1|3",
-        "null,carer,2",
+        "cardiologist,eyeSurgeon,58|58,1|3",
+        "carer,null,58,2",
+        "null,null,58,|",
     }, nullValues = {"null"})
-    void testGetPanelSpecialisms(String doctorSpecialism, String doctorSpecialismSecond, String expected) {
-
+    void testGetPanelSpecialisms(String doctorSpecialism, String secondSpecialism, String johTiers, String expected) {
         DefaultPanelComposition panelComposition = new DefaultPanelComposition();
-        panelComposition.setCategory("6");
-        panelComposition.setJohTiers(List.of("58"));
+        panelComposition.setJohTiers(splitCsvParamArray(johTiers));
         when(panelCompositionService.getDefaultPanelComposition(any())).thenReturn(panelComposition);
-
-        SessionCategoryMap sessionCategoryMap = new SessionCategoryMap(
-                PIP_NEW_CLAIM, Issue.DD, true, false, SessionCategory.CATEGORY_06, null
-        );
         SscsCaseData caseData = SscsCaseData.builder()
             .benefitCode(BENEFIT_CODE).issueCode(ISSUE_CODE)
             .sscsIndustrialInjuriesData(SscsIndustrialInjuriesData.builder()
-                .panelDoctorSpecialism(doctorSpecialism).secondPanelDoctorSpecialism(doctorSpecialismSecond).build())
+                .panelDoctorSpecialism(doctorSpecialism).secondPanelDoctorSpecialism(secondSpecialism).build())
             .build();
-        List<String> result = hearingsPanelMapping.getPanelSpecialisms(caseData, sessionCategoryMap);
+
+        List<String> result = hearingsPanelMapping.getPanelSpecialisms(caseData);
 
         List<String> expectedList = splitCsvParamArray(expected);
-        assertThat(result)
-            .containsExactlyInAnyOrderElementsOf(expectedList);
-
+        assertThat(result).containsExactlyInAnyOrderElementsOf(expectedList);
     }
 
     @DisplayName("When a case is given with no second doctor getPanelRequirements returns the valid PanelRequirements")
@@ -247,34 +234,24 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
         "generalPractitioner,4",
     }, nullValues = {"null"})
     void testGetPanelSpecialisms(String doctorSpecialism, String expected) {
-
         DefaultPanelComposition panelComposition = new DefaultPanelComposition();
         panelComposition.setCategory("5");
         panelComposition.setJohTiers(List.of("58"));
         when(panelCompositionService.getDefaultPanelComposition(any())).thenReturn(panelComposition);
-
         var sscsIiData =
                 SscsIndustrialInjuriesData.builder().panelDoctorSpecialism(doctorSpecialism).build();
         SscsCaseData caseData = SscsCaseData.builder()
                 .benefitCode(BENEFIT_CODE).issueCode(ISSUE_CODE).sscsIndustrialInjuriesData(sscsIiData).build();
-        SessionCategoryMap sessionCategoryMap = new SessionCategoryMap(
-                PIP_NEW_CLAIM, Issue.DD, false, false, SessionCategory.CATEGORY_05, null);
-        List<String> result = hearingsPanelMapping.getPanelSpecialisms(caseData, sessionCategoryMap);
+
+        List<String> result = hearingsPanelMapping.getPanelSpecialisms(caseData);
 
         List<String> expectedList = splitCsvParamArray(expected);
-        assertThat(result)
-            .containsExactlyInAnyOrderElementsOf(expectedList);
-
+        assertThat(result).containsExactlyInAnyOrderElementsOf(expectedList);
     }
 
     @DisplayName("When an case has a null doctor specialism return an empty list.")
     @Test
     void testWhenAnCaseHasAnNullDoctorSpecialismReturnAnEmptyList() {
-
-        SessionCategoryMap sessionCategoryMap = new SessionCategoryMap(PIP_NEW_CLAIM, Issue.DD,
-            false, false, SessionCategory.CATEGORY_05, null
-        );
-
         SscsCaseData caseData = SscsCaseData.builder()
             .benefitCode(BENEFIT_CODE)
             .issueCode(ISSUE_CODE)
@@ -285,79 +262,37 @@ class HearingsPanelMappingTest extends HearingsMappingBase {
         DefaultPanelComposition panelComposition = new DefaultPanelComposition();
         panelComposition.setCategory("5");
         when(panelCompositionService.getDefaultPanelComposition(any())).thenReturn(panelComposition);
-        List<String> result = hearingsPanelMapping.getPanelSpecialisms(caseData, sessionCategoryMap);
+
+        List<String> result = hearingsPanelMapping.getPanelSpecialisms(caseData);
 
         List<String> expectedList = Collections.emptyList();
         assertThat(result)
             .containsExactlyInAnyOrderElementsOf(expectedList);
-
     }
 
     @DisplayName("When a panel composition has no session category then return empty list.")
     @Test
     void testWhenEmptyPanelCompositionSessionCategoryReturnAnEmptyList() {
-        SessionCategoryMap sessionCategoryMap = new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                false, false, SessionCategory.CATEGORY_05, null
-        );
-
-        SscsCaseData caseData = SscsCaseData.builder()
-                .benefitCode(BENEFIT_CODE)
-                .issueCode(ISSUE_CODE)
-                .build();
+        SscsCaseData caseData = SscsCaseData.builder().benefitCode(BENEFIT_CODE).issueCode(ISSUE_CODE).build();
         DefaultPanelComposition panelComposition = new DefaultPanelComposition();
         when(panelCompositionService.getDefaultPanelComposition(any())).thenReturn(panelComposition);
-        List<String> result = hearingsPanelMapping.getPanelSpecialisms(caseData, sessionCategoryMap);
+        List<String> result = hearingsPanelMapping.getPanelSpecialisms(caseData);
 
         List<String> expectedList = Collections.emptyList();
-        assertThat(result)
-                .containsExactlyInAnyOrderElementsOf(expectedList);
+        assertThat(result).containsExactlyInAnyOrderElementsOf(expectedList);
     }
 
     @DisplayName("When a case benefit is CHILD_SUPPORT then return empty list.")
     @Test
     void testWhenAnCaseBenefitChildSupportReturnAnEmptyList() {
-
-        SessionCategoryMap sessionCategoryMap = new SessionCategoryMap(BenefitCode.CHILD_SUPPORT_ASSESSMENTS, Issue.DD,
-                                                                       false, false, SessionCategory.CATEGORY_05, null
-        );
-
         SscsCaseData caseData = SscsCaseData.builder()
-            .benefitCode(CHILD_SUPPORT_BENEFIT_CODE)
-            .issueCode(ISSUE_CODE)
-            .sscsIndustrialInjuriesData(SscsIndustrialInjuriesData.builder()
-                                            .panelDoctorSpecialism("doesntexist")
-                                            .build())
-            .build();
+            .benefitCode(CHILD_SUPPORT_BENEFIT_CODE).issueCode(ISSUE_CODE)
+            .sscsIndustrialInjuriesData(SscsIndustrialInjuriesData.builder().panelDoctorSpecialism("doesntexist")
+                    .build()).build();
 
-        List<String> result = hearingsPanelMapping.getPanelSpecialisms(caseData, sessionCategoryMap);
+        List<String> result = hearingsPanelMapping.getPanelSpecialisms(caseData);
 
         List<String> expectedList = Collections.emptyList();
-        assertThat(result)
-            .containsExactlyInAnyOrderElementsOf(expectedList);
-
+        assertThat(result).containsExactlyInAnyOrderElementsOf(expectedList);
     }
-
-
-    @DisplayName("When a non doctor panel member is given getPanelMemberSpecialism returns the valid reference")
-    @ParameterizedTest
-    @EnumSource(
-        value = PanelMember.class,
-        mode = EnumSource.Mode.EXCLUDE,
-        names = {"FQPM", "MQPM1", "MQPM2"}
-    )
-    void testGetPanelMemberSpecialism(PanelMember value) {
-        // added FQPM to the exclude list because LA is not currently set up to handle specialism for this type.
-        String result = HearingsPanelMapping.getPanelMemberSpecialism(value, null, null);
-
-        assertThat(result).isEqualTo(value.getReference());
-    }
-
-    @DisplayName("When the Panel Member is type FQPM, then return null for specialism")
-    @Test
-    void testGivenFqpmPanelMemberThenReturnNullForSpecialism() {
-        // LA is not currently set up to handle specialism for FQPM panel members.
-        String result = HearingsPanelMapping.getPanelMemberSpecialism(PanelMember.FQPM, null, null);
-        assertThat(result).isNull();
-    }
-
 }

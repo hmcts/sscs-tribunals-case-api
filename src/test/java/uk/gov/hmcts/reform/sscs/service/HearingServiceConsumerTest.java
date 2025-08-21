@@ -45,40 +45,28 @@ import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.helper.mapping.OverridesMapping;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HmcUpdateResponse;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
-import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
-import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @ExtendWith(MockitoExtension.class)
 public class HearingServiceConsumerTest {
+
     private static final long HEARING_REQUEST_ID = 12345;
     private static final long CASE_ID = 1625080769409918L;
     private static final String BENEFIT_CODE = "002";
     private static final String ISSUE_CODE = "DD";
     private static final String PROCESSING_VENUE = "Processing Venue";
 
-    private SscsCaseData caseData;
-
-    @Mock
-    public HearingDurationsService hearingDurations;
-
-    @Mock
-    public SessionCategoryMapService sessionCategoryMaps;
-
-    @Mock
-    private VenueService venueService;
-
     @Mock
     HmcUpdateResponse response;
-
     @Mock
     private ReferenceDataServiceHolder refData;
-
     @Mock
     private OverridesMapping overridesMapping;
 
     @InjectMocks
     private HearingServiceConsumer hearingServiceConsumer;
+
+    private SscsCaseData caseData;
 
     @BeforeEach
     void setup() {

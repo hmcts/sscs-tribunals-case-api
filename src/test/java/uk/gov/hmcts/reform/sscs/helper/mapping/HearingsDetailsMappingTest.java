@@ -28,11 +28,13 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.HearingLocation;
@@ -42,17 +44,15 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDetails;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
-import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
+@ExtendWith(MockitoExtension.class)
 class HearingsDetailsMappingTest extends HearingsMappingBase {
 
     @Mock
     private HearingDurationsService hearingDurations;
-    @Mock
-    private SessionCategoryMapService sessionCategoryMaps;
     @Mock
     private ReferenceDataServiceHolder refData;
     @Mock
@@ -109,7 +109,6 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
     @DisplayName("When a valid hearing wrapper is given buildHearingDetails returns the correct Hearing Details")
     @Test
     void buildHearingDetails() throws ListingException {
-
         given(refData.getHearingDurations()).willReturn(hearingDurations);
         given(refData.getVenueService()).willReturn(venueService);
 
@@ -144,7 +143,7 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
             .caseData(caseData)
             .build();
 
-        given(hearingsPanelMapping.getPanelRequirements(caseData, refData))
+        given(hearingsPanelMapping.getPanelRequirements(caseData))
                 .willReturn(PanelRequirements.builder().roleTypes(List.of()).build());
 
         HearingDetails hearingDetails = hearingsDetailsMapping.buildHearingDetails(wrapper, refData);

@@ -53,7 +53,7 @@ public final class HearingsDetailsMapping {
         SscsCaseData caseData = wrapper.getCaseData();
         boolean adjournmentInProgress = isYes(caseData.getAdjournment().getAdjournmentInProgress());
         return HearingDetails.builder()
-                .autolistFlag(hearingsAutoListMapping.shouldBeAutoListed(caseData, refData))
+                .autolistFlag(hearingsAutoListMapping.shouldBeAutoListed(caseData))
                 .hearingType(getHearingType(caseData))
                 .hearingWindow(buildHearingWindow(caseData, refData))
                 .duration(getHearingDuration(caseData, refData))
@@ -67,7 +67,7 @@ public final class HearingsDetailsMapping {
                 .hearingRequester(getHearingRequester())
                 .privateHearingRequiredFlag(isPrivateHearingRequired())
                 .leadJudgeContractType(getLeadJudgeContractType())
-                .panelRequirements(hearingsPanelMapping.getPanelRequirements(caseData, refData))
+                .panelRequirements(hearingsPanelMapping.getPanelRequirements(caseData))
                 .hearingIsLinkedFlag(isCaseLinked(caseData))
                 .amendReasonCodes(getAmendReasonCodes(caseData))
                 .hearingChannels(getHearingChannels(caseData, adjournmentInProgress))

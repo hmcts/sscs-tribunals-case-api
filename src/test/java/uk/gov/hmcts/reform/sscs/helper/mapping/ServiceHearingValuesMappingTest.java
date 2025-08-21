@@ -8,6 +8,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsWindowMapping.DAYS_TO_ADD_HEARING_WINDOW_TODAY;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.CaseCategoryType.CASE_SUBTYPE;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.CaseCategoryType.CASE_TYPE;
@@ -32,12 +34,9 @@ import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.PartyFlags;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.ServiceHearingValues;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.CaseCategory;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingWindow;
-import uk.gov.hmcts.reform.sscs.model.single.hearing.RelatedParty;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingPriority;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
-import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
-import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
@@ -48,41 +47,27 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
 
     private static final String NOTE_FROM_OTHER_PARTY = "other party note";
     private static final String NOTE_FROM_APPELLANT = "appellant note";
-
     public static final String BENEFIT = "Benefit";
-
-    public static final String APPELLANT_PARTY_ID = "a2b837d5-ee28-4bc9-a3d8-ce2d2de9fb296292997e-14d4-4814-a163-e64018d2c441";
+    public static final String APPELLANT_PARTY_ID =
+            "a2b837d5-ee28-4bc9-a3d8-ce2d2de9fb296292997e-14d4-4814-a163-e64018d2c441";
     public static final String REPRESENTATIVE_PARTY_ID = "a2b837d5-ee28-4bc9-a3d8-ce2d2de9fb29";
     public static final String OTHER_PARTY_ID = "4dd6b6fa-6562-4699-8e8b-6c70cf8a333e";
-    private static final SessionCategoryMap sessionCategoryMap =
-            new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-        false, false, SessionCategory.CATEGORY_06, null);
 
     @Mock
     public VerbalLanguagesService verbalLanguages;
-
     @Mock
     public SignLanguagesService signLanguages;
-
     @Mock
     private ReferenceDataServiceHolder refData;
-
-    @Mock
-    private SessionCategoryMapService sessionCategoryMaps;
-
     @Mock
     private VenueService venueService;
     private SscsCaseData caseData;
-
     @Mock
     private HearingsPanelMapping hearingsPanelMapping;
-
     @Mock
     private PanelCompositionService panelCompositionService;
-
     @Mock
     private HearingsAutoListMapping hearingsAutoListMapping;
-
     @Mock
     private HearingsCaseMapping hearingsCaseMapping;
 
@@ -90,30 +75,18 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
 
     @BeforeEach
     public void setUp() {
-        serviceHearingValuesMapping = new ServiceHearingValuesMapping(hearingsPanelMapping, hearingsAutoListMapping, panelCompositionService, hearingsCaseMapping);
+        serviceHearingValuesMapping = new ServiceHearingValuesMapping(hearingsPanelMapping, hearingsAutoListMapping,
+                panelCompositionService, hearingsCaseMapping);
         caseData = SscsCaseData.builder()
-            .ccdCaseId("1234")
-            .benefitCode(BENEFIT_CODE)
-            .issueCode(ISSUE_CODE)
-            .urgentCase("Yes")
-            .adjournment(Adjournment.builder()
-                .adjournmentInProgress(YesNo.NO)
-                .canCaseBeListedRightAway(YesNo.YES)
-                .build())
+            .ccdCaseId("1234").benefitCode(BENEFIT_CODE).issueCode(ISSUE_CODE).urgentCase("Yes")
+            .adjournment(Adjournment.builder().adjournmentInProgress(NO).canCaseBeListedRightAway(YES).build())
             .caseManagementLocation(CaseManagementLocation.builder()
-                .baseLocation("LIVERPOOL SOCIAL SECURITY AND CHILD SUPPORT TRIBUNAL")
-                .region("North West")
-                .build())
+                .baseLocation("LIVERPOOL SOCIAL SECURITY AND CHILD SUPPORT TRIBUNAL").region("North West").build())
             .appeal(Appeal.builder()
                 .hearingType("final")
                 .appellant(Appellant.builder()
                     .id(APPELLANT_PARTY_ID)
-                    .name(Name.builder()
-                        .firstName("Fred")
-                        .lastName("Flintstone")
-                        .title("Mr")
-                        .build())
-                    .build())
+                        .name(Name.builder().firstName("Fred").lastName("Flintstone").title("Mr").build()).build())
                 .hearingSubtype(HearingSubtype.builder()
                     .hearingTelephoneNumber("0999733733")
                     .hearingVideoEmail("test@gmail.com")
@@ -122,16 +95,9 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
                     .wantsHearingTypeVideo("No")
                     .build())
                 .hearingOptions(HearingOptions.builder()
-                    .wantsToAttend("Yes")
-                    .wantsSupport("Yes")
-                    .languageInterpreter("Yes")
-                    .languages("Bulgarian")
-                    .signLanguageType("Makaton")
-                    .arrangements(Arrays.asList(
-                        "signLanguageInterpreter",
-                        "hearingLoop",
-                        "disabledAccess"
-                    ))
+                        .wantsToAttend("Yes").wantsSupport("Yes")
+                        .languageInterpreter("Yes").languages("Bulgarian").signLanguageType("Makaton")
+                        .arrangements(Arrays.asList("signLanguageInterpreter", "hearingLoop", "disabledAccess"))
                     .scheduleHearing("No")
                     .excludeDates(getExcludeDates())
                     .agreeLessNotice("No")
@@ -140,49 +106,28 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
                 .rep(Representative.builder()
                     .id(REPRESENTATIVE_PARTY_ID)
                     .hasRepresentative("Yes")
-                    .name(Name.builder()
-                        .title("Mr")
-                        .firstName("Harry")
-                        .lastName("Potter")
-                        .build())
-                    .address(Address.builder()
-                        .line1("123 Hairy Lane")
-                        .line2("Off Hairy Park")
-                        .town("Town")
-                        .county("County")
-                        .postcode("CM14 4LQ")
-                        .build())
+                    .name(Name.builder().title("Mr").firstName("Harry").lastName("Potter").build())
+                    .address(Address.builder().line1("123 Hairy Lane").line2("Off Hairy Park")
+                            .town("Town").county("County").postcode("CM14 4LQ").build())
                     .contact(Contact.builder()
-                        .email("harry.potter@wizards.com")
-                        .mobile("07411999999")
-                        .phone(null)
-                        .build())
-                    .build())
+                            .email("harry.potter@wizards.com").mobile("07411999999").phone(null).build()).build())
                 .build())
             .events(getEventsOfCaseData())
             .languagePreferenceWelsh("No")
             .otherParties(getOtherParties())
             .linkedCasesBoolean("No")
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
-                .overrideFields(OverrideFields.builder()
-                    .duration(30).build()).build())
+                .overrideFields(OverrideFields.builder().duration(30).build()).build())
             .sscsIndustrialInjuriesData(SscsIndustrialInjuriesData.builder()
-                .panelDoctorSpecialism("cardiologist")
-                .secondPanelDoctorSpecialism("eyeSurgeon")
-                .build())
+                .panelDoctorSpecialism("cardiologist").secondPanelDoctorSpecialism("eyeSurgeon").build())
             .build();
 
-        given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
-
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
-
         given(refData.getSignLanguages()).willReturn(signLanguages);
-
         given(refData.getVerbalLanguages().getVerbalLanguage("Bulgarian"))
-                .willReturn(new Language("bul","Test", null, null,null,List.of("Bulgarian")));
-
+                .willReturn(new Language("bul","Test", null, null,null, List.of("Bulgarian")));
         given(refData.getSignLanguages().getSignLanguage("Makaton"))
-                .willReturn(new Language("sign-mkn","Test",null, null,null,List.of("Makaton")));
+                .willReturn(new Language("sign-mkn","Test",null, null,null, List.of("Makaton")));
     }
 
     @Test
@@ -195,7 +140,7 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
                 CaseCategory.builder().categoryType(CASE_SUBTYPE).categoryValue("BBA3-002-DD").build()
         );
 
-        given(hearingsCaseMapping.buildCaseCategories(eq(caseData), eq(refData))).willReturn(caseCategories);
+        given(hearingsCaseMapping.buildCaseCategories(eq(caseData))).willReturn(caseCategories);
 
         // when
         final ServiceHearingValues serviceHearingValues = serviceHearingValuesMapping.mapServiceHearingValues(caseData, refData);
@@ -236,7 +181,7 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
     @Test
     void shouldMapPartiesInServiceHearingValues() throws ListingException {
         // given
-        caseData.setDwpIsOfficerAttending(YesNo.YES.getValue());
+        caseData.setDwpIsOfficerAttending(YES.getValue());
         given(refData.getVenueService()).willReturn(venueService);
         // when
         final ServiceHearingValues serviceHearingValues = serviceHearingValuesMapping.mapServiceHearingValues(caseData, refData);
@@ -327,8 +272,8 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
                                              .title("Mr")
                                              .build())
                                    .address(Address.builder().build())
-                                   .confidentialityRequired(YesNo.NO)
-                                   .unacceptableCustomerBehaviour(YesNo.YES)
+                                   .confidentialityRequired(NO)
+                                   .unacceptableCustomerBehaviour(YES)
                                    .hearingSubtype(HearingSubtype.builder()
                                                        .hearingTelephoneNumber("0999733735")
                                                        .hearingVideoEmail("test2@gmail.com")
@@ -352,10 +297,10 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
                                    .otherPartySubscription(Subscription.builder().build())
                                    .otherPartyAppointeeSubscription(Subscription.builder().build())
                                    .otherPartyRepresentativeSubscription(Subscription.builder().build())
-                                   .sendNewOtherPartyNotification(YesNo.NO)
+                                   .sendNewOtherPartyNotification(NO)
                                    .reasonableAdjustment(ReasonableAdjustmentDetails.builder()
                                                              .reasonableAdjustmentRequirements("Some adjustments...")
-                                                             .wantsReasonableAdjustment(YesNo.YES)
+                                                             .wantsReasonableAdjustment(YES)
                                                              .build())
                                    .appointeeReasonableAdjustment(ReasonableAdjustmentDetails.builder().build())
                                    .repReasonableAdjustment(ReasonableAdjustmentDetails.builder().build())
@@ -367,11 +312,6 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
             }
         };
     }
-
-    private List<RelatedParty> getRelatedParties() {
-        return new ArrayList<>();
-    }
-
 
     private List<ExcludeDate> getExcludeDates() {
         return new ArrayList<>() {

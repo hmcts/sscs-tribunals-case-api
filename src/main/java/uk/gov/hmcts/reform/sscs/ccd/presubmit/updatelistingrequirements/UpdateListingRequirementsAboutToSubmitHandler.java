@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.DISTRICT_TRIBUNAL_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
@@ -29,9 +30,6 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @RequiredArgsConstructor
 public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    @Value("${feature.default-panel-comp.enabled}")
-    private boolean isDefaultPanelCompEnabled;
-
     private final HearingDurationsService hearingDurationsService;
 
 
@@ -53,41 +51,16 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
         }
 
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        ReserveTo callbackReserveTo = callbackResponse.getData().getSchedulingAndListingFields().getReserveTo();
-        SchedulingAndListingFields caseDataSnlFields = sscsCaseData.getSchedulingAndListingFields();
-
-        if (nonNull(callbackReserveTo)) {
-            YesNo callbackReservedDtj = callbackReserveTo.getReservedDistrictTribunalJudge();
-            ReserveTo caseDataReserveTo = caseDataSnlFields.getReserveTo();
-            caseDataReserveTo.setReservedDistrictTribunalJudge(callbackReservedDtj);
-
-            if (isYes(callbackReservedDtj)) {
-                caseDataReserveTo.setReservedJudge(null);
-            }
+        if ("NoMedicalMemberRequired"
+                .equals(sscsCaseData.getPanelMemberComposition().getPanelCompositionMemberMedical1())) {
+            sscsCaseData.getPanelMemberComposition().clearMedicalMembers();
         }
+        resetReservedJudgeFields(sscsCaseData);
+        syncConfirmPanelComposition(callbackResponse.getData());
 
-        if (isDefaultPanelCompEnabled && callbackResponse.getData().getPanelMemberComposition() != null) {
-            if ("NoMedicalMemberRequired".equals(
-                    callbackResponse.getData().getPanelMemberComposition().getPanelCompositionMemberMedical1()
-            )) {
-                callbackResponse.getData().getPanelMemberComposition().clearMedicalMembers();
-            }
-
-            if (nonNull(callbackReserveTo) && isYes(callbackReserveTo.getReservedDistrictTribunalJudge())) {
-                callbackResponse.getData().getPanelMemberComposition().setPanelCompositionJudge(null);
-                callbackResponse.getData().getPanelMemberComposition()
-                        .setDistrictTribunalJudge(DISTRICT_TRIBUNAL_JUDGE.getReference());
-            } else {
-                callbackResponse.getData().getPanelMemberComposition().setDistrictTribunalJudge(null);
-            }
-
-            syncConfirmPanelComposition(callbackResponse.getData());
-        }
-
-        OverrideFields overrideFields = caseDataSnlFields.getOverrideFields();
+        OverrideFields overrideFields = sscsCaseData.getSchedulingAndListingFields().getOverrideFields();
 
         if (nonNull(overrideFields) && !overrideFields.isAllNull()) {
             HearingChannel hearingChannel = overrideFields.getAppellantHearingChannel();
@@ -100,14 +73,12 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 SscsUtil.updateHearingInterpreter(sscsCaseData, callbackResponse, appellantInterpreter);
             }
             if (updateDuration) {
-                sscsCaseData.getSchedulingAndListingFields().getOverrideFields().setDuration(
-                        hearingDurationsService.getHearingDurationBenefitIssueCodes(sscsCaseData)
-                );
+                overrideFields.setDuration(hearingDurationsService.getHearingDurationBenefitIssueCodes(sscsCaseData));
             }
         }
       
         sscsCaseData.getAppeal()
-            .setHearingOptions(Optional.ofNullable(sscsCaseData.getAppeal().getHearingOptions())
+            .setHearingOptions(ofNullable(sscsCaseData.getAppeal().getHearingOptions())
                 .map(HearingOptions::toBuilder)
                 .orElseGet(HearingOptions::builder)
                 .hmcHearingType(getHmcHearingType(sscsCaseData))
@@ -115,27 +86,18 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
         return callbackResponse;
     }
 
-    private boolean updateHearingDuration(SscsCaseData sscsCaseData, Optional<CaseDetails<SscsCaseData>> sscsCaseDataBefore) {
-        if (nonNull(sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getDuration()) || isNull(sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues())) {
-            return false;
+    private void resetReservedJudgeFields(SscsCaseData caseData) {
+        YesNo reservedDtj = ofNullable(caseData.getSchedulingAndListingFields().getReserveTo())
+                .orElse(new ReserveTo()).getReservedDistrictTribunalJudge();
+
+        if (isYes(reservedDtj)) {
+            caseData.getSchedulingAndListingFields().getReserveTo().setReservedJudge(null);
+            caseData.getPanelMemberComposition().setPanelCompositionJudge(null);
+            caseData.getPanelMemberComposition()
+                    .setDistrictTribunalJudge(DISTRICT_TRIBUNAL_JUDGE.getReference());
+        } else {
+            caseData.getPanelMemberComposition().setDistrictTribunalJudge(null);
         }
-        boolean channelUpdated = false;
-        boolean interpreterUpdated = false;
-        if (sscsCaseDataBefore.isPresent()) {
-            OverrideFields overrideFieldsBefore = sscsCaseDataBefore.get().getCaseData().getSchedulingAndListingFields().getOverrideFields();
-            HearingChannel channelBefore = nonNull(overrideFieldsBefore) ? overrideFieldsBefore.getAppellantHearingChannel() : null;
-            HearingChannel channelCurrent = sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getAppellantHearingChannel();
-            channelUpdated = !Objects.equals(channelBefore, channelCurrent);
-        }
-        HearingInterpreter appellantInterpreter = sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter();
-        if (nonNull(appellantInterpreter.getIsInterpreterWanted())) {
-            Optional<HearingOptions> hearingOptions = Optional.ofNullable(sscsCaseData.getAppeal().getHearingOptions());
-            String caseInterpreter = hearingOptions.isPresent() && nonNull(hearingOptions.get().getLanguageInterpreter())
-                    ? hearingOptions.get().getLanguageInterpreter()
-                    : "No";
-            interpreterUpdated = YesNo.isYes(caseInterpreter) != YesNo.isYes(appellantInterpreter.getIsInterpreterWanted());
-        }
-        return channelUpdated || interpreterUpdated;
     }
 
     private void syncConfirmPanelComposition(SscsCaseData sscsCaseData) {
@@ -144,8 +106,40 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
         sscsCaseData.setIsFqpmRequired(panelMemberComposition.hasFqpm() ? YES : NO);
 
         if (sscsCaseData.isIbcCase()) {
-            sscsCaseData.setIsMedicalMemberRequired(
-                panelMemberComposition.hasMedicalMember() ? YES : NO);
+            sscsCaseData.setIsMedicalMemberRequired(panelMemberComposition.hasMedicalMember() ? YES : NO);
         }
+    }
+
+    private boolean updateHearingDuration(SscsCaseData sscsCaseData,
+                                          Optional<CaseDetails<SscsCaseData>> caseDetailsBeforeOpt) {
+        var snlFields = sscsCaseData.getSchedulingAndListingFields();
+        if (nonNull(snlFields.getOverrideFields().getDuration()) || isNull(snlFields.getDefaultListingValues())) {
+            return false;
+        }
+        return isChannelUpdated(caseDetailsBeforeOpt, snlFields) || isInterpreterUpdated(sscsCaseData);
+    }
+
+    private static boolean isChannelUpdated(Optional<CaseDetails<SscsCaseData>> caseDetailsBeforeOpt,
+                                            SchedulingAndListingFields snlFields) {
+        var caseDetailsBefore = caseDetailsBeforeOpt
+                .orElseThrow(() -> new RuntimeException("CaseDeatailsBefore cannot be empty"));
+        OverrideFields overrideFieldsBefore =
+                caseDetailsBefore.getCaseData().getSchedulingAndListingFields().getOverrideFields();
+        HearingChannel channelBefore =
+                nonNull(overrideFieldsBefore) ? overrideFieldsBefore.getAppellantHearingChannel() : null;
+        HearingChannel channelCurrent = snlFields.getOverrideFields().getAppellantHearingChannel();
+        return !Objects.equals(channelBefore, channelCurrent);
+    }
+
+    private static boolean isInterpreterUpdated(SscsCaseData sscsCaseData) {
+        HearingInterpreter appellantInterpreter =
+                sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter();
+        if (nonNull(appellantInterpreter.getIsInterpreterWanted())) {
+            Optional<HearingOptions> hearingOptions = ofNullable(sscsCaseData.getAppeal().getHearingOptions());
+            var caseInterpreter = hearingOptions.isPresent() && nonNull(hearingOptions.get().getLanguageInterpreter())
+                    ? hearingOptions.get().getLanguageInterpreter() : "No";
+            return isYes(caseInterpreter) != isYes(appellantInterpreter.getIsInterpreterWanted());
+        }
+        return false;
     }
 }

@@ -287,7 +287,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             }
         }
 
-        if (isYes(adjournment.getInterpreterRequired())) {
+        if (nonNull(adjournment.getInterpreterRequired())) {
             HearingInterpreter interpreter = HearingInterpreter.builder()
                 .interpreterLanguage(adjournment.getInterpreterLanguage())
                 .isInterpreterWanted(adjournment.getInterpreterRequired())
