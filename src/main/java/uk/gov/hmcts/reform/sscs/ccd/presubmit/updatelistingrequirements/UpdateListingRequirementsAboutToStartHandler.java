@@ -6,7 +6,6 @@ import static java.util.Objects.requireNonNull;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -31,9 +30,6 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
 
     private final PanelCompositionService panelCompositionService;
     private final DynamicListLanguageUtil utils;
-
-    @Value("${feature.default-panel-comp.enabled}")
-    private final boolean isDefaultPanelCompEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -76,31 +72,25 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
             overrideFields.setHmcHearingType(sscsCaseData.getHmcHearingType());
         }
 
-        if (isDefaultPanelCompEnabled) {
-            if (isNull(sscsCaseData.getPanelMemberComposition())
-                    || sscsCaseData.getPanelMemberComposition().isEmpty()) {
-                var johTiers = panelCompositionService.getDefaultPanelComposition(sscsCaseData).getJohTiers();
-                sscsCaseData.setPanelMemberComposition(new PanelMemberComposition(johTiers));
-                log.info("Setting default JOH tiers ({}) on case ({})", johTiers, caseId);
-            }
-            if (nonNull(sscsCaseData.getPanelMemberComposition())
-                    && nonNull(sscsCaseData.getPanelMemberComposition().getPanelCompositionJudge())) {
-                if (isNull(schedulingAndListingFields.getReserveTo())) {
-                    schedulingAndListingFields.setReserveTo(ReserveTo.builder().build());
-                }
-                schedulingAndListingFields.getReserveTo().setReservedDistrictTribunalJudge(YesNo.NO);
-            }
+        if (isNull(sscsCaseData.getPanelMemberComposition())
+                || sscsCaseData.getPanelMemberComposition().isEmpty()) {
+            var johTiers = panelCompositionService.getDefaultPanelComposition(sscsCaseData).getJohTiers();
+            sscsCaseData.setPanelMemberComposition(new PanelMemberComposition(johTiers));
+            log.info("Setting default JOH tiers ({}) on case ({})", johTiers, caseId);
         }
 
+        if (nonNull(sscsCaseData.getPanelMemberComposition().getPanelCompositionJudge())) {
+            if (isNull(schedulingAndListingFields.getReserveTo())) {
+                schedulingAndListingFields.setReserveTo(ReserveTo.builder().build());
+            }
+            schedulingAndListingFields.getReserveTo().setReservedDistrictTribunalJudge(YesNo.NO);
+        }
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
     private OverrideFields initialiseOverrideFields() {
-        HearingInterpreter appellantInterpreter = HearingInterpreter.builder().build();
-
-        OverrideFields overrideFields = new OverrideFields();
-        overrideFields.setAppellantInterpreter(appellantInterpreter);
-
-        return overrideFields;
+        return OverrideFields.builder()
+                .appellantInterpreter(HearingInterpreter.builder().build())
+                .build();
     }
 }

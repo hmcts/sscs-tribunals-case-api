@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -24,7 +25,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
@@ -35,7 +35,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ReserveTo;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.reference.data.model.DefaultPanelComposition;
@@ -61,7 +60,7 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
         CaseDetails<SscsCaseData> caseDetails =
                 new CaseDetails<>(1234L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
         callback = new Callback<>(caseDetails, empty(), UPDATE_LISTING_REQUIREMENTS, false);
-        handler = new UpdateListingRequirementsAboutToStartHandler(panelCompositionService, utils, false);
+        handler = new UpdateListingRequirementsAboutToStartHandler(panelCompositionService, utils);
     }
 
     @Test
@@ -71,11 +70,11 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
 
     @Test
     public void handleNonInitiatedUpdateListingRequirementsSandL() {
-
         DynamicListItem item = new DynamicListItem("abcd", "Abcd Abcd");
         DynamicList list = new DynamicList(item, List.of(item));
-
         given(utils.generateInterpreterLanguageFields(any())).willReturn(list);
+        given(panelCompositionService.getDefaultPanelComposition(eq(sscsCaseData)))
+                .willReturn(new DefaultPanelComposition());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
@@ -93,11 +92,12 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
         DynamicList list = new DynamicList(item, List.of(item));
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
         given(utils.generateInterpreterLanguageFields(any())).willReturn(list);
+        given(panelCompositionService.getDefaultPanelComposition(eq(sscsCaseData)))
+                .willReturn(new DefaultPanelComposition());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         HearingInterpreter interpreter = response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter();
-
         assertEquals(0, response.getErrors().size());
         assertNotNull(interpreter);
         assertNotNull(interpreter.getInterpreterLanguage());
@@ -110,6 +110,8 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
         DynamicList list = new DynamicList(item, List.of(item));
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
         given(utils.generateInterpreterLanguageFields(any())).willReturn(list);
+        given(panelCompositionService.getDefaultPanelComposition(eq(sscsCaseData)))
+                .willReturn(new DefaultPanelComposition());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
@@ -130,8 +132,9 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
                 .build())
             .build();
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
-
         given(utils.generateInterpreterLanguageFields(any())).willReturn(interpreterLanguage);
+        given(panelCompositionService.getDefaultPanelComposition(eq(sscsCaseData)))
+                .willReturn(new DefaultPanelComposition());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
@@ -150,6 +153,8 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
         sscsCaseData.setHmcHearingType(expectedHearingType);
         DynamicList interpreterLanguage = new DynamicList(null, List.of());
         given(utils.generateInterpreterLanguageFields(any())).willReturn(interpreterLanguage);
+        given(panelCompositionService.getDefaultPanelComposition(eq(sscsCaseData)))
+                .willReturn(new DefaultPanelComposition());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
@@ -162,6 +167,8 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
         sscsCaseData.setHmcHearingType(null);
         DynamicList interpreterLanguage = new DynamicList(null, List.of());
         given(utils.generateInterpreterLanguageFields(any())).willReturn(interpreterLanguage);
+        given(panelCompositionService.getDefaultPanelComposition(eq(sscsCaseData)))
+                .willReturn(new DefaultPanelComposition());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
@@ -171,7 +178,7 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
 
     @Test
     public void setReserveToJudgeToNoIfPanelCompositionJudgeSelected() {
-        handler = new UpdateListingRequirementsAboutToStartHandler(panelCompositionService, utils, true);
+        handler = new UpdateListingRequirementsAboutToStartHandler(panelCompositionService, utils);
         sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").build());
         DynamicList interpreterLanguage = new DynamicList(null, List.of());
         given(utils.generateInterpreterLanguageFields(any())).willReturn(interpreterLanguage);
@@ -183,23 +190,8 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
     }
 
     @Test
-    public void leaveReserveToJudgeIfDefaultPanelCompDisabled() {
-        ReflectionTestUtils.setField(handler, "isDefaultPanelCompEnabled", false);
-        sscsCaseData.getSchedulingAndListingFields().setReserveTo(ReserveTo.builder()
-                .reservedDistrictTribunalJudge(YesNo.YES).build());
-        sscsCaseData.setPanelMemberComposition(PanelMemberComposition.builder().panelCompositionJudge("84").build());
-        DynamicList interpreterLanguage = new DynamicList(null, List.of());
-        given(utils.generateInterpreterLanguageFields(any())).willReturn(interpreterLanguage);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-        assertThat(response.getData().getSchedulingAndListingFields().getReserveTo().getReservedDistrictTribunalJudge()).isEqualTo(YesNo.YES);
-    }
-
-    @Test
     public void whenPanelCompositionIsEmptyOrNull_thenPopulatePanelCompositionWithDefaultValues() {
-        handler = new UpdateListingRequirementsAboutToStartHandler(panelCompositionService, utils, true);
+        handler = new UpdateListingRequirementsAboutToStartHandler(panelCompositionService, utils);
         DynamicList interpreterLanguage = new DynamicList(null, List.of());
         given(utils.generateInterpreterLanguageFields(any())).willReturn(interpreterLanguage);
         var johTiers = List.of("50", "84");
@@ -225,7 +217,6 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
         var response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         verifyNoInteractions(panelCompositionService);
-
         assertEquals("22", response.getData().getPanelMemberComposition().getPanelCompositionJudge());
         assertEquals("58", response.getData().getPanelMemberComposition().getPanelCompositionMemberMedical1());
         assertNull(response.getData().getPanelMemberComposition().getPanelCompositionDisabilityAndFqMember());

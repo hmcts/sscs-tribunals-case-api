@@ -51,6 +51,23 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerMainTest extends IssueAdj
         assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isEqualTo(SPANISH);
     }
 
+    @DisplayName("Given an adjournment event with language interpreter set to no and case has existing interpreter, "
+        + "then overwrite existing interpreter in hearing options")
+    @Test
+    void givenAdjournmentEventWithLanguageInterpreterNotRequiredAndCaseHasExistingInterpreter_overwriteExistingInterpreter() {
+        callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterRequired(NO);
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder()
+            .languageInterpreter(YES.getValue())
+            .languages("French")
+            .build());
+        setupHearingDurationValues();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo(NO.getValue());
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter().getIsInterpreterWanted()).isEqualTo(NO);
+    }
+
     @DisplayName("Given an adjournment event with language interpreter required and interpreter language set, "
         + "then do not display error")
     @Test

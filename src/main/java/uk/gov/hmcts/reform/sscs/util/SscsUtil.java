@@ -85,7 +85,6 @@ import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingDuration;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
-import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
@@ -404,23 +403,6 @@ public class SscsUtil {
 
     public static boolean isGapsCase(SscsCaseData sscsCaseData) {
         return GAPS.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute());
-    }
-
-    public static void validateBenefitIssueCode(SscsCaseData caseData,
-                                                PreSubmitCallbackResponse<SscsCaseData> response,
-                                                SessionCategoryMapService categoryMapService) {
-        boolean isSecondDoctorPresent = isNotBlank(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism());
-        boolean fqpmRequired = isYes(caseData.getIsFqpmRequired());
-
-
-        if (isNull(Benefit.getBenefitFromBenefitCode(caseData.getBenefitCode()))) {
-            response.addError(BENEFIT_CODE_NOT_IN_USE);
-        }
-
-        if (isNull(categoryMapService.getSessionCategory(caseData.getBenefitCode(), caseData.getIssueCode(),
-            isSecondDoctorPresent, fqpmRequired))) {
-            response.addError(INVALID_BENEFIT_ISSUE_CODE);
-        }
     }
 
     public static String buildWriteFinalDecisionHeldBefore(SscsCaseData caseData, @NonNull String signedInJudgeName) {
