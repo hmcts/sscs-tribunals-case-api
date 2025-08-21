@@ -310,7 +310,7 @@ def versions = [
         springsecurity : '6.5.1',
         jackson        : '2.19.0',
         lombok         : '1.18.38',
-        commonsio      : '2.19.0',
+        commonsio      : '2.20.0',
         openfeign      : '13.6'
 ]
 
@@ -420,7 +420,7 @@ dependencies {
 
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.9.0'
+    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.10.1'
     implementation group: 'me.xdrop', name: 'fuzzywuzzy', version: '1.4.0'
 
     contractTestImplementation sourceSets.main.runtimeClasspath
