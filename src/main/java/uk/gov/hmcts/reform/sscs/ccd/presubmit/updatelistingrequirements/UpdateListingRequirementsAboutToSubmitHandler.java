@@ -14,7 +14,6 @@ import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -29,9 +28,6 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @Slf4j
 @RequiredArgsConstructor
 public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-    
-    @Value("${feature.hearing-duration.enabled}")
-    private boolean isHearingDurationEnabled;
 
     private final HearingDurationsService hearingDurationsService;
 
@@ -70,8 +66,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             if (nonNull(hearingChannel)) {
                 SscsUtil.updateHearingChannel(sscsCaseData, hearingChannel);
             }
-            boolean updateDuration =
-                    isHearingDurationEnabled && updateHearingDuration(sscsCaseData, callback.getCaseDetailsBefore());
+            boolean updateDuration = updateHearingDuration(sscsCaseData, callback.getCaseDetailsBefore());
             HearingInterpreter appellantInterpreter = overrideFields.getAppellantInterpreter();
             if (nonNull(appellantInterpreter)) {
                 SscsUtil.updateHearingInterpreter(sscsCaseData, callbackResponse, appellantInterpreter);
