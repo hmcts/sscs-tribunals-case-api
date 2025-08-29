@@ -222,6 +222,7 @@ class OverridesMappingTest {
         given(refData.getHearingDurations()).willReturn(hearingDurations);
         given(refData.getVenueService()).willReturn(venueService);
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
+        given(refData.getSignLanguages()).willReturn(signLanguages);
 
         overridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData, true);
         OverrideFields result = caseData.getSchedulingAndListingFields().getDefaultListingValues();
@@ -252,6 +253,8 @@ class OverridesMappingTest {
         given(refData.getHearingDurations()).willReturn(hearingDurations);
         given(refData.getVenueService()).willReturn(venueService);
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
+        given(refData.getSignLanguages()).willReturn(signLanguages);
+
 
         overridesMapping.setOverrideValues(wrapper.getCaseData(), refData, true);
         OverrideFields result = caseData.getSchedulingAndListingFields().getOverrideFields();
@@ -284,6 +287,7 @@ class OverridesMappingTest {
         given(refData.getHearingDurations()).willReturn(hearingDurations);
         given(refData.getVenueService()).willReturn(venueService);
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
+        given(refData.getSignLanguages()).willReturn(signLanguages);
 
         OverrideFields defaultListingValues = new OverrideFields().toBuilder()
             .autoList(NO)
@@ -323,6 +327,7 @@ class OverridesMappingTest {
             .willReturn(language);
 
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
+        given(refData.getSignLanguages()).willReturn(signLanguages);
 
         HearingInterpreter result = OverridesMapping.getAppellantInterpreter(appeal, refData);
 
@@ -354,6 +359,8 @@ class OverridesMappingTest {
             .willReturn(language);
 
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
+        given(refData.getSignLanguages()).willReturn(signLanguages);
+
 
         HearingInterpreter result = OverridesMapping.getAppellantInterpreter(appeal, refData);
 
@@ -521,6 +528,8 @@ class OverridesMappingTest {
             .willReturn(language);
 
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
+        given(refData.getSignLanguages()).willReturn(signLanguages);
+
 
         Language result = OverridesMapping.getInterpreterLanguage(hearingOptions, refData);
 
