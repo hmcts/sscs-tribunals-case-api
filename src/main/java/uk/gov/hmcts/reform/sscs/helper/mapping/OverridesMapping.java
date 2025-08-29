@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.helper.mapping;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
 
 import jakarta.validation.Valid;
@@ -9,7 +10,6 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -47,7 +47,7 @@ public final class OverridesMapping {
     }
 
     public static OverrideFields getDefaultListingValues(@Valid SscsCaseData caseData) {
-        OverrideFields defaultListingValues = Optional.ofNullable(caseData)
+        OverrideFields defaultListingValues = ofNullable(caseData)
                 .map(SscsCaseData::getSchedulingAndListingFields)
                 .map(SchedulingAndListingFields::getDefaultListingValues)
                 .orElse(OverrideFields.builder().build());
@@ -59,14 +59,14 @@ public final class OverridesMapping {
     }
 
     public static OverrideFields getOverrideFields(@Valid SscsCaseData caseData) {
-        return Optional.ofNullable(caseData)
+        return ofNullable(caseData)
                 .map(SscsCaseData::getSchedulingAndListingFields)
                 .map(SchedulingAndListingFields::getOverrideFields)
                 .orElse(OverrideFields.builder().build());
     }
 
     public static List<AmendReason> getAmendReasonCodes(@Valid SscsCaseData caseData) {
-        return Optional.ofNullable(caseData.getSchedulingAndListingFields().getAmendReasons())
+        return ofNullable(caseData.getSchedulingAndListingFields().getAmendReasons())
                 .orElse(Collections.emptyList());
     }
   
@@ -162,9 +162,9 @@ public final class OverridesMapping {
 
         if (isTrue(hearingOptions.wantsSignLanguageInterpreter())) {
             String signLanguage = hearingOptions.getSignLanguageType();
-            Language language = refData.getSignLanguages().getSignLanguage(signLanguage);
             String verbalLanguage = hearingOptions.getLanguages();
-            language = isNull(language) ? refData.getSignLanguages().getSignLanguage(verbalLanguage) : language;
+            Language language = ofNullable(refData.getSignLanguages().getSignLanguage(signLanguage))
+                    .orElse(refData.getSignLanguages().getSignLanguage(verbalLanguage));
             if (isNull(language)) {
                 throw new InvalidMappingException(String.format("The language %s cannot be mapped", signLanguage));
             }
@@ -173,8 +173,8 @@ public final class OverridesMapping {
         }
         if (YesNo.isYes(hearingOptions.getLanguageInterpreter())) {
             String verbalLanguage = hearingOptions.getLanguages();
-            Language language = refData.getVerbalLanguages().getVerbalLanguage(verbalLanguage);
-            language = isNull(language) ? refData.getSignLanguages().getSignLanguage(verbalLanguage) : language;
+            Language language = ofNullable(refData.getVerbalLanguages().getVerbalLanguage(verbalLanguage))
+                    .orElse(refData.getSignLanguages().getSignLanguage(verbalLanguage));
 
             if (isNull(language)) {
                 throw new InvalidMappingException(String.format("The language %s cannot be mapped", verbalLanguage));
