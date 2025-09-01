@@ -233,7 +233,7 @@ class CaseUpdatedAboutToStartHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
 
-        assertThat(response.getErrors().size()).isEqualTo(0);
+        assertThat(response.getErrors()).isEmpty();
         assertThat(hearingOptions.getLanguagesList()).isNotNull();
         assertThat(hearingOptions.getLanguagesList().getValue().getLabel()).isEqualTo("British Sign Language (BSL)");
     }
