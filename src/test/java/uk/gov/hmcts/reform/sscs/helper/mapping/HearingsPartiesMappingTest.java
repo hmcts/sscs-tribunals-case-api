@@ -550,6 +550,10 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
     void testGetIndividualInterpreterLanguage(String value) {
         given(verbalLanguages.getVerbalLanguage(value))
                 .willReturn(null);
+        given(signLanguages.getSignLanguage(value))
+                .willReturn(null);
+        given(refData.getSignLanguages()).willReturn(signLanguages);
+
 
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
 
