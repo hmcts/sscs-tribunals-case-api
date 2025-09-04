@@ -47,6 +47,7 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.HmcUpdateResponse;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingDuration;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
+import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.CcdCaseService;
 import uk.gov.hmcts.reform.sscs.service.HearingsService;
@@ -91,6 +92,8 @@ public class HearingRequestHandlerIT {
     private HmcHearingApi hearingApi;
     @MockitoBean
     private UpdateCcdCaseService updateCcdCaseService;
+    @Autowired
+    private SignLanguagesService signLanguagesService;
 
     @Test
     public void testHearingsUpdateCaseV2() throws UpdateCaseException, TribunalsEventProcessingException, GetCaseException {
@@ -110,6 +113,7 @@ public class HearingRequestHandlerIT {
         when(venueService.getActiveRegionalEpimsIdsForRpc(any())).thenReturn(List.of(VenueDetails.builder().epimsId("1").build()));
         when(venueService.getEpimsIdForVenue(any())).thenReturn("1");
         when(refData.getVerbalLanguages()).thenReturn(verbalLanguages);
+        when(refData.getSignLanguages()).thenReturn(signLanguagesService);
         when(verbalLanguages.getVerbalLanguage(any())).thenReturn(Language.builder().reference("LANG").build());
         HmcUpdateResponse response = HmcUpdateResponse.builder().hearingRequestId(22L).build();
         when(hearingApi.createHearingRequest(any(), any(), any(), any(), any(), any())).thenReturn(response);

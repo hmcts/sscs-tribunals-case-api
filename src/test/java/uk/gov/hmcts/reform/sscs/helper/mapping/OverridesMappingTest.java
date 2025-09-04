@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.helper.mapping;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AmendReason.ADMIN_ERROR;
@@ -222,6 +223,7 @@ class OverridesMappingTest {
         given(refData.getHearingDurations()).willReturn(hearingDurations);
         given(refData.getVenueService()).willReturn(venueService);
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
+        given(refData.getSignLanguages()).willReturn(signLanguages);
 
         overridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData);
         OverrideFields result = caseData.getSchedulingAndListingFields().getDefaultListingValues();
@@ -252,6 +254,8 @@ class OverridesMappingTest {
         given(refData.getHearingDurations()).willReturn(hearingDurations);
         given(refData.getVenueService()).willReturn(venueService);
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
+        given(refData.getSignLanguages()).willReturn(signLanguages);
+
 
         overridesMapping.setOverrideValues(wrapper.getCaseData(), refData);
         OverrideFields result = caseData.getSchedulingAndListingFields().getOverrideFields();
@@ -284,6 +288,7 @@ class OverridesMappingTest {
         given(refData.getHearingDurations()).willReturn(hearingDurations);
         given(refData.getVenueService()).willReturn(venueService);
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
+        given(refData.getSignLanguages()).willReturn(signLanguages);
 
         OverrideFields defaultListingValues = new OverrideFields().toBuilder()
             .autoList(NO)
@@ -323,6 +328,7 @@ class OverridesMappingTest {
             .willReturn(language);
 
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
+        given(refData.getSignLanguages()).willReturn(signLanguages);
 
         HearingInterpreter result = OverridesMapping.getAppellantInterpreter(appeal, refData);
 
@@ -354,6 +360,8 @@ class OverridesMappingTest {
             .willReturn(language);
 
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
+        given(refData.getSignLanguages()).willReturn(signLanguages);
+
 
         HearingInterpreter result = OverridesMapping.getAppellantInterpreter(appeal, refData);
 
@@ -384,6 +392,7 @@ class OverridesMappingTest {
             .willReturn(null);
 
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
+        given(refData.getSignLanguages()).willReturn(signLanguages);
 
         assertThatExceptionOfType(InvalidMappingException.class).isThrownBy(() -> OverridesMapping.getAppellantInterpreter(appeal, refData));
     }
@@ -520,6 +529,8 @@ class OverridesMappingTest {
             .willReturn(language);
 
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
+        given(refData.getSignLanguages()).willReturn(signLanguages);
+
 
         Language result = OverridesMapping.getInterpreterLanguage(hearingOptions, refData);
 
@@ -607,4 +618,27 @@ class OverridesMappingTest {
             .isNotNull()
             .isEqualTo(expected);
     }
+
+
+    @DisplayName("When the appellant wants a sign language and selects it from the dropdown,"
+            + " getInterpreterLanguage returns the correct sign language")
+    @Test
+    void testGetInterpreterLanguageReturnsSignLanguage() throws InvalidMappingException {
+        HearingOptions hearingOptions = HearingOptions.builder()
+                .languageInterpreter("Yes")
+                .languages("British Sign Language")
+                .arrangements(List.of("signLanguageInterpreter"))
+                .build();
+        Language language = new Language("bsl", "Test", null, null, null, List.of());
+
+        given(signLanguages.getSignLanguage(any())).willReturn(language);
+
+        given(refData.getSignLanguages()).willReturn(signLanguages);
+
+
+        Language result = OverridesMapping.getInterpreterLanguage(hearingOptions, refData);
+
+        assertThat(result).isEqualTo(language);
+    }
+
 }
