@@ -996,7 +996,7 @@
   {"LiveFrom": "18/03/2025", "CaseTypeID": "Benefit", "CaseEventID": "tribunalCommunication", "AccessProfile":  "caseworker-sscs-ibcaresponsewriter", "CRUD":  "CRUD"},
   {"LiveFrom": "18/03/2025", "CaseTypeID": "Benefit", "CaseEventID": "tribunalCommunication", "AccessProfile":  "caseworker-sscs-hmrcresponsewriter", "CRUD":  "CRUD"},
   {"LiveFrom": "18/03/2025", "CaseTypeID": "Benefit", "CaseEventID": "tribunalCommunication", "AccessProfile":  "caseworker-sscs-dwpresponsewriter", "CRUD":  "CRUD"},
-  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "ftaCommunication", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "ftaCommunication", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseEventID": "ftaCommunication", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseEventID": "ftaCommunication", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseEventID": "ftaCommunication", "AccessProfile": "caseworker-sscs-registrar", "CRUD": "CRUD"}
