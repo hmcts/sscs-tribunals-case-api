@@ -6,6 +6,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -17,13 +18,12 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode.PIP_NEW_CLAIM;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CASE_UPDATED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.Issue.AT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
@@ -32,6 +32,7 @@ import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -68,6 +69,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DateRange;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
@@ -77,6 +79,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
@@ -88,9 +91,8 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
-import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
+import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
-import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
@@ -121,9 +123,11 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     @Mock
     private VenueService venueService;
     @Mock
-    private SessionCategoryMapService categoryMapService;
-    @Mock
     private PanelCompositionService panelCompositionService;
+  
+    @Mock
+    private HearingDurationsService hearingDurationsService;
+
     @Mock
     private AssociatedCaseLinkHelper associatedCaseLinkHelper;
 
@@ -145,60 +149,35 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
                 idamService,
                 refDataService,
                 venueService,
-                categoryMapService,
-                panelCompositionService,
-                false);
+                hearingDurationsService,
+                panelCompositionService);
 
         sscsCaseData = SscsCaseData.builder()
                 .ccdCaseId("ccdId")
                 .appeal(Appeal.builder()
-                        .benefitType(BenefitType.builder()
-                                .code("PIP")
-                                .build())
+                        .benefitType(BenefitType.builder().code("PIP").build())
                         .appellant(Appellant.builder()
                                 .name(Name.builder().firstName("First").lastName("Last").build())
                                 .address(Address.builder().line1("Line1").line2("Line2").postcode("CM120NS").build())
                                 .identity(Identity.builder().nino("AB223344B").dob("1995-12-20").build())
                                 .isAppointee("Yes")
-                                .appointee(
-                                        Appointee.builder()
-                                                .address(Address.builder()
-                                                        .line1("123 the Street")
-                                                        .postcode("CM120NS")
-                                                        .build()
-                                                )
-                                                .build()
-                                )
-                                .build())
-                        .rep(Representative.builder().address(Address.builder()
-                                                .line1("123 the Street")
-                                                .postcode("CM120NS")
-                                                .build()
-                                        )
-                                        .build()
-                        )
+                                .appointee(Appointee.builder()
+                                        .address(Address.builder().line1("123 the Street").postcode("CM120NS").build())
+                                        .build()).build())
+                        .rep(Representative.builder()
+                                .address(Address.builder().line1("123 the Street").postcode("CM120NS").build()).build())
                         .build())
-                .jointParty(JointParty.builder()
-                        .jointPartyAddressSameAsAppellant(NO)
-                        .address(Address.builder()
-                                .line1("123 the street")
-                                .postcode("CM120NS")
-                                .build()
-                        )
-                        .build()
-                )
+                .jointParty(JointParty.builder().jointPartyAddressSameAsAppellant(NO)
+                        .address(Address.builder().line1("123 the street").postcode("CM120NS").build()).build())
                 .benefitCode("002")
                 .issueCode("DD")
                 .isFqpmRequired(NO)
                 .build();
 
-
         sscsCaseDataBefore = SscsCaseData.builder()
                 .ccdCaseId("ccdId")
                 .appeal(Appeal.builder()
-                        .appellant(Appellant.builder()
-                                .address(Address.builder()
-                                        .line1("123 the Street")
+                        .appellant(Appellant.builder().address(Address.builder().line1("123 the Street")
                                         .postcode("CM120NS")
                                         .build())
                                 .appointee(
@@ -241,9 +220,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         lenient().when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                 .roles(List.of(SUPER_USER.getValue()))
                 .build());
-        lenient().when(categoryMapService.getSessionCategory(
-                any(String.class), any(String.class), any(boolean.class), any(boolean.class))
-        ).thenReturn(new SessionCategoryMap(PIP_NEW_CLAIM, AT, true, true));
+        lenient().when(panelCompositionService.isBenefitIssueCodeValid(any(), any())).thenReturn(true);
         appeal = callback.getCaseDetails().getCaseData().getAppeal();
     }
 
@@ -1796,11 +1773,9 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     @Test
     public void givenInvalidIssueBenefitCode_thenThrowError() {
-        when(categoryMapService.getSessionCategory(anyString(), anyString(), anyBoolean(), anyBoolean()))
-                .thenReturn(null);
+        when(panelCompositionService.isBenefitIssueCodeValid(any(), any())).thenReturn(false);
 
-        PreSubmitCallbackResponse<SscsCaseData> response =
-                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(1));
     }
@@ -1856,6 +1831,54 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     }
 
     @Test
+    void shouldUpdateOverrideInterpreterWhenInterpreterUpdated() {
+        sscsCaseDataBefore.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("No").build());
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("Yes").languages("Arabic").build());
+        sscsCaseData.getAppeal().getHearingOptions().setLanguagesList(new DynamicList(new DynamicListItem("Arabic", "Arabic"), Collections.emptyList()));
+        sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder()
+                .appellantInterpreter(HearingInterpreter.builder().isInterpreterWanted(NO).build()).build());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter().getIsInterpreterWanted(), is(YES));
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter().getInterpreterLanguage().getValue().getCode(), is("Arabic"));
+    }
+
+    @Test
+    void shouldUpdateOverrideLanguageAndKeepDuration_WhenOnlyLanguageUpdated() {
+        sscsCaseDataBefore.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("Yes").languages("Spanish").build());
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("Yes").languages("Arabic").build());
+        sscsCaseData.getAppeal().getHearingOptions().setLanguagesList(new DynamicList(new DynamicListItem("Arabic", "Arabic"), Collections.emptyList()));
+        sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder()
+                .appellantInterpreter(HearingInterpreter.builder().isInterpreterWanted(YES).build()).build());
+        DynamicList languagesList = new DynamicList(new DynamicListItem("Spanish", "Spanish"), Collections.emptyList());
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().duration(95)
+                .appellantInterpreter(HearingInterpreter.builder().isInterpreterWanted(YES).interpreterLanguage(languagesList).build()).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter().getIsInterpreterWanted(), is(YES));
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter().getInterpreterLanguage().getValue().getCode(), is("Arabic"));
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getDuration(), is(95));
+
+    }
+
+    @Test
+    void shouldNotUpdateOverrideInterpreterWhenInterpreterNotUpdated() {
+        sscsCaseDataBefore.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("No").build());
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("No").build());
+        sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder().duration(60).build());
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter(), nullValue());
+    }
+
+    @Test
+    void shouldNotUpdateOverrideWhenDefaultListingValuesIsNull() {
+        sscsCaseDataBefore.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("No").build());
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("Yes").build());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields(), nullValue());
+    }
+
+    @Test
     void ifIbcCaseThenSetHearingRouteToListAssist() {
         sscsCaseData.setBenefitCode(IBCA_BENEFIT_CODE);
         sscsCaseData.getAppeal().getAppellant().getIdentity().setIbcaReference("IBCA12345");
@@ -1883,13 +1906,13 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getPanelMemberComposition());
-        verifyNoInteractions(panelCompositionService);
+        verify(panelCompositionService).isBenefitIssueCodeValid(any(), any());
     }
 
     @Test
     void shouldSetPanelMemberComposition() {
         var panelMemberComposition = new PanelMemberComposition(List.of("84"));
-        when(panelCompositionService.resetPanelCompositionIfStale(sscsCaseData, sscsCaseDataBefore))
+        when(panelCompositionService.resetPanelCompositionIfStale(sscsCaseData, Optional.of(caseDetailsBefore)))
                 .thenReturn(panelMemberComposition);
         when(panelCompositionService.isBenefitIssueCodeValid(any(), any())).thenReturn(true);
         handler = new CaseUpdatedAboutToSubmitHandler(
@@ -1900,9 +1923,8 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
                 idamService,
                 refDataService,
                 venueService,
-                categoryMapService,
-                panelCompositionService,
-                true);
+                hearingDurationsService,
+                panelCompositionService);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 

@@ -5,7 +5,6 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -18,10 +17,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Service
 @Slf4j
 public class ConfirmPanelCompositionAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-
-    @Value("${feature.default-panel-comp.enabled}")
-    private boolean isDefaultPanelCompEnabled;
-
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -45,10 +40,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandler implements PreSubmitCal
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (isDefaultPanelCompEnabled) {
-            syncUpdateListingRequirements(sscsCaseData);
-        }
-
+        syncUpdateListingRequirements(sscsCaseData);
         processInterloc(sscsCaseData);
         return response;
     }

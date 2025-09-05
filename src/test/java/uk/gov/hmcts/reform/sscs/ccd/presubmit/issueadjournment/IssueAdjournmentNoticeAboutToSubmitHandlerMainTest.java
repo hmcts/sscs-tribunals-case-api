@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournment;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -48,6 +49,23 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerMainTest extends IssueAdj
 
         assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo(YES.getValue());
         assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isEqualTo(SPANISH);
+    }
+
+    @DisplayName("Given an adjournment event with language interpreter set to no and case has existing interpreter, "
+        + "then overwrite existing interpreter in hearing options")
+    @Test
+    void givenAdjournmentEventWithLanguageInterpreterNotRequiredAndCaseHasExistingInterpreter_overwriteExistingInterpreter() {
+        callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterRequired(NO);
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder()
+            .languageInterpreter(YES.getValue())
+            .languages("French")
+            .build());
+        setupHearingDurationValues();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo(NO.getValue());
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter().getIsInterpreterWanted()).isEqualTo(NO);
     }
 
     @DisplayName("Given an adjournment event with language interpreter required and interpreter language set, "
@@ -120,7 +138,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerMainTest extends IssueAdj
         adjournment.setTypeOfNextHearing(FACE_TO_FACE);
         adjournment.setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.STANDARD);
         setupHearingDurationValues();
-
+        when(hearingDurationsService.addExtraTimeIfNeeded(any(), any(), any(), any())).thenReturn(90);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         var schedulingAndListingFields = response.getData().getSchedulingAndListingFields();
@@ -142,8 +160,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerMainTest extends IssueAdj
         adjournment.setInterpreterRequired(NO);
         adjournment.setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.STANDARD);
         setupHearingDurationValues();
-
-
+        when(hearingDurationsService.addExtraTimeIfNeeded(any(), any(), any(), any())).thenReturn(60);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -167,6 +184,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerMainTest extends IssueAdj
         hearingDuration.setDurationPaper(30);
         hearingDuration.setDurationFaceToFace(null);
         when(hearingDurationsService.getHearingDuration(eq(sscsCaseData.getBenefitCode()), eq(sscsCaseData.getIssueCode()))).thenReturn(hearingDuration);
+        when(hearingDurationsService.addExtraTimeIfNeeded(any(), any(), any(), any())).thenReturn(null);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 

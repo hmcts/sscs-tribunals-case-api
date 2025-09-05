@@ -35,24 +35,12 @@ export class UploadResponse extends BaseStep {
       await this.loginUserWithCaseId(credentials.hmrcSuperUser, false, caseId);
     }
     await this.homePage.navigateToTab('Summary');
-    await this.homePage.delay(1000);
-    await this.homePage.reloadPage();
-    try {
-      await this.homePage.navigateToTab('Summary');
-      await this.summaryTab.verifyPresenceOfText('Ready to list');
-      await this.homePage.navigateToTab('History');
-      await Promise.all(
+    await this.summaryTab.verifyPresenceOfText('Ready to list');
+    if(environment.name == "aat") await this.homePage.clickBeforeTabBtn();
+    await this.homePage.navigateToTab('History');
+    await Promise.all(
         historyLinks.map((linkName) => this.verifyHistoryTabLink(linkName))
-      );
-    } catch {
-      await this.homePage.reloadPage();
-      await this.homePage.navigateToTab('Summary');
-      await this.summaryTab.verifyPresenceOfText('Ready to list');
-      await this.homePage.navigateToTab('History');
-      await Promise.all(
-        historyLinks.map((linkName) => this.verifyHistoryTabLink(linkName))
-      );
-    }
+    );
   }
 
   async performUploadResponseWithFurtherInfoOnAPIPAndReviewResponse(pipCaseId: string) {

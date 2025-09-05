@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -28,16 +27,12 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
 
     private final DwpDocumentService dwpDocumentService;
     private final PanelCompositionService panelCompositionService;
-    private final boolean integratedListAssistEnabled;
 
     @Autowired
     public HmctsResponseReviewedAboutToSubmitHandler(DwpDocumentService dwpDocumentService,
-                                                     PanelCompositionService panelCompositionService,
-                                                     @Value("${feature.default-panel-comp.enabled}")
-                                                     boolean integratedListAssistEnabled) {
+                                                     PanelCompositionService panelCompositionService) {
         this.dwpDocumentService = dwpDocumentService;
         this.panelCompositionService = panelCompositionService;
-        this.integratedListAssistEnabled = integratedListAssistEnabled;
     }
 
     @Override
@@ -78,13 +73,10 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
         if (isNull(sscsCaseData.getDwpResponseDate())) {
             sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
         }
-
         validateInterlocReferralReason(sscsCaseData, preSubmitCallbackResponse);
-        var caseDetailsBefore = callback.getCaseDetailsBefore().orElse(null);
-        if (integratedListAssistEnabled && nonNull(caseDetailsBefore)) {
-            sscsCaseData.setPanelMemberComposition(panelCompositionService
-                    .resetPanelCompositionIfStale(sscsCaseData, caseDetailsBefore.getCaseData()));
-        }
+
+        sscsCaseData.setPanelMemberComposition(panelCompositionService
+                .resetPanelCompositionIfStale(sscsCaseData, callback.getCaseDetailsBefore()));
 
         return preSubmitCallbackResponse;
     }

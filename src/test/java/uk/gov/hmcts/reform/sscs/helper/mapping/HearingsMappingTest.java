@@ -7,7 +7,9 @@ import static org.mockito.BDDMockito.given;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseAccessManagementFields;
@@ -21,28 +23,15 @@ import uk.gov.hmcts.reform.sscs.model.HearingWrapper;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.CaseDetails;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDetails;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingRequestPayload;
-import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
-import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
-import uk.gov.hmcts.reform.sscs.service.VenueService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
+@ExtendWith(MockitoExtension.class)
 class HearingsMappingTest extends HearingsMappingBase {
 
     @Mock
-    private HearingDurationsService hearingDurations;
-
-    @Mock
-    private SessionCategoryMapService sessionCategoryMaps;
-
-    @Mock
     private ReferenceDataServiceHolder refData;
-
-    @Mock
-    private VenueService venueService;
-
     @Mock
     private HearingsDetailsMapping hearingsDetailsMapping;
-
     @Mock
     private HearingsCaseMapping hearingsCaseMapping;
 

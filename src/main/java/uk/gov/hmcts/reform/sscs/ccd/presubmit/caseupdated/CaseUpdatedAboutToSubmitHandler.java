@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -27,7 +28,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -44,10 +44,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Entity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -62,8 +64,8 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
+import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
-import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
@@ -82,10 +84,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final IdamService idamService;
     private final RefDataService refDataService;
     private final VenueService venueService;
-    private final SessionCategoryMapService categoryMapService;
+    private final HearingDurationsService hearingDurationsService;
     private final PanelCompositionService panelCompositionService;
     private final PostcodeValidator postcodeValidator = new PostcodeValidator();
-    private final boolean integratedListAssistEnabled;
 
     private static ConstraintValidatorContext context;
     private static final String WARNING_MESSAGE = "%s has not been provided for the %s, do you want to ignore this warning and proceed?";
@@ -107,20 +108,17 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                                     IdamService idamService,
                                     RefDataService refDataService,
                                     VenueService venueService,
-                                    SessionCategoryMapService categoryMapService,
-                                    PanelCompositionService panelCompositionService,
-                                    @Value("${feature.default-panel-comp.enabled}")
-                                    boolean integratedListAssistEnabled) {
+                                    HearingDurationsService hearingDurationsService,
+                                    PanelCompositionService panelCompositionService) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
         this.airLookupService = airLookupService;
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.idamService = idamService;
         this.refDataService = refDataService;
+        this.hearingDurationsService = hearingDurationsService;
         this.panelCompositionService = panelCompositionService;
         this.venueService = venueService;
-        this.categoryMapService = categoryMapService;
-        this.integratedListAssistEnabled = integratedListAssistEnabled;
     }
 
     @Override
@@ -215,11 +213,63 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (sscsCaseData.isIbcCase()) {
             SscsUtil.setListAssistRoutes(sscsCaseData);
         }
-        if (integratedListAssistEnabled && caseDetailsBefore.isPresent()) {
-            sscsCaseData.setPanelMemberComposition(panelCompositionService
-                    .resetPanelCompositionIfStale(sscsCaseData, caseDetailsBefore.get().getCaseData()));
+        OverrideFields updatedOverrideFields = updateOverrideFields(sscsCaseData, caseDetailsBefore);
+        if (!updatedOverrideFields.isAllNull()) {
+            sscsCaseData.getSchedulingAndListingFields().setOverrideFields(updatedOverrideFields);
         }
+        sscsCaseData.setPanelMemberComposition(panelCompositionService
+                .resetPanelCompositionIfStale(sscsCaseData, caseDetailsBefore));
         return preSubmitCallbackResponse;
+    }
+
+    private OverrideFields updateOverrideFields(SscsCaseData sscsCaseData, Optional<CaseDetails<SscsCaseData>> caseDetailsBefore) {
+        OverrideFields overrideFields = ofNullable(sscsCaseData.getSchedulingAndListingFields().getOverrideFields())
+                .orElse(OverrideFields.builder().build());
+        if (isNull(sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues()) || caseDetailsBefore.isEmpty()) {
+            return overrideFields;
+        }
+        HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
+        if (nonNull(hearingOptions)) {
+            HearingOptions hearingOptionsBefore = ofNullable(caseDetailsBefore.get().getCaseData().getAppeal().getHearingOptions())
+                    .orElse(HearingOptions.builder().build());
+            if (hasInterpreterChanged(sscsCaseData, hearingOptionsBefore)) {
+                updateOverrideInterpreter(hearingOptions, overrideFields);
+                updateOverrideDuration(sscsCaseData, overrideFields);
+            } else if (hasLanguageChanged(sscsCaseData, hearingOptionsBefore)) {
+                updateOverrideInterpreter(hearingOptions, overrideFields);
+            }
+        }
+        return overrideFields;
+    }
+
+    private boolean hasInterpreterChanged(SscsCaseData sscsCaseData, HearingOptions hearingOptionsBefore) {
+        String languageInterpreter = sscsCaseData.getAppeal().getHearingOptions().getLanguageInterpreter();
+        String languageInterpreterBefore = hearingOptionsBefore.getLanguageInterpreter();
+        return !Objects.equals(languageInterpreterBefore, languageInterpreter);
+    }
+
+    private boolean hasLanguageChanged(SscsCaseData sscsCaseData, HearingOptions hearingOptionsBefore) {
+        String languageBefore = hearingOptionsBefore.getLanguages();
+        String language = sscsCaseData.getAppeal().getHearingOptions().getLanguages();
+        return !Objects.equals(languageBefore, language);
+    }
+
+    private void updateOverrideInterpreter(HearingOptions hearingOptions, OverrideFields overrideFields) {
+        String languageInterpreter = hearingOptions.getLanguageInterpreter();
+        DynamicList languageList = hearingOptions.getLanguagesList();
+        DynamicList overrideLanguageList = null;
+        if (nonNull(hearingOptions.getLanguages())) {
+            overrideLanguageList = new DynamicList(languageList.getValue(), languageList.getListItems());
+        }
+        HearingInterpreter hearingInterpreter = HearingInterpreter.builder()
+                .isInterpreterWanted(YesNo.valueOf(languageInterpreter.toUpperCase()))
+                .interpreterLanguage(overrideLanguageList).build();
+        overrideFields.setAppellantInterpreter(hearingInterpreter);
+    }
+
+    private void updateOverrideDuration(SscsCaseData sscsCaseData, OverrideFields overrideFields) {
+        Integer duration = hearingDurationsService.getHearingDurationBenefitIssueCodes(sscsCaseData);
+        overrideFields.setDuration(duration);
     }
 
     private void updateLanguage(SscsCaseData sscsCaseData) {
@@ -244,16 +294,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private void validateBenefitIssueCode(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> response) {
-        if (integratedListAssistEnabled) {
-            if (!panelCompositionService.isBenefitIssueCodeValid(caseData.getBenefitCode(), caseData.getIssueCode())) {
-                response.addError("Incorrect benefit/issue code combination");
-            }
-        } else {
-            boolean isSecondDoctorPresent = isNotBlank(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism());
-            boolean fqpmRequired = isYes(caseData.getIsFqpmRequired());
-            if (isNull(categoryMapService.getSessionCategory(caseData.getBenefitCode(), caseData.getIssueCode(), isSecondDoctorPresent, fqpmRequired))) {
-                response.addError("Incorrect benefit/issue code combination");
-            }
+        if (!panelCompositionService.isBenefitIssueCodeValid(caseData.getBenefitCode(), caseData.getIssueCode())) {
+            response.addError("Incorrect benefit/issue code combination");
         }
     }
 
@@ -585,7 +627,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             return sscsCaseData.getAppeal().getAppellant().getAddress().getPortOfEntry();
         } else {
             if (YES.getValue().equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAppointee())) {
-                return Optional.ofNullable(sscsCaseData.getAppeal().getAppellant().getAppointee())
+                return ofNullable(sscsCaseData.getAppeal().getAppellant().getAppointee())
                         .map(Appointee::getAddress)
                         .map(Address::getPostcode)
                         .map(String::trim)

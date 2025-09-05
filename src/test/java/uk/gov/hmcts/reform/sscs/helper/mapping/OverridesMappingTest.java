@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.helper.mapping;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AmendReason.ADMIN_ERROR;
@@ -22,14 +23,28 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AmendReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingWindow;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.exception.InvalidMappingException;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.HearingWrapper;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
-import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
@@ -51,8 +66,6 @@ class OverridesMappingTest {
     private VerbalLanguagesService verbalLanguages;
     @Mock
     private SignLanguagesService signLanguages;
-    @Mock
-    private SessionCategoryMapService sessionCategoryMaps;
     @Mock
     private ReferenceDataServiceHolder refData;
     @Mock
@@ -210,6 +223,7 @@ class OverridesMappingTest {
         given(refData.getHearingDurations()).willReturn(hearingDurations);
         given(refData.getVenueService()).willReturn(venueService);
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
+        given(refData.getSignLanguages()).willReturn(signLanguages);
 
         overridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData, true);
         OverrideFields result = caseData.getSchedulingAndListingFields().getDefaultListingValues();
@@ -240,6 +254,8 @@ class OverridesMappingTest {
         given(refData.getHearingDurations()).willReturn(hearingDurations);
         given(refData.getVenueService()).willReturn(venueService);
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
+        given(refData.getSignLanguages()).willReturn(signLanguages);
+
 
         overridesMapping.setOverrideValues(wrapper.getCaseData(), refData, true);
         OverrideFields result = caseData.getSchedulingAndListingFields().getOverrideFields();
@@ -272,6 +288,7 @@ class OverridesMappingTest {
         given(refData.getHearingDurations()).willReturn(hearingDurations);
         given(refData.getVenueService()).willReturn(venueService);
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
+        given(refData.getSignLanguages()).willReturn(signLanguages);
 
         OverrideFields defaultListingValues = new OverrideFields().toBuilder()
             .autoList(NO)
@@ -311,6 +328,7 @@ class OverridesMappingTest {
             .willReturn(language);
 
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
+        given(refData.getSignLanguages()).willReturn(signLanguages);
 
         HearingInterpreter result = OverridesMapping.getAppellantInterpreter(appeal, refData);
 
@@ -342,6 +360,8 @@ class OverridesMappingTest {
             .willReturn(language);
 
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
+        given(refData.getSignLanguages()).willReturn(signLanguages);
+
 
         HearingInterpreter result = OverridesMapping.getAppellantInterpreter(appeal, refData);
 
@@ -372,6 +392,7 @@ class OverridesMappingTest {
             .willReturn(null);
 
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
+        given(refData.getSignLanguages()).willReturn(signLanguages);
 
         assertThatExceptionOfType(InvalidMappingException.class).isThrownBy(() -> OverridesMapping.getAppellantInterpreter(appeal, refData));
     }
@@ -508,6 +529,8 @@ class OverridesMappingTest {
             .willReturn(language);
 
         given(refData.getVerbalLanguages()).willReturn(verbalLanguages);
+        given(refData.getSignLanguages()).willReturn(signLanguages);
+
 
         Language result = OverridesMapping.getInterpreterLanguage(hearingOptions, refData);
 
@@ -557,7 +580,7 @@ class OverridesMappingTest {
         caseData.setDwpResponseDate("2021-12-01");
         caseData.getAppeal().getHearingOptions().setOther(value);
 
-        YesNo result = overridesMapping.getHearingDetailsAutoList(caseData, refData);
+        YesNo result = overridesMapping.getHearingDetailsAutoList(caseData);
 
         assertThat(result)
             .isNotNull()
@@ -595,4 +618,27 @@ class OverridesMappingTest {
             .isNotNull()
             .isEqualTo(expected);
     }
+
+
+    @DisplayName("When the appellant wants a sign language and selects it from the dropdown,"
+            + " getInterpreterLanguage returns the correct sign language")
+    @Test
+    void testGetInterpreterLanguageReturnsSignLanguage() throws InvalidMappingException {
+        HearingOptions hearingOptions = HearingOptions.builder()
+                .languageInterpreter("Yes")
+                .languages("British Sign Language")
+                .arrangements(List.of("signLanguageInterpreter"))
+                .build();
+        Language language = new Language("bsl", "Test", null, null, null, List.of());
+
+        given(signLanguages.getSignLanguage(any())).willReturn(language);
+
+        given(refData.getSignLanguages()).willReturn(signLanguages);
+
+
+        Language result = OverridesMapping.getInterpreterLanguage(hearingOptions, refData);
+
+        assertThat(result).isEqualTo(language);
+    }
+
 }
