@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.setCommRequ
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -102,7 +103,7 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
         String replyText = ftaCommunicationFields.getCommRequestResponseTextArea();
         boolean noActionRequired = !ObjectUtils.isEmpty(ftaCommunicationFields.getCommRequestResponseNoAction());
         CommunicationRequestReply reply = CommunicationRequestReply.builder()
-            .replyDateTime(LocalDateTime.now())
+            .replyDateTime(LocalDateTime.now(ZoneId.of("Europe/London")))
             .replyUserName(userDetails.getName())
             .replyUserRole(getRoleName(userDetails))
             .replyMessage(noActionRequired ? "No reply required" : replyText)
