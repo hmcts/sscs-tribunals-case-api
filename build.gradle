@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets
 plugins {
     id 'application'
     id 'pmd'
-    id 'org.sonarqube' version '6.2.0.5505'
+    id 'org.sonarqube' version '6.3.1.5724'
     id 'jacoco'
     id 'org.springframework.boot' version '3.5.3'
     id 'uk.gov.hmcts.java' version '0.12.67'
@@ -466,7 +466,7 @@ dependencies {
 
     testImplementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: pitest.pitestVersion.get()
     testImplementation group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: '0.5'
-    testImplementation group: 'org.pitest', name: 'pitest', version: '1.20.1'
+    testImplementation group: 'org.pitest', name: 'pitest', version: '1.20.2'
     testImplementation group: 'com.typesafe', name: 'config', version: '1.4.3'
 
     testImplementation group: 'com.h2database', name: 'h2', version: '2.3.232'
