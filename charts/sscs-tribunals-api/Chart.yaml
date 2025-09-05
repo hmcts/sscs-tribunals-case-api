@@ -1,7 +1,7 @@
 apiVersion: v2
 name: sscs-tribunals-api
 home: https://github.com/hmcts/sscs-tribunals-case-api
-version: 0.0.215
+version: 0.0.216
 description: SSCS Tribunals Case API
 maintainers:
   - name: HMCTS SSCS Team
@@ -19,7 +19,7 @@ dependencies:
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: job.enabled
   - name: xui-webapp
-    version: 1.0.30
+    version: 1.0.34
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: xui-webapp.enabled
   - name: ccd
@@ -29,7 +29,7 @@ dependencies:
     tags:
       - sscs-ccd-idam-pr
   - name: sscs-tribunals-frontend
-    version: 0.2.53
+    version: 0.2.67
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: sscs-tribunals-frontend.enabled
   - name: redis
@@ -62,7 +62,7 @@ dependencies:
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: aac-manage-case-assignment.enabled
   - name: am-org-role-mapping-service
-    version: 0.0.72
+    version: 0.0.73
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: am-org-role-mapping-service.enabled
   # WA
@@ -83,7 +83,7 @@ dependencies:
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: wa.enabled
   - name: wa-workflow-api
-    version: 0.1.1
+    version: 0.1.2
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: wa.enabled
   #    initiation
