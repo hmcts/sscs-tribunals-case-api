@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.EntityRoleCode;
@@ -134,7 +133,6 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
     @Test
     void shouldMapServiceHearingValuesSuccessfully() throws ListingException {
         // given
-        ReflectionTestUtils.setField(serviceHearingValuesMapping, "isHearingDurationEnabled", true);
         given(refData.getVenueService()).willReturn(venueService);
 
         List<CaseCategory> caseCategories = Arrays.asList(

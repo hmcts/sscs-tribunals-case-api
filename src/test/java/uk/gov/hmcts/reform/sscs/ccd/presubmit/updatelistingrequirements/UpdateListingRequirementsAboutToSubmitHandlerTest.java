@@ -31,7 +31,6 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
@@ -272,7 +271,6 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @Test
     void givenAppellantInterpreterHasChanged_thenUpdateCaseDataOverrideDuration() {
-        ReflectionTestUtils.setField(handler, "isHearingDurationEnabled", true);
         sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder()
                 .duration(60)
                 .build());
@@ -314,7 +312,6 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @Test
     void updateHearingDuration_shouldUpdateDurationWhenChannelHasChanged() {
-        ReflectionTestUtils.setField(handler, "isHearingDurationEnabled", true);
         sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder()
                 .duration(60)
                 .build());
@@ -338,7 +335,6 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @Test
     void updateHearingDuration_shouldNotUpdateDurationWhenChannelHasNotChanged() {
-        ReflectionTestUtils.setField(handler, "isHearingDurationEnabled", true);
         sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder()
                 .duration(60)
                 .build());

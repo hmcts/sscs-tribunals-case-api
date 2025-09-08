@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
@@ -28,10 +27,6 @@ public final class ServiceHearingValuesMapping {
     private final PanelCompositionService panelCompositionService;
 
     private final HearingsCaseMapping hearingsCaseMapping;
-  
-    @Value("${feature.hearing-duration.enabled}")
-    private boolean isHearingDurationEnabled;
-
 
     ServiceHearingValuesMapping(HearingsPanelMapping hearingsPanelMapping, HearingsAutoListMapping hearingsAutoListMapping, PanelCompositionService panelCompositionService, HearingsCaseMapping hearingsCaseMapping) {
         this.hearingsPanelMapping = hearingsPanelMapping;
@@ -47,7 +42,7 @@ public final class ServiceHearingValuesMapping {
         boolean shouldBeAutoListed = hearingsAutoListMapping.shouldBeAutoListed(caseData);
         int hearingDuration = 0;
         try {
-            hearingDuration = HearingsDurationMapping.getHearingDuration(caseData, refData, isHearingDurationEnabled);
+            hearingDuration = HearingsDurationMapping.getHearingDuration(caseData, refData);
         } catch (ListingException e) {
             log.error("Error getting hearing duration for case ID {}: {}", caseData.getCcdCaseId(), e.getMessage());
         }

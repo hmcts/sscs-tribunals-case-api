@@ -27,6 +27,8 @@ import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.reference.data.model.HearingDuration;
+import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
 
@@ -46,6 +48,9 @@ public class IssueAdjournmentIt extends AbstractEventIt {
     @MockitoBean
     private VenueService venueService;
 
+    @MockitoBean
+    private HearingDurationsService hearingDurationsService;
+
     @Before
     public void setup() throws IOException {
         json = getJson("callback/issueAdjournmentCallback.json");
@@ -60,6 +65,9 @@ public class IssueAdjournmentIt extends AbstractEventIt {
         UploadResponse uploadResponse = createUploadResponse();
         when(evidenceManagementService.upload(any(), anyString())).thenReturn(uploadResponse);
         when(venueService.getEpimsIdForVenue(any())).thenReturn("1");
+        HearingDuration hearingDuration = new HearingDuration();
+        hearingDuration.setDurationFaceToFace(60);
+        when(hearingDurationsService.getHearingDuration(anyString(), anyString())).thenReturn(hearingDuration);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
         assertHttpStatus(response, HttpStatus.OK);

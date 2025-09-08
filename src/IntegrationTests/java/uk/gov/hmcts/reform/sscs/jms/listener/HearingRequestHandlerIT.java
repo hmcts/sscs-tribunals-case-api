@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.jms.listener;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -43,6 +44,7 @@ import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
 import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HmcUpdateResponse;
+import uk.gov.hmcts.reform.sscs.reference.data.model.HearingDuration;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
@@ -115,6 +117,10 @@ public class HearingRequestHandlerIT {
         when(verbalLanguages.getVerbalLanguage(any())).thenReturn(Language.builder().reference("LANG").build());
         HmcUpdateResponse response = HmcUpdateResponse.builder().hearingRequestId(22L).build();
         when(hearingApi.createHearingRequest(any(), any(), any(), any(), any(), any())).thenReturn(response);
+        HearingDuration hearingDuration = new HearingDuration();
+        hearingDuration.setDurationFaceToFace(60);
+        when(hearingDurationsService.getHearingDuration(anyString(), anyString())).thenReturn(hearingDuration);
+
 
         String message = "{\n"
             + "  \"ccdCaseId\": \"" + CASE_ID + "\",\n"
