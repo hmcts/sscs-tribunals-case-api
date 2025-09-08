@@ -2,13 +2,16 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.ArrayList;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseData;
 
+@Slf4j
 @Component
 public class PreSubmitCallbackDispatcher<T extends CaseData> {
 
@@ -36,6 +39,7 @@ public class PreSubmitCallbackDispatcher<T extends CaseData> {
                                     PreSubmitCallbackResponse<T> callbackResponse,
                                     String userAuthorisation
                                     ) {
+        List<PreSubmitCallbackHandler<T>> eligibleHandlers = new ArrayList<>();
 
         for (PreSubmitCallbackHandler<T> callbackHandler : callbackHandlers) {
             if (callbackHandler.canHandle(callbackType, callback)) {
@@ -45,7 +49,11 @@ public class PreSubmitCallbackDispatcher<T extends CaseData> {
                 callbackResponse.setData(callbackResponseFromHandler.getData());
                 callbackResponse.addErrors(callbackResponseFromHandler.getErrors());
                 callbackResponse.addWarnings(callbackResponseFromHandler.getWarnings());
+                eligibleHandlers.add(callbackHandler);
             }
+        }
+        if (eligibleHandlers.size() > 1) {
+            log.info("{} has more than one handler {}", callback.getEvent(), eligibleHandlers);
         }
     }
 }
