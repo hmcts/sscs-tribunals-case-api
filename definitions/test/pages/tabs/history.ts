@@ -88,4 +88,8 @@ export class History {
       .textContent();
     expect(text).toContain(fieldValue); // TODO An exact match is not done as there is Text from Upper nodes of the Dom Tree Appearing.
   }
+
+  async getDateOfEvent(): Promise<string> {
+    return await this.page.locator('.EventLog-DetailsPanel .tooltip').textContent();
+  }
 }
