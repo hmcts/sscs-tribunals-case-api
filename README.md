@@ -160,7 +160,7 @@ docker-compose up
 curl http://localhost:8008/health
 ```
 
-## Gotchas
+## Gotchas.
 
 ### PRs Starting with "Bump"
 Preview environments are not created for PRs starting with "Bump" due to a decision to avoid unnecessary environments created by Dependabot.
