@@ -1,4 +1,4 @@
-import { expect, Page } from '@playwright/test';
+import { expect, Locator, Page } from '@playwright/test';
 import { WebAction } from '../../common/web.action';
 import { HomePage } from '../common/homePage';
 
@@ -91,5 +91,10 @@ export class History {
 
   async getDateOfEvent(): Promise<string> {
     return await this.page.locator('.EventLog-DetailsPanel .tooltip').textContent();
+  }
+
+  async getAuthorOfEvent(): Promise<string> {
+    const authorSelector: Locator = this.page.locator("//table[@class='EventLogDetails']//span[text()='Author']/../following-sibling::td/span");  
+    return await authorSelector.textContent();
   }
 }

@@ -28,9 +28,18 @@ export class CommunicateWithFtaPage {
         await webActions.clickButton('Continue');
     }
 
-    async fillOutRequestData(requestTopic: string) {
+    async fillOutNewRequestData(requestTopic = 'Appeal Type') {
         await webActions.chooseOptionByLabel('#commRequestTopic', requestTopic);
         await webActions.inputField('#commRequestQuestion', 'Test details for FTA communication Request');
+        await webActions.clickButton('Continue');
+        await webActions.clickSubmitButton();
+    }
+
+    async fillOutReviewFtaReply() {
+        await webActions.clickRadioButton('Review FTA Reply');
+        await webActions.clickButton('Continue');
+        const tribunalComms = await this.page.locator("//input[@name='tribunalRequestsToReviewDl']/../label//p").textContent();
+        await webActions.checkAnCheckBox(tribunalComms);
         await webActions.clickButton('Continue');
         await webActions.clickSubmitButton();
     }

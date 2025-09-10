@@ -10,11 +10,4 @@ export class TribunalFtaCommunications {
         this.page = page;
         webActions = new WebAction(this.page);
     }
-
-    async verifyRequestFromTribunal(){
-        
-    }
-
-
-
 }
