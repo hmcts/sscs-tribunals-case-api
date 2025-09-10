@@ -20,15 +20,13 @@ export class CommunicateWithFta extends BaseStep {
         await this.homePage.chooseEvent('Communication with FTA');
     }
 
-    async submitNewCommunicationRequesttoFta(): Promise<EventDetails> {
+    async submitNewCommunicationRequesttoFta() {
         await this.communicateWithFtaPage.verifyPageContent();
         await this.communicateWithFtaPage.selectCommunicationType('New Request');
         await this.communicateWithFtaPage.fillOutNewRequestData();
         await this.verifyHistoryTabDetails('With FTA', 'Communication with FTA');
-
-        const dateOfEvent = await this.historyTab.getDateOfEvent();
-        const authorOfEvent = await this.historyTab.getAuthorOfEvent();
-        return await { dateOfEvent, authorOfEvent } as EventDetails
+        await this.homePage.navigateToTab('Tribunal/FTA Communications');
+        await this.tribunalFtaCommunicationsTab.verifyRequestFromTribunalExists();
     }
 
     async replyToCaseWorkersQueryToFta(caseId: string) {
@@ -38,6 +36,8 @@ export class CommunicateWithFta extends BaseStep {
         await this.homePage.chooseEvent('Communication with Tribunal');
         await this.communicateWithTribunalPage.replyToTribunalQuery();
         await this.verifyHistoryTabDetails('With FTA', 'Communication with Tribunal');
+        await this.homePage.navigateToTab('Tribunal/FTA Communications');
+        await this.tribunalFtaCommunicationsTab.verifyReplyFromFtaExists();
     }
 
     async reviewFtaReply(caseId: string) {
@@ -47,12 +47,8 @@ export class CommunicateWithFta extends BaseStep {
         await this.homePage.chooseEvent('Communication with FTA');
         await this.communicateWithFtaPage.fillOutReviewFtaReply();
         await this.verifyHistoryTabDetails('With FTA', 'Communication with FTA');
+        await this.homePage.navigateToTab('Tribunal/FTA Communications');
+        await this.tribunalFtaCommunicationsTab.verifyReplyHasBeenReviewed();
     }
-
-    // async verifyNotificationEventDetails(dateOfRequest: string, authorOfRequest: string, requestTopic: string) {
-    //     // to allow time for the event to be logged
-    //     await this.homePage.navigateToTab('Tribunal/FTA Communications');
-    //     await this.tribunalFtaCommunicationsTab.verifyRequestFromTribunal(dateOfRequest, authorOfRequest, requestTopic);
-    // }
 }
 
