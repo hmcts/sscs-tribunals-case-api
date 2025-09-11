@@ -16,7 +16,7 @@ export class CommunicateWithFta extends BaseStep {
     }
 
     async communicateWithFta(caseId: string) {
-        await this.loginUserWithCaseId(credentials.caseWorker, false, caseId);
+        await this.loginUserWithCaseId(credentials.amTribunalCaseWorker, false, caseId);
         await this.homePage.chooseEvent('Communication with FTA');
     }
 
@@ -31,19 +31,17 @@ export class CommunicateWithFta extends BaseStep {
 
     async replyToCaseWorkersQueryToFta(caseId: string) {
         await this.signOut();
-        //change to fta user
-        await this.loginUserWithCaseId(credentials.caseWorker, false, caseId);
+        await this.loginUserWithCaseId(credentials.dwpResponseWriter, false, caseId);
         await this.homePage.chooseEvent('Communication with Tribunal');
         await this.communicateWithTribunalPage.replyToTribunalQuery();
         await this.verifyHistoryTabDetails('With FTA', 'Communication with Tribunal');
         await this.homePage.navigateToTab('Tribunal/FTA Communications');
-        await this.tribunalFtaCommunicationsTab.verifyReplyFromFtaExists();
+        await this.tribunalFtaCommunicationsTab.verifyReplyExists();
     }
 
     async reviewFtaReply(caseId: string) {
         await this.signOut();
-        //change to caseworker user
-        await this.loginUserWithCaseId(credentials.caseWorker, false, caseId);
+        await this.loginUserWithCaseId(credentials.amTribunalCaseWorker, false, caseId);
         await this.homePage.chooseEvent('Communication with FTA');
         await this.communicateWithFtaPage.fillOutReviewFtaReply();
         await this.verifyHistoryTabDetails('With FTA', 'Communication with FTA');
