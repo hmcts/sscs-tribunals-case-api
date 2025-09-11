@@ -15,44 +15,56 @@ export class CommunicateWithFta extends BaseStep {
         this.page = page;
     }
 
-    async communicateWithFta(caseId: string) {
-        await this.loginUserWithCaseId(credentials.caseWorker, false, caseId);
-        await this.homePage.chooseEvent('Communication with FTA');
+    async communicateWithUser(caseId: string, event: string, user: string) {
+        await this.loginUserWithCaseId(credentials[user], false, caseId);
+        await this.homePage.chooseEvent(event);
     }
 
-    async submitNewCommunicationRequesttoFta(): Promise<EventDetails> {
-        await this.communicateWithFtaPage.verifyPageContent();
+    async submitNewCommunicationRequest(options: {isCommsToFta: boolean }){
+    if (options.isCommsToFta) {
+        await this.communicateWithFtaPage.verifyPageContent(true);
         await this.communicateWithFtaPage.selectCommunicationType('New Request');
-        await this.communicateWithFtaPage.fillOutNewRequestData();
+        await this.communicateWithFtaPage.fillOutNewRequestData('Appeal Type', 'FTA');
         await this.verifyHistoryTabDetails('With FTA', 'Communication with FTA');
-
-        const dateOfEvent = await this.historyTab.getDateOfEvent();
-        const authorOfEvent = await this.historyTab.getAuthorOfEvent();
-        return await { dateOfEvent, authorOfEvent } as EventDetails
+        await this.homePage.navigateToTab('Tribunal/FTA Communications');
+        await this.tribunalFtaCommunicationsTab.verifyRequestFromTribunalExists();
+    } else {
+        await this.communicateWithFtaPage.verifyPageContent(false);
+        await this.communicateWithFtaPage.selectCommunicationType('New Request');
+        await this.communicateWithFtaPage.fillOutNewRequestData('Appeal Type', 'Caseworker');
+        await this.homePage.navigateToTab('Tribunal/FTA Communications');
+        await this.tribunalFtaCommunicationsTab.verifyRequestFromFTAExists();
     }
+}
 
-    async replyToCaseWorkersQueryToFta(caseId: string) {
+
+    async replyToQuery(caseId: string, options: { 
+        event: 'Communication with Tribunal' | 'Communication with FTA', 
+        replyMethod: 'replyToTribunalQuery' | 'replyToFTAQuery'
+    }) {
         await this.signOut();
-        //change to fta user
         await this.loginUserWithCaseId(credentials.caseWorker, false, caseId);
-        await this.homePage.chooseEvent('Communication with Tribunal');
-        await this.communicateWithTribunalPage.replyToTribunalQuery();
-        await this.verifyHistoryTabDetails('With FTA', 'Communication with Tribunal');
+        await this.homePage.chooseEvent(options.event);
+        await this.communicateWithTribunalPage[options.replyMethod]();
+        await this.verifyHistoryTabDetails('With FTA', options.event);
+        await this.homePage.navigateToTab('Tribunal/FTA Communications');
+        await this.tribunalFtaCommunicationsTab.verifyReplyExists();
     }
 
-    async reviewFtaReply(caseId: string) {
-        await this.signOut();
+    async reviewUserReply(caseId: string, options: {
+        tribsVerifyReply: boolean,
+        userType: 'caseWorker' | 'dwpResponseWriter',
+        event: 'Communication with Tribunal' | 'Communication with FTA',
+        reviewMethod: 'fillOutReviewTribunalReply' | 'fillOutReviewFtaReply'
+    }) {
+         await this.signOut();
         //change to caseworker user
-        await this.loginUserWithCaseId(credentials.caseWorker, false, caseId);
-        await this.homePage.chooseEvent('Communication with FTA');
-        await this.communicateWithFtaPage.fillOutReviewFtaReply();
-        await this.verifyHistoryTabDetails('With FTA', 'Communication with FTA');
+        await this.loginUserWithCaseId(credentials[options.userType], false, caseId);
+        await this.homePage.chooseEvent(options.event);
+        await this.communicateWithFtaPage[options.reviewMethod]();
+        if(options.tribsVerifyReply) await this.verifyHistoryTabDetails('With FTA', 'Communication with FTA');
+        await this.homePage.navigateToTab('Tribunal/FTA Communications');
+        await this.tribunalFtaCommunicationsTab.verifyReplyHasBeenReviewed(options.tribsVerifyReply);
     }
-
-    // async verifyNotificationEventDetails(dateOfRequest: string, authorOfRequest: string, requestTopic: string) {
-    //     // to allow time for the event to be logged
-    //     await this.homePage.navigateToTab('Tribunal/FTA Communications');
-    //     await this.tribunalFtaCommunicationsTab.verifyRequestFromTribunal(dateOfRequest, authorOfRequest, requestTopic);
-    // }
 }
 

@@ -22,4 +22,16 @@ export class CommunicateWithTribunalPage {
         await webActions.clickButton('Continue');
         await webActions.clickSubmitButton();
     }
+
+    async replyToFTAQuery(replyRequired = true) {
+        await webActions.clickRadioButton('Reply to FTA Query');
+        await webActions.clickButton('Continue');
+        await webActions.chooseOptionByIndex('#ftaRequestsDl', 1);
+        await webActions.clickButton('Continue');
+        await (replyRequired
+            ? webActions.inputField('#commRequestResponseTextArea', 'Test details for FTA communication Reply')
+            : webActions.checkAnCheckBox('No reply required'));
+        await webActions.clickButton('Continue');
+        await webActions.clickSubmitButton();
+    }
 }
