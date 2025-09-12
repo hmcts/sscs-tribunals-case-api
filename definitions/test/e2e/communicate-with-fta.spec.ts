@@ -4,7 +4,7 @@ import createCaseBasedOnCaseType from '../api/client/sscs/factory/appeal.type.fa
 
 let caseId: string;
 
-test('Caseworker raise new request & FTA replies to the query & Caseworker reviews FTA reply',
+test('Caseworker raise new request & FTA(DWP) replies to the query & Caseworker reviews FTA(DWP) reply',
     { tag: '@nightly-pipeline' },
     async ({ communicateWithFtaSteps }) => {
         caseId = await createCaseBasedOnCaseType('PIP');
@@ -31,7 +31,7 @@ test('Caseworker raise new request & FTA replies to the query & Caseworker revie
     });
 
 
-test('FTA raises a new request & Caseworker replies to the query & FTA reviews Caseworker reply',
+test('FTA(DWP) raises a new request & Caseworker replies to the query & FTA(DWP) reviews Caseworker reply',
     { tag: '@nightly-pipeline' },
     async ({ communicateWithFtaSteps }) => {
         caseId = await createCaseBasedOnCaseType('PIP');
@@ -59,7 +59,7 @@ test('FTA raises a new request & Caseworker replies to the query & FTA reviews C
     }
 )
 
-test('Delete a request',
+test('Delete a request sent to FTA(DWP)',
     { tag: '@nightly-pipeline' },
     async ({ communicateWithFtaSteps }) => {
         caseId = await createCaseBasedOnCaseType('PIP');
