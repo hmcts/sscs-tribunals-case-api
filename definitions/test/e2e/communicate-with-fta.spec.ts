@@ -1,6 +1,5 @@
 import { test } from '../lib/steps.factory';
 import createCaseBasedOnCaseType from '../api/client/sscs/factory/appeal.type.factory';
-import { EventDetails } from '../fixtures/steps/communicate-with-fta';
 
 
 let caseId: string;
@@ -11,13 +10,13 @@ test(
         caseId = await createCaseBasedOnCaseType('PIP');
 
         // Caseworker raise new request
-        await communicateWithFtaSteps.communicateWithUser(caseId, 'Communication with FTA', 'caseWorker');
+        await communicateWithFtaSteps.communicateWithUser(caseId, 'Communication with FTA', 'amTribunalCaseWorker');
         
         //Completes the communication with FTA request grabs details from history tab for verification
         await communicateWithFtaSteps.submitNewCommunicationRequest({isCommsToFta: true});
 
         // FTA replies to the query
-        await communicateWithFtaSteps.replyToQuery(caseId, {
+        await communicateWithFtaSteps.replyToQuery(caseId, 'dwpResponseWriter', {
             event: 'Communication with Tribunal', 
             replyMethod: 'replyToTribunalQuery'
         });
@@ -25,7 +24,7 @@ test(
         // Caseworker reviews FTA reply
         await communicateWithFtaSteps.reviewUserReply(caseId, {
             tribsVerifyReply: true,
-            userType: 'caseWorker',
+            userType: 'amTribunalCaseWorker',
             event: 'Communication with FTA',
             reviewMethod: 'fillOutReviewFtaReply'
         });
@@ -33,7 +32,6 @@ test(
 
 
 test('FTA raises a new request & Caseworker replies to the query & FTA reviews Caseworker reply',
-    {tag: '@wip-2008'},
      async({communicateWithFtaSteps})   => {
         caseId = await createCaseBasedOnCaseType('PIP');
         
@@ -44,7 +42,7 @@ test('FTA raises a new request & Caseworker replies to the query & FTA reviews C
         await communicateWithFtaSteps.submitNewCommunicationRequest({isCommsToFta: false});
 
         // Caseworker replies to the query
-        await communicateWithFtaSteps.replyToQuery(caseId, {
+        await communicateWithFtaSteps.replyToQuery(caseId, 'amTribunalCaseWorker', {
             event: 'Communication with FTA', 
             replyMethod: 'replyToFTAQuery'
         });

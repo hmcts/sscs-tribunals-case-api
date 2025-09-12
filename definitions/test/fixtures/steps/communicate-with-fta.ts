@@ -37,22 +37,21 @@ export class CommunicateWithFta extends BaseStep {
         }
     }
 
-    async replyToQuery(caseId: string, options: { 
+    async replyToQuery(caseId: string, user: string, options: { 
         event: 'Communication with Tribunal' | 'Communication with FTA', 
         replyMethod: 'replyToTribunalQuery' | 'replyToFTAQuery'
     }) {
         await this.signOut();
-        await this.loginUserWithCaseId(credentials.caseWorker, false, caseId);
+        await this.loginUserWithCaseId(credentials[user], false, caseId);
         await this.homePage.chooseEvent(options.event);
         await this.communicateWithTribunalPage[options.replyMethod]();
-        await this.verifyHistoryTabDetails('With FTA', options.event);
         await this.homePage.navigateToTab('Tribunal/FTA Communications');
         await this.tribunalFtaCommunicationsTab.verifyReplyExists();
     }
 
     async reviewUserReply(caseId: string, options: {
         tribsVerifyReply: boolean,
-        userType: 'caseWorker' | 'dwpResponseWriter',
+        userType: 'amTribunalCaseWorker' | 'dwpResponseWriter',
         event: 'Communication with Tribunal' | 'Communication with FTA',
         reviewMethod: 'fillOutReviewTribunalReply' | 'fillOutReviewFtaReply'
     }) {

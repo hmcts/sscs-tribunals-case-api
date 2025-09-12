@@ -1,4 +1,4 @@
-import { expect, Page } from '@playwright/test';
+import { Page } from '@playwright/test';
 import { WebAction } from '../../common/web.action';
 
 let webActions: WebAction;
@@ -12,17 +12,18 @@ export class TribunalFtaCommunications {
     }
 
     async verifyRequestFromTribunalExists() {
-        const requestFromTribunal = await this.page.locator("//span[text()='Requests from Tribunal 1']//ancestor::dl/..");
-        await expect(requestFromTribunal).toBeVisible();
+        const requestFromTribunal = "//span[text()='Requests from Tribunal 1']//ancestor::dl/..";
+        await webActions.verifyElementVisibility(requestFromTribunal);
     }
 
     async verifyRequestFromFTAExists() {
-        const requestFromTribunal = await this.page.locator("//span[text()='Requests from FTA 1']//ancestor::dl/..");
-        await expect(requestFromTribunal).toBeVisible();
+        const requestFromFTA = "//span[text()='Requests from FTA 1']//ancestor::dl/..";
+        await webActions.verifyElementVisibility(requestFromFTA);
     }
 
     async verifyReplyExists() {
-        const replyFromFta = await this.page.locator("//span[text()='Reply']//ancestor::dl/..");
+        const reply = "//span[text()='Reply']//ancestor::dl/.."
+        await webActions.verifyElementVisibility(reply);
     }
 
     async verifyReplyHasBeenReviewed(tribsVerifyReply: boolean) {
@@ -33,8 +34,6 @@ export class TribunalFtaCommunications {
             replyReviewed = "//*[normalize-space()='Has the reply been reviewed by the FTA?']/..//span//span[normalize-space()='Yes']";
         }
         
-        await expect(this.page.locator(replyReviewed)).toBeVisible();
-        await webActions.verifyPageLabel(replyReviewed, "Yes");
+        await webActions.verifyElementVisibility(replyReviewed);
     }
-
 }
