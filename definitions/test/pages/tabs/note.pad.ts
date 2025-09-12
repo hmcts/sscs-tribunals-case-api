@@ -18,4 +18,10 @@ export class NotePad {
       )
     ).toBeVisible();
   }
+
+  async verifyRequestOrReplyDeleteNoteExists(note: string, reasonForDeletion: string) {
+    await webActions.verifyElementVisibility(`//span[text()='Note pad 1']`)
+    await webActions.verifyElementVisibility(`//th[normalize-space()='Note']/../td//span[contains(text(), '${note}')]`);
+    await webActions.verifyElementVisibility(`//th[normalize-space()='Note']/../td//span[contains(text(), '${reasonForDeletion}')]`);
+  }
 }

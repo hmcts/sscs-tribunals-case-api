@@ -64,6 +64,9 @@ import { UploadToRemoveFromTabPage } from '../../pages/upload.to.remove.from.tab
 import { UploadToRemoveFromDocumentsPage } from '../../pages/upload.to.remove.from.documents.page';
 import { MoveToTabPage } from '../../pages/move.to.tab.page';
 import { MoveDocumentsPage } from '../../pages/move.documents.page';
+import { CommunicateWithFtaPage } from '../../pages/communicate.with.fta.page';
+import { CommunicateWithTribunalPage } from '../../pages/communicate.with.tribunal.page';
+import { TribunalFtaCommunications } from '../../pages/tabs/tribunalFtaCommunications';
 
 export abstract class BaseStep {
   readonly page: Page;
@@ -132,6 +135,9 @@ export abstract class BaseStep {
   protected prepareCaseForHearingPage: PrepareCaseForHearingPage;
   protected reviewConfidentialityPage: ReviewConfidentialityPage;
   protected createUpdateToCaseDataPage;
+  protected communicateWithFtaPage: CommunicateWithFtaPage;
+  protected communicateWithTribunalPage: CommunicateWithTribunalPage;
+  protected tribunalFtaCommunicationsTab: TribunalFtaCommunications;
 
   protected constructor(page: Page) {
     this.page = page;
@@ -213,6 +219,9 @@ export abstract class BaseStep {
     this.prepareCaseForHearingPage = new PrepareCaseForHearingPage(this.page);
     this.reviewConfidentialityPage = new ReviewConfidentialityPage(this.page);
     this.createUpdateToCaseDataPage = new CreateUpdateToCaseDataPage(this.page);
+    this.communicateWithFtaPage = new CommunicateWithFtaPage(this.page);
+    this.tribunalFtaCommunicationsTab = new TribunalFtaCommunications(this.page);
+    this.communicateWithTribunalPage = new CommunicateWithTribunalPage(this.page);
   }
 
   async loginUserWithCaseIdViaCaseList(
