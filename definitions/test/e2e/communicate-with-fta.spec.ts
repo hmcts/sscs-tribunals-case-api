@@ -4,20 +4,20 @@ import createCaseBasedOnCaseType from '../api/client/sscs/factory/appeal.type.fa
 
 let caseId: string;
 
-test(
-    'Caseworker raise new request & FTA replies to the query & Caseworker reviews FTA reply',
+test('Caseworker raise new request & FTA replies to the query & Caseworker reviews FTA reply',
+    { tag: '@nightly-pipeline' },
     async ({ communicateWithFtaSteps }) => {
         caseId = await createCaseBasedOnCaseType('PIP');
 
         // Caseworker raise new request
         await communicateWithFtaSteps.communicateWithUser(caseId, 'Communication with FTA', 'amTribunalCaseWorker');
-        
+
         //Completes the communication with FTA request grabs details from history tab for verification
-        await communicateWithFtaSteps.submitNewCommunicationRequest({isCommsToFta: true});
+        await communicateWithFtaSteps.submitNewCommunicationRequest({ isCommsToFta: true });
 
         // FTA replies to the query
         await communicateWithFtaSteps.replyToQuery(caseId, 'dwpResponseWriter', {
-            event: 'Communication with Tribunal', 
+            event: 'Communication with Tribunal',
             replyMethod: 'replyToTribunalQuery'
         });
 
@@ -32,22 +32,23 @@ test(
 
 
 test('FTA raises a new request & Caseworker replies to the query & FTA reviews Caseworker reply',
-     async({communicateWithFtaSteps})   => {
+    { tag: '@nightly-pipeline' },
+    async ({ communicateWithFtaSteps }) => {
         caseId = await createCaseBasedOnCaseType('PIP');
-        
+
         // FTA raises a new request
         await communicateWithFtaSteps.communicateWithUser(caseId, 'Communication with Tribunal', 'dwpResponseWriter');
-        
+
         //Completes the communication with Tribunal request grabs details from history tab for verification
-        await communicateWithFtaSteps.submitNewCommunicationRequest({isCommsToFta: false});
+        await communicateWithFtaSteps.submitNewCommunicationRequest({ isCommsToFta: false });
 
         // Caseworker replies to the query
         await communicateWithFtaSteps.replyToQuery(caseId, 'amTribunalCaseWorker', {
-            event: 'Communication with FTA', 
+            event: 'Communication with FTA',
             replyMethod: 'replyToFTAQuery'
         });
 
-         // FTA reviews Caseworker reply
+        // FTA reviews Caseworker reply
         await communicateWithFtaSteps.reviewUserReply(caseId, {
             tribsVerifyReply: false,
             userType: 'dwpResponseWriter',
@@ -55,5 +56,21 @@ test('FTA raises a new request & Caseworker replies to the query & FTA reviews C
             reviewMethod: 'fillOutReviewTribunalReply'
         });
 
-     }
+    }
+)
+
+test('Delete a request',
+    { tag: '@nightly-pipeline' },
+    async ({ communicateWithFtaSteps }) => {
+        caseId = await createCaseBasedOnCaseType('PIP');
+
+        // Caseworker raise new request
+        await communicateWithFtaSteps.communicateWithUser(caseId, 'Communication with FTA', 'amTribunalCaseWorker');
+
+        //Completes the communication with FTA request
+        await communicateWithFtaSteps.submitNewCommunicationRequest({ isCommsToFta: true });
+
+        // Caseworker deletes the request
+        await communicateWithFtaSteps.deleteRequestOrReply();
+    }
 )
