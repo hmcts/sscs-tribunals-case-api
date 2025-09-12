@@ -21,22 +21,21 @@ export class CommunicateWithFta extends BaseStep {
     }
 
     async submitNewCommunicationRequest(options: {isCommsToFta: boolean }){
-    if (options.isCommsToFta) {
-        await this.communicateWithFtaPage.verifyPageContent(true);
-        await this.communicateWithFtaPage.selectCommunicationType('New Request');
-        await this.communicateWithFtaPage.fillOutNewRequestData('Appeal Type', 'FTA');
-        await this.verifyHistoryTabDetails('With FTA', 'Communication with FTA');
-        await this.homePage.navigateToTab('Tribunal/FTA Communications');
-        await this.tribunalFtaCommunicationsTab.verifyRequestFromTribunalExists();
-    } else {
-        await this.communicateWithFtaPage.verifyPageContent(false);
-        await this.communicateWithFtaPage.selectCommunicationType('New Request');
-        await this.communicateWithFtaPage.fillOutNewRequestData('Appeal Type', 'Caseworker');
-        await this.homePage.navigateToTab('Tribunal/FTA Communications');
-        await this.tribunalFtaCommunicationsTab.verifyRequestFromFTAExists();
+        if (options.isCommsToFta) {
+            await this.communicateWithFtaPage.verifyPageContent(true);
+            await this.communicateWithFtaPage.selectCommunicationType('New Request');
+            await this.communicateWithFtaPage.fillOutNewRequestData('Appeal Type', 'FTA');
+            await this.verifyHistoryTabDetails('With FTA', 'Communication with FTA');
+            await this.homePage.navigateToTab('Tribunal/FTA Communications');
+            await this.tribunalFtaCommunicationsTab.verifyRequestFromTribunalExists();
+        } else {
+            await this.communicateWithFtaPage.verifyPageContent(false);
+            await this.communicateWithFtaPage.selectCommunicationType('New Request');
+            await this.communicateWithFtaPage.fillOutNewRequestData('Appeal Type', 'Caseworker');
+            await this.homePage.navigateToTab('Tribunal/FTA Communications');
+            await this.tribunalFtaCommunicationsTab.verifyRequestFromFTAExists();
+        }
     }
-}
-
 
     async replyToQuery(caseId: string, options: { 
         event: 'Communication with Tribunal' | 'Communication with FTA', 

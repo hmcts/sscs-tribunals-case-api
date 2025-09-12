@@ -12,6 +12,7 @@ test(
 
         // Caseworker raise new request
         await communicateWithFtaSteps.communicateWithUser(caseId, 'Communication with FTA', 'caseWorker');
+        
         //Completes the communication with FTA request grabs details from history tab for verification
         await communicateWithFtaSteps.submitNewCommunicationRequest({isCommsToFta: true});
 
