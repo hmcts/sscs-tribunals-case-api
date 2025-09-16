@@ -64,6 +64,7 @@ import { UploadToRemoveFromTabPage } from '../../pages/upload.to.remove.from.tab
 import { UploadToRemoveFromDocumentsPage } from '../../pages/upload.to.remove.from.documents.page';
 import { MoveToTabPage } from '../../pages/move.to.tab.page';
 import { MoveDocumentsPage } from '../../pages/move.documents.page';
+import { WriteAdjournmentPages } from '../../pages/write.adjournment.page';
 
 export abstract class BaseStep {
   readonly page: Page;
@@ -132,6 +133,7 @@ export abstract class BaseStep {
   protected prepareCaseForHearingPage: PrepareCaseForHearingPage;
   protected reviewConfidentialityPage: ReviewConfidentialityPage;
   protected createUpdateToCaseDataPage;
+  protected writeAdjournmentPage: WriteAdjournmentPages;
 
   protected constructor(page: Page) {
     this.page = page;
@@ -213,6 +215,7 @@ export abstract class BaseStep {
     this.prepareCaseForHearingPage = new PrepareCaseForHearingPage(this.page);
     this.reviewConfidentialityPage = new ReviewConfidentialityPage(this.page);
     this.createUpdateToCaseDataPage = new CreateUpdateToCaseDataPage(this.page);
+    this.writeAdjournmentPage = new WriteAdjournmentPages(this.page);
   }
 
   async loginUserWithCaseIdViaCaseList(
@@ -252,10 +255,11 @@ export abstract class BaseStep {
   ) {
     await this.homePage.navigateToTab('History');
     await this.homePage.delay(1000);
-    /*if(state) await this.historyTab.verifyHistoryPageContentByKeyValue('End state', state);
-        if(event) await this.historyTab.verifyHistoryPageContentByKeyValue('Event', event);
-        if(comment) await this.historyTab.verifyHistoryPageContentByKeyValue('Comment', comment);*/
-    if (event) await this.historyTab.verifyEventCompleted(event);
+    if(event) await this.historyTab.verifyEventCompleted(event);
+  }
+
+  async verifyEndStateInHistoryTab(state: string) {
+    if (state) await this.historyTab.verifyPageContentByKeyValue('End state', state);
   }
 
   async verifyHistoryTabLink(linkLabel: string) {
