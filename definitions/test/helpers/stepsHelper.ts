@@ -37,6 +37,7 @@ export class StepsHelper {
   }
 
   async verifyHearingHelper() {
+    await new Promise((f) => setTimeout(f, 5000));
     await this.homePage.navigateToTab('Hearings');
     await this.hearingsTab.verifyHearingStatusSummary(false);
   }
