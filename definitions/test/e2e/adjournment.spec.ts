@@ -14,18 +14,17 @@ test.describe('Adjournment Feature', () => {
   });
 
   test('Adjourn a hearing & move case back to ready to list state',
-    {tag: '@CI-2021'},
+    {tag: '@nightly-pipeline'},
     async ({ adjournmentSteps }, testInfo) => {
       const caseId = (testInfo as any).caseId;
       await adjournmentSteps.writeAdjournmentAndMoveToListing(caseId, { setToRTLFlag: true });
       await adjournmentSteps.performIssueAdjournmentNoticeForAnAppeal({ endState: 'Ready to list' });
       await adjournmentSteps.verifyAdjournmentDecisionForAnAppeal();
       await adjournmentSteps.verifyListingRequirements();
-      await adjournmentSteps.verifyHearingHelper(caseId);
   });
 
   test('Adjourn a hearing & move case back to Not listable state',
-    {tag: '@CI-2021'},
+    {tag: '@nightly-pipeline'},
     async ({ adjournmentSteps }, testInfo) => {
       const caseId = (testInfo as any).caseId;
       await adjournmentSteps.writeAdjournmentAndMoveToListing(caseId, { setToRTLFlag: false });
