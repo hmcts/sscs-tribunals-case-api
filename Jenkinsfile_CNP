@@ -8,8 +8,8 @@ import uk.gov.hmcts.contino.GithubAPI
 def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
-def dmnBranch = "edit-dnm-preview"
-def waStandaloneBranch = "edit-dnm-preview"
+def dmnBranch = "master"
+def waStandaloneBranch = "master"
 
 def secrets = [
         'sscs-${env}': [
