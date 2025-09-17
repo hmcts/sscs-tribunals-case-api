@@ -50,6 +50,7 @@ import { CreateUpdateToCaseDataSteps } from '../fixtures/steps/update.to.case.da
 import { GenerateAppealPdfSteps } from '../fixtures/steps/generate.appeal.pdf';
 import { ManageDocuments } from '../fixtures/steps/manage.documents';
 import { UpdateListingRequirement } from '../fixtures/steps/update.listing.requirements'; 
+import { Adjournment } from '../fixtures/steps/adjournment';
 
 type MyStepsFixtures = {
   addNoteSteps: Note;
@@ -103,6 +104,7 @@ type MyStepsFixtures = {
   createUpdateToCaseDataSteps: CreateUpdateToCaseDataSteps;
   generateAppealPdfSteps: GenerateAppealPdfSteps;
   updateListingRequirementSteps: UpdateListingRequirement;
+  adjournmentSteps: Adjournment;
 };
 
 export const test = stepsFactory.extend<MyStepsFixtures>({
@@ -406,5 +408,9 @@ export const test = stepsFactory.extend<MyStepsFixtures>({
   updateListingRequirementSteps: async ({ page }, use) => {
     const updateListingRequirementSteps = new UpdateListingRequirement(page);
     await use(updateListingRequirementSteps);
+  },
+  adjournmentSteps: async ({ page }, use) => {
+    const adjournmentSteps = new Adjournment(page);
+    await use(adjournmentSteps);
   }
 });

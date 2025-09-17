@@ -1,0 +1,42 @@
+{
+    "eventName": "Write adjournment notice",
+    "issueAdjournmentEventName": "Issue adjournment notice",
+
+    "typeOfAppealHeading": "Type of appeal",
+    "generateNotice": {
+        "label": "Generate notice?",
+        "options": {
+            "yes": "Yes",
+            "no": "No"
+        }
+    },
+
+    "panelMembers": {
+        "excludedHeading": "Are panel members excluded?",
+        "heading": "Panel members",
+        "members": [
+            "Test Panel Member1",
+            "Test Panel Member2"
+        ]
+    },
+
+    "hearing": {
+        "typeHeading": "Type of hearing",
+        "caseDirectionsHeading": "Can case be listed right away?",
+        "directionToPartiesHeading": "Are you making directions to the parties?",
+        "directionsDueDateHeading": "Directions due date",
+        "nextFormatHeading": "Next hearing format",
+        "nextVenueHeading": "Next hearing venue",
+        "timeSlotHeading": "How long should the next hearing be listed for?",
+        "languageInterpreterHeading": "Language interpreter",
+        "nextDateHeading": "When should the next hearing be?"
+    },
+
+    "adjournmentReasonHeading": "Reasons for adjournment",
+
+    "previewAdjournmentNotice": {
+        "heading": "Preview Adjournment Notice",
+        "label": "Preview Adjournment",
+        "guidanceText": "All documents must be PDF formatted"
+    }
+}
