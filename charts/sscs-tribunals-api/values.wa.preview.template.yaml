@@ -290,8 +290,6 @@ xui-webapp:
           - system-user-password
 
 global:
-  security:
-    allowInsecureImages: true
   ccdApiGatewayIngress: http://${SERVICE_NAME}-ccd-api-gw
   ccdAdminWebIngress: ${SERVICE_NAME}-ccd-admin-web
   ccdDataStoreUrl: http://${SERVICE_NAME}-ccd-data-store-api
@@ -647,9 +645,7 @@ elastic:
 sscs-tribunals-frontend:
   enabled: true
   nodejs:
-    image:
-      registry: hmctspublic.azurecr.io
-      repository: imported/bitnami/redis
+    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
     ingressHost: sya-${SERVICE_FQDN}
     registerAdditionalDns:
       enabled: true
