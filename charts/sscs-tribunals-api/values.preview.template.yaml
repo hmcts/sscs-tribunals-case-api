@@ -702,7 +702,7 @@ sscs-tribunals-frontend:
           - sscs-redis-connection-string
 
 redis:
-  enabled: true
+  enabled: false
   serviceAccount:
     create: false
     name: "sscs"
