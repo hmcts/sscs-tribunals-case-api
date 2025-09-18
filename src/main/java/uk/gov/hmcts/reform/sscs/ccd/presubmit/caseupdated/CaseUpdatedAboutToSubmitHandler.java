@@ -11,6 +11,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.isScottishCase;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.validateHearingOptionsAndExcludeDates;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SYSTEM_USER;
@@ -58,7 +59,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.AssociatedCaseLinkHelper;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish.IsScottishHandler;
 import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
@@ -428,7 +428,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     public void maybeChangeIsScottish(RegionalProcessingCenter oldRpc, RegionalProcessingCenter newRpc, SscsCaseData caseData) {
         if (oldRpc != newRpc) {
-            String isScottishCase = IsScottishHandler.isScottishCase(newRpc, caseData);
+            String isScottishCase = isScottishCase(newRpc);
             caseData.setIsScottishCase(isScottishCase);
         }
     }
