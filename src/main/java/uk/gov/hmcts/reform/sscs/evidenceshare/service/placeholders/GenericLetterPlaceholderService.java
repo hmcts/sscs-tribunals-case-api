@@ -60,6 +60,7 @@ public class GenericLetterPlaceholderService {
     }
 
     public Map<String, Object> populatePlaceholders(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String otherPartyId) {
+        log.info("Populating placeholders for letter type: {} for case id: {}", letterType, caseData.getCcdCaseId());
         Address address = PlaceholderUtility.getAddress(caseData, letterType, otherPartyId);
         String name = PlaceholderUtility.getName(caseData, letterType, otherPartyId);
 
