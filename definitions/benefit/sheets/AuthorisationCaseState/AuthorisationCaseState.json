@@ -141,6 +141,8 @@
   {"LiveFrom": "25/06/2019", "CaseTypeID": "Benefit", "CaseStateID": "postHearing", "AccessProfile": "caseworker-wa-task-configuration", "CRUD": "CRU"},
   {"LiveFrom": "25/06/2019", "CaseTypeID": "Benefit", "CaseStateID": "appealCreated", "AccessProfile": "caseworker-ras-validation", "CRUD": "R"},
   {"LiveFrom": "25/06/2019", "CaseTypeID": "Benefit", "CaseStateID": "dormantAppealState", "AccessProfile": "caseworker-ras-validation", "CRUD": "R"},
+  {"LiveFrom": "25/06/2019", "CaseTypeID": "Benefit", "CaseStateID": "draft", "AccessProfile": "caseworker-ras-validation", "CRUD": "R"},
+  {"LiveFrom": "25/06/2019", "CaseTypeID": "Benefit", "CaseStateID": "draftArchived", "AccessProfile": "caseworker-ras-validation", "CRUD": "R"},
   {"LiveFrom": "25/06/2019", "CaseTypeID": "Benefit", "CaseStateID": "incompleteApplication", "AccessProfile": "caseworker-ras-validation", "CRUD": "R"},
   {"LiveFrom": "25/06/2019", "CaseTypeID": "Benefit", "CaseStateID": "incompleteApplicationInformationReqsted", "AccessProfile": "caseworker-ras-validation", "CRUD": "R"},
   {"LiveFrom": "25/06/2019", "CaseTypeID": "Benefit", "CaseStateID": "interlocutoryReviewState", "AccessProfile": "caseworker-ras-validation", "CRUD": "R"},
