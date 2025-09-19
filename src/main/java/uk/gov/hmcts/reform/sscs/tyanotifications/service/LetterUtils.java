@@ -372,6 +372,7 @@ public class LetterUtils {
     public static Map<String, Object> getAddressPlaceholders(Address address, boolean truncate, LetterType letterType) {
         HashMap<String, Object> addressPlaceHolders = new HashMap<>();
         List<String> lines = lines(address);
+        log.info("Address lines to be used for letterType {}: {}", letterType, lines);
         List<String> addressConstants =  new ArrayList<>();
 
         switch (letterType) {
