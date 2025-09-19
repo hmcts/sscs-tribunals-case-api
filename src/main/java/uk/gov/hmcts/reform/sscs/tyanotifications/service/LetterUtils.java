@@ -390,7 +390,7 @@ public class LetterUtils {
         }
 
         for (int i = 0; i < lines.size(); i++) {
-            log.info("Adding letter address lines for letter type {}", letterType);
+            log.info("Adding letter address lines for letterType {}: {} = {}", letterType, addressConstants.get(i), lines.get(i));
             addressPlaceHolders.put(addressConstants.get(i), truncate ? truncateAddressLine(defaultToEmptyStringIfNull(lines.get(i))) : defaultToEmptyStringIfNull(lines.get(i)));
         }
         return addressPlaceHolders;
