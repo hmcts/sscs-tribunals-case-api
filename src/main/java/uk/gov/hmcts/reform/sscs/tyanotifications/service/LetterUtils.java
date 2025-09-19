@@ -40,6 +40,8 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
@@ -56,6 +58,8 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationClientRun
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 
 public class LetterUtils {
+
+    private static final Logger log = LoggerFactory.getLogger(LetterUtils.class);
 
     private LetterUtils() {
         // Hiding utility class constructor
@@ -386,6 +390,7 @@ public class LetterUtils {
         }
 
         for (int i = 0; i < lines.size(); i++) {
+            log.info("Adding letter address lines for letter type {}", letterType);
             addressPlaceHolders.put(addressConstants.get(i), truncate ? truncateAddressLine(defaultToEmptyStringIfNull(lines.get(i))) : defaultToEmptyStringIfNull(lines.get(i)));
         }
         return addressPlaceHolders;
