@@ -8,5 +8,6 @@
   {"LiveFrom": "25/06/2019", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
   {"LiveFrom": "25/06/2019", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-wa-task-configuration", "CRUD": "CRU"},
   {"LiveFrom": "25/06/2019", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-pcqextractor", "CRUD": "R"},
-  {"LiveFrom": "25/06/2019", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-ras-validation", "CRUD": "R"}
+  {"LiveFrom": "25/06/2019", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-ras-validation", "CRUD": "R"},
+  {"LiveFrom": "14/11/2023", "CaseTypeID": "Benefit", "AccessProfile": "GS_profile", "CRUD": "R"}
 ]
