@@ -447,12 +447,12 @@ dependencies {
 
     testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '4.1.1'
     testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-assertj', version: '4.1.1'
-    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.3'
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.5'
     testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.3.0'
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.18.0'
-    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.18.0'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.20.0'
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.20.0'
     testImplementation group: 'com.github.tomakehurst', name: 'wiremock-standalone', version: '3.0.1'
-    testImplementation group: 'org.wiremock.integrations', name: 'wiremock-spring-boot', version: '3.10.0'
+    testImplementation group: 'org.wiremock.integrations', name: 'wiremock-spring-boot', version: '3.10.6'
     testImplementation group: 'pl.pragmatists', name: 'JUnitParams', version: '1.1.1'
 
     testImplementation group: 'org.apiguardian', name: 'apiguardian-api', version: '1.1.2'
