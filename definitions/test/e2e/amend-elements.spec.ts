@@ -8,7 +8,6 @@ test.describe('Amend elements Feature', () => {
     testInfo.attach('caseId', { body: ucCaseId });
     await uploadResponseSteps.performUploadResponseOnAUniversalCredit(ucCaseId);
     (testInfo as any).caseId = ucCaseId;
-    console.log(ucCaseId);
   });
 
   test('Update elements and issues codes',
