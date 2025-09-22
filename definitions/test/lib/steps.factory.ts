@@ -50,6 +50,7 @@ import { CreateUpdateToCaseDataSteps } from '../fixtures/steps/update.to.case.da
 import { GenerateAppealPdfSteps } from '../fixtures/steps/generate.appeal.pdf';
 import { ManageDocuments } from '../fixtures/steps/manage.documents';
 import { UpdateListingRequirement } from '../fixtures/steps/update.listing.requirements'; 
+import { CommunicateWithFta } from '../fixtures/steps/communicate-with-fta';
 import { Adjournment } from '../fixtures/steps/adjournment';
 import { AmendElements } from '../fixtures/steps/amend.elements';
 
@@ -105,6 +106,7 @@ type MyStepsFixtures = {
   createUpdateToCaseDataSteps: CreateUpdateToCaseDataSteps;
   generateAppealPdfSteps: GenerateAppealPdfSteps;
   updateListingRequirementSteps: UpdateListingRequirement;
+  communicateWithFtaSteps: CommunicateWithFta;
   adjournmentSteps: Adjournment;
   amendElementSteps: AmendElements;
 };
@@ -410,6 +412,12 @@ export const test = stepsFactory.extend<MyStepsFixtures>({
   updateListingRequirementSteps: async ({ page }, use) => {
     const updateListingRequirementSteps = new UpdateListingRequirement(page);
     await use(updateListingRequirementSteps);
+  },
+  communicateWithFtaSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
+    const communicateWithFtaSteps = new CommunicateWithFta(page);
+    await use(communicateWithFtaSteps);
+    console.log(`${testInfo.title} ${testInfo.status}`);
   },
   adjournmentSteps: async ({ page }, use) => {
     const adjournmentSteps = new Adjournment(page);

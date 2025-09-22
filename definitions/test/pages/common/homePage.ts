@@ -28,6 +28,7 @@ export class HomePage {
   readonly ftaDocumentsTab: Locator;
   readonly otherPartyDetailsTab: Locator;
   readonly hearingsTab: Locator;
+  readonly tribunalFtaCommunicationsTab: Locator;
   readonly afterTabBtn: Locator;
   readonly caseTypeDropdown: string;
   readonly caseRefInputField: string;
@@ -61,6 +62,7 @@ export class HomePage {
     this.otherPartyDetailsTab = page.getByRole('tab').filter({ hasText: /^Other Party Details$/ });
     this.hearingsTab = page.getByRole('tab').filter({ hasText: /^Hearings$/ });
     this.elementsAndIssuesTab = page.getByRole('tab').filter({ hasText: /^Elements and issues$/ });
+    this.tribunalFtaCommunicationsTab = page.getByRole('tab').filter({ hasText: /^Tribunal\/FTA Communications$/ });
     this.afterTabBtn = page.locator(
       '//html/body/exui-root/exui-case-home/div/exui-case-details-home/exui-case-viewer-container/ccd-case-viewer/div/ccd-case-full-access-view/div[2]/div/mat-tab-group/mat-tab-header/button[2]/div'
     );
@@ -312,6 +314,11 @@ export class HomePage {
       case 'Elements and issues': {
         await expect(this.elementsAndIssuesTab).toBeVisible();
         await this.elementsAndIssuesTab.click();
+        break;
+      }
+      case 'Tribunal/FTA Communications': {
+        await expect(this.tribunalFtaCommunicationsTab).toBeVisible();
+        await this.tribunalFtaCommunicationsTab.click();
         break;
       }
       default: {
