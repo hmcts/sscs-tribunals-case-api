@@ -44,6 +44,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -138,6 +139,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
                 .hearingId(String.valueOf(1))
                 .venue(Venue.builder().name("Venue 1").build())
                 .time("12:00")
+                .hearingStatus(HearingStatus.COMPLETED)
                 .build()).build();
 
         Hearing hearing2 = Hearing.builder().value(HearingDetails.builder()
@@ -146,6 +148,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
                 .hearingId(String.valueOf(1))
                 .venue(Venue.builder().name("Venue 1").build())
                 .time("12:00")
+                .hearingStatus(HearingStatus.LISTED)
                 .build()).build();
 
         caseData.setHearings(List.of(hearing1, hearing2));
