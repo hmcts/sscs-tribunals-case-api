@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.helper;
 import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus.ADJOURNED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus.AWAITING_LISTING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus.CANCELLED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus.LISTED;
@@ -122,8 +121,7 @@ public class SscsHelper {
             && hearing.getValue() != null
             && hearing.getValue().getHearingStatus() != null
             && (AWAITING_LISTING.equals(hearing.getValue().getHearingStatus())
-                || LISTED.equals(hearing.getValue().getHearingStatus())
-        );
+                || LISTED.equals(hearing.getValue().getHearingStatus()));
     }
 
     public static boolean hasHearingScheduledInTheFuture(SscsCaseData caseData) {
