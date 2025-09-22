@@ -64,5 +64,13 @@ export class CommunicateWithFta extends BaseStep {
         await this.homePage.navigateToTab('Tribunal/FTA Communications');
         await this.tribunalFtaCommunicationsTab.verifyReplyHasBeenReviewed(options.tribsVerifyReply);
     }
+
+    async deleteRequestOrReply() {
+        await this.homePage.chooseEvent('Communication with FTA');
+        await this.communicateWithFtaPage.verifyPageContent(true);
+        await this.communicateWithFtaPage.deleteRequestOrReply();
+        await this.homePage.navigateToTab('Notepad');
+        await this.notePadTab.verifyRequestOrReplyDeleteNoteExists('Request deleted: Appeal Type', 'Test reason for deleting request/reply');
+    }
 }
 

@@ -62,4 +62,14 @@ export class CommunicateWithFtaPage {
         await webActions.clickButton('Continue');
         await webActions.clickSubmitButton();
     }
+
+    async deleteRequestOrReply() {
+        await webActions.clickRadioButton('Delete a request/reply');
+        await webActions.clickButton('Continue');
+        await webActions.chooseOptionByIndex('#deleteCommRequestRadioDl', 1);
+        await webActions.clickButton('Continue');
+        await webActions.inputField('#deleteCommRequestTextArea', 'Test reason for deleting request/reply');
+        await webActions.clickButton('Continue');
+        await webActions.clickSubmitButton();
+    }
 }
