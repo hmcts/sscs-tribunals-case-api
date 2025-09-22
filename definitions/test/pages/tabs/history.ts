@@ -1,4 +1,4 @@
-import { expect, Page } from '@playwright/test';
+import { expect, Locator, Page } from '@playwright/test';
 import { WebAction } from '../../common/web.action';
 import { HomePage } from '../common/homePage';
 
@@ -87,5 +87,14 @@ export class History {
       .locator(`//div/markdown/h2[contains(text(),"${fieldValue}")]`)
       .textContent();
     expect(text).toContain(fieldValue); // TODO An exact match is not done as there is Text from Upper nodes of the Dom Tree Appearing.
+  }
+
+  async getDateOfEvent(): Promise<string> {
+    return await this.page.locator('.EventLog-DetailsPanel .tooltip').textContent();
+  }
+
+  async getAuthorOfEvent(): Promise<string> {
+    const authorSelector: Locator = this.page.locator("//table[@class='EventLogDetails']//span[text()='Author']/../following-sibling::td/span");  
+    return await authorSelector.textContent();
   }
 }
