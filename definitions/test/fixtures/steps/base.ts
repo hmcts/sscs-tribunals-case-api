@@ -67,6 +67,7 @@ import { MoveDocumentsPage } from '../../pages/move.documents.page';
 import { CommunicateWithFtaPage } from '../../pages/communicate.with.fta.page';
 import { CommunicateWithTribunalPage } from '../../pages/communicate.with.tribunal.page';
 import { TribunalFtaCommunications } from '../../pages/tabs/tribunalFtaCommunications';
+import { WriteAdjournmentPages } from '../../pages/write.adjournment.page';
 
 export abstract class BaseStep {
   readonly page: Page;
@@ -138,6 +139,7 @@ export abstract class BaseStep {
   protected communicateWithFtaPage: CommunicateWithFtaPage;
   protected communicateWithTribunalPage: CommunicateWithTribunalPage;
   protected tribunalFtaCommunicationsTab: TribunalFtaCommunications;
+  protected writeAdjournmentPage: WriteAdjournmentPages;
 
   protected constructor(page: Page) {
     this.page = page;
@@ -222,6 +224,7 @@ export abstract class BaseStep {
     this.communicateWithFtaPage = new CommunicateWithFtaPage(this.page);
     this.tribunalFtaCommunicationsTab = new TribunalFtaCommunications(this.page);
     this.communicateWithTribunalPage = new CommunicateWithTribunalPage(this.page);
+    this.writeAdjournmentPage = new WriteAdjournmentPages(this.page);
   }
 
   async loginUserWithCaseIdViaCaseList(
@@ -261,10 +264,11 @@ export abstract class BaseStep {
   ) {
     await this.homePage.navigateToTab('History');
     await this.homePage.delay(1000);
-    /*if(state) await this.historyTab.verifyHistoryPageContentByKeyValue('End state', state);
-        if(event) await this.historyTab.verifyHistoryPageContentByKeyValue('Event', event);
-        if(comment) await this.historyTab.verifyHistoryPageContentByKeyValue('Comment', comment);*/
-    if (event) await this.historyTab.verifyEventCompleted(event);
+    if(event) await this.historyTab.verifyEventCompleted(event);
+  }
+
+  async verifyEndStateInHistoryTab(state: string) {
+    if (state) await this.historyTab.verifyPageContentByKeyValue('End state', state);
   }
 
   async verifyHistoryTabLink(linkLabel: string) {

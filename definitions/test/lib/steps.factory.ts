@@ -51,6 +51,7 @@ import { GenerateAppealPdfSteps } from '../fixtures/steps/generate.appeal.pdf';
 import { ManageDocuments } from '../fixtures/steps/manage.documents';
 import { UpdateListingRequirement } from '../fixtures/steps/update.listing.requirements'; 
 import { CommunicateWithFta } from '../fixtures/steps/communicate-with-fta';
+import { Adjournment } from '../fixtures/steps/adjournment';
 
 type MyStepsFixtures = {
   addNoteSteps: Note;
@@ -105,6 +106,7 @@ type MyStepsFixtures = {
   generateAppealPdfSteps: GenerateAppealPdfSteps;
   updateListingRequirementSteps: UpdateListingRequirement;
   communicateWithFtaSteps: CommunicateWithFta;
+  adjournmentSteps: Adjournment;
 };
 
 export const test = stepsFactory.extend<MyStepsFixtures>({
@@ -414,5 +416,9 @@ export const test = stepsFactory.extend<MyStepsFixtures>({
     const communicateWithFtaSteps = new CommunicateWithFta(page);
     await use(communicateWithFtaSteps);
     console.log(`${testInfo.title} ${testInfo.status}`);
+  },
+  adjournmentSteps: async ({ page }, use) => {
+    const adjournmentSteps = new Adjournment(page);
+    await use(adjournmentSteps);
   }
 });
