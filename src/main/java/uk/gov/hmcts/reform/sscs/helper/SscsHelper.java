@@ -3,7 +3,10 @@ package uk.gov.hmcts.reform.sscs.helper;
 import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus.ADJOURNED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus.AWAITING_LISTING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus.CANCELLED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus.LISTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INCOMPLETE_APPLICATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INCOMPLETE_APPLICATION_INFORMATION_REQUESTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
@@ -114,6 +117,15 @@ public class SscsHelper {
         return false;
     }
 
+    private static boolean isActiveStatusHearing(Hearing hearing) {
+        return hearing != null
+            && hearing.getValue() != null
+            && hearing.getValue().getHearingStatus() != null
+            && (AWAITING_LISTING.equals(hearing.getValue().getHearingStatus())
+                || LISTED.equals(hearing.getValue().getHearingStatus())
+        );
+    }
+
     public static boolean hasHearingScheduledInTheFuture(SscsCaseData caseData) {
         Optional<Hearing> futureHearing = Optional.ofNullable(caseData.getHearings())
             .orElse(Collections.emptyList())
@@ -122,5 +134,14 @@ public class SscsHelper {
                 .filter(hearing -> !CANCELLED.equals(hearing.getValue().getHearingStatus()))
                 .findFirst();
         return futureHearing.isPresent();
+    }
+
+    public static boolean hasListedOrAwaitingListingHearing(SscsCaseData caseData) {
+        Optional<Hearing> activeHearing = Optional.ofNullable(caseData.getHearings())
+            .orElse(Collections.emptyList())
+            .stream()
+                .filter(SscsHelper::isActiveStatusHearing)
+                .findFirst();
+        return activeHearing.isPresent();
     }
 }
