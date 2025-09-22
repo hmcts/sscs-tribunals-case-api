@@ -51,6 +51,7 @@ import { GenerateAppealPdfSteps } from '../fixtures/steps/generate.appeal.pdf';
 import { ManageDocuments } from '../fixtures/steps/manage.documents';
 import { UpdateListingRequirement } from '../fixtures/steps/update.listing.requirements'; 
 import { Adjournment } from '../fixtures/steps/adjournment';
+import { AmendElements } from '../fixtures/steps/amend.elements';
 
 type MyStepsFixtures = {
   addNoteSteps: Note;
@@ -105,6 +106,7 @@ type MyStepsFixtures = {
   generateAppealPdfSteps: GenerateAppealPdfSteps;
   updateListingRequirementSteps: UpdateListingRequirement;
   adjournmentSteps: Adjournment;
+  amendElementSteps: AmendElements;
 };
 
 export const test = stepsFactory.extend<MyStepsFixtures>({
@@ -412,5 +414,9 @@ export const test = stepsFactory.extend<MyStepsFixtures>({
   adjournmentSteps: async ({ page }, use) => {
     const adjournmentSteps = new Adjournment(page);
     await use(adjournmentSteps);
+  },
+   amendElementSteps: async ({ page }, use) => {
+    const amendElementSteps = new AmendElements(page);
+    await use(amendElementSteps);
   }
 });

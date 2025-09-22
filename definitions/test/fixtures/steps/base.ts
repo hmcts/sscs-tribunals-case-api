@@ -65,6 +65,8 @@ import { UploadToRemoveFromDocumentsPage } from '../../pages/upload.to.remove.fr
 import { MoveToTabPage } from '../../pages/move.to.tab.page';
 import { MoveDocumentsPage } from '../../pages/move.documents.page';
 import { WriteAdjournmentPages } from '../../pages/write.adjournment.page';
+import { AmendElementPage } from '../../pages/amend.element.page';
+import { ElementsAndIssues } from '../../pages/tabs/elementsAndIssues';
 
 export abstract class BaseStep {
   readonly page: Page;
@@ -134,6 +136,8 @@ export abstract class BaseStep {
   protected reviewConfidentialityPage: ReviewConfidentialityPage;
   protected createUpdateToCaseDataPage;
   protected writeAdjournmentPage: WriteAdjournmentPages;
+  protected amendElementPage: AmendElementPage;
+  protected elementsAndIssuesTab: ElementsAndIssues;
 
   protected constructor(page: Page) {
     this.page = page;
@@ -216,6 +220,8 @@ export abstract class BaseStep {
     this.reviewConfidentialityPage = new ReviewConfidentialityPage(this.page);
     this.createUpdateToCaseDataPage = new CreateUpdateToCaseDataPage(this.page);
     this.writeAdjournmentPage = new WriteAdjournmentPages(this.page);
+    this.amendElementPage = new AmendElementPage(this.page);
+    this.elementsAndIssuesTab = new ElementsAndIssues(this.page);
   }
 
   async loginUserWithCaseIdViaCaseList(

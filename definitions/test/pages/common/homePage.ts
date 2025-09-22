@@ -32,6 +32,7 @@ export class HomePage {
   readonly caseTypeDropdown: string;
   readonly caseRefInputField: string;
   readonly searchResultsField: string;
+  readonly elementsAndIssuesTab: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -59,6 +60,7 @@ export class HomePage {
     this.ftaDocumentsTab = page.getByRole('tab').filter({ hasText: /^FTA Documents$/ });
     this.otherPartyDetailsTab = page.getByRole('tab').filter({ hasText: /^Other Party Details$/ });
     this.hearingsTab = page.getByRole('tab').filter({ hasText: /^Hearings$/ });
+    this.elementsAndIssuesTab = page.getByRole('tab').filter({ hasText: /^Elements and issues$/ });
     this.afterTabBtn = page.locator(
       '//html/body/exui-root/exui-case-home/div/exui-case-details-home/exui-case-viewer-container/ccd-case-viewer/div/ccd-case-full-access-view/div[2]/div/mat-tab-group/mat-tab-header/button[2]/div'
     );
@@ -305,6 +307,11 @@ export class HomePage {
       case 'Hearings': {
         await expect(this.hearingsTab).toBeVisible();
         await this.hearingsTab.click();
+        break;
+      }
+      case 'Elements and issues': {
+        await expect(this.elementsAndIssuesTab).toBeVisible();
+        await this.elementsAndIssuesTab.click();
         break;
       }
       default: {
