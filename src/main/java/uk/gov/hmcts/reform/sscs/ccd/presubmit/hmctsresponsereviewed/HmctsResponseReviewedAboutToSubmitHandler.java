@@ -3,20 +3,33 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.PHE_REQUEST;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.ccd.callback.*;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpResponseDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
+import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 
 
@@ -27,12 +40,15 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
 
     private final DwpDocumentService dwpDocumentService;
     private final PanelCompositionService panelCompositionService;
+    private final AddNoteService addNoteService;
 
     @Autowired
     public HmctsResponseReviewedAboutToSubmitHandler(DwpDocumentService dwpDocumentService,
-                                                     PanelCompositionService panelCompositionService) {
+                                                     PanelCompositionService panelCompositionService,
+                                                     AddNoteService addNoteService) {
         this.dwpDocumentService = dwpDocumentService;
         this.panelCompositionService = panelCompositionService;
+        this.addNoteService = addNoteService;
     }
 
     @Override
@@ -52,8 +68,7 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
-        final SscsCaseData sscsCaseData = caseDetails.getCaseData();
+        final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse =
             new PreSubmitCallbackResponse<>(sscsCaseData);
@@ -77,6 +92,8 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
 
         sscsCaseData.setPanelMemberComposition(panelCompositionService
                 .resetPanelCompositionIfStale(sscsCaseData, callback.getCaseDetailsBefore()));
+
+        addNote(sscsCaseData, userAuthorisation);
 
         return preSubmitCallbackResponse;
     }
@@ -137,5 +154,30 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
                 dwpDocument.getValue().setDocumentFileName(documentTypePrefix + " on " + todayDate);
             }
         }
+    }
+
+    private void addNote(SscsCaseData caseData, String userAuthorisation) {
+        String note = caseData.getTempNoteDetail();
+        if (nonNull(caseData.getInterlocReferralReason())
+                && caseData.getInterlocReferralReason() != InterlocReferralReason.NONE
+                && nonNull(caseData.getSelectWhoReviewsCase())) {
+
+            String reasonLabel = caseData.getInterlocReferralReason().getDescription();
+
+            log.info("Add note details for case id {} - select who reviews case: {}, interloc referral reason: {}",
+                    caseData.getCcdCaseId(), caseData.getSelectWhoReviewsCase(), caseData.getInterlocReferralReason());
+
+            String whoReviewsCaseCode = caseData.getSelectWhoReviewsCase().getValue().getCode();
+
+            Optional<String> whoReviewsCaseLabel = Arrays.stream(SelectWhoReviewsCase.values())
+                    .filter(selectWhoReviewsCase ->
+                            selectWhoReviewsCase.getId().equals(whoReviewsCaseCode))
+                    .map(selectWhoReviewsCase -> selectWhoReviewsCase.getLabel().toLowerCase())
+                    .findFirst();
+
+            note = String.format("Referred to interloc for %s - %s%s",
+                    whoReviewsCaseLabel.orElse(""), reasonLabel, isNotBlank(note) ? " - ".concat(note) : "");
+        }
+        addNoteService.addNote(userAuthorisation, caseData, note);
     }
 }

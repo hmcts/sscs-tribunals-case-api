@@ -8,6 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
@@ -15,6 +18,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.HMCTS_RESPONSE_REVIE
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.RESPONSE_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_JUDGE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_TCW;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -22,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,6 +38,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
@@ -47,13 +54,20 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
+import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 
 @ExtendWith(MockitoExtension.class)
 public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
-    private HmctsResponseReviewedAboutToSubmitHandler handler;
+
+    @Mock
+    private PanelCompositionService panelCompService;
+    @Mock
+    DwpDocumentService dwpDocumentService;
+    @Mock
+    AddNoteService addNoteService;
 
     private Callback<SscsCaseData> callback;
     private CaseDetails<SscsCaseData> caseDetails;
@@ -61,10 +75,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     private SscsCaseData sscsCaseData;
     private SscsCaseData sscsCaseDataBefore;
 
-    @Mock
-    private PanelCompositionService panelCompositionService;
-    @Mock
-    DwpDocumentService dwpDocumentService;
+    private HmctsResponseReviewedAboutToSubmitHandler handler;
 
     @BeforeEach
     public void setUp() {
@@ -83,7 +94,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
                 new CaseDetails<>(1234L, "SSCS", RESPONSE_RECEIVED, sscsCaseDataBefore, now(), "Benefit");
         callback = new Callback<>(caseDetails, Optional.of(caseDetailsBefore), HMCTS_RESPONSE_REVIEWED, false);
 
-        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompositionService);
+        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompService, addNoteService);
     }
 
     @Test
@@ -421,13 +432,70 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
     @Test
     public void shouldResetPanelComposition() {
-        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompositionService);
+        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompService, addNoteService);
         var panelComposition = new PanelMemberComposition(List.of("84"));
-        when(panelCompositionService.resetPanelCompositionIfStale(sscsCaseData, Optional.of(caseDetailsBefore)))
+        when(panelCompService.resetPanelCompositionIfStale(sscsCaseData, Optional.of(caseDetailsBefore)))
                 .thenReturn(panelComposition);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(panelComposition, response.getData().getPanelMemberComposition());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "TIME_EXTENSION",
+        "PHE_REQUEST",
+        "OVER_300_PAGES",
+        "OVER_13_MONTHS",
+        "OTHER",
+        "NO_RESPONSE_TO_DIRECTION"
+    })
+    public void ifEventIsResponseReviewed_AddInterlocReferralReasonToNote(InterlocReferralReason value) {
+        sscsCaseData.setTempNoteDetail("Here is my note");
+        sscsCaseData.setInterlocReferralReason(value);
+        sscsCaseData.setSelectWhoReviewsCase(getWhoReviewsCaseDynamicList());
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), HMCTS_RESPONSE_REVIEWED, false);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(addNoteService,times(1)).addNote(eq(USER_AUTHORISATION), eq(sscsCaseData),
+                eq(String.format("Referred to interloc for review by judge - %s - Here is my note",
+                        value.getDescription())));
+    }
+
+    @Test
+    public void testInterlocReferralReasonIsNoneAndResponseReviewedEvent_thenNoNoteIsAdded() {
+        sscsCaseData.setTempNoteDetail(null);
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.NONE);
+        sscsCaseData.setSelectWhoReviewsCase(getWhoReviewsCaseDynamicList());
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), HMCTS_RESPONSE_REVIEWED, false);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(addNoteService,times(1))
+                .addNote(eq(USER_AUTHORISATION), eq(sscsCaseData), eq(null));
+    }
+
+    @Test
+    public void testTempNoteFilledIsNullAndResponseReviewedEvent_thenNoteIsAdded() {
+        sscsCaseData.setTempNoteDetail(null);
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.OVER_300_PAGES);
+        sscsCaseData.setSelectWhoReviewsCase(getWhoReviewsCaseDynamicList());
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), HMCTS_RESPONSE_REVIEWED, false);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(addNoteService,times(1)).addNote(eq(USER_AUTHORISATION), eq(sscsCaseData),
+                eq("Referred to interloc for review by judge - Over 300 pages"));
+    }
+
+    @NotNull
+    private static DynamicList getWhoReviewsCaseDynamicList() {
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()));
+        listOptions.add(new DynamicListItem(REVIEW_BY_JUDGE.getId(), REVIEW_BY_JUDGE.getLabel()));
+        return new DynamicList(new DynamicListItem("reviewByJudge",null), listOptions);
     }
 }

@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
+import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
@@ -34,11 +35,14 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 public class AdminAppealWithdrawnHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final ListAssistHearingMessageHelper hearingMessageHelper;
+    private final AddNoteService addNoteService;
     private boolean isScheduleListingEnabled;
 
     public AdminAppealWithdrawnHandler(ListAssistHearingMessageHelper hearingMessageHelper,
-        @Value("${feature.snl.enabled}") boolean isScheduleListingEnabled) {
+                                       AddNoteService addNoteService,
+                                       @Value("${feature.snl.enabled}") boolean isScheduleListingEnabled) {
         this.hearingMessageHelper = hearingMessageHelper;
+        this.addNoteService = addNoteService;
         this.isScheduleListingEnabled = isScheduleListingEnabled;
     }
 
@@ -65,6 +69,7 @@ public class AdminAppealWithdrawnHandler implements PreSubmitCallbackHandler<Ssc
         }
         clearPostponementTransientFields(caseData);
         cancelHearing(callback);
+        addNoteService.addNote(userAuthorisation, caseData, caseData.getTempNoteDetail());
         return new PreSubmitCallbackResponse<>(caseData);
     }
 
