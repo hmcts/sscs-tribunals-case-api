@@ -126,23 +126,25 @@ public class HearingsService {
         overridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData);
 
         if (isNull(hearing)) {
+            log.info("No existing hearing found, hearing is {}, now proceeding to create a hearing", hearing);
             HearingRequestPayload hearingPayload = hearingsMapping.buildHearingPayload(wrapper, refData);
-            log.debug("Sending Create Hearing Request for Case ID {}", caseId);
+            log.info("Sending Create Hearing Request for Case ID {}", caseId);
             hmcUpdateResponse = hmcHearingApiService.sendCreateHearingRequest(hearingPayload);
 
             var johTiers = hearingPayload.getHearingDetails().getPanelRequirements().getRoleTypes();
             log.info("Saving JOH tiers ({}) onto the case ({})", johTiers, caseId);
             wrapper.getCaseData().setPanelMemberComposition(new PanelMemberComposition(johTiers));
 
-            log.debug("Received Create Hearing Request Response for Case ID {}, Hearing State {} and Response:\n{}",
+            log.info("Received Create Hearing Request Response for Case ID {}, Hearing State {} and Response:\n{}",
                     caseId, wrapper.getHearingState().getState(), hmcUpdateResponse.toString());
         } else {
+            log.info("existing hearing found for Case ID {}, skipping Create Hearing Request", caseId);
             hmcUpdateResponse = HmcUpdateResponse.builder()
                     .hearingRequestId(hearing.getHearingId())
                     .versionNumber(getHearingVersionNumber(hearing))
                     .status(hearing.getHmcStatus())
                     .build();
-            log.debug("Existing hearing found, skipping Create Hearing Request for Case ID {}, Hearing State {},"
+            log.info("Existing hearing found, skipping Create Hearing Request for Case ID {}, Hearing State {},"
                             + "Hearing version {} and Hearing Id {}",
                     caseId, hearing.getHmcStatus(), hearing.getRequestVersion(), hearing.getHearingId());
         }
