@@ -250,6 +250,7 @@ public class HearingsService {
                 event, event.getDescription());
 
         try {
+            log.info("Case ID: {} has hearing state: {}", wrapper.getCaseData().getCcdCaseId(), wrapper.getHearingState());
             Consumer<SscsCaseDetails> caseDataMutator = hearingServiceConsumer
                     .getCreateHearingCaseDetailsConsumerV2(
                             wrapper.getCaseData().getPanelMemberComposition(),
