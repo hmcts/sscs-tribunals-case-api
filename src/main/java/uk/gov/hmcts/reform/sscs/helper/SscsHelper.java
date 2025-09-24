@@ -116,11 +116,16 @@ public class SscsHelper {
         return false;
     }
 
-    private static boolean isActiveStatusHearing(Hearing hearing) {
+    private static boolean hasActiveOrUnknownHearingStatus(Hearing hearing) {
+        if (hearing != null
+                && hearing.getValue() != null
+                && (isNull(hearing.getValue().getHearingStatus()))) {
+            return true;
+        }
         return hearing != null
-            && hearing.getValue() != null
-            && hearing.getValue().getHearingStatus() != null
-            && (AWAITING_LISTING.equals(hearing.getValue().getHearingStatus())
+                && hearing.getValue() != null
+                && hearing.getValue().getHearingStatus() != null
+                && (AWAITING_LISTING.equals(hearing.getValue().getHearingStatus())
                 || LISTED.equals(hearing.getValue().getHearingStatus()));
     }
 
@@ -134,11 +139,11 @@ public class SscsHelper {
         return futureHearing.isPresent();
     }
 
-    public static boolean hasListedOrAwaitingListingHearing(SscsCaseData caseData) {
+    public static boolean hasListedOrAwaitingListingOrUnknownHearing(SscsCaseData caseData) {
         Optional<Hearing> activeHearing = Optional.ofNullable(caseData.getHearings())
             .orElse(Collections.emptyList())
             .stream()
-                .filter(SscsHelper::isActiveStatusHearing)
+                .filter(SscsHelper::hasActiveOrUnknownHearingStatus)
                 .findFirst();
         return activeHearing.isPresent();
     }

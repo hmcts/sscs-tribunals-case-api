@@ -67,7 +67,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
             return HearingHandler.GAPS.handle(sscsCaseData, hearingRequestHandler);
         }
 
-        if (SscsHelper.hasListedOrAwaitingListingHearing(sscsCaseData) && warningsShouldNotBeIgnored(callback)) {
+        if (SscsHelper.hasListedOrAwaitingListingOrUnknownHearing(sscsCaseData) && warningsShouldNotBeIgnored(callback)) {
             var response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
             response.addWarning(EXISTING_HEARING_WARNING);
             log.warn("Warning: {}", EXISTING_HEARING_WARNING);
