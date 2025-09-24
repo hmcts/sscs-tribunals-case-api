@@ -56,6 +56,7 @@ public class PreSubmitCallbackDispatcherTest {
         CaseDetails<CaseData> caseDetails =
                 new CaseDetails<>(1234L, "SSCS", READY_TO_LIST, caseData, now(), "Benefit");
         callback = new Callback<>(caseDetails, empty(), DWP_UPLOAD_RESPONSE, false);
+        callback.setPageId("pageId");
         response1 = new PreSubmitCallbackResponse<>(caseDataMutation1);
         response1.addErrors(List.of("error1"));
         response2 = new PreSubmitCallbackResponse<>(caseDataMutation2);
@@ -83,6 +84,7 @@ public class PreSubmitCallbackDispatcherTest {
         assertEquals(caseData, callbackCaptor.getValue().getCaseDetails().getCaseData());
         verify(handler2).handle(eq(ABOUT_TO_SUBMIT), callbackCaptor.capture(), eq(USER_AUTHORISATION));
         assertEquals(caseDataMutation1, callbackCaptor.getValue().getCaseDetails().getCaseData());
+        assertEquals("pageId", callbackCaptor.getValue().getPageId());
     }
 
     @Test

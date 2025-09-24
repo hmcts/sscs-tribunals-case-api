@@ -58,8 +58,10 @@ public class PreSubmitCallbackDispatcher<T extends CaseData> {
                 callback.getCaseDetails().getCreatedDate(),
                 callback.getCaseDetails().getCaseTypeId()
         );
-        return new Callback<>(
+        var updatedCallback = new Callback<>(
                 updatedCaseDetails, callback.getCaseDetailsBefore(), callback.getEvent(), callback.isIgnoreWarnings()
         );
+        updatedCallback.setPageId(callback.getPageId());
+        return updatedCallback;
     }
 }
