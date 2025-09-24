@@ -68,6 +68,8 @@ import { CommunicateWithFtaPage } from '../../pages/communicate.with.fta.page';
 import { CommunicateWithTribunalPage } from '../../pages/communicate.with.tribunal.page';
 import { TribunalFtaCommunications } from '../../pages/tabs/tribunalFtaCommunications';
 import { WriteAdjournmentPages } from '../../pages/write.adjournment.page';
+import { AmendElementPage } from '../../pages/amend.element.page';
+import { ElementsAndIssues } from '../../pages/tabs/elementsAndIssues';
 
 export abstract class BaseStep {
   readonly page: Page;
@@ -140,6 +142,8 @@ export abstract class BaseStep {
   protected communicateWithTribunalPage: CommunicateWithTribunalPage;
   protected tribunalFtaCommunicationsTab: TribunalFtaCommunications;
   protected writeAdjournmentPage: WriteAdjournmentPages;
+  protected amendElementPage: AmendElementPage;
+  protected elementsAndIssuesTab: ElementsAndIssues;
 
   protected constructor(page: Page) {
     this.page = page;
@@ -225,6 +229,8 @@ export abstract class BaseStep {
     this.tribunalFtaCommunicationsTab = new TribunalFtaCommunications(this.page);
     this.communicateWithTribunalPage = new CommunicateWithTribunalPage(this.page);
     this.writeAdjournmentPage = new WriteAdjournmentPages(this.page);
+    this.amendElementPage = new AmendElementPage(this.page);
+    this.elementsAndIssuesTab = new ElementsAndIssues(this.page);
   }
 
   async loginUserWithCaseIdViaCaseList(

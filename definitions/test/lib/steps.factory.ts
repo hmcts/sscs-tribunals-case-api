@@ -52,6 +52,7 @@ import { ManageDocuments } from '../fixtures/steps/manage.documents';
 import { UpdateListingRequirement } from '../fixtures/steps/update.listing.requirements'; 
 import { CommunicateWithFta } from '../fixtures/steps/communicate-with-fta';
 import { Adjournment } from '../fixtures/steps/adjournment';
+import { AmendElements } from '../fixtures/steps/amend.elements';
 
 type MyStepsFixtures = {
   addNoteSteps: Note;
@@ -107,6 +108,7 @@ type MyStepsFixtures = {
   updateListingRequirementSteps: UpdateListingRequirement;
   communicateWithFtaSteps: CommunicateWithFta;
   adjournmentSteps: Adjournment;
+  amendElementSteps: AmendElements;
 };
 
 export const test = stepsFactory.extend<MyStepsFixtures>({
@@ -420,5 +422,9 @@ export const test = stepsFactory.extend<MyStepsFixtures>({
   adjournmentSteps: async ({ page }, use) => {
     const adjournmentSteps = new Adjournment(page);
     await use(adjournmentSteps);
+  },
+   amendElementSteps: async ({ page }, use) => {
+    const amendElementSteps = new AmendElements(page);
+    await use(amendElementSteps);
   }
 });
