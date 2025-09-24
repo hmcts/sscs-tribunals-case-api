@@ -117,6 +117,7 @@ public class SscsHelper {
     }
 
     private static boolean hasActiveOrUnknownHearingStatus(Hearing hearing) {
+        log.info("Checking hearing status for hearing id: {} and hearing {}", hearing.getValue().getHearingId(), hearing);
         if (hearing != null
                 && hearing.getValue() != null
                 && (isNull(hearing.getValue().getHearingStatus()))) {
