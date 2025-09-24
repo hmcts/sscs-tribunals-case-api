@@ -76,5 +76,6 @@ public class HearingServiceConsumer {
             log.debug("Case Updated with AdjournmentInProgress to NO for Case ID {}", caseData.getCcdCaseId());
             caseData.getAdjournment().setAdjournmentInProgress(YesNo.NO);
         }
+        log.info("case id {} updated case data with hearing response xx", caseData.getCcdCaseId());
     }
 }

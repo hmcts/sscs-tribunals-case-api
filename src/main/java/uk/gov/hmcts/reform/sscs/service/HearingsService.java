@@ -137,6 +137,8 @@ public class HearingsService {
 
             log.info("Received Create Hearing Request Response for Case ID {}, Hearing State {} and Response:\n{}",
                     caseId, wrapper.getHearingState().getState(), hmcUpdateResponse.toString());
+
+            hearingResponseUpdate(wrapper, hmcUpdateResponse);
         } else {
             log.info("existing hearing found for Case ID {}, skipping Create Hearing Request", caseId);
             hmcUpdateResponse = HmcUpdateResponse.builder()
@@ -148,8 +150,6 @@ public class HearingsService {
                             + "Hearing version {} and Hearing Id {}",
                     caseId, hearing.getHmcStatus(), hearing.getRequestVersion(), hearing.getHearingId());
         }
-
-        hearingResponseUpdate(wrapper, hmcUpdateResponse);
     }
 
     private Long getHearingVersionNumber(CaseHearing hearing) {
@@ -234,6 +234,7 @@ public class HearingsService {
         HearingEvent event = HearingsServiceHelper.getHearingEvent(wrapper.getHearingState());
         log.info("Updating case with event {} description is {}", event, event.getDescription());
 
+        //here gemma
         updateCaseWithHearingResponseV2(wrapper, response, hearingRequestId, event, caseId);
 
         log.info("Case Updated with Hearing Response for Case ID {}, Hearing ID {}, Hearing State {} and CCD Event {}",
