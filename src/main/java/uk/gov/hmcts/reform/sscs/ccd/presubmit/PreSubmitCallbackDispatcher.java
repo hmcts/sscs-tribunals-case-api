@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase.CreateCaseAboutToStartHandler.isCreateCaseStartCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +12,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 
 @Slf4j
 @Component
@@ -34,8 +36,10 @@ public class PreSubmitCallbackDispatcher<T extends CaseData> {
             if (callbackHandler.canHandle(callbackType, callback)) {
                 eligibleHandlers.add(callbackHandler);
 
+                var updatedCallback = getUpdatedCallback(aggregateResponse.getData(), callback, callbackType);
+
                 PreSubmitCallbackResponse<T> handlerResponse =
-                        callbackHandler.handle(callbackType, getUpdatedCallback(aggregateResponse, callback), userAuth);
+                        callbackHandler.handle(callbackType, updatedCallback, userAuth);
 
                 aggregateResponse.setData(handlerResponse.getData());
                 aggregateResponse.addErrors(handlerResponse.getErrors());
@@ -48,13 +52,14 @@ public class PreSubmitCallbackDispatcher<T extends CaseData> {
         return aggregateResponse;
     }
 
-    private Callback<T> getUpdatedCallback(PreSubmitCallbackResponse<T> aggregateResponse,
-                                                     Callback<T> callback) {
+    private Callback<T> getUpdatedCallback(T caseData, Callback<T> callback, CallbackType callbackType) {
+        State callbackState = isCreateCaseStartCallback(callbackType, callback.getEvent())
+                ? null : callback.getCaseDetails().getState();
         var updatedCaseDetails = new CaseDetails<>(
                 callback.getCaseDetails().getId(),
                 callback.getCaseDetails().getJurisdiction(),
-                callback.getCaseDetails().getState(),
-                aggregateResponse.getData(),
+                callbackState,
+                caseData,
                 callback.getCaseDetails().getCreatedDate(),
                 callback.getCaseDetails().getCaseTypeId()
         );
