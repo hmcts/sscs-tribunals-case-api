@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 
 @Slf4j
 @Component
@@ -40,11 +41,14 @@ public class PreSubmitCallbackDispatcher<T extends CaseData> {
                                     String userAuthorisation
                                     ) {
         List<PreSubmitCallbackHandler<T>> eligibleHandlers = new ArrayList<>();
-
-        log.info("============================================================");
-        log.info("Dispatching callback for event={}, callbackType={}, state={}",
-                callback.getEvent(), callbackType, callback.getCaseDetails().getState());
-        log.info("============================================================");
+        State callbackState = null;
+        try {
+            callbackState = callback.getCaseDetails().getState();
+        } catch (Exception e) {
+            log.info("============================================================");
+            log.info("State is null for event={}, callbackType={}", callback.getEvent(), callbackType);
+            log.info("============================================================");
+        }
 
         for (PreSubmitCallbackHandler<T> callbackHandler : callbackHandlers) {
             if (callbackHandler.canHandle(callbackType, callback)) {
