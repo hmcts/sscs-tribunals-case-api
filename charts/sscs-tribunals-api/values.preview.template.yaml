@@ -326,8 +326,6 @@ global:
   postgresSecret: postgres
   databaseNamePrefix: "pr-${CHANGE_ID}-"
   postgresUsername: hmcts
-  security:
-    allowInsecureImages: true
 
 ccd:
   enabled: ${PREVIEW_BRANCH_WITH_LOCAL_CCD}
@@ -724,9 +722,6 @@ redis:
     enabled: false
     slaveCount: 0
   usePassword: false
-  image:
-    registry: hmctspublic.azurecr.io
-    repository: imported/bitnami/redis
   master:
     persistence:
       enabled: false
