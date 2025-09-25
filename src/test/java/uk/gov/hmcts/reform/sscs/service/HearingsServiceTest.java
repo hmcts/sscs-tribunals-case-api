@@ -298,7 +298,7 @@ class HearingsServiceTest {
 
     @DisplayName("When create Hearing is given and there is already a hearing requested/awaiting listing addHearingResponse should run without error")
     @Test
-    void processHearingWrapperCreateExistingHearing() throws GetHearingException {
+    void processHearingWrapperCreateExistingHearing() throws GetHearingException, ListingException {
         var details = uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDetails.builder().build();
         RequestDetails requestDetails = RequestDetails.builder().versionNumber(2L).build();
         HearingGetResponse hearingGetResponse = HearingGetResponse.builder()
@@ -308,7 +308,6 @@ class HearingsServiceTest {
             .partyDetails(List.of())
             .hearingResponse(HearingResponse.builder().build())
             .build();
-        given(hmcHearingApiService.getHearingRequest(anyString())).willReturn(hearingGetResponse);
         HearingsGetResponse hearingsGetResponse = HearingsGetResponse.builder()
             .caseHearings(List.of(CaseHearing.builder()
                 .hearingId(HEARING_REQUEST_ID)
@@ -317,8 +316,17 @@ class HearingsServiceTest {
                 .build()))
             .build();
 
+        given(hmcHearingApiService.sendCancelHearingRequest(any(HearingCancelRequestPayload.class), anyString()))
+                .willReturn(HmcUpdateResponse.builder().hearingRequestId(HEARING_REQUEST_ID).build());
         given(hmcHearingApiService.getHearingsRequest(anyString(),eq(null)))
             .willReturn(hearingsGetResponse);
+        given(hmcHearingApiService.sendCreateHearingRequest(any(HearingRequestPayload.class)))
+                .willReturn(HmcUpdateResponse.builder().build());
+        var hearingPayload = HearingRequestPayload.builder()
+                .hearingDetails(uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDetails.builder()
+                        .panelRequirements(PanelRequirements.builder().roleTypes(List.of("58"))
+                                .build()).build()).build();
+        when(hearingsMapping.buildHearingPayload(any(), any())).thenReturn(hearingPayload);
 
         wrapper.setHearingState(CREATE_HEARING);
 
@@ -327,8 +335,7 @@ class HearingsServiceTest {
     }
 
     @Test
-    void processHearingWrapperCreateExistingHearingWhenHearingDoesntExists() throws GetHearingException {
-        given(hmcHearingApiService.getHearingRequest(anyString())).willThrow(new GetHearingException(""));
+    void processHearingWrapperCreateExistingHearingWhenHearingDoesntExists() throws GetHearingException, ListingException {
         HearingsGetResponse hearingsGetResponse = HearingsGetResponse.builder()
             .caseHearings(List.of(CaseHearing.builder()
                                       .hearingId(HEARING_REQUEST_ID)
@@ -337,8 +344,18 @@ class HearingsServiceTest {
                                       .build()))
             .build();
 
+        given(hmcHearingApiService.sendCancelHearingRequest(any(HearingCancelRequestPayload.class), anyString()))
+                .willReturn(HmcUpdateResponse.builder().hearingRequestId(HEARING_REQUEST_ID).build());
+        given(hmcHearingApiService.sendCreateHearingRequest(any(HearingRequestPayload.class)))
+                .willReturn(HmcUpdateResponse.builder().build());
         given(hmcHearingApiService.getHearingsRequest(anyString(),eq(null)))
             .willReturn(hearingsGetResponse);
+
+        var hearingPayload = HearingRequestPayload.builder()
+                .hearingDetails(uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDetails.builder()
+                        .panelRequirements(PanelRequirements.builder().roleTypes(List.of("58"))
+                                .build()).build()).build();
+        when(hearingsMapping.buildHearingPayload(any(), any())).thenReturn(hearingPayload);
 
         wrapper.setHearingState(CREATE_HEARING);
 
