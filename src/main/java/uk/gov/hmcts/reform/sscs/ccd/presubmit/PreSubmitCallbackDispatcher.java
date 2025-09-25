@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 
 @Slf4j
 @Component
@@ -53,14 +52,13 @@ public class PreSubmitCallbackDispatcher<T extends CaseData> {
     }
 
     private Callback<T> getUpdatedCallback(T caseData, Callback<T> callback, CallbackType callbackType) {
-        State callbackState = isCreateCaseStartCallback(callbackType, callback.getEvent())
-                ? null : callback.getCaseDetails().getState();
+        boolean isCreateCaseStartCallback = isCreateCaseStartCallback(callbackType, callback.getEvent());
         var updatedCaseDetails = new CaseDetails<>(
                 callback.getCaseDetails().getId(),
                 callback.getCaseDetails().getJurisdiction(),
-                callbackState,
+                isCreateCaseStartCallback ? null : callback.getCaseDetails().getState(),
                 caseData,
-                callback.getCaseDetails().getCreatedDate(),
+                isCreateCaseStartCallback ? null : callback.getCaseDetails().getCreatedDate(),
                 callback.getCaseDetails().getCaseTypeId()
         );
         var updatedCallback = new Callback<>(
