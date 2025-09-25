@@ -41,6 +41,9 @@ public class PreSubmitCallbackDispatcher<T extends CaseData> {
                                     ) {
         List<PreSubmitCallbackHandler<T>> eligibleHandlers = new ArrayList<>();
 
+        log.info("Dispatching callback for event={}, callbackType={}, state={}",
+                callback.getEvent(), callbackType, callback.getCaseDetails().getState());
+
         for (PreSubmitCallbackHandler<T> callbackHandler : callbackHandlers) {
             if (callbackHandler.canHandle(callbackType, callback)) {
 
