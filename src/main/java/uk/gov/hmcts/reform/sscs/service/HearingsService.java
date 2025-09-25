@@ -122,10 +122,10 @@ public class HearingsService {
         HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseId, null);
         CaseHearing hearing = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse, false);
         log.info("Existing hearing found for Case ID {}: {}", caseId, hearing != null ? hearing.getHearingId() : "none");
-        HmcUpdateResponse hmcUpdateResponse;
         overridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData);
+        HmcUpdateResponse hmcUpdateResponse;
 
-        if(nonNull(hearing)) {
+        if (nonNull(hearing)) {
             HearingCancelRequestPayload hearingPayload = HearingsRequestMapping.buildCancelHearingPayload(wrapper);
             HmcUpdateResponse response = hmcHearingApiService.sendCancelHearingRequest(hearingPayload, String.valueOf(hearing.getHearingId()));
 
