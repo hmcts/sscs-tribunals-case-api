@@ -316,8 +316,6 @@ class HearingsServiceTest {
                 .build()))
             .build();
 
-        given(hmcHearingApiService.sendCancelHearingRequest(any(HearingCancelRequestPayload.class), anyString()))
-                .willReturn(HmcUpdateResponse.builder().hearingRequestId(HEARING_REQUEST_ID).build());
         given(hmcHearingApiService.getHearingsRequest(anyString(),eq(null)))
             .willReturn(hearingsGetResponse);
         given(hmcHearingApiService.sendCreateHearingRequest(any(HearingRequestPayload.class)))
@@ -344,8 +342,6 @@ class HearingsServiceTest {
                                       .build()))
             .build();
 
-        given(hmcHearingApiService.sendCancelHearingRequest(any(HearingCancelRequestPayload.class), anyString()))
-                .willReturn(HmcUpdateResponse.builder().hearingRequestId(HEARING_REQUEST_ID).build());
         given(hmcHearingApiService.sendCreateHearingRequest(any(HearingRequestPayload.class)))
                 .willReturn(HmcUpdateResponse.builder().build());
         given(hmcHearingApiService.getHearingsRequest(anyString(),eq(null)))

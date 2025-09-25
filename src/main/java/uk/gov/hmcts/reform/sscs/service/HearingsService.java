@@ -126,13 +126,20 @@ public class HearingsService {
         HmcUpdateResponse hmcUpdateResponse;
 
         if (nonNull(hearing)) {
-            HearingCancelRequestPayload cancelHearingPayload = HearingsRequestMapping.buildCancelHearingPayload(wrapper);
-            HmcUpdateResponse response = hmcHearingApiService.sendCancelHearingRequest(cancelHearingPayload, String.valueOf(hearing.getHearingId()));
 
             log.info("Cancelling the existing hearing found with hearing state requested or awaiting listing. "
                     + "Case ID {}, Hearing ID {}", caseId, hearing.getHearingId());
 
-            hearingResponseUpdate(wrapper, response);
+            HearingWrapper cancellationWrapper = HearingWrapper.builder()
+                    .caseData(wrapper.getCaseData())
+                    .eventId(wrapper.getEventId())
+                    .eventToken(wrapper.getEventToken())
+                    .caseState(wrapper.getCaseState())
+                    .hearingState(HearingState.CANCEL_HEARING)
+                    .cancellationReasons(List.of(CancellationReason.OTHER))
+                    .build();
+
+            cancelHearing(cancellationWrapper);
         }
 
         HearingRequestPayload hearingPayload = hearingsMapping.buildHearingPayload(wrapper, refData);
