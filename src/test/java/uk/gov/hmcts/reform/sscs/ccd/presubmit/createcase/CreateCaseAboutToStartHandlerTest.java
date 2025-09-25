@@ -78,13 +78,13 @@ public class CreateCaseAboutToStartHandlerTest {
         Appeal appeal = result.getData().getAppeal();
         BenefitType benefitType = appeal.getBenefitType();
         Appellant appellant = appeal.getAppellant();
-        Address address = appellant.getAddress();
-        DynamicList ukPortOfEntryList = address.getUkPortOfEntryList();
-        DynamicList descriptionSelection = benefitType.getDescriptionSelection();
         assertNotNull(appeal);
         assertNotNull(benefitType);
         assertNotNull(appellant);
+        Address address = appellant.getAddress();
         assertNotNull(address);
+        DynamicList ukPortOfEntryList = address.getUkPortOfEntryList();
+        DynamicList descriptionSelection = benefitType.getDescriptionSelection();
         assertNotNull(ukPortOfEntryList);
         assertNotNull(descriptionSelection);
         assertThat(descriptionSelection.getListItems()).isNotEmpty();
