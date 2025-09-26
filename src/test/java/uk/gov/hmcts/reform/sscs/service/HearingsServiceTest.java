@@ -67,7 +67,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
-import uk.gov.hmcts.reform.sscs.exception.GetHearingException;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.exception.UnhandleableHearingStateException;
 import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
@@ -296,18 +295,10 @@ class HearingsServiceTest {
             .isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
     }
 
-    @DisplayName("When create Hearing is given and there is already a hearing requested/awaiting listing addHearingResponse should run without error")
+    @DisplayName("When create Hearing is given and there is already a hearing requested/awaiting listing addHearingResponse should"
+            + "run without error")
     @Test
-    void processHearingWrapperCreateExistingHearing() throws GetHearingException, ListingException {
-        var details = uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDetails.builder().build();
-        RequestDetails requestDetails = RequestDetails.builder().versionNumber(2L).build();
-        HearingGetResponse hearingGetResponse = HearingGetResponse.builder()
-            .hearingDetails(details)
-            .requestDetails(requestDetails)
-            .caseDetails(CaseDetails.builder().build())
-            .partyDetails(List.of())
-            .hearingResponse(HearingResponse.builder().build())
-            .build();
+    void processHearingWrapperCreateExistingRequestedOrAwaitingListingHearing() throws ListingException {
         HearingsGetResponse hearingsGetResponse = HearingsGetResponse.builder()
             .caseHearings(List.of(CaseHearing.builder()
                 .hearingId(HEARING_REQUEST_ID)
@@ -332,12 +323,13 @@ class HearingsServiceTest {
             .isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
     }
 
-    @Test
-    void processHearingWrapperCreateExistingHearingWhenHearingDoesntExists() throws GetHearingException, ListingException {
+    @ParameterizedTest
+    @CsvSource({"LISTED", "CANCELLED", "CANCELLATION_REQUESTED", "CANCELLATION_SUBMITTED", "ADJOURNED", "AWAITING_ACTUALS", "COMPLETED"})
+    void processHearingWrapperCreateExistingHearingWhenHearingIsNotRequestedOrAwaitingListing(HmcStatus hmcStatus) throws ListingException {
         HearingsGetResponse hearingsGetResponse = HearingsGetResponse.builder()
             .caseHearings(List.of(CaseHearing.builder()
                                       .hearingId(HEARING_REQUEST_ID)
-                                      .hmcStatus(HmcStatus.HEARING_REQUESTED)
+                                      .hmcStatus(hmcStatus)
                                       .requestVersion(1L)
                                       .build()))
             .build();
@@ -359,7 +351,7 @@ class HearingsServiceTest {
             .isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
     }
 
-    @DisplayName("When wrapper with a valid create Hearing State is given addHearingResponse should run without error")
+    @DisplayName("When wrapper with a valid update Hearing State is given addHearingResponse should run without error")
     @Test
     void processHearingWrapperUpdate() throws ListingException {
         willAnswer(invocation -> {
