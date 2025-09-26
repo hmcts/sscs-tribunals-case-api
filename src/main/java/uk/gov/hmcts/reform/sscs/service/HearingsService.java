@@ -117,19 +117,12 @@ public class HearingsService {
 
     private void createHearing(HearingWrapper wrapper) throws UpdateCaseException, ListingException {
         SscsCaseData caseData = wrapper.getCaseData();
-
         String caseId = caseData.getCcdCaseId();
         HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseId, null);
-        CaseHearing hearing = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse, false);
-        log.info("Existing hearing found for Case ID {}: {}", caseId, hearing != null ? hearing.getHearingId() : "none");
+        CaseHearing hearing = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse, true);
         overridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData);
-        HmcUpdateResponse hmcUpdateResponse;
 
         if (nonNull(hearing)) {
-
-            log.info("Cancelling the existing hearing found with hearing state requested or awaiting listing. "
-                    + "Case ID {}, Hearing ID {}", caseId, hearing.getHearingId());
-
             HearingWrapper cancellationWrapper = HearingWrapper.builder()
                     .caseData(wrapper.getCaseData())
                     .eventId(wrapper.getEventId())
@@ -139,9 +132,12 @@ public class HearingsService {
                     .cancellationReasons(List.of(CancellationReason.OTHER))
                     .build();
 
+            log.info("Cancelling existing hearing with hearing state requested or awaiting listing. "
+                    + "Case ID {}, Hearing ID {}", caseId, hearing.getHearingId());
             cancelHearing(cancellationWrapper);
         }
 
+        HmcUpdateResponse hmcUpdateResponse;
         HearingRequestPayload hearingPayload = hearingsMapping.buildHearingPayload(wrapper, refData);
         log.info("Sending Create Hearing Request for Case ID {}", caseId);
         hmcUpdateResponse = hmcHearingApiService.sendCreateHearingRequest(hearingPayload);
@@ -238,7 +234,6 @@ public class HearingsService {
         HearingEvent event = HearingsServiceHelper.getHearingEvent(wrapper.getHearingState());
         log.info("Updating case with event {} description is {}", event, event.getDescription());
 
-        //here gemma
         updateCaseWithHearingResponseV2(wrapper, response, hearingRequestId, event, caseId);
 
         log.info("Case Updated with Hearing Response for Case ID {}, Hearing ID {}, Hearing State {} and CCD Event {}",
@@ -255,7 +250,6 @@ public class HearingsService {
                 event, event.getDescription());
 
         try {
-            log.info("Case ID: {} has hearing state: {}", wrapper.getCaseData().getCcdCaseId(), wrapper.getHearingState());
             Consumer<SscsCaseDetails> caseDataMutator = hearingServiceConsumer
                     .getCreateHearingCaseDetailsConsumerV2(
                             wrapper.getCaseData().getPanelMemberComposition(),

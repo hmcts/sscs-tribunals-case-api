@@ -37,14 +37,10 @@ public class HearingServiceConsumer {
         return sscsCaseDetails -> {
             try {
                 if (isUpdateHearing) {
-                    log.info("case id {} is an update hearing request, not setting default listing values",
-                            sscsCaseDetails.getData().getCcdCaseId());
                     if (isNull(sscsCaseDetails.getData().getSchedulingAndListingFields().getOverrideFields())) {
                         overridesMapping.setOverrideValues(sscsCaseDetails.getData(), refData);
                     }
                 } else {
-                    log.info("case id {} is a create hearing request, setting default listing values",
-                            sscsCaseDetails.getData().getCcdCaseId());
                     overridesMapping.setDefaultListingValues(sscsCaseDetails.getData(), refData);
                 }
                 sscsCaseDetails.getData().setPanelMemberComposition(panelComposition);
@@ -56,15 +52,9 @@ public class HearingServiceConsumer {
     }
 
     private void updateCaseDataWithHearingResponse(HmcUpdateResponse response, Long hearingRequestId, SscsCaseData caseData) {
-        log.info("case id {} received hearing response from HMC for hearing request id {}",
-                caseData.getCcdCaseId(), hearingRequestId);
         Hearing hearing = HearingsServiceHelper.getHearingById(hearingRequestId, caseData);
-        log.info("case id {} found hearing {} for hearing request id {}",
-                caseData.getCcdCaseId(), hearing, hearingRequestId);
 
         if (isNull(hearing)) {
-            log.info("case id {} did not find hearing for hearing request id {}, creating new hearing",
-                    caseData.getCcdCaseId(), hearingRequestId);
             hearing = HearingsServiceHelper.createHearing(hearingRequestId);
             HearingsServiceHelper.addHearing(hearing, caseData);
         }
@@ -76,6 +66,5 @@ public class HearingServiceConsumer {
             log.debug("Case Updated with AdjournmentInProgress to NO for Case ID {}", caseData.getCcdCaseId());
             caseData.getAdjournment().setAdjournmentInProgress(YesNo.NO);
         }
-        log.info("case id {} updated case data with hearing response xx", caseData.getCcdCaseId());
     }
 }
