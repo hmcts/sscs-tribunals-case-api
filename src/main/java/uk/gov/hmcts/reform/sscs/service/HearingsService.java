@@ -117,34 +117,37 @@ public class HearingsService {
 
     private void createHearing(HearingWrapper wrapper) throws UpdateCaseException, ListingException {
         SscsCaseData caseData = wrapper.getCaseData();
-
         String caseId = caseData.getCcdCaseId();
         HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseId, null);
-        CaseHearing hearing = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse, false);
-        HmcUpdateResponse hmcUpdateResponse;
+        CaseHearing hearing = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse, true);
         overridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData);
 
-        if (isNull(hearing)) {
-            HearingRequestPayload hearingPayload = hearingsMapping.buildHearingPayload(wrapper, refData);
-            log.debug("Sending Create Hearing Request for Case ID {}", caseId);
-            hmcUpdateResponse = hmcHearingApiService.sendCreateHearingRequest(hearingPayload);
-
-            var johTiers = hearingPayload.getHearingDetails().getPanelRequirements().getRoleTypes();
-            log.info("Saving JOH tiers ({}) onto the case ({})", johTiers, caseId);
-            wrapper.getCaseData().setPanelMemberComposition(new PanelMemberComposition(johTiers));
-
-            log.debug("Received Create Hearing Request Response for Case ID {}, Hearing State {} and Response:\n{}",
-                    caseId, wrapper.getHearingState().getState(), hmcUpdateResponse.toString());
-        } else {
-            hmcUpdateResponse = HmcUpdateResponse.builder()
-                    .hearingRequestId(hearing.getHearingId())
-                    .versionNumber(getHearingVersionNumber(hearing))
-                    .status(hearing.getHmcStatus())
+        if (nonNull(hearing)) {
+            HearingWrapper cancellationWrapper = HearingWrapper.builder()
+                    .caseData(wrapper.getCaseData())
+                    .eventId(wrapper.getEventId())
+                    .eventToken(wrapper.getEventToken())
+                    .caseState(wrapper.getCaseState())
+                    .hearingState(HearingState.CANCEL_HEARING)
+                    .cancellationReasons(List.of(CancellationReason.OTHER))
                     .build();
-            log.debug("Existing hearing found, skipping Create Hearing Request for Case ID {}, Hearing State {},"
-                            + "Hearing version {} and Hearing Id {}",
-                    caseId, hearing.getHmcStatus(), hearing.getRequestVersion(), hearing.getHearingId());
+
+            log.info("Cancelling existing hearing with hearing state requested or awaiting listing. "
+                    + "Case ID {}, Hearing ID {}", caseId, hearing.getHearingId());
+            cancelHearing(cancellationWrapper);
         }
+
+        HmcUpdateResponse hmcUpdateResponse;
+        HearingRequestPayload hearingPayload = hearingsMapping.buildHearingPayload(wrapper, refData);
+        log.info("Sending Create Hearing Request for Case ID {}", caseId);
+        hmcUpdateResponse = hmcHearingApiService.sendCreateHearingRequest(hearingPayload);
+
+        var johTiers = hearingPayload.getHearingDetails().getPanelRequirements().getRoleTypes();
+        log.info("Saving JOH tiers ({}) onto the case ({})", johTiers, caseId);
+        wrapper.getCaseData().setPanelMemberComposition(new PanelMemberComposition(johTiers));
+
+        log.info("Received Create Hearing Request Response for Case ID {}, Hearing State {} and Response:\n{}",
+                caseId, wrapper.getHearingState().getState(), hmcUpdateResponse.toString());
 
         hearingResponseUpdate(wrapper, hmcUpdateResponse);
     }
