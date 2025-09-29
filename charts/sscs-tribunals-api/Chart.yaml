@@ -33,7 +33,7 @@ dependencies:
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: sscs-tribunals-frontend.enabled
   - name: redis
-    version: 20.13.4
+    version: 22.0.7
     repository: "oci://registry-1.docker.io/bitnamicharts"
     condition: redis.enabled
   - name: em-ccdorc
