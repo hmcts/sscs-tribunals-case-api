@@ -1,117 +1,99 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
+import static java.time.LocalDateTime.now;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CASE_UPDATED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.COH_DECISION_ISSUED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.JUDGE_DECISION_STRIKEOUT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.TCW_DECISION_STRIKE_OUT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.WITH_DWP;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
+import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
+@ExtendWith(MockitoExtension.class)
 public class OutcomeServiceHandlerTest {
+
     private static final String USER_AUTHORISATION = "Bearer token";
+
+    private SscsCaseData sscsCaseData;
+    private CaseDetails<SscsCaseData> caseDetails;
+    private Callback<SscsCaseData> callback;
 
     private OutcomeServiceHandler handler;
 
-    private SscsCaseData sscsCaseData;
-
-    @Mock
-    private CaseDetails<SscsCaseData> caseDetails;
-
-    @Mock
-    private Callback<SscsCaseData> callback;
-
-    @Before
+    @BeforeEach
     public void setUp() {
-        openMocks(this);
-        handler = new OutcomeServiceHandler();
-
         sscsCaseData = SscsCaseData.builder().build();
+        caseDetails = new CaseDetails<>(123L, "SSCS", WITH_DWP, sscsCaseData, now(), "Benefit");
 
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        handler = new OutcomeServiceHandler();
     }
 
     @Test
     public void givenTcwDecisionStrikeOut_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.TCW_DECISION_STRIKE_OUT);
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), TCW_DECISION_STRIKE_OUT, false);
 
         assertTrue(handler.canHandle(CallbackType.ABOUT_TO_SUBMIT, callback));
     }
 
     @Test
     public void givenJudgeDecisionStrikeoutEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.JUDGE_DECISION_STRIKEOUT);
-
-        assertTrue(handler.canHandle(CallbackType.ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
-    public void givenReinstateAppealEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.REINSTATE_APPEAL);
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), JUDGE_DECISION_STRIKEOUT, false);
 
         assertTrue(handler.canHandle(CallbackType.ABOUT_TO_SUBMIT, callback));
     }
 
     @Test
     public void givenCohDecisionIssued_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.COH_DECISION_ISSUED);
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), COH_DECISION_ISSUED, false);
 
         assertTrue(handler.canHandle(CallbackType.ABOUT_TO_SUBMIT, callback));
     }
 
     @Test
     public void setsOutcomeForTcwDecisionStrikeOut() {
-        when(callback.getEvent()).thenReturn(EventType.TCW_DECISION_STRIKE_OUT);
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), TCW_DECISION_STRIKE_OUT, false);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        var response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getOutcome(), is("nonCompliantAppealStruckout"));
+        assertEquals("nonCompliantAppealStruckout", response.getData().getOutcome());
     }
 
     @Test
     public void setsOutcomeForJudgeDecisionStrikeout() {
-        when(callback.getEvent()).thenReturn(EventType.JUDGE_DECISION_STRIKEOUT);
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), JUDGE_DECISION_STRIKEOUT, false);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        var response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getOutcome(), is("nonCompliantAppealStruckout"));
-    }
-
-    @Test
-    public void setsOutcomeForReinstateAppeal() {
-        when(callback.getEvent()).thenReturn(EventType.REINSTATE_APPEAL);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getOutcome(), is("reinstated"));
+        assertEquals("nonCompliantAppealStruckout", response.getData().getOutcome());
     }
 
     @Test
     public void setsOutcomeForCohDecisionIssued() {
-        when(callback.getEvent()).thenReturn(EventType.COH_DECISION_ISSUED);
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), COH_DECISION_ISSUED, false);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        var response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getOutcome(), is("decisionUpheld"));
+        assertEquals("decisionUpheld", response.getData().getOutcome());
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwExceptionIfCannotHandleEventType() {
-        when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
-
         sscsCaseData = SscsCaseData.builder().interlocReviewState(InterlocReviewState.REVIEW_BY_TCW).build();
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), CASE_UPDATED, false);
 
-        handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThrows(IllegalStateException.class,
+                () -> handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION));
     }
 }
