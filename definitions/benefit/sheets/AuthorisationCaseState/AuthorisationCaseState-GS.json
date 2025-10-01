@@ -1,0 +1,19 @@
+[
+  {"LiveFrom": "14/11/2023", "CaseTypeID": "Benefit", "CaseStateID": "appealCreated", "AccessProfile": "GS_profile", "CRUD": "R"},
+  {"LiveFrom": "14/11/2023", "CaseTypeID": "Benefit", "CaseStateID": "dormantAppealState", "AccessProfile": "GS_profile", "CRUD": "R"},
+  {"LiveFrom": "14/11/2023", "CaseTypeID": "Benefit", "CaseStateID": "incompleteApplication", "AccessProfile": "GS_profile", "CRUD": "R"},
+  {"LiveFrom": "14/11/2023", "CaseTypeID": "Benefit", "CaseStateID": "incompleteApplicationInformationReqsted", "AccessProfile": "GS_profile", "CRUD": "R"},
+  {"LiveFrom": "14/11/2023", "CaseTypeID": "Benefit", "CaseStateID": "interlocutoryReviewState", "AccessProfile": "GS_profile", "CRUD": "R"},
+  {"LiveFrom": "14/11/2023", "CaseTypeID": "Benefit", "CaseStateID": "responseReceived", "AccessProfile": "GS_profile", "CRUD": "R"},
+  {"LiveFrom": "14/11/2023", "CaseTypeID": "Benefit", "CaseStateID": "validAppeal", "AccessProfile": "GS_profile", "CRUD": "R"},
+  {"LiveFrom": "14/11/2023", "CaseTypeID": "Benefit", "CaseStateID": "voidState", "AccessProfile": "GS_profile", "CRUD": "R"},
+  {"LiveFrom": "14/11/2023", "CaseTypeID": "Benefit", "CaseStateID": "withDwp", "AccessProfile": "GS_profile", "CRUD": "R"},
+  {"LiveFrom": "14/11/2023", "CaseTypeID": "Benefit", "CaseStateID": "hearing", "AccessProfile": "GS_profile", "CRUD": "R"},
+  {"LiveFrom": "14/11/2023", "CaseTypeID": "Benefit", "CaseStateID": "readyToList", "AccessProfile": "GS_profile", "CRUD": "R"},
+  {"LiveFrom": "14/11/2023", "CaseTypeID": "Benefit", "CaseStateID": "closed", "AccessProfile": "GS_profile", "CRUD": "R"},
+  {"LiveFrom": "14/11/2023", "CaseTypeID": "Benefit", "CaseStateID": "notListable", "AccessProfile": "GS_profile", "CRUD": "R"},
+  {"LiveFrom": "14/11/2023", "CaseTypeID": "Benefit", "CaseStateID": "handlingError", "AccessProfile": "GS_profile", "CRUD": "R"},
+  {"LiveFrom": "14/11/2023", "CaseTypeID": "Benefit", "CaseStateID": "listingError", "AccessProfile": "GS_profile", "CRUD": "R"},
+  {"LiveFrom": "14/11/2023", "CaseTypeID": "Benefit", "CaseStateID": "postHearing", "AccessProfile": "GS_profile", "CRUD": "R"},
+  {"LiveFrom": "14/11/2023", "CaseTypeID": "Benefit", "CaseStateID": "withUT", "AccessProfile": "GS_profile", "CRUD": "R"}
+]
