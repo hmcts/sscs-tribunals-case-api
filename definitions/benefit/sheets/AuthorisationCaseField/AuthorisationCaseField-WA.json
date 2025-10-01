@@ -25,5 +25,6 @@
   {"LiveFrom": "08/03/2023", "CaseTypeID": "Benefit", "CaseFieldID": "issueInterlocDecisionDate", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "08/03/2023", "CaseTypeID": "Benefit", "CaseFieldID": "issueInterlocDecisionDate", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
   {"LiveFrom": "08/03/2023", "CaseTypeID": "Benefit", "CaseFieldID": "issueInterlocDecisionDate", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
-  {"LiveFrom": "08/03/2023", "CaseTypeID": "Benefit", "CaseFieldID": "issueInterlocDecisionDate", "AccessProfile": "caseworker-sscs-judge", "CRUD": "CRUD"}
+  {"LiveFrom": "08/03/2023", "CaseTypeID": "Benefit", "CaseFieldID": "issueInterlocDecisionDate", "AccessProfile": "caseworker-sscs-judge", "CRUD": "CRUD"},
+  {"LiveFrom": "26/09/2025", "CaseTypeID": "Benefit", "CaseFieldID": "caseManagementLocation", "AccessProfile": "caseworker-ras-validation", "CRUD": "R"}
 ]
