@@ -1,0 +1,6 @@
+[
+  {"LiveFrom": "14/11/2023", "CaseTypeID": "Benefit", "CaseFieldID": "caseNameHmctsInternal", "AccessProfile": "GS_profile", "CRUD": "R"},
+  {"LiveFrom": "14/11/2023", "CaseTypeID": "Benefit", "CaseFieldID": "caseManagementLocation", "AccessProfile": "GS_profile", "CRUD": "R"},
+  {"LiveFrom": "14/11/2023", "CaseTypeID": "Benefit", "CaseFieldID": "caseManagementCategory", "AccessProfile": "GS_profile", "CRUD": "R"},
+  {"LiveFrom": "14/11/2023", "CaseTypeID": "Benefit", "CaseFieldID": "SearchCriteria", "AccessProfile": "GS_profile", "CRUD": "R"}
+]
