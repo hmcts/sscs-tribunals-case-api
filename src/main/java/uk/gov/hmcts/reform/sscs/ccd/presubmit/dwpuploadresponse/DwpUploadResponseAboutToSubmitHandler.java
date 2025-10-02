@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
@@ -49,34 +50,30 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
+import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
+import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
+import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
 import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 import uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutToSubmit implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private static final DateTimeFormatter DD_MM_YYYY_FORMAT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
     public static final int NEW_OTHER_PARTY_RESPONSE_DUE_DAYS = 14;
+    private static final String EXISTING_HEARING_WARNING = "There is already a hearing request in List assist, \"\n"
+            + " \"are you sure you want to send another request? If you do proceed, then please cancel the existing hearing request first";
     private final DwpDocumentService dwpDocumentService;
     private final AddNoteService addNoteService;
     private final PanelCompositionService panelCompositionService;
+    private final HmcHearingApiService hmcHearingApiService;
     private final AddedDocumentsUtil addedDocumentsUtil;
     private static final Enum<EventType> EVENT_TYPE = EventType.DWP_UPLOAD_RESPONSE;
-
-
-    @Autowired
-    public DwpUploadResponseAboutToSubmitHandler(DwpDocumentService dwpDocumentService, AddNoteService addNoteService,
-                                                 AddedDocumentsUtil addedDocumentsUtil,
-                                                 PanelCompositionService panelCompositionService) {
-        this.dwpDocumentService = dwpDocumentService;
-        this.addNoteService = addNoteService;
-        this.panelCompositionService = panelCompositionService;
-        this.addedDocumentsUtil = addedDocumentsUtil;
-    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -250,6 +247,8 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         validateDwpResponseDocuments(sscsCaseData, preSubmitCallbackResponse);
 
         validateDwpAudioVideoEvidence(sscsCaseData, preSubmitCallbackResponse);
+
+        checkForListedHearings(sscsCaseData, preSubmitCallbackResponse);
         return preSubmitCallbackResponse;
     }
 
@@ -260,6 +259,17 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                     preSubmitCallbackResponse.addError("You must upload an audio/video document when submitting a RIP 1 document");
                 }
             }
+        }
+    }
+
+    private void checkForListedHearings(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseData.getCcdCaseId(), HmcStatus.LISTED);
+
+        if (HearingRoute.LIST_ASSIST == caseData.getSchedulingAndListingFields().getHearingRoute()
+                && nonNull(hearingsGetResponse.getCaseHearings())  && !hearingsGetResponse.getCaseHearings().isEmpty()
+                && caseData.getDwpFurtherInfo().equals("No")) {
+            preSubmitCallbackResponse.addError(EXISTING_HEARING_WARNING);
+            log.error("Error on case {}: There is already a hearing request in List assist", caseData.getCcdCaseId());
         }
     }
 

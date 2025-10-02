@@ -38,6 +38,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
+import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
 
 @RunWith(JUnitParamsRunner.class)
 public class HmctsResponseReviewedAboutToStartTest {
@@ -51,6 +52,10 @@ public class HmctsResponseReviewedAboutToStartTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
+    @Mock
+    private HmcHearingApiService hmcHearingApiService;
+
+    @Mock
     private DwpAddressLookupService dwpAddressLookupService;
 
     private SscsCaseData sscsCaseData;
@@ -59,7 +64,7 @@ public class HmctsResponseReviewedAboutToStartTest {
     public void setUp() {
         openMocks(this);
         dwpAddressLookupService = new DwpAddressLookupService();
-        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService);
+        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hmcHearingApiService);
 
         when(callback.getEvent()).thenReturn(EventType.HMCTS_RESPONSE_REVIEWED);
 
