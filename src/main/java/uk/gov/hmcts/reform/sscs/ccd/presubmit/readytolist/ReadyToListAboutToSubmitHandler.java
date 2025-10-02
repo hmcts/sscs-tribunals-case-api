@@ -4,10 +4,8 @@ import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -18,7 +16,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.helper.SscsHelper;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
 import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
 import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
@@ -72,10 +69,12 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(sscsCaseData.getCcdCaseId(), HmcStatus.LISTED);
 
-        if (nonNull(hearingsGetResponse)) {
+
+        if (HearingRoute.LIST_ASSIST == sscsCaseData.getSchedulingAndListingFields().getHearingRoute()
+                && nonNull(hearingsGetResponse.getCaseHearings())  && !hearingsGetResponse.getCaseHearings().isEmpty()) {
             var response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
             response.addError(EXISTING_HEARING_WARNING);
-            log.warn("Error on case {}: {}", sscsCaseData.getCcdCaseId(), EXISTING_HEARING_WARNING);
+            log.error("Error on case {}: There is already a hearing request in List assist", sscsCaseData.getCcdCaseId());
             return response;
         }
 
