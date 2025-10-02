@@ -1,8 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,12 +19,16 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.helper.SscsHelper;
+import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
+import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
+import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingRequestHandler;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     static final String EXISTING_HEARING_WARNING = "There is already a hearing request in List assist, "
@@ -31,12 +38,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
 
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final HearingRequestHandler hearingRequestHandler;
-
-    public ReadyToListAboutToSubmitHandler(@Autowired RegionalProcessingCenterService regionalProcessingCenterService,
-                                       @Autowired HearingRequestHandler hearingRequestHandler) {
-        this.regionalProcessingCenterService = regionalProcessingCenterService;
-        this.hearingRequestHandler = hearingRequestHandler;
-    }
+    private final HmcHearingApiService hmcHearingApiService;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -67,10 +69,13 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
             return HearingHandler.GAPS.handle(sscsCaseData, hearingRequestHandler);
         }
 
-        if (SscsHelper.hasHearingScheduledInTheFuture(sscsCaseData) && warningsShouldNotBeIgnored(callback)) {
+
+        HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(sscsCaseData.getCcdCaseId(), HmcStatus.LISTED);
+
+        if (nonNull(hearingsGetResponse)) {
             var response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
-            response.addWarning(EXISTING_HEARING_WARNING);
-            log.warn("Warning: {}", EXISTING_HEARING_WARNING);
+            response.addError(EXISTING_HEARING_WARNING);
+            log.warn("Error on case {}: {}", sscsCaseData.getCcdCaseId(), EXISTING_HEARING_WARNING);
             return response;
         }
 
