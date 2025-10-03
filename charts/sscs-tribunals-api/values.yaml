@@ -149,6 +149,9 @@ sscs-tribunals-frontend:
   enabled: false
 redis:
   enabled: false
+  image:
+    registry: hmctspublic.azurecr.io
+    repository: imported/bitnami/redis
 ccd:
   enabled: false
 em-ccdorc:

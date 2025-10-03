@@ -1,7 +1,7 @@
 apiVersion: v2
 name: sscs-tribunals-api
 home: https://github.com/hmcts/sscs-tribunals-case-api
-version: 0.0.216
+version: 0.0.217
 description: SSCS Tribunals Case API
 maintainers:
   - name: HMCTS SSCS Team
@@ -33,7 +33,7 @@ dependencies:
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: sscs-tribunals-frontend.enabled
   - name: redis
-    version: 20.13.4
+    version: 22.0.7
     repository: "oci://registry-1.docker.io/bitnamicharts"
     condition: redis.enabled
   - name: em-ccdorc
