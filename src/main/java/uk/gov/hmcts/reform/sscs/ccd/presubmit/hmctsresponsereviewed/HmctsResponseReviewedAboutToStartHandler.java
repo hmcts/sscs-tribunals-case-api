@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.APPENDIX_12;
@@ -9,13 +10,14 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_RESPONSE
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.UCB;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_TCW;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist.ReadyToListAboutToSubmitHandler.EXISTING_HEARING_WARNING;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -24,17 +26,17 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
+import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
+import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
+import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
 
 @Service
+@RequiredArgsConstructor
 public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final DwpAddressLookupService service;
-
-    @Autowired
-    public HmctsResponseReviewedAboutToStartHandler(DwpAddressLookupService service) {
-        this.service = service;
-    }
+    private final HmcHearingApiService hmcHearingApiService;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -70,6 +72,13 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
         final PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
         if (sscsCaseData.getCreatedInGapsFrom() == null || !sscsCaseData.getCreatedInGapsFrom().equals("readyToList")) {
             preSubmitCallbackResponse.addError("This event cannot be run for cases created in GAPS at valid appeal");
+        }
+
+        HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(sscsCaseData.getCcdCaseId(), HmcStatus.LISTED);
+
+        if (HearingRoute.LIST_ASSIST == sscsCaseData.getSchedulingAndListingFields().getHearingRoute()
+                && nonNull(hearingsGetResponse.getCaseHearings())  && !hearingsGetResponse.getCaseHearings().isEmpty()) {
+            preSubmitCallbackResponse.addError(EXISTING_HEARING_WARNING);
         }
 
         return preSubmitCallbackResponse;

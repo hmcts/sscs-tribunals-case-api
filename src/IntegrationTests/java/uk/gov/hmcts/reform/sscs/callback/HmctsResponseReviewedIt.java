@@ -15,6 +15,7 @@ import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWi
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,6 +32,9 @@ import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.controller.CcdCallbackController;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
+import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
+import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -42,12 +46,18 @@ public class HmctsResponseReviewedIt extends AbstractEventIt {
     @MockitoBean
     private IdamService idamService;
 
+    @MockitoBean
+    private HmcHearingApiService hmcHearingApiService;
+
     @Before
     public void setup() throws IOException {
         CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         mapper.findAndRegisterModules();
         json = getJson("callback/hmctsResponseReviewedCallback.json");
+
+        when(hmcHearingApiService.getHearingsRequest(any(), eq(HmcStatus.LISTED)))
+                .thenReturn(HearingsGetResponse.builder().caseHearings(List.of()).build());
 
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
     }
