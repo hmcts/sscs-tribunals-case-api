@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_RESPONSE
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.UCB;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_TCW;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist.ReadyToListAboutToSubmitHandler.EXISTING_HEARING_WARNING;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -77,8 +78,7 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
 
         if (HearingRoute.LIST_ASSIST == sscsCaseData.getSchedulingAndListingFields().getHearingRoute()
                 && nonNull(hearingsGetResponse.getCaseHearings())  && !hearingsGetResponse.getCaseHearings().isEmpty()) {
-            preSubmitCallbackResponse.addError("There is already a hearing request in List assist, "
-                    + "are you sure you want to send another request? If you do proceed, then please cancel the existing hearing request first");
+            preSubmitCallbackResponse.addError(EXISTING_HEARING_WARNING);
         }
 
         return preSubmitCallbackResponse;

@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.PHE_REQ
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_TCW;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist.ReadyToListAboutToSubmitHandler.EXISTING_HEARING_WARNING;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getUpdatedDirectionDueDate;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
@@ -66,8 +67,6 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
     private static final DateTimeFormatter DD_MM_YYYY_FORMAT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
     public static final int NEW_OTHER_PARTY_RESPONSE_DUE_DAYS = 14;
-    private static final String EXISTING_HEARING_WARNING = "There is already a hearing request in List assist, \"\n"
-            + " \"are you sure you want to send another request? If you do proceed, then please cancel the existing hearing request first";
     private final DwpDocumentService dwpDocumentService;
     private final AddNoteService addNoteService;
     private final PanelCompositionService panelCompositionService;

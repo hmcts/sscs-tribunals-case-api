@@ -28,7 +28,7 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @RequiredArgsConstructor
 public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    static final String EXISTING_HEARING_WARNING = "There is already a hearing request in List assist, "
+    public static final String EXISTING_HEARING_WARNING = "There is already a hearing request in List assist, "
             + "are you sure you want to send another request? If you do proceed, then please cancel the existing hearing request first";
     static final String GAPS_CASE_WARNING = "This is a GAPS case, If you do want to proceed, "
             + "then please change the hearing route to List Assist";

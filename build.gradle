@@ -267,10 +267,7 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/sscs/controller/FunctionalTestController.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/tyanotifications/utils/GetAllTemplatesFromNotify.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/bulkscan/domain/**," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/bulkscan/bulkscancore/domain/**," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/dwpuploadresponse/DwpUploadResponseAboutToSubmitHandler.java," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/hmctsresponsereviewed/HmctsResponseReviewedAboutToStartHandler.java,"
-
+                "src/main/java/uk/gov/hmcts/reform/sscs/bulkscan/bulkscancore/domain/**,"
         property "sonar.host.url", "https://sonar.reform.hmcts.net/"
     }
 }
