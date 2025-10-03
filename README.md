@@ -8,7 +8,7 @@ A Spring Boot application for creating new appeals for SSCS appellants.
 - [Quick Start](#quick-start)
 - [Development](#development)
 - [Testing](#testing)
-- [Docker](#docker)
+- [Docker](#docker-work-in-progress)
 - [Useful Commands](#useful-commands)
 - [Gotchas](#gotchas)
 
