@@ -297,12 +297,13 @@ class HearingsServiceTest {
 
     @DisplayName("When create Hearing is given and there is already a hearing requested/awaiting listing addHearingResponse should"
             + "run without error")
-    @Test
-    void processHearingWrapperCreateExistingRequestedOrAwaitingListingHearing() throws ListingException {
+    @ParameterizedTest
+    @CsvSource({"AWAITING_LISTING", "UPDATE_REQUESTED", "UPDATE_SUBMITTED", "HEARING_REQUESTED"})
+    void processHearingWrapperCreateExistingRequestedOrAwaitingListingHearing(HmcStatus hmcStatus) throws ListingException {
         HearingsGetResponse hearingsGetResponse = HearingsGetResponse.builder()
             .caseHearings(List.of(CaseHearing.builder()
                 .hearingId(HEARING_REQUEST_ID)
-                .hmcStatus(HmcStatus.HEARING_REQUESTED)
+                .hmcStatus(hmcStatus)
                 .requestVersion(1L)
                 .build()))
             .build();

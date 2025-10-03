@@ -66,9 +66,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
             return HearingHandler.GAPS.handle(sscsCaseData, hearingRequestHandler);
         }
 
-
         HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(sscsCaseData.getCcdCaseId(), HmcStatus.LISTED);
-
 
         if (HearingRoute.LIST_ASSIST == sscsCaseData.getSchedulingAndListingFields().getHearingRoute()
                 && nonNull(hearingsGetResponse.getCaseHearings())  && !hearingsGetResponse.getCaseHearings().isEmpty()) {
