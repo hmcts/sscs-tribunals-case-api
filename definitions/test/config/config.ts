@@ -106,7 +106,11 @@ export const credentials = {
   amRegionalCenterTeamLeader: {
     email: process.env.TEST_AM_REGIONAL_CENTER_TEAM_LEADER_USERNAME,
     password: process.env.TEST_AM_REGIONAL_CENTER_TEAM_LEADER_PASSWORD
-  }
+  },
+  amCtscTeamLeader: {
+    email: process.env.TEST_AM_CTSC_TEAM_LEADER_USERNAME,
+    password: process.env.TEST_AM_CTSC_TEAM_LEADER_PASSWORD
+}
 };
 
 export const resources = {
