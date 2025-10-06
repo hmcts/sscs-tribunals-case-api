@@ -48,8 +48,6 @@ public class ConfirmPanelCompositionAboutToStartHandler implements PreSubmitCall
 
         HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(sscsCaseData.getCcdCaseId(), HmcStatus.LISTED);
 
-        log.info("Hearing details from HMC API for case id {} : {}", sscsCaseData.getCcdCaseId(), hearingsGetResponse);
-
         if (HearingRoute.LIST_ASSIST == sscsCaseData.getSchedulingAndListingFields().getHearingRoute()
                 && nonNull(hearingsGetResponse.getCaseHearings())  && !hearingsGetResponse.getCaseHearings().isEmpty()) {
             response.addError(EXISTING_HEARING_WARNING);
