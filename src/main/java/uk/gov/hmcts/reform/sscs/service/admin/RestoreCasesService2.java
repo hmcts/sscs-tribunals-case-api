@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.sscs.service.admin;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish.IsScottishHandler.isScottishCase;
 import static uk.gov.hmcts.reform.sscs.exception.BenefitMappingException.createException;
+import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.isScottishCase;
 import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.generateBenefitCode;
 import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.generateCaseCode;
 import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.generateIssueCode;
@@ -181,7 +181,7 @@ public class RestoreCasesService2 {
             sscsCaseData.setDwpState(DwpState.UNREGISTERED);
         }
 
-        String isScotCase = isScottishCase(sscsCaseData.getRegionalProcessingCenter(), sscsCaseData);
+        String isScotCase = isScottishCase(sscsCaseData.getRegionalProcessingCenter());
 
         if (!isScotCase.equals(sscsCaseData.getIsScottishCase())) {
             sscsCaseData.setIsScottishCase(isScotCase);
