@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INCOMPLETE_APPLICATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INCOMPLETE_APPLICATION_INFORMATION_REQUESTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse.DwpUploadResponseAboutToSubmitHandler.NEW_OTHER_PARTY_RESPONSE_DUE_DAYS;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist.ReadyToListAboutToSubmitHandler.EXISTING_HEARING_WARNING;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.generateDwpResponseDueDate;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDateTime;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isValidBenefitTypeForConfidentiality;
@@ -23,15 +24,22 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.core.config.plugins.validation.constraints.Required;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
+import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
+import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
 
 @Slf4j
+@RequiredArgsConstructor
 public class SscsHelper {
 
-    private SscsHelper() {
-    }
+    private final HmcHearingApiService hmcHearingApiService;
 
     public static List<State> getPreValidStates() {
         return of(INCOMPLETE_APPLICATION, INCOMPLETE_APPLICATION_INFORMATION_REQUESTED, INTERLOCUTORY_REVIEW_STATE);
@@ -121,6 +129,16 @@ public class SscsHelper {
                 .filter(hearing -> !CANCELLED.equals(hearing.getValue().getHearingStatus()))
                 .findFirst();
         return futureHearing.isPresent();
+    }
+
+    public PreSubmitCallbackResponse<SscsCaseData> validationCheckForListedHearings(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> response ) {
+        HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseData.getCcdCaseId(), HmcStatus.LISTED);
+        if (HearingRoute.LIST_ASSIST == caseData.getSchedulingAndListingFields().getHearingRoute()
+                && nonNull(hearingsGetResponse.getCaseHearings()) && !hearingsGetResponse.getCaseHearings().isEmpty()) {
+            response.addError(EXISTING_HEARING_WARNING);
+            log.error("Error on case {}: There is already a hearing request in List assist", caseData.getCcdCaseId());
+        }
+        return response;
     }
 
     public static String isScottishCase(RegionalProcessingCenter rpc) {

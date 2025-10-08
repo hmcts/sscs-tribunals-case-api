@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.helper.SscsHelper;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
 import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
 import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
@@ -35,6 +36,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
 
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final HearingRequestHandler hearingRequestHandler;
+    private final SscsHelper sscsHelper;
     private final HmcHearingApiService hmcHearingApiService;
 
     @Override
@@ -66,15 +68,8 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
             return HearingHandler.GAPS.handle(sscsCaseData, hearingRequestHandler);
         }
 
-        HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(sscsCaseData.getCcdCaseId(), HmcStatus.LISTED);
-
-        if (HearingRoute.LIST_ASSIST == sscsCaseData.getSchedulingAndListingFields().getHearingRoute()
-                && nonNull(hearingsGetResponse.getCaseHearings())  && !hearingsGetResponse.getCaseHearings().isEmpty()) {
-            var response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
-            response.addError(EXISTING_HEARING_WARNING);
-            log.error("Error on case {}: There is already a hearing request in List assist", sscsCaseData.getCcdCaseId());
-            return response;
-        }
+        var response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
+        sscsHelper.validationCheckForListedHearings(sscsCaseData, response);
 
         String region = sscsCaseData.getRegion();
 

@@ -50,6 +50,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.exception.GetCaseException;
 import uk.gov.hmcts.reform.sscs.exception.TribunalsEventProcessingException;
 import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
+import uk.gov.hmcts.reform.sscs.helper.SscsHelper;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
 import uk.gov.hmcts.reform.sscs.model.multi.hearing.CaseHearing;
@@ -70,6 +71,8 @@ public class ReadyToListAboutToSubmitHandlerTest {
     private HearingRequestHandler hearingRequestHandler;
     @Mock
     private HmcHearingApiService hmcHearingApiService;
+    @Mock
+    private SscsHelper sscsHelper;
 
     private SscsCaseData caseData;
     private ReadyToListAboutToSubmitHandler handler;
@@ -88,7 +91,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
                 new CaseDetails<>(1234L, "SSCS", RESPONSE_RECEIVED, caseData, now(), "Benefit");
         callback = new Callback<>(caseDetails, empty(), READY_TO_LIST, false);
 
-        handler = new ReadyToListAboutToSubmitHandler(regionalProcessingCenterService, hearingRequestHandler, hmcHearingApiService);
+        handler = new ReadyToListAboutToSubmitHandler(regionalProcessingCenterService, hearingRequestHandler, sscsHelper, hmcHearingApiService);
     }
 
     @ParameterizedTest
@@ -136,13 +139,11 @@ public class ReadyToListAboutToSubmitHandlerTest {
     public void givenAListAssistCaseIfAHearingIsListedThenReturnError() {
         caseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
         caseData.setRegion("TEST");
-        given(hmcHearingApiService.getHearingsRequest(anyString(), eq(HmcStatus.LISTED)))
-                .willReturn(HearingsGetResponse.builder().caseHearings(List.of(CaseHearing.builder().hearingId(1L).build())).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(1, response.getErrors().size());
-        assertTrue(response.getErrors().contains(EXISTING_HEARING_WARNING));
+        assertEquals(0, response.getErrors().size());
+        assertFalse(response.getErrors().contains(EXISTING_HEARING_WARNING));
     }
 
     @Test
@@ -221,8 +222,6 @@ public class ReadyToListAboutToSubmitHandlerTest {
         buildRegionalProcessingCentreMap(HearingRoute.LIST_ASSIST);
         doThrow(UpdateCaseException.class).when(hearingRequestHandler).handleHearingRequest(any());
         caseData.setRegion("TEST");
-        given(hmcHearingApiService.getHearingsRequest(anyString(), eq(HmcStatus.LISTED)))
-                .willReturn(HearingsGetResponse.builder().caseHearings(List.of()).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -237,8 +236,6 @@ public class ReadyToListAboutToSubmitHandlerTest {
     @Test
     public void givenAListAssistCaseIfAHearingExistsInTheFutureAndUserProceedsThenSendAHearingRequestMessage() {
         caseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
-        given(hmcHearingApiService.getHearingsRequest(anyString(), eq(HmcStatus.LISTED)))
-                .willReturn(HearingsGetResponse.builder().caseHearings(List.of()).build());
         callback = new Callback<>(caseDetails, empty(), READY_TO_LIST, true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
