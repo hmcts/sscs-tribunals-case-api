@@ -3,8 +3,6 @@ package uk.gov.hmcts.reform.sscs.callback;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.PHE_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
@@ -14,7 +12,6 @@ import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpSt
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
 import java.io.IOException;
-import java.util.List;
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,9 +26,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
-import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
-import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
+import uk.gov.hmcts.reform.sscs.service.HearingsService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -45,13 +40,11 @@ public class DwpUploadResponseIt extends AbstractEventIt {
     private UserInfo userInfo;
 
     @MockitoBean
-    private HmcHearingApiService hmcHearingApiService;
+    private HearingsService hearingsService;
 
     @Before
     public void setup() throws IOException {
         setup("callback/dwpUploadResponse.json");
-        when(hmcHearingApiService.getHearingsRequest(any(), eq(HmcStatus.LISTED)))
-                .thenReturn(HearingsGetResponse.builder().caseHearings(List.of()).build());
     }
 
     @Test
