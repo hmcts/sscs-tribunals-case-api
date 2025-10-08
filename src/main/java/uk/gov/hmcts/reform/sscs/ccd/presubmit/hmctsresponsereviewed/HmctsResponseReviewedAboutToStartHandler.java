@@ -23,16 +23,16 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
+import uk.gov.hmcts.reform.sscs.service.HearingsService;
 
 @Service
 @RequiredArgsConstructor
 public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final DwpAddressLookupService service;
-    private final HearingsServiceHelper hearingsServiceHelper;
+    private final HearingsService hearingsService;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -70,7 +70,7 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
             preSubmitCallbackResponse.addError("This event cannot be run for cases created in GAPS at valid appeal");
         }
 
-        hearingsServiceHelper.validationCheckForListedHearings(sscsCaseData, preSubmitCallbackResponse);
+        hearingsService.validationCheckForListedHearings(sscsCaseData, preSubmitCallbackResponse);
 
         return preSubmitCallbackResponse;
     }

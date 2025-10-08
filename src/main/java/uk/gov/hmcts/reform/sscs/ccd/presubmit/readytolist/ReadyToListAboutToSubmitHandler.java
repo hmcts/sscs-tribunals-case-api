@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper;
+import uk.gov.hmcts.reform.sscs.service.HearingsService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingRequestHandler;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
@@ -25,14 +25,12 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @RequiredArgsConstructor
 public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    public static final String EXISTING_HEARING_WARNING = "There is already a hearing request in List assist, "
-            + "are you sure you want to send another request? If you do proceed, then please cancel the existing hearing request first";
     static final String GAPS_CASE_WARNING = "This is a GAPS case, If you do want to proceed, "
             + "then please change the hearing route to List Assist";
 
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final HearingRequestHandler hearingRequestHandler;
-    private final HearingsServiceHelper hearingsServiceHelper;
+    private final HearingsService hearingsService;
 
 
     @Override
@@ -65,7 +63,10 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
         }
 
         var response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
-        hearingsServiceHelper.validationCheckForListedHearings(sscsCaseData, response);
+        hearingsService.validationCheckForListedHearings(sscsCaseData, response);
+        if (!response.getErrors().isEmpty()) {
+            return response;
+        }
 
         String region = sscsCaseData.getRegion();
 

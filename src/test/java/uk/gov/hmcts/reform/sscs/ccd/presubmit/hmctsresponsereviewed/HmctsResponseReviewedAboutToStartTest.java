@@ -11,7 +11,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_TCW;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist.ReadyToListAboutToSubmitHandler.EXISTING_HEARING_WARNING;
+import static uk.gov.hmcts.reform.sscs.service.HearingsService.EXISTING_HEARING_WARNING;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -41,8 +41,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
+import uk.gov.hmcts.reform.sscs.service.HearingsService;
 
 @RunWith(JUnitParamsRunner.class)
 public class HmctsResponseReviewedAboutToStartTest {
@@ -57,7 +57,7 @@ public class HmctsResponseReviewedAboutToStartTest {
     private CaseDetails<SscsCaseData> caseDetails;
 
     @Mock
-    private HearingsServiceHelper hearingsServiceHelper;
+    private HearingsService hearingsService;
 
     @Mock
     private DwpAddressLookupService dwpAddressLookupService;
@@ -68,7 +68,7 @@ public class HmctsResponseReviewedAboutToStartTest {
     public void setUp() {
         openMocks(this);
         dwpAddressLookupService = new DwpAddressLookupService();
-        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsServiceHelper);
+        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService);
 
         when(callback.getEvent()).thenReturn(EventType.HMCTS_RESPONSE_REVIEWED);
 
@@ -162,7 +162,7 @@ public class HmctsResponseReviewedAboutToStartTest {
     public void givenAListAssistCaseIfAHearingIsListedThenReturnError() {
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
 
-        when(hearingsServiceHelper.validationCheckForListedHearings(any(), any()))
+        when(hearingsService.validationCheckForListedHearings(any(), any()))
                 .thenAnswer(invocation -> {
                     PreSubmitCallbackResponse<SscsCaseData> response = invocation.getArgument(1);
                     response.addError(EXISTING_HEARING_WARNING);

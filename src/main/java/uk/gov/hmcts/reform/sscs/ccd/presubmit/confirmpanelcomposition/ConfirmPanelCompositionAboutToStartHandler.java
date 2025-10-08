@@ -12,14 +12,14 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper;
+import uk.gov.hmcts.reform.sscs.service.HearingsService;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class ConfirmPanelCompositionAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final HearingsServiceHelper hearingsServiceHelper;
+    private final HearingsService hearingsService;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -41,7 +41,7 @@ public class ConfirmPanelCompositionAboutToStartHandler implements PreSubmitCall
 
         final PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        hearingsServiceHelper.validationCheckForListedHearings(sscsCaseData, response);
+        hearingsService.validationCheckForListedHearings(sscsCaseData, response);
 
         return response;
     }
