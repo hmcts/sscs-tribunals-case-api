@@ -124,9 +124,9 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
             log.info("Issuing for {} for caseId {}", documentType.getValue(), caseData.getCcdCaseId());
             furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, documentType, allowedLetterTypes, otherPartyOriginalSenderId);
         } catch (Exception e) {
-            handleIssueFurtherEvidenceException(caseData);
-            String errorMsg = "Failed sending further evidence for case(%s)...";
-            throw new IssueFurtherEvidenceException(String.format(errorMsg, caseData.getCcdCaseId()), e);
+            handleIssueFurtherEvidenceException(caseData, e);
+            String errorMsg = "Failed sending further evidence for case(%s) with exception(%s)";
+            throw new IssueFurtherEvidenceException(String.format(errorMsg, caseData.getCcdCaseId(), e.getMessage()), e);
         }
         log.info("Issued for caseId {}", caseData.getCcdCaseId());
     }
@@ -136,6 +136,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
 
         Map<String, SscsDocument> binaryDocumentUrlLinkCaseDataMap = updatedCaseData.getSscsDocument()
                 .stream()
+                .filter(sscsDocument -> sscsDocument.getValue().getDocumentLink() != null)
                 .collect(toMap(document -> document.getValue().getDocumentLink().getDocumentBinaryUrl(), Function.identity()));
 
         try {
@@ -144,16 +145,16 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
                     EventType.UPDATE_CASE_ONLY.getCcdType(),
                     idamTokens,
                     sscsCaseDetails -> {
-                        sscsCaseDetails.getData().getSscsDocument().forEach(
-                                sscsDocument -> {
-                                    String documentBinaryUrl = sscsDocument.getValue().getDocumentLink().getDocumentBinaryUrl();
-                                    if (binaryDocumentUrlLinkCaseDataMap.containsKey(documentBinaryUrl)) {
-                                        sscsDocument.getValue().setResizedDocumentLink(
-                                                binaryDocumentUrlLinkCaseDataMap.get(documentBinaryUrl).getValue().getResizedDocumentLink()
-                                        );
-                                    }
-                                }
-                        );
+                        sscsCaseDetails.getData().getSscsDocument()
+                                .stream()
+                                .filter(sscsDocument -> sscsDocument.getValue().getDocumentLink() != null)
+                                .forEach(
+                                        sscsDocument -> {
+                                            String documentBinaryUrl = sscsDocument.getValue().getDocumentLink().getDocumentBinaryUrl();
+                                            if (binaryDocumentUrlLinkCaseDataMap.containsKey(documentBinaryUrl)) {
+                                                sscsDocument.getValue().setResizedDocumentLink(binaryDocumentUrlLinkCaseDataMap.get(documentBinaryUrl).getValue().getResizedDocumentLink());
+                                            }
+                                        });
 
                         final String description = determineDescription(sscsCaseDetails.getData().getSscsDocument());
                         setEvidenceIssuedFlagToYes(sscsCaseDetails.getData().getSscsDocument());
@@ -178,14 +179,15 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         return !hasResizedDocs ? baseDescription : baseDescription + " and attached resized document(s)";
     }
 
-    private void handleIssueFurtherEvidenceException(SscsCaseData caseData) {
+    private void handleIssueFurtherEvidenceException(SscsCaseData caseData, Exception e) {
+        log.error("Failed to issue further evidence for case:{}, with exception:{}", caseData.getCcdCaseId(), e.getMessage());
         updateCcdCaseService.updateCaseV2(Long.valueOf(caseData.getCcdCaseId()),
                 EventType.SEND_FURTHER_EVIDENCE_ERROR.getCcdType(),
                 "Failed to issue further evidence",
                 "Review document tab to see document(s) that haven't been issued, then use the"
                         + " \"Reissue further evidence\" within next step and select affected document(s) to re-send",
                 idamService.getIdamTokens(),
-                sscsCaseData -> caseData.setHmctsDwpState("failedSendingFurtherEvidence")
+                sscsCaseDetails -> sscsCaseDetails.getData().setHmctsDwpState("failedSendingFurtherEvidence")
         );
     }
 

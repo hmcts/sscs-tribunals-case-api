@@ -17,13 +17,13 @@ public class Activity {
         this.selectionKey = selectionKey;
     }
 
-    @Schema(example = "an activity", required = true)
+    @Schema(example = "an activity", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "activity")
     public String getActivity() {
         return activity;
     }
 
-    @Schema(example = "2.1", required = true)
+    @Schema(example = "2.1", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "selection_key")
     public String getSelectionKey() {
         return selectionKey;

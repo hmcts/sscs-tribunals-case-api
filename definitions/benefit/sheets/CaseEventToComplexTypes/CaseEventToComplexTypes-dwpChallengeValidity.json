@@ -1,0 +1,60 @@
+[
+  {
+    "CaseEventID": "dwpChallengeValidity",
+    "CaseFieldID": "dwpChallengeValidityDocument",
+    "ListElementCode": "dwpResponseDocumentTitle",
+    "ID": "dwpChallengeValidityDocumentDwpTitle",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.code!=\"infectedBloodCompensation\" AND appeal.benefitType.code!=\"guardiansAllowance\" AND appeal.benefitType.code!=\"childBenefit\" AND appeal.benefitType.code!=\"nationalInsuranceCredits\" AND appeal.benefitType.code!=\"guaranteedMinimumPension\" AND appeal.benefitType.code!=\"homeResponsibilitiesProtection\" AND appeal.benefitType.code!=\"taxCredit\" AND appeal.benefitType.code!=\"taxFreeChildcare\" AND appeal.benefitType.code!=\"thirtyHoursFreeChildcare\"",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseEventID": "dwpChallengeValidity",
+    "CaseFieldID": "dwpChallengeValidityDocument",
+    "ListElementCode": "hmrcResponseDocumentTitle",
+    "ID": "dwpChallengeValidityDocumentHmrcTitle",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.code=\"guardiansAllowance\" OR appeal.benefitType.code=\"childBenefit\" OR appeal.benefitType.code=\"nationalInsuranceCredits\" OR appeal.benefitType.code=\"guaranteedMinimumPension\" OR appeal.benefitType.code=\"homeResponsibilitiesProtection\" OR appeal.benefitType.code=\"taxCredit\" OR appeal.benefitType.code=\"taxFreeChildcare\" OR appeal.benefitType.code=\"thirtyHoursFreeChildcare\"",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseEventID": "dwpChallengeValidity",
+    "CaseFieldID": "dwpChallengeValidityDocument",
+    "ListElementCode": "ibcaResponseDocumentTitle",
+    "ID": "dwpChallengeValidityDocumentIbcaTitle",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodCompensation\"",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseEventID": "dwpChallengeValidity",
+    "CaseFieldID": "dwpChallengeValidityDocument",
+    "ListElementCode": "documentFileName",
+    "ID": "dwpChallengeValidityDocumentDocumentFileName",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 2,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "dwpChallengeValidity",
+    "CaseFieldID": "dwpChallengeValidityDocument",
+    "ListElementCode": "documentLink",
+    "ID": "dwpChallengeValidityDocumentDocumentLink",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 3,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "Y"
+  }
+]

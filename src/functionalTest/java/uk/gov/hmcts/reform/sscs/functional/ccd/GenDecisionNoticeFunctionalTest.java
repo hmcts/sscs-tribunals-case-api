@@ -16,6 +16,7 @@ import junitparams.Parameters;
 import org.apache.http.HttpResponse;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.ClassRule;
@@ -57,7 +58,7 @@ public class GenDecisionNoticeFunctionalTest extends BaseFunctionTest {
             Arrays.asList(allowed ? "allowed" : "refused"));
 
         byte[] bytes = callPreviewFinalDecision(json);
-        try (PDDocument document = PDDocument.load(bytes)) {
+        try (PDDocument document = Loader.loadPDF(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             if (allowed) {

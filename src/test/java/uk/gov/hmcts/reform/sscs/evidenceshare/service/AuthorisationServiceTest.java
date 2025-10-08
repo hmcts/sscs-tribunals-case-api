@@ -23,10 +23,14 @@ public class AuthorisationServiceTest {
 
     private static final String SERVICE_NAME = "SSCS";
 
+    private static final String SERVICE_HEADER = "test-header";
+
+    private static final String CCD_DATA = "ccd_data";
+
     @Before
-    public void setup() {
+    public void setUp() {
         openMocks(this);
-        service = new AuthorisationService(serviceAuthorisationApi);
+        service = new AuthorisationService(serviceAuthorisationApi, "ccd_data");
     }
 
     @Test

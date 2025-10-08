@@ -25,11 +25,11 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.sscs.model.HmcFailureMessage;
@@ -56,7 +56,7 @@ public class FeignClientErrorDecoderIntegrationTest {
 
     private static WireMockServer wireMockServer;
 
-    @MockBean
+    @MockitoBean
     private AppInsightsService appInsightsService;
 
     private ArgumentCaptor<HmcFailureMessage> argument;
@@ -91,6 +91,8 @@ public class FeignClientErrorDecoderIntegrationTest {
                 () -> hmcHearingApi.getHearingRequest(
                     IDAM_OAUTH2_TOKEN,
                     SERVICE_AUTHORIZATION_TOKEN,
+                    null,
+                    null,
                     null,
                     CASE_ID,
                     null))

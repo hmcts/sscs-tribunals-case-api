@@ -15,9 +15,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
@@ -34,7 +34,7 @@ public class UpdateSscs5OtherPartyDataIt extends AbstractEventIt {
     public static final String OTHER_PARTY_ID_1 = "34c1ef28-b6c7-4b45-bb40-4bfe1e7133c5";
     public static final String OTHER_PARTY_ID_2 = "bc81340e-a116-4b74-a091-9cf1564df9ca";
     public static final int UUID_SIZE = 36;
-    @MockBean
+    @MockitoBean
     private IdamService idamService;
 
     @Before

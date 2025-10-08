@@ -19,7 +19,7 @@ public class Evidence {
         this.createdDate = createdDate;
     }
 
-    @Schema(example = "8f79deb3-5d7a-4e6f-846a-a8131ac6a3bb", required = true)
+    @Schema(example = "8f79deb3-5d7a-4e6f-846a-a8131ac6a3bb", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "id")
     public String getId() {
         String[] split = documentLink.split("/");
@@ -27,13 +27,13 @@ public class Evidence {
         return split[split.length - 1];
     }
 
-    @Schema(example = "some_file_name.txt", required = true)
+    @Schema(example = "some_file_name.txt", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "file_name")
     public String getFileName() {
         return fileName;
     }
 
-    @Schema(example = "2018-10-24'T'12:11:21Z", required = true)
+    @Schema(example = "2018-10-24'T'12:11:21Z", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "created_date")
     public String getCreatedDate() {
         return createdDate;

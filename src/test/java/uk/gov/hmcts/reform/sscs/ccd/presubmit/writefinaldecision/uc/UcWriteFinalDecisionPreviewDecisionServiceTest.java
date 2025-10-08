@@ -6,7 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.io.IOException;
@@ -63,8 +63,8 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
     protected Map<LanguagePreference, Map<EventType, String>> getBenefitSpecificDocuments() {
         final Map<EventType, String> englishEventTypeDocs = new HashMap<>();
         final Map<EventType, String> welshEventTypeDocs = new HashMap<>();
-        welshEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-final-decision-notice.docx");
-        englishEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-final-decision-notice.docx");
+        welshEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-final-decision-notice-v2.docx");
+        englishEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-final-decision-notice-v2.docx");
         Map<LanguagePreference, Map<EventType, String>> docs = new HashMap<>();
         docs.put(LanguagePreference.ENGLISH, englishEventTypeDocs);
         docs.put(LanguagePreference.WELSH, welshEventTypeDocs);

@@ -1,0 +1,27 @@
+[
+  {
+    "LiveFrom": "13/01/2025",
+    "CaseEventID": "amendHearingOutcome",
+    "CaseFieldID": "hearingOutcomes",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "COMPLEX",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "LiveFrom": "30/10/2024",
+    "CaseEventID": "amendHearingOutcome",
+    "CaseFieldID": "completedHearingsList",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "N",
+    "RetainHiddenValue": "Yes",
+    "FieldShowCondition": "hearingOutcomes.hearingOutcomeId=\"DoNotShow\""
+  }
+]

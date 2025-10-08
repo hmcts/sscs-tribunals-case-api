@@ -1,18 +1,66 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.tya;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.atMost;
+import static org.mockito.Mockito.atMostOnce;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.BENEFIT_NAME_ACRONYM_LITERAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.BENEFIT_NAME_ACRONYM_LITERAL_WELSH;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADJOURNED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADMIN_APPEAL_WITHDRAWN;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_DORMANT;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_LAPSED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_WITHDRAWN;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.CASE_UPDATED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DECISION_ISSUED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DIRECTION_ISSUED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DRAFT_TO_NON_COMPLIANT;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DRAFT_TO_VALID_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DWP_RESPONSE_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DWP_UPLOAD_RESPONSE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.EVIDENCE_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.EVIDENCE_REMINDER;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.HEARING_BOOKED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.HEARING_REMINDER;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_ADJOURNMENT_NOTICE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_ADJOURNMENT_NOTICE_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.JOINT_PARTY_ADDED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.NON_COMPLIANT;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.POSTPONEMENT;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PROCESS_AUDIO_VIDEO;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PROCESS_AUDIO_VIDEO_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.REQUEST_FOR_INFORMATION;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.RESEND_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.STRUCK_OUT;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SUBSCRIPTION_UPDATED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SYA_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.VALID_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper.assertHttpStatus;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper.getRequestWithAuthHeader;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper.getRequestWithoutAuthHeader;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper.updateEmbeddedJson;
 
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.*;
-import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import junitparams.NamedParameters;
 import junitparams.Parameters;
 import org.apache.commons.io.FileUtils;
@@ -179,6 +227,25 @@ public class NotificationsIt extends NotificationsItBase {
         Map<String, ?> personalisation = emailPersonalisationCaptor.getValue();
         assertEquals("Carer's Allowance", personalisation.get(BENEFIT_NAME_ACRONYM_LITERAL));
         assertEquals("Lwfans Gofalwr", personalisation.get(BENEFIT_NAME_ACRONYM_LITERAL_WELSH));
+    }
+
+    @Test
+    public void shouldSetInfectedBloodCompensationDescriptionInAcronymField() throws Exception {
+        String path = getClass().getClassLoader().getResource("json/ccdResponseTest.json").getFile();
+        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+
+        json = updateEmbeddedJson(json, "infectedBloodCompensation", "case_details", "case_data", "appeal", "benefitType", "code");
+        HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
+        assertHttpStatus(response, HttpStatus.OK);
+
+        ArgumentCaptor<String> emailTemplateIdCaptor = ArgumentCaptor.forClass(String.class);
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<Map<String, ?>> emailPersonalisationCaptor = ArgumentCaptor.forClass(Map.class);
+        verify(notificationClient, times(1))
+                .sendEmail(emailTemplateIdCaptor.capture(), any(), emailPersonalisationCaptor.capture(), any());
+        Map<String, ?> personalisation = emailPersonalisationCaptor.getValue();
+        assertEquals("IBC", personalisation.get(BENEFIT_NAME_ACRONYM_LITERAL));
+        assertEquals("IGH", personalisation.get(BENEFIT_NAME_ACRONYM_LITERAL_WELSH));
     }
 
     @Test
@@ -571,7 +638,7 @@ public class NotificationsIt extends NotificationsItBase {
                 GAPS_ROUTE,
                 Collections.singletonList("6ce5e7b0-b94f-4f6e-878b-012ec0ee17d1"),
                 Collections.singletonList("c4db4fca-6876-4130-b4eb-09e900ae45a8"),
-                Arrays.asList("TB-SCS-GNO-ENG-00659.docx", "TB-SCS-GNO-ENG-00659.docx"),
+                Arrays.asList("TB-SCS-GNO-ENG-00659-v2.docx", "TB-SCS-GNO-ENG-00659-v2.docx"),
                 "yes",
                 "yes",
                 "1",
@@ -584,7 +651,7 @@ public class NotificationsIt extends NotificationsItBase {
                 GAPS_ROUTE,
                 Collections.singletonList("6ce5e7b0-b94f-4f6e-878b-012ec0ee17d1"),
                 Collections.singletonList("c4db4fca-6876-4130-b4eb-09e900ae45a8"),
-                Arrays.asList("TB-SCS-GNO-ENG-00659.docx", "TB-SCS-GNO-ENG-00659.docx"),
+                Arrays.asList("TB-SCS-GNO-ENG-00659-v2.docx", "TB-SCS-GNO-ENG-00659-v2.docx"),
                 "yes",
                 "yes",
                 "1",
@@ -597,7 +664,7 @@ public class NotificationsIt extends NotificationsItBase {
                 GAPS_ROUTE,
                 Collections.emptyList(),
                 Collections.emptyList(),
-                Arrays.asList("TB-SCS-GNO-ENG-00677.docx", "TB-SCS-GNO-ENG-00677.docx"),
+                Arrays.asList("TB-SCS-GNO-ENG-00677-v2.docx", "TB-SCS-GNO-ENG-00677-v2.docx"),
                 "yes",
                 "yes",
                 "0",
@@ -610,7 +677,7 @@ public class NotificationsIt extends NotificationsItBase {
                 GAPS_ROUTE,
                 Collections.emptyList(),
                 Collections.emptyList(),
-                Arrays.asList("TB-SCS-GNO-ENG-00677.docx", "TB-SCS-GNO-ENG-00677.docx"),
+                Arrays.asList("TB-SCS-GNO-ENG-00677-v2.docx", "TB-SCS-GNO-ENG-00677-v2.docx"),
                 "yes",
                 "yes",
                 "0",
@@ -714,7 +781,7 @@ public class NotificationsIt extends NotificationsItBase {
                 GAPS_ROUTE,
                 Collections.emptyList(),
                 Collections.emptyList(),
-                Arrays.asList("TB-SCS-GNO-ENG-00510.docx", "TB-SCS-GNO-ENG-00510.docx"),
+                Arrays.asList("TB-SCS-GNO-ENG-00510-v2.docx", "TB-SCS-GNO-ENG-00510-v2.docx"),
                 "yes",
                 "yes",
                 "0",
@@ -727,7 +794,7 @@ public class NotificationsIt extends NotificationsItBase {
                 GAPS_ROUTE,
                 Collections.emptyList(),
                 Collections.emptyList(),
-                Arrays.asList("TB-SCS-GNO-WEL-00649.docx", "TB-SCS-GNO-WEL-00649.docx"),
+                Arrays.asList("TB-SCS-GNO-WEL-00649-v2.docx", "TB-SCS-GNO-WEL-00649-v2.docx"),
                 "yes",
                 "yes",
                 "0",
@@ -923,7 +990,7 @@ public class NotificationsIt extends NotificationsItBase {
                 LIST_ASSIST_ROUTE,
                 Collections.singletonList("aa0930a3-e1bd-4b50-ac6b-34df73ec8378"),
                 Collections.singletonList("8aa77a9c-9bc6-424d-8716-1c948681270e"),
-                Arrays.asList("TB-SCS-LET-ENG-Hearing-Booked.docx", "TB-SCS-LET-ENG-Hearing-Booked.docx"),
+                Arrays.asList("TB-SCS-LET-ENG-Hearing-Booked-v2.docx", "TB-SCS-LET-ENG-Hearing-Booked-v2.docx"),
                 "yes",
                 "yes",
                 "1",
@@ -975,7 +1042,7 @@ public class NotificationsIt extends NotificationsItBase {
                 LIST_ASSIST_ROUTE,
                 Collections.singletonList("6ce5e7b0-b94f-4f6e-878b-012ec0ee17d1"),
                 Collections.singletonList("c4db4fca-6876-4130-b4eb-09e900ae45a8"),
-                Arrays.asList("TB-SCS-GNO-ENG-00659.docx", "TB-SCS-GNO-ENG-00659.docx"),
+                Arrays.asList("TB-SCS-GNO-ENG-00659-v2.docx", "TB-SCS-GNO-ENG-00659-v2.docx"),
                 "yes",
                 "yes",
                 "1",
@@ -988,7 +1055,7 @@ public class NotificationsIt extends NotificationsItBase {
                 LIST_ASSIST_ROUTE,
                 Collections.singletonList("6ce5e7b0-b94f-4f6e-878b-012ec0ee17d1"),
                 Collections.singletonList("c4db4fca-6876-4130-b4eb-09e900ae45a8"),
-                Arrays.asList("TB-SCS-GNO-ENG-00659.docx", "TB-SCS-GNO-ENG-00659.docx"),
+                Arrays.asList("TB-SCS-GNO-ENG-00659-v2.docx", "TB-SCS-GNO-ENG-00659-v2.docx"),
                 "yes",
                 "yes",
                 "1",
@@ -1001,7 +1068,7 @@ public class NotificationsIt extends NotificationsItBase {
                 LIST_ASSIST_ROUTE,
                 Collections.emptyList(),
                 Collections.emptyList(),
-                Arrays.asList("TB-SCS-GNO-ENG-00677.docx", "TB-SCS-GNO-ENG-00677.docx"),
+                Arrays.asList("TB-SCS-GNO-ENG-00677-v2.docx", "TB-SCS-GNO-ENG-00677-v2.docx"),
                 "yes",
                 "yes",
                 "0",
@@ -1014,7 +1081,7 @@ public class NotificationsIt extends NotificationsItBase {
                 LIST_ASSIST_ROUTE,
                 Collections.emptyList(),
                 Collections.emptyList(),
-                Arrays.asList("TB-SCS-GNO-ENG-00677.docx", "TB-SCS-GNO-ENG-00677.docx"),
+                Arrays.asList("TB-SCS-GNO-ENG-00677-v2.docx", "TB-SCS-GNO-ENG-00677-v2.docx"),
                 "yes",
                 "yes",
                 "0",
@@ -1118,7 +1185,7 @@ public class NotificationsIt extends NotificationsItBase {
                 LIST_ASSIST_ROUTE,
                 Collections.emptyList(),
                 Collections.emptyList(),
-                Arrays.asList("TB-SCS-GNO-ENG-00510.docx", "TB-SCS-GNO-ENG-00510.docx"),
+                Arrays.asList("TB-SCS-GNO-ENG-00510-v2.docx", "TB-SCS-GNO-ENG-00510-v2.docx"),
                 "yes",
                 "yes",
                 "0",
@@ -1131,7 +1198,7 @@ public class NotificationsIt extends NotificationsItBase {
                 LIST_ASSIST_ROUTE,
                 Collections.emptyList(),
                 Collections.emptyList(),
-                Arrays.asList("TB-SCS-GNO-WEL-00649.docx", "TB-SCS-GNO-WEL-00649.docx"),
+                Arrays.asList("TB-SCS-GNO-WEL-00649-v2.docx", "TB-SCS-GNO-WEL-00649-v2.docx"),
                 "yes",
                 "yes",
                 "0",
@@ -1314,9 +1381,9 @@ public class NotificationsIt extends NotificationsItBase {
                 APPEAL_WITHDRAWN,
                 "paper",
                 GAPS_ROUTE,
-                Arrays.asList("8620e023-f663-477e-a771-9cfad50ee30f", "e29a2275-553f-4e70-97f4-2994c095f281"),
+                Arrays.asList("6919c7bd-96c7-4b6a-8a1d-4f8591a2ca19", "e29a2275-553f-4e70-97f4-2994c095f281"),
                 Arrays.asList("446c7b23-7342-42e1-adff-b4c367e951cb", "f59440ee-19ca-4d47-a702-13e9cecaccbd"),
-                Arrays.asList("TB-SCS-GNO-ENG-00659.docx", "TB-SCS-GNO-ENG-00659.docx"),
+                Arrays.asList("TB-SCS-GNO-ENG-00659-v2.docx", "TB-SCS-GNO-ENG-00659-v2.docx"),
                 "yes",
                 "yes",
                 "yes",
@@ -1329,9 +1396,9 @@ public class NotificationsIt extends NotificationsItBase {
                 APPEAL_WITHDRAWN,
                 "oral",
                 GAPS_ROUTE,
-                Arrays.asList("8620e023-f663-477e-a771-9cfad50ee30f", "e29a2275-553f-4e70-97f4-2994c095f281"),
+                Arrays.asList("6919c7bd-96c7-4b6a-8a1d-4f8591a2ca19", "e29a2275-553f-4e70-97f4-2994c095f281"),
                 Arrays.asList("446c7b23-7342-42e1-adff-b4c367e951cb", "f59440ee-19ca-4d47-a702-13e9cecaccbd"),
-                Arrays.asList("TB-SCS-GNO-ENG-00659.docx", "TB-SCS-GNO-ENG-00659.docx"),
+                Arrays.asList("TB-SCS-GNO-ENG-00659-v2.docx", "TB-SCS-GNO-ENG-00659-v2.docx"),
                 "yes",
                 "yes",
                 "yes",
@@ -1346,7 +1413,7 @@ public class NotificationsIt extends NotificationsItBase {
                 GAPS_ROUTE,
                 Collections.singletonList("e29a2275-553f-4e70-97f4-2994c095f281"),
                 Arrays.asList("446c7b23-7342-42e1-adff-b4c367e951cb", "f59440ee-19ca-4d47-a702-13e9cecaccbd"),
-                Arrays.asList("TB-SCS-GNO-ENG-00659.docx", "TB-SCS-GNO-ENG-00659.docx"),
+                Arrays.asList("TB-SCS-GNO-ENG-00659-v2.docx", "TB-SCS-GNO-ENG-00659-v2.docx"),
                 "no",
                 "yes",
                 "yes",
@@ -1361,7 +1428,7 @@ public class NotificationsIt extends NotificationsItBase {
                 GAPS_ROUTE,
                 Collections.emptyList(),
                 Collections.emptyList(),
-                Arrays.asList("TB-SCS-GNO-ENG-00659.docx", "TB-SCS-GNO-ENG-00659.docx"),
+                Arrays.asList("TB-SCS-GNO-ENG-00659-v2.docx", "TB-SCS-GNO-ENG-00659-v2.docx"),
                 "no",
                 "no",
                 "no",
@@ -1376,7 +1443,7 @@ public class NotificationsIt extends NotificationsItBase {
                 GAPS_ROUTE,
                 Collections.singletonList("e29a2275-553f-4e70-97f4-2994c095f281"),
                 Arrays.asList("446c7b23-7342-42e1-adff-b4c367e951cb", "f59440ee-19ca-4d47-a702-13e9cecaccbd"),
-                Arrays.asList("TB-SCS-GNO-ENG-00659.docx", "TB-SCS-GNO-ENG-00659.docx"),
+                Arrays.asList("TB-SCS-GNO-ENG-00659-v2.docx", "TB-SCS-GNO-ENG-00659-v2.docx"),
                 "no",
                 "yes",
                 "yes",
@@ -1871,7 +1938,7 @@ public class NotificationsIt extends NotificationsItBase {
                 GAPS_ROUTE,
                 Collections.emptyList(),
                 Collections.emptyList(),
-                Arrays.asList("TB-SCS-GNO-ENG-00677.docx", "TB-SCS-GNO-ENG-00677.docx"),
+                Arrays.asList("TB-SCS-GNO-ENG-00677-v2.docx", "TB-SCS-GNO-ENG-00677-v2.docx"),
                 "no",
                 "no",
                 "no",
@@ -1886,7 +1953,7 @@ public class NotificationsIt extends NotificationsItBase {
                 GAPS_ROUTE,
                 Collections.emptyList(),
                 Collections.emptyList(),
-                Arrays.asList("TB-SCS-GNO-ENG-00677.docx", "TB-SCS-GNO-ENG-00677.docx"),
+                Arrays.asList("TB-SCS-GNO-ENG-00677-v2.docx", "TB-SCS-GNO-ENG-00677-v2.docx"),
                 "no",
                 "no",
                 "no",
@@ -2155,9 +2222,9 @@ public class NotificationsIt extends NotificationsItBase {
                 APPEAL_WITHDRAWN,
                 "paper",
                 LIST_ASSIST_ROUTE,
-                Arrays.asList("8620e023-f663-477e-a771-9cfad50ee30f", "e29a2275-553f-4e70-97f4-2994c095f281"),
+                Arrays.asList("6919c7bd-96c7-4b6a-8a1d-4f8591a2ca19", "e29a2275-553f-4e70-97f4-2994c095f281"),
                 Arrays.asList("446c7b23-7342-42e1-adff-b4c367e951cb", "f59440ee-19ca-4d47-a702-13e9cecaccbd"),
-                Arrays.asList("TB-SCS-GNO-ENG-00659.docx", "TB-SCS-GNO-ENG-00659.docx"),
+                Arrays.asList("TB-SCS-GNO-ENG-00659-v2.docx", "TB-SCS-GNO-ENG-00659-v2.docx"),
                 "yes",
                 "yes",
                 "yes",
@@ -2170,9 +2237,9 @@ public class NotificationsIt extends NotificationsItBase {
                 APPEAL_WITHDRAWN,
                 "oral",
                 LIST_ASSIST_ROUTE,
-                Arrays.asList("8620e023-f663-477e-a771-9cfad50ee30f", "e29a2275-553f-4e70-97f4-2994c095f281"),
+                Arrays.asList("6919c7bd-96c7-4b6a-8a1d-4f8591a2ca19", "e29a2275-553f-4e70-97f4-2994c095f281"),
                 Arrays.asList("446c7b23-7342-42e1-adff-b4c367e951cb", "f59440ee-19ca-4d47-a702-13e9cecaccbd"),
-                Arrays.asList("TB-SCS-GNO-ENG-00659.docx", "TB-SCS-GNO-ENG-00659.docx"),
+                Arrays.asList("TB-SCS-GNO-ENG-00659-v2.docx", "TB-SCS-GNO-ENG-00659-v2.docx"),
                 "yes",
                 "yes",
                 "yes",
@@ -2187,7 +2254,7 @@ public class NotificationsIt extends NotificationsItBase {
                 LIST_ASSIST_ROUTE,
                 Collections.singletonList("e29a2275-553f-4e70-97f4-2994c095f281"),
                 Arrays.asList("446c7b23-7342-42e1-adff-b4c367e951cb", "f59440ee-19ca-4d47-a702-13e9cecaccbd"),
-                Arrays.asList("TB-SCS-GNO-ENG-00659.docx", "TB-SCS-GNO-ENG-00659.docx"),
+                Arrays.asList("TB-SCS-GNO-ENG-00659-v2.docx", "TB-SCS-GNO-ENG-00659-v2.docx"),
                 "no",
                 "yes",
                 "yes",
@@ -2202,7 +2269,7 @@ public class NotificationsIt extends NotificationsItBase {
                 LIST_ASSIST_ROUTE,
                 Collections.emptyList(),
                 Collections.emptyList(),
-                Arrays.asList("TB-SCS-GNO-ENG-00659.docx", "TB-SCS-GNO-ENG-00659.docx"),
+                Arrays.asList("TB-SCS-GNO-ENG-00659-v2.docx", "TB-SCS-GNO-ENG-00659-v2.docx"),
                 "no",
                 "no",
                 "no",
@@ -2217,7 +2284,7 @@ public class NotificationsIt extends NotificationsItBase {
                 LIST_ASSIST_ROUTE,
                 Collections.singletonList("e29a2275-553f-4e70-97f4-2994c095f281"),
                 Arrays.asList("446c7b23-7342-42e1-adff-b4c367e951cb", "f59440ee-19ca-4d47-a702-13e9cecaccbd"),
-                Arrays.asList("TB-SCS-GNO-ENG-00659.docx", "TB-SCS-GNO-ENG-00659.docx"),
+                Arrays.asList("TB-SCS-GNO-ENG-00659-v2.docx", "TB-SCS-GNO-ENG-00659-v2.docx"),
                 "no",
                 "yes",
                 "yes",
@@ -2712,7 +2779,7 @@ public class NotificationsIt extends NotificationsItBase {
                 LIST_ASSIST_ROUTE,
                 Collections.emptyList(),
                 Collections.emptyList(),
-                Arrays.asList("TB-SCS-GNO-ENG-00677.docx", "TB-SCS-GNO-ENG-00677.docx"),
+                Arrays.asList("TB-SCS-GNO-ENG-00677-v2.docx", "TB-SCS-GNO-ENG-00677-v2.docx"),
                 "no",
                 "no",
                 "no",
@@ -2727,7 +2794,7 @@ public class NotificationsIt extends NotificationsItBase {
                 LIST_ASSIST_ROUTE,
                 Collections.emptyList(),
                 Collections.emptyList(),
-                Arrays.asList("TB-SCS-GNO-ENG-00677.docx", "TB-SCS-GNO-ENG-00677.docx"),
+                Arrays.asList("TB-SCS-GNO-ENG-00677-v2.docx", "TB-SCS-GNO-ENG-00677-v2.docx"),
                 "no",
                 "no",
                 "no",
@@ -3905,7 +3972,7 @@ public class NotificationsIt extends NotificationsItBase {
                 GAPS_ROUTE,
                 Collections.emptyList(),
                 Collections.emptyList(),
-                Collections.singletonList("TB-SCS-GNO-ENG-00677.docx"),
+                Collections.singletonList("TB-SCS-GNO-ENG-00677-v2.docx"),
                 "yes",
                 "yes",
                 "0",
@@ -3919,7 +3986,7 @@ public class NotificationsIt extends NotificationsItBase {
                 GAPS_ROUTE,
                 Collections.emptyList(),
                 Collections.emptyList(),
-                Collections.singletonList("TB-SCS-GNO-ENG-00677.docx"),
+                Collections.singletonList("TB-SCS-GNO-ENG-00677-v2.docx"),
                 "yes",
                 "yes",
                 "0",
@@ -4141,9 +4208,9 @@ public class NotificationsIt extends NotificationsItBase {
                 APPEAL_WITHDRAWN,
                 "paper",
                 GAPS_ROUTE,
-                Collections.singletonList("8620e023-f663-477e-a771-9cfad50ee30f"),
+                Collections.singletonList("6919c7bd-96c7-4b6a-8a1d-4f8591a2ca19"),
                 Collections.singletonList("446c7b23-7342-42e1-adff-b4c367e951cb"),
-                Collections.singletonList("TB-SCS-GNO-ENG-00659.docx"),
+                Collections.singletonList("TB-SCS-GNO-ENG-00659-v2.docx"),
                 "yes",
                 "yes",
                 "1",
@@ -4155,9 +4222,9 @@ public class NotificationsIt extends NotificationsItBase {
                 APPEAL_WITHDRAWN,
                 "oral",
                 GAPS_ROUTE,
-                Collections.singletonList("8620e023-f663-477e-a771-9cfad50ee30f"),
+                Collections.singletonList("6919c7bd-96c7-4b6a-8a1d-4f8591a2ca19"),
                 Collections.singletonList("446c7b23-7342-42e1-adff-b4c367e951cb"),
-                Collections.singletonList("TB-SCS-GNO-ENG-00659.docx"),
+                Collections.singletonList("TB-SCS-GNO-ENG-00659-v2.docx"),
                 "yes",
                 "yes",
                 "1",
@@ -4452,7 +4519,7 @@ public class NotificationsIt extends NotificationsItBase {
                 LIST_ASSIST_ROUTE,
                 Collections.emptyList(),
                 Collections.emptyList(),
-                Collections.singletonList("TB-SCS-GNO-ENG-00677.docx"),
+                Collections.singletonList("TB-SCS-GNO-ENG-00677-v2.docx"),
                 "yes",
                 "yes",
                 "0",
@@ -4466,7 +4533,7 @@ public class NotificationsIt extends NotificationsItBase {
                 LIST_ASSIST_ROUTE,
                 Collections.emptyList(),
                 Collections.emptyList(),
-                Collections.singletonList("TB-SCS-GNO-ENG-00677.docx"),
+                Collections.singletonList("TB-SCS-GNO-ENG-00677-v2.docx"),
                 "yes",
                 "yes",
                 "0",
@@ -4688,9 +4755,9 @@ public class NotificationsIt extends NotificationsItBase {
                 APPEAL_WITHDRAWN,
                 "paper",
                 LIST_ASSIST_ROUTE,
-                Collections.singletonList("8620e023-f663-477e-a771-9cfad50ee30f"),
+                Collections.singletonList("6919c7bd-96c7-4b6a-8a1d-4f8591a2ca19"),
                 Collections.singletonList("446c7b23-7342-42e1-adff-b4c367e951cb"),
-                Collections.singletonList("TB-SCS-GNO-ENG-00659.docx"),
+                Collections.singletonList("TB-SCS-GNO-ENG-00659-v2.docx"),
                 "yes",
                 "yes",
                 "1",
@@ -4702,9 +4769,9 @@ public class NotificationsIt extends NotificationsItBase {
                 APPEAL_WITHDRAWN,
                 "oral",
                 LIST_ASSIST_ROUTE,
-                Collections.singletonList("8620e023-f663-477e-a771-9cfad50ee30f"),
+                Collections.singletonList("6919c7bd-96c7-4b6a-8a1d-4f8591a2ca19"),
                 Collections.singletonList("446c7b23-7342-42e1-adff-b4c367e951cb"),
-                Collections.singletonList("TB-SCS-GNO-ENG-00659.docx"),
+                Collections.singletonList("TB-SCS-GNO-ENG-00659-v2.docx"),
                 "yes",
                 "yes",
                 "1",

@@ -16,11 +16,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLinkDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.exception.GetCaseException;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
-import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
 import uk.gov.hmcts.reform.sscs.helper.mapping.HearingsCaseMapping;
 import uk.gov.hmcts.reform.sscs.helper.mapping.ServiceHearingValuesMapping;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.service.ServiceHearingRequest;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.ServiceHearingValues;
 import uk.gov.hmcts.reform.sscs.model.service.linkedcases.ServiceLinkedCases;
@@ -39,24 +40,31 @@ public class ServiceHearingsService {
 
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
+    private final UpdateCcdCaseService updateCcdCaseService;
+
+    private final IdamService idamService;
+
+    private final ServiceHearingValuesMapping serviceHearingValuesMapping;
+
     public ServiceHearingValues getServiceHearingValues(ServiceHearingRequest request)
-            throws GetCaseException, UpdateCaseException, ListingException, JsonProcessingException {
+            throws GetCaseException, ListingException, JsonProcessingException {
         SscsCaseDetails caseDetails = ccdCaseService.getCaseDetails(request.getCaseId());
 
         SscsCaseData caseData = caseDetails.getData();
         String originalCaseData = objectMapper.writeValueAsString(caseData);
 
-        ServiceHearingValues model = ServiceHearingValuesMapping.mapServiceHearingValues(caseData, refData);
+        ServiceHearingValues model = serviceHearingValuesMapping.mapServiceHearingValues(caseData, refData);
 
         String updatedCaseData = objectMapper.writeValueAsString(caseData);
 
         if (!originalCaseData.equals(updatedCaseData)) {
-            log.debug("Updating case data with Service Hearing Values for Case ID {}", caseData.getCcdCaseId());
-            ccdCaseService.updateCaseData(
-                    caseData,
-                    EventType.UPDATE_CASE_ONLY,
+            log.info("Updating case V2 data with Service Hearing Values for Case ID {}", caseData.getCcdCaseId());
+            Long currentCaseId = Long.parseLong(caseData.getCcdCaseId());
+            updateCcdCaseService.triggerCaseEventV2(currentCaseId,
+                    EventType.UPDATE_CASE_ONLY.getType(),
                     "Updating caseDetails IDs",
-                    "IDs updated for caseDetails due to ServiceHearingValues request");
+                    "IDs updated for caseDetails due to ServiceHearingValues request",
+                    idamService.getIdamTokens());
         }
 
         return model;

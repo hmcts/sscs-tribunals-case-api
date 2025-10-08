@@ -1,5 +1,5 @@
 {
-    "eventNameCaptor": "Update UCB flag",
-    "ucbFieldLabel": "Appellant - Unacceptable Customer Behaviour (UCB)",
-    "ucbFieldValue_Yes": "Yes"
+  "eventNameCaptor": "Update UCB flag",
+  "ucbFieldLabel": "Appellant - Unacceptable Customer Behaviour (UCB)",
+  "ucbFieldValue_Yes": "Yes"
 }

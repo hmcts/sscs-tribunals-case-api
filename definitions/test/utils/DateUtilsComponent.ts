@@ -1,8 +1,8 @@
-class DateUtilsComponent {
+import logger from './loggerUtil';
 
+class DateUtilsComponent {
   static getDate() {
-    let currentTime = new Date();
-    return currentTime;
+    return new Date();
   }
 
   static formatClaimReferenceToAUIDisplayFormat(claimReference) {
@@ -32,19 +32,19 @@ class DateUtilsComponent {
       month: 'long',
       year: 'numeric',
       hour: 'numeric',
-      minute : 'numeric',
+      minute: 'numeric'
     });
   }
 
-  static formatDateToYYYYMMDD (date) {
-    return date.toISOString().substring(0,10);
+  static formatDateToYYYYMMDD(date) {
+    return date.toISOString().substring(0, 10);
   }
 
   static formatDateToSpecifiedDateFormat(date) {
     return date.toLocaleString('en-GB', {
       day: 'numeric',
       month: 'long',
-      year: 'numeric',
+      year: 'numeric'
     });
   }
 
@@ -52,8 +52,18 @@ class DateUtilsComponent {
     return date.toLocaleString('en-GB', {
       day: 'numeric',
       month: 'short',
-      year: 'numeric',
+      year: 'numeric'
     });
+  }
+
+  static formatDateToSpecifiedDateNumberFormat(date) {
+    return date
+      .toLocaleString('en-GB', {
+        day: 'numeric',
+        month: 'numeric',
+        year: 'numeric'
+      })
+      .replaceAll('/', '-');
   }
 
   static checkWeekend(date) {
@@ -76,20 +86,22 @@ class DateUtilsComponent {
   static async getCurrentMonth() {
     const tomorrow = new Date();
     tomorrow.setDate(new Date().getDate() + 1);
-    let currentMonth = tomorrow.getMonth() + 1;
-    return currentMonth;
+    return tomorrow.getMonth() + 1;
   }
 
   static async getCurrentYear() {
     let currentTime = new Date();
-    let year = currentTime.getFullYear();
-    return year;
+    return currentTime.getFullYear();
+  }
+
+  static async getNextYear() {
+    let currentYear = new Date();
+    return currentYear.getFullYear() + 1;
   }
 
   static async getCurrentDay() {
     let currentTime = new Date();
-    let day = currentTime.getDay();
-    return day;
+    return currentTime.getDay();
   }
 
   static async getCurrentDayDateTime() {
@@ -99,8 +111,7 @@ class DateUtilsComponent {
     let year = currentTime.getFullYear();
     let hour = currentTime.getHours();
     let minutes = currentTime.getMinutes();
-    let presentDay = year + '-' + month + '-' + day + '-' + hour + '-' + minutes;
-    return presentDay;
+    return year + '-' + month + '-' + day + '-' + hour + '-' + minutes;
   }
 
   static async isWeekend() {
@@ -153,7 +164,7 @@ class DateUtilsComponent {
         break;
 
       default:
-        console.log('please enter the correct date');
+        logger.debug('please enter the correct date');
         break;
     }
 
@@ -165,19 +176,17 @@ class DateUtilsComponent {
     let currentDate = new Date(startDate);
 
     while (count < days) {
-        currentDate.setDate(currentDate.getDate() + 1);
-        const dayOfWeek = currentDate.getDay();
-        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-            count++;
-        }
+      currentDate.setDate(currentDate.getDate() + 1);
+      const dayOfWeek = currentDate.getDay();
+      if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+        count++;
+      }
     }
 
     return currentDate;
-}
-
-
+  }
 }
 
 const fourWeeksFroToday = DateUtilsComponent.rollDateToCertainWeeks(4);
-// console.log('There are 4 weeks fro Today : ' + DateUtilsComponent.formatDateToYYYYMMDD(fourWeeksFroToday));
+// logger.debug('There are 4 weeks fro Today : ' + DateUtilsComponent.formatDateToYYYYMMDD(fourWeeksFroToday));
 export default DateUtilsComponent;

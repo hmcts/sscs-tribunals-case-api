@@ -2,14 +2,20 @@ package uk.gov.hmcts.reform.sscs.functional.mya;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.FUNCTIONAL_RETRY_LIMIT;
 
 import java.io.IOException;
+import org.junit.Rule;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.functional.tyanotifications.Retry;
 
 public class SubscriptionTest extends BaseFunctionTest {
     private static final String YES = "yes";
     private static final String NO = "no";
+
+    @Rule
+    public Retry retry = new Retry(FUNCTIONAL_RETRY_LIMIT);
 
     @Test
     public void shouldUpdateSubscription() throws IOException, InterruptedException {

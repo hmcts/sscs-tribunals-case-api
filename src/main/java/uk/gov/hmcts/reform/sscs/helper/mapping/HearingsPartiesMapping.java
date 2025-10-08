@@ -10,7 +10,6 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
-import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsMapping.DWP_ID;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsMapping.getEntityRoleCode;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.DayOfWeekUnavailabilityType.ALL_DAY;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.EntityRoleCode.INTERPRETER;
@@ -18,6 +17,9 @@ import static uk.gov.hmcts.reform.sscs.model.hmc.reference.EntityRoleCode.REPRES
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.EntityRoleCode.RESPONDENT;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.PartyType.INDIVIDUAL;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.PartyType.ORGANISATION;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DWP_ACRONYM;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.HMRC_ACRONYM;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBCA_ACRONYM;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -30,7 +32,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.lang.NonNull;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.exception.InvalidMappingException;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.HearingWrapper;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.EntityRoleCode;
@@ -74,7 +75,7 @@ public final class HearingsPartiesMapping {
 
         List<PartyDetails> partiesDetails = new ArrayList<>();
 
-        partiesDetails.add(createDwpPartyDetails(caseData));
+        partiesDetails.add(createPartyDetails(caseData));
 
         if (isYes(caseData.getJointParty().getHasJointParty())) {
             partiesDetails.addAll(
@@ -85,24 +86,16 @@ public final class HearingsPartiesMapping {
                             null,
                             null,
                             refData,
-                            null
-                    ));
+                            null));
         }
 
         OverrideFields overrideFields = OverridesMapping.getOverrideFields(caseData);
 
-        String adjournLanguageRef = Optional.of(caseData)
-                .filter(caseD -> isYes(caseD.getAdjournment().getInterpreterRequired()))
-                .map(SscsCaseData::getAdjournment)
-                .map(Adjournment::getInterpreterLanguage)
-                .map(DynamicList::getValue)
-                .map(DynamicListItem::getCode)
-                .filter(StringUtils::isNotBlank)
-                .orElse(null);
+        Adjournment adjournment = caseData.getAdjournment();
 
         partiesDetails.addAll(buildHearingPartiesPartyDetails(
                 appellant, appeal.getRep(), appeal.getHearingOptions(),
-                appeal.getHearingSubtype(), overrideFields, refData, adjournLanguageRef));
+                appeal.getHearingSubtype(), overrideFields, refData, adjournment));
 
         List<CcdValue<OtherParty>> otherParties = caseData.getOtherParties();
 
@@ -124,7 +117,7 @@ public final class HearingsPartiesMapping {
                                                                      HearingSubtype hearingSubtype,
                                                                      OverrideFields overrideFields,
                                                                      ReferenceDataServiceHolder refData,
-                                                                     String adjournLanguage)
+                                                                     Adjournment adjournment)
             throws ListingException {
 
         List<PartyDetails> partyDetails = new ArrayList<>();
@@ -134,7 +127,7 @@ public final class HearingsPartiesMapping {
                 party.getId(),
                 overrideFields,
                 refData,
-                adjournLanguage));
+                adjournment));
 
         if (nonNull(party.getAppointee()) && isYes(party.getIsAppointee())) {
             partyDetails.add(createHearingPartyDetails(party.getAppointee(),
@@ -153,7 +146,7 @@ public final class HearingsPartiesMapping {
                     party.getId(),
                     null,
                     refData,
-                    null));
+                    adjournment));
         }
 
         return partyDetails;
@@ -165,7 +158,7 @@ public final class HearingsPartiesMapping {
                                                          String partyId,
                                                          OverrideFields overrideFields,
                                                          ReferenceDataServiceHolder refData,
-                                                         String adjournLanguage)
+                                                         Adjournment adjournment)
             throws ListingException {
 
         PartyDetails.PartyDetailsBuilder partyDetails = PartyDetails.builder();
@@ -179,7 +172,7 @@ public final class HearingsPartiesMapping {
                 partyId,
                 overrideFields,
                 refData,
-                adjournLanguage));
+                adjournment));
         partyDetails.partyChannelSubType(getPartyChannelSubType());
         partyDetails.unavailabilityDayOfWeek(getPartyUnavailabilityDayOfWeek());
         partyDetails.unavailabilityRanges(getPartyUnavailabilityRange(hearingOptions));
@@ -187,12 +180,12 @@ public final class HearingsPartiesMapping {
         return partyDetails.build();
     }
 
-    public static PartyDetails createDwpPartyDetails(SscsCaseData caseData) throws ListingException {
+    public static PartyDetails createPartyDetails(SscsCaseData caseData) throws ListingException {
         return PartyDetails.builder()
-                .partyID(DWP_ID)
+                .partyID(getOrganisationName(caseData.getBenefitCode()))
                 .partyType(ORGANISATION)
                 .partyRole(RESPONDENT.getHmcReference())
-                .organisationDetails(getDwpOrganisationDetails(caseData))
+                .organisationDetails(getOrganisationDetails(caseData))
                 .unavailabilityDayOfWeek(getDwpUnavailabilityDayOfWeek())
                 .unavailabilityRanges(getPartyUnavailabilityRange(null))
                 .build();
@@ -215,14 +208,14 @@ public final class HearingsPartiesMapping {
                                                               String partyId,
                                                               OverrideFields overrideFields,
                                                               ReferenceDataServiceHolder refData,
-                                                              String adjournLanguage)
+                                                              Adjournment adjournment)
             throws ListingException {
 
         return IndividualDetails.builder()
                 .firstName(getIndividualFirstName(entity))
                 .lastName(getIndividualLastName(entity))
                 .preferredHearingChannel(HearingChannelUtil.getIndividualPreferredHearingChannel(hearingSubtype, hearingOptions, overrideFields))
-                .interpreterLanguage(getIndividualInterpreterLanguage(hearingOptions, overrideFields, refData, adjournLanguage))
+                .interpreterLanguage(getIndividualInterpreterLanguage(hearingOptions, overrideFields, refData, adjournment))
                 .reasonableAdjustments(HearingsAdjustmentMapping.getIndividualsAdjustments(hearingOptions))
                 .vulnerableFlag(isIndividualVulnerableFlag())
                 .vulnerabilityDetails(getIndividualVulnerabilityDetails())
@@ -273,11 +266,16 @@ public final class HearingsPartiesMapping {
     public static String getIndividualInterpreterLanguage(HearingOptions hearingOptions,
                                                           OverrideFields overrideFields,
                                                           ReferenceDataServiceHolder refData,
-                                                          String adjournLanguage)
-            throws InvalidMappingException {
+                                                          Adjournment adjournment) {
 
-        if (nonNull(adjournLanguage)) {
-            return adjournLanguage;
+        if (nonNull(adjournment) && YesNo.isYes(adjournment.getAdjournmentInProgress())) {
+            return Optional.of(adjournment)
+                    .filter(adj -> isYes(adj.getInterpreterRequired()))
+                    .map(Adjournment::getInterpreterLanguage)
+                    .map(DynamicList::getValue)
+                    .map(DynamicListItem::getCode)
+                    .filter(StringUtils::isNotBlank)
+                    .orElse(null);
         }
 
         if (nonNull(overrideFields)
@@ -296,8 +294,7 @@ public final class HearingsPartiesMapping {
     }
 
     @Nullable
-    public static Language getLanguage(HearingOptions hearingOptions, ReferenceDataServiceHolder refData)
-            throws InvalidMappingException {
+    public static Language getLanguage(HearingOptions hearingOptions, ReferenceDataServiceHolder refData) {
 
         Language language = null;
 
@@ -305,15 +302,16 @@ public final class HearingsPartiesMapping {
             String signLanguage = hearingOptions.getSignLanguageType();
             language = refData.getSignLanguages().getSignLanguage(signLanguage);
             if (isNull(language)) {
-                throw new InvalidMappingException(String.format("The language %s cannot be mapped", signLanguage));
+                log.warn("The language {} cannot be mapped", signLanguage);
             }
         }
 
         if (isYes(hearingOptions.getLanguageInterpreter())) {
             String verbalLanguage = hearingOptions.getLanguages();
             language = refData.getVerbalLanguages().getVerbalLanguage(verbalLanguage);
+            language = isNull(language) ? refData.getSignLanguages().getSignLanguage(verbalLanguage) : language;
             if (isNull(language)) {
-                throw new InvalidMappingException(String.format("The language %s cannot be mapped", verbalLanguage));
+                log.warn("The language {} cannot be mapped", verbalLanguage);
             }
         }
         return language;
@@ -411,15 +409,19 @@ public final class HearingsPartiesMapping {
         return null;
     }
 
-    public static OrganisationDetails getDwpOrganisationDetails(SscsCaseData caseData) {
+    public static OrganisationDetails getOrganisationDetails(SscsCaseData caseData) {
         return OrganisationDetails.builder()
                 .name(getOrganisationName(caseData.getBenefitCode()))
                 .organisationType("ORG")
                 .build();
     }
 
-    private static String getOrganisationName(String benefitCode) {
-        return List.of("015", "016", "030", "034", "050", "053", "054", "055", "057", "058").contains(benefitCode) ? "HMRC" : "DWP";
+    public static String getOrganisationName(String benefitCode) {
+        return switch (benefitCode) {
+            case "015", "016", "030", "034", "050", "053", "054", "055", "057", "058" -> HMRC_ACRONYM;
+            case "093" -> IBCA_ACRONYM;
+            default -> DWP_ACRONYM;
+        };
     }
 
     public static List<UnavailabilityDayOfWeek> getPartyUnavailabilityDayOfWeek() {

@@ -24,7 +24,7 @@ public class HearingArrangements {
         this.otherArrangements = otherArrangements;
     }
 
-    @Schema(example = "true", required = true)
+    @Schema(example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "language_interpreter")
     public boolean isLanguageInterpreter() {
         return languageInterpreter;
@@ -36,7 +36,7 @@ public class HearingArrangements {
         return languages;
     }
 
-    @Schema(example = "true", required = true)
+    @Schema(example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "sign_language_interpreter")
     public boolean isSignLanguageInterpreter() {
         return signLanguageInterpreter;
@@ -48,19 +48,19 @@ public class HearingArrangements {
         return signLangaugeType;
     }
 
-    @Schema(example = "true", required = true)
+    @Schema(example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "hearing_loop_required")
     public boolean isHearingLoopRequired() {
         return hearingLoopRequired;
     }
 
-    @Schema(example = "true", required = true)
+    @Schema(example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "disabled_access_required")
     public boolean isDisabledAccessRequired() {
         return disabledAccessRequired;
     }
 
-    @Schema(example = "some other arrangements", required = true)
+    @Schema(example = "some other arrangements", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "other_arrangements")
     public String getOtherArrangements() {
         return otherArrangements;

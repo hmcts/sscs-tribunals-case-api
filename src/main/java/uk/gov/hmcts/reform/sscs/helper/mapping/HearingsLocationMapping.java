@@ -78,7 +78,7 @@ public final class HearingsLocationMapping {
     private static List<HearingLocation> getPaperCaseLocations(SscsCaseData caseData, ReferenceDataServiceHolder refData) throws ListingException {
         if (HearingChannelUtil.isPaperCase(caseData)) {
             RegionalProcessingCenter rpc = caseData.getRegionalProcessingCenter();
-            validatedRpc(rpc, refData);
+            validatedRpc(rpc, refData, caseData.isIbcCase());
 
             List<VenueDetails> venueDetailsList = refData
                     .getVenueService()
@@ -99,11 +99,11 @@ public final class HearingsLocationMapping {
         return Collections.emptyList();
     }
 
-    private static void validatedRpc(RegionalProcessingCenter regionalProcessingCenter, ReferenceDataServiceHolder refData) throws ListingException {
+    private static void validatedRpc(RegionalProcessingCenter regionalProcessingCenter, ReferenceDataServiceHolder refData, boolean isIbca) throws ListingException {
         if (nonNull(regionalProcessingCenter)) {
             String regionalProcessingCenterPostCode = regionalProcessingCenter.getPostcode();
             RegionalProcessingCenterService regionalProcessingCenterService = refData.getRegionalProcessingCenterService();
-            RegionalProcessingCenter processingCenterByPostCode = regionalProcessingCenterService.getByPostcode(regionalProcessingCenterPostCode);
+            RegionalProcessingCenter processingCenterByPostCode = regionalProcessingCenterService.getByPostcode(regionalProcessingCenterPostCode, isIbca);
 
             log.info("rpc by postcode {}", processingCenterByPostCode);
 
@@ -117,14 +117,14 @@ public final class HearingsLocationMapping {
 
     private static List<HearingLocation> getAdjournedLocations(SscsCaseData caseData,
                                                                ReferenceDataServiceHolder refData) throws ListingException {
-        if (refData.isAdjournmentFlagEnabled() && isYes(caseData.getAdjournment().getAdjournmentInProgress())) {
+        if (isYes(caseData.getAdjournment().getAdjournmentInProgress())) {
             List<String> epimsIds;
 
             Adjournment adjournment = caseData.getAdjournment();
             VenueService venueService = refData.getVenueService();
             if (PAPER.equals(adjournment.getTypeOfNextHearing())) {
                 RegionalProcessingCenter rpc = caseData.getRegionalProcessingCenter();
-                validatedRpc(rpc, refData);
+                validatedRpc(rpc, refData, caseData.isIbcCase());
 
                 List<VenueDetails> paperVenues = venueService.getActiveRegionalEpimsIdsForRpc(rpc.getEpimsId());
 

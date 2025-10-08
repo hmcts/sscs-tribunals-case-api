@@ -6,7 +6,11 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_DOCUMENT;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_PARTY_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_PARTY_REPRESENTATIVE_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,7 +20,7 @@ import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.apache.commons.io.IOUtils;
-import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.Loader;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -149,7 +153,7 @@ public class SscsDocumentServiceTest {
     @Test
     public void resizedPdfReturnsResizedWhenOutsideSizeLimit() throws Exception {
         byte[] pdfContent = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("myPdf.pdf"));
-        when(pdfHelper.scaleToA4(any())).thenReturn(Optional.of(PDDocument.load(pdfContent)));
+        when(pdfHelper.scaleToA4(any())).thenReturn(Optional.of(Loader.loadPDF(pdfContent)));
         Pdf pdf = new Pdf(pdfContent, "file.pdf");
         Optional<Pdf> result = sscsDocumentService.resizedPdf(pdf);
         assertEquals(true, result.isPresent());

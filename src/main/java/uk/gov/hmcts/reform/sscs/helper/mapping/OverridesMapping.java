@@ -2,18 +2,31 @@ package uk.gov.hmcts.reform.sscs.helper.mapping;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
 
+import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AmendReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingWindow;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.exception.InvalidMappingException;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.HearingLocation;
@@ -23,32 +36,41 @@ import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 import uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil;
 
 @Slf4j
+@Service
 public final class OverridesMapping {
 
-    private OverridesMapping() {
+    private final HearingsAutoListMapping hearingsAutoListMapping;
 
+    OverridesMapping(HearingsAutoListMapping hearingsAutoListMapping) {
+
+        this.hearingsAutoListMapping = hearingsAutoListMapping;
     }
 
     public static OverrideFields getDefaultListingValues(@Valid SscsCaseData caseData) {
-        return Optional.ofNullable(caseData)
+        OverrideFields defaultListingValues = ofNullable(caseData)
                 .map(SscsCaseData::getSchedulingAndListingFields)
                 .map(SchedulingAndListingFields::getDefaultListingValues)
                 .orElse(OverrideFields.builder().build());
+        assert caseData != null;
+        if (caseData.isIbcCase()) {
+            defaultListingValues.setDuration(null);
+        }
+        return defaultListingValues;
     }
 
     public static OverrideFields getOverrideFields(@Valid SscsCaseData caseData) {
-        return Optional.ofNullable(caseData)
+        return ofNullable(caseData)
                 .map(SscsCaseData::getSchedulingAndListingFields)
                 .map(SchedulingAndListingFields::getOverrideFields)
                 .orElse(OverrideFields.builder().build());
     }
 
     public static List<AmendReason> getAmendReasonCodes(@Valid SscsCaseData caseData) {
-        return Optional.ofNullable(caseData.getSchedulingAndListingFields().getAmendReasons())
+        return ofNullable(caseData.getSchedulingAndListingFields().getAmendReasons())
                 .orElse(Collections.emptyList());
     }
-
-    public static void setDefaultListingValues(SscsCaseData caseData, ReferenceDataServiceHolder refData)
+  
+    public void setDefaultListingValues(SscsCaseData caseData, ReferenceDataServiceHolder refData)
             throws ListingException {
 
         //this is NOT being set in the consumer during V2 process
@@ -63,8 +85,8 @@ public final class OverridesMapping {
                     caseData.getCcdCaseId());
         }
     }
-
-    public static void setOverrideValues(SscsCaseData caseData, ReferenceDataServiceHolder refData)
+  
+    public void setOverrideValues(SscsCaseData caseData, ReferenceDataServiceHolder refData)
             throws ListingException {
 
         OverrideFields overrideFields = getOverrideFieldValues(caseData, refData);
@@ -76,18 +98,18 @@ public final class OverridesMapping {
                 caseData.getCcdCaseId());
     }
 
-    private static OverrideFields getOverrideFieldValues(SscsCaseData caseData, ReferenceDataServiceHolder refData)
+    private OverrideFields getOverrideFieldValues(SscsCaseData caseData, ReferenceDataServiceHolder refData)
             throws ListingException {
 
         // get case data from hearing wrapper and required appeal fields
         Appeal appeal = caseData.getAppeal();
         HearingSubtype subtype = appeal.getHearingSubtype();
         HearingOptions options = appeal.getHearingOptions();
-        int duration = HearingsDurationMapping.getHearingDuration(caseData, refData);
+        Integer duration = caseData.isIbcCase() ? null : HearingsDurationMapping.getHearingDuration(caseData, refData);
         HearingInterpreter interpreter = getAppellantInterpreter(appeal, refData);
         HearingChannel channel = HearingChannelUtil.getIndividualPreferredHearingChannel(subtype, options, null);
         HearingWindow hearingWindow = getHearingDetailsHearingWindow(caseData, refData);
-        YesNo autoList = getHearingDetailsAutoList(caseData, refData);
+        YesNo autoList = getHearingDetailsAutoList(caseData);
         List<CcdValue<CcdValue<String>>> venueEpimsIds = getHearingDetailsLocations(caseData, refData);
 
         return OverrideFields.builder()
@@ -140,8 +162,9 @@ public final class OverridesMapping {
 
         if (isTrue(hearingOptions.wantsSignLanguageInterpreter())) {
             String signLanguage = hearingOptions.getSignLanguageType();
-            Language language = refData.getSignLanguages().getSignLanguage(signLanguage);
-
+            String verbalLanguage = hearingOptions.getLanguages();
+            Language language = ofNullable(refData.getSignLanguages().getSignLanguage(signLanguage))
+                    .orElse(refData.getSignLanguages().getSignLanguage(verbalLanguage));
             if (isNull(language)) {
                 throw new InvalidMappingException(String.format("The language %s cannot be mapped", signLanguage));
             }
@@ -150,7 +173,8 @@ public final class OverridesMapping {
         }
         if (YesNo.isYes(hearingOptions.getLanguageInterpreter())) {
             String verbalLanguage = hearingOptions.getLanguages();
-            Language language = refData.getVerbalLanguages().getVerbalLanguage(verbalLanguage);
+            Language language = ofNullable(refData.getVerbalLanguages().getVerbalLanguage(verbalLanguage))
+                    .orElse(refData.getSignLanguages().getSignLanguage(verbalLanguage));
 
             if (isNull(language)) {
                 throw new InvalidMappingException(String.format("The language %s cannot be mapped", verbalLanguage));
@@ -173,9 +197,9 @@ public final class OverridesMapping {
                 .build();
     }
 
-    public static YesNo getHearingDetailsAutoList(@Valid SscsCaseData caseData, ReferenceDataServiceHolder refData)
+    public YesNo getHearingDetailsAutoList(@Valid SscsCaseData caseData)
             throws ListingException {
-        return HearingsAutoListMapping.shouldBeAutoListed(caseData, refData) ? YesNo.YES : YesNo.NO;
+        return hearingsAutoListMapping.shouldBeAutoListed(caseData) ? YesNo.YES : YesNo.NO;
     }
 
     public static List<CcdValue<CcdValue<String>>> getHearingDetailsLocations(

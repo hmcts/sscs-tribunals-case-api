@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class EmailService {
 
     private final EmailSenderProvider emailSenderProvider;
 
-    @Retryable(value = EmailSendFailedException.class,
+    @Retryable(retryFor = EmailSendFailedException.class,
         backoff = @Backoff(delay = 100, maxDelay = 500))
     public void sendEmail(long caseId, final Email email) {
         try {

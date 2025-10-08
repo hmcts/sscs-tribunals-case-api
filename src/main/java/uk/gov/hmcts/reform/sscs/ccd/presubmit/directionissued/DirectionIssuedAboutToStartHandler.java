@@ -45,16 +45,18 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
-
         setDirectionTypeDropDown(sscsCaseData);
         setExtensionNextEventDropdown(callback.getCaseDetails().getState(), sscsCaseData);
-
         if (isPostHearingsEnabled) {
             sscsCaseData.setPrePostHearing(null);
         }
 
         clearFields(sscsCaseData);
         setPartiesToSendLetter(sscsCaseData);
+        if (callbackType.equals(CallbackType.ABOUT_TO_START)) {
+            sscsCaseData.getExtendedSscsCaseData().setSelectNextHmcHearingType(NO);
+            sscsCaseData.setHmcHearingType(null);
+        }
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
@@ -64,6 +66,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
 
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
         listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
+        listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
 
         if (isYes(sscsCaseData.getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding())) {
             listOptions.add(new DynamicListItem(REFUSE_HEARING_RECORDING_REQUEST.toString(), REFUSE_HEARING_RECORDING_REQUEST.getLabel()));

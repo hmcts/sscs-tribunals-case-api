@@ -7,8 +7,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -30,7 +30,7 @@ public class DocmosisTemplateConfigTest {
     @Autowired
     private DocmosisTemplateConfig docmosisTemplateConfig;
 
-    @MockBean
+    @MockitoBean
     protected AirLookupService airLookupService;
 
     @Test
@@ -38,7 +38,7 @@ public class DocmosisTemplateConfigTest {
         assertThat("TB-SCS-GNO-ENG-00010.doc").isEqualTo(
             docmosisTemplateConfig.getTemplate()
                 .get(LanguagePreference.ENGLISH).get(DocumentType.DL6.getValue()).get("name"));
-        assertThat("TB-SCS-GNO-WEL-00469.docx").isEqualTo(
+        assertThat("TB-SCS-GNO-WEL-00469-v2.docx").isEqualTo(
             docmosisTemplateConfig.getTemplate().get(LanguagePreference.WELSH).get("d609-97").get(
                 "name"));
 

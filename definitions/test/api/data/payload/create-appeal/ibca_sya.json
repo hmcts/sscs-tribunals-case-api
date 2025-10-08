@@ -1,0 +1,95 @@
+{
+  "benefitType": {
+    "description": "Infected Blood Compensation",
+    "code": "infectedBloodCompensation"
+  },
+  "languagePreferenceWelsh": false,
+  "appellant": {
+    "ibcaReference": "101010",
+    "ibcRole": "myself",
+    "title": "Mr.",
+    "firstName": "appellant",
+    "lastName": "user",
+    "dob": "10-02-1989",
+    "contactDetails": {
+      "inMainlandUk": false,
+      "addressLine1": "Office Gold Building 3 Chiswick Park",
+      "addressLine2": "566 Chiswick High Road",
+      "townCity": "London",
+      "postCode": "560027",
+      "country": "India",
+      "portOfEntry": "GBATMDH00",
+      "phoneNumber": "07827297000",
+      "emailAddress": "test@test.com"
+    }
+  },
+  "mrn": {
+    "date": "08-11-2024",
+    "dateAppealSubmitted": "08-11-2024"
+  },
+  "smsNotify": {
+    "wantsSMSNotifications": true,
+    "smsNumber": "07827297000",
+    "useSameNumber": false
+  },
+  "hasRepresentative": true,
+  "representative": {
+    "contactDetails": {
+      "inMainlandUk": true,
+      "postcodeLookup": "sw1a2aa",
+      "postcodeAddress": "100023336956",
+      "addressLine1": "PRIME MINISTER & FIRST LORD OF THE TREASURY",
+      "addressLine2": "10 , DOWNING STREET",
+      "townCity": "LONDON",
+      "county": "LONDON",
+      "postCode": "SW1A 2AA",
+      "phoneNumber": null,
+      "emailAddress": null
+    },
+    "title": "Mr",
+    "firstName": "test",
+    "lastName": "rep",
+    "organisation": "rep-org"
+  },
+  "reasonsForAppealing": {
+    "reasons": [
+      {
+        "whatYouDisagreeWith": "i disagree with this",
+        "reasonForAppealing": "i diagree because of this"
+      }
+    ],
+    "otherReasons": "some extra info"
+  },
+  "evidenceProvide": false,
+  "hearing": {
+    "wantsToAttend": true,
+    "options": {
+      "hearingTypeTelephone": true,
+      "telephone": "07827297000",
+      "hearingTypeVideo": false,
+      "email": null,
+      "hearingTypeFaceToFace": false
+    },
+    "wantsSupport": true,
+    "arrangements": {
+      "languageInterpreter": true,
+      "signLanguageInterpreter": false,
+      "hearingLoop": false,
+      "accessibleHearingRoom": false,
+      "other": false
+    },
+    "interpreterLanguageType": "Gallacian",
+    "signLanguageType": null,
+    "anythingElse": null,
+    "scheduleHearing": true,
+    "datesCantAttend": [
+      "14-03-2025"
+    ]
+  },
+  "pcqId": "48a0bb69-e159-4efb-9929-efd9c5b453a8",
+  "signAndSubmit": {
+    "signer": "signed-name"
+  },
+  "isSaveAndReturn": "No",
+  "ccdCaseId": null
+}

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getHmcHearingType;
 
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
@@ -40,11 +42,14 @@ public class AdjournCaseAboutToStartHandler implements PreSubmitCallbackHandler<
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-
+        if (isDirectionHearing(sscsCaseData)) {
+            preSubmitCallbackResponse.addError("In order to run this event the hearing type must be substantive, please update the hearing type to proceed");
+            return preSubmitCallbackResponse;
+        }
         DynamicList languageList = utils.generateInterpreterLanguageFields(sscsCaseData.getAdjournment().getInterpreterLanguage());
         if (sscsCaseData.getSscsDocument() != null) {
             boolean draftAdjournmentDoc = sscsCaseData.getSscsDocument().stream()
-                    .anyMatch(sscsDocument -> sscsDocument.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()));
+                .anyMatch(sscsDocument -> sscsDocument.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()));
             if (!draftAdjournmentDoc) {
                 sscsCaseData.setAdjournment(Adjournment.builder().build());
             }
@@ -56,5 +61,8 @@ public class AdjournCaseAboutToStartHandler implements PreSubmitCallbackHandler<
         return preSubmitCallbackResponse;
     }
 
+    private boolean isDirectionHearing(SscsCaseData sscsCaseData) {
+        return HmcHearingType.DIRECTION_HEARINGS.equals(getHmcHearingType(sscsCaseData));
+    }
 }
 

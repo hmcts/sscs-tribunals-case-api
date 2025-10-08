@@ -1,14 +1,18 @@
 package uk.gov.hmcts.reform.sscs;
 
+import static com.fasterxml.jackson.databind.DeserializationFeature.READ_ENUMS_USING_TO_STRING;
+import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE;
+import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_ENUMS_USING_TO_STRING;
 import static java.util.Arrays.asList;
 
-import com.microsoft.applicationinsights.web.internal.ApplicationInsightsServletContextListener;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.ValidatorFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
-import javax.servlet.ServletContextListener;
-import javax.validation.ValidatorFactory;
 import okhttp3.OkHttpClient;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.quartz.spi.JobFactory;
@@ -16,13 +20,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationInitializer;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.cloud.openfeign.FeignAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -33,6 +37,7 @@ import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
 import org.springframework.http.converter.xml.SourceHttpMessageConverter;
@@ -74,7 +79,7 @@ import uk.gov.service.notify.NotificationClient;
     "uk.gov.hmcts.reform.sendletter",
     "uk.gov.hmcts.reform.ccd.client"
 })
-
+@ImportAutoConfiguration({FeignAutoConfiguration.class})
 @ComponentScan(basePackages = {"uk.gov.hmcts.reform", "uk.gov.hmcts.reform.sscs",
     "uk.gov.hmcts.reform.ccd.document.am"})
 @EnableScheduling
@@ -189,20 +194,20 @@ public class TribunalsCaseApiApplication implements CommandLineRunner {
     @Value("${gov.uk.notification.api.testKey}")
     private String testApiKey;
 
-    @Bean
-    public ServletListenerRegistrationBean<ServletContextListener> appInsightsServletContextListenerRegistrationBean(
-        ApplicationInsightsServletContextListener applicationInsightsServletContextListener) {
-        ServletListenerRegistrationBean<ServletContextListener> srb =
-            new ServletListenerRegistrationBean<>();
-        srb.setListener(applicationInsightsServletContextListener);
-        return srb;
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public ApplicationInsightsServletContextListener applicationInsightsServletContextListener() {
-        return new ApplicationInsightsServletContextListener();
-    }
+    //    @Bean
+    //    public ServletListenerRegistrationBean<ServletContextListener> appInsightsServletContextListenerRegistrationBean(
+    //        ApplicationInsightsServletContextListener applicationInsightsServletContextListener) {
+    //        ServletListenerRegistrationBean<ServletContextListener> srb =
+    //            new ServletListenerRegistrationBean<>();
+    //        srb.setListener(applicationInsightsServletContextListener);
+    //        return srb;
+    //    }
+    //
+    //    @Bean
+    //    @ConditionalOnMissingBean
+    //    public ApplicationInsightsServletContextListener applicationInsightsServletContextListener() {
+    //        return new ApplicationInsightsServletContextListener();
+    //    }
 
 
     @Bean
@@ -231,6 +236,25 @@ public class TribunalsCaseApiApplication implements CommandLineRunner {
     }
 
     @Bean
+    public SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer() {
+        return new SscsCaseCallbackDeserializer(mapper());
+    }
+
+    private ObjectMapper mapper() {
+        Jackson2ObjectMapperBuilder objectMapperBuilder =
+            new Jackson2ObjectMapperBuilder()
+                .featuresToEnable(READ_ENUMS_USING_TO_STRING)
+                .featuresToEnable(READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE)
+                .featuresToEnable(WRITE_ENUMS_USING_TO_STRING)
+                .serializationInclusion(JsonInclude.Include.NON_ABSENT);
+
+        ObjectMapper mapper = objectMapperBuilder.createXmlMapper(false).build();
+        mapper.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
+        mapper.findAndRegisterModules();
+        return mapper;
+    }
+
+    @Bean
     public JobMapper getJobMapper(CcdActionDeserializer ccdActionDeserializer,
                                   NotificationService notificationService,
                                   RetryNotificationService retryNotificationService,
@@ -240,7 +264,7 @@ public class TribunalsCaseApiApplication implements CommandLineRunner {
                                   SscsCaseCallbackDeserializer deserializer) {
         // Had to wire these up like this Spring will not wire up CcdActionExecutor otherwise.
         CcdActionExecutor ccdActionExecutor = new CcdActionExecutor(notificationService, retryNotificationService, ccdService, updateCcdCaseService, idamService, deserializer);
-        return new JobMapper(asList(
+        return new JobMapper(List.of(
             new JobMapping<>(payload -> !payload.contains("onlineHearingId"), ccdActionDeserializer, ccdActionExecutor)
         ));
     }

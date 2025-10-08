@@ -1,21 +1,29 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DECISION_ISSUED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_CASE_ONLY;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.HandlerHelper.buildCallback;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -28,6 +36,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
@@ -39,6 +48,9 @@ public class ManualCaseCreatedHandlerTest {
 
     @Mock
     private IdamService idamService;
+
+    @Mock
+    private UpdateCcdCaseService updateCcdCaseService;
 
     @InjectMocks
     private ManualCaseCreatedHandler handler;
@@ -107,22 +119,24 @@ public class ManualCaseCreatedHandlerTest {
     }
 
     @Test
-    public void shouldUpdateCcd_givenCaseAccessManagementFeatureEnabled() {
+    public void shouldUpdateCcd_givenCaseAccessManagementFeatureEnabledAndV2FlagEnabled() {
         setField(handler, "caseAccessManagementFeature", true);
         Callback<SscsCaseData> callback = buildCallback(SscsCaseData.builder()
-                .createdInGapsFrom(READY_TO_LIST.getId()).build(),
-            READY_TO_LIST,
-            VALID_APPEAL_CREATED);
+                        .createdInGapsFrom(READY_TO_LIST.getId()).build(),
+                READY_TO_LIST,
+                VALID_APPEAL_CREATED);
 
         handler.handle(SUBMITTED, callback);
 
-        verify(ccdService).updateCase(
-            eq(callback.getCaseDetails().getCaseData()),
-            eq(callback.getCaseDetails().getId()),
-            eq(UPDATE_CASE_ONLY.getCcdType()),
-            eq("Case Update - Manual Case Created"),
-            eq("Case was updated in SSCS-Evidence-Share"),
-            any());
+        verify(updateCcdCaseService).updateCaseV2(
+                eq(callback.getCaseDetails().getId()),
+                eq(UPDATE_CASE_ONLY.getCcdType()),
+                eq("Case Update - Manual Case Created"),
+                eq("Case was updated in SSCS-Evidence-Share"),
+                any(),
+                any(Consumer.class));
+
+        verify(ccdService, never()).updateCase(any(), anyLong(), any(), any(), any(), any());
     }
 
     private Map<String, Map<String, Object>> getSupplementaryData() {

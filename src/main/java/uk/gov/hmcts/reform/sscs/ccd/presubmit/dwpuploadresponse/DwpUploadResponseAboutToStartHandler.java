@@ -44,6 +44,14 @@ public class DwpUploadResponseAboutToStartHandler extends ResponseEventsAboutToS
             updateDwpStateList(sscsCaseData);
         }
 
+        if (sscsCaseData.isIbcCase()) {
+            final String benefitCode = sscsCaseData.getBenefitCode();
+            sscsCaseData.setBenefitCodeIbcaOnly(benefitCode);
+
+            final String issueCode = sscsCaseData.getIssueCode();
+            sscsCaseData.setIssueCodeIbcaOnly(issueCode);
+        }
+
         return preSubmitCallbackResponse;
     }
 

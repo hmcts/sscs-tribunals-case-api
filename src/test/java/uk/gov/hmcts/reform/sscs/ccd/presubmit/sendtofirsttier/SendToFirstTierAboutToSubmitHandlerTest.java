@@ -18,7 +18,18 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SendToFirstTier;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SendToFirstTierActions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @ExtendWith(MockitoExtension.class)
@@ -83,8 +94,8 @@ public class SendToFirstTierAboutToSubmitHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(SendToFirstTierActions.class)
-    void shouldReturnWithoutError(SendToFirstTierActions action) {
+    @EnumSource(value = SendToFirstTierActions.class, mode = EnumSource.Mode.EXCLUDE, names = {"DECISION_REMITTED"})
+    void shouldReturnWithoutErrorNonRemitted(SendToFirstTierActions action) {
         List<Hearing> hearings = List.of(Hearing.builder().value(HearingDetails.builder().build()).build());
         caseData.setHearings(hearings);
         caseData.getPostHearing().getSendToFirstTier().setAction(action);
@@ -96,6 +107,23 @@ public class SendToFirstTierAboutToSubmitHandlerTest {
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getState()).isEqualTo(State.DORMANT_APPEAL_STATE);
+    }
+
+    @Test
+    void shouldReturnWithoutErrorRemitted() {
+        List<Hearing> hearings = List.of(Hearing.builder().value(HearingDetails.builder().build()).build());
+        caseData.setHearings(hearings);
+        caseData.getPostHearing().getSendToFirstTier().setAction(SendToFirstTierActions.DECISION_REMITTED);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        when(callback.getEvent()).thenReturn(SEND_TO_FIRST_TIER);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getState()).isEqualTo(State.NOT_LISTABLE);
     }
 
     @Test
@@ -127,4 +155,43 @@ public class SendToFirstTierAboutToSubmitHandlerTest {
         assertThat(response.getErrors()).anyMatch(error -> error.contains("decision document"));
     }
 
+    @ParameterizedTest
+    @EnumSource(value = HearingRoute.class)
+    void givenSetToDormant_shouldSetHearingTypeFromRpcIfNull(HearingRoute hearingRoute) {
+        List<Hearing> hearings = List.of(Hearing.builder().value(HearingDetails.builder().build()).build());
+        caseData.setHearings(hearings);
+        caseData.getPostHearing().getSendToFirstTier().setAction(SendToFirstTierActions.DECISION_REMADE);
+        RegionalProcessingCenter regionalProcessingCenter = RegionalProcessingCenter.builder().hearingRoute(hearingRoute).build();
+        caseData.setRegionalProcessingCenter(regionalProcessingCenter);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        when(callback.getEvent()).thenReturn(SEND_TO_FIRST_TIER);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getState()).isEqualTo(State.DORMANT_APPEAL_STATE);
+        assertThat(response.getData().getSchedulingAndListingFields().getHearingRoute()).isEqualTo(hearingRoute);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = HearingRoute.class)
+    void givenSetToDormant_shouldNotSetHearingTypeIfPresent(HearingRoute hearingRoute) {
+        List<Hearing> hearings = List.of(Hearing.builder().value(HearingDetails.builder().build()).build());
+        caseData.setHearings(hearings);
+        caseData.getPostHearing().getSendToFirstTier().setAction(SendToFirstTierActions.DECISION_REMADE);
+        SchedulingAndListingFields schedulingAndListingFields = SchedulingAndListingFields.builder().hearingRoute(hearingRoute).build();
+        caseData.setSchedulingAndListingFields(schedulingAndListingFields);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        when(callback.getEvent()).thenReturn(SEND_TO_FIRST_TIER);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getState()).isEqualTo(State.DORMANT_APPEAL_STATE);
+        assertThat(response.getData().getSchedulingAndListingFields().getHearingRoute()).isEqualTo(hearingRoute);
+    }
 }

@@ -6,10 +6,10 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,10 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
@@ -40,7 +40,11 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.OutOfHoursCalculator;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis.PdfLetterService;
-import uk.gov.service.notify.*;
+import uk.gov.service.notify.NotificationClient;
+import uk.gov.service.notify.NotificationClientException;
+import uk.gov.service.notify.SendEmailResponse;
+import uk.gov.service.notify.SendLetterResponse;
+import uk.gov.service.notify.SendSmsResponse;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -55,10 +59,10 @@ public class HearingReminderIt {
     @Autowired
     NotificationService notificationService;
 
-    @MockBean
+    @MockitoBean
     private AuthorisationService authorisationService;
 
-    @MockBean(name = "notificationClient")
+    @MockitoBean(name = "notificationClient")
     NotificationClient client;
 
     @Mock
@@ -70,13 +74,13 @@ public class HearingReminderIt {
     @Mock
     private SendLetterResponse sendLetterResponse;
 
-    @MockBean
+    @MockitoBean
     private JobExecutor<String> jobExecutor;
 
-    @MockBean
+    @MockitoBean
     private OutOfHoursCalculator outOfHoursCalculator;
 
-    @MockBean
+    @MockitoBean
     private PdfLetterService pdfLetterService;
 
     @Autowired
@@ -89,7 +93,7 @@ public class HearingReminderIt {
     @Autowired
     private SscsCaseCallbackDeserializer deserializer;
 
-    @MockBean
+    @MockitoBean
     private IdamService idamService;
 
     @Before

@@ -2,53 +2,52 @@ package uk.gov.hmcts.reform.sscs.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.reform.sscs.domain.CaseData;
-import uk.gov.hmcts.reform.sscs.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.exception.OrchestratorJsonException;
-import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
-import uk.gov.hmcts.reform.sscs.service.servicebus.TopicPublisher;
+import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
 
 
 public class CcdCallbackOrchestratorControllerTest {
 
-    private static final String MESSAGE = "a message";
-
     private CcdCallbackOrchestratorController controller;
 
     @Mock
-    private TopicPublisher topicPublisher;
+    private SendCallbackHandler callbackHandler;
 
     @Mock
-    private AuthorisationService authorisationService;
+    private SscsCaseCallbackDeserializer deserializer;
 
     @Before
     public void setUp() {
         openMocks(this);
-        controller = new CcdCallbackOrchestratorController(authorisationService, topicPublisher);
+        controller = new CcdCallbackOrchestratorController(callbackHandler, deserializer);
     }
 
     @Test
-    public void shouldCreateAndSendNotificationForSscsCaseData() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-        CaseData caseData = CaseData.builder().eventId("testEventId").caseDetails(CaseDetails.builder().caseId("1234567").build()).build();
-        String message = mapper.writeValueAsString(caseData);
-        ResponseEntity<String> responseEntity = controller.send("", message);
-        verify(topicPublisher).sendMessage(eq(message), any(), any());
+    public void shouldCreateAndSendNotificationForSscsCaseData() {
+        SscsCaseData sscsCaseData = SscsCaseData.builder().build();
+        var time = LocalDateTime.now();
+        CaseDetails<SscsCaseData> details = new CaseDetails<>(1L, "jurisdiction", null, sscsCaseData, time, "Benefit");
+        EventType eventType = EventType.APPEAL_RECEIVED;
+        when(deserializer.deserialize(anyString())).thenReturn(new Callback<>(details, Optional.empty(), eventType, false));
+        ResponseEntity<String> responseEntity = controller.send("");
+        verify(callbackHandler).handle(any());
         assertEquals(200, responseEntity.getStatusCode().value());
         assertEquals("{}", responseEntity.getBody());
     }
 
-    @Test(expected = OrchestratorJsonException.class)
-    public void shouldThrowExceptionForInvalidMessage() throws Exception {
-        controller.send("", MESSAGE);
-    }
 }

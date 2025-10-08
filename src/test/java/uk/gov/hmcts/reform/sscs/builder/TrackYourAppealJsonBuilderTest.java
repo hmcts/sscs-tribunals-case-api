@@ -1,7 +1,30 @@
 package uk.gov.hmcts.reform.sscs.builder;
 
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
-import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.*;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.ADJOURNED_HEARING_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.ADJOURNED_HEARING_MYA;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.ADJOURNMENT_NOTICE_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.ADJOURNMENT_NOTICE_MYA;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.APPEAL_RECEIVED_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.APPEAL_RECEIVED_CHILD_SUPPORT_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.APPEAL_RECEIVED_CHILD_SUPPORT_MYA;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.APPEAL_RECEIVED_MYA;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.AUDIO_VIDEO_EVIDENCE_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.AUDIO_VIDEO_EVIDENCE_MYA;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.DORMANT_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.DORMANT_MYA;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.DWP_RESPOND_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.DWP_RESPOND_MYA;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.DWP_RESPOND_MYA_FOR_PAPER_HEARING_TYPE;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.FINAL_DECISION_NOTICE_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.FINAL_DECISION_NOTICE_MYA;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.HEARING_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.HEARING_MYA;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.HEARING_PAPER_MYA;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.HMC_HEARING_TYPE_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.HMC_HEARING_TYPE_MYA;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.NOT_LISTABLE_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.NOT_LISTABLE_MYA;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.Before;
@@ -127,6 +150,14 @@ public class TrackYourAppealJsonBuilderTest {
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter(), 1L, true, "appealCreated");
         assertJsonEquals("file.mp3", objectNode.get("appeal").get("audioVideoEvidence").get(0).get("name"));
+    }
+
+    @Test
+    public void shouldReturnHmcHearingTypeInTheMyaResponseWithHearing() {
+        SscsCaseData caseData = HMC_HEARING_TYPE_CCD.getDeserializeMessage();
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+            populateRegionalProcessingCenter(), 1L, true, "hearing");
+        assertJsonEquals(HMC_HEARING_TYPE_MYA.getSerializedMessage(), objectNode);
     }
 
     private RegionalProcessingCenter populateRegionalProcessingCenter() {

@@ -7,7 +7,6 @@ import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWi
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -19,11 +18,11 @@ import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Rule;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -51,7 +50,7 @@ public abstract class AbstractEventIt {
 
     protected MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     protected AuthorisationService authorisationService;
 
     @Autowired
@@ -70,12 +69,12 @@ public abstract class AbstractEventIt {
 
     void setup() throws IOException {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
-        mapper.registerModule(new JavaTimeModule());
+        mapper.findAndRegisterModules();
     }
 
     void setup(String jsonFile) throws IOException {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
-        mapper.registerModule(new JavaTimeModule());
+        mapper.findAndRegisterModules();
         json = getJson(jsonFile);
     }
 

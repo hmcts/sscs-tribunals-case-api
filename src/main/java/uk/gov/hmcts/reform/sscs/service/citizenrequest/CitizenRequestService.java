@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -36,8 +35,6 @@ public class CitizenRequestService {
     private final CcdService ccdService;
     private final IdamService idamService;
     private final UpdateCcdCaseService updateCcdCaseService;
-    @Value("${feature.hearings-recording-request.case-updateV2.enabled:false}")
-    private boolean hearingsRecordingReqCaseUpdateV2Enabled;
 
     public CitizenRequestService(OnlineHearingService onlineHearingService,
                                  CcdService ccdService,
@@ -72,11 +69,7 @@ public class CitizenRequestService {
         Optional<SscsCaseDetails> caseDetails = onlineHearingService.getCcdCaseByIdentifier(identifier);
         UserDetails user = idamService.getUserDetails(authorisation);
 
-        if (hearingsRecordingReqCaseUpdateV2Enabled) {
-            return caseDetails.map(sscsCase -> submitHearingRecordingRequest(sscsCase.getId(), hearingIds, user.getEmail())).orElse(false);
-        } else {
-            return caseDetails.map(sscsCase -> submitHearingRecordingRequest(sscsCase.getData(), sscsCase.getId(), hearingIds, user.getEmail())).orElse(false);
-        }
+        return caseDetails.map(sscsCase -> submitHearingRecordingRequest(sscsCase.getId(), hearingIds, user.getEmail())).orElse(false);
     }
 
     private HearingRecordingResponse mapToHearingRecording(SscsCaseData sscsCaseData, String idamEmail) {

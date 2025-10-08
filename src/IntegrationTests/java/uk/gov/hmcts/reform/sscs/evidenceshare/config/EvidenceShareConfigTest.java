@@ -10,8 +10,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 @TestPropertySource(locations = "classpath:config/application_it.properties")
 public class EvidenceShareConfigTest {
 
-    @MockBean
+    @MockitoBean
     protected AirLookupService airLookupService;
     // Below rules are needed to use the junitParamsRunner together with SpringRunner
     @ClassRule

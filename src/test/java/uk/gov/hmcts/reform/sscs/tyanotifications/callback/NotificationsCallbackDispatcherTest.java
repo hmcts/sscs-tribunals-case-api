@@ -5,7 +5,10 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.times;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.*;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.EARLIEST;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.EARLY;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
 

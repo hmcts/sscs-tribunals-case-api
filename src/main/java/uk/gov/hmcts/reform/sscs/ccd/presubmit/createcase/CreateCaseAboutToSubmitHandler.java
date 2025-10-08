@@ -1,20 +1,41 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase;
 
+import static java.util.List.of;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_APPEAL_PDF;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_TO_INCOMPLETE_APPLICATION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_TO_NON_COMPLIANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_TO_VALID_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INCOMPLETE_APPLICATION_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.isScottishCase;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.generateUniqueIbcaId;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getSscsType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleBenefitType;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleIbcaCase;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.pdf.service.client.exception.PDFServiceClientException;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
@@ -28,57 +49,65 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
 
     private final SscsPdfService sscsPdfService;
     private final EmailHelper emailHelper;
+    @Value("${feature.work-allocation.enabled}")
+    private final boolean workAllocationFeature;
+
+    private static final List<EventType> NON_PAPER_EVENTS = of(VALID_APPEAL_CREATED, DRAFT_TO_VALID_APPEAL_CREATED,
+            NON_COMPLIANT, DRAFT_TO_NON_COMPLIANT, INCOMPLETE_APPLICATION_RECEIVED, DRAFT_TO_INCOMPLETE_APPLICATION);
 
     private final VerbalLanguagesService verbalLanguagesService;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+        boolean nonPaperCase =
+                !"Paper".equalsIgnoreCase(callback.getCaseDetails().getCaseData().getAppeal().getReceivedVia());
         return callbackType == CallbackType.ABOUT_TO_SUBMIT
-                && (!"Paper".equalsIgnoreCase(callback.getCaseDetails().getCaseData().getAppeal().getReceivedVia())
-                && (callback.getEvent() == EventType.VALID_APPEAL_CREATED
-                || callback.getEvent() == EventType.DRAFT_TO_VALID_APPEAL_CREATED
-                || callback.getEvent() == EventType.NON_COMPLIANT
-                || callback.getEvent() == EventType.DRAFT_TO_NON_COMPLIANT
-                || callback.getEvent() == EventType.INCOMPLETE_APPLICATION_RECEIVED
-                || callback.getEvent() == EventType.DRAFT_TO_INCOMPLETE_APPLICATION)
-                || callback.getEvent() == EventType.CREATE_APPEAL_PDF);
+                && (callback.getEvent() == CREATE_APPEAL_PDF
+                || (nonPaperCase && NON_PAPER_EVENTS.contains(callback.getEvent()))
+            );
     }
 
     @Override
-    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
+                                                          String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
-        SscsCaseData caseData = caseDetails.getCaseData();
-
-        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
-
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setPoAttendanceConfirmed(YesNo.NO);
         caseData.setTribunalDirectPoToAttend(YesNo.NO);
 
         handleBenefitType(caseData);
+        if (IBCA_BENEFIT_CODE.equals(caseData.getBenefitCode())) {
+            handleIbcaCase(caseData);
+        }
         updateLanguage(caseData);
 
         if (isNull(caseData.getDwpIsOfficerAttending())) {
             caseData.setDwpIsOfficerAttending(NO.toString());
         }
 
-        if (!isNull(caseData.getBenefitCode())) {
+        if (nonNull(caseData.getBenefitCode())) {
             if (isNull(caseData.getIssueCode())) {
                 caseData.setIssueCode("DD");
             }
-
             caseData.setCaseCode(caseData.getBenefitCode() + caseData.getIssueCode());
         }
 
-        if (caseData.getCaseCreated() == null) {
-            preSubmitCallbackResponse.addError("The Case Created Date must be set to generate the SSCS1");
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
+        if (isNull(caseData.getCaseCreated())) {
+            preSubmitCallbackResponse.addError("The Case Created Date must be set to generate the " + getSscsType(caseData));
         } else {
             createAppealPdf(caseData);
         }
 
+        if (!CREATE_APPEAL_PDF.equals(callback.getEvent())) {
+            caseData.setPreWorkAllocation(workAllocationFeature ? YesNo.NO : YesNo.YES);
+            caseData.setIsScottishCase(isScottishCase(caseData.getRegionalProcessingCenter()));
+            log.info("Setting isScottishCase field to {} for case {}",
+                    caseData.getIsScottishCase(), callback.getCaseDetails().getId());
+        }
         return preSubmitCallbackResponse;
     }
 
@@ -99,21 +128,23 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
     }
 
     private void createAppealPdf(SscsCaseData caseData) {
-        String fileName = emailHelper.generateUniqueEmailId(caseData.getAppeal().getAppellant()) + ".pdf";
+        final String fileName = IBCA_BENEFIT_CODE.equals(caseData.getBenefitCode())
+                ? generateUniqueIbcaId(caseData.getAppeal().getAppellant()) + ".pdf"
+                : emailHelper.generateUniqueEmailId(caseData.getAppeal().getAppellant()) + ".pdf";
+        final String documentType = IBCA_BENEFIT_CODE.equals(caseData.getBenefitCode()) ? "sscs8" : "sscs1";
+        final boolean hasPdf = hasPdfDocument(caseData, fileName);
 
-        boolean hasPdf = hasPdfDocument(caseData, fileName);
-
-        log.info("Does case have sscs1 pdf {} for caseId {}", hasPdf, caseData.getCcdCaseId());
+        log.info("Does case have {} pdf {} for caseId {}", documentType, hasPdf, caseData.getCcdCaseId());
         if (!hasPdf) {
             log.info("Existing pdf document not found, start generating pdf for caseId {}", caseData.getCcdCaseId());
 
             try {
                 updateAppointeeNullIfNotPresent(caseData);
                 caseData.setEvidencePresent(hasEvidence(caseData, fileName));
-                sscsPdfService.generatePdf(caseData, Long.parseLong(caseData.getCcdCaseId()), "sscs1", fileName);
+                sscsPdfService.generatePdf(caseData, Long.parseLong(caseData.getCcdCaseId()), documentType, fileName);
 
             } catch (PDFServiceClientException pdfServiceClientException) {
-                log.error("Sscs1 form could not be generated for caseId {} for exception ", caseData.getCcdCaseId(), pdfServiceClientException);
+                log.error("{} form could not be generated for caseId {} for exception ", documentType, caseData.getCcdCaseId(), pdfServiceClientException);
             }
         }
     }

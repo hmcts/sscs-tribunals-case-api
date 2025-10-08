@@ -102,5 +102,6 @@
     "signer": "Joe Bloggs"
   },
   "pcqId": "12345678",
-  "languagePreferenceWelsh" : false
+  "languagePreferenceWelsh" : false,
+  "linkedCasesBoolean":"No"
 }

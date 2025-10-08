@@ -19,9 +19,9 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -39,24 +39,24 @@ import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 @AutoConfigureMockMvc
 public abstract class WriteFinalDecisionItBase extends AbstractEventIt {
 
-    @MockBean
+    @MockitoBean
     protected CoreCaseDataApi coreCaseDataApi;
 
-    @MockBean
+    @MockitoBean
     protected IdamClient idamClient;
 
-    @MockBean
+    @MockitoBean
     protected AuthTokenGenerator authTokenGenerator;
 
-    @MockBean
+    @MockitoBean
     protected EvidenceManagementService evidenceManagementService;
 
-    @MockBean
+    @MockitoBean
     protected GenerateFile generateFile;
 
-    @MockBean
+    @MockitoBean
     protected UserDetails userDetails;
-    @MockBean
+    @MockitoBean
     protected UserInfo userInfo;
 
     protected abstract String getBenefitType();

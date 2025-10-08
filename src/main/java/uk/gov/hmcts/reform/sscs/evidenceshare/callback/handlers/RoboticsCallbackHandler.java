@@ -2,7 +2,13 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_TO_PROCEED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CASE_UPDATED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_RAISE_EXCEPTION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INTERLOC_VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NOT_LISTABLE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.RESEND_CASE_TO_GAPS2;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,8 +21,13 @@ import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.RoboticsService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
@@ -31,6 +42,8 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
     private final CcdService ccdService;
 
+    private final UpdateCcdCaseService updateCcdCaseService;
+
     private final IdamService idamService;
 
     private final RegionalProcessingCenterService regionalProcessingCenterService;
@@ -41,11 +54,13 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
     @Autowired
     public RoboticsCallbackHandler(RoboticsService roboticsService,
                                    CcdService ccdService,
+                                   UpdateCcdCaseService updateCcdCaseService,
                                    IdamService idamService,
                                    RegionalProcessingCenterService regionalProcessingCenterService
     ) {
         this.roboticsService = roboticsService;
         this.ccdService = ccdService;
+        this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.dispatchPriority = DispatchPriority.EARLIEST;
@@ -78,12 +93,12 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
         SscsCaseDetails latestCase = ccdService.getByCaseId(callback.getCaseDetails().getId(), idamService.getIdamTokens());
 
-        if (gapsSwitchOverFeature && HearingRoute.LIST_ASSIST == callback.getCaseDetails().getCaseData()
-            .getSchedulingAndListingFields().getHearingRoute()) {
+        if ((gapsSwitchOverFeature && HearingRoute.LIST_ASSIST == callback.getCaseDetails().getCaseData()
+            .getSchedulingAndListingFields().getHearingRoute()) || callback.getCaseDetails().getCaseData().isIbcCase()) {
             log.info("Hearing route is: {}. Case {} will not be sent to robotics.",
                 HearingRoute.LIST_ASSIST, callback.getCaseDetails().getId());
 
-            updateCaseDataIfEventApplicable(callback, "Case sent to List Assist", "Updated case with sent to List Assist");
+            triggerV2EventIfEventApplicable(callback);
 
             return;
         }
@@ -93,18 +108,10 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
             log.info("Is case valid to send to robotics {} for case id {}", isCaseValidToSendToRobotics, callback.getCaseDetails().getId());
 
             if (isCaseValidToSendToRobotics) {
-                updateRpc(callback);
+                updateRpc(callback.getCaseDetails().getCaseData());
                 roboticsService.sendCaseToRobotics(callback.getCaseDetails());
 
-                // As part of ticket SSCS-6869, a new field was required to let the caseworker know when a case had been sent to GAPS2 via Robotics. However, if this was done as part of this handler it would need to be updated
-                // as part of a separate event. Some of the events handled in this class are handled in the SendToBulkPrintHandler, which also triggers an update to CCD. If both these events occur at the same time then we would
-                // end up with a concurrent case modification error from CCD. Therefore, this is an attempt to safely update the case. For events not handled in SendToBulkPrintHandler then trigger a separate updateCase event.
-                // For events that are handled in the SendToBulkPrintHandler then just update the case data here, as the case would be saved to CCD further down the chain as part of the sentToDwp event in SendToBulkPrintHandler.
-
-                callback.getCaseDetails().getCaseData().setDateCaseSentToGaps(LocalDate.now().toString());
-                callback.getCaseDetails().getCaseData().setDateTimeCaseSentToGaps(LocalDateTime.now().toString());
-
-                updateCaseDataIfEventApplicable(callback, "Case sent to robotics", "Updated case with date sent to robotics");
+                updateCaseDataIfEventApplicable(callback);
 
             }
         } catch (Exception e) {
@@ -112,30 +119,59 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
         }
     }
 
-    private void updateCaseDataIfEventApplicable(Callback<SscsCaseData> callback, String summary,
-                                                 String description) {
+    private void triggerV2EventIfEventApplicable(Callback<SscsCaseData> callback) {
+        String summary = "Case sent to List Assist";
+        String description = "Updated case with sent to List Assist";
+        String ccdEventType = getApplicableCcdEventType(callback);
+
+        if (ccdEventType != null) {
+            updateCcdCaseService.triggerCaseEventV2(
+                    Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId()),
+                    ccdEventType, summary, description,
+                    idamService.getIdamTokens());
+        }
+    }
+
+    private void updateCaseDataIfEventApplicable(Callback<SscsCaseData> callback) {
+
+        String ccdEventType = getApplicableCcdEventType(callback);
+
+        if (ccdEventType != null) {
+            // As part of ticket SSCS-6869, a new field was required to let the caseworker know when a case had been sent to GAPS2 via Robotics. However, if this was done as part of this handler it would need to be updated
+            // as part of a separate event. Some of the events handled in this class are handled in the SendToBulkPrintHandler, which also triggers an update to CCD. If both these events occur at the same time then we would
+            // end up with a concurrent case modification error from CCD. Therefore, this is an attempt to safely update the case. For events not handled in SendToBulkPrintHandler then trigger a separate updateCase event.
+            // For events that are handled in the SendToBulkPrintHandler then just update the case data here, as the case would be saved to CCD further down the chain as part of the sentToDwp event in SendToBulkPrintHandler.
+
+            updateCcdCaseService.updateCaseV2(
+                    Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId()),
+                    ccdEventType, "Case sent to robotics", "Updated case with date sent to robotics",
+                    idamService.getIdamTokens(),
+                    sscsCaseDetails -> {
+                        sscsCaseDetails.getData().setDateCaseSentToGaps(LocalDate.now().toString());
+                        sscsCaseDetails.getData().setDateTimeCaseSentToGaps(LocalDateTime.now().toString());
+                        updateRpc(sscsCaseDetails.getData());
+                    }
+            );
+        }
+    }
+
+    private String getApplicableCcdEventType(Callback<SscsCaseData> callback) {
         String ccdEventType = null;
         if (callback.getEvent() == DWP_RAISE_EXCEPTION) {
             ccdEventType = NOT_LISTABLE.getCcdType();
         } else if (callback.getEvent() == EventType.READY_TO_LIST
-            || callback.getEvent() == RESEND_CASE_TO_GAPS2) {
+                || callback.getEvent() == RESEND_CASE_TO_GAPS2) {
             ccdEventType = CASE_UPDATED.getCcdType();
         }
 
-        if (ccdEventType != null) {
-            ccdService.updateCase(callback.getCaseDetails().getCaseData(),
-                Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId()),
-                ccdEventType, summary, description,
-                idamService.getIdamTokens());
-        }
+        return ccdEventType;
     }
 
-    private void updateRpc(final Callback<SscsCaseData> callback) {
+    private void updateRpc(final SscsCaseData sscsCaseData) {
         // Updating the RPC also done on CASE_UPDATED in tribunals-api.
         // We should update the case details before sending robotics.
-        final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         if (sscsCaseData.getAppeal().getAppellant() != null && sscsCaseData.getAppeal().getAppellant().getAddress() != null && sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode() != null) {
-            RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode());
+            RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode(), sscsCaseData.isIbcCase());
             sscsCaseData.setRegionalProcessingCenter(rpc);
 
             if (rpc != null) {

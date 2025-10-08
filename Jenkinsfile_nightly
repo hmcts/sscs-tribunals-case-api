@@ -3,12 +3,13 @@
 properties([
         pipelineTriggers([cron('H 07 * * 1-5')]),
         parameters([
-                string(name: 'URL_TO_TEST', defaultValue: 'http://sscs-tribunals-api-aat.service.core-compute-aat.internal', description: 'The URL you want to run these tests against'),
+                string(name: 'UI_URL_TO_TEST', defaultValue: 'https://manage-case.aat.platform.hmcts.net/', description: 'The URL you want to run these tests against'),
+                string(name: 'API_URL_TO_TEST', defaultValue: 'http://sscs-tribunals-api-aat.service.core-compute-aat.internal', description: 'The URL you want to run these tests against'),
                 string(name: 'SecurityRules',
                         defaultValue: 'https://raw.githubusercontent.com/hmcts/security-test-rules/master/conf/security-rules.conf',
                         description: 'The URL you want to run these tests against'),
         ])
-    ])
+])
 
 @Library("Infrastructure")
 
@@ -17,55 +18,146 @@ def product = "sscs"
 def component = "tribunals-api"
 
 def secrets = [
-    'sscs-${env}'      : [
-        secret('idam-api', 'IDAM_API_URL'),
-        secret('idam-oauth-user', 'IDAM_OAUTH2_CLIENT_ID'),
-        secret('ccd-api', 'CORE_CASE_DATA_API_URL'),
-        secret('idam-redirect', 'IDAM_OAUTH2_REDIRECT_URL'),
-        secret('idam-sscs-systemupdate-user', 'IDAM_SSCS_SYSTEMUPDATE_USER'),
-        secret('idam-sscs-systemupdate-password', 'IDAM_SSCS_SYSTEMUPDATE_PASSWORD'),
-        secret('idam-sscs-oauth2-client-secret', 'IDAM_OAUTH2_CLIENT_SECRET'),
-        secret('idam-s2s-api', 'IDAM_S2S_AUTH'),
-        secret('sscs-s2s-secret', 'IDAM_S2S_AUTH_TOTP_SECRET'),
-        secret('s2s-micro', 'IDAM_S2S_AUTH_MICROSERVICE'),
-        secret('docmosis-endpoint', 'PDF_SERVICE_CONVERT_URL'),
-        secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY'),
+        'sscs-${env}': [
+                secret('idam-api', 'IDAM_API_URL'),
+                secret('idam-oauth-user', 'IDAM_OAUTH2_CLIENT_ID'),
+                secret('ccd-api', 'CORE_CASE_DATA_API_URL'),
+                secret('idam-redirect', 'IDAM_OAUTH2_REDIRECT_URL'),
+                secret('idam-sscs-systemupdate-user', 'IDAM_SSCS_SYSTEMUPDATE_USER'),
+                secret('idam-sscs-systemupdate-password', 'IDAM_SSCS_SYSTEMUPDATE_PASSWORD'),
+                secret('idam-sscs-oauth2-client-secret', 'IDAM_OAUTH2_CLIENT_SECRET'),
+                secret('idam-s2s-api', 'IDAM_S2S_AUTH'),
+                secret('sscs-s2s-secret', 'IDAM_S2S_AUTH_TOTP_SECRET'),
+                secret('s2s-micro', 'IDAM_S2S_AUTH_MICROSERVICE'),
+                secret('docmosis-endpoint', 'PDF_SERVICE_CONVERT_URL'),
+                secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY'),
 
-        // tya notifications
-        secret('notification-key', 'NOTIFICATION_API_KEY'),
-        secret('notification-test-key', 'NOTIFICATION_API_TEST_KEY'),
-        secret('sscs-email-mac-secret-text', 'EMAIL_MAC_SECRET_TEXT'),
-        secret('tya-link', 'SSCS_TRACK_YOUR_APPEAL_LINK'),
-        secret('evidence-share-topic-shared-access-key', 'AMQP_PASSWORD')
-    ]
+                // tya notifications
+                secret('notification-key', 'NOTIFICATION_API_KEY'),
+                secret('notification-test-key', 'NOTIFICATION_API_TEST_KEY'),
+                secret('sscs-email-mac-secret-text', 'EMAIL_MAC_SECRET_TEXT'),
+                secret('tya-link', 'SSCS_TRACK_YOUR_APPEAL_LINK'),
+
+                //e2e tests
+                secret('test-e2e-caseofficer-username', 'TEST_CASEOFFICER_USERNAME'),
+                secret('test-e2e-caseofficer-password', 'TEST_CASEOFFICER_PASSWORD'),
+                secret('test-e2e-hmc-caseofficer-username', 'TEST_HMC_CASEOFFICER_USERNAME'),
+                secret('test-e2e-hmc-caseofficer-password', 'TEST_HMC_CASEOFFICER_PASSWORD'),
+                secret('test-e2e-judge-username', 'TEST_JUDGE_USERNAME'),
+                secret('test-e2e-judge-password', 'TEST_JUDGE_PASSWORD'),
+                secret('test-e2e-salaried-judge-username', 'TEST_SALARIED_JUDGE_USERNAME'),
+                secret('test-e2e-salaried-judge-password', 'TEST_SALARIED_JUDGE_PASSWORD'),
+                secret('test-e2e-fee-paid-judge-username', 'TEST_FEE_PAID_JUDGE_USERNAME'),
+                secret('test-e2e-fee-paid-judge-password', 'TEST_FEE_PAID_JUDGE_PASSWORD'),
+                secret('test-e2e-dwp-username', 'TEST_DWP_USERNAME'),
+                secret('test-e2e-dwp-password', 'TEST_DWP_PASSWORD'),
+                secret('test-e2e-am-tcw-username', 'TEST_AM_TRIBUNAL_CASEWORKER_USERNAME'),
+                secret('test-e2e-am-tcw-password', 'TEST_AM_TRIBUNAL_CASEWORKER_PASSWORD'),
+                secret('test-e2e-am-caseofficer-case-allocator-username', 'TEST_AM_CASEOFFICER_CASE_ALLOCATOR_USERNAME'),
+                secret('test-e2e-am-caseofficer-case-allocator-password', 'TEST_AM_CASEOFFICER_CASE_ALLOCATOR_PASSWORD'),
+                secret('test-e2e-hmrc-username', 'TEST_HMRC_USERNAME'),
+                secret('test-e2e-hmrc-password', 'TEST_HMRC_PASSWORD'),
+                secret('test-e2e-am-regional-center-admin-username', 'TEST_AM_REGIONAL_CENTER_ADMIN_USERNAME'),
+                secret('test-e2e-am-regional-center-admin-password', 'TEST_AM_REGIONAL_CENTER_ADMIN_PASSWORD'),
+                secret('test-e2e-am-regional-center-team-leader-username', 'TEST_AM_REGIONAL_CENTER_TEAM_LEADER_USERNAME'),
+                secret('test-e2e-am-regional-center-team-leader-password', 'TEST_AM_REGIONAL_CENTER_TEAM_LEADER_PASSWORD'),
+
+
+                secret('test-e2e-am-caseofficer-username', 'TEST_AM_CASEOFFICER_USERNAME'),
+                secret('test-e2e-am-caseofficer-password', 'TEST_AM_CASEOFFICER_PASSWORD'),
+                secret('test-e2e-caseofficer-username', 'TEST_AM_SUPERUSER_USERNAME'),
+                secret('test-e2e-caseofficer-password', 'TEST_AM_SUPERUSER_PASSWORD'),
+                secret('test-e2e-superuser-username', 'SUPER_USER_USERNAME'),
+                secret('test-e2e-superuser-password', 'SUPER_USER_PASSWORD'),
+                secret('test-e2e-hmrc-superuser-username', 'TEST_HMRC_SUPER_USER_USERNAME'),
+                secret('test-e2e-hmrc-superuser-password', 'TEST_HMRC_SUPER_USER_PASSWORD'),
+                secret('test-e2e-am-senior-tcw-case-allocator-username', 'TEST_AM_SENIOR_TRIBUNAL_CASEWORKER_CASE_ALLOCATOR_USERNAME'),
+                secret('test-e2e-am-senior-tcw-case-allocator-password', 'TEST_AM_SENIOR_TRIBUNAL_CASEWORKER_CASE_ALLOCATOR_PASSWORD')
+        ]
 ]
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
-    [ $class: 'AzureKeyVaultSecret',
-      secretType: 'Secret',
-      name: secretName,
-      version: '',
-      envVariable: envVar
+    [$class     : 'AzureKeyVaultSecret',
+     secretType : 'Secret',
+     name       : secretName,
+     version    : '',
+     envVariable: envVar
     ]
 }
 
-withNightlyPipeline(type, product, component) {
-    env.TEST_URL = params.URL_TO_TEST
-    env.POST_HEARINGS_FEATURE = false
-    env.Rules = params.SecurityRules
+def setAatEnvVars() {
+    env.PREVIEW_BRANCH_WITH_LOCAL_CCD = false
+    env.TEST_E2E_URL_WEB = "https://manage-case.aat.platform.hmcts.net/"
+    env.TEST_E2E_API_URI = "http://sscs-tribunals-api-aat.service.core-compute-aat.internal"
+    env.CCD_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+    env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+    env.CCD_GW_API = "https://gateway-ccd.aat.platform.hmcts.net"
+    env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
     env.TEST_DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
     env.DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
-    env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
-    env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
+    env.ENVIRONMENT = "aat"
+    env.HEARINGS_ENABLED = "Yes"
+}
+
+withNightlyPipeline(type, product, component) {
+    env.TEST_URL = params.API_URL_TO_TEST
+    env.POST_HEARINGS_FEATURE = false
+    env.Rules = params.SecurityRules
+    setAatEnvVars()
+    env.TEST_E2E_URL_WEB = params.UI_URL_TO_TEST
 
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
     enableFortifyScan()
-    enableSecurityScan()
     enableFullFunctionalTest()
-    enableMutationTest()
+
+    afterAlways('fullFunctionalTest') {
+        runE2eTestsNightly()
+        publishHTML([
+                allowMissing         : true,
+                alwaysLinkToLastBuild: true,
+                keepAll              : true,
+                reportDir            : "playwright-report",
+                reportFiles          : 'index.html',
+                reportName           : 'SSCS E2E Test Report'
+        ])
+        runAccessibilityTestsNightly()
+        publishHTML([
+                allowMissing         : true,
+                alwaysLinkToLastBuild: true,
+                keepAll              : true,
+                reportDir            : "accessibility-report",
+                reportFiles          : 'index.html',
+                reportName           : 'SSCS Accessibility Test Report'
+        ])
+    }
+
 
     afterSuccess('fortify-scan') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+    }
+}
+
+def runE2eTestsNightly() {
+    stage('Playwright tests') {
+        try {
+            sh './gradlew runE2eTestsNightly'
+        } catch (Error) {
+            unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+        } finally {
+            steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'definitions/test/playwright-report/**'
+        }
+    }
+}
+
+def runAccessibilityTestsNightly() {
+    stage('Accessibility tests') {
+        try {
+            sh './gradlew runAccessibilityTestsNightly'
+        } catch (Error) {
+            unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+        } finally {
+            steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'definitions/test/accessibility-report/**'
+        }
     }
 }

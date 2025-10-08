@@ -2,9 +2,13 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -17,18 +21,19 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @Slf4j
 public class CreateCaseAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    @Value("${feature.infected-blood-appeal.enabled}")
-    private boolean isInfectedBloodAppealEnabled;
+    private static final List<EventType> CREATE_CASE_EVENTS =
+            List.of(VALID_APPEAL_CREATED, NON_COMPLIANT, INCOMPLETE_APPLICATION_RECEIVED);
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
-        return callbackType.equals(CallbackType.ABOUT_TO_START)
-                && ((callback.getEvent() == EventType.VALID_APPEAL_CREATED
-                || callback.getEvent() == EventType.NON_COMPLIANT
-                || callback.getEvent() == EventType.INCOMPLETE_APPLICATION_RECEIVED));
+        return isCreateCaseStartCallback(callbackType, callback.getEvent());
+    }
+
+    public static boolean isCreateCaseStartCallback(CallbackType callbackType, EventType event) {
+        return callbackType.equals(ABOUT_TO_START) && CREATE_CASE_EVENTS.contains(event);
     }
 
     @Override
@@ -52,7 +57,19 @@ public class CreateCaseAboutToStartHandler implements PreSubmitCallbackHandler<S
             appeal.setBenefitType(type);
         }
 
-        appeal.getBenefitType().setDescriptionSelection(SscsUtil.getBenefitDescriptions(isInfectedBloodAppealEnabled));
+        appeal.getBenefitType().setDescriptionSelection(SscsUtil.getBenefitDescriptions());
+
+        if (isNull(appeal.getAppellant())) {
+            Appellant appellant = Appellant.builder().build();
+            appeal.setAppellant(appellant);
+        }
+
+        if (isNull(appeal.getAppellant().getAddress())) {
+            Address address = Address.builder().build();
+            appeal.getAppellant().setAddress(address);
+        }
+
+        appeal.getAppellant().getAddress().setUkPortOfEntryList(SscsUtil.getPortsOfEntry());
 
         return new PreSubmitCallbackResponse<>(caseData);
     }

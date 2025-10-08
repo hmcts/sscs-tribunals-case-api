@@ -2,18 +2,15 @@
 
 set -e
 
-username=${1}
-password=${2}
+USERNAME=${1}
+PASSWORD=${2}
 
-IDAM_API_URL=${IDAM_API_BASE_URL:-http://localhost:5000}
-IDAM_URL=${IDAM_STUB_LOCALHOST:-$IDAM_API_URL}
+IDAM_URI=${IDAM_API_BASE_URL:-http://localhost:5000}
+REDIRECT_URI=http://localhost:3451/oauth2redirect
+CLIENT_ID="ccd_gateway"
+CLIENT_SECRET=${CCD_API_GATEWAY_IDAM_CLIENT_SECRET:-ccd_gateway_secret}
+SCOPE="openid%20profile%20roles"
 
-clientSecret=${CCD_API_GATEWAY_IDAM_CLIENT_SECRET:-ccd_gateway_secret}
-redirectUri=${CCD_IDAM_REDIRECT_URL:-http://localhost:3451/oauth2redirect}
-if [ -z "$IDAM_STUB_LOCALHOST" ]; then
-  code=$(curl --insecure --fail --show-error --silent -X POST --user "${username}:${password}" "${IDAM_URL}/oauth2/authorize?redirect_uri=${redirectUri}&response_type=code&client_id=ccd_gateway" -d "" | docker run --rm --interactive stedolan/jq -r .code)
-else
-  code=stubbed-value
-fi
-
-curl --insecure --fail --show-error --silent -X POST -H "Content-Type: application/x-www-form-urlencoded" --user "ccd_gateway:${clientSecret}" "${IDAM_URL}/oauth2/token?code=${code}&redirect_uri=${redirectUri}&grant_type=authorization_code" -d "" | docker run --rm --interactive stedolan/jq -r .access_token
+curl --silent --show-error --fail \
+    -H "Content-Type: application/x-www-form-urlencoded" \
+    -XPOST "${IDAM_URI}/o/token?grant_type=password&redirect_uri=${REDIRECT_URI}&client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&username=${USERNAME}&password=${PASSWORD}&scope=${SCOPE}" -d "" | jq -r .access_token

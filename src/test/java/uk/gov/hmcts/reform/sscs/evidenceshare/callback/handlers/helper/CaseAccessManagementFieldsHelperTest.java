@@ -6,12 +6,20 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.FormType.SSCS1;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.FormType.SSCS5;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.helper.CaseAccessManagementFieldsHelper.*;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.helper.CaseAccessManagementFieldsHelper.hasAppellantName;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.helper.CaseAccessManagementFieldsHelper.isHmrcBenefit;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.helper.CaseAccessManagementFieldsHelper.setCaseNames;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.helper.CaseAccessManagementFieldsHelper.setCategories;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.helper.CaseAccessManagementFieldsHelper.setOgdType;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 class CaseAccessManagementFieldsHelperTest {
 

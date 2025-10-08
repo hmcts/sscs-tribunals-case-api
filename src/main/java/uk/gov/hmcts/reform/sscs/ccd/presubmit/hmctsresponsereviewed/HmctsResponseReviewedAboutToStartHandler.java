@@ -59,6 +59,14 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
         setDwpDocuments(sscsCaseData);
         setSelectWhoReviewsCase(sscsCaseData);
 
+        if (sscsCaseData.isIbcCase()) {
+            final String benefitCode = sscsCaseData.getBenefitCode();
+            sscsCaseData.setBenefitCodeIbcaOnly(benefitCode);
+
+            final String issueCode = sscsCaseData.getIssueCode();
+            sscsCaseData.setIssueCodeIbcaOnly(issueCode);
+        }
+
         final PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
         if (sscsCaseData.getCreatedInGapsFrom() == null || !sscsCaseData.getCreatedInGapsFrom().equals("readyToList")) {
             preSubmitCallbackResponse.addError("This event cannot be run for cases created in GAPS at valid appeal");

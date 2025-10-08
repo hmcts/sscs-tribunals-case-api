@@ -45,12 +45,15 @@ public class GetFirstTierDocumentsSubmittedHandler implements PreSubmitCallbackH
                                                           String userAuthorisation) {
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        Long caseId = Long.valueOf(caseData.getCcdCaseId());
+        long caseId = Long.parseLong(caseData.getCcdCaseId());
         CcdCallbackMap callbackMap = BUNDLE_CREATED;
 
         log.info("Get first tier documents: handling action {} for case {}", callbackMap, caseId);
 
-        caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
+        caseData = ccdCallbackMapService.handleCcdCallbackMapV2(
+                callbackMap,
+                caseId
+        );
 
         return new PreSubmitCallbackResponse<>(caseData);
     }

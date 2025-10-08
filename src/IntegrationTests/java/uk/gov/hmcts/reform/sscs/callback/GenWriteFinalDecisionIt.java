@@ -369,10 +369,10 @@ public class GenWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         List<TemplateComponent<?>> components = content.getComponents();
         if (allowed) {
             assertIsParagraphWithText(components, 1, "The appeal is allowed.");
-            assertIsParagraphWithText(components, 2, "The decision made by the Respondent on 17/11/2020 is set aside.");
+            assertIsParagraphWithText(components, 2, "The decision made by HM Revenue and Customs on 17/11/2020 is set aside.");
         } else {
             assertIsParagraphWithText(components, 1, "The appeal is refused.");
-            assertIsParagraphWithText(components, 2, "The decision made by the Respondent on 17/11/2020 is confirmed.");
+            assertIsParagraphWithText(components, 2, "The decision made by HM Revenue and Customs on 17/11/2020 is confirmed.");
         }
         assertIsParagraphWithText(components, 3, "My summary.");
         assertIsParagraphWithText(components, 4, "Reasons for decision 1");

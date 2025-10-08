@@ -96,7 +96,7 @@ public class PostponementRequestServiceTest {
             .hasSize(1)
             .extracting(SscsDocument::getValue)
             .extracting("documentType", "documentFileName", "originalPartySender")
-            .containsExactly(tuple(DocumentType.POSTPONEMENT_REQUEST.getValue(), DOCUMENT_FILENAME, uploadParty.getValue()));
+            .containsExactly(tuple(DocumentType.POSTPONEMENT_REQUEST.getValue(), DOCUMENT_FILENAME, uploadParty.getLabel()));
     }
 
     @DisplayName("When case has a hearing and no existing excluded dates addCurrentHearingToExcludeDates adds the "

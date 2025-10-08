@@ -14,7 +14,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Correspondence;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.SorPlaceholderService;
@@ -40,7 +44,7 @@ class CcdNotificationServiceTest {
 
         ccdNotificationService.storeNotificationLetterIntoCcd(event, letter, caseId, recipient);
         verify(ccdNotificationsPdfService, times(1))
-            .mergeLetterCorrespondenceIntoCcd(eq(letter), eq(caseId), any(), eq(senderType));
+            .mergeLetterCorrespondenceIntoCcdV2(eq(letter), eq(caseId), any(), eq(senderType));
     }
 
     @Test
@@ -57,7 +61,10 @@ class CcdNotificationServiceTest {
 
     @Test
     void returnRepresentativeToFieldGivenOrganisationButNoNameForSorLetter() {
-        sorPlaceholderService = new SorPlaceholderService(placeholderService);
+        sorPlaceholderService = new SorPlaceholderService(placeholderService,
+            "0300 123 1142",
+            "0300 131 2850",
+            "0300 790 6234");
         SscsCaseData caseData = buildCaseData();
         caseData.getAppeal().getRep().setName(new Name(null, null, null));
         caseData.getAppeal().getRep().setOrganisation("Test organisation");

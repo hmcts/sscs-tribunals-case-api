@@ -1,0 +1,193 @@
+{
+  "case_creation_details": {
+    "case_type_id": "Benefit",
+    "event_id": "validAppealCreated",
+    "case_data": {
+      "evidencePresent": "Yes",
+      "caseCode": "051DD",
+      "subscriptions": {
+        "appellantSubscription": null,
+        "supporterSubscription": null,
+        "representativeSubscription": null,
+        "appointeeSubscription": {
+          "wantSmsNotifications": "No",
+          "tya": "TYA_RANDOM_NUMBER",
+          "email": null,
+          "mobile": "07411222222",
+          "subscribeEmail": "No",
+          "subscribeSms": "No",
+          "reason": null,
+          "lastLoggedIntoMya": null
+        },
+        "jointPartySubscription": null
+      },
+      "formType": "sscs1peu",
+      "dwpRegionalCentre": "Sheffield DRT",
+      "bulkScanCaseReference": "1234567891011",
+      "CaseAccessCategory": "employmentAndSupportAllowance",
+      "caseManagementCategory": {
+        "value": {
+          "code": "ESA",
+          "label": "Employment and Support Allowance"
+        },
+        "list_items": [
+          {
+            "code": "ESA",
+            "label": "Employment and Support Allowance"
+          }
+        ]
+      },
+      "caseNameHmctsInternal": "John Smith",
+      "caseNameHmctsRestricted": "John Smith",
+      "caseNamePublic": "John Smith",
+      "ogdType": "DWP",
+      "appeal": {
+        "mrnDetails": {
+          "dwpIssuingOffice": "Sheffield DRT",
+          "mrnDate": "MRN_DATE",
+          "mrnLateReason": null,
+          "mrnMissingReason": null
+        },
+        "appellant": {
+          "name": {
+            "title": "Mr",
+            "firstName": "John",
+            "lastName": "Smith"
+          },
+          "address": {
+            "line1": "2 Drake Close",
+            "line2": "Hutton",
+            "town": "Brentwood",
+            "county": "Essex",
+            "postcode": "CM13 1AQ"
+          },
+          "contact": {
+            "email": null,
+            "phone": null,
+            "mobile": null
+          },
+          "organisation": null,
+          "id": "24ea0144-a793-4dde-8bcf-6fc258541204",
+          "identity": {
+            "dob": "1976-11-11",
+            "nino": "BB000000B"
+          },
+          "isAppointee": "Yes",
+          "confidentialityRequired": null,
+          "appointee": {
+            "id": "5362d389-307a-4e4e-b32c-7b7eef0048fa",
+            "name": {
+              "title": "Mr",
+              "firstName": "Tyrion",
+              "lastName": "Lannister"
+            },
+            "address": {
+              "line1": "2 Casterly Rock",
+              "line2": "Benedictine",
+              "town": "Coventry",
+              "county": "Warwickshire",
+              "postcode": "CV3 6GU"
+            },
+            "contact": {
+              "email": null,
+              "phone": "01234567899",
+              "mobile": "07411222222"
+            },
+            "organisation": null,
+            "identity": {
+              "dob": "1976-11-11",
+              "nino": "BB000000B"
+            }
+          },
+          "isAddressSameAsAppointee": null,
+          "role": null
+        },
+        "benefitType": {
+          "code": "ESA",
+          "description": "Employment and Support Allowance"
+        },
+        "hearingOptions": {
+          "wantsToAttend": "Yes",
+          "wantsSupport": "No",
+          "languageInterpreter": "No",
+          "languages": null,
+          "arrangements": [],
+          "scheduleHearing": "Yes",
+          "excludeDates": [
+            {
+              "value": {
+                "start": "2030-12-01",
+                "end": null
+              }
+            }
+          ]
+        },
+        "appealReasons": null,
+        "rep": {
+          "id": null,
+          "identity": null,
+          "hasRepresentative": "No",
+          "organisation": null,
+          "name": null,
+          "address": null,
+          "contact": null
+        },
+        "signer": null,
+        "hearingType": "oral",
+        "hearingSubtype": {
+          "wantsHearingTypeTelephone": "Yes",
+          "hearingTelephoneNumber": "01234567890",
+          "wantsHearingTypeVideo": "Yes",
+          "hearingVideoEmail": "my@email.com",
+          "wantsHearingTypeFaceToFace": "No"
+        },
+        "receivedVia": "Paper"
+      },
+      "benefitCode": "051",
+      "sscsDocument": [
+        {
+          "value": {
+            "documentType": "appellantEvidence",
+            "documentFileName": "11111.pdf",
+            "documentDateAdded": "2018-10-10",
+            "documentLink": {
+              "document_url": "http://www.bbc.com",
+              "document_binary_url": "http://www.bbc.com/binary",
+              "document_filename": "myfile.jpg"
+            }
+          }
+        }
+      ],
+      "linkedCasesBoolean": "No",
+      "caseCreated": "2018-01-11",
+      "region": "BRADFORD",
+      "regionalProcessingCenter": {
+        "faxNumber": "0126 434 7983",
+        "address4": "Rushton Avenue",
+        "phoneNumber": "0300 123 1142",
+        "name": "BRADFORD",
+        "address1": "HM Courts & Tribunals Service",
+        "address2": "Social Security & Child Support Appeals",
+        "address3": "Phoenix House",
+        "postcode": "BD3 7BH",
+        "city": "BRADFORD",
+        "email": "SSCS_Bradford@justice.gov.uk",
+        "hearingRoute": "gaps",
+        "epimsId": "698118"
+      },
+      "caseManagementLocation": {
+        "baseLocation": "815833",
+        "region": "1"
+      },
+      "processingVenue": "Coventry (CMCB)",
+      "createdInGapsFrom": "readyToList",
+      "issueCode": "DD"
+    }
+  },
+  "warnings": [],
+  "supplementary_data": {
+    "$set": {
+      "HMCTSServiceId": "BBA3"
+    }
+  }
+}

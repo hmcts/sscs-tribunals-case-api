@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.helper.mapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsWindowMapping.DAYS_TO_ADD_HEARING_WINDOW_DWP_RESPONDED;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsWindowMapping.DAYS_TO_ADD_HEARING_WINDOW_TODAY;
@@ -19,7 +18,16 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Postponement;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingWindow;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
@@ -141,7 +149,7 @@ class HearingsWindowMappingTest {
     void testBuildHearingWindowNotAutoListUrgent() {
         SscsCaseData caseData = SscsCaseData.builder()
             .dwpResponseDate(LocalDate.now().toString())
-            .appeal(new Appeal(null, null, null, new HearingOptions("yes", null, null, null, null, null, null, null, null, null, null, null), null, null, null, null, new HearingSubtype("yes", "07444123456", null, null, null), null))
+            .appeal(new Appeal(null, null, null, new HearingOptions("yes", null, null, null, null, null, null, null, null, null, null, null, null), null, null, null, null, new HearingSubtype("yes", "07444123456", null, null, null), null))
             .build();
         HearingWindow result = HearingsWindowMapping.buildHearingWindow(caseData, refData);
 
@@ -244,7 +252,7 @@ class HearingsWindowMappingTest {
         assertThat(result).isFalse();
     }
 
-    @DisplayName("When isAdjournmentFlagEnabled is true and case is being adjourned, "
+    @DisplayName("When case is being adjourned, "
         + "AdjournCalculateDateHelper is used to calculate HearingWindowStart instead of HearingsWindowMapping "
         + "so throws an exception due to missing data")
     @Test
@@ -255,14 +263,13 @@ class HearingsWindowMappingTest {
                 .build())
             .build();
 
-        given(refData.isAdjournmentFlagEnabled()).willReturn(true);
 
         assertThatThrownBy(() -> HearingsWindowMapping.buildHearingWindow(caseData, refData))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("Unexpected nextHearingDateType for case id null: 'null'");
     }
 
-    @DisplayName("When isAdjournmentFlagEnabled is true and case is not being adjourned, "
+    @DisplayName("When case is not being adjourned, "
         + "HearingsWindowMapping.getHearingWindowStart is used")
     @Test
     void testBuildHearingDetailsNotAdjourned() {
@@ -270,13 +277,12 @@ class HearingsWindowMappingTest {
             .adjournment(null)
             .build();
 
-        given(refData.isAdjournmentFlagEnabled()).willReturn(true);
 
         HearingWindow result = HearingsWindowMapping.buildHearingWindow(caseData, refData);
         assertThat(result).isNotNull();
     }
 
-    @DisplayName("When isAdjournmentFlagEnabled is true, adjournment is in progress, hearing date type is 'date to be fixed'"
+    @DisplayName("When adjournment is in progress, hearing date type is 'date to be fixed'"
         + "and every other field is null, HearingWindow must be null ")
     @Test
     void givenAdjorunmentAndDateToBeFixed_hearingWindowMustBeNull() {
@@ -289,7 +295,6 @@ class HearingsWindowMappingTest {
             .adjournment(adjournment)
             .build();
 
-        given(refData.isAdjournmentFlagEnabled()).willReturn(true);
 
         HearingWindow result = HearingsWindowMapping.buildHearingWindow(caseData, refData);
         assertThat(result).isNull();

@@ -279,5 +279,6 @@
   "dwpIsOfficerAttending":  "No",
   "poAttendanceConfirmed": "No",
   "tribunalDirectPoToAttend": "No",
-  "hearingRoute":"gaps"
+  "hearingRoute":"gaps",
+  "linkedCasesBoolean":"No"
 }

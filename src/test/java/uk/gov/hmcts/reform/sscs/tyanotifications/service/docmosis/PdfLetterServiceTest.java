@@ -1,10 +1,25 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.IBCA_URL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.SSCS_URL_LITERAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.SscsCaseDataUtils.getWelshDate;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ADDRESS_NAME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.LETTER_ADDRESS_LINE_1;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.LETTER_ADDRESS_LINE_2;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.LETTER_ADDRESS_LINE_3;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.LETTER_ADDRESS_LINE_4;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.LETTER_ADDRESS_POSTCODE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis.PdfLetterService.GENERATED_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis.PdfLetterService.WELSH_GENERATED_DATE_LITERAL;
@@ -25,7 +40,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Entity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.DocmosisPdfService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.DocmosisTemplatesConfig;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType;
@@ -110,11 +132,48 @@ public class PdfLetterServiceTest {
         PdfCoverSheet pdfCoverSheet = new PdfCoverSheet(wrapper.getCaseId(),
             name.getFullNameNoTitle(),
             address.getLine1(),
-            address.getLine2(),
             address.getTown(),
             address.getCounty(),
             address.getPostcode(),
+            "",
             EVIDENCE_ADDRESS.getLine2(),
+            expectedLine3,
+            EVIDENCE_ADDRESS.getTown(),
+            expectedPostcode,
+            DOCMOSIS_TEMPLATES_CONFIG.getHmctsImgVal(),
+            DOCMOSIS_TEMPLATES_CONFIG.getHmctsWelshImgVal());
+        verify(docmosisPdfService).createPdf(eq(pdfCoverSheet), eq("my01.doc"));
+    }
+
+    @Test
+    @Parameters({"Yes, true", "Yes, false", "No, true", "No, false"})
+    public void willCreateAPdfToTheCorrectIbcAddress(String isScottish, boolean isScottishPoBoxFeatureEnabled) {
+        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+            APPEAL_RECEIVED,
+            appellant,
+            representative,
+            null
+        );
+
+        EVIDENCE_ADDRESS.setScottishPoBoxFeatureEnabled(isScottishPoBoxFeatureEnabled);
+        wrapper.getNewSscsCaseData().setIsScottishCase(isScottish);
+        wrapper.getNewSscsCaseData().setBenefitCode("093");
+
+        pdfLetterService.buildCoversheet(wrapper, new SubscriptionWithType(EMPTY_SUBSCRIPTION, SubscriptionType.APPELLANT,
+            appellant, appellant));
+
+        Address address = appellant.getAddress();
+        String expectedLine3 = "Yes".equalsIgnoreCase(isScottish) && isScottishPoBoxFeatureEnabled ? EVIDENCE_ADDRESS.getScottishLine3() : EVIDENCE_ADDRESS.getIbcAddressLine3();
+        String expectedPostcode = "Yes".equalsIgnoreCase(isScottish) && isScottishPoBoxFeatureEnabled ? EVIDENCE_ADDRESS.getScottishPostcode() : EVIDENCE_ADDRESS.getIbcAddressPostcode();
+
+        PdfCoverSheet pdfCoverSheet = new PdfCoverSheet(wrapper.getCaseId(),
+            appellant.getName().getFullNameNoTitle(),
+            address.getLine1(),
+            address.getTown(),
+            address.getCounty(),
+            address.getPostcode(),
+            "",
+            EVIDENCE_ADDRESS.getIbcAddressLine2(),
             expectedLine3,
             EVIDENCE_ADDRESS.getTown(),
             expectedPostcode,
@@ -228,6 +287,56 @@ public class PdfLetterServiceTest {
         assertEquals("MySecondVeryVeryLongAddressLineWithLotsOfChar", placeholderCaptor.getValue().get(LETTER_ADDRESS_LINE_2));
         assertEquals("MyTownVeryVeryLongAddressLineWithLotsOfCharac", placeholderCaptor.getValue().get(LETTER_ADDRESS_LINE_3));
         assertEquals("MyCountyVeryVeryLongAddressLineWithLotsOfChar", placeholderCaptor.getValue().get(LETTER_ADDRESS_LINE_4));
+        assertEquals("www.gov.uk/appeal-benefit-decision", placeholderCaptor.getValue().get(SSCS_URL_LITERAL));
+        assertEquals("L2 5UZ", placeholderCaptor.getValue().get(LETTER_ADDRESS_POSTCODE));
+        assertNull(placeholderCaptor.getValue().get(WELSH_GENERATED_DATE_LITERAL));
+    }
+
+    @Test
+    public void givenAnIbcCase_willGenerateALetterWithIbcUrl() throws IOException {
+        PDDocument doc = new PDDocument();
+        doc.addPage(new PDPage());
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        doc.save(baos);
+        Mockito.reset(docmosisPdfService);
+        when(docmosisPdfService.createPdfFromMap(any(), anyString())).thenReturn(baos.toByteArray());
+        when(docmosisPdfService.createPdf(any(), anyString())).thenReturn(baos.toByteArray());
+        baos.close();
+        doc.close();
+
+        Name name = Name.builder().firstName("Jimmy").lastName("lastName").build();
+
+        Address address = Address.builder()
+            .line1("line1")
+            .line2("line2")
+            .town("town")
+            .county("county")
+            .postcode("L2 5UZ").build();
+
+        appellant.setName(name);
+        appellant.setAddress(address);
+
+        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+            APPEAL_RECEIVED,
+            appellant,
+            representative,
+            null
+        );
+        Notification notification = Notification.builder().template(Template.builder().docmosisTemplateId("docmosis.doc").build()).placeholders(new HashMap<>()).build();
+        wrapper.getNewSscsCaseData().setBenefitCode("093");
+        byte[] letter = pdfLetterService.generateLetter(wrapper, notification,
+            new SubscriptionWithType(EMPTY_SUBSCRIPTION, SubscriptionType.APPELLANT, appellant, appellant));
+        assertTrue(ArrayUtils.isNotEmpty(letter));
+
+        ArgumentCaptor<Map<String, Object>> placeholderCaptor = ArgumentCaptor.forClass(Map.class);
+
+        verify(docmosisPdfService).createPdfFromMap(placeholderCaptor.capture(), eq(notification.getDocmosisLetterTemplate()));
+        assertEquals("Jimmy lastName", placeholderCaptor.getValue().get(ADDRESS_NAME));
+        assertEquals("line1", placeholderCaptor.getValue().get(LETTER_ADDRESS_LINE_1));
+        assertEquals("line2", placeholderCaptor.getValue().get(LETTER_ADDRESS_LINE_2));
+        assertEquals("town", placeholderCaptor.getValue().get(LETTER_ADDRESS_LINE_3));
+        assertEquals("county", placeholderCaptor.getValue().get(LETTER_ADDRESS_LINE_4));
+        assertEquals(IBCA_URL, placeholderCaptor.getValue().get(SSCS_URL_LITERAL));
         assertEquals("L2 5UZ", placeholderCaptor.getValue().get(LETTER_ADDRESS_POSTCODE));
         assertNull(placeholderCaptor.getValue().get(WELSH_GENERATED_DATE_LITERAL));
     }
@@ -269,6 +378,7 @@ public class PdfLetterServiceTest {
         ArgumentCaptor<Map<String, Object>> placeholderCaptor = ArgumentCaptor.forClass(Map.class);
 
         verify(docmosisPdfService).createPdfFromMap(placeholderCaptor.capture(), eq(notification.getDocmosisLetterTemplate()));
+        
         assertEquals("My Company", placeholderCaptor.getValue().get(ADDRESS_NAME));
         assertEquals("FirstLine", placeholderCaptor.getValue().get(LETTER_ADDRESS_LINE_1));
         assertEquals("SecondLine", placeholderCaptor.getValue().get(LETTER_ADDRESS_LINE_2));

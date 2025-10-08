@@ -6,10 +6,12 @@
     "updateOtherPartyDataLastName": "Other party",
     "updateOtherPartyDataAddressLine": "101, test street",
     "updateOtherPartyDataAddressTown": "Town test",
+    "updateOtherPartyDataAddressCountry": "United Kingdom",
     "updateOtherPartyDataAddressPostCode": "TS2 2ST",
     "updateOtherPartyDataConfidentiality": "No",
     "updateOtherPartyDataBehaviour": "No",
     "updateOtherPartyDataRole": "Paying parent",
+    "updateOtherPartyDataLivingInUK": "Yes",
 
     "updateOtherPartyDataDropdownValue" : "Paying parent"
 

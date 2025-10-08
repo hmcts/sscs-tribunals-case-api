@@ -11,7 +11,7 @@ public class FinalDecision {
         this.reason = reason;
     }
 
-    @Schema(example = "Some final reason for the decision", required = false)
+    @Schema(example = "Some final reason for the decision", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "reason")
     public String getReason() {
         return reason;

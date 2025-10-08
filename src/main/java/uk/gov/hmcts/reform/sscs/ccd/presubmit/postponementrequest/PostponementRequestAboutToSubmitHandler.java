@@ -60,7 +60,7 @@ public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbac
                 uploadParty = Optional.of(UploadParty.DWP);
             }
 
-            postponementRequestService.processPostponementRequest(sscsCaseData, UploadParty.DWP, uploadParty);
+            postponementRequestService.processPostponementRequest(sscsCaseData, UploadParty.FTA, uploadParty);
             List<SscsDocument> documents = sscsCaseData.getSscsDocument();
             documents.get(documents.size() - 1).getValue().setBundleAddition(footerService.getNextBundleAddition(documents));
         }

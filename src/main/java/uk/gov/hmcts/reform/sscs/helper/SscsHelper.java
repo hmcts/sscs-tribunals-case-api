@@ -1,8 +1,11 @@
 package uk.gov.hmcts.reform.sscs.helper;
 
-import static java.util.Arrays.asList;
+import static java.util.List.of;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus.CANCELLED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INCOMPLETE_APPLICATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INCOMPLETE_APPLICATION_INFORMATION_REQUESTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
@@ -27,18 +30,15 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 @Slf4j
 public class SscsHelper {
 
-    private static final List<State> PRE_VALID_STATES =
-            asList(INCOMPLETE_APPLICATION, INCOMPLETE_APPLICATION_INFORMATION_REQUESTED, INTERLOCUTORY_REVIEW_STATE);
-
     private SscsHelper() {
     }
 
     public static List<State> getPreValidStates() {
-        return PRE_VALID_STATES;
+        return of(INCOMPLETE_APPLICATION, INCOMPLETE_APPLICATION_INFORMATION_REQUESTED, INTERLOCUTORY_REVIEW_STATE);
     }
 
     private static boolean hasNewOtherPartyEntryAdded(SscsCaseData sscsCaseData) {
-        Optional<CcdValue<OtherParty>> otherParty = Optional.ofNullable(sscsCaseData.getOtherParties()).orElse(Collections.emptyList()).stream().filter(
+        Optional<CcdValue<OtherParty>> otherParty = ofNullable(sscsCaseData.getOtherParties()).orElse(Collections.emptyList()).stream().filter(
                 op -> YesNo.isYes(op.getValue().getSendNewOtherPartyNotification())
         ).findFirst();
         return otherParty.isPresent();
@@ -104,7 +104,7 @@ public class SscsHelper {
             && StringUtils.isNotBlank(hearingDetails.getVenue().getName());
     }
 
-    private static boolean getValidHearing(Hearing hearing) {
+    private static boolean isFutureHearing(Hearing hearing) {
         HearingDetails hearingDetails = hearing.getValue();
         if (isValidHearing(hearingDetails)) {
             LocalDateTime hearingDateTime = getLocalDateTime(hearingDetails.getHearingDate(), hearingDetails.getTime());
@@ -114,9 +114,20 @@ public class SscsHelper {
     }
 
     public static boolean hasHearingScheduledInTheFuture(SscsCaseData caseData) {
-        Optional<Hearing> futureHearing = Optional.ofNullable(caseData.getHearings())
+        Optional<Hearing> futureHearing = ofNullable(caseData.getHearings())
             .orElse(Collections.emptyList())
-            .stream().filter(SscsHelper::getValidHearing).findFirst();
+            .stream()
+                .filter(SscsHelper::isFutureHearing)
+                .filter(hearing -> !CANCELLED.equals(hearing.getValue().getHearingStatus()))
+                .findFirst();
         return futureHearing.isPresent();
+    }
+
+    public static String isScottishCase(RegionalProcessingCenter rpc) {
+        String isScotCase = isNull(rpc) || isNull(rpc.getName())
+                || !rpc.getName().equalsIgnoreCase("GLASGOW") ? "No" : "Yes";
+        log.info("Calculated isScottishCase field to {} for {} RPC for case",
+                isScotCase, nonNull(rpc) ? rpc.getName() : "empty");
+        return isScotCase;
     }
 }

@@ -1,0 +1,3 @@
+# Ignore all .html and .njk files
+**/*.html
+**/*.njk

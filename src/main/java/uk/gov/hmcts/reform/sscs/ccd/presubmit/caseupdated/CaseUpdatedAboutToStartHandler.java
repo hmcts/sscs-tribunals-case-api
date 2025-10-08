@@ -2,19 +2,26 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
+import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
@@ -27,9 +34,7 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
     private final DynamicListLanguageUtil utils;
 
     private final VerbalLanguagesService verbalLanguagesService;
-
-    @Value("${feature.infected-blood-appeal.enabled}")
-    private boolean isInfectedBloodAppealEnabled;
+    private final SignLanguagesService signLanguagesService;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -47,7 +52,6 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
         }
 
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-        String caseId = sscsCaseData.getCcdCaseId();
         Appeal appeal = sscsCaseData.getAppeal();
         HearingOptions hearingOptions = appeal.getHearingOptions();
 
@@ -56,29 +60,21 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
 
             String existingLanguage = hearingOptions.getLanguages();
 
-            log.info("Existing language {}", existingLanguage);
-
             if (!StringUtils.isEmpty(existingLanguage)) {
                 Language language = verbalLanguagesService.getVerbalLanguage(existingLanguage);
-
+                language = isNull(language) ? signLanguagesService.getSignLanguage(existingLanguage) : language;
                 if (null != language) {
-                    log.info("Verbal language dialect {}, dialect reference {} ", language.getDialectEn(), language.getDialectReference());
-                    log.info("Verbal language full reference {}, mrd reference {} ", language.getReference(), language.getMrdReference());
-
                     DynamicListItem dynamicListItem = utils.getLanguageDynamicListItem(language);
-
-                    log.info("Dynamic List item code {} , label {} ", dynamicListItem.getCode(), dynamicListItem.getLabel());
-
                     interpreterLanguages.setValue(dynamicListItem);
                 }
             }
 
-            interpreterLanguages.getListItems().forEach(li -> log.info("interpreter language list item code {}, list item label {}", li.getCode(), li.getLabel()));
             hearingOptions.setLanguagesList(interpreterLanguages);
-            log.info("Populated {} Languages in DynamicList for caseId {} for update to case data event",
-                    interpreterLanguages.getListItems().size(), caseId);
         }
         setupBenefitSelection(sscsCaseData);
+        if (sscsCaseData.isIbcCase()) {
+            setupUkPortsOfEntry(sscsCaseData);
+        }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
@@ -87,18 +83,33 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
         BenefitType benefitType = sscsCaseData.getAppeal().getBenefitType();
 
         if (!isNull(benefitType)) {
-            DynamicList benefitDescriptions = SscsUtil.getBenefitDescriptions(isInfectedBloodAppealEnabled);
-            DynamicListItem selectedBenefit = getSelectedBenefit(benefitDescriptions.getListItems(), sscsCaseData.getBenefitCode());
+            DynamicList benefitDescriptions = SscsUtil.getBenefitDescriptions();
+            DynamicListItem selectedBenefit = getSelectedDynamicListItem(benefitDescriptions.getListItems(), sscsCaseData.getBenefitCode());
             benefitDescriptions.setValue(selectedBenefit);
             benefitType.setDescriptionSelection(benefitDescriptions);
         }
     }
 
-    private DynamicListItem getSelectedBenefit(List<DynamicListItem> listItems, String benefitCode) {
-        if (isNull(benefitCode) || isNull(listItems)) {
+    private void setupUkPortsOfEntry(SscsCaseData sscsCaseData) {
+        DynamicList portOfEntryDynamicList = sscsCaseData.getAppeal().getAppellant().getAddress().getUkPortOfEntryList();
+        if (portOfEntryDynamicList == null || portOfEntryDynamicList.getValue() == null) {
+            final DynamicList ukPortOfEntries = SscsUtil.getPortsOfEntry();
+            String portOfEntryCode = sscsCaseData.getAppeal().getAppellant().getAddress().getPortOfEntry();
+
+            if (isNotEmpty(portOfEntryCode)) {
+                DynamicListItem selectedPortOfEntry = getSelectedDynamicListItem(ukPortOfEntries.getListItems(), portOfEntryCode);
+                ukPortOfEntries.setValue(selectedPortOfEntry);
+            }
+
+            sscsCaseData.getAppeal().getAppellant().getAddress().setUkPortOfEntryList(ukPortOfEntries);
+        }
+    }
+
+    private DynamicListItem getSelectedDynamicListItem(List<DynamicListItem> listItems, String code) {
+        if (isNull(code) || isNull(listItems)) {
             return null;
         }
 
-        return listItems.stream().filter(item -> benefitCode.equals(item.getCode())).findFirst().orElse(null);
+        return listItems.stream().filter(item -> code.equals(item.getCode())).findFirst().orElse(null);
     }
 }

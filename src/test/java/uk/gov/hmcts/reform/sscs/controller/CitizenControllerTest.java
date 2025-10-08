@@ -3,11 +3,14 @@ package uk.gov.hmcts.reform.sscs.controller;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.util.DataFixtures.someOnlineHearing;
 
 import java.util.List;
@@ -103,6 +106,7 @@ public class CitizenControllerTest {
         String userId = "userId";
         String email = "someemail@example.com";
         String postcode = "somePostcode";
+        AssociateCaseDetails matchCaseDetails = new AssociateCaseDetails(email, postcode, null);
 
         when(idamService.generateServiceAuthorization()).thenReturn("serviceAuth");
         when(idamService.getUserDetails(oauthToken)).thenReturn(idamUserDetails);
@@ -110,11 +114,10 @@ public class CitizenControllerTest {
         when(citizenLoginService.associateCaseToCitizen(
                 argThat(tokens -> userId.equals(tokens.getUserId()) && oauthToken.equals(tokens.getIdamOauth2Token())),
                 eq(tya),
-                eq(email),
-                eq(postcode)
+                eq(matchCaseDetails)
         )).thenReturn(Optional.of(onlineHearing));
 
-        ResponseEntity<OnlineHearing> response = underTest.associateUserWithCase(oauthToken, tya, new AssociateCaseDetails(email, postcode));
+        ResponseEntity<OnlineHearing> response = underTest.associateUserWithCase(oauthToken, tya, matchCaseDetails);
 
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
         assertThat(response.getBody(), is(onlineHearing));
@@ -124,16 +127,15 @@ public class CitizenControllerTest {
     public void cannotAssociateUserWithCase() {
         String oauthToken = "oAuth";
         String tya = "tya";
-        String userId = "userId";
-        String email = "someemail@example.com";
-        String postcode = "somePostcode";
+        AssociateCaseDetails matchCaseDetails =
+                new AssociateCaseDetails("someemail@example.com", "somePostcode", "A12B34");
 
         when(idamService.generateServiceAuthorization()).thenReturn("serviceAuth");
         when(idamService.getUserDetails(oauthToken)).thenReturn(idamUserDetails);
-        when(citizenLoginService.associateCaseToCitizen(null, tya, email, postcode))
+        when(citizenLoginService.associateCaseToCitizen(null, tya, matchCaseDetails))
                 .thenReturn(Optional.empty());
 
-        ResponseEntity<OnlineHearing> response = underTest.associateUserWithCase(oauthToken, tya, new AssociateCaseDetails(email, postcode));
+        ResponseEntity<OnlineHearing> response = underTest.associateUserWithCase(oauthToken, tya, matchCaseDetails);
 
         assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
     }
@@ -161,10 +163,10 @@ public class CitizenControllerTest {
         assertFalse(result.isEmpty(), "The result should not be empty");
 
         Map<String, String> aberdeenEntry = Map.of(
-            "label", "Aberdeen",
             "trafficType", "Sea traffic",
-            "locationCode", "GB000434"
-        );
+            "locationCode", "GBSTABD00",
+            "label", "Aberdeen"
+            );
 
         assertTrue(result.contains(aberdeenEntry), "The result should contain the entry for Aberdeen");
 
@@ -198,7 +200,7 @@ public class CitizenControllerTest {
 
         Map<String, String> jordanEntry = Map.of(
             "label", "Jordan",
-            "officialName", "The Hashemite Kingdom of Jordan"
+            "officialName", "Jordan"
         );
 
         assertTrue(result.contains(jordanEntry), "The result should contain the entry for Jordan");

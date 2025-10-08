@@ -5,26 +5,162 @@ import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
+import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getBenefitByCodeOrThrowException;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getLongBenefitNameDescriptionWithOptionalAcronym;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelComposition.JUDGE_DOCTOR_AND_DISABILITY_EXPERT_IF_APPLICABLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.*;
+import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsDetailsMapping.getHearingType;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.CC_DATE_FORMAT;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DAYS_STRING;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DWP_ACRONYM;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DWP_ACRONYM_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DWP_FIRST_TIER_AGENCY_GROUP;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DWP_FIRST_TIER_AGENCY_GROUP_TITLE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DWP_FIRST_TIER_AGENCY_GROUP_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DWP_FULL_NAME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DWP_FULL_NAME_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.FINAL_DECISION_DATE_FORMAT;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.HEARING_TIME_FORMAT;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.HMRC_ACRONYM;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.HMRC_ACRONYM_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.HMRC_FULL_NAME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.HMRC_FULL_NAME_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBCA_ACRONYM;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBCA_ACRONYM_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBCA_FULL_NAME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBCA_FULL_NAME_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBC_ACRONYM;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBC_ACRONYM_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.JOINT_TEXT_WITH_A_SPACE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.JOINT_TEXT_WITH_A_SPACE_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.MAC_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.MAX_DWP_RESPONSE_DAYS;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.MAX_DWP_RESPONSE_DAYS_CHILD_SUPPORT;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.RESPONSE_DATE_FORMAT;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.SSCS5;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.SSCS8;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.THE_STRING;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.THE_STRING_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.TOMORROW_STRING;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists.EVENTS_WITH_SUBSCRIPTION_TYPE_DOCMOSIS_TEMPLATES;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists.EVENTS_WITH_SUBSCRIPTION_TYPE_EMAIL_TEMPLATES;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.*;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.*;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.DISABLED_ACCESS;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.HEARING_LOOP;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.LANGUAGE_INTERPRETER;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.OTHER_ARRANGEMENTS;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.SIGN_INTERPRETER;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ACCEPT_VIEW_BY_DATE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ADDRESS_LINE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPEAL_ID_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPEAL_REF;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPEAL_RESPOND_DATE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPEAL_RESPOND_DATE_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPELLANT_NAME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPOINTEE_DESCRIPTION;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPOINTEE_NAME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.BENEFIT_FULL_NAME_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.BENEFIT_FULL_NAME_LITERAL_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.BENEFIT_NAME_ACRONYM_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.BENEFIT_NAME_ACRONYM_LITERAL_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.BENEFIT_NAME_ACRONYM_SHORT_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.BENEFIT_NAME_AND_OPTIONAL_ACRONYM;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.BENEFIT_NAME_AND_OPTIONAL_ACRONYM_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.CASE_REFERENCE_ID;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.CCD_ID;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.CLAIMING_EXPENSES_LINK_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.CONFIDENTIALITY_OUTCOME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.COUNTY_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.CREATED_DATE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.CREATED_DATE_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.CURRENT_DATE_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.DAYS_TO_HEARING_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.DECISION_DATE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.DECISION_POSTED_RECEIVE_DATE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.DECISION_POSTED_RECEIVE_DATE_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ENTITY_TYPE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.EVIDENCE_RECEIVED_DATE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.EVIDENCE_RECEIVED_DATE_LITERAL_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.FINAL_DECISION_DATE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.FIRST_TIER_AGENCY_ACRONYM;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.FIRST_TIER_AGENCY_ACRONYM_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.FIRST_TIER_AGENCY_FULL_NAME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.FIRST_TIER_AGENCY_FULL_NAME_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.FIRST_TIER_AGENCY_GROUP;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.FIRST_TIER_AGENCY_GROUP_TITLE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.FIRST_TIER_AGENCY_GROUP_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.FIRST_TIER_AGENCY_OFFICE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_ARRANGEMENT_DETAILS_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_ARRANGEMENT_DETAILS_LITERAL_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_CONTACT_DATE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_DATE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_DATE_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_INFO_LINK_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_TIME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_TYPE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HELPLINE_PHONE_NUMBER;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HMC_HEARING_TYPE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.INFO_REQUEST_DETAIL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.IS_GRANTED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.IS_IBC_CASE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.IS_NOT_IBC_CASE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.JOINT;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.JOINT_PARTY_APPEAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.JOINT_PARTY_NAME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.JOINT_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.MANAGE_EMAILS_LINK_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ONLINE_HEARING_LINK_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ONLINE_HEARING_REGISTER_LINK_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ONLINE_HEARING_SIGN_IN_LINK_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.OTHER_PARTY_NAME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.PANEL_COMPOSITION;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.PANEL_COMPOSITION_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.PARTY_TYPE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.PHONE_NUMBER;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.PHONE_NUMBER_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.POSTCODE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.QUESTION_ROUND_EXPIRES_DATE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.REGIONAL_OFFICE_NAME_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.REGIONAL_OFFICE_POSTCODE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.REPRESENTEE_NAME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.SENDER_NAME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.SUBMIT_EVIDENCE_INFO_LINK_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.SUBMIT_EVIDENCE_LINK_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.SUPPORT_CENTRE_NAME_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.TOWN_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.TRACK_APPEAL_LINK_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.TRIBUNAL_RESPONSE_DATE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.VENUE_ADDRESS_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.VENUE_MAP_LINK_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.WITH_OPTIONAL_THE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.WITH_OPTIONAL_THE_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.APPELLANT;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.APPOINTEE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.JOINT_PARTY;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.OTHER_PARTY;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.REPRESENTATIVE;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.BUNDLE_CREATED_FOR_UPPER_TRIBUNAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.CASE_UPDATED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DIRECTION_ISSUED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DIRECTION_ISSUED_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.EVIDENCE_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.JUDGE_DECISION_APPEAL_TO_PROCEED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PERMISSION_TO_APPEAL_REFUSED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.REVIEW_AND_SET_ASIDE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SUBSCRIPTION_CREATED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.TCW_DECISION_APPEAL_TO_PROCEED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.personalisation.SyaAppealCreatedAndReceivedPersonalisation.TWO_NEW_LINES;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.personalisation.SyaAppealCreatedAndReceivedPersonalisation.getOptionalField;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getNameForOtherParty;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.hasAppointee;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.hasJointParty;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.hasRepresentative;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -33,7 +169,13 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -42,11 +184,35 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AppellantInfoRequest;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Event;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
+import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelComposition;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.exception.BenefitMappingException;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
-import uk.gov.hmcts.reform.sscs.tyanotifications.config.*;
+import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationConfig;
+import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists;
+import uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration;
+import uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants;
+import uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.properties.EvidenceProperties;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
@@ -164,7 +330,10 @@ public class Personalisation<E extends NotificationWrapper> {
             if (hasBenefitType(ccdResponse)) {
                 benefit = getBenefitByCodeOrThrowException(ccdResponse.getAppeal().getBenefitType().getCode());
 
-                if (benefit.isHasAcronym()) {
+                if (ccdResponse.isIbcCase()) {
+                    personalisation.put(BENEFIT_NAME_ACRONYM_LITERAL, IBC_ACRONYM);
+                    personalisation.put(BENEFIT_NAME_ACRONYM_LITERAL_WELSH, IBC_ACRONYM_WELSH);
+                } else if (benefit.isHasAcronym()) {
                     personalisation.put(BENEFIT_NAME_ACRONYM_LITERAL, benefit.name());
                     personalisation.put(BENEFIT_NAME_ACRONYM_LITERAL_WELSH, benefit.name());
                 } else {
@@ -266,6 +435,7 @@ public class Personalisation<E extends NotificationWrapper> {
         personalisation.put(APPOINTEE_NAME, getName(APPOINTEE, ccdResponse, responseWrapper));
 
         personalisation.put(HEARING_TYPE, responseWrapper.getNewSscsCaseData().getAppeal().getHearingType());
+        personalisation.put(HMC_HEARING_TYPE_LITERAL, getHearingType(ccdResponse).getHmcReference());
 
         if (subscriptionWithType.getSubscriptionType() == REPRESENTATIVE) {
             personalisation.put(PersonalisationMappingConstants.REPRESENTATIVE, "Yes");
@@ -301,6 +471,14 @@ public class Personalisation<E extends NotificationWrapper> {
             || REVIEW_AND_SET_ASIDE.equals(notificationEventType)
             || BUNDLE_CREATED_FOR_UPPER_TRIBUNAL.equals(notificationEventType)) {
             setDecisionDate(personalisation, ccdResponse);
+        }
+
+        if (ccdResponse.isIbcCase()) {
+            personalisation.put(IS_IBC_CASE, "Yes");
+            personalisation.put(IS_NOT_IBC_CASE, "No");
+        } else {
+            personalisation.put(IS_IBC_CASE, "No");
+            personalisation.put(IS_NOT_IBC_CASE, "Yes");
         }
 
         personalisation.put(IS_GRANTED, isGranted);
@@ -341,28 +519,56 @@ public class Personalisation<E extends NotificationWrapper> {
     }
 
     private void addFirstTierAgencyFields(Map<String, Object> personalisation, Benefit benefit, SscsCaseData ccdResponse) {
-        personalisation.put(FIRST_TIER_AGENCY_ACRONYM, isHmrcBenefit(benefit, ccdResponse.getFormType()) ? HMRC_ACRONYM : DWP_ACRONYM);
-        personalisation.put(FIRST_TIER_AGENCY_ACRONYM_WELSH, isHmrcBenefit(benefit, ccdResponse.getFormType()) ? HMRC_ACRONYM_WELSH : DWP_ACRONYM_WELSH);
-        personalisation.put(FIRST_TIER_AGENCY_FULL_NAME, isHmrcBenefit(benefit, ccdResponse.getFormType()) ? HMRC_FULL_NAME : DWP_FULL_NAME);
-        personalisation.put(FIRST_TIER_AGENCY_FULL_NAME_WELSH, isHmrcBenefit(benefit, ccdResponse.getFormType()) ? HMRC_FULL_NAME_WELSH : DWP_FULL_NAME_WELSH);
-        personalisation.put(FIRST_TIER_AGENCY_GROUP, isHmrcBenefit(benefit, ccdResponse.getFormType()) ? HMRC_ACRONYM : DWP_FIRST_TIER_AGENCY_GROUP);
-        personalisation.put(FIRST_TIER_AGENCY_GROUP_TITLE, isHmrcBenefit(benefit, ccdResponse.getFormType()) ? HMRC_ACRONYM : DWP_FIRST_TIER_AGENCY_GROUP_TITLE);
-        personalisation.put(FIRST_TIER_AGENCY_GROUP_WELSH, isHmrcBenefit(benefit, ccdResponse.getFormType()) ? HMRC_ACRONYM : DWP_FIRST_TIER_AGENCY_GROUP_WELSH);
-        personalisation.put(FIRST_TIER_AGENCY_OFFICE, ccdResponse.getDwpRegionalCentre());
-        personalisation.put(WITH_OPTIONAL_THE, isHmrcBenefit(benefit, ccdResponse.getFormType()) ? "" : THE_STRING);
-        personalisation.put(WITH_OPTIONAL_THE_WELSH, isHmrcBenefit(benefit, ccdResponse.getFormType()) ? "" : THE_STRING_WELSH);
-    }
+        final String type = benefit == null
+                ? String.valueOf(ccdResponse.getFormType())
+                : String.valueOf(benefit.getSscsType());
 
-    private boolean isHmrcBenefit(Benefit benefit, FormType formType) {
-        if (benefit == null) {
-            return FormType.SSCS5.equals(formType);
+        switch (type) {
+            case SSCS5 -> {
+                personalisation.put(FIRST_TIER_AGENCY_ACRONYM, HMRC_ACRONYM);
+                personalisation.put(FIRST_TIER_AGENCY_ACRONYM_WELSH, HMRC_ACRONYM_WELSH);
+                personalisation.put(FIRST_TIER_AGENCY_FULL_NAME, HMRC_FULL_NAME);
+                personalisation.put(FIRST_TIER_AGENCY_FULL_NAME_WELSH, HMRC_FULL_NAME_WELSH);
+                personalisation.put(FIRST_TIER_AGENCY_GROUP, HMRC_ACRONYM);
+                personalisation.put(FIRST_TIER_AGENCY_GROUP_TITLE, HMRC_ACRONYM);
+                personalisation.put(FIRST_TIER_AGENCY_GROUP_WELSH, HMRC_ACRONYM);
+                personalisation.put(FIRST_TIER_AGENCY_OFFICE, ccdResponse.getDwpRegionalCentre());
+                personalisation.put(WITH_OPTIONAL_THE, "");
+                personalisation.put(WITH_OPTIONAL_THE_WELSH, "");
+            }
+            case SSCS8 -> {
+                personalisation.put(FIRST_TIER_AGENCY_ACRONYM, IBCA_ACRONYM);
+                personalisation.put(FIRST_TIER_AGENCY_ACRONYM_WELSH, IBCA_ACRONYM_WELSH);
+                personalisation.put(FIRST_TIER_AGENCY_FULL_NAME, IBCA_FULL_NAME);
+                personalisation.put(FIRST_TIER_AGENCY_FULL_NAME_WELSH, IBCA_FULL_NAME_WELSH);
+                personalisation.put(FIRST_TIER_AGENCY_GROUP, IBCA_FULL_NAME);
+                personalisation.put(FIRST_TIER_AGENCY_GROUP_TITLE, IBCA_FULL_NAME);
+                personalisation.put(FIRST_TIER_AGENCY_GROUP_WELSH, IBCA_FULL_NAME_WELSH);
+                personalisation.put(FIRST_TIER_AGENCY_OFFICE, IBCA_ACRONYM);
+                personalisation.put(WITH_OPTIONAL_THE, "");
+                personalisation.put(WITH_OPTIONAL_THE_WELSH, "");
+            }
+            default -> {
+                personalisation.put(FIRST_TIER_AGENCY_ACRONYM, DWP_ACRONYM);
+                personalisation.put(FIRST_TIER_AGENCY_ACRONYM_WELSH, DWP_ACRONYM_WELSH);
+                personalisation.put(FIRST_TIER_AGENCY_FULL_NAME, DWP_FULL_NAME);
+                personalisation.put(FIRST_TIER_AGENCY_FULL_NAME_WELSH, DWP_FULL_NAME_WELSH);
+                personalisation.put(FIRST_TIER_AGENCY_GROUP, DWP_FIRST_TIER_AGENCY_GROUP);
+                personalisation.put(FIRST_TIER_AGENCY_GROUP_TITLE, DWP_FIRST_TIER_AGENCY_GROUP_TITLE);
+                personalisation.put(FIRST_TIER_AGENCY_GROUP_WELSH, DWP_FIRST_TIER_AGENCY_GROUP_WELSH);
+                personalisation.put(FIRST_TIER_AGENCY_OFFICE, ccdResponse.getDwpRegionalCentre());
+                personalisation.put(WITH_OPTIONAL_THE, THE_STRING);
+                personalisation.put(WITH_OPTIONAL_THE_WELSH, THE_STRING_WELSH);
+            }
         }
-        return SscsType.SSCS5.equals(benefit.getSscsType());
     }
 
     private void setHelplineTelephone(SscsCaseData ccdResponse, Map<String, Object> personalisation) {
+        final Benefit benefit = ccdResponse.getBenefitType().orElse(Benefit.PIP);
         if ("yes".equalsIgnoreCase(ccdResponse.getIsScottishCase())) {
             personalisation.put(HELPLINE_PHONE_NUMBER, config.getHelplineTelephoneScotland());
+        } else if (benefit.equals(Benefit.INFECTED_BLOOD_COMPENSATION)) {
+            personalisation.put(HELPLINE_PHONE_NUMBER, config.getHelplineTelephoneIbc());
         } else {
             personalisation.put(HELPLINE_PHONE_NUMBER, config.getHelplineTelephone());
         }
@@ -542,7 +748,7 @@ public class Personalisation<E extends NotificationWrapper> {
 
         if (EventType.READY_TO_LIST.getCcdType().equals(ccdResponse.getCreatedInGapsFrom())) {
             personalisation.put(REGIONAL_OFFICE_NAME_LITERAL, evidenceProperties.getAddress().getLine1());
-            personalisation.put(SUPPORT_CENTRE_NAME_LITERAL, evidenceProperties.getAddress().getLine2());
+            personalisation.put(SUPPORT_CENTRE_NAME_LITERAL, evidenceProperties.getAddress().getLine2(ccdResponse));
             personalisation.put(ADDRESS_LINE_LITERAL, evidenceProperties.getAddress().getLine3(ccdResponse));
             personalisation.put(TOWN_LITERAL, evidenceProperties.getAddress().getTown());
             personalisation.put(COUNTY_LITERAL, evidenceProperties.getAddress().getCounty());
@@ -557,9 +763,18 @@ public class Personalisation<E extends NotificationWrapper> {
             personalisation.put(POSTCODE_LITERAL, rpc.getPostcode());
             personalisation.put(REGIONAL_OFFICE_POSTCODE_LITERAL, rpc.getPostcode());
         }
-
         personalisation.put(PHONE_NUMBER_WELSH, evidenceProperties.getAddress().getTelephoneWelsh());
-        personalisation.put(PHONE_NUMBER, determinePhoneNumber(rpc));
+
+        if (ccdResponse.isIbcCase()) {
+            personalisation.put(
+                    PHONE_NUMBER,
+                    Objects.equals(ccdResponse.getIsScottishCase(), "Yes")
+                            ? config.getHelplineTelephoneScotland()
+                            : evidenceProperties.getAddress().getTelephoneIbc()
+            );
+        } else {
+            personalisation.put(PHONE_NUMBER, determinePhoneNumber(rpc));
+        }
 
         setHearingArrangementDetails(personalisation, ccdResponse);
 

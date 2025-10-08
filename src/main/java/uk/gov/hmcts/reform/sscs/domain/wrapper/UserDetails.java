@@ -29,13 +29,13 @@ public class UserDetails {
         this.subscriptions = subscriptions;
     }
 
-    @Schema(example = "Appellant", required = true)
+    @Schema(example = "Appellant", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "type")
     public String getType() {
         return type;
     }
 
-    @Schema(example = "manish sharma", required = true)
+    @Schema(example = "manish sharma", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "name")
     public String getName() {
         return name;
@@ -46,7 +46,7 @@ public class UserDetails {
         return addressDetails;
     }
 
-    @Schema(example = "manish.sharma@gmail.com", required = true)
+    @Schema(example = "manish.sharma@gmail.com", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "email")
     public String getEmail() {
         return email;

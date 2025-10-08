@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.sendtofirsttier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -18,7 +19,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
@@ -87,7 +87,6 @@ public class SendToFirstTierSubmittedHandlerTest {
     @ParameterizedTest
     @EnumSource(value = SendToFirstTierActions.class)
     void givenRequestPostHearingTypes_shouldReturnCallCorrectCallback_whenCcdCallbackMapV2IsEnabled(SendToFirstTierActions value) {
-        ReflectionTestUtils.setField(handler, "isHandleCcdCallbackMapV2Enabled", true);
         caseData.getPostHearing().setSendToFirstTier(SendToFirstTier.builder()
                 .action(value)
                 .build());
@@ -104,28 +103,6 @@ public class SendToFirstTierSubmittedHandlerTest {
 
         assertThat(response.getErrors()).isEmpty();
         verify(ccdCallbackMapService, times(1))
-                .handleCcdCallbackMapV2(value, CASE_ID);
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = SendToFirstTierActions.class)
-    void givenRequestPostHearingTypes_shouldReturnCallCorrectCallback_whenCcdCallbackMapV2IsDisabled(SendToFirstTierActions value) {
-        ReflectionTestUtils.setField(handler, "isHandleCcdCallbackMapV2Enabled", false);
-        caseData.getPostHearing().setSendToFirstTier(SendToFirstTier.builder()
-                .action(value)
-                .build());
-
-        when(callback.getEvent()).thenReturn(SEND_TO_FIRST_TIER);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(caseData);
-        when(ccdCallbackMapService.handleCcdCallbackMap(value, caseData))
-                .thenReturn(SscsCaseData.builder().build());
-
-        PreSubmitCallbackResponse<SscsCaseData> response =
-                handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-        verify(ccdCallbackMapService, times(1))
-                .handleCcdCallbackMap(value, caseData);
+                .handleCcdCallbackMapV2(eq(value), eq(CASE_ID));
     }
 }

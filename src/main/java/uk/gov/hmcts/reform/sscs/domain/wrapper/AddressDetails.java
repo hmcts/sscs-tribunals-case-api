@@ -23,31 +23,31 @@ public class AddressDetails {
         this.postcode = postcode;
     }
 
-    @Schema(example = "14 Oxford Road", required = true)
+    @Schema(example = "14 Oxford Road", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "line1")
     public String getLine1() {
         return line1;
     }
 
-    @Schema(example = "Hastings", required = true)
+    @Schema(example = "Hastings", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "line2")
     public String getLine2() {
         return line2;
     }
 
-    @Schema(example = "East Sussex", required = true)
+    @Schema(example = "East Sussex", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "town")
     public String getTown() {
         return town;
     }
 
-    @Schema(example = "Sussex", required = true)
+    @Schema(example = "Sussex", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "county")
     public String getCounty() {
         return county;
     }
 
-    @Schema(example = "TN38 6EW", required = true)
+    @Schema(example = "TN38 6EW", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "postcode")
     public String getPostcode() {
         return postcode;

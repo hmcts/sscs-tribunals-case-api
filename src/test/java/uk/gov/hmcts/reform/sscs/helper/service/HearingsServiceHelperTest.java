@@ -20,6 +20,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -169,8 +170,9 @@ class HearingsServiceHelperTest {
     }
 
     @DisplayName("When a response with valid and invalid hearings is given findExistingRequestedHearings returns the latest valid hearing")
-    @Test
-    void testFindExistingRequestedHearings() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void testFindExistingRequestedHearings(Boolean isUpdateHearing) {
         HearingsGetResponse hearingsGetResponse = HearingsGetResponse.builder()
             .caseHearings(List.of(
                 CaseHearing.builder()
@@ -193,7 +195,7 @@ class HearingsServiceHelperTest {
                     .build()))
             .build();
 
-        CaseHearing result = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse);
+        CaseHearing result = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse, isUpdateHearing);
 
         assertThat(result)
             .isNotNull()
@@ -202,8 +204,9 @@ class HearingsServiceHelperTest {
     }
 
     @DisplayName("When a response with only invalid hearings is given findExistingRequestedHearings returns null")
-    @Test
-    void testFindExistingRequestedHearingsInvalid() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void testFindExistingRequestedHearingsInvalid(Boolean isUpdateHearing) {
         HearingsGetResponse hearingsGetResponse = HearingsGetResponse.builder()
             .caseHearings(List.of(
                 CaseHearing.builder()
@@ -214,17 +217,18 @@ class HearingsServiceHelperTest {
                     .build()))
             .build();
 
-        CaseHearing result = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse);
+        CaseHearing result = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse, isUpdateHearing);
 
         assertThat(result).isNull();
     }
 
     @DisplayName("When a null response given findExistingRequestedHearings returns null")
-    @Test
-    void testFindExistingRequestedHearingsNull() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void testFindExistingRequestedHearingsNull(Boolean isUpdateHearing) {
         HearingsGetResponse hearingsGetResponse = HearingsGetResponse.builder().build();
 
-        CaseHearing result = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse);
+        CaseHearing result = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse, isUpdateHearing);
 
         assertThat(result).isNull();
     }
@@ -237,7 +241,7 @@ class HearingsServiceHelperTest {
         mode = EnumSource.Mode.INCLUDE,
         names = {"HEARING_REQUESTED", "AWAITING_LISTING"})
     void testIsCaseHearingRequestedOrAwaitingListing(HmcStatus value) {
-        boolean result = HearingsServiceHelper.isCaseHearingRequestedOrAwaitingListing(value);
+        boolean result = HearingsServiceHelper.isCaseHearingRequestedOrAwaitingListing(value, false);
 
         assertThat(result).isTrue();
     }
@@ -245,12 +249,37 @@ class HearingsServiceHelperTest {
     @DisplayName("When the status doesnt match isCaseHearingRequestedOrAwaitingListing returns false")
     @ParameterizedTest
     @EnumSource(
-        value = HmcStatus.class,
-        mode = EnumSource.Mode.EXCLUDE,
-        names = {"HEARING_REQUESTED", "AWAITING_LISTING"})
+            value = HmcStatus.class,
+            mode = EnumSource.Mode.EXCLUDE,
+            names = {"HEARING_REQUESTED", "AWAITING_LISTING"})
     @NullSource
     void testIsCaseHearingRequestedOrAwaitingListingNonMatching(HmcStatus value) {
-        boolean result = HearingsServiceHelper.isCaseHearingRequestedOrAwaitingListing(value);
+        boolean result = HearingsServiceHelper.isCaseHearingRequestedOrAwaitingListing(value, false);
+
+        assertThat(result).isFalse();
+    }
+
+    @DisplayName("When the status matches states for updating hearing returns true")
+    @ParameterizedTest
+    @EnumSource(
+            value = HmcStatus.class,
+            mode = EnumSource.Mode.INCLUDE,
+            names = {"HEARING_REQUESTED", "AWAITING_LISTING", "UPDATE_SUBMITTED", "UPDATE_REQUESTED"})
+    void testIsCaseHearingInValidStateForUpdateHearingRequest(HmcStatus value) {
+        boolean result = HearingsServiceHelper.isCaseHearingRequestedOrAwaitingListing(value, true);
+
+        assertThat(result).isTrue();
+    }
+
+    @DisplayName("When the status doesn't match requested, listed or submitted state returns false")
+    @ParameterizedTest
+    @EnumSource(
+        value = HmcStatus.class,
+        mode = EnumSource.Mode.EXCLUDE,
+        names = {"HEARING_REQUESTED", "AWAITING_LISTING", "UPDATE_SUBMITTED", "UPDATE_REQUESTED"})
+    @NullSource
+    void testIsCaseHearingRequestedInNonMatchingStateForUpdateHearing(HmcStatus value) {
+        boolean result = HearingsServiceHelper.isCaseHearingRequestedOrAwaitingListing(value, true);
 
         assertThat(result).isFalse();
     }

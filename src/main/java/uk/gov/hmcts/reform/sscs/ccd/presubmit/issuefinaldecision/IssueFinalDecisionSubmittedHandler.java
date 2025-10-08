@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
+import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,17 +18,16 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
-import uk.gov.hmcts.reform.sscs.service.event.EventPublisher;
+import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
 
 @Component
 @Slf4j
 @AllArgsConstructor
 public class IssueFinalDecisionSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private final CcdCallbackMapService ccdCallbackMapService;
-    private final EventPublisher eventPublisher;
+    private final SendCallbackHandler sendCallbackHandler;
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
-
 
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
@@ -49,15 +49,19 @@ public class IssueFinalDecisionSubmittedHandler implements PreSubmitCallbackHand
         if (isPostHearingsEnabled) {
             Correction correction = caseData.getPostHearing().getCorrection();
 
-            if (isYes(correction.getIsCorrectionFinalDecisionInProgress())) {
-                correction.setIsCorrectionFinalDecisionInProgress(NO);
-                caseData = ccdCallbackMapService.handleCcdCallbackMap(CorrectionActions.GRANT, caseData);
+            Consumer<SscsCaseData> sscsCaseDataConsumer = sscsCaseData ->
+                    sscsCaseData.getPostHearing().getCorrection().setIsCorrectionFinalDecisionInProgress(NO);
 
+            if (isYes(correction.getIsCorrectionFinalDecisionInProgress())) {
+                caseData = ccdCallbackMapService.handleCcdCallbackMapV2(
+                        CorrectionActions.GRANT,
+                        callback.getCaseDetails().getId(),
+                        sscsCaseDataConsumer);
                 return new PreSubmitCallbackResponse<>(caseData);
             }
         }
-        log.info("Publishing message for the event {}", callback.getEvent());
-        eventPublisher.publishEvent(callback);
+        log.info("Publishing message for the event {} for case id: {}", callback.getEvent(), callback.getCaseDetails().getId());
+        sendCallbackHandler.handle(callback);
 
         return new PreSubmitCallbackResponse<>(caseData);
     }

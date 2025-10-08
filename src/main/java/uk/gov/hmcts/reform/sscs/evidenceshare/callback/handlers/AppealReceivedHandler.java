@@ -6,7 +6,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -29,9 +28,6 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
     private final UpdateCcdCaseService updateCcdCaseService;
 
     private final IdamService idamService;
-
-    @Value("${feature.trigger-eventV2.enabled}")
-    private boolean isTriggerEventV2Enabled;
 
     @Autowired
     public AppealReceivedHandler(CcdService ccdService,
@@ -71,26 +67,14 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
             log.error("Thread sleep interrupted: " + e.getMessage());
         }
 
-        if (isTriggerEventV2Enabled) {
-            log.info("About to update case v2 with appealReceived event for id {}", callback.getCaseDetails().getId());
-            updateCcdCaseService.triggerCaseEventV2(
-                    callback.getCaseDetails().getId(),
-                    APPEAL_RECEIVED.getCcdType(),
-                    "Appeal received",
-                    "Appeal received event has been triggered from Tribunals API for digital case",
-                    idamService.getIdamTokens()
-            );
-        } else {
-            log.info("About to update case with appealReceived event for id {}", callback.getCaseDetails().getId());
-            ccdService.updateCase(
-                    callback.getCaseDetails().getCaseData(),
-                    callback.getCaseDetails().getId(),
-                    APPEAL_RECEIVED.getCcdType(),
-                    "Appeal received",
-                    "Appeal received event has been triggered from Evidence Share for digital case",
-                    idamService.getIdamTokens()
-            );
-        }
+        log.info("About to update case v2 with appealReceived event for id {}", callback.getCaseDetails().getId());
+        updateCcdCaseService.triggerCaseEventV2(
+                callback.getCaseDetails().getId(),
+                APPEAL_RECEIVED.getCcdType(),
+                "Appeal received",
+                "Appeal received event has been triggered from Tribunals API for digital case",
+                idamService.getIdamTokens()
+        );
     }
 
     @Override

@@ -29,7 +29,7 @@ public class CcdNotificationService {
     public void storeNotificationLetterIntoCcd(EventType eventType, byte[] pdfLetter,
                                                Long ccdCaseId, String recipient) {
         var correspondence = buildCorrespondence(eventType, recipient);
-        ccdNotificationsPdfService.mergeLetterCorrespondenceIntoCcd(pdfLetter, ccdCaseId, correspondence, SENDER_TYPE);
+        ccdNotificationsPdfService.mergeLetterCorrespondenceIntoCcdV2(pdfLetter, ccdCaseId, correspondence, SENDER_TYPE);
     }
 
     Correspondence buildCorrespondence(EventType eventType, String recipient) {

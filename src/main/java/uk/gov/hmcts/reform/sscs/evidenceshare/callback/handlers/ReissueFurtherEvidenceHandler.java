@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.FurtherEvidenceService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -23,16 +23,16 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData> {
 
     private final FurtherEvidenceService furtherEvidenceService;
-    private final CcdService ccdService;
     private final IdamService idamService;
+    private final UpdateCcdCaseService updateCcdCaseService;
 
     @Autowired
     public ReissueFurtherEvidenceHandler(FurtherEvidenceService furtherEvidenceService,
-                                         CcdService ccdService,
-                                         IdamService idamService) {
+                                         IdamService idamService,
+                                         UpdateCcdCaseService updateCcdCaseService) {
         this.furtherEvidenceService = furtherEvidenceService;
-        this.ccdService = ccdService;
         this.idamService = idamService;
+        this.updateCcdCaseService = updateCcdCaseService;
     }
 
     @Override
@@ -57,7 +57,7 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
             allowedLetterTypes, getOtherPartyToResendOriginalSenderId(reissueArtifactUi, selectedDocument));
 
         if (CollectionUtils.isNotEmpty(allowedLetterTypes)) {
-            udateCaseForReasonableAdjustments(caseData, selectedDocument);
+            updateCaseV2(caseData, selectedDocument);
         }
     }
 
@@ -88,7 +88,7 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
     private AbstractDocument<? extends AbstractDocumentDetails> getSelectedDocumentInUiFromCaseData(SscsCaseData caseData,
                                                                                                     ReissueArtifactUi reissueArtifactUi) {
         return Stream.of(caseData.getSscsDocument(), caseData.getSscsWelshDocuments())
-            .flatMap(documents -> getStreamIfNonNull(documents))
+            .flatMap(this::getStreamIfNonNull)
             .filter(document -> isDocumentSelectedInUiEqualsToStreamDocument(reissueArtifactUi, document))
             .findFirst()
             .orElseThrow(() -> new IllegalStateException(getNoSelectedDocumentErrorMessage(caseData)));
@@ -98,9 +98,10 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
                                                                  AbstractDocument<? extends AbstractDocumentDetails> document) {
         String expectedUrl = reissueArtifactUi.getReissueFurtherEvidenceDocument().getValue().getCode();
 
-        return (document.getValue().getDocumentLink().getDocumentUrl().equals(expectedUrl)
-            || (document.getValue().getEditedDocumentLink() != null
-            && document.getValue().getEditedDocumentLink().getDocumentUrl().equals(expectedUrl)));
+        return (document.getValue().getDocumentLink() != null
+                && document.getValue().getDocumentLink().getDocumentUrl().equals(expectedUrl)
+                || (document.getValue().getEditedDocumentLink() != null
+                && document.getValue().getEditedDocumentLink().getDocumentUrl().equals(expectedUrl)));
     }
 
     private Stream<? extends AbstractDocument<? extends AbstractDocumentDetails>> getStreamIfNonNull(List<? extends AbstractDocument<? extends AbstractDocumentDetails>> documents) {
@@ -111,16 +112,6 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
         return String.format("Cannot find the selected document to reissue with url %s for caseId %s.",
             caseData.getReissueArtifactUi().getReissueFurtherEvidenceDocument().getValue().getCode(),
             caseData.getCcdCaseId());
-    }
-
-    private void udateCaseForReasonableAdjustments(SscsCaseData caseData, AbstractDocument selectedDocument) {
-        if (caseData.getReasonableAdjustmentsLetters() != null) {
-            final SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(Long.valueOf(caseData.getCcdCaseId()), idamService.getIdamTokens());
-            caseData = sscsCaseDetails.getData();
-        }
-        setEvidenceIssuedFlagToYes(selectedDocument);
-        setReissueFlagsToNull(caseData);
-        updateCase(caseData, selectedDocument);
     }
 
     private List<FurtherEvidenceLetterType> getAllowedFurtherEvidenceLetterTypes(SscsCaseData caseData) {
@@ -195,15 +186,20 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
         }
     }
 
-    private void updateCase(SscsCaseData caseData, AbstractDocument selectedDocument) {
+    private void updateCaseV2(final SscsCaseData caseData, AbstractDocument selectedDocument) {
 
-        ccdService.updateCase(
-            caseData,
-            Long.valueOf(caseData.getCcdCaseId()),
-            EventType.UPDATE_CASE_ONLY.getCcdType(),
-            "Update case data only",
-            determineDescription(selectedDocument),
-            idamService.getIdamTokens());
+        updateCcdCaseService.updateCaseV2(
+                Long.valueOf(caseData.getCcdCaseId()),
+                EventType.UPDATE_CASE_ONLY.getCcdType(),
+                "Update case data only",
+                determineDescription(selectedDocument),
+                idamService.getIdamTokens(),
+                sscsCaseDetails -> {
+                    final AbstractDocument documentIssuedFlagToYes =
+                            getSelectedDocumentInUiFromCaseData(sscsCaseDetails.getData(), sscsCaseDetails.getData().getReissueArtifactUi());
+                    setEvidenceIssuedFlagToYes(documentIssuedFlagToYes);
+                    setReissueFlagsToNull(sscsCaseDetails.getData());
+                });
     }
 
     public String determineDescription(AbstractDocument document) {

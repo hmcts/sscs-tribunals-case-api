@@ -3,9 +3,9 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadhearingrecording;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
+import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 import java.util.regex.Pattern;
-import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

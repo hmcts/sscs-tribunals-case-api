@@ -18,7 +18,13 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -28,7 +34,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.ResourceHttpMessageConverter;
@@ -36,6 +41,7 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
 import org.springframework.http.converter.xml.SourceHttpMessageConverter;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
@@ -77,25 +83,25 @@ public class CcdMideventCallbackControllerTest {
     private MockMvc mockMvc;
 
     @SuppressWarnings("PMD.UnusedPrivateField")
-    @MockBean
+    @MockitoBean
     private AuthorisationService authorisationService;
 
-    @MockBean
+    @MockitoBean
     private SscsCaseCallbackDeserializer deserializer;
 
-    @MockBean
+    @MockitoBean
     private PipWriteFinalDecisionPreviewDecisionService writeFinalDecisionPreviewDecisionService;
 
-    @MockBean
+    @MockitoBean
     private AdjournCasePreviewService adjournCasePreviewService;
 
     @Mock
     private AdjournCaseCcdService adjournCaseCcdService;
 
-    @MockBean
+    @MockitoBean
     private RestoreCasesService2 restoreCasesService2;
 
-    @MockBean
+    @MockitoBean
     private AdjournCaseMidEventValidationService adjournCaseMidEventValidationService;
 
     @Before

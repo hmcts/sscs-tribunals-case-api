@@ -5,49 +5,48 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_SEND_TO_INTERLOC;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Collections;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
+import java.util.function.Consumer;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.controller.CcdCallbackController;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@RunWith(JUnitParamsRunner.class)
 public class HmctsResponseReviewedIt extends AbstractEventIt {
 
-    @MockBean
-    private CcdService ccdService;
+    @MockitoBean
+    private UpdateCcdCaseService updateCcdCaseService;
 
-    @MockBean
+    @MockitoBean
     private IdamService idamService;
 
     @Before
     public void setup() throws IOException {
         CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-        mapper.registerModule(new JavaTimeModule());
+        mapper.findAndRegisterModules();
         json = getJson("callback/hmctsResponseReviewedCallback.json");
 
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
@@ -85,9 +84,8 @@ public class HmctsResponseReviewedIt extends AbstractEventIt {
 
 
     @Test
-    @Parameters({"Yes,VALID_SEND_TO_INTERLOC", "No,READY_TO_LIST"})
-    public void callToSubmittedHandler_willTriggerValidSendToInterlocEvent(String yesOrNo, EventType eventType) throws Exception {
-        json = json.replaceAll("IS_INTERLOC_REQUIRED_VALUE", yesOrNo);
+    public void callToSubmittedHandler_willTriggerValidSendToInterlocEvent() throws Exception {
+        json = json.replaceAll("IS_INTERLOC_REQUIRED_VALUE", YES.getValue());
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdSubmittedEvent"));
 
@@ -96,6 +94,32 @@ public class HmctsResponseReviewedIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
-        verify(ccdService).updateCase(any(SscsCaseData.class), eq(12345656789L), eq(eventType.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(updateCcdCaseService).updateCaseV2(
+                eq(12345656789L),
+                eq(VALID_SEND_TO_INTERLOC.getCcdType()),
+                any(String.class),
+                any(String.class),
+                any(IdamTokens.class),
+                any(Consumer.class));
+    }
+
+    @Test
+    public void callToSubmittedHandler_willTriggerReadyToListEvent() throws Exception {
+        json = json.replaceAll("IS_INTERLOC_REQUIRED_VALUE", NO.getValue());
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdSubmittedEvent"));
+
+        assertHttpStatus(response, HttpStatus.OK);
+
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+
+        assertEquals(Collections.EMPTY_SET, result.getErrors());
+        verify(updateCcdCaseService).updateCaseV2(
+                eq(12345656789L),
+                eq(READY_TO_LIST.getCcdType()),
+                any(String.class),
+                any(String.class),
+                any(IdamTokens.class),
+                any(Consumer.class));
     }
 }

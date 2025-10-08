@@ -1,0 +1,80 @@
+{
+  "event": {
+    "id": "incompleteApplicationReceived",
+    "summary": "Case created",
+    "description": "Case created from exception record"
+  },
+  "data": {
+    "appeal": {
+      "mrnDetails": {
+        "dwpIssuingOffice": "Sheffield DRT",
+        "mrnDate": "2018-12-09",
+        "mrnLateReason": null,
+        "mrnMissingReason": null
+      },
+      "appellant": {
+        "name": {
+          "title": "Mr",
+          "firstName": "John",
+          "lastName": null
+        },
+        "address": {},
+        "contact": {
+          "email": null,
+          "phone": null,
+          "mobile": null
+        },
+        "identity": {
+          "dob": null,
+          "nino": null
+        },
+        "isAppointee": "No",
+        "appointee": null,
+        "isAddressSameAsAppointee": null
+      },
+      "benefitType": {
+        "code": "ESA",
+        "description": "Employment and Support Allowance"
+      },
+      "hearingSubtype": {},
+      "hearingOptions": {
+        "wantsToAttend": "Yes",
+        "wantsSupport": "No",
+        "languageInterpreter": "No",
+        "arrangements": [],
+        "scheduleHearing": "No"
+      },
+      "appealReasons": null,
+      "rep": {
+        "hasRepresentative": "No",
+        "organisation": null,
+        "name": null,
+        "address": null,
+        "contact": null
+      },
+      "signer": null,
+      "hearingType": "oral",
+      "receivedVia": "Paper"
+    },
+    "sscsDocument": [],
+    "subscriptions": {
+      "appellantSubscription": {
+        "wantSmsNotifications": "No",
+        "email": null,
+        "mobile": null,
+        "subscribeEmail": "No",
+        "subscribeSms": "No",
+        "reason": null
+      },
+      "supporterSubscription": null,
+      "representativeSubscription": null,
+      "appointeeSubscription": null
+    },
+    "evidencePresent": "No",
+    "bulkScanCaseReference": "1234567890",
+    "caseCreated": "2018-01-11"
+  },
+  "security_classification": "PUBLIC",
+  "event_token": "test_event_token",
+  "ignore_warning": false
+}

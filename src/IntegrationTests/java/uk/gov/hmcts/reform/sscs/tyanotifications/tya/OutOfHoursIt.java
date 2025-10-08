@@ -1,15 +1,19 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.tya;
 
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper.assertHttpStatus;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper.getRequestWithAuthHeader;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper.updateEmbeddedJson;
 
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.UUID;
-import javax.servlet.http.HttpServletResponse;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -24,10 +28,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
@@ -45,7 +49,15 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationTestRecipien
 import uk.gov.hmcts.reform.sscs.tyanotifications.controller.NotificationController;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationFactory;
 import uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.*;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.MarkdownTransformationService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationHandler;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationValidService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.OutOfHoursCalculator;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.ReminderService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.SaveCorrespondenceAsyncService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.SendNotificationService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis.PdfLetterService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.reminder.JobGroupGenerator;
 import uk.gov.service.notify.NotificationClient;
@@ -85,7 +97,7 @@ public class OutOfHoursIt {
     @Autowired
     NotificationValidService notificationValidService;
 
-    @MockBean
+    @MockitoBean
     private AuthorisationService authorisationService;
 
     @Mock
@@ -100,7 +112,7 @@ public class OutOfHoursIt {
     @Autowired
     private SscsCaseCallbackDeserializer deserializer;
 
-    @MockBean
+    @MockitoBean
     private IdamService idamService;
 
     String json;
@@ -108,7 +120,7 @@ public class OutOfHoursIt {
     @Autowired
     private NotificationHandler notificationHandler;
 
-    @MockBean
+    @MockitoBean
     private OutOfHoursCalculator outOfHoursCalculator;
 
     @Autowired

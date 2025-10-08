@@ -99,6 +99,8 @@ class HearingGetConsumerTest extends BasePactTest {
             IDAM_OAUTH2_TOKEN,
             SERVICE_AUTHORIZATION_TOKEN,
             null,
+            null,
+            null,
             VALID_CASE_ID,
             null
         );
@@ -130,6 +132,8 @@ class HearingGetConsumerTest extends BasePactTest {
         HearingGetResponse result = hmcHearingApi.getHearingRequest(
             IDAM_OAUTH2_TOKEN,
             SERVICE_AUTHORIZATION_TOKEN,
+            null,
+            null,
             null,
             VALID_CASE_ID,
             OPTION_FIELD_IS_VALID_VALUE
@@ -164,6 +168,8 @@ class HearingGetConsumerTest extends BasePactTest {
             IDAM_OAUTH2_TOKEN,
             SERVICE_AUTHORIZATION_TOKEN,
             null,
+            null,
+            null,
             VALID_NO_CONTENT_CASE_ID,
             null
         );
@@ -197,6 +203,8 @@ class HearingGetConsumerTest extends BasePactTest {
                 IDAM_OAUTH2_TOKEN,
                 SERVICE_AUTHORIZATION_TOKEN,
                 null,
+                null,
+                null,
                 BAD_REQUEST_CASE_ID,
                 null
             )).extracting(STATUS).isEqualTo(BAD_REQUEST);
@@ -228,6 +236,8 @@ class HearingGetConsumerTest extends BasePactTest {
                 UNAUTHORISED_IDAM_OAUTH2_TOKEN,
                 UNAUTHORISED_SERVICE_AUTHORIZATION_TOKEN,
                 null,
+                null,
+                null,
                 UNAUTHORISED_CASE_ID,
                 null
             )).extracting(STATUS).isEqualTo(UNAUTHORIZED);
@@ -257,6 +267,8 @@ class HearingGetConsumerTest extends BasePactTest {
             () -> hmcHearingApi.getHearingRequest(
                 IDAM_OAUTH2_TOKEN,
                 SERVICE_AUTHORIZATION_TOKEN,
+                null,
+                null,
                 null,
                 FORBIDDEN_CASE_ID,
                 null
@@ -288,6 +300,8 @@ class HearingGetConsumerTest extends BasePactTest {
             () -> hmcHearingApi.getHearingRequest(
                 IDAM_OAUTH2_TOKEN,
                 SERVICE_AUTHORIZATION_TOKEN,
+                null,
+                null,
                 null,
                 NOT_FOUND_CASE_ID,
                 null

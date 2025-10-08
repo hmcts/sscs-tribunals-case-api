@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.functional.sya;
 
 import static io.restassured.RestAssured.baseURI;
-import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
-import static org.junit.Assert.assertEquals;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_CCD;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_CCD_CHILD_SUPPORT;
@@ -11,43 +11,32 @@ import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_NO_MRN_DATE_CCD;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_SSCS5;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_WITH_INTERLOC_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS;
 
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
 import java.time.LocalDate;
-import junitparams.JUnitParamsRunner;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer;
 
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(SpringExtension.class)
 @Slf4j
 public class SubmitAppealTest {
-
-    @ClassRule
-    public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
-
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
 
     @Value("${test-url}")
     private String testUrl;
@@ -60,7 +49,7 @@ public class SubmitAppealTest {
 
     private IdamTokens idamTokens;
 
-    @Before
+    @BeforeEach
     public void setup() {
         baseURI = testUrl;
         idamTokens = idamService.getIdamTokens();
@@ -105,8 +94,11 @@ public class SubmitAppealTest {
     private void assertCaseIsExpectedResult(String expectedBody, String expectedState, String expectedResponse) {
         LocalDate now = LocalDate.now();
         LocalDate interlocutoryReviewDate = now.minusMonths(13).minusDays(1);
-        LocalDate mrnDate = expectedState.equals("interlocutoryReviewState") ? interlocutoryReviewDate :
-                expectedState.equals("incompleteApplication") ? null : now;
+        LocalDate mrnDate = switch (expectedState) {
+            case "interlocutoryReviewState" -> interlocutoryReviewDate;
+            case "incompleteApplication" -> null;
+            default -> now;
+        };
         String nino = submitHelper.getRandomNino();
 
         expectedBody = submitHelper.setNino(expectedBody, nino);
@@ -123,7 +115,7 @@ public class SubmitAppealTest {
 
         SscsCaseDetails sscsCaseDetails = submitHelper.findCaseInCcd(id, idamTokens);
 
-        log.info(String.format("SYA created with CCD ID %s", id));
+        log.info("SYA created with CCD ID {}", id);
 
         assertThatJson(sscsCaseDetails.getData())
             .whenIgnoringPaths(
@@ -141,7 +133,10 @@ public class SubmitAppealTest {
                 "correctionGenerateNotice",
                 "generateNotice",
                 "dateAdded",
+                "dateSentToDwp",
                 "directionNoticeContent",
+                "dwpDueDate",
+                "hmctsDwpState",
                 "libertyToApply",
                 "libertyToApplyBodyContent",
                 "libertyToApplyGenerateNotice",
@@ -158,97 +153,64 @@ public class SubmitAppealTest {
                 "preWorkAllocation")
             .isEqualTo(changeExpectedFields(expectedResponse, nino, mrnDate));
 
-        assertEquals(expectedState, sscsCaseDetails.getState());
+        assertThat(expectedState).isEqualTo(sscsCaseDetails.getState());
 
-        assertEquals("Joe Bloggs", sscsCaseDetails.getData().getCaseAccessManagementFields().getCaseNameHmctsInternal());
-        assertEquals("Joe Bloggs", sscsCaseDetails.getData().getCaseAccessManagementFields().getCaseNameHmctsRestricted());
-        assertEquals("Joe Bloggs", sscsCaseDetails.getData().getCaseAccessManagementFields().getCaseNamePublic());
+        assertThat("Joe Bloggs").isEqualTo(sscsCaseDetails.getData().getCaseAccessManagementFields().getCaseNameHmctsInternal());
+        assertThat("Joe Bloggs").isEqualTo(sscsCaseDetails.getData().getCaseAccessManagementFields().getCaseNameHmctsRestricted());
+        assertThat("Joe Bloggs").isEqualTo(sscsCaseDetails.getData().getCaseAccessManagementFields().getCaseNamePublic());
     }
 
     private String changeExpectedFields(String serializedMessage, String nino, LocalDate mrnDate) {
-        serializedMessage = serializedMessage.replace("AB877533C", nino);
-        serializedMessage = serializedMessage.replace("2021-04-13", LocalDate.now().toString());
+        serializedMessage = serializedMessage
+            .replace("AB877533C", nino)
+            .replace("2021-04-13", LocalDate.now().toString());
 
         if (mrnDate != null) {
             serializedMessage = serializedMessage.replace("2018-02-01", mrnDate.toString());
         }
 
-
         return serializedMessage;
     }
 
     @Test
-    public void appealShouldCreateDuplicateAndLinked() throws InterruptedException {
-        SyaJsonMessageSerializer syaJsonMessageSerializer = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS;
-        String body = syaJsonMessageSerializer.getSerializedMessage();
+    public void appealShouldCreateDuplicateAndLinked() {
         String nino = submitHelper.getRandomNino();
-
-        body = submitHelper.setNino(body, nino);
-
         LocalDate mrnDate = LocalDate.now();
-        body = submitHelper.setLatestMrnDate(body, mrnDate);
+        log.info("Generated NINO: {} and MRN date: {}", nino, mrnDate);
 
-        SyaCaseWrapper wrapper = syaJsonMessageSerializer.getDeserializeMessage();
-        wrapper.getAppellant().setNino(nino);
-
-        RequestSpecification httpRequest = RestAssured.given()
-            .body(body)
-            .header("Content-Type", "application/json");
-
-        Response response = httpRequest.post("/appeals");
-
+        Response response = submitHelper.submitAppeal(nino, mrnDate);
         response.then().statusCode(HttpStatus.SC_CREATED);
 
-        final Long id = getCcdIdFromLocationHeader(response.getHeader("Location"));
-        SscsCaseDetails sscsCaseDetails = submitHelper.findCaseInCcd(id, idamTokens);
-
-        log.info(String.format("SYA created with CCD ID %s", id));
-        assertEquals("validAppeal", sscsCaseDetails.getState());
+        final Long firstCaseId = getCcdIdFromLocationHeader(response.getHeader("Location"));
+        log.info("First SYA case created with CCD ID {}", firstCaseId);
+        submitHelper.defaultAwait().untilAsserted(() -> {
+            SscsCaseDetails firstCaseDetails = submitHelper.findCaseInCcd(firstCaseId, idamTokens);
+            assertThat(State.WITH_DWP.getId()).isEqualTo(firstCaseDetails.getState());
+        });
 
         //create a case with different mrn date
-        body = syaJsonMessageSerializer.getSerializedMessage();
-        body = submitHelper.setNino(body, nino);
-
         mrnDate = LocalDate.now().minusMonths(12);
-        body = submitHelper.setLatestMrnDate(body, mrnDate);
 
-        httpRequest = RestAssured.given()
-            .body(body)
-            .header("Content-Type", "application/json");
-
-        // Give ES time to index
-        Thread.sleep(3000L);
-
-        response = httpRequest.post("/appeals");
-
+        response =  submitHelper.submitAppeal(nino, mrnDate);
         response.then().statusCode(HttpStatus.SC_CREATED);
 
         final Long secondCaseId = getCcdIdFromLocationHeader(response.getHeader("Location"));
-        log.info("Duplicate case " + secondCaseId);
-        SscsCaseDetails secondCaseSscsCaseDetails = submitHelper.findCaseInCcd(secondCaseId, idamTokens);
+        log.info("Duplicate SYA case created with CCD ID {} and MRN date {}", secondCaseId, mrnDate);
 
-        if (secondCaseSscsCaseDetails.getData().getAssociatedCase() == null) {
-            //Give time for evidence share to create associated case link
-            Thread.sleep(5000L);
-            secondCaseSscsCaseDetails = submitHelper.findCaseInCcd(secondCaseId, idamTokens);
-        }
+        submitHelper.defaultAwait().untilAsserted(() -> {
+            SscsCaseDetails secondCaseDetails = submitHelper.findCaseInCcd(secondCaseId, idamTokens);
+            assertThat(secondCaseDetails.getData().getAssociatedCase())
+                .as("AssociatedCase was not created or size doesn't match!")
+                .isNotNull()
+                .hasSize(1);
+            assertThat(YesNo.YES.toString()).isEqualTo(secondCaseDetails.getData().getLinkedCasesBoolean());
+        });
 
-        log.info("Duplicate case " + secondCaseSscsCaseDetails.getId() + " has been found");
-
-        assertEquals(1, secondCaseSscsCaseDetails.getData().getAssociatedCase().size());
-        assertEquals("Yes", secondCaseSscsCaseDetails.getData().getLinkedCasesBoolean());
-        log.info(secondCaseSscsCaseDetails.toString());
-
+        log.info("Resubmitting case with nino {} and mrn date {} for second time", nino, mrnDate);
         // check duplicate returns 409
-        httpRequest = RestAssured.given()
-                .body(body)
-                .header("Content-Type", "application/json");
-
-        // Give ES time to index
-        Thread.sleep(5000L);
-
-        response = httpRequest.post("/appeals");
-
+        response = submitHelper.submitAppeal(nino, mrnDate);
         response.then().statusCode(HttpStatus.SC_CONFLICT);
+
+        log.info("True duplicate was rejected");
     }
 }

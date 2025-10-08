@@ -1,23 +1,39 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static java.time.LocalDateTime.now;
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpResponseDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 
+@ExtendWith(MockitoExtension.class)
 public class DwpDocumentServiceTest {
 
     private SscsCaseData sscsCaseData;
 
     private DwpDocumentService dwpDocumentService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         dwpDocumentService = new DwpDocumentService();
 
@@ -27,6 +43,69 @@ public class DwpDocumentServiceTest {
                 .appeal(Appeal.builder().build())
                 .build();
 
+    }
+
+    @Test
+    public void givenNoDwpDocument_thenDwpUploadedCollectionIsUpdated() {
+        DwpDocument dwpResponseDocument = DwpDocument.builder().value(DwpDocumentDetails.builder()
+                .documentLink(DocumentLink.builder().documentFilename("response.pdf")
+                        .documentBinaryUrl("/responsebinaryurl").documentUrl("/responseurl").build())
+                .documentType(DwpDocumentType.DWP_RESPONSE.getValue()).build()).build();
+        DwpDocument dwpAt38Document = DwpDocument.builder().value(DwpDocumentDetails.builder()
+                .documentLink(DocumentLink.builder().documentFilename("at38.pdf")
+                        .documentBinaryUrl("/binaryurl").documentUrl("/url").build())
+                .documentType(DwpDocumentType.AT_38.getValue()).build()).build();
+        DwpDocument dwpEvidenceDocument = DwpDocument.builder().value(DwpDocumentDetails.builder()
+                .documentLink(DocumentLink.builder().documentFilename("evidence.pdf")
+                        .documentBinaryUrl("/evidencebinaryurl").documentUrl("/evidenceurl").build())
+                .documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue()).build()).build();
+        SscsCaseData caseData = SscsCaseData.builder()
+                .dwpResponseDocument(new DwpResponseDocument(dwpResponseDocument.getValue().getDocumentLink(),
+                                dwpResponseDocument.getValue().getDocumentFileName()))
+                .dwpAT38Document(new DwpResponseDocument(dwpAt38Document.getValue().getDocumentLink(),
+                        dwpAt38Document.getValue().getDocumentFileName()))
+                .dwpEvidenceBundleDocument(new DwpResponseDocument(dwpEvidenceDocument.getValue().getDocumentLink(),
+                        dwpEvidenceDocument.getValue().getDocumentFileName())).build();
+
+        dwpDocumentService.moveDocsToCorrectCollection(caseData);
+
+        String todayDate = now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        assertThat(caseData.getDwpDocuments(), hasItem(
+                hasProperty("value", allOf(
+                        hasProperty("documentLink", allOf(
+                                hasProperty("documentUrl", is("/evidenceurl")),
+                                hasProperty("documentBinaryUrl", is("/evidencebinaryurl")),
+                                hasProperty("documentFilename",
+                                        is("FTA evidence received on " + todayDate + ".pdf"))
+                        ))
+                ))
+        ));
+
+        assertThat(caseData.getDwpDocuments(), hasItem(
+                hasProperty("value", allOf(
+                        hasProperty("documentLink", allOf(
+                                hasProperty("documentUrl", is("/responseurl")),
+                                hasProperty("documentBinaryUrl", is("/responsebinaryurl")),
+                                hasProperty("documentFilename",
+                                        is("FTA response received on " + todayDate + ".pdf"))
+                        ))
+                ))
+        ));
+
+        assertThat(caseData.getDwpDocuments(), hasItem(
+                hasProperty("value", allOf(
+                        hasProperty("documentLink", allOf(
+                                hasProperty("documentUrl", is("/url")),
+                                hasProperty("documentBinaryUrl", is("/binaryurl")),
+                                hasProperty("documentFilename", is("AT38 received on " + todayDate + ".pdf"))
+                        )),
+                        hasProperty("documentFileName", is("AT38 received on " + todayDate))
+                ))
+        ));
+
+        assertNull(caseData.getDwpResponseDocument());
+        assertNull(caseData.getDwpAT38Document());
+        assertNull(caseData.getDwpEvidenceBundleDocument());
     }
 
     @Test

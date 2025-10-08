@@ -1,0 +1,29 @@
+[
+  {
+    "CaseEventID": "amendHearingOutcome",
+    "CaseFieldID": "hearingOutcomes",
+    "ListElementCode": "hearingOutcomeId",
+    "ID": "hearingOutcomeDetailsOutcomeId",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "13/01/2025",
+    "FieldDisplayOrder": 1
+  },
+  {
+    "CaseEventID": "amendHearingOutcome",
+    "CaseFieldID": "hearingOutcomes",
+    "ListElementCode": "didPoAttendHearing",
+    "ID": "hearingOutcomeDetailsDidPoAttendHearing",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "13/01/2025",
+    "FieldDisplayOrder": 2
+  },
+  {
+    "CaseEventID": "amendHearingOutcome",
+    "CaseFieldID": "hearingOutcomes",
+    "ListElementCode": "completedHearings",
+    "ID": "hearingOutcomeCompletedHearings",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "13/01/2025",
+    "FieldDisplayOrder": 3
+  }
+]

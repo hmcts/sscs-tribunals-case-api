@@ -8,7 +8,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_CASE_ONLY;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsMappingBase.BENEFIT_CODE;
@@ -29,14 +28,33 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseAccessManagementFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLinkDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseManagementLocation;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DateRange;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsIndustrialInjuriesData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.exception.GetCaseException;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
+import uk.gov.hmcts.reform.sscs.helper.mapping.ServiceHearingValuesMapping;
 import uk.gov.hmcts.reform.sscs.model.service.ServiceHearingRequest;
+import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.PartyDetails;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.ServiceHearingValues;
 import uk.gov.hmcts.reform.sscs.model.service.linkedcases.ServiceLinkedCases;
-import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
-import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,16 +63,11 @@ class ServiceHearingsServiceTest {
     private static final long CASE_ID = 12345L;
 
     @Mock
-    private SessionCategoryMapService sessionCategoryMaps;
-
-    @Mock
-    private VenueService venueService;
-
-    @Mock
     private ReferenceDataServiceHolder refData;
-
     @Mock
     private CcdCaseService ccdCaseService;
+    @Mock
+    private ServiceHearingValuesMapping serviceHearingValuesMapping;
 
     @InjectMocks
     private ServiceHearingsService serviceHearingsService;
@@ -62,11 +75,10 @@ class ServiceHearingsServiceTest {
     private SscsCaseData caseData;
     private SscsCaseDetails caseDetails;
 
-
     @BeforeEach
     void setup() {
         caseData = SscsCaseData.builder()
-            .ccdCaseId("1234")
+            .ccdCaseId(String.valueOf(CASE_ID))
             .benefitCode(BENEFIT_CODE)
             .issueCode(ISSUE_CODE)
             .urgentCase("Yes")
@@ -123,34 +135,6 @@ class ServiceHearingsServiceTest {
             .build();
     }
 
-    @DisplayName("When a case data is retrieved an entity which does not have a Id, that a new Id will be generated and the method updateCaseData will be called once")
-    @Test
-    void testGetServiceHearingValuesNoIds() throws Exception {
-        ServiceHearingRequest request = ServiceHearingRequest.builder()
-            .caseId(String.valueOf(CASE_ID))
-            .build();
-
-        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE,ISSUE_CODE,true,false))
-            .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                false,false, SessionCategory.CATEGORY_03,null));
-
-        given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
-
-        given(venueService.getEpimsIdForVenue(caseData.getProcessingVenue())).willReturn("9876");
-
-        given(refData.getVenueService()).willReturn(venueService);
-
-        given(ccdCaseService.getCaseDetails(String.valueOf(CASE_ID))).willReturn(caseDetails);
-
-        ServiceHearingValues result = serviceHearingsService.getServiceHearingValues(request);
-
-        assertThat(result.getParties())
-            .extracting("partyID")
-            .doesNotContainNull();
-
-        verify(ccdCaseService, times(1)).updateCaseData(any(SscsCaseData.class), eq(UPDATE_CASE_ONLY), anyString(), anyString());
-    }
-
     @DisplayName("When a listing error is throw due to invalid excluded dates, then catch the error, send a listing error event and rethrow the error")
     @Test
     void testGetServiceHearingValuesInvalidDateRange() throws Exception {
@@ -163,17 +147,9 @@ class ServiceHearingsServiceTest {
                 .build())
              .build()));
 
-        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE,ISSUE_CODE,true,false))
-            .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                                               false,false, SessionCategory.CATEGORY_03,null));
-
-        given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
-
-        given(venueService.getEpimsIdForVenue(caseData.getProcessingVenue())).willReturn("9876");
-
-        given(refData.getVenueService()).willReturn(venueService);
-
         given(ccdCaseService.getCaseDetails(String.valueOf(CASE_ID))).willReturn(caseDetails);
+
+        given(serviceHearingValuesMapping.mapServiceHearingValues(any(), any())).willThrow(new ListingException("Invalid date range"));
 
         ServiceHearingRequest request = ServiceHearingRequest.builder()
             .caseId(String.valueOf(CASE_ID))
@@ -195,23 +171,17 @@ class ServiceHearingsServiceTest {
         caseData.getAppeal().getRep().setId("9f6fe72e-7e6e-4ad5-9a47-e70fc37e9de4");
         caseData.getJointParty().setId("c11dc4a2-0447-4cd2-80fe-250df5c8d0a9");
 
-        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE,ISSUE_CODE,true,false))
-            .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                false,false, SessionCategory.CATEGORY_03,null));
-
-        given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
-
-        given(venueService.getEpimsIdForVenue(caseData.getProcessingVenue())).willReturn("9876");
-
-        given(refData.getVenueService()).willReturn(venueService);
-
         given(ccdCaseService.getCaseDetails(String.valueOf(CASE_ID))).willReturn(caseDetails);
+
+        given(serviceHearingValuesMapping
+                .mapServiceHearingValues(caseData, refData))
+                .willReturn(ServiceHearingValues.builder().parties(List.of(PartyDetails.builder().partyID("1234").build())).build());
 
         ServiceHearingValues result = serviceHearingsService.getServiceHearingValues(request);
 
         assertThat(result.getParties())
-            .extracting("partyID")
-            .doesNotContainNull();
+                .extracting("partyID")
+                .doesNotContainNull();
 
         verify(ccdCaseService, never()).updateCaseData(any(SscsCaseData.class), any(EventType.class), anyString(), anyString());
     }
@@ -294,8 +264,6 @@ class ServiceHearingsServiceTest {
 
         assertThat(result.get(0)).isEqualTo(expected);
     }
-
-
 
     private static Stream<Arguments> invalidCasesParameters() {
         return Stream.of(

@@ -13,6 +13,7 @@ import junitparams.Parameters;
 import org.apache.http.HttpResponse;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.ClassRule;
@@ -43,7 +44,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
     public void scenario1_refused_non_support_group_less_than_15pts_sch2_reg29NotApplies_shouldGeneratePdfWithExpectedText() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/esaRefusedNonSupportGroupOnlyCallback.json");
         byte[] bytes = callPreviewFinalDecision(json);
-        try (PDDocument document = PDDocument.load(bytes)) {
+        try (PDDocument document = Loader.loadPDF(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
@@ -64,7 +65,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
     public void scenario2_refused_isSupportGroup_noSch3_Reg29NotApplies_shouldGeneratePdfWithExpectedText() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/esaRefusedSupportNoSch3NoReg35Callback.json");
         byte[] bytes = callPreviewFinalDecision(json);
-        try (PDDocument document = PDDocument.load(bytes)) {
+        try (PDDocument document = Loader.loadPDF(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
@@ -84,7 +85,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
     public void scenario3_allowed_isSupportGroup_noSch3_Reg35Applies() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/esaAllowedSupportNoSch3NoReg35Callback.json");
         byte[] bytes = callPreviewFinalDecision(json);
-        try (PDDocument document = PDDocument.load(bytes)) {
+        try (PDDocument document = Loader.loadPDF(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
@@ -105,7 +106,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
     public void scenario4_allowed_isSupportGroup_selectionMadeForSch3() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/esaAllowedIsSupportGroupSch3SelectionMadeCallback.json");
         byte[] bytes = callPreviewFinalDecision(json);
-        try (PDDocument document = PDDocument.load(bytes)) {
+        try (PDDocument document = Loader.loadPDF(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
@@ -126,7 +127,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
     public void scenario5_allowed_notSupportGroup_moreThan15Points_noSch3_NoReg35() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/esaAllowedNonSupportGroupNoSch3NoReg35Callback.json");
         byte[] bytes = callPreviewFinalDecision(json);
-        try (PDDocument document = PDDocument.load(bytes)) {
+        try (PDDocument document = Loader.loadPDF(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
@@ -154,7 +155,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         String date = dateObj.format(formatter);
 
-        try (PDDocument document = PDDocument.load(bytes)) {
+        try (PDDocument document = Loader.loadPDF(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
@@ -180,7 +181,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
     public void scenario7_allowed_notSupportGroup_lessThan15Points_Reg29Applies_noSch3_noReg35() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/esaAllowedNonSupportGroupLessThan15ptsReg29AppliesNoSch3NoReg35Callback.json");
         byte[] bytes = callPreviewFinalDecision(json);
-        try (PDDocument document = PDDocument.load(bytes)) {
+        try (PDDocument document = Loader.loadPDF(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
@@ -204,7 +205,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
     public void scenario8_allowed_notSupportGroup_LessThan15PointsSch2_Reg29Applies_Reg35Applies() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/esaAllowedNoSupportGroupLessThan15PointsReg29AndReg35AppliesCallback.json");
         byte[] bytes = callPreviewFinalDecision(json);
-        try (PDDocument document = PDDocument.load(bytes)) {
+        try (PDDocument document = Loader.loadPDF(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
@@ -235,7 +236,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/esaDwpReassessTheAwardCallback.json");
         json = json.replaceAll("DWP_REASSESS_THE_AWARD", code);
         byte[] bytes = callPreviewFinalDecision(json);
-        try (PDDocument document = PDDocument.load(bytes)) {
+        try (PDDocument document = Loader.loadPDF(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
@@ -267,7 +268,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/esaDwpReassessTheAwardCallbackZeroPoints.json");
         json = json.replaceAll("DWP_REASSESS_THE_AWARD", code);
         byte[] bytes = callPreviewFinalDecision(json);
-        try (PDDocument document = PDDocument.load(bytes)) {
+        try (PDDocument document = Loader.loadPDF(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
@@ -288,7 +289,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
     public void scenario9_allowed_notSupportGroup_lessThan15Points_Reg29Applies_Sch3Applies() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/esaAllowedNonSupportGroupLessThan15ptsReg29AppliesSch3AppliesCallback.json");
         byte[] bytes = callPreviewFinalDecision(json);
-        try (PDDocument document = PDDocument.load(bytes)) {
+        try (PDDocument document = Loader.loadPDF(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
@@ -313,7 +314,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/esaAllowedNonWcaCallback.json");
         json = json.replaceFirst("allowed", "refused");
         byte[] bytes = callPreviewFinalDecision(json);
-        try (PDDocument document = PDDocument.load(bytes)) {
+        try (PDDocument document = Loader.loadPDF(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
@@ -331,7 +332,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
     public void scenario11_allowed_nonWcaAppeal() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/esaAllowedNonWcaCallback.json");
         byte[] bytes = callPreviewFinalDecision(json);
-        try (PDDocument document = PDDocument.load(bytes)) {
+        try (PDDocument document = Loader.loadPDF(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
@@ -349,7 +350,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
     public void scenario12_allowed_notSupportGroup_moreThan15Points_noSch3_Reg35Applies() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/esaAllowedNonSupportGroupNoSch3Reg35AppliesCallback.json");
         byte[] bytes = callPreviewFinalDecision(json);
-        try (PDDocument document = PDDocument.load(bytes)) {
+        try (PDDocument document = Loader.loadPDF(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));

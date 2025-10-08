@@ -18,7 +18,8 @@ public class ClearHmctsDwpStateHandler implements PreSubmitCallbackHandler<SscsC
         requireNonNull(callbackType, "callbackType must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == EventType.SEND_TO_DWP_OFFLINE;
+                && (callback.getEvent() == EventType.SEND_TO_DWP_OFFLINE
+                || callback.getEvent() ==  EventType.CLEAR_FAILED_FE_FILTER);
     }
 
     @Override

@@ -5,33 +5,37 @@ import static java.util.Objects.requireNonNull;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.helper.SscsHelper;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
-import uk.gov.hmcts.reform.sscs.service.servicebus.HearingMessagingServiceFactory;
+import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingRequestHandler;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
 @Slf4j
 public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final boolean gapsSwitchOverFeature;
+    static final String EXISTING_HEARING_WARNING = "There is already a hearing request in List assist, "
+            + "are you sure you want to send another request? If you do proceed, then please cancel the existing hearing request first";
+    static final String GAPS_CASE_WARNING = "This is a GAPS case, If you do want to proceed, "
+            + "then please change the hearing route to List Assist";
 
     private final RegionalProcessingCenterService regionalProcessingCenterService;
+    private final HearingRequestHandler hearingRequestHandler;
 
-    private final HearingMessagingServiceFactory hearingMessagingServiceFactory;
-
-    public ReadyToListAboutToSubmitHandler(@Value("${feature.gaps-switchover.enabled}") boolean gapsSwitchOverFeature,
-                                           @Autowired RegionalProcessingCenterService regionalProcessingCenterService,
-                                           @Autowired HearingMessagingServiceFactory hearingMessagingServiceFactory) {
-        this.gapsSwitchOverFeature = gapsSwitchOverFeature;
+    public ReadyToListAboutToSubmitHandler(@Autowired RegionalProcessingCenterService regionalProcessingCenterService,
+                                       @Autowired HearingRequestHandler hearingRequestHandler) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
-        this.hearingMessagingServiceFactory = hearingMessagingServiceFactory;
+        this.hearingRequestHandler = hearingRequestHandler;
     }
 
     @Override
@@ -39,8 +43,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
-        return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent() == EventType.READY_TO_LIST;
+        return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT) && callback.getEvent() == EventType.READY_TO_LIST;
     }
 
     @Override
@@ -52,31 +55,31 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        if (HearingRoute.GAPS == sscsCaseData.getSchedulingAndListingFields().getHearingRoute()) {
+        if (!sscsCaseData.isIbcCase() && HearingRoute.GAPS == sscsCaseData.getSchedulingAndListingFields().getHearingRoute()) {
 
-            if (!callback.isIgnoreWarnings() && !YesNo.YES.equals(sscsCaseData.getIgnoreCallbackWarnings())) {
-                PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
-                String gapsProceedWarning = "This is a GAPS case, If you do want to proceed, "
-                    + "then please change the hearing route to List Assist";
-                response.addWarning(gapsProceedWarning);
+            if (warningsShouldNotBeIgnored(callback)) {
+                var response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
+                response.addWarning(GAPS_CASE_WARNING);
+                log.warn("Warning: {}", GAPS_CASE_WARNING);
                 return response;
             }
 
-            return HearingHandler.GAPS.handle(sscsCaseData, gapsSwitchOverFeature,
-                hearingMessagingServiceFactory.getMessagingService(HearingRoute.GAPS));
+            return HearingHandler.GAPS.handle(sscsCaseData, hearingRequestHandler);
         }
 
-        if (SscsHelper.hasHearingScheduledInTheFuture(sscsCaseData)
-                && !callback.isIgnoreWarnings()) {
-            PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
-            String listAssistExistsWarning = "There is already a hearing request in List assist, "
-                + "are you sure you want to send another request? If you do proceed, then please cancel the existing hearing request first";
-            response.addWarning(listAssistExistsWarning);
+        if (SscsHelper.hasHearingScheduledInTheFuture(sscsCaseData) && warningsShouldNotBeIgnored(callback)) {
+            var response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
+            response.addWarning(EXISTING_HEARING_WARNING);
+            log.warn("Warning: {}", EXISTING_HEARING_WARNING);
             return response;
         }
-        
+
         String region = sscsCaseData.getRegion();
 
+        if (sscsCaseData.isIbcCase()) {
+            SscsUtil.setListAssistRoutes(sscsCaseData);
+            return HearingHandler.valueOf(HearingRoute.LIST_ASSIST.name()).handle(sscsCaseData, hearingRequestHandler);
+        }
         Map<String, RegionalProcessingCenter> regionalProcessingCenterMap = regionalProcessingCenterService
                 .getRegionalProcessingCenterMap();
 
@@ -85,7 +88,10 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
                 .map(RegionalProcessingCenter::getHearingRoute)
                 .findFirst().orElse(HearingRoute.GAPS);
 
-        return HearingHandler.valueOf(route.name()).handle(sscsCaseData, gapsSwitchOverFeature,
-            hearingMessagingServiceFactory.getMessagingService(route));
+        return HearingHandler.valueOf(route.name()).handle(sscsCaseData, hearingRequestHandler);
+    }
+
+    boolean warningsShouldNotBeIgnored(Callback<SscsCaseData> callback) {
+        return !callback.isIgnoreWarnings() && !YesNo.YES.equals(callback.getCaseDetails().getCaseData().getIgnoreCallbackWarnings());
     }
 }

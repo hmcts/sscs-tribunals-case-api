@@ -5,25 +5,49 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_1;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_2;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_3;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_4;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_POSTCODE;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_1_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_2_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_3_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_4_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_5_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.defaultToEmptyStringIfNull;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.truncateAddressLine;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists.EVENTS_FOR_ACTION_FURTHER_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.hasAppointee;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ReasonableAdjustments;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
@@ -35,6 +59,12 @@ public class LetterUtils {
 
     private LetterUtils() {
         // Hiding utility class constructor
+    }
+
+    public enum LetterType {
+        DOCMOSIS,
+        GOV_NOTIFY,
+        PLACEHOLDER_SERVICE
     }
 
     public static Address getAddressToUseForLetter(NotificationWrapper wrapper, SubscriptionWithType subscriptionWithType) {
@@ -98,7 +128,7 @@ public class LetterUtils {
 
     public static byte[] addBlankPageAtTheEndIfOddPage(byte[] letter) throws IOException {
         if (ArrayUtils.isNotEmpty(letter)) {
-            PDDocument loadDoc = PDDocument.load(letter);
+            PDDocument loadDoc = Loader.loadPDF(letter);
             if (loadDoc.getNumberOfPages() % 2 != 0) {
                 final PDPage blankPage = new PDPage(PDRectangle.A4);
                 // need to add PDPageContentStream here to pass gov notify validation!
@@ -120,9 +150,9 @@ public class LetterUtils {
 
     public static byte[] buildBundledLetter(byte[] coveringLetter, byte[] directionText) throws IOException {
         if (coveringLetter != null && directionText != null) {
-            PDDocument bundledLetter = PDDocument.load(coveringLetter);
+            PDDocument bundledLetter = Loader.loadPDF(coveringLetter);
 
-            PDDocument loadDoc = PDDocument.load(directionText);
+            PDDocument loadDoc = Loader.loadPDF(directionText);
 
             final PDFMergerUtility merger = new PDFMergerUtility();
             merger.appendDocument(bundledLetter, loadDoc);
@@ -321,5 +351,43 @@ public class LetterUtils {
             }
         }
         return false;
+    }
+
+    public static List<String> lines(Address address) {
+        if (isYes(address.getInMainlandUk()) || address.getInMainlandUk() == null) {
+            return Stream.of(address.getLine1(), address.getLine2(), address.getTown(), address.getCounty(), address.getPostcode())
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+        } else {
+            return Stream.of(address.getLine1(), address.getLine2(), address.getTown(), address.getPostcode(), address.getCountry())
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+        }
+    }
+
+    public static Map<String, Object> getAddressPlaceholders(Address address, boolean truncate, LetterType letterType) {
+        HashMap<String, Object> addressPlaceHolders = new HashMap<>();
+        List<String> lines = lines(address);
+        List<String> addressConstants =  new ArrayList<>();
+
+        switch (letterType) {
+            case DOCMOSIS:
+                addressConstants.addAll(List.of(LETTER_ADDRESS_LINE_1, LETTER_ADDRESS_LINE_2, LETTER_ADDRESS_LINE_3, LETTER_ADDRESS_LINE_4, LETTER_ADDRESS_POSTCODE));
+                break;
+            case GOV_NOTIFY:
+                addressConstants.addAll(List.of(ADDRESS_LINE_2, ADDRESS_LINE_3, ADDRESS_LINE_4, ADDRESS_LINE_5, POSTCODE_LITERAL));
+                break;
+            case PLACEHOLDER_SERVICE:
+                addressConstants.addAll(List.of(RECIPIENT_ADDRESS_LINE_1_LITERAL, RECIPIENT_ADDRESS_LINE_2_LITERAL, RECIPIENT_ADDRESS_LINE_3_LITERAL, RECIPIENT_ADDRESS_LINE_4_LITERAL, RECIPIENT_ADDRESS_LINE_5_LITERAL));
+                break;
+            default:
+                throw new IllegalArgumentException("Unexpected value for letterType: " + letterType);
+
+        }
+
+        for (int i = 0; i < lines.size(); i++) {
+            addressPlaceHolders.put(addressConstants.get(i), truncate ? truncateAddressLine(defaultToEmptyStringIfNull(lines.get(i))) : defaultToEmptyStringIfNull(lines.get(i)));
+        }
+        return addressPlaceHolders;
     }
 }

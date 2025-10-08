@@ -2,7 +2,10 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionhearingrecordingrequest;
 
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -21,7 +24,21 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRecordingRequest;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRecordingRequestDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartyHearingRecordingReqUi;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartyHearingRecordingReqUiDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ProcessHearingRecordingRequest;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RequestStatus;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsHearingRecording;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsHearingRecordingCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsHearingRecordingDetails;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 
 @RunWith(JUnitParamsRunner.class)

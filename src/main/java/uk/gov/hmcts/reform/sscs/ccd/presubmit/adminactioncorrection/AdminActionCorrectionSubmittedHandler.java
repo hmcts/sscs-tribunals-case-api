@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adminactioncorrection;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
+import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,7 +11,10 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdminCorrectionType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
@@ -40,7 +44,7 @@ public class AdminActionCorrectionSubmittedHandler implements PreSubmitCallbackH
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
-        String caseId = caseData.getCcdCaseId();
+        long caseId = Long.parseLong(caseData.getCcdCaseId());
         PostHearing postHearing = caseData.getPostHearing();
         AdminCorrectionType adminCorrectionType = postHearing.getCorrection().getAdminCorrectionType();
 
@@ -51,9 +55,14 @@ public class AdminActionCorrectionSubmittedHandler implements PreSubmitCallbackH
         }
 
         log.info("Admin Action Correction: handling adminActionCorrection {} for case {}", adminCorrectionType, caseId);
-        SscsUtil.clearPostHearingFields(caseData, isPostHearingsEnabled);
+        Consumer<SscsCaseData> sscsCaseDataConsumer = sscsCaseData -> SscsUtil.clearPostHearingFields(sscsCaseData, isPostHearingsEnabled);
 
-        caseData = ccdCallbackMapService.handleCcdCallbackMap(adminCorrectionType, caseData);
+        caseData = ccdCallbackMapService.handleCcdCallbackMapV2(
+                adminCorrectionType,
+                caseId,
+                sscsCaseDataConsumer
+        );
+
         return new PreSubmitCallbackResponse<>(caseData);
     }
 }

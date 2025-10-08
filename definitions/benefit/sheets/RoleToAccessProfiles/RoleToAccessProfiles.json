@@ -21,6 +21,15 @@
   {
     "LiveFrom": "18/03/2023",
     "CaseTypeID": "Benefit",
+    "RoleName" : "idam:caseworker-wa-task-configuration",
+    "Authorisation": "",
+    "ReadOnly": "N",
+    "AccessProfiles": "caseworker,caseworker-sscs,caseworker-wa-task-configuration",
+    "Disabled": "N"
+  },
+  {
+    "LiveFrom": "18/03/2023",
+    "CaseTypeID": "Benefit",
     "RoleName": "idam:caseworker-sscs-clerk",
     "Authorisation": "",
     "ReadOnly": "N",
@@ -150,7 +159,7 @@
     "LiveFrom": "18/03/2023",
     "CaseTypeID": "Benefit",
     "RoleName": "idam:caseworker-sscs-ibcaresponsewriter",
-    "CaseAccessCategories": "infectedBloodAppeal",
+    "CaseAccessCategories": "infectedBloodCompensation",
     "Authorisation": "",
     "ReadOnly": "N",
     "AccessProfiles": "caseworker,caseworker-sscs,caseworker-sscs-ibcaresponsewriter",

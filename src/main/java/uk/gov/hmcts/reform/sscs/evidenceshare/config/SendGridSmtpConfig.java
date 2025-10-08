@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.config;
 
+import jakarta.validation.constraints.NotEmpty;
 import java.util.Properties;
-import javax.validation.constraints.NotEmpty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

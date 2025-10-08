@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournment;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod.PROVIDE_DATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod.PROVIDE_PERIOD;
@@ -9,23 +10,24 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType.NON_STANDARD;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType.STANDARD;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.ADJOURNMENT_NOTICE_ISSUED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
-import static uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil.isInterpreterRequired;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getDurationForAdjournment;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.hasChannelChangedForAdjournment;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.hasInterpreterChangedForAdjournment;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -37,6 +39,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.helper.mapping.OverridesMapping;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
@@ -78,6 +81,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         }
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        CaseDetails<SscsCaseData> oldCaseDetails = callback.getCaseDetailsBefore().orElse(null);
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
@@ -94,7 +98,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             calculateDueDate(sscsCaseData);
 
             if (sscsCaseData.getAdjournment().getPreviewDocument() != null) {
-                processResponse(sscsCaseData, preSubmitCallbackResponse, documentTranslationStatus);
+                processResponse(sscsCaseData, preSubmitCallbackResponse, documentTranslationStatus, oldCaseDetails);
             } else {
                 preSubmitCallbackResponse.addError("There is no Draft Adjournment Notice on the case so adjournment cannot be issued");
             }
@@ -104,7 +108,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
     }
 
     private void processResponse(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
-                                 SscsDocumentTranslationStatus documentTranslationStatus) {
+                                 SscsDocumentTranslationStatus documentTranslationStatus, CaseDetails<SscsCaseData> oldCaseDetails) {
         createAdjournmentNoticeFromPreviewDraft(preSubmitCallbackResponse, documentTranslationStatus);
 
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
@@ -122,7 +126,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         updateHearingOptions(sscsCaseData);
         updateRpc(sscsCaseData);
         updatePanelMembers(sscsCaseData);
-        updateOverrideFields(sscsCaseData);
+        updateOverrideFields(sscsCaseData, oldCaseDetails);
 
         if (SscsUtil.isSAndLCase(sscsCaseData) && State.READY_TO_LIST.equals(sscsCaseData.getState())) {
             adjournment.setAdjournmentInProgress(YES);
@@ -250,7 +254,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         }
     }
 
-    private void updateOverrideFields(SscsCaseData caseData) {
+    private void updateOverrideFields(SscsCaseData caseData, CaseDetails<SscsCaseData> oldCaseDetails) {
         OverrideFields fields = caseData.getSchedulingAndListingFields().getOverrideFields();
 
         if (isNull(fields)) {
@@ -283,7 +287,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             }
         }
 
-        if (isYes(adjournment.getInterpreterRequired())) {
+        if (nonNull(adjournment.getInterpreterRequired())) {
             HearingInterpreter interpreter = HearingInterpreter.builder()
                 .interpreterLanguage(adjournment.getInterpreterLanguage())
                 .isInterpreterWanted(adjournment.getInterpreterRequired())
@@ -294,7 +298,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         updateHearingChannelAndWantsToAttend(caseData);
         handleHearingWindow(caseData, fields);
 
-        Integer duration = handleHearingDuration(caseData);
+        Integer duration = handleHearingDuration(caseData, oldCaseDetails);
         fields.setDuration(duration);
     }
 
@@ -319,39 +323,40 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         }
     }
 
-    private Integer handleHearingDuration(SscsCaseData caseData) {
+    private Integer handleHearingDuration(SscsCaseData caseData, CaseDetails<SscsCaseData> oldCaseDetails) {
         AdjournCaseNextHearingDurationType durationType = caseData.getAdjournment().getNextHearingListingDurationType();
 
-        if (STANDARD.equals(durationType)) {
-            OverrideFields defaultListingValues = caseData.getSchedulingAndListingFields().getDefaultListingValues();
-
-            if (nonNull(defaultListingValues)) {
-                Integer existingDuration = caseData.getSchedulingAndListingFields().getDefaultListingValues().getDuration();
-                if (nonNull(existingDuration)) {
-                    if (isYes(caseData.getAppeal().getHearingOptions().getWantsToAttend())
-                            && isInterpreterRequired(caseData)) {
-                        return existingDuration + MIN_HEARING_DURATION;
-                    } else {
-                        return existingDuration;
-                    }
+        if (!NON_STANDARD.equals(durationType)) {
+            Integer duration = getDurationForAdjournment(caseData, hearingDurationsService);
+            HearingOptions hearingOptions = nonNull(oldCaseDetails)
+                    ? ofNullable(oldCaseDetails.getCaseData().getAppeal().getHearingOptions()).orElse(HearingOptions.builder().build())
+                    : HearingOptions.builder().build();
+            String hearingType = nonNull(oldCaseDetails)
+                    ? oldCaseDetails.getCaseData().getAppeal().getHearingType()
+                    : null;
+            boolean hasInterpreterChannelChanged = hasChannelChangedForAdjournment(caseData, hearingType) || hasInterpreterChangedForAdjournment(caseData, hearingOptions);
+            if (hasInterpreterChannelChanged && isNull(duration)) {
+                return null;
+            } else if (!hasInterpreterChannelChanged) {
+                Integer overrideDuration = OverridesMapping.getOverrideFields(caseData).getDuration();
+                if (nonNull(overrideDuration) && overrideDuration >= MIN_HEARING_DURATION) {
+                    return overrideDuration;
                 }
             }
+            return duration;
         }
 
-        if (NON_STANDARD.equals(durationType)) {
-            Integer nextDuration = caseData.getAdjournment().getNextHearingListingDuration();
-            if (nonNull(nextDuration)) {
-                AdjournCaseNextHearingDurationUnits units = caseData.getAdjournment().getNextHearingListingDurationUnits();
-                if (units == AdjournCaseNextHearingDurationUnits.SESSIONS && nextDuration >= MIN_HEARING_SESSION_DURATION) {
-                    return nextDuration * DURATION_SESSIONS_MULTIPLIER;
-                } else if (units == AdjournCaseNextHearingDurationUnits.MINUTES && nextDuration >= MIN_HEARING_DURATION) {
-                    return nextDuration;
-                }
-
-                return DURATION_DEFAULT;
+        Integer nextDuration = caseData.getAdjournment().getNextHearingListingDuration();
+        if (nonNull(nextDuration)) {
+            AdjournCaseNextHearingDurationUnits units = caseData.getAdjournment().getNextHearingListingDurationUnits();
+            if (units == AdjournCaseNextHearingDurationUnits.SESSIONS && nextDuration >= MIN_HEARING_SESSION_DURATION) {
+                return nextDuration * DURATION_SESSIONS_MULTIPLIER;
+            } else if (units == AdjournCaseNextHearingDurationUnits.MINUTES && nextDuration >= MIN_HEARING_DURATION) {
+                return nextDuration;
             }
-        }
 
+            return DURATION_DEFAULT;
+        }
         return hearingDurationsService.getHearingDurationBenefitIssueCodes(caseData);
     }
 
@@ -384,4 +389,5 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             }
         }
     }
+
 }

@@ -13,16 +13,29 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
+import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
-public class CaseUpdatedAboutToStartHandlerTest {
+class CaseUpdatedAboutToStartHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     private SscsCaseData sscsCaseData;
@@ -38,6 +51,9 @@ public class CaseUpdatedAboutToStartHandlerTest {
 
     @Mock
     private VerbalLanguagesService verbalLanguagesService;
+
+    @Mock
+    private SignLanguagesService signLanguagesService;
 
     @InjectMocks
     private CaseUpdatedAboutToStartHandler handler;
@@ -69,33 +85,99 @@ public class CaseUpdatedAboutToStartHandlerTest {
     }
 
     @Test
-    void givenBenefitType_shouldHaveCorrectBenefitSelectionWithInfectedBloodAppealDisabled() {
-        ReflectionTestUtils.setField(handler, "isInfectedBloodAppealEnabled", false);
-
+    void givenBenefitType_shouldHaveCorrectBenefitSelection() {
         var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         var benefitSelection = result.getData().getAppeal().getBenefitType().getDescriptionSelection();
 
         assertThat(benefitSelection).isNotNull();
         assertThat(benefitSelection.getValue()).isNotNull();
         assertThat(benefitSelection.getValue().getCode()).isEqualTo("002");
-        assertThat(benefitSelection.getListItems().size()).isEqualTo(34);
+        assertThat(benefitSelection.getListItems()).hasSize(35);
     }
 
     @Test
-    void givenBenefitType_shouldHaveCorrectBenefitSelectionWithInfectedBloodAppealEnabled() {
-        ReflectionTestUtils.setField(handler, "isInfectedBloodAppealEnabled", true);
-
+    void givenPortOfEntryValueNotNull_shouldNotSetListUp() {
+        DynamicList ukPortOfEntries = SscsUtil.getPortsOfEntry();
+        ukPortOfEntries.setValue(new DynamicListItem("GBSTTRT00", "Althorpe"));
+        sscsCaseData.setBenefitCode("093");
+        sscsCaseData.getAppeal().getAppellant().getAddress().setUkPortOfEntryList(ukPortOfEntries);
         var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        var benefitSelection = result.getData().getAppeal().getBenefitType().getDescriptionSelection();
+        var portOfEntryList = result.getData().getAppeal().getAppellant().getAddress().getUkPortOfEntryList();
+        var portOfEntry = result.getData().getAppeal().getAppellant().getAddress().getUkPortOfEntry();
+        var portOfEntryCode = result.getData().getAppeal().getAppellant().getAddress().getPortOfEntry();
 
-        assertThat(benefitSelection).isNotNull();
-        assertThat(benefitSelection.getValue()).isNotNull();
-        assertThat(benefitSelection.getValue().getCode()).isEqualTo("002");
-        assertThat(benefitSelection.getListItems().size()).isEqualTo(35);
+        assertThat(portOfEntry).isNull();
+        assertThat(portOfEntryCode).isNull();
+        assertThat(portOfEntryList).isNotNull();
+        assertThat(portOfEntryList.getValue().getCode()).isEqualTo("GBSTTRT00");
+        assertThat(portOfEntryList.getValue().getLabel()).isEqualTo("Althorpe");
+        assertThat(portOfEntryList.getListItems()).hasSameSizeAs(ukPortOfEntries.getListItems());
     }
 
     @Test
-    public void givenThatOriginalLanguageFieldIsEmpty_thenSetDynamicListInitialValueToNull() {
+    void givenPortOfEntryValueNull_shouldSetListUpWithNullValue() {
+        DynamicList ukPortOfEntries = SscsUtil.getPortsOfEntry();
+        sscsCaseData.setBenefitCode("093");
+        sscsCaseData.getAppeal().getAppellant().getAddress().setUkPortOfEntryList(ukPortOfEntries);
+        var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        var portOfEntryList = result.getData().getAppeal().getAppellant().getAddress().getUkPortOfEntryList();
+        var portOfEntry = result.getData().getAppeal().getAppellant().getAddress().getUkPortOfEntry();
+        var portOfEntryCode = result.getData().getAppeal().getAppellant().getAddress().getPortOfEntry();
+
+        assertThat(portOfEntry).isNull();
+        assertThat(portOfEntryCode).isNull();
+        assertThat(portOfEntryList).isNotNull();
+        assertThat(portOfEntryList.getValue()).isNull();
+        assertThat(portOfEntryList.getListItems()).hasSize(UkPortOfEntry.values().length);
+    }
+
+    @Test
+    void givenPortOfEntryCode_shouldSetListUpWithValueFromCode() {
+        sscsCaseData.setBenefitCode("093");
+        sscsCaseData.getAppeal().getAppellant().getAddress().setPortOfEntry("GBSTTRT00");
+        var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        var portOfEntryList = result.getData().getAppeal().getAppellant().getAddress().getUkPortOfEntryList();
+        var portOfEntry = result.getData().getAppeal().getAppellant().getAddress().getUkPortOfEntry();
+        var portOfEntryCode = result.getData().getAppeal().getAppellant().getAddress().getPortOfEntry();
+
+        assertThat(portOfEntry.getLocationCode()).isEqualTo("GBSTTRT00");
+        assertThat(portOfEntry.getLabel()).isEqualTo("Althorpe");
+        assertThat(portOfEntryCode).isEqualTo("GBSTTRT00");
+        assertThat(portOfEntryList).isNotNull();
+        assertThat(portOfEntryList.getValue().getCode()).isEqualTo("GBSTTRT00");
+        assertThat(portOfEntryList.getValue().getLabel()).isEqualTo("Althorpe");
+        assertThat(portOfEntryList.getListItems()).hasSize(UkPortOfEntry.values().length);
+    }
+
+    @Test
+    void givenNoPortOfEntryCode_shouldSetListUpWithNullValue() {
+        sscsCaseData.setBenefitCode("093");
+        var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        var portOfEntryList = result.getData().getAppeal().getAppellant().getAddress().getUkPortOfEntryList();
+        var portOfEntry = result.getData().getAppeal().getAppellant().getAddress().getUkPortOfEntry();
+        var portOfEntryCode = result.getData().getAppeal().getAppellant().getAddress().getPortOfEntry();
+
+        assertThat(portOfEntry).isNull();
+        assertThat(portOfEntryCode).isNull();
+        assertThat(portOfEntryList).isNotNull();
+        assertThat(portOfEntryList.getValue()).isNull();
+        assertThat(portOfEntryList.getListItems()).hasSize(UkPortOfEntry.values().length);
+    }
+
+    @Test
+    void givenNonIbcCase_shouldNotSetListUp() {
+        var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        var portOfEntryList = result.getData().getAppeal().getAppellant().getAddress().getUkPortOfEntryList();
+        var portOfEntry = result.getData().getAppeal().getAppellant().getAddress().getUkPortOfEntry();
+        var portOfEntryCode = result.getData().getAppeal().getAppellant().getAddress().getPortOfEntry();
+
+        assertThat(portOfEntry).isNull();
+        assertThat(portOfEntryCode).isNull();
+        assertThat(portOfEntryList).isNull();
+    }
+
+    @Test
+    void givenThatOriginalLanguageFieldIsEmpty_thenSetDynamicListInitialValueToNull() {
         sscsCaseData = CaseDataUtils.buildCaseData();
         sscsCaseData.getAppeal().getHearingOptions().setLanguages(null);
 
@@ -114,7 +196,7 @@ public class CaseUpdatedAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenThatOriginalLanguageFieldIsNonEmpty_thenSetDynamicListInitialValue() {
+    void givenThatOriginalLanguageFieldIsNonEmpty_thenSetDynamicListInitialValue() {
         sscsCaseData = CaseDataUtils.buildCaseData();
         sscsCaseData.getAppeal().getHearingOptions().setLanguages("Welsh");
 
@@ -135,7 +217,29 @@ public class CaseUpdatedAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenThatOriginalLanguageFieldIsNonEmptyandInvalid_thenSetDynamicListInitialValue() {
+    void givenThatOriginalLanguageFieldIsSignLanguage_thenSetDynamicListInitialValue() {
+        sscsCaseData = CaseDataUtils.buildCaseData();
+        sscsCaseData.getAppeal().getHearingOptions().setLanguages("British Sign Language (BSL)");
+
+        DynamicListItem item = new DynamicListItem("bfi", "British Sign Language (BSL)");
+        DynamicList list = new DynamicList(null, List.of(item));
+
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(dynamicListLanguageUtil.generateInterpreterLanguageFields(any())).willReturn(list);
+        given(dynamicListLanguageUtil.getLanguageDynamicListItem(any())).willReturn(item);
+        given(verbalLanguagesService.getVerbalLanguage(any())).willReturn(null);
+        given(signLanguagesService.getSignLanguage(any())).willReturn(new Language("bfi", "British Sign Language (BSL)"));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(hearingOptions.getLanguagesList()).isNotNull();
+        assertThat(hearingOptions.getLanguagesList().getValue().getLabel()).isEqualTo("British Sign Language (BSL)");
+    }
+
+    @Test
+    void givenThatOriginalLanguageFieldIsNonEmptyandInvalid_thenSetDynamicListInitialValue() {
         sscsCaseData = CaseDataUtils.buildCaseData();
         sscsCaseData.getAppeal().getHearingOptions().setLanguages("Wales");
 
@@ -146,6 +250,7 @@ public class CaseUpdatedAboutToStartHandlerTest {
         given(dynamicListLanguageUtil.generateInterpreterLanguageFields(any())).willReturn(list);
         given(dynamicListLanguageUtil.getLanguageDynamicListItem(any())).willReturn(item);
         given(verbalLanguagesService.getVerbalLanguage(any())).willReturn(null);
+        given(signLanguagesService.getSignLanguage(any())).willReturn(null);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();

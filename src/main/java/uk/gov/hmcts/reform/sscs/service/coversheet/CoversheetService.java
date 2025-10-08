@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.OnlineHearingService;
 import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.PdfService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils;
 
 @Service
 public class CoversheetService {
@@ -47,15 +48,20 @@ public class CoversheetService {
                     String derivedTemplate = documentConfiguration.getEvidence()
                             .get(sscsCaseData.getLanguagePreference()).get(TEMPLATE);
                     Address address = sscsCaseData.getAppeal().getAppellant().getAddress();
+                    var lines = LetterUtils.lines(address);
+                    for (int i = lines.size(); i < 5; i++) {
+                        lines.add("");
+                    }
 
+                    var lineNum = 0;
                     PdfCoverSheet pdfCoverSheet = new PdfCoverSheet(
                             "" + sscsCase.getId(),
                             sscsCaseData.getAppeal().getAppellant().getName().getFullNameNoTitle(),
-                            address.getLine1(),
-                            address.getLine2(),
-                            address.getTown(),
-                            address.getCounty(),
-                            address.getPostcode(),
+                            lines.get(lineNum++),
+                            lines.get(lineNum++),
+                            lines.get(lineNum++),
+                            lines.get(lineNum++),
+                            lines.get(lineNum),
                             documentConfiguration.getEvidence()
                                     .get(LanguagePreference.ENGLISH).get(HMCTS_IMG_VALUE),
                             documentConfiguration.getEvidence()

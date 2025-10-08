@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @EqualsAndHashCode
 public class EvidenceDescription {
-    @Schema(example = "this is a description of the evidence", required = false)
+    @Schema(example = "this is a description of the evidence", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @JsonProperty(value = "body")
     private String body;
 

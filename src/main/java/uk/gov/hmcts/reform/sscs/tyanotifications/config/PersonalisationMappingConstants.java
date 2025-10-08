@@ -9,6 +9,7 @@ public final class PersonalisationMappingConstants {
     public static final String ADDRESS_LINE_4 = "address_line_4";
     public static final String ADDRESS_LINE_5 = "address_line_5";
     public static final String ADDRESS_LINE_LITERAL = "address_line";
+
     public static final String ADDRESS_NAME = "address_name";
     public static final String APPEAL_ID_LITERAL = "appeal_id";
     public static final String APPEAL_REF = "appeal_ref";
@@ -63,12 +64,15 @@ public final class PersonalisationMappingConstants {
     public static final String HEARING_DATE_WELSH = "welsh_hearing_date";
     public static final String HEARING_DETAILS_LITERAL = "hearing_details";
     public static final String HEARING_DETAILS_LITERAL_WELSH = "welsh_hearing_details";
+    public static final String HMC_HEARING_TYPE_LITERAL = "hmc_hearing_type";
     public static final String HEARING_INFO_LINK_LITERAL = "hearing_info_link";
     public static final String HEARING_TIME = "hearing_time";
     public static final String HEARING_TYPE = "hearing_type";
     public static final String HELPLINE_PHONE_NUMBER = "helpline_phone_number";
     public static final String INFO_REQUEST_DETAIL = "info_request_detail";
     public static final String IS_GRANTED = "isGranted";
+    public static final String IS_IBC_CASE = "is_ibc_case";
+    public static final String IS_NOT_IBC_CASE = "is_not_ibc_case";
     public static final String IS_OTHER_PARTY = "is_other_party";
     public static final String JOINT = "joint";
     public static final String JOINT_PARTY = "joint_party";
@@ -80,6 +84,7 @@ public final class PersonalisationMappingConstants {
     public static final String LETTER_ADDRESS_LINE_3 = "letter_address_line_3";
     public static final String LETTER_ADDRESS_LINE_4 = "letter_address_line_4";
     public static final String LETTER_ADDRESS_POSTCODE = "letter_address_postcode";
+
     public static final String NAME = "name";
     public static final String MANAGE_EMAILS_LINK_LITERAL = "manage_emails_link";
     public static final String MRN_DETAILS_LITERAL = "mrn_details";
@@ -126,6 +131,7 @@ public final class PersonalisationMappingConstants {
     public static final String SENDER_NAME = "sender_name";
     public static final String LETTER_CONTENT_TYPE = "letter_content_type";
     public static final String FURTHER_EVIDENCE_ACTION = "further_evidence_action";
+    public static final String POSTPONEMENT_REQUEST = "postponement_request";
 
     private PersonalisationMappingConstants() {
         //

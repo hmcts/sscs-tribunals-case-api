@@ -41,13 +41,13 @@ public class OnlineHearing {
         this.appealDetails = appealDetails;
     }
 
-    @Schema(example = "ID_1", required = true)
+    @Schema(example = "ID_1", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "online_hearing_id")
     public String getOnlineHearingId() {
         return onlineHearingId;
     }
 
-    @Schema(example = "Joe Smith", required = true)
+    @Schema(example = "Joe Smith", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "appellant_name")
     public String getAppellantName() {
         return appellantName;
@@ -59,7 +59,7 @@ public class OnlineHearing {
         return caseReference;
     }
 
-    @Schema(example = "123456789", required = true)
+    @Schema(example = "123456789", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "case_id")
     public Long getCaseId() {
         return caseId;

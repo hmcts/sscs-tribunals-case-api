@@ -49,6 +49,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
@@ -62,15 +63,18 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     public static final int NEW_OTHER_PARTY_RESPONSE_DUE_DAYS = 14;
     private final DwpDocumentService dwpDocumentService;
     private final AddNoteService addNoteService;
+    private final PanelCompositionService panelCompositionService;
     private final AddedDocumentsUtil addedDocumentsUtil;
     private static final Enum<EventType> EVENT_TYPE = EventType.DWP_UPLOAD_RESPONSE;
 
 
     @Autowired
     public DwpUploadResponseAboutToSubmitHandler(DwpDocumentService dwpDocumentService, AddNoteService addNoteService,
-                                                 AddedDocumentsUtil addedDocumentsUtil) {
+                                                 AddedDocumentsUtil addedDocumentsUtil,
+                                                 PanelCompositionService panelCompositionService) {
         this.dwpDocumentService = dwpDocumentService;
         this.addNoteService = addNoteService;
+        this.panelCompositionService = panelCompositionService;
         this.addedDocumentsUtil = addedDocumentsUtil;
     }
 
@@ -95,6 +99,17 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         if (isNotEmpty(preSubmitCallbackResponse.getErrors())) {
             return preSubmitCallbackResponse;
+        }
+
+        if (sscsCaseData.isIbcCase()) {
+            final String benefitCode = sscsCaseData.getBenefitCodeIbcaOnly();
+            sscsCaseData.setBenefitCode(benefitCode);
+
+            final String issueCode = sscsCaseData.getIssueCodeIbcaOnly();
+            sscsCaseData.setIssueCode(issueCode);
+
+            sscsCaseData.setBenefitCodeIbcaOnly(null);
+            sscsCaseData.setIssueCodeIbcaOnly(null);
         }
 
         updateDwpState(sscsCaseData);
@@ -123,11 +138,15 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                 sscsCaseData.setDwpDueDate(null);
             }
         }
+
         sscsCaseData.setDirectionDueDate(getUpdatedDirectionDueDate(sscsCaseData));
         updateBenefitType(sscsCaseData);
+
+        sscsCaseData.setPanelMemberComposition(panelCompositionService
+                .resetPanelCompositionIfStale(sscsCaseData, callback.getCaseDetailsBefore()));
+
         return preSubmitCallbackResponse;
     }
-
 
     private void updateBenefitType(SscsCaseData caseData) {
         String benefitCode = caseData.getBenefitCode();
@@ -365,5 +384,4 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                                 .build()
                 ).build());
     }
-
 }

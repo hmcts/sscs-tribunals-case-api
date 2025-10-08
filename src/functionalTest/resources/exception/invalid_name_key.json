@@ -1,0 +1,31 @@
+{
+  "id": "id",
+  "case_type_id": "case_type_id",
+  "po_box": "po_box",
+  "po_box_jurisdiction": "bulkscan",
+  "form_type": "SSCS1",
+  "journey_classification": "NEW_APPLICATION",
+  "delivery_date": "2019-08-01T01:02:03.456Z",
+  "opening_date": "2019-08-02T02:03:04.567Z",
+  "scanned_documents": [
+    {
+      "type": "Form",
+      "subtype": "XYZ",
+      "url": {
+        "document_url": "url",
+        "document_binary_url": "binary-url",
+        "document_filename": "987654321-123456789.pdf"
+      },
+      "control_number": "987654321",
+      "file_name": "987654321-123456789.pdf",
+      "scanned_date": "2019-08-01T00:01:02.345Z",
+      "delivery_date": "2019-08-01T01:02:03.456Z"
+    }
+  ],
+  "ocr_data_fields": [
+    {
+      "name": "first_name",
+      "value": "FIRST"
+    }
+  ]
+}

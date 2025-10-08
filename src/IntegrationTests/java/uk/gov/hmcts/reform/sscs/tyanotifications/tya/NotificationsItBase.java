@@ -2,8 +2,15 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.tya;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.atMost;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPELLANT_NAME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.NAME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.REPRESENTATIVE_NAME;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -25,9 +32,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
@@ -43,11 +50,22 @@ import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.DocmosisPdfService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationConfig;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationTestRecipients;
 import uk.gov.hmcts.reform.sscs.tyanotifications.controller.NotificationController;
-import uk.gov.hmcts.reform.sscs.tyanotifications.controller.ReminderTestController;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationFactory;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.*;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.MarkdownTransformationService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationHandler;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationValidService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.OutOfHoursCalculator;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.ReminderService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.SaveCorrespondenceAsyncService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.SendNotificationService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis.PdfLetterService;
-import uk.gov.service.notify.*;
+import uk.gov.service.notify.NotificationClient;
+import uk.gov.service.notify.NotificationClientException;
+import uk.gov.service.notify.SendEmailResponse;
+import uk.gov.service.notify.SendLetterResponse;
+import uk.gov.service.notify.SendSmsResponse;
 
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest
@@ -78,7 +96,7 @@ public class NotificationsItBase {
     @Mock
     private ReminderService reminderService;
 
-    @MockBean
+    @MockitoBean
     protected AuthorisationService authorisationService;
 
     @Mock
@@ -96,7 +114,7 @@ public class NotificationsItBase {
     @Autowired
     private SscsCaseCallbackDeserializer deserializer;
 
-    @MockBean
+    @MockitoBean
     private IdamService idamService;
 
     protected String json;
@@ -104,7 +122,7 @@ public class NotificationsItBase {
     @Autowired
     private NotificationHandler notificationHandler;
 
-    @MockBean
+    @MockitoBean
     private OutOfHoursCalculator outOfHoursCalculator;
 
     @Autowired
@@ -116,7 +134,7 @@ public class NotificationsItBase {
     @Autowired
     private DocmosisPdfService docmosisPdfService;
 
-    @MockBean
+    @MockitoBean
     private DocmosisPdfGenerationService docmosisPdfGenerationService;
 
     @Mock

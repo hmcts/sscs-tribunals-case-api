@@ -5,9 +5,9 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
+import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -59,7 +59,7 @@ public final class HearingsWindowMapping {
     }
 
     public static LocalDate getDateRangeStart(@Valid SscsCaseData caseData, ReferenceDataServiceHolder refData) {
-        return refData.isAdjournmentFlagEnabled() && isYes(caseData.getAdjournment().getAdjournmentInProgress())
+        return isYes(caseData.getAdjournment().getAdjournmentInProgress())
                 ? AdjournmentCalculateDateHelper.getHearingWindowStart(caseData)
                 : getHearingWindowStart(caseData);
     }

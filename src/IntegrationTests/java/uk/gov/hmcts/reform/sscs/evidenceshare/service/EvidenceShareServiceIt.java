@@ -3,37 +3,61 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.UNREGISTERED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SENT_TO_DWP;
 
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeMessage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.*;
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
+import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
+import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -50,12 +74,13 @@ import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
-import uk.gov.hmcts.reform.sscs.service.servicebus.TopicConsumer;
+import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
 
 
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest
 @TestPropertySource(locations = "classpath:config/application_es_it.properties")
+// TODO: These are very slow, originally they stopped at TopicProducer so we should mock from that point
 public class EvidenceShareServiceIt {
 
     // Below rules are needed to use the junitParamsRunner together with SpringRunner
@@ -66,44 +91,44 @@ public class EvidenceShareServiceIt {
     public final SpringMethodRule springMethodRule = new SpringMethodRule();
     //end of rules needed for junitParamsRunner
 
-    @MockBean
+    @MockitoBean
     @SuppressWarnings({"PMD.UnusedPrivateField"})
     private IdamService idamService;
 
-    @MockBean
+    @MockitoBean
     @SuppressWarnings({"PMD.UnusedPrivateField"})
     private CcdClient ccdClient;
 
-    @MockBean
+    @MockitoBean
     @SuppressWarnings({"PMD.UnusedPrivateField"})
     private EvidenceDownloadClientApi evidenceDownloadClientApi;
 
-    @MockBean
+    @MockitoBean
     @SuppressWarnings({"PMD.UnusedPrivateField"})
     private EvidenceMetadataDownloadClientApi evidenceMetadataDownloadClientApi;
 
-    @MockBean
+    @MockitoBean
     private EvidenceManagementService evidenceManagementService;
 
-    @MockBean
+    @MockitoBean
     private EvidenceManagementSecureDocStoreService evidenceManagementSecureDocStoreService;
 
-    @MockBean
+    @MockitoBean
     private CcdService ccdService;
 
-    @MockBean
+    @MockitoBean
     private UpdateCcdCaseService updateCcdCaseService;
 
-    @MockBean
+    @MockitoBean
     private RestTemplate restTemplate;
 
-    @MockBean
+    @MockitoBean
     private BulkPrintService bulkPrintService;
 
     @Autowired
     private RoboticsService roboticsService;
 
-    @MockBean
+    @MockitoBean
     private EmailService emailService;
 
     @Autowired
@@ -113,18 +138,24 @@ public class EvidenceShareServiceIt {
     private RoboticsCallbackHandler roboticsCallbackHandler;
 
     @Autowired
-    private TopicConsumer topicConsumer;
+    private SendCallbackHandler sendCallbackHandler;
 
     @Autowired
     private PdfStoreService pdfStoreService;
+
+    @Autowired
+    private SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer;
+
+    @Autowired
+    private ThreadPoolTaskExecutor executor;
 
     @Captor
     ArgumentCaptor<ArrayList<Pdf>> documentCaptor;
 
     @Captor
-    private ArgumentCaptor<SscsCaseData> caseDataCaptor;
+    private ArgumentCaptor<Consumer<SscsCaseDetails>> consumerArgumentCaptor;
 
-    @MockBean
+    @MockitoBean
     protected AirLookupService airLookupService;
 
     private static final String FILE_CONTENT = "Welcome to PDF document service";
@@ -133,7 +164,7 @@ public class EvidenceShareServiceIt {
 
     protected MimeMessage message;
 
-    @MockBean(name = "sendGridMailSender")
+    @MockitoBean(name = "sendGridMailSender")
     protected JavaMailSender mailSender;
 
     Optional<UUID> expectedOptionalUuid = Optional.of(UUID.fromString("0f14d0ab-9605-4a62-a9e4-5ed26688389b"));
@@ -149,7 +180,7 @@ public class EvidenceShareServiceIt {
     }
 
     @Test
-    public void givenDigitalCaseWithMrnDateWithin30Days_shouldGenerateDL6TemplateAndAndAddToCaseInCcdAndSendToRoboticsAndBulkPrintInCorrectOrder() throws IOException {
+    public void givenDigitalCaseWithMrnDateWithin30Days_shouldGenerateDL6TemplateAndAndAddToCaseInCcdAndSendToRoboticsAndBulkPrintInCorrectOrder() throws IOException, InterruptedException {
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource("evidenceshare/validAppealCreatedCallbackWithMrn.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
@@ -159,15 +190,21 @@ public class EvidenceShareServiceIt {
         json = json.replace("CCD_EVENT_ID", "validAppealCreated");
         json = json.replace("CREATED_IN_GAPS_FROM", "readyToList");
 
-        when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any())).thenReturn(SscsCaseDetails.builder().build());
+        when(updateCcdCaseService.updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any(), any())).thenReturn(SscsCaseDetails.builder().build());
+        Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(json, "1");
+        sendCallbackHandler.handle(sscsCaseDataCallback);
 
-        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any());
+        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
+
+        verify(updateCcdCaseService).updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any(), consumerArgumentCaptor.capture());
+
+        SscsCaseData sscsCaseData = verifySscsCaseData(json);
+        assertEquals(UNREGISTERED, sscsCaseData.getDwpState());
     }
 
     @Test
-    public void givenDigitalCaseWithMrnDateOlderThan30Days_shouldGenerateDL16TemplateAndAndAddToCaseInCcdAndTriggerSentToDwpEvent() throws IOException {
+    public void givenDigitalCaseWithMrnDateOlderThan30Days_shouldGenerateDL16TemplateAndAndAddToCaseInCcdAndTriggerSentToDwpEvent() throws IOException, InterruptedException {
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource("evidenceshare/validAppealCreatedCallbackWithMrn.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
@@ -176,15 +213,20 @@ public class EvidenceShareServiceIt {
         json = json.replace("CCD_EVENT_ID", "validAppealCreated");
         json = json.replace("CREATED_IN_GAPS_FROM", "readyToList");
 
-        when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any())).thenReturn(SscsCaseDetails.builder().build());
+        when(updateCcdCaseService.updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any(), any())).thenReturn(SscsCaseDetails.builder().build());
+        Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(json, "1");
+        sendCallbackHandler.handle(sscsCaseDataCallback);
 
-        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any());
+        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
+
+        verify(updateCcdCaseService).updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any(), consumerArgumentCaptor.capture());
+        SscsCaseData sscsCaseData = verifySscsCaseData(json);
+        assertEquals(UNREGISTERED, sscsCaseData.getDwpState());
     }
 
     @Test
-    public void givenNonDigitalCaseAndSecureDocstoreOff_shouldGenerateDlDocumentTemplateAndAndAddToCaseInCcdAndSendToRoboticsAndBulkPrint() throws IOException {
+    public void givenNonDigitalCaseAndSecureDocstoreOff_shouldGenerateDlDocumentTemplateAndAndAddToCaseInCcdAndSendToRoboticsAndBulkPrint() throws IOException, InterruptedException {
         //FIXME: Remove this test once secureDocStoreEnabled feature switched on
         ReflectionTestUtils.setField(pdfStoreService, "secureDocStoreEnabled", false);
 
@@ -206,9 +248,12 @@ public class EvidenceShareServiceIt {
         when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any())).thenReturn(expectedOptionalUuid);
 
         String documentList = "Case has been sent to the FTA via Bulk Print with bulk print id: 0f14d0ab-9605-4a62-a9e4-5ed26688389b and with documents: dl16-12345656789.pdf, sscs1.pdf, filename1.pdf";
-        when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any())).thenReturn(SscsCaseDetails.builder().build());
+        when(updateCcdCaseService.updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq(documentList), any(), any())).thenReturn(SscsCaseDetails.builder().build());
+        Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(json, "1");
+        sendCallbackHandler.handle(sscsCaseDataCallback);
+
+        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
         Assert.assertEquals(3, documentCaptor.getValue().size());
         Assert.assertEquals("dl16-12345656789.pdf", documentCaptor.getValue().get(0).getName());
@@ -221,11 +266,13 @@ public class EvidenceShareServiceIt {
         verify(bulkPrintService).sendToBulkPrint(any(), any(), any());
         verify(emailService).sendEmail(anyLong(), any());
 
-        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any());
+        verify(updateCcdCaseService).updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq(documentList), any(), consumerArgumentCaptor.capture());
+
+        verifySscsCaseData(json);
     }
 
     @Test
-    public void givenNonDigitalCaseAndSecureDocStoreOn_shouldGenerateDlDocumentTemplateAndAndAddToCaseInCcdAndSendToRoboticsAndBulkPrint() throws IOException {
+    public void givenNonDigitalCaseAndSecureDocStoreOn_shouldGenerateDlDocumentTemplateAndAndAddToCaseInCcdAndSendToRoboticsAndBulkPrint() throws IOException, InterruptedException {
         ReflectionTestUtils.setField(pdfStoreService, "secureDocStoreEnabled", true);
 
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
@@ -246,9 +293,12 @@ public class EvidenceShareServiceIt {
         when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any())).thenReturn(expectedOptionalUuid);
 
         String documentList = "Case has been sent to the FTA via Bulk Print with bulk print id: 0f14d0ab-9605-4a62-a9e4-5ed26688389b and with documents: dl16-12345656789.pdf, sscs1.pdf, filename1.pdf";
-        when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any())).thenReturn(SscsCaseDetails.builder().build());
+        when(updateCcdCaseService.updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq(documentList), any(), any())).thenReturn(SscsCaseDetails.builder().build());
+        Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(json, "1");
+        sendCallbackHandler.handle(sscsCaseDataCallback);
+
+        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
         Assert.assertEquals(3, documentCaptor.getValue().size());
         Assert.assertEquals("dl16-12345656789.pdf", documentCaptor.getValue().get(0).getName());
@@ -261,11 +311,13 @@ public class EvidenceShareServiceIt {
         verify(bulkPrintService).sendToBulkPrint(any(), any(), any());
         verify(emailService).sendEmail(anyLong(), any());
 
-        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any());
+        verify(updateCcdCaseService).updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq(documentList), any(), consumerArgumentCaptor.capture());
+
+        verifySscsCaseData(json);
     }
 
     @Test
-    public void givenDigitalCaseInReadyToListState_shouldSendToRoboticsAndUpdateDwpOffice() throws IOException {
+    public void givenDigitalCaseInReadyToListState_shouldSendToRoboticsAndUpdateDwpOffice() throws IOException, InterruptedException {
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource("evidenceshare/validAppealCreatedCallbackWithMrn.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
@@ -273,32 +325,39 @@ public class EvidenceShareServiceIt {
         json = json.replace("CASE_STATE", "readyToList");
         json = json.replace("CCD_EVENT_ID", "readyToList");
         json = json.replace("CREATED_IN_GAPS_FROM", "readyToList");
+        Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(json, "1");
+        sendCallbackHandler.handle(sscsCaseDataCallback);
+
+        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
         verify(emailService).sendEmail(anyLong(), any());
 
-        verify(ccdService).updateCase(caseDataCaptor.capture(), any(), eq(EventType.CASE_UPDATED.getCcdType()), any(), any(), any());
-        assertEquals("DWP PIP (2)", caseDataCaptor.getValue().getAppeal().getMrnDetails().getDwpIssuingOffice());
+        verify(updateCcdCaseService).updateCaseV2(any(), eq(EventType.CASE_UPDATED.getCcdType()), any(), any(), any(), any());
     }
 
     @Test
     public void appealWithNoMrnDate_shouldNotGenerateTemplateOrAddToCcdAndShouldUpdateCaseWithSecondaryState()
-        throws IOException {
+            throws IOException, InterruptedException {
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource("evidenceshare/validAppealCreatedCallback.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = json.replace("CREATED_IN_GAPS_FROM", "validAppeal");
+        Callback<SscsCaseData> callback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        ArgumentCaptor<SscsCaseData> caseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
+        sendCallbackHandler.handle(callback);
 
-        topicConsumer.onMessage(json, "1");
+        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
-        then(ccdService)
+        then(updateCcdCaseService)
             .should(times(1))
-            .updateCase(caseDataCaptor.capture(), any(), eq("sendToDwpError"), any(), any(), any());
-        assertNull(caseDataCaptor.getValue().getAppeal().getMrnDetails().getMrnDate());
-        assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
+            .updateCaseV2(any(), eq("sendToDwpError"), any(), any(), any(), consumerArgumentCaptor.capture());
+        Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
+        SscsCaseData sscsCaseData = sscsCaseDataCallback.getCaseDetails().getCaseData();
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+        assertNull(sscsCaseData.getAppeal().getMrnDetails().getMrnDate());
+        assertEquals("failedSending", sscsCaseData.getHmctsDwpState());
 
         verifyNoMoreInteractions(restTemplate);
         verifyNoMoreInteractions(evidenceManagementService);
@@ -306,33 +365,46 @@ public class EvidenceShareServiceIt {
     }
 
     @Test
-    public void nonReceivedViaPaper_shouldNotBeBulkPrintedAndStateShouldBeUpdated() throws IOException {
+    public void nonReceivedViaPaper_shouldNotBeBulkPrintedAndStateShouldBeUpdated() throws IOException, InterruptedException {
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource("evidenceshare/validAppealCreatedCallback.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = json.replace("PAPER", "ONLINE");
         json = json.replace("CREATED_IN_GAPS_FROM", "validAppeal");
+        Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(json, "1");
+        sendCallbackHandler.handle(sscsCaseDataCallback);
+
+        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
         verifyNoMoreInteractions(restTemplate);
         verifyNoMoreInteractions(evidenceManagementService);
-        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any());
+        verify(updateCcdCaseService).updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any(), consumerArgumentCaptor.capture());
+
+        verifySscsCaseData(json);
+
         verify(emailService).sendEmail(anyLong(), any());
     }
 
     @Test
-    public void givenADigitalCase_shouldNotBeBulkPrintedAndStateShouldBeUpdatedAndNotSentToRobotics() throws IOException {
+    public void givenADigitalCase_shouldNotBeBulkPrintedAndStateShouldBeUpdatedAndNotSentToRobotics() throws IOException, InterruptedException {
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource("evidenceshare/validAppealCreatedCallback.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = json.replace("CREATED_IN_GAPS_FROM", "readyToList");
+        Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(json, "1");
+        sendCallbackHandler.handle(sscsCaseDataCallback);
+
+        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
         verifyNoMoreInteractions(restTemplate);
         verifyNoMoreInteractions(evidenceManagementService);
-        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any());
+        verify(updateCcdCaseService).updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any(), consumerArgumentCaptor.capture());
+
+        SscsCaseData sscsCaseData = verifySscsCaseData(json);
+        assertEquals(UNREGISTERED, sscsCaseData.getDwpState());
+
         verifyNoMoreInteractions(emailService);
     }
 
@@ -377,5 +449,16 @@ public class EvidenceShareServiceIt {
         uk.gov.hmcts.reform.ccd.document.am.model.Document document = uk.gov.hmcts.reform.ccd.document.am.model.Document.builder().links(links).build();
 
         return document;
+    }
+
+    private SscsCaseData verifySscsCaseData(String json) {
+        Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
+        SscsCaseData sscsCaseData = sscsCaseDataCallback.getCaseDetails().getCaseData();
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+        assertEquals(SENT_TO_DWP.getCcdType(), sscsCaseData.getHmctsDwpState());
+        assertNotNull(sscsCaseData.getDateSentToDwp());
+        assertNotNull(sscsCaseData.getDwpDueDate());
+        return sscsCaseData;
     }
 }

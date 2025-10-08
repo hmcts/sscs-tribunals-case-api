@@ -61,14 +61,17 @@ public class GetFirstTierDocumentsSubmittedHandlerTest {
     }
 
     @Test
-    public void shouldUpdateEvent() {
+    public void shouldUpdateEventWhenCcdCallbackMapV2IsEnabled() {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        when(ccdCallbackMapService.handleCcdCallbackMap(capture.capture(), eq(sscsCaseData))).thenReturn(sscsCaseData);
+        when(ccdCallbackMapService.handleCcdCallbackMapV2(
+                capture.capture(),
+                eq(Long.valueOf(sscsCaseData.getCcdCaseId()))))
+                .thenReturn(sscsCaseData);
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        verify(ccdCallbackMapService).handleCcdCallbackMap(capture.capture(), eq(sscsCaseData));
+        verify(ccdCallbackMapService).handleCcdCallbackMapV2(capture.capture(), eq(Long.valueOf(sscsCaseData.getCcdCaseId())));
         assertThat(capture.getValue().getCallbackEvent()).isEqualTo(EventType.BUNDLE_CREATED_FOR_UPPER_TRIBUNAL);
         assertThat(capture.getValue().getCallbackSummary()).isEqualTo("Bundle created for UT");
         assertThat(capture.getValue().getCallbackDescription()).isEqualTo("Bundle created for UT");

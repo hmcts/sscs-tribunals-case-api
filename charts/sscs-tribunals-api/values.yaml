@@ -2,6 +2,7 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
   enabled: true
   image: 'hmctspublic.azurecr.io/sscs/tribunals-api:latest'
   applicationPort: 8080
+  terminationGracePeriodSeconds: 120
   aadIdentityName: sscs
   ingressHost: sscs-tribunals-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   spotInstances:
@@ -43,10 +44,6 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
           alias: PDF_SERVICE_ACCESS_KEY
         - name: app-insights-connection-string
           alias: app-insights-connection-string
-        - name: sscs-servicebus-connection-string-tf
-          alias: HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING
-        - name: evidence-share-topic-shared-access-key
-          alias: AMQP_PASSWORD
         - name: robotics-email-to
           alias: ROBOTICS_EMAIL_TO
         - name: robotics-email-from
@@ -70,9 +67,6 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
         #         hearings=api
         - name: hmc-servicebus-shared-access-key-tf
           alias: HMC_HEARINGS_TOPIC_ACCESS_KEY
-        - name: sscs-servicebus-shared-access-key
-          alias: TRIBUNALS_EVENT_QUEUE_ACCESS_KEY
-
   environment:
     SERVER_PORT: 8080
     REFORM_TEAM: sscs
@@ -91,9 +85,9 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     IDAM_OAUTH2_REDIRECT_URL: "https://evidence-sharing-preprod.sscs.reform.hmcts.net"
     PDF_API_URL: "http://rpe-pdf-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+    ROLE_ASSIGNMENT_API_URL: "http://am-role-assignment-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     DOCUMENT_MANAGEMENT_URL: "http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     IDAM_S2S_AUTH: "http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
-    BULK_SCAN_URL: "http://sscs-bulk-scan-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     IDAM_API_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
     IDAM_API_JWK_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net/jwks
     BUNDLE_URL: http://em-ccd-orchestrator-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
@@ -103,34 +97,23 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     JUDICIAL_REF_API_URL: "http://rd-judicial-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     SECURE_DOC_STORE_FEATURE: true
     WORK_ALLOCATION_FEATURE: false
-    HEARINGS_EVENT_QUEUE_NAME: tribunals-to-hearing-api-{{ .Values.global.environment }}
     CASE_ACCESS_MANAGEMENT_FEATURE: false
     ELINKS_V2_FEATURE_ENABLED: false
     DELETED_REDACTED_DOC_ENABLED: false
     UPLOAD_HEARING_FILTER_ENABLED: false
-    CITIZEN_LOGIN_SERVICE_V2: false
-    ADD_LINK_TO_OTHER_ASSOCIATED_CASES_V2: false
     IDAM_OAUTH2_CLIENT_ID: "sscs"
     CORE_CASE_DATA_JURISDICTION_ID: SSCS
     CORE_CASE_DATA_CASE_TYPE_ID: Benefit
     SEND_LETTER_SERVICE_BASEURL: "http://rpe-send-letter-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     SEND_LETTER_SERVICE_ENABLED: "true"
     TRUST_ALL_CERTS: "true"
-    SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-{{ .Values.global.environment }}"
-    TOPIC_NAME: "sscs-evidenceshare-topic-{{ .Values.global.environment }}"
-    AMQP_HOST: "sscs-servicebus-{{ .Values.global.environment }}.servicebus.windows.net"
-    AMQP_USERNAME: "SendAndListenSharedAccessKey"
     MAX_RETRY_ATTEMPTS: 3
     PDF_SERVICE_BASE_URL: https://docmosis.{{ .Values.global.environment }}.platform.hmcts.net/rs/render
     ROBOTICS_EMAIL_MESSAGE: "Please find attached the robotics json file \nPlease do not respond to this email"
     EMAIL_SERVER_HOST: "mta.reform.hmcts.net"
-    EMAIL_SERVER_PORT: "25"
+    EMAIL_SERVER_PORT: 25
     EMAIL_SMTP_TLS_ENABLED: "true"
     EMAIL_SMTP_SSL_TRUST: "*"
-    HEARING_RECORDING_REQUEST_CASE_UPDATE_V2_ENABLED: false
-    TRIGGER_EVENT_V2_ENABLED: false
-    SUBMIT_APPEAL_SERVICE_V2_ENABLED: false
-    HANDLE_CCD_CALLBACKMAP_V2: false
     CALLBACK_MAX_RETRY_ATTEMPTS: 3
     SSCS_TRACK_YOUR_APPEAL_LINK: https://track-appeal.nonprod.platform.hmcts.net/trackyourappeal/appeal_id
     JOB_SCHEDULER_DB_USERNAME: pgadmin
@@ -139,6 +122,8 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     RUN_DB_MIGRATION_ON_STARTUP: false
     POST_HEARINGS_FEATURE: true
     POST_HEARINGS_B_FEATURE: true
+    LOGBACK_REQUIRE_ALERT_LEVEL: "false"
+    LOGBACK_REQUIRE_ERROR_CODE: "false"
 
     #    hearings=api
     IDAM_S2S_URL: "http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
@@ -149,20 +134,12 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-{{ .Values.global.environment }}"
     HMC_HEARINGS_LISTENING_ENABLED: false
     HMC_HEARINGS_TOPIC_POLICY_NAME: SendAndListenSharedAccessKey
-    TRIBUNALS_EVENT_QUEUE_NAMESPACE: "sscs-servicebus-{{ .Values.global.environment }}"
-    TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api-{{ .Values.global.environment }}"
-    TRIBUNALS_HEARINGS_LISTENING_ENABLED: false
-    TRIBUNALS_EVENT_QUEUE_POLICY_NAME: SendAndListenSharedAccessKey
     EXUI_API_URL: "https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net"
     HMC_API_URL: "http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     SSCS_SERVICE_CODE: BBA3
-    HMC_DEPLOYMENT_FILTER_ENABLED: false
     HEARINGS_CASE_UPDATE_V2_ENABLED: true
-    BYPASS_HEARING_API_SERVICE: true
 
 postgresql:
-  enabled: false
-idam-pr:
   enabled: false
 xui-webapp:
   enabled: false
@@ -172,11 +149,12 @@ sscs-tribunals-frontend:
   enabled: false
 redis:
   enabled: false
+  image:
+    registry: hmctspublic.azurecr.io
+    repository: imported/bitnami/redis
 ccd:
   enabled: false
 em-ccdorc:
-  enabled: false
-sscs-hearings-api:
   enabled: false
 servicebus:
   enabled: false
@@ -185,6 +163,8 @@ ccd-case-document-am-api:
 aac-manage-case-assignment:
   enabled: false
 am-org-role-mapping-service:
+  enabled: false
+em-stitching:
   enabled: false
 wa:
   enabled: false

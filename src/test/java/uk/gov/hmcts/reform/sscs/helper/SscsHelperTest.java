@@ -1,27 +1,43 @@
 package uk.gov.hmcts.reform.sscs.helper;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.*;
+import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getUpdatedDirectionDueDate;
+import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.hasHearingScheduledInTheFuture;
+import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.validateHearingOptionsAndExcludeDates;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DateRange;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
 
 public class SscsHelperTest {
 
     public static final LocalDate NOW = LocalDate.now();
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         sscsCaseData = SscsCaseData.builder()
                 .ccdCaseId("ccdId")
@@ -118,6 +134,28 @@ public class SscsHelperTest {
 
         sscsCaseData.setHearings(List.of(hearing1, hearing2, hearing3));
         assertFalse(hasHearingScheduledInTheFuture(sscsCaseData));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "AWAITING_LISTING, true",
+        "CANCELLED, false"
+    })
+    public void givenANonCancelledHearingsInTheFuture_ThenReturnTrue(HearingStatus hearingStatus,
+                                                                     boolean expectedResult) {
+        HearingDetails hearingDetails = HearingDetails.builder()
+            .hearingDate(LocalDate.now().plusDays(5).toString())
+            .start(LocalDateTime.now().plusDays(5))
+            .hearingId(String.valueOf(1))
+            .time("12:00")
+            .venue(Venue.builder().name("Venue 1").build())
+            .hearingStatus(hearingStatus)
+            .build();
+        Hearing hearing = Hearing.builder().value(hearingDetails).build();
+
+        sscsCaseData.setHearings(List.of(hearing));
+
+        assertThat(hasHearingScheduledInTheFuture(sscsCaseData)).isEqualTo(expectedResult);
     }
 
     @Test

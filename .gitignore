@@ -25,6 +25,11 @@ build
 
 # VS Code
 .vscode/
+/bin/*
+ !/bin/*.sh
+ !/bin/utils
+ /bin/utils/*
+ !/bin/utils/*.sh
 
 # Auto-generated file at compile time, used to display git version on health endpoint
 /src/main/resources/uk/gov/hmcts/reform/sscs/git.properties
@@ -37,8 +42,20 @@ lib/applicationinsights-agent-*.jar
 lib/applicationinsights.log
 
 # definitions
+definitions/test/node_modules
+definitions/test/test-results
+definitions/test/playwright-report
 definitions/**/*.xlsx
 definitions/**/*.xlsx#
 
-# aat env file
+# mirrord
+.mirrord/*
+
+# env files
 .aat-env
+.env.local
+
+# befta noise
+befta_recent_executions_info_PREVIEW.json
+/notification_pdfs/*
+node_modules

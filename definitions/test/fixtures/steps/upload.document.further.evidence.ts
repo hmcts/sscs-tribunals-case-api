@@ -7,165 +7,234 @@ import eventTestData from '../../pages/content/event.name.event.description_en.j
 import { CancelTranslations } from './cancel.translations';
 import { RequestTranslations } from './request.translations';
 
-
 const actionFurtherEvidenceTestdata = require('../../pages/content/action.further.evidence_en.json');
 const uploadDocumentFurtherEvidenceData = require('../../pages/content/upload.document.further.evidence_en.json');
 
-
 export class UploadDocumentFurtherEvidence extends BaseStep {
+  readonly page: Page;
 
-    readonly page : Page;
+  constructor(page: Page) {
+    super(page);
+    this.page = page;
+  }
 
-    constructor(page: Page) {
-        super(page);
-        this.page = page;
+  async performUploadDocumentFurtherEvidence(
+    caseId: string,
+    uploadAudioFile?: boolean
+  ) {
+    await this.loginUserWithCaseId(
+      credentials.amCaseWorkerWithCaseAllocatorRole,
+      false,
+      caseId
+    );
+    await expect(this.homePage.summaryTab).toBeVisible();
+    await this.homePage.chooseEvent('Upload document FE');
+
+    await this.uploadDocumentFurtherEvidencePage.verifyPageContent();
+    await this.uploadDocumentFurtherEvidencePage.clickAddNew();
+    await this.uploadDocumentFurtherEvidencePage.selectDocumenType(
+      uploadDocumentFurtherEvidenceData.documentType
+    );
+    await this.uploadDocumentFurtherEvidencePage.inputFilename(
+      uploadDocumentFurtherEvidenceData.fileName
+    );
+
+    if (uploadAudioFile) {
+      await this.uploadDocumentFurtherEvidencePage.uploadFurtherEvidenceDoc(
+        uploadDocumentFurtherEvidenceData.testaudiofile
+      );
+    } else {
+      await this.uploadDocumentFurtherEvidencePage.uploadFurtherEvidenceDoc(
+        uploadDocumentFurtherEvidenceData.testfileone
+      );
     }
 
-    async performUploadDocumentFurtherEvidence(caseId: string, uploadAudioFile ?: boolean) {
+    await this.uploadDocumentFurtherEvidencePage.confirmSubmission();
 
-        await this.loginUserWithCaseId(credentials.amCaseWorkerWithCaseAllocatorRole, false, caseId);
-        await this.homePage.reloadPage();
-        await expect(this.homePage.summaryTab).toBeVisible();
-        await this.homePage.chooseEvent('Upload document FE');
+    await this.eventNameAndDescriptionPage.verifyPageContent(
+      uploadDocumentFurtherEvidenceData.eventName
+    );
+    await this.eventNameAndDescriptionPage.inputData(
+      eventTestData.eventSummaryInput,
+      eventTestData.eventDescriptionInput
+    );
+    await this.eventNameAndDescriptionPage.confirmSubmission();
 
-        await this.uploadDocumentFurtherEvidencePage.verifyPageContent();
-        await this.uploadDocumentFurtherEvidencePage.clickAddNew();
-        await this.uploadDocumentFurtherEvidencePage.selectDocumenType(uploadDocumentFurtherEvidenceData.documentType);
-        await this.uploadDocumentFurtherEvidencePage.inputFilename(uploadDocumentFurtherEvidenceData.fileName);
+    await expect(this.homePage.summaryTab).toBeVisible();
+    await this.homePage.clickSignOut();
+  }
 
-        if(uploadAudioFile) {
-            await this.uploadDocumentFurtherEvidencePage.uploadFurtherEvidenceDoc(uploadDocumentFurtherEvidenceData.testaudiofile);
-        } else {
-            await this.uploadDocumentFurtherEvidencePage.uploadFurtherEvidenceDoc(uploadDocumentFurtherEvidenceData.testfileone);
-        }
-        
-        await this.uploadDocumentFurtherEvidencePage.confirmSubmission();
+  async allocateCaseToCtscUser(caseId: string) {
+    // CTSC Admin with case allocator role allocates case to another CTSC Admin
+    await this.loginUserWithCaseId(
+      credentials.amCaseWorkerWithCaseAllocatorRole,
+      false,
+      caseId
+    );
+    await expect(this.homePage.summaryTab).toBeVisible();
+    await this.homePage.delay(3000);
+    await this.homePage.navigateToTab('Roles and access');
+    await this.rolesAndAccessTab.allocateCtscRole(
+      credentials.amCaseWorker.email
+    );
+  }
 
-        await this.eventNameAndDescriptionPage.verifyPageContent(uploadDocumentFurtherEvidenceData.eventName);
-        await this.eventNameAndDescriptionPage.inputData(eventTestData.eventSummaryInput,
-            eventTestData.eventDescriptionInput);
-        await this.eventNameAndDescriptionPage.confirmSubmission();
+  async verifyCtscAdminAsAllocatedCaseWorkerCanViewTheAutomaticallyAssignedActionUnprocessedCorrespondenceTask(
+    caseId: string
+  ) {
+    // Action Unprocessed Correspondence task is automatically assigned to allocated CTSC Admin
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+    await this.homePage.navigateToTab('Tasks');
+    await this.tasksTab.verifyTaskIsDisplayed(aucTask.name);
+  }
 
-        await expect(this.homePage.summaryTab).toBeVisible();
-        await this.homePage.clickSignOut();
-    }
+  async verifyCtscAdminAsAllocatedCaseWorkerCanViewTheAutomaticallyAssignedReviewBilingualDocumentTask(
+    caseId: string
+  ) {
+    // Review Bi-Lingual Document - CTSC task is automatically assigned to allocated CTSC Admin
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+    await this.homePage.navigateToTab('Tasks');
+    await this.tasksTab.verifyTaskIsDisplayed(rbdTask.name);
+  }
 
-    async allocateCaseToCtscUser(caseId: string) {
-        // CTSC Admin with case allocator role allocates case to another CTSC Admin
-        await this.loginUserWithCaseId(credentials.amCaseWorkerWithCaseAllocatorRole, false, caseId);
-        await expect(this.homePage.summaryTab).toBeVisible();
-        await this.homePage.delay(3000);
-        await this.homePage.navigateToTab('Roles and access');
-        await this.rolesAndAccessTab.allocateCtscRole(credentials.amCaseWorker.email);
-    }
+  async verifyCtscAdminAsAllocatedCaseWorkerCanCompleteTheAssignedActionUnprocessedCorrespondenceTask(
+    caseId: string
+  ) {
+    // Verify CTSC Admin as allocated caseworker can see the assigned Action Unprocessed Correspondence task
+    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+    await this.homePage.navigateToTab('Tasks');
+    await this.tasksTab.verifyTaskIsDisplayed(aucTask.name);
 
-    async verifyCtscAdminAsAllocatedCaseWorkerCanViewTheAutomaticallyAssignedActionUnprocessedCorrespondenceTask(caseId: string) {
+    // CTSC Admin verifies assigned task details
+    await this.tasksTab.verifyPriortiy(aucTask.name, aucTask.priority);
+    await this.tasksTab.verifyPageContentByKeyValue(
+      aucTask.name,
+      'Assigned to',
+      aucTask.assignedTo
+    );
+    await this.tasksTab.verifyManageOptions(
+      aucTask.name,
+      aucTask.assignedManageOptions
+    );
+    await this.tasksTab.verifyNextStepsOptions(
+      aucTask.name,
+      aucTask.nextStepsOptions
+    );
 
-        // Action Unprocessed Correspondence task is automatically assigned to allocated CTSC Admin
-        await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
-        await this.homePage.navigateToTab('Tasks');
-        await this.tasksTab.verifyTaskIsDisplayed(aucTask.name);
-    }
+    // Select Action Further Evidence next step and complete the event
+    await this.tasksTab.clickNextStepLink(aucTask.actionFurtherEvidence.link);
 
-    async verifyCtscAdminAsAllocatedCaseWorkerCanViewTheAutomaticallyAssignedReviewBilingualDocumentTask(caseId: string) {
+    await this.actionFurtherEvidencePage.selectFEOption();
+    await this.actionFurtherEvidencePage.selectSenderOption(
+      actionFurtherEvidenceTestdata.ftaSender
+    );
+    await this.actionFurtherEvidencePage.selectbundle();
+    await this.actionFurtherEvidencePage.confirmSubmission();
 
-        // Review Bi-Lingual Document - CTSC task is automatically assigned to allocated CTSC Admin
-        await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
-        await this.homePage.navigateToTab('Tasks');
-        await this.tasksTab.verifyTaskIsDisplayed(rbdTask.name);
-    }
+    await this.eventNameAndDescriptionPage.verifyPageContent(
+      actionFurtherEvidenceTestdata.eventName
+    );
+    await this.eventNameAndDescriptionPage.inputData(
+      eventTestData.eventSummaryInput,
+      eventTestData.eventDescriptionInput
+    );
+    await this.eventNameAndDescriptionPage.confirmSubmission();
 
-    async verifyCtscAdminAsAllocatedCaseWorkerCanCompleteTheAssignedActionUnprocessedCorrespondenceTask(caseId: string) {
+    await expect(this.homePage.summaryTab).toBeVisible();
+    await this.homePage.delay(3000);
 
-        // Verify CTSC Admin as allocated caseworker can see the assigned Action Unprocessed Correspondence task
-        await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
-        await this.homePage.navigateToTab('Tasks');
-        await this.tasksTab.verifyTaskIsDisplayed(aucTask.name);
+    await this.tasksTab.verifyTaskIsHidden(aucTask.name);
+  }
 
-        // CTSC Admin verifies assigned task details
-        await this.tasksTab.verifyPriortiy(aucTask.name, aucTask.priority);
-        await this.tasksTab.verifyPageContentByKeyValue(aucTask.name, 'Assigned to', aucTask.assignedTo);
-        await this.tasksTab.verifyManageOptions(aucTask.name, aucTask.assignedManageOptions);
-        await this.tasksTab.verifyNextStepsOptions(aucTask.name, aucTask.nextStepsOptions);
+  async verifyCtscAdminAsAllocatedCaseWorkerCanCompleteTheAssignedReviewBilingualDocumentTask(
+    caseId: string
+  ) {
+    // Verify CTSC Admin as allocated caseworker can see the assigned Review Bi-Lingual Document - CTSC task
+    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+    await this.homePage.navigateToTab('Tasks');
+    await this.tasksTab.verifyTaskIsDisplayed(rbdTask.name);
 
-        // Select Action Further Evidence next step and complete the event
-        await this.tasksTab.clickNextStepLink(aucTask.actionFurtherEvidence.link);
+    // CTSC Admin verifies assigned task details
+    await this.tasksTab.verifyPriortiy(rbdTask.name, rbdTask.priority);
+    await this.tasksTab.verifyPageContentByKeyValue(
+      rbdTask.name,
+      'Assigned to',
+      rbdTask.assignedTo
+    );
+    await this.tasksTab.verifyManageOptions(
+      rbdTask.name,
+      rbdTask.assignedManageOptions
+    );
+    await this.tasksTab.verifyNextStepsOptions(
+      rbdTask.name,
+      rbdTask.nextStepsOptions
+    );
 
-        await this.actionFurtherEvidencePage.selectFEOption();
-        await this.actionFurtherEvidencePage.selectSenderOption(actionFurtherEvidenceTestdata.ftaSender);
-        await this.actionFurtherEvidencePage.selectbundle();
-        await this.actionFurtherEvidencePage.confirmSubmission();
+    // Select Request translation from WLU next step and complete the event
+    await this.tasksTab.clickNextStepLink(
+      rbdTask.requestTranslationFromWlu.link
+    );
 
-        await this.eventNameAndDescriptionPage.verifyPageContent(actionFurtherEvidenceTestdata.eventName);
-        await this.eventNameAndDescriptionPage.inputData(eventTestData.eventSummaryInput,
-            eventTestData.eventDescriptionInput);
-        await this.eventNameAndDescriptionPage.confirmSubmission();
+    let requestTranslations = new RequestTranslations(this.page);
+    await requestTranslations.completeRequestTranslations();
 
-        await expect(this.homePage.summaryTab).toBeVisible();
-        await this.homePage.delay(3000);
+    // CTSC Admin verifies the task is removed from the tasks list
+    await this.tasksTab.verifyTaskIsHidden(rbdTask.name);
+  }
 
-        await this.tasksTab.verifyTaskIsHidden(aucTask.name);
-    }
+  async verifyUnassignedActionUnprocessedCorrespondenceTaskCanBeCancelledManuallyByCtscAdmin(
+    caseId: string
+  ) {
+    // Verify CTSC Admin can view the unassigned Action Unprocessed Correspondence task
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+    await this.homePage.navigateToTab('Tasks');
+    await this.tasksTab.verifyTaskIsDisplayed(aucTask.name);
+    await this.tasksTab.verifyPageContentByKeyValue(
+      aucTask.name,
+      'Assigned to',
+      aucTask.assignedToWhenNotAssigned
+    );
+    await this.tasksTab.verifyManageOptions(
+      aucTask.name,
+      aucTask.unassignedManageOptions
+    );
 
-    async verifyCtscAdminAsAllocatedCaseWorkerCanCompleteTheAssignedReviewBilingualDocumentTask(caseId: string) {
+    // CTSC Admin cancels the task manually
+    await this.tasksTab.cancelTask(aucTask.name);
 
-        // Verify CTSC Admin as allocated caseworker can see the assigned Review Bi-Lingual Document - CTSC task
-        await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
-        await this.homePage.navigateToTab('Tasks');
-        await this.tasksTab.verifyTaskIsDisplayed(rbdTask.name);
+    // Verify task is removed from the tasks list within Tasks tab
+    await this.homePage.navigateToTab('Tasks');
+    await this.tasksTab.verifyTaskIsHidden(aucTask.name);
+  }
 
-        // CTSC Admin verifies assigned task details
-        await this.tasksTab.verifyPriortiy(rbdTask.name, rbdTask.priority);
-        await this.tasksTab.verifyPageContentByKeyValue(rbdTask.name, 'Assigned to', rbdTask.assignedTo);
-        await this.tasksTab.verifyManageOptions(rbdTask.name, rbdTask.assignedManageOptions);
-        await this.tasksTab.verifyNextStepsOptions(rbdTask.name, rbdTask.nextStepsOptions);
+  async verifyCtscAdminCanViewBilingualDocumentTaskAndCancelWelshTranslations(
+    caseId: string
+  ) {
+    // Verify CTSC Admin can view the unassigned Review Bi-Lingual Document task
+    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+    await this.homePage.navigateToTab('Tasks');
+    await this.tasksTab.verifyTaskIsDisplayed(rbdTask.name);
+    await this.tasksTab.verifyPageContentByKeyValue(
+      rbdTask.name,
+      'Assigned to',
+      rbdTask.assignedToWhenNotAssigned
+    );
+    await this.tasksTab.verifyManageOptions(
+      rbdTask.name,
+      rbdTask.unassignedManageOptions
+    );
 
-        // Select Request translation from WLU next step and complete the event
-        await this.tasksTab.clickNextStepLink(rbdTask.requestTranslationFromWlu.link);
+    // CTSC Admin cancels translations
+    let cancelTranslations = new CancelTranslations(this.page);
+    await cancelTranslations.performCancelTranslations(caseId, false);
+  }
 
-        let requestTranslations = new RequestTranslations(this.page);
-        await requestTranslations.completeRequestTranslations();
-
-        // CTSC Admin verifies the task is removed from the tasks list
-        await this.tasksTab.verifyTaskIsHidden(rbdTask.name);
-    }
-
-    async verifyUnassignedActionUnprocessedCorrespondenceTaskCanBeCancelledManuallyByCtscAdmin(caseId: string) {
-
-        // Verify CTSC Admin can view the unassigned Action Unprocessed Correspondence task
-        await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
-        await this.homePage.navigateToTab('Tasks')
-        await this.tasksTab.verifyTaskIsDisplayed(aucTask.name);
-        await this.tasksTab.verifyPageContentByKeyValue(aucTask.name, 'Assigned to', aucTask.assignedToWhenNotAssigned);
-        await this.tasksTab.verifyManageOptions(aucTask.name, aucTask.unassignedManageOptions);
-
-        // CTSC Admin cancels the task manually
-        await this.tasksTab.cancelTask(aucTask.name);
-
-        // Verify task is removed from the tasks list within Tasks tab
-        await this.homePage.navigateToTab('Tasks');
-        await this.tasksTab.verifyTaskIsHidden(aucTask.name);
-    }
-
-    async verifyCtscAdminCanViewBilingualDocumentTaskAndCancelWelshTranslations(caseId: string) {
-
-        // Verify CTSC Admin can view the unassigned Review Bi-Lingual Document task
-        await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
-        await this.homePage.navigateToTab('Tasks');
-        await this.tasksTab.verifyTaskIsDisplayed(rbdTask.name);
-        await this.tasksTab.verifyPageContentByKeyValue(rbdTask.name, 'Assigned to', rbdTask.assignedToWhenNotAssigned);
-        await this.tasksTab.verifyManageOptions(rbdTask.name, rbdTask.unassignedManageOptions);
-
-        // CTSC Admin cancels translations
-        let cancelTranslations = new CancelTranslations(this.page)
-        await cancelTranslations.performCancelTranslations(caseId, false);
-    }
-
-    async verifyUnassignedReviewBilingualDocumentTaskIsRemovedFromTheTasksList(caseId: string) {
-
-        // CTSC Admin verifies task is removed from the tasks list within Tasks tab
-        await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
-        await this.homePage.navigateToTab('Tasks');
-        await this.tasksTab.verifyTaskIsHidden(rbdTask.name);
-    }
+  async verifyUnassignedReviewBilingualDocumentTaskIsRemovedFromTheTasksList(
+    caseId: string
+  ) {
+    // CTSC Admin verifies task is removed from the tasks list within Tasks tab
+    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+    await this.homePage.navigateToTab('Tasks');
+    await this.tasksTab.verifyTaskIsHidden(rbdTask.name);
+  }
 }

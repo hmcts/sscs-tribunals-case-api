@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Objects;
 import org.apache.commons.io.FileUtils;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
@@ -29,7 +30,7 @@ public class PdfWatermarkerTest {
         byte[] blankPdf = getBytes(document);
         byte[] outputBytes = pw.shrinkAndWatermarkPdf(blankPdf,
                 "Appellant evidence","Addition  A");
-        try (PDDocument doc = PDDocument.load(outputBytes)) {
+        try (PDDocument doc = Loader.loadPDF(outputBytes)) {
             String text = new PDFTextStripper().getText(doc);
             assertThat(page1).isEqualToNormalizingNewlines(text);
         }
@@ -44,7 +45,7 @@ public class PdfWatermarkerTest {
         byte[] blankPdf = getBytes(document);
         byte[] outputBytes = pw.shrinkAndWatermarkPdf(blankPdf,
                 "Appellant evidence", "Addition  A");
-        try (PDDocument doc = PDDocument.load(outputBytes)) {
+        try (PDDocument doc = Loader.loadPDF(outputBytes)) {
             String text = new PDFTextStripper().getText(doc);
             assertEquals(2, doc.getNumberOfPages());
             assertThat(page1 + page2).isEqualToNormalizingNewlines(text);
@@ -60,7 +61,7 @@ public class PdfWatermarkerTest {
         byte[] blankPdf = getBytes(document);
         byte[] outputBytes = pw.shrinkAndWatermarkPdf(blankPdf,
                 "Appellant evidence", "Addition  A");
-        try (PDDocument doc = PDDocument.load(outputBytes)) {
+        try (PDDocument doc = Loader.loadPDF(outputBytes)) {
             String text = new PDFTextStripper().getText(doc);
             assertEquals(2, doc.getNumberOfPages());
             assertThat(page1 + page2).isEqualToNormalizingNewlines(text);

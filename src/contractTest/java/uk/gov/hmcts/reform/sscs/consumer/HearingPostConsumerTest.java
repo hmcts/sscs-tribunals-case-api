@@ -135,6 +135,8 @@ class HearingPostConsumerTest extends BasePactTest {
             ContractTestDataProvider.IDAM_OAUTH2_TOKEN,
             ContractTestDataProvider.SERVICE_AUTHORIZATION_TOKEN,
             null,
+            null,
+            null,
             ContractTestDataProvider.generateHearingRequest()
         );
 

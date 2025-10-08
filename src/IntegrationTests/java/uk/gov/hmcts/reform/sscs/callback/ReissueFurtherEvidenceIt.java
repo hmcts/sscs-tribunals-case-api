@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -12,9 +11,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
@@ -28,10 +27,10 @@ import uk.gov.hmcts.reform.sscs.controller.CcdCallbackController;
 @AutoConfigureMockMvc
 public class ReissueFurtherEvidenceIt extends AbstractEventIt {
 
-    @MockBean
+    @MockitoBean
     private CoreCaseDataApi coreCaseDataApi;
 
-    @MockBean
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
 
     private String midEventPartialJson;
@@ -42,7 +41,7 @@ public class ReissueFurtherEvidenceIt extends AbstractEventIt {
     public void setup() throws IOException {
         CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-        mapper.registerModule(new JavaTimeModule());
+        mapper.findAndRegisterModules();
         json = getJson("callback/reissueFurtherEvidenceCallback.json");
         midEventPartialJson = getJson("callback/reissueFurtherEvidenceDocumentPartial.json");
         aboutToSubmitPartialJson = getJson("callback/reissueFurtherEvidenceOriginalSenderPartial.json");

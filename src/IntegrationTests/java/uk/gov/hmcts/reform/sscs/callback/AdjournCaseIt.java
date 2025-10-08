@@ -20,9 +20,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.mockito.ArgumentCaptor;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -76,13 +76,13 @@ public class AdjournCaseIt extends AbstractEventIt {
     public static final String DATE_2017 = "2017-07-17";
     public static final String DATE_2019 = "2019-10-10";
     public static final String DOCUMENT_URL = "document.url";
-    @MockBean
+    @MockitoBean
     private IdamClient idamClient;
-    @MockBean
+    @MockitoBean
     private GenerateFile generateFile;
-    @MockBean
+    @MockitoBean
     private UserInfo userInfo;
-    @MockBean
+    @MockitoBean
     private JudicialRefDataService judicialRefDataService;
 
     @DisplayName("Call to mid event callback when path is YES NO YES will validate the data when due date in past")

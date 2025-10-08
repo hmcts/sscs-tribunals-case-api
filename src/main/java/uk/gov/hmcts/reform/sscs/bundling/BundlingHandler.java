@@ -15,6 +15,8 @@ import static uk.gov.hmcts.reform.sscs.util.ConfidentialityRequestUtil.isAtLeast
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -93,10 +95,11 @@ public class BundlingHandler {
 
         log.info("Setting the bundleConfiguration on the case {} for case id {}", sscsCaseData.getBundleConfiguration(), callback.getCaseDetails().getId());
 
-        BundleCallback<SscsCaseData> bundleCallback = new BundleCallback(callback);
+        BundleCallback<SscsCaseData> bundleCallback = new BundleCallback<>(callback);
         return sendToBundleService(bundleCallback);
     }
 
+    @SuppressWarnings("unchecked")
     private PreSubmitCallbackResponse<SscsCaseData> sendToBundleService(BundleCallback<SscsCaseData> callback) {
         return serviceRequestExecutor.post(callback, bundleUrl + CREATE_BUNDLE_ENDPOINT);
     }
@@ -125,15 +128,13 @@ public class BundlingHandler {
 
     private boolean hasBundleAdditionsWithSameCharacter(SscsCaseData sscsCaseData) {
         return emptyIfNull(sscsCaseData.getSscsDocument())
-                .stream()
-                .filter(document -> document.getValue() != null)
-                .map(document -> document.getValue().getBundleAddition())
-                .filter(bundleAddition -> bundleAddition != null)
-                .map(String::toUpperCase)
-                .collect(Collectors.groupingBy(Function.identity(), counting()))    // create a map {A=2,B=1}
-                .entrySet().stream()
-                .filter(bundleAdditionItem -> bundleAdditionItem.getValue() > 1)
-                .count() > 0;
+            .stream()
+            .filter(document -> document.getValue() != null)
+            .map(document -> document.getValue().getBundleAddition())
+            .filter(Objects::nonNull)
+            .map(String::toUpperCase)
+            .collect(Collectors.groupingBy(Function.identity(), counting()))    // create a map {A=2,B=1}
+            .entrySet().stream().anyMatch(bundleAdditionItem -> bundleAdditionItem.getValue() > 1);
 
     }
 
@@ -158,7 +159,9 @@ public class BundlingHandler {
                 .stream()
                 .filter(sscsDocument -> sscsDocument.getValue() != null)
                 .filter(sscsDocument -> isNull(sscsDocument.getValue().getDocumentFileName()))
-                .forEach(sscsDocument -> sscsDocument.getValue().setDocumentFileName(sscsDocument.getValue().getDocumentLink().getDocumentFilename()));
+                .forEach(sscsDocument -> sscsDocument.getValue().setDocumentFileName(Optional.ofNullable(
+                    sscsDocument.getValue().getDocumentLink()).orElse(sscsDocument.getValue().getAvDocumentLink())
+                    .getDocumentFilename()));
     }
 
     private void setMultiBundleConfig(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {

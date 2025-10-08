@@ -1,0 +1,131 @@
+{
+  "createCaseData": {
+    "channelType": "Online (SYA)",
+    "benefitType": "Infected Blood Compensation / 093",
+    "hearingType": "Oral",
+    "hearingRoute": "List Assist",
+    "mrnOrReviewDecisionNoticeDetails": {
+      "date": "",
+      "lateReason": "test for late reason"
+    },
+    "appellantDetails": {
+      "nameDetails": {
+        "title": "Mr.",
+        "firstName": "ibca_automation_firstname",
+        "middleName": "ibca_automation_middlename",
+        "lastName": "ibca_automation_lastname"
+      },
+      "identityDetails": {
+        "dob": "1-1-2000",
+        "ibcaReferenceNumber": "A11B22"
+      },
+      "addressDetails": {
+        "line1": "12, Highstreet, Test",
+        "line2": "Highstreet",
+        "line3": "",
+        "town": "Camden",
+        "county": "Hertfordshire",
+        "postcode": "TS1 1ST",
+        "country": "United Kingdom",
+        "isLiveInEngland": "Yes"
+      },
+      "contactDetails": {
+        "contactNumber": "07398785050",
+        "mobileNumber": "07398785051",
+        "contactEmail": "test@gmail.com"
+      },
+      "appellantRole": "I am appealing for myself"
+    },
+    "hearingSubtype": {
+      "telephone": "No",
+      "video": "No",
+      "faceToFace": "No"
+    },
+    "hearingOptions": {
+      "isAttending": "No",
+      "needLanguageIntepreter": "No",
+      "wantsSupport": "No",
+      "unavailableDates": "No",
+      "otherInformation": "no other information",
+      "signLanguages": "Gallacian"
+    },
+    "appealReasons": [
+      {
+        "reason": "test for reasons",
+        "description": "test for description"
+      }
+    ],
+    "supporterDetails": {
+      "nameDetails": {
+        "title": "Mr",
+        "firstName": "SF1",
+        "middleName": "SM1",
+        "lastName": "SL1"
+      },
+      "contactDetails": {
+        "contactNumber": "07398785050",
+        "mobileNumber": "07398785051",
+        "contactEmail": "testsupport@gmail.com"
+      }
+    },
+    "representativeDetails": {
+      "hasRepresentative": "No"
+    },
+    "signer": "Joe Bloggs",
+    "caseCreatedDate": "",
+    "regionalCentre": "London",
+    "isScottishCase": "No",
+    "ftaIssuingOffice": "IBCA"
+  },
+  "updateCaseData": {
+    "mrnOrReviewDecisionNoticeDetails": {
+      "date": "",
+      "lateReason": "updated test for late reason"
+    },
+    "appellantDetails": {
+      "nameDetails": {
+        "title": "Mr.",
+        "firstName": "ibca_update_automation_firstname",
+        "middleName": "ibca_update_automation_middlename",
+        "lastName": "ibca_update_automation_lastname"
+      },
+      "identityDetails": {
+        "dob": "1-1-2001",
+        "ibcaReferenceNumber": "C33B44"
+      },
+      "addressDetails": {
+        "line1": "12, Lowstreet, Test"
+      },
+      "contactDetails": {
+        "contactNumber": "07398785050",
+        "mobileNumber": "07398785051",
+        "contactEmail": "updatetest@gmail.com"
+      },
+      "appellantRole": "I am appealing for myself"
+    },
+    "hearingSubtype": {
+      "telephone": "No",
+      "video": "No",
+      "faceToFace": "Yes"
+    },
+    "hearingOptions": {
+      "isAttending": "Yes",
+      "needLanguageIntepreter": "Yes",
+      "wantsSupport": "Yes",
+      "unavailableDates": "No",
+      "otherInformation": "updated with other information",
+      "signLanguages": "Jamaican"
+    },
+    "appealReasons": [
+      {
+        "reason": "update test for reasons",
+        "description": "update test for description"
+      }
+    ],
+    "signer": "Joe Bloggs Update",
+    "caseCreatedDate": "",
+    "regionalCentre": "Birmingham",
+    "isScottishCase": "No",
+    "ftaIssuingOffice": "IBCA"
+  }
+}

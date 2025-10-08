@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
@@ -22,23 +23,32 @@ import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 @SuppressWarnings({"PMD.ExcessiveImports", "PMD.UnusedFormalParameter", "PMD.TooManyMethods", "AvoidThrowingRawExceptionTypes"})
 public class HearingServiceConsumer {
     private final ReferenceDataServiceHolder refData;
-
+    private final OverridesMapping overridesMapping;
 
     public Consumer<SscsCaseData> getCreateHearingCaseDataConsumer(HmcUpdateResponse response, Long hearingRequestId) {
         return sscsCaseData -> updateCaseDataWithHearingResponse(response, hearingRequestId, sscsCaseData);
 
     }
 
-    public Consumer<SscsCaseDetails> getCreateHearingCaseDetailsConsumerV2(HmcUpdateResponse response, Long hearingRequestId) {
+    public Consumer<SscsCaseDetails> getCreateHearingCaseDetailsConsumerV2(PanelMemberComposition panelComposition,
+                                                                           HmcUpdateResponse response,
+                                                                           Long hearingRequestId,
+                                                                           boolean isUpdateHearing) {
         return sscsCaseDetails -> {
             try {
-                OverridesMapping.setDefaultListingValues(sscsCaseDetails.getData(), refData);
+                if (isUpdateHearing) {
+                    if (isNull(sscsCaseDetails.getData().getSchedulingAndListingFields().getOverrideFields())) {
+                        overridesMapping.setOverrideValues(sscsCaseDetails.getData(), refData);
+                    }
+                } else {
+                    overridesMapping.setDefaultListingValues(sscsCaseDetails.getData(), refData);
+                }
+                sscsCaseDetails.getData().setPanelMemberComposition(panelComposition);
                 updateCaseDataWithHearingResponse(response, hearingRequestId, sscsCaseDetails.getData());
             } catch (ListingException e) {
                 throw new RuntimeException(e);
             }
         };
-
     }
 
     private void updateCaseDataWithHearingResponse(HmcUpdateResponse response, Long hearingRequestId, SscsCaseData caseData) {
@@ -52,8 +62,7 @@ public class HearingServiceConsumer {
         HearingsServiceHelper.updateHearingId(hearing, response);
         HearingsServiceHelper.updateVersionNumber(hearing, response);
 
-        if (refData.isAdjournmentFlagEnabled()
-                && YesNo.isYes(caseData.getAdjournment().getAdjournmentInProgress())) {
+        if (YesNo.isYes(caseData.getAdjournment().getAdjournmentInProgress())) {
             log.debug("Case Updated with AdjournmentInProgress to NO for Case ID {}", caseData.getCcdCaseId());
             caseData.getAdjournment().setAdjournmentInProgress(YesNo.NO);
         }

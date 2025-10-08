@@ -40,7 +40,7 @@ public class CaseUpdatedSubmittedHandler implements PreSubmitCallbackHandler<Ssc
 
         return callbackType.equals(CallbackType.SUBMITTED)
                 && callback.getEvent() == EventType.CASE_UPDATED
-                && READY_TO_LIST.getId().equals(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom());
+                && READY_TO_LIST.getId().equals(sscsCaseData.getCreatedInGapsFrom());
     }
 
     @Override

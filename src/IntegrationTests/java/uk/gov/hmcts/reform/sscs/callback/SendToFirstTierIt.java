@@ -12,17 +12,16 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -45,32 +44,31 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @SpringBootTest(properties = {
-    "feature.postHearingsB.enabled=true",
-    "feature.handle-ccd-callbackMap-v2.enabled=true"
+    "feature.postHearingsB.enabled=true"
 })
 @AutoConfigureMockMvc
 public class SendToFirstTierIt extends AbstractEventIt {
 
-    @SpyBean
+    @MockitoSpyBean
     private CcdCallbackMapService ccdCallbackMapService;
 
-    @SpyBean
+    @MockitoSpyBean
     private SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer;
 
-    @MockBean
+    @MockitoBean
     private IdamService idamService;
 
-    @MockBean
+    @MockitoBean
     private CcdClient ccdClient;
 
-    @MockBean
+    @MockitoBean
     private SscsCcdConvertService sscsCcdConvertService;
 
     @BeforeEach
     public void setup() throws IOException {
         CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-        mapper.registerModule(new JavaTimeModule());
+        mapper.findAndRegisterModules();
         json = getJson("callback/sendToFirstTierRequest.json");
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
     }

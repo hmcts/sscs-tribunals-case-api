@@ -233,6 +233,19 @@
   },
   {
     "CaseEventID": "writeFinalDecision",
+    "CaseFieldID": "writeFinalDecisionOtherPanelMemberName",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 6,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "panelMemberNames",
+    "FieldShowCondition": "appeal.benefitType.code=\"ESA\" OR appeal.benefitType.code=\"UC\" OR appeal.benefitType.code=\"childSupport\" OR appeal.benefitType.code=\"taxCredit\" OR appeal.benefitType.code=\"guardiansAllowance\" OR appeal.benefitType.code=\"taxFreeChildcare\" OR appeal.benefitType.code=\"homeResponsibilitiesProtection\" OR appeal.benefitType.code=\"childBenefit\" OR appeal.benefitType.code=\"thirtyHoursFreeChildcare\" OR appeal.benefitType.code=\"guaranteedMinimumPension\" OR appeal.benefitType.code=\"nationalInsuranceCredits\"",
+    "ShowSummaryChangeOption": "Y",
+    "RetainHiddenValue": "Yes"
+  },
+  {
+    "CaseEventID": "writeFinalDecision",
     "CaseFieldID": "writeFinalDecisionMedicallyQualifiedPanelMemberName",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
@@ -254,19 +267,6 @@
     "PageID": "panelMemberNames",
     "FieldShowCondition": "appeal.benefitType.code=\"childSupport\" OR appeal.benefitType.code=\"taxCredit\" OR appeal.benefitType.code=\"guardiansAllowance\" OR appeal.benefitType.code=\"taxFreeChildcare\" OR appeal.benefitType.code=\"homeResponsibilitiesProtection\" OR appeal.benefitType.code=\"childBenefit\" OR appeal.benefitType.code=\"thirtyHoursFreeChildcare\" OR appeal.benefitType.code=\"guaranteedMinimumPension\" OR appeal.benefitType.code=\"nationalInsuranceCredits\"",
     "ShowSummaryChangeOption": "Y"
-  },
-  {
-    "CaseEventID": "writeFinalDecision",
-    "CaseFieldID": "writeFinalDecisionOtherPanelMemberName",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 6,
-    "PageFieldDisplayOrder": 3,
-    "PageID": "panelMemberNames",
-    "FieldShowCondition": "appeal.benefitType.code=\"ESA\" OR appeal.benefitType.code=\"UC\" OR appeal.benefitType.code=\"childSupport\" OR appeal.benefitType.code=\"taxCredit\" OR appeal.benefitType.code=\"guardiansAllowance\" OR appeal.benefitType.code=\"taxFreeChildcare\" OR appeal.benefitType.code=\"homeResponsibilitiesProtection\" OR appeal.benefitType.code=\"childBenefit\" OR appeal.benefitType.code=\"thirtyHoursFreeChildcare\" OR appeal.benefitType.code=\"guaranteedMinimumPension\" OR appeal.benefitType.code=\"nationalInsuranceCredits\"",
-    "ShowSummaryChangeOption": "Y",
-    "RetainHiddenValue": "Yes"
   },
   {
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=decisionDate",

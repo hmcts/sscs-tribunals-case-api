@@ -104,7 +104,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         String heldBefore = buildHeldBefore(caseData, userAuthorisation, isPostHearingsEnabled);
 
         if (isPostHearingsEnabled && nonNull(finalDecisionCaseData.getFinalDecisionHeldAt())
-                && SscsUtil.isCorrectionInProgress(caseData, isPostHearingsEnabled)) {
+            && SscsUtil.isCorrectionInProgress(caseData, isPostHearingsEnabled)) {
             heldAt = finalDecisionCaseData.getFinalDecisionHeldAt();
         }
 
@@ -167,19 +167,16 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         writeFinalDecisionBuilder.presentingOfficerAttended("yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPresentingOfficerAttendedQuestion()));
         if (isOtherPartyPresent(caseData) && CollectionUtils.isNotEmpty(caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions())) {
             writeFinalDecisionBuilder.otherPartyNamesAttendedHearing(caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions().stream()
-                            .filter(aq -> YesNo.YES.equals(aq.getValue().getAttendedOtherParty()))
-                            .map(aq -> aq.getValue().getOtherPartyName())
-                            .collect(Collectors.joining(", ")));
+                .filter(aq -> YesNo.YES.equals(aq.getValue().getAttendedOtherParty()))
+                .map(aq -> aq.getValue().getOtherPartyName())
+                .collect(Collectors.joining(", ")));
         }
 
-        Optional<Benefit> benefit = caseData.getBenefitType();
-        if (benefit.isPresent()) {
-            if (benefit.get().getSscsType().equals(SscsType.SSCS5)) {
-                writeFinalDecisionBuilder.isHmrc(true);
-            } else {
-                writeFinalDecisionBuilder.isHmrc(false);
-            }
-        }
+        SscsType sscsFormType = Optional.ofNullable(caseData.getBenefitType())
+            .flatMap(benefit -> benefit.map(Benefit::getSscsType))
+            .orElse(null);
+        writeFinalDecisionBuilder.isHmrc(SscsType.SSCS5.equals(sscsFormType));
+        writeFinalDecisionBuilder.isIbca(caseData.isIbcCase() || SscsType.SSCS8.equals(sscsFormType));
 
         WriteFinalDecisionTemplateBody payload = writeFinalDecisionBuilder.build();
 
@@ -206,7 +203,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
     }
 
     protected abstract void setTemplateContent(DecisionNoticeOutcomeService outcomeService, PreSubmitCallbackResponse<SscsCaseData> response,
-        NoticeIssuedTemplateBodyBuilder builder, SscsCaseData caseData, WriteFinalDecisionTemplateBody payload);
+                                               NoticeIssuedTemplateBodyBuilder builder, SscsCaseData caseData, WriteFinalDecisionTemplateBody payload);
 
     private void setHearings(WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder, SscsCaseData caseData) {
         String heldAt = SscsUtil.buildWriteFinalDecisionHeldAt(caseData, venueDataLoader);

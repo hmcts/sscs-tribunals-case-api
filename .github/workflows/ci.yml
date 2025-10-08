@@ -1,4 +1,4 @@
-name: CI
+name: CI - Integration tests
 
 on:
   pull_request:
@@ -22,12 +22,18 @@ jobs:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle-
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 17
-      - name: Run checks
-        run: ./gradlew check
+          java-version: 21
       - name: Run integration tests
         run: ./gradlew integration
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          check_name: Integration Tests results
+          comment_title: Integration Tests results
+          files: |
+            build/test-results/**/*.xml

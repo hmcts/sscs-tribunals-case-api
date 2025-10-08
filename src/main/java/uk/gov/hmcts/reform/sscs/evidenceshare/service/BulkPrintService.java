@@ -2,11 +2,18 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
 import static java.lang.String.format;
 import static java.util.Base64.getEncoder;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +26,7 @@ import uk.gov.hmcts.reform.sendletter.api.SendLetterApi;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.evidenceshare.exception.BulkPrintException;
@@ -34,6 +42,8 @@ public class BulkPrintService implements PrintService {
     private static final String CASE_IDENTIFIER = "caseIdentifier";
     private static final String LETTER_TYPE_KEY = "letterType";
     private static final String APPELLANT_NAME = "appellantName";
+    private static final String IS_INTERNATIONAL = "isInternational";
+    private static final String IS_IBCA = "isIbca";
     public static final String RECIPIENTS = "recipients";
 
     private final SendLetterApi sendLetterApi;
@@ -100,8 +110,8 @@ public class BulkPrintService implements PrintService {
             PDDocument bundledLetter;
 
             try {
-                bundledLetter = PDDocument.load(letter);
-                PDDocument loadDoc = PDDocument.load(coverSheet);
+                bundledLetter = Loader.loadPDF(letter);
+                PDDocument loadDoc = Loader.loadPDF(coverSheet);
 
                 final PDFMergerUtility merger = new PDFMergerUtility();
                 merger.appendDocument(bundledLetter, loadDoc);
@@ -161,6 +171,12 @@ public class BulkPrintService implements PrintService {
         additionalData.put(CASE_IDENTIFIER, sscsCaseData.getCcdCaseId());
         additionalData.put(APPELLANT_NAME, sscsCaseData.getAppeal().getAppellant().getName().getFullNameNoTitle());
         additionalData.put(RECIPIENTS, getRecipients(recipient));
+
+        YesNo isInUk = sscsCaseData.getAppeal().getAppellant().getAddress().getInMainlandUk();
+        if (NO.equals(isInUk)) {
+            additionalData.put(IS_INTERNATIONAL, "true");
+        }
+        additionalData.put(IS_IBCA, sscsCaseData.isIbcCase() ? "true" : "false");
         return additionalData;
     }
 

@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.SET_ASIDE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
+import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
@@ -32,7 +33,7 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private final CcdCallbackMapService ccdCallbackMapService;
 
-    private final CcdService ccdService;
+    private final UpdateCcdCaseService updateCcdCaseService;
 
     private final IdamService idamService;
 
@@ -56,7 +57,7 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
-        Long caseId = Long.valueOf(caseData.getCcdCaseId());
+        long caseId = Long.parseLong(caseData.getCcdCaseId());
 
         PostHearing postHearing = caseData.getPostHearing();
         PostHearingReviewType typeSelected = postHearing.getReviewType();
@@ -73,9 +74,13 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
 
         boolean isSetAsideRefusedSor = isSetAsideRefusedSor(postHearing);
 
-        SscsUtil.clearPostHearingFields(caseData, isPostHearingsEnabled);
+        Consumer<SscsCaseData> sscsCaseDataConsumer = sscsCaseData -> SscsUtil.clearPostHearingFields(sscsCaseData, isPostHearingsEnabled);
 
-        caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
+        caseData = ccdCallbackMapService.handleCcdCallbackMapV2(
+                callbackMap,
+                caseId,
+                sscsCaseDataConsumer
+        );
 
         if (isSetAsideRefusedSor) {
             handleSetAsideRefusedSor(caseData);
@@ -85,7 +90,8 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
     }
 
     private void handleSetAsideRefusedSor(SscsCaseData caseData) {
-        ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
+
+        updateCcdCaseService.triggerCaseEventV2(Long.valueOf(caseData.getCcdCaseId()),
             EventType.SOR_REQUEST.getCcdType(), "Send to hearing Judge for statement of reasons", "",
             idamService.getIdamTokens());
     }
