@@ -26,5 +26,16 @@ export class MyWorkPage {
   async verifyNoAssignedTasks() {
     await webActions.verifyTextVisibility('You have no assigned tasks.')
   }
+
+  async unassignTask(taskName: string) {
+    const manageBtn = `//td[contains(.,'${taskName}')]/..//button[contains(.,'Manage')]`
+    const unassignLink = '//a[@id="action_unclaim"]'
+    await webActions.clickElementById(manageBtn);
+    await webActions.clickElementById(unassignLink);
+    await webActions.clickButton('Unassign');
+    await webActions.verifyTextVisibility(`You've unassigned a task. It's now in Available tasks.`);
+    await this.verifyNoAssignedTasks();
+  }
+
 }
 

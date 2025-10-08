@@ -53,7 +53,7 @@ import { UpdateListingRequirement } from '../fixtures/steps/update.listing.requi
 import { CommunicateWithFta } from '../fixtures/steps/communicate-with-fta';
 import { Adjournment } from '../fixtures/steps/adjournment';
 import { AmendElements } from '../fixtures/steps/amend.elements';
-import { ReviewIncompleteApplication } from '../fixtures/steps/work-allocation/review.incomplete.application';
+import { ReviewIncompleteAppeal } from '../fixtures/steps/work-allocation/review.incomplete.appeal';
 
 type MyStepsFixtures = {
   addNoteSteps: Note;
@@ -110,7 +110,7 @@ type MyStepsFixtures = {
   communicateWithFtaSteps: CommunicateWithFta;
   adjournmentSteps: Adjournment;
   amendElementSteps: AmendElements;
-  reviewIncompleteApplicationSteps: ReviewIncompleteApplication;
+  reviewIncompleteAppealSteps: ReviewIncompleteAppeal;
 };
 
 export const test = stepsFactory.extend<MyStepsFixtures>({
@@ -429,8 +429,8 @@ export const test = stepsFactory.extend<MyStepsFixtures>({
     const amendElementSteps = new AmendElements(page);
     await use(amendElementSteps);
   },
-  reviewIncompleteApplicationSteps: async ({ page }, use) => {
-    const reviewIncompleteApplicationSteps = new ReviewIncompleteApplication(page);
-    await use(reviewIncompleteApplicationSteps);
+  reviewIncompleteAppealSteps: async ({ page }, use) => {
+    const reviewIncompleteAppealSteps = new ReviewIncompleteAppeal(page);
+    await use(reviewIncompleteAppealSteps);
   }
 });
