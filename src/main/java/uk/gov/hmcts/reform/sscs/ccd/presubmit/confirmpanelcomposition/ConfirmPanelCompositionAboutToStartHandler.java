@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.confirmpanelcomposition;
 
-import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist.ReadyToListAboutToSubmitHandler.EXISTING_HEARING_WARNING;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,19 +10,16 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
-import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
-import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
+import uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class ConfirmPanelCompositionAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final HmcHearingApiService hmcHearingApiService;
+    private final HearingsServiceHelper hearingsServiceHelper;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -46,13 +41,7 @@ public class ConfirmPanelCompositionAboutToStartHandler implements PreSubmitCall
 
         final PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(sscsCaseData.getCcdCaseId(), HmcStatus.LISTED);
-
-        if (HearingRoute.LIST_ASSIST == sscsCaseData.getSchedulingAndListingFields().getHearingRoute()
-                && nonNull(hearingsGetResponse.getCaseHearings())  && !hearingsGetResponse.getCaseHearings().isEmpty()) {
-            response.addError(EXISTING_HEARING_WARNING);
-            log.info("Existing hearing warning added for case id {}", sscsCaseData.getCcdCaseId());
-        }
+        hearingsServiceHelper.validationCheckForListedHearings(sscsCaseData, response);
 
         return response;
     }

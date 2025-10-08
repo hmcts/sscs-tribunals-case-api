@@ -10,7 +10,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.PHE_REQ
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_TCW;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist.ReadyToListAboutToSubmitHandler.EXISTING_HEARING_WARNING;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getUpdatedDirectionDueDate;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
@@ -43,20 +42,17 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
+import uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
-import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
-import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
-import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
 import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 import uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil;
 
@@ -70,7 +66,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     private final DwpDocumentService dwpDocumentService;
     private final AddNoteService addNoteService;
     private final PanelCompositionService panelCompositionService;
-    private final HmcHearingApiService hmcHearingApiService;
+    private final HearingsServiceHelper hearingsServiceHelper;
     private final AddedDocumentsUtil addedDocumentsUtil;
     private static final Enum<EventType> EVENT_TYPE = EventType.DWP_UPLOAD_RESPONSE;
 
@@ -262,13 +258,8 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     }
 
     private void checkForListedHearings(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseData.getCcdCaseId(), HmcStatus.LISTED);
-
-        if (HearingRoute.LIST_ASSIST == caseData.getSchedulingAndListingFields().getHearingRoute()
-                && nonNull(hearingsGetResponse.getCaseHearings())  && !hearingsGetResponse.getCaseHearings().isEmpty()
-                && caseData.getDwpFurtherInfo().equals("No")) {
-            preSubmitCallbackResponse.addError(EXISTING_HEARING_WARNING);
-            log.error("Error on case {}: There is already a hearing request in List assist", caseData.getCcdCaseId());
+        if (caseData.getDwpFurtherInfo().equals("No")) {
+            hearingsServiceHelper.validationCheckForListedHearings(caseData, preSubmitCallbackResponse);
         }
     }
 

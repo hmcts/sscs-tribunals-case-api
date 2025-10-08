@@ -17,7 +17,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.RESPONSE_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist.ReadyToListAboutToSubmitHandler.EXISTING_HEARING_WARNING;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist.ReadyToListAboutToSubmitHandler.GAPS_CASE_WARNING;
 
 import java.util.HashMap;
@@ -45,9 +44,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.exception.GetCaseException;
 import uk.gov.hmcts.reform.sscs.exception.TribunalsEventProcessingException;
 import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
-import uk.gov.hmcts.reform.sscs.helper.SscsHelper;
+import uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
-import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingRequestHandler;
 
@@ -62,9 +60,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
     @Mock
     private HearingRequestHandler hearingRequestHandler;
     @Mock
-    private HmcHearingApiService hmcHearingApiService;
-    @Mock
-    private SscsHelper sscsHelper;
+    private HearingsServiceHelper hearingsServiceHelper;
 
     private SscsCaseData caseData;
     private ReadyToListAboutToSubmitHandler handler;
@@ -83,7 +79,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
                 new CaseDetails<>(1234L, "SSCS", RESPONSE_RECEIVED, caseData, now(), "Benefit");
         callback = new Callback<>(caseDetails, empty(), READY_TO_LIST, false);
 
-        handler = new ReadyToListAboutToSubmitHandler(regionalProcessingCenterService, hearingRequestHandler, sscsHelper, hmcHearingApiService);
+        handler = new ReadyToListAboutToSubmitHandler(regionalProcessingCenterService, hearingRequestHandler, hearingsServiceHelper);
     }
 
     @ParameterizedTest
@@ -125,17 +121,6 @@ public class ReadyToListAboutToSubmitHandlerTest {
 
         assertEquals(0, response.getErrors().size());
         assertEquals(0, response.getWarnings().size());
-    }
-
-    @Test
-    public void givenAListAssistCaseIfAHearingIsListedThenReturnError() {
-        caseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
-        caseData.setRegion("TEST");
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(0, response.getErrors().size());
-        assertFalse(response.getErrors().contains(EXISTING_HEARING_WARNING));
     }
 
     @Test

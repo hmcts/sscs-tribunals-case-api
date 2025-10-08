@@ -12,9 +12,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willAnswer;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
@@ -80,14 +80,11 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.WorkAllocationFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
-import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
-import uk.gov.hmcts.reform.sscs.model.multi.hearing.CaseHearing;
-import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
-import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
@@ -109,7 +106,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Mock
     private PanelCompositionService panelCompositionService;
     @Mock
-    private HmcHearingApiService hmcHearingApiService;
+    private HearingsServiceHelper hearingsServiceHelper;
 
     private DwpDocumentService dwpDocumentService;
     private AddedDocumentsUtil addedDocumentsUtil;
@@ -144,7 +141,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         dwpDocumentService = new DwpDocumentService();
         addNoteService = new AddNoteService(userDetailsService);
         handler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
-                addNoteService, panelCompositionService, hmcHearingApiService, addedDocumentsUtil);
+                addNoteService, panelCompositionService, hearingsServiceHelper, addedDocumentsUtil);
     }
 
     @Test
@@ -216,8 +213,13 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     public void givenAListAssistCaseIfAHearingIsListedAndDwpFurtherInfoIsNo_displayAnError() {
         callback.getCaseDetails().getCaseData().getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
         callback.getCaseDetails().getCaseData().setDwpFurtherInfo("No");
-        given(hmcHearingApiService.getHearingsRequest(anyString(), eq(HmcStatus.LISTED)))
-                .willReturn(HearingsGetResponse.builder().caseHearings(List.of(CaseHearing.builder().hearingId(1L).build())).build());
+
+        willAnswer(invocation -> {
+            PreSubmitCallbackResponse<SscsCaseData> resp = invocation.getArgument(1);
+            resp.addError(EXISTING_HEARING_WARNING);
+            return null;
+        }).given(hearingsServiceHelper).validationCheckForListedHearings(any(), any());
+
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -769,7 +771,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenAudioVideoDocuments_shouldComputeCorrectAudioVideoTotals() throws JsonProcessingException {
         handler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
-            new AddNoteService(userDetailsService), panelCompositionService, hmcHearingApiService, new AddedDocumentsUtil(true));
+            new AddNoteService(userDetailsService), panelCompositionService, hearingsServiceHelper, new AddedDocumentsUtil(true));
 
         List<AudioVideoEvidence> audioVideoEvidence = new ArrayList<>();
 
@@ -819,7 +821,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenPreExistingAudioVideoDocuments_shouldComputeCorrectAudioVideoTotalsForAvAddedThisEvent() throws JsonProcessingException {
         handler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
-            new AddNoteService(userDetailsService), panelCompositionService, hmcHearingApiService, new AddedDocumentsUtil(true));
+            new AddNoteService(userDetailsService), panelCompositionService, hearingsServiceHelper, new AddedDocumentsUtil(true));
 
         List<AudioVideoEvidence> newAudioVideoEvidence = new ArrayList<>();
 
@@ -871,7 +873,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenNoNewAudioVideoDocuments_shouldStillClearAddedDocuments() {
         handler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
-            new AddNoteService(userDetailsService), panelCompositionService, hmcHearingApiService, new AddedDocumentsUtil(true));
+            new AddNoteService(userDetailsService), panelCompositionService, hearingsServiceHelper, new AddedDocumentsUtil(true));
 
         sscsCaseData.setDwpUploadAudioVideoEvidence(new ArrayList<>());
         sscsCaseData.setWorkAllocationFields(WorkAllocationFields.builder()
@@ -1551,7 +1553,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         when(panelCompositionService.resetPanelCompositionIfStale(eq(sscsCaseData), eq(Optional.of(caseDetailsBefore))))
                 .thenReturn(panelComposition);
         handler = new DwpUploadResponseAboutToSubmitHandler(
-                dwpDocumentService, addNoteService, panelCompositionService, hmcHearingApiService, addedDocumentsUtil);
+                dwpDocumentService, addNoteService, panelCompositionService, hearingsServiceHelper, addedDocumentsUtil);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 

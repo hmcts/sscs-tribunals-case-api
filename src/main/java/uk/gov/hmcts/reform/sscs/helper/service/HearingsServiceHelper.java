@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.helper.service;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist.ReadyToListAboutToSubmitHandler.EXISTING_HEARING_WARNING;
 
 import jakarta.validation.Valid;
 import java.util.ArrayList;
@@ -9,11 +10,15 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.jetbrains.annotations.Nullable;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
@@ -27,12 +32,13 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingSubChannel;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HmcUpdateResponse;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
+import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
 
 @Slf4j
+@RequiredArgsConstructor
 public final class HearingsServiceHelper {
 
-    private HearingsServiceHelper() {
-    }
+    private final HmcHearingApiService hmcHearingApiService;
 
     public static void updateHearingId(Hearing hearing, HmcUpdateResponse response) {
         if (nonNull(response.getHearingRequestId())) {
@@ -120,6 +126,16 @@ public final class HearingsServiceHelper {
             return HmcStatus.HEARING_REQUESTED == hmcStatus
                     || HmcStatus.AWAITING_LISTING == hmcStatus;
         }
+    }
+
+    public PreSubmitCallbackResponse<SscsCaseData> validationCheckForListedHearings(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+        HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseData.getCcdCaseId(), HmcStatus.LISTED);
+        if (HearingRoute.LIST_ASSIST == caseData.getSchedulingAndListingFields().getHearingRoute()
+                && CollectionUtils.isNotEmpty(hearingsGetResponse.getCaseHearings())) {
+            response.addError(EXISTING_HEARING_WARNING);
+            log.error("Error on case {}: There is already a hearing request in List assist", caseData.getCcdCaseId());
+        }
+        return response;
     }
 
     public static HearingChannel getHearingSubChannel(HearingGetResponse hearingGetResponse) {

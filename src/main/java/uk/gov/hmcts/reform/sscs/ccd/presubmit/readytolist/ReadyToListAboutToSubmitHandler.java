@@ -15,8 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.helper.SscsHelper;
-import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
+import uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingRequestHandler;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
@@ -33,8 +32,8 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
 
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final HearingRequestHandler hearingRequestHandler;
-    private final SscsHelper sscsHelper;
-    private final HmcHearingApiService hmcHearingApiService;
+    private final HearingsServiceHelper hearingsServiceHelper;
+
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -66,7 +65,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
         }
 
         var response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
-        sscsHelper.validationCheckForListedHearings(sscsCaseData, response);
+        hearingsServiceHelper.validationCheckForListedHearings(sscsCaseData, response);
 
         String region = sscsCaseData.getRegion();
 

@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
@@ -42,13 +41,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
-import uk.gov.hmcts.reform.sscs.model.multi.hearing.CaseHearing;
-import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
-import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDaySchedule;
-import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
+import uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
-import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
 
 @RunWith(JUnitParamsRunner.class)
 public class HmctsResponseReviewedAboutToStartTest {
@@ -63,7 +57,7 @@ public class HmctsResponseReviewedAboutToStartTest {
     private CaseDetails<SscsCaseData> caseDetails;
 
     @Mock
-    private HmcHearingApiService hmcHearingApiService;
+    private HearingsServiceHelper hearingsServiceHelper;
 
     @Mock
     private DwpAddressLookupService dwpAddressLookupService;
@@ -74,7 +68,7 @@ public class HmctsResponseReviewedAboutToStartTest {
     public void setUp() {
         openMocks(this);
         dwpAddressLookupService = new DwpAddressLookupService();
-        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hmcHearingApiService);
+        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsServiceHelper);
 
         when(callback.getEvent()).thenReturn(EventType.HMCTS_RESPONSE_REVIEWED);
 
@@ -168,16 +162,12 @@ public class HmctsResponseReviewedAboutToStartTest {
     public void givenAListAssistCaseIfAHearingIsListedThenReturnError() {
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
 
-        when(hmcHearingApiService.getHearingsRequest(any(),eq(HmcStatus.LISTED))).thenReturn(
-                HearingsGetResponse.builder().caseHearings(List.of(CaseHearing.builder()
-                                .hearingId(1L)
-                                .hearingChannels(List.of(HearingChannel.FACE_TO_FACE))
-                                .hearingDaySchedule(List.of(HearingDaySchedule.builder()
-                                        .hearingStartDateTime(LocalDateTime.now())
-                                        .hearingEndDateTime(LocalDateTime.now().plusHours(2))
-                                        .build()))
-                                .build()))
-                        .build());
+        when(hearingsServiceHelper.validationCheckForListedHearings(any(), any()))
+                .thenAnswer(invocation -> {
+                    PreSubmitCallbackResponse<SscsCaseData> response = invocation.getArgument(1);
+                    response.addError(EXISTING_HEARING_WARNING);
+                    return null;
+                });
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 

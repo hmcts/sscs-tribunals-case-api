@@ -6,16 +6,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.willAnswer;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CONFIRM_PANEL_COMPOSITION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist.ReadyToListAboutToSubmitHandler.EXISTING_HEARING_WARNING;
 
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,10 +27,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
-import uk.gov.hmcts.reform.sscs.model.multi.hearing.CaseHearing;
-import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
-import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
+import uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper;
 
 @ExtendWith(MockitoExtension.class)
 public class ConfirmPanelCompositionAboutToStartHandlerTest {
@@ -43,7 +38,7 @@ public class ConfirmPanelCompositionAboutToStartHandlerTest {
     private ConfirmPanelCompositionAboutToStartHandler handler;
 
     @Mock
-    private HmcHearingApiService hmcHearingApiService;
+    private HearingsServiceHelper hearingsServiceHelper;
 
     private SscsCaseData sscsCaseData;
     private Callback<SscsCaseData> callback;
@@ -80,8 +75,12 @@ public class ConfirmPanelCompositionAboutToStartHandlerTest {
     @DisplayName("Throw an Error if existing hearing in Listed state")
     void throwsErrorIfHearingInListedState() {
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
-        given(hmcHearingApiService.getHearingsRequest(anyString(), eq(HmcStatus.LISTED)))
-                .willReturn(HearingsGetResponse.builder().caseHearings(List.of(CaseHearing.builder().hearingId(1L).build())).build());
+
+        willAnswer(invocation -> {
+            PreSubmitCallbackResponse<SscsCaseData> resp = invocation.getArgument(1);
+            resp.addError(EXISTING_HEARING_WARNING);
+            return null;
+        }).given(hearingsServiceHelper).validationCheckForListedHearings(any(), any());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
@@ -93,8 +92,6 @@ public class ConfirmPanelCompositionAboutToStartHandlerTest {
     @DisplayName("Handle successfully if no existing hearing in Listed state")
     void givenNoHearingInListedState_thenHandle() {
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
-        given(hmcHearingApiService.getHearingsRequest(anyString(), eq(HmcStatus.LISTED)))
-                .willReturn(HearingsGetResponse.builder().caseHearings(List.of()).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
