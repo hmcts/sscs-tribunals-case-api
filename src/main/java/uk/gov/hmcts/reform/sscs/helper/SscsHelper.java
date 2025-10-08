@@ -27,6 +27,7 @@ import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.core.config.plugins.validation.constraints.Required;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -134,7 +135,7 @@ public class SscsHelper {
     public PreSubmitCallbackResponse<SscsCaseData> validationCheckForListedHearings(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> response ) {
         HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseData.getCcdCaseId(), HmcStatus.LISTED);
         if (HearingRoute.LIST_ASSIST == caseData.getSchedulingAndListingFields().getHearingRoute()
-                && nonNull(hearingsGetResponse.getCaseHearings()) && !hearingsGetResponse.getCaseHearings().isEmpty()) {
+                && CollectionUtils.isNotEmpty(hearingsGetResponse.getCaseHearings())) {
             response.addError(EXISTING_HEARING_WARNING);
             log.error("Error on case {}: There is already a hearing request in List assist", caseData.getCcdCaseId());
         }
