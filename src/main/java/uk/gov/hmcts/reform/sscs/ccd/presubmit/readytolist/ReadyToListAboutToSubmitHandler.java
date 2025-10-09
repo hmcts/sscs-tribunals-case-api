@@ -64,7 +64,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         var response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
         hearingsService.validationCheckForListedHearings(sscsCaseData, response);
-        if (!response.getErrors().isEmpty()) {
+        if (!response.getErrors().isEmpty() || !response.getWarnings().isEmpty()) {
             return response;
         }
 

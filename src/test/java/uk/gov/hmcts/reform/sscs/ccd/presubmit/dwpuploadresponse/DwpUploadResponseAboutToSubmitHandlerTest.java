@@ -26,7 +26,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.WITH_DWP;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse.DwpUploadResponseAboutToSubmitHandler.NEW_OTHER_PARTY_RESPONSE_DUE_DAYS;
-import static uk.gov.hmcts.reform.sscs.service.HearingsService.EXISTING_HEARING_WARNING;
+import static uk.gov.hmcts.reform.sscs.service.HearingsService.EXISTING_HEARING_ERROR;
+import static uk.gov.hmcts.reform.sscs.service.HearingsService.REQUEST_FAILURE_WARNING;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_1;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_2;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_3;
@@ -45,6 +46,7 @@ import java.util.Optional;
 import junitparams.converters.Nullable;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -216,7 +218,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         willAnswer(invocation -> {
             PreSubmitCallbackResponse<SscsCaseData> resp = invocation.getArgument(1);
-            resp.addError(EXISTING_HEARING_WARNING);
+            resp.addError(EXISTING_HEARING_ERROR);
             return null;
         }).given(hearingsService).validationCheckForListedHearings(any(), any());
 
@@ -224,7 +226,25 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
-        assertTrue(response.getErrors().contains(EXISTING_HEARING_WARNING));
+        assertTrue(response.getErrors().contains(EXISTING_HEARING_ERROR));
+    }
+
+    @Test
+    @DisplayName("Give warning if existing hearing in exception state")
+    void giveWarningIfHearingInExceptionState() {
+        callback.getCaseDetails().getCaseData().getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
+        callback.getCaseDetails().getCaseData().setDwpFurtherInfo("No");
+
+        willAnswer(invocation -> {
+            PreSubmitCallbackResponse<SscsCaseData> resp = invocation.getArgument(1);
+            resp.addWarning(REQUEST_FAILURE_WARNING);
+            return null;
+        }).given(hearingsService).validationCheckForListedHearings(any(), any());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getWarnings().size());
+        assertTrue(response.getWarnings().contains(REQUEST_FAILURE_WARNING));
     }
 
     @Test

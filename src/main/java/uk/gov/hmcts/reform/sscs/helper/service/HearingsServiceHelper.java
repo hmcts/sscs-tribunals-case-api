@@ -124,6 +124,16 @@ public final class HearingsServiceHelper {
         }
     }
 
+    @Nullable
+    public static CaseHearing findHearingsWithRequestedHearingState(HearingsGetResponse hearingsGetResponse, HmcStatus hmcStatus) {
+        return Optional.ofNullable(hearingsGetResponse)
+                .map(HearingsGetResponse::getCaseHearings)
+                .orElse(Collections.emptyList()).stream()
+                .filter(caseHearing -> caseHearing.getHmcStatus() == hmcStatus)
+                .min(Comparator.comparing(CaseHearing::getHearingRequestDateTime))
+                .orElse(null);
+    }
+
     public static HearingChannel getHearingSubChannel(HearingGetResponse hearingGetResponse) {
         List<HearingDaySchedule> hearingDaySchedules = hearingGetResponse.getHearingResponse().getHearingSessions();
 

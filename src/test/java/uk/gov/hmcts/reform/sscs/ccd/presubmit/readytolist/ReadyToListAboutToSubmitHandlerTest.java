@@ -19,7 +19,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.RESPONSE_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist.ReadyToListAboutToSubmitHandler.GAPS_CASE_WARNING;
-import static uk.gov.hmcts.reform.sscs.service.HearingsService.EXISTING_HEARING_WARNING;
+import static uk.gov.hmcts.reform.sscs.service.HearingsService.EXISTING_HEARING_ERROR;
+import static uk.gov.hmcts.reform.sscs.service.HearingsService.REQUEST_FAILURE_WARNING;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -132,14 +133,31 @@ public class ReadyToListAboutToSubmitHandlerTest {
 
         willAnswer(invocation -> {
             PreSubmitCallbackResponse<SscsCaseData> resp = invocation.getArgument(1);
-            resp.addError(EXISTING_HEARING_WARNING);
+            resp.addError(EXISTING_HEARING_ERROR);
             return null;
         }).given(hearingsService).validationCheckForListedHearings(any(), any());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(1).isEqualTo(response.getErrors().size());
-        assertThat(true).isEqualTo(response.getErrors().contains(EXISTING_HEARING_WARNING));
+        assertThat(true).isEqualTo(response.getErrors().contains(EXISTING_HEARING_ERROR));
+    }
+
+    @Test
+    public void giveWarningIfHearingInExceptionState() {
+        caseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
+        caseData.setRegion("TEST");
+
+        willAnswer(invocation -> {
+            PreSubmitCallbackResponse<SscsCaseData> resp = invocation.getArgument(1);
+            resp.addWarning(REQUEST_FAILURE_WARNING);
+            return null;
+        }).given(hearingsService).validationCheckForListedHearings(any(), any());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(1).isEqualTo(response.getWarnings().size());
+        assertThat(true).isEqualTo(response.getWarnings().contains(REQUEST_FAILURE_WARNING));
     }
 
     @Test

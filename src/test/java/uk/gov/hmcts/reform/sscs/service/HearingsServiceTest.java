@@ -528,19 +528,20 @@ class HearingsServiceTest {
                 .build();
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
-        given(hmcHearingApiService.getHearingsRequest(eq("1234"), eq(HmcStatus.LISTED)))
+        given(hmcHearingApiService.getHearingsRequest(eq("1234"), any()))
                 .willReturn(HearingsGetResponse.builder()
-                        .caseHearings(List.of(CaseHearing.builder().hearingId(1L).build()))
+                        .caseHearings(List.of(CaseHearing.builder().hearingId(1L).hmcStatus(HmcStatus.LISTED).build()))
                         .build());
 
         hearingsService.validationCheckForListedHearings(caseData, response);
 
+        assertThat(response.getWarnings()).isEmpty();
         assertThat(1).isEqualTo(response.getErrors().size());
-        assertThat(response.getErrors()).contains(HearingsService.EXISTING_HEARING_WARNING);
+        assertThat(response.getErrors()).contains(HearingsService.EXISTING_HEARING_ERROR);
     }
 
     @Test
-    void shouldNotAddErrorWhenListAssistAndNoListedHearings() {
+    void shouldAddWarningWhenListAssistAndHearingExceptionExist() {
         SscsCaseData caseData = SscsCaseData.builder()
                 .ccdCaseId("1234")
                 .schedulingAndListingFields(
@@ -548,7 +549,30 @@ class HearingsServiceTest {
                                 .hearingRoute(HearingRoute.LIST_ASSIST)
                                 .build())
                 .build();
-        given(hmcHearingApiService.getHearingsRequest(eq("1234"), eq(HmcStatus.LISTED)))
+
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+        given(hmcHearingApiService.getHearingsRequest(eq("1234"), any()))
+                .willReturn(HearingsGetResponse.builder()
+                        .caseHearings(List.of(CaseHearing.builder().hearingId(1L).hmcStatus(HmcStatus.EXCEPTION).build()))
+                        .build());
+
+        hearingsService.validationCheckForListedHearings(caseData, response);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(1).isEqualTo(response.getWarnings().size());
+        assertThat(response.getWarnings()).contains(HearingsService.REQUEST_FAILURE_WARNING);
+    }
+
+    @Test
+    void shouldNotAddErrorOrWarningWhenListAssistAndNoListedOrExceptionHearings() {
+        SscsCaseData caseData = SscsCaseData.builder()
+                .ccdCaseId("1234")
+                .schedulingAndListingFields(
+                        SchedulingAndListingFields.builder()
+                                .hearingRoute(HearingRoute.LIST_ASSIST)
+                                .build())
+                .build();
+        given(hmcHearingApiService.getHearingsRequest(eq("1234"), any()))
                 .willReturn(HearingsGetResponse.builder().caseHearings(Collections.emptyList()).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
@@ -556,6 +580,7 @@ class HearingsServiceTest {
         hearingsService.validationCheckForListedHearings(caseData, response);
 
         assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getWarnings()).isEmpty();
     }
 
     @Test
@@ -573,5 +598,6 @@ class HearingsServiceTest {
         hearingsService.validationCheckForListedHearings(caseData, response);
 
         assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getWarnings()).isEmpty();
     }
 }

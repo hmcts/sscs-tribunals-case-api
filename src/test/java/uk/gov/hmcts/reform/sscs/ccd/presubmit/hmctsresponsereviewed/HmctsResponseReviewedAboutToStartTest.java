@@ -11,7 +11,8 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_TCW;
-import static uk.gov.hmcts.reform.sscs.service.HearingsService.EXISTING_HEARING_WARNING;
+import static uk.gov.hmcts.reform.sscs.service.HearingsService.EXISTING_HEARING_ERROR;
+import static uk.gov.hmcts.reform.sscs.service.HearingsService.REQUEST_FAILURE_WARNING;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -165,14 +166,32 @@ public class HmctsResponseReviewedAboutToStartTest {
         when(hearingsService.validationCheckForListedHearings(any(), any()))
                 .thenAnswer(invocation -> {
                     PreSubmitCallbackResponse<SscsCaseData> response = invocation.getArgument(1);
-                    response.addError(EXISTING_HEARING_WARNING);
+                    response.addError(EXISTING_HEARING_ERROR);
                     return null;
                 });
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         Assertions.assertEquals(1, response.getErrors().size());
-        Assertions.assertTrue(response.getErrors().contains(EXISTING_HEARING_WARNING));
+        Assertions.assertTrue(response.getErrors().contains(EXISTING_HEARING_ERROR));
+    }
+
+    @Test
+    public void giveWarningIfHearingInExceptionState() {
+        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
+
+        when(hearingsService.validationCheckForListedHearings(any(), any()))
+                .thenAnswer(invocation -> {
+                    PreSubmitCallbackResponse<SscsCaseData> response = invocation.getArgument(1);
+                    response.addWarning(REQUEST_FAILURE_WARNING);
+                    return null;
+                });
+
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        Assertions.assertEquals(1, response.getWarnings().size());
+        Assertions.assertTrue(response.getWarnings().contains(REQUEST_FAILURE_WARNING));
     }
 
     @Test

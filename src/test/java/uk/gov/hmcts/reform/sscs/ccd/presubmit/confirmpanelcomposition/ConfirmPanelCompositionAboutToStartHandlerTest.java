@@ -12,7 +12,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CONFIRM_PANEL_COMPOSITION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
-import static uk.gov.hmcts.reform.sscs.service.HearingsService.EXISTING_HEARING_WARNING;
+import static uk.gov.hmcts.reform.sscs.service.HearingsService.EXISTING_HEARING_ERROR;
+import static uk.gov.hmcts.reform.sscs.service.HearingsService.REQUEST_FAILURE_WARNING;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -78,14 +79,31 @@ public class ConfirmPanelCompositionAboutToStartHandlerTest {
 
         willAnswer(invocation -> {
             PreSubmitCallbackResponse<SscsCaseData> resp = invocation.getArgument(1);
-            resp.addError(EXISTING_HEARING_WARNING);
+            resp.addError(EXISTING_HEARING_ERROR);
             return null;
         }).given(hearingsService).validationCheckForListedHearings(any(), any());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
-        assertTrue(response.getErrors().contains(EXISTING_HEARING_WARNING));
+        assertTrue(response.getErrors().contains(EXISTING_HEARING_ERROR));
+    }
+
+    @Test
+    @DisplayName("Give warning if existing hearing in exception state")
+    void giveWarningIfHearingInExceptionState() {
+        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
+
+        willAnswer(invocation -> {
+            PreSubmitCallbackResponse<SscsCaseData> resp = invocation.getArgument(1);
+            resp.addWarning(REQUEST_FAILURE_WARNING);
+            return null;
+        }).given(hearingsService).validationCheckForListedHearings(any(), any());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getWarnings().size());
+        assertTrue(response.getWarnings().contains(REQUEST_FAILURE_WARNING));
     }
 
     @Test

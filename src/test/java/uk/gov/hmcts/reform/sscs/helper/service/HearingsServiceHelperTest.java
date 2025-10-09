@@ -233,6 +233,46 @@ class HearingsServiceHelperTest {
         assertThat(result).isNull();
     }
 
+    @DisplayName("When a desired hearing state given findHearingsWithRequestedHearingState returns case hearing")
+    @ParameterizedTest
+    @CsvSource({"AWAITING_LISTING", "UPDATE_REQUESTED", "UPDATE_SUBMITTED", "HEARING_REQUESTED",
+        "CANCELLATION_REQUESTED", "CANCELLATION_SUBMITTED", "CANCELLED", "EXCEPTION", "AWAITING_ACTUALS",
+        "COMPLETED", "ADJOURNED", "LISTED"})
+    void testFindHearingsWithRequestedHearingState(HmcStatus hmcStatus) {
+        HearingsGetResponse hearingsGetResponse = HearingsGetResponse.builder().caseHearings(List.of(
+                CaseHearing.builder()
+                        .hearingId(4545L)
+                        .hmcStatus(hmcStatus)
+                        .requestVersion(3L)
+                        .hearingRequestDateTime(LocalDateTime.of(2020,1,1,10,0))
+                        .build())).build();
+
+        CaseHearing result = HearingsServiceHelper.findHearingsWithRequestedHearingState(hearingsGetResponse, hmcStatus);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getHmcStatus(), is(hmcStatus));
+    }
+
+    @DisplayName("When a desired hearing state not given findHearingsWithRequestedHearingState returns null")
+    @ParameterizedTest
+    @CsvSource({"AWAITING_LISTING", "UPDATE_REQUESTED", "UPDATE_SUBMITTED", "HEARING_REQUESTED",
+        "CANCELLATION_REQUESTED", "CANCELLATION_SUBMITTED", "CANCELLED", "EXCEPTION", "AWAITING_ACTUALS", "COMPLETED",
+        "LISTED"})
+    void testFindHearingsWithRequestedHearingStateInvalid(HmcStatus hmcStatus) {
+        HearingsGetResponse hearingsGetResponse = HearingsGetResponse.builder().caseHearings(List.of(
+                CaseHearing.builder()
+                        .hearingId(4545L)
+                        .hmcStatus(HmcStatus.ADJOURNED)
+                        .requestVersion(3L)
+                        .hearingRequestDateTime(LocalDateTime.of(2020,1,1,10,0))
+                        .build())).build();
+
+        CaseHearing result = HearingsServiceHelper.findHearingsWithRequestedHearingState(hearingsGetResponse, hmcStatus);
+
+        assertThat(result).isNull();
+    }
+
+
 
     @DisplayName("When the status matches isCaseHearingRequestedOrAwaitingListing returns true")
     @ParameterizedTest

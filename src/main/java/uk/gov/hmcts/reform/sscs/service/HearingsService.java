@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper.findHearingsWithRequestedHearingState;
 import static uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper.getHearingId;
 
 import feign.FeignException;
@@ -9,7 +10,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.ExhaustedRetryException;
 import org.springframework.retry.annotation.Backoff;
@@ -69,8 +69,9 @@ public class HearingsService {
 
     // Leaving blank for now until a future change is scoped and completed, then we can add the case states back in
     private static final Long HEARING_VERSION_NUMBER = 1L;
-    public static final String EXISTING_HEARING_WARNING = "There is already a hearing request in List assist, "
+    public static final String EXISTING_HEARING_ERROR = "There is already a hearing request in List assist, "
             + "are you sure you want to send another request? If you do proceed, then please cancel the existing hearing request first";
+    public static final String REQUEST_FAILURE_WARNING = "There is a listing request in failure state, please update any missing data then send a new listing request.";
 
     @Retryable(
             retryFor = UpdateCaseException.class,
@@ -326,11 +327,18 @@ public class HearingsService {
     }
 
     public PreSubmitCallbackResponse<SscsCaseData> validationCheckForListedHearings(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> response) {
-        HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseData.getCcdCaseId(), HmcStatus.LISTED);
-        if (HearingRoute.LIST_ASSIST == caseData.getSchedulingAndListingFields().getHearingRoute()
-                && CollectionUtils.isNotEmpty(hearingsGetResponse.getCaseHearings())) {
-            response.addError(EXISTING_HEARING_WARNING);
-            log.error("Error on case {}: There is already a hearing request in List assist", caseData.getCcdCaseId());
+        if (HearingRoute.LIST_ASSIST == caseData.getSchedulingAndListingFields().getHearingRoute()) {
+            HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseData.getCcdCaseId(), null);
+            CaseHearing listedCase = findHearingsWithRequestedHearingState(hearingsGetResponse, HmcStatus.LISTED);
+            if (nonNull(listedCase)) {
+                response.addError(EXISTING_HEARING_ERROR);
+                log.error("Error on case {}: There is already a hearing request in List assist", caseData.getCcdCaseId());
+            }
+            CaseHearing requestFailureCase = findHearingsWithRequestedHearingState(hearingsGetResponse, HmcStatus.EXCEPTION);
+            if (nonNull(requestFailureCase)) {
+                response.addWarning(REQUEST_FAILURE_WARNING);
+                log.info("Warning on case {}: There is a failed request in List assist", caseData.getCcdCaseId());
+            }
         }
         return response;
     }
