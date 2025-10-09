@@ -109,9 +109,11 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     private PanelCompositionService panelCompositionService;
     @Mock
     private HearingsService hearingsService;
-
+    @Mock
     private DwpDocumentService dwpDocumentService;
+    @Mock
     private AddedDocumentsUtil addedDocumentsUtil;
+    @Mock
     private AddNoteService addNoteService;
 
     private DwpUploadResponseAboutToSubmitHandler handler;
