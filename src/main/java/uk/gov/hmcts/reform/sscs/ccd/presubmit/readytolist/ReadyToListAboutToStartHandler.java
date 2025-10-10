@@ -40,7 +40,9 @@ public class ReadyToListAboutToStartHandler implements PreSubmitCallbackHandler<
 
         final PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
+        log.info("about to check for listed hearings for case id {}", sscsCaseData.getCcdCaseId());
         hearingsService.validationCheckForListedHearings(sscsCaseData, response);
+        log.info("completed check for listed hearings for case id {}", sscsCaseData.getCcdCaseId());
 
         return response;
     }
