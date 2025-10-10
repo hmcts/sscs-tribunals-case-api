@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.service.HearingsService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingRequestHandler;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
@@ -30,7 +29,6 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
 
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final HearingRequestHandler hearingRequestHandler;
-    private final HearingsService hearingsService;
 
 
     @Override

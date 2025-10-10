@@ -83,7 +83,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
                 new CaseDetails<>(1234L, "SSCS", RESPONSE_RECEIVED, caseData, now(), "Benefit");
         callback = new Callback<>(caseDetails, empty(), READY_TO_LIST, false);
 
-        handler = new ReadyToListAboutToSubmitHandler(regionalProcessingCenterService, hearingRequestHandler, hearingsService);
+        handler = new ReadyToListAboutToSubmitHandler(regionalProcessingCenterService, hearingRequestHandler);
     }
 
     @ParameterizedTest
