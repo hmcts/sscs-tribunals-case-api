@@ -62,12 +62,6 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
             return HearingHandler.GAPS.handle(sscsCaseData, hearingRequestHandler);
         }
 
-        var response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
-        hearingsService.validationCheckForListedHearings(sscsCaseData, response);
-        if (!response.getErrors().isEmpty() || !response.getWarnings().isEmpty()) {
-            return response;
-        }
-
         String region = sscsCaseData.getRegion();
 
         if (sscsCaseData.isIbcCase()) {
@@ -87,7 +81,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
         return HearingHandler.valueOf(route.name()).handle(sscsCaseData, hearingRequestHandler);
     }
 
-    boolean warningsShouldNotBeIgnored(Callback<SscsCaseData> callback) {
+    public static boolean warningsShouldNotBeIgnored(Callback<SscsCaseData> callback) {
         return !callback.isIgnoreWarnings() && !YesNo.YES.equals(callback.getCaseDetails().getCaseData().getIgnoreCallbackWarnings());
     }
 }
