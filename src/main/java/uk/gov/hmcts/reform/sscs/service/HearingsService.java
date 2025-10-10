@@ -126,7 +126,7 @@ public class HearingsService {
         SscsCaseData caseData = wrapper.getCaseData();
         String caseId = caseData.getCcdCaseId();
         HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseId, null);
-        CaseHearing hearing = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse, true);
+        CaseHearing hearing = HearingsServiceHelper.findHearingsWithRequestedHearingState(hearingsGetResponse, null, true);
         overridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData);
 
         if (nonNull(hearing)) {
@@ -188,7 +188,7 @@ public class HearingsService {
         }
 
         HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseId, null);
-        CaseHearing hearing = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse, true);
+        CaseHearing hearing = HearingsServiceHelper.findHearingsWithRequestedHearingState(hearingsGetResponse, null, true);
         if (nonNull(hearing)) {
             Long hmcHearingVersionId = getHearingVersionNumber(hearing);
             Hearing caseDataHearing = HearingsServiceHelper.getHearingById(hearing.getHearingId(), caseData);
@@ -329,12 +329,12 @@ public class HearingsService {
     public PreSubmitCallbackResponse<SscsCaseData> validationCheckForListedHearings(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         if (HearingRoute.LIST_ASSIST == caseData.getSchedulingAndListingFields().getHearingRoute()) {
             HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseData.getCcdCaseId(), null);
-            CaseHearing listedCase = findHearingsWithRequestedHearingState(hearingsGetResponse, HmcStatus.LISTED);
+            CaseHearing listedCase = findHearingsWithRequestedHearingState(hearingsGetResponse, HmcStatus.LISTED, false);
             if (nonNull(listedCase)) {
                 response.addError(EXISTING_HEARING_ERROR);
                 log.error("Error on case {}: There is already a hearing request in List assist", caseData.getCcdCaseId());
             }
-            CaseHearing requestFailureCase = findHearingsWithRequestedHearingState(hearingsGetResponse, HmcStatus.EXCEPTION);
+            CaseHearing requestFailureCase = findHearingsWithRequestedHearingState(hearingsGetResponse, HmcStatus.EXCEPTION, false);
             if (nonNull(requestFailureCase)) {
                 response.addWarning(REQUEST_FAILURE_WARNING);
                 log.info("Warning on case {}: There is a failed request in List assist", caseData.getCcdCaseId());
