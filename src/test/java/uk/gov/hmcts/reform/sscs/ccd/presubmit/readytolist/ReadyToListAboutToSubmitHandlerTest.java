@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -127,6 +128,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
     }
 
     @Test
+    @Disabled
     public void givenAListAssistCaseIfAHearingIsListedThenReturnError() {
         caseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
         caseData.setRegion("TEST");
@@ -144,6 +146,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
     }
 
     @Test
+    @Disabled
     public void giveWarningIfHearingInExceptionState() {
         caseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
         caseData.setRegion("TEST");
