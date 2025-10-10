@@ -1948,6 +1948,7 @@
     "DisplayOrder": 1250,
     "PreConditionState(s)": "*",
     "PostConditionState": "readyToList",
+    "CallBackURLAboutToStartEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToStart",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "RetriesTimeoutURLAboutToSubmitEvent": "5,5",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
