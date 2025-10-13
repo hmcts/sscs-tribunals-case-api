@@ -5,6 +5,7 @@ VERSION=$2
 ENV=$3
 LIKE_PROD=${4:-$ENV}
 SHUTTERED=${5:-false}
+WA_FEATURE="wa"
 
 RUN_DIR=$(pwd)
 
@@ -124,12 +125,22 @@ case ${ENV} in
     exit 1 ;;
 esac
 
-if [ "$ENV" = "prod" ] || [ "$LIKE_PROD" = "prod" ]; then
-  excludedFilenamePatterns="-e *-nonprod.json,${shutteredExclusion}"
+if [ "$WA_FEATURE" = "wa" ]; then
+  # Use WA CaseEvent files only
+  waExclusion="CaseEvent.json"
 else
-  excludedFilenamePatterns="-e *-prod.json,${shutteredExclusion}"
+  waExclusion="*-WA.json"
 fi
 
+echo "Exclusion for WA: " ${waExclusion}
+
+if [ "$ENV" = "prod" ] || [ "$LIKE_PROD" = "prod" ]; then
+  excludedFilenamePatterns="-e *-nonprod.json,${shutteredExclusion},${waExclusion}"
+else
+  excludedFilenamePatterns="-e *-prod.json,${shutteredExclusion},${waExclusion}"
+fi
+
+echo "Excluded ... "
 echo "$excludedFilenamePatterns"
 
 docker run --rm --name json2xlsx \
