@@ -8,7 +8,6 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.isScottishCase;
@@ -19,6 +18,7 @@ import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isConfidential;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleBenefitType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleIbcaCase;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.resolvePostCode;
 
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.ArrayList;
@@ -28,12 +28,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
@@ -622,20 +620,4 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
     }
 
-    private static String resolvePostCode(SscsCaseData sscsCaseData) {
-        if (NO.equals(sscsCaseData.getAppeal().getAppellant().getAddress().getInMainlandUk())) {
-            return sscsCaseData.getAppeal().getAppellant().getAddress().getPortOfEntry();
-        } else {
-            if (YES.getValue().equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAppointee())) {
-                return ofNullable(sscsCaseData.getAppeal().getAppellant().getAppointee())
-                        .map(Appointee::getAddress)
-                        .map(Address::getPostcode)
-                        .map(String::trim)
-                        .filter(StringUtils::isNotEmpty)
-                        .orElse(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode());
-            }
-
-            return sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
-        }
-    }
 }
