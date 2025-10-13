@@ -1,7 +1,7 @@
 import { test } from '../../lib/steps.factory';
 import createCaseBasedOnCaseType from '../../api/client/sscs/factory/appeal.type.factory';
 
-test.describe('Work Allocation - Review Incomplete Appeal CTSC Task', { tag: ['@WA', '@preview-regression'] }, async () => {
+test.describe('Work Allocation - Review Incomplete Appeal CTSC Task', { tag: ['@work-allocation', '@preview-regression'] }, async () => {
   let caseId: string;
 
   test('As a CTSC Admin without case allocator role I can view the Review Incomplete Appeal task', async ({ reviewIncompleteAppealSteps }) => {
