@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.HearingsService;
 
@@ -42,7 +45,7 @@ public class ReadyToListAboutToStartHandler implements PreSubmitCallbackHandler<
 
         log.info("On case {} Testing123 callback flag: {}, case data flag: {}",
                 sscsCaseData.getCcdCaseId(), callback.isIgnoreWarnings(), callback.getCaseDetails().getCaseData().getIgnoreCallbackWarnings());
-        if (ReadyToListAboutToSubmitHandler.warningsShouldNotBeIgnored(callback)) {
+        if (NO.equals(callback.getCaseDetails().getCaseData().getIgnoreCallbackWarnings())) {
             hearingsService.validationCheckForListedHearings(sscsCaseData, response);
         }
 
