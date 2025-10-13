@@ -184,4 +184,8 @@ export class WebAction {
   async pause() {
     await this.page.pause();
   }
+
+  async refreshPage() {
+    await this.page.reload({ waitUntil: 'networkidle' } );
+  }
 }
