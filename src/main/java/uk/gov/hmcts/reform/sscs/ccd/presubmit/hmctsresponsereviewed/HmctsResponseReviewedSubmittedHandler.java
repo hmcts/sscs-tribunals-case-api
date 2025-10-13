@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -68,6 +69,7 @@ public class HmctsResponseReviewedSubmittedHandler implements PreSubmitCallbackH
                         caseData.setOriginalSender(sscsCaseData.getOriginalSender());
                     });
         } else {
+            callback.getCaseDetails().getCaseData().setIgnoreCallbackWarnings(YesNo.YES);
             updateCase(
                     callback.getCaseDetails().getId(),
                     READY_TO_LIST,
