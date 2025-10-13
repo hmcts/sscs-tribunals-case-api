@@ -39,7 +39,10 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
 
+
         callback.getCaseDetails().getCaseData().setIgnoreCallbackWarnings(YesNo.YES);
+        log.info("On case {} Testing123 callback flag: {}, case data flag: {}",
+                callback.getCaseDetails().getCaseData().getCcdCaseId(), callback.isIgnoreWarnings(), callback.getCaseDetails().getCaseData().getIgnoreCallbackWarnings());
 
         return callbackType.equals(CallbackType.SUBMITTED)
             && callback.getEvent() == EventType.DWP_UPLOAD_RESPONSE
