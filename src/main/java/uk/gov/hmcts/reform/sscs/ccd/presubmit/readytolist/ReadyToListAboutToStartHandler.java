@@ -41,7 +41,7 @@ public class ReadyToListAboutToStartHandler implements PreSubmitCallbackHandler<
         final PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         log.info("On case {} Testing123 callback flag: {}, case data flag: {}",
-                sscsCaseData.getCcdCaseId(), callback.isIgnoreWarnings(), sscsCaseData.getIgnoreCallbackWarnings());
+                sscsCaseData.getCcdCaseId(), callback.isIgnoreWarnings(), callback.getCaseDetails().getCaseData().getIgnoreCallbackWarnings());
         if (ReadyToListAboutToSubmitHandler.warningsShouldNotBeIgnored(callback)) {
             hearingsService.validationCheckForListedHearings(sscsCaseData, response);
         }
