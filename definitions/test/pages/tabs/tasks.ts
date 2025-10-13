@@ -32,7 +32,6 @@ export class Tasks {
       await homePage.delay(10000);
       await homePage.navigateToTab('Tasks');
       await homePage.delay(timeouts.shortTimeout);
-      await webActions.refreshPage();
     }
 
     if (!taskVisible) {
