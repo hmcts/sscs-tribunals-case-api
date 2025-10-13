@@ -134,5 +134,5 @@ export const timeouts = {
   shortTimeout: 5000,
   mediumTimout: 60000,
   longTimeout: 120000,
-  maxTimeout: 240000
+  maxTimeout: 350000
 };
