@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
@@ -137,6 +138,11 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         sscsCaseData.setPanelMemberComposition(panelCompositionService
                 .resetPanelCompositionIfStale(sscsCaseData, callback.getCaseDetailsBefore()));
 
+        if(HearingRoute.LIST_ASSIST.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute())) {
+            // Setting this to yes so that the warning about hearings in exception state on ready to list does not block the event
+            sscsCaseData.setIgnoreCallbackWarnings(YesNo.YES);
+            log.info("Case {} is List Assist so setting IgnoreCallbackWarnings to Yes", sscsCaseData.getCcdCaseId());
+        }
         return preSubmitCallbackResponse;
     }
 
