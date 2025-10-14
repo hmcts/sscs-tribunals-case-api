@@ -76,6 +76,9 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         log.info("Calling hearing handler for route {} for case ID: {}", route, sscsCaseData.getCcdCaseId());
 
+        // clear the ignore warnings field after use
+        sscsCaseData.setIgnoreCallbackWarnings(null);
+
         return HearingHandler.valueOf(route.name()).handle(sscsCaseData, hearingRequestHandler);
     }
 
