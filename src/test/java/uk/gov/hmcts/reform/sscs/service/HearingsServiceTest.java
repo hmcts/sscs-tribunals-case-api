@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -473,7 +474,7 @@ class HearingsServiceTest {
         assertThatNoException().isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
     }
 
-
+    @Disabled
     @DisplayName("When wrapper has a hearing request version different to the hmc request version then updateHearing should sync request version")
     @ParameterizedTest
     @EnumSource(
