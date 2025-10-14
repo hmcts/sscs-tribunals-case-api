@@ -2,7 +2,7 @@
   "name": "Review Incomplete Appeal - CTSC",
   "priority": "low",
   "assignedToWhenNotAssigned": "Unassigned",
-  "assignedTo": "sscs-ctscdmin nw-liverpool",
+  "assignedTo": "SSCS ctscadmin",
   "unassignedManageOptions": ["Assign to me"],
   "assignedManageOptions": ["Reassign task", "Unassign task"],
   "unassignedManageOptionsForCaseAllocator": [
