@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpResponseDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
@@ -96,8 +97,10 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
 
         addNote(sscsCaseData, userAuthorisation);
 
-        // Setting this to yes so that the warning about hearings in exception state on ready to list does not block the event
-        sscsCaseData.setIgnoreCallbackWarnings(YesNo.YES);
+        if (HearingRoute.LIST_ASSIST.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute())) {
+            // Setting this to yes so that the warning about hearings in exception state on ready to list does not block the event
+            sscsCaseData.setIgnoreCallbackWarnings(YesNo.YES);
+        }
 
         return preSubmitCallbackResponse;
     }
