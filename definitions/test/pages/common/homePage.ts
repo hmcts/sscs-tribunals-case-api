@@ -238,7 +238,6 @@ export class HomePage {
       }
       case 'Tasks': {
         await expect(this.tasksTab).toBeVisible();
-        await this.page.getByRole('tablist').evaluate(el => (el.style = 'transform: translateX(0px);'));
         await this.tasksTab.click();
         break;
       }
@@ -342,12 +341,5 @@ export class HomePage {
     await this.page.getByLabel('Case type').selectOption(caseType);
     await this.page.getByLabel('Event').selectOption(event);
     await this.page.getByRole('button', { name: 'Start' }).click();
-  }
-
-  async navigateToMyWork(){
-    const myWorkLink = this.page.getByRole('link', { name: 'My work' });
-    await myWorkLink.waitFor();
-    await myWorkLink.click();
-    await expect(this.page.locator('h3').filter({ hasText: 'My work' })).toBeVisible();
   }
 }
