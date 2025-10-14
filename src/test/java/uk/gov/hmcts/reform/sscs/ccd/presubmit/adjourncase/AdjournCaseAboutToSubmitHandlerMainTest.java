@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,6 +15,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingVenue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
@@ -56,5 +60,20 @@ class AdjournCaseAboutToSubmitHandlerMainTest extends AdjournCaseAboutToSubmitHa
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         LocalDate date = response.getData().getAdjournment().getGeneratedDate();
         assertThat(date).isEqualTo(LocalDate.now());
+    }
+
+    @DisplayName("When a venue closes, write adjournment notice should call airlookup and set new processing venue on the case.")
+    @Test
+    void givenClosedVenueUpdateProcessingVenue() {
+        sscsCaseData.getAdjournment().setNextHearingVenue(AdjournCaseNextHearingVenue.SAME_VENUE);
+        sscsCaseData.setProcessingVenue("Closed Venue");
+        Appellant appellant = new Appellant();
+        appellant.setAddress(Address.builder().build());
+        sscsCaseData.getAppeal().setAppellant(appellant);
+        when(venueService.getEpimsIdForVenue("Closed Venue")).thenReturn("000000");
+        when(venueService.getVenueDetailsForActiveVenueByEpimsId("000000")).thenReturn(null);
+        when(airLookupService.lookupAirVenueNameByPostCode(any(), any())).thenReturn("New Venue");
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getData().getProcessingVenue()).isEqualTo("New Venue");
     }
 }
