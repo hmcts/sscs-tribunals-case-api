@@ -34,7 +34,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -474,7 +473,6 @@ class HearingsServiceTest {
         assertThatNoException().isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
     }
 
-    @Disabled
     @DisplayName("When wrapper has a hearing request version different to the hmc request version then updateHearing should sync request version")
     @ParameterizedTest
     @EnumSource(
@@ -534,7 +532,7 @@ class HearingsServiceTest {
                         .caseHearings(List.of(CaseHearing.builder().hearingId(1L).hmcStatus(HmcStatus.LISTED).build()))
                         .build());
 
-        hearingsService.validationCheckForListedHearings(caseData, response);
+        hearingsService.validationCheckForListedOrExceptionHearings(caseData, response);
 
         assertThat(response.getWarnings()).isEmpty();
         assertThat(1).isEqualTo(response.getErrors().size());
@@ -557,7 +555,7 @@ class HearingsServiceTest {
                         .caseHearings(List.of(CaseHearing.builder().hearingId(1L).hmcStatus(HmcStatus.EXCEPTION).build()))
                         .build());
 
-        hearingsService.validationCheckForListedHearings(caseData, response);
+        hearingsService.validationCheckForListedOrExceptionHearings(caseData, response);
 
         assertThat(response.getErrors()).isEmpty();
         assertThat(1).isEqualTo(response.getWarnings().size());
@@ -578,7 +576,7 @@ class HearingsServiceTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
-        hearingsService.validationCheckForListedHearings(caseData, response);
+        hearingsService.validationCheckForListedOrExceptionHearings(caseData, response);
 
         assertThat(response.getErrors()).isEmpty();
         assertThat(response.getWarnings()).isEmpty();
@@ -596,7 +594,7 @@ class HearingsServiceTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
-        hearingsService.validationCheckForListedHearings(caseData, response);
+        hearingsService.validationCheckForListedOrExceptionHearings(caseData, response);
 
         assertThat(response.getErrors()).isEmpty();
         assertThat(response.getWarnings()).isEmpty();

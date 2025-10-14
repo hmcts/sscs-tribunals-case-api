@@ -163,7 +163,7 @@ public class HmctsResponseReviewedAboutToStartTest {
     public void givenAListAssistCaseIfAHearingIsListedThenReturnError() {
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
 
-        when(hearingsService.validationCheckForListedHearings(any(), any()))
+        when(hearingsService.validationCheckForListedOrExceptionHearings(any(), any()))
                 .thenAnswer(invocation -> {
                     PreSubmitCallbackResponse<SscsCaseData> response = invocation.getArgument(1);
                     response.addError(EXISTING_HEARING_ERROR);
@@ -180,7 +180,7 @@ public class HmctsResponseReviewedAboutToStartTest {
     public void giveWarningIfHearingInExceptionState() {
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
 
-        when(hearingsService.validationCheckForListedHearings(any(), any()))
+        when(hearingsService.validationCheckForListedOrExceptionHearings(any(), any()))
                 .thenAnswer(invocation -> {
                     PreSubmitCallbackResponse<SscsCaseData> response = invocation.getArgument(1);
                     response.addWarning(REQUEST_FAILURE_WARNING);

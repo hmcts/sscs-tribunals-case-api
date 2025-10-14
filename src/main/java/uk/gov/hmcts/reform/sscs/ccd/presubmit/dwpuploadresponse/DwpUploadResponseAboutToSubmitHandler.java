@@ -139,7 +139,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                 .resetPanelCompositionIfStale(sscsCaseData, callback.getCaseDetailsBefore()));
 
         if (HearingRoute.LIST_ASSIST.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute())) {
-            // Setting this to yes so that the warning about hearings in exception state on ready to list does not block the event
+            // Setting this to yes so that the warning about hearings in exception state on ready to list does not block the RTL event
             sscsCaseData.setIgnoreCallbackWarnings(YesNo.YES);
             log.info("Case {} is List Assist so setting IgnoreCallbackWarnings to Yes", sscsCaseData.getCcdCaseId());
         }
@@ -266,7 +266,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
     private void checkForListedHearings(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (caseData.getDwpFurtherInfo().equals("No")) {
-            hearingsService.validationCheckForListedHearings(caseData, preSubmitCallbackResponse);
+            hearingsService.validationCheckForListedOrExceptionHearings(caseData, preSubmitCallbackResponse);
         }
     }
 

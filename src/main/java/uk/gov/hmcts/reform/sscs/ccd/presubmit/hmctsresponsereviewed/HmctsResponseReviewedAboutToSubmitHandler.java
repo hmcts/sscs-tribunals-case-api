@@ -98,7 +98,7 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
         addNote(sscsCaseData, userAuthorisation);
 
         if (HearingRoute.LIST_ASSIST.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute())) {
-            // Setting this to yes so that the warning about hearings in exception state on ready to list does not block the event
+            // Setting this to yes so that the warning about hearings in exception state on ready to list does not block the RTL event
             sscsCaseData.setIgnoreCallbackWarnings(YesNo.YES);
         }
 

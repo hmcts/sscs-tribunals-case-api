@@ -78,7 +78,7 @@ public class ReadyToListAboutToStartHandlerTest {
             PreSubmitCallbackResponse<SscsCaseData> resp = invocation.getArgument(1);
             resp.addError(EXISTING_HEARING_ERROR);
             return null;
-        }).given(hearingsService).validationCheckForListedHearings(any(), any());
+        }).given(hearingsService).validationCheckForListedOrExceptionHearings(any(), any());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
@@ -95,7 +95,7 @@ public class ReadyToListAboutToStartHandlerTest {
             PreSubmitCallbackResponse<SscsCaseData> resp = invocation.getArgument(1);
             resp.addWarning(REQUEST_FAILURE_WARNING);
             return null;
-        }).given(hearingsService).validationCheckForListedHearings(any(), any());
+        }).given(hearingsService).validationCheckForListedOrExceptionHearings(any(), any());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 

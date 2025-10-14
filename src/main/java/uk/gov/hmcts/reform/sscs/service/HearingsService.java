@@ -192,12 +192,12 @@ public class HearingsService {
         if (nonNull(hearing)) {
             Long hmcHearingVersionId = getHearingVersionNumber(hearing);
             Hearing caseDataHearing = HearingsServiceHelper.getHearingById(hearing.getHearingId(), caseData);
-            // removing version number check so I can cause hearing exception in list assist
-            //if (nonNull(caseDataHearing) && !caseDataHearing.getValue().getVersionNumber().equals(hmcHearingVersionId)) {
-            //    log.info("Setting case {} hearing version number to {} on ccd for hearing id {}",
-            //            caseId, hmcHearingVersionId, hearing.getHearingId());
-            //    caseData.getLatestHearing().getValue().setVersionNumber(hmcHearingVersionId);
-            //}
+
+            if (nonNull(caseDataHearing) && !caseDataHearing.getValue().getVersionNumber().equals(hmcHearingVersionId)) {
+                log.info("Setting case {} hearing version number to {} on ccd for hearing id {}",
+                        caseId, hmcHearingVersionId, hearing.getHearingId());
+                caseData.getLatestHearing().getValue().setVersionNumber(hmcHearingVersionId);
+            }
 
             log.info("Case id: {}, hmc hearing request version: {}, ccd case data hearing request version: {}",
                     caseId, hmcHearingVersionId, caseData.getLatestHearing().getValue().getVersionNumber());
@@ -326,7 +326,7 @@ public class HearingsService {
                 .build();
     }
 
-    public PreSubmitCallbackResponse<SscsCaseData> validationCheckForListedHearings(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+    public PreSubmitCallbackResponse<SscsCaseData> validationCheckForListedOrExceptionHearings(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         if (HearingRoute.LIST_ASSIST == caseData.getSchedulingAndListingFields().getHearingRoute()) {
             HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseData.getCcdCaseId(), null);
             CaseHearing listedCase = findHearingsWithRequestedHearingState(hearingsGetResponse, HmcStatus.LISTED, false);

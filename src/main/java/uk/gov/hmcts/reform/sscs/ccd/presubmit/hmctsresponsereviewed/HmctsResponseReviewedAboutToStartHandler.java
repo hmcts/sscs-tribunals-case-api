@@ -70,7 +70,7 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
             preSubmitCallbackResponse.addError("This event cannot be run for cases created in GAPS at valid appeal");
         }
 
-        hearingsService.validationCheckForListedHearings(sscsCaseData, preSubmitCallbackResponse);
+        hearingsService.validationCheckForListedOrExceptionHearings(sscsCaseData, preSubmitCallbackResponse);
 
         return preSubmitCallbackResponse;
     }

@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.willAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -19,14 +18,11 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.RESPONSE_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist.ReadyToListAboutToSubmitHandler.GAPS_CASE_WARNING;
-import static uk.gov.hmcts.reform.sscs.service.HearingsService.EXISTING_HEARING_ERROR;
-import static uk.gov.hmcts.reform.sscs.service.HearingsService.REQUEST_FAILURE_WARNING;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -125,42 +121,6 @@ public class ReadyToListAboutToSubmitHandlerTest {
 
         assertEquals(0, response.getErrors().size());
         assertEquals(0, response.getWarnings().size());
-    }
-
-    @Test
-    @Disabled
-    public void givenAListAssistCaseIfAHearingIsListedThenReturnError() {
-        caseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
-        caseData.setRegion("TEST");
-
-        willAnswer(invocation -> {
-            PreSubmitCallbackResponse<SscsCaseData> resp = invocation.getArgument(1);
-            resp.addError(EXISTING_HEARING_ERROR);
-            return null;
-        }).given(hearingsService).validationCheckForListedHearings(any(), any());
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(1).isEqualTo(response.getErrors().size());
-        assertThat(true).isEqualTo(response.getErrors().contains(EXISTING_HEARING_ERROR));
-    }
-
-    @Test
-    @Disabled
-    public void giveWarningIfHearingInExceptionState() {
-        caseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
-        caseData.setRegion("TEST");
-
-        willAnswer(invocation -> {
-            PreSubmitCallbackResponse<SscsCaseData> resp = invocation.getArgument(1);
-            resp.addWarning(REQUEST_FAILURE_WARNING);
-            return null;
-        }).given(hearingsService).validationCheckForListedHearings(any(), any());
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(1).isEqualTo(response.getWarnings().size());
-        assertThat(true).isEqualTo(response.getWarnings().contains(REQUEST_FAILURE_WARNING));
     }
 
     @Test

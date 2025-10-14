@@ -41,7 +41,7 @@ public class ConfirmPanelCompositionAboutToStartHandler implements PreSubmitCall
 
         final PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        hearingsService.validationCheckForListedHearings(sscsCaseData, response);
+        hearingsService.validationCheckForListedOrExceptionHearings(sscsCaseData, response);
 
         return response;
     }
