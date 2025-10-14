@@ -49,11 +49,10 @@ import { AccessibilitySteps } from '../fixtures/steps/accessibilitySteps';
 import { CreateUpdateToCaseDataSteps } from '../fixtures/steps/update.to.case.data';
 import { GenerateAppealPdfSteps } from '../fixtures/steps/generate.appeal.pdf';
 import { ManageDocuments } from '../fixtures/steps/manage.documents';
-import { UpdateListingRequirement } from '../fixtures/steps/update.listing.requirements';
+import { UpdateListingRequirement } from '../fixtures/steps/update.listing.requirements'; 
 import { CommunicateWithFta } from '../fixtures/steps/communicate-with-fta';
 import { Adjournment } from '../fixtures/steps/adjournment';
 import { AmendElements } from '../fixtures/steps/amend.elements';
-import { ReviewIncompleteAppeal } from '../fixtures/steps/work-allocation/review.incomplete.appeal';
 
 type MyStepsFixtures = {
   addNoteSteps: Note;
@@ -110,7 +109,6 @@ type MyStepsFixtures = {
   communicateWithFtaSteps: CommunicateWithFta;
   adjournmentSteps: Adjournment;
   amendElementSteps: AmendElements;
-  reviewIncompleteAppealSteps: ReviewIncompleteAppeal;
 };
 
 export const test = stepsFactory.extend<MyStepsFixtures>({
@@ -425,12 +423,8 @@ export const test = stepsFactory.extend<MyStepsFixtures>({
     const adjournmentSteps = new Adjournment(page);
     await use(adjournmentSteps);
   },
-  amendElementSteps: async ({ page }, use) => {
+   amendElementSteps: async ({ page }, use) => {
     const amendElementSteps = new AmendElements(page);
     await use(amendElementSteps);
-  },
-  reviewIncompleteAppealSteps: async ({ page }, use) => {
-    const reviewIncompleteAppealSteps = new ReviewIncompleteAppeal(page);
-    await use(reviewIncompleteAppealSteps);
   }
 });
