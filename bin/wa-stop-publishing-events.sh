@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Run from project root like this:
+# ./bin/wa-stop-publishing-events.sh OR
+# ./bin/wa-stop-publishing-events.sh "<FILEPATH>"
+
 JSON_FILE=${1:-"./definitions/benefit/sheets/CaseEvent/CaseEvent.json"}
 
 if [ ! -f "$JSON_FILE" ]; then
