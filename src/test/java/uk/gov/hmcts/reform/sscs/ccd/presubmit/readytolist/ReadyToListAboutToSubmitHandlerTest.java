@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.RESPONSE_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist.ReadyToListAboutToSubmitHandler.GAPS_CASE_WARNING;
 
@@ -276,5 +277,21 @@ public class ReadyToListAboutToSubmitHandlerTest {
                 .name("TEST")
                 .build());
         when(regionalProcessingCenterService.getRegionalProcessingCenterMap()).thenReturn(rpcMap);
+    }
+
+    @Test
+    public void givenListAssistCase_thenSetIgnoreWarningsToNull() {
+        caseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
+        caseData.setIgnoreCallbackWarnings(YES);
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertNull(response.getData().getIgnoreCallbackWarnings());
+    }
+
+    @Test
+    public void givenGapsCase_thenSetIgnoreWarningsIsNotSet() {
+        caseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.GAPS);
+        caseData.setIgnoreCallbackWarnings(NO);
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(NO).isEqualTo(response.getData().getIgnoreCallbackWarnings());
     }
 }

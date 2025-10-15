@@ -1580,4 +1580,18 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         assertEquals(panelComposition, response.getData().getPanelMemberComposition());
     }
+
+    @Test
+    public void givenListAssistCase_thenSetIgnoreWarningsToYes() {
+        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(YES, response.getData().getIgnoreCallbackWarnings());
+    }
+
+    @Test
+    public void givenGapsCase_thenSetIgnoreWarningsIsNotSet() {
+        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.GAPS);
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertNull(response.getData().getIgnoreCallbackWarnings());
+    }
 }

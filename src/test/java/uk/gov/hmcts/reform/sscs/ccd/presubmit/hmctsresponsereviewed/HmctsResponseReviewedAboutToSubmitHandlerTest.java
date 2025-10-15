@@ -49,6 +49,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpResponseDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
@@ -489,6 +490,20 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
         verify(addNoteService,times(1)).addNote(eq(USER_AUTHORISATION), eq(sscsCaseData),
                 eq("Referred to interloc for review by judge - Over 300 pages"));
+    }
+
+    @Test
+    public void givenListAssistCase_thenSetIgnoreWarningsToYes() {
+        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(YES, response.getData().getIgnoreCallbackWarnings());
+    }
+
+    @Test
+    public void givenGapsCase_thenSetIgnoreWarningsIsNotSet() {
+        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.GAPS);
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertNull(response.getData().getIgnoreCallbackWarnings());
     }
 
     @NotNull
