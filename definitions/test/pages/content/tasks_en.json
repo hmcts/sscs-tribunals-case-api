@@ -38,5 +38,13 @@
   "ctscRole": {
     "roleType": "CTSC",
     "assignToName": "SSCS ctscadmin"
+  },
+  "ctscTeamLeaderLiverpoolNwRole": {
+    "roleType": "CTSC",
+    "assignToName": "sscs-ctsctl nw-liverpool"
+  },
+  "ctscAdminLiverpoolNwRole": {
+    "roleType": "CTSC",
+    "assignToName": "sscs-ctscdmin nw-liverpool"
   }
 }
