@@ -72,7 +72,11 @@ def secrets = [
                 secret('test-e2e-hmrc-superuser-username', 'TEST_HMRC_SUPER_USER_USERNAME'),
                 secret('test-e2e-hmrc-superuser-password', 'TEST_HMRC_SUPER_USER_PASSWORD'),
                 secret('test-e2e-am-senior-tcw-case-allocator-username', 'TEST_AM_SENIOR_TRIBUNAL_CASEWORKER_CASE_ALLOCATOR_USERNAME'),
-                secret('test-e2e-am-senior-tcw-case-allocator-password', 'TEST_AM_SENIOR_TRIBUNAL_CASEWORKER_CASE_ALLOCATOR_PASSWORD')
+                secret('test-e2e-am-senior-tcw-case-allocator-password', 'TEST_AM_SENIOR_TRIBUNAL_CASEWORKER_CASE_ALLOCATOR_PASSWORD'),
+                secret('test-e2e-ctsc-team-leader-nw-liverpool-username', 'TEST_CTSC_TEAM_LEADER_NW_LIVERPOOL_USERNAME'),
+                secret('test-e2e-ctsc-team-leader-nw-liverpool-password', 'TEST_CTSC_TEAM_LEADER_NW_LIVERPOOL_PASSWORD'),
+                secret('test-e2e-ctsc-admin-nw-liverpool-username', 'TEST_CTSC_ADMIN_NW_LIVERPOOL_USERNAME'),
+                secret('test-e2e-ctsc-admin-nw-liverpool-password', 'TEST_CTSC_ADMIN_NW_LIVERPOOL_PASSWORD')
         ]
 ]
 

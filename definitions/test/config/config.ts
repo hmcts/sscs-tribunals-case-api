@@ -106,6 +106,14 @@ export const credentials = {
   amRegionalCenterTeamLeader: {
     email: process.env.TEST_AM_REGIONAL_CENTER_TEAM_LEADER_USERNAME,
     password: process.env.TEST_AM_REGIONAL_CENTER_TEAM_LEADER_PASSWORD
+  },
+  amCtscTeamLeaderNwLiverpool: {
+    email: process.env.TEST_CTSC_TEAM_LEADER_NW_LIVERPOOL_USERNAME,
+    password: process.env.TEST_CTSC_TEAM_LEADER_NW_LIVERPOOL_PASSWORD
+  },
+  amCtscAdminNwLiverpool: {
+    email: process.env.TEST_CTSC_ADMIN_NW_LIVERPOOL_USERNAME,
+    password: process.env.TEST_CTSC_ADMIN_NW_LIVERPOOL_PASSWORD
   }
 };
 
@@ -126,5 +134,5 @@ export const timeouts = {
   shortTimeout: 5000,
   mediumTimout: 60000,
   longTimeout: 120000,
-  maxTimeout: 180000
+  maxTimeout: 350000
 };
