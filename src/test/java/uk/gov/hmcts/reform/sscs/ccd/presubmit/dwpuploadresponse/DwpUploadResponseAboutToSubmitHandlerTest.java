@@ -46,7 +46,6 @@ import java.util.Optional;
 import junitparams.converters.Nullable;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -214,7 +213,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAListAssistCaseIfAHearingIsListedAndDwpFurtherInfoIsNo_displayAnError() {
+    public void givenListAssistHearingInListedStateAndDwpFurtherInfoIsNo_displayAnError() {
         callback.getCaseDetails().getCaseData().getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
         callback.getCaseDetails().getCaseData().setDwpFurtherInfo("No");
 
@@ -232,8 +231,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    @DisplayName("Give warning if existing hearing in exception state")
-    void giveWarningIfHearingInExceptionState() {
+    void givenListAssistHearingInExceptionState_displayWarning() {
         callback.getCaseDetails().getCaseData().getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
         callback.getCaseDetails().getCaseData().setDwpFurtherInfo("No");
 
@@ -256,6 +254,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size());
         assertEquals(NO, response.getData().getHasUnprocessedAudioVideoEvidence());
     }
 

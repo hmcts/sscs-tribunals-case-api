@@ -74,11 +74,10 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
                 .map(RegionalProcessingCenter::getHearingRoute)
                 .findFirst().orElse(HearingRoute.GAPS);
 
-        log.info("Calling hearing handler for route {} for case ID: {}", route, sscsCaseData.getCcdCaseId());
-
         // clear the ignore warnings field after use
         sscsCaseData.setIgnoreCallbackWarnings(null);
 
+        log.info("Calling hearing handler for route {} for case ID: {}", route, sscsCaseData.getCcdCaseId());
         return HearingHandler.valueOf(route.name()).handle(sscsCaseData, hearingRequestHandler);
     }
 
