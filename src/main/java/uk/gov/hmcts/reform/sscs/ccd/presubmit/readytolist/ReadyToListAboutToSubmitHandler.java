@@ -74,7 +74,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
                 .map(RegionalProcessingCenter::getHearingRoute)
                 .findFirst().orElse(HearingRoute.GAPS);
 
-        if(HearingRoute.LIST_ASSIST.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute())) {
+        if (HearingRoute.LIST_ASSIST.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute())) {
             // clear the ignore warnings field after use
             sscsCaseData.setIgnoreCallbackWarnings(null);
         }
