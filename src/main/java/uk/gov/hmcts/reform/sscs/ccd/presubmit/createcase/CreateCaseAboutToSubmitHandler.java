@@ -29,17 +29,14 @@ import uk.gov.hmcts.reform.pdf.service.client.exception.PDFServiceClientExceptio
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Issue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
-import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
-import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 
 @Component
@@ -49,13 +46,12 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
 
     private final SscsPdfService sscsPdfService;
     private final EmailHelper emailHelper;
+
     @Value("${feature.work-allocation.enabled}")
     private final boolean workAllocationFeature;
 
     private static final List<EventType> NON_PAPER_EVENTS = of(VALID_APPEAL_CREATED, DRAFT_TO_VALID_APPEAL_CREATED,
             NON_COMPLIANT, DRAFT_TO_NON_COMPLIANT, INCOMPLETE_APPLICATION_RECEIVED, DRAFT_TO_INCOMPLETE_APPLICATION);
-
-    private final VerbalLanguagesService verbalLanguagesService;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -82,7 +78,6 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
         if (IBCA_BENEFIT_CODE.equals(caseData.getBenefitCode())) {
             handleIbcaCase(caseData);
         }
-        updateLanguage(caseData);
 
         if (isNull(caseData.getDwpIsOfficerAttending())) {
             caseData.setDwpIsOfficerAttending(NO.toString());
@@ -90,7 +85,7 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
 
         if (nonNull(caseData.getBenefitCode())) {
             if (isNull(caseData.getIssueCode())) {
-                caseData.setIssueCode("DD");
+                caseData.setIssueCode(Issue.DD.toString());
             }
             caseData.setCaseCode(caseData.getBenefitCode() + caseData.getIssueCode());
         }
@@ -109,22 +104,6 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
                     caseData.getIsScottishCase(), callback.getCaseDetails().getId());
         }
         return preSubmitCallbackResponse;
-    }
-
-    private void updateLanguage(SscsCaseData caseData) {
-        Appeal appeal = caseData.getAppeal();
-        if (nonNull(appeal)) {
-            HearingOptions hearingOptions = appeal.getHearingOptions();
-
-            if (nonNull(hearingOptions)) {
-                String syaSelectedLanguage = hearingOptions.getLanguages();
-                Language language = verbalLanguagesService.getVerbalLanguage(syaSelectedLanguage);
-
-                if (nonNull(language)) {
-                    hearingOptions.setLanguages(language.getNameEn());
-                }
-            }
-        }
     }
 
     private void createAppealPdf(SscsCaseData caseData) {
