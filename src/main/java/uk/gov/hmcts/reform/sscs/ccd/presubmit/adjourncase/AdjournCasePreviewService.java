@@ -195,17 +195,14 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                 VenueDetails venueDetails = venueDataLoader.getVenueDetailsMap().get(venueId.toString());
 
                 if (nonNull(venueDetails)) {
-                    if (Objects.equals(venueDetails.getActive(), "No")) {
-                        String postCode = resolvePostCode(caseData);
-                        String newProcessingVenue = airLookupService.lookupAirVenueNameByPostCode(postCode, caseData.getAppeal().getBenefitType());
-                        Integer newVenueId = airLookupService.lookupVenueIdByAirVenueName(newProcessingVenue);
-                        venueDetails = venueDataLoader.getVenueDetailsMap().get(newVenueId.toString());
-                    }
                     adjournCaseBuilder.nextHearingVenue(venueDetails.getGapsVenName());
                     adjournCaseBuilder.nextHearingAtVenue(true);
 
                     return;
                 }
+            } else if (!IN_CHAMBERS.equals(venueName)) {
+                String postCode = resolvePostCode(caseData);
+                venueName = airLookupService.lookupAirVenueNameByPostCode(postCode, caseData.getAppeal().getBenefitType());
             }
 
             adjournCaseBuilder.nextHearingVenue(venueName);

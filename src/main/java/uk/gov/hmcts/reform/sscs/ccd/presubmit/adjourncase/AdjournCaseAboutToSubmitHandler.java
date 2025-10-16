@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.resolvePostCode;
@@ -14,7 +13,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
@@ -53,14 +51,13 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
         if (nonNull(adjournment.getNextHearingVenue()) && adjournment.getNextHearingVenue() == AdjournCaseNextHearingVenue.SAME_VENUE) {
             String processingVenue = sscsCaseData.getProcessingVenue();
             try {
-                String venueEpimsId = venueService.getEpimsIdForVenue(processingVenue);
-                VenueDetails courtVenue = venueService.getVenueDetailsForActiveVenueByEpimsId(venueEpimsId);
-                if (isNull(courtVenue)) {
-                    updateProcessingVenue(sscsCaseData);
-                }
+                venueService.getEpimsIdForVenue(processingVenue);
+
             } catch (IllegalStateException e) {
                 log.info("Cannot find  epims id for venue {}", processingVenue);
-                updateProcessingVenue(sscsCaseData);
+                String postCode = resolvePostCode(sscsCaseData);
+                String newProcessingVenue = airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType());
+                sscsCaseData.setProcessingVenue(newProcessingVenue);
             }
         }
 
@@ -81,10 +78,4 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    private void updateProcessingVenue(SscsCaseData sscsCaseData) {
-        String postCode = resolvePostCode(sscsCaseData);
-        String newProcessingVenue = airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType());
-        sscsCaseData.setProcessingVenue(newProcessingVenue);
-
-    }
 }
