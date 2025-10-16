@@ -74,6 +74,8 @@ JAVA_TOOL_OPTIONS="-Djava.locale.providers=COMPAT,CLDR"
    ```bash
    ./gradlew bootWithCCD
    ```
+   
+It will be on localhot:3455
 
 3. **Test the application health:**
    ```bash
