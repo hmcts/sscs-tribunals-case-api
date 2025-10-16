@@ -52,12 +52,15 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         if (nonNull(adjournment.getNextHearingVenue()) && adjournment.getNextHearingVenue() == AdjournCaseNextHearingVenue.SAME_VENUE) {
             String processingVenue = sscsCaseData.getProcessingVenue();
-            String venueEpimsId = venueService.getEpimsIdForVenue(processingVenue);
-            VenueDetails courtVenue = venueService.getVenueDetailsForActiveVenueByEpimsId(venueEpimsId);
-            if (isNull(courtVenue)) {
-                String postCode = resolvePostCode(sscsCaseData);
-                String newProcessingVenue = airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType());
-                sscsCaseData.setProcessingVenue(newProcessingVenue);
+            try {
+                String venueEpimsId = venueService.getEpimsIdForVenue(processingVenue);
+                VenueDetails courtVenue = venueService.getVenueDetailsForActiveVenueByEpimsId(venueEpimsId);
+                if (isNull(courtVenue)) {
+                    updateProcessingVenue(sscsCaseData);
+                }
+            } catch (IllegalStateException e) {
+                log.info("Cannot find  epims id for venue {}", processingVenue);
+                updateProcessingVenue(sscsCaseData);
             }
         }
 
@@ -76,5 +79,12 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
         adjournment.setGeneratedDate(LocalDate.now());
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
+    }
+
+    private void updateProcessingVenue(SscsCaseData sscsCaseData) {
+        String postCode = resolvePostCode(sscsCaseData);
+        String newProcessingVenue = airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType());
+        sscsCaseData.setProcessingVenue(newProcessingVenue);
+
     }
 }
