@@ -70,6 +70,7 @@ import { TribunalFtaCommunications } from '../../pages/tabs/tribunalFtaCommunica
 import { WriteAdjournmentPages } from '../../pages/write.adjournment.page';
 import { AmendElementPage } from '../../pages/amend.element.page';
 import { ElementsAndIssues } from '../../pages/tabs/elementsAndIssues';
+import { MyWorkPage } from '../../pages/my.work.page';
 
 export abstract class BaseStep {
   readonly page: Page;
@@ -144,6 +145,7 @@ export abstract class BaseStep {
   protected writeAdjournmentPage: WriteAdjournmentPages;
   protected amendElementPage: AmendElementPage;
   protected elementsAndIssuesTab: ElementsAndIssues;
+  protected myWorkPage: MyWorkPage;
 
   protected constructor(page: Page) {
     this.page = page;
@@ -231,6 +233,7 @@ export abstract class BaseStep {
     this.writeAdjournmentPage = new WriteAdjournmentPages(this.page);
     this.amendElementPage = new AmendElementPage(this.page);
     this.elementsAndIssuesTab = new ElementsAndIssues(this.page);
+    this.myWorkPage = new MyWorkPage(this.page);
   }
 
   async loginUserWithCaseIdViaCaseList(
@@ -270,7 +273,7 @@ export abstract class BaseStep {
   ) {
     await this.homePage.navigateToTab('History');
     await this.homePage.delay(1000);
-    if(event) await this.historyTab.verifyEventCompleted(event);
+    if (event) await this.historyTab.verifyEventCompleted(event);
   }
 
   async verifyEndStateInHistoryTab(state: string) {
