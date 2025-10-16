@@ -38,6 +38,8 @@ For versions and a complete list of dependencies, see `build.gradle`.
    ```bash
    ./gradlew bootWithCCD
    ```
+   
+It will be on localhot:3455
 
 3. **Test the application health:**
    ```bash
