@@ -70,8 +70,7 @@ class AdjournCaseAboutToSubmitHandlerMainTest extends AdjournCaseAboutToSubmitHa
         Appellant appellant = new Appellant();
         appellant.setAddress(Address.builder().build());
         sscsCaseData.getAppeal().setAppellant(appellant);
-        when(venueService.getEpimsIdForVenue("Closed Venue")).thenReturn("000000");
-        when(venueService.getVenueDetailsForActiveVenueByEpimsId("000000")).thenReturn(null);
+        when(venueService.getEpimsIdForVenue("Closed Venue")).thenThrow(IllegalStateException.class);
         when(airLookupService.lookupAirVenueNameByPostCode(any(), any())).thenReturn("New Venue");
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getData().getProcessingVenue()).isEqualTo("New Venue");
