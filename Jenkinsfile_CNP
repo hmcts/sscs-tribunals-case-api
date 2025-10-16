@@ -141,21 +141,31 @@ withPipeline(type, product, component) {
             enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
         }
 
+        if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:wa").size() > 0) {
+            env.WORK_ALLOCATION_FEATURE_ENABLED = 'true'
+        } else {
+            env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
+        }
+
         def tests = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "test-suite")
         env.TEST_SUITE = tests.size() > 0 ? tests.collect { it.replace("test-suite:", "@") }.join("|") : "@preview-pipeline"
         echo "Tags added on case is  " + { env.TEST_SUITE }
     }
     onDemo {
         env.ENVIRONMENT = "demo"
+        env.WORK_ALLOCATION_FEATURE_ENABLED = 'true'
     }
     onPerftest {
         env.ENVIRONMENT = "perftest"
+        env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
     }
     onIthc {
         env.ENVIRONMENT = "ithc"
+        env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
     }
     afterAlways('functionalTest:aat') {
         env.ENVIRONMENT = "prod"
+        env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
     }
 
     before('highleveldatasetup') {
@@ -195,7 +205,7 @@ def runNotificationTests() {
 }
 
 def generateDefinitions() {
-    sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT}"
+    sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${env.WORK_ALLOCATION_FEATURE_ENABLED}"
     steps.archiveArtifacts artifacts: "definitions/benefit/*.xlsx"
 
     sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT}"
