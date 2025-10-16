@@ -12,7 +12,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -202,7 +201,14 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                 }
             } else if (!IN_CHAMBERS.equals(venueName)) {
                 String postCode = resolvePostCode(caseData);
-                venueName = airLookupService.lookupAirVenueNameByPostCode(postCode, caseData.getAppeal().getBenefitType());
+                String newVenueName = airLookupService.lookupAirVenueNameByPostCode(postCode, caseData.getAppeal().getBenefitType());
+                Integer newVenueId = airLookupService.lookupVenueIdByAirVenueName(newVenueName);
+                VenueDetails venueDetails = venueDataLoader.getVenueDetailsMap().get(newVenueId.toString());
+                if (nonNull(venueDetails)) {
+                    adjournCaseBuilder.nextHearingVenue(venueDetails.getGapsVenName());
+                    adjournCaseBuilder.nextHearingAtVenue(true);
+                    return;
+                }
             }
 
             adjournCaseBuilder.nextHearingVenue(venueName);
