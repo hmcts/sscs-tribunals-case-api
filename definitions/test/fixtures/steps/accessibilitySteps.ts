@@ -8,6 +8,7 @@ import uploadDocumentFurtherEvidenceData from '../../pages/content/upload.docume
 import eventTestData from '../../pages/content/event.name.event.description_en.json';
 import bundleTestData from '../../pages/content/create.a.bundle_en.json';
 import { StringUtilsComponent } from '../../utils/StringUtilsComponent';
+import { environment } from '../../config/config';
 
 // Accessibility Test Steps:
 // Create a case
@@ -138,7 +139,7 @@ export class AccessibilitySteps extends BaseStep {
     await this.homePage.delay(5000);
     await this.homePage.reloadPage();
     await expect(this.homePage.summaryTab).toBeVisible();
-    await this.homePage.clickBeforeTabBtn();
+    if (environment.name == 'aat') await this.homePage.clickBeforeTabBtn();
     await this.homePage.navigateToTab('Bundles');
 
     await this.bundlesTab.verifyTableElementByIndex(
