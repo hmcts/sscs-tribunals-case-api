@@ -41,7 +41,7 @@ export class UploadToRemoveFromDocumentsPage {
 
   async removeDocument(tab: string, filename: string): Promise<void> {
     let fileNamesLocator = await this.page
-      .locator('ccd-read-document-field > a')
+      .locator('ccd-read-document-field > button')
       .all();
     let fileNames = await Promise.all(
       fileNamesLocator.map(async (file) => await file.textContent())

@@ -38,7 +38,7 @@ export class Hearings {
   }
 
   async clickHearingDetails() {
-    await webActions.clickLink('View or edit');
+    await webActions.clickButtonByRole('View or edit');
   }
 
   async clickBackLink() {
@@ -57,7 +57,7 @@ export class Hearings {
 
   async clickCancelLink() {
     await webActions.verifyTextVisibility('Cancel');
-    await webActions.clickLink('Cancel');
+    await webActions.clickButtonByRole('Cancel');
   }
 
   async submitCancellationReason() {
@@ -72,7 +72,7 @@ export class Hearings {
   }
 
   async verifyCancellationDetails(cancelReason: string) {
-    await webActions.clickLink('View details');
+    await webActions.clickButtonByRole('View details');
     await webActions.verifyTextVisibility('Cancellation requested');
     await webActions.verifyTextVisibility(cancelReason);
   }
