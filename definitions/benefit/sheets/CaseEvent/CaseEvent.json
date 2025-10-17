@@ -39,7 +39,7 @@
     "ShowSummary": "N",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "19/11/2019",
@@ -68,7 +68,7 @@
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdSubmittedEvent",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -98,23 +98,6 @@
     "Publish": "N",
     "ShowSummary": "N",
     "ShowEventNotes": "N"
-  },
-  {
-    "LiveFrom": "01/09/2021",
-    "CaseTypeID": "Benefit",
-    "ID": "actionPostponementRequest",
-    "Name": "Action Postponement Request",
-    "Description": "Action Postponement Request",
-    "DisplayOrder": 80,
-    "EventEnablingCondition": "unprocessedPostponementRequest=\"Yes\" AND interlocReviewState!=\"none\" AND interlocReviewState!=\"awaitingAdminAction\" AND interlocReviewState!=\"welshTranslation\" AND interlocReviewState!=\"\"",
-    "PreConditionState(s)": "*",
-    "PostConditionState": "*",
-    "CallBackURLAboutToStartEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToStart",
-    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
-    "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
-    "ShowEventNotes": "Y",
-    "SecurityClassification": "Public",
-    "Publish": "N"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -155,7 +138,7 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N",
+    "Publish": "${CCD_DEF_PUBLISH}",
     "ShowSummary": "N"
   },
   {
@@ -184,7 +167,7 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -339,7 +322,7 @@
     "PostConditionState": "responseReceived",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -470,7 +453,7 @@
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
     "SecurityClassification": "Public",
-    "Publish": "N",
+    "Publish": "${CCD_DEF_PUBLISH}",
     "ShowEventNotes": "N"
   },
   {
@@ -499,7 +482,7 @@
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
     "SecurityClassification": "Public",
-    "Publish": "N",
+    "Publish": "${CCD_DEF_PUBLISH}",
     "ShowEventNotes": "N"
   },
   {
@@ -544,7 +527,7 @@
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/sendNotification",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -559,7 +542,7 @@
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -659,7 +642,7 @@
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -728,7 +711,7 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -767,7 +750,7 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N",
+    "Publish": "${CCD_DEF_PUBLISH}",
     "ShowSummary": "Y"
   },
   {
@@ -841,7 +824,7 @@
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N",
+    "Publish": "${CCD_DEF_PUBLISH}",
     "ShowSummary": "Y"
   },
   {
@@ -875,7 +858,7 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -1019,7 +1002,7 @@
     "CallBackURLAboutToStartEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToStart",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "SecurityClassification": "Public",
-    "Publish": "N",
+    "Publish": "${CCD_DEF_PUBLISH}",
     "ShowEventNotes": "N"
   },
   {
@@ -1118,7 +1101,7 @@
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -1134,7 +1117,7 @@
     "RetriesTimeoutURLSubmittedEvent": "5,5",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -1431,7 +1414,7 @@
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -1444,7 +1427,7 @@
     "PostConditionState": "*",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -1458,7 +1441,7 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -1474,7 +1457,7 @@
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -1489,7 +1472,7 @@
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -1533,7 +1516,7 @@
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -1550,7 +1533,7 @@
     "ShowSummary": "N",
     "ShowEventNotes": "N",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -1654,7 +1637,7 @@
     "PostConditionState": "listingError",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "10/06/2022",
@@ -1706,7 +1689,7 @@
     "PostConditionState": "*",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N",
+    "Publish": "${CCD_DEF_PUBLISH}",
     "CallBackURLAboutToStartEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToStart",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
@@ -1738,7 +1721,7 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -1806,7 +1789,7 @@
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -1862,7 +1845,7 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -1878,7 +1861,7 @@
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -1955,7 +1938,7 @@
     "RetriesTimeoutURLSubmittedEvent": "5,5",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -2003,7 +1986,7 @@
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N",
+    "Publish": "${CCD_DEF_PUBLISH}",
     "ShowSummary": "Y"
   },
   {
@@ -2017,7 +2000,7 @@
     "PostConditionState": "*",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "SecurityClassification": "Public",
-    "Publish": "N",
+    "Publish": "${CCD_DEF_PUBLISH}",
     "ShowSummary": "N",
     "ShowEventNotes": "N"
   },
@@ -2062,7 +2045,7 @@
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -2076,7 +2059,7 @@
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -2090,7 +2073,7 @@
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -2105,7 +2088,7 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdSubmittedEvent",
     "SecurityClassification": "Public",
-    "Publish": "N",
+    "Publish": "${CCD_DEF_PUBLISH}",
     "ShowSummary": "N",
     "ShowEventNotes": "N"
   },
@@ -2119,7 +2102,7 @@
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
     "SecurityClassification": "Public",
-    "Publish": "N",
+    "Publish": "${CCD_DEF_PUBLISH}",
     "CallBackURLAboutToStartEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToStart",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
@@ -2138,21 +2121,7 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
-  },
-  {
-    "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
-    "ID": "interlocSendToTcw",
-    "Name": "Send case to TCW",
-    "Description": "Send case to TCW",
-    "DisplayOrder": 1390,
-    "PreConditionState(s)": "interlocutoryReviewState",
-    "PostConditionState": "interlocutoryReviewState",
-    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
-    "ShowEventNotes": "Y",
-    "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -2179,7 +2148,7 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -2193,7 +2162,7 @@
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -2235,7 +2204,7 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -2249,7 +2218,7 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -2264,7 +2233,7 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -2277,7 +2246,7 @@
     "PostConditionState": "*",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "11/11/2019",
@@ -2302,7 +2271,7 @@
     "PostConditionState": "withDwp",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -2370,7 +2339,7 @@
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -2383,7 +2352,7 @@
     "PostConditionState": "*",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "SecurityClassification": "Public",
-    "Publish": "N",
+    "Publish": "${CCD_DEF_PUBLISH}",
     "ShowSummary": "Y",
     "ShowEventNotes": "N"
   },
@@ -2466,7 +2435,7 @@
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdSubmittedEvent",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -2505,7 +2474,7 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdSubmittedEvent",
     "SecurityClassification": "Public",
-    "Publish": "N",
+    "Publish": "${CCD_DEF_PUBLISH}",
     "ShowSummary": "Y",
     "ShowEventNotes": "Y"
   },
@@ -2570,7 +2539,7 @@
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdSubmittedEvent",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -2612,7 +2581,7 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -2651,7 +2620,7 @@
     "PostConditionState": "*",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "SecurityClassification": "Public",
-    "Publish": "N",
+    "Publish": "${CCD_DEF_PUBLISH}",
     "ShowSummary": "Y",
     "ShowEventNotes": "N"
   },
@@ -2668,7 +2637,7 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "SecurityClassification": "Public",
-    "Publish": "N",
+    "Publish": "${CCD_DEF_PUBLISH}",
     "ShowSummary": "Y",
     "ShowEventNotes": "N"
   },
@@ -2701,7 +2670,7 @@
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -2750,7 +2719,7 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -2792,7 +2761,7 @@
     "ShowSummary": "Y",
     "ShowEventNotes": "N",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -2808,24 +2777,7 @@
     "ShowSummary": "Y",
     "ShowEventNotes": "N",
     "SecurityClassification": "Public",
-    "Publish": "N"
-  },
-  {
-    "LiveFrom": "01/09/2021",
-    "CaseTypeID": "Benefit",
-    "ID": "actionPostponementRequestWelsh",
-    "Name": "Welsh- Action Postponement Req",
-    "Description": "Welsh- Action Postponement Req",
-    "DisplayOrder": 1860,
-    "EventEnablingCondition": "unprocessedPostponementRequest=\"Yes\" AND interlocReviewState!=\"none\" AND interlocReviewState!=\"awaitingAdminAction\" AND interlocReviewState!=\"welshTranslation\" AND interlocReviewState!=\"\"",
-    "PreConditionState(s)": "*",
-    "PostConditionState": "*",
-    "CallBackURLAboutToStartEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToStart",
-    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
-    "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
-    "ShowEventNotes": "Y",
-    "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -2859,7 +2811,7 @@
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdSubmittedEvent",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -2925,19 +2877,6 @@
   {
     "LiveFrom": "01/01/2018",
     "CaseTypeID": "Benefit",
-    "ID": "manageWelshDocuments",
-    "Name": "Welsh – manage Welsh doc(s)",
-    "Description": "Manage Welsh document(s)",
-    "DisplayOrder": 1930,
-    "PreConditionState(s)": "*",
-    "PostConditionState": "*",
-    "ShowEventNotes": "Y",
-    "SecurityClassification": "Public",
-    "Publish": "N"
-  },
-  {
-    "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
     "ID": "markDocumentsForTranslation",
     "Name": "Welsh - mark docs for trans",
     "Description": "Mark documents for translation",
@@ -2980,7 +2919,7 @@
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2017",
@@ -3011,7 +2950,7 @@
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdSubmittedEvent",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -3091,7 +3030,7 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdSubmittedEvent",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "05/11/2022",
@@ -3109,7 +3048,7 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdSubmittedEvent",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "13/10/2022",
@@ -3148,7 +3087,7 @@
     "PostConditionState": "postHearing",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "13/10/2022",
@@ -3161,7 +3100,7 @@
     "PostConditionState": "dormantAppealState",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "13/10/2022",
@@ -3179,7 +3118,7 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdSubmittedEvent",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "13/10/2022",
@@ -3205,7 +3144,7 @@
     "PostConditionState": "notListable",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "13/10/2022",
@@ -3218,7 +3157,7 @@
     "PostConditionState": "dormantAppealState",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "13/10/2022",
@@ -3231,7 +3170,7 @@
     "PostConditionState": "*",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "23/11/2022",
@@ -3244,7 +3183,7 @@
     "PostConditionState": "postHearing",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "23/11/2022",
@@ -3270,7 +3209,7 @@
     "PostConditionState": "postHearing",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "23/11/2022",
@@ -3283,7 +3222,7 @@
     "PostConditionState": "postHearing",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "21/03/2023",
@@ -3302,7 +3241,7 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdSubmittedEvent",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "23/03/2023",
@@ -3340,7 +3279,7 @@
     "PostConditionState": "postHearing",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "09/05/2023",
@@ -3353,7 +3292,7 @@
     "PostConditionState": "dormantAppealState",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "09/05/2023",
@@ -3366,7 +3305,7 @@
     "PostConditionState": "dormantAppealState",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "09/05/2023",
@@ -3379,7 +3318,7 @@
     "PostConditionState": "notListable",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "23/11/2022",
@@ -3392,7 +3331,7 @@
     "PostConditionState": "postHearing",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "09/05/2023",
@@ -3405,7 +3344,7 @@
     "PostConditionState": "notListable",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "09/05/2023",
@@ -3418,7 +3357,7 @@
     "PostConditionState": "dormantAppealState",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "09/05/2023",
@@ -3450,7 +3389,7 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdSubmittedEvent",
     "SecurityClassification": "Public",
-    "Publish": "N"
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "07/07/2023",
