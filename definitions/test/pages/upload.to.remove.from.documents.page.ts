@@ -65,7 +65,7 @@ export class UploadToRemoveFromDocumentsPage {
     await expect(removePopUp).toBeVisible();
     await removePopUp.first().click();
     await expect(removePopUp).toBeHidden();
-    expect(await this.page.locator('ccd-read-document-field > a').count()).toBe(
+    expect(await this.page.locator('ccd-read-document-field > button').count()).toBe(
       fileNames.length - 1
     );
   }
