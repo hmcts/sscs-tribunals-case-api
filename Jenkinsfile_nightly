@@ -37,7 +37,7 @@ def secrets = [
                 secret('notification-test-key', 'NOTIFICATION_API_TEST_KEY'),
                 secret('sscs-email-mac-secret-text', 'EMAIL_MAC_SECRET_TEXT'),
                 secret('tya-link', 'SSCS_TRACK_YOUR_APPEAL_LINK'),
-
+   
                 //e2e tests
                 secret('test-e2e-caseofficer-username', 'TEST_CASEOFFICER_USERNAME'),
                 secret('test-e2e-caseofficer-password', 'TEST_CASEOFFICER_PASSWORD'),
@@ -104,11 +104,12 @@ def setAatEnvVars() {
 }
 
 withNightlyPipeline(type, product, component) {
-    env.TEST_URL = params.API_URL_TO_TEST
+    // env.TEST_URL = params.API_URL_TO_TEST
     env.POST_HEARINGS_FEATURE = false
     env.Rules = params.SecurityRules
     setAatEnvVars()
     env.TEST_E2E_URL_WEB = params.UI_URL_TO_TEST
+    env.TEST_URL = params.API_URL_TO_TEST
 
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
