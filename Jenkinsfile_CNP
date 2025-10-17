@@ -5,6 +5,14 @@
 import uk.gov.hmcts.contino.AppPipelineDsl
 import uk.gov.hmcts.contino.GithubAPI
 
+properties([
+        parameters([
+                string(name: 'WA_ENABLED', defaultValue: 'false', description: 'Feature flag to toggle WA config on/off')
+        ]),
+        [$class: 'GithubProjectProperty', projectUrlStr: 'https://github.com/hmcts/tribunals-case-api'],
+        pipelineTriggers([[$class: 'GitHubPushTrigger']])
+])
+
 def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
@@ -142,6 +150,7 @@ withPipeline(type, product, component) {
         setAatEnvVars();
 
         enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
+        env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
     }
     onPR() {
         setPreviewEnvVars();
@@ -168,15 +177,14 @@ withPipeline(type, product, component) {
     }
     onPerftest {
         env.ENVIRONMENT = "perftest"
-        env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
+        env.WORK_ALLOCATION_FEATURE_ENABLED = params.WA_ENABLED
     }
     onIthc {
         env.ENVIRONMENT = "ithc"
-        env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
+        env.WORK_ALLOCATION_FEATURE_ENABLED = params.WA_ENABLED
     }
     afterAlways('functionalTest:aat') {
         env.ENVIRONMENT = "prod"
-        env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
     }
 
     before('highleveldatasetup') {
