@@ -17,5 +17,7 @@
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseStateID": "notListable", "AccessProfile": "caseworker-ras-validation", "CRUD": "R"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseStateID": "postHearing", "AccessProfile": "caseworker-ras-validation", "CRUD": "R"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseStateID": "withUT", "AccessProfile": "caseworker-wa-task-configuration", "CRUD": "R"},
-  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseStateID": "withUT", "AccessProfile": "caseworker-ras-validation", "CRUD": "R"}
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseStateID": "withUT", "AccessProfile": "caseworker-ras-validation", "CRUD": "R"},
+  {"LiveFrom": "26/09/2025", "CaseTypeID": "Benefit", "CaseStateID": "draft", "AccessProfile": "caseworker-ras-validation", "CRUD": "R"},
+  {"LiveFrom": "26/09/2025", "CaseTypeID": "Benefit", "CaseStateID": "draftArchived", "AccessProfile": "caseworker-ras-validation", "CRUD": "R"}
 ]
