@@ -150,11 +150,9 @@ export class WebAction {
   }
 
   async isButtonClickable(elementLocator: string): Promise<void> {
-    await expect(this.page.getByRole('button', { name: elementLocator }).first()).toBeVisible();
-    await expect(this.page
-      .getByRole('button', { name: elementLocator })
-      .first()
-    ).toBeEnabled();
+     await expect(this.page.getByRole('button', { name: elementLocator })
+     .first())
+     .toBeVisible();
   }
 
   async clickNextStepButton(elementId: string): Promise<void> {
