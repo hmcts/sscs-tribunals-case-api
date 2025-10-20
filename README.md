@@ -112,7 +112,7 @@ Run all unit tests:
      System.getProperties().setProperty("pact.verifier.publishResults", "true");
      ```
 
-## Docker (Work in progress...)
+## Docker
 
 ### Build and Run with Docker
 
@@ -160,6 +160,20 @@ docker-compose up
 curl http://localhost:8008/health
 ```
 
+### CCD config generation
+```bash
+# Generate CCD config for demo
+./bin/create-xlsx.sh benefit dev demo
+```
+```bash
+# Generate prod like CCD config for demo
+./bin/create-xlsx.sh benefit dev demo prod
+```
+```bash
+# Generate CCD config for demo with WA enabled
+./bin/create-xlsx.sh benefit dev demo "" "" true
+```
+
 ## Gotchas
 
 ### PRs Starting with "Bump"
@@ -171,5 +185,5 @@ Elastic indices may be missing on preview. Recreate them by logging into CCD adm
 This avoids re-triggering the pipeline build and saves time.
 
 ### Work allocation in preview
-Work allocation is now enabled in preview. To enable work allocation in preview, you need to add the `pr-values:wa` label to your PR. This will ensure that the work allocation service is started and configured correctly for the preview environment.
-If some events are not triggering WA tasks, or are not being recognised by the WA service, double check that the case-event.json entry for the event has the `Publish` field set to `"Y"`. If it is not set, then CCD will not publish the event to the message listener and the WA service will not be able to process it.
+Work allocation is now enabled in preview. To enable work allocation in preview, you need to add the `pr-values:wa` label to your PR. This will ensure that the work allocation service is started and configured correctly for the preview environment. To enable WA in other environments use both `WORK_ALLOCATION_FEATURE` in `cnp-flux-config` repo and `WORK_ALLOCATION_FEATURE_ENABLED` in `Jenkinsfile_CNP`.
+If some events are not triggering WA tasks, or are not being recognised by the WA service, double check that the case-event.json entry for the event has the `Publish` field set to `"${CCD_DEF_PUBLISH}"`. If it is not set, then CCD will not publish the event to the message listener and the WA service will not be able to process it.
