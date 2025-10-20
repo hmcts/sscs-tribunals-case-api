@@ -137,6 +137,7 @@ fi
 
 if [ "$ENV" = "prod" ] || [ "$LIKE_PROD" = "prod" ]; then
   excludedFilenamePatterns="-e *-nonprod.json,${shutteredExclusion},*-nonprod-*,*-WA-*"
+  CCD_DEF_PUBLISH="N"
 else
   excludedFilenamePatterns="-e *-prod.json,${shutteredExclusion},${waExclusion}"
 fi
