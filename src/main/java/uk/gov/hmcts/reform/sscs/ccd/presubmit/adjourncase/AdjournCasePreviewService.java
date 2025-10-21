@@ -6,7 +6,6 @@ import static org.apache.commons.lang3.StringUtils.stripToEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.IN_CHAMBERS;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getLastValidHearing;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.resolvePostCode;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -124,7 +123,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         HearingType nextHearingType = HearingType.getByKey(String.valueOf(adjournment.getTypeOfNextHearing()));
 
         if (HearingType.FACE_TO_FACE.equals(nextHearingType)) {
-            handleFaceToFaceHearing(adjournment, adjournCaseBuilder, venueName, caseData);
+            handleFaceToFaceHearing(adjournment, adjournCaseBuilder, venueName);
         } else {
             adjournCaseBuilder.nextHearingAtVenue(false);
             if (adjournment.getNextHearingVenueSelected() != null) {
@@ -171,7 +170,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         }
     }
 
-    private void handleFaceToFaceHearing(Adjournment adjournment, AdjournCaseTemplateBodyBuilder adjournCaseBuilder, String venueName, SscsCaseData caseData) {
+    private void handleFaceToFaceHearing(Adjournment adjournment, AdjournCaseTemplateBodyBuilder adjournCaseBuilder, String venueName) {
         if (adjournment.getNextHearingVenue() == AdjournCaseNextHearingVenue.SOMEWHERE_ELSE) {
             if (nonNull(adjournment.getNextHearingVenueSelected())
                 && nonNull(adjournment.getNextHearingVenueSelected().getValue())
@@ -197,16 +196,6 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                     adjournCaseBuilder.nextHearingVenue(venueDetails.getGapsVenName());
                     adjournCaseBuilder.nextHearingAtVenue(true);
 
-                    return;
-                }
-            } else if (!IN_CHAMBERS.equals(venueName)) {
-                String postCode = resolvePostCode(caseData);
-                String newVenueName = airLookupService.lookupAirVenueNameByPostCode(postCode, caseData.getAppeal().getBenefitType());
-                Integer newVenueId = airLookupService.lookupVenueIdByAirVenueName(newVenueName);
-                VenueDetails venueDetails = venueDataLoader.getVenueDetailsMap().get(newVenueId.toString());
-                if (nonNull(venueDetails)) {
-                    adjournCaseBuilder.nextHearingVenue(venueDetails.getGapsVenName());
-                    adjournCaseBuilder.nextHearingAtVenue(true);
                     return;
                 }
             }

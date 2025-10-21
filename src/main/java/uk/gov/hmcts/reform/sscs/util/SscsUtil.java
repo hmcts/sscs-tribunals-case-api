@@ -34,12 +34,10 @@ import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCasePanelMembersExcluded;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
@@ -757,23 +755,5 @@ public class SscsUtil {
         String languageInterpreter = ofNullable(hearingOptions.getLanguageInterpreter()).orElse("NO");
         return nonNull(caseData.getAdjournment().getInterpreterRequired()) && !caseData.getAdjournment().getInterpreterRequired().equals(YesNo.valueOf(languageInterpreter.toUpperCase()));
     }
-
-    public static String resolvePostCode(SscsCaseData sscsCaseData) {
-        if (NO.equals(sscsCaseData.getAppeal().getAppellant().getAddress().getInMainlandUk())) {
-            return sscsCaseData.getAppeal().getAppellant().getAddress().getPortOfEntry();
-        } else {
-            if (YES.getValue().equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAppointee())) {
-                return ofNullable(sscsCaseData.getAppeal().getAppellant().getAppointee())
-                        .map(Appointee::getAddress)
-                        .map(Address::getPostcode)
-                        .map(String::trim)
-                        .filter(org.apache.commons.lang3.StringUtils::isNotEmpty)
-                        .orElse(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode());
-            }
-
-            return sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
-        }
-    }
-
 }
 

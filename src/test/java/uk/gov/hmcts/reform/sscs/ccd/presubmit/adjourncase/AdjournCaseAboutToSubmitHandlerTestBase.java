@@ -12,11 +12,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
-import uk.gov.hmcts.reform.sscs.service.VenueService;
 
 @ExtendWith(MockitoExtension.class)
 abstract class AdjournCaseAboutToSubmitHandlerTestBase {
@@ -41,19 +39,13 @@ abstract class AdjournCaseAboutToSubmitHandlerTestBase {
     protected UserDetailsService userDetailsService;
 
     @Mock
-    protected AirLookupService airLookupService;
-
-    @Mock
-    protected VenueService venueService;
-
-    @Mock
     protected VenueDataLoader venueDataLoader;
 
     protected SscsCaseData sscsCaseData;
 
     @BeforeEach
     protected void setUp() {
-        handler = new AdjournCaseAboutToSubmitHandler(previewDocumentService, userDetailsService, airLookupService, venueService);
+        handler = new AdjournCaseAboutToSubmitHandler(previewDocumentService, userDetailsService);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
             .appeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build())
             .schedulingAndListingFields(SchedulingAndListingFields.builder()

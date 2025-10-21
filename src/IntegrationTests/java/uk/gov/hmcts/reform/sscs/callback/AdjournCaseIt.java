@@ -353,7 +353,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         checkPayloadDetails(parentPayload, payload, nextHearingDate, "face to face hearing",
             A_STANDARD_TIME_SLOT, "faceToFace", interpreterDescription);
         assertThat(payload.isNextHearingAtVenue()).isTrue();
-        assertThat(payload.getNextHearingVenue()).isEqualTo("Basildon Combined Court");
+        assertThat(payload.getNextHearingVenue()).isEqualTo(CHESTER_MAGISTRATE_S_COURT);
     }
 
     private static void checkPayloadDetails(
