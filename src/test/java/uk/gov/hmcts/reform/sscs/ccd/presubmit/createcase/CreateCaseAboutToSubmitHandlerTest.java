@@ -49,8 +49,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
-import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
-import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 
 @ExtendWith(MockitoExtension.class)
@@ -65,8 +63,6 @@ public class CreateCaseAboutToSubmitHandlerTest {
     private SscsPdfService sscsPdfService;
     @Mock
     private EmailHelper emailHelper;
-    @Mock
-    private VerbalLanguagesService verbalLanguagesService;
 
     private Callback<SscsCaseData> callback;
     private CaseDetails<SscsCaseData> caseDetails;
@@ -88,7 +84,8 @@ public class CreateCaseAboutToSubmitHandlerTest {
                 new CaseDetails<>(1234L, "SSCS", WITH_DWP, buildCaseDataWithoutPdf(), now(), "Benefit");
         callback = new Callback<>(caseDetails, empty(), CREATE_APPEAL_PDF, false);
 
-        createCaseAboutToSubmitHandler = new CreateCaseAboutToSubmitHandler(sscsPdfService, emailHelper, false, verbalLanguagesService);
+        createCaseAboutToSubmitHandler =
+                new CreateCaseAboutToSubmitHandler(sscsPdfService, emailHelper, false);
     }
 
     @ParameterizedTest
@@ -222,7 +219,8 @@ public class CreateCaseAboutToSubmitHandlerTest {
         var caseDetails =
                 new CaseDetails<>(1234L, "SSCS", WITH_DWP, caseDataWithNullSscsDocument, now(), "Benefit");
         var callback = new Callback<>(caseDetails, empty(), CREATE_APPEAL_PDF, false);
-        when(emailHelper.generateUniqueEmailId(caseDetails.getCaseData().getAppeal().getAppellant())).thenReturn("Test");
+        when(emailHelper.generateUniqueEmailId(caseDetails.getCaseData().getAppeal().getAppellant()))
+                .thenReturn("Test");
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -251,7 +249,8 @@ public class CreateCaseAboutToSubmitHandlerTest {
 
     @Test
     void shouldSetPdfFileNameWithIbcaReferenceWhenBenefitIsIbca() {
-        SscsCaseData caseDataWithSscsDocument = buildCaseData("Test", "infectedBloodCompensation", "IBCA");
+        SscsCaseData caseDataWithSscsDocument =
+                buildCaseData("Test", "infectedBloodCompensation", "IBCA");
         caseDataWithSscsDocument.setCcdCaseId(CCD_CASE_ID.toString());
         caseDataWithSscsDocument.setBenefitCode(IBCA_BENEFIT_CODE);
         caseDataWithSscsDocument.getAppeal().getAppellant().getIdentity().setIbcaReference("IBCA12345");
@@ -260,7 +259,8 @@ public class CreateCaseAboutToSubmitHandlerTest {
                 new CaseDetails<>(1234L, "SSCS", WITH_DWP, caseDataWithSscsDocument, now(), "Benefit");
         var callback = new Callback<>(caseDetails, empty(), CREATE_APPEAL_PDF, false);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("Yes", response.getData().getEvidencePresent());
         verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), eq("sscs8"), any());
@@ -268,7 +268,8 @@ public class CreateCaseAboutToSubmitHandlerTest {
 
     @Test
     void shouldCallPdfServiceWhenSscsDocumentIsNullWhenBenefitCodeIsIbca() {
-        SscsCaseData caseDataWithNullSscsDocument = buildCaseData("Test", "infectedBloodCompensation", "IBCA");
+        SscsCaseData caseDataWithNullSscsDocument =
+                buildCaseData("Test", "infectedBloodCompensation", "IBCA");
         caseDataWithNullSscsDocument.setCcdCaseId(CCD_CASE_ID.toString());
         caseDataWithNullSscsDocument.setBenefitCode(IBCA_BENEFIT_CODE);
         caseDataWithNullSscsDocument.getAppeal().getAppellant().getIdentity().setIbcaReference("IBCA12345");
@@ -277,7 +278,8 @@ public class CreateCaseAboutToSubmitHandlerTest {
                 new CaseDetails<>(1234L, "SSCS", WITH_DWP, caseDataWithNullSscsDocument, now(), "Benefit");
         var callback = new Callback<>(caseDetails, empty(), CREATE_APPEAL_PDF, false);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("No", response.getData().getEvidencePresent());
         verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), eq("sscs8"), any());
@@ -308,19 +310,6 @@ public class CreateCaseAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenLanguageHasBeenSet_thenConfirmCorrectLanguageNameAndSetIt() {
-        String oldLanguageName = "Putonghue";
-        String newLanguageName = "Mandarin";
-
-        caseDetails.getCaseData().getAppeal().getHearingOptions().setLanguages(oldLanguageName);
-        when(verbalLanguagesService.getVerbalLanguage(oldLanguageName)).thenReturn(Language.builder()
-                .nameEn(newLanguageName).build());
-
-        PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(newLanguageName, response.getData().getAppeal().getHearingOptions().getLanguages());
-    }
-
-    @Test
     void throwsExceptionIfItCannotHandleTheAppeal() {
         var callback = new Callback<>(caseDetails, empty(), APPEAL_RECEIVED, false);
 
@@ -332,7 +321,8 @@ public class CreateCaseAboutToSubmitHandlerTest {
     void shouldReturnErrorIfNullCreatedDate() throws CcdException {
         callback.getCaseDetails().getCaseData().setCaseCreated(null);
         callback.getCaseDetails().getCaseData().setBenefitCode("015");
-        PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
         assertTrue(response.getErrors().contains("The Case Created Date must be set to generate the SSCS5"));
@@ -342,7 +332,8 @@ public class CreateCaseAboutToSubmitHandlerTest {
     void shouldPreserveDwpIsOfficerAttendingValue() {
         caseDetails.getCaseData().setDwpIsOfficerAttending(YesNo.YES.toString());
 
-        PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertTrue(YesNo.isYes(response.getData().getDwpIsOfficerAttending()));
     }
 
@@ -350,7 +341,8 @@ public class CreateCaseAboutToSubmitHandlerTest {
     void whenBenefitCodeIsNotNull_shouldSetCorrectCaseCode() {
         caseDetails.getCaseData().setBenefitCode("001");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals("001DD", response.getData().getCaseCode());
     }
 
@@ -359,7 +351,8 @@ public class CreateCaseAboutToSubmitHandlerTest {
         caseDetails.getCaseData().setBenefitCode("001");
         caseDetails.getCaseData().setIssueCode("US");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals("001US", response.getData().getCaseCode());
     }
 
