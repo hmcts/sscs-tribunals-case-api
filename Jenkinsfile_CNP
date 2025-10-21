@@ -143,8 +143,10 @@ withPipeline(type, product, component) {
 
         if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:wa").size() > 0) {
             env.WORK_ALLOCATION_FEATURE_ENABLED = 'true'
+            echo "Enabling Work Allocation"
         } else {
             env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
+            echo "Disabling Work Allocation"
         }
 
         def tests = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "test-suite")
