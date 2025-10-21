@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.helper.mapping;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.BooleanUtils.isFalse;
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -31,7 +32,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.lang.NonNull;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DateRange;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Entity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Party;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.HearingWrapper;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.EntityRoleCode;
@@ -50,11 +67,6 @@ import uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil;
 // TODO Unsuppress in future
 @Slf4j
 public final class HearingsPartiesMapping {
-
-    public static final String LANGUAGE_REFERENCE_TEMPLATE = "%s%s";
-    public static final String LANGUAGE_DIALECT_TEMPLATE = "-%s";
-    public static final String DWP_PO_FIRST_NAME = "Presenting";
-    public static final String DWP_PO_LAST_NAME = "Officer";
 
     public static final String ORGANISATION_NAME_REPLACEMENT = "-";
 
@@ -290,11 +302,11 @@ public final class HearingsPartiesMapping {
             return null;
         }
 
-        return getLanguageReference(getLanguage(hearingOptions, refData));
+        return getLanguageReference(hearingOptions, refData);
     }
 
     @Nullable
-    public static Language getLanguage(HearingOptions hearingOptions, ReferenceDataServiceHolder refData) {
+    public static String getLanguageReference(HearingOptions hearingOptions, ReferenceDataServiceHolder refData) {
 
         Language language = null;
 
@@ -314,28 +326,13 @@ public final class HearingsPartiesMapping {
                 log.warn("The language {} cannot be mapped", verbalLanguage);
             }
         }
-        return language;
-    }
-
-    public static String getLanguageReference(Language language) {
-        if (isNull(language)) {
-            return null;
-        }
-        return String.format(LANGUAGE_REFERENCE_TEMPLATE,
-                language.getReference(), getDialectReference(language));
-    }
-
-    private static String getDialectReference(Language language) {
-        if (isBlank(language.getDialectReference())) {
-            return "";
-        }
-        return String.format(LANGUAGE_DIALECT_TEMPLATE, language.getDialectReference());
+        return nonNull(language) ? language.getFullReference() : null;
     }
 
     @Nullable
     public static String getOverrideInterpreterLanguage(OverrideFields overrideFields) {
         if (isYes(overrideFields.getAppellantInterpreter().getIsInterpreterWanted())) {
-            return Optional.ofNullable(overrideFields.getAppellantInterpreter().getInterpreterLanguage())
+            return ofNullable(overrideFields.getAppellantInterpreter().getInterpreterLanguage())
                     .map(DynamicList::getValue)
                     .map(DynamicListItem::getCode)
                     .orElse(null);
