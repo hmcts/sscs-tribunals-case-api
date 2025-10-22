@@ -1379,8 +1379,9 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertThat(YES, is(response.getData().getIsConfidentialCase()));
     }
 
-    @Test
-    public void givenValidIbcaCase_thenNoError() {
+    @ParameterizedTest
+    @CsvSource({"Yes", "No"})
+    public void givenValidIbcaCase_thenNoError(String dwpFurtherInfo) {
         final SscsCaseData caseDataBefore = SscsCaseData.builder().build();
         final SscsCaseData caseData = SscsCaseData.builder()
                 .ccdCaseId("1234")
@@ -1388,7 +1389,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
                 .benefitCodeIbcaOnly("093")
                 .issueCode("DD")
                 .issueCodeIbcaOnly("RA")
-                .dwpFurtherInfo("Yes")
+                .dwpFurtherInfo(dwpFurtherInfo)
                 .dynamicDwpState(new DynamicList(""))
                 .dwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("a.pdf").documentFilename("a.pdf").build()).build())
                 .dwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("b.pdf").documentFilename("b.pdf").build()).build())

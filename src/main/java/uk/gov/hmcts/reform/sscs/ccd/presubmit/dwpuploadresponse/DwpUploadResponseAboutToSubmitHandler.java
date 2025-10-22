@@ -265,7 +265,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     }
 
     private void checkForListedHearings(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if (caseData.getDwpFurtherInfo().equals("No")) {
+        if (YesNo.NO.getValue().equals(caseData.getDwpFurtherInfo())) {
             hearingsService.validationCheckForListedOrExceptionHearings(caseData, preSubmitCallbackResponse);
         }
     }
