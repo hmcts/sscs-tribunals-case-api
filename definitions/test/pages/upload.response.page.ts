@@ -21,7 +21,7 @@ export class UploadResponsePage {
         await webActions.verifyPageLabel('h2', 'AT38 (Optional)'); //Section heading
         await webActions.verifyPageLabel('h2', 'FTA Evidence bundle'); //Section heading
         await webActions.verifyPageLabel('h2', 'Audio/Video Evidence'); //Section heading */
-    await webActions.isLinkClickable('Cancel');
+    await webActions.isButtonClickable('Cancel');
   }
 
   async uploadDocs(): Promise<void> {
