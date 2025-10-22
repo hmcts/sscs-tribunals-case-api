@@ -8,7 +8,6 @@ import uploadDocumentFurtherEvidenceData from '../../pages/content/upload.docume
 import eventTestData from '../../pages/content/event.name.event.description_en.json';
 import bundleTestData from '../../pages/content/create.a.bundle_en.json';
 import { StringUtilsComponent } from '../../utils/StringUtilsComponent';
-import { environment } from '../../config/config';
 
 // Accessibility Test Steps:
 // Create a case
