@@ -51,6 +51,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -1380,7 +1382,8 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"Yes", "No"})
+    @NullAndEmptySource
+    @ValueSource(strings = { "Yes", "No" })
     public void givenValidIbcaCase_thenNoError(String dwpFurtherInfo) {
         final SscsCaseData caseDataBefore = SscsCaseData.builder().build();
         final SscsCaseData caseData = SscsCaseData.builder()
