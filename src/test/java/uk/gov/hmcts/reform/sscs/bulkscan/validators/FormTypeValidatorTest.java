@@ -1,14 +1,16 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.validators;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.bulkscan.helper.OcrDataBuilderTest.buildScannedValidationOcrData;
 
+import com.networknt.schema.JsonSchema;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.ExceptionRecord;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.OcrDataField;
 import uk.gov.hmcts.reform.sscs.bulkscan.json.SscsJsonExtractor;
@@ -18,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.domain.CaseResponse;
 public class FormTypeValidatorTest {
     final SscsJsonExtractor sscsJsonExtractor = new SscsJsonExtractor();
     final FormTypeValidator validator = new FormTypeValidator(sscsJsonExtractor);
+    private final SscsJsonExtractor mockExtractor = Mockito.mock(SscsJsonExtractor.class);
 
     @Test
     public void givenNewFieldsInV2OfTheForm_thenNoErrorsAreGiven() {
@@ -42,7 +45,7 @@ public class FormTypeValidatorTest {
         ExceptionRecord exceptionRecord = ExceptionRecord.builder().ocrDataFields(scanOcrData).formType(FormType.SSCS1PEU.toString()).build();
 
         CaseResponse response = validator.validate("caseId", exceptionRecord);
-        assertNull(response.getErrors());
+        assertThat(response.getErrors()).isNull();
     }
 
 
@@ -57,7 +60,7 @@ public class FormTypeValidatorTest {
         ExceptionRecord exceptionRecord = ExceptionRecord.builder().ocrDataFields(scanOcrData).formType(FormType.SSCS1.toString()).build();
 
         CaseResponse response = validator.validate("caseId", exceptionRecord);
-        assertNull(response.getErrors());
+        assertThat(response.getErrors()).isNull();
     }
 
     @Test
@@ -71,7 +74,8 @@ public class FormTypeValidatorTest {
         ExceptionRecord exceptionRecord = ExceptionRecord.builder().ocrDataFields(scanOcrData).formType("invalid_key").build();
 
         CaseResponse response = validator.validate("123456", exceptionRecord);
-        assertEquals("No valid form type was found. There needs to be a valid form_type on the OCR data or on the exception record.", response.getErrors().getFirst());
+        assertThat("No valid form type was found. There needs to be a valid form_type on the OCR data or on the exception record.")
+            .isEqualTo(response.getErrors().getFirst());
     }
 
     @Test
@@ -89,9 +93,11 @@ public class FormTypeValidatorTest {
         ExceptionRecord exceptionRecord = ExceptionRecord.builder().ocrDataFields(scanOcrData).formType(FormType.SSCS1PE.toString()).build();
 
         CaseResponse response = validator.validate("caseId", exceptionRecord);
-        assertEquals(2, response.getErrors().size());
-        assertEquals("#: extraneous key [invalid_key] is not permitted", response.getErrors().get(0));
-        assertEquals("#: extraneous key [invalid_key2] is not permitted", response.getErrors().get(1));
+        assertThat(2).isEqualTo(response.getErrors().size());
+        assertThat("$: property 'invalid_key' is not defined in the schema and the schema does not allow additional properties")
+            .isEqualTo(response.getErrors().get(0));
+        assertThat("$: property 'invalid_key2' is not defined in the schema and the schema does not allow additional properties")
+            .isEqualTo(response.getErrors().get(1));
     }
 
 
@@ -106,8 +112,8 @@ public class FormTypeValidatorTest {
         ExceptionRecord exceptionRecord = ExceptionRecord.builder().ocrDataFields(scanOcrData).formType(FormType.SSCS2.toString()).build();
 
         CaseResponse response = validator.validate("caseId", exceptionRecord);
-        assertNull(response.getErrors());
-        assertEquals(0, response.getWarnings().size());
+        assertThat(response.getErrors()).isNull();
+        assertThat(0).isEqualTo(response.getWarnings().size());
     }
 
     @Test
@@ -125,8 +131,8 @@ public class FormTypeValidatorTest {
         ExceptionRecord exceptionRecord = ExceptionRecord.builder().ocrDataFields(scanOcrData).formType(FormType.SSCS2.toString()).build();
 
         CaseResponse response = validator.validate("caseId", exceptionRecord);
-        assertNull(response.getErrors());
-        assertEquals(0, response.getWarnings().size());
+        assertThat(response.getErrors()).isNull();
+        assertThat(0).isEqualTo(response.getWarnings().size());
     }
 
     @Test
@@ -143,8 +149,8 @@ public class FormTypeValidatorTest {
         ExceptionRecord exceptionRecord = ExceptionRecord.builder().ocrDataFields(scanOcrData).formType(FormType.SSCS2.toString()).build();
 
         CaseResponse response = validator.validate("caseId", exceptionRecord);
-        assertNull(response.getErrors());
-        assertEquals(0, response.getWarnings().size());
+        assertThat(response.getErrors()).isNull();
+        assertThat(0).isEqualTo(response.getWarnings().size());
     }
 
     @Test
@@ -162,8 +168,8 @@ public class FormTypeValidatorTest {
         ExceptionRecord exceptionRecord = ExceptionRecord.builder().ocrDataFields(scanOcrData).formType(FormType.SSCS5.toString()).build();
 
         CaseResponse response = validator.validate("caseId", exceptionRecord);
-        assertNull(response.getErrors());
-        assertEquals(0, response.getWarnings().size());
+        assertThat(response.getErrors()).isNull();
+        assertThat(0).isEqualTo(response.getWarnings().size());
     }
 
     @NotNull
@@ -195,5 +201,31 @@ public class FormTypeValidatorTest {
         pairs.put("is_benefit_type_guaranteed_minimum_pension", false);
         pairs.put("is_benefit_type_national_insurance_credits", false);
         return pairs;
+    }
+
+    @Test
+    public void shouldReturnNullWhenSchemaFileIsMissing() {
+        FormTypeValidator validator = new FormTypeValidator(mockExtractor);
+        JsonSchema schema = invokeTryLoadSscsSchema(validator, "/nonexistent_schema.json");
+
+        assertThat(schema).isNull();
+    }
+
+    @Test
+    public void shouldReturnNullWhenSchemaFileIsMalformed() {
+        FormTypeValidator validator = new FormTypeValidator(mockExtractor);
+        JsonSchema schema = invokeTryLoadSscsSchema(validator, "/schema/malformed_schema.json");
+
+        assertThat(schema).isNull();
+    }
+
+    private JsonSchema invokeTryLoadSscsSchema(FormTypeValidator validator, String path) {
+        try {
+            Method method = FormTypeValidator.class.getDeclaredMethod("tryLoadSscsSchema", String.class);
+            method.setAccessible(true);
+            return (JsonSchema) method.invoke(validator, path);
+        } catch (Exception e) {
+            throw new RuntimeException("Error invoking tryLoadSscsSchema", e);
+        }
     }
 }

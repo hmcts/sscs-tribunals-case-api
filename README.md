@@ -1,172 +1,190 @@
 # SSCS - Tribunals Case API
 
-## Purpose 
-Tribunals case api is a spring boot based application to create new appeals for the SSCS Appellants
+A Spring Boot application for creating new appeals for SSCS appellants.
 
-### Prerequisites
+## Table of Contents
+- [Background](#background)
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+- [Development](#development)
+- [Testing](#testing)
+- [Docker](#docker)
+- [Useful Commands](#useful-commands)
+- [Gotchas](#gotchas)
 
-For versions and complete list of dependencies see build.gradle
+## Background
 
-* Java 21
-* Spring Boot
-* Gradle
+The SSCS Tribunals Case API is part of the SSCS ecosystem, enabling appellants to submit appeals and interact with the tribunal system. It integrates with CCD and other services to manage appeals.
 
-## Building and deploying the application
+## Prerequisites
 
-### Building the application
+- **Java 21** - Required for running the application
+- **Spring Boot** - Framework for building the application
+- **Gradle** - Build tool for managing dependencies and tasks
+- **Docker** - Used for containerizing the application and running dependencies such as CCD and Pact Broker locally. Ensure Docker is installed and running on your machine. [Download Docker](https://www.docker.com/products/docker-desktop)
 
-To build the project execute the following command:
+For versions and a complete list of dependencies, see `build.gradle`.
 
-```
-./gradlew build
-```
+## Quick Start
 
-### Running the application
+**NOTE:** If you haven't already connected to the HMCTS Azure environment through Azure CLI, you will need to do this. Please contact the development team for instructions.
 
-Run the application by executing:
+1. **Build the application:**
+   ```bash
+   ./gradlew build
+   ```
 
-```
-./gradlew bootWithCCD
-```
+2. **Run the application:**
+   ```bash
+   ./gradlew bootWithCCD
+   ```
 
-### Cftlib
+3. **Test the application health:**
+   ```bash
+   curl http://localhost:8008/health
+   ```
+   Expected response:
+   ```json
+   {"status":"UP"}
+   ```
 
-This repo is now integrated with the rse-cft-library. For more information see the bootWithCCD task in build.gradle.
-Extra compose files can be provided in src/cftlib/resources/docker.
+## Development
 
-### Running Smoke Test locally
-Once the application running locally, please make sure
-1. Your local CCD is up and running with subscription id "7S9MxdSBpt"
-2. Execute ./gradlew --info smoke
+### Configuration
 
-### Running in Docker(Work in progress...)
-Create the image of the application by executing the following command:
+The application integrates with the `rse-cft-library`. Additional Docker Compose files can be provided in `src/cftlib/resources/docker`.
 
-```
-  ./gradlew installDist
-```
+### Running Cron Tasks
 
-Create docker image:
+- Run a cron task locally:
+   ```bash
+   TASK_NAME=MigrateCasesTask ./gradlew bootRun
+   ```
+- Run a cron task in preview by adding the `pr-labels:job` label to the PR in GitHub. Configure additional settings in `charts/sscs-tribunals-api/values.job.preview.template.yaml`.
 
-```
-  docker-compose build
-```
+Refer to [this sample](https://github.com/hmcts/cnp-flux-config/tree/8a819d0f5d1d35f5d8c1e8610d8662419f0a0d1b/apps/sscs/sscs-cron) for setting up cron tasks in Flux.
 
-Run the distribution by executing the following command:
+## Testing
 
-```
-  docker-compose up
-```
-
-This will start the API container exposing the application's port
-
-In order to test if the application is up, you can call its health endpoint:
-
-```
-  curl http://localhost:8008/health
-```
-
-You should get a response similar to this:
-
-```
-  {"status":"UP"}
-```
-
-
-### Unit tests
-
-To run all unit tests execute the following command:
-
-```
+### Unit Tests
+Run all unit tests:
+```bash
 ./gradlew test
 ```
 
-### Running contract or pact tests:
+### Running Smoke Tests Locally
 
-You can run contract or pact tests as follows:
-
-```
-./gradlew contract
-```
-
-You can then publish your pact tests locally by first running the pact docker-compose:
-
-```
-docker-compose -f docker-pactbroker-compose.yml up
-```
-
-and then using it to publish your tests:
-
-```
-./gradlew pactPublish
-```
-
-
-or to run the tests and publish in one go you can run the following:
-
-```
-./gradlew runAndPublishConsumerPactTests
-```
-
-In order to run the CCD Provider Tests to determine that the CCD Consumer contract tests published here can be verified you'll need to check out the following github repo:
-
-```
-https://github.com/hmcts/ccd-data-store-api/tree/TA-82_CcdProviderPactTest
-```
-And run the following test ensuring that the Pacts created here are published to your local Pact Broker instance and that you have an up to date CCD Docker setup running locally with up to date CCD definition deployed
-
-```
-https://github.com/hmcts/ccd-data-store-api/blob/TA-82_CcdProviderPactTest/src/contractTest/java/uk/gov/hmcts/ccd/v2/external/controller/CasesControllerProviderTest.java
-```
-Please change the version tag to point to 'Dev' and ensure the Pact Broker annotations point to your local Pact Broker instance
-
-```
-@PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
-    host = "${PACT_BROKER_URL:localhost}",
-    port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
-    @VersionSelector(tag = "Dev")})
-```
-
-Also if you require the Provider verification to be published uncomment the following line before running the CasesControllerProviderTest:
-
-```
-  System.getProperties().setProperty("pact.verifier.publishResults", "true");
-```
-
-If you need to run the CCD provider test against the Preview environment for a particular branch of code then please ensure that the Pact Broker annotations are pointing to the central reform Pact Broker with the following credentials ( with the tag in the @VersionSelector pointing to your feature branch name of the PR):
-
-```
-@PactBroker(scheme = "${PACT_BROKER_SCHEME:https}",
-    host = "${PACT_BROKER_URL:pact-broker.platform.hmcts.net}",
-    port = "${PACT_BROKER_PORT:443}", consumerVersionSelectors = {
-    @VersionSelector(tag = "feature_branch_name")})
-
-```
-
-### Running Functional UI tests against Preview env on a Pipeline
-
-By default preview pipelines would just have 1 test as part of sanity check on Preview env, but QA's would need to add label `test-suite:preview-regression` to their respective ticket PR's to enable running regression UI test pack against preview env. 
-
-The format of the label added to run UI tests is always `test-suite:<tag-name>` so please make sure if above tag name(ie preview-regression) gets updated on tests or new tags added needs github label name to be updated or new label to be created depending on your scenario.
-
-In order to include Bundling & Hearings tests as part of preview pipeline, QA's need to add an additional label `test-suite:aat-regression` against their PR. As a pre-requisite to add "aat-regression" label please make sure your PR has gone through the config set-up explained in this section [Running tribunals with hearings enabled](#Running-tribunals-with-hearings-enabled) of readme.
-
-
-### Cron tasks
-
-- You can run a cron task locally by setting the `TASK_NAME` environment variable.
-
+1. Ensure your local CCD is running with subscription ID `7S9MxdSBpt`.
+2. Execute:
    ```bash
-   #Example
-   TASK_NAME=MigrateCasesTask ./gradlew bootRun
+   ./gradlew --info smoke
    ```
-- You can run a cron task in preview by adding `pr-labels:job` label on the PR in Github. Configure any additional configuration needed in [values.job.preview.template.yaml](charts/sscs-tribunals-api/values.job.preview.template.yaml)
-- Refer to [this sample](https://github.com/hmcts/cnp-flux-config/tree/8a819d0f5d1d35f5d8c1e8610d8662419f0a0d1b/apps/sscs/sscs-cron) for setting up cron task in flux.
+
+### Contract or Pact Tests
+
+1. Run contract tests:
+   ```bash
+   ./gradlew contract
+   ```
+
+2. Publish pact tests locally:
+   ```bash
+   docker-compose -f docker-pactbroker-compose.yml up
+   ./gradlew pactPublish
+   ```
+
+3. Run and publish tests in one go:
+   ```bash
+   ./gradlew runAndPublishConsumerPactTests
+   ```
+
+4. Verify CCD Provider Tests:
+   - Clone the [ccd-data-store-api](https://github.com/hmcts/ccd-data-store-api/tree/TA-82_CcdProviderPactTest).
+   - Run the `CasesControllerProviderTest` with the following configuration:
+     ```java
+     @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
+         host = "${PACT_BROKER_URL:localhost}",
+         port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
+         @VersionSelector(tag = "Dev")})
+     ```
+   - Publish results:
+     ```java
+     System.getProperties().setProperty("pact.verifier.publishResults", "true");
+     ```
+
+## Docker
+
+### Build and Run with Docker
+
+1. **Create the distribution:**
+   ```bash
+   ./gradlew installDist
+   ```
+
+2. **Build the Docker image:**
+   ```bash
+   docker-compose build
+   ```
+
+3. **Run the application:**
+   ```bash
+   docker-compose up
+   ```
+
+## Useful Commands
+
+### Gradle Commands
+```bash
+# Build the application
+./gradlew build
+
+# Run the application
+./gradlew bootWithCCD
+
+# Run unit tests
+./gradlew test
+
+# Run smoke tests
+./gradlew --info smoke
+```
+
+### Docker Commands
+```bash
+# Build Docker image
+docker-compose build
+
+# Run Docker containers
+docker-compose up
+
+# Test application health
+curl http://localhost:8008/health
+```
+
+### CCD config generation
+```bash
+# Generate CCD config for demo
+./bin/create-xlsx.sh benefit dev demo
+```
+```bash
+# Generate prod like CCD config for demo
+./bin/create-xlsx.sh benefit dev demo prod
+```
+```bash
+# Generate CCD config for demo with WA enabled
+./bin/create-xlsx.sh benefit dev demo "" "" true
+```
 
 ## Gotchas
 
-PRs that start with _"Bump"_ won't have a preview environment. The decision was made after we realised that most the preview environments were created by Depandabot.
+### PRs Starting with "Bump"
+Preview environments are not created for PRs starting with "Bump" due to a decision to avoid unnecessary environments created by Dependabot.
 
-### Preview cases not listing 
-Elastic indices may be missing on preview. They can be recreated by login into ccd admin for e.g. - https://admin-web-sscs-tribunals-api-pr-4091.preview.platform.hmcts.net/ and clicking on "Create Elasticsearch Indices" link. 
-This would avoid re-triggering the pipeline build and save time.
+### Preview Cases Not Listing
+Elastic indices may be missing on preview. Recreate them by logging into CCD admin (e.g., `https://admin-web-sscs-tribunals-api-pr-4091.preview.platform.hmcts.net/`) and clicking "Create Elasticsearch Indices."
+
+This avoids re-triggering the pipeline build and saves time.
+
+### Work allocation in preview
+Work allocation is now enabled in preview. To enable work allocation in preview, you need to add the `pr-values:wa` label to your PR. This will ensure that the work allocation service is started and configured correctly for the preview environment. To enable WA in other environments use both `WORK_ALLOCATION_FEATURE` in `cnp-flux-config` repo and `WORK_ALLOCATION_FEATURE_ENABLED` in `Jenkinsfile_CNP`.
+
+If some events are not triggering WA tasks, or are not being recognised by the WA service, double check that the case-event.json entry for the event has the `Publish` field set to `"${CCD_DEF_PUBLISH}"`. If it is not set, then CCD will not publish the event to the message listener and the WA service will not be able to process it.

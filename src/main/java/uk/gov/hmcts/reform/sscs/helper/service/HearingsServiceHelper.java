@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingSubChannel;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HmcUpdateResponse;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
-import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 
 @Slf4j
 public final class HearingsServiceHelper {
@@ -102,18 +101,25 @@ public final class HearingsServiceHelper {
     }
 
     @Nullable
-    public static CaseHearing findExistingRequestedHearings(HearingsGetResponse hearingsGetResponse) {
+    public static CaseHearing findExistingRequestedHearings(HearingsGetResponse hearingsGetResponse, boolean isUpdateHearing) {
         return Optional.ofNullable(hearingsGetResponse)
             .map(HearingsGetResponse::getCaseHearings)
             .orElse(Collections.emptyList()).stream()
-            .filter(caseHearing -> isCaseHearingRequestedOrAwaitingListing(caseHearing.getHmcStatus()))
+            .filter(caseHearing -> isCaseHearingRequestedOrAwaitingListing(caseHearing.getHmcStatus(), isUpdateHearing))
             .min(Comparator.comparing(CaseHearing::getHearingRequestDateTime))
             .orElse(null);
     }
 
-    public static boolean isCaseHearingRequestedOrAwaitingListing(HmcStatus hmcStatus) {
-        return HmcStatus.HEARING_REQUESTED == hmcStatus
-            || HmcStatus.AWAITING_LISTING == hmcStatus;
+    public static boolean isCaseHearingRequestedOrAwaitingListing(HmcStatus hmcStatus, boolean isUpdateHearing) {
+        if (isUpdateHearing) {
+            return HmcStatus.HEARING_REQUESTED == hmcStatus
+                    || HmcStatus.AWAITING_LISTING == hmcStatus
+                    || HmcStatus.UPDATE_REQUESTED == hmcStatus
+                    || HmcStatus.UPDATE_SUBMITTED == hmcStatus;
+        } else {
+            return HmcStatus.HEARING_REQUESTED == hmcStatus
+                    || HmcStatus.AWAITING_LISTING == hmcStatus;
+        }
     }
 
     public static HearingChannel getHearingSubChannel(HearingGetResponse hearingGetResponse) {
@@ -141,12 +147,11 @@ public final class HearingsServiceHelper {
         return hearingSubChannel.map(HearingSubChannel::getHearingChannel).orElse(null);
     }
 
-    public static void checkBenefitIssueCode(SessionCategoryMap sessionCategoryMap) throws ListingException {
-        if (isNull(sessionCategoryMap)) {
+    public static void checkBenefitIssueCode(Boolean validIssueBenefit) throws ListingException {
+        if (!validIssueBenefit) {
             log.error("sessionCaseCode is null. The benefit/issue code is probably an incorrect combination"
-                          + " and cannot be mapped to a session code. Refer to the session-category-map.json file"
-                          + " for the correct combinations.");
-
+                    + " and cannot be mapped to a session code. Refer to the panel-category-map.json file"
+                    + " for the correct combinations.");
             throw new ListingException("Incorrect benefit/issue code combination");
         }
     }

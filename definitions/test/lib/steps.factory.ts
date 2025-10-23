@@ -49,6 +49,11 @@ import { AccessibilitySteps } from '../fixtures/steps/accessibilitySteps';
 import { CreateUpdateToCaseDataSteps } from '../fixtures/steps/update.to.case.data';
 import { GenerateAppealPdfSteps } from '../fixtures/steps/generate.appeal.pdf';
 import { ManageDocuments } from '../fixtures/steps/manage.documents';
+import { UpdateListingRequirement } from '../fixtures/steps/update.listing.requirements';
+import { CommunicateWithFta } from '../fixtures/steps/communicate-with-fta';
+import { Adjournment } from '../fixtures/steps/adjournment';
+import { AmendElements } from '../fixtures/steps/amend.elements';
+import { ReviewIncompleteAppeal } from '../fixtures/steps/work-allocation/review.incomplete.appeal';
 
 type MyStepsFixtures = {
   addNoteSteps: Note;
@@ -101,6 +106,11 @@ type MyStepsFixtures = {
   accessibilitySteps: AccessibilitySteps;
   createUpdateToCaseDataSteps: CreateUpdateToCaseDataSteps;
   generateAppealPdfSteps: GenerateAppealPdfSteps;
+  updateListingRequirementSteps: UpdateListingRequirement;
+  communicateWithFtaSteps: CommunicateWithFta;
+  adjournmentSteps: Adjournment;
+  amendElementSteps: AmendElements;
+  reviewIncompleteAppealSteps: ReviewIncompleteAppeal;
 };
 
 export const test = stepsFactory.extend<MyStepsFixtures>({
@@ -401,4 +411,26 @@ export const test = stepsFactory.extend<MyStepsFixtures>({
     const generateAppealPdfSteps = new GenerateAppealPdfSteps(page);
     await use(generateAppealPdfSteps);
   },
+  updateListingRequirementSteps: async ({ page }, use) => {
+    const updateListingRequirementSteps = new UpdateListingRequirement(page);
+    await use(updateListingRequirementSteps);
+  },
+  communicateWithFtaSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
+    const communicateWithFtaSteps = new CommunicateWithFta(page);
+    await use(communicateWithFtaSteps);
+    console.log(`${testInfo.title} ${testInfo.status}`);
+  },
+  adjournmentSteps: async ({ page }, use) => {
+    const adjournmentSteps = new Adjournment(page);
+    await use(adjournmentSteps);
+  },
+  amendElementSteps: async ({ page }, use) => {
+    const amendElementSteps = new AmendElements(page);
+    await use(amendElementSteps);
+  },
+  reviewIncompleteAppealSteps: async ({ page }, use) => {
+    const reviewIncompleteAppealSteps = new ReviewIncompleteAppeal(page);
+    await use(reviewIncompleteAppealSteps);
+  }
 });

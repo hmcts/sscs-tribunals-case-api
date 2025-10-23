@@ -94,6 +94,11 @@ class DateUtilsComponent {
     return currentTime.getFullYear();
   }
 
+  static async getNextYear() {
+    let currentYear = new Date();
+    return currentYear.getFullYear() + 1;
+  }
+
   static async getCurrentDay() {
     let currentTime = new Date();
     return currentTime.getDay();

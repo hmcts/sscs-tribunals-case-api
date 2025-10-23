@@ -168,7 +168,7 @@ docmosis:
                 name: TB-SCS-LET-ENG-Issue-Generic-Letter.docx
             postHearingAppSorWritten:
                 cover: TB-SCS-GNO-ENG-00012.docx
-                name: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome-v2.docx
+                name: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome-v3.docx
         welsh:
             d609-97:
                 name: TB-SCS-GNO-WEL-00469-v2.docx
@@ -183,7 +183,7 @@ docmosis:
                 name: TB-SCS-LET-ENG-Issue-Generic-Letter.docx
             postHearingAppSorWritten:
                 cover: TB-SCS-GNO-WEL-00479.docx
-                name: TB-SCS-LET-WEL-Statement-Of-Reasons-Outcome-v2.docx
+                name: TB-SCS-LET-WEL-Statement-Of-Reasons-Outcome-v3.docx
 
 document:
     bilingual:
@@ -231,6 +231,8 @@ evidenceDescription:
             template:
                 path: /templates/evidenceDescriptionWelsh.html
 feature:
+    ibc-ni-postcodes:
+        enabled: ${IBC_NI_POSTCODES_FEATURE:false}
     uc-office-feature:
         enabled: ${UC_OFFICE_FEATURE:false}
     case-access-management:
@@ -275,8 +277,6 @@ feature:
         enabled: ${TRIBUNAL_INTERNAL_DOCUMENTS_ENABLED:false}
     hearings-case-updateV2:
         enabled: ${HEARINGS_CASE_UPDATE_V2_ENABLED:false}
-    default-panel-comp:
-        enabled: ${DEFAULT_PANEL_COMPOSITION_ENABLED:false}
 
 idam:
     api:
@@ -447,42 +447,42 @@ notification:
     english:
         adminCorrectionHeader:
             appellant:
-                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused-v2.docx
             appointee:
-                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused-v2.docx
             representative:
-                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused-v2.docx
             joint_party:
-                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused-v2.docx
             other_party:
-                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused.docx
-            docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused-v2.docx
+            docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused-v2.docx
         correctionRequest:
             docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence-v3.docx
         correctionGranted:
             appellant:
-                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused-v2.docx
             appointee:
-                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused-v2.docx
             representative:
-                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused-v2.docx
             joint_party:
-                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused-v2.docx
             other_party:
-                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused.docx
-            docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused-v2.docx
+            docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused-v2.docx
         correctionRefused:
             appellant:
-                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused-v2.docx
             appointee:
-                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused-v2.docx
             representative:
-                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused-v2.docx
             joint_party:
-                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused-v2.docx
             other_party:
-                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused.docx
-            docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused-v2.docx
+            docmosisId: TB-SCS-LET-ENG-Correction-Granted-Refused-v2.docx
         setAsideRequest:
             docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence-v3.docx
         libertyToApplyRequest:
@@ -689,9 +689,9 @@ notification:
         processAudioVideo:
             docmosisId: TB-SCS-GNO-ENG-00677-v2.docx
         setAsideGranted:
-            docmosisId: TB-SCS-LET-ENG-Set-Aside-Grant-Refused.docx
+            docmosisId: TB-SCS-LET-ENG-Set-Aside-Grant-Refused-v2.docx
         setAsideRefused:
-            docmosisId: TB-SCS-LET-ENG-Set-Aside-Grant-Refused.docx
+            docmosisId: TB-SCS-LET-ENG-Set-Aside-Grant-Refused-v2.docx
         directionIssued:
             appealToProceed:
                 appellant:
@@ -704,17 +704,6 @@ notification:
                     docmosisId: TB-SCS-GNO-ENG-00551-v2.docx
                 other_party:
                     docmosisId: TB-SCS-GNO-ENG-00551-v2.docx
-            provideInformation:
-                appellant:
-                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
-                appointee:
-                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
-                representative:
-                    docmosisId: TB-SCS-GNO-ENG-00089.docx
-                joint_party:
-                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
-                other_party:
-                    docmosisId: TB-SCS-GNO-ENG-00089.docx
             grantExtension:
                 appellant:
                     docmosisId: TB-SCS-GNO-ENG-00556-v2.docx
@@ -778,6 +767,28 @@ notification:
                 other_party:
                     docmosisId: TB-SCS-GNO-ENG-00639-v2.docx
             refuseHearingRecordingRequest:
+                appellant:
+                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
+                appointee:
+                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
+                representative:
+                    docmosisId: TB-SCS-GNO-ENG-00089.docx
+                joint_party:
+                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
+                other_party:
+                    docmosisId: TB-SCS-GNO-ENG-00089.docx
+            provideInformation:
+                appellant:
+                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
+                appointee:
+                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
+                representative:
+                    docmosisId: TB-SCS-GNO-ENG-00089.docx
+                joint_party:
+                    docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
+                other_party:
+                    docmosisId: TB-SCS-GNO-ENG-00089.docx
+            issueAndSendToAdmin:
                 appellant:
                     docmosisId: TB-SCS-GNO-ENG-00067-v2.docx
                 appointee:
@@ -873,9 +884,9 @@ notification:
         libertyToApplyRefused:
             docmosisId: TB-SCS-LET-ENG-Liberty-to-Apply-Granted-Refused-v2.docx
         sORExtendTime:
-            docmosisId: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome-v2.docx
+            docmosisId: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome-v3.docx
         sORRefused:
-            docmosisId: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome-v2.docx
+            docmosisId: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome-v3.docx
         paper:
             responseReceived:
                 appellant:
@@ -1086,42 +1097,42 @@ notification:
     welsh:
         adminCorrectionHeader:
             appellant:
-                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused-v2.docx
             appointee:
-                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused-v2.docx
             representative:
-                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused-v2.docx
             joint_party:
-                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused-v2.docx
             other_party:
-                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused.docx
-            docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused-v2.docx
+            docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused-v2.docx
         correctionRequest:
             docmosisId: TB-SCS-LET-WEL-Action-Further-Evidence-v2.docx
         correctionGranted:
             appellant:
-                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused-v2.docx
             appointee:
-                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused-v2.docx
             representative:
-                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused-v2.docx
             joint_party:
-                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused-v2.docx
             other_party:
-                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused.docx
-            docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused-v2.docx
+            docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused-v2.docx
         correctionRefused:
             appellant:
-                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused-v2.docx
             appointee:
-                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused-v2.docx
             representative:
-                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused-v2.docx
             joint_party:
-                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused-v2.docx
             other_party:
-                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused.docx
-            docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused.docx
+                docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused-v2.docx
+            docmosisId: TB-SCS-LET-WEL-Correction-Granted-Refused-v2.docx
         setAsideRequest:
             docmosisId: TB-SCS-LET-WEL-Action-Further-Evidence-v2.docx
         libertyToApplyRequest:
@@ -1328,9 +1339,9 @@ notification:
         processAudioVideoWelsh:
             docmosisId: TB-SCS-GNO-WEL-00678-v2.docx
         setAsideGranted:
-            docmosisId: TB-SCS-LET-WEL-Set-Aside-Grant-Refused.docx
+            docmosisId: TB-SCS-LET-WEL-Set-Aside-Grant-Refused-v2.docx
         setAsideRefused:
-            docmosisId: TB-SCS-LET-WEL-Set-Aside-Grant-Refused.docx
+            docmosisId: TB-SCS-LET-WEL-Set-Aside-Grant-Refused-v2.docx
         directionIssuedWelsh:
             appealToProceed:
                 appellant:
@@ -1344,6 +1355,17 @@ notification:
                 other_party:
                     docmosisId: TB-SCS-GNO-WEL-00590-v2.docx
             provideInformation:
+                appellant:
+                    docmosisId: TB-SCS-GNO-WEL-00468-v2.docx
+                appointee:
+                    docmosisId: TB-SCS-GNO-WEL-00468-v2.docx
+                representative:
+                    docmosisId: TB-SCS-GNO-WEL-00472.docx
+                joint_party:
+                    docmosisId: TB-SCS-GNO-WEL-00468-v2.docx
+                other_party:
+                    docmosisId: TB-SCS-GNO-WEL-00472.docx
+            issueAndSendToAdmin:
                 appellant:
                     docmosisId: TB-SCS-GNO-WEL-00468-v2.docx
                 appointee:
@@ -1512,9 +1534,9 @@ notification:
         libertyToApplyRefused:
             docmosisId: TB-SCS-LET-WEL-Liberty-to-Apply-Granted-Refused-v2.docx
         sORExtendTime:
-            docmosisId: TB-SCS-LET-WEL-Statement-Of-Reasons-Outcome-v2.docx
+            docmosisId: TB-SCS-LET-WEL-Statement-Of-Reasons-Outcome-v3.docx
         sORRefused:
-            docmosisId: TB-SCS-LET-WEL-Statement-Of-Reasons-Outcome-v2.docx
+            docmosisId: TB-SCS-LET-WEL-Statement-Of-Reasons-Outcome-v3.docx
         paper:
             responseReceived:
                 appellant:

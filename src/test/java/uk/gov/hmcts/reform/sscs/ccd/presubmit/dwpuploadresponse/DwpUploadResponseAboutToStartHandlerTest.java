@@ -1,51 +1,47 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
+import static java.time.LocalDateTime.now;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_UPLOAD_RESPONSE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.WITH_DWP;
 
-import junitparams.JUnitParamsRunner;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
+import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DwpUploadResponseAboutToStartHandlerTest {
-    private static final String USER_AUTHORISATION = "Bearer token";
 
-    private DwpUploadResponseAboutToStartHandler dwpUploadResponseAboutToStartHandler;
+    private static final String USER_AUTHORISATION = "Bearer token";
     private SscsCaseData sscsCaseData;
 
-    @Mock
     private Callback<SscsCaseData> callback;
 
-    @Mock
-    private CaseDetails<SscsCaseData> caseDetails;
+    private DwpUploadResponseAboutToStartHandler dwpUploadResponseAboutToStartHandler;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        openMocks(this);
-        dwpUploadResponseAboutToStartHandler = new DwpUploadResponseAboutToStartHandler();
         sscsCaseData = SscsCaseData.builder()
                 .createdInGapsFrom(READY_TO_LIST.getId())
                 .dynamicDwpState(new DynamicList(""))
                 .build();
-        when(callback.getEvent()).thenReturn(EventType.DWP_UPLOAD_RESPONSE);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        CaseDetails<SscsCaseData> caseDetails =
+                new CaseDetails<>(1234L, "SSCS", WITH_DWP, sscsCaseData, now(), "Benefit");
+        callback = new Callback<>(caseDetails, Optional.empty(), DWP_UPLOAD_RESPONSE, false);
+        dwpUploadResponseAboutToStartHandler = new DwpUploadResponseAboutToStartHandler();
     }
 
     @Test

@@ -25,4 +25,6 @@ public class PdfWrapper {
 
     private String englishBenefitName;
 
+    private Boolean isNiPostCodeFeatureEnabled;
+
 }

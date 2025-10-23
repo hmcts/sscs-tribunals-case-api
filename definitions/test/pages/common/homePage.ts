@@ -28,10 +28,12 @@ export class HomePage {
   readonly ftaDocumentsTab: Locator;
   readonly otherPartyDetailsTab: Locator;
   readonly hearingsTab: Locator;
+  readonly tribunalFtaCommunicationsTab: Locator;
   readonly afterTabBtn: Locator;
   readonly caseTypeDropdown: string;
   readonly caseRefInputField: string;
   readonly searchResultsField: string;
+  readonly elementsAndIssuesTab: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -59,6 +61,8 @@ export class HomePage {
     this.ftaDocumentsTab = page.getByRole('tab').filter({ hasText: /^FTA Documents$/ });
     this.otherPartyDetailsTab = page.getByRole('tab').filter({ hasText: /^Other Party Details$/ });
     this.hearingsTab = page.getByRole('tab').filter({ hasText: /^Hearings$/ });
+    this.elementsAndIssuesTab = page.getByRole('tab').filter({ hasText: /^Elements and issues$/ });
+    this.tribunalFtaCommunicationsTab = page.getByRole('tab').filter({ hasText: /^Tribunal\/FTA Communications$/ });
     this.afterTabBtn = page.locator(
       '//html/body/exui-root/exui-case-home/div/exui-case-details-home/exui-case-viewer-container/ccd-case-viewer/div/ccd-case-full-access-view/div[2]/div/mat-tab-group/mat-tab-header/button[2]/div'
     );
@@ -234,6 +238,7 @@ export class HomePage {
       }
       case 'Tasks': {
         await expect(this.tasksTab).toBeVisible();
+        await this.page.getByRole('tablist').evaluate(el => (el.style = 'transform: translateX(0px);'));
         await this.tasksTab.click();
         break;
       }
@@ -307,6 +312,16 @@ export class HomePage {
         await this.hearingsTab.click();
         break;
       }
+      case 'Elements and issues': {
+        await expect(this.elementsAndIssuesTab).toBeVisible();
+        await this.elementsAndIssuesTab.click();
+        break;
+      }
+      case 'Tribunal/FTA Communications': {
+        await expect(this.tribunalFtaCommunicationsTab).toBeVisible();
+        await this.tribunalFtaCommunicationsTab.click();
+        break;
+      }
       default: {
         //statements;
         break;
@@ -327,5 +342,12 @@ export class HomePage {
     await this.page.getByLabel('Case type').selectOption(caseType);
     await this.page.getByLabel('Event').selectOption(event);
     await this.page.getByRole('button', { name: 'Start' }).click();
+  }
+
+  async navigateToMyWork(){
+    const myWorkLink = this.page.getByRole('link', { name: 'My work' });
+    await myWorkLink.waitFor();
+    await myWorkLink.click();
+    await expect(this.page.locator('h3').filter({ hasText: 'My work' })).toBeVisible();
   }
 }

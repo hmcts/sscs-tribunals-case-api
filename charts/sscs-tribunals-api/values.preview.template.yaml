@@ -63,7 +63,7 @@ java:
     HMC_DEPLOYMENT_ID: "sscs-${CHANGE_ID}"
     SCOTTISH_PO_BOX_ENABLED: true
     TRIBUNAL_INTERNAL_DOCUMENTS_ENABLED: true
-    DEFAULT_PANEL_COMPOSITION_ENABLED: true
+    IBC_NI_POSTCODES_FEATURE: true
   secrets:
     JOB_SCHEDULER_DB_PASSWORD:
       secretRef: postgres
@@ -326,6 +326,8 @@ global:
   postgresSecret: postgres
   databaseNamePrefix: "pr-${CHANGE_ID}-"
   postgresUsername: hmcts
+  security:
+    allowInsecureImages: true
 
 ccd:
   enabled: ${PREVIEW_BRANCH_WITH_LOCAL_CCD}
@@ -358,6 +360,17 @@ ccd:
         ORM_ENV: pr
         CCD_DATA_STORE_URL: http://${SERVICE_NAME}-ccd-data-store-api
       keyVaults:
+        am:
+          resourceGroup: am
+          secrets:
+            - name: am-role-assignment-service-s2s-secret
+              alias: AM_ROLE_ASSIGNMENT_SERVICE_SECRET
+            - name: app-insights-connection-string
+              alias: app-insights-connection-string
+            - name: role-assignment-service-IDAM-CLIENT-SECRET
+              alias: ROLE_ASSIGNMENT_IDAM_CLIENT_SECRET
+            - name: role-assignment-service-IDAM-ADMIN-SECRET
+              alias: ROLE_ASSIGNMENT_IDAM_ADMIN_PASSWORD
       secrets:
         ROLE_ASSIGNMENT_DB_PASSWORD:
           secretRef: postgres
@@ -626,6 +639,7 @@ ccd:
         CCD_DOCUMENT_URL_PATTERN: ^https?://(((?:dm-store-aat\.service\.core-compute-aat\.internal(?::\d+)?)\/documents\/[A-Za-z0-9-]+(?:\/binary)?))
         CASE_DOCUMENT_AM_URL: ${CASE_DOCUMENT_AM_URL}
         UPLOAD_TIMESTAMP_FEATURED_CASE_TYPES: CARE_SUPERVISION_EPO
+        DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_gw,ccd_ps,sscs,bulk_scan_orchestrator,ccpay_bubble,ctsc_work_allocation,em_ccd_orchestrator,xui_webapp,aac_manage_case_assignment,wa_task_configuration_api,wa_task_monitor,ccd_case_document_am_api,hmc_cft_hearing_service,wa_task_management_api
       secrets:
         DATA_STORE_DB_PASSWORD:
           secretRef: postgres
@@ -639,7 +653,6 @@ ccd:
 
   ccd-api-gateway-web:
     nodejs:
-      image: hmctspublic.azurecr.io/ccd/api-gateway-web:prod-66a4048-20250203150702
       imagePullPolicy: Always
       environment:
         ADDRESS_LOOKUP_TOKEN: ${ADDRESS_LOOKUP_TOKEN}
@@ -688,6 +701,7 @@ sscs-tribunals-frontend:
       SERVICES_IDAM_LOGIN_URL: https://idam-web-public.aat.platform.hmcts.net/login
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       UV_THREADPOOL_SIZE: 64
+      IBC_NI_POSTCODES_FEATURE: true
     keyVaults:
       sscs:
         secrets:
@@ -700,6 +714,10 @@ sscs-tribunals-frontend:
 
 redis:
   enabled: true
+  serviceAccount:
+    create: false
+    name: "sscs"
+    automountServiceAccountToken: true
   replica:
     replicaCount: 0
   cluster:

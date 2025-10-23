@@ -5,11 +5,12 @@ VERSION=$2
 ENV=$3
 LIKE_PROD=${4:-$ENV}
 SHUTTERED=${5:-false}
+WA_ENABLED=${6:-false}
 
 RUN_DIR=$(pwd)
 
 if [ -z "$TYPE" ] || [ -z "$VERSION" ] || [ -z "$ENV" ]; then
-    echo "Usage: create-xlsx.sh [type] [version] [env] [like_prod] [shuttered]"
+    echo "Usage: create-xlsx.sh [type] [version] [env] [like_prod] [shuttered] [wa_enabled]"
     exit 1
 fi
 
@@ -124,10 +125,21 @@ case ${ENV} in
     exit 1 ;;
 esac
 
-if [ "$ENV" = "prod" ] || [ "$LIKE_PROD" = "prod" ]; then
-  excludedFilenamePatterns="-e *-nonprod.json,${shutteredExclusion}"
+if [ "$WA_ENABLED" = "true" ]; then
+    echo "Work Allocation is enabled"
+    CCD_DEF_PUBLISH="Y"
+    waExclusion="*-nonWA*"
 else
-  excludedFilenamePatterns="-e *-prod.json,${shutteredExclusion}"
+    echo "Work Allocation is disabled"
+    CCD_DEF_PUBLISH="N"
+    waExclusion="*-WA-*"
+fi
+
+if [ "$ENV" = "prod" ] || [ "$LIKE_PROD" = "prod" ]; then
+  excludedFilenamePatterns="-e *-nonprod.json,${shutteredExclusion},*-nonprod-*,*-WA-*"
+  CCD_DEF_PUBLISH="N"
+else
+  excludedFilenamePatterns="-e *-prod.json,${shutteredExclusion},${waExclusion}"
 fi
 
 echo "$excludedFilenamePatterns"
@@ -145,5 +157,6 @@ docker run --rm --name json2xlsx \
   -e "CCD_DEF_MYA_APPOINTEE_LINK=${MYA_APPOINTEE_LINK}" \
   -e "CCD_DEF_ENV=${UPPERCASE_ENV}" \
   -e "CCD_DEF_VERSION=${CCD_DEF_VERSION}" \
+  -e "CCD_DEF_PUBLISH=${CCD_DEF_PUBLISH}" \
   hmctspublic.azurecr.io/ccd/definition-processor:latest \
   json2xlsx -D /tmp/json/sheets "$excludedFilenamePatterns" -o "/tmp/output/${ccdDefinitionFile}"

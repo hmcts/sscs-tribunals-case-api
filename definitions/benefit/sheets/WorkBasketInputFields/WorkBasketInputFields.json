@@ -157,5 +157,17 @@
   {"LiveFrom": "30/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "infoRequestFromTribunal", "Label": "Info request from Tribunal", "DisplayOrder": 31},
   {"LiveFrom": "31/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "tribunalResponseDueDate", "Label": "Tribunal reply by date", "DisplayOrder": 32},
   {"LiveFrom": "31/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "tribunalResponseProvidedDate", "Label": "Tribunal reply provided date", "DisplayOrder": 33},
-  {"LiveFrom": "31/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "ftaResponseDueDate", "Label": "FTA reply by date", "DisplayOrder": 34}
+  {"LiveFrom": "31/03/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "ftaResponseDueDate", "Label": "FTA reply by date", "DisplayOrder": 34},
+  {"LiveFrom": "07/09/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-hmrcresponsewriter", "CaseFieldID": "awaitingInfoFromTribunal", "Label": "Awaiting info from Tribunal", "DisplayOrder": 29},
+  {"LiveFrom": "07/09/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-hmrcresponsewriter", "CaseFieldID": "infoProvidedByTribunal", "Label": "Info provided by Tribunal", "DisplayOrder": 30},
+  {"LiveFrom": "07/09/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-hmrcresponsewriter", "CaseFieldID": "infoRequestFromTribunal", "Label": "Info request from Tribunal", "DisplayOrder": 31},
+  {"LiveFrom": "07/09/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-hmrcresponsewriter", "CaseFieldID": "tribunalResponseDueDate", "Label": "Tribunal reply by date", "DisplayOrder": 32},
+  {"LiveFrom": "07/09/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-hmrcresponsewriter", "CaseFieldID": "tribunalResponseProvidedDate", "Label": "Tribunal reply provided date", "DisplayOrder": 33},
+  {"LiveFrom": "07/09/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-hmrcresponsewriter", "CaseFieldID": "ftaResponseDueDate", "Label": "FTA reply by date", "DisplayOrder": 34},
+  {"LiveFrom": "07/09/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-dwpresponsewriter", "CaseFieldID": "awaitingInfoFromTribunal", "Label": "Awaiting info from Tribunal", "DisplayOrder": 29},
+  {"LiveFrom": "07/09/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-dwpresponsewriter", "CaseFieldID": "infoProvidedByTribunal", "Label": "Info provided by Tribunal", "DisplayOrder": 30},
+  {"LiveFrom": "07/09/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-dwpresponsewriter", "CaseFieldID": "infoRequestFromTribunal", "Label": "Info request from Tribunal", "DisplayOrder": 31},
+  {"LiveFrom": "07/09/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-dwpresponsewriter", "CaseFieldID": "tribunalResponseDueDate", "Label": "Tribunal reply by date", "DisplayOrder": 32},
+  {"LiveFrom": "07/09/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-dwpresponsewriter", "CaseFieldID": "tribunalResponseProvidedDate", "Label": "Tribunal reply provided date", "DisplayOrder": 33},
+  {"LiveFrom": "07/09/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-dwpresponsewriter", "CaseFieldID": "ftaResponseDueDate", "Label": "FTA reply by date", "DisplayOrder": 34}
 ]

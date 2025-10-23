@@ -1,5 +1,2 @@
 [
-  {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs", "TabID": "fta_communications", "TabLabel": "Tribunal/FTA Communications", "TabDisplayOrder": 12, "TabShowCondition": "ftaCommunications=\"*\" OR tribunalCommunications=\"*\"", "CaseFieldID": "dwpState", "TabFieldDisplayOrder": 1, "FieldShowCondition": "dwpState=\"DONOTSHOW\""},
-  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "fta_communications", "CaseFieldID": "ftaCommunications", "TabFieldDisplayOrder": 2, "FieldShowCondition": "ftaCommunications=\"*\""},
-  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "fta_communications", "CaseFieldID": "tribunalCommunications", "TabFieldDisplayOrder": 3, "FieldShowCondition": "tribunalCommunications=\"*\""}
 ]

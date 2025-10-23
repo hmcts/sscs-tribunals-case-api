@@ -28,11 +28,13 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.HearingLocation;
@@ -41,27 +43,22 @@ import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDetails;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
-import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
-import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
+@ExtendWith(MockitoExtension.class)
 class HearingsDetailsMappingTest extends HearingsMappingBase {
 
     @Mock
     private HearingDurationsService hearingDurations;
-
-    @Mock
-    private SessionCategoryMapService sessionCategoryMaps;
-
     @Mock
     private ReferenceDataServiceHolder refData;
-
     @Mock
     private VenueService venueService;
-
+    @Mock
+    private HearingsPanelMapping hearingsPanelMapping;
     @Mock
     private RegionalProcessingCenterService regionalProcessingCenterService;
 
@@ -85,13 +82,13 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
     private SscsCaseData caseData;
 
     @Mock
-    private HearingsPanelMapping hearingsPanelMapping;
+    private HearingsAutoListMapping hearingsAutoListMapping;
 
     private HearingsDetailsMapping hearingsDetailsMapping;
 
     @BeforeEach
     void setUp() {
-        hearingsDetailsMapping = new HearingsDetailsMapping(hearingsPanelMapping);
+        hearingsDetailsMapping = new HearingsDetailsMapping(hearingsPanelMapping, hearingsAutoListMapping);
         OverrideFields defaultListingValues = OverrideFields.builder()
             .duration(60)
             .build();
@@ -112,12 +109,7 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
     @DisplayName("When a valid hearing wrapper is given buildHearingDetails returns the correct Hearing Details")
     @Test
     void buildHearingDetails() throws ListingException {
-        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE, ISSUE_CODE, false, false))
-            .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                false, false, SessionCategory.CATEGORY_03, null));
-
         given(refData.getHearingDurations()).willReturn(hearingDurations);
-        given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
         given(refData.getVenueService()).willReturn(venueService);
 
         OverrideFields defaultListingValues = OverrideFields.builder()
@@ -151,7 +143,8 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
             .caseData(caseData)
             .build();
 
-        given(hearingsPanelMapping.getPanelRequirements(caseData, refData)).willReturn(PanelRequirements.builder().build());
+        given(hearingsPanelMapping.getPanelRequirements(caseData))
+                .willReturn(PanelRequirements.builder().roleTypes(List.of()).build());
 
         HearingDetails hearingDetails = hearingsDetailsMapping.buildHearingDetails(wrapper, refData);
 
@@ -489,7 +482,6 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
     @DisplayName("When a case has been adjourned and a different venue has been selected, return the new venue")
     @Test
     void getHearingLocationsAdjournmentNewVenue() throws ListingException {
-        given(refData.isAdjournmentFlagEnabled()).willReturn(true);
         caseData.getAdjournment().setAdjournmentInProgress(YesNo.YES);
 
         given(refData.getVenueService()).willReturn(venueService);
@@ -506,7 +498,6 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
     @DisplayName("When a case has been adjourned and the same venue has been selected, return the same venue")
     @Test
     void getHearingLocationsAdjournmentSameVenue() throws ListingException {
-        given(refData.isAdjournmentFlagEnabled()).willReturn(true);
         caseData.getAdjournment().setAdjournmentInProgress(YesNo.YES);
 
         given(venueService.getEpimsIdForVenueId(EPIMS_ID_1)).willReturn(EPIMS_ID_2);
@@ -543,7 +534,6 @@ class HearingsDetailsMappingTest extends HearingsMappingBase {
         given(venueService.getEpimsIdForVenue(caseData.getProcessingVenue())).willReturn(EPIMS_ID_1);
         given(refData.getVenueService()).willReturn(venueService);
 
-        given(refData.isAdjournmentFlagEnabled()).willReturn(false); //TODO: remove flag
 
         checkHearingLocationResults(HearingsLocationMapping.getHearingLocations(caseData, refData),
             EPIMS_ID_1);

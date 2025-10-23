@@ -124,7 +124,6 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     POST_HEARINGS_B_FEATURE: true
     LOGBACK_REQUIRE_ALERT_LEVEL: "false"
     LOGBACK_REQUIRE_ERROR_CODE: "false"
-    DEFAULT_PANEL_COMPOSITION_ENABLED: false
 
     #    hearings=api
     IDAM_S2S_URL: "http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
@@ -140,7 +139,6 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     SSCS_SERVICE_CODE: BBA3
     HEARINGS_CASE_UPDATE_V2_ENABLED: true
 
-
 postgresql:
   enabled: false
 xui-webapp:
@@ -151,6 +149,9 @@ sscs-tribunals-frontend:
   enabled: false
 redis:
   enabled: false
+  image:
+    registry: hmctspublic.azurecr.io
+    repository: imported/bitnami/redis
 ccd:
   enabled: false
 em-ccdorc:

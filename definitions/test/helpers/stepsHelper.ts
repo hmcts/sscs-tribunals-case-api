@@ -1,16 +1,19 @@
 import { Page } from '@playwright/test';
 import { HomePage } from '../pages/common/homePage';
 import { UploadResponsePage } from '../pages/upload.response.page';
+import { Hearings } from '../pages/tabs/hearings';
 
 export class StepsHelper {
   readonly page: Page;
   public homePage: HomePage;
   public uploadResponsePage: UploadResponsePage;
+  public hearingsTab: Hearings;
 
   constructor(page: Page) {
     this.page = page;
     this.homePage = new HomePage(this.page);
     this.uploadResponsePage = new UploadResponsePage(this.page);
+    this.hearingsTab = new Hearings(this.page);
   }
 
   async uploadResponseHelper(
@@ -31,5 +34,11 @@ export class StepsHelper {
     await this.uploadResponsePage.selectIssueCode(issueCodeData);
     await this.uploadResponsePage.chooseAssistOption(assistOption);
     await this.uploadResponsePage.continueSubmission();
+  }
+
+  async verifyHearingHelper() {
+    await new Promise((f) => setTimeout(f, 5000));
+    await this.homePage.navigateToTab('Hearings');
+    await this.hearingsTab.verifyHearingStatusSummary(false);
   }
 }

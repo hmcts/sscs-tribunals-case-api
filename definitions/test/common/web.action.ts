@@ -123,6 +123,10 @@ export class WebAction {
     await this.page.getByLabel(elementValue).first().check();
   }
 
+  async unCheckAnCheckBox(elementLocator: string): Promise<void> {
+    await this.page.locator(elementLocator).uncheck();
+  }
+
   async clickElementById(elementLocator: string): Promise<void> {
     await this.verifyElementVisibility(elementLocator);
     await this.page.locator(elementLocator).first().click();

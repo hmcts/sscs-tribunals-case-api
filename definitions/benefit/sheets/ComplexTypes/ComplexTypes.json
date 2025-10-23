@@ -38,7 +38,7 @@
   {"LiveFrom": "01/01/2018", "ID": "address", "ListElementCode": "county", "FieldType": "Text", "ElementLabel": "County", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "address", "ListElementCode": "postcode", "FieldType": "Text", "ElementLabel": "Postcode", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "address", "ListElementCode": "country", "FieldType": "Text", "ElementLabel": "Country", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "01/01/2018", "ID": "address", "ListElementCode": "inMainlandUk", "FieldType": "YesOrNo", "ElementLabel": "Living in England, Scotland or Wales", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "ID": "address", "ListElementCode": "inMainlandUk", "FieldType": "YesOrNo", "ElementLabel": "Living in England, Scotland, Wales or Northern Ireland", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "address", "ListElementCode": "portOfEntry", "FieldType": "Text", "ElementLabel": "Port of Entry Code", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "address", "ListElementCode": "ukPortOfEntryList", "FieldType": "DynamicList", "ElementLabel": "Port of Entry", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "identity", "ListElementCode": "dob", "FieldType": "Date", "ElementLabel": "Date of birth", "SecurityClassification": "PUBLIC"},
@@ -551,11 +551,12 @@
   {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationReply", "ListElementCode": "replyMessage", "FieldType": "TextArea", "ElementLabel": "Reply", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationReply", "ListElementCode": "replyHasBeenActionedByTribunal", "FieldType": "YesOrNo", "ElementLabel": "Has the reply been reviewed by the Tribunal?", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationReply", "ListElementCode": "replyHasBeenActionedByFta", "FieldType": "YesOrNo", "ElementLabel": "Has the reply been reviewed by the FTA?", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestReply", "FieldType": "ftaCommunicationReply", "ElementLabel": "Reply", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestDateTime", "FieldType": "DateTime", "ElementLabel": "Date Of Request", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestResponseDueDate", "FieldType": "Date", "ElementLabel": "Reply Due Date", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestUserName", "FieldType": "Text", "ElementLabel": "Request From Name", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestUserRole", "FieldType": "Text", "ElementLabel": "Request From Role", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestTopic", "FieldType": "FixedList", "ElementLabel": "Request Topic", "FieldTypeParameter" : "FL_commRequestTopic", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestMessage", "FieldType": "TextArea", "ElementLabel": "Request", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestReply", "FieldType": "ftaCommunicationReply", "ElementLabel": "Reply", "SecurityClassification": "PUBLIC"}
+  {"LiveFrom": "29/05/2025", "ID": "overrideFields", "ListElementCode": "updateListingRequirementsInterpreterDurationLabel", "FieldType": "Label", "ElementLabel": "If an interpreter is needed for the next hearing, please add an extra 30 minutes to the duration.", "FieldShowCondition": "updateListingRequirementsInterpreterDurationLabel=\"DUMMY_VALUE_TO_HIDE_FIELD\"" , "SecurityClassification": "PUBLIC"}
 ]

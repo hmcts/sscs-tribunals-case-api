@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -10,6 +11,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.isScottishCase;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.validateHearingOptionsAndExcludeDates;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SYSTEM_USER;
@@ -27,7 +29,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -44,10 +45,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Entity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -56,13 +59,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.AssociatedCaseLinkHelper;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish.IsScottishHandler;
 import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
-import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
+import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
@@ -81,12 +84,11 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final IdamService idamService;
     private final RefDataService refDataService;
     private final VenueService venueService;
-    private final SessionCategoryMapService categoryMapService;
-    private final boolean caseAccessManagementFeature;
+    private final HearingDurationsService hearingDurationsService;
+    private final PanelCompositionService panelCompositionService;
     private final PostcodeValidator postcodeValidator = new PostcodeValidator();
+
     private static ConstraintValidatorContext context;
-
-
     private static final String WARNING_MESSAGE = "%s has not been provided for the %s, do you want to ignore this warning and proceed?";
 
     private static final String ERROR_MESSAGE = "%s has not been provided for the %s";
@@ -106,17 +108,17 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                                     IdamService idamService,
                                     RefDataService refDataService,
                                     VenueService venueService,
-                                    SessionCategoryMapService categoryMapService,
-                                    @Value("${feature.case-access-management.enabled}")  boolean caseAccessManagementFeature) {
+                                    HearingDurationsService hearingDurationsService,
+                                    PanelCompositionService panelCompositionService) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
         this.airLookupService = airLookupService;
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.idamService = idamService;
         this.refDataService = refDataService;
-        this.caseAccessManagementFeature = caseAccessManagementFeature;
+        this.hearingDurationsService = hearingDurationsService;
+        this.panelCompositionService = panelCompositionService;
         this.venueService = venueService;
-        this.categoryMapService = categoryMapService;
     }
 
     @Override
@@ -129,7 +131,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     @Override
-    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
+                                                          String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
@@ -210,7 +213,63 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (sscsCaseData.isIbcCase()) {
             SscsUtil.setListAssistRoutes(sscsCaseData);
         }
+        OverrideFields updatedOverrideFields = updateOverrideFields(sscsCaseData, caseDetailsBefore);
+        if (!updatedOverrideFields.isAllNull()) {
+            sscsCaseData.getSchedulingAndListingFields().setOverrideFields(updatedOverrideFields);
+        }
+        sscsCaseData.setPanelMemberComposition(panelCompositionService
+                .resetPanelCompositionIfStale(sscsCaseData, caseDetailsBefore));
         return preSubmitCallbackResponse;
+    }
+
+    private OverrideFields updateOverrideFields(SscsCaseData sscsCaseData, Optional<CaseDetails<SscsCaseData>> caseDetailsBefore) {
+        OverrideFields overrideFields = ofNullable(sscsCaseData.getSchedulingAndListingFields().getOverrideFields())
+                .orElse(OverrideFields.builder().build());
+        if (isNull(sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues()) || caseDetailsBefore.isEmpty()) {
+            return overrideFields;
+        }
+        HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
+        if (nonNull(hearingOptions)) {
+            HearingOptions hearingOptionsBefore = ofNullable(caseDetailsBefore.get().getCaseData().getAppeal().getHearingOptions())
+                    .orElse(HearingOptions.builder().build());
+            if (hasInterpreterChanged(sscsCaseData, hearingOptionsBefore)) {
+                updateOverrideInterpreter(hearingOptions, overrideFields);
+                updateOverrideDuration(sscsCaseData, overrideFields);
+            } else if (hasLanguageChanged(sscsCaseData, hearingOptionsBefore)) {
+                updateOverrideInterpreter(hearingOptions, overrideFields);
+            }
+        }
+        return overrideFields;
+    }
+
+    private boolean hasInterpreterChanged(SscsCaseData sscsCaseData, HearingOptions hearingOptionsBefore) {
+        String languageInterpreter = sscsCaseData.getAppeal().getHearingOptions().getLanguageInterpreter();
+        String languageInterpreterBefore = hearingOptionsBefore.getLanguageInterpreter();
+        return !Objects.equals(languageInterpreterBefore, languageInterpreter);
+    }
+
+    private boolean hasLanguageChanged(SscsCaseData sscsCaseData, HearingOptions hearingOptionsBefore) {
+        String languageBefore = hearingOptionsBefore.getLanguages();
+        String language = sscsCaseData.getAppeal().getHearingOptions().getLanguages();
+        return !Objects.equals(languageBefore, language);
+    }
+
+    private void updateOverrideInterpreter(HearingOptions hearingOptions, OverrideFields overrideFields) {
+        String languageInterpreter = hearingOptions.getLanguageInterpreter();
+        DynamicList languageList = hearingOptions.getLanguagesList();
+        DynamicList overrideLanguageList = null;
+        if (nonNull(hearingOptions.getLanguages())) {
+            overrideLanguageList = new DynamicList(languageList.getValue(), languageList.getListItems());
+        }
+        HearingInterpreter hearingInterpreter = HearingInterpreter.builder()
+                .isInterpreterWanted(YesNo.valueOf(languageInterpreter.toUpperCase()))
+                .interpreterLanguage(overrideLanguageList).build();
+        overrideFields.setAppellantInterpreter(hearingInterpreter);
+    }
+
+    private void updateOverrideDuration(SscsCaseData sscsCaseData, OverrideFields overrideFields) {
+        Integer duration = hearingDurationsService.getHearingDurationBenefitIssueCodes(sscsCaseData);
+        overrideFields.setDuration(duration);
     }
 
     private void updateLanguage(SscsCaseData sscsCaseData) {
@@ -234,13 +293,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
     }
 
-    private void validateBenefitIssueCode(SscsCaseData caseData,
-                                          PreSubmitCallbackResponse<SscsCaseData> response) {
-        boolean isSecondDoctorPresent = isNotBlank(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism());
-        boolean fqpmRequired = isYes(caseData.getIsFqpmRequired());
-
-        if (isNull(categoryMapService.getSessionCategory(caseData.getBenefitCode(), caseData.getIssueCode(),
-                isSecondDoctorPresent, fqpmRequired))) {
+    private void validateBenefitIssueCode(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+        if (!panelCompositionService.isBenefitIssueCodeValid(caseData.getBenefitCode(), caseData.getIssueCode())) {
             response.addError("Incorrect benefit/issue code combination");
         }
     }
@@ -349,10 +403,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             response.addWarning("Benefit type code is empty");
             return false;
         } else if (Benefit.findBenefitByShortName(benefitType.getCode()).isEmpty()) {
-            if (!caseAccessManagementFeature) {
-                String validBenefitTypes = Arrays.stream(Benefit.values()).sequential().map(Benefit::getShortName).collect(Collectors.joining(", "));
-                response.addWarning("Benefit type code is invalid, should be one of: " + validBenefitTypes);
-            }
             return false;
         }
         return true;
@@ -378,7 +428,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     public void maybeChangeIsScottish(RegionalProcessingCenter oldRpc, RegionalProcessingCenter newRpc, SscsCaseData caseData) {
         if (oldRpc != newRpc) {
-            String isScottishCase = IsScottishHandler.isScottishCase(newRpc, caseData);
+            String isScottishCase = isScottishCase(newRpc);
             caseData.setIsScottishCase(isScottishCase);
         }
     }
@@ -396,7 +446,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
             sscsCaseData.setProcessingVenue(venue);
 
-            if (caseAccessManagementFeature && isNotEmpty(venue)) {
+            if (isNotEmpty(venue)) {
                 String venueEpimsId = venueService.getEpimsIdForVenue(venue);
                 CourtVenue courtVenue = refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId);
 
@@ -512,10 +562,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private void updateCaseName(Callback<SscsCaseData> callback, SscsCaseData caseData) {
-        if (!caseAccessManagementFeature) {
-            return;
-        }
-
         final String caseName = getCaseName(caseData.getAppeal().getAppellant());
         CaseDetails<SscsCaseData> oldCaseDetails = callback.getCaseDetailsBefore().orElse(null);
 
@@ -541,10 +587,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private void updateCaseCategoriesIfBenefitTypeUpdated(Callback<SscsCaseData> callback,
                                                           SscsCaseData sscsCaseData,
                                                           PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if (!caseAccessManagementFeature) {
-            return;
-        }
-
         Optional<Benefit> benefit = sscsCaseData.getBenefitType();
 
         CaseDetails<SscsCaseData> oldCaseDetails = callback.getCaseDetailsBefore().orElse(null);
@@ -585,7 +627,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             return sscsCaseData.getAppeal().getAppellant().getAddress().getPortOfEntry();
         } else {
             if (YES.getValue().equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAppointee())) {
-                return Optional.ofNullable(sscsCaseData.getAppeal().getAppellant().getAppointee())
+                return ofNullable(sscsCaseData.getAppeal().getAppellant().getAppointee())
                         .map(Appointee::getAddress)
                         .map(Address::getPostcode)
                         .map(String::trim)

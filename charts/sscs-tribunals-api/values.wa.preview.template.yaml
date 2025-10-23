@@ -9,7 +9,7 @@ java:
   readinessDelay: 45
   environment:
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
-    CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
+    CORE_CASE_DATA_API_URL: ${CORE_CASE_DATA_API_URL}
     DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
     BUNDLE_URL: http://${SERVICE_NAME}-em-ccdorc
     CCD_UI_BASE_URL: https://${SERVICE_NAME}-case-management-web
@@ -42,6 +42,7 @@ java:
     HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "${SERVICE_NAME}-hmcsb-sscs"
     HMC_HEARINGS_TOPIC_NAMESPACE: "hmc-servicebus-aat"
     HMC_DEPLOYMENT_ID: "sscs-${CHANGE_ID}"
+    IBC_NI_POSTCODES_FEATURE: true
 
 am-org-role-mapping-service:
   enabled: true
@@ -241,7 +242,7 @@ xui-webapp:
       SERVICES_EM_ANNO_API: ${CCD_GW_API}
       SERVICES_CCD_COMPONENT_API: ${CCD_GW_API}
       SERVICES_CCD_DATA_STORE_API: ${CORE_CASE_DATA_API_URL}
-      SERVICES_CCD_CASE_ASSIGNMENT_API: http://${SERVICE_NAME}-aac
+      SERVICES_CCD_CASE_ASSIGNMENT_API: http://${SERVICE_NAME}-aac-manage-case-assignment
       SERVICES_TERMS_AND_CONDITIONS: http://${SERVICE_NAME}-xui-terms-and-conditions
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       SERVICES_S2S: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
@@ -333,7 +334,19 @@ ccd:
         ROLE_ASSIGNMENT_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
         ORM_ENV: pr
         CCD_DATA_STORE_URL: http://${SERVICE_NAME}-ccd-data-store-api
+        RAS_ENV: pr
       keyVaults:
+        am:
+          resourceGroup: am
+          secrets:
+            - name: am-role-assignment-service-s2s-secret
+              alias: AM_ROLE_ASSIGNMENT_SERVICE_SECRET
+            - name: app-insights-connection-string
+              alias: app-insights-connection-string
+            - name: role-assignment-service-IDAM-CLIENT-SECRET
+              alias: ROLE_ASSIGNMENT_IDAM_CLIENT_SECRET
+            - name: role-assignment-service-IDAM-ADMIN-SECRET
+              alias: ROLE_ASSIGNMENT_IDAM_ADMIN_PASSWORD
       secrets:
         ROLE_ASSIGNMENT_DB_PASSWORD:
           secretRef: postgres
@@ -602,6 +615,7 @@ ccd:
         CCD_DOCUMENT_URL_PATTERN: ^https?://(((?:dm-store-aat\.service\.core-compute-aat\.internal(?::\d+)?)\/documents\/[A-Za-z0-9-]+(?:\/binary)?))
         CASE_DOCUMENT_AM_URL: ${CASE_DOCUMENT_AM_URL}
         UPLOAD_TIMESTAMP_FEATURED_CASE_TYPES: CARE_SUPERVISION_EPO
+        DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_gw,ccd_ps,sscs,bulk_scan_orchestrator,ccpay_bubble,ctsc_work_allocation,em_ccd_orchestrator,xui_webapp,aac_manage_case_assignment,wa_task_configuration_api,wa_task_monitor,ccd_case_document_am_api,hmc_cft_hearing_service,wa_workflow_api,wa_case_event_handler,wa_task_management_api,am_role_assignment_service
       secrets:
         DATA_STORE_DB_PASSWORD:
           secretRef: postgres
@@ -615,7 +629,6 @@ ccd:
 
   ccd-api-gateway-web:
     nodejs:
-      image: hmctspublic.azurecr.io/ccd/api-gateway-web:prod-66a4048-20250203150702
       imagePullPolicy: Always
       environment:
         ADDRESS_LOOKUP_TOKEN: ${ADDRESS_LOOKUP_TOKEN}
@@ -664,6 +677,7 @@ sscs-tribunals-frontend:
       SERVICES_IDAM_LOGIN_URL: https://idam-web-public.aat.platform.hmcts.net/login
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       UV_THREADPOOL_SIZE: 64
+      IBC_NI_POSTCODES_FEATURE: true
     keyVaults:
       sscs:
         secrets:
@@ -794,6 +808,7 @@ wa-task-management-api:
       WA_SYSTEM_USERNAME: ${WA_SYSTEM_USERNAME}
       WA_SYSTEM_PASSWORD: ${WA_SYSTEM_PASSWORD}
       ALLOWED_CASE_TYPES: "benefit"
+      MANDATORY_TASK_FIELD_CHECK_ENABLED: true
 
 wa-task-monitor:
   java:

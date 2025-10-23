@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.util;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
 import static java.util.function.Predicate.not;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
@@ -34,9 +35,11 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCasePanelMembersExcluded;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
@@ -57,8 +60,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InternalCaseDocumentData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Issue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.JudicialUserPanel;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LibertyToApplyActions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PermissionToAppealActions;
@@ -78,7 +83,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
-import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
+import uk.gov.hmcts.reform.sscs.reference.data.model.HearingDuration;
+import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
@@ -92,12 +98,15 @@ public class SscsUtil {
 
     private static final String ID_FORMAT = "%s_%s";
 
+    public static final String CATEGORY_TYPE_TEMPLATE = "%s-%03d";
+    public static final String CATEGORY_SUBTYPE_TEMPLATE = "%s%s";
+
     private SscsUtil() {
         //
     }
 
     public static <T> List<T> mutableEmptyListIfNull(List<T> list) {
-        return Optional.ofNullable(list).orElse(new ArrayList<>());
+        return ofNullable(list).orElse(new ArrayList<>());
     }
 
     public static boolean isSAndLCase(SscsCaseData sscsCaseData) {
@@ -257,7 +266,7 @@ public class SscsUtil {
         }
         sscsDocument.getValue().setBundleAddition(null);
         sscsDocument.getValue().setEvidenceIssued(null);
-        InternalCaseDocumentData internalCaseDocumentData = Optional.ofNullable(caseData.getInternalCaseDocumentData())
+        InternalCaseDocumentData internalCaseDocumentData = ofNullable(caseData.getInternalCaseDocumentData())
             .orElse(InternalCaseDocumentData.builder().build());
         List<SscsDocument> documents = new ArrayList<>(emptyIfNull(internalCaseDocumentData.getSscsInternalDocument()));
         documents.addFirst(sscsDocument);
@@ -266,7 +275,7 @@ public class SscsUtil {
     }
 
     public static void removeDocumentFromCaseDataInternalDocuments(SscsCaseData caseData, SscsDocument sscsDocument) {
-        InternalCaseDocumentData internalCaseDocumentData = Optional.ofNullable(caseData.getInternalCaseDocumentData())
+        InternalCaseDocumentData internalCaseDocumentData = ofNullable(caseData.getInternalCaseDocumentData())
             .orElse(InternalCaseDocumentData.builder().build());
         List<SscsDocument> caseDocuments = new ArrayList<>(emptyIfNull(internalCaseDocumentData.getSscsInternalDocument()));
         caseDocuments = removeDocumentFromDocList(getDocumentIdFromUrl(sscsDocument), caseDocuments);
@@ -396,23 +405,6 @@ public class SscsUtil {
         return GAPS.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute());
     }
 
-    public static void validateBenefitIssueCode(SscsCaseData caseData,
-                                                PreSubmitCallbackResponse<SscsCaseData> response,
-                                                SessionCategoryMapService categoryMapService) {
-        boolean isSecondDoctorPresent = isNotBlank(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism());
-        boolean fqpmRequired = isYes(caseData.getIsFqpmRequired());
-
-
-        if (isNull(Benefit.getBenefitFromBenefitCode(caseData.getBenefitCode()))) {
-            response.addError(BENEFIT_CODE_NOT_IN_USE);
-        }
-
-        if (isNull(categoryMapService.getSessionCategory(caseData.getBenefitCode(), caseData.getIssueCode(),
-            isSecondDoctorPresent, fqpmRequired))) {
-            response.addError(INVALID_BENEFIT_ISSUE_CODE);
-        }
-    }
-
     public static String buildWriteFinalDecisionHeldBefore(SscsCaseData caseData, @NonNull String signedInJudgeName) {
         List<String> names = new ArrayList<>();
         names.add(signedInJudgeName);
@@ -540,7 +532,9 @@ public class SscsUtil {
         } else {
             caseData.getAppeal().setHearingOptions(HearingOptions.builder().hearingRoute(LIST_ASSIST).build());
         }
-        caseData.getAppeal().getMrnDetails().setDwpIssuingOffice("IBCA");
+        MrnDetails mrnDetails = ofNullable(caseData.getAppeal().getMrnDetails()).orElse(MrnDetails.builder().build());
+        mrnDetails.setDwpIssuingOffice("IBCA");
+        caseData.getAppeal().setMrnDetails(mrnDetails);
         if (caseData.getRegionalProcessingCenter() != null) {
             RegionalProcessingCenter listAssistRegionalProcessingCenter = caseData.getRegionalProcessingCenter()
                 .toBuilder()
@@ -688,7 +682,7 @@ public class SscsUtil {
     }
 
     public static HmcHearingType getHmcHearingType(SscsCaseData sscsCaseData) {
-        return Optional.ofNullable(sscsCaseData.getSchedulingAndListingFields())
+        return ofNullable(sscsCaseData.getSchedulingAndListingFields())
             .map(SchedulingAndListingFields::getOverrideFields)
             .map(OverrideFields::getHmcHearingType)
             .orElse(sscsCaseData.getHmcHearingType());
@@ -696,10 +690,10 @@ public class SscsUtil {
 
     public static void setHearingRouteIfNotSet(SscsCaseData sscsCaseData) {
         SchedulingAndListingFields schedulingAndListingFields =
-            Optional.ofNullable(sscsCaseData.getSchedulingAndListingFields())
+            ofNullable(sscsCaseData.getSchedulingAndListingFields())
                 .orElse(SchedulingAndListingFields.builder().build());
         if (isNull(schedulingAndListingFields.getHearingRoute())) {
-            HearingRoute hearingRoute = Optional.ofNullable(sscsCaseData.getRegionalProcessingCenter())
+            HearingRoute hearingRoute = ofNullable(sscsCaseData.getRegionalProcessingCenter())
                 .orElse(RegionalProcessingCenter.builder().build()).getHearingRoute();
             schedulingAndListingFields.setHearingRoute(hearingRoute);
             sscsCaseData.setSchedulingAndListingFields(schedulingAndListingFields);
@@ -707,21 +701,59 @@ public class SscsUtil {
     }
 
     public static void setListAssistRoutes(SscsCaseData sscsCaseData) {
-        SchedulingAndListingFields schedulingAndListingFields = Optional.ofNullable(sscsCaseData.getSchedulingAndListingFields())
+        SchedulingAndListingFields schedulingAndListingFields = ofNullable(sscsCaseData.getSchedulingAndListingFields())
             .orElse(SchedulingAndListingFields.builder().build());
         schedulingAndListingFields.setHearingRoute(HearingRoute.LIST_ASSIST);
         sscsCaseData.setSchedulingAndListingFields(schedulingAndListingFields);
 
-        RegionalProcessingCenter rpc = Optional.ofNullable(sscsCaseData.getRegionalProcessingCenter())
+        RegionalProcessingCenter rpc = ofNullable(sscsCaseData.getRegionalProcessingCenter())
             .orElse(RegionalProcessingCenter.builder().build());
         sscsCaseData.setRegionalProcessingCenter(rpc.toBuilder().hearingRoute(HearingRoute.LIST_ASSIST).build());
 
-        Appeal appeal = Optional.ofNullable(sscsCaseData.getAppeal()).orElse(Appeal.builder().build());
-        HearingOptions hearingOptions = Optional.ofNullable(appeal.getHearingOptions())
+        Appeal appeal = ofNullable(sscsCaseData.getAppeal()).orElse(Appeal.builder().build());
+        HearingOptions hearingOptions = ofNullable(appeal.getHearingOptions())
             .orElse(HearingOptions.builder().build());
         hearingOptions.setHearingRoute(HearingRoute.LIST_ASSIST);
         appeal.setHearingOptions(hearingOptions);
         sscsCaseData.setAppeal(appeal);
+    }
+
+    public static String getCategoryTypeValue(SscsCaseData sscsCaseData) {
+        return String.format(CATEGORY_TYPE_TEMPLATE, "BBA3", BenefitCode.getBenefitCode(sscsCaseData.getBenefitCode()).getCcdReference());
+    }
+
+    public static String getCategorySubTypeValue(SscsCaseData sscsCaseData) {
+        return String.format(CATEGORY_SUBTYPE_TEMPLATE, getCategoryTypeValue(sscsCaseData), Issue.valueOf(sscsCaseData.getIssueCode()).name());
+    }
+
+    public static Integer getDurationForAdjournment(SscsCaseData sscsCaseData, HearingDurationsService hearingDurationsService) {
+        HearingDuration hearingDuration = hearingDurationsService.getHearingDuration(sscsCaseData.getBenefitCode(), sscsCaseData.getIssueCode());
+        Integer duration = AdjournCaseTypeOfHearing.PAPER.equals(sscsCaseData.getAdjournment().getTypeOfNextHearing())
+                ? hearingDuration.getDurationPaper()
+                : YesNo.isYes(sscsCaseData.getAdjournment().getInterpreterRequired())
+                ? hearingDuration.getDurationInterpreter()
+                : hearingDuration.getDurationFaceToFace();
+        if (!AdjournCaseTypeOfHearing.PAPER.equals(sscsCaseData.getAdjournment().getTypeOfNextHearing())) {
+            return hearingDurationsService.addExtraTimeIfNeeded(duration, hearingDuration.getBenefitCode(), hearingDuration.getIssue(), sscsCaseData.getIssueCodesForAllElementsDisputed());
+        } else {
+            return duration;
+        }
+    }
+
+    public static boolean hasChannelChangedForAdjournment(SscsCaseData caseData, String hearingType) {
+
+        if (YesNo.NO.equals(caseData.getAdjournment().getGenerateNotice())) {
+            return (HearingType.ORAL.getValue().equals(hearingType) && AdjournCaseTypeOfHearing.PAPER.equals(caseData.getAdjournment().getTypeOfNextHearing()))
+                    || (HearingType.PAPER.getValue().equals(hearingType) && !AdjournCaseTypeOfHearing.PAPER.equals(caseData.getAdjournment().getTypeOfNextHearing()));
+        }
+        return (AdjournCaseTypeOfHearing.PAPER.equals(caseData.getAdjournment().getTypeOfHearing())
+                && !AdjournCaseTypeOfHearing.PAPER.equals(caseData.getAdjournment().getTypeOfNextHearing()))
+                || (AdjournCaseTypeOfHearing.PAPER.equals(caseData.getAdjournment().getTypeOfNextHearing()) && !AdjournCaseTypeOfHearing.PAPER.equals(caseData.getAdjournment().getTypeOfHearing()));
+    }
+
+    public static boolean hasInterpreterChangedForAdjournment(SscsCaseData caseData, HearingOptions hearingOptions) {
+        String languageInterpreter = ofNullable(hearingOptions.getLanguageInterpreter()).orElse("NO");
+        return nonNull(caseData.getAdjournment().getInterpreterRequired()) && !caseData.getAdjournment().getInterpreterRequired().equals(YesNo.valueOf(languageInterpreter.toUpperCase()));
     }
 }
 

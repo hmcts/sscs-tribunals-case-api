@@ -7,7 +7,8 @@ import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRoleName
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.setCommRequestFilters;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -92,7 +93,7 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
         String replyText = communicationFields.getCommRequestResponseTextArea();
         boolean noActionRequired = !ObjectUtils.isEmpty(communicationFields.getCommRequestResponseNoAction());
         CommunicationRequestReply reply = CommunicationRequestReply.builder()
-            .replyDateTime(LocalDateTime.now())
+            .replyDateTime(ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDateTime())
             .replyUserName(userDetails.getName())
             .replyUserRole(getRoleName(userDetails))
             .replyMessage(noActionRequired ? "No reply required" : replyText)

@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
+import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
@@ -33,6 +34,7 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
     private final DynamicListLanguageUtil utils;
 
     private final VerbalLanguagesService verbalLanguagesService;
+    private final SignLanguagesService signLanguagesService;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -60,7 +62,7 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
 
             if (!StringUtils.isEmpty(existingLanguage)) {
                 Language language = verbalLanguagesService.getVerbalLanguage(existingLanguage);
-
+                language = isNull(language) ? signLanguagesService.getSignLanguage(existingLanguage) : language;
                 if (null != language) {
                     DynamicListItem dynamicListItem = utils.getLanguageDynamicListItem(language);
                     interpreterLanguages.setValue(dynamicListItem);

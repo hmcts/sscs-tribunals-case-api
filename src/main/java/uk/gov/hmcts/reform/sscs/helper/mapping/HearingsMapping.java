@@ -1,8 +1,5 @@
 package uk.gov.hmcts.reform.sscs.helper.mapping;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
-import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsCaseMapping.buildHearingCaseDetails;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsPartiesMapping.buildHearingPartiesDetails;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsRequestMapping.buildHearingRequestDetails;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.EntityRoleCode.APPELLANT;
@@ -20,12 +17,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Entity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Interpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.HearingWrapper;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.EntityRoleCode;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingRequestPayload;
-import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @Slf4j
@@ -33,9 +28,11 @@ import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 public final class HearingsMapping {
 
     private final HearingsDetailsMapping hearingsDetailsMapping;
+    private final HearingsCaseMapping hearingsCaseMapping;
 
-    HearingsMapping(HearingsDetailsMapping hearingsDetailsMapping) {
+    HearingsMapping(HearingsDetailsMapping hearingsDetailsMapping, HearingsCaseMapping hearingsCaseMapping) {
         this.hearingsDetailsMapping = hearingsDetailsMapping;
+        this.hearingsCaseMapping = hearingsCaseMapping;
     }
 
     public HearingRequestPayload buildHearingPayload(HearingWrapper wrapper, ReferenceDataServiceHolder refData)
@@ -43,19 +40,9 @@ public final class HearingsMapping {
         return HearingRequestPayload.builder()
                 .requestDetails(buildHearingRequestDetails(wrapper))
                 .hearingDetails(hearingsDetailsMapping.buildHearingDetails(wrapper, refData))
-                .caseDetails(buildHearingCaseDetails(wrapper, refData))
+                .caseDetails(hearingsCaseMapping.buildHearingCaseDetails(wrapper, refData))
                 .partiesDetails(buildHearingPartiesDetails(wrapper, refData))
                 .build();
-    }
-
-    public static SessionCategoryMap getSessionCaseCodeMap(SscsCaseData caseData, ReferenceDataServiceHolder refData) {
-        boolean doctorSpecialistSecond = isNotBlank(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism());
-        boolean fqpmRequired = isYes(caseData.getIsFqpmRequired());
-        return refData.getSessionCategoryMaps()
-                .getSessionCategory(caseData.getBenefitCode(),
-                        caseData.getIssueCode(),
-                        doctorSpecialistSecond,
-                        fqpmRequired);
     }
 
     public static EntityRoleCode getEntityRoleCode(Entity entity) {
@@ -76,5 +63,4 @@ public final class HearingsMapping {
         }
         return OTHER_PARTY;
     }
-
 }

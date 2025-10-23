@@ -192,7 +192,7 @@ export class Tasks {
     await this.page.getByRole('button', { name: 'Continue' }).click();
     await this.page
       .locator('#inputSelectPerson')
-      .fill(tasksTestData.ctscRole.assignToName);
+      .fill(tasksTestData.ctscAdminLiverpoolNwRole.assignToName);
     await expect(
       this.page.locator('div.mat-autocomplete-panel.mat-autocomplete-visible')
     ).toBeVisible();
@@ -210,7 +210,7 @@ export class Tasks {
     ).toBeVisible();
     await expect(
       this.page.locator(
-        `//td[normalize-space()='${tasksTestData.ctscRole.assignToName}']`
+        `//td[normalize-space()='${tasksTestData.ctscAdminLiverpoolNwRole.assignToName}']`
       )
     ).toBeVisible();
     await this.page

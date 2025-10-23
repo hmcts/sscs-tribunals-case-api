@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,7 +96,7 @@ public class SscsJsonExtractorTest {
 
         ScannedData result = sscsJsonExtractor.extractJson(ExceptionRecord.builder().openingDate(LocalDateTime.now().minusYears(3)).build());
 
-        assertEquals(DateTime.now().minusYears(3).toLocalDate().toString(), result.getOpeningDate());
+        assertEquals(LocalDateTime.now().minusYears(3).toLocalDate().toString(), result.getOpeningDate());
     }
 
     @Test
@@ -105,7 +104,7 @@ public class SscsJsonExtractorTest {
 
         ScannedData result = sscsJsonExtractor.extractJson(ExceptionRecord.builder().openingDate(null).build());
 
-        assertEquals(DateTime.now().toLocalDate().toString(), result.getOpeningDate());
+        assertEquals(LocalDateTime.now().toLocalDate().toString(), result.getOpeningDate());
     }
 
     @SafeVarargs

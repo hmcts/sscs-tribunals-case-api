@@ -72,8 +72,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -1727,8 +1725,8 @@ public class SscsCaseTransformerTest {
 
         assertEquals(YES_LITERAL, transformedCase.get("evidencePresent"));
 
-        org.joda.time.format.DateTimeFormatter dtfOut = DateTimeFormat.forPattern("yyyy-MM-dd");
-        String expectedCreatedDate = dtfOut.print(new DateTime());
+        DateTimeFormatter dtfOut = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String expectedCreatedDate = dtfOut.format(LocalDateTime.now());
         assertEquals(expectedCreatedDate, transformedCase.get("caseCreated"));
 
         assertTrue(result.getErrors().isEmpty());
@@ -1754,8 +1752,8 @@ public class SscsCaseTransformerTest {
 
         assertEquals(YES_LITERAL, transformedCase.get("evidencePresent"));
 
-        org.joda.time.format.DateTimeFormatter dtfOut = DateTimeFormat.forPattern("yyyy-MM-dd");
-        String expectedCreatedDate = dtfOut.print(new DateTime().minusYears(3));
+        DateTimeFormatter dtfOut = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String expectedCreatedDate = dtfOut.format(LocalDateTime.now().minusYears(3));
         assertEquals(expectedCreatedDate, transformedCase.get("caseCreated"));
 
         assertTrue(result.getErrors().isEmpty());

@@ -24,8 +24,9 @@ test.describe(
       request
     }) => {
       test.slow();
+      caseId = await createCaseBasedOnCaseType('PIP');
       await uploadResponseSteps.checkHmcEnvironment(request);
-      await uploadResponseSteps.performUploadResponseWithFurtherInfoOnAPIPAndReviewResponse();
+      await uploadResponseSteps.performUploadResponseWithFurtherInfoOnAPIPAndReviewResponse(caseId);
     });
 
     test('As a caseworker review response submitted without any further info #executeTearDown', async ({
