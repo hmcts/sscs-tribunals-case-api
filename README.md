@@ -11,6 +11,7 @@ A Spring Boot application for creating new appeals for SSCS appellants.
 - [Docker](#docker)
 - [Useful Commands](#useful-commands)
 - [Gotchas](#gotchas)
+- [Work Allocation](#work-allocation)
 
 ## Background
 
@@ -185,6 +186,25 @@ Examples:
 ./bin/create-xlsx.sh benefit dev aat false prod true
 ```
 
+## Work allocation
+Work allocation can be enabled in lower environments. To generate the correct CCD configuration for this feature, 
+the script includes configuration files containing `-WA-` in their names and excludes those with `-nonWA` when WA is 
+enabled. Conversely, when WA is disabled, it includes configuration files with `-nonWA` and excludes those with `-WA-`.
+
+The `"Publish": "${CCD_DEF_PUBLISH}"` field is set dynamically to `"Y"` when WA is enabled and `"N"` when 
+it is disabled. This is used by CCD to publish the event to the message listener so the WA service will be able to process it.
+
+### Enabling WA
+To enable work allocation in preview, you only need to add the `pr-values:wa` label to your PR. 
+This will ensure that the work allocation service is started and configured correctly for the preview environment. 
+
+To enable WA in any other lower environment set both the application feature flag (`WORK_ALLOCATION_FEATURE` in 
+`cnp-flux-config` repo) and the CCD configuration flag (`WORK_ALLOCATION_FEATURE_ENABLED` in `Jenkinsfile_CNP`) for the 
+required environment to true.
+
+If some events are not triggering WA tasks, or are not being recognised by the WA service, double check that the 
+case-event.json entry for the event has the `Publish` field set to `"${CCD_DEF_PUBLISH}"`.
+
 ## Gotchas
 
 ### PRs Starting with "Bump"
@@ -194,7 +214,3 @@ Preview environments are not created for PRs starting with "Bump" due to a decis
 Elastic indices may be missing on preview. Recreate them by logging into CCD admin (e.g., `https://admin-web-sscs-tribunals-api-pr-4091.preview.platform.hmcts.net/`) and clicking "Create Elasticsearch Indices."
 
 This avoids re-triggering the pipeline build and saves time.
-
-### Work allocation in preview
-Work allocation is now enabled in preview. To enable work allocation in preview, you need to add the `pr-values:wa` label to your PR. This will ensure that the work allocation service is started and configured correctly for the preview environment. To enable WA in other environments use both `WORK_ALLOCATION_FEATURE` in `cnp-flux-config` repo and `WORK_ALLOCATION_FEATURE_ENABLED` in `Jenkinsfile_CNP`.
-If some events are not triggering WA tasks, or are not being recognised by the WA service, double check that the case-event.json entry for the event has the `Publish` field set to `"${CCD_DEF_PUBLISH}"`. If it is not set, then CCD will not publish the event to the message listener and the WA service will not be able to process it.
