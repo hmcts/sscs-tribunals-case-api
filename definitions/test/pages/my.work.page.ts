@@ -15,7 +15,7 @@ export class MyWorkPage {
     caseName = 'Test Appellant',
     caseCategory = 'Personal Independence Payment',
     location = 'CARDIFF',
-    task = 'Review Incomplete Appeal - CTSC',
+    task = 'CTSC - Review Incomplete Appeal',
     priority = 'low') {
     const expectedText = [caseName, caseCategory, location, task, priority];
     for (const text of expectedText) {
