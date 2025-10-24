@@ -1,6 +1,5 @@
 import { Page } from '@playwright/test';
 import { WebAction } from '../common/web.action';
-import name from './review.incomplete.appeal.task_en.json';
 
 let webActions: WebAction;
 
@@ -16,7 +15,7 @@ export class MyWorkPage {
     caseName = 'Test Appellant',
     caseCategory = 'Personal Independence Payment',
     location = 'CARDIFF',
-    task = name,
+    task = 'CTSC - Review Incomplete Appeal',
     priority = 'low') {
     const expectedText = [caseName, caseCategory, location, task, priority];
     for (const text of expectedText) {
