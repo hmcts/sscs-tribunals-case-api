@@ -2,7 +2,7 @@ import { Page } from '@playwright/test';
 import { BaseStep } from '../base';
 import { credentials } from '../../../config/config';
 import task from '../../../pages/content/review.incomplete.appeal.task_en.json';
-import requestInfo from '../../../pages/content/fta.communication_en.json';
+import communicateWithFta from '../../../pages/content/fta.communication_en.json';
 import { VoidCase } from '../void.case';
 
 
