@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 import { WebAction } from '../common/web.action';
-import name from 'review.incomplete.appeal.task_en.json';
+import name from './review.incomplete.appeal.task_en.json';
 
 let webActions: WebAction;
 
