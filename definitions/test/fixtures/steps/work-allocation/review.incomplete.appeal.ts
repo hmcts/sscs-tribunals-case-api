@@ -38,8 +38,8 @@ export class ReviewIncompleteAppeal extends BaseStep {
     await this.loginPage.goToCase(caseId)
     await this.homePage.navigateToTab('Tasks');
     await this.tasksTab.clickNextStepLink(task.communicateWithFta.eventTitle);
-    await this.CommunicateWithFtaPage.selectCommunicationType('New Request');
-    await this.CommunicateWithFtaPage.fillOutNewRequestData('MRN/Review Decision Notice Details', 'FTA')
+    await this.communicateWithFtaPage.selectCommunicationType('New Request');
+    await this.communicateWithFtaPage.fillOutNewRequestData('MRN/Review Decision Notice Details', 'FTA')
     await this.homePage.navigateToTab('Tasks');
     await this.homePage.navigateToMyWork();
     await this.myWorkPage.verifyNoAssignedTasks();
