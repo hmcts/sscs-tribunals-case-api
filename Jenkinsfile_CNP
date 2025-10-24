@@ -207,9 +207,7 @@ def runNotificationTests() {
 }
 
 def generateDefinitions() {
-    sh """
-        ./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} "" "" ${env.WORK_ALLOCATION_FEATURE_ENABLED}
-    """
+    sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${env.WORK_ALLOCATION_FEATURE_ENABLED}"
     steps.archiveArtifacts artifacts: "definitions/benefit/*.xlsx"
 
     sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT}"

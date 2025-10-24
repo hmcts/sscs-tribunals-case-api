@@ -3,14 +3,14 @@
 TYPE=$1
 VERSION=$2
 ENV=$3
-LIKE_PROD=${4:-$ENV}
-SHUTTERED=${5:-false}
-WA_ENABLED=${6:-false}
+WA_ENABLED=${4:-false}
+LIKE_PROD=${5:-$ENV}
+SHUTTERED=${6:-false}
 
 RUN_DIR=$(pwd)
 
 if [ -z "$TYPE" ] || [ -z "$VERSION" ] || [ -z "$ENV" ]; then
-    echo "Usage: create-xlsx.sh [type] [version] [env] [like_prod] [shuttered] [wa_enabled]"
+    echo "Usage: create-xlsx.sh [type] [version] [env] [wa_enabled] [like_prod] [shuttered]"
     exit 1
 fi
 
