@@ -29,7 +29,7 @@ export class Tasks {
         break;
       }
       await homePage.navigateToTab('Summary');
-      await homePage.delay(50000);
+      await homePage.delay(70000);
       await homePage.navigateToTab('Tasks');
       await homePage.delay(timeouts.shortTimeout);
     }
