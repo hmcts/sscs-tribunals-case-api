@@ -82,8 +82,10 @@ export class ReviewIncompleteAppeal extends BaseStep {
     // CTSC Administrator voids the case
     await voidCase.performVoidCase(caseId, false);
 
+
     // Verify task is removed from the tasks list within Tasks tab
     await this.homePage.navigateToTab('Tasks');
+    await this.homePage.delay(100000);
     await this.tasksTab.verifyTaskIsHidden(task.name);
   }
 }
