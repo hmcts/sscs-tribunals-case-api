@@ -18,7 +18,7 @@ export class MyWorkPage {
     caseCategory = 'Personal Independence Payment',
     location = 'CARDIFF',
     task = reviewIncompleteAppeal.name,
-    priority = 'low') {
+    priority = reviewIncompleteAppeal.priority) {
     const expectedText = [caseName, caseCategory, location, task, priority];
     for (const text of expectedText) {
       await webActions.verifyTextVisibility(text);
