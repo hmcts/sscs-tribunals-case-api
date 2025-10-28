@@ -91,6 +91,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
+import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
@@ -733,6 +734,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         String venueB = "VenueB";
         String venueEpimsId = "12345";
         when(venueService.getEpimsIdForVenue(venueB)).thenReturn(venueEpimsId);
+        when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueEpimsId)).thenReturn(VenueDetails.builder().build());
         when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType())).thenReturn(
                 venueB);
 
@@ -761,6 +763,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         String venueEpimsId = "12345";
 
         when(venueService.getEpimsIdForVenue(venueB)).thenReturn(venueEpimsId);
+        when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueEpimsId)).thenReturn(VenueDetails.builder().build());
         when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType())).thenReturn(venueB);
         when(refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId)).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());
 
@@ -814,6 +817,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         String venueEpimsId = "12345";
 
         when(venueService.getEpimsIdForVenue(venueB)).thenReturn(venueEpimsId);
+        when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueEpimsId)).thenReturn(VenueDetails.builder().build());
         when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType()))
                 .thenReturn(venueB);
         when(refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId)).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());
