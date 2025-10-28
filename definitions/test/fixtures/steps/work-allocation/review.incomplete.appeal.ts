@@ -85,7 +85,7 @@ export class ReviewIncompleteAppeal extends BaseStep {
 
     // Verify task is removed from the tasks list within Tasks tab
     await this.homePage.navigateToTab('Tasks');
-    await this.homePage.delay(100000);
+    await this.homePage.delay(30000);
     await this.tasksTab.verifyTaskIsHidden(task.name);
   }
 }
