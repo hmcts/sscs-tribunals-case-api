@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
@@ -52,11 +53,13 @@ import uk.gov.hmcts.reform.sscs.model.AppConstants;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
+import uk.gov.hmcts.reform.sscs.service.HearingsService;
 import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 import uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutToSubmit implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private static final DateTimeFormatter DD_MM_YYYY_FORMAT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
@@ -64,19 +67,9 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     private final DwpDocumentService dwpDocumentService;
     private final AddNoteService addNoteService;
     private final PanelCompositionService panelCompositionService;
+    private final HearingsService hearingsService;
     private final AddedDocumentsUtil addedDocumentsUtil;
     private static final Enum<EventType> EVENT_TYPE = EventType.DWP_UPLOAD_RESPONSE;
-
-
-    @Autowired
-    public DwpUploadResponseAboutToSubmitHandler(DwpDocumentService dwpDocumentService, AddNoteService addNoteService,
-                                                 AddedDocumentsUtil addedDocumentsUtil,
-                                                 PanelCompositionService panelCompositionService) {
-        this.dwpDocumentService = dwpDocumentService;
-        this.addNoteService = addNoteService;
-        this.panelCompositionService = panelCompositionService;
-        this.addedDocumentsUtil = addedDocumentsUtil;
-    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -144,6 +137,12 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         sscsCaseData.setPanelMemberComposition(panelCompositionService
                 .resetPanelCompositionIfStale(sscsCaseData, callback.getCaseDetailsBefore()));
+
+        if (HearingRoute.LIST_ASSIST.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute())) {
+            // Setting this to yes so that the warning about hearings in exception state on ready to list does not block the RTL event
+            sscsCaseData.setIgnoreCallbackWarnings(YesNo.YES);
+            log.info("Case {} is List Assist so setting IgnoreCallbackWarnings to Yes", sscsCaseData.getCcdCaseId());
+        }
 
         return preSubmitCallbackResponse;
     }
@@ -250,6 +249,8 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         validateDwpResponseDocuments(sscsCaseData, preSubmitCallbackResponse);
 
         validateDwpAudioVideoEvidence(sscsCaseData, preSubmitCallbackResponse);
+
+        checkForListedHearings(sscsCaseData, preSubmitCallbackResponse);
         return preSubmitCallbackResponse;
     }
 
@@ -260,6 +261,12 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                     preSubmitCallbackResponse.addError("You must upload an audio/video document when submitting a RIP 1 document");
                 }
             }
+        }
+    }
+
+    private void checkForListedHearings(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        if (YesNo.NO.getValue().equals(caseData.getDwpFurtherInfo())) {
+            hearingsService.validationCheckForListedOrExceptionHearings(caseData, preSubmitCallbackResponse);
         }
     }
 
