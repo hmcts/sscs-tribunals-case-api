@@ -56,7 +56,5 @@ jobs:
         uses: thollander/actions-comment-pull-request@v3
         with:
           file-path: report.txt
-          message: |
-            # CCD diff report
           comment-tag: CCD_diff_report
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
