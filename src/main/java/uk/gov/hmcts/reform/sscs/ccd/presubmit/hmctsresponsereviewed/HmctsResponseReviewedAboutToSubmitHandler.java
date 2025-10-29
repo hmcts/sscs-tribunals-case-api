@@ -22,8 +22,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpResponseDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase;
@@ -94,6 +96,11 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
                 .resetPanelCompositionIfStale(sscsCaseData, callback.getCaseDetailsBefore()));
 
         addNote(sscsCaseData, userAuthorisation);
+
+        if (HearingRoute.LIST_ASSIST.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute())) {
+            // Setting this to yes so that the warning about hearings in exception state on ready to list does not block the RTL event
+            sscsCaseData.setIgnoreCallbackWarnings(YesNo.YES);
+        }
 
         return preSubmitCallbackResponse;
     }
