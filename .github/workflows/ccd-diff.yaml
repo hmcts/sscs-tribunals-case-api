@@ -48,7 +48,9 @@ jobs:
       - name: Generate report
         id: ccd-diff
         run: |
-          npx -q @hmcts/ccd-diff build/master build/branch > report.txt
+          echo "# CCD diff report" > report.txt
+          echo "" >> report.txt
+          npx -q @hmcts/ccd-diff build/master build/branch >> report.txt
       - name: Display
         run: |
           cat report.txt
