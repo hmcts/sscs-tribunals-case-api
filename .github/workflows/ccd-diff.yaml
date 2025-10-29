@@ -49,8 +49,6 @@ jobs:
         id: ccd-diff
         run: |
           npx -q @hmcts/ccd-diff build/master build/branch > report.txt
-          REPORT=$(sed -e 's/%/%25/g' -e 's/$/%0A/g' report.txt)
-          echo "content=$REPORT" >> $GITHUB_OUTPUT
       - name: Display
         run: |
           cat report.txt
@@ -59,6 +57,6 @@ jobs:
         with:
           message: |
             # CCD diff report
-            ${{ steps.ccd-diff.outputs.content }}
+            $(cat report.txt)
           comment-tag: CCD_diff_report
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
