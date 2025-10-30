@@ -63,6 +63,7 @@ import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
+import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
@@ -441,13 +442,15 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         String venue = airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType());
 
         if (venue != null && !venue.equalsIgnoreCase(sscsCaseData.getProcessingVenue())) {
-            log.info("Processing venue requires updating for case {}: setting venue name to {} from {}", caseDetails.getId(), venue,
-                sscsCaseData.getProcessingVenue());
-
-            sscsCaseData.setProcessingVenue(venue);
+            String venueEpimsId = venueService.getEpimsIdForVenue(venue);
+            VenueDetails newVenue = venueService.getVenueDetailsForActiveVenueByEpimsId(venueEpimsId);
+            if (nonNull(newVenue) && (newVenue.getLegacyVenue() == null || !Objects.equals(newVenue.getLegacyVenue(), sscsCaseData.getProcessingVenue()))) {
+                log.info("Processing venue requires updating for case {}: setting venue name to {} from {}", caseDetails.getId(), venue,
+                        sscsCaseData.getProcessingVenue());
+                sscsCaseData.setProcessingVenue(venue);
+            }
 
             if (isNotEmpty(venue)) {
-                String venueEpimsId = venueService.getEpimsIdForVenue(venue);
                 CourtVenue courtVenue = refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId);
 
                 sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
