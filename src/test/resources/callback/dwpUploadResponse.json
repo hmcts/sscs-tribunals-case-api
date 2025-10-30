@@ -24,6 +24,7 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
+      "dwpFurtherInfo": "Yes",
       "elementsDisputedList": [
         "testElement"
       ],
