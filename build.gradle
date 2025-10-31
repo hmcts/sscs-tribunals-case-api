@@ -368,8 +368,8 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'pdf-service-client', version: '8.0.2'
     implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '5.0.4'
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.3'
-    
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '516f626'
+
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6.3.12'
 
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.9'
 
@@ -561,7 +561,7 @@ bootWithCCD {
 
     //---Debug-----
     //Uncomment to launch with debug
-    //jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
+    jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
 
     //---Extra ccd loging----
     //Uncomment for ccd callback logging
