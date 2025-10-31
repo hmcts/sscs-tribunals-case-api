@@ -444,10 +444,18 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (venue != null && !venue.equalsIgnoreCase(sscsCaseData.getProcessingVenue())) {
             String venueEpimsId = venueService.getEpimsIdForVenue(venue);
             VenueDetails newVenue = venueService.getVenueDetailsForActiveVenueByEpimsId(venueEpimsId);
-            if (nonNull(newVenue) && (newVenue.getLegacyVenue() == null || !Objects.equals(newVenue.getLegacyVenue(), sscsCaseData.getProcessingVenue()))) {
-                log.info("Processing venue requires updating for case {}: setting venue name to {} from {}", caseDetails.getId(), venue,
-                        sscsCaseData.getProcessingVenue());
-                sscsCaseData.setProcessingVenue(venue);
+            if (nonNull(newVenue)) {
+                if (isEmpty(newVenue.getLegacyVenue()) || !Objects.equals(newVenue.getLegacyVenue(), sscsCaseData.getProcessingVenue())) {
+                    log.info("Processing venue requires updating for case {}: setting venue name to {} from {}",
+                            caseDetails.getId(), venue, sscsCaseData.getProcessingVenue());
+                    sscsCaseData.setProcessingVenue(venue);
+                } else {
+                    venue = sscsCaseData.getProcessingVenue();
+                    venueEpimsId = venueService.getEpimsIdForVenue(venue);
+                    log.info("Legacy venue {} has not been updated for case {}",
+                            venue, caseDetails.getId());
+                }
+
             }
 
             if (isNotEmpty(venue)) {

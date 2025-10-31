@@ -762,14 +762,16 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
                         .build());
         String venueA = "VenueA";
         String venueB = "VenueB";
-        String venueEpimsId = "12345";
+        String venueBEpimsId = "12345";
+        String venueAEpimsId = "12346";
         callback.getCaseDetails().getCaseData().setProcessingVenue(venueA);
-        when(venueService.getEpimsIdForVenue(venueB)).thenReturn(venueEpimsId);
-        when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueEpimsId)).thenReturn(VenueDetails.builder().venName(venueB).legacyVenue(venueA).build());
+        when(venueService.getEpimsIdForVenue(venueB)).thenReturn(venueBEpimsId);
+        when(venueService.getEpimsIdForVenue(venueA)).thenReturn(venueAEpimsId);
+        when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueBEpimsId)).thenReturn(VenueDetails.builder().venName(venueB).legacyVenue(venueA).build());
         when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType())).thenReturn(
                 venueB);
 
-        when(refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId)).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());
+        when(refDataService.getCourtVenueRefDataByEpimsId(venueAEpimsId)).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());
 
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("AB12 00B");
 
@@ -777,6 +779,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         assertEquals(venueA, response.getData().getProcessingVenue());
         assertNotNull(response.getData().getCaseManagementLocation());
+        assertEquals("regionId", response.getData().getCaseManagementLocation().getRegion());
     }
 
     @Test
