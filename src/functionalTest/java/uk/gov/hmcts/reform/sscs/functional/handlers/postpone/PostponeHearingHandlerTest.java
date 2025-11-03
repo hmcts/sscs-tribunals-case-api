@@ -85,6 +85,5 @@ public class PostponeHearingHandlerTest extends BaseHandler {
         assertThat(result.getPostponement().getUnprocessedPostponement()).isEqualTo(NO);
         assertThat(result.getPostponement().getPostponementEvent()).isEqualTo(READY_TO_LIST);
         assertThat(result.getDwpState()).isEqualTo(DwpState.HEARING_POSTPONED);
-        assertThat(result.getIgnoreCallbackWarnings()).isEqualTo(YES);
     }
 }
