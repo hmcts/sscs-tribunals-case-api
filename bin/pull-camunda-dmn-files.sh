@@ -19,5 +19,5 @@ if [ ! -d "./camunda" ]; then
   mkdir camunda
 fi
 
-cp -r ./sscs-task-configuration/src/main/resources/*.dmn ./camunda
+cp -r ./sscs-task-configuration/src/main/resources/*.dmn ./sscs-task-configuration/src/main/resources/judge-dnm/*.dmn ./camunda
 rm -rf ./sscs-task-configuration
