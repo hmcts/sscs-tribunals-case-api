@@ -323,6 +323,19 @@
     "RetainHiddenValue": "Yes"
   },
   {
+    "CaseEventID": "writeFinalDecision",
+    "CaseFieldID": "esaRegulationApplied",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "24/10/2025",
+    "PageDisplayOrder": 8,
+    "PageFieldDisplayOrder": 3,
+    "PageID": "workCapabilityAssessment",
+    "FieldShowCondition" : "appeal.benefitType.code=\"ESA\" AND wcaAppeal = \"Yes\"",
+    "ShowSummaryChangeOption": "Y",
+    "RetainHiddenValue": "Yes"
+  },
+  {
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=schedule6",
     "CaseEventID": "writeFinalDecision",
     "CaseFieldID": "ucWriteFinalDecisionPhysicalDisabilitiesQuestion",
