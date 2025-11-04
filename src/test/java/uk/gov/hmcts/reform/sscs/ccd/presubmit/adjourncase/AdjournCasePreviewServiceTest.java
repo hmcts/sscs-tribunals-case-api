@@ -157,6 +157,7 @@ class AdjournCasePreviewServiceTest {
                         .lastName("Last'NamE")
                         .build())
                     .identity(Identity.builder().build())
+                        .address(Address.builder().build())
                     .build())
                 .build())
             .adjournment(Adjournment.builder()
