@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -27,12 +28,13 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingSubChannel;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HmcUpdateResponse;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
+import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
 
 @Slf4j
+@RequiredArgsConstructor
 public final class HearingsServiceHelper {
 
-    private HearingsServiceHelper() {
-    }
+    private final HmcHearingApiService hmcHearingApiService;
 
     public static void updateHearingId(Hearing hearing, HmcUpdateResponse response) {
         if (nonNull(response.getHearingRequestId())) {
@@ -101,24 +103,23 @@ public final class HearingsServiceHelper {
     }
 
     @Nullable
-    public static CaseHearing findExistingRequestedHearings(HearingsGetResponse hearingsGetResponse, boolean isUpdateHearing) {
+    public static CaseHearing findHearingsWithRequestedHearingState(HearingsGetResponse hearingsGetResponse, HmcStatus desiredHmcStatus, boolean isCreateOrUpdateHearing) {
         return Optional.ofNullable(hearingsGetResponse)
-            .map(HearingsGetResponse::getCaseHearings)
-            .orElse(Collections.emptyList()).stream()
-            .filter(caseHearing -> isCaseHearingRequestedOrAwaitingListing(caseHearing.getHmcStatus(), isUpdateHearing))
-            .min(Comparator.comparing(CaseHearing::getHearingRequestDateTime))
-            .orElse(null);
+                .map(HearingsGetResponse::getCaseHearings)
+                .orElse(Collections.emptyList()).stream()
+                .filter(caseHearing -> isCaseHearingInDesiredHearingState(caseHearing.getHmcStatus(), desiredHmcStatus, isCreateOrUpdateHearing))
+                .min(Comparator.comparing(CaseHearing::getHearingRequestDateTime))
+                .orElse(null);
     }
 
-    public static boolean isCaseHearingRequestedOrAwaitingListing(HmcStatus hmcStatus, boolean isUpdateHearing) {
-        if (isUpdateHearing) {
-            return HmcStatus.HEARING_REQUESTED == hmcStatus
-                    || HmcStatus.AWAITING_LISTING == hmcStatus
-                    || HmcStatus.UPDATE_REQUESTED == hmcStatus
-                    || HmcStatus.UPDATE_SUBMITTED == hmcStatus;
+    public static boolean isCaseHearingInDesiredHearingState(HmcStatus caseHearingHmcStatus, HmcStatus desiredHmcStatus, boolean isCreateOrUpdateHearing) {
+        if (isCreateOrUpdateHearing) {
+            return HmcStatus.HEARING_REQUESTED == caseHearingHmcStatus
+                    || HmcStatus.AWAITING_LISTING == caseHearingHmcStatus
+                    || HmcStatus.UPDATE_REQUESTED == caseHearingHmcStatus
+                    || HmcStatus.UPDATE_SUBMITTED == caseHearingHmcStatus;
         } else {
-            return HmcStatus.HEARING_REQUESTED == hmcStatus
-                    || HmcStatus.AWAITING_LISTING == hmcStatus;
+            return desiredHmcStatus == caseHearingHmcStatus;
         }
     }
 
