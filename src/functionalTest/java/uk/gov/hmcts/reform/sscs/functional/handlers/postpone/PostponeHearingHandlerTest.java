@@ -14,8 +14,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.http.ContentType;
 import java.util.Optional;
-
-import io.restassured.response.Response;
+import org.apache.http.HttpStatus;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
@@ -66,19 +65,21 @@ public class PostponeHearingHandlerTest extends BaseHandler {
             POSTPONED,
             false);
 
-        Response response = given()
+        String response = given()
             .contentType(ContentType.JSON)
             .header("Authorization", idamTokens.getIdamOauth2Token())
             .header("ServiceAuthorization", idamTokens.getServiceAuthorization())
             .body(body)
+            .expect()
+            .statusCode(200)
             .when()
-            .post("/ccdSubmittedEvent/");
+            .post("/ccdSubmittedEvent/")
+            .then()
+            .statusCode(HttpStatus.SC_OK)
+            .log().all(true)
+            .extract().body().asString();
 
-        response.then().log().all();
-        assertThat(response.getStatusCode()).isEqualTo(200);
-
-        String responseString = response.getBody().asString();
-        JsonNode root = mapper.readTree(responseString);
+        JsonNode root = mapper.readTree(response);
         SscsCaseData result = mapper.readValue(root.path("data").toPrettyString(), new TypeReference<SscsCaseData>(){});
 
         assertThat(result.getPostponement().getUnprocessedPostponement()).isEqualTo(NO);
