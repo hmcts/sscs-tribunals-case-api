@@ -1,0 +1,13 @@
+{
+  "ftaCommunicationCaption": "Communication with FTA",
+  "ftaCommunicationHeading": "Select FTA Communication action",
+  "ftaCommunicationCommunicationTypeSetLabel": "Communication type",
+  "ftaCommunicationCommunicationTypeNewRequestRadioButtonLabel": "New Request",
+  "ftaCommunicationCommunicationTypeReplyToFtaRadioButtonLabel": "Reply to FTA Query",
+  "ftaCommunicationCommunicationTypeReviewFtaReplyRadioButtonLabel": "Review FTA Reply",
+  "ftaCommunicationCommunicationTypeDeletaFtaRequestRadioButtonLabel": "Delete a request/reply",
+  "ftaCommunicationRequestTopicDropdownLabel": "Request Topic",
+  "ftaCommunicationRequestTopicDropdownValue": "MRN/Review Decision Notice Details",
+  "requestInfoDetailsToRequestInputLabel": "Request",
+  "requestInfoDetailsToRequestInput": "Automation testing of the Communicate with FTA Event"
+}

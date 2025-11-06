@@ -1,5 +1,5 @@
 {
-  "name": "Review Incomplete Appeal - CTSC",
+  "name": "CTSC - Review Incomplete Appeal",
   "priority": "low",
   "assignedToWhenNotAssigned": "Unassigned",
   "assignedTo": "sscs-ctscdmin nw-liverpool",
@@ -16,9 +16,15 @@
     "Reassign task",
     "Unassign task"
   ],
-  "nextStepsOptions": ["Request Information From Party"],
-  "requestInformationFromParty": {
-    "link": "Request Information From Party",
-    "eventTitle": "Request information"
+  "nextStepsOptions": [
+    "Communicate with FTA",
+    "Update to case data"],
+  "communicateWithFta": {
+    "link": "Communicate with FTA",
+    "eventTitle": "Communicate with FTA"
+  },
+  "updateToCaseData": {
+    "link": "Update to case data",
+    "eventTitle": "Update to case data"
   }
 }
