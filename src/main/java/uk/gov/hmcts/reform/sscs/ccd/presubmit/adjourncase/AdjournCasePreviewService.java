@@ -6,11 +6,13 @@ import static org.apache.commons.lang3.StringUtils.stripToEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.IN_CHAMBERS;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getLastValidHearing;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.resolvePostCode;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,7 +125,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         HearingType nextHearingType = HearingType.getByKey(String.valueOf(adjournment.getTypeOfNextHearing()));
 
         if (HearingType.FACE_TO_FACE.equals(nextHearingType)) {
-            handleFaceToFaceHearing(adjournment, adjournCaseBuilder, venueName);
+            handleFaceToFaceHearing(adjournment, adjournCaseBuilder, venueName, caseData);
         } else {
             adjournCaseBuilder.nextHearingAtVenue(false);
             if (adjournment.getNextHearingVenueSelected() != null) {
@@ -170,7 +172,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         }
     }
 
-    private void handleFaceToFaceHearing(Adjournment adjournment, AdjournCaseTemplateBodyBuilder adjournCaseBuilder, String venueName) {
+    private void handleFaceToFaceHearing(Adjournment adjournment, AdjournCaseTemplateBodyBuilder adjournCaseBuilder, String venueName, SscsCaseData caseData) {
         if (adjournment.getNextHearingVenue() == AdjournCaseNextHearingVenue.SOMEWHERE_ELSE) {
             if (nonNull(adjournment.getNextHearingVenueSelected())
                 && nonNull(adjournment.getNextHearingVenueSelected().getValue())
@@ -190,6 +192,15 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
             Integer venueId = airLookupService.lookupVenueIdByAirVenueName(venueName);
 
             if (nonNull(venueId)) {
+                String postCode = resolvePostCode(caseData);
+                String newVenueName = airLookupService.lookupAirVenueNameByPostCode(postCode, caseData.getAppeal().getBenefitType());
+                if (!Objects.equals(venueName, newVenueName)) {
+                    Integer newVenueId = airLookupService.lookupVenueIdByAirVenueName(newVenueName);
+                    VenueDetails venueDetails = venueDataLoader.getVenueDetailsMap().get(newVenueId.toString());
+                    if (nonNull(venueDetails) && Objects.equals(venueDetails.getLegacyVenue(), venueName)) {
+                        venueId =  newVenueId;
+                    }
+                }
                 VenueDetails venueDetails = venueDataLoader.getVenueDetailsMap().get(venueId.toString());
 
                 if (nonNull(venueDetails)) {
