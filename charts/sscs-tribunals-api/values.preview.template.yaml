@@ -95,8 +95,6 @@ am-org-role-mapping-service:
     keyVaults:
       am:
         secrets:
-          - name: app-insights-connection-string
-            alias: app-insights-connection-string
           - name: am-org-role-mapping-service-s2s-secret
             alias: AM_ORG_ROLE_MAPPING_SERVICE_SECRET
           - name: orm-IDAM-CLIENT-ID

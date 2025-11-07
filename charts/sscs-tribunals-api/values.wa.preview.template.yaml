@@ -68,8 +68,6 @@ am-org-role-mapping-service:
     keyVaults:
       am:
         secrets:
-          - name: app-insights-connection-string
-            alias: app-insights-connection-string
           - name: am-org-role-mapping-service-s2s-secret
             alias: AM_ORG_ROLE_MAPPING_SERVICE_SECRET
           - name: orm-IDAM-CLIENT-ID
@@ -341,8 +339,6 @@ ccd:
           secrets:
             - name: am-role-assignment-service-s2s-secret
               alias: AM_ROLE_ASSIGNMENT_SERVICE_SECRET
-            - name: app-insights-connection-string
-              alias: app-insights-connection-string
             - name: role-assignment-service-IDAM-CLIENT-SECRET
               alias: ROLE_ASSIGNMENT_IDAM_CLIENT_SECRET
             - name: role-assignment-service-IDAM-ADMIN-SECRET
