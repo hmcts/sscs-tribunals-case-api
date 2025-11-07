@@ -329,7 +329,7 @@
     "DisplayContext": "MANDATORY",
     "LiveFrom": "24/10/2025",
     "PageDisplayOrder": 8,
-    "PageFieldDisplayOrder": 3,
+    "PageFieldDisplayOrder": 4,
     "PageID": "workCapabilityAssessment",
     "FieldShowCondition" : "appeal.benefitType.code=\"ESA\" AND wcaAppeal = \"Yes\"",
     "ShowSummaryChangeOption": "Y",

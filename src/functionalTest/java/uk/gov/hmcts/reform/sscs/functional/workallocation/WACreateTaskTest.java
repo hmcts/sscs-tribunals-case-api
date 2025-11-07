@@ -131,7 +131,6 @@ public class WACreateTaskTest {
                 "UC Test Case",
                 idamTokens
             );
-
         assertNotNull(caseDetails);
         assertNotNull(caseDetails.getState());
         assertEquals(State.VALID_APPEAL.getId(), caseDetails.getState());
@@ -166,6 +165,58 @@ public class WACreateTaskTest {
         //Run Write Final Appeal Event with populated data
         //OR trigger the callbacks with populated fields
 
+
+    }
+    @Test
+    public void shouldCreateESACaseWithCorrectData() {
+        //Get and update test data
+        SscsCaseData caseData =
+            convertSyaToCcdCaseDataV2(ALL_DETAILS.getDeserializeMessage(),
+                false,
+                new SscsCaseData());
+
+        // Create case in CCD and verify
+        SscsCaseDetails caseDetails =
+            ccdService.createCase(caseData,
+                CREATE_TEST_CASE.getCcdType(),
+                "SSCS: Creating a Test Case from FT",
+                "UC Test Case",
+                idamTokens
+            );
+
+        assertNotNull(caseDetails);
+        assertNotNull(caseDetails.getState());
+        assertEquals(State.VALID_APPEAL.getId(), caseDetails.getState());
+
+        BenefitType ucBenefitType = BenefitType.builder()
+            .code(ESA.getShortName())
+            .description(ESA.getDescription())
+            .build();
+
+        caseData.setWcaAppeal(YES);
+        caseData.setBenefitCode(ESA.getBenefitCode());
+        caseData.getAppeal().setBenefitType(ucBenefitType);
+
+        // Run another event to update the Case data and change the State
+        SscsCaseData updatedCaseData =
+            ccdService.updateCase(caseData,
+                caseDetails.getId(),
+                UPDATE_CASE_ONLY.getCcdType(), //The user triggering the event needs to have permissions
+                "Update Case from functional test",
+                "Test case",
+                idamTokens).getData();
+
+        assertEquals(YES, updatedCaseData.getWcaAppeal());
+        assertEquals(ucBenefitType, updatedCaseData.getAppeal().getBenefitType());
+        assertEquals(ESA.getBenefitCode(), updatedCaseData.getBenefitCode());
+
+        SscsCaseDetails fullUpdatedCase =
+            ccdService.getByCaseId(Long.valueOf(updatedCaseData.getCcdCaseId()), idamTokens);
+
+        assertEquals(State.VALID_APPEAL.getId(), fullUpdatedCase.getState());
+
+        //Run Write Final Appeal Event with populated data
+        //OR trigger the callbacks with populated fields
 
     }
 
