@@ -29,6 +29,37 @@ For versions and a complete list of dependencies, see `build.gradle`.
 
 **NOTE:** If you haven't already connected to the HMCTS Azure environment through Azure CLI, you will need to do this. Please contact the development team for instructions.
 
+Add the following entries to your hosts file:
+
+```text
+127.0.0.1 host.docker.internal
+127.0.0.1 rse-idam-simulator
+127.0.0.1 dm-store
+127.0.0.1 shared-database-pg12
+```
+
+Set the following environment properties where the PDF_SERVICE_ACCESS_KEY and NOTIFICATION_API_TEST_KEY values are retrieved from az vault. The following code
+will generate the required key/value pairs.
+
+Note: 
+* Please log into azure before running (az login).
+* These must be available to the running service so can be added to .aat-env or your machines environent properties.
+
+```bash
+
+cat <<EOF
+PDF_SERVICE_ACCESS_KEY="$(az keyvault secret show --vault-name sscs-aat --name docmosis-api-key --query value -o tsv 2>/dev/null)"
+NOTIFICATION_API_TEST_KEY="$(az keyvault secret show --vault-name sscs-aat --name notification-test-key --query value -o tsv 2>/dev/null)"
+TESTING_SUPPORT_ENABLED="true"
+TEST_DOCUMENT_MANAGEMENT_URL="http://localhost:5005"
+TEST_URL="http://localhost:8008"
+JUDICIAL_REF_API_URL="http://localhost:8084"
+SEND_LETTER_SERVICE_BASEURL="http://localhost:8084"
+JAVA_TOOL_OPTIONS="-Djava.locale.providers=COMPAT,CLDR"
+JOB_SCHEDULER_DB_PORT="6432"
+EOF
+```
+
 1. **Build the application:**
    ```bash
    ./gradlew build
@@ -173,3 +204,6 @@ This avoids re-triggering the pipeline build and saves time.
 ### Work allocation in preview
 Work allocation is now enabled in preview. To enable work allocation in preview, you need to add the `pr-values:wa` label to your PR. This will ensure that the work allocation service is started and configured correctly for the preview environment.
 If some events are not triggering WA tasks, or are not being recognised by the WA service, double check that the case-event.json entry for the event has the `Publish` field set to `"Y"`. If it is not set, then CCD will not publish the event to the message listener and the WA service will not be able to process it.
+
+### Local DM Store Not Healthy (DOWN or UNKNOWN)
+If this is the first time that the container has been created then it may need to be restarted multiple times in order for it to come up successfully!
