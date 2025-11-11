@@ -36,7 +36,8 @@ export class UploadResponse extends BaseStep {
     }
     await this.homePage.navigateToTab('Summary');
     await this.summaryTab.verifyPresenceOfText('Ready to list');
-    if(environment.name == "aat") await this.homePage.clickBeforeTabBtn();
+    //if(environment.name == "aat") 
+    await this.homePage.clickBeforeTabBtn();
     await this.homePage.navigateToTab('History');
     await Promise.all(
         historyLinks.map((linkName) => this.verifyHistoryTabLink(linkName))
