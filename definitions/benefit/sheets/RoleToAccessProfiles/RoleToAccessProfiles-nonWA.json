@@ -18,6 +18,16 @@
     "AccessProfiles": "caseworker-sscs",
     "Disabled": "N"
   },
+
+  {
+    "LiveFrom": "18/03/2023",
+    "CaseTypeID": "Benefit",
+    "RoleName": "idam:caseworker-sscs-superuser",
+    "Authorisation": "",
+    "ReadOnly": "N",
+    "AccessProfiles": "caseworker,caseworker-sscs,caseworker-sscs-superuser",
+    "Disabled": "N"
+  },
   {
     "LiveFrom": "18/03/2023",
     "CaseTypeID": "Benefit",
