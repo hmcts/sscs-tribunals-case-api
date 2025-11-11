@@ -125,7 +125,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             .ccdCaseId("1234")
             .benefitCode("022")
             .issueCode("CC")
-            .dwpFurtherInfo("Yes")
+            .dwpFurtherInfo("No")
             .dynamicDwpState(new DynamicList(""))
             .dwpResponseDocument(DwpResponseDocument.builder()
                     .documentLink(DocumentLink.builder().documentUrl("a.pdf").documentFilename("a.pdf").build())
@@ -1405,12 +1405,18 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         var response = handler.handle(ABOUT_TO_SUBMIT, ibcaCallback, USER_AUTHORISATION);
 
-        assertThat(response.getErrors().size(), is(0));
-        assertThat(response.getWarnings().size(), is(0));
-        assertThat(response.getData().getBenefitCode(), is("093"));
-        assertThat(response.getData().getIssueCode(), is("RA"));
-        assertNull(response.getData().getBenefitCodeIbcaOnly());
-        assertNull(response.getData().getIssueCodeIbcaOnly());
+
+        if ("Yes".equals(dwpFurtherInfo)) {
+            assertThat(response.getWarnings().size(), is(1));
+            assertTrue(response.getWarnings().contains("Are you sure you want the Tribunal to review this case?"));
+        } else {
+            assertThat(response.getErrors().size(), is(0));
+            assertThat(response.getWarnings().size(), is(0));
+            assertThat(response.getData().getBenefitCode(), is("093"));
+            assertThat(response.getData().getIssueCode(), is("RA"));
+            assertNull(response.getData().getBenefitCodeIbcaOnly());
+            assertNull(response.getData().getIssueCodeIbcaOnly());
+        }
     }
 
     @ParameterizedTest
@@ -1600,7 +1606,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    void shouldReturnWarningWhenFTAUploadsResponseAndSelectsWantsFurtherInfo() {
+    void shouldReturnWarningWhenFtaUploadsResponseAndSelectsWantsFurtherInfo() {
         callback.getCaseDetails().getCaseData().setDwpFurtherInfo("Yes");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -1610,7 +1616,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    void shouldNotReturnWarningWhenFTAUploadsResponseAndDoesNotSelectsWantsFurtherInfo() {
+    void shouldNotReturnWarningWhenFtaUploadsResponseAndDoesNotSelectsWantsFurtherInfo() {
         callback.getCaseDetails().getCaseData().setDwpFurtherInfo("No");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);

@@ -252,7 +252,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         checkForListedHearings(sscsCaseData, preSubmitCallbackResponse);
 
-        if(YesNo.YES.getValue().equals(sscsCaseData.getDwpFurtherInfo())){
+        if (YesNo.YES.getValue().equals(sscsCaseData.getDwpFurtherInfo())) {
             preSubmitCallbackResponse.addWarning("Are you sure you want the Tribunal to review this case?");
         }
 
