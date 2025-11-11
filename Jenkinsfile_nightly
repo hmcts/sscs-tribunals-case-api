@@ -17,12 +17,10 @@ def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
 
-def vaultOverrides = [
-  'demo': 'demo'
-]
+def matchingEnv = "aat"
 
 def secrets = [
-        'sscs-${env}': [
+        "sscs-${matchingEnv}": [
                 secret('idam-api', 'IDAM_API_URL'),
                 secret('idam-oauth-user', 'IDAM_OAUTH2_CLIENT_ID'),
                 secret('ccd-api', 'CORE_CASE_DATA_API_URL'),
@@ -144,10 +142,8 @@ withNightlyPipeline(type, product, component) {
     env.POST_HEARINGS_FEATURE = false
     env.Rules = params.SecurityRules
     setDemoEnvVars()
-    echo "Environment selected is  " + { env.ENVIRONMENT }
 
     env.TEST_E2E_URL_WEB = params.UI_URL_TO_TEST
-    overrideVaultEnvironments(vaultOverrides)
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
     enableFortifyScan()
