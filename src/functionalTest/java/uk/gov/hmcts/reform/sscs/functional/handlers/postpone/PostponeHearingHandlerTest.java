@@ -12,7 +12,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.restassured.config.RestAssuredConfig;
 import io.restassured.http.ContentType;
 import java.util.Optional;
 import org.apache.http.HttpStatus;
@@ -67,27 +66,18 @@ public class PostponeHearingHandlerTest extends BaseHandler {
             false);
 
         String response = given()
-                .contentType(ContentType.JSON)
-                .header("Authorization", idamTokens.getIdamOauth2Token())
-                .header("ServiceAuthorization", idamTokens.getServiceAuthorization())
-                .body(body).config(
-                        RestAssuredConfig
-                                .config()
-                                .encoderConfig(
-                                        RestAssuredConfig
-                                                .config()
-                                                .getEncoderConfig()
-                                                .appendDefaultContentCharsetToContentTypeIfUndefined(false)
-                                )
-                )
-                .expect()
-                .statusCode(200)
-                .when()
-                .post("/ccdSubmittedEvent/")
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .log().all(true)
-                .extract().body().asString();
+            .contentType(ContentType.JSON)
+            .header("Authorization", idamTokens.getIdamOauth2Token())
+            .header("ServiceAuthorization", idamTokens.getServiceAuthorization())
+            .body(body).relaxedHTTPSValidation()
+            .expect()
+            .statusCode(200)
+            .when()
+            .post("/ccdSubmittedEvent/")
+            .then()
+            .statusCode(HttpStatus.SC_OK)
+            .log().all(true)
+            .extract().body().asString();
 
         JsonNode root = mapper.readTree(response);
         SscsCaseData result = mapper.readValue(root.path("data").toPrettyString(), new TypeReference<SscsCaseData>(){});
