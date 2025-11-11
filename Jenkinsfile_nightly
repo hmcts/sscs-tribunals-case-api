@@ -17,7 +17,7 @@ def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
 
-def matchingEnv = "aat"
+def matchingEnv = "demo"
 
 def secrets = [
         "sscs-${matchingEnv}": [
