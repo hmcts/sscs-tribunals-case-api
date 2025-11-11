@@ -55,9 +55,14 @@ TEST_DOCUMENT_MANAGEMENT_URL="http://localhost:5005"
 TEST_URL="http://localhost:8008"
 JUDICIAL_REF_API_URL="http://localhost:8084"
 SEND_LETTER_SERVICE_BASEURL="http://localhost:8084"
-JAVA_TOOL_OPTIONS="-Djava.locale.providers=COMPAT,CLDR"
 JOB_SCHEDULER_DB_PORT="6432"
 EOF
+```
+
+Add the following property to the .aat-env file
+
+```text
+JAVA_TOOL_OPTIONS="-Djava.locale.providers=COMPAT,CLDR"
 ```
 
 1. **Build the application:**
