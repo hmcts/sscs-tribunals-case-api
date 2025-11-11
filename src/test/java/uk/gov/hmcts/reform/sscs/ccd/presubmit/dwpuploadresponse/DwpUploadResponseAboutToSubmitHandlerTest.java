@@ -1598,4 +1598,23 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertNull(response.getData().getIgnoreCallbackWarnings());
     }
+
+    @Test
+    void shouldReturnWarningWhenFTAUploadsResponseAndSelectsWantsFurtherInfo() {
+        callback.getCaseDetails().getCaseData().setDwpFurtherInfo("Yes");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getWarnings().size());
+        assertTrue(response.getWarnings().contains("Are you sure you want the Tribunal to review this case?"));
+    }
+
+    @Test
+    void shouldNotReturnWarningWhenFTAUploadsResponseAndDoesNotSelectsWantsFurtherInfo() {
+        callback.getCaseDetails().getCaseData().setDwpFurtherInfo("No");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getWarnings().isEmpty());
+    }
 }
