@@ -176,7 +176,7 @@ withNightlyPipeline(type, product, component) {
     //             reportFiles          : 'index.html',
     //             reportName           : 'SSCS Accessibility Test Report'
     //     ])
-   }
+   //}
 
 
     afterSuccess('fortify-scan') {
