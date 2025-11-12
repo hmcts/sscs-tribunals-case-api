@@ -17,10 +17,9 @@ def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
 
-def matchingEnv = "demo"
 
 def secrets = [
-        'sscs-${matchingEnv}': [
+        'sscs-${env}': [
                 secret('idam-api', 'IDAM_API_URL'),
                 secret('idam-oauth-user', 'IDAM_OAUTH2_CLIENT_ID'),
                 secret('ccd-api', 'CORE_CASE_DATA_API_URL'),
@@ -78,7 +77,7 @@ def secrets = [
                 secret('test-e2e-ctsc-team-leader-nw-liverpool-username', 'TEST_CTSC_TEAM_LEADER_NW_LIVERPOOL_USERNAME'),
                 secret('test-e2e-ctsc-team-leader-nw-liverpool-password', 'TEST_CTSC_TEAM_LEADER_NW_LIVERPOOL_PASSWORD'),
                 secret('test-e2e-ctsc-admin-nw-liverpool-username', 'TEST_CTSC_ADMIN_NW_LIVERPOOL_USERNAME'),
-                secret('test-e2e-ctsc-admin-nw-liverpool-password', 'TEST_CTSC_ADMIN_NW_LIVERPOOL_PASSWORD')
+                secret('test-e2e-ctsc-admin-nw-liverpool-password', 'TEST_CTSC_ADMIN_NW_LIVERPOOL_PASSWORD'),
         ]
 ]
 
@@ -99,8 +98,8 @@ def setDemoEnvVars() {
     env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-demo.service.core-compute-demo.internal"
     env.CCD_GW_API = "https://gateway-ccd.demo.platform.hmcts.net"
     env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-demo.service.core-compute-demo.internal"
-    env.TEST_DOCUMENT_MANAGEMENT_URL = 'http://dm-store-demo.service.core-compute-demo.internal'
-    env.DOCUMENT_MANAGEMENT_URL = 'http://dm-store-demo.service.core-compute-demo.internal'
+    env.TEST_DOCUMENT_MANAGEMENT_URL = "http://dm-store-demo.service.core-compute-demo.internal"
+    env.DOCUMENT_MANAGEMENT_URL = "http://dm-store-demo.service.core-compute-demo.internal"
     env.ENVIRONMENT = "demo"
     env.HEARINGS_ENABLED = "Yes"
 }
