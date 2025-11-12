@@ -116,15 +116,16 @@ withNightlyPipeline(type, product, component) {
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
 
-    stage('Playwright tests') {
-        try {
-            sh './gradlew runE2eTestsNightly'
-        } catch (Error) {
-            unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
-        } finally {
-            steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'definitions/test/playwright-report/**'
+    afterAlways('DependencyCheckNightly') {
+        stage('Playwright tests') {
+            try {
+                sh './gradlew runE2eTestsNightly'
+            } catch (Error) {
+                unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+            } finally {
+                steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'definitions/test/playwright-report/**'
+            }
         }
     }
-
 }
 
