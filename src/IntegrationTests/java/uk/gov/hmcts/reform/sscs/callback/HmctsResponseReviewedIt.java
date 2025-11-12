@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.controller.CcdCallbackController;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.service.HearingsService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -42,13 +43,15 @@ public class HmctsResponseReviewedIt extends AbstractEventIt {
     @MockitoBean
     private IdamService idamService;
 
+    @MockitoBean
+    private HearingsService hearingsService;
+
     @Before
     public void setup() throws IOException {
         CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         mapper.findAndRegisterModules();
         json = getJson("callback/hmctsResponseReviewedCallback.json");
-
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
     }
 
