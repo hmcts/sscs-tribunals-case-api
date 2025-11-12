@@ -76,7 +76,7 @@ public class BaseFunctionalTest {
         RestAssured.useRelaxedHTTPSValidation();
         Response response = RestAssured
             .given()
-            .header("ServiceAuthorization", "" + idamTokens.getServiceAuthorization())
+            .header("ServiceAuthorization", idamTokens.getServiceAuthorization())
             .contentType("application/json")
             .body(json)
             .when()
@@ -93,7 +93,7 @@ public class BaseFunctionalTest {
         RestAssured.useRelaxedHTTPSValidation();
         Response response = RestAssured
             .given()
-            .header("ServiceAuthorization", "" + idamTokens.getServiceAuthorization())
+            .header("ServiceAuthorization", idamTokens.getServiceAuthorization())
             .contentType("application/json")
             .then()
             .body(json, equalTo(expectedJson.getMap("")))
@@ -111,7 +111,7 @@ public class BaseFunctionalTest {
         RestAssured.useRelaxedHTTPSValidation();
         Response response = RestAssured
             .given()
-            .header("ServiceAuthorization", "" + idamTokens.getServiceAuthorization())
+            .header("ServiceAuthorization", idamTokens.getServiceAuthorization())
             .header(AUTHORIZATION, idamTokens.getIdamOauth2Token())
             .header("user-id", idamTokens.getUserId())
             .contentType("application/json")
@@ -130,7 +130,7 @@ public class BaseFunctionalTest {
         RestAssured.useRelaxedHTTPSValidation();
         Response response = RestAssured
             .given()
-            .header("ServiceAuthorization", "" + idamTokens.getServiceAuthorization())
+            .header("ServiceAuthorization", idamTokens.getServiceAuthorization())
             .header(AUTHORIZATION, idamTokens.getIdamOauth2Token())
             .header("user-id", idamTokens.getUserId())
             .contentType("application/json")
