@@ -13,7 +13,7 @@ export class ProvideAppointeeDetailsPage {
 
   async verifyPageContent(heading: string) {
     await webAction.verifyPageLabel('h1.govuk-heading-l', heading); //Page heading
-    await webAction.isLinkClickable('Cancel');
+    await webAction.isButtonClickable('Cancel');
   }
 
   async verifyDropDownElementNotVisble(labelText: string): Promise<void> {

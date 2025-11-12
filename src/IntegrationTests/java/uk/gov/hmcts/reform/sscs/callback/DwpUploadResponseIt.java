@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.service.HearingsService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -37,6 +38,9 @@ public class DwpUploadResponseIt extends AbstractEventIt {
 
     @MockitoBean
     private UserInfo userInfo;
+
+    @MockitoBean
+    private HearingsService hearingsService;
 
     @Before
     public void setup() throws IOException {

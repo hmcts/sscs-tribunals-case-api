@@ -141,12 +141,23 @@ export class WebAction {
     await this.page.getByRole('link', { name: elementLocator }).first().click();
   }
 
+  async clickButtonByRole(elementLocator: string): Promise<void> {
+    await expect(this.page.getByRole('button', { name: elementLocator , exact: true})).toBeVisible();
+    await this.page.getByRole('button', { name: elementLocator, exact: true}).click();
+  }
+
   async isLinkClickable(elementLocator: string): Promise<void> {
     await expect(this.page.getByRole('link', { name: elementLocator }).first()).toBeVisible();
     await expect(this.page
       .getByRole('link', { name: elementLocator })
       .first()
     ).toBeEnabled();
+  }
+
+  async isButtonClickable(elementLocator: string): Promise<void> {
+     await expect(this.page.getByRole('button', { name: elementLocator })
+     .first())
+     .toBeVisible();
   }
 
   async clickNextStepButton(elementId: string): Promise<void> {
