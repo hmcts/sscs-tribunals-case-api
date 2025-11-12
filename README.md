@@ -214,3 +214,4 @@ Preview environments are not created for PRs starting with "Bump" due to a decis
 Elastic indices may be missing on preview. Recreate them by logging into CCD admin (e.g., `https://admin-web-sscs-tribunals-api-pr-4091.preview.platform.hmcts.net/`) and clicking "Create Elasticsearch Indices."
 
 This avoids re-triggering the pipeline build and saves time.
+
