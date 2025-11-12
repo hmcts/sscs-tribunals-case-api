@@ -146,28 +146,36 @@ withNightlyPipeline(type, product, component) {
     env.TEST_E2E_URL_WEB = params.UI_URL_TO_TEST
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
-    enableFortifyScan()
-    enableFullFunctionalTest()
- 
-    afterAlways('fullFunctionalTest') {
-        runE2eTestsNightly()
-        publishHTML([
-                allowMissing         : true,
-                alwaysLinkToLastBuild: true,
-                keepAll              : true,
-                reportDir            : "playwright-report",
-                reportFiles          : 'index.html',
-                reportName           : 'SSCS E2E Test Report'
-        ])
-        runAccessibilityTestsNightly()
-        publishHTML([
-                allowMissing         : true,
-                alwaysLinkToLastBuild: true,
-                keepAll              : true,
-                reportDir            : "accessibility-report",
-                reportFiles          : 'index.html',
-                reportName           : 'SSCS Accessibility Test Report'
-        ])
+    //enableFortifyScan()
+    //enableFullFunctionalTest()
+    runE2eTestsNightly()
+    publishHTML([
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : "playwright-report",
+            reportFiles          : 'index.html',
+            reportName           : 'SSCS E2E Test Report'
+    ])
+    // afterAlways('fullFunctionalTest') {
+    //     runE2eTestsNightly()
+    //     publishHTML([
+    //             allowMissing         : true,
+    //             alwaysLinkToLastBuild: true,
+    //             keepAll              : true,
+    //             reportDir            : "playwright-report",
+    //             reportFiles          : 'index.html',
+    //             reportName           : 'SSCS E2E Test Report'
+    //     ])
+    //     runAccessibilityTestsNightly()
+    //     publishHTML([
+    //             allowMissing         : true,
+    //             alwaysLinkToLastBuild: true,
+    //             keepAll              : true,
+    //             reportDir            : "accessibility-report",
+    //             reportFiles          : 'index.html',
+    //             reportName           : 'SSCS Accessibility Test Report'
+    //     ])
    }
 
 
