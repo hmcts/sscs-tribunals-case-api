@@ -35,7 +35,6 @@ Add the following entries to your hosts file:
 127.0.0.1 host.docker.internal
 127.0.0.1 rse-idam-simulator
 127.0.0.1 dm-store
-127.0.0.1 shared-database-pg12
 ```
 
 Set the following environment properties where the PDF_SERVICE_ACCESS_KEY and NOTIFICATION_API_TEST_KEY values are retrieved from az vault. The following code
