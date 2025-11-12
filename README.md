@@ -1,6 +1,6 @@
 # SSCS - Tribunals Case API
 
-A Spring Boot application for creating new appeals for SSCS appellants.
+A Spring Boot application for creating new appeals for SSCS appellants
 
 ## Table of Contents
 - [Background](#background)
