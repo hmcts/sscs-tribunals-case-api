@@ -8,8 +8,8 @@ import uk.gov.hmcts.contino.GithubAPI
 def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
-def dmnBranch = "SSCSCI-2096"
-def waStandaloneBranch = "SSCSCI-2096"
+def dmnBranch = "SSCSCI-2276-spike-task-warning"
+def waStandaloneBranch = "SSCSCI-2276-spike-task-warning"
 
 def secrets = [
         'sscs-${env}': [
