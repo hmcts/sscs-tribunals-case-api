@@ -161,8 +161,9 @@ export class UploadResponsePage {
     await webActions.clickButton('Continue');
   }
 
-  async continueSubmission(): Promise<void> {
+  async continueSubmission(assistOption = 'No'): Promise<void> {
     await webActions.clickButton('Continue');
+    if(assistOption == 'Yes') await webActions.clickButton('Ignore Warning and Continue');
   }
 
   async delay(ms: number) {

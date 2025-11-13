@@ -33,7 +33,7 @@ export class StepsHelper {
     if (ucbFlag) await this.uploadResponsePage.uploadUCBDocs();
     await this.uploadResponsePage.selectIssueCode(issueCodeData);
     await this.uploadResponsePage.chooseAssistOption(assistOption);
-    await this.uploadResponsePage.continueSubmission();
+    await this.uploadResponsePage.continueSubmission(assistOption);
   }
 
   async verifyHearingHelper() {

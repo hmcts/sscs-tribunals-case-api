@@ -69,7 +69,7 @@ public class PostponeHearingHandlerTest extends BaseHandler {
             .contentType(ContentType.JSON)
             .header("Authorization", idamTokens.getIdamOauth2Token())
             .header("ServiceAuthorization", idamTokens.getServiceAuthorization())
-            .body(body)
+            .body(body).relaxedHTTPSValidation()
             .expect()
             .statusCode(200)
             .when()

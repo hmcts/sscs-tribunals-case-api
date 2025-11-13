@@ -251,6 +251,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         validateDwpAudioVideoEvidence(sscsCaseData, preSubmitCallbackResponse);
 
         checkForListedHearings(sscsCaseData, preSubmitCallbackResponse);
+
         return preSubmitCallbackResponse;
     }
 
