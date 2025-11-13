@@ -253,7 +253,9 @@
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 17,
     "PageID": "1.0",
-    "ShowSummaryChangeOption": "Y"
+    "ShowSummaryChangeOption": "Y",
+    "Publish": "${CCD_DEF_PUBLISH}",
+    "PublishAs": "action"
   },
   {
     "CaseEventID": "hmctsResponseReviewed",
@@ -266,7 +268,8 @@
     "PageFieldDisplayOrder": 18,
     "PageID": "1.0",
     "ShowSummaryChangeOption": "Y",
-    "RetainHiddenValue": "Yes"
+    "RetainHiddenValue": "Yes",
+    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "CaseEventID": "hmctsResponseReviewed",

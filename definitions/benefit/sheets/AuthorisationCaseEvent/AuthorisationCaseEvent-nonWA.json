@@ -1,0 +1,4 @@
+[
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "interlocSendToTcw", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "R"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "interlocSendToTcw", "AccessProfile": "caseworker-sscs-judge", "CRUD": "R"}
+]

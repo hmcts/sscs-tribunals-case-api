@@ -1,0 +1,63 @@
+[
+  {
+    "LiveFrom": "01/09/2021",
+    "CaseTypeID": "Benefit",
+    "ID": "actionPostponementRequest",
+    "Name": "Action Postponement Request",
+    "Description": "Action Postponement Request",
+    "DisplayOrder": 80,
+    "EventEnablingCondition": "unprocessedPostponementRequest=\"Yes\" AND interlocReviewState!=\"none\" AND interlocReviewState!=\"awaitingAdminAction\" AND interlocReviewState!=\"welshTranslation\" AND interlocReviewState!=\"\"",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "CallBackURLAboutToStartEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToStart",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
+    "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
+    "ShowEventNotes": "Y",
+    "SecurityClassification": "Public",
+    "Publish": "N"
+  },
+  {
+    "LiveFrom": "01/01/2018",
+    "CaseTypeID": "Benefit",
+    "ID": "interlocSendToTcw",
+    "Name": "Send case to TCW",
+    "Description": "Send case to TCW",
+    "DisplayOrder": 1390,
+    "PreConditionState(s)": "interlocutoryReviewState",
+    "PostConditionState": "interlocutoryReviewState",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
+    "ShowEventNotes": "Y",
+    "SecurityClassification": "Public",
+    "Publish": "N"
+  },
+  {
+    "LiveFrom": "01/09/2021",
+    "CaseTypeID": "Benefit",
+    "ID": "actionPostponementRequestWelsh",
+    "Name": "Welsh- Action Postponement Req",
+    "Description": "Welsh- Action Postponement Req",
+    "DisplayOrder": 1860,
+    "EventEnablingCondition": "unprocessedPostponementRequest=\"Yes\" AND interlocReviewState!=\"none\" AND interlocReviewState!=\"awaitingAdminAction\" AND interlocReviewState!=\"welshTranslation\" AND interlocReviewState!=\"\"",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "CallBackURLAboutToStartEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToStart",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
+    "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
+    "ShowEventNotes": "Y",
+    "SecurityClassification": "Public",
+    "Publish": "N"
+  },
+  {
+    "LiveFrom": "01/01/2018",
+    "CaseTypeID": "Benefit",
+    "ID": "manageWelshDocuments",
+    "Name": "Welsh – manage Welsh doc(s)",
+    "Description": "Manage Welsh document(s)",
+    "DisplayOrder": 1930,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "ShowEventNotes": "Y",
+    "SecurityClassification": "Public",
+    "Publish": "N"
+  }
+]
