@@ -185,7 +185,7 @@ public class SubmitAppealTest {
         log.info("First SYA case created with CCD ID {}", firstCaseId);
         submitHelper.defaultAwait().untilAsserted(() -> {
             SscsCaseDetails firstCaseDetails = submitHelper.findCaseInCcd(firstCaseId, idamTokens);
-            assertThat(State.WITH_DWP.getId()).isEqualTo(firstCaseDetails.getState());
+            assertThat(firstCaseDetails.getState()).isEqualTo(State.WITH_DWP.getId());
         });
 
         //create a case with different mrn date
