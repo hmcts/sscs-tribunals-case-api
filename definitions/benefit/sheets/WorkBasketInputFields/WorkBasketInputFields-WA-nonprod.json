@@ -1,0 +1,6 @@
+[
+  {"LiveFrom": "19/05/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-clerk", "CaseFieldID": "preWorkAllocation", "Label": "Case created before WA went Live", "DisplayOrder": 23},
+  {"LiveFrom": "19/05/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-registrar", "CaseFieldID": "preWorkAllocation", "Label": "Case created before WA went Live", "DisplayOrder": 23},
+  {"LiveFrom": "19/05/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-judge", "CaseFieldID": "preWorkAllocation", "Label": "Case created before WA went Live", "DisplayOrder": 23},
+  {"LiveFrom": "19/05/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "CaseFieldID": "preWorkAllocation", "Label": "Case created before WA went Live", "DisplayOrder": 23}
+]
