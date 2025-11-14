@@ -32,6 +32,9 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
         if (sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply() == null) {
             sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         }
+        if (sscsCaseData.getSscsEsaCaseData().getWhichEsaRegulationsApply() == null) {
+            sscsCaseData.getSscsEsaCaseData().setWhichEsaRegulationsApply(sscsCaseData.getSscsEsaCaseData().defaultEsaRegulationsYears());
+        }
     }
 
     @Override
@@ -49,10 +52,6 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
             sscsCaseData.getSscsEsaCaseData().setShowRegulation29Page(NO);
             sscsCaseData.getSscsEsaCaseData().setShowSchedule3ActivitiesPage(YES);
         }
-    }
-
-    private boolean isWcaNotSupportGroupOnly(SscsCaseData sscsCaseData) {
-        return sscsCaseData.isWcaAppeal() && !sscsCaseData.isSupportGroupOnlyAppeal();
     }
 
     @Override
@@ -90,12 +89,16 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
     protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData, String pageId) {
         if (pageId != null && pageId.equals("workCapabilityAssessment")) {
             if (isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())
-                    && sscsCaseData.isWcaAppeal()
-                    && "allowed".equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused())) {
+                && sscsCaseData.isWcaAppeal()
+                && "allowed".equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused())) {
                 sscsCaseData.setShowDwpReassessAwardPage(YesNo.YES);
                 return;
             }
             sscsCaseData.setShowDwpReassessAwardPage(YesNo.NO);
         }
+    }
+
+    private boolean isWcaNotSupportGroupOnly(SscsCaseData sscsCaseData) {
+        return sscsCaseData.isWcaAppeal() && !sscsCaseData.isSupportGroupOnlyAppeal();
     }
 }
