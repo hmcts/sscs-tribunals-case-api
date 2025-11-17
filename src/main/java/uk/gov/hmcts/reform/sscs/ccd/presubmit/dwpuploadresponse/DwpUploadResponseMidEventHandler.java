@@ -109,7 +109,7 @@ public class DwpUploadResponseMidEventHandler implements PreSubmitCallbackHandle
 
     private static void validateDwpFurtherInfo(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         if (YesNo.YES.getValue().equals(sscsCaseData.getDwpFurtherInfo())) {
-            response.addWarning("Are you sure you want the Tribunal to review this case?");
+            response.addWarning("Are you sure you want HMCTS to review the case?");
         }
     }
 }

@@ -188,7 +188,7 @@ public class DwpUploadResponseMidEventHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getWarnings().size());
-        assertTrue(response.getWarnings().contains("Are you sure you want the Tribunal to review this case?"));
+        assertTrue(response.getWarnings().contains("Are you sure you want HMCTS to review the case?"));
     }
 
     @Test
