@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
@@ -58,6 +59,24 @@ class FeatureToggleServiceTest {
             "example@email.com");
 
         assertFalse(result);
+
+    }
+
+    @Test
+    void shouldThrowWhenMandatoryFieldMissing() {
+
+        assertThrowsExactly(NullPointerException.class,
+            () -> featureToggleService.getBooleanValue(
+                null,
+                "some-user-id",
+                "example@email.com")
+        );
+        assertThrowsExactly(NullPointerException.class,
+            () -> featureToggleService.getBooleanValue(
+                FeatureFlag.SSCS_CHILD_MAINTENANCE_FT,
+                null,
+                "example@email.com")
+        );
 
     }
 }
