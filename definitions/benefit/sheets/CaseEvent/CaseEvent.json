@@ -791,7 +791,7 @@
     "ShowSummary": "Y",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N",
+    "Publish": "Y",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent"
   },
@@ -806,7 +806,7 @@
     "ShowSummary": "Y",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
-    "Publish": "N",
+    "Publish": "Y",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdSubmittedEvent"
