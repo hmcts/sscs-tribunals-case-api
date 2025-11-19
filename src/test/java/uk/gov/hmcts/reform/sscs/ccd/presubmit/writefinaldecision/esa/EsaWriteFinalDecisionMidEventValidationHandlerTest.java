@@ -17,6 +17,7 @@ import junitparams.converters.Nullable;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicRadioList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicRadioListElement;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
@@ -34,8 +35,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     @Override
     protected void setValidPointsAndActivitiesScenario(SscsCaseData caseData, String descriptorFlowValue) {
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.NO);
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(
-            List.of("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(List.of("mobilisingUnaided"));
 
         // < 15 points - correct for these fields
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1b");
@@ -133,13 +133,8 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
-    @Parameters({
-        "YES, NO",
-        "NO,YES",
-        "null, NO"
-    })
-    public void givenEsaCaseWithWcaAppealFlow_thenSetShowSummaryOfOutcomePage(
-        @Nullable YesNo wcaFlow, YesNo expectedShowResult) {
+    @Parameters({"YES, NO", "NO,YES", "null, NO"})
+    public void givenEsaCaseWithWcaAppealFlow_thenSetShowSummaryOfOutcomePage(@Nullable YesNo wcaFlow, YesNo expectedShowResult) {
 
         sscsCaseData.setWcaAppeal(wcaFlow);
 
@@ -165,17 +160,8 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
-    @Parameters({
-        "YES, allowed, YES",
-        "YES, refused, NO",
-        "NO, allowed, NO",
-        "NO, refused, NO",
-        "null, allowed, NO",
-        "NO, null, NO",
-        "null, null, NO",
-    })
-    public void givenEsaCaseWithWcaAppealFlowAndAllowedFlow_thenSetShowDwpReassessAwardPage(
-        @Nullable YesNo wcaFlow, @Nullable String allowedFlow, YesNo expectedShowResult) {
+    @Parameters({"YES, allowed, YES", "YES, refused, NO", "NO, allowed, NO", "NO, refused, NO", "null, allowed, NO", "NO, null, NO", "null, null, NO",})
+    public void givenEsaCaseWithWcaAppealFlowAndAllowedFlow_thenSetShowDwpReassessAwardPage(@Nullable YesNo wcaFlow, @Nullable String allowedFlow, YesNo expectedShowResult) {
 
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         sscsCaseData.setWcaAppeal(wcaFlow);
@@ -291,6 +277,9 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
         assertThat(response.getData().getSscsEsaCaseData().getWhichEsaRegulationsApply()).isNotNull();
+        final DynamicRadioListElement dynamicRadioListElement2013 = new DynamicRadioListElement("2013", "2013");
+        assertThat(response.getData().getSscsEsaCaseData().getWhichEsaRegulationsApply().getValue()).isEqualTo(dynamicRadioListElement2013);
+        assertThat(response.getData().getSscsEsaCaseData().getWhichEsaRegulationsApply().getListItems()).containsExactlyInAnyOrder(new DynamicRadioListElement("2008", "2008"), dynamicRadioListElement2013);
     }
 
     @Test
