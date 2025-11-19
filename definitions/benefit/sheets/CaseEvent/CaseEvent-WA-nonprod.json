@@ -201,5 +201,17 @@
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
     "Publish": "${CCD_DEF_PUBLISH}"
+  },
+  {
+    "LiveFrom": "01/01/2018",
+    "CaseTypeID": "Benefit",
+    "ID": "overdueResponse",
+    "Name": "Overdue Response",
+    "Description": "2 days since request sent to fta",
+    "DisplayOrder": 9994,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "Publish": "${CCD_DEF_PUBLISH}"
   }
 ]

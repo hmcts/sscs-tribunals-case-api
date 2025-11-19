@@ -22,5 +22,7 @@
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "newCaseRolesAssigned", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRU"},
   {"LiveFrom": "06/02/2024", "CaseTypeID": "Benefit", "CaseEventID": "waCaseMigration", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRU"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "interlocSendToTcw", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRU"},
-  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "interlocSendToTcw", "AccessProfile": "caseworker-sscs-judge", "CRUD": "CRU"}
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "interlocSendToTcw", "AccessProfile": "caseworker-sscs-judge", "CRUD": "CRU"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "overdueResponse", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "overdueResponse", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"}
 ]
