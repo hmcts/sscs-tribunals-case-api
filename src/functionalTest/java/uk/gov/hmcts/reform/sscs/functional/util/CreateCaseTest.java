@@ -72,7 +72,7 @@ class CreateCaseTest {
         SscsCaseDetails fullUpdatedCase =
             ccdService.getByCaseId(Long.parseLong(updatedCaseData.getCcdCaseId()), idamTokens);
 
-        assertThat(fullUpdatedCase.getState()).isEqualTo(state.name());
+        assertThat(fullUpdatedCase.getState()).isEqualTo(state.toString());
         log.info("Case ID is {}", fullUpdatedCase.getData().getCcdCaseId());
     }
 
