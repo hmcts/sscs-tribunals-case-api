@@ -121,4 +121,6 @@ public class WriteFinalDecisionTemplateBody {
     private boolean isHmrc;
     @JsonProperty("is_ibca")
     private boolean isIbca;
+    @JsonProperty("uc_capability_assessment_start_date")
+    private LocalDate ucCapabilityAssessmentStartDate;
 }

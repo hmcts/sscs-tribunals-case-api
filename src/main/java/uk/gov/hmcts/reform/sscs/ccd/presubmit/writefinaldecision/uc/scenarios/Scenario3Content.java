@@ -12,7 +12,7 @@ public class Scenario3Content extends UcTemplateContent {
         addComponent(new Paragraph(
             WriteFinalDecisionComponentId.CONFIRMED_OR_SET_ASIDE_PARAGRAPH.name(), getConfirmedOrSetAsideSentence(writeFinalDecisionTemplateBody.isSetAside(), writeFinalDecisionTemplateBody.getDateOfDecision(), writeFinalDecisionTemplateBody.isHmrc(), writeFinalDecisionTemplateBody.isIbca())));
         addComponent(new Paragraph(UcTemplateComponentId.DOES_HAVE_LIMITED_CAPABILITY_FOR_WORK_PARAGRAPH.name(),
-            getLimitedCapabilityForWorkRelatedSentence(writeFinalDecisionTemplateBody.getAppellantName(), true)));
+            getLimitedCapabilityForWorkRelatedSentence(writeFinalDecisionTemplateBody.getAppellantName(), true, writeFinalDecisionTemplateBody.getUcCapabilityAssessmentStartDate())));
         addComponent(new Paragraph(
             UcTemplateComponentId.HAS_LIMITED_CAPABILITY_FOR_WORK.name(), getSecretaryOfStateAcceptsHasLimitedCapabilityForWorkSentence(writeFinalDecisionTemplateBody.getAppellantName(), true)));
         addComponent(new Paragraph(UcTemplateComponentId.DOES_NOT_HAVE_LIMITED_CAPABILITY_FOR_SCHEDULE_9_PARAGRAPH_4_APPLIED_PARAGRAPH.name(), getNoSchedule7SentenceSchedule9Paragraph4Applies()));
