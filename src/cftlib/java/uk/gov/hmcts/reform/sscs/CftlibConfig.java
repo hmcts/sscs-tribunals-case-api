@@ -37,7 +37,6 @@ public class CftlibConfig implements CFTLibConfigurer {
             "Account",
             List.of(
                 "caseworker",
-                "caseworker",
                 "caseworker-sscs",
                 "caseworker-sscs-superuser",
                 "caseworker-sscs-clerk",
