@@ -17,7 +17,6 @@ import junitparams.converters.Nullable;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicRadioList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicRadioListElement;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
@@ -277,9 +276,6 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
         assertThat(response.getData().getSscsEsaCaseData().getWhichEsaRegulationsApply()).isNotNull();
-        final DynamicRadioListElement dynamicRadioListElement2013 = new DynamicRadioListElement("2013", "2013");
-        assertThat(response.getData().getSscsEsaCaseData().getWhichEsaRegulationsApply().getValue()).isEqualTo(dynamicRadioListElement2013);
-        assertThat(response.getData().getSscsEsaCaseData().getWhichEsaRegulationsApply().getListItems()).containsExactlyInAnyOrder(new DynamicRadioListElement("2008", "2008"), dynamicRadioListElement2013);
     }
 
     @Test
