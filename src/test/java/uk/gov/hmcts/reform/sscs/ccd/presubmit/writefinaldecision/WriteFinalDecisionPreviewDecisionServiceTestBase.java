@@ -96,9 +96,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
     protected SscsCaseData sscsCaseData;
 
-    protected static String APPEllANT_NAME = "Appellant Lastname";
     protected static String DATE_OF_DECISION = "2018-10-10";
-
 
     protected abstract WriteFinalDecisionPreviewDecisionServiceBase createPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
         DocumentConfiguration documentConfiguration);

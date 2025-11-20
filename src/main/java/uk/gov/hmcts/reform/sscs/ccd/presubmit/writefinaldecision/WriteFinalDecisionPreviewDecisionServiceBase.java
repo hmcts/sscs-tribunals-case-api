@@ -164,10 +164,6 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         writeFinalDecisionBuilder.isHmrc(SscsType.SSCS5.equals(sscsFormType));
         writeFinalDecisionBuilder.isIbca(caseData.isIbcCase() || SscsType.SSCS8.equals(sscsFormType));
 
-        if (nonNull(caseData.getSscsUcCaseData())) {
-            writeFinalDecisionBuilder.ucCapabilityAssessmentStartDate(Optional.ofNullable(caseData.getSscsUcCaseData().getUcWriteFinalDecisionWorkCapabilityAssessmentStartDate()).map(LocalDate::parse).orElse(null));
-        }
-
         WriteFinalDecisionTemplateBody payload = writeFinalDecisionBuilder.build();
 
         validateRequiredProperties(payload);
