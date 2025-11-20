@@ -38,7 +38,7 @@ class FeatureToggleServiceTest {
         when(ldClient.boolVariation(anyString(), any(LDContext.class), eq(Boolean.FALSE)))
             .thenReturn(expected);
 
-        boolean result = featureToggleService.getBooleanValue(
+        boolean result = featureToggleService.isEnabled(
             FeatureFlag.SSCS_CHILD_MAINTENANCE_FT,
             "some-user-id",
             "example@email.com");
@@ -50,14 +50,14 @@ class FeatureToggleServiceTest {
     @Test
     void shouldThrowWhenMandatoryFieldMissing() {
 
-        assertThrowsExactly(NullPointerException.class,
-            () -> featureToggleService.getBooleanValue(
+        assertThrowsExactly(IllegalArgumentException.class,
+            () -> featureToggleService.isEnabled(
                 null,
                 "some-user-id",
                 "example@email.com")
         );
-        assertThrowsExactly(NullPointerException.class,
-            () -> featureToggleService.getBooleanValue(
+        assertThrowsExactly(IllegalArgumentException.class,
+            () -> featureToggleService.isEnabled(
                 FeatureFlag.SSCS_CHILD_MAINTENANCE_FT,
                 null,
                 "example@email.com")

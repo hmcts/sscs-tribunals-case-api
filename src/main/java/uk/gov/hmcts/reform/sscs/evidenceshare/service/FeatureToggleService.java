@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
-import static java.util.Objects.requireNonNull;
+import static java.util.Optional.ofNullable;
 
 import com.launchdarkly.sdk.LDContext;
 import com.launchdarkly.sdk.server.LDClient;
@@ -23,9 +23,11 @@ public class FeatureToggleService {
         this.ldUserKey = ldUserKey;
     }
 
-    public boolean getBooleanValue(final FeatureFlag featureFlag, final String userId, final String email) {
-        requireNonNull(featureFlag, "featureFlag must not be null");
-        requireNonNull(userId, "userId must not be null");
+    public boolean isEnabled(final FeatureFlag featureFlag, final String userId, final String email) {
+        ofNullable(featureFlag)
+            .orElseThrow(() -> new IllegalArgumentException("featureFlag must not be null"));
+        ofNullable(userId)
+            .orElseThrow(() -> new IllegalArgumentException("userId must not be null"));
 
         log.info("Retrieve boolean value for featureFlag: {} for userId: {}", featureFlag, userId);
         return ldClient.boolVariation(featureFlag.getKey(), createLaunchDarklyContext(userId, email), false);
@@ -37,7 +39,7 @@ public class FeatureToggleService {
     }
 
     private LDContext createLaunchDarklyContext(final String userId, final String email) {
-        return LDContext.builder("sscs-tribunals-api")
+        return LDContext.builder("sscs-tribunals-case-api")
             .set("name", userId)
             .set("email", email)
             .set("firstName", "SSCS")
