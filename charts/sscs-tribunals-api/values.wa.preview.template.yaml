@@ -977,12 +977,12 @@ ccd-message-publisher:
 sscs-cron-trigger:
   job:
     kind: CronJob
-    suspend: 'false'
+    suspend: false
     image: 'hmctspublic.azurecr.io/sscs/cron-trigger:pr-203'
     releaseNameOverride: ${SERVICE_NAME}-sscs-cron-trigger
     name: ${SERVICE_NAME}-sscs-cron-trigger
     schedule: "*/5 * * * *"
-    aadIdentityName: wa
+    aadIdentityName: sscs
     keyVaults:
       sscs:
         secrets:
