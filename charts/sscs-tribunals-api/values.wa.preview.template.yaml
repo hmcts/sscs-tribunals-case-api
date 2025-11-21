@@ -977,7 +977,7 @@ ccd-message-publisher:
 sscs-cron-trigger:
   job:
     kind: CronJob
-    image: 'hmctspublic.azurecr.io/sscs/cron-trigger:prod-dc4345f-20251114203924'
+    image: 'hmctspublic.azurecr.io/sscs/cron-trigger:pr-203'
     releaseNameOverride: ${SERVICE_NAME}-sscs-cron-trigger
     name: ${SERVICE_NAME}-sscs-cron-trigger
     schedule: "*/5 * * * *"
