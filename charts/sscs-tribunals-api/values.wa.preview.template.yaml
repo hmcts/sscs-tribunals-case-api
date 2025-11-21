@@ -982,7 +982,7 @@ sscs-cron-trigger:
     releaseNameOverride: ${SERVICE_NAME}-sscs-cron-trigger
     name: ${SERVICE_NAME}-sscs-cron-trigger
     schedule: "*/5 * * * *"
-    aadIdentityName: sscs
+    aadIdentityName: wa
     keyVaults:
       sscs:
         secrets:
