@@ -326,6 +326,8 @@ ccd:
 
   am-role-assignment-service:
     java:
+      readinessDelay: 60
+      livenessDelay: 60
       ingressHost: am-role-assignment-service-${SERVICE_FQDN}
       autoscaling:
         enabled: false
