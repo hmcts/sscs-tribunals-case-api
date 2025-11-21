@@ -89,7 +89,7 @@ am-org-role-mapping-service:
       S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
       CASE_WORKER_REF_APP_URL: http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal
       JUDICIAL_REF_APP_URL: http://rd-judicial-api-aat.service.core-compute-aat.internal
-      ROLE_ASSIGNMENT_APP_URL: ${SERVICE_NAME}-am-role-assignment-service
+      ROLE_ASSIGNMENT_APP_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
       JUDICIAL_BOOKING_APP_URL: http://am-judicial-booking-service-aat.service.core-compute-aat.internal
       AMQP_SHARED_ACCESS_KEY_NAME: RootManageSharedAccessKey
       AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
@@ -131,7 +131,7 @@ aac-manage-case-assignment:
       PRD_HOST: http://rd-professional-api-aat.service.core-compute-aat.internal
       CCD_DEFINITION_STORE_ALLOWED_SERVICE: xui_webapp
       CCD_DATA_STORE_ALLOWED_SERVICE: xui_webapp
-      ROLE_ASSIGNMENT_URL: "http://${SERVICE_NAME}-am-role-assignment-service"
+      ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
     autoscaling:
       enabled: false
     keyVaults:
@@ -253,7 +253,7 @@ xui-webapp:
       SERVICES_PRD_COMMONDATA_API: http://rd-commondata-api-aat.service.core-compute-aat.internal
       SERVICES_DOCUMENTS_API_V2: http://${SERVICE_NAME}-ccd-case-document-am-api
       SERVICES_ROLE_ASSIGNMENT_API: https://am-role-assignment-service-${SERVICE_FQDN}
-      HEALTH_ROLE_ASSIGNMENT_API: http://${SERVICE_NAME}-am-role-assignment-service/health
+      HEALTH_ROLE_ASSIGNMENT_API: http://am-role-assignment-service-aat.service.core-compute-aat.internal/health
       SERVICES_ROLE_ASSIGNMENT_MAPPING_API: http://${SERVICE_NAME}-am-org-role-mapping-service
       GLOBAL_SEARCH_SERVICES: IA,CIVIL,PRIVATELAW,PUBLICLAW,SSCS
       JURISDICTIONS: SSCS
@@ -321,25 +321,6 @@ ccd:
       enabled: false
     elastic:
       enabled: ${PREVIEW_CCD_ENABLED}
-
-  am-role-assignment-service:
-    java:
-      ingressHost: am-role-assignment-service-${SERVICE_FQDN}
-      autoscaling:
-        enabled: false
-        minReplicas: 1
-        maxReplicas: 1
-      environment:
-        ROLE_ASSIGNMENT_DB_USERNAME: hmcts
-        ROLE_ASSIGNMENT_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
-        ORM_ENV: pr
-        CCD_DATA_STORE_URL: http://${SERVICE_NAME}-ccd-data-store-api
-      keyVaults:
-      secrets:
-        ROLE_ASSIGNMENT_DB_PASSWORD:
-          secretRef: postgres
-          key: PASSWORD
-          disabled: false
 
   elasticsearch:
     nameOverride: ${SERVICE_NAME}-es
@@ -591,6 +572,7 @@ ccd:
         IDAM_DATA_STORE_SYSTEM_USER_PASSWORD: ${IDAM_DATA_STORE_SYSTEM_USER_PASSWORD}
         IDAM_API_BASE_URL: https://idam-api.aat.platform.hmcts.net
         IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
+        ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
         DATA_STORE_CROSS_JURISDICTIONAL_ROLES: caseworker-caa,caseworker-approver
         ELASTIC_SEARCH_ENABLED: true
         ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
@@ -782,7 +764,7 @@ wa-task-management-api:
         disabled: false
     environment:
       CAMUNDA_URL: https://camunda-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net/engine-rest
-      ROLE_ASSIGNMENT_URL: "http://${SERVICE_NAME}-am-role-assignment-service"
+      ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
       POSTGRES_HOST: sscs-preview.postgres.database.azure.com
       POSTGRES_NAME: "pr-${CHANGE_ID}-cft_task_db"
       POSTGRES_USERNAME: hmcts
@@ -809,7 +791,7 @@ wa-task-monitor:
       CASE_EVENT_HANDLER_SERVICE_URL: http://{{ .Release.Name }}-wa-case-event-handler
       CCD_SEARCH_URL: http://{{ .Release.Name }}-ccd-data-store-api
       CCD_URL: http://{{ .Release.Name }}-ccd-data-store-api
-      ROLE_ASSIGNMENT_URL: "http://${SERVICE_NAME}-am-role-assignment-service"
+      ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
       S2S_SECRET_TASK_MONITOR: ${S2S_SECRET_TASK_MONITOR}
       WA_IDAM_CLIENT_SECRET: ${WA_IDAM_CLIENT_SECRET}
       WA_SYSTEM_USERNAME: ${WA_SYSTEM_USERNAME}
@@ -834,7 +816,7 @@ wa-case-event-handler:
       CAMUNDA_URL: https://camunda-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net/engine-rest
       CCD_URL: http://{{ .Release.Name }}-ccd-data-store-api
       CCD_SEARCH_URL: http://{{ .Release.Name }}-ccd-data-store-api
-      ROLE_ASSIGNMENT_URL: "http://${SERVICE_NAME}-am-role-assignment-service"
+      ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
       WA_WORKFLOW_API_URL: http://{{ .Release.Name }}-wa-workflow-api
       WA_TASK_MANAGEMENT_API_URL: http://{{ .Release.Name }}-wa-task-management-api
       AZURE_SERVICE_BUS_TOPIC_NAME: "${SERVICE_NAME}-servicebus-ccd-events"
