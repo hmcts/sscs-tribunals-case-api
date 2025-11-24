@@ -332,7 +332,7 @@
     "PageDisplayOrder": 8,
     "PageFieldDisplayOrder": 4,
     "PageID": "workCapabilityAssessment",
-    "FieldShowCondition" : "appeal.benefitType.code=\"UC\" AND wcaAppeal=\"Yes\"",
+    "FieldShowCondition" : "appeal.benefitType.code=\"UC\" AND wcaAppeal=\"Yes\" AND writeFinalDecisionAllowedOrRefused = \"allowed\"",
     "ShowSummaryChangeOption": "Y",
     "RetainHiddenValue": "Yes"
   },
