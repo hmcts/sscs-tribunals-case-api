@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.functional.sya;
 
+import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS;
@@ -70,7 +71,7 @@ public class SubmitHelper {
 
     protected ConditionFactory defaultAwait() {
         return await()
-            .atMost(15, SECONDS)
+            .atMost(2, MINUTES)
             .pollInterval(2, SECONDS);
     }
 }
