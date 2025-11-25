@@ -54,6 +54,8 @@ am-org-role-mapping-service:
     devcpuRequests: 250m
     devmemoryLimits: 2048Mi
     devcpuLimits: 1500m
+    readinessDelay: 120
+    livenessDelay: 120
     secrets:
       SB_ACCESS_KEY:
         secretRef: sscs-sb-preview
