@@ -19,8 +19,11 @@ class UcTemplateContentTest {
 
     @ParameterizedTest
     @MethodSource("doesHaveLimitedCapabilityForWorkSentence")
-    void shouldReturnDoesHaveLimitedCapabilityForWorkSentence(String appellantName, boolean isTreatedLimitedCapability, boolean includeWorkRelatedActivities, boolean isWorkRelatedActivitiesLimited, boolean isWorkRelatedActivitiesToBeTreatedLimitedCapability, String expected) {
-        String formattedSentence = content.getDoesHaveLimitedCapabilityForWorkSentence(appellantName, isTreatedLimitedCapability, includeWorkRelatedActivities, isWorkRelatedActivitiesLimited, isWorkRelatedActivitiesToBeTreatedLimitedCapability, LocalDate.now());
+    void shouldReturnDoesHaveLimitedCapabilityForWorkSentence(String appellantName, boolean isTreatedLimitedCapability, boolean includeWorkRelatedActivities, boolean isWorkRelatedActivitiesLimited,
+                                                              boolean isWorkRelatedActivitiesToBeTreatedLimitedCapability, String expected) {
+        String formattedSentence = content.getDoesHaveLimitedCapabilityForWorkSentence(
+            appellantName, isTreatedLimitedCapability, includeWorkRelatedActivities, isWorkRelatedActivitiesLimited,
+            isWorkRelatedActivitiesToBeTreatedLimitedCapability, LocalDate.now());
         assertThat(formattedSentence).isEqualTo(expected);
     }
 
@@ -32,12 +35,27 @@ class UcTemplateContentTest {
     }
 
     private static Stream<Arguments> doesHaveLimitedCapabilityForWorkSentence() {
-        return Stream.of(Arguments.of("Joe Bloggs", true, true, true, true, "Joe Bloggs is to be treated as having limited capability for work and is to be treated as having limited capability for work-related activity from %s.".formatted(today())), Arguments.of("Joe Bloggs", false, true, true, true, "Joe Bloggs has limited capability for work and is to be treated as having limited capability for work-related activity from %s.".formatted(today())), Arguments.of("Joe Bloggs", true, false, true, true, "Joe Bloggs is to be treated as having limited capability for work from %s.".formatted(today())), Arguments.of("Joe Bloggs", true, true, false, true, "Joe Bloggs is to be treated as having limited capability for work and for work-related activity from %s.".formatted(today())), Arguments.of("Joe Bloggs", true, true, true, false, "Joe Bloggs is to be treated as having limited capability for work and has limited capability for work-related activity from %s.".formatted(today())));
+        return Stream.of(
+            Arguments.of(
+                "Joe Bloggs", true, true, true, true,
+                ("Joe Bloggs is to be treated as having limited capability for work and is to be treated as having " + "limited capability for work-related activity from %s.").formatted(today())),
+            Arguments.of(
+                "Joe Bloggs", false, true, true, true,
+                ("Joe Bloggs has limited capability for work and is to be treated as having limited capability for " + "work-related activity from %s.").formatted(today())),
+            Arguments.of("Joe Bloggs", true, false, true, true, "Joe Bloggs is to be treated as having limited capability for work from %s.".formatted(today())),
+            Arguments.of(
+                "Joe Bloggs", true, true, false, true, ("Joe Bloggs is to be treated as having limited capability for work and for work-related activity " + "from" + " %s.").formatted(today())),
+            Arguments.of(
+                "Joe Bloggs", true, true, true, false,
+                ("Joe Bloggs is to be treated as having limited capability for work and has limited capability for " + "work-related activity from %s.").formatted(today())));
     }
 
     private static Stream<Arguments> doesHaveLimitedCapabilityForWorkRelatedActivitySentence() {
-        return Stream.of(Arguments.of("Joe Bloggs", true, "Joe Bloggs is to be treated as having limited capability for work-related activity from %s.".formatted(today())), Arguments.of("Joe Bloggs", false, "Joe Bloggs has limited capability for work-related activity from %s.".formatted(today())));
+        return Stream.of(
+            Arguments.of("Joe Bloggs", true, ("Joe Bloggs is to be treated as having limited capability for work-related activity from %s.").formatted(today())),
+            Arguments.of("Joe Bloggs", false, "Joe Bloggs has limited capability for work-related activity from %s.".formatted(today())));
     }
+
 
     @NotNull
     private static String today() {
