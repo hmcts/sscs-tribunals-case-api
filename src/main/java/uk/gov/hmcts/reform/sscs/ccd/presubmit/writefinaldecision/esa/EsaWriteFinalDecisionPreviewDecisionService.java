@@ -6,7 +6,9 @@ import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,7 +23,11 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody.WriteFinalDecisionTemplateBodyBuilder;
-import uk.gov.hmcts.reform.sscs.service.*;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
+import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeOutcomeService;
+import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
+import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 
 @Slf4j
 @Component
@@ -32,7 +38,8 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
 
     @Autowired
     public EsaWriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
-                                                       EsaDecisionNoticeQuestionService decisionNoticeQuestionService, EsaDecisionNoticeOutcomeService outcomeService, DocumentConfiguration documentConfiguration, VenueDataLoader venueDataLoader) {
+                                                       EsaDecisionNoticeQuestionService decisionNoticeQuestionService, EsaDecisionNoticeOutcomeService outcomeService,
+                                                       DocumentConfiguration documentConfiguration, VenueDataLoader venueDataLoader) {
         super(generateFile, userDetailsService, decisionNoticeQuestionService, outcomeService, documentConfiguration, venueDataLoader);
         this.esaDecisionNoticeQuestionService = decisionNoticeQuestionService;
         this.venueDataLoader = venueDataLoader;
@@ -149,7 +156,6 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
         builder.regulation35Applicable(caseData.getSscsEsaCaseData().getDoesRegulation35Apply() == null ? null : caseData.getSscsEsaCaseData().getDoesRegulation35Apply().toBoolean());
         builder.supportGroupOnly(caseData.isSupportGroupOnlyAppeal());
         builder.esaRegulationsYear(nonNull(caseData.getSscsEsaCaseData().getWhichEsaRegulationsApply()) ? caseData.getSscsEsaCaseData().getWhichEsaRegulationsApply() : null);
-
     }
 
     @Override
