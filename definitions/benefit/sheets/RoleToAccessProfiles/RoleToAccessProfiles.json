@@ -12,33 +12,6 @@
   {
     "LiveFrom": "18/03/2023",
     "CaseTypeID": "Benefit",
-    "RoleName": "idam:caseworker-sscs-systemupdate",
-    "Authorisation": "",
-    "ReadOnly": "N",
-    "AccessProfiles": "caseworker,caseworker-sscs,caseworker-sscs-systemupdate",
-    "Disabled": "N"
-  },
-  {
-    "LiveFrom": "18/03/2023",
-    "CaseTypeID": "Benefit",
-    "RoleName" : "idam:caseworker-wa-task-configuration",
-    "Authorisation": "",
-    "ReadOnly": "N",
-    "AccessProfiles": "caseworker,caseworker-sscs,caseworker-wa-task-configuration",
-    "Disabled": "N"
-  },
-  {
-    "LiveFrom": "18/03/2023",
-    "CaseTypeID": "Benefit",
-    "RoleName": "idam:caseworker-sscs-clerk",
-    "Authorisation": "",
-    "ReadOnly": "N",
-    "AccessProfiles": "caseworker,caseworker-sscs,caseworker-sscs-clerk",
-    "Disabled": "N"
-  },
-  {
-    "LiveFrom": "18/03/2023",
-    "CaseTypeID": "Benefit",
     "RoleName": "idam:caseworker-sscs-judge",
     "Authorisation": "",
     "ReadOnly": "N",
@@ -66,28 +39,10 @@
   {
     "LiveFrom": "18/03/2023",
     "CaseTypeID": "Benefit",
-    "RoleName": "idam:caseworker-sscs-superuser",
-    "Authorisation": "",
-    "ReadOnly": "N",
-    "AccessProfiles": "caseworker,caseworker-sscs,caseworker-sscs-superuser",
-    "Disabled": "N"
-  },
-  {
-    "LiveFrom": "18/03/2023",
-    "CaseTypeID": "Benefit",
     "RoleName": "idam:caseworker-sscs-registrar",
     "Authorisation": "",
     "ReadOnly": "N",
     "AccessProfiles": "caseworker,caseworker-sscs,caseworker-sscs-registrar",
-    "Disabled": "N"
-  },
-  {
-    "LiveFrom": "18/03/2023",
-    "CaseTypeID": "Benefit",
-    "RoleName": "idam:caseworker-sscs-anonymouscitizen",
-    "Authorisation": "",
-    "ReadOnly": "N",
-    "AccessProfiles": "caseworker,caseworker-sscs,caseworker-sscs-anonymouscitizen",
     "Disabled": "N"
   },
   {
@@ -102,19 +57,47 @@
   {
     "LiveFrom": "18/03/2023",
     "CaseTypeID": "Benefit",
-    "RoleName": "idam:caseworker-sscs-bulkscan",
+    "RoleName": "idam:caseworker-sscs-hmrcresponsewriter",
+    "CaseAccessCategories": "taxCredit,guardiansAllowance,tax-freeChildcare,homeResponsibilitiesProtection,childBenefit,30HoursFreeChildcare,guaranteedMinimumPension,nationalInsuranceCredits",
     "Authorisation": "",
     "ReadOnly": "N",
-    "AccessProfiles": "caseworker,caseworker-sscs,caseworker-sscs-bulkscan",
+    "AccessProfiles": "caseworker,caseworker-sscs,caseworker-sscs-hmrcresponsewriter",
     "Disabled": "N"
   },
   {
     "LiveFrom": "18/03/2023",
     "CaseTypeID": "Benefit",
-    "RoleName": "idam:caseworker-sscs-teamleader",
+    "RoleName": "idam:caseworker-sscs-systemupdate",
     "Authorisation": "",
     "ReadOnly": "N",
-    "AccessProfiles": "caseworker,caseworker-sscs,caseworker-sscs-teamleader",
+    "AccessProfiles": "caseworker,caseworker-sscs,caseworker-sscs-systemupdate",
+    "Disabled": "N"
+  },
+  {
+    "LiveFrom": "18/03/2023",
+    "CaseTypeID": "Benefit",
+    "RoleName" : "idam:caseworker-wa-task-configuration",
+    "Authorisation": "",
+    "ReadOnly": "N",
+    "AccessProfiles": "caseworker,caseworker-sscs,caseworker-wa-task-configuration",
+    "Disabled": "N"
+  },
+  {
+    "LiveFrom": "18/03/2023",
+    "CaseTypeID": "Benefit",
+    "RoleName": "idam:caseworker-sscs-anonymouscitizen",
+    "Authorisation": "",
+    "ReadOnly": "N",
+    "AccessProfiles": "caseworker,caseworker-sscs,caseworker-sscs-anonymouscitizen",
+    "Disabled": "N"
+  },
+  {
+    "LiveFrom": "18/03/2023",
+    "CaseTypeID": "Benefit",
+    "RoleName": "idam:caseworker-sscs-bulkscan",
+    "Authorisation": "",
+    "ReadOnly": "N",
+    "AccessProfiles": "caseworker,caseworker-sscs,caseworker-sscs-bulkscan",
     "Disabled": "N"
   },
   {
@@ -129,30 +112,10 @@
   {
     "LiveFrom": "18/03/2023",
     "CaseTypeID": "Benefit",
-    "RoleName": "idam:caseworker-sscs",
-    "CaseAccessCategories": "doNotRemove",
-    "Authorisation": "",
-    "ReadOnly": "N",
-    "AccessProfiles": "caseworker-sscs",
-    "Disabled": "N"
-  },
-  {
-    "LiveFrom": "18/03/2023",
-    "CaseTypeID": "Benefit",
     "RoleName": "[CREATOR]",
     "Authorisation": "",
     "ReadOnly": "N",
     "AccessProfiles": "[CREATOR]",
-    "Disabled": "N"
-  },
-  {
-    "LiveFrom": "18/03/2023",
-    "CaseTypeID": "Benefit",
-    "RoleName": "idam:caseworker-sscs-hmrcresponsewriter",
-    "CaseAccessCategories": "taxCredit,guardiansAllowance,tax-freeChildcare,homeResponsibilitiesProtection,childBenefit,30HoursFreeChildcare,guaranteedMinimumPension,nationalInsuranceCredits",
-    "Authorisation": "",
-    "ReadOnly": "N",
-    "AccessProfiles": "caseworker,caseworker-sscs,caseworker-sscs-hmrcresponsewriter",
     "Disabled": "N"
   },
   {
