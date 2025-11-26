@@ -225,7 +225,7 @@ def setAatEnvVars() {
     env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
     env.EM_STITCHING_API_URL = "http://em-stitching-aat.service.core-compute-aat.internal"
     env.ENVIRONMENT = "aat"
-    env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
+    env.WORK_ALLOCATION_FEATURE_ENABLED = 'true'
 }
 
 def setPreviewEnvVars() {
