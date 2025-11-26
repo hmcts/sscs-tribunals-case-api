@@ -331,6 +331,10 @@ ccd:
       readinessDelay: 120
       livenessDelay: 120
       ingressHost: am-role-assignment-service-${SERVICE_FQDN}
+      devmemoryRequests: 1024Mi
+      devcpuRequests: 250m
+      devmemoryLimits: 2048Mi
+      devcpuLimits: 1500m
       autoscaling:
         enabled: false
         minReplicas: 1
