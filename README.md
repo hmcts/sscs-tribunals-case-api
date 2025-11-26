@@ -19,9 +19,9 @@ The SSCS Tribunals Case API is part of the SSCS ecosystem, enabling appellants t
 
 ## Prerequisites
 
-- **Java 21** - Required for running the application
-- **Spring Boot** - Framework for building the application
-- **Gradle** - Build tool for managing dependencies and tasks
+- **Java 21** - Required for running the application.
+- **Spring Boot** - Framework for building the application.
+- **Gradle** - Build tool for managing dependencies and tasks.
 - **Docker** - Used for containerizing the application and running dependencies such as CCD and Pact Broker locally. Ensure Docker is installed and running on your machine. [Download Docker](https://www.docker.com/products/docker-desktop)
 
 For versions and a complete list of dependencies, see `build.gradle`.
