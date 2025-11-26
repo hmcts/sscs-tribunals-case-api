@@ -8,8 +8,8 @@ import uk.gov.hmcts.contino.GithubAPI
 def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
-def dmnBranch = "SSCSCI-2096"
-def waStandaloneBranch = "SSCSCI-2096"
+def dmnBranch = "master"
+def waStandaloneBranch = "master"
 
 def secrets = [
         'sscs-${env}': [
@@ -155,7 +155,7 @@ withPipeline(type, product, component) {
     }
     onDemo {
         env.ENVIRONMENT = "demo"
-        env.WORK_ALLOCATION_FEATURE_ENABLED = 'true'
+        env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
     }
     onPerftest {
         env.ENVIRONMENT = "perftest"
