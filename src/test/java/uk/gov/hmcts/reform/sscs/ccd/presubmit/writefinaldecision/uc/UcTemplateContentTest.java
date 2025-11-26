@@ -5,7 +5,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scena
 import static uk.gov.hmcts.reform.sscs.util.DateUtilities.today;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -14,8 +13,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcScenario;
 
 class UcTemplateContentTest {
-
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    
     private final UcTemplateContent content = new UcTemplateContentUnderTest();
 
     @Test

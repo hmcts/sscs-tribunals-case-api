@@ -155,8 +155,5 @@ public class UcWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisi
         builder.schedule9Paragraph4Applicable(caseData.getSscsUcCaseData().getDoesSchedule9Paragraph4Apply() == null ? null :  caseData.getSscsUcCaseData().getDoesSchedule9Paragraph4Apply().toBoolean());
         builder.supportGroupOnly(caseData.isSupportGroupOnlyAppeal());
         builder.ucCapabilityAssessmentStartDate(Optional.ofNullable(caseData.getSscsUcCaseData().getUcWriteFinalDecisionWorkCapabilityAssessmentStartDate()).map(LocalDate::parse).orElse(null));
-
     }
-
-
 }

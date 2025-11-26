@@ -328,7 +328,7 @@
     "CaseFieldID": "ucWriteFinalDecisionWorkCapabilityAssessmentStartDate",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
-    "LiveFrom": "19/11/2025",
+    "LiveFrom": "26/11/2025",
     "PageDisplayOrder": 8,
     "PageFieldDisplayOrder": 4,
     "PageID": "workCapabilityAssessment",
