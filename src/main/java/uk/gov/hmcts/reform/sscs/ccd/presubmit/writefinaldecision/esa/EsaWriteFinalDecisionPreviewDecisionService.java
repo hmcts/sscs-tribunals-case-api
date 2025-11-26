@@ -148,7 +148,7 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
         builder.regulation29Applicable(caseData.getSscsEsaCaseData().getDoesRegulation29Apply() == null ? null : caseData.getSscsEsaCaseData().getDoesRegulation29Apply().toBoolean());
         builder.regulation35Applicable(caseData.getSscsEsaCaseData().getDoesRegulation35Apply() == null ? null : caseData.getSscsEsaCaseData().getDoesRegulation35Apply().toBoolean());
         builder.supportGroupOnly(caseData.isSupportGroupOnlyAppeal());
-        builder.esaRegulationsYear(nonNull(caseData.getSscsEsaCaseData().getWhichEsaRegulationsApply()) ? caseData.getSscsEsaCaseData().getWhichEsaRegulationsApply().getValue().getCode() : null);
+        builder.esaRegulationsYear(nonNull(caseData.getSscsEsaCaseData().getWhichEsaRegulationsApply()) ? caseData.getSscsEsaCaseData().getWhichEsaRegulationsApply() : null);
 
     }
 

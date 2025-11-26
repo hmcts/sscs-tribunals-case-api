@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
 import static java.util.Collections.emptyList;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -16,7 +15,6 @@ import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicRadioList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
@@ -269,24 +267,6 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals(showWorkCapabilityPage, response.getData().getShowWorkCapabilityAssessmentPage());
-    }
-
-    @Test
-    public void shouldApplyDefaultValuesToEsaRegulationsApplyIfNotAlreadyPopulated() {
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-        assertThat(response.getData().getSscsEsaCaseData().getWhichEsaRegulationsApply()).isNotNull();
-    }
-
-    @Test
-    public void shouldNotApplyDefaultValuesToEsaRegulationsApplyIfAlreadyPopulated() {
-        sscsCaseData.getSscsEsaCaseData().setWhichEsaRegulationsApply(new DynamicRadioList(null, emptyList()));
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getSscsEsaCaseData().getWhichEsaRegulationsApply()).isNotNull();
-        assertThat(response.getData().getSscsEsaCaseData().getWhichEsaRegulationsApply().getListItems()).isEmpty();
     }
 
 }

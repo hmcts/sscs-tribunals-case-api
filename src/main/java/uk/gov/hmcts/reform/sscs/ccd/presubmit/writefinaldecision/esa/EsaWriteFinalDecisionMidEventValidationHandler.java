@@ -32,9 +32,6 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
         if (sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply() == null) {
             sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         }
-        if (sscsCaseData.getSscsEsaCaseData().getWhichEsaRegulationsApply() == null) {
-            sscsCaseData.getSscsEsaCaseData().setWhichEsaRegulationsApply(sscsCaseData.getSscsEsaCaseData().defaultEsaRegulationsYears());
-        }
     }
 
     @Override

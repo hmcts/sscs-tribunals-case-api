@@ -293,12 +293,7 @@
       ],
       "caseCreated":"2020-11-05",
       "region":"BRADFORD",
-      "whichEsaRegulationsApply" : {
-        "value" : {
-          "code" : "2013",
-          "label" : "2013"
-        }
-      }
+      "whichEsaRegulationsApply" : "2013"
     },
     "data_classification":{
       "caseCode":"PUBLIC",
