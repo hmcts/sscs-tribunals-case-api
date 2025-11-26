@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
-import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -10,10 +9,13 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import jakarta.validation.Validator;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Collections;
+import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
@@ -22,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecis
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerTestBase;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 
+@RunWith(JUnitParamsRunner.class)
 public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFinalDecisionMidEventValidationHandlerTestBase {
 
     @Override
@@ -32,7 +35,8 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     @Override
     protected void setValidPointsAndActivitiesScenario(SscsCaseData caseData, String descriptorFlowValue) {
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.NO);
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(List.of("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(
+                Arrays.asList("mobilisingUnaided"));
 
         // < 15 points - correct for these fields
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1b");
@@ -50,8 +54,8 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
     @Override
     protected void setEmptyActivitiesListScenario(SscsCaseData caseData) {
-        caseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(emptyList());
-        caseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMentalAssessmentQuestion(emptyList());
+        caseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Collections.emptyList());
+        caseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMentalAssessmentQuestion(Collections.emptyList());
     }
 
     @Override
@@ -80,7 +84,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(List.of("schedule3MobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("schedule3MobilisingUnaided"));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -130,8 +134,13 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
-    @Parameters({"YES, NO", "NO,YES", "null, NO"})
-    public void givenEsaCaseWithWcaAppealFlow_thenSetShowSummaryOfOutcomePage(@Nullable YesNo wcaFlow, YesNo expectedShowResult) {
+    @Parameters({
+        "YES, NO",
+        "NO,YES",
+        "null, NO"
+    })
+    public void givenEsaCaseWithWcaAppealFlow_thenSetShowSummaryOfOutcomePage(
+            @Nullable YesNo wcaFlow, YesNo expectedShowResult) {
 
         sscsCaseData.setWcaAppeal(wcaFlow);
 
@@ -157,8 +166,17 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
-    @Parameters({"YES, allowed, YES", "YES, refused, NO", "NO, allowed, NO", "NO, refused, NO", "null, allowed, NO", "NO, null, NO", "null, null, NO",})
-    public void givenEsaCaseWithWcaAppealFlowAndAllowedFlow_thenSetShowDwpReassessAwardPage(@Nullable YesNo wcaFlow, @Nullable String allowedFlow, YesNo expectedShowResult) {
+    @Parameters({
+        "YES, allowed, YES",
+        "YES, refused, NO",
+        "NO, allowed, NO",
+        "NO, refused, NO",
+        "null, allowed, NO",
+        "NO, null, NO",
+        "null, null, NO",
+    })
+    public void givenEsaCaseWithWcaAppealFlowAndAllowedFlow_thenSetShowDwpReassessAwardPage(
+            @Nullable YesNo wcaFlow, @Nullable String allowedFlow, YesNo expectedShowResult) {
 
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         sscsCaseData.setWcaAppeal(wcaFlow);
