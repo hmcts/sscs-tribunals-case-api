@@ -120,8 +120,18 @@ public class CftlibConfig implements CFTLibConfigurer {
             "caseworker-wa-task-configuration",
             "caseworker-ras-validation",
             "GS_profile");
-        var def = Files.readAllBytes(Path.of("./definitions/benefit/CCD_SSCSDefinition_LOCAL.xlsx"));
-        lib.importDefinition(def);
+
+        try (var paths = Files.list(Path.of("./definitions"))) {
+            paths.filter(p -> p.getFileName().toString().startsWith("benefit"))
+                .filter(Files::isDirectory)
+                .forEach(p -> {
+                    try {
+                        lib.importDefinition(Files.readAllBytes(p.resolve("CCD_SSCSDefinition_LOCAL.xlsx")));
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+        }
 
         var roleAssignments =
             Resources.toString(

@@ -14,14 +14,14 @@ if [ -z "$TYPE" ] || [ -z "$VERSION" ] || [ -z "$ENV" ]; then
 fi
 
 case $TYPE in
-    "benefit")
+    benefit|benefit-pr-[0-9]*)
         CASE_TYPE_XLSX_NAME="SSCS"
         ;;
     "bulkscan")
         CASE_TYPE_XLSX_NAME="BulkScanning"
         ;;
     *)
-        echo "Type must be 'benefit' or 'bulkscan'"
+        echo "Type must be 'benefit' or match patter 'benefit-pr-<number>' or 'bulkscan'"
         exit 1
         ;;
 esac
@@ -59,7 +59,7 @@ elif [ "$ENV" = "pr" ]; then
     EM_CCD_ORCHESTRATOR_URL=${EM_CCD_ORCHESTRATOR_URL:="https://em-ccdorc-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"}
     TRIBUNALS_API_URL=${TRIBUNALS_API_URL:="https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"}
     BULK_SCAN_ORCHESTRATOR_URL="http://bulk-scan-orchestrator-aat.service.core-compute-aat.internal"
-elif [ "$ENV" = "aat" ] || [ "$ENV" = "demo" ] || [ "$ENV" = "prod" ] || [ "$ENV" = "perftest" ] || [ "$ENV" = "ithc" ]; then
+elif [ "$ENV" = "aat" ] || [ "$ENV" = "demo" ] || [ "$ENV" = "demo-int" ] || [ "$ENV" = "prod" ] || [ "$ENV" = "perftest" ] || [ "$ENV" = "ithc" ]; then
     EM_CCD_ORCHESTRATOR_URL="http://em-ccd-orchestrator-${ENV}.service.core-compute-${ENV}.internal"
     TRIBUNALS_API_URL="http://sscs-tribunals-api-${ENV}.service.core-compute-${ENV}.internal"
     BULK_SCAN_ORCHESTRATOR_URL="http://bulk-scan-orchestrator-${ENV}.service.core-compute-${ENV}.internal"
@@ -83,7 +83,7 @@ case ${ENV} in
     MYA_REPRESENTATIVE_LINK="http://sscs-cor.aat.platform.hmcts.net/sign-in?tya=\${subscriptions.representativeSubscription.tya}"
     MYA_APPOINTEE_LINK="http://sscs-cor.aat.platform.hmcts.net/sign-in?tya=\${subscriptions.appointeeSubscription.tya}"
   ;;
-  demo)
+  demo|demo-int)
     TYA_LINK="https://sscs-tya-frontend-${ENV}.service.core-compute-${ENV}.internal/validate-surname/\${subscriptions.appellantSubscription.tya}/trackyourappeal"
     TYA_APPOINTEE_LINK="https://sscs-tya-frontend-${ENV}.service.core-compute-${ENV}.internal/validate-surname/\${subscriptions.appointeeSubscription.tya}/trackyourappeal"
     MYA_LINK="https://sscs-cor.demo.platform.hmcts.net/sign-in?tya=\${subscriptions.appellantSubscription.tya}"
