@@ -27,7 +27,7 @@ public abstract class UcTemplateContent extends WriteFinalDecisionTemplateConten
     public abstract UcScenario getScenario();
 
     public String getDoesNotHaveLimitedCapabilityForWorkSentence(String appellantName) {
-        return appellantName + " does not have limited capability for work and cannot be treated as having limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to " + getUsageDependentBenefitTypeString() + ".";
+        return appellantName + " does not have limited capability for work and cannot be treated as having limited capability for work.";
     }
 
     public String getDoesNotHaveLimitedCapabilityForWorkNoSchedule7Sentence(String appellantName) {
