@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.functional.tyanotifications.sya.notifications;
 
-import static java.time.Duration.ofMinutes;
 import static java.time.Duration.ofSeconds;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.hasSize;
@@ -455,7 +454,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     @Test
     public void shouldSaveReasonableAdjustmentNotificationForAppellant() throws IOException {
         simulateCcdCallback(APPEAL_RECEIVED, BASE_PATH_TYAN + APPEAL_RECEIVED.getId() + "AppellantReasonableAdjustmentCallback.json");
-        await().pollInterval(ofSeconds(2)).atMost(ofMinutes(2)).until(() -> tryFetchNotificationsForTestCaseWithFlag(true, null, appealReceivedAppellantEmailId), hasSize(1));
+        await().pollInterval(ofSeconds(2)).atMost(ofSeconds(30)).until(() -> tryFetchNotificationsForTestCaseWithFlag(true, null, appealReceivedAppellantEmailId), hasSize(1));
 
         SscsCaseData caseData = getSscsCaseDataWithReasonableAdjustmentsOutstanding();
 
