@@ -54,6 +54,8 @@ am-org-role-mapping-service:
     devcpuRequests: 250m
     devmemoryLimits: 2048Mi
     devcpuLimits: 1500m
+    readinessDelay: 120
+    livenessDelay: 120
     secrets:
       SB_ACCESS_KEY:
         secretRef: sscs-sb-preview
@@ -117,8 +119,8 @@ aac-manage-case-assignment:
     releaseNameOverride: ${SERVICE_NAME}-aac-manage-case-assignment
     image: hmctspublic.azurecr.io/aac/manage-case-assignment:latest
     ingressHost: aac-${SERVICE_FQDN}
-    readinessDelay: 60
-    livenessDelay: 60
+    readinessDelay: 120
+    livenessDelay: 120
     environment:
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
@@ -326,6 +328,8 @@ ccd:
 
   am-role-assignment-service:
     java:
+      readinessDelay: 120
+      livenessDelay: 120
       ingressHost: am-role-assignment-service-${SERVICE_FQDN}
       autoscaling:
         enabled: false
