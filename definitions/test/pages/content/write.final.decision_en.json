@@ -136,6 +136,9 @@
   "workCapabilitiesAssessmentPageHeading": "Work capability assessment",
   "isThisAWCAAppeal": "Is this a WCA appeal?",
   "isThisASupportGroupOnlyAppealLabel": "Is this a support group only appeal?",
+  "whichEsaRegulationsApplyLabel": "Which ESA Regulations apply?",
+  "esaRegulations2008Label": "2008",
+  "esaRegulations2013Label": "2013",
 
   "schedule7ActivitiesPageHeading": "Schedule 7 activities",
   "schedule7ActivitiesLabel": "Schedule 7 Activities",
