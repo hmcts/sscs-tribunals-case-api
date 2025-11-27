@@ -250,9 +250,5 @@ Elastic indices may be missing on preview. Recreate them by logging into CCD adm
 
 This avoids re-triggering the pipeline build and saves time.
 
-### Work allocation in preview
-Work allocation is now enabled in preview. To enable work allocation in preview, you need to add the `pr-values:wa` label to your PR. This will ensure that the work allocation service is started and configured correctly for the preview environment.
-If some events are not triggering WA tasks, or are not being recognised by the WA service, double check that the case-event.json entry for the event has the `Publish` field set to `"Y"`. If it is not set, then CCD will not publish the event to the message listener and the WA service will not be able to process it.
-
 ### Local DM Store Not Healthy (DOWN or UNKNOWN)
 If this is the first time that the container has been created then it may need to be restarted multiple times in order for it to come up successfully!
