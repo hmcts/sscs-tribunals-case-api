@@ -50,6 +50,20 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         this.venueDataLoader = venueDataLoader;
     }
 
+    public abstract String getBenefitType();
+
+    private static String getTemplateId(final DocumentConfiguration documentConfiguration, final LanguagePreference languagePreference) {
+        Map<EventType, String> eventTypeStringMap = documentConfiguration.getDocuments().get(languagePreference);
+        if (eventTypeStringMap == null) {
+            throw new IllegalStateException("Unable to obtain benefit specific documents for language:" + languagePreference);
+        }
+        String templateId = eventTypeStringMap.get(EventType.ISSUE_FINAL_DECISION);
+        if (templateId == null) {
+            throw new IllegalStateException("Unable to obtain template id for ISSUE_FINAL_DECISION and language:" + languagePreference);
+        }
+        return templateId;
+    }
+
     @Override
     protected NoticeIssuedTemplateBody createPayload(PreSubmitCallbackResponse<SscsCaseData> response,
                                                      SscsCaseData caseData, String documentTypeLabel,
@@ -191,6 +205,22 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
     protected abstract void setTemplateContent(DecisionNoticeOutcomeService outcomeService, PreSubmitCallbackResponse<SscsCaseData> response,
                                                NoticeIssuedTemplateBodyBuilder builder, SscsCaseData caseData, WriteFinalDecisionTemplateBody payload);
 
+    private void setHearings(WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder, SscsCaseData caseData) {
+        String heldAt = SscsUtil.buildWriteFinalDecisionHeldAt(caseData, venueDataLoader);
+
+        if (!IN_CHAMBERS.equals(heldAt)) {
+            HearingDetails finalHearing = getLastValidHearing(caseData);
+
+            if (nonNull(finalHearing) && nonNull(finalHearing.getHearingDate())) {
+                writeFinalDecisionBuilder.heldOn(LocalDate.parse(finalHearing.getHearingDate()));
+            }
+        } else {
+            writeFinalDecisionBuilder.heldOn(LocalDate.now());
+        }
+
+        writeFinalDecisionBuilder.heldAt(heldAt);
+    }
+
     protected abstract void setEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData);
 
     protected abstract void setDescriptorsAndPoints(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData);
@@ -215,6 +245,19 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
             .activityAnswerValue(answer.getActivityAnswerValue())
             .activityQuestionValue(activityQuestion.getValue())
             .build();
+    }
+
+    private void validateRequiredProperties(WriteFinalDecisionTemplateBody payload) {
+        if (payload.getHeldAt() == null && payload.getHeldOn() == null) {
+            throw new IllegalStateException("Unable to determine hearing date or venue");
+        } else if (payload.getHeldOn() == null) {
+            throw new IllegalStateException("Unable to determine hearing date");
+        } else if (payload.getHeldAt() == null) {
+            throw new IllegalStateException("Unable to determine hearing venue");
+        }
+        if (payload.getDateOfDecision() == null) {
+            throw new IllegalStateException("Unable to determine date of decision");
+        }
     }
 
     protected String buildHeldBefore(SscsCaseData caseData, String userAuthorisation, boolean isPostHearingsEnabled) {
@@ -246,48 +289,5 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         if (eventType == EventType.WRITE_FINAL_DECISION) {
             sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGeneratedDate(LocalDate.now().toString());
         }
-    }
-
-    public abstract String getBenefitType();
-
-    private void setHearings(WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder, SscsCaseData caseData) {
-        String heldAt = SscsUtil.buildWriteFinalDecisionHeldAt(caseData, venueDataLoader);
-
-        if (!IN_CHAMBERS.equals(heldAt)) {
-            HearingDetails finalHearing = getLastValidHearing(caseData);
-
-            if (nonNull(finalHearing) && nonNull(finalHearing.getHearingDate())) {
-                writeFinalDecisionBuilder.heldOn(LocalDate.parse(finalHearing.getHearingDate()));
-            }
-        } else {
-            writeFinalDecisionBuilder.heldOn(LocalDate.now());
-        }
-
-        writeFinalDecisionBuilder.heldAt(heldAt);
-    }
-
-    private void validateRequiredProperties(WriteFinalDecisionTemplateBody payload) {
-        if (payload.getHeldAt() == null && payload.getHeldOn() == null) {
-            throw new IllegalStateException("Unable to determine hearing date or venue");
-        } else if (payload.getHeldOn() == null) {
-            throw new IllegalStateException("Unable to determine hearing date");
-        } else if (payload.getHeldAt() == null) {
-            throw new IllegalStateException("Unable to determine hearing venue");
-        }
-        if (payload.getDateOfDecision() == null) {
-            throw new IllegalStateException("Unable to determine date of decision");
-        }
-    }
-
-    private static String getTemplateId(final DocumentConfiguration documentConfiguration, final LanguagePreference languagePreference) {
-        Map<EventType, String> eventTypeStringMap = documentConfiguration.getDocuments().get(languagePreference);
-        if (eventTypeStringMap == null) {
-            throw new IllegalStateException("Unable to obtain benefit specific documents for language:" + languagePreference);
-        }
-        String templateId = eventTypeStringMap.get(EventType.ISSUE_FINAL_DECISION);
-        if (templateId == null) {
-            throw new IllegalStateException("Unable to obtain template id for ISSUE_FINAL_DECISION and language:" + languagePreference);
-        }
-        return templateId;
     }
 }
