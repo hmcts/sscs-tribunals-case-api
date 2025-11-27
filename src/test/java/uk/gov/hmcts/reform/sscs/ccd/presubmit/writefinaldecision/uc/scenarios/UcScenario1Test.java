@@ -15,24 +15,25 @@ class UcScenario1Test {
 
     @Test
     void testScenario1() {
-        List<Descriptor> schedule6Descriptors =
-            singletonList(Descriptor.builder()
-                              .activityQuestionValue("Mobilising Unaided")
-                              .activityAnswerValue("1")
-                              .activityAnswerLetter("c").activityAnswerPoints(9).build());
+        List<Descriptor> schedule6Descriptors = singletonList(Descriptor.builder()
+            .activityQuestionValue("Mobilising Unaided")
+            .activityAnswerValue("1")
+            .activityAnswerLetter("c")
+            .activityAnswerPoints(9)
+            .build());
 
-        WriteFinalDecisionTemplateBody body =
-            WriteFinalDecisionTemplateBody.builder()
-                .hearingType("faceToFace")
-                .attendedHearing(true)
-                .presentingOfficerAttended(true)
-                .dateOfDecision("2020-09-20")
-                .ucNumberOfPoints(9)
-                .pageNumber("A1")
-                .appellantName("Felix Sydney")
-                .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
-                .anythingElse("Something else")
-                .ucSchedule6Descriptors(schedule6Descriptors).build();
+        WriteFinalDecisionTemplateBody body = WriteFinalDecisionTemplateBody.builder()
+            .hearingType("faceToFace")
+            .attendedHearing(true)
+            .presentingOfficerAttended(true)
+            .dateOfDecision("2020-09-20")
+            .ucNumberOfPoints(9)
+            .pageNumber("A1")
+            .appellantName("Felix Sydney")
+            .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
+            .anythingElse("Something else")
+            .ucSchedule6Descriptors(schedule6Descriptors)
+            .build();
 
         UcTemplateContent content = UcScenario.SCENARIO_1.getContent(body);
 
@@ -66,24 +67,25 @@ class UcScenario1Test {
 
     @Test
     void testScenario1WhenAnythingElseBlank() {
-        List<Descriptor> schedule6Descriptors =
-            singletonList(Descriptor.builder()
-                              .activityQuestionValue("Mobilising Unaided")
-                              .activityAnswerValue("1")
-                              .activityAnswerLetter("c").activityAnswerPoints(9).build());
+        List<Descriptor> schedule6Descriptors = singletonList(Descriptor.builder()
+            .activityQuestionValue("Mobilising Unaided")
+            .activityAnswerValue("1")
+            .activityAnswerLetter("c")
+            .activityAnswerPoints(9)
+            .build());
 
-        WriteFinalDecisionTemplateBody body =
-            WriteFinalDecisionTemplateBody.builder()
-                .hearingType("faceToFace")
-                .attendedHearing(true)
-                .presentingOfficerAttended(true)
-                .dateOfDecision("2020-09-20")
-                .ucNumberOfPoints(9)
-                .pageNumber("A1")
-                .appellantName("Felix Sydney")
-                .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
-                .anythingElse(" ")
-                .ucSchedule6Descriptors(schedule6Descriptors).build();
+        WriteFinalDecisionTemplateBody body = WriteFinalDecisionTemplateBody.builder()
+            .hearingType("faceToFace")
+            .attendedHearing(true)
+            .presentingOfficerAttended(true)
+            .dateOfDecision("2020-09-20")
+            .ucNumberOfPoints(9)
+            .pageNumber("A1")
+            .appellantName("Felix Sydney")
+            .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
+            .anythingElse(" ")
+            .ucSchedule6Descriptors(schedule6Descriptors)
+            .build();
 
         UcTemplateContent content = UcScenario.SCENARIO_1.getContent(body);
 
@@ -117,18 +119,18 @@ class UcScenario1Test {
     void testScenario1NoSchedule6() {
         List<Descriptor> schedule6Descriptors = emptyList();
 
-        WriteFinalDecisionTemplateBody body =
-            WriteFinalDecisionTemplateBody.builder()
-                .hearingType("faceToFace")
-                .attendedHearing(true)
-                .presentingOfficerAttended(true)
-                .dateOfDecision("2020-09-20")
-                .ucNumberOfPoints(0)
-                .pageNumber("A1")
-                .appellantName("Felix Sydney")
-                .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
-                .anythingElse("Something else")
-                .ucSchedule6Descriptors(schedule6Descriptors).build();
+        WriteFinalDecisionTemplateBody body = WriteFinalDecisionTemplateBody.builder()
+            .hearingType("faceToFace")
+            .attendedHearing(true)
+            .presentingOfficerAttended(true)
+            .dateOfDecision("2020-09-20")
+            .ucNumberOfPoints(0)
+            .pageNumber("A1")
+            .appellantName("Felix Sydney")
+            .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
+            .anythingElse("Something else")
+            .ucSchedule6Descriptors(schedule6Descriptors)
+            .build();
 
         UcTemplateContent content = UcScenario.SCENARIO_1.getContent(body);
 
@@ -159,25 +161,26 @@ class UcScenario1Test {
 
     @Test
     void testScenario1IsIbc() {
-        List<Descriptor> schedule6Descriptors =
-            singletonList(Descriptor.builder()
-                              .activityQuestionValue("Mobilising Unaided")
-                              .activityAnswerValue("1")
-                              .activityAnswerLetter("c").activityAnswerPoints(9).build());
+        List<Descriptor> schedule6Descriptors = singletonList(Descriptor.builder()
+            .activityQuestionValue("Mobilising Unaided")
+            .activityAnswerValue("1")
+            .activityAnswerLetter("c")
+            .activityAnswerPoints(9)
+            .build());
 
-        WriteFinalDecisionTemplateBody body =
-            WriteFinalDecisionTemplateBody.builder()
-                .hearingType("faceToFace")
-                .attendedHearing(true)
-                .presentingOfficerAttended(true)
-                .dateOfDecision("2020-09-20")
-                .ucNumberOfPoints(9)
-                .pageNumber("A1")
-                .appellantName("Felix Sydney")
-                .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
-                .anythingElse("Something else")
-                .isIbca(true)
-                .ucSchedule6Descriptors(schedule6Descriptors).build();
+        WriteFinalDecisionTemplateBody body = WriteFinalDecisionTemplateBody.builder()
+            .hearingType("faceToFace")
+            .attendedHearing(true)
+            .presentingOfficerAttended(true)
+            .dateOfDecision("2020-09-20")
+            .ucNumberOfPoints(9)
+            .pageNumber("A1")
+            .appellantName("Felix Sydney")
+            .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
+            .anythingElse("Something else")
+            .isIbca(true)
+            .ucSchedule6Descriptors(schedule6Descriptors)
+            .build();
 
         UcTemplateContent content = UcScenario.SCENARIO_1.getContent(body);
 

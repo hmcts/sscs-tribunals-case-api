@@ -11,21 +11,21 @@ public class UcScenario2Test {
 
     @Test
     public void testScenario2() {
-        WriteFinalDecisionTemplateBody body =
-            WriteFinalDecisionTemplateBody.builder()
-                .hearingType("faceToFace")
-                .attendedHearing(true)
-                .presentingOfficerAttended(true)
-                .isAllowed(false)
-                .isSetAside(false)
-                .dateOfDecision("2020-09-20")
-                .ucNumberOfPoints(null)
-                .pageNumber("A1")
-                .appellantName("Felix Sydney")
-                .schedule9Paragraph4Applicable(false)
-                .supportGroupOnly(true)
-                .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
-                .anythingElse("Something else").build();
+        WriteFinalDecisionTemplateBody body = WriteFinalDecisionTemplateBody.builder()
+            .hearingType("faceToFace")
+            .attendedHearing(true)
+            .presentingOfficerAttended(true)
+            .isAllowed(false)
+            .isSetAside(false)
+            .dateOfDecision("2020-09-20")
+            .ucNumberOfPoints(null)
+            .pageNumber("A1")
+            .appellantName("Felix Sydney")
+            .schedule9Paragraph4Applicable(false)
+            .supportGroupOnly(true)
+            .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
+            .anythingElse("Something else")
+            .build();
 
         UcTemplateContent content = UcScenario.SCENARIO_2.getContent(body);
 

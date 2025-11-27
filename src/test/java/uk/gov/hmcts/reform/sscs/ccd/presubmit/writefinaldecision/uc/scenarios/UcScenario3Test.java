@@ -1,9 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios;
 
-import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.sscs.util.DateUtilities.today;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcTemplateContent;
@@ -13,9 +12,23 @@ public class UcScenario3Test {
 
     @Test
     public void testScenario3() {
-        WriteFinalDecisionTemplateBody body = WriteFinalDecisionTemplateBody.builder().hearingType("faceToFace").attendedHearing(true).presentingOfficerAttended(true).isAllowed(true).isSetAside(
-            true).dateOfDecision("2020-09-20").ucNumberOfPoints(null).pageNumber("A1").appellantName("Felix Sydney").schedule9Paragraph4Applicable(true).supportGroupOnly(true).reasonsForDecision(
-            Arrays.asList("My first reasons", "My second reasons")).anythingElse("Something else").dwpReassessTheAward("doNotReassess12").ucCapabilityAssessmentStartDate(now()).build();
+        WriteFinalDecisionTemplateBody body = WriteFinalDecisionTemplateBody.builder()
+            .hearingType("faceToFace")
+            .attendedHearing(true)
+            .presentingOfficerAttended(true)
+            .isAllowed(true)
+            .isSetAside(true)
+            .dateOfDecision("2020-09-20")
+            .ucNumberOfPoints(null)
+            .pageNumber("A1")
+            .appellantName("Felix Sydney")
+            .schedule9Paragraph4Applicable(true)
+            .supportGroupOnly(true)
+            .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
+            .anythingElse("Something else")
+            .dwpReassessTheAward("doNotReassess12")
+            .ucCapabilityAssessmentStartDate(LocalDate.of(2025, 11, 18))
+            .build();
 
         UcTemplateContent content = UcScenario.SCENARIO_3.getContent(body);
 
@@ -24,14 +37,14 @@ public class UcScenario3Test {
             
             The decision made by the Secretary of State on 20/09/2020 is set aside.
             
-            Felix Sydney is to be treated as having limited capability for work-related activity from %s.
+            Felix Sydney is to be treated as having limited capability for work-related activity from 18/11/2025.
             
             The Secretary of State has accepted that Felix Sydney has limited capability for work. This was not in issue.
             
             No activity or descriptor from Schedule 7 of the Universal Credit (UC) Regulations 2013 was satisfied but Schedule 9, paragraph 4 of the UC Regulations applied.
             
-            The tribunal applied Schedule 9, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found\
-             not to have limited capability for work-related activity.
+            The tribunal applied Schedule 9, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found \
+            not to have limited capability for work-related activity.
             
             My first reasons
             
@@ -45,7 +58,7 @@ public class UcScenario3Test {
             Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. \
             The Tribunal recommends that the Department does not reassess Felix Sydney within 12 months from today's date.
             
-            """.formatted(today());
+            """;
 
         assertThat(content.getComponents()).hasSize(11);
 

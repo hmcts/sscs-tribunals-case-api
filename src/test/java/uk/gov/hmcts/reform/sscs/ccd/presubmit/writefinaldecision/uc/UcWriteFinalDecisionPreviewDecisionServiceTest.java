@@ -1,6 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
@@ -8,7 +12,11 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -49,7 +57,8 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
     @Override
     protected WriteFinalDecisionPreviewDecisionServiceBase createPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
                                                                                         DocumentConfiguration documentConfiguration) {
-        return new UcWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService, ucDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
+        return new UcWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService, ucDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration,
+            venueDataLoader);
     }
 
     @Override
@@ -144,8 +153,11 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNotNull(body.getUcSchedule6Descriptors().getFirst());
         assertEquals(9, body.getUcSchedule6Descriptors().getFirst().getActivityAnswerPoints());
         assertEquals("c", body.getUcSchedule6Descriptors().getFirst().getActivityAnswerLetter());
-        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.", body.getUcSchedule6Descriptors().getFirst().getActivityAnswerValue());
-        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", body.getUcSchedule6Descriptors().getFirst().getActivityQuestionValue());
+        assertEquals(
+            "Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.",
+            body.getUcSchedule6Descriptors().getFirst().getActivityAnswerValue());
+        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.",
+            body.getUcSchedule6Descriptors().getFirst().getActivityQuestionValue());
         assertEquals("1", body.getUcSchedule6Descriptors().getFirst().getActivityQuestionNumber());
         assertNotNull(body.getUcNumberOfPoints());
         assertEquals(9, body.getUcNumberOfPoints().intValue());
@@ -162,7 +174,11 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertEquals(UcScenario.SCENARIO_1, templateContent.getScenario());
 
         assertEquals(8, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
-        Optional<TemplateComponent<?>> schedule6DescriptorTable = payload.getWriteFinalDecisionTemplateContent().getComponents().stream().filter(c -> UcTemplateComponentId.SCHEDULE_6_DESCRIPTORS.name().equals(c.getId())).findFirst();
+        Optional<TemplateComponent<?>> schedule6DescriptorTable = payload.getWriteFinalDecisionTemplateContent()
+            .getComponents()
+            .stream()
+            .filter(c -> UcTemplateComponentId.SCHEDULE_6_DESCRIPTORS.name().equals(c.getId()))
+            .findFirst();
         assertNotNull(schedule6DescriptorTable);
         Assert.assertTrue(schedule6DescriptorTable.isPresent());
         DescriptorTable table = (DescriptorTable) schedule6DescriptorTable.get();
@@ -231,7 +247,11 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertEquals(UcScenario.SCENARIO_1, templateContent.getScenario());
 
         assertEquals(7, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
-        Optional<TemplateComponent<?>> schedule6DescriptorTable = payload.getWriteFinalDecisionTemplateContent().getComponents().stream().filter(c -> UcTemplateComponentId.SCHEDULE_6_DESCRIPTORS.name().equals(c.getId())).findFirst();
+        Optional<TemplateComponent<?>> schedule6DescriptorTable = payload.getWriteFinalDecisionTemplateContent()
+            .getComponents()
+            .stream()
+            .filter(c -> UcTemplateComponentId.SCHEDULE_6_DESCRIPTORS.name().equals(c.getId()))
+            .findFirst();
         assertNotNull(schedule6DescriptorTable);
         assertFalse(schedule6DescriptorTable.isPresent());
     }
@@ -318,7 +338,8 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         assertEquals(1, response.getErrors().size());
-        assertEquals("You have specified that the appeal is refused, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.", response.getErrors().iterator().next());
+        assertEquals("You have specified that the appeal is refused, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.",
+            response.getErrors().iterator().next());
 
     }
 
@@ -749,8 +770,11 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNotNull(body.getUcSchedule6Descriptors().getFirst());
         assertEquals(15, body.getUcSchedule6Descriptors().getFirst().getActivityAnswerPoints());
         assertEquals("a", body.getUcSchedule6Descriptors().getFirst().getActivityAnswerLetter());
-        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.", body.getUcSchedule6Descriptors().getFirst().getActivityAnswerValue());
-        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", body.getUcSchedule6Descriptors().getFirst().getActivityQuestionValue());
+        assertEquals(
+            "Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.",
+            body.getUcSchedule6Descriptors().getFirst().getActivityAnswerValue());
+        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.",
+            body.getUcSchedule6Descriptors().getFirst().getActivityQuestionValue());
         assertEquals("1", body.getUcSchedule6Descriptors().getFirst().getActivityQuestionNumber());
         assertNotNull(body.getUcNumberOfPoints());
         assertEquals(15, body.getUcNumberOfPoints().intValue());
@@ -826,8 +850,11 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNotNull(body.getUcSchedule6Descriptors().getFirst());
         assertEquals(15, body.getUcSchedule6Descriptors().getFirst().getActivityAnswerPoints());
         assertEquals("a", body.getUcSchedule6Descriptors().getFirst().getActivityAnswerLetter());
-        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.", body.getUcSchedule6Descriptors().getFirst().getActivityAnswerValue());
-        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", body.getUcSchedule6Descriptors().getFirst().getActivityQuestionValue());
+        assertEquals(
+            "Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.",
+            body.getUcSchedule6Descriptors().getFirst().getActivityAnswerValue());
+        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.",
+            body.getUcSchedule6Descriptors().getFirst().getActivityQuestionValue());
         assertEquals("1", body.getUcSchedule6Descriptors().getFirst().getActivityQuestionNumber());
         assertNotNull(body.getUcNumberOfPoints());
         assertEquals(15, body.getUcNumberOfPoints().intValue());
@@ -872,7 +899,8 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         assertEquals(1, response.getErrors().size());
-        assertEquals("You have awarded 15 points or more and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.",
+        assertEquals(
+            "You have awarded 15 points or more and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.",
             response.getErrors().iterator().next());
 
     }
@@ -935,8 +963,11 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNotNull(body.getUcSchedule6Descriptors().getFirst());
         assertEquals(15, body.getUcSchedule6Descriptors().getFirst().getActivityAnswerPoints());
         assertEquals("a", body.getUcSchedule6Descriptors().getFirst().getActivityAnswerLetter());
-        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.", body.getUcSchedule6Descriptors().getFirst().getActivityAnswerValue());
-        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", body.getUcSchedule6Descriptors().getFirst().getActivityQuestionValue());
+        assertEquals(
+            "Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.",
+            body.getUcSchedule6Descriptors().getFirst().getActivityAnswerValue());
+        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.",
+            body.getUcSchedule6Descriptors().getFirst().getActivityQuestionValue());
         assertEquals("1", body.getUcSchedule6Descriptors().getFirst().getActivityQuestionNumber());
         assertNotNull(body.getUcNumberOfPoints());
         assertEquals(15, body.getUcNumberOfPoints().intValue());
@@ -1049,7 +1080,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(1, response.getErrors().size());
-        assertEquals("You have awarded 15 points or more and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.", response.getErrors().iterator().next());
+        assertEquals(
+            "You have awarded 15 points or more and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.",
+            response.getErrors().iterator().next());
     }
 
     @Test
@@ -1110,8 +1143,11 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNotNull(body.getUcSchedule6Descriptors().getFirst());
         assertEquals(15, body.getUcSchedule6Descriptors().getFirst().getActivityAnswerPoints());
         assertEquals("a", body.getUcSchedule6Descriptors().getFirst().getActivityAnswerLetter());
-        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.", body.getUcSchedule6Descriptors().getFirst().getActivityAnswerValue());
-        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", body.getUcSchedule6Descriptors().getFirst().getActivityQuestionValue());
+        assertEquals(
+            "Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.",
+            body.getUcSchedule6Descriptors().getFirst().getActivityAnswerValue());
+        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.",
+            body.getUcSchedule6Descriptors().getFirst().getActivityQuestionValue());
         assertEquals("1", body.getUcSchedule6Descriptors().getFirst().getActivityQuestionNumber());
         assertNotNull(body.getUcNumberOfPoints());
         assertEquals(15, body.getUcNumberOfPoints().intValue());
@@ -1121,8 +1157,8 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertEquals(2, body.getUcSchedule7Descriptors().size());
         assertNotNull(body.getUcSchedule7Descriptors().getFirst());
         assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally "
-                     + "or could reasonably be worn or used. Cannot either: (a) mobilise more than 50 metres on level ground without stopping in order to avoid significant "
-                     + "discomfort or exhaustion; or (b) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.",
+                + "or could reasonably be worn or used. Cannot either: (a) mobilise more than 50 metres on level ground without stopping in order to avoid significant "
+                + "discomfort or exhaustion; or (b) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.",
             body.getUcSchedule7Descriptors().getFirst().getActivityQuestionValue());
 
         assertEquals("1", body.getUcSchedule7Descriptors().getFirst().getActivityQuestionNumber());
@@ -1131,7 +1167,8 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertEquals(0, body.getUcSchedule7Descriptors().getFirst().getActivityAnswerPoints());
 
         assertNotNull(body.getUcSchedule7Descriptors().get(1));
-        assertEquals("14. Appropriateness of behaviour with other people, due to cognitive impairment or mental disorder. Has, on a daily basis, uncontrollable episodes of aggressive or disinhibited behaviour that would be unreasonable in any workplace.",
+        assertEquals(
+            "14. Appropriateness of behaviour with other people, due to cognitive impairment or mental disorder. Has, on a daily basis, uncontrollable episodes of aggressive or disinhibited behaviour that would be unreasonable in any workplace.",
             body.getUcSchedule7Descriptors().get(1).getActivityQuestionValue());
 
         assertEquals("14", body.getUcSchedule7Descriptors().get(1).getActivityQuestionNumber());
@@ -1180,7 +1217,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         assertEquals(1, response.getErrors().size());
-        assertEquals("You have awarded 15 points or more and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.", response.getErrors().iterator().next());
+        assertEquals(
+            "You have awarded 15 points or more and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.",
+            response.getErrors().iterator().next());
     }
 
     @Override
@@ -1194,7 +1233,8 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(
-            NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true, true, true, false, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true, true, true, false, true,
+            documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
     }
@@ -1823,8 +1863,11 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNotNull(body.getUcSchedule6Descriptors().getFirst());
         assertEquals(9, body.getUcSchedule6Descriptors().getFirst().getActivityAnswerPoints());
         assertEquals("c", body.getUcSchedule6Descriptors().getFirst().getActivityAnswerLetter());
-        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.", body.getUcSchedule6Descriptors().getFirst().getActivityAnswerValue());
-        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", body.getUcSchedule6Descriptors().getFirst().getActivityQuestionValue());
+        assertEquals(
+            "Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.",
+            body.getUcSchedule6Descriptors().getFirst().getActivityAnswerValue());
+        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.",
+            body.getUcSchedule6Descriptors().getFirst().getActivityQuestionValue());
         assertEquals("1", body.getUcSchedule6Descriptors().getFirst().getActivityQuestionNumber());
         assertNotNull(body.getUcNumberOfPoints());
         assertEquals(9, body.getUcNumberOfPoints().intValue());
@@ -1867,7 +1910,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(1, response.getErrors().size());
-        assertEquals("You have awarded less than 15 points and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.", response.getErrors().iterator().next());
+        assertEquals(
+            "You have awarded less than 15 points and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.",
+            response.getErrors().iterator().next());
     }
 
     @Test
@@ -1962,7 +2007,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         assertEquals(1, response.getErrors().size());
-        assertEquals("You have awarded less than 15 points and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.", response.getErrors().iterator().next());
+        assertEquals(
+            "You have awarded less than 15 points and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.",
+            response.getErrors().iterator().next());
     }
 
     @Test
@@ -2022,8 +2069,11 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNotNull(body.getUcSchedule6Descriptors().getFirst());
         assertEquals(9, body.getUcSchedule6Descriptors().getFirst().getActivityAnswerPoints());
         assertEquals("c", body.getUcSchedule6Descriptors().getFirst().getActivityAnswerLetter());
-        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.", body.getUcSchedule6Descriptors().getFirst().getActivityAnswerValue());
-        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", body.getUcSchedule6Descriptors().getFirst().getActivityQuestionValue());
+        assertEquals(
+            "Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.",
+            body.getUcSchedule6Descriptors().getFirst().getActivityAnswerValue());
+        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.",
+            body.getUcSchedule6Descriptors().getFirst().getActivityQuestionValue());
         assertEquals("1", body.getUcSchedule6Descriptors().getFirst().getActivityQuestionNumber());
         assertNotNull(body.getUcNumberOfPoints());
         assertEquals(9, body.getUcNumberOfPoints().intValue());
@@ -2066,7 +2116,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(1, response.getErrors().size());
-        assertEquals("You have awarded less than 15 points and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.", response.getErrors().iterator().next());
+        assertEquals(
+            "You have awarded less than 15 points and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.",
+            response.getErrors().iterator().next());
     }
 
     @Test
@@ -2093,7 +2145,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         Assert.assertEquals(1, response.getErrors().size());
 
-        Assert.assertEquals("You have awarded less than 15 points and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.", response.getErrors().iterator().next());
+        Assert.assertEquals(
+            "You have awarded less than 15 points and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.",
+            response.getErrors().iterator().next());
 
         assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
@@ -2226,8 +2280,11 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNotNull(body.getUcSchedule6Descriptors().getFirst());
         assertEquals(9, body.getUcSchedule6Descriptors().getFirst().getActivityAnswerPoints());
         assertEquals("c", body.getUcSchedule6Descriptors().getFirst().getActivityAnswerLetter());
-        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.", body.getUcSchedule6Descriptors().getFirst().getActivityAnswerValue());
-        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", body.getUcSchedule6Descriptors().getFirst().getActivityQuestionValue());
+        assertEquals(
+            "Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.",
+            body.getUcSchedule6Descriptors().getFirst().getActivityAnswerValue());
+        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.",
+            body.getUcSchedule6Descriptors().getFirst().getActivityQuestionValue());
         assertEquals("1", body.getUcSchedule6Descriptors().getFirst().getActivityQuestionNumber());
         assertNotNull(body.getUcNumberOfPoints());
         assertEquals(9, body.getUcNumberOfPoints().intValue());
@@ -2271,7 +2328,8 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(1, response.getErrors().size());
-        assertEquals("You have awarded less than 15 points and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.",
+        assertEquals(
+            "You have awarded less than 15 points and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.",
             response.getErrors().iterator().next());
 
     }
