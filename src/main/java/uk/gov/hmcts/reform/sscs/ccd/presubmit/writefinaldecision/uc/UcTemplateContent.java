@@ -53,20 +53,13 @@ public abstract class UcTemplateContent extends WriteFinalDecisionTemplateConten
 
     public String getSchedule6PointsSentence(Integer points, Boolean isSufficient, List<Descriptor> ucSchedule6Descriptors) {
         return "In applying the Work Capability Assessment " + points + (points == 1 ? " point was" : " points were")
-            + " scored from the activities and descriptors in Schedule "
-            + "6 of the " + getUsageDependentBenefitTypeRegulationsString() + getSchedule6PointsSentenceMadeUpAsFollowsSuffix(isSufficient, ucSchedule6Descriptors);
-    }
-
-    private String getSchedule6PointsSentenceMadeUpAsFollowsSuffix(Boolean isSufficient, List<Descriptor> ucSchedule6Descriptors) {
-        return isSufficient != null && isSufficient
-            ? ucSchedule6Descriptors == null || ucSchedule6Descriptors.isEmpty() ? "." : " made up as follows:"
-            : ". This is insufficient to meet the "
-                + "threshold for the test. Schedule 8, paragraph 4 of the " + getUsageDependentBenefitTypeRegulationsString() + " did not apply.";
+               + " scored from the activities and descriptors in Schedule "
+               + "6 of the " + getUsageDependentBenefitTypeRegulationsString() + getSchedule6PointsSentenceMadeUpAsFollowsSuffix(isSufficient, ucSchedule6Descriptors);
     }
 
     public String getInsufficientPointsSentenceSchedule8Paragraph4Applied() {
         return "This is because insufficient points were scored to meet the threshold for the Work Capability Assessment, "
-            + "but Schedule 8, paragraph 4 of the " + getUsageDependentBenefitTypeRegulationsString() + " applied.";
+               + "but Schedule 8, paragraph 4 of the " + getUsageDependentBenefitTypeRegulationsString() + " applied.";
     }
 
     public String getInsufficientPointsSentenceNoSchedule8Paragraph4Sentence() {
@@ -79,13 +72,13 @@ public abstract class UcTemplateContent extends WriteFinalDecisionTemplateConten
 
     public String getSchedule8Paragraph4AndSchedule9Paragraph4DiseaseOrDisablementSentence(boolean isSchedule8Paragraph4Applied, boolean isSchedule9Paragraph4Applied) {
         return "The tribunal applied"
-            + (isSchedule8Paragraph4Applied ? " Schedule 8, paragraph 4" : "")
-            + (isSchedule8Paragraph4Applied && isSchedule9Paragraph4Applied ? " and" : "")
-            + (isSchedule9Paragraph4Applied ? " Schedule 9, paragraph 4" : "")
-            + " because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability"
-            + (isSchedule8Paragraph4Applied ? " for work" : "")
-            + (isSchedule8Paragraph4Applied && isSchedule9Paragraph4Applied ? " and" : "")
-            + (isSchedule9Paragraph4Applied ? " for work-related activity." : ".");
+               + (isSchedule8Paragraph4Applied ? " Schedule 8, paragraph 4" : "")
+               + (isSchedule8Paragraph4Applied && isSchedule9Paragraph4Applied ? " and" : "")
+               + (isSchedule9Paragraph4Applied ? " Schedule 9, paragraph 4" : "")
+               + " because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability"
+               + (isSchedule8Paragraph4Applied ? " for work" : "")
+               + (isSchedule8Paragraph4Applied && isSchedule9Paragraph4Applied ? " and" : "")
+               + (isSchedule9Paragraph4Applied ? " for work-related activity." : ".");
     }
 
     public String getNoSchedule7SentenceSchedule9Paragraph4Applies() {
@@ -94,7 +87,7 @@ public abstract class UcTemplateContent extends WriteFinalDecisionTemplateConten
 
     public String getContinuesToHaveWorkRelatedSentenceButNotLimitedWorkRelatedActivityOnly(String appellantName) {
         return appellantName + " continues to have limited capability for work but does not have limited capability for "
-                + "work-related activity and cannot be treated as having limited capability for work-related activity.";
+               + "work-related activity and cannot be treated as having limited capability for work-related activity.";
     }
 
     public String getNoDescriptorFromSchedule7Schedule9NotApplied() {
@@ -103,6 +96,13 @@ public abstract class UcTemplateContent extends WriteFinalDecisionTemplateConten
 
     public String getSecretaryOfStateAcceptsHasLimitedCapabilityForWorkSentence(String appellantName, boolean work) {
         return "The Secretary of State has accepted that " + appellantName + " has limited capability for "
-                + (work ? "work." : "work-related activity.") + " This was not in issue.";
+               + (work ? "work." : "work-related activity.") + " This was not in issue.";
+    }
+
+    private String getSchedule6PointsSentenceMadeUpAsFollowsSuffix(Boolean isSufficient, List<Descriptor> ucSchedule6Descriptors) {
+        return isSufficient != null && isSufficient
+            ? ucSchedule6Descriptors == null || ucSchedule6Descriptors.isEmpty() ? "." : " made up as follows:"
+            : ". This is insufficient to meet the "
+              + "threshold for the test. Schedule 8, paragraph 4 of the " + getUsageDependentBenefitTypeRegulationsString() + " did not apply.";
     }
 }
