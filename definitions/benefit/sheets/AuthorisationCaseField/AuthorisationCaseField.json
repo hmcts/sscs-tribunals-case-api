@@ -1057,7 +1057,11 @@
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "writeFinalDecisionDetailsOfDecision", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "wcaAppeal", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "supportGroupOnlyAppeal", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+<<<<<<< Updated upstream
   {"LiveFrom": "26/11/2025", "CaseTypeID": "Benefit", "CaseFieldID": "ucWriteFinalDecisionWorkCapabilityAssessmentStartDate", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+=======
+  {"LiveFrom": "12/11/2025", "CaseTypeID": "Benefit", "CaseFieldID": "whichEsaRegulationsApply", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+>>>>>>> Stashed changes
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "pipWriteFinalDecisionDailyLivingActivitiesQuestion", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "pipWriteFinalDecisionMobilityActivitiesQuestion", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "pipWriteFinalDecisionPreparingFoodQuestion", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
