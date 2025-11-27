@@ -14,7 +14,7 @@ export class Tasks {
     webActions = new WebAction(this.page);
   }
 
-  async verifyTaskIsDisplayed(taskName: string) {
+  async  verifyTaskIsDisplayed(taskName: string) {
     let homePage = new HomePage(this.page);
     let taskVisible = false;
 
@@ -23,7 +23,7 @@ export class Tasks {
 
     while (Date.now() - startTime < timeout) {
       taskVisible = await this.page.isVisible(
-        `//exui-case-task[./*[normalize-space()='${taskName}']]`
+        `//exui-case-task[./*[normalize-space()='${taskName}']][1]`
       );
       if (taskVisible) {
         break;
@@ -101,7 +101,7 @@ export class Tasks {
   async clickAssignTask(taskName: string) {
     await this.page
       .locator(
-        `//exui-case-task[./*[normalize-space()='${taskName}']]//a[normalize-space()='${tasksTestData.assignTask}']`
+        `//exui-case-task[./*[normalize-space()='${taskName}']][1]//a[normalize-space()='${tasksTestData.assignTask}'][1]`
       )
       .click();
   }
@@ -131,6 +131,7 @@ export class Tasks {
       this.page.locator(
         `//exui-case-task[./*[normalize-space()='${taskName}']]//*[normalize-space()='${fieldLabel}']/../dd[normalize-space()="${fieldValue}"]`
       )
+      .first()
     ).toBeVisible();
   }
 
@@ -140,13 +141,14 @@ export class Tasks {
         .locator(
           `//exui-case-task[./*[normalize-space()='${taskName}']]//exui-priority-field`
         )
+        .first()
         .textContent()
     ).trim();
     expect(displayedPriority).toBe(expectedPriority);
   }
 
   async verifyManageOptions(taskName: string, options: string[]) {
-    let selector = `//exui-case-task[./*[normalize-space()='${taskName}']]//div[.//span[normalize-space()='${tasksTestData.manageLabel}']]/dd/a`;
+    let selector = `//exui-case-task[./*[normalize-space()='${taskName}']][1]//div[.//span[normalize-space()='${tasksTestData.manageLabel}']]/dd/a`;
 
     const availableOptions = await this.page.$$eval(selector, (elements) =>
       elements.map((element) => element.textContent.trim())
