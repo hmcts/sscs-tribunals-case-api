@@ -14,7 +14,7 @@ export class CtscActionUnprocessedCorrespondence extends BaseStep {
   }
 
   async createActionUnprocessedCorrespondenceTask(caseId: string) {
-    await this.loginUserWithCaseId(credentials.amSuperUser, false, caseId);
+    await this.loginUserWithCaseId(credentials.amCtscTeamLeaderNwLiverpool, false, caseId);
     await this.homePage.chooseEvent('Upload document FE');
     await this.uploadDocumentFurtherEvidencePage.verifyPageContent();
     await this.uploadDocumentFurtherEvidencePage.clickAddNew();
@@ -27,7 +27,7 @@ export class CtscActionUnprocessedCorrespondence extends BaseStep {
   }
 
   async createMultipleActionUnprocessedCorrespondenceTasks(caseId: string, numberOfTasksToBeCreated = 3) {
-    await this.loginUserWithCaseId(credentials.amSuperUser, false, caseId);
+    await this.loginUserWithCaseId(credentials.amCtscTeamLeaderNwLiverpool, false, caseId);
     for (let i = 0; i < numberOfTasksToBeCreated; i++) {
       await this.homePage.chooseEvent('Upload document FE');
       await this.uploadDocumentFurtherEvidencePage.verifyPageContent();
@@ -97,4 +97,10 @@ export class CtscActionUnprocessedCorrespondence extends BaseStep {
   async verifyUnprocessedCorrespondenceTabNotVisible() {
      await expect(this.homePage.unprocessedCorrespondenceTab).toBeHidden();
       }
+    
+  async cancelDuplicateUnprocessedCorrespondenceTasks() {
+     await this.homePage.navigateToTab('Tasks');
+     await this.tasksTab.cancelMultipleTasks(task.name);
+     await this.tasksTab.verifyTaskIsHidden(task.name);
+  }
 }

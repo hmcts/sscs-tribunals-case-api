@@ -70,9 +70,12 @@ export class ActionFurtherEvidencePage {
   }
 
   async selectbundle() {
-    await webActions.clickElementById(
-      "label[for='scannedDocuments_0_includeInBundle_Yes']"
-    );
+    const numberofDocs = await this.page.locator("//span[normalize-space()='Include in bundle? (Optional)']").count();
+    for (let i = 0; i < numberofDocs; i++) {
+      await webActions.clickElementById(
+        `label[for='scannedDocuments_${i}_includeInBundle_Yes']`
+      );
+    }
   }
 
   async confirmSubmission(): Promise<void> {

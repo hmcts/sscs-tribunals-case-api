@@ -29,7 +29,7 @@ export class Tasks {
         break;
       }
       await homePage.navigateToTab('Summary');
-      await homePage.delay(80000);
+      await homePage.delay(30000);
       await homePage.navigateToTab('Tasks');
       await homePage.delay(timeouts.shortTimeout);
     }
@@ -76,11 +76,12 @@ export class Tasks {
   }
 
   async clickCancelTask(taskName: string) {
-    await this.page
+    const cancelTaskLocator = this.page
       .locator(
-        `//exui-case-task[./*[normalize-space()='${taskName}']]//a[normalize-space()='${tasksTestData.cancelTask}']`
-      )
-      .click();
+        `//exui-case-task[./*[normalize-space()='${taskName}']][1]//a[normalize-space()='${tasksTestData.cancelTask}']`
+      );
+    await expect(cancelTaskLocator).toBeVisible();
+    await cancelTaskLocator.click();
   }
 
   async clickMarkAsDone(taskName: string) {
@@ -404,5 +405,17 @@ export class Tasks {
     await expect(
       task.getByRole('link', { name: tasksTestData.assignTask })
     ).toBeHidden();
+  }
+
+  async cancelMultipleTasks(taskName: string) {
+    let task = this.page.locator(
+      `//exui-case-task[./*[normalize-space()='${taskName}']]`
+    );
+    await expect(task.first()).toBeVisible();
+    const taskCount = await task.count();
+    for (let i = 0; i < taskCount; i++) {
+      await expect(task.first()).toBeVisible();
+      await this.cancelTask(taskName);
+    }
   }
 }
