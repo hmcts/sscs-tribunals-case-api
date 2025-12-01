@@ -1,7 +1,7 @@
 import { test } from '../../lib/steps.factory';
 import createCaseBasedOnCaseType from '../../api/client/sscs/factory/appeal.type.factory';
 
-test.describe('Work Allocation - CTSC - Action Unprocessed Correspondence', { tag: ['@preview-regression'] }, async () => {
+test.describe('Work Allocation - CTSC - Action Unprocessed Correspondence', { tag: ['@work-allocation'] }, async () => {
   let caseId: string;
 
   test.beforeEach(async () => {
