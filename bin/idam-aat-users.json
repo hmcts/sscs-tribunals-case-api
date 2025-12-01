@@ -12,5 +12,52 @@
         "caseworker-sscs-judge"
       ]
     }
+  },
+  {
+    "user": {
+      "id": "68c1584e-9356-4a7e-bbd6-b13b98a9ef9d",
+      "email": "RegionalMedicalMember.Ben@ejudiciary.net",
+      "forename": "Sal",
+      "surname": "Ben",
+      "displayName": "Sal",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-judge",
+        "caseworker-sscs-judge-salaried"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "7fadc714-cabf-4c90-ad6a-3d73a7b38083",
+      "email": "sscs-senior-cw-nw-liverpool@justice.gov.uk",
+      "forename": "sscs-senior-cw",
+      "surname": "nw-liverpool",
+      "displayName": "sscs-senior-cw",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-SSCS-registrar",
+        "caseworker-SSCS-clerk",
+        "caseworker-SSCS-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "bf4ab7bf-5116-4f9e-9a4a-ef946bd608a2",
+      "email": "sscs-senior-cw-wales-cardiff@justice.gov.uk",
+      "forename": "sscs-senior-cw",
+      "surname": "wales-cardiff",
+      "displayName": "sscs-senior-cw",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-SSCS-registrar",
+        "caseworker-SSCS-clerk",
+        "caseworker-SSCS-superuser"
+      ]
+    }
   }
 ]
