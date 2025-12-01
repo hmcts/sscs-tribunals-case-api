@@ -8,8 +8,8 @@ import uk.gov.hmcts.contino.GithubAPI
 def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
-def dmnBranch = "SSCSCI-2275-incomplete-reply-overdue-multiple"
-def waStandaloneBranch = "SSCSCI-2275-incomplete-reply-overdue-multiple"
+def dmnBranch = "SSCSCI-2275-incomplete-reply-overdue"
+def waStandaloneBranch = "SSCSCI-2275-incomplete-reply-overdue"
 
 def secrets = [
         'sscs-${env}': [
