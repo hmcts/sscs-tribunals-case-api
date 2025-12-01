@@ -98,9 +98,9 @@ export class CtscActionUnprocessedCorrespondence extends BaseStep {
      await expect(this.homePage.unprocessedCorrespondenceTab).toBeHidden();
       }
     
-  async cancelDuplicateUnprocessedCorrespondenceTasks() {
+  async markDuplicateUnprocessedCorrespondenceTasksAsDone() {
      await this.homePage.navigateToTab('Tasks');
-     await this.tasksTab.cancelMultipleTasks(task.name);
+     await this.tasksTab.markMultipleTasksAsDone(task.name);
      await this.tasksTab.verifyTaskIsHidden(task.name);
   }
 }

@@ -85,15 +85,16 @@ export class Tasks {
   }
 
   async clickMarkAsDone(taskName: string) {
-    await this.page
+    const markAsDoneLocator = this.page
       .locator(
-        `//exui-case-task[./*[normalize-space()='${taskName}']]//a[normalize-space()='${tasksTestData.markAsDone}']`
-      )
-      .click();
+        `//exui-case-task[./*[normalize-space()='${taskName}']][1]//a[normalize-space()='${tasksTestData.markAsDone}']`
+      );
+    await expect(markAsDoneLocator).toBeVisible();
+    await markAsDoneLocator.click();
   }
-
+    
   async selfAssignTask(taskName: string) {
-    let selector = `//exui-case-task[./*[normalize-space()='${taskName}']]//a[normalize-space()='${tasksTestData.assignToMe}']`;
+    let selector = `//exui-case-task[./*[normalize-space()='${taskName}']][1]//a[normalize-space()='${tasksTestData.assignToMe}']`;
     await expect(this.page.locator(selector)).toBeVisible();
     await this.page.locator(selector).click();
     await expect(this.page.locator(selector)).toBeHidden();
@@ -407,7 +408,7 @@ export class Tasks {
     ).toBeHidden();
   }
 
-  async cancelMultipleTasks(taskName: string) {
+async markMultipleTasksAsDone(taskName: string) {
     let task = this.page.locator(
       `//exui-case-task[./*[normalize-space()='${taskName}']]`
     );
@@ -415,7 +416,8 @@ export class Tasks {
     const taskCount = await task.count();
     for (let i = 0; i < taskCount; i++) {
       await expect(task.first()).toBeVisible();
-      await this.cancelTask(taskName);
+      await this.selfAssignTask(taskName);
+      await this.markTheTaskAsDone(taskName);
     }
   }
 }
