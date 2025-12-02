@@ -447,5 +447,18 @@
     "PageID": "updateOtherParties",
     "PageShowCondition": "appeal.benefitType.code=\"childSupport\"",
     "PageLabel": "Update other party data"
+  },
+  {
+    "CaseEventID": "overdueResponse",
+    "CaseFieldID": "benefitCode",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 9,
+    "PageID": "1.0",
+    "FieldShowCondition": "appeal.benefitType.code=\"DoNotUse\"",
+    "ShowSummaryChangeOption": "Y",
+    "Publish": "${CCD_DEF_PUBLISH}"
   }
 ]
