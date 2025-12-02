@@ -452,13 +452,12 @@
     "CaseEventID": "overdueResponse",
     "CaseFieldID": "benefitCode",
     "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
+    "DisplayContext": "READONLY",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 9,
     "PageID": "1.0",
-    "FieldShowCondition": "appeal.benefitType.code=\"DoNotUse\"",
-    "ShowSummaryChangeOption": "Y",
+    "ShowSummaryChangeOption": "N",
     "Publish": "${CCD_DEF_PUBLISH}"
   }
 ]
