@@ -549,6 +549,7 @@
   {"LiveFrom": "10/09/2019", "CaseTypeID": "Benefit", "ID": "ftaResponseDueDate", "Label": "FTA need to reply by", "FieldType": "Date", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "14/04/2025", "CaseTypeID": "Benefit", "ID": "tribunalRequestsToReviewDl", "Label": "Tribunal Communications", "FieldType": "DynamicMultiSelectList", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "14/04/2025", "CaseTypeID": "Benefit", "ID": "ftaRequestsToReviewDl", "Label": "FTA Communications", "FieldType": "DynamicMultiSelectList", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "14/04/2025", "CaseTypeID": "Benefit", "ID": "latestFtaCommunicationId", "Label": "FTA Communications", "FieldType": "TextArea", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "10/09/2019", "CaseTypeID": "Benefit", "ID": "tribunalResponseProvidedDate", "Label": "Date the Tribunal responded", "FieldType": "Date", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "10/09/2019", "CaseTypeID": "Benefit", "ID": "ftaResponseProvidedDate", "Label": "Date the FTA responded", "FieldType": "Date", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "13/03/2023", "CaseTypeID": "Benefit", "ID": "deleteCommRequestRadioDl", "Label": "Communication Requests", "FieldType": "DynamicList", "SecurityClassification": "PUBLIC"},
