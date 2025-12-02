@@ -1,5 +1,5 @@
 {
-  "name": "Action Unprocessed Correspondence - CTSC",
+  "name": "CTSC - Action Unprocessed Correspondence",
   "priority": "high",
   "assignedToWhenNotAssigned": "Unassigned",
   "assignedTo": "SSCS ctscadmin",
@@ -21,9 +21,13 @@
     "Reassign task",
     "Unassign task"
   ],
-  "nextStepsOptions": ["Action Further Evidence"],
+  "nextStepsOptions": ["Action Further Evidence", "Manage Documents"],
   "actionFurtherEvidence": {
     "link": "Action Further Evidence",
     "eventTitle": "Handle Further Evidence"
+  },
+  "manageDocuments": {
+    "link": "Manage Documents",
+    "eventTitle": "Upload/remove or move a document"
   }
 }
