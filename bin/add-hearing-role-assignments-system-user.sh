@@ -19,7 +19,7 @@ curl --silent --show-error -X POST "https://am-role-assignment-service-sscs-trib
             "assignerId": "'"${SYSTEM_USER_ID}"'",
             "process": "sscs-system-users",
             "reference": "sscs-hearings-system-user",
-            "replaceExisting": false
+            "replaceExisting": true
           },
           "requestedRoles": [
             {
