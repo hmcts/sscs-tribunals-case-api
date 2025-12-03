@@ -359,6 +359,7 @@ ccd:
         ROLE_ASSIGNMENT_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
         ORM_ENV: pr
         CCD_DATA_STORE_URL: http://${SERVICE_NAME}-ccd-data-store-api
+        BYPASS_ORG_DROOL_RULE: true
       keyVaults:
       secrets:
         ROLE_ASSIGNMENT_DB_PASSWORD:
