@@ -24,7 +24,7 @@ curl --silent --show-error -X POST "https://am-role-assignment-service-sscs-trib
         },
         "requestedRoles": [
           {
-            "actorId": "22cb52eb-9490-42ce-837b-58b81702855a",
+            "actorId": "'"${USER_ID}"'",
             "roleType": "ORGANISATION",
             "classification": "PUBLIC",
             "roleName": "hearing-manager",
@@ -37,7 +37,7 @@ curl --silent --show-error -X POST "https://am-role-assignment-service-sscs-trib
             "actorIdType": "IDAM"
           },
           {
-            "actorId": "22cb52eb-9490-42ce-837b-58b81702855a",
+            "actorId": "'"${USER_ID}"'",
             "roleType": "ORGANISATION",
             "classification": "PUBLIC",
             "roleName": "hearing-viewer",
