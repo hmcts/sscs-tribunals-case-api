@@ -36,7 +36,8 @@ function send_curl_request() {
 send_curl_request "${BASEDIR}/staff-idam-ids.json" "CASEWORKER"
 send_curl_request "${BASEDIR}/sscs-judicial-idam-ids.json" "JUDICIAL"
 
-USER_ID=$(curl --silent --show-error -X GET "${IDAM_API_BASE_URL}/details" -H "accept: application/json" -H "authorization: Bearer ${IDAM_TOKEN}" | jq -r .id)
+SSCS_SYSTEM_USER_TOKEN=$(${BASEDIR}/utils/idam-lease-user-token.sh $IDAM_SSCS_SYSTEMUPDATE_USER $IDAM_SSCS_SYSTEMUPDATE_PASSWORD)
+SYSTEM_USER_ID=$(curl --silent --show-error -X GET "${IDAM_API_BASE_URL}/details" -H "accept: application/json" -H "authorization: Bearer ${SSCS_SYSTEM_USER_TOKEN}" | jq -r .id)
 
 curl --silent --show-error -X POST "https://am-role-assignment-service-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net/am/role-assignments" \
   -H "accept: application/vnd.uk.gov.hmcts.role-assignment-service.create-assignments+json;charset=UTF-8;version=1.0" \
@@ -44,14 +45,14 @@ curl --silent --show-error -X POST "https://am-role-assignment-service-sscs-trib
   -H "ServiceAuthorization: Bearer ${S2S_TOKEN}" \
   -H "Content-Type: application/json" \
   -d '{ "roleRequest": {
-            "assignerId": "'"${USER_ID}"'",
+            "assignerId": "'"${SYSTEM_USER_ID}"'",
             "process": "sscs-system-users",
             "reference": "sscs-hearings-system-user",
             "replaceExisting": true
           },
           "requestedRoles": [
             {
-              "actorId": "'"${USER_ID}"'",
+              "actorId": "'"${SYSTEM_USER_ID}"'",
               "roleType": "ORGANISATION",
               "classification": "PUBLIC",
               "roleName": "hearing-manager",
@@ -64,7 +65,7 @@ curl --silent --show-error -X POST "https://am-role-assignment-service-sscs-trib
               "actorIdType": "IDAM"
             },
             {
-              "actorId": "'"${USER_ID}"'",
+              "actorId": "'"${SYSTEM_USER_ID}"'",
               "roleType": "ORGANISATION",
               "classification": "PUBLIC",
               "roleName": "hearing-viewer",
