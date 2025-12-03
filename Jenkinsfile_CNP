@@ -105,7 +105,16 @@ def secrets = [
         ],
         'am-${env}'  : [
                 secret('am-role-assignment-service-s2s-secret', 'AM_ROLE_ASSIGNMENT_SERVICE_SECRET')
-        ]
+        ],
+        'aac-${env}'  : [
+                secret('idam-mca-client-secret', 'IDAM_MCA_CLIENT_SECRET'),
+                secret('idam-mca-system-user-username', 'IDAM_CAA_USERNAME'),
+                secret('idam-mca-system-user-password', 'IDAM_CAA_PASSWORD'),
+                secret('idam-noc-approver-username', 'IDAM_NOC_APPROVER_USERNAME'),
+                secret('idam-noc-approver-password', 'IDAM_NOC_APPROVER_PASSWORD'),
+                secret('aac-manage-case-s2s-secret', 'MANAGE_CASE_S2S_KEY'),
+                secret('notify-mca-api-key-secret', 'NOTIFY_MCA_API_KEY')
+        ],
 ]
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
@@ -123,7 +132,7 @@ withPipeline(type, product, component) {
     enableHighLevelDataSetup()
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
-    syncBranchesWithMaster(['ithc', 'perftest'])
+    syncBranchesWithMaster(['demo', 'ithc', 'perftest'])
 
     env.DOCUMENT_MANAGEMENT_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.TEST_DOCUMENT_MANAGEMENT_URL = "http://dm-store-aat.service.core-compute-aat.internal"
@@ -141,21 +150,33 @@ withPipeline(type, product, component) {
             enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
         }
 
+        if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:wa").size() > 0) {
+            env.WORK_ALLOCATION_FEATURE_ENABLED = 'true'
+            echo "Enabling Work Allocation"
+        } else {
+            env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
+            echo "Disabling Work Allocation"
+        }
+
         def tests = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "test-suite")
         env.TEST_SUITE = tests.size() > 0 ? tests.collect { it.replace("test-suite:", "@") }.join("|") : "@preview-pipeline"
         echo "Tags added on case is  " + { env.TEST_SUITE }
     }
     onDemo {
         env.ENVIRONMENT = "demo"
+        env.WORK_ALLOCATION_FEATURE_ENABLED = 'true'
     }
     onPerftest {
         env.ENVIRONMENT = "perftest"
+        env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
     }
     onIthc {
         env.ENVIRONMENT = "ithc"
+        env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
     }
     afterAlways('functionalTest:aat') {
         env.ENVIRONMENT = "prod"
+        env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
     }
 
     before('highleveldatasetup') {
@@ -195,7 +216,7 @@ def runNotificationTests() {
 }
 
 def generateDefinitions() {
-    sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT}"
+    sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${env.WORK_ALLOCATION_FEATURE_ENABLED}"
     steps.archiveArtifacts artifacts: "definitions/benefit/*.xlsx"
 
     sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT}"
@@ -212,6 +233,7 @@ def setAatEnvVars() {
     env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
     env.EM_STITCHING_API_URL = "http://em-stitching-aat.service.core-compute-aat.internal"
     env.ENVIRONMENT = "aat"
+    env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
 }
 
 def setPreviewEnvVars() {

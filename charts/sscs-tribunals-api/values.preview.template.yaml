@@ -776,5 +776,3 @@ postgresql:
       - name: "pr-${CHANGE_ID}-sscs-job-scheduler"
       - name: "pr-${CHANGE_ID}-emstitch"
       - name: "pr-${CHANGE_ID}-org_role_mapping"
-
-
