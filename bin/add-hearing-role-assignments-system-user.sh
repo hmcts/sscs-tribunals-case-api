@@ -12,7 +12,7 @@ echo -e "\nCreating role assignment: \n User: ${SYSTEM_USER_ID}"
 
 curl --silent --show-error -X POST "https://am-role-assignment-service-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net/am/role-assignments" \
   -H "accept: application/vnd.uk.gov.hmcts.role-assignment-service.create-assignments+json;charset=UTF-8;version=1.0" \
-  -H "Authorization: Bearer ${IDAM_TOKEN}" \
+  -H "Authorization: Bearer ${SSCS_SYSTEM_USER_TOKEN}" \
   -H "ServiceAuthorization: Bearer ${S2S_TOKEN}" \
   -H "Content-Type: application/json" \
   -d '{ "roleRequest": {
