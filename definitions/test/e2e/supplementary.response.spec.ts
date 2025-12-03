@@ -6,8 +6,7 @@ test.describe.serial(
   'WA - Supplementary Response - Action Unprocessed Correspondence CTSC task initiation and completion tests',
   {
     tag: '@work-allocation'
-  },
-  async () => {
+  },() => {
     let caseId: string;
 
     test.beforeAll('Create case', async () => {
@@ -55,8 +54,7 @@ test.describe.serial(
   'WA - Supplementary Response - Action Unprocessed Correspondence CTSC task cancellation tests',
   {
     tag: '@work-allocation'
-  },
-  async () => {
+  }, () => {
     let caseId: string;
 
     test.beforeAll('Create case', async () => {

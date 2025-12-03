@@ -1,8 +1,6 @@
 import { test } from '../lib/steps.factory';
 
-let caseId: string;
-
-test.describe('Death of appellant test', async () => {
+test.describe('Death of appellant test', () => {
   test(
     'Death of an Appellant without an Appointee',
     { tag: '@nightly-pipeline' },

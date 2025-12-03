@@ -7,7 +7,7 @@ test.describe.serial(
   {
     tag: '@work-allocation'
   },
-  async () => {
+  () => {
     let caseId: string;
 
     test.beforeAll('Create case', async () => {
@@ -59,7 +59,7 @@ test.describe.serial(
   {
     tag: '@work-allocation'
   },
-  async () => {
+  () => {
     let caseId: string;
 
     test.beforeAll('Create case', async () => {
@@ -104,7 +104,7 @@ test.describe.serial(
   {
     tag: '@work-allocation'
   },
-  async () => {
+  () => {
     let caseId: string;
 
     test.beforeAll('Create case', async () => {
@@ -162,7 +162,7 @@ test.describe.serial(
   {
     tag: '@work-allocation'
   },
-  async () => {
+  () => {
     let caseId: string;
 
     test.beforeAll('Create case', async () => {

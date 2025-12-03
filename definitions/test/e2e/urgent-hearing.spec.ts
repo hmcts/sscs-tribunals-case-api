@@ -2,7 +2,7 @@ import { test } from '../lib/steps.factory';
 import createCaseBasedOnCaseType from '../api/client/sscs/factory/appeal.type.factory';
 import performAppealDormantOnCase from '../api/client/sscs/appeal.event';
 
-test.describe('Urgent hearing test', async () => {
+test.describe('Urgent hearing test', () => {
   let caseId: string;
 
   test.beforeEach('Case has to be Created', async () => {
@@ -55,7 +55,7 @@ test.describe.serial(
   {
     tag: '@work-allocation'
   },
-  async () => {
+  () => {
     let caseId: string;
 
     test.beforeAll('Create case', async () => {
@@ -98,7 +98,7 @@ test.describe.serial(
   {
     tag: '@work-allocation'
   },
-  async () => {
+  () => {
     let caseId: string;
 
     test.beforeAll('Create case', async () => {
@@ -139,7 +139,7 @@ test.describe.serial(
   {
     tag: '@work-allocation'
   },
-  async () => {
+  () => {
     let caseId: string;
 
     test.beforeAll('Create case', async () => {
@@ -180,7 +180,7 @@ test.describe.serial(
   {
     tag: '@work-allocation'
   },
-  async () => {
+  () => {
     let caseId: string;
 
     test.beforeAll('Create case', async () => {
@@ -210,13 +210,12 @@ test.describe.serial(
       );
     });
 
-    test('As a Tribunal Caseworker, complete the Review Urgent Hearing Request task ', async ({
-      urgentHearingSteps
-    }) => {
-      test.slow();
-      await urgentHearingSteps.verifyTcwCanCompleteTheAssignedReviewUrgentHearingRequestTask(
-        caseId
-      );
+    test('As a Tribunal Caseworker, complete the Review Urgent Hearing Request task',
+      async ({urgentHearingSteps}) => {
+        test.slow();
+        await urgentHearingSteps.verifyTcwCanCompleteTheAssignedReviewUrgentHearingRequestTask(
+          caseId
+        );
     });
 
     test.afterAll('Case has to be set to Dormant', async () => {
@@ -230,7 +229,7 @@ test.describe.serial(
   {
     tag: '@work-allocation'
   },
-  async () => {
+  () => {
     let caseId: string;
 
     test.beforeAll('Create case', async () => {
@@ -271,7 +270,7 @@ test.describe.serial(
   {
     tag: '@work-allocation'
   },
-  async () => {
+  () => {
     let caseId: string;
 
     test.beforeAll('Create case', async () => {

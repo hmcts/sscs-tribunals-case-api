@@ -7,7 +7,7 @@ let caseId: string;
 test.describe(
   'Create a new hearing for an List assist case',
   { tag: '@nightly-pipeline' },
-  async () => {
+  () => {
     test.beforeEach(
       'Check HMC environment',
       async ({ uploadResponseSteps, request }) => {
@@ -18,6 +18,7 @@ test.describe(
     test.afterEach(
       'Cancel the hearings after test run',
       async({ hearingSteps }, testInfo) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
         (testInfo.title.includes("#executeTearDown")) && await hearingSteps.cancelHearingForCleanUp();
       }
     )

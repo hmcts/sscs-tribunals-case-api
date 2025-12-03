@@ -7,7 +7,7 @@ let caseId: string;
 test.describe(
   'Manage documents tests',
   { tag: '@nightly-pipeline' },
-  async () => {
+  () => {
     test('Upload/remove documents from documents tab', async ({
       manageDocumentsSteps
     }) => {
@@ -17,9 +17,9 @@ test.describe(
         false,
         caseId
       );
-      let documentType = 'Other document';
-      let fileName = 'testfile1.pdf';
-      let tab = 'Documents';
+      const documentType = 'Other document';
+      const fileName = 'testfile1.pdf';
+      const tab = 'Documents';
       await manageDocumentsSteps.verifyFileNotInTab(
         tab,
         documentType,
@@ -48,9 +48,9 @@ test.describe(
         false,
         caseId
       );
-      let documentType = 'Other document';
-      let fileName = 'testfile1.pdf';
-      let tab = 'Tribunal Internal Documents';
+      const documentType = 'Other document';
+      const fileName = 'testfile1.pdf';
+      const tab = 'Tribunal Internal Documents';
       await manageDocumentsSteps.verifyInternalDocumentsTabHidden();
       await manageDocumentsSteps.uploadDocumentToTab(
         tab,
@@ -85,8 +85,8 @@ test.describe(
         false,
         caseId
       );
-      let documentType = 'Other document';
-      let fileName = 'testfile1.pdf';
+      const documentType = 'Other document';
+      const fileName = 'testfile1.pdf';
       await manageDocumentsSteps.uploadDocumentToTab(
         'Documents',
         documentType,
@@ -124,9 +124,9 @@ test.describe(
         false,
         caseId
       );
-      let documentType = 'Other document';
-      let fileName = 'testfile1.pdf';
-      let tab = 'Tribunal Internal Documents';
+      const documentType = 'Other document';
+      const fileName = 'testfile1.pdf';
+      const tab = 'Tribunal Internal Documents';
       await manageDocumentsSteps.uploadDocumentToTab(
         tab,
         documentType,
@@ -152,9 +152,9 @@ test.describe(
       await manageDocumentsSteps.removeDocumentFromTab('Documents', 'SSCS1');
       await manageDocumentsSteps.moveInternalDocumentNoneFoundErrorCheck();
       await manageDocumentsSteps.moveDocumentNoneFoundErrorCheck();
-      let documentType = 'Other document';
-      let fileName = 'testfile1.pdf';
-      let tab = 'Tribunal Internal Documents';
+      const documentType = 'Other document';
+      const fileName = 'testfile1.pdf';
+      const tab = 'Tribunal Internal Documents';
       await manageDocumentsSteps.uploadDocumentToTab(
         tab,
         documentType,

@@ -3,7 +3,7 @@ import createCaseBasedOnCaseType from '../api/client/sscs/factory/appeal.type.fa
 
 let caseId: string;
 
-test.describe('Update listing requirement test', async () => {
+test.describe('Update listing requirement test', () => {
 
     test.beforeEach('Case has to be Created', async () => {
       caseId = await createCaseBasedOnCaseType('PIP');

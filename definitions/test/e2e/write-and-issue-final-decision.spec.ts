@@ -1,18 +1,16 @@
 import { test } from '../lib/steps.factory';
 import createCaseBasedOnCaseType from '../api/client/sscs/factory/appeal.type.factory';
 
-let caseId: string;
-
 test.describe(
   'Issue Final Decision - PIP Appeal Type',
   { tag: '@nightly-pipeline' },
-  async () => {
+  () => {
     test(
       "Issue Final Decision - Upload Response with Further Information as No - Simple Decision Notice - 'Yes' notice generated. - No Award Given",
       { tag: ['@regression'] },
       async ({ issueFinalDecisionSteps }) => {
         test.slow();
-        let pipCaseId = await createCaseBasedOnCaseType('PIP');
+        const pipCaseId = await createCaseBasedOnCaseType('PIP');
         await issueFinalDecisionSteps.performWriteFinalDecisionForAPIPAppealNoAwardAndNoticeGenerated(
           pipCaseId
         );
@@ -26,7 +24,7 @@ test.describe(
       { tag: ['@preview-pipeline', '@regression'] },
       async ({ issueFinalDecisionSteps }) => {
         test.slow();
-        let pipCaseId = await createCaseBasedOnCaseType('PIP');
+        const pipCaseId = await createCaseBasedOnCaseType('PIP');
         await issueFinalDecisionSteps.performWriteFinalDecisionForAPIPAppealAwardAndNoticeGenerated(
           pipCaseId
         );
@@ -40,13 +38,13 @@ test.describe(
 test.describe(
   'Issue Final Decision - Tax Credit Appeal Type',
   { tag: ['@preview-regression', '@nightly-pipeline'] },
-  async () => {
+  () => {
     test(
       "Issue Final Decision - Upload Response with Further Information as No - Simple Decision Notice - 'No' notice generated",
       { tag: ['@regression'] },
       async ({ issueFinalDecisionSteps }) => {
         test.slow();
-        let taxCreditCaseId = await createCaseBasedOnCaseType('TAX CREDIT');
+        const taxCreditCaseId = await createCaseBasedOnCaseType('TAX CREDIT');
         await issueFinalDecisionSteps.performWriteFinalDecisionForATaxCreditAppealAndNoNoticeGenerated(
           taxCreditCaseId
         );
@@ -60,12 +58,12 @@ test.describe(
 test.describe(
   'Issue Final Decision - Universal Credit Appeal Type',
   { tag: ['@preview-regression', '@nightly-pipeline'] },
-  async () => {
+  () => {
     test("Issue Final Decision - Simple Decision Notice - 'Yes' notice generated", async ({
       issueFinalDecisionSteps
     }) => {
       test.slow();
-      let universalCreditCaseId = await createCaseBasedOnCaseType('UC');
+      const universalCreditCaseId = await createCaseBasedOnCaseType('UC');
       await issueFinalDecisionSteps.performWriteFinalDecisionForAUniversalCreditAppealAndNoticeGenerated(
         universalCreditCaseId
       );
@@ -78,13 +76,13 @@ test.describe(
 test.describe(
   'Issue Final Decision - ESA Appeal Type',
   { tag: '@nightly-pipeline' },
-  async () => {
+  () => {
     test(
       "Issue Final Decision - 'Yes' notice generated - 'No' Award Given",
       { tag: '@preview-regression' },
       async ({ issueFinalDecisionSteps }) => {
         test.slow();
-        let esaCaseId = await createCaseBasedOnCaseType('ESA');
+        const esaCaseId = await createCaseBasedOnCaseType('ESA');
         await issueFinalDecisionSteps.performWriteFinalDecisionForAESAAppealNoAwardGivenAndNoticeGenerated(
           esaCaseId
         );
@@ -97,7 +95,7 @@ test.describe(
       issueFinalDecisionSteps
     }) => {
       test.slow();
-      let esaCaseId = await createCaseBasedOnCaseType('ESA');
+      const esaCaseId = await createCaseBasedOnCaseType('ESA');
       await issueFinalDecisionSteps.performWriteFinalDecisionForAESAAppealYesAwardGivenAndNoticeGenerated(
         esaCaseId
       );

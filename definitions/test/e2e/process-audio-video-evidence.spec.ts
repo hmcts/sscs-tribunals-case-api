@@ -7,7 +7,7 @@ let caseId: string;
 test.describe(
   'Process audio/video evidence test',
   { tag: '@nightly-pipeline' },
-  async () => {
+  () => {
     test.beforeEach('Case has to be Created', async () => {
       caseId = await createCaseBasedOnCaseType('PIP');
     });
@@ -67,7 +67,7 @@ test.describe(
 test.describe.serial(
   'WA - Manual Process Audio/Video Evidence task completion test',
   { tag: '@work-allocation' },
-  async () => {
+  () => {
     test.beforeAll('Case has to be Created', async () => {
       caseId = await createCaseBasedOnCaseType('PIP');
     });
@@ -98,7 +98,7 @@ test.describe.serial(
 test.describe.serial(
   'WA - Process Audio/Video Evidence task iniation and completion tests',
   { tag: '@work-allocation' },
-  async () => {
+  () => {
     test.beforeAll('Case has to be Created', async () => {
       caseId = await createCaseBasedOnCaseType('PIP');
     });
@@ -135,7 +135,7 @@ test.describe.serial(
 test.describe.serial(
   'WA - Process Audio/Video Evidence task automatic cancellation when case is void',
   { tag: '@work-allocation' },
-  async () => {
+  () => {
     test.beforeAll('Case has to be Created', async () => {
       caseId = await createCaseBasedOnCaseType('PIP');
     });

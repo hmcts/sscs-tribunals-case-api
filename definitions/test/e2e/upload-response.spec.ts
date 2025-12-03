@@ -7,7 +7,7 @@ let caseId: string;
 test.describe(
   'Upload response tests',
   { tag: ['@preview-regression', '@nightly-pipeline'] },
-  async () => {
+  () => {
 
     test.afterEach(
       'Cancel the hearings after test run',
@@ -44,7 +44,7 @@ test.describe(
     }) => {
       test.slow();
       await uploadResponseSteps.checkHmcEnvironment(request);
-      let ucCaseId = await createCaseBasedOnCaseType('UC');
+      const ucCaseId = await createCaseBasedOnCaseType('UC');
       await uploadResponseSteps.performUploadResponseOnAUniversalCredit(ucCaseId);
     });
   }
@@ -53,7 +53,7 @@ test.describe(
 test.describe(
   'Upload response tests for PHE workflow',
   { tag: '@nightly-pipeline' },
-  async () => {
+  () => {
     test.beforeEach('Case has to be Created', async () => {
       caseId = await createCaseBasedOnCaseType('PIP');
     });
@@ -85,7 +85,7 @@ test.describe(
 test.describe(
   'Upload response tests for UCB workflow',
   { tag: '@nightly-pipeline' },
-  async () => {
+  () => {
     test.beforeEach('Case has to be Created', async () => {
       caseId = await createCaseBasedOnCaseType('PIP');
     });
@@ -114,7 +114,7 @@ test.describe(
 test.describe.serial(
   'Error scenarios',
   { tag: '@nightly-pipeline' },
-  async () => {
+  () => {
     test('Verify Upload response error scenario', async ({
       uploadResponseSteps
     }) => {
@@ -143,7 +143,7 @@ test.describe.serial(
   {
     tag: '@work-allocation'
   },
-  async () => {
+  () => {
     let caseId: string;
 
     test.beforeAll('Case has to be Created', async () => {
@@ -179,7 +179,7 @@ test.describe(
   {
     tag: '@work-allocation'
   },
-  async () => {
+  () => {
     let caseId: string;
 
     test.beforeAll('Case has to be Created', async () => {

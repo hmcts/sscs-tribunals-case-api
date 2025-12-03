@@ -7,7 +7,7 @@ let caseId: string;
 test.describe.serial(
   'WA - Referred by Judge task initiation',
   { tag: '@work-allocation' },
-  async () => {
+  () => {
     test.beforeAll('Case has to be Created', async () => {
       caseId = await createCaseBasedOnCaseType('PIP');
     });
@@ -39,7 +39,7 @@ test.describe.serial(
 test.describe.serial(
   'WA - Referred by Judge task completion tests',
   { tag: '@work-allocation' },
-  async () => {
+  () => {
     test.beforeAll('Case has to be Created', async () => {
       caseId = await createCaseBasedOnCaseType('PIP');
     });
@@ -75,7 +75,7 @@ test.describe.serial(
   {
     tag: '@work-allocation'
   },
-  async () => {
+  () => {
     let caseId: string;
 
     test.beforeAll('Case has to be Created', async () => {

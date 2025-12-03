@@ -7,9 +7,9 @@ test.describe(
   {
     tag: '@work-allocation'
   },
-  async () => {
+  () => {
     test.describe
-      .serial('WA - Task initiation and completion by Regional Center Admin', async () => {
+      .serial('WA - Task initiation and completion by Regional Center Admin', () => {
       let caseId: string;
 
       test.beforeAll('Case has to be Created', async () => {
@@ -42,7 +42,7 @@ test.describe(
     });
 
     test.describe
-      .serial('WA - Task initiation and completion by Regional Center Team Leader', async () => {
+      .serial('WA - Task initiation and completion by Regional Center Team Leader', () => {
       let caseId: string;
 
       test.beforeAll('Case has to be Created', async () => {
@@ -81,7 +81,7 @@ test.describe.serial(
   {
     tag: '@work-allocation'
   },
-  async () => {
+  () => {
     let caseId: string;
 
     test.beforeAll('Case has to be Created', async () => {
