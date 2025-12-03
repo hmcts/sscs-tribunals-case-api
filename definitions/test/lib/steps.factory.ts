@@ -54,6 +54,7 @@ import { CommunicateWithFta } from '../fixtures/steps/communicate-with-fta';
 import { Adjournment } from '../fixtures/steps/adjournment';
 import { AmendElements } from '../fixtures/steps/amend.elements';
 import { ReviewIncompleteAppeal } from '../fixtures/steps/work-allocation/review.incomplete.appeal';
+import { CtscActionUnprocessedCorrespondence } from '../fixtures/steps/work-allocation/ctsc.action.unprocessed.correspondence';
 
 type MyStepsFixtures = {
   addNoteSteps: Note;
@@ -111,6 +112,7 @@ type MyStepsFixtures = {
   adjournmentSteps: Adjournment;
   amendElementSteps: AmendElements;
   reviewIncompleteAppealSteps: ReviewIncompleteAppeal;
+  ctscActionUnprocessedCorrespondenceSteps: CtscActionUnprocessedCorrespondence;
 };
 
 export const test = stepsFactory.extend<MyStepsFixtures>({
@@ -432,5 +434,9 @@ export const test = stepsFactory.extend<MyStepsFixtures>({
   reviewIncompleteAppealSteps: async ({ page }, use) => {
     const reviewIncompleteAppealSteps = new ReviewIncompleteAppeal(page);
     await use(reviewIncompleteAppealSteps);
+  },
+  ctscActionUnprocessedCorrespondenceSteps: async ({ page }, use) => {
+    const ctscActionUnprocessedCorrespondenceSteps = new CtscActionUnprocessedCorrespondence(page);
+    await use(ctscActionUnprocessedCorrespondenceSteps);
   }
 });
