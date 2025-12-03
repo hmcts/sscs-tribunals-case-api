@@ -15,38 +15,39 @@ curl --silent --show-error -X POST "https://am-role-assignment-service-sscs-trib
   -H "Authorization: Bearer ${SSCS_SYSTEM_USER_TOKEN}" \
   -H "ServiceAuthorization: Bearer ${S2S_TOKEN}" \
   -H "Content-Type: application/json" \
-  -d '{ "roleRequest": {
-            "assignerId": "'"${SYSTEM_USER_ID}"'",
-            "process": "sscs-system-users",
-            "reference": "sscs-hearings-system-user",
-            "replaceExisting": true
-          },
-          "requestedRoles": [
-            {
-              "actorId": "'"${SYSTEM_USER_ID}"'",
-              "roleType": "ORGANISATION",
-              "classification": "PUBLIC",
-              "roleName": "hearing-manager",
-              "roleCategory": "SYSTEM",
-              "grantType": "STANDARD",
-              "attributes": {
-                "jurisdiction": "SSCS",
-                "caseType": "Benefit"
-              },
-              "actorIdType": "IDAM"
+  -d '{
+        "roleRequest": {
+          "assignerId": "606f5bff-02f4-4a9b-8b72-12875174b289",
+          "process": "sscs-system-users",
+          "reference": "sscs-hearings-system-user",
+          "replaceExisting": true
+        },
+        "requestedRoles": [
+          {
+            "actorId": "22cb52eb-9490-42ce-837b-58b81702855a",
+            "roleType": "ORGANISATION",
+            "classification": "PUBLIC",
+            "roleName": "hearing-manager",
+            "roleCategory": "SYSTEM",
+            "grantType": "STANDARD",
+            "attributes": {
+              "jurisdiction": "SSCS",
+              "caseType": "Benefit"
             },
-            {
-              "actorId": "'"${SYSTEM_USER_ID}"'",
-              "roleType": "ORGANISATION",
-              "classification": "PUBLIC",
-              "roleName": "hearing-viewer",
-              "roleCategory": "SYSTEM",
-              "grantType": "STANDARD",
-              "attributes": {
-                "jurisdiction": "SSCS",
-                "caseType": "Benefit"
-              },
-              "actorIdType": "IDAM"
-            }
-          ]
+            "actorIdType": "IDAM"
+          },
+          {
+            "actorId": "22cb52eb-9490-42ce-837b-58b81702855a",
+            "roleType": "ORGANISATION",
+            "classification": "PUBLIC",
+            "roleName": "hearing-viewer",
+            "roleCategory": "SYSTEM",
+            "grantType": "STANDARD",
+            "attributes": {
+              "jurisdiction": "SSCS",
+              "caseType": "Benefit"
+            },
+            "actorIdType": "IDAM"
+          }
+        ]
       }'
