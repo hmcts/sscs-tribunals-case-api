@@ -16,7 +16,7 @@ curl --silent --show-error -X POST "https://am-role-assignment-service-sscs-trib
   -H "ServiceAuthorization: Bearer ${S2S_TOKEN}" \
   -H "Content-Type: application/json" \
   -d '{ "roleRequest": {
-            "assignerId": "41033a79-b9c1-4a36-b0ff-113451f736ba",
+            "assignerId": "'"${SYSTEM_USER_ID}"'",
             "process": "sscs-system-users",
             "reference": "sscs-hearings-system-user",
             "replaceExisting": false
