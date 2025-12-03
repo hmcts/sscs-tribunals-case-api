@@ -748,7 +748,7 @@ public class PersonalisationTest {
         assertNull(result.get(EVIDENCE_RECEIVED_DATE_LITERAL));
         assertEquals(EMPTY, result.get(JOINT));
         assertEquals(EMPTY, result.get(JOINT_WELSH));
-        assertNull(result.get(JOINT_PARTY));
+        assertNull(result.get(JOINT_PARTY.name()));
 
         assertEquals(ADDRESS1, result.get(REGIONAL_OFFICE_NAME_LITERAL));
         assertEquals(ADDRESS2, result.get(SUPPORT_CENTRE_NAME_LITERAL));
@@ -1188,7 +1188,7 @@ public class PersonalisationTest {
 
         Map<String, Object> result = personalisation.setEventData(new HashMap<>(), response, APPEAL_RECEIVED);
 
-        assertEquals(LocalDate.now().plusDays(personalisation.calculateMaxDwpResponseDays(response.getBenefitCode())).format(DateTimeFormatter.ofPattern(RESPONSE_DATE_FORMAT)), result.get(APPEAL_RESPOND_DATE));
+        assertEquals(LocalDate.now().plusDays(personalisation.calculateMaxDwpResponseDays(response.getAppeal().getBenefitType())).format(DateTimeFormatter.ofPattern(RESPONSE_DATE_FORMAT)), result.get(APPEAL_RESPOND_DATE));
     }
 
     @Test
@@ -1962,7 +1962,7 @@ public class PersonalisationTest {
                 .build())
             .build();
 
-        OtherParty otherParty = sscsCaseData.getOtherParties().get(0).getValue();
+        OtherParty otherParty = sscsCaseData.getOtherParties().getFirst().getValue();
         Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper.builder()
                 .newSscsCaseData(sscsCaseData)
                 .notificationEventType(SUBSCRIPTION_CREATED)
