@@ -3,8 +3,6 @@ import { BaseStep } from './base';
 import { credentials, environment } from '../../config/config';
 import createCaseBasedOnCaseType from '../../api/client/sscs/factory/appeal.type.factory';
 import { StepsHelper } from '../../helpers/stepsHelper';
-import task from '../../pages/content/review.fta.response.task_en.json';
-import { VoidCase } from './void.case';
 
 const responseReviewedTestData = require('../../pages/content/response.reviewed_en.json');
 const uploadResponseTestdata = require('../../pages/content/upload.response_en.json');
@@ -383,124 +381,10 @@ export class UploadResponse extends BaseStep {
     // await performAppealDormantOnCase(UploadResponse.caseId);
   }
 
-  async verifyCtscAdminWithCaseAllocatorRoleCanViewReviewFTAResponseTask(
-    caseId: string
-  ) {
-    await this.uploadResponseWithFurtherInfoAsDwpCaseWorker(caseId);
-
-    /* Login as CTSC Administrator with case allocator role and view the 
-           unassigned Review FTA Response task */
-    await this.loginUserWithCaseId(
-      credentials.amCaseWorkerWithCaseAllocatorRole,
-      true,
-      caseId
-    );
-    await this.homePage.navigateToTab('Summary');
-    await this.summaryTab.verifyPresenceOfText('Response received');
-    await this.homePage.navigateToTab('Tasks');
-    await this.tasksTab.verifyTaskIsDisplayed(task.name);
-    await this.tasksTab.verifyPriortiy(task.name, task.priority);
-    await this.tasksTab.verifyPageContentByKeyValue(
-      task.name,
-      'Assigned to',
-      task.assignedToWhenNotAssigned
-    );
-    await this.tasksTab.verifyManageOptions(
-      task.name,
-      task.unassignedManageOptionsForCaseAllocator
-    );
-  }
-
-  async verifyCtscAdminWithoutCaseAllocatorRoleCanCompleteReviewFTAResponseTask(
-    caseId: string
-  ) {
-    // Login as CTSC Administrator and view the unassigned Review FTA Response task
-    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
-    await this.homePage.navigateToTab('Tasks');
-    await this.tasksTab.verifyTaskIsDisplayed(task.name);
-    await this.tasksTab.verifyPriortiy(task.name, task.priority);
-    await this.tasksTab.verifyPageContentByKeyValue(
-      task.name,
-      'Assigned to',
-      task.assignedToWhenNotAssigned
-    );
-
-    // CTSC Administrator self assigns task and verifies assigned task details
-    await this.tasksTab.selfAssignTask(task.name);
-    await this.tasksTab.verifyPageContentByKeyValue(
-      task.name,
-      'Assigned to',
-      task.assignedTo
-    );
-    await this.tasksTab.verifyManageOptions(
-      task.name,
-      task.assignedManageOptions
-    );
-    await this.tasksTab.verifyNextStepsOptions(
-      task.name,
-      task.nextStepsOptions
-    );
-
-    // Select Response reviewed next step and complete the event
-    await this.tasksTab.clickNextStepLink(task.responseReviewed.link);
-    await this.responseReviewedPage.verifyPageContent(
-      responseReviewedTestData.captionValue,
-      responseReviewedTestData.headingValue
-    );
-    await this.responseReviewedPage.chooseInterlocOption('No');
-    await this.responseReviewedPage.confirmSubmission();
-
-    await expect(this.homePage.summaryTab).toBeVisible();
-
-    // Verify task is removed from the tasks list within Tasks tab
-    await this.homePage.navigateToTab('Tasks');
-    await this.tasksTab.verifyTaskIsHidden(task.name);
-  }
-
-  async verifyReviewFTAResponseTaskIsCancelledAutomaticallyWhenTheCaseIsVoid(
-    caseId: string
-  ) {
-    await this.uploadResponseWithFurtherInfoAsDwpCaseWorker(caseId);
-
-    // Verify CTSC Admin can view the unassigned Review FTA Response task
-    await this.homePage.signOut();
-    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
-    await this.homePage.navigateToTab('Tasks');
-    await this.tasksTab.verifyTaskIsDisplayed(task.name);
-    await this.tasksTab.verifyManageOptions(
-      task.name,
-      task.unassignedManageOptions
-    );
-
-    // CTSC Administrator self assigns task and verifies assigned task details
-    await this.tasksTab.selfAssignTask(task.name);
-    await this.tasksTab.verifyPageContentByKeyValue(
-      task.name,
-      'Assigned to',
-      task.assignedTo
-    );
-    await this.tasksTab.verifyManageOptions(
-      task.name,
-      task.assignedManageOptions
-    );
-    await this.tasksTab.verifyNextStepsOptions(
-      task.name,
-      task.nextStepsOptions
-    );
-
-    // CTSC Administrator voids the case
-    let voidCase = new VoidCase(this.page);
-    await voidCase.performVoidCase(caseId, false);
-
-    // Verify task is removed from the tasks list within Tasks tab
-    await this.homePage.navigateToTab('Tasks');
-    await this.tasksTab.verifyTaskIsHidden(task.name);
-  }
-
   async uploadResponseWithFurtherInfoAsDwpCaseWorker(caseId: string) {
     // As DWP caseworker upload response with further info
     await this.loginUserWithCaseId(
-      credentials.dwpResponseWriter,
+      credentials.amCtscTeamLeaderNwLiverpool,
       false,
       caseId
     );

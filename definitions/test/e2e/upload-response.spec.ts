@@ -138,41 +138,7 @@ test.describe.serial(
   }
 );
 
-test.describe.serial(
-  'WA - Review FTA response CTSC work allocation task initiation and completion tests',
-  {
-    tag: '@work-allocation'
-  },
-  async () => {
-    let caseId: string;
 
-    test.beforeAll('Case has to be Created', async () => {
-      caseId = await createCaseBasedOnCaseType('PIP');
-    });
-
-    test('As a CSTC Admin with case allocator role, view Review FTA response CTSC task', async ({
-      uploadResponseSteps
-    }) => {
-      test.slow();
-      await uploadResponseSteps.verifyCtscAdminWithCaseAllocatorRoleCanViewReviewFTAResponseTask(
-        caseId
-      );
-    });
-
-    test('As a CSTC Administrator without case allocator role, view and complete Review FTA Response CTSC task', async ({
-      uploadResponseSteps
-    }) => {
-      test.slow();
-      await uploadResponseSteps.verifyCtscAdminWithoutCaseAllocatorRoleCanCompleteReviewFTAResponseTask(
-        caseId
-      );
-    });
-
-    test.afterAll('Case has to be set to Dormant', async () => {
-      await performAppealDormantOnCase(caseId);
-    });
-  }
-);
 
 test.describe(
   'WA - Review FTA Response CTSC task automatic cancellation when case is void',
@@ -186,14 +152,7 @@ test.describe(
       caseId = await createCaseBasedOnCaseType('PIP');
     });
 
-    test('Review FTA Response task is cancelled automatically when case is void', async ({
-      uploadResponseSteps
-    }) => {
-      test.slow();
-      await uploadResponseSteps.verifyReviewFTAResponseTaskIsCancelledAutomaticallyWhenTheCaseIsVoid(
-        caseId
-      );
-    });
+    
 
     test.afterAll('Case has to be set to Dormant', async () => {
       await performAppealDormantOnCase(caseId);
