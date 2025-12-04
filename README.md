@@ -253,5 +253,3 @@ This avoids re-triggering the pipeline build and saves time.
 ### Local DM Store Not Healthy (DOWN or UNKNOWN)
 If this is the first time that the container has been created then it may need to be restarted multiple times in order for it to come up successfully!
 
-
-
