@@ -44,6 +44,8 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBCA
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBCA_FULL_NAME_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.JOINT_TEXT_WITH_A_SPACE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.JOINT_TEXT_WITH_A_SPACE_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.MAX_DWP_RESPONSE_DAYS;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.MAX_DWP_RESPONSE_DAYS_CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.RESPONSE_DATE_FORMAT;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.THE_STRING;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.THE_STRING_WELSH;
@@ -172,6 +174,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -262,10 +265,11 @@ public class PersonalisationTest {
     private final String evidenceAddressTelephoneWelsh = PHONE_WELSH;
     private final String evidenceAddressTelephoneIbc = PHONE_IBC;
     private final EvidenceProperties.EvidenceAddress evidenceAddress = new EvidenceProperties.EvidenceAddress();
+    private AutoCloseable autoCloseable;
 
     @BeforeEach
     public void setup() {
-        openMocks(this);
+        autoCloseable = openMocks(this);
         when(config.getTrackAppealLink()).thenReturn(Link.builder().linkUrl("http://tyalink.com/appeal_id").build());
         when(config.getMyaLink()).thenReturn(Link.builder().linkUrl("http://myalink.com/appeal_id").build());
         when(config.getMyaClaimingExpensesLink()).thenReturn(Link.builder().linkUrl("http://myalink.com/claimingExpenses").build());
@@ -326,6 +330,11 @@ public class PersonalisationTest {
         personalisations.put(LanguagePreference.ENGLISH, englishMap);
         personalisations.put(LanguagePreference.WELSH, welshMap);
         personalisationConfiguration.setPersonalisation(personalisations);
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        autoCloseable.close();
     }
 
     private static Map<String, String> getWelshMap() {
@@ -1178,17 +1187,26 @@ public class PersonalisationTest {
         assertEquals("12 August 2018", result.get(APPEAL_RESPOND_DATE));
     }
 
-    @Test
-    public void givenDigitalCaseWithNoDateSentToDwp_thenUseTodaysDateForAppealRespondDate() {
+    @ParameterizedTest
+    @CsvSource({"PIP," + MAX_DWP_RESPONSE_DAYS, "childSupport," + MAX_DWP_RESPONSE_DAYS_CHILD_SUPPORT})
+    public void givenDigitalCaseWithNoDateSentToDwp_thenUseTodaysDateForAppealRespondDate(
+        String benefitCode, int responsePeriod) {
+
         SscsCaseData response = SscsCaseData.builder()
-            .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
-            .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build())
+            .ccdCaseId(CASE_ID)
+            .caseReference("SC/1234/5")
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code(benefitCode).build())
+                .build())
             .createdInGapsFrom("readyToList")
             .build();
 
         Map<String, Object> result = personalisation.setEventData(new HashMap<>(), response, APPEAL_RECEIVED);
 
-        assertEquals(LocalDate.now().plusDays(personalisation.calculateMaxDwpResponseDays(response.getAppeal().getBenefitType())).format(DateTimeFormatter.ofPattern(RESPONSE_DATE_FORMAT)), result.get(APPEAL_RESPOND_DATE));
+        assertThat(result.get(APPEAL_RESPOND_DATE))
+            .isEqualTo(LocalDate.now()
+                .plusDays(responsePeriod)
+                .format(DateTimeFormatter.ofPattern(RESPONSE_DATE_FORMAT)));
     }
 
     @Test
