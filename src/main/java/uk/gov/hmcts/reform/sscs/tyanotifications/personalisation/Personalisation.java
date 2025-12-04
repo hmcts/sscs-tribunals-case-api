@@ -836,7 +836,7 @@ public class Personalisation<E extends NotificationWrapper> {
     }
 
     private int calculateMaxDwpResponseDays(BenefitType benefitType) {
-        if (benefitType.getCode() != null && benefitType.getCode().equals("childSupport")) {
+        if (benefitType.getCode() != null && Benefit.CHILD_SUPPORT.getShortName().equals(benefitType.getCode())) {
             return MAX_DWP_RESPONSE_DAYS_CHILD_SUPPORT;
         } else {
             return MAX_DWP_RESPONSE_DAYS;
