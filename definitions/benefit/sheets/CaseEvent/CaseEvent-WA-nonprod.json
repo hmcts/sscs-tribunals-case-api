@@ -211,6 +211,7 @@
     "DisplayOrder": 9994,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "SecurityClassification": "Public",
     "Publish": "${CCD_DEF_PUBLISH}"
   }
