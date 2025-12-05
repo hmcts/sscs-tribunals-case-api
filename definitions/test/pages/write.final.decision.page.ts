@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 import { WebAction } from '../common/web.action';
 import writeFinalDecisionData from './content/write.final.decision_en.json';
 
@@ -1307,7 +1307,9 @@ export class WriteFinalDecisionPages {
   }
 
   async inputAndVerifyPageContentForWorkCapabilityAssessmentPageData(
-    supportGroup: boolean
+    supportGroup: boolean,
+    isESACase = false,
+    esaRegulationYear: '2008' | '2013' = '2013'
   ) {
     await webActions.clickElementById('#wcaAppeal_Yes');
     await webActions.verifyPageLabel(
@@ -1322,6 +1324,16 @@ export class WriteFinalDecisionPages {
       "[for='supportGroupOnlyAppeal_No']",
       writeFinalDecisionData.noLabel
     );
+    if (isESACase) {
+      await webActions.verifyTextVisibility(
+        writeFinalDecisionData.whichEsaRegulationsApplyLabel
+      );
+      await webActions.clickRadioButton(
+        esaRegulationYear === '2008'
+          ? writeFinalDecisionData.esaRegulations2008Label
+          : writeFinalDecisionData.esaRegulations2013Label
+      );
+    }
     supportGroup
       ? await webActions.clickElementById('#supportGroupOnlyAppeal_Yes')
       : await webActions.clickElementById('#supportGroupOnlyAppeal_No');
@@ -1591,7 +1603,8 @@ export class WriteFinalDecisionPages {
   }
 
   async verifyPageContentForCheckYourAnswersPageForESACaseWithScheduleAndReasses(
-    appealPermission: string
+    appealPermission: string,
+    esaRegulationsLabel = writeFinalDecisionData.esaRegulations2013Label
   ) {
     //await webActions.verifyPageLabel('.govuk-caption-l', writeFinalDecisionData.eventNameCaptor); // No Captor on this Page.
     await webActions.verifyPageLabel(
@@ -1669,6 +1682,13 @@ export class WriteFinalDecisionPages {
       '.form-table tr:nth-of-type(13) > .form-cell .text-16',
       writeFinalDecisionData.noLabel
     );
+
+    const esaRegulationRow = this.page.locator('tr', {
+      hasText: new RegExp(esaRegulationsLabel)
+    });
+    const rowCount = await esaRegulationRow.count();
+    expect(rowCount).toBeGreaterThan(0);
+    await expect(esaRegulationRow.first()).toContainText(esaRegulationsLabel);
 
     // await webActions.verifyPageLabel('.form-table tr:nth-of-type(14) > .form-cell .text-16', phyDisabilities);
     // await webActions.verifyPageLabel('.form-table tr:nth-of-type(15) > .form-cell .text-16', menDisabilities);

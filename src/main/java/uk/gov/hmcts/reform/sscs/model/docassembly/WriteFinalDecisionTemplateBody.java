@@ -123,4 +123,6 @@ public class WriteFinalDecisionTemplateBody {
     private boolean isIbca;
     @JsonProperty("uc_capability_assessment_start_date")
     private LocalDate ucCapabilityAssessmentStartDate;
+    @JsonProperty("esa_regulations_year")
+    private String esaRegulationsYear;
 }
