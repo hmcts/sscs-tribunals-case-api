@@ -14,7 +14,7 @@ test.describe('Work Allocation - CTSC - Review FTA response Task',{tag: [ /*'@wo
       await ctscReviewFtaResponseSteps.verifyCtscAdminWithCaseAllocatorRoleCanViewReviewFTAResponseTask(caseId);
     });
 
-    test('As a CSTC Administrator without case allocator role, view and complete Review FTA Response CTSC task', async ({ ctscReviewFtaResponseSteps }) => {
+    test('As a CSTC Admin without case allocator role, view and complete Review FTA Response CTSC task', async ({ ctscReviewFtaResponseSteps }) => {
       test.slow();
       await ctscReviewFtaResponseSteps.verifyCtscAdminWithoutCaseAllocatorRoleCanCompleteReviewFTAResponseTask(caseId);
     });
