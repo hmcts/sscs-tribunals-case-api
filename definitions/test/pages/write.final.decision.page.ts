@@ -1217,66 +1217,25 @@ export class WriteFinalDecisionPages {
 
     await webActions.verifyPageLabel(
       '.form-table tr:nth-of-type(16) > .valign-top > .text-16',
-      writeFinalDecisionData.schedule7ActivitiesLabel
-    );
-    await webActions.verifyPageLabel(
-      'tr:nth-of-type(16) tr:nth-of-type(1) .text-16',
-      writeFinalDecisionData.manualDexterityLabel
-    );
-    await webActions.verifyPageLabel(
-      'tr:nth-of-type(16) tr:nth-of-type(2) .text-16',
-      writeFinalDecisionData.initiatingAndCompletingLabel
+      writeFinalDecisionData.doSchedule7ActivitiesApply
     );
 
-    await webActions.verifyPageLabel(
-      '.form-table tr:nth-of-type(17) > .valign-top > .text-16',
-      writeFinalDecisionData.whatIsTheLastPageInTheTribunalBundleLabel
-    );
-    await webActions.verifyPageLabel(
-      'tr:nth-of-type(17) > .form-cell .text-16',
-      writeFinalDecisionData.lastPageInTheTribunalBundleInput
-    );
+    await webActions.verifyTextVisibility(writeFinalDecisionData.manualDexterityLabel);
+    await webActions.verifyTextVisibility(writeFinalDecisionData.initiatingAndCompletingLabel);
 
-    await webActions.verifyPageLabel(
-      'tr:nth-of-type(19) > .valign-top > .text-16',
-      writeFinalDecisionData.whenShouldFTAReAssessTheAwardLabel
-    );
-    await webActions.verifyPageLabel(
-      'tr:nth-of-type(19) > .form-cell .text-16',
-      writeFinalDecisionData.reassessWithin3MonthsLabel
-    );
+    await webActions.verifyTextVisibility(writeFinalDecisionData.whatIsTheLastPageInTheTribunalBundleLabel);
+    await webActions.verifyTextVisibility(writeFinalDecisionData.lastPageInTheTribunalBundleInput);
 
-    await webActions.verifyPageLabel(
-      'tr:nth-of-type(20) > .valign-top > .text-16',
-      writeFinalDecisionData.reasonsForDecisionLabel
-    );
-    await webActions.verifyPageLabel(
-      'tr:nth-of-type(20) > td:nth-of-type(1) span:nth-of-type(1)',
-      writeFinalDecisionData.reasonsForDecisionInput
-    );
+    await webActions.verifyTextVisibility(writeFinalDecisionData.whenShouldFTAReAssessTheAwardLabel);
+    await webActions.verifyTextVisibility(writeFinalDecisionData.reassessWithin3MonthsLabel);
 
-    await webActions.verifyPageLabel(
-      'tr:nth-of-type(20) > .valign-top > .text-16',
-      writeFinalDecisionData.reasonsForDecisionLabel
-    );
-    await webActions.verifyPageLabel(
-      'tr:nth-of-type(20) > td:nth-of-type(1) span:nth-of-type(1)',
-      writeFinalDecisionData.reasonsForDecisionInput
-    );
+    await webActions.verifyTextVisibility(writeFinalDecisionData.reasonsForDecisionLabel);
+    await webActions.verifyTextVisibility(writeFinalDecisionData.reasonsForDecisionInput);
 
-    await webActions.verifyPageLabel(
-      'tr:nth-of-type(21) > .valign-top > .text-16',
-      writeFinalDecisionData.checkYourAnswersAnythingElse
-    );
-    await webActions.verifyPageLabel(
-      'tr:nth-of-type(21) > .form-cell span',
-      writeFinalDecisionData.anythingElseInput
-    );
+    await webActions.verifyTextVisibility(writeFinalDecisionData.checkYourAnswersAnythingElse);
+    await webActions.verifyTextVisibility(writeFinalDecisionData.anythingElseInput);
 
-    await webActions.verifyPageLabel(
-      'tr:nth-of-type(22) > .valign-top > .text-16',
-      writeFinalDecisionData.previewDecisionNoticeLabel
-    );
+    await webActions.verifyTextVisibility(writeFinalDecisionData.previewDecisionNoticeLabel);
   }
 
   async inputPageContentForMovingAroundPageData() {
@@ -1306,9 +1265,15 @@ export class WriteFinalDecisionPages {
     );
   }
 
+  async verifyPageContentForWorkCapabilityAssessmentPageWithStartDate() {
+    await this.verifyPageContentForWorkCapabilityAssessmentPage();
+    // Start date fields stay hidden until WCA is set to 'Yes', so only assert labels after selection.
+  }
+
   async inputAndVerifyPageContentForWorkCapabilityAssessmentPageData(
     supportGroup: boolean,
     isESACase = false,
+    includeStartDate = false,
     esaRegulationYear: '2008' | '2013' = '2013'
   ) {
     await webActions.clickElementById('#wcaAppeal_Yes');
@@ -1337,6 +1302,29 @@ export class WriteFinalDecisionPages {
     supportGroup
       ? await webActions.clickElementById('#supportGroupOnlyAppeal_Yes')
       : await webActions.clickElementById('#supportGroupOnlyAppeal_No');
+
+    if (includeStartDate) {
+      // The start date fields appear after selecting WCA = Yes; use a safe past date.
+      await webActions.verifyElementVisibility(
+        '#ucWriteFinalDecisionWorkCapabilityAssessmentStartDate legend > .form-label'
+      );
+      await webActions.verifyPageLabel(
+        '#ucWriteFinalDecisionWorkCapabilityAssessmentStartDate legend > .form-label',
+        writeFinalDecisionData.ucAwardStartDateLabel
+      );
+      await webActions.inputField(
+        '#ucWriteFinalDecisionWorkCapabilityAssessmentStartDate-day',
+        '01'
+      );
+      await webActions.inputField(
+        '#ucWriteFinalDecisionWorkCapabilityAssessmentStartDate-month',
+        '01'
+      );
+      await webActions.inputField(
+        '#ucWriteFinalDecisionWorkCapabilityAssessmentStartDate-year',
+        '2023'
+      );
+    }
   }
 
   async verifyPageContentForSchedule7ActivitiesPage() {
