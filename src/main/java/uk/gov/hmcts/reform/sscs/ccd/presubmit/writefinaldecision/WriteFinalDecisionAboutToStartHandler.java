@@ -58,6 +58,8 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
             }
         }
 
+        sscsCaseData.getSscsEsaCaseData().setWhichEsaRegulationsApply("2013");
+
         SscsUtil.setCorrectionInProgress(caseDetails, isPostHearingsEnabled);
         clearTransientFields(sscsCaseData);
 
