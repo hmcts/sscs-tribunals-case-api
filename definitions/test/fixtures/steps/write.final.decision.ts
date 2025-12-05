@@ -405,7 +405,8 @@ export class WriteFinalDecision extends BaseStep {
 
     await this.writeFinalDecisionPage.verifyPageContentForWorkCapabilityAssessmentPage();
     await this.writeFinalDecisionPage.inputAndVerifyPageContentForWorkCapabilityAssessmentPageData(
-      false
+      false,
+      true
     );
     await this.writeFinalDecisionPage.submitContinueBtn();
     await new Promise((f) => setTimeout(f, 1000)); //Delay required for the Case to be ready
@@ -505,7 +506,8 @@ export class WriteFinalDecision extends BaseStep {
 
     await this.writeFinalDecisionPage.verifyPageContentForWorkCapabilityAssessmentPage();
     await this.writeFinalDecisionPage.inputAndVerifyPageContentForWorkCapabilityAssessmentPageData(
-      false
+      false,
+      true
     );
     await this.writeFinalDecisionPage.submitContinueBtn();
     await new Promise((f) => setTimeout(f, 1000)); //Delay required for the Case to be ready
