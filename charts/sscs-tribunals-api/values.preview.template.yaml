@@ -272,7 +272,7 @@ xui-webapp:
       SERVICES_EM_ANNO_API: ${CCD_GW_API}
       SERVICES_CCD_COMPONENT_API: ${CCD_GW_API}
       SERVICES_CCD_DATA_STORE_API: ${CORE_CASE_DATA_API_URL}
-      SERVICES_CCD_CASE_ASSIGNMENT_API: http://${SERVICE_NAME}-aac-manage-case-assignment
+      SERVICES_CCD_CASE_ASSIGNMENT_API: http://${SERVICE_NAME}-aac
       SERVICES_TERMS_AND_CONDITIONS: http://${SERVICE_NAME}-xui-terms-and-conditions
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       SERVICES_S2S: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
