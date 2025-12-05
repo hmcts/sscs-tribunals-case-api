@@ -1,10 +1,9 @@
 import { test } from '../lib/steps.factory';
 import createCaseBasedOnCaseType from '../api/client/sscs/factory/appeal.type.factory';
-import { request } from '@playwright/test';
 
 let caseId: string;
 
-test.describe('Enhanced confidentiality test', async () => {
+test.describe('Enhanced confidentiality test', () => {
   test.beforeEach('Case has to be Created', async () => {
     caseId = await createCaseBasedOnCaseType('UC');
     test.setTimeout(360000);

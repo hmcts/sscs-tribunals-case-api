@@ -6,7 +6,7 @@ import ibcData from "../../pages/content/iba/iba.casedata_en.json";
 
 test.describe.configure({ mode: 'serial' });
 
-test.describe("Create IBA Paper Scottish case appeal and perform few events", { tag: '@ibc' }, async () => {
+test.describe("Create IBA Paper Scottish case appeal and perform few events", { tag: '@ibc' }, () => {
 
   let ibcCaseId: string;
 

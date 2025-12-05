@@ -5,7 +5,7 @@ import performAppealDormantOnCase from '../api/client/sscs/appeal.event';
 test.describe(
   'Reinstatement request tests',
   { tag: ['@preview-regression', '@nightly-pipeline'] },
-  async () => {
+  () => {
     let caseId: string;
 
     test.beforeEach('Case has to be Created', async () => {
@@ -31,7 +31,7 @@ test.describe.serial(
   {
     tag: '@work-allocation'
   },
-  async () => {
+  () => {
     let caseId: string;
 
     test.beforeAll('Create case', async () => {
@@ -72,7 +72,7 @@ test.describe.serial(
   {
     tag: '@work-allocation'
   },
-  async () => {
+  () => {
     let caseId: string;
 
     test.beforeAll('Create case', async () => {
@@ -113,7 +113,7 @@ test.describe.serial(
   {
     tag: '@work-allocation'
   },
-  async () => {
+  () => {
     let caseId: string;
 
     test.beforeAll('Create case', async () => {
@@ -143,9 +143,8 @@ test.describe.serial(
       );
     });
 
-    test('As a Tribunal Caseworker, complete the Review Reinstatement Request task ', async ({
-      reinstatementSteps
-    }) => {
+    test('As a Tribunal Caseworker, complete the Review Reinstatement Request task', 
+      async ({ reinstatementSteps }) => {
       test.slow();
       await reinstatementSteps.verifyTcwCanCompleteTheAssignedReviewReinstatementRequestTask(
         caseId
@@ -163,7 +162,7 @@ test.describe.serial(
   {
     tag: '@work-allocation'
   },
-  async () => {
+  () => {
     let caseId: string;
 
     test.beforeAll('Create case', async () => {
@@ -204,7 +203,7 @@ test.describe.serial(
   {
     tag: '@work-allocation'
   },
-  async () => {
+  () => {
     let caseId: string;
 
     test.beforeAll('Create case', async () => {

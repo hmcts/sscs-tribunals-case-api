@@ -9,14 +9,14 @@ import createCaseBasedOnCaseType from '../api/client/sscs/factory/appeal.type.fa
 import { performEventOnCaseWithUploadResponse } from '../api/client/sscs/factory/appeal.update.factory';
 //var event_token: string = JSON.parse(response_document).push({hello: 'value'});
 
-test('Test to Test API Working....', async () => {
-  let pipCaseId = await createCaseBasedOnCaseType('PIP');
+test('Verify API Working....', async () => {
+  const pipCaseId = await createCaseBasedOnCaseType('PIP');
   await new Promise((f) => setTimeout(f, 10000)); //Delay required for the Case to be ready
-  let responseWriterToken: string = await accessToken(
+  const responseWriterToken: string = await accessToken(
     credentials.dwpResponseWriter
   );
-  let serviceToken: string = await getSSCSServiceToken();
-  let responseWriterId: string = await accessId(credentials.dwpResponseWriter);
+  const serviceToken: string = await getSSCSServiceToken();
+  const responseWriterId: string = await accessId(credentials.dwpResponseWriter);
   await performEventOnCaseWithUploadResponse(
     responseWriterToken.trim(),
     serviceToken.trim(),

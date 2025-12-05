@@ -1,11 +1,9 @@
 import { test } from '../lib/steps.factory';
 
-let caseId: string;
-
 test.describe(
   'Issue direction test',
   { tag: '@nightly-pipeline' },
-  async () => {
+  () => {
     test(
       'Issue Direction Notice - Pre Hearing - Normal Tax Credit Application - Appeal to Proceed',
       { tag: '@preview-regression' },

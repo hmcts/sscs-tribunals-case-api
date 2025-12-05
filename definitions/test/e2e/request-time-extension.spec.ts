@@ -6,7 +6,7 @@ let caseId: string;
 test.describe(
   'Request time extension test',
   { tag: '@nightly-pipeline' },
-  async () => {
+  () => {
     test.beforeAll('Case has to be Created', async () => {
       caseId = await createCaseBasedOnCaseType('PIP');
     });
@@ -29,7 +29,7 @@ test.describe.serial(
   {
     tag: '@work-allocation'
   },
-  async () => {
+  () => {
     let caseId: string;
 
     test.beforeAll('Case has to be Created', async () => {
@@ -74,7 +74,7 @@ test.describe.serial(
   {
     tag: '@work-allocation'
   },
-  async () => {
+  () => {
     let caseId: string;
 
     test.beforeAll('Case has to be Created', async () => {

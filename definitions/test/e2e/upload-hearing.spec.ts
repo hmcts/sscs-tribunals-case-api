@@ -3,7 +3,7 @@ import createCaseBasedOnCaseType from '../api/client/sscs/factory/appeal.type.fa
 
 let caseId: string;
 
-test.describe('Hearing upload test', async () => {
+test.describe('Hearing upload test', () => {
   test.beforeEach('Case has to be Created', async () => {
     caseId = await createCaseBasedOnCaseType('PIP');
     test.setTimeout(240000);

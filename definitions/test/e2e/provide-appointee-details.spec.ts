@@ -5,7 +5,7 @@ import performAppealDormantOnCase from '../api/client/sscs/appeal.event';
 test.describe(
   'Provide Appointee Details to a Non Dormant Case',
   { tag: '@nightly-pipeline' },
-  async () => {
+  () => {
     let caseId: string;
     test.beforeAll('A non Dormant case has to be Created', async () => {
       caseId = await createCaseBasedOnCaseType('PIP');
@@ -24,7 +24,7 @@ test.describe(
 test.describe(
   'Provide No Appointee Details on a Dormant Case',
   { tag: '@nightly-pipeline' },
-  async () => {
+  () => {
     let caseId: string;
     test.beforeAll('Case has to be Created', async () => {
       caseId = await createCaseBasedOnCaseType('PIP');
@@ -42,7 +42,7 @@ test.describe(
 test.describe(
   'Provide Appointee Details on a Dormant Case',
   { tag: ['@preview-regression', '@nightly-pipeline'] },
-  async () => {
+  () => {
     let caseId: string;
     test.beforeAll('Case has to be Created', async () => {
       caseId = await createCaseBasedOnCaseType('PIP');

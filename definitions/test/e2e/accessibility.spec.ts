@@ -4,13 +4,13 @@ import createCaseBasedOnCaseType from '../api/client/sscs/factory/appeal.type.fa
 let firstCaseId: string;
 let secondCaseId: string;
 
-test.describe('Accessibility Tests', { tag: '@accessibility' }, async () => {
+test.describe('Accessibility Tests', { tag: '@accessibility' }, () => {
   test.beforeAll('Case has to be Created', async () => {
     firstCaseId = await createCaseBasedOnCaseType('PIP');
     secondCaseId = await createCaseBasedOnCaseType('PIP');
   });
 
-  test('Test', async ({ accessibilitySteps }) => {
+  test('Execute accessibility scan on pages', async ({ accessibilitySteps }) => {
     test.setTimeout(240000);
     await accessibilitySteps.performAccessibilityTest(
       firstCaseId,
