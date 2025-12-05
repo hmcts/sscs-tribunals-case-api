@@ -121,4 +121,6 @@ public class WriteFinalDecisionTemplateBody {
     private boolean isHmrc;
     @JsonProperty("is_ibca")
     private boolean isIbca;
+    @JsonProperty("esa_regulations_year")
+    private String esaRegulationsYear;
 }

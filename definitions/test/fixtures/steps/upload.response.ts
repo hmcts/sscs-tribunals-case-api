@@ -358,7 +358,7 @@ export class UploadResponse extends BaseStep {
       uploadResponseTestdata.pipIssueCode
     );
     await this.uploadResponsePage.chooseAssistOption('Yes');
-    await this.uploadResponsePage.continueSubmission();
+    await this.uploadResponsePage.continueSubmission('Yes');
 
     await this.checkYourAnswersPage.confirmSubmission();
     await this.checkYourAnswersPage.verifyPHMEErrorMsg();
@@ -376,7 +376,7 @@ export class UploadResponse extends BaseStep {
     await this.uploadResponsePage.uploadDocs();
     await this.uploadResponsePage.selectIssueCode('DD');
     await this.uploadResponsePage.chooseAssistOption('Yes');
-    await this.uploadResponsePage.continueSubmission();
+    await this.uploadResponsePage.continueSubmission('Yes');
 
     await this.checkYourAnswersPage.confirmSubmission();
     await this.checkYourAnswersPage.verifyIssueCodeErrorMsg();
