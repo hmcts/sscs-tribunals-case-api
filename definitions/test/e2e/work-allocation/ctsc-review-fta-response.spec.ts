@@ -29,7 +29,5 @@ test.describe('Work Allocation - CTSC - Review FTA response Task',{tag: ['@work-
           test.slow();
           await ctscReviewFtaResponseSteps.verifyReviewFTAResponseTaskIsCancelledAutomaticallyWhenTheCaseIsVoid(caseId);
         });
-
-  
   }
 );

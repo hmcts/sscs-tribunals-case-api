@@ -28,11 +28,7 @@ export class CtscReviewFtaResponse extends BaseStep {
   }
   
 async verifyCtscAdminWithCaseAllocatorRoleCanViewReviewFTAResponseTask(caseId: string) {
-    await this.loginUserWithCaseId(
-      credentials.amCaseWorkerWithCaseAllocatorRole,
-      true,
-      caseId
-    );
+    await this.loginUserWithCaseId(credentials.amCaseWorkerWithCaseAllocatorRole, true, caseId);
     await this.homePage.navigateToTab('Summary');
     await this.summaryTab.verifyPresenceOfText('Response received');
     await this.homePage.navigateToTab('Tasks');
@@ -49,11 +45,9 @@ async verifyCtscAdminWithCaseAllocatorRoleCanViewReviewFTAResponseTask(caseId: s
     );
   }
 
-  async verifyCtscAdminWithoutCaseAllocatorRoleCanCompleteReviewFTAResponseTask(
-    caseId: string
-  ) {
+  async verifyCtscAdminWithoutCaseAllocatorRoleCanCompleteReviewFTAResponseTask(caseId: string) {
     // Login as CTSC Administrator and view the unassigned Review FTA Response task
-    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+    await this.loginUserWithCaseId(credentials.amCtscAdminNwLiverpool, true, caseId);
     await this.homePage.navigateToTab('Tasks');
     await this.tasksTab.verifyTaskIsDisplayed(task.name);
     await this.tasksTab.verifyPriortiy(task.name, task.priority);
@@ -98,7 +92,7 @@ async verifyCtscAdminWithCaseAllocatorRoleCanViewReviewFTAResponseTask(caseId: s
   async verifyReviewFTAResponseTaskIsCancelledAutomaticallyWhenTheCaseIsVoid(caseId: string) {
     // Verify CTSC Admin can view the unassigned Review FTA Response task
     await this.homePage.signOut();
-    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+    await this.loginUserWithCaseId(credentials.amCtscAdminNwLiverpool, true, caseId);
     await this.homePage.navigateToTab('Tasks');
     await this.tasksTab.verifyTaskIsDisplayed(task.name);
     await this.tasksTab.verifyManageOptions(

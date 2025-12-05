@@ -138,28 +138,6 @@ test.describe.serial(
   }
 );
 
-
-
-test.describe(
-  'WA - Review FTA Response CTSC task automatic cancellation when case is void',
-  {
-    tag: '@work-allocation'
-  },
-  async () => {
-    let caseId: string;
-
-    test.beforeAll('Case has to be Created', async () => {
-      caseId = await createCaseBasedOnCaseType('PIP');
-    });
-
-    
-
-    test.afterAll('Case has to be set to Dormant', async () => {
-      await performAppealDormantOnCase(caseId);
-    });
-  }
-);
-
 test.afterEach(async ({ page }, testInfo) => {
   if (testInfo.status !== testInfo.expectedStatus) {
     // Get a unique place for the screenshot.
