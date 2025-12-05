@@ -218,6 +218,7 @@ export class HomePage {
       }
       case 'History': {
         try {
+          await this.scrollToStartOfTabs();
           await expect(this.historyTab).toBeVisible();
           await this.historyTab.click();
           await expect(this.page.locator('table.EventLogTable')).toBeVisible({ timeout: 10000 });
@@ -229,6 +230,7 @@ export class HomePage {
       }
       case 'Summary': {
         try {
+          await this.scrollToStartOfTabs();
           await expect(this.summaryTab).toBeVisible();
           await this.summaryTab.click();
           await expect(this.page.locator('#summaryCreatedInGapsFrom')).toBeVisible({ timeout: 10000 });
@@ -239,8 +241,8 @@ export class HomePage {
         break;
       }
       case 'Tasks': {
+        await this.scrollToStartOfTabs();
         await expect(this.tasksTab).toBeVisible();
-        await this.page.getByRole('tablist').evaluate(el => (el.style = 'transform: translateX(0px);'));
         await this.tasksTab.click();
         break;
       }
@@ -255,6 +257,7 @@ export class HomePage {
         break;
       }
       case 'Appeal Details': {
+        await this.scrollToStartOfTabs();
         await expect(this.appealDetailsTab).toBeVisible();
         await this.appealDetailsTab.click();
         break;
@@ -351,5 +354,9 @@ export class HomePage {
     await myWorkLink.waitFor();
     await myWorkLink.click();
     await expect(this.page.locator('h3').filter({ hasText: 'My work' })).toBeVisible();
+  }
+
+  async scrollToStartOfTabs() {
+    await this.page.getByRole('tablist').evaluate(el => (el.style = 'transform: translateX(0px);'));
   }
 }

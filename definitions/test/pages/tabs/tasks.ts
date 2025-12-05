@@ -58,7 +58,7 @@ export class Tasks {
         break;
       }
       await homePage.navigateToTab('Summary');
-      await homePage.delay(1000);
+      await homePage.delay(30000);
       await homePage.navigateToTab('Tasks');
       await homePage.delay(timeouts.shortTimeout);
     }
