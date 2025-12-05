@@ -186,7 +186,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AppellantInfoRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
@@ -677,7 +676,7 @@ public class Personalisation<E extends NotificationWrapper> {
 
     Map<String, Object> setEventData(Map<String, Object> personalisation, SscsCaseData ccdResponse, NotificationEventType notificationEventType) {
         if (ccdResponse.getCreatedInGapsFrom() != null && ccdResponse.getCreatedInGapsFrom().equals("readyToList")) {
-            LocalDate localDate = LocalDate.parse(ofNullable(ccdResponse.getDateSentToDwp()).orElse(LocalDate.now().toString())).plusDays(calculateMaxDwpResponseDays(ccdResponse.getAppeal().getBenefitType()));
+            LocalDate localDate = LocalDate.parse(ofNullable(ccdResponse.getDateSentToDwp()).orElse(LocalDate.now().toString())).plusDays(calculateMaxDwpResponseDays(ccdResponse));
             String dwpResponseDateString = formatLocalDate(localDate);
             personalisation.put(APPEAL_RESPOND_DATE, dwpResponseDateString);
             translateToWelshDate(localDate, ccdResponse, value ->
@@ -728,7 +727,7 @@ public class Personalisation<E extends NotificationWrapper> {
     }
 
     private Map<String, Object> setAppealReceivedDetails(Map<String, Object> personalisation, EventDetails eventDetails, SscsCaseData ccdResponse) {
-        LocalDate localDate = eventDetails.getDateTime().plusDays(calculateMaxDwpResponseDays(ccdResponse.getAppeal().getBenefitType())).toLocalDate();
+        LocalDate localDate = eventDetails.getDateTime().plusDays(calculateMaxDwpResponseDays(ccdResponse)).toLocalDate();
         String dwpResponseDateString = formatLocalDate(localDate);
         personalisation.put(APPEAL_RESPOND_DATE, dwpResponseDateString);
         translateToWelshDate(localDate, ccdResponse, value ->
@@ -835,8 +834,9 @@ public class Personalisation<E extends NotificationWrapper> {
             benefit, notificationWrapper, notificationWrapper.getNewSscsCaseData().getCreatedInGapsFrom());
     }
 
-    private int calculateMaxDwpResponseDays(BenefitType benefitType) {
-        if (benefitType.getCode() != null && Benefit.CHILD_SUPPORT.getShortName().equals(benefitType.getCode())) {
+    private int calculateMaxDwpResponseDays(SscsCaseData data) {
+        if (hasBenefitType(data) &&  Benefit.CHILD_SUPPORT.getShortName()
+            .equals((data.getAppeal().getBenefitType().getCode()))) {
             return MAX_DWP_RESPONSE_DAYS_CHILD_SUPPORT;
         } else {
             return MAX_DWP_RESPONSE_DAYS;

@@ -173,11 +173,13 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
@@ -1188,16 +1190,14 @@ public class PersonalisationTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"PIP," + MAX_DWP_RESPONSE_DAYS, "childSupport," + MAX_DWP_RESPONSE_DAYS_CHILD_SUPPORT})
+    @MethodSource("appealResponseDate")
     public void givenDigitalCaseWithNoDateSentToDwp_thenUseTodaysDateForAppealRespondDate(
-        String benefitCode, int responsePeriod) {
+        Appeal appeal, int responsePeriod) {
 
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID)
             .caseReference("SC/1234/5")
-            .appeal(Appeal.builder()
-                .benefitType(BenefitType.builder().code(benefitCode).build())
-                .build())
+            .appeal(appeal)
             .createdInGapsFrom("readyToList")
             .build();
 
@@ -1207,6 +1207,18 @@ public class PersonalisationTest {
             .isEqualTo(LocalDate.now()
                 .plusDays(responsePeriod)
                 .format(DateTimeFormatter.ofPattern(RESPONSE_DATE_FORMAT)));
+    }
+
+    private static Stream<Arguments> appealResponseDate() {
+        return Stream.of(
+            Arguments.of(Appeal.builder()
+                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+                .build(), MAX_DWP_RESPONSE_DAYS_CHILD_SUPPORT),
+            Arguments.of(null, MAX_DWP_RESPONSE_DAYS),
+            Arguments.of(Appeal.builder().build(), MAX_DWP_RESPONSE_DAYS),
+            Arguments.of(Appeal.builder().benefitType(BenefitType.builder().build()).build(), MAX_DWP_RESPONSE_DAYS),
+            Arguments.of(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.ESA.getShortName()).build()).build(), MAX_DWP_RESPONSE_DAYS)
+        );
     }
 
     @Test
