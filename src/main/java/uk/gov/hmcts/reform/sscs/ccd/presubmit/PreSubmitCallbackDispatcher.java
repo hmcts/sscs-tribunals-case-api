@@ -45,7 +45,8 @@ public class PreSubmitCallbackDispatcher<T extends CaseData> {
                 aggregateResponse.addWarnings(handlerResponse.getWarnings());
             }
         }
-        if (eligibleHandlers.size() > 1) {
+        //TODO revert to this line (eligibleHandlers.size() > 1) {
+        if (!eligibleHandlers.isEmpty()) {
             log.info("{} has more than one handler {}", callback.getEvent(), eligibleHandlers);
         }
         return aggregateResponse;
