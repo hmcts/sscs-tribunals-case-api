@@ -558,5 +558,6 @@
   {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestUserRole", "FieldType": "Text", "ElementLabel": "Request From Role", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestTopic", "FieldType": "FixedList", "ElementLabel": "Request Topic", "FieldTypeParameter" : "FL_commRequestTopic", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestMessage", "FieldType": "TextArea", "ElementLabel": "Request", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "taskCreatedForRequest", "FieldType": "YesOrNo", "ElementLabel": "Task Created For Request", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "29/05/2025", "ID": "overrideFields", "ListElementCode": "updateListingRequirementsInterpreterDurationLabel", "FieldType": "Label", "ElementLabel": "If an interpreter is needed for the next hearing, please add an extra 30 minutes to the duration.", "FieldShowCondition": "updateListingRequirementsInterpreterDurationLabel=\"DUMMY_VALUE_TO_HIDE_FIELD\"" , "SecurityClassification": "PUBLIC"}
 ]
