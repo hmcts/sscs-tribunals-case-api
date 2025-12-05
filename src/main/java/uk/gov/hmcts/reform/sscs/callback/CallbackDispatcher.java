@@ -43,13 +43,6 @@ public class CallbackDispatcher<T extends CaseData> {
             callbackHandlers.size(),
             callback.getCaseDetails().getId());
 
-        final List<String> names = callbackHandlers.stream()
-            .filter(handler -> handler.canHandle(callbackType, callback))
-            .map(tCallbackHandlers -> tCallbackHandlers.getClass().getSimpleName())
-            .toList();
-
-        log.info("====================== Triggered Handler names: {}", names);
-
         callbackHandlers.stream()
             .filter(handler -> handler.canHandle(callbackType, callback))
             .forEach(handler -> handler.handle(callbackType, callback));
