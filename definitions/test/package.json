@@ -9,8 +9,8 @@
     "start": "node index.js",
     "lint:playwright": "eslint ./e2e/*.ts ./e2e/**/*.ts",
     "test:e2e": "npx playwright install chromium && npx playwright test --config ./playwright.config.ts --project firefox --reporter=html",
-    "test:pr": "yarn test:e2e --grep-invert @work-allocation --grep $TEST_SUITE",
-    "test:aat": "yarn test:e2e --grep-invert @work-allocation --grep @master-pipeline",
+    "test:pr": "yarn lint:playwright && yarn test:e2e --grep-invert @work-allocation --grep $TEST_SUITE",
+    "test:aat": "yarn lint:playwright && yarn test:e2e --grep-invert @work-allocation --grep @master-pipeline",
     "test:nightly": "yarn lint:playwright && yarn test:e2e --grep-invert @work-allocation --grep @nightly-pipeline",
     "test:accessibility": "yarn test:e2e --grep @accessibility"
   },
