@@ -361,6 +361,11 @@ ccd:
         ROLE_ASSIGNMENT_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
         ORM_ENV: pr
         CCD_DATA_STORE_URL: http://${SERVICE_NAME}-ccd-data-store-api
+        RAS_ENV: pr
+      devmemoryRequests: 1024Mi
+      devcpuRequests: 250m
+      devmemoryLimits: 2048Mi
+      devcpuLimits: 1500m
       keyVaults:
         am:
           resourceGroup: am
