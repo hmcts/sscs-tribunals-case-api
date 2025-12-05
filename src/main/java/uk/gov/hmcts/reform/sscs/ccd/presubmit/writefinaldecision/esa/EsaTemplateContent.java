@@ -1,11 +1,17 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
 import java.util.List;
+import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
+import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateContent;
 
+@RequiredArgsConstructor
 public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateContent {
+
+    private final WriteFinalDecisionTemplateBody templateBody;
 
     @Override
     protected String getBenefitTypeNameWithoutInitials() {
@@ -13,7 +19,7 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
     }
 
     protected String getRegulationsYear() {
-        return "2008";
+        return Objects.toString(this.templateBody.getEsaRegulationsYear(), "2008");
     }
 
     @Override
