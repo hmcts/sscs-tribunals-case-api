@@ -28,7 +28,7 @@ export class CtscReviewFtaResponse extends BaseStep {
   }
   
 async verifyCtscAdminWithCaseAllocatorRoleCanViewReviewFTAResponseTask(caseId: string) {
-    await this.loginUserWithCaseId(credentials.amCtscAdminNwLiverpool, true, caseId);
+    await this.loginUserWithCaseId(credentials.amCtscTeamLeaderNwLiverpool, true, caseId);
     await this.homePage.navigateToTab('Summary');
     await this.summaryTab.verifyPresenceOfText('Response received');
     await this.homePage.navigateToTab('Tasks');
