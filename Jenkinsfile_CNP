@@ -204,11 +204,6 @@ withPipeline(type, product, component) {
         }
         runE2eTests()
     }
-
-    afterSuccess('smoketest:aat') {
-        sh './bin/add-hearing-role-assignments-system-user.sh'
-
-    }
 }
 
 def runNotificationTests() {
