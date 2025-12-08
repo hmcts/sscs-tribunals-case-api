@@ -51,10 +51,6 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
         }
     }
 
-    private boolean isWcaNotSupportGroupOnly(SscsCaseData sscsCaseData) {
-        return sscsCaseData.isWcaAppeal() && !sscsCaseData.isSupportGroupOnlyAppeal();
-    }
-
     @Override
     protected void validateAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (isYes(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply())) {
@@ -90,12 +86,16 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
     protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData, String pageId) {
         if (pageId != null && pageId.equals("workCapabilityAssessment")) {
             if (isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())
-                    && sscsCaseData.isWcaAppeal()
-                    && "allowed".equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused())) {
+                && sscsCaseData.isWcaAppeal()
+                && "allowed".equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused())) {
                 sscsCaseData.setShowDwpReassessAwardPage(YesNo.YES);
                 return;
             }
             sscsCaseData.setShowDwpReassessAwardPage(YesNo.NO);
         }
+    }
+
+    private boolean isWcaNotSupportGroupOnly(SscsCaseData sscsCaseData) {
+        return sscsCaseData.isWcaAppeal() && !sscsCaseData.isSupportGroupOnlyAppeal();
     }
 }

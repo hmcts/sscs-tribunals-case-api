@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
+import static java.util.Objects.nonNull;
 import static java.util.Optional.empty;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase;
@@ -22,7 +23,11 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody.WriteFinalDecisionTemplateBodyBuilder;
-import uk.gov.hmcts.reform.sscs.service.*;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
+import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeOutcomeService;
+import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
+import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 
 @Slf4j
 @Component
@@ -33,21 +38,17 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
 
     @Autowired
     public EsaWriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
-        EsaDecisionNoticeQuestionService decisionNoticeQuestionService, EsaDecisionNoticeOutcomeService outcomeService, DocumentConfiguration documentConfiguration, VenueDataLoader venueDataLoader) {
+                                                       EsaDecisionNoticeQuestionService decisionNoticeQuestionService, EsaDecisionNoticeOutcomeService outcomeService,
+                                                       DocumentConfiguration documentConfiguration, VenueDataLoader venueDataLoader) {
         super(generateFile, userDetailsService, decisionNoticeQuestionService, outcomeService, documentConfiguration, venueDataLoader);
         this.esaDecisionNoticeQuestionService = decisionNoticeQuestionService;
         this.venueDataLoader = venueDataLoader;
     }
 
     @Override
-    public String getBenefitType() {
-        return "ESA";
-    }
-
-    @Override
     protected void setTemplateContent(DecisionNoticeOutcomeService outcomeService, PreSubmitCallbackResponse<SscsCaseData> response,
-        NoticeIssuedTemplateBodyBuilder builder, SscsCaseData caseData,
-        WriteFinalDecisionTemplateBody payload) {
+                                      NoticeIssuedTemplateBodyBuilder builder, SscsCaseData caseData,
+                                      WriteFinalDecisionTemplateBody payload) {
 
         if (isYes(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
 
@@ -151,10 +152,15 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
         if (caseData.getSscsEsaCaseData().getSchedule3Selections() != null && !caseData.getSscsEsaCaseData().getSchedule3Selections().isEmpty()) {
             builder.esaSchedule3Descriptors(getEsaSchedule3DescriptorsFromQuestionKeys(caseData, caseData.getSscsEsaCaseData().getSchedule3Selections()));
         }
-        builder.regulation29Applicable(caseData.getSscsEsaCaseData().getDoesRegulation29Apply() == null ? null :  caseData.getSscsEsaCaseData().getDoesRegulation29Apply().toBoolean());
-        builder.regulation35Applicable(caseData.getSscsEsaCaseData().getDoesRegulation35Apply() == null ? null :  caseData.getSscsEsaCaseData().getDoesRegulation35Apply().toBoolean());
+        builder.regulation29Applicable(caseData.getSscsEsaCaseData().getDoesRegulation29Apply() == null ? null : caseData.getSscsEsaCaseData().getDoesRegulation29Apply().toBoolean());
+        builder.regulation35Applicable(caseData.getSscsEsaCaseData().getDoesRegulation35Apply() == null ? null : caseData.getSscsEsaCaseData().getDoesRegulation35Apply().toBoolean());
         builder.supportGroupOnly(caseData.isSupportGroupOnlyAppeal());
+        builder.esaRegulationsYear(nonNull(caseData.getSscsEsaCaseData().getWhichEsaRegulationsApply()) ? caseData.getSscsEsaCaseData().getWhichEsaRegulationsApply() : null);
     }
 
+    @Override
+    public String getBenefitType() {
+        return "ESA";
+    }
 
 }
