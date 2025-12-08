@@ -1216,65 +1216,56 @@ export class WriteFinalDecisionPages {
     //await webActions.verifyPageLabel('.form-table tr:nth-of-type(15) > .form-cell .text-16', writeFinalDecisionData.theSchedule7ActivitiesSelectedBelowApply);
 
     await webActions.verifyPageLabel(
-      '.form-table tr:nth-of-type(16) > .valign-top > .text-16',
+      '.form-table tr:nth-of-type(17) > .valign-top > .text-16',
       writeFinalDecisionData.schedule7ActivitiesLabel
     );
     await webActions.verifyPageLabel(
-      'tr:nth-of-type(16) tr:nth-of-type(1) .text-16',
+      'tr:nth-of-type(17) tr:nth-of-type(1) .text-16',
       writeFinalDecisionData.manualDexterityLabel
     );
     await webActions.verifyPageLabel(
-      'tr:nth-of-type(16) tr:nth-of-type(2) .text-16',
+      'tr:nth-of-type(17) tr:nth-of-type(2) .text-16',
       writeFinalDecisionData.initiatingAndCompletingLabel
     );
 
     await webActions.verifyPageLabel(
-      '.form-table tr:nth-of-type(17) > .valign-top > .text-16',
+      '.form-table tr:nth-of-type(18) > .valign-top > .text-16',
       writeFinalDecisionData.whatIsTheLastPageInTheTribunalBundleLabel
     );
     await webActions.verifyPageLabel(
-      'tr:nth-of-type(17) > .form-cell .text-16',
+      'tr:nth-of-type(18) > .form-cell .text-16',
       writeFinalDecisionData.lastPageInTheTribunalBundleInput
     );
 
     await webActions.verifyPageLabel(
-      'tr:nth-of-type(19) > .valign-top > .text-16',
+      'tr:nth-of-type(20) > .valign-top > .text-16',
       writeFinalDecisionData.whenShouldFTAReAssessTheAwardLabel
     );
     await webActions.verifyPageLabel(
-      'tr:nth-of-type(19) > .form-cell .text-16',
+      'tr:nth-of-type(20) > .form-cell .text-16',
       writeFinalDecisionData.reassessWithin3MonthsLabel
     );
 
     await webActions.verifyPageLabel(
-      'tr:nth-of-type(20) > .valign-top > .text-16',
-      writeFinalDecisionData.reasonsForDecisionLabel
-    );
-    await webActions.verifyPageLabel(
-      'tr:nth-of-type(20) > td:nth-of-type(1) span:nth-of-type(1)',
-      writeFinalDecisionData.reasonsForDecisionInput
-    );
-
-    await webActions.verifyPageLabel(
-      'tr:nth-of-type(20) > .valign-top > .text-16',
-      writeFinalDecisionData.reasonsForDecisionLabel
-    );
-    await webActions.verifyPageLabel(
-      'tr:nth-of-type(20) > td:nth-of-type(1) span:nth-of-type(1)',
-      writeFinalDecisionData.reasonsForDecisionInput
-    );
-
-    await webActions.verifyPageLabel(
       'tr:nth-of-type(21) > .valign-top > .text-16',
-      writeFinalDecisionData.checkYourAnswersAnythingElse
+      writeFinalDecisionData.reasonsForDecisionLabel
     );
     await webActions.verifyPageLabel(
-      'tr:nth-of-type(21) > .form-cell span',
-      writeFinalDecisionData.anythingElseInput
+      'tr:nth-of-type(21) > td:nth-of-type(1) span:nth-of-type(1)',
+      writeFinalDecisionData.reasonsForDecisionInput
     );
 
     await webActions.verifyPageLabel(
       'tr:nth-of-type(22) > .valign-top > .text-16',
+      writeFinalDecisionData.checkYourAnswersAnythingElse
+    );
+    await webActions.verifyPageLabel(
+      'tr:nth-of-type(22) > .form-cell span',
+      writeFinalDecisionData.anythingElseInput
+    );
+
+    await webActions.verifyPageLabel(
+      'tr:nth-of-type(23) > .valign-top > .text-16',
       writeFinalDecisionData.previewDecisionNoticeLabel
     );
   }
