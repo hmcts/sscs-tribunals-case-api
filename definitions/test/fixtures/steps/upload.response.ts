@@ -384,7 +384,7 @@ export class UploadResponse extends BaseStep {
   async uploadResponseWithFurtherInfoAsDwpCaseWorker(caseId: string) {
     // As DWP caseworker upload response with further info
     await this.loginUserWithCaseId(
-      credentials.amCtscTeamLeaderNwLiverpool,
+      credentials.dwpResponseWriter,
       false,
       caseId
     );
