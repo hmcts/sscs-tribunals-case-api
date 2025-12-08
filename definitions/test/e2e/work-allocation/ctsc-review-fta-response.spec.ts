@@ -1,7 +1,7 @@
 import { test } from '../../lib/steps.factory';
 import createCaseBasedOnCaseType from '../../api/client/sscs/factory/appeal.type.factory';
 
-test.describe('Work Allocation - CTSC - Review FTA response Task',{tag: [ /*'@work-allocation',*/ '@preview-regression']}, async () => {
+test.describe('Work Allocation - CTSC - Review FTA response Task',{tag: [ '@work-allocation', '@preview-regression']}, async () => {
     let caseId: string;
 
     test.beforeEach('Case has to be Created', async ({ uploadResponseSteps }) => {
