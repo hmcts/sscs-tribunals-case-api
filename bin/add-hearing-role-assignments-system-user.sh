@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -eu
 
+environment=$1
+
 export IDAM_API_BASE_URL=https://idam-api.aat.platform.hmcts.net
 
 BASEDIR=$(dirname "$0")
@@ -10,7 +12,15 @@ SYSTEM_USER_ID=$(curl --silent --show-error -X GET "${IDAM_API_BASE_URL}/details
 
 echo -e "\nCreating role assignment: \n User: ${SYSTEM_USER_ID}"
 
-curl --silent --show-error -X POST "https://am-role-assignment-service-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net/am/role-assignments" \
+if [ "$environment" = "preview" ]; then
+    RAS_URL="https://am-role-assignment-service-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+fi
+
+if [ "$environment" = "aat" ]; then
+    RAS_URL="http://am-role-assignment-service-aat.service.core-compute-aat.internal"
+fi
+
+curl --silent --show-error -X POST "${RAS_URL}/am/role-assignments" \
   -H "accept: application/vnd.uk.gov.hmcts.role-assignment-service.create-assignments+json;charset=UTF-8;version=1.0" \
   -H "Authorization: Bearer ${SSCS_SYSTEM_USER_TOKEN}" \
   -H "ServiceAuthorization: Bearer ${S2S_TOKEN}" \
