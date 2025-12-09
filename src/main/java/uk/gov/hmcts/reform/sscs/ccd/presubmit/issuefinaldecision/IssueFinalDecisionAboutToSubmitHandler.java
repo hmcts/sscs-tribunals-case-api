@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_CORRECTED_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
@@ -160,9 +161,12 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
     }
 
     private void clearTransientFields(SscsCaseData sscsCaseData) {
-        sscsCaseData.getSscsDocument()
-                .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue()));
-        sscsCaseData.getSscsDocument()
-                .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_CORRECTED_NOTICE.getValue()));
+        InternalCaseDocumentData internalCaseDocumentData = sscsCaseData.getInternalCaseDocumentData();
+        if (nonNull(internalCaseDocumentData) && nonNull(internalCaseDocumentData.getSscsInternalDocument())) {
+            internalCaseDocumentData.getSscsInternalDocument()
+                    .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue()));
+            internalCaseDocumentData.getSscsInternalDocument()
+                    .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_CORRECTED_NOTICE.getValue()));
+        }
     }
 }
