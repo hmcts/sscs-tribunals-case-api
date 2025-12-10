@@ -1,8 +1,8 @@
 {
-  "name": "Review FTA Response - CTSC",
+  "name": "CTSC - Review FTA Response",
   "priority": "high",
   "assignedToWhenNotAssigned": "Unassigned",
-  "assignedTo": "SSCS ctscadmin",
+  "assignedTo": "sscs-ctscdmin nw-liverpool",
   "unassignedManageOptions": ["Assign to me"],
   "assignedManageOptions": ["Reassign task", "Unassign task"],
   "unassignedManageOptionsForCaseAllocator": [
