@@ -29,7 +29,7 @@ public class DirectionNoticeDocmosisConfigTestIt extends AbstractNotificationCon
 
     @Test
     @Parameters({
-        "APPEAL_TO_PROCEED, TB-SCS-GNO-ENG-00551-v2.docx, TB-SCS-GNO-ENG-00551-v2.docx, TB-SCS-GNO-ENG-00551-v2.docx",
+        "APPEAL_TO_PROCEED, TB-SCS-GNO-ENG-00551-v3.docx, TB-SCS-GNO-ENG-00551-v3.docx, TB-SCS-GNO-ENG-00551-v3.docx",
         "PROVIDE_INFORMATION, TB-SCS-GNO-ENG-00067-v2.docx, TB-SCS-GNO-ENG-00089.docx, TB-SCS-GNO-ENG-00067-v2.docx",
         "ISSUE_AND_SEND_TO_ADMIN, TB-SCS-GNO-ENG-00067-v2.docx, TB-SCS-GNO-ENG-00089.docx, TB-SCS-GNO-ENG-00067-v2.docx",
         "GRANT_EXTENSION, TB-SCS-GNO-ENG-00556-v2.docx, TB-SCS-GNO-ENG-00556-v2.docx, TB-SCS-GNO-ENG-00556-v2.docx",
