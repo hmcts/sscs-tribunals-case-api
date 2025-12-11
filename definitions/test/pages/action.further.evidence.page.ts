@@ -94,6 +94,7 @@ export class ActionFurtherEvidencePage {
     await this.verifyPageContent();
     await this.selectFEOption();
     await this.selectSenderOption(senderOption);
+    await this.clickAddNewButton();
     await this.selectDocType(docType);
     await this.uploadDocs(fileName);
     await this.enterFileName();
