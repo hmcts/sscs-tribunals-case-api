@@ -40,6 +40,8 @@ public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackH
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType,
                                                           Callback<SscsCaseData> callback,
                                                           String userAuthorisation) {
+        log.info("Handling Tribunal Communication Submitted callback for Case ID: {}",
+                callback.getCaseDetails().getId());
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
         String caseId = String.valueOf(callback.getCaseDetails().getId());
@@ -53,6 +55,19 @@ public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackH
                 "desc");
 
         log.info("Camunda tasks found for caseID: {}, Task List: {}", caseId, camundaTaskList);
+
+        String taskProcessCategoryId = "ftaCommunicationId_" + sscsCaseData.getCommunicationFields().getLatestFtaCommunicationId();
+
+        if (!camundaTaskList.isEmpty()) {
+            String taskIdToBeCancelled = camundaTaskList.stream().filter(
+                    task -> taskProcessCategoryId.equals(task.getProcessInstanceId()))
+                    .findFirst().orElse(null).getId();
+            log.info("Cancelling Camunda task for caseID: {}, Task ID: {}", caseId, taskIdToBeCancelled);
+
+            camundaClient.cancelTask(
+                    idamService.getIdamTokens().getServiceAuthorization(),
+                    taskIdToBeCancelled);
+        }
 
 
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
