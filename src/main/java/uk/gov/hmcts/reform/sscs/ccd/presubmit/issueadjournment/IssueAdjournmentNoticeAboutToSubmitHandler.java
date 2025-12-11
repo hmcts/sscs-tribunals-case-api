@@ -137,6 +137,9 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         clearBasicTransientFields(sscsCaseData);
         clearAdjournmentTransientFields(sscsCaseData);
 
+        preSubmitCallbackResponse.getData().getSscsDocument()
+                .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()));
+
         InternalCaseDocumentData internalCaseDocumentData = ofNullable(preSubmitCallbackResponse.getData().getInternalCaseDocumentData())
                 .orElse(InternalCaseDocumentData.builder().build());
         if (internalCaseDocumentData.getSscsInternalDocument() != null) {

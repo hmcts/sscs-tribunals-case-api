@@ -161,6 +161,10 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
     }
 
     private void clearTransientFields(SscsCaseData sscsCaseData) {
+        sscsCaseData.getSscsDocument()
+                .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue()));
+        sscsCaseData.getSscsDocument()
+                .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_CORRECTED_NOTICE.getValue()));
         InternalCaseDocumentData internalCaseDocumentData = sscsCaseData.getInternalCaseDocumentData();
         if (nonNull(internalCaseDocumentData) && nonNull(internalCaseDocumentData.getSscsInternalDocument())) {
             internalCaseDocumentData.getSscsInternalDocument()
