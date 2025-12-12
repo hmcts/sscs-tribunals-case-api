@@ -3542,5 +3542,17 @@
     "PostConditionState": "*",
     "SecurityClassification": "Public",
     "Publish": "N"
+  },
+  {
+    "LiveFrom": "02/12/2025",
+    "CaseTypeID": "Benefit",
+    "ID": "requestOtherPartyData",
+    "Name": "Request Other Party Data",
+    "DisplayOrder": 1304,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "awaitOtherPartyData",
+    "ShowEventNotes": "Y",
+    "SecurityClassification": "Public",
+    "Publish": "N"
   }
 ]
