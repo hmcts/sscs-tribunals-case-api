@@ -173,3 +173,11 @@ This avoids re-triggering the pipeline build and saves time.
 ### Work allocation in preview
 Work allocation is now enabled in preview. To enable work allocation in preview, you need to add the `pr-values:wa` label to your PR. This will ensure that the work allocation service is started and configured correctly for the preview environment.
 If some events are not triggering WA tasks, or are not being recognised by the WA service, double check that the case-event.json entry for the event has the `Publish` field set to `"Y"`. If it is not set, then CCD will not publish the event to the message listener and the WA service will not be able to process it.
+
+### Work allocation users in preview
+In order to test work allocation in preview you will need to login with users set up with role assignments, to do this you must first run the create-idam-users script to create the users in IDAM AAT.
+Before running the script you must first ensure you are using the VPN, that you have the Azure CLI installed, and that you have permissions to access the sscs aat keyvault.
+To run the script, execute the following commands in the project root:
+```bash
+chmod +x bin/create-idam-users.sh
+bin/create-idam-users.sh

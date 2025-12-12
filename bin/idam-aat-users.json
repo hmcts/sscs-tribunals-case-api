@@ -59,5 +59,82 @@
         "caseworker-SSCS-superuser"
       ]
     }
+  },
+  {
+    "user": {
+      "id": "959b4ba5-a56a-4901-9524-ec3b36c06b26",
+      "email": "sscs-senior-cw-midlands-bradford@justice.gov.uk",
+      "forename": "sscs-senior-cw",
+      "surname": "midlands-bradford",
+      "displayName": "sscs-senior-cw",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-SSCS-registrar",
+        "caseworker-SSCS-clerk",
+        "caseworker-SSCS-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "ed83e76b-d9bc-48ce-af41-28865483db8f",
+      "email": "sscs-senior-cw-ne-leeds@justice.gov.uk",
+      "forename": "sscs-senior-cw",
+      "surname": "ne-leeds",
+      "displayName": "sscs-senior-cw",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-SSCS-registrar",
+        "caseworker-SSCS-clerk",
+        "caseworker-SSCS-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "ed83e76b-d9bc-48ce-af41-28865483db8f",
+      "email": "sscs-cw-scotland-glasgow@justice.gov.uk",
+      "forename": "sscs-cw-1",
+      "surname": "scotland-glasgow",
+      "displayName": "sscs-cw-1",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-registrar",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "90475d91-c42c-4777-b29f-3194ce3e9147",
+      "email": "sscs-cw-nw-liverpool@justice.gov.uk",
+      "forename": "sscs-cw",
+      "surname": "nw-liverpool",
+      "displayName": "sscs-cw",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-registrar",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "4c866b31-f136-4e01-8025-934bca07268e",
+      "email": "sscs-cw-national-bradford@justice.gov.uk",
+      "forename": "sscs-cw",
+      "surname": "national-bradford",
+      "displayName": "sscs-cw",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-registrar",
+        "caseworker-sscs-clerk"
+      ]
+    }
   }
 ]
