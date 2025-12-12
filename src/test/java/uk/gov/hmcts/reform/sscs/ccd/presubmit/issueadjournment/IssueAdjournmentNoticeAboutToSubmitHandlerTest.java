@@ -207,9 +207,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
                 .hasSize(0);
 
         assertThat(response.getData().getInternalCaseDocumentData().getSscsInternalDocument())
-                .map(SscsDocument::getValue)
-                .map(SscsDocumentDetails::getDocumentType)
-                .doesNotContain(DRAFT_ADJOURNMENT_NOTICE.getValue());
+                .isNull();
     }
 
     @DisplayName("When adjournment is enabled and case is LA and case cannot be listed right away "
