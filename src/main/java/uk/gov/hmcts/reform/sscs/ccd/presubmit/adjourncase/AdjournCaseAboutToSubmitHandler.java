@@ -62,7 +62,7 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
             }
         }
 
-        previewDocumentService.writePreviewDocumentToSscsDocument(
+        previewDocumentService.writePreviewDocumentToSscsInternalDocument(
                 sscsCaseData,
                 DRAFT_ADJOURNMENT_NOTICE,
                 adjournment.getPreviewDocument());

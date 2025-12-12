@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InternalCaseDocumentData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
@@ -42,16 +43,16 @@ class PreviewDocumentServiceTest {
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("ccdId")
             .appeal(Appeal.builder().build())
-            .sscsDocument(docs)
+            .internalCaseDocumentData(InternalCaseDocumentData.builder().sscsInternalDocument(docs).build())
             .build();
     }
 
     @DisplayName("Given draft adjournment notice already exists on case, then overwrite existing draft")
     @Test
     void givenDraftAdjournmentNoticeAlreadyExists_thenOverwritesExistingDraft() {
-        previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_ADJOURNMENT_NOTICE, sscsCaseData.getAdjournment().getPreviewDocument());
+        previewDocumentService.writePreviewDocumentToSscsInternalDocument(sscsCaseData, DRAFT_ADJOURNMENT_NOTICE, sscsCaseData.getAdjournment().getPreviewDocument());
 
-        assertThat(sscsCaseData.getSscsDocument())
+        assertThat(sscsCaseData.getInternalCaseDocumentData().getSscsInternalDocument())
             .hasSize(1)
             .extracting(AbstractDocument::getValue)
             .extracting(AbstractDocumentDetails::getDocumentFileName)
