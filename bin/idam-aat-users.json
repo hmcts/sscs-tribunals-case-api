@@ -136,5 +136,206 @@
         "caseworker-sscs-clerk"
       ]
     }
+  },
+  {
+    "user": {
+      "id": "ccb923d2-7c46-4cf1-9828-ecf44f531458",
+      "email": "sscs-court-clerk-ne-leeds@justice.gov.uk",
+      "forename": "sscs-court-clerk",
+      "surname": "ne-leeds",
+      "displayName": "sscs-court-clerk",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "422e3587-d3ec-48a3-b89c-0824a92d2cd5",
+      "email": "sscs-court-clerk-nw-liverpool@justice.gov.uk",
+      "forename": "sscs-court-clerk",
+      "surname": "nw-liverpool",
+      "displayName": "sscs-court-clerk",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "6d9df4ab-2e48-4498-a307-6b9cbce08f5c",
+      "email": "sscs-court-clerk-scotland-glasgow@justice.gov.uk",
+      "forename": "sscs-court-clerk",
+      "surname": "scotland-glasgow",
+      "displayName": "sscs-court-clerk",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "bccf798e-c27e-4884-9e20-641570436f34",
+      "email": "sscs-dwp-1-london-chelmsford@justice.gov.uk",
+      "forename": "sscs-dwp-1",
+      "surname": "london-chelmsford",
+      "displayName": "sscs-dwp-1",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-dwpresponsewriter"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "3350d0f9-d19b-4714-872e-d4c48a85694d",
+      "email": "sscs-dwp-1-scotland-glasgow@justice.gov.uk",
+      "forename": "sscs-dwp-1",
+      "surname": "scotland-glasgow",
+      "displayName": "sscs-dwp-1",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-dwpresponsewriter"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "4e93f331-caea-460b-b0ba-e518423b9566",
+      "email": "sscs-dwp-national-chesterfield@justice.gov.uk",
+      "forename": "sscs-dwp-1",
+      "surname": "national-chesterfield",
+      "displayName": "sscs-dwp-1",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-dwpresponsewriter"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "856fb75f-e0e2-4d1b-9b59-a95a88acd8f1",
+      "email": "sscs-hmrc-wales-cardiff@justice.gov.uk",
+      "forename": "sscs-hmrc",
+      "surname": "wales-cardiff",
+      "displayName": "sscs-hmrc",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-hmrcresponsewriter"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "eef28b27-8e6d-419b-b7ec-230b9b93046a",
+      "email": "sscs-hmrc-scotland-glasgow@justice.gov.uk",
+      "forename": "sscs-hmrc",
+      "surname": "scotland-glasgow",
+      "displayName": "sscs-hmrc",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-hmrcresponsewriter"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "203a800c-7076-478f-a603-9e594bb82eaa",
+      "email": "sscs-hmrc-national-bradford@justice.gov.uk",
+      "forename": "sscs-hmrc",
+      "surname": "national-bradford",
+      "displayName": "sscs-hmrc",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-hmrcresponsewriter"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "c7e26be2-1896-4f98-8dc8-5eaa3bace6b7",
+      "email": "sscs-hctl-midlands-bradford@justice.gov.uk",
+      "forename": "sscs-hcl",
+      "surname": "midlands-bradford",
+      "displayName": "sscs-hcl",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "53514267-008d-45e9-b440-4f1e830fd16b",
+      "email": "sscs-hctl-se-bexleyheath@justice.gov.uk",
+      "forename": "sscs-hcl",
+      "surname": "se-bexleyheath",
+      "displayName": "sscs-hcl",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "96909786-3a9b-4a85-b7b3-d7e8e90493bd",
+      "email": "sscs-hctl-ne-leeds@justice.gov.uk",
+      "forename": "sscs-hcl",
+      "surname": "ne-leeds",
+      "displayName": "sscs-hcl",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "0cdd7720-95c7-461a-a5ae-1cf476151793",
+      "email": "sscs-hctl-scotland-glasgow@justice.gov.uk",
+      "forename": "sscs-hcl",
+      "surname": "scotland-glasgow",
+      "displayName": "sscs-hcl",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "01200c21-0d96-4d33-a70b-2a981f984b02",
+      "email": "sscs-rctl-london-sutton@justice.gov.uk",
+      "forename": "sscs-rctl",
+      "surname": "london-sutton",
+      "displayName": "sscs-rctl",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-superuser"
+      ]
+    }
   }
 ]
