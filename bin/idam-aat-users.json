@@ -1,35 +1,6 @@
 [
   {
     "user": {
-      "id": "3e186b60-527a-46f3-9005-c430d234490f",
-      "email": "TribunalMember.PaulJoyce@ejudiciary.net",
-      "forename": "Paul",
-      "surname": "Joyce",
-      "displayName": "Paul",
-      "roleNames": [
-        "caseworker",
-        "caseworker-sscs",
-        "caseworker-sscs-judge"
-      ]
-    }
-  },
-  {
-    "user": {
-      "id": "68c1584e-9356-4a7e-bbd6-b13b98a9ef9d",
-      "email": "RegionalMedicalMember.Ben@ejudiciary.net",
-      "forename": "Sal",
-      "surname": "Ben",
-      "displayName": "Sal",
-      "roleNames": [
-        "caseworker",
-        "caseworker-sscs",
-        "caseworker-sscs-judge",
-        "caseworker-sscs-judge-salaried"
-      ]
-    }
-  },
-  {
-    "user": {
       "id": "7fadc714-cabf-4c90-ad6a-3d73a7b38083",
       "email": "sscs-senior-cw-nw-liverpool@justice.gov.uk",
       "forename": "sscs-senior-cw",
@@ -335,6 +306,337 @@
         "caseworker-sscs",
         "caseworker-sscs-clerk",
         "caseworker-sscs-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "399b68d8-a907-4476-8e1f-281e4fe48c8b",
+      "email": "sscs-rctl-wales-cardiff@justice.gov.uk",
+      "forename": "sscs-rctl",
+      "surname": "wales-cardiff",
+      "displayName": "sscs-rctl",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "5b132f55-9af3-4a64-acc4-4c046023d49c",
+      "email": "sscs-rctl-scotland-glasgow@justice.gov.uk",
+      "forename": "sscs-rctl",
+      "surname": "scotland-glasgow",
+      "displayName": "sscs-rctl",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "ade50149-07e0-42a0-94d3-42ea71c328f8",
+      "email": "sscs-rctl-nw-liverpool@justice.gov.uk",
+      "forename": "sscs-rctl",
+      "surname": "nw-liverpool",
+      "displayName": "sscs-rctl",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "c4c35ef0-1fbc-4e92-986d-3ef80a0a3819",
+      "email": "sscs-hcadmin-ne-leeds@justice.gov.uk",
+      "forename": "sscs-hcadmin",
+      "surname": "ne-leeds",
+      "displayName": "sscs-hcadmin",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "8650db53-9a90-4d90-bb13-7fef9cb23e70",
+      "email": "sscs-hcadmin-nw-liverpool@justice.gov.uk",
+      "forename": "sscs-hcadmin",
+      "surname": "nw-liverpool",
+      "displayName": "sscs-hcadmin",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "6774e9cd-1792-4910-8ad1-fd579766007e",
+      "email": "sscs-hcadmin-wales-cardiff@justice.gov.uk",
+      "forename": "sscs-hcadmin",
+      "surname": "wales-cardiff",
+      "displayName": "sscs-hcadmin",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "6774e9cd-1792-4910-8ad1-fd579766007e",
+      "email": "sscs-hcadmin-wales-cardiff@justice.gov.uk",
+      "forename": "sscs-hcadmin",
+      "surname": "wales-cardiff",
+      "displayName": "sscs-hcadmin",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "f3f98a91-ec9d-4161-ad41-76eb1257fd3d",
+      "email": "sscs-hcadmin-scotland-glasgow@justice.gov.uk",
+      "forename": "sscs-hcadmin",
+      "surname": "scotland-glasgow",
+      "displayName": "sscs-hcadmin",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "b2b2a9e7-4232-4c51-9c78-8ee269c82b58",
+      "email": "sscs-rcadmin-se-bexleyheath@justice.gov.uk",
+      "forename": "sscs-rcadmin",
+      "surname": "se-bexleyheath",
+      "displayName": "sscs-rcadmin",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "d6b3d854-1aa0-4581-b77f-e5b65937a6b4",
+      "email": "sscs-rcadmin-midlands-bradford@justice.gov.uk",
+      "forename": "sscs-rcadmin",
+      "surname": "midlands-bradford",
+      "displayName": "sscs-rcadmin",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "1252cc99-1879-4aa0-a1f2-535e6e3b7d2e",
+      "email": "sscs-rcadmin-wales-cardiff@justice.gov.uk",
+      "forename": "sscs-rcadmin",
+      "surname": "wales-cardiff",
+      "displayName": "sscs-rcadmin",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "783ece16-0574-4122-9340-0311ba3c5c0e",
+      "email": "sscs-rcadmin-scotland-glasgow@justice.gov.uk",
+      "forename": "sscs-rcadmin",
+      "surname": "scotland-glasgow",
+      "displayName": "sscs-rcadmin",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "9f0b5e4f-6519-4c07-bb75-7eb2f1bd39ac",
+      "email": "sscs-ctscdmin-national-crownhouse@justice.gov.uk",
+      "forename": "sscs-ctscdmin",
+      "surname": "national-crownhouse",
+      "displayName": "sscs-ctscdmin",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "5a943dde-e590-479e-bebd-9a689ef662df",
+      "email": "sscs-ctscdmin-scotland-glasgow@justice.gov.uk",
+      "forename": "sscs-ctscdmin",
+      "surname": "scotland-glasgow",
+      "displayName": "sscs-ctscdmin",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "84eed2b6-4c5a-4705-9e22-c66a9e38ea2e",
+      "email": "sscs-ctscdmin-nw-liverpool@justice.gov.uk",
+      "forename": "sscs-ctscdmin",
+      "surname": "nw-liverpool",
+      "displayName": "sscs-ctscdmin",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "24f8ad33-d6af-4cba-8ad3-a5653326e1a3",
+      "email": "sscs-ctscdmin-wales-cardiff@justice.gov.uk",
+      "forename": "sscs-ctscdmin",
+      "surname": "wales-cardiff",
+      "displayName": "sscs-ctscdmin",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "09a743a8-fd8c-4ba5-aed5-19582c2d9a88",
+      "email": "sscs-ctsctl-scotland-glasgow@justice.gov.uk",
+      "forename": "sscs-ctsctl",
+      "surname": "scotland-glasgow",
+      "displayName": "sscs-ctsctl",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "9387c7e3-8600-44ef-ae5e-936f00585c5f",
+      "email": "sscs-ctsctl-wales-cardiff@justice.gov.uk",
+      "forename": "sscs-ctsctl",
+      "surname": "wales-cardiff",
+      "displayName": "sscs-ctsctl",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "2818df16-c3a7-42e6-9866-ee30ab8cbc1e",
+      "email": "sscs-ctsctl-ne-leeds@justice.gov.uk",
+      "forename": "sscs-ctsctl",
+      "surname": "ne-leeds",
+      "displayName": "sscs-ctsctl",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "afcf13b7-1ec8-4e17-bd93-976e28384758",
+      "email": "sscs-ctsctl-nw-liverpool@justice.gov.uk",
+      "forename": "sscs-ctsctl",
+      "surname": "nw-liverpool",
+      "displayName": "sscs-ctsctl",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "85857cf7-6f0b-48b6-8429-b823f127c9af",
+      "email": "sscs-ctsctl-midlands-bradford@justice.gov.uk",
+      "forename": "sscs-ctsctl",
+      "surname": "midlands-bradford",
+      "displayName": "sscs-ctsctl",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "3e186b60-527a-46f3-9005-c430d234490f",
+      "email": "TribunalMember.PaulJoyce@ejudiciary.net",
+      "forename": "Paul",
+      "surname": "Joyce",
+      "displayName": "Paul",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-judge"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "68c1584e-9356-4a7e-bbd6-b13b98a9ef9d",
+      "email": "RegionalMedicalMember.Ben@ejudiciary.net",
+      "forename": "Sal",
+      "surname": "Ben",
+      "displayName": "Sal",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-judge",
+        "caseworker-sscs-judge-salaried"
       ]
     }
   }
