@@ -1,7 +1,7 @@
 apiVersion: v2
 name: sscs-tribunals-api
 home: https://github.com/hmcts/sscs-tribunals-case-api
-version: 0.0.220
+version: 0.0.221
 description: SSCS Tribunals Case API
 maintainers:
   - name: HMCTS SSCS Team
@@ -75,15 +75,15 @@ dependencies:
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: wa.enabled
   - name: wa-task-monitor
-    version: ~0.1.0
+    version: ~0.1.2
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: wa.enabled
   - name: wa-case-event-handler
-    version: 0.1.0
+    version: 0.1.1
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: wa.enabled
   - name: wa-workflow-api
-    version: 0.1.1
+    version: 0.1.2
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: wa.enabled
   #    initiation
