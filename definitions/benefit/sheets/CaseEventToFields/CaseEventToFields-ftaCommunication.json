@@ -136,5 +136,18 @@
     "PageDisplayOrder": 7,
     "PageFieldDisplayOrder": 2,
     "PageID": "deleteRequest"
+  },
+  {
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "latestFtaCommunicationId",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 7,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "3.0",
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "ftaRequestType=\"Do Not Show\"",
+    "Publish": "${CCD_DEF_PUBLISH}"
   }
 ]

@@ -1,7 +1,7 @@
 apiVersion: v2
 name: sscs-tribunals-api
 home: https://github.com/hmcts/sscs-tribunals-case-api
-version: 0.0.220
+version: 0.0.221
 description: SSCS Tribunals Case API
 maintainers:
   - name: HMCTS SSCS Team
@@ -113,7 +113,7 @@ dependencies:
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: wa.enabled
   - name: sscs-cron-trigger
-    version: 0.0.20
+    version: 0.0.21
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: wa.enabled
   - name: ccd-def-cleanup

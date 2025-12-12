@@ -102,5 +102,18 @@
     "PageShowCondition": "tribunalRequestType=\"reviewTribunalReply\"",
     "PageLabel": "Select an FTA communication to mark as reviewed",
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=selectTribunalReply"
+  },
+  {
+    "CaseEventID": "tribunalCommunication",
+    "CaseFieldID": "latestFtaCommunicationId",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 7,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "3.0",
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "tribunalRequestType=\"Do Not Show\"",
+    "Publish": "${CCD_DEF_PUBLISH}"
   }
 ]
