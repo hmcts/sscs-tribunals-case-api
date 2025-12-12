@@ -31,6 +31,7 @@ import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -145,6 +146,9 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         if (internalCaseDocumentData.getSscsInternalDocument() != null) {
             internalCaseDocumentData.getSscsInternalDocument()
                     .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()));
+            if (CollectionUtils.isEmpty(internalCaseDocumentData.getSscsInternalDocument())) {
+                internalCaseDocumentData.setSscsInternalDocument(null);
+            }
         }
     }
 
