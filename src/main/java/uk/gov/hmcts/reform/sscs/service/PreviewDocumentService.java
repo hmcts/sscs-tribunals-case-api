@@ -20,6 +20,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 public class PreviewDocumentService {
 
     public void writePreviewDocumentToSscsInternalDocument(SscsCaseData sscsCaseData, DocumentType documentType, DocumentLink documentLink) {
+        if (sscsCaseData.getSscsDocument() != null) {
+            sscsCaseData.getSscsDocument()
+                    .removeIf(doc -> documentType.getValue().equals(doc.getValue().getDocumentType()));
+        }
         InternalCaseDocumentData internalCaseDocumentData = ofNullable(sscsCaseData.getInternalCaseDocumentData())
                 .orElse(InternalCaseDocumentData.builder().build());
         List<SscsDocument> documents = new ArrayList<>(emptyIfNull(internalCaseDocumentData.getSscsInternalDocument()));
