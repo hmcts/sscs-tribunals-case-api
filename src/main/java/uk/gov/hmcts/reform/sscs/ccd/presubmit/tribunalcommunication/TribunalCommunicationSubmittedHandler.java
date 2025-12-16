@@ -29,14 +29,6 @@ public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackH
     private CamundaClientApi camundaClient;
 
     private final IdamService idamService;
-
-    private final Map<String, String> tokens = new ConcurrentHashMap<>();
-    @Value("${idam.scope}")
-    protected String userScope;
-    @Value("${spring.security.oauth2.client.registration.oidc.client-id}")
-    protected String idamClientId;
-    @Value("${spring.security.oauth2.client.registration.oidc.client-secret}")
-    protected String idamClientSecret;
     public static final String AUTHORIZATION = "Authorization";
     public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
 
