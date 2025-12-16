@@ -40,6 +40,9 @@ class UpdateOtherPartyMidEventHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
+    private static final String LINE_1 = "first address line";
+    private static final String VALID_UK_POSTCODE = "SWA 1AA";
+
     private static final String ERROR_ADDRESS_LINE_1_OTHER_PARTY = "You must enter address line 1 for the other party";
     private static final String ERROR_ADDRESS_LINE_1_OTHER_PARTY_REP = "You must enter address line 1 for the other party representative";
     private static final String ERROR_COUNTRY_OTHER_PARTY = "You must enter a valid country for the other party";
@@ -67,15 +70,15 @@ class UpdateOtherPartyMidEventHandlerTest {
     }
 
     private static Address addressMissingPostcode() {
-        return Address.builder().line1("first address line").build();
+        return Address.builder().line1(LINE_1).build();
     }
 
     private static Address validUkAddress() {
-        return Address.builder().line1("first address line").postcode("SWA 1AA").build();
+        return Address.builder().line1(LINE_1).postcode(VALID_UK_POSTCODE).build();
     }
 
     private static Address ukAddressMissingFirstLine() {
-        return Address.builder().postcode("SWA 1AA").build();
+        return Address.builder().postcode(VALID_UK_POSTCODE).build();
     }
 
     @BeforeEach
@@ -83,26 +86,33 @@ class UpdateOtherPartyMidEventHandlerTest {
         handler = new UpdateOtherPartyMidEventHandler();
     }
 
-    private PreSubmitCallbackResponse<SscsCaseData> runMidEvent(SscsCaseData caseData) {
-        when(callback.getEvent()).thenReturn(UPDATE_OTHER_PARTY_DATA);
+    private void stubCallbackWith(EventType eventType, SscsCaseData caseData) {
+        when(callback.getEvent()).thenReturn(eventType);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
+    }
 
+    private SscsCaseData caseDataWithBenefitAndParties(String benefitCode, List<CcdValue<OtherParty>> otherParties) {
+        return SscsCaseData.builder()
+            .benefitCode(benefitCode)
+            .otherParties(otherParties)
+            .build();
+    }
+
+    private PreSubmitCallbackResponse<SscsCaseData> runMidEvent(SscsCaseData caseData) {
+        stubCallbackWith(UPDATE_OTHER_PARTY_DATA, caseData);
         return handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
     }
 
     @Test
     void shouldReturnTrueForCanHandle() {
-        OtherParty party = OtherParty.builder().address(Address.builder().line1("42 new road").build()).build();
-
-        SscsCaseData caseData = SscsCaseData.builder()
-            .benefitCode(IBCA_BENEFIT_CODE)
-            .otherParties(List.of(new CcdValue<>(party)))
+        OtherParty party = OtherParty.builder()
+            .address(Address.builder().line1("42 new road").build())
             .build();
 
-        when(callback.getEvent()).thenReturn(UPDATE_OTHER_PARTY_DATA);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(caseData);
+        SscsCaseData caseData = caseDataWithBenefitAndParties(IBCA_BENEFIT_CODE, List.of(ccd(party)));
+
+        stubCallbackWith(UPDATE_OTHER_PARTY_DATA, caseData);
 
         assertThat(handler.canHandle(MID_EVENT, callback)).isTrue();
     }
@@ -122,10 +132,7 @@ class UpdateOtherPartyMidEventHandlerTest {
 
     @Test
     void shouldReturnFalseForCanHandleWhenNoOtherParties() {
-        when(callback.getEvent()).thenReturn(UPDATE_OTHER_PARTY_DATA);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(SscsCaseData.builder().build());
-
+        stubCallbackWith(UPDATE_OTHER_PARTY_DATA, SscsCaseData.builder().build());
         assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
     }
 
@@ -139,13 +146,10 @@ class UpdateOtherPartyMidEventHandlerTest {
     @Test
     void shouldReturnNoErrorsOnMidEventForUkNoRep() {
         OtherParty party = OtherParty.builder()
-            .address(Address.builder().line1("42 new road").inMainlandUk(YES).postcode("SWA 1AA").build())
+            .address(Address.builder().line1("42 new road").inMainlandUk(YES).postcode(VALID_UK_POSTCODE).build())
             .build();
 
-        SscsCaseData caseData = SscsCaseData.builder()
-            .benefitCode(IBCA_BENEFIT_CODE)
-            .otherParties(List.of(ccd(party)))
-            .build();
+        SscsCaseData caseData = caseDataWithBenefitAndParties(IBCA_BENEFIT_CODE, List.of(ccd(party)));
 
         PreSubmitCallbackResponse<SscsCaseData> response = runMidEvent(caseData);
 
@@ -217,10 +221,7 @@ class UpdateOtherPartyMidEventHandlerTest {
         @ParameterizedTest(name = "{0}")
         @MethodSource("addressAndErrorProvider")
         void shouldReturnSingleErrorOnMidEvent(String description, List<CcdValue<OtherParty>> otherParties, String expectedError) {
-            SscsCaseData caseData = SscsCaseData.builder()
-                .benefitCode(Benefit.CHILD_SUPPORT.name())
-                .otherParties(otherParties)
-                .build();
+            SscsCaseData caseData = caseDataWithBenefitAndParties(Benefit.CHILD_SUPPORT.name(), otherParties);
 
             PreSubmitCallbackResponse<SscsCaseData> response = runMidEvent(caseData);
 
@@ -232,7 +233,7 @@ class UpdateOtherPartyMidEventHandlerTest {
     class InfectedBloodCaseType {
 
         private SscsCaseData ibcCaseWith(OtherParty party) {
-            return SscsCaseData.builder().benefitCode(IBCA_BENEFIT_CODE).otherParties(List.of(ccd(party))).build();
+            return caseDataWithBenefitAndParties(IBCA_BENEFIT_CODE, List.of(ccd(party)));
         }
 
         @Test
