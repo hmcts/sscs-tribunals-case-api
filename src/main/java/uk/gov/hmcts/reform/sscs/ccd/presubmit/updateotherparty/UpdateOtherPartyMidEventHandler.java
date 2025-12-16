@@ -25,25 +25,23 @@ import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
 @Slf4j
 public class UpdateOtherPartyMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final PostcodeValidator postcodeValidator = new PostcodeValidator();
-
     private static final String OTHER_PARTY = "other party";
     private static final String OTHER_PARTY_REPRESENTATIVE = "other party representative";
+    private static final String OTHER_PARTY_APPOINTEE = "other party appointee";
     private static final String ERROR_ADDRESS_LINE_1 = "You must enter address line 1 for the %s";
     private static final String ERROR_COUNTRY = "You must enter a valid country for the %s";
     private static final String ERROR_POSTCODE = "You must enter a valid UK postcode for the %s";
     private static final String ERROR_MAINLAND_SELECTION = "You must select whether the address is in mainland UK for the %s";
     private static final String ERROR_ADDRESS_MISSING = "Address details are missing for the %s";
+    private final PostcodeValidator postcodeValidator = new PostcodeValidator();
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
-        return callbackType.equals(CallbackType.MID_EVENT)
-                && callback.getEvent() == UPDATE_OTHER_PARTY_DATA
-                && callback.getCaseDetails().getCaseData().isIbcCase()
-                && nonNull(callback.getCaseDetails().getCaseData().getOtherParties());
+        return callbackType.equals(CallbackType.MID_EVENT) && callback.getEvent() == UPDATE_OTHER_PARTY_DATA && nonNull(
+            callback.getCaseDetails().getCaseData().getOtherParties());
     }
 
     @Override
@@ -53,21 +51,24 @@ public class UpdateOtherPartyMidEventHandler implements PreSubmitCallbackHandler
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+        boolean ibcCase = callback.getCaseDetails().getCaseData().isIbcCase();
 
         caseData.getOtherParties().forEach(party -> {
-            response.addErrors(validateAddress(party.getValue().getAddress(), OTHER_PARTY));
-
+            response.addErrors(validateAddress(party.getValue().getAddress(), OTHER_PARTY, ibcCase));
             if (party.getValue().hasRepresentative()) {
-                response.addErrors(validateAddress(
-                    party.getValue().getRep().getAddress(),
-                    OTHER_PARTY_REPRESENTATIVE
-                ));
+                response.addErrors(
+                    validateAddress(party.getValue().getRep().getAddress(), OTHER_PARTY_REPRESENTATIVE, ibcCase));
+
+            }
+            if (party.getValue().hasAppointee()) {
+                response.addErrors(
+                    validateAddress(party.getValue().getAppointee().getAddress(), OTHER_PARTY_APPOINTEE, ibcCase));
             }
         });
         return response;
     }
 
-    private Set<String> validateAddress(Address address, String addressPrefix) {
+    private Set<String> validateAddress(Address address, String addressPrefix, boolean ibcCase) {
         Set<String> validationErrors = new HashSet<>();
 
         if (address == null) {
@@ -79,6 +80,15 @@ public class UpdateOtherPartyMidEventHandler implements PreSubmitCallbackHandler
             validationErrors.add(String.format(ERROR_ADDRESS_LINE_1, addressPrefix));
         }
 
+        if (ibcCase) {
+            validateIbcCountryAndPostcode(address, addressPrefix, validationErrors);
+        } else {
+            validateUkPostcode(address, addressPrefix, validationErrors);
+        }
+        return validationErrors;
+    }
+
+    private void validateIbcCountryAndPostcode(Address address, String addressPrefix, Set<String> validationErrors) {
         YesNo isInMainlandUk = address.getInMainlandUk();
         if (isEmpty(isInMainlandUk)) {
             validationErrors.add(String.format(ERROR_MAINLAND_SELECTION, addressPrefix));
@@ -87,10 +97,13 @@ public class UpdateOtherPartyMidEventHandler implements PreSubmitCallbackHandler
                 validationErrors.add(String.format(ERROR_COUNTRY, addressPrefix));
             }
         } else if (YES.equals(isInMainlandUk)) {
-            if (isEmpty(address.getPostcode()) || !postcodeValidator.isValid(address.getPostcode(), null)) {
-                validationErrors.add(String.format(ERROR_POSTCODE, addressPrefix));
-            }
+            validateUkPostcode(address, addressPrefix, validationErrors);
         }
-        return validationErrors;
+    }
+
+    private void validateUkPostcode(Address address, String addressPrefix, Set<String> validationErrors) {
+        if (isEmpty(address.getPostcode()) || !postcodeValidator.isValid(address.getPostcode(), null)) {
+            validationErrors.add(String.format(ERROR_POSTCODE, addressPrefix));
+        }
     }
 }
