@@ -3,9 +3,12 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.tribunalcommunication;
 import static java.util.Objects.requireNonNull;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -13,9 +16,9 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.client.CamundaClient;
 import uk.gov.hmcts.reform.sscs.domain.CamundaTask;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.service.CamundaClientApi;
 
 @Slf4j
 @Service
@@ -23,9 +26,19 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Autowired
-    private CamundaClient camundaClient;
+    private CamundaClientApi camundaClient;
 
     private final IdamService idamService;
+
+    private final Map<String, String> tokens = new ConcurrentHashMap<>();
+    @Value("${idam.scope}")
+    protected String userScope;
+    @Value("${spring.security.oauth2.client.registration.oidc.client-id}")
+    protected String idamClientId;
+    @Value("${spring.security.oauth2.client.registration.oidc.client-secret}")
+    protected String idamClientSecret;
+    public static final String AUTHORIZATION = "Authorization";
+    public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -47,7 +60,7 @@ public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackH
         String caseId = String.valueOf(callback.getCaseDetails().getId());
 
         List<CamundaTask> camundaTaskList = camundaClient.getTasksByTaskVariables(
-                idamService.getIdamTokens().getServiceAuthorization(),
+                idamService.getIdamWaTokens().getServiceAuthorization(),
                 "caseId_eq_" + caseId
                         + ",jurisdiction_eq_SSCS"
                         + ",caseTypeId_eq_Benefit",
@@ -68,7 +81,6 @@ public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackH
                     idamService.getIdamTokens().getServiceAuthorization(),
                     taskIdToBeCancelled);
         }
-
 
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
         return callbackResponse;

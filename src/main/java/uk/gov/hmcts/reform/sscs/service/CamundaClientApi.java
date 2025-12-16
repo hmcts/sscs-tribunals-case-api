@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.client;
+package uk.gov.hmcts.reform.sscs.service;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.sscs.domain.CamundaTask;
         url = "https://camunda-sscs-tribunals-api-pr-4961.preview.platform.hmcts.net/engine-rest"
 )
 @SuppressWarnings("PMD.UseObjectForClearerAPI")
-public interface CamundaClient {
+public interface CamundaClientApi {
 
     String SERVICE_AUTHORIZATION = "ServiceAuthorization";
 

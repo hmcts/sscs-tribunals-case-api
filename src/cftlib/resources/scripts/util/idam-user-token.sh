@@ -6,13 +6,13 @@
 ##    - password: ID assigned to user in generated token. Default to `London01`.
 ##
 
-USERNAME=${1:-system.update@hmcts.net}
-PASSWORD=${2:-password}
-REDIRECT_URI="http://xui-webapp/oauth2/callback"
-CLIENT_ID="ccd_gateway"
-CLIENT_SECRET="OOOOOOOOOOOOOOOO"
+USERNAME=${1:-sscs-ctscdmin-nw-liverpool@justice.gov.uk}
+PASSWORD=${2:-Testing123}
+REDIRECT_URI="https://evidence-sharing-preprod.sscs.reform.hmcts.net"
+CLIENT_ID="sscs"
+CLIENT_SECRET="naA2#nvAJ$ge^eEzW2"
 SCOPE="openid%20profile%20roles%20authorities"
-IDAM_API_URL="${IDAM_API_URL:-http://localhost:5062}"
+IDAM_API_URL="${IDAM_API_URL:-https://idam-api.aat.platform.hmcts.net}"
 
 curl --silent --show-error \
   -H "Content-Type: application/x-www-form-urlencoded" \
