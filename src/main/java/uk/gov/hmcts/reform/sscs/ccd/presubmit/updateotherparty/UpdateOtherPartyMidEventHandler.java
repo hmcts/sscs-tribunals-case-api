@@ -24,8 +24,6 @@ import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
 @Service
 public class UpdateOtherPartyMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final PostcodeValidator postcodeValidator = new PostcodeValidator();
-
     private static final String OTHER_PARTY = "other party";
     private static final String OTHER_PARTY_REPRESENTATIVE = "other party representative";
     private static final String OTHER_PARTY_APPOINTEE = "other party appointee";
@@ -34,12 +32,12 @@ public class UpdateOtherPartyMidEventHandler implements PreSubmitCallbackHandler
     private static final String ERROR_POSTCODE = "You must enter a valid UK postcode for the %s";
     private static final String ERROR_MAINLAND_SELECTION = "You must select whether the address is in mainland UK for the %s";
     private static final String ERROR_ADDRESS_MISSING = "Address details are missing for the %s";
+    private final PostcodeValidator postcodeValidator = new PostcodeValidator();
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
-
         return callbackType.equals(CallbackType.MID_EVENT)
             && callback.getEvent() == UPDATE_OTHER_PARTY_DATA
             && nonNull(callback.getCaseDetails().getCaseData().getOtherParties());
@@ -50,72 +48,65 @@ public class UpdateOtherPartyMidEventHandler implements PreSubmitCallbackHandler
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
-
-        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
-        boolean isIbcCase = caseData.isIbcCase();
-
-        caseData.getOtherParties().forEach(party -> validateOtherPartyAddresses(party, isIbcCase, response));
-
+        final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        final boolean supportsInternationalAddress = supportsInternationalAddress(caseData);
+        final PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+        caseData.getOtherParties()
+            .forEach(party -> validateOtherPartyAddresses(party, supportsInternationalAddress, response));
         return response;
     }
 
-    private void validateOtherPartyAddresses(CcdValue<OtherParty> party, boolean isIbcCase, PreSubmitCallbackResponse<SscsCaseData> response) {
-        response.addErrors(validateAddress(party.getValue().getAddress(), OTHER_PARTY, isIbcCase));
-
+    private void validateOtherPartyAddresses(CcdValue<OtherParty> party, boolean supportsInternationalAddress, PreSubmitCallbackResponse<SscsCaseData> response) {
+        response.addErrors(validateAddress(party.getValue().getAddress(), OTHER_PARTY, supportsInternationalAddress));
         if (party.getValue().hasRepresentative()) {
-            response.addErrors(
-                validateAddress(party.getValue().getRep().getAddress(), OTHER_PARTY_REPRESENTATIVE, isIbcCase));
+            response.addErrors(validateAddress(party.getValue().getRep().getAddress(), OTHER_PARTY_REPRESENTATIVE,
+                supportsInternationalAddress));
         }
-
         if (party.getValue().hasAppointee()) {
-            response.addErrors(
-                validateAddress(party.getValue().getAppointee().getAddress(), OTHER_PARTY_APPOINTEE, isIbcCase));
+            response.addErrors(validateAddress(party.getValue().getAppointee().getAddress(), OTHER_PARTY_APPOINTEE,
+                supportsInternationalAddress));
         }
     }
 
-    private Set<String> validateAddress(Address address, String addressPrefix, boolean isIbcCase) {
-        Set<String> validationErrors = new HashSet<>();
-
+    private Set<String> validateAddress(Address address, String addressPrefix, boolean supportsInternationalAddress) {
+        final Set<String> validationErrors = new HashSet<>();
         if (address == null) {
             validationErrors.add(String.format(ERROR_ADDRESS_MISSING, addressPrefix));
             return validationErrors;
         }
-
         if (isEmpty(address.getLine1())) {
             validationErrors.add(String.format(ERROR_ADDRESS_LINE_1, addressPrefix));
         }
-
-        if (isIbcCase) {
-            validateIbcCountryAndPostcode(address, addressPrefix, validationErrors);
+        if (supportsInternationalAddress) {
+            validateCountryAndPostcode(address, addressPrefix, validationErrors);
         } else {
             validateUkPostcode(address, addressPrefix, validationErrors);
         }
-
         return validationErrors;
     }
 
-    private void validateIbcCountryAndPostcode(Address address, String partyRoleLabel, Set<String> errors) {
-        YesNo isInMainlandUk = address.getInMainlandUk();
-
+    private void validateCountryAndPostcode(Address address, String addressPrefix, Set<String> validationErrors) {
+        final YesNo isInMainlandUk = address.getInMainlandUk();
         if (isEmpty(isInMainlandUk)) {
-            errors.add(String.format(ERROR_MAINLAND_SELECTION, partyRoleLabel));
-            return;
-        }
-
-        if (NO.equals(isInMainlandUk)) {
+            validationErrors.add(String.format(ERROR_MAINLAND_SELECTION, addressPrefix));
+        } else if (NO.equals(isInMainlandUk)) {
             if (isBlank(address.getCountry())) {
-                errors.add(String.format(ERROR_COUNTRY, partyRoleLabel));
+                validationErrors.add(String.format(ERROR_COUNTRY, addressPrefix));
             }
-            return;
+        } else {
+            if (isEmpty(address.getPostcode()) || !postcodeValidator.isValid(address.getPostcode(), null)) {
+                validateUkPostcode(address, addressPrefix, validationErrors);
+            }
         }
-
-        validateUkPostcode(address, partyRoleLabel, errors);
     }
 
     private void validateUkPostcode(Address address, String partyRoleLabel, Set<String> errors) {
         if (isEmpty(address.getPostcode()) || !postcodeValidator.isValid(address.getPostcode(), null)) {
             errors.add(String.format(ERROR_POSTCODE, partyRoleLabel));
         }
+    }
+
+    private boolean supportsInternationalAddress(SscsCaseData caseData) {
+        return caseData.isIbcCase();
     }
 }
