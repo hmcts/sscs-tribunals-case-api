@@ -44,6 +44,8 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBCA
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBCA_FULL_NAME_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.JOINT_TEXT_WITH_A_SPACE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.JOINT_TEXT_WITH_A_SPACE_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.MAX_DWP_RESPONSE_DAYS;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.MAX_DWP_RESPONSE_DAYS_CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.RESPONSE_DATE_FORMAT;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.THE_STRING;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.THE_STRING_WELSH;
@@ -171,10 +173,13 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
@@ -262,10 +267,11 @@ public class PersonalisationTest {
     private final String evidenceAddressTelephoneWelsh = PHONE_WELSH;
     private final String evidenceAddressTelephoneIbc = PHONE_IBC;
     private final EvidenceProperties.EvidenceAddress evidenceAddress = new EvidenceProperties.EvidenceAddress();
+    private AutoCloseable autoCloseable;
 
     @BeforeEach
     public void setup() {
-        openMocks(this);
+        autoCloseable = openMocks(this);
         when(config.getTrackAppealLink()).thenReturn(Link.builder().linkUrl("http://tyalink.com/appeal_id").build());
         when(config.getMyaLink()).thenReturn(Link.builder().linkUrl("http://myalink.com/appeal_id").build());
         when(config.getMyaClaimingExpensesLink()).thenReturn(Link.builder().linkUrl("http://myalink.com/claimingExpenses").build());
@@ -326,6 +332,11 @@ public class PersonalisationTest {
         personalisations.put(LanguagePreference.ENGLISH, englishMap);
         personalisations.put(LanguagePreference.WELSH, welshMap);
         personalisationConfiguration.setPersonalisation(personalisations);
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        autoCloseable.close();
     }
 
     private static Map<String, String> getWelshMap() {
@@ -748,7 +759,7 @@ public class PersonalisationTest {
         assertNull(result.get(EVIDENCE_RECEIVED_DATE_LITERAL));
         assertEquals(EMPTY, result.get(JOINT));
         assertEquals(EMPTY, result.get(JOINT_WELSH));
-        assertNull(result.get(JOINT_PARTY));
+        assertNull(result.get(JOINT_PARTY.name()));
 
         assertEquals(ADDRESS1, result.get(REGIONAL_OFFICE_NAME_LITERAL));
         assertEquals(ADDRESS2, result.get(SUPPORT_CENTRE_NAME_LITERAL));
@@ -1178,17 +1189,36 @@ public class PersonalisationTest {
         assertEquals("12 August 2018", result.get(APPEAL_RESPOND_DATE));
     }
 
-    @Test
-    public void givenDigitalCaseWithNoDateSentToDwp_thenUseTodaysDateForAppealRespondDate() {
+    @ParameterizedTest
+    @MethodSource("appealResponseDate")
+    public void givenDigitalCaseWithNoDateSentToDwp_thenUseTodaysDateForAppealRespondDate(
+        Appeal appeal, int responsePeriod) {
+
         SscsCaseData response = SscsCaseData.builder()
-            .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
-            .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build())
+            .ccdCaseId(CASE_ID)
+            .caseReference("SC/1234/5")
+            .appeal(appeal)
             .createdInGapsFrom("readyToList")
             .build();
 
         Map<String, Object> result = personalisation.setEventData(new HashMap<>(), response, APPEAL_RECEIVED);
 
-        assertEquals(LocalDate.now().plusDays(personalisation.calculateMaxDwpResponseDays(response.getBenefitCode())).format(DateTimeFormatter.ofPattern(RESPONSE_DATE_FORMAT)), result.get(APPEAL_RESPOND_DATE));
+        assertThat(result.get(APPEAL_RESPOND_DATE))
+            .isEqualTo(LocalDate.now()
+                .plusDays(responsePeriod)
+                .format(DateTimeFormatter.ofPattern(RESPONSE_DATE_FORMAT)));
+    }
+
+    private static Stream<Arguments> appealResponseDate() {
+        return Stream.of(
+            Arguments.of(Appeal.builder()
+                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+                .build(), MAX_DWP_RESPONSE_DAYS_CHILD_SUPPORT),
+            Arguments.of(null, MAX_DWP_RESPONSE_DAYS),
+            Arguments.of(Appeal.builder().build(), MAX_DWP_RESPONSE_DAYS),
+            Arguments.of(Appeal.builder().benefitType(BenefitType.builder().build()).build(), MAX_DWP_RESPONSE_DAYS),
+            Arguments.of(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.ESA.getShortName()).build()).build(), MAX_DWP_RESPONSE_DAYS)
+        );
     }
 
     @Test
@@ -1962,7 +1992,7 @@ public class PersonalisationTest {
                 .build())
             .build();
 
-        OtherParty otherParty = sscsCaseData.getOtherParties().get(0).getValue();
+        OtherParty otherParty = sscsCaseData.getOtherParties().getFirst().getValue();
         Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper.builder()
                 .newSscsCaseData(sscsCaseData)
                 .notificationEventType(SUBSCRIPTION_CREATED)
