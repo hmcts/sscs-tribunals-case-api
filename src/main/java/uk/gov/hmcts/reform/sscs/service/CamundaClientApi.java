@@ -5,7 +5,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import java.util.List;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -15,7 +14,9 @@ import uk.gov.hmcts.reform.sscs.domain.CamundaTask;
 
 @FeignClient(
         name = "camunda",
-        url = "https://wa-task-management-api-sscs-tribunals-api-pr-4961.preview.platform.hmcts.net/task"
+        url = "https://camunda-sscs-tribunals-api-pr-4961.preview.platform.hmcts.net/engine-rest"
+                +
+                "https://wa-task-management-api-sscs-tribunals-api-pr-4961.preview.platform.hmcts.net/task"
 )
 @SuppressWarnings("PMD.UseObjectForClearerAPI")
 public interface CamundaClientApi {
