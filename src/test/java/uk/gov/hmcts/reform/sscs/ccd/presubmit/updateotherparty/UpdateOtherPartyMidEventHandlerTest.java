@@ -72,21 +72,6 @@ class UpdateOtherPartyMidEventHandlerTest {
         return CcdValue.<OtherParty>builder().value(otherParty).build();
     }
 
-    // ---- canHandle / guard behaviour ------------------------------------------------------------
-
-    private static Representative repHasRepButNoAddress() {
-        return Representative.builder()
-            .hasRepresentative(YES.getValue())
-            .build();
-    }
-
-    private static Representative repWithAddress(Address address) {
-        return Representative.builder()
-            .hasRepresentative(YES.getValue())
-            .address(address)
-            .build();
-    }
-
     private static Address validAddress() {
         return Address.builder().line1(LINE_1).postcode(POSTCODE).build();
     }
@@ -99,19 +84,13 @@ class UpdateOtherPartyMidEventHandlerTest {
         return Address.builder().line1(LINE_1).build();
     }
 
-    // ---- Child Support: UK-only address validation ----------------------------------------------
-
     private static Address addressWithInvalidPostcode() {
         return Address.builder().line1(LINE_1).postcode(INVALID_POSTCODE).build();
     }
 
-    // ---- IBCA: UK + International address validation --------------------------------------------
-
     private static Address addressMissingFirstLine() {
         return Address.builder().postcode(POSTCODE).build();
     }
-
-    // ---- test helpers ----------------------------------------------------------------------------
 
     private static Address ukAddress() {
         return Address.builder().line1(LINE_1).inMainlandUk(YES).postcode(POSTCODE).build();
@@ -141,14 +120,25 @@ class UpdateOtherPartyMidEventHandlerTest {
         return Address.builder().inMainlandUk(NO).build();
     }
 
-    // ---- Address fixtures ------------------------------------------------------------------------
-
     private static Address anInternationalAddressNoCountry() {
         return Address.builder().line1(LINE_1).postcode(ZIPCODE).inMainlandUk(NO).build();
     }
 
     private static Address anInternationalAddressWithNoFirstLineAddressOrCountry() {
         return Address.builder().inMainlandUk(NO).postcode(ZIPCODE).build();
+    }
+
+    private static Representative hasRepButNoAddress() {
+        return Representative.builder()
+            .hasRepresentative(YES.getValue())
+            .build();
+    }
+
+    private static Representative repWithAddress(Address address) {
+        return Representative.builder()
+            .hasRepresentative(YES.getValue())
+            .address(address)
+            .build();
     }
 
     @BeforeEach
@@ -241,7 +231,7 @@ class UpdateOtherPartyMidEventHandlerTest {
                 Arguments.of("Representative present but no address provided",
                     List.of(ccd(OtherParty.builder()
                         .address(validAddress())
-                        .rep(repHasRepButNoAddress())
+                        .rep(hasRepButNoAddress())
                         .build())),
                     ERROR_ADDRESS_MISSING_OTHER_PARTY_REP),
 
