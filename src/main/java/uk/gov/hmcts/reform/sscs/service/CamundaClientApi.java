@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.sscs.domain.CamundaTask;
 
 @FeignClient(
         name = "camunda",
-        url = "https://wa-task-management-api-sscs-tribunals-api-pr-4961.preview.platform.hmcts.net/task"
+        url = "https://camunda-sscs-tribunals-api-pr-4961.preview.platform.hmcts.net/engine-rest"
 )
 @SuppressWarnings("PMD.UseObjectForClearerAPI")
 public interface CamundaClientApi {
