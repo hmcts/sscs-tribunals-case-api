@@ -50,6 +50,7 @@ public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackH
 
         List<CamundaTask> camundaTaskList = camundaClient.getTasksByTaskVariables(
                 idamService.getIdamWaTokens().getServiceAuthorization(),
+                idamService.getIdamWaTokens().getIdamOauth2Token(),
                 "caseId_eq_" + caseId
                         + ",jurisdiction_eq_SSCS"
                         + ",caseTypeId_eq_Benefit",
@@ -68,6 +69,7 @@ public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackH
 
             camundaClient.cancelTask(
                     idamService.getIdamTokens().getServiceAuthorization(),
+                    idamService.getIdamWaTokens().getIdamOauth2Token(),
                     taskIdToBeCancelled);
         }
 

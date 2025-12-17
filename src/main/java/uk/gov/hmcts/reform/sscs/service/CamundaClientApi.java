@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import java.util.List;
@@ -28,6 +29,7 @@ public interface CamundaClientApi {
     @ResponseBody
     List<CamundaTask> getTasksByTaskVariables(
             @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
+            @RequestHeader(AUTHORIZATION) String authorisation,
             @RequestParam("taskVariables") String taskVariables,
             @RequestParam(value = "sortBy", defaultValue = "created", required = false) String sortBy,
             @RequestParam(value = "sortOrder", defaultValue = "desc", required = false) String sortOrder
@@ -38,6 +40,7 @@ public interface CamundaClientApi {
             consumes = APPLICATION_JSON_VALUE
     )
     void cancelTask(@RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
+                    @RequestHeader(AUTHORIZATION) String authorisation,
                         @PathVariable("task-id") String id);
 
 
