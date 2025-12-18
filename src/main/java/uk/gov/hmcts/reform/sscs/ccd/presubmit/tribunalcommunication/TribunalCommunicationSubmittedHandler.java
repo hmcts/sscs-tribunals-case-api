@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.sscs.service.WaTaskManagementApi;
 public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Autowired
-    private WaTaskManagementApi WaTaskManagementApi;
+    private WaTaskManagementApi waTaskManagementApi;
 
     private final IdamService idamService;
     public static final String AUTHORIZATION = "Authorization";
@@ -52,7 +52,7 @@ public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackH
                 idamService.getIdamWaTokens().getIdamOauth2Token().substring(0,5),
                 idamService.getIdamWaTokens().getServiceAuthorization().substring(0,5));
 
-        List<CamundaTask> camundaTaskList = WaTaskManagementApi.getTasksByTaskVariables(
+        List<CamundaTask> camundaTaskList = waTaskManagementApi.getTasksByTaskVariables(
                 idamService.getIdamWaTokens().getServiceAuthorization(),
                 idamService.getIdamWaTokens().getIdamOauth2Token(),
                 "caseId_eq_" + caseId
@@ -71,7 +71,7 @@ public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackH
                     .findFirst().orElse(null).getId();
             log.info("Cancelling Camunda task for caseID: {}, Task ID: {}", caseId, taskIdToBeCancelled);
 
-            WaTaskManagementApi.cancelTask(
+            waTaskManagementApi.cancelTask(
                     idamService.getIdamTokens().getServiceAuthorization(),
                     idamService.getIdamWaTokens().getIdamOauth2Token(),
                     taskIdToBeCancelled);
