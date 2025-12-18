@@ -129,6 +129,11 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 withNightlyPipeline(type, product, component) {
     def githubApi = new GithubAPI(this)
 
+    echo "Checking for DO NOT MERGE labels"
+    if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "DO NOT MERGE").size() > 0) {
+        echo "Checking for DO NOT MERGE labels 2"
+    }
+
     enableHighLevelDataSetup()
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
@@ -144,10 +149,6 @@ withNightlyPipeline(type, product, component) {
         enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
     }
     onPR() {
-        echo "Checking for dependencies labels"
-        if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "dependencies").size() > 0) {
-            echo "Checking for dependencies labels 2"
-        }
 
         setPreviewEnvVars()
 
