@@ -134,6 +134,10 @@ withNightlyPipeline(type, product, component) {
     enableSlackNotifications('#sscs-tech')
     syncBranchesWithMaster(['demo', 'ithc', 'perftest'])
 
+    if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "dependencies").size() > 0) {
+        echo "Checking for dependencies labels"
+    }
+
     env.DOCUMENT_MANAGEMENT_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.TEST_DOCUMENT_MANAGEMENT_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.PACT_BROKER_FULL_URL = "https://pact-broker.platform.hmcts.net"
@@ -147,7 +151,6 @@ withNightlyPipeline(type, product, component) {
         setPreviewEnvVars();
 
         if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "dependencies").size() > 0) {
-            echo "Checking for dependencies labels"
             enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
         }
 
