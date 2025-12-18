@@ -325,20 +325,6 @@
   {
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=workCapabilityAssessment",
     "CaseEventID": "writeFinalDecision",
-    "CaseFieldID": "ucWriteFinalDecisionWorkCapabilityAssessmentStartDate",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
-    "LiveFrom": "26/11/2025",
-    "PageDisplayOrder": 8,
-    "PageFieldDisplayOrder": 4,
-    "PageID": "workCapabilityAssessment",
-    "FieldShowCondition" : "appeal.benefitType.code=\"UC\" AND wcaAppeal=\"Yes\" AND writeFinalDecisionAllowedOrRefused = \"allowed\"",
-    "ShowSummaryChangeOption": "Y",
-    "RetainHiddenValue": "Yes"
-  },
-  {
-    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=workCapabilityAssessment",
-    "CaseEventID": "writeFinalDecision",
     "CaseFieldID": "whichEsaRegulationsApply",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",

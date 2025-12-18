@@ -1113,154 +1113,160 @@ export class WriteFinalDecisionPages {
   async verifyPageContentForCheckYourAnswersPageForUCCaseWithScheduleAndReasses() {
     //await webActions.verifyPageLabel('.govuk-caption-l', writeFinalDecisionData.eventNameCaptor); // No Captor on this Page.
     await webActions.verifyPageLabel(
-        'h1.govuk-heading-l',
-        writeFinalDecisionData.checkYourAnswersPageHeading
+      'h1.govuk-heading-l',
+      writeFinalDecisionData.checkYourAnswersPageHeading
     );
     await webActions.verifyPageLabel(
-        '.heading-h2',
-        writeFinalDecisionData.checkYourAnswersSectionHeading
+      '.heading-h2',
+      writeFinalDecisionData.checkYourAnswersSectionHeading
     );
     await webActions.verifyPageLabel(
-        'form.check-your-answers > div.ng-star-inserted > span.text-16',
-        writeFinalDecisionData.checkYourInformationCarefullyLabel
+      'form.check-your-answers > div.ng-star-inserted > span.text-16',
+      writeFinalDecisionData.checkYourInformationCarefullyLabel
     );
 
     await webActions.verifyPageLabel(
-        '.form-table tr:nth-of-type(3) > .valign-top > .text-16',
-        writeFinalDecisionData.generateNoticeLabel
+      '.form-table tr:nth-of-type(3) > .valign-top > .text-16',
+      writeFinalDecisionData.generateNoticeLabel
     );
     await webActions.verifyPageLabel(
-        '.form-table tr:nth-of-type(3) > .form-cell .text-16',
-        writeFinalDecisionData.yesLabel
+      '.form-table tr:nth-of-type(3) > .form-cell .text-16',
+      writeFinalDecisionData.yesLabel
     );
 
     await webActions.verifyPageLabel(
-        '.form-table tr:nth-of-type(4) > .valign-top > .text-16',
-        writeFinalDecisionData.isTheAppealLabel
+      '.form-table tr:nth-of-type(4) > .valign-top > .text-16',
+      writeFinalDecisionData.isTheAppealLabel
     );
     await webActions.verifyPageLabel(
-        '.form-table tr:nth-of-type(4) > .form-cell .text-16',
-        writeFinalDecisionData.allowedLabel
+      '.form-table tr:nth-of-type(4) > .form-cell .text-16',
+      writeFinalDecisionData.allowedLabel
     );
 
     await webActions.verifyPageLabel(
-        '.form-table tr:nth-of-type(5) > .valign-top > .text-16',
-        writeFinalDecisionData.whatTypeOfHearingWasHeldLabel
+      '.form-table tr:nth-of-type(5) > .valign-top > .text-16',
+      writeFinalDecisionData.whatTypeOfHearingWasHeldLabel
     );
     await webActions.verifyPageLabel(
-        '.form-table tr:nth-of-type(5) > .form-cell .text-16',
-        writeFinalDecisionData.faceToFaceLabel
+      '.form-table tr:nth-of-type(5) > .form-cell .text-16',
+      writeFinalDecisionData.faceToFaceLabel
     );
 
     await webActions.verifyPageLabel(
-        '.form-table tr:nth-of-type(6) > .valign-top > .text-16',
-        writeFinalDecisionData.didAPresentingOfficerLabel
+      '.form-table tr:nth-of-type(6) > .valign-top > .text-16',
+      writeFinalDecisionData.didAPresentingOfficerLabel
     );
     await webActions.verifyPageLabel(
-        '.form-table tr:nth-of-type(6) > .form-cell .text-16',
-        writeFinalDecisionData.yesLabel
+      '.form-table tr:nth-of-type(6) > .form-cell .text-16',
+      writeFinalDecisionData.yesLabel
     );
 
     await webActions.verifyPageLabel(
-        '.form-table tr:nth-of-type(7) > .valign-top > .text-16',
-        writeFinalDecisionData.didTheAppellantAttendTheHearing
+      '.form-table tr:nth-of-type(7) > .valign-top > .text-16',
+      writeFinalDecisionData.didTheAppellantAttendTheHearing
     );
     await webActions.verifyPageLabel(
-        '.form-table tr:nth-of-type(7) > .form-cell .text-16',
-        writeFinalDecisionData.noLabel
+      '.form-table tr:nth-of-type(7) > .form-cell .text-16',
+      writeFinalDecisionData.noLabel
     );
 
     await webActions.verifyPageLabel(
-        '.form-table tr:nth-of-type(9) > .valign-top > .text-16',
-        writeFinalDecisionData.nameOfMedicallyQualifiedPanelMemberMQPMWithoutOptionalLabel
+      '.form-table tr:nth-of-type(9) > .valign-top > .text-16',
+      writeFinalDecisionData.nameOfMedicallyQualifiedPanelMemberMQPMWithoutOptionalLabel
     );
     await webActions.verifyPageLabel(
-        '.form-table tr:nth-of-type(9) > .form-cell .text-16',
-        writeFinalDecisionData.nameOfMedicallyQualifiedPanelMemberInput
+      '.form-table tr:nth-of-type(9) > .form-cell .text-16',
+      writeFinalDecisionData.nameOfMedicallyQualifiedPanelMemberInput
     );
 
     await webActions.verifyPageLabel(
-        '.form-table tr:nth-of-type(8) > .valign-top > .text-16',
-        writeFinalDecisionData.otherWithoutOptionalLabel
+      '.form-table tr:nth-of-type(8) > .valign-top > .text-16',
+      writeFinalDecisionData.otherWithoutOptionalLabel
     );
     await webActions.verifyPageLabel(
-        '.form-table tr:nth-of-type(8) > .form-cell .text-16',
-        writeFinalDecisionData.otherPanelMemberInput
+      '.form-table tr:nth-of-type(8) > .form-cell .text-16',
+      writeFinalDecisionData.otherPanelMemberInput
     );
 
     await webActions.verifyPageLabel(
-        '.form-table tr:nth-of-type(10) > .valign-top > .text-16',
-        writeFinalDecisionData.dateOfFTADecisionLabel
+      '.form-table tr:nth-of-type(10) > .valign-top > .text-16',
+      writeFinalDecisionData.dateOfFTADecisionLabel
     );
 
     await webActions.verifyPageLabel(
-        '.form-table tr:nth-of-type(12) > .valign-top > .text-16',
-        writeFinalDecisionData.isThisAWCAAppeal
+      '.form-table tr:nth-of-type(12) > .valign-top > .text-16',
+      writeFinalDecisionData.isThisAWCAAppeal
     );
     await webActions.verifyPageLabel(
-        '.form-table tr:nth-of-type(12) > .form-cell .text-16',
-        writeFinalDecisionData.yesLabel
+      '.form-table tr:nth-of-type(12) > .form-cell .text-16',
+      writeFinalDecisionData.yesLabel
     );
 
     await webActions.verifyPageLabel(
-        '.form-table tr:nth-of-type(13) > .valign-top > .text-16',
-        writeFinalDecisionData.isThisASupportGroupOnlyAppealLabel
+      '.form-table tr:nth-of-type(13) > .valign-top > .text-16',
+      writeFinalDecisionData.isThisASupportGroupOnlyAppealLabel
     );
     await webActions.verifyPageLabel(
-        '.form-table tr:nth-of-type(13) > .form-cell .text-16',
-        writeFinalDecisionData.yesLabel
+      '.form-table tr:nth-of-type(13) > .form-cell .text-16',
+      writeFinalDecisionData.yesLabel
     );
 
-    // Commented out as The return value was 'Show Schedule 7 Activities Apply?'
+    //Commented out as The return value was 'Show Schedule 7 Activities Apply?'
     //await webActions.verifyPageLabel('.form-table tr:nth-of-type(15) > .valign-top > .text-16', writeFinalDecisionData.doSchedule7ActivitiesApply);
     //await webActions.verifyPageLabel('.form-table tr:nth-of-type(15) > .form-cell .text-16', writeFinalDecisionData.theSchedule7ActivitiesSelectedBelowApply);
 
-    const scheduleActivitiesQuestion = this.page.locator(
-      '.form-table tr:nth-of-type(16) > .valign-top > .text-16'
+    await webActions.verifyPageLabel(
+      '.form-table tr:nth-of-type(17) > .valign-top > .text-16',
+      writeFinalDecisionData.schedule7ActivitiesLabel
     );
-    const scheduleQuestionText =
-      (await scheduleActivitiesQuestion.textContent())?.trim() || '';
-    expect(scheduleQuestionText).toMatch(
-      /Do Schedule 7 Activities Apply\?|Show the Schedule 7 Activities Page\?/
+    await webActions.verifyPageLabel(
+      'tr:nth-of-type(17) tr:nth-of-type(1) .text-16',
+      writeFinalDecisionData.manualDexterityLabel
     );
-
-    await webActions.verifyTextVisibility(
-        writeFinalDecisionData.manualDexterityLabel
-    );
-    await webActions.verifyTextVisibility(
-        writeFinalDecisionData.initiatingAndCompletingLabel
+    await webActions.verifyPageLabel(
+      'tr:nth-of-type(17) tr:nth-of-type(2) .text-16',
+      writeFinalDecisionData.initiatingAndCompletingLabel
     );
 
-    await webActions.verifyTextVisibility(
-        writeFinalDecisionData.whatIsTheLastPageInTheTribunalBundleLabel
+    await webActions.verifyPageLabel(
+      '.form-table tr:nth-of-type(18) > .valign-top > .text-16',
+      writeFinalDecisionData.whatIsTheLastPageInTheTribunalBundleLabel
     );
-    await webActions.verifyTextVisibility(
-        writeFinalDecisionData.lastPageInTheTribunalBundleInput
-    );
-
-    await webActions.verifyTextVisibility(
-        writeFinalDecisionData.whenShouldFTAReAssessTheAwardLabel
-    );
-    await webActions.verifyTextVisibility(
-        writeFinalDecisionData.reassessWithin3MonthsLabel
+    await webActions.verifyPageLabel(
+      'tr:nth-of-type(18) > .form-cell .text-16',
+      writeFinalDecisionData.lastPageInTheTribunalBundleInput
     );
 
-    await webActions.verifyTextVisibility(
-        writeFinalDecisionData.reasonsForDecisionLabel
+    await webActions.verifyPageLabel(
+      'tr:nth-of-type(20) > .valign-top > .text-16',
+      writeFinalDecisionData.whenShouldFTAReAssessTheAwardLabel
     );
-    await webActions.verifyTextVisibility(
-        writeFinalDecisionData.reasonsForDecisionInput
-    );
-
-    await webActions.verifyTextVisibility(
-        writeFinalDecisionData.checkYourAnswersAnythingElse
-    );
-    await webActions.verifyTextVisibility(
-        writeFinalDecisionData.anythingElseInput
+    await webActions.verifyPageLabel(
+      'tr:nth-of-type(20) > .form-cell .text-16',
+      writeFinalDecisionData.reassessWithin3MonthsLabel
     );
 
-    await webActions.verifyTextVisibility(
-        writeFinalDecisionData.previewDecisionNoticeLabel
+    await webActions.verifyPageLabel(
+      'tr:nth-of-type(21) > .valign-top > .text-16',
+      writeFinalDecisionData.reasonsForDecisionLabel
+    );
+    await webActions.verifyPageLabel(
+      'tr:nth-of-type(21) > td:nth-of-type(1) span:nth-of-type(1)',
+      writeFinalDecisionData.reasonsForDecisionInput
+    );
+
+    await webActions.verifyPageLabel(
+      'tr:nth-of-type(22) > .valign-top > .text-16',
+      writeFinalDecisionData.checkYourAnswersAnythingElse
+    );
+    await webActions.verifyPageLabel(
+      'tr:nth-of-type(22) > .form-cell span',
+      writeFinalDecisionData.anythingElseInput
+    );
+
+    await webActions.verifyPageLabel(
+      'tr:nth-of-type(23) > .valign-top > .text-16',
+      writeFinalDecisionData.previewDecisionNoticeLabel
     );
   }
 
@@ -1291,15 +1297,9 @@ export class WriteFinalDecisionPages {
     );
   }
 
-  async verifyPageContentForWorkCapabilityAssessmentPageWithStartDate() {
-    await this.verifyPageContentForWorkCapabilityAssessmentPage();
-    // Start date fields stay hidden until WCA is set to 'Yes', so only assert labels after selection.
-  }
-
   async inputAndVerifyPageContentForWorkCapabilityAssessmentPageData(
     supportGroup: boolean,
     isESACase = false,
-    includeStartDate = false,
     esaRegulationYear: '2008' | '2013' = '2013'
   ) {
     await webActions.clickElementById('#wcaAppeal_Yes');
@@ -1328,29 +1328,6 @@ export class WriteFinalDecisionPages {
     supportGroup
       ? await webActions.clickElementById('#supportGroupOnlyAppeal_Yes')
       : await webActions.clickElementById('#supportGroupOnlyAppeal_No');
-
-    if (includeStartDate) {
-      // The start date fields appear after selecting WCA = Yes; use a safe past date.
-      await webActions.verifyElementVisibility(
-        '#ucWriteFinalDecisionWorkCapabilityAssessmentStartDate legend > .form-label'
-      );
-      await webActions.verifyPageLabel(
-        '#ucWriteFinalDecisionWorkCapabilityAssessmentStartDate legend > .form-label',
-        writeFinalDecisionData.ucAwardStartDateLabel
-      );
-      await webActions.inputField(
-        '#ucWriteFinalDecisionWorkCapabilityAssessmentStartDate-day',
-        '01'
-      );
-      await webActions.inputField(
-        '#ucWriteFinalDecisionWorkCapabilityAssessmentStartDate-month',
-        '01'
-      );
-      await webActions.inputField(
-        '#ucWriteFinalDecisionWorkCapabilityAssessmentStartDate-year',
-        '2023'
-      );
-    }
   }
 
   async verifyPageContentForSchedule7ActivitiesPage() {
