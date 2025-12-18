@@ -134,22 +134,22 @@ withNightlyPipeline(type, product, component) {
     enableSlackNotifications('#sscs-tech')
     syncBranchesWithMaster(['demo', 'ithc', 'perftest'])
 
-    echo "Checking for dependencies labels"
-    if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "dependencies").size() > 0) {
-        echo "Checking for dependencies labels 2"
-    }
-
     env.DOCUMENT_MANAGEMENT_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.TEST_DOCUMENT_MANAGEMENT_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.PACT_BROKER_FULL_URL = "https://pact-broker.platform.hmcts.net"
 
     onMaster() {
-        setAatEnvVars();
+        setAatEnvVars()
 
         enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
     }
     onPR() {
-        setPreviewEnvVars();
+        echo "Checking for dependencies labels"
+        if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "dependencies").size() > 0) {
+            echo "Checking for dependencies labels 2"
+        }
+        
+        setPreviewEnvVars()
 
         if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "dependencies").size() > 0) {
             enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
@@ -234,7 +234,7 @@ def generateDefinitions() {
 }
 
 def setAatEnvVars() {
-    env.PREVIEW_BRANCH_WITH_LOCAL_CCD = false;
+    env.PREVIEW_BRANCH_WITH_LOCAL_CCD = false
     env.TEST_E2E_URL_WEB = "https://manage-case.aat.platform.hmcts.net/"
     env.TEST_E2E_API_URI = "http://sscs-tribunals-api-aat.service.core-compute-aat.internal"
     env.CCD_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
@@ -248,7 +248,7 @@ def setAatEnvVars() {
 
 def setPreviewEnvVars() {
     env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.PREVIEW_BRANCH_WITH_LOCAL_CCD = true;
+    env.PREVIEW_BRANCH_WITH_LOCAL_CCD = true
     env.TEST_E2E_URL_WEB = "https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.TEST_E2E_API_URI = "https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.CCD_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
