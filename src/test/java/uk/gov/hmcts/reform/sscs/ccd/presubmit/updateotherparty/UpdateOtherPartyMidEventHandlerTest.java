@@ -40,7 +40,7 @@ class UpdateOtherPartyMidEventHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
-
+    private static final String DUFFTOWN = "DUFFTOWN";
     private static final String ZIPCODE = "01210";
     private static final String POSTCODE = "SWA 1AA";
     private static final String LINE_1 = "22 OnlyLine Lane";
@@ -121,6 +121,10 @@ class UpdateOtherPartyMidEventHandlerTest {
         assertThat(ex).hasMessage("Cannot handle callback");
     }
 
+    private static Representative repWithAddress(Address address) {
+        return Representative.builder().hasRepresentative(YES.getValue()).address(address).build();
+    }
+
     @Nested
     class ValidationUkOnly {
 
@@ -148,11 +152,7 @@ class UpdateOtherPartyMidEventHandlerTest {
         }
 
         private static Address ukAddressMissingPostCodeAndFirstLine() {
-            return Address.builder().town("DUFFTOWN").build();
-        }
-
-        private static Representative repWithAddress(Address address) {
-            return Representative.builder().hasRepresentative(YES.getValue()).address(address).build();
+            return Address.builder().town(DUFFTOWN).build();
         }
 
         private static Appointee appointeeWithAddress(Address address) {
@@ -208,7 +208,7 @@ class UpdateOtherPartyMidEventHandlerTest {
                     .build())), ERROR_POSTCODE_OTHER_PARTY_APPOINTEE));
         }
 
-        private static Stream<Arguments> validUkOtherPartyCases() {
+        private static Stream<Arguments> casesWithNoValidationError() {
             return Stream.of(
 
                 Arguments.of("Other party address missing",
@@ -217,7 +217,7 @@ class UpdateOtherPartyMidEventHandlerTest {
                 Arguments.of("Other party address present but no first line of address or postcode",
                     OtherParty.builder().address(ukAddressMissingPostCodeAndFirstLine()).build()),
 
-                Arguments.of("Other party address present with first line of address of postcode",
+                Arguments.of("Other party address present with first line of address and postcode",
                     OtherParty.builder().address(validAddress()).build()),
 
                 Arguments.of("Representative present but no address provided",
@@ -228,7 +228,7 @@ class UpdateOtherPartyMidEventHandlerTest {
                     .rep(repWithAddress(ukAddressMissingPostCodeAndFirstLine()))
                     .build()),
 
-                Arguments.of("Representative present with first line of address of postcode",
+                Arguments.of("Representative present with first line of address and postcode",
                     OtherParty.builder().address(validAddress()).rep(repWithAddress(validAddress())).build()),
 
                 Arguments.of("Appointee present but no address", OtherParty.builder()
@@ -237,7 +237,7 @@ class UpdateOtherPartyMidEventHandlerTest {
                     .appointee(appointeeWithAddress(null))
                     .build()),
 
-                Arguments.of("Appointee present but no first line of address of postcode", OtherParty.builder()
+                Arguments.of("Appointee present but no first line of address or postcode", OtherParty.builder()
                     .address(validAddress())
                     .appointee(appointeeWithAddress(ukAddressMissingPostCodeAndFirstLine()))
                     .build()),
@@ -260,7 +260,7 @@ class UpdateOtherPartyMidEventHandlerTest {
         }
 
         @ParameterizedTest(name = "{0}")
-        @MethodSource("validUkOtherPartyCases")
+        @MethodSource("casesWithNoValidationError")
         void shouldReturnNoErrorsForValidUkOtherParty(String description, OtherParty party) {
             SscsCaseData caseData = caseDataWithBenefitAndParties(Benefit.CHILD_SUPPORT.name(), List.of(ccd(party)));
 
@@ -283,7 +283,7 @@ class UpdateOtherPartyMidEventHandlerTest {
         private static final String ERROR_MAINLAND_SELECTION_OTHER_PARTY_REP = "You must select whether the address is in mainland UK for the other party representative";
         private static final String ADDRESS_DETAILS_ARE_MISSING_FOR_THE_OTHER_PARTY = "Address details are missing for the other party";
 
-        private static Address validAddress() {
+        private static Address validUkAddress() {
             return Address.builder().line1(LINE_1).postcode(POSTCODE).inMainlandUk(YES).build();
         }
 
@@ -331,10 +331,6 @@ class UpdateOtherPartyMidEventHandlerTest {
             return Address.builder().inMainlandUk(NO).postcode(ZIPCODE).build();
         }
 
-        private static Representative repWithAddress(Address address) {
-            return Representative.builder().hasRepresentative(YES.getValue()).address(address).build();
-        }
-
         private static Stream<Arguments> casesWithErrors() {
             return Stream.of(
 
@@ -374,7 +370,7 @@ class UpdateOtherPartyMidEventHandlerTest {
                     .build(), Set.of(ERROR_ADDRESS_LINE_1_OTHER_PARTY_REP, ERROR_COUNTRY_OTHER_PARTY_REP)),
 
                 Arguments.of("UK other party with rep empty UK address details", OtherParty.builder()
-                    .address(validAddress())
+                    .address(validUkAddress())
                     .rep(repWithAddress(ukAddressWithNoAddressDetails()))
                     .build(), Set.of(ERROR_ADDRESS_LINE_1_OTHER_PARTY_REP, ERROR_POSTCODE_OTHER_PARTY_REP)),
 
@@ -395,19 +391,19 @@ class UpdateOtherPartyMidEventHandlerTest {
 
         private static Stream<Arguments> casesWithNoErrors() {
             return Stream.of(
-                Arguments.of("UK other party, no rep", OtherParty.builder().address(validAddress()).build()),
+                Arguments.of("UK other party, no rep", OtherParty.builder().address(validUkAddress()).build()),
 
                 Arguments.of("UK other party, UK rep",
-                    OtherParty.builder().address(validAddress()).rep(repWithAddress(validAddress())).build()),
+                    OtherParty.builder().address(validUkAddress()).rep(repWithAddress(validUkAddress())).build()),
 
                 Arguments.of("UK other party, international rep",
-                    OtherParty.builder().address(validAddress()).rep(repWithAddress(anInternationalAddress())).build()),
+                    OtherParty.builder().address(validUkAddress()).rep(repWithAddress(anInternationalAddress())).build()),
 
                 Arguments.of("International other party, no rep",
                     OtherParty.builder().address(anInternationalAddress()).build()),
 
                 Arguments.of("International other party, UK rep",
-                    OtherParty.builder().address(anInternationalAddress()).rep(repWithAddress(validAddress())).build()),
+                    OtherParty.builder().address(anInternationalAddress()).rep(repWithAddress(validUkAddress())).build()),
 
                 Arguments.of("International other party, international rep", OtherParty.builder()
                     .address(anInternationalAddress())
