@@ -299,8 +299,7 @@
         }
       ],
       "region":"BRADFORD",
-      "writeFinalDecisionAnythingElse":"Anything else.",
-      "ucWriteFinalDecisionWorkCapabilityAssessmentStartDate" : "2025-11-18"
+      "writeFinalDecisionAnythingElse":"Anything else."
     },
     "data_classification":{
       "caseCode":"PUBLIC",
