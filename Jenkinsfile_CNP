@@ -148,7 +148,7 @@ withNightlyPipeline(type, product, component) {
         if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "dependencies").size() > 0) {
             echo "Checking for dependencies labels 2"
         }
-        
+
         setPreviewEnvVars()
 
         if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "dependencies").size() > 0) {
