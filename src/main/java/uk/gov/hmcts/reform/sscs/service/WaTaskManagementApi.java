@@ -29,7 +29,8 @@ public interface WaTaskManagementApi {
     List<CamundaTask> getTasksByTaskVariables(
             @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
             @RequestHeader(AUTHORIZATION) String authorisation,
-            @RequestParam("jurisdiction") String jurisdiction,
+            @RequestParam(value = "jurisdiction", defaultValue = "SSCS", required = false) String jurisdiction,
+            @RequestParam(value = "caseId", defaultValue = "1234", required = false) String caseId,
             @RequestParam(value = "sortBy", defaultValue = "created", required = false) String sortBy,
             @RequestParam(value = "sortOrder", defaultValue = "desc", required = false) String sortOrder
     );
