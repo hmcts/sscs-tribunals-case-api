@@ -134,8 +134,9 @@ withNightlyPipeline(type, product, component) {
     enableSlackNotifications('#sscs-tech')
     syncBranchesWithMaster(['demo', 'ithc', 'perftest'])
 
+    echo "Checking for dependencies labels"
     if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "dependencies").size() > 0) {
-        echo "Checking for dependencies labels"
+        echo "Checking for dependencies labels 2"
     }
 
     env.DOCUMENT_MANAGEMENT_URL = "http://dm-store-aat.service.core-compute-aat.internal"
