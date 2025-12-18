@@ -129,16 +129,30 @@ class UpdateOtherPartyMidEventHandlerTest {
     }
 
     private static Representative hasRepButNoAddress() {
-        return Representative.builder()
-            .hasRepresentative(YES.getValue())
-            .build();
+        return Representative.builder().hasRepresentative(YES.getValue()).build();
     }
 
     private static Representative repWithAddress(Address address) {
-        return Representative.builder()
-            .hasRepresentative(YES.getValue())
-            .address(address)
-            .build();
+        return Representative.builder().hasRepresentative(YES.getValue()).address(address).build();
+    }
+
+    private SscsCaseData ibcCaseWith(OtherParty party) {
+        return caseDataWithBenefitAndParties(IBCA_BENEFIT_CODE, List.of(ccd(party)));
+    }
+
+    private void stubCallbackWith(SscsCaseData caseData) {
+        when(callback.getEvent()).thenReturn(EventType.UPDATE_OTHER_PARTY_DATA);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+    }
+
+    private SscsCaseData caseDataWithBenefitAndParties(String benefitCode, List<CcdValue<OtherParty>> otherParties) {
+        return SscsCaseData.builder().benefitCode(benefitCode).otherParties(otherParties).build();
+    }
+
+    private PreSubmitCallbackResponse<SscsCaseData> runMidEvent(SscsCaseData caseData) {
+        stubCallbackWith(caseData);
+        return handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
     }
 
     @BeforeEach
@@ -156,6 +170,12 @@ class UpdateOtherPartyMidEventHandlerTest {
         assertThat(handler.canHandle(MID_EVENT, callback)).isTrue();
     }
 
+    @Test
+    void shouldReturnFalseForCanHandleWhenNoOtherParties() {
+        stubCallbackWith(SscsCaseData.builder().build());
+        assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
+    }
+
     @ParameterizedTest
     @EnumSource(value = CallbackType.class, names = {"MID_EVENT"}, mode = EnumSource.Mode.EXCLUDE)
     void shouldReturnFalseForCanHandleWhenNotMidEvent(CallbackType callbackType) {
@@ -170,50 +190,19 @@ class UpdateOtherPartyMidEventHandlerTest {
     }
 
     @Test
-    void shouldReturnFalseForCanHandleWhenNoOtherParties() {
-        stubCallbackWith(SscsCaseData.builder().build());
-        assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
-    }
-
-    @Test
     void shouldThrowIllegalStateExceptionIfCannotHandle() {
-        IllegalStateException ex = assertThrows(
-            IllegalStateException.class,
-            () -> handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION)
-        );
+        IllegalStateException ex = assertThrows(IllegalStateException.class,
+            () -> handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION));
 
         assertThat(ex).hasMessage("Cannot handle callback");
     }
 
-    private SscsCaseData ibcCaseWith(OtherParty party) {
-        return caseDataWithBenefitAndParties(IBCA_BENEFIT_CODE, List.of(ccd(party)));
-    }
-
-    private void stubCallbackWith(SscsCaseData caseData) {
-        when(callback.getEvent()).thenReturn(EventType.UPDATE_OTHER_PARTY_DATA);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(caseData);
-    }
-
-    private SscsCaseData caseDataWithBenefitAndParties(String benefitCode, List<CcdValue<OtherParty>> otherParties) {
-        return SscsCaseData.builder()
-            .benefitCode(benefitCode)
-            .otherParties(otherParties)
-            .build();
-    }
-
-    private PreSubmitCallbackResponse<SscsCaseData> runMidEvent(SscsCaseData caseData) {
-        stubCallbackWith(caseData);
-        return handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-    }
-
     @Nested
-    class ChildSupportValidationUkOnly {
+    class ValidationUkOnly {
 
-        private static Stream<Arguments> casesWithSingleError() {
+        private static Stream<Arguments> casesWithValidationError() {
             return Stream.of(
-                Arguments.of("Other party address missing",
-                    List.of(ccd(OtherParty.builder().address(null).build())),
+                Arguments.of("Other party address missing", List.of(ccd(OtherParty.builder().address(null).build())),
                     ADDRESS_DETAILS_MISSING_OTHER_PARTY),
 
                 Arguments.of("Other party address missing first line",
@@ -229,54 +218,40 @@ class UpdateOtherPartyMidEventHandlerTest {
                     ERROR_POSTCODE_OTHER_PARTY),
 
                 Arguments.of("Representative present but no address provided",
-                    List.of(ccd(OtherParty.builder()
-                        .address(validAddress())
-                        .rep(hasRepButNoAddress())
-                        .build())),
+                    List.of(ccd(OtherParty.builder().address(validAddress()).rep(hasRepButNoAddress()).build())),
                     ERROR_ADDRESS_MISSING_OTHER_PARTY_REP),
 
-                Arguments.of("Representative missing first line",
-                    List.of(ccd(OtherParty.builder()
-                        .address(validAddress())
-                        .rep(repWithAddress(addressMissingFirstLine()))
-                        .build())),
-                    ERROR_ADDRESS_LINE_1_OTHER_PARTY_REP),
+                Arguments.of("Representative missing first line", List.of(ccd(OtherParty.builder()
+                    .address(validAddress())
+                    .rep(repWithAddress(addressMissingFirstLine()))
+                    .build())), ERROR_ADDRESS_LINE_1_OTHER_PARTY_REP),
 
-                Arguments.of("Representative missing postcode",
-                    List.of(ccd(OtherParty.builder()
-                        .address(validAddress())
-                        .rep(repWithAddress(addressMissingPostcode()))
-                        .build())),
-                    ERROR_POSTCODE_OTHER_PARTY_REP),
+                Arguments.of("Representative missing postcode", List.of(ccd(OtherParty.builder()
+                    .address(validAddress())
+                    .rep(repWithAddress(addressMissingPostcode()))
+                    .build())), ERROR_POSTCODE_OTHER_PARTY_REP),
 
-                Arguments.of("Appointee present but no address",
-                    List.of(ccd(OtherParty.builder()
-                        .address(validAddress())
-                        .isAppointee(YES.getValue())
-                        .appointee(Appointee.builder().build())
-                        .build())),
-                    ADDRESS_DETAILS_MISSING_OTHER_PARTY_APPOINTEE),
+                Arguments.of("Appointee present but no address", List.of(ccd(OtherParty.builder()
+                    .address(validAddress())
+                    .isAppointee(YES.getValue())
+                    .appointee(Appointee.builder().build())
+                    .build())), ADDRESS_DETAILS_MISSING_OTHER_PARTY_APPOINTEE),
 
-                Arguments.of("Appointee missing first line",
-                    List.of(ccd(OtherParty.builder()
-                        .address(validAddress())
-                        .isAppointee(YES.getValue())
-                        .appointee(Appointee.builder().address(addressMissingFirstLine()).build())
-                        .build())),
-                    ERROR_LINE1_OTHER_PARTY_APPOINTEE),
+                Arguments.of("Appointee missing first line", List.of(ccd(OtherParty.builder()
+                    .address(validAddress())
+                    .isAppointee(YES.getValue())
+                    .appointee(Appointee.builder().address(addressMissingFirstLine()).build())
+                    .build())), ERROR_LINE1_OTHER_PARTY_APPOINTEE),
 
-                Arguments.of("Appointee missing postcode",
-                    List.of(ccd(OtherParty.builder()
-                        .address(validAddress())
-                        .isAppointee(YES.getValue())
-                        .appointee(Appointee.builder().address(addressMissingPostcode()).build())
-                        .build())),
-                    ERROR_POSTCODE_OTHER_PARTY_APPOINTEE)
-            );
+                Arguments.of("Appointee missing postcode", List.of(ccd(OtherParty.builder()
+                    .address(validAddress())
+                    .isAppointee(YES.getValue())
+                    .appointee(Appointee.builder().address(addressMissingPostcode()).build())
+                    .build())), ERROR_POSTCODE_OTHER_PARTY_APPOINTEE));
         }
 
         @ParameterizedTest(name = "{0}")
-        @MethodSource("casesWithSingleError")
+        @MethodSource("casesWithValidationError")
         void shouldReturnExactlyOneError(String description, List<CcdValue<OtherParty>> otherParties, String expectedError) {
             SscsCaseData caseData = caseDataWithBenefitAndParties(Benefit.CHILD_SUPPORT.name(), otherParties);
 
@@ -297,12 +272,11 @@ class UpdateOtherPartyMidEventHandlerTest {
     }
 
     @Nested
-    class IbcValidationUkAndInternational {
+    class ValidationUkAndInternational {
 
         private static Stream<Arguments> casesWithErrors() {
             return Stream.of(
-                Arguments.of("Other party empty address",
-                    OtherParty.builder().address(anEmptyAddress()).build(),
+                Arguments.of("Other party empty address", OtherParty.builder().address(anEmptyAddress()).build(),
                     Set.of(ERROR_ADDRESS_LINE_1_OTHER_PARTY, ERROR_MAINLAND_SELECTION_OTHER_PARTY)),
 
                 Arguments.of("Other party empty UK address details",
@@ -329,41 +303,30 @@ class UpdateOtherPartyMidEventHandlerTest {
                     OtherParty.builder().address(anInternationalAddressNoCountry()).build(),
                     Set.of(ERROR_COUNTRY_OTHER_PARTY)),
 
-                Arguments.of("International other party with rep empty international address",
-                    OtherParty.builder()
-                        .address(anInternationalAddress())
-                        .rep(repWithAddress(anEmptyInternationalAddress()))
-                        .build(),
-                    Set.of(ERROR_ADDRESS_LINE_1_OTHER_PARTY_REP, ERROR_COUNTRY_OTHER_PARTY_REP)),
+                Arguments.of("International other party with rep empty international address", OtherParty.builder()
+                    .address(anInternationalAddress())
+                    .rep(repWithAddress(anEmptyInternationalAddress()))
+                    .build(), Set.of(ERROR_ADDRESS_LINE_1_OTHER_PARTY_REP, ERROR_COUNTRY_OTHER_PARTY_REP)),
 
-                Arguments.of("UK other party with rep empty UK address details",
-                    OtherParty.builder()
-                        .address(ukAddress())
-                        .rep(repWithAddress(ukAddressWithNoAddressDetails()))
-                        .build(),
-                    Set.of(ERROR_ADDRESS_LINE_1_OTHER_PARTY_REP, ERROR_POSTCODE_OTHER_PARTY_REP)),
+                Arguments.of("UK other party with rep empty UK address details", OtherParty.builder()
+                    .address(ukAddress())
+                    .rep(repWithAddress(ukAddressWithNoAddressDetails()))
+                    .build(), Set.of(ERROR_ADDRESS_LINE_1_OTHER_PARTY_REP, ERROR_POSTCODE_OTHER_PARTY_REP)),
 
                 Arguments.of("International other party with rep address missing mainland selection",
-                    OtherParty.builder()
-                        .address(anInternationalAddress())
-                        .rep(repWithAddress(validAddress()))
-                        .build(),
+                    OtherParty.builder().address(anInternationalAddress()).rep(repWithAddress(validAddress())).build(),
                     Set.of(ERROR_MAINLAND_SELECTION_OTHER_PARTY_REP)),
 
                 Arguments.of("International other party missing line1+country, rep UK missing postcode",
                     OtherParty.builder()
                         .address(anInternationalAddressWithNoFirstLineAddressOrCountry())
                         .rep(repWithAddress(addressMissingPostcode()))
-                        .build(),
-                    Set.of(ERROR_ADDRESS_LINE_1_OTHER_PARTY, ERROR_COUNTRY_OTHER_PARTY,
-                        ERROR_MAINLAND_SELECTION_OTHER_PARTY_REP))
-            );
+                        .build(), Set.of(ERROR_ADDRESS_LINE_1_OTHER_PARTY, ERROR_COUNTRY_OTHER_PARTY,
+                        ERROR_MAINLAND_SELECTION_OTHER_PARTY_REP)));
         }
 
         private static Stream<Arguments> casesWithNoErrors() {
-            return Stream.of(
-                Arguments.of("UK other party, no rep",
-                    OtherParty.builder().address(ukAddress()).build()),
+            return Stream.of(Arguments.of("UK other party, no rep", OtherParty.builder().address(ukAddress()).build()),
 
                 Arguments.of("UK other party, UK rep",
                     OtherParty.builder().address(ukAddress()).rep(repWithAddress(ukAddress())).build()),
@@ -377,12 +340,10 @@ class UpdateOtherPartyMidEventHandlerTest {
                 Arguments.of("International other party, UK rep",
                     OtherParty.builder().address(anInternationalAddress()).rep(repWithAddress(ukAddress())).build()),
 
-                Arguments.of("International other party, international rep",
-                    OtherParty.builder()
-                        .address(anInternationalAddress())
-                        .rep(repWithAddress(anInternationalAddress()))
-                        .build())
-            );
+                Arguments.of("International other party, international rep", OtherParty.builder()
+                    .address(anInternationalAddress())
+                    .rep(repWithAddress(anInternationalAddress()))
+                    .build()));
         }
 
         @ParameterizedTest(name = "{0}")
