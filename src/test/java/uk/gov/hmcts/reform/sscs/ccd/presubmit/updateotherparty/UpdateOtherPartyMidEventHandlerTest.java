@@ -136,6 +136,10 @@ class UpdateOtherPartyMidEventHandlerTest {
         return Representative.builder().hasRepresentative(YES.getValue()).address(address).build();
     }
 
+    private static Appointee appointeeWithAddress(Address address) {
+        return Appointee.builder().address(address).build();
+    }
+
     private SscsCaseData ibcCaseWith(OtherParty party) {
         return caseDataWithBenefitAndParties(IBCA_BENEFIT_CODE, List.of(ccd(party)));
     }
@@ -260,9 +264,25 @@ class UpdateOtherPartyMidEventHandlerTest {
             assertThat(response.getErrors()).containsExactly(expectedError);
         }
 
-        @Test
-        void shouldReturnNoErrorsForValidUkOtherPartyWithNoRepresentative() {
-            OtherParty party = OtherParty.builder().address(ukAddress()).build();
+        private static Stream<Arguments> validUkOtherPartyCases() {
+            return Stream.of(
+                Arguments.of("Valid UK other party with no representative",
+                    OtherParty.builder().address(ukAddress()).build()),
+
+                Arguments.of("Valid UK other party with representative",
+                    OtherParty.builder().address(ukAddress()).rep(repWithAddress(ukAddress())).build()),
+
+                Arguments.of("Valid UK other party with appointee",
+                    OtherParty.builder()
+                        .address(ukAddress())
+                        .appointee(appointeeWithAddress(ukAddress()))
+                        .build())
+            );
+        }
+
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("validUkOtherPartyCases")
+        void shouldReturnNoErrorsForValidUkOtherParty(String description, OtherParty party) {
             SscsCaseData caseData = caseDataWithBenefitAndParties(Benefit.CHILD_SUPPORT.name(), List.of(ccd(party)));
 
             PreSubmitCallbackResponse<SscsCaseData> response = runMidEvent(caseData);
