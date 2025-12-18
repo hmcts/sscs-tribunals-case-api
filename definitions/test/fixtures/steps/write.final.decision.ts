@@ -268,6 +268,8 @@ export class WriteFinalDecision extends BaseStep {
 
     await this.writeFinalDecisionPage.verifyPageContentForWorkCapabilityAssessmentPage();
     await this.writeFinalDecisionPage.inputAndVerifyPageContentForWorkCapabilityAssessmentPageData(
+      true,
+      false,
       true
     );
     await this.writeFinalDecisionPage.submitContinueBtn();

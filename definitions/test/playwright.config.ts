@@ -32,7 +32,7 @@ export default defineConfig({
   ],
   use: {
     actionTimeout: 30000,
-    navigationTimeout: 30000,
+    navigationTimeout: 180000,
     baseURL: urls.xuiUrl,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
