@@ -147,6 +147,7 @@ withNightlyPipeline(type, product, component) {
         setPreviewEnvVars();
 
         if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "dependencies").size() > 0) {
+            echo "Checking for dependencies labels"
             enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
         }
 
