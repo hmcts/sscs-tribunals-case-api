@@ -15,9 +15,9 @@ import uk.gov.hmcts.reform.sscs.domain.CamundaTask;
 @FeignClient(
         name = "camunda",
         url = "https://wa-task-management-api-sscs-tribunals-api-pr-4961.preview.platform.hmcts.net"
-)
+        )
 @SuppressWarnings("PMD.UseObjectForClearerAPI")
-public interface CamundaClientApi {
+public interface WaTaskManagementApi {
 
     String SERVICE_AUTHORIZATION = "ServiceAuthorization";
 

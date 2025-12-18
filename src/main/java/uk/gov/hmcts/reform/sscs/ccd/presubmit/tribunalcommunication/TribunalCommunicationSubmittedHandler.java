@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.domain.CamundaTask;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.service.CamundaClientApi;
+import uk.gov.hmcts.reform.sscs.service.WaTaskManagementApi;
 
 @Slf4j
 @Service
@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.sscs.service.CamundaClientApi;
 public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Autowired
-    private CamundaClientApi camundaClient;
+    private WaTaskManagementApi WaTaskManagementApi;
 
     private final IdamService idamService;
     public static final String AUTHORIZATION = "Authorization";
@@ -48,7 +48,11 @@ public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackH
 
         String caseId = String.valueOf(callback.getCaseDetails().getId());
 
-        List<CamundaTask> camundaTaskList = camundaClient.getTasksByTaskVariables(
+        log.info("Masked wa token: {}***** and: {}*****",
+                idamService.getIdamWaTokens().getIdamOauth2Token().substring(0,5),
+                idamService.getIdamWaTokens().getServiceAuthorization().substring(0,5));
+
+        List<CamundaTask> camundaTaskList = WaTaskManagementApi.getTasksByTaskVariables(
                 idamService.getIdamWaTokens().getServiceAuthorization(),
                 idamService.getIdamWaTokens().getIdamOauth2Token(),
                 "caseId_eq_" + caseId
@@ -67,7 +71,7 @@ public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackH
                     .findFirst().orElse(null).getId();
             log.info("Cancelling Camunda task for caseID: {}, Task ID: {}", caseId, taskIdToBeCancelled);
 
-            camundaClient.cancelTask(
+            WaTaskManagementApi.cancelTask(
                     idamService.getIdamTokens().getServiceAuthorization(),
                     idamService.getIdamWaTokens().getIdamOauth2Token(),
                     taskIdToBeCancelled);
