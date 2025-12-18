@@ -126,7 +126,7 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
     ]
 }
 
-withPipeline(type, product, component) {
+withNightlyPipeline(type, product, component) {
     def githubApi = new GithubAPI(this)
 
     enableHighLevelDataSetup()
