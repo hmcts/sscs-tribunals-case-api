@@ -49,15 +49,13 @@ public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackH
         String caseId = String.valueOf(callback.getCaseDetails().getId());
 
         log.info("Masked wa token: {}***** and: {}*****",
-                idamService.getIdamWaTokens().getIdamOauth2Token().substring(0,5),
-                idamService.getIdamWaTokens().getServiceAuthorization().substring(0,5));
+                idamService.getIdamWaTokens().getIdamOauth2Token().substring(0,10),
+                idamService.getIdamWaTokens().getServiceAuthorization().substring(0,10));
 
         List<CamundaTask> camundaTaskList = waTaskManagementApi.getTasksByTaskVariables(
                 idamService.getIdamWaTokens().getServiceAuthorization(),
                 idamService.getIdamWaTokens().getIdamOauth2Token(),
-                "caseId_eq_" + caseId
-                        + ",jurisdiction_eq_SSCS"
-                        + ",caseTypeId_eq_Benefit",
+                "SSCS",
                 "created",
                 "desc");
 
