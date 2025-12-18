@@ -64,22 +64,6 @@ public class UpdateOtherPartyMidEventHandler implements PreSubmitCallbackHandler
         return response;
     }
 
-    private void validateOtherParty(OtherParty party, boolean isIbcCase, PreSubmitCallbackResponse<SscsCaseData> response) {
-        response.addErrors(validateAddress(party.getAddress(), OTHER_PARTY, isIbcCase));
-
-        if (party.hasRepresentative()) {
-            response.addErrors(validateAddress(party.getRep().getAddress(), OTHER_PARTY_REPRESENTATIVE, isIbcCase));
-        }
-
-        if (party.hasAppointee()) {
-            response.addErrors(validateAddress(party.getAppointee().getAddress(), OTHER_PARTY_APPOINTEE, isIbcCase));
-        }
-    }
-
-    private Set<String> validateAddress(Address address, String addressPrefix, boolean isIbcCase) {
-        return isIbcCase ? validateIbcAddress(address, addressPrefix) : validateNonIbcAddress(address, addressPrefix);
-    }
-
     private Set<String> validateIbcAddress(Address address, String addressPrefix) {
         Set<String> validationErrors = new HashSet<>();
 
@@ -107,23 +91,36 @@ public class UpdateOtherPartyMidEventHandler implements PreSubmitCallbackHandler
         return validationErrors;
     }
 
-    private Set<String> validateNonIbcAddress(Address address, String partyRole) {
+    private void validateOtherParty(OtherParty party, boolean isIbcCase, PreSubmitCallbackResponse<SscsCaseData> response) {
+        response.addErrors(validateAddress(party.getAddress(), OTHER_PARTY, isIbcCase));
+
+        if (party.hasRepresentative()) {
+            response.addErrors(validateAddress(party.getRep().getAddress(), OTHER_PARTY_REPRESENTATIVE, isIbcCase));
+        }
+
+        if (party.hasAppointee()) {
+            response.addErrors(validateAddress(party.getAppointee().getAddress(), OTHER_PARTY_APPOINTEE, isIbcCase));
+        }
+    }
+
+    private Set<String> validateAddress(Address address, String addressPrefix, boolean isIbcCase) {
+        return isIbcCase ? validateIbcAddress(address, addressPrefix) : validateNonIbcAddress(address, addressPrefix);
+    }
+
+    private Set<String> validateNonIbcAddress(Address address, String addressPrefix) {
         Set<String> errors = new HashSet<>();
         if (isNull(address)) {
             return errors;
         }
         if (isNotBlank(address.getLine1())) {
             if (isEmpty(address.getPostcode()) || !postcodeValidator.isValid(address.getPostcode(), null)) {
-                addError(errors, ERROR_POSTCODE_NON_IBC, partyRole);
+                errors.add(String.format(ERROR_POSTCODE_NON_IBC, addressPrefix));
             }
         }
         if (isNotBlank(address.getPostcode()) && isBlank(address.getLine1())) {
-            addError(errors, ERROR_ADDRESS_LINE_1_NON_IBC, partyRole);
+            errors.add(String.format(ERROR_ADDRESS_LINE_1_NON_IBC, addressPrefix));
         }
         return errors;
     }
 
-    private void addError(Set<String> errors, String template, String partyRole) {
-        errors.add(template.formatted(partyRole));
-    }
 }
