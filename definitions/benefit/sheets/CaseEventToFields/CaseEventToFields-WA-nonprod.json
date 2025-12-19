@@ -481,5 +481,17 @@
     "PageID": "1.0",
     "PageLabel": "Sent to FTA state",
     "Publish": "${CCD_DEF_PUBLISH}"
+  },
+  {
+    "CaseEventID": "overdueResponse",
+    "CaseFieldID": "latestFtaCommunicationId",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "05/012/2025",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "N",
+    "Publish": "${CCD_DEF_PUBLISH}"
   }
 ]
