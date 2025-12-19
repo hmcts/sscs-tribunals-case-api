@@ -38,8 +38,19 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 @ExtendWith(MockitoExtension.class)
 class UpdateOtherPartyMidEventHandlerTest {
 
-    private static final String USER_AUTHORISATION = "Bearer token";
+    private static final String ERROR_ADDRESS_LINE_1_OTHER_PARTY = "You must enter address line 1 for the other party";
+    private static final String ERROR_ADDRESS_LINE_1_OTHER_PARTY_REP = "You must enter address line 1 for the other party representative";
+    private static final String ERROR_COUNTRY_OTHER_PARTY = "You must enter a valid country for the other party";
+    private static final String ERROR_COUNTRY_OTHER_PARTY_REP = "You must enter a valid country for the other party representative";
+    private static final String ERROR_POSTCODE_OTHER_PARTY = "You must enter a valid UK postcode for the other party";
+    private static final String ERROR_POSTCODE_OTHER_PARTY_REP = "You must enter a valid UK postcode for the other party representative";
+    private static final String ERROR_MAINLAND_SELECTION_OTHER_PARTY = "You must select whether the address is in mainland UK for the other party";
+    private static final String ERROR_MAINLAND_SELECTION_OTHER_PARTY_REP = "You must select whether the address is in mainland UK for the other party representative";
+    private static final String ADDRESS_DETAILS_ARE_MISSING_FOR_THE_OTHER_PARTY = "Address details are missing for the other party";
+    private static final String ERROR_LINE1_OTHER_PARTY_APPOINTEE = "You must enter address line 1 for the other party appointee";
+    private static final String ERROR_POSTCODE_OTHER_PARTY_APPOINTEE = "You must enter a valid UK postcode for the other party appointee";
 
+    private static final String USER_AUTHORISATION = "Bearer token";
     private static final String DUFFTOWN = "DUFFTOWN";
     private static final String ZIPCODE = "01210";
     private static final String POSTCODE = "SWA 1AA";
@@ -127,13 +138,6 @@ class UpdateOtherPartyMidEventHandlerTest {
 
     @Nested
     class ValidationUkOnly {
-
-        private static final String ERROR_ADDRESS_LINE_1_OTHER_PARTY = "You have not entered address line 1 for the other party";
-        private static final String ERROR_ADDRESS_LINE_1_OTHER_PARTY_REP = "You have not entered address line 1 for the other party representative";
-        private static final String ERROR_LINE1_OTHER_PARTY_APPOINTEE = "You have not entered address line 1 for the other party appointee";
-        private static final String ERROR_POSTCODE_OTHER_PARTY = "You have entered an invalid UK postcode for the other party";
-        private static final String ERROR_POSTCODE_OTHER_PARTY_REP = "You have entered an invalid UK postcode for the other party representative";
-        private static final String ERROR_POSTCODE_OTHER_PARTY_APPOINTEE = "You have entered an invalid UK postcode for the other party appointee";
 
         private static Address validAddress() {
             return Address.builder().line1(LINE_1).postcode(POSTCODE).build();
@@ -272,16 +276,6 @@ class UpdateOtherPartyMidEventHandlerTest {
 
     @Nested
     class ValidationUkAndInternational {
-
-        private static final String ERROR_ADDRESS_LINE_1_OTHER_PARTY = "You must enter address line 1 for the other party";
-        private static final String ERROR_ADDRESS_LINE_1_OTHER_PARTY_REP = "You must enter address line 1 for the other party representative";
-        private static final String ERROR_COUNTRY_OTHER_PARTY = "You must enter a valid country for the other party";
-        private static final String ERROR_COUNTRY_OTHER_PARTY_REP = "You must enter a valid country for the other party representative";
-        private static final String ERROR_POSTCODE_OTHER_PARTY = "You must enter a valid UK postcode for the other party";
-        private static final String ERROR_POSTCODE_OTHER_PARTY_REP = "You must enter a valid UK postcode for the other party representative";
-        private static final String ERROR_MAINLAND_SELECTION_OTHER_PARTY = "You must select whether the address is in mainland UK for the other party";
-        private static final String ERROR_MAINLAND_SELECTION_OTHER_PARTY_REP = "You must select whether the address is in mainland UK for the other party representative";
-        private static final String ADDRESS_DETAILS_ARE_MISSING_FOR_THE_OTHER_PARTY = "Address details are missing for the other party";
 
         private static Address validUkAddress() {
             return Address.builder().line1(LINE_1).postcode(POSTCODE).inMainlandUk(YES).build();

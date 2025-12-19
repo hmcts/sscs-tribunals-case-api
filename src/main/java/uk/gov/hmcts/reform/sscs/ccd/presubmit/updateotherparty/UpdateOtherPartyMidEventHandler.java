@@ -31,13 +31,12 @@ public class UpdateOtherPartyMidEventHandler implements PreSubmitCallbackHandler
     private static final String OTHER_PARTY = "other party";
     private static final String OTHER_PARTY_REPRESENTATIVE = "other party representative";
     private static final String OTHER_PARTY_APPOINTEE = "other party appointee";
-    private static final String ERROR_ADDRESS_LINE_1_IBC = "You must enter address line 1 for the %s";
-    private static final String ERROR_ADDRESS_LINE_1_NON_IBC = "You have not entered address line 1 for the %s";
+    private static final String ERROR_ADDRESS_LINE_1 = "You must enter address line 1 for the %s";
     private static final String ERROR_COUNTRY = "You must enter a valid country for the %s";
-    private static final String ERROR_POSTCODE_IBC = "You must enter a valid UK postcode for the %s";
-    private static final String ERROR_POSTCODE_NON_IBC = "You have entered an invalid UK postcode for the %s";
+    private static final String ERROR_POSTCODE = "You must enter a valid UK postcode for the %s";
     private static final String ERROR_MAINLAND_SELECTION = "You must select whether the address is in mainland UK for the %s";
     private static final String ERROR_ADDRESS_MISSING = "Address details are missing for the %s";
+
     private final PostcodeValidator postcodeValidator = new PostcodeValidator();
 
     @Override
@@ -64,33 +63,6 @@ public class UpdateOtherPartyMidEventHandler implements PreSubmitCallbackHandler
         return response;
     }
 
-    private Set<String> validateIbcAddress(Address address, String addressPrefix) {
-        Set<String> validationErrors = new HashSet<>();
-
-        if (address == null) {
-            validationErrors.add(String.format(ERROR_ADDRESS_MISSING, addressPrefix));
-            return validationErrors;
-        }
-
-        if (isEmpty(address.getLine1())) {
-            validationErrors.add(String.format(ERROR_ADDRESS_LINE_1_IBC, addressPrefix));
-        }
-
-        YesNo isInMainlandUk = address.getInMainlandUk();
-        if (isEmpty(isInMainlandUk)) {
-            validationErrors.add(String.format(ERROR_MAINLAND_SELECTION, addressPrefix));
-        } else if (NO.equals(isInMainlandUk)) {
-            if (isBlank(address.getCountry())) {
-                validationErrors.add(String.format(ERROR_COUNTRY, addressPrefix));
-            }
-        } else if (YES.equals(isInMainlandUk)) {
-            if (isEmpty(address.getPostcode()) || !postcodeValidator.isValid(address.getPostcode(), null)) {
-                validationErrors.add(String.format(ERROR_POSTCODE_IBC, addressPrefix));
-            }
-        }
-        return validationErrors;
-    }
-
     private void validateOtherParty(OtherParty party, boolean isIbcCase, PreSubmitCallbackResponse<SscsCaseData> response) {
         response.addErrors(validateAddress(party.getAddress(), OTHER_PARTY, isIbcCase));
 
@@ -107,20 +79,49 @@ public class UpdateOtherPartyMidEventHandler implements PreSubmitCallbackHandler
         return isIbcCase ? validateIbcAddress(address, addressPrefix) : validateNonIbcAddress(address, addressPrefix);
     }
 
+    private Set<String> validateIbcAddress(Address address, String addressPrefix) {
+        Set<String> validationErrors = new HashSet<>();
+
+        if (address == null) {
+            validationErrors.add(String.format(ERROR_ADDRESS_MISSING, addressPrefix));
+            return validationErrors;
+        }
+
+        if (isEmpty(address.getLine1())) {
+            validationErrors.add(String.format(ERROR_ADDRESS_LINE_1, addressPrefix));
+        }
+
+        YesNo isInMainlandUk = address.getInMainlandUk();
+        if (isEmpty(isInMainlandUk)) {
+            validationErrors.add(String.format(ERROR_MAINLAND_SELECTION, addressPrefix));
+        } else if (NO.equals(isInMainlandUk)) {
+            if (isBlank(address.getCountry())) {
+                validationErrors.add(String.format(ERROR_COUNTRY, addressPrefix));
+            }
+        } else if (YES.equals(isInMainlandUk)) {
+            validatePostcode(address, addressPrefix, validationErrors);
+        }
+        return validationErrors;
+    }
+
     private Set<String> validateNonIbcAddress(Address address, String addressPrefix) {
         Set<String> errors = new HashSet<>();
         if (isNull(address)) {
             return errors;
         }
         if (isNotBlank(address.getLine1())) {
-            if (isEmpty(address.getPostcode()) || !postcodeValidator.isValid(address.getPostcode(), null)) {
-                errors.add(String.format(ERROR_POSTCODE_NON_IBC, addressPrefix));
-            }
+            validatePostcode(address, addressPrefix, errors);
         }
         if (isNotBlank(address.getPostcode()) && isBlank(address.getLine1())) {
-            errors.add(String.format(ERROR_ADDRESS_LINE_1_NON_IBC, addressPrefix));
+            errors.add(String.format(ERROR_ADDRESS_LINE_1, addressPrefix));
         }
         return errors;
+    }
+
+    private void validatePostcode(Address address, String addressPrefix, Set<String> errors) {
+        if (isEmpty(address.getPostcode()) || !postcodeValidator.isValid(address.getPostcode(), null)) {
+            errors.add(String.format(ERROR_POSTCODE, addressPrefix));
+        }
     }
 
 }
