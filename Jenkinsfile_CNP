@@ -8,8 +8,8 @@ import uk.gov.hmcts.contino.GithubAPI
 def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
-def dmnBranch = "master"
-def waStandaloneBranch = "master"
+def dmnBranch = "SSCSCI-2275-incomplete-reply-overdue-multiple"
+def waStandaloneBranch = "SSCSCI-2275-incomplete-reply-overdue-multiple"
 
 def secrets = [
         'sscs-${env}': [
@@ -18,6 +18,8 @@ def secrets = [
                 secret('idam-redirect', 'IDAM_OAUTH2_REDIRECT_URL'),
                 secret('idam-sscs-systemupdate-user', 'IDAM_SSCS_SYSTEMUPDATE_USER'),
                 secret('idam-sscs-systemupdate-password', 'IDAM_SSCS_SYSTEMUPDATE_PASSWORD'),
+                secret('idam-sscs-wa-system-user', 'IDAM_SSCS_WA_SYSTEM_USERNAME'),
+                secret('idam-sscs-wa-system-password', 'IDAM_SSCS_WA_SYSTEM_PASSWORD'),
                 secret('idam-sscs-oauth2-client-secret', 'IDAM_OAUTH2_CLIENT_SECRET'),
                 secret('idam-s2s-api', 'IDAM_S2S_AUTH'),
                 secret('ccd-jid', 'CORE_CASE_DATA_JURISDICTION_ID'),
