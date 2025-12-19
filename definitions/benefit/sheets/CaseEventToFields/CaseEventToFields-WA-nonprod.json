@@ -484,7 +484,7 @@
   },
   {
     "CaseEventID": "overdueFtaResponse",
-    "CaseFieldID": "latestFtaCommunicationId",
+    "CaseFieldID": "waTaskFtaCommunicationId",
     "CaseTypeID": "Benefit",
     "DisplayContext": "READONLY",
     "LiveFrom": "05/12/2025",
