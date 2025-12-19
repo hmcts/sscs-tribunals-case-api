@@ -24,6 +24,8 @@ java:
     IDAM_S2S-AUTH_MICROSERVICE: ${IDAM_S2S_AUTH_MICROSERVICE}
     IDAM_SSCS_SYSTEMUPDATE_USER: ${IDAM_SSCS_SYSTEMUPDATE_USER}
     IDAM_SSCS_SYSTEMUPDATE_PASSWORD: ${IDAM_SSCS_SYSTEMUPDATE_PASSWORD}
+    IDAM_SSCS_WA_SYSTEM_USER: ${IDAM_SSCS_WA_SYSTEM_USERNAME}
+    DAM_SSCS_WA_SYSTEM_PASSWORD: ${IDAM_SSCS_WA_SYSTEM_PASSWORD}
     CORE_CASE_DATA_JURISDICTION_ID: SSCS
     CORE_CASE_DATA_CASE_TYPE_ID: Benefit
     TEST_URL: http://${SERVICE_NAME}
@@ -972,7 +974,7 @@ ccd-message-publisher:
 sscs-cron-trigger:
   job:
     kind: CronJob
-    image: 'hmctspublic.azurecr.io/sscs/cron-trigger:pr-5'
+    image: 'hmctspublic.azurecr.io/sscs/cron-trigger:pr-208'
     releaseNameOverride: ${SERVICE_NAME}-sscs-cron-trigger
     name: ${SERVICE_NAME}-sscs-cron-trigger
     schedule: "0 10-17 * * *"

@@ -101,6 +101,7 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
             .build();
         communicationRequest.getValue().setRequestReply(reply);
         communicationRequest.getValue().setRequestResponseDueDate(null);
+        communicationFields.setWaTaskFtaCommunicationId(chosenTribunalRequestId);
     }
 
     private void clearFields(FtaCommunicationFields communicationFields) {

@@ -77,6 +77,7 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
                 throw new RuntimeException(e);
             }
             ftaCommunicationFields.setFtaCommunications(ftaComms);
+            ftaCommunicationFields.setWaTaskFtaCommunicationId(ftaCommunicationFields.getFtaCommunications().getFirst().getId());
         } else if (FtaRequestType.REPLY_TO_FTA_QUERY.equals(ftaCommunicationFields.getFtaRequestType())) {
             handleReplyToFtaQuery(ftaCommunicationFields, userDetails);
         } else if (ftaCommunicationFields.getFtaRequestType() == FtaRequestType.REVIEW_FTA_REPLY) {

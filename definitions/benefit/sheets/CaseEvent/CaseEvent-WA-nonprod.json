@@ -201,5 +201,18 @@
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
     "Publish": "${CCD_DEF_PUBLISH}"
+  },
+  {
+    "LiveFrom": "01/12/2025",
+    "CaseTypeID": "Benefit",
+    "ID": "overdueFtaResponse",
+    "Name": "Overdue FTA Response",
+    "Description": "2 days since request sent to FTA with no response",
+    "DisplayOrder": 9994,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
+    "SecurityClassification": "Public",
+    "Publish": "${CCD_DEF_PUBLISH}"
   }
 ]

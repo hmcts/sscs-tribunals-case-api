@@ -31,6 +31,10 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
           alias: IDAM_SSCS_SYSTEMUPDATE_USER
         - name: idam-sscs-systemupdate-password
           alias: IDAM_SSCS_SYSTEMUPDATE_PASSWORD
+        - name: idam-sscs-wa-system-user
+          alias: IDAM_SSCS_WA_SYSTEM_USER
+        - name: idam-sscs-wa-system-password
+          alias: IDAM_SSCS_WA_SYSTEM_PASSWORD
         - name: idam-sscs-oauth2-client-secret
           alias: IDAM_OAUTH2_CLIENT_SECRET
         - name: sscs-s2s-secret
