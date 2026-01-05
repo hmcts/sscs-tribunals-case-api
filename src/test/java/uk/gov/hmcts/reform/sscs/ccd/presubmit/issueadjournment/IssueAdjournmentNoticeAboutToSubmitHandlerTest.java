@@ -45,6 +45,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InternalCaseDocumentData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
@@ -168,6 +169,45 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
             .map(SscsDocument::getValue)
             .map(SscsDocumentDetails::getDocumentType)
             .containsOnly(DRAFT_ADJOURNMENT_NOTICE.getValue());
+    }
+
+    @Test
+    void givenAnAdjournmentNotice_thenDeleteDraftAdjournmentDocumentFromSscsDocuments() {
+        setupHearingDurationValues();
+        DocumentLink docLink = DocumentLink.builder().documentUrl("test.pdf").documentFilename("test.pdf").build();
+        sscsCaseData.getAdjournment().setPreviewDocument(docLink);
+        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentType(DRAFT_ADJOURNMENT_NOTICE.getValue()).build()).build();
+        ArrayList<SscsDocument> sscsDocuments = new ArrayList<>();
+        sscsDocuments.add(sscsDocument);
+        sscsCaseData.setSscsDocument(sscsDocuments);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors())
+                .hasSize(0);
+
+        assertThat(response.getData().getSscsDocument())
+                .map(SscsDocument::getValue)
+                .map(SscsDocumentDetails::getDocumentType)
+                .doesNotContain(DRAFT_ADJOURNMENT_NOTICE.getValue());
+    }
+
+
+    @Test
+    void givenAnAdjournmentNotice_thenDeleteDraftAdjournmentDocumentFromInternalSscsDocuments() {
+        setupHearingDurationValues();
+        DocumentLink docLink = DocumentLink.builder().documentUrl("test.pdf").documentFilename("test.pdf").build();
+        sscsCaseData.getAdjournment().setPreviewDocument(docLink);
+        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentType(DRAFT_ADJOURNMENT_NOTICE.getValue()).build()).build();
+        ArrayList<SscsDocument> sscsDocuments = new ArrayList<>();
+        sscsDocuments.add(sscsDocument);
+        sscsCaseData.setInternalCaseDocumentData(InternalCaseDocumentData.builder().sscsInternalDocument(sscsDocuments).build());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors())
+                .hasSize(0);
+
+        assertThat(response.getData().getInternalCaseDocumentData().getSscsInternalDocument())
+                .isNull();
     }
 
     @DisplayName("When adjournment is enabled and case is LA and case cannot be listed right away "
