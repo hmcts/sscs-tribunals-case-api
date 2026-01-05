@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.domain.CamundaTask;
 public interface WaTaskManagementApi {
 
     String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+    String AUTHORIZATION = "Authorization";
 
     @PostMapping(value = "/task",
             consumes = APPLICATION_JSON_VALUE,
@@ -29,8 +30,7 @@ public interface WaTaskManagementApi {
     List<CamundaTask> getTasksByTaskVariables(
             @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
             @RequestHeader(AUTHORIZATION) String authorisation,
-            @RequestParam(value = "jurisdiction", defaultValue = "SSCS", required = false) String jurisdiction,
-            @RequestParam(value = "caseId", defaultValue = "1234", required = false) String caseId,
+            @RequestParam("taskVariables") String taskVariables,
             @RequestParam(value = "sortBy", defaultValue = "created", required = false) String sortBy,
             @RequestParam(value = "sortOrder", defaultValue = "desc", required = false) String sortOrder
     );
