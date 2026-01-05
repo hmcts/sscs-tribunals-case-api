@@ -162,46 +162,46 @@ class UpdateOtherPartyMidEventHandlerTest {
         private static Stream<Arguments> casesWithValidationError() {
             return Stream.of(
 
-                Arguments.of("Other party address missing first line",
+                Arguments.of("Other party address details (Address line 1)",
                     List.of(ccd(OtherParty.builder().address(addressMissingFirstLine()).build())),
                     ERROR_ADDRESS_LINE_1_OTHER_PARTY),
 
-                Arguments.of("Other party address missing postcode",
+                Arguments.of("Other party address details (No postcode)",
                     List.of(ccd(OtherParty.builder().address(addressMissingPostcode()).build())),
                     ERROR_POSTCODE_OTHER_PARTY),
 
-                Arguments.of("Other party address invalid postcode",
+                Arguments.of("Other party address details (Invalid Postcode format)",
                     List.of(ccd(OtherParty.builder().address(addressWithInvalidPostcode()).build())),
                     ERROR_POSTCODE_OTHER_PARTY),
 
-                Arguments.of("Representative missing first line", List.of(ccd(OtherParty.builder()
+                Arguments.of("Other Party Representative address details (Address line 1)", List.of(ccd(OtherParty.builder()
                     .address(validAddress())
                     .rep(repWithAddress(addressMissingFirstLine()))
                     .build())), ERROR_ADDRESS_LINE_1_OTHER_PARTY_REP),
 
-                Arguments.of("Representative missing postcode", List.of(ccd(OtherParty.builder()
+                Arguments.of("Other Party Representative address details (No postcode)", List.of(ccd(OtherParty.builder()
                     .address(validAddress())
                     .rep(repWithAddress(addressMissingPostcode()))
                     .build())), ERROR_POSTCODE_OTHER_PARTY_REP),
 
-                Arguments.of("Representative invalid postcode", List.of(ccd(OtherParty.builder()
+                Arguments.of("Other Party Representative address details (Invalid Postcode format)", List.of(ccd(OtherParty.builder()
                     .address(validAddress())
                     .rep(repWithAddress(addressWithInvalidPostcode()))
                     .build())), ERROR_POSTCODE_OTHER_PARTY_REP),
 
-                Arguments.of("Appointee missing first line", List.of(ccd(OtherParty.builder()
+                Arguments.of("Other Party Appointee address details (Address line 1)", List.of(ccd(OtherParty.builder()
                     .address(validAddress())
                     .isAppointee(YES.getValue())
                     .appointee(appointeeWithAddress(addressMissingFirstLine()))
                     .build())), ERROR_LINE1_OTHER_PARTY_APPOINTEE),
 
-                Arguments.of("Appointee missing postcode", List.of(ccd(OtherParty.builder()
+                Arguments.of("Other Party Appointee address details (No postcode)", List.of(ccd(OtherParty.builder()
                     .address(validAddress())
                     .isAppointee(YES.getValue())
                     .appointee(appointeeWithAddress(addressMissingPostcode()))
                     .build())), ERROR_POSTCODE_OTHER_PARTY_APPOINTEE),
 
-                Arguments.of("Appointee missing postcode", List.of(ccd(OtherParty.builder()
+                Arguments.of("Other Party Appointee address details (Invalid Postcode format)", List.of(ccd(OtherParty.builder()
                     .address(validAddress())
                     .isAppointee(YES.getValue())
                     .appointee(appointeeWithAddress(addressWithInvalidPostcode()))
