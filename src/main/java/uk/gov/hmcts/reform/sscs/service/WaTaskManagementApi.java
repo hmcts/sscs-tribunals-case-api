@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.sscs.model.RequestWaTasksPayload;
 
 @FeignClient(
         name = "camunda",
-        url = "https://wa-task-management-api-sscs-tribunals-api-pr-4961.preview.platform.hmcts.net"
+        url = "https://wa-task-management-api-sscs-tribunals-api-pr-4986.preview.platform.hmcts.net"
 )
 @SuppressWarnings("PMD.UseObjectForClearerAPI")
 public interface WaTaskManagementApi {
