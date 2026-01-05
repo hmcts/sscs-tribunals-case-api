@@ -61,6 +61,8 @@ public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackH
 
                 String camundaTaskRequestVariables = "caseId_eq_" + caseId + ",jurisdiction_eq_SSCS" + ",caseTypeId_eq_Benefit";
 
+                log.info("Fetching Camunda tasks for caseID: {} with variables: {}", caseId, camundaTaskRequestVariables);
+
                 List<CamundaTask> camundaTaskList = waTaskManagementApi.getTasksByTaskVariables(
                         idamService.getIdamWaTokens().getServiceAuthorization(),
                         idamService.getIdamWaTokens().getIdamOauth2Token(),

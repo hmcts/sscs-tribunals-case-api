@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.tribunalcommunication;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -58,7 +59,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
     void setUp() {
         openMocks(this);
 
-        handler = new TribunalCommunicationAboutToSubmitHandler(idamService, businessDaysCalculatorService);
+        handler = new TribunalCommunicationAboutToSubmitHandler(idamService, businessDaysCalculatorService, false);
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").build();
 
@@ -278,6 +279,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         assertNotNull(request.getRequestReply().getReplyDateTime());
         assertNull(request.getRequestResponseDueDate());
         assertEquals(LocalDate.now(), response.getData().getCommunicationFields().getFtaResponseProvidedDate());
+        assertNull(response.getData().getCommunicationFields().getWaTaskFtaCommunicationId());
     }
 
     @Test
@@ -550,5 +552,35 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         assertEquals(YesNo.NO, resultComs.get(1).getValue().getRequestReply().getReplyHasBeenActionedByFta());
         assertEquals(YesNo.YES, resultComs.getLast().getValue().getRequestReply().getReplyHasBeenActionedByFta());
         assertEquals(LocalDate.now(), response.getData().getCommunicationFields().getTribunalResponseProvidedDate());
+    }
+
+    @Test
+    void givenWorkAllocationEnabled_thenShouldSet_andShouldNotClearTribunalRequestType() {
+
+        String replyText = "Reply text";
+
+        CommunicationRequest communicationRequest = buildCommRequest();
+        CommunicationRequest communicationRequest2 = buildCommRequestNotActionedResponseDateOffset(1, true);
+        DynamicListItem chosenTribunalRequest = new DynamicListItem(communicationRequest.getId(), "item");
+        DynamicList ftaRequestsDl = new DynamicList(chosenTribunalRequest, Collections.singletonList(chosenTribunalRequest));
+        FtaCommunicationFields ftaCommunicationFields = FtaCommunicationFields.builder()
+                .tribunalRequestsDl(ftaRequestsDl)
+                .ftaCommunications(List.of(communicationRequest, communicationRequest2))
+                .commRequestResponseTextArea(replyText)
+                .commRequestResponseNoAction(Collections.emptyList())
+                .tribunalRequestType(TribunalRequestType.REPLY_TO_TRIBUNAL_QUERY)
+                .build();
+        sscsCaseData.setCommunicationFields(ftaCommunicationFields);
+
+        String userName = "Test User";
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
+                .name(userName).roles(List.of(UserRole.CTSC_CLERK.getValue())).build());
+
+        handler = new TribunalCommunicationAboutToSubmitHandler(idamService, businessDaysCalculatorService, true);
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(communicationRequest.getId()).isEqualTo(response.getData().getCommunicationFields().getWaTaskFtaCommunicationId());
+        assertThat(TribunalRequestType.REPLY_TO_TRIBUNAL_QUERY).isEqualTo(response.getData().getCommunicationFields().getTribunalRequestType());
     }
 }

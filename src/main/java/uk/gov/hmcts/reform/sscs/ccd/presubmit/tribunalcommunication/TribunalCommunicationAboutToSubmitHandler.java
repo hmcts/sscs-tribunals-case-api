@@ -13,6 +13,7 @@ import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -29,12 +30,16 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
 
     private final IdamService idamService;
     private final BusinessDaysCalculatorService businessDaysCalculatorService;
+    private final boolean isWorkAllocationEnabled;
 
     @Autowired
     public TribunalCommunicationAboutToSubmitHandler(IdamService idamService,
-                                                     BusinessDaysCalculatorService businessDaysCalculatorService) {
+                                                     BusinessDaysCalculatorService businessDaysCalculatorService,
+                                                     @Value("${feature.work-allocation.enabled}") boolean isWorkAllocationEnabled
+    ) {
         this.idamService = idamService;
         this.businessDaysCalculatorService = businessDaysCalculatorService;
+        this.isWorkAllocationEnabled = isWorkAllocationEnabled;
     }
 
     @Override
@@ -101,18 +106,22 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
             .build();
         communicationRequest.getValue().setRequestReply(reply);
         communicationRequest.getValue().setRequestResponseDueDate(null);
-        communicationFields.setWaTaskFtaCommunicationId(chosenTribunalRequestId);
+        if (isWorkAllocationEnabled) {
+            communicationFields.setWaTaskFtaCommunicationId(chosenTribunalRequestId);
+        }
     }
 
     private void clearFields(FtaCommunicationFields communicationFields) {
         communicationFields.setCommRequestQuestion(null);
         communicationFields.setCommRequestTopic(null);
-        communicationFields.setTribunalRequestType(null);
         communicationFields.setTribunalRequestNoResponseQuery(null);
         communicationFields.setCommRequestResponseTextArea(null);
         communicationFields.setFtaRequestsDl(null);
         communicationFields.setCommRequestResponseNoAction(null);
         communicationFields.setFtaRequestsToReviewDl(null);
+        if (!isWorkAllocationEnabled) {
+            communicationFields.setTribunalRequestType(null);
+        }
     }
 
     private void handleReviewTribunalReply(FtaCommunicationFields ftaCommunicationFields) {
