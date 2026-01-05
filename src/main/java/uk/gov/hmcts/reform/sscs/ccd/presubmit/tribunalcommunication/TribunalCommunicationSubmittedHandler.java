@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.TribunalRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.domain.CamundaTask;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.model.RequestWaTasksPayload;
 import uk.gov.hmcts.reform.sscs.service.WaTaskManagementApi;
 
 @Slf4j
@@ -66,9 +67,8 @@ public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackH
                 List<CamundaTask> camundaTaskList = waTaskManagementApi.getTasksByTaskVariables(
                         idamService.getIdamWaTokens().getServiceAuthorization(),
                         idamService.getIdamWaTokens().getIdamOauth2Token(),
-                        camundaTaskRequestVariables,
-                        "created",
-                        "desc");
+                        RequestWaTasksPayload.builder().jurisdiction("SSCS").caseId(caseId).build()
+                        );
 
                 log.info("Camunda tasks found for caseID: {}, Task List: {}", caseId, camundaTaskList);
 
