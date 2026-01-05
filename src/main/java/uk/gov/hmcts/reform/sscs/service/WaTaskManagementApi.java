@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import uk.gov.hmcts.reform.sscs.domain.CamundaTask;
 import uk.gov.hmcts.reform.sscs.model.RequestWaTasksPayload;
@@ -29,8 +30,9 @@ public interface WaTaskManagementApi {
     @ResponseBody
     List<CamundaTask> getTasksByTaskVariables(
             @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
-            @RequestHeader(AUTHORIZATION) String authorisation,
-            @RequestBody RequestWaTasksPayload requestWaTasksPayload
+            @RequestParam("taskVariables") String taskVariables,
+            @RequestParam(value = "sortBy", defaultValue = "created", required = false) String sortBy,
+            @RequestParam(value = "sortOrder", defaultValue = "desc", required = false) String sortOrder
     );
 
     @PostMapping(
