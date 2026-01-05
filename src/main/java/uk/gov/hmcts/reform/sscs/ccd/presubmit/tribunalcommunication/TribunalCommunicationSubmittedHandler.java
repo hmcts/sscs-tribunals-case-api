@@ -5,7 +5,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -17,7 +16,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.TribunalRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.domain.CamundaTask;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.model.RequestWaTasksPayload;
 import uk.gov.hmcts.reform.sscs.service.WaTaskManagementApi;
 
 @Slf4j
@@ -66,7 +64,7 @@ public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackH
 
                 List<CamundaTask> camundaTaskList = waTaskManagementApi.getTasksByTaskVariables(
                         idamService.getIdamWaTokens().getServiceAuthorization(),
-                        "case_id_eq_" + caseId + ",jurisdiction_eq_SSCS,case_type_id_eq_Benefit",
+                        "caseId_eq_" + caseId + ",jurisdiction_eq_SSCS,caseTypeId_eq_Benefit",
                         "created",
                         "desc"
                         );
