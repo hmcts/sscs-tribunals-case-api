@@ -65,29 +65,6 @@ class UpdateOtherPartyMidEventHandlerTest {
 
     private UpdateOtherPartyMidEventHandler handler;
 
-    private static CcdValue<OtherParty> ccd(OtherParty otherParty) {
-        return CcdValue.<OtherParty>builder().value(otherParty).build();
-    }
-
-    private SscsCaseData ibcCaseWith(OtherParty party) {
-        return caseDataWithBenefitAndParties(IBCA_BENEFIT_CODE, List.of(ccd(party)));
-    }
-
-    private void stubCallbackWith(SscsCaseData caseData) {
-        when(callback.getEvent()).thenReturn(EventType.UPDATE_OTHER_PARTY_DATA);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(caseData);
-    }
-
-    private SscsCaseData caseDataWithBenefitAndParties(String benefitCode, List<CcdValue<OtherParty>> otherParties) {
-        return SscsCaseData.builder().benefitCode(benefitCode).otherParties(otherParties).build();
-    }
-
-    private PreSubmitCallbackResponse<SscsCaseData> runMidEvent(SscsCaseData caseData) {
-        stubCallbackWith(caseData);
-        return handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-    }
-
     @BeforeEach
     void setUp() {
         handler = new UpdateOtherPartyMidEventHandler();
@@ -136,31 +113,50 @@ class UpdateOtherPartyMidEventHandlerTest {
         return Representative.builder().hasRepresentative(YES.getValue()).address(address).build();
     }
 
+    private static CcdValue<OtherParty> ccd(OtherParty otherParty) {
+        return CcdValue.<OtherParty>builder().value(otherParty).build();
+    }
+
+    private SscsCaseData ibcCaseWith(OtherParty party) {
+        return caseDataWithBenefitAndParties(IBCA_BENEFIT_CODE, List.of(ccd(party)));
+    }
+
+    private void stubCallbackWith(SscsCaseData caseData) {
+        when(callback.getEvent()).thenReturn(EventType.UPDATE_OTHER_PARTY_DATA);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+    }
+
+    private SscsCaseData caseDataWithBenefitAndParties(String benefitCode, List<CcdValue<OtherParty>> otherParties) {
+        return SscsCaseData.builder().benefitCode(benefitCode).otherParties(otherParties).build();
+    }
+
+    private PreSubmitCallbackResponse<SscsCaseData> runMidEvent(SscsCaseData caseData) {
+        stubCallbackWith(caseData);
+        return handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+    }
+
     @Nested
     class ValidationUkOnly {
 
-        private static Address validAddress() {
-            return Address.builder().line1(LINE_1).postcode(POSTCODE).build();
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("casesWithValidationError")
+        void shouldReturnExactlyOneError(String description, List<CcdValue<OtherParty>> otherParties, String expectedError) {
+            SscsCaseData caseData = caseDataWithBenefitAndParties(Benefit.CHILD_SUPPORT.name(), otherParties);
+
+            PreSubmitCallbackResponse<SscsCaseData> response = runMidEvent(caseData);
+
+            assertThat(response.getErrors()).containsExactly(expectedError);
         }
 
-        private static Address addressMissingPostcode() {
-            return Address.builder().line1(LINE_1).build();
-        }
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("casesWithNoValidationError")
+        void shouldReturnNoErrorsForValidUkOtherParty(String description, OtherParty party) {
+            SscsCaseData caseData = caseDataWithBenefitAndParties(Benefit.CHILD_SUPPORT.name(), List.of(ccd(party)));
 
-        private static Address addressWithInvalidPostcode() {
-            return Address.builder().line1(LINE_1).postcode(INVALID_POSTCODE).build();
-        }
+            PreSubmitCallbackResponse<SscsCaseData> response = runMidEvent(caseData);
 
-        private static Address addressMissingFirstLine() {
-            return Address.builder().postcode(POSTCODE).build();
-        }
-
-        private static Address ukAddressMissingPostCodeAndFirstLine() {
-            return Address.builder().town(DUFFTOWN).build();
-        }
-
-        private static Appointee appointeeWithAddress(Address address) {
-            return Appointee.builder().address(address).build();
+            assertThat(response.getErrors()).isEmpty();
         }
 
         private static Stream<Arguments> casesWithValidationError() {
@@ -215,8 +211,7 @@ class UpdateOtherPartyMidEventHandlerTest {
         private static Stream<Arguments> casesWithNoValidationError() {
             return Stream.of(
 
-                Arguments.of("Other party address missing",
-                    OtherParty.builder().address(null).build()),
+                Arguments.of("Other party address missing", OtherParty.builder().address(null).build()),
 
                 Arguments.of("Other party address present but no first line of address or postcode",
                     OtherParty.builder().address(ukAddressMissingPostCodeAndFirstLine()).build()),
@@ -253,76 +248,48 @@ class UpdateOtherPartyMidEventHandlerTest {
 
         }
 
-        @ParameterizedTest(name = "{0}")
-        @MethodSource("casesWithValidationError")
-        void shouldReturnExactlyOneError(String description, List<CcdValue<OtherParty>> otherParties, String expectedError) {
-            SscsCaseData caseData = caseDataWithBenefitAndParties(Benefit.CHILD_SUPPORT.name(), otherParties);
-
-            PreSubmitCallbackResponse<SscsCaseData> response = runMidEvent(caseData);
-
-            assertThat(response.getErrors()).containsExactly(expectedError);
+        private static Address validAddress() {
+            return Address.builder().line1(LINE_1).postcode(POSTCODE).build();
         }
 
-        @ParameterizedTest(name = "{0}")
-        @MethodSource("casesWithNoValidationError")
-        void shouldReturnNoErrorsForValidUkOtherParty(String description, OtherParty party) {
-            SscsCaseData caseData = caseDataWithBenefitAndParties(Benefit.CHILD_SUPPORT.name(), List.of(ccd(party)));
+        private static Address addressMissingPostcode() {
+            return Address.builder().line1(LINE_1).build();
+        }
 
-            PreSubmitCallbackResponse<SscsCaseData> response = runMidEvent(caseData);
+        private static Address addressWithInvalidPostcode() {
+            return Address.builder().line1(LINE_1).postcode(INVALID_POSTCODE).build();
+        }
 
-            assertThat(response.getErrors()).isEmpty();
+        private static Address addressMissingFirstLine() {
+            return Address.builder().postcode(POSTCODE).build();
+        }
+
+        private static Address ukAddressMissingPostCodeAndFirstLine() {
+            return Address.builder().town(DUFFTOWN).build();
+        }
+
+        private static Appointee appointeeWithAddress(Address address) {
+            return Appointee.builder().address(address).build();
         }
     }
 
     @Nested
     class ValidationUkAndInternational {
 
-        private static Address validUkAddress() {
-            return Address.builder().line1(LINE_1).postcode(POSTCODE).inMainlandUk(YES).build();
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("casesWithErrors")
+        void shouldReturnErrors(String description, OtherParty party, Set<String> expectedErrors) {
+            PreSubmitCallbackResponse<SscsCaseData> response = runMidEvent(ibcCaseWith(party));
+
+            assertThat(response.getErrors()).containsExactlyInAnyOrderElementsOf(expectedErrors);
         }
 
-        private static Address addressMissingMainland() {
-            return Address.builder().line1(LINE_1).postcode(POSTCODE).build();
-        }
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("casesWithNoErrors")
+        void shouldReturnNoErrors(String description, OtherParty party) {
+            PreSubmitCallbackResponse<SscsCaseData> response = runMidEvent(ibcCaseWith(party));
 
-        private static Address anEmptyAddress() {
-            return Address.builder().build();
-        }
-
-        private static Address addressMissingPostcodeAndMainland() {
-            return Address.builder().line1(LINE_1).build();
-        }
-
-        private static Address ukAddressWithNoPostcode() {
-            return Address.builder().line1(LINE_1).inMainlandUk(YES).build();
-        }
-
-        private static Address ukAddressWithInvalidPostcode() {
-            return Address.builder().line1(LINE_1).inMainlandUk(YES).postcode(INVALID_POSTCODE).build();
-        }
-
-        private static Address ukAddressWithNoFirstLine() {
-            return Address.builder().postcode(POSTCODE).inMainlandUk(YES).build();
-        }
-
-        private static Address ukAddressWithNoAddressDetails() {
-            return Address.builder().inMainlandUk(YES).build();
-        }
-
-        private static Address anInternationalAddress() {
-            return Address.builder().line1(LINE_1).inMainlandUk(NO).postcode(ZIPCODE).country(AMERICA).build();
-        }
-
-        private static Address anEmptyInternationalAddress() {
-            return Address.builder().inMainlandUk(NO).build();
-        }
-
-        private static Address anInternationalAddressNoCountry() {
-            return Address.builder().line1(LINE_1).postcode(ZIPCODE).inMainlandUk(NO).build();
-        }
-
-        private static Address anInternationalAddressWithNoFirstLineAddressOrCountry() {
-            return Address.builder().inMainlandUk(NO).postcode(ZIPCODE).build();
+            assertThat(response.getErrors()).isEmpty();
         }
 
         private static Stream<Arguments> casesWithErrors() {
@@ -372,8 +339,7 @@ class UpdateOtherPartyMidEventHandlerTest {
                     OtherParty.builder()
                         .address(anInternationalAddress())
                         .rep(repWithAddress(addressMissingMainland()))
-                        .build(),
-                    Set.of(ERROR_MAINLAND_SELECTION_OTHER_PARTY_REP)),
+                        .build(), Set.of(ERROR_MAINLAND_SELECTION_OTHER_PARTY_REP)),
 
                 Arguments.of("International other party missing line1+country, rep UK missing postcode",
                     OtherParty.builder()
@@ -390,14 +356,18 @@ class UpdateOtherPartyMidEventHandlerTest {
                 Arguments.of("UK other party, UK rep",
                     OtherParty.builder().address(validUkAddress()).rep(repWithAddress(validUkAddress())).build()),
 
-                Arguments.of("UK other party, international rep",
-                    OtherParty.builder().address(validUkAddress()).rep(repWithAddress(anInternationalAddress())).build()),
+                Arguments.of("UK other party, international rep", OtherParty.builder()
+                    .address(validUkAddress())
+                    .rep(repWithAddress(anInternationalAddress()))
+                    .build()),
 
                 Arguments.of("International other party, no rep",
                     OtherParty.builder().address(anInternationalAddress()).build()),
 
-                Arguments.of("International other party, UK rep",
-                    OtherParty.builder().address(anInternationalAddress()).rep(repWithAddress(validUkAddress())).build()),
+                Arguments.of("International other party, UK rep", OtherParty.builder()
+                    .address(anInternationalAddress())
+                    .rep(repWithAddress(validUkAddress()))
+                    .build()),
 
                 Arguments.of("International other party, international rep", OtherParty.builder()
                     .address(anInternationalAddress())
@@ -405,20 +375,53 @@ class UpdateOtherPartyMidEventHandlerTest {
                     .build()));
         }
 
-        @ParameterizedTest(name = "{0}")
-        @MethodSource("casesWithErrors")
-        void shouldReturnErrors(String description, OtherParty party, Set<String> expectedErrors) {
-            PreSubmitCallbackResponse<SscsCaseData> response = runMidEvent(ibcCaseWith(party));
-
-            assertThat(response.getErrors()).containsExactlyInAnyOrderElementsOf(expectedErrors);
+        private static Address validUkAddress() {
+            return Address.builder().line1(LINE_1).postcode(POSTCODE).inMainlandUk(YES).build();
         }
 
-        @ParameterizedTest(name = "{0}")
-        @MethodSource("casesWithNoErrors")
-        void shouldReturnNoErrors(String description, OtherParty party) {
-            PreSubmitCallbackResponse<SscsCaseData> response = runMidEvent(ibcCaseWith(party));
-
-            assertThat(response.getErrors()).isEmpty();
+        private static Address addressMissingMainland() {
+            return Address.builder().line1(LINE_1).postcode(POSTCODE).build();
         }
+
+        private static Address anEmptyAddress() {
+            return Address.builder().build();
+        }
+
+        private static Address addressMissingPostcodeAndMainland() {
+            return Address.builder().line1(LINE_1).build();
+        }
+
+        private static Address ukAddressWithNoPostcode() {
+            return Address.builder().line1(LINE_1).inMainlandUk(YES).build();
+        }
+
+        private static Address ukAddressWithInvalidPostcode() {
+            return Address.builder().line1(LINE_1).inMainlandUk(YES).postcode(INVALID_POSTCODE).build();
+        }
+
+        private static Address ukAddressWithNoFirstLine() {
+            return Address.builder().postcode(POSTCODE).inMainlandUk(YES).build();
+        }
+
+        private static Address ukAddressWithNoAddressDetails() {
+            return Address.builder().inMainlandUk(YES).build();
+        }
+
+        private static Address anInternationalAddress() {
+            return Address.builder().line1(LINE_1).inMainlandUk(NO).postcode(ZIPCODE).country(AMERICA).build();
+        }
+
+        private static Address anEmptyInternationalAddress() {
+            return Address.builder().inMainlandUk(NO).build();
+        }
+
+        private static Address anInternationalAddressNoCountry() {
+            return Address.builder().line1(LINE_1).postcode(ZIPCODE).inMainlandUk(NO).build();
+        }
+
+        private static Address anInternationalAddressWithNoFirstLineAddressOrCountry() {
+            return Address.builder().inMainlandUk(NO).postcode(ZIPCODE).build();
+        }
+
     }
 }
