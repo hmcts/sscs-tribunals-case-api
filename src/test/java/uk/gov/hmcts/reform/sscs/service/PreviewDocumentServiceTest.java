@@ -17,7 +17,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InternalCaseDocumentData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
@@ -43,41 +42,16 @@ class PreviewDocumentServiceTest {
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("ccdId")
             .appeal(Appeal.builder().build())
-            .internalCaseDocumentData(InternalCaseDocumentData.builder().sscsInternalDocument(docs).build())
+            .sscsDocument(docs)
             .build();
     }
 
-    @DisplayName("Given draft adjournment notice already exists in internal docs, then overwrite existing draft")
+    @DisplayName("Given draft adjournment notice already exists on case, then overwrite existing draft")
     @Test
     void givenDraftAdjournmentNoticeAlreadyExists_thenOverwritesExistingDraft() {
-        previewDocumentService.writePreviewDocumentToSscsInternalDocument(sscsCaseData, DRAFT_ADJOURNMENT_NOTICE, sscsCaseData.getAdjournment().getPreviewDocument());
+        previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_ADJOURNMENT_NOTICE, sscsCaseData.getAdjournment().getPreviewDocument());
 
-        assertThat(sscsCaseData.getInternalCaseDocumentData().getSscsInternalDocument())
-            .hasSize(1)
-            .extracting(AbstractDocument::getValue)
-            .extracting(AbstractDocumentDetails::getDocumentFileName)
-            .allSatisfy(fileName -> {
-                assertThat(fileName).containsPattern(Pattern.compile("Draft Adjournment Notice generated on \\d{1,2}-\\d{1,2}-\\d{4}\\.pdf"));
-                assertThat(fileName).contains(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
-            });
-    }
-
-    @DisplayName("Given draft adjournment notice already exists in sscs documents, then delete existing draft and save to internal docs")
-    @Test
-    void givenDraftAdjournmentNoticeAlreadyExistsInSscsDocuments_thenDeleteExistingDraft() {
-        ArrayList<SscsDocument> sscsDocuments = new ArrayList<>();
-        sscsDocuments.add(SscsDocument.builder()
-                .value(SscsDocumentDetails.builder()
-                        .documentFileName(OLD_DRAFT_DOC)
-                        .documentType(DRAFT_ADJOURNMENT_NOTICE.getValue())
-                        .build())
-                .build());
-        sscsCaseData.setSscsDocument(sscsDocuments);
-        sscsCaseData.getInternalCaseDocumentData().setSscsInternalDocument(null);
-        previewDocumentService.writePreviewDocumentToSscsInternalDocument(sscsCaseData, DRAFT_ADJOURNMENT_NOTICE, sscsCaseData.getAdjournment().getPreviewDocument());
-
-        assertThat(sscsCaseData.getSscsDocument()).isEmpty();
-        assertThat(sscsCaseData.getInternalCaseDocumentData().getSscsInternalDocument())
+        assertThat(sscsCaseData.getSscsDocument())
             .hasSize(1)
             .extracting(AbstractDocument::getValue)
             .extracting(AbstractDocumentDetails::getDocumentFileName)

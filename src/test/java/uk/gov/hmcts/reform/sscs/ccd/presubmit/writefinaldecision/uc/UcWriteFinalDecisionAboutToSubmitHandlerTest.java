@@ -20,7 +20,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InternalCaseDocumentData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
@@ -646,7 +645,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         SscsDocument doc = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("oldDraft.doc").documentType(DRAFT_DECISION_NOTICE.getValue()).build()).build();
         List<SscsDocument> docs = new ArrayList<>();
         docs.add(doc);
-        callback.getCaseDetails().getCaseData().setInternalCaseDocumentData(InternalCaseDocumentData.builder().sscsInternalDocument(docs).build());
+        callback.getCaseDetails().getCaseData().setSscsDocument(docs);
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
@@ -654,8 +653,8 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(1, response.getData().getInternalCaseDocumentData().getSscsInternalDocument().size());
-        assertEquals((String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))), response.getData().getInternalCaseDocumentData().getSscsInternalDocument().get(0).getValue().getDocumentFileName());
+        assertEquals(1, response.getData().getSscsDocument().size());
+        assertEquals((String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))), response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
     }
 
     // Refused scenario 1

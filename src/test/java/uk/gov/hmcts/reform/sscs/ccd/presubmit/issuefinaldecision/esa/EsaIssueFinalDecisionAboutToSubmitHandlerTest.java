@@ -46,7 +46,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InternalCaseDocumentData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -202,11 +201,11 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         SscsDocument document2 = buildSscsDocumentWithDocumentType(FINAL_DECISION_NOTICE.getValue());
 
         List<SscsDocument> documentList = new ArrayList<>(List.of(document1, document2));
-        callback.getCaseDetails().getCaseData().setInternalCaseDocumentData(InternalCaseDocumentData.builder().sscsInternalDocument(documentList).build());
+        callback.getCaseDetails().getCaseData().setSscsDocument(documentList);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
-        assertEquals(1, response.getData().getInternalCaseDocumentData().getSscsInternalDocument().size());
+        assertEquals(1, response.getData().getSscsDocument().size());
     }
 
     @Test
@@ -220,11 +219,11 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         SscsDocument document3 = buildSscsDocumentWithDocumentType(DRAFT_DECISION_NOTICE.getValue());
 
         List<SscsDocument> documentList = new ArrayList<>(List.of(document1, document3));
-        callback.getCaseDetails().getCaseData().setInternalCaseDocumentData(InternalCaseDocumentData.builder().sscsInternalDocument(documentList).build());
+        callback.getCaseDetails().getCaseData().setSscsDocument(documentList);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
-        assertEquals(1, response.getData().getInternalCaseDocumentData().getSscsInternalDocument().size());
+        assertEquals(1, response.getData().getSscsDocument().size());
     }
 
     @Test

@@ -138,9 +138,9 @@ public abstract class WriteFinalDecisionItBase extends AbstractEventIt {
 
         assertNull(result.getData().getOutcome());
 
-        assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getInternalCaseDocumentData().getSscsInternalDocument().getFirst().getValue().getDocumentType());
-        assertEquals(LocalDate.now().toString(), result.getData().getInternalCaseDocumentData().getSscsInternalDocument().getFirst().getValue().getDocumentDateAdded());
-        assertEquals("Draft Decision Notice generated on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf", result.getData().getInternalCaseDocumentData().getSscsInternalDocument().getFirst().getValue().getDocumentFileName());
+        assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals(LocalDate.now().toString(), result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
+        assertEquals("Draft Decision Notice generated on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
     }
 
     /**
@@ -172,9 +172,9 @@ public abstract class WriteFinalDecisionItBase extends AbstractEventIt {
         assertNotNull(result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionGeneratedDate());
         assertEquals(LocalDate.now().toString(), result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionGeneratedDate());
 
-        assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getInternalCaseDocumentData().getSscsInternalDocument().getFirst().getValue().getDocumentType());
-        assertEquals(LocalDate.now().toString(), result.getData().getInternalCaseDocumentData().getSscsInternalDocument().getFirst().getValue().getDocumentDateAdded());
-        assertEquals("Draft Decision Notice generated on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf", result.getData().getInternalCaseDocumentData().getSscsInternalDocument().getFirst().getValue().getDocumentFileName());
+        assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals(LocalDate.now().toString(), result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
+        assertEquals("Draft Decision Notice generated on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
     }
 
     /**
@@ -202,9 +202,9 @@ public abstract class WriteFinalDecisionItBase extends AbstractEventIt {
 
         assertEquals(LocalDate.now().toString(), result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionGeneratedDate());
 
-        assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getInternalCaseDocumentData().getSscsInternalDocument().getFirst().getValue().getDocumentType());
-        assertEquals(LocalDate.now().toString(), result.getData().getInternalCaseDocumentData().getSscsInternalDocument().getFirst().getValue().getDocumentDateAdded());
-        assertEquals("Draft Decision Notice generated on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf", result.getData().getInternalCaseDocumentData().getSscsInternalDocument().getFirst().getValue().getDocumentFileName());
+        assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals(LocalDate.now().toString(), result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
+        assertEquals("Draft Decision Notice generated on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
     }
 
     @Test
@@ -220,9 +220,9 @@ public abstract class WriteFinalDecisionItBase extends AbstractEventIt {
 
         assertNull(result.getData().getOutcome());
 
-        assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getInternalCaseDocumentData().getSscsInternalDocument().getFirst().getValue().getDocumentType());
-        assertEquals(LocalDate.now().toString(), result.getData().getInternalCaseDocumentData().getSscsInternalDocument().getFirst().getValue().getDocumentDateAdded());
-        assertEquals("Draft Decision Notice generated on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf", result.getData().getInternalCaseDocumentData().getSscsInternalDocument().getFirst().getValue().getDocumentFileName());
+        assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals(LocalDate.now().toString(), result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
+        assertEquals("Draft Decision Notice generated on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
     }
 
     @Test
@@ -238,8 +238,8 @@ public abstract class WriteFinalDecisionItBase extends AbstractEventIt {
 
         assertNull(result.getData().getOutcome());
 
-        assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getInternalCaseDocumentData().getSscsInternalDocument().getFirst().getValue().getDocumentType());
-        assertEquals(LocalDate.now().toString(), result.getData().getInternalCaseDocumentData().getSscsInternalDocument().get(0).getValue().getDocumentDateAdded());
-        assertEquals("Draft Decision Notice generated on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + ".pdf", result.getData().getInternalCaseDocumentData().getSscsInternalDocument().getFirst().getValue().getDocumentFileName());
+        assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals(LocalDate.now().toString(), result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
+        assertEquals("Draft Decision Notice generated on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + ".pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
     }
 }

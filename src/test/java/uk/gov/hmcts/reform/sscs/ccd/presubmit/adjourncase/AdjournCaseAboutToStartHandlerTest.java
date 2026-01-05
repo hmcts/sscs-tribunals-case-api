@@ -42,7 +42,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InternalCaseDocumentData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -133,7 +132,7 @@ class AdjournCaseAboutToStartHandlerTest {
         List<SscsDocument> documentList = new ArrayList<>();
         SscsDocumentDetails details = SscsDocumentDetails.builder().documentType(DocumentType.DRAFT_ADJOURNMENT_NOTICE.getValue()).build();
         documentList.add(new SscsDocument(details));
-        sscsCaseData.setInternalCaseDocumentData(InternalCaseDocumentData.builder().sscsInternalDocument(documentList).build());
+        sscsCaseData.setSscsDocument(documentList);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertTrue(response.getData().getAdjournment().getAdjournmentInProgress().toBoolean());
         assertEquals(0, response.getErrors().size());

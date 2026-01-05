@@ -31,7 +31,6 @@ import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -140,16 +139,6 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
         preSubmitCallbackResponse.getData().getSscsDocument()
                 .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()));
-
-        InternalCaseDocumentData internalCaseDocumentData = ofNullable(preSubmitCallbackResponse.getData().getInternalCaseDocumentData())
-                .orElse(InternalCaseDocumentData.builder().build());
-        if (internalCaseDocumentData.getSscsInternalDocument() != null) {
-            internalCaseDocumentData.getSscsInternalDocument()
-                    .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()));
-            if (CollectionUtils.isEmpty(internalCaseDocumentData.getSscsInternalDocument())) {
-                internalCaseDocumentData.setSscsInternalDocument(null);
-            }
-        }
     }
 
     private static State isCaseListable(SscsCaseData sscsCaseData) {

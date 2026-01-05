@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
-import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getHmcHearingType;
 
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InternalCaseDocumentData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
@@ -30,8 +29,8 @@ public class AdjournCaseAboutToStartHandler implements PreSubmitCallbackHandler<
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.ABOUT_TO_START
             && callback.getEvent() == EventType.ADJOURN_CASE
-            && nonNull(callback.getCaseDetails())
-            && nonNull(callback.getCaseDetails().getCaseData());
+            && Objects.nonNull(callback.getCaseDetails())
+            && Objects.nonNull(callback.getCaseDetails().getCaseData());
     }
 
     @Override
@@ -48,9 +47,8 @@ public class AdjournCaseAboutToStartHandler implements PreSubmitCallbackHandler<
             return preSubmitCallbackResponse;
         }
         DynamicList languageList = utils.generateInterpreterLanguageFields(sscsCaseData.getAdjournment().getInterpreterLanguage());
-        InternalCaseDocumentData internalCaseDocumentData = sscsCaseData.getInternalCaseDocumentData();
-        if (nonNull(internalCaseDocumentData) &&  nonNull(internalCaseDocumentData.getSscsInternalDocument())) {
-            boolean draftAdjournmentDoc = internalCaseDocumentData.getSscsInternalDocument().stream()
+        if (sscsCaseData.getSscsDocument() != null) {
+            boolean draftAdjournmentDoc = sscsCaseData.getSscsDocument().stream()
                 .anyMatch(sscsDocument -> sscsDocument.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()));
             if (!draftAdjournmentDoc) {
                 sscsCaseData.setAdjournment(Adjournment.builder().build());

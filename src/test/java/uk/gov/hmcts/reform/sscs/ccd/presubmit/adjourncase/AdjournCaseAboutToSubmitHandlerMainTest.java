@@ -48,7 +48,7 @@ class AdjournCaseAboutToSubmitHandlerMainTest extends AdjournCaseAboutToSubmitHa
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(previewDocumentService, times(1)).writePreviewDocumentToSscsInternalDocument(
+        verify(previewDocumentService, times(1)).writePreviewDocumentToSscsDocument(
             sscsCaseData, DRAFT_ADJOURNMENT_NOTICE, null);
     }
 
