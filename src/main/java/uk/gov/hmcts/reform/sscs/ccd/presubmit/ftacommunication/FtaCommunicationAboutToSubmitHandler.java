@@ -16,6 +16,7 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -32,6 +33,9 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
 
     private final IdamService idamService;
     private final BusinessDaysCalculatorService businessDaysCalculatorService;
+
+    @Value("${feature.work-allocation.enabled}")
+    private boolean isWorkAllocationEnabled;
 
     @Autowired
     public FtaCommunicationAboutToSubmitHandler(IdamService idamService,
@@ -77,7 +81,9 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
                 throw new RuntimeException(e);
             }
             ftaCommunicationFields.setFtaCommunications(ftaComms);
-            ftaCommunicationFields.setWaTaskFtaCommunicationId(ftaCommunicationFields.getFtaCommunications().getFirst().getId());
+            if (isWorkAllocationEnabled) {
+                ftaCommunicationFields.setWaTaskFtaCommunicationId(ftaCommunicationFields.getFtaCommunications().getFirst().getId());
+            }
         } else if (FtaRequestType.REPLY_TO_FTA_QUERY.equals(ftaCommunicationFields.getFtaRequestType())) {
             handleReplyToFtaQuery(ftaCommunicationFields, userDetails);
         } else if (ftaCommunicationFields.getFtaRequestType() == FtaRequestType.REVIEW_FTA_REPLY) {

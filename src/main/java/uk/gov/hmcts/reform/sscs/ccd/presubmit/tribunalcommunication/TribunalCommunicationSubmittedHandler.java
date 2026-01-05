@@ -59,7 +59,7 @@ public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackH
             if (TribunalRequestType.REPLY_TO_TRIBUNAL_QUERY.equals(sscsCaseData.getCommunicationFields().getTribunalRequestType())) {
                 String caseId = String.valueOf(callback.getCaseDetails().getId());
 
-                String camundaTaskRequestVariables = "caseId_eq_" + caseId + ",jurisdiction_eq_SSCS" + ",caseTypeId_eq_Benefit";
+                String camundaTaskRequestVariables = "caseId_eq_" + caseId + ",jurisdiction_eq_SSCS";
 
                 log.info("Fetching Camunda tasks for caseID: {} with variables: {}", caseId, camundaTaskRequestVariables);
 
