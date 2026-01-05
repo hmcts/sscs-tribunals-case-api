@@ -31,7 +31,7 @@ public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackH
     public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
 
     @Value("${feature.work-allocation.enabled}")
-    private boolean isWorkAllocationEnabled;
+    private final boolean isWorkAllocationEnabled;
 
 
     @Override
@@ -53,12 +53,11 @@ public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackH
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
         if (isWorkAllocationEnabled) {
+            log.info("Work Allocation is enabled - checking for Camunda tasks to cancel for Case ID: {}",
+                    callback.getCaseDetails().getId());
+
             if (TribunalRequestType.REPLY_TO_TRIBUNAL_QUERY.equals(sscsCaseData.getCommunicationFields().getTribunalRequestType())) {
                 String caseId = String.valueOf(callback.getCaseDetails().getId());
-
-                log.info("Masked wa token: {}***** and: {}*****",
-                        idamService.getIdamWaTokens().getIdamOauth2Token().substring(0,15),
-                        idamService.getIdamWaTokens().getServiceAuthorization().substring(0,15));
 
                 String camundaTaskRequestVariables = "caseId_eq_" + caseId + ",jurisdiction_eq_SSCS" + ",caseTypeId_eq_Benefit";
 
