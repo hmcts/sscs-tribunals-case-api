@@ -2,6 +2,7 @@ import { WebAction } from '../common/web.action';
 import { expect, Page } from '@playwright/test';
 import updatenotListableData from './content/update.not.listable_en.json';
 import eventTestData from './content/event.name.event.description_en.json';
+import dateUtilsComponent from '../utils/DateUtilsComponent';
 
 let webActions: WebAction;
 
@@ -32,16 +33,37 @@ export class NotListablePage {
   }
 
   async enterValidDirectionDueDate() {
-    await webActions.inputField('#notListableDueDate-day', '21');
-    await webActions.inputField('#notListableDueDate-month', '12');
-    await webActions.inputField('#notListableDueDate-year', '2025');
+    const futureDate = dateUtilsComponent.rollDateToCertainWeeks(4);
+    await webActions.inputField(
+      '#notListableDueDate-day',
+      String(futureDate.getDate())
+    );
+    await webActions.inputField(
+      '#notListableDueDate-month',
+      String(futureDate.getMonth() + 1)
+    );
+    await webActions.inputField(
+      '#notListableDueDate-year',
+      String(futureDate.getFullYear())
+    );
     await this.page.locator('#notListableDueDate-day').click();
   }
 
   async enterInvalidDirectionDueDate() {
-    await webActions.inputField('#notListableDueDate-day', '01');
-    await webActions.inputField('#notListableDueDate-month', '02');
-    await webActions.inputField('#notListableDueDate-year', '2024');
+    const pastDate = new Date();
+    pastDate.setDate(pastDate.getDate() - 1);
+    await webActions.inputField(
+      '#notListableDueDate-day',
+      String(pastDate.getDate())
+    );
+    await webActions.inputField(
+      '#notListableDueDate-month',
+      String(pastDate.getMonth() + 1)
+    );
+    await webActions.inputField(
+      '#notListableDueDate-year',
+      String(pastDate.getFullYear())
+    );
     await this.page.locator('#notListableDueDate-day').click();
   }
 
