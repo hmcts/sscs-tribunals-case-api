@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import lombok.extern.slf4j.Slf4j;
-import net.javacrumbs.jsonunit.core.Option;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
@@ -226,7 +225,7 @@ public class BaseFunctionalTest {
                 "case_creation_details.case_data.appeal.rep.id",
                 "case_creation_details.case_data.appeal.appellant.appointee.id"
             )
-            .withFailMessage(String.format("Expected: %s%nActual: %s", expectedJson, actualJson)
+            .withFailMessage("Expected: %s%nActual: %s".formatted(expectedJson, actualJson)
             )
             .isEqualTo(expectedJson);
     }
