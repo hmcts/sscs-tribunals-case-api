@@ -48,14 +48,7 @@ public class AdjournCaseAboutToStartHandler implements PreSubmitCallbackHandler<
             return preSubmitCallbackResponse;
         }
         DynamicList languageList = utils.generateInterpreterLanguageFields(sscsCaseData.getAdjournment().getInterpreterLanguage());
-        InternalCaseDocumentData internalCaseDocumentData = sscsCaseData.getInternalCaseDocumentData();
-        if (nonNull(internalCaseDocumentData) &&  nonNull(internalCaseDocumentData.getSscsInternalDocument())) {
-            boolean draftAdjournmentDoc = internalCaseDocumentData.getSscsInternalDocument().stream()
-                .anyMatch(sscsDocument -> sscsDocument.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()));
-            if (!draftAdjournmentDoc) {
-                sscsCaseData.setAdjournment(Adjournment.builder().build());
-            }
-        } else {
+        if (!draftDocInInternalDocuments(sscsCaseData) && !draftDocInSscsDocuments(sscsCaseData)) {
             sscsCaseData.setAdjournment(Adjournment.builder().build());
         }
         sscsCaseData.getAdjournment().setInterpreterLanguage(languageList);
@@ -65,6 +58,23 @@ public class AdjournCaseAboutToStartHandler implements PreSubmitCallbackHandler<
 
     private boolean isDirectionHearing(SscsCaseData sscsCaseData) {
         return HmcHearingType.DIRECTION_HEARINGS.equals(getHmcHearingType(sscsCaseData));
+    }
+
+    private boolean draftDocInSscsDocuments(SscsCaseData sscsCaseData) {
+        if (nonNull(sscsCaseData.getSscsDocument())) {
+            return sscsCaseData.getSscsDocument().stream()
+                    .anyMatch(sscsDocument -> sscsDocument.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()));
+        }
+        return false;
+    }
+
+    private boolean draftDocInInternalDocuments(SscsCaseData sscsCaseData) {
+        InternalCaseDocumentData internalCaseDocumentData = sscsCaseData.getInternalCaseDocumentData();
+        if ((nonNull(internalCaseDocumentData) && nonNull(internalCaseDocumentData.getSscsInternalDocument()))) {
+            return internalCaseDocumentData.getSscsInternalDocument().stream()
+                    .anyMatch(sscsDocument -> sscsDocument.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()));
+        }
+        return false;
     }
 }
 
