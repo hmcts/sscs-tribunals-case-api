@@ -61,18 +61,44 @@ public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackH
             if (TribunalRequestType.REPLY_TO_TRIBUNAL_QUERY.equals(sscsCaseData.getCommunicationFields().getTribunalRequestType())) {
                 String caseId = String.valueOf(callback.getCaseDetails().getId());
 
-                Map<String, Object> camundaRequestBody = Map.of(
+                Map<String, Object> camundaRequestBodyMap = Map.of(
                         "processVariables", List.of(Map.of(
                                 "name", KEY_CASE_ID,
                                 "operator", "eq",
                                 "value", caseId
                         )));
 
-                log.info("Fetching Camunda tasks for caseID: {} with variables: {}", caseId, camundaRequestBody);
+                String camundaRequestBodyString =
+                        "{\n"
+                        + "    \"search_parameters\": [\n"
+                        + "    {\n"
+                        + "      \"key\": \"jurisdiction\",\n"
+                        + "      \"operator\": \"IN\",\n"
+                        + "      \"values\": [\n"
+                        + "          \"SSCS\"\n"
+                        + "       ]\n"
+                        + "    },\n"
+                        + "    {\n"
+                        + "      \"key\": \"caseId\",\n"
+                        + "      \"operator\": \"IN\",\n"
+                        + "      \"values\": [\n"
+                        + "          \"" + caseId + "\"\n"
+                        + "       ]\n"
+                        + "    }    \n"
+                        + "  ],\n"
+                        + "  \"sorting_parameters\": [\n"
+                        + "    {\n"
+                        + "      \"sort_by\": \"due_date\",\n"
+                        + "      \"sort_order\": \"asc\"\n"
+                        + "    }\n"
+                        + "  ]\n"
+                        + "}";
+
+                log.info("Fetching Camunda tasks for caseID: {} with variables: \n{}", caseId, camundaRequestBodyString);
 
                 List<CamundaTask> camundaTaskList = waTaskManagementApi.getTasksByTaskVariables(
                         idamService.getIdamWaTokens().getServiceAuthorization(),
-                        camundaRequestBody
+                        camundaRequestBodyString
                         );
 
                 log.info("Camunda tasks found for caseID: {}, Task List: {}", caseId, camundaTaskList);
