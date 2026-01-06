@@ -58,6 +58,13 @@ export class ListingRequirementPage {
     await webAction.verifyElementVisibility("#field-trigger-summary");
     await webAction.clickSubmitButton();
   }
+  
+  async submitEventNoChangeNoHearingRequested() {
+    await webAction.clickButton('Continue');
+    await webAction.clickSubmitButton();
+    await webAction.verifyElementVisibility("#field-trigger-summary");
+    await webAction.clickSubmitButton();
+  }
 
   async updateHearingToDirection() {
     await webAction.clickElementById(

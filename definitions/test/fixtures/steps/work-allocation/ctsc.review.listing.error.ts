@@ -61,12 +61,9 @@ export class CtscReviewListingError extends BaseStep {
         await this.tasksTab.verifyManageOptions(task.name, task.assignedManageOptions);
         await this.tasksTab.verifyNextStepsOptions(task.name, task.nextStepsOptions);
 
-        // Verify navigation for Update listing requiremnts next step option
-        await this.tasksTab.verifyNextStepNavigation(task.updateListingRequirements.link, task.updateListingRequirements.eventTitle);
-
-        // Select Ready to list next step and complete the event
+        // Select update listing requirements next step and complete the event
         await this.tasksTab.clickNextStepLink(task.updateListingRequirements.link);
-        await this.listingRequirementPage.submitUpdatedValuesNoReasons();
+        await this.listingRequirementPage.submitEventNoChangeNoHearingRequested();
         await expect(this.homePage.summaryTab).toBeVisible();
     
         // Verify task is removed from the tasks list within Tasks tab
