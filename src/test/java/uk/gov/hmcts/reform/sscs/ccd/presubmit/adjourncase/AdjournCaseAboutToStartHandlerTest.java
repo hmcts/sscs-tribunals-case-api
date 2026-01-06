@@ -125,7 +125,7 @@ class AdjournCaseAboutToStartHandlerTest {
     }
 
     @Test
-    void givenCaseHasAdjournedFieldsPopulated_andDraftDocument_thenDoNotClearTransientFields() {
+    void givenCaseHasAdjournedFieldsPopulated_andDraftDocumentInInternalDocs_thenDoNotClearTransientFields() {
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -134,6 +134,21 @@ class AdjournCaseAboutToStartHandlerTest {
         SscsDocumentDetails details = SscsDocumentDetails.builder().documentType(DocumentType.DRAFT_ADJOURNMENT_NOTICE.getValue()).build();
         documentList.add(new SscsDocument(details));
         sscsCaseData.setInternalCaseDocumentData(InternalCaseDocumentData.builder().sscsInternalDocument(documentList).build());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertTrue(response.getData().getAdjournment().getAdjournmentInProgress().toBoolean());
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    void givenCaseHasAdjournedFieldsPopulated_andDraftDocumentInSscsDocs_thenDoNotClearTransientFields() {
+        when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        List<SscsDocument> documentList = new ArrayList<>();
+        SscsDocumentDetails details = SscsDocumentDetails.builder().documentType(DocumentType.DRAFT_ADJOURNMENT_NOTICE.getValue()).build();
+        documentList.add(new SscsDocument(details));
+        sscsCaseData.setSscsDocument(documentList);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertTrue(response.getData().getAdjournment().getAdjournmentInProgress().toBoolean());
         assertEquals(0, response.getErrors().size());
