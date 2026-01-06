@@ -2,7 +2,7 @@ import { test } from "../../lib/steps.factory";
 import createCaseBasedOnCaseType from "../../api/client/sscs/factory/appeal.type.factory";
 import performAppealDormantOnCase from "../../api/client/sscs/appeal.event";
 
-test.describe.serial('WA - Review Listing Error CTSC task initiation and completion tests', { tag: '@work-allocation' }, async () => {
+test.describe.serial('Work Allocation - Review Listing Error CTSC task initiation and completion tests', { tag: '@work-allocation' }, async () => {
     let caseId: string;
 
     test.beforeAll("Case has to be Created", async () => {
