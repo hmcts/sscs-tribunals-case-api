@@ -94,11 +94,11 @@ public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackH
                         + "  ]\n"
                         + "}";
 
-                log.info("Fetching Camunda tasks for caseID: {} with variables: \n{}", caseId, camundaRequestBodyString);
+                log.info("Fetching Camunda tasks for caseID: {} with variables: \n{}", caseId, camundaRequestBodyMap);
 
                 List<CamundaTask> camundaTaskList = waTaskManagementApi.getTasksByTaskVariables(
                         idamService.getIdamWaTokens().getServiceAuthorization(),
-                        camundaRequestBodyString
+                        camundaRequestBodyMap
                         );
 
                 log.info("Camunda tasks found for caseID: {}, Task List: {}", caseId, camundaTaskList);
@@ -106,11 +106,12 @@ public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackH
                 String taskProcessCategoryId = "ftaCommunicationId_" + sscsCaseData.getCommunicationFields().getWaTaskFtaCommunicationId();
 
                 if (nonNull(camundaTaskList) && !camundaTaskList.isEmpty()) {
-                    String taskIdToBeCancelled = camundaTaskList.stream().filter(
+                    CamundaTask camundaTaskToBeCancelled = camundaTaskList.stream().filter(
                                     task -> taskProcessCategoryId.equals(task.getProcessInstanceId()))
-                            .findFirst().orElse(null).getId();
+                            .findFirst().orElse(null);
 
-                    if (nonNull(taskIdToBeCancelled)) {
+                    if (nonNull(camundaTaskToBeCancelled)) {
+                        String taskIdToBeCancelled = camundaTaskToBeCancelled.getId();
                         log.info("Cancelling Camunda task for caseID: {}, Task ID: {}", caseId, taskIdToBeCancelled);
 
                         waTaskManagementApi.cancelTask(
