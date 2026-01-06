@@ -2,6 +2,7 @@ import { WebAction } from '../common/web.action';
 import { expect, Page } from '@playwright/test';
 import updatenotListableData from './content/update.not.listable_en.json';
 import eventTestData from './content/event.name.event.description_en.json';
+import dateUtilsComponent from '../utils/DateUtilsComponent';
 
 let webActions: WebAction;
 
@@ -32,9 +33,9 @@ export class NotListablePage {
   }
 
   async enterValidDirectionDueDate() {
-    await webActions.inputField('#notListableDueDate-day', '21');
-    await webActions.inputField('#notListableDueDate-month', '12');
-    await webActions.inputField('#notListableDueDate-year', '2025');
+    await webActions.inputField('#notListableDueDate-day', `${dateUtilsComponent.getTomorrowDate()}`);
+    await webActions.inputField('#notListableDueDate-month', `${dateUtilsComponent.getCurrentMonth()}`);
+    await webActions.inputField('#notListableDueDate-year', `${dateUtilsComponent.getCurrentYear()}`);
     await this.page.locator('#notListableDueDate-day').click();
   }
 
@@ -59,10 +60,13 @@ export class NotListablePage {
   }
 
   async verifyCheckYourAnswersPage() {
+
+    let tomorrowDate = dateUtilsComponent.getTomorrowDate();
+    let formattedDate = dateUtilsComponent.formatDateToSpecifiedDateShortFormat(tomorrowDate);
     await webActions.verifyTextVisibility(
       'Test Reason(s) for the case being not listable is required'
     );
-    await webActions.verifyTextVisibility('21 Dec 2025');
+    await webActions.verifyTextVisibility(formattedDate);
   }
 
   async insertEventSummaryAndDescription() {

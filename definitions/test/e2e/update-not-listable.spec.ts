@@ -2,7 +2,7 @@ import { test } from '../lib/steps.factory';
 
 test.describe(
   'Update Not listable tests',
-  { tag: '@nightly-pipeline' },
+  { tag: '@nightly-pipeline-06' },
   async () => {
     //Happy Path Test
     test('Not listable test - Set case to Not listable', async ({
