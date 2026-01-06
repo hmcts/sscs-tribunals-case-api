@@ -33,9 +33,9 @@ export class NotListablePage {
   }
 
   async enterValidDirectionDueDate() {
-    await webActions.inputField('#notListableDueDate-day', `${dateUtilsComponent.getTomorrowDate()}`);
-    await webActions.inputField('#notListableDueDate-month', `${dateUtilsComponent.getCurrentMonth()}`);
-    await webActions.inputField('#notListableDueDate-year', `${dateUtilsComponent.getCurrentYear()}`);
+    await webActions.inputField('#notListableDueDate-day', (await dateUtilsComponent.getTomorrowDate()).toString());
+    await webActions.inputField('#notListableDueDate-month', (await dateUtilsComponent.getCurrentMonth()).toString());
+    await webActions.inputField('#notListableDueDate-year', (await dateUtilsComponent.getCurrentYear()).toString());
     await this.page.locator('#notListableDueDate-day').click();
   }
 
