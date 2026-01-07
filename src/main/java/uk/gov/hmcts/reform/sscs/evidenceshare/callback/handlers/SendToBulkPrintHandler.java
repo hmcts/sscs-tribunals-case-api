@@ -141,6 +141,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
         log.info("Appeal Benefit Type: {}", caseData.getAppeal().getBenefitType().getCode());
 
         //TODO Refactor to do properly
+        //TODO Check that these are all the codes required see Benefit.java as there are other codes which could be related to CM too.
         //Child Maintenance to trigger a different update event
         if (nonNull(caseData.getAppeal().getBenefitType())
             && caseData.getAppeal().getBenefitType().getCode()

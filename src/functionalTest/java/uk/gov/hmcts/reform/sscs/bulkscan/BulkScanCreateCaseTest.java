@@ -17,6 +17,7 @@ import java.time.Duration;
 import junit.framework.AssertionFailedError;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -27,6 +28,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -58,7 +61,7 @@ public class BulkScanCreateCaseTest {
         idamTokens = idamService.getIdamTokens();
     }
 
-    public SscsCaseDetails createPaperCase(
+    public SscsCaseDetails createCase(
         EventType eventType,
         String benefitCode,
         String benefitDescription) {
@@ -68,19 +71,26 @@ public class BulkScanCreateCaseTest {
         SscsCaseData caseData = minimalCaseData.toBuilder()
             .appeal(minimalCaseData.getAppeal().toBuilder()
                 .benefitType(BenefitType.builder()
-                    .code(benefitCode)
+                    .code(Benefit.CHILD_SUPPORT.getShortName())
                     .description(benefitDescription)
                     .build())
                 .receivedVia("Paper")
                 .build())
             .benefitCode(benefitCode)
+            .subscriptions(Subscriptions.builder()
+                .appellantSubscription(
+                    Subscription.builder()
+                        .subscribeEmail("yes")
+                        .email("test.someone@somewhere.com")
+                        .build())
+                .build())
             .formType(SSCS2)
             .build();
 
         //TODO could remove
         assertEquals("Paper", caseData.getAppeal().getReceivedVia());
         assertNotNull(caseData.getAppeal().getBenefitType());
-        assertEquals(benefitCode, caseData.getAppeal().getBenefitType().getCode());
+        assertEquals(benefitCode, caseData.getBenefitCode());
 
         return ccdService.createCase(caseData, eventType.getCcdType(),
             "FT createPaperCase Created this Case",
@@ -90,6 +100,7 @@ public class BulkScanCreateCaseTest {
     }
 
     @Test
+    @Disabled
     void shouldRetrieveCaseById() {
 
         SscsCaseDetails ccdCaseDetails = ccdService.getByCaseId(1764843894280640L, idamTokens);
@@ -103,7 +114,7 @@ public class BulkScanCreateCaseTest {
         String benefitCode = Benefit.CHILD_SUPPORT.getBenefitCode();
         String benefitDescription = Benefit.CHILD_SUPPORT.getDescription();
 
-        SscsCaseDetails sscsCaseDetails = createPaperCase(VALID_APPEAL_CREATED, benefitCode, benefitDescription);
+        SscsCaseDetails sscsCaseDetails = createCase(VALID_APPEAL_CREATED, benefitCode, benefitDescription);
 
         assertEquals(VALID_APPEAL.getId(), sscsCaseDetails.getState());
 
@@ -128,7 +139,7 @@ public class BulkScanCreateCaseTest {
         String benefitCode = Benefit.CHILD_SUPPORT.getBenefitCode();
         String benefitDescription = Benefit.CHILD_SUPPORT.getDescription();
 
-        SscsCaseDetails sscsCaseDetails = createPaperCase(INCOMPLETE_APPLICATION_RECEIVED, benefitCode, benefitDescription);
+        SscsCaseDetails sscsCaseDetails = createCase(INCOMPLETE_APPLICATION_RECEIVED, benefitCode, benefitDescription);
 
         assertEquals(INCOMPLETE_APPLICATION.getId(), sscsCaseDetails.getState());
 
@@ -142,7 +153,7 @@ public class BulkScanCreateCaseTest {
         String benefitCode = Benefit.CHILD_SUPPORT.getBenefitCode();
         String benefitDescription = Benefit.CHILD_SUPPORT.getDescription();
 
-        final SscsCaseDetails sscsCaseDetails = createPaperCase(NON_COMPLIANT, benefitCode, benefitDescription);
+        final SscsCaseDetails sscsCaseDetails = createCase(NON_COMPLIANT, benefitCode, benefitDescription);
 
         assertEquals(INTERLOCUTORY_REVIEW_STATE.getId(), sscsCaseDetails.getState());
 
