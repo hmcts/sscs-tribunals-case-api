@@ -33,6 +33,7 @@ public class TaskManagementApiServiceTest {
     private static final String TASK_ID_1 = "taskId1";
     private static final String TASK_ID_2 = "taskId2";
     private static final String TASK_ID_3 = "taskId3";
+    private static final String TASK_ID_4 = "taskId4";
     private static final String ADDITIONAL_PROP_KEY = "additionalPropKey";
     private static final String ADDITIONAL_PROP_VALUE = "additionalPropValue";
 
@@ -173,7 +174,11 @@ public class TaskManagementApiServiceTest {
                 )
                 .build();
 
-        List<Task> responseTaskList = List.of(task1, task2, task3);
+        Task task4 = Task.builder()
+                .id(TASK_ID_4)
+                .build();
+
+        List<Task> responseTaskList = List.of(task1, task2, task3, task4);
 
         GetTasksResponse getTasksResponse = GetTasksResponse.builder()
                 .tasks(responseTaskList)
@@ -187,6 +192,5 @@ public class TaskManagementApiServiceTest {
         verify(taskManagementApi, times(1)).cancelTask(SERVICE_AUTHORIZATION, IDAM_OAUTH2_TOKEN, TASK_ID_1);
         verify(taskManagementApi, times(1)).cancelTask(SERVICE_AUTHORIZATION, IDAM_OAUTH2_TOKEN, TASK_ID_2);
         verify(taskManagementApi, times(0)).cancelTask(SERVICE_AUTHORIZATION, IDAM_OAUTH2_TOKEN, TASK_ID_3);
-
     }
 }

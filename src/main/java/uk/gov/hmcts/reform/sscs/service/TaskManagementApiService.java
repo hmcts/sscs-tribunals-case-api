@@ -68,7 +68,7 @@ public class TaskManagementApiService {
 
         if (nonNull(taskList) && !taskList.isEmpty()) {
             taskList.stream().filter(
-                            task -> nonNull(task.getAdditionalProperties().get(additionalPropertyKey)))
+                            task -> nonNull(task.getAdditionalProperties()) && nonNull(task.getAdditionalProperties().get(additionalPropertyKey)))
                     .forEach(task -> {
                         cancelTaskByTaskId(task.getId());
                         log.info("Cancelling task for case ID: {}, task ID: {}, fta {}: {}",
