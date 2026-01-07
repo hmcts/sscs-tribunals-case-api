@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +24,7 @@ public class TaskManagementApiService {
     private final IdamService idamService;
     private final TaskManagementApi taskManagementApi;
 
-    public List<Task> getTasksByCaseId(String caseId) throws TaskManagementException {
+    public List<Task> getTaskListByCaseId(String caseId) throws TaskManagementException {
 
         TaskRequestPayload request = TaskRequestPayload.builder()
                 .searchParameters(List.of(
@@ -32,9 +35,9 @@ public class TaskManagementApiService {
                                 .build()))
                 .build();
 
-        log.info("Wa task search request: {} for case id: {} ", request, caseId);
+        log.info("Fetching tasks for caseID: {}", caseId);
 
-        GetTasksResponse response = null;
+        GetTasksResponse response;
         try {
             response = taskManagementApi.getTasksByCaseId(
                     idamService.getIdamWaTokens().getServiceAuthorization(),
@@ -45,18 +48,34 @@ public class TaskManagementApiService {
             log.error("There was an issue retrieving tasks from task management api: {}", e.getMessage());
             throw new TaskManagementException(e.getMessage());
         }
+        if (isNull(response)) {
+            throw new TaskManagementException("No tasks found for case ID: " + caseId);
+        }
         return response.getTasks();
     }
 
-    public void cancelTask(String taskId) {
-        try {
-            taskManagementApi.cancelTask(
-                    idamService.getIdamWaTokens().getServiceAuthorization(),
-                    idamService.getIdamWaTokens().getIdamOauth2Token(),
-                    taskId
+    public void cancelTaskByTaskId(String taskId) {
+        taskManagementApi.cancelTask(
+                idamService.getIdamWaTokens().getServiceAuthorization(),
+                idamService.getIdamWaTokens().getIdamOauth2Token(),
+                taskId
+        );
+    }
+
+    public void cancelTasksByTaskProperties(String caseId, String additionalPropertyKey) {
+
+        List<Task> taskList = getTaskListByCaseId(caseId);
+
+        if (nonNull(taskList) && !taskList.isEmpty()) {
+            taskList.stream().filter(
+                            task -> nonNull(task.getAdditionalProperties().get(additionalPropertyKey)))
+                    .forEach(task -> {
+                        cancelTaskByTaskId(task.getId());
+                        log.info("Cancelling task for case ID: {}, task ID: {}, fta {}: {}",
+                                caseId, task.getId(), additionalPropertyKey,
+                                task.getAdditionalProperties().get(additionalPropertyKey));
+                    }
             );
-        } catch (TaskManagementException e) {
-            log.error("There was an issue cancelling task in task management api: {}", e.getMessage());
         }
     }
 }
