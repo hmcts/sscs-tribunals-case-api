@@ -16,25 +16,23 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.TribunalRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.domain.CamundaTask;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.service.WaTaskManagementApi;
+import uk.gov.hmcts.reform.sscs.model.task.management.Task;
+import uk.gov.hmcts.reform.sscs.service.TaskManagementApiService;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final WaTaskManagementApi waTaskManagementApi;
-
     private final IdamService idamService;
+    private final TaskManagementApiService taskManagementApiService;
     public static final String AUTHORIZATION = "Authorization";
     public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
     public static final String KEY_CASE_ID = "caseId";
 
     @Value("${feature.work-allocation.enabled}")
     private final boolean isWorkAllocationEnabled;
-
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -96,28 +94,22 @@ public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackH
 
                 log.info("Fetching Camunda tasks for caseID: {} with variables: \n{}", caseId, camundaRequestBodyMap);
 
-                List<CamundaTask> camundaTaskList = waTaskManagementApi.getTasksByTaskVariables(
-                        idamService.getIdamWaTokens().getServiceAuthorization(),
-                        camundaRequestBodyMap
-                        );
+                List<Task> taskList = taskManagementApiService.getTasksByCaseId(caseId);
 
-                log.info("Camunda tasks found for caseID: {}, Task List: {}", caseId, camundaTaskList);
+                log.info("Camunda tasks found for caseID: {}, Task List: {}", caseId, taskList);
 
-                String taskProcessCategoryId = "ftaCommunicationId_" + sscsCaseData.getCommunicationFields().getWaTaskFtaCommunicationId();
+                String taskFtaCommunicationId = sscsCaseData.getCommunicationFields().getWaTaskFtaCommunicationId();
 
-                if (nonNull(camundaTaskList) && !camundaTaskList.isEmpty()) {
-                    CamundaTask camundaTaskToBeCancelled = camundaTaskList.stream().filter(
-                                    task -> taskProcessCategoryId.equals(task.getProcessInstanceId()))
+                if (nonNull(taskList) && !taskList.isEmpty()) {
+                    Task taskToBeCancelled = taskList.stream().filter(
+                                    task -> task.getAdditionalProperties().get("ftaCommunicationId").equals(taskFtaCommunicationId))
                             .findFirst().orElse(null);
 
-                    if (nonNull(camundaTaskToBeCancelled)) {
-                        String taskIdToBeCancelled = camundaTaskToBeCancelled.getId();
+                    if (nonNull(taskToBeCancelled)) {
+                        String taskIdToBeCancelled = taskToBeCancelled.getId();
                         log.info("Cancelling Camunda task for caseID: {}, Task ID: {}", caseId, taskIdToBeCancelled);
 
-                        waTaskManagementApi.cancelTask(
-                                idamService.getIdamWaTokens().getServiceAuthorization(),
-                                idamService.getIdamWaTokens().getIdamOauth2Token(),
-                                taskIdToBeCancelled);
+                        taskManagementApiService.cancelTask(taskIdToBeCancelled);
                     }
                 }
             }
