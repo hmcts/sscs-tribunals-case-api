@@ -29,7 +29,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
-public class OverdueFtaResponseAboutToSubmitHandlerTest {
+class OverdueFtaResponseAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     private OverdueFtaResponseAboutToSubmitHandler handler;

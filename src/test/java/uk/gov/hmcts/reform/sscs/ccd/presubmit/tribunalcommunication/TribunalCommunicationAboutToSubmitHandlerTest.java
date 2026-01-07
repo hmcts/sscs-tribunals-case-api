@@ -580,7 +580,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(communicationRequest.getId()).isEqualTo(response.getData().getCommunicationFields().getWaTaskFtaCommunicationId());
-        assertThat(TribunalRequestType.REPLY_TO_TRIBUNAL_QUERY).isEqualTo(response.getData().getCommunicationFields().getTribunalRequestType());
+        assertThat(response.getData().getCommunicationFields().getWaTaskFtaCommunicationId()).isEqualTo(communicationRequest.getId());
+        assertThat(response.getData().getCommunicationFields().getTribunalRequestType()).isEqualTo(TribunalRequestType.REPLY_TO_TRIBUNAL_QUERY);
     }
 }
