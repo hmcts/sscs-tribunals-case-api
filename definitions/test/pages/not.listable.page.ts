@@ -33,37 +33,16 @@ export class NotListablePage {
   }
 
   async enterValidDirectionDueDate() {
-    const futureDate = dateUtilsComponent.rollDateToCertainWeeks(4);
-    await webActions.inputField(
-      '#notListableDueDate-day',
-      String(futureDate.getDate())
-    );
-    await webActions.inputField(
-      '#notListableDueDate-month',
-      String(futureDate.getMonth() + 1)
-    );
-    await webActions.inputField(
-      '#notListableDueDate-year',
-      String(futureDate.getFullYear())
-    );
+    await webActions.inputField('#notListableDueDate-day', (await dateUtilsComponent.getTomorrowDate()).toString());
+    await webActions.inputField('#notListableDueDate-month', (await dateUtilsComponent.getCurrentMonth()).toString());
+    await webActions.inputField('#notListableDueDate-year', (await dateUtilsComponent.getCurrentYear()).toString());
     await this.page.locator('#notListableDueDate-day').click();
   }
 
   async enterInvalidDirectionDueDate() {
-    const pastDate = new Date();
-    pastDate.setDate(pastDate.getDate() - 1);
-    await webActions.inputField(
-      '#notListableDueDate-day',
-      String(pastDate.getDate())
-    );
-    await webActions.inputField(
-      '#notListableDueDate-month',
-      String(pastDate.getMonth() + 1)
-    );
-    await webActions.inputField(
-      '#notListableDueDate-year',
-      String(pastDate.getFullYear())
-    );
+    await webActions.inputField('#notListableDueDate-day', '01');
+    await webActions.inputField('#notListableDueDate-month', '02');
+    await webActions.inputField('#notListableDueDate-year', '2024');
     await this.page.locator('#notListableDueDate-day').click();
   }
 
@@ -81,10 +60,12 @@ export class NotListablePage {
   }
 
   async verifyCheckYourAnswersPage() {
+    let tomorrowDate = dateUtilsComponent.getTomorrowDate();
+    let formattedDate = dateUtilsComponent.formatDateToSpecifiedDateShortFormat(tomorrowDate);
     await webActions.verifyTextVisibility(
       'Test Reason(s) for the case being not listable is required'
     );
-    await webActions.verifyTextVisibility('21 Dec 2025');
+    await webActions.verifyTextVisibility(formattedDate);
   }
 
   async insertEventSummaryAndDescription() {
