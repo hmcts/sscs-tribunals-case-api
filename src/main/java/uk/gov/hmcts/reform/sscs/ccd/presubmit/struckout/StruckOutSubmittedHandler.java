@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.voidcase;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.struckout;
 
 import static java.util.Objects.requireNonNull;
 
@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.sscs.service.TaskManagementApiService;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class VoidCaseSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class StruckOutSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final TaskManagementApiService taskManagementApiService;
 
@@ -31,7 +31,7 @@ public class VoidCaseSubmittedHandler implements PreSubmitCallbackHandler<SscsCa
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.SUBMITTED)
-                && (callback.getEvent() == EventType.VOID_CASE);
+                && callback.getEvent() == EventType.STRUCK_OUT;
     }
 
     @Override
@@ -47,10 +47,10 @@ public class VoidCaseSubmittedHandler implements PreSubmitCallbackHandler<SscsCa
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
         final String caseId = String.valueOf(callback.getCaseDetails().getId());
 
-        log.info("Handling Void Case Submitted callback for case id: {}", caseId);
+        log.info("Handling Struck Out Case Submitted callback for case id: {}", caseId);
 
         if (isWorkAllocationEnabled) {
-            log.info("Work Allocation is enabled - Void Case cancelling tasks for Case ID: {}", caseId);
+            log.info("Work Allocation is enabled - Struck Out Case cancelling tasks for Case ID: {}", caseId);
             taskManagementApiService.cancelTasksByTaskProperties(caseId, "ftaCommunicationId");
         }
 

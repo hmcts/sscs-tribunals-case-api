@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.voidcase;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.struckout;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -20,12 +20,11 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.service.TaskManagementApiService;
 
-public class VoidCaseSubmittedHandlerTest {
-
+public class StruckOutSubmittedHandlerTest {
     private static final String CASE_ID = "1234";
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    private VoidCaseSubmittedHandler handler;
+    private StruckOutSubmittedHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -39,9 +38,9 @@ public class VoidCaseSubmittedHandlerTest {
     @BeforeEach
     void setUp() {
         openMocks(this);
-        handler = new VoidCaseSubmittedHandler(taskManagementApiService, true);
+        handler = new StruckOutSubmittedHandler(taskManagementApiService, true);
         SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId(CASE_ID).build();
-        when(callback.getEvent()).thenReturn(EventType.VOID_CASE);
+        when(callback.getEvent()).thenReturn(EventType.STRUCK_OUT);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(caseDetails.getId()).thenReturn(Long.valueOf(CASE_ID));
@@ -71,7 +70,7 @@ public class VoidCaseSubmittedHandlerTest {
 
     @Test
     void givenWorkAllocationDisabled_thenDoNotCallTaskManagementApiService() {
-        handler = new VoidCaseSubmittedHandler(taskManagementApiService, false);
+        handler = new StruckOutSubmittedHandler(taskManagementApiService, false);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
         verify(taskManagementApiService, times(0)).cancelTasksByTaskProperties(any(), any());
     }

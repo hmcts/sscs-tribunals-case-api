@@ -65,7 +65,8 @@ public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackH
 
                 if (nonNull(taskList) && !taskList.isEmpty()) {
                     Task taskToBeCancelled = taskList.stream().filter(
-                                    task -> task.getAdditionalProperties().get("ftaCommunicationId").equals(taskFtaCommunicationId))
+                                    task -> nonNull(task.getAdditionalProperties())
+                                            && task.getAdditionalProperties().get("ftaCommunicationId").equals(taskFtaCommunicationId))
                             .findFirst().orElse(null);
 
                     if (nonNull(taskToBeCancelled)) {

@@ -1,6 +1,9 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.voidcase;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.dormant;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CONFIRM_LAPSED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DORMANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.WITHDRAWN;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +13,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.TaskManagementApiService;
@@ -18,7 +20,7 @@ import uk.gov.hmcts.reform.sscs.service.TaskManagementApiService;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class VoidCaseSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class DormantEventsSubmittedHandler  implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final TaskManagementApiService taskManagementApiService;
 
@@ -31,7 +33,10 @@ public class VoidCaseSubmittedHandler implements PreSubmitCallbackHandler<SscsCa
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.SUBMITTED)
-                && (callback.getEvent() == EventType.VOID_CASE);
+                && (callback.getEvent() == WITHDRAWN
+                || callback.getEvent() == DORMANT
+                || callback.getEvent() == CONFIRM_LAPSED
+            );
     }
 
     @Override
@@ -47,10 +52,10 @@ public class VoidCaseSubmittedHandler implements PreSubmitCallbackHandler<SscsCa
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
         final String caseId = String.valueOf(callback.getCaseDetails().getId());
 
-        log.info("Handling Void Case Submitted callback for case id: {}", caseId);
+        log.info("Handling {} Case Submitted callback for case id: {}", callback.getEvent().getCcdType(), caseId);
 
         if (isWorkAllocationEnabled) {
-            log.info("Work Allocation is enabled - Void Case cancelling tasks for Case ID: {}", caseId);
+            log.info("Work Allocation is enabled - {} Case cancelling tasks for Case ID: {}", callback.getEvent().getCcdType(), caseId);
             taskManagementApiService.cancelTasksByTaskProperties(caseId, "ftaCommunicationId");
         }
 

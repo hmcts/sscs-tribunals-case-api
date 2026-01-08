@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.voidcase;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.dormant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -12,6 +12,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -20,12 +22,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.service.TaskManagementApiService;
 
-public class VoidCaseSubmittedHandlerTest {
-
-    private static final String CASE_ID = "1234";
+public class DormantEventsSubmittedHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
-
-    private VoidCaseSubmittedHandler handler;
+    private static final String CASE_ID = "1234";
+    private DormantEventsSubmittedHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -39,16 +39,17 @@ public class VoidCaseSubmittedHandlerTest {
     @BeforeEach
     void setUp() {
         openMocks(this);
-        handler = new VoidCaseSubmittedHandler(taskManagementApiService, true);
+        handler = new DormantEventsSubmittedHandler(taskManagementApiService, true);
         SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId(CASE_ID).build();
-        when(callback.getEvent()).thenReturn(EventType.VOID_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(caseDetails.getId()).thenReturn(Long.valueOf(CASE_ID));
     }
 
-    @Test
-    void givenAValidSubmittedEvent_thenReturnTrue() {
+    @ParameterizedTest
+    @EnumSource(value = EventType.class, names = {"WITHDRAWN", "DORMANT", "CONFIRM_LAPSED"})
+    void givenAValidSubmittedEvent_thenReturnTrue(EventType eventType) {
+        when(callback.getEvent()).thenReturn(eventType);
         assertThat(handler.canHandle(SUBMITTED, callback)).isTrue();
     }
 
@@ -63,15 +64,19 @@ public class VoidCaseSubmittedHandlerTest {
         assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
     }
 
-    @Test
-    void givenWorkAllocationEnabled_thenCancelTasks() {
+    @ParameterizedTest
+    @EnumSource(value = EventType.class, names = {"WITHDRAWN", "DORMANT", "CONFIRM_LAPSED"})
+    void givenWorkAllocationEnabled_thenCancelTasks(EventType eventType) {
+        when(callback.getEvent()).thenReturn(eventType);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
         verify(taskManagementApiService, times(1)).cancelTasksByTaskProperties(CASE_ID, "ftaCommunicationId");
     }
 
-    @Test
-    void givenWorkAllocationDisabled_thenDoNotCallTaskManagementApiService() {
-        handler = new VoidCaseSubmittedHandler(taskManagementApiService, false);
+    @ParameterizedTest
+    @EnumSource(value = EventType.class, names = {"WITHDRAWN", "DORMANT", "CONFIRM_LAPSED"})
+    void givenWorkAllocationDisabled_thenDoNotCallTaskManagementApiService(EventType eventType) {
+        when(callback.getEvent()).thenReturn(eventType);
+        handler = new DormantEventsSubmittedHandler(taskManagementApiService, false);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
         verify(taskManagementApiService, times(0)).cancelTasksByTaskProperties(any(), any());
     }
