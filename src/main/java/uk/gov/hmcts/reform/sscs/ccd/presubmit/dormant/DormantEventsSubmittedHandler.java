@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.TaskManagementApiService;
@@ -48,17 +47,14 @@ public class DormantEventsSubmittedHandler  implements PreSubmitCallbackHandler<
             throw new IllegalStateException("Cannot handle callback.");
         }
 
-        final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
-        final SscsCaseData sscsCaseData = caseDetails.getCaseData();
         final String caseId = String.valueOf(callback.getCaseDetails().getId());
 
         log.info("Handling {} Case Submitted callback for case id: {}", callback.getEvent().getCcdType(), caseId);
 
         if (isWorkAllocationEnabled) {
-            log.info("Work Allocation is enabled - {} Case cancelling tasks for Case ID: {}", callback.getEvent().getCcdType(), caseId);
             taskManagementApiService.cancelTasksByTaskProperties(caseId, "ftaCommunicationId");
         }
 
-        return new PreSubmitCallbackResponse<>(sscsCaseData);
+        return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
     }
 }

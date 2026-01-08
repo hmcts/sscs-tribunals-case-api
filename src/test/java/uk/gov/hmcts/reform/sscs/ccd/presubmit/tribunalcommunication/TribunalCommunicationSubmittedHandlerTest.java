@@ -31,7 +31,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.TribunalRequestType;
 import uk.gov.hmcts.reform.sscs.model.task.management.Task;
 import uk.gov.hmcts.reform.sscs.service.TaskManagementApiService;
 
-public class TribunalCommunicationSubmittedHandlerTest {
+class TribunalCommunicationSubmittedHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
@@ -65,7 +65,7 @@ public class TribunalCommunicationSubmittedHandlerTest {
 
         when(callback.getEvent()).thenReturn(EventType.TRIBUNAL_COMMUNICATION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);;
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
 
     @Test

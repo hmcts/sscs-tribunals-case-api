@@ -71,7 +71,7 @@ public class TaskManagementApiService {
                             task -> nonNull(task.getAdditionalProperties()) && nonNull(task.getAdditionalProperties().get(additionalPropertyKey)))
                     .forEach(task -> {
                         cancelTaskByTaskId(task.getId());
-                        log.info("Cancelling task for case ID: {}, task ID: {}, fta {}: {}",
+                        log.info("Cancelling task for case ID: {}, task ID: {}, additional property key: {}, fta communication id: {}",
                                 caseId, task.getId(), additionalPropertyKey,
                                 task.getAdditionalProperties().get(additionalPropertyKey));
                     }

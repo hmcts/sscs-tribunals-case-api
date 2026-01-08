@@ -16,13 +16,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.service.TaskManagementApiService;
 
-public class DormantEventsSubmittedHandlerTest {
+class DormantEventsSubmittedHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String CASE_ID = "1234";
     private DormantEventsSubmittedHandler handler;
@@ -68,7 +67,7 @@ public class DormantEventsSubmittedHandlerTest {
     @EnumSource(value = EventType.class, names = {"WITHDRAWN", "DORMANT", "CONFIRM_LAPSED"})
     void givenWorkAllocationEnabled_thenCancelTasks(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
         verify(taskManagementApiService, times(1)).cancelTasksByTaskProperties(CASE_ID, "ftaCommunicationId");
     }
 
@@ -77,7 +76,7 @@ public class DormantEventsSubmittedHandlerTest {
     void givenWorkAllocationDisabled_thenDoNotCallTaskManagementApiService(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
         handler = new DormantEventsSubmittedHandler(taskManagementApiService, false);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
         verify(taskManagementApiService, times(0)).cancelTasksByTaskProperties(any(), any());
     }
 }

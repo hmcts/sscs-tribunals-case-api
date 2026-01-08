@@ -79,7 +79,6 @@ public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackH
             sscsCaseData.getCommunicationFields().setTribunalRequestType(null);
         }
 
-        PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-        return callbackResponse;
+        return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 }

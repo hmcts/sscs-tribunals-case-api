@@ -25,7 +25,7 @@ import uk.gov.hmcts.reform.sscs.model.task.management.TaskSearchParameterKey;
 import uk.gov.hmcts.reform.sscs.model.task.management.TaskSearchParameterList;
 
 @ExtendWith(MockitoExtension.class)
-public class TaskManagementApiServiceTest {
+class TaskManagementApiServiceTest {
 
     private static final String SERVICE_AUTHORIZATION = "Bearer ServiceAuthorization";
     private static final String IDAM_OAUTH2_TOKEN = "Bearer Oauth2Token";

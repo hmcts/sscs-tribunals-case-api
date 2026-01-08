@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -43,17 +42,14 @@ public class StruckOutSubmittedHandler implements PreSubmitCallbackHandler<SscsC
             throw new IllegalStateException("Cannot handle callback.");
         }
 
-        final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
-        final SscsCaseData sscsCaseData = caseDetails.getCaseData();
         final String caseId = String.valueOf(callback.getCaseDetails().getId());
 
         log.info("Handling Struck Out Case Submitted callback for case id: {}", caseId);
 
         if (isWorkAllocationEnabled) {
-            log.info("Work Allocation is enabled - Struck Out Case cancelling tasks for Case ID: {}", caseId);
             taskManagementApiService.cancelTasksByTaskProperties(caseId, "ftaCommunicationId");
         }
 
-        return new PreSubmitCallbackResponse<>(sscsCaseData);
+        return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
     }
 }

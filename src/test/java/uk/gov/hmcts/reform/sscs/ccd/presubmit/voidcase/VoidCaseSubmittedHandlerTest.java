@@ -14,13 +14,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.service.TaskManagementApiService;
 
-public class VoidCaseSubmittedHandlerTest {
+class VoidCaseSubmittedHandlerTest {
 
     private static final String CASE_ID = "1234";
     private static final String USER_AUTHORISATION = "Bearer token";
@@ -65,14 +64,14 @@ public class VoidCaseSubmittedHandlerTest {
 
     @Test
     void givenWorkAllocationEnabled_thenCancelTasks() {
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
         verify(taskManagementApiService, times(1)).cancelTasksByTaskProperties(CASE_ID, "ftaCommunicationId");
     }
 
     @Test
     void givenWorkAllocationDisabled_thenDoNotCallTaskManagementApiService() {
         handler = new VoidCaseSubmittedHandler(taskManagementApiService, false);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
         verify(taskManagementApiService, times(0)).cancelTasksByTaskProperties(any(), any());
     }
 }
