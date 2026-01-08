@@ -4,7 +4,7 @@ import performAppealDormantOnCase from "../../api/client/sscs/appeal.event";
 
 let caseId: string;
 
-test.describe.serial('Work Allocation - CTSC - Review Admin action task tests', { tag: ['@work-allocation', '@preview-regression'] }, async () => {
+test.describe.serial('Work Allocation - CTSC - Review Admin action task tests', { tag: ['@work-allocation'] }, async () => {
 
     test("As a CSTC Admin without case allocator role, review admin action task", async ({ ctscReviewAdminActionSteps }) => {
         test.slow();
@@ -28,7 +28,7 @@ test.describe.serial('Work Allocation - CTSC - Review Admin action task tests', 
     });
 });
 
-test("Review Admin Action task is cancelled automatically when case is void", { tag: ['@work-allocation', '@preview-regression'] }, async ({ ctscReviewAdminActionSteps }) => {
+test("Review Admin Action task is cancelled automatically when case is void", { tag: ['@work-allocation'] }, async ({ ctscReviewAdminActionSteps }) => {
     test.slow();
     caseId = await createCaseBasedOnCaseType('PIP');
     await ctscReviewAdminActionSteps.createReviewAdminActionTask(caseId);
