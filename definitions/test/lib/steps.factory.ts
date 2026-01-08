@@ -56,6 +56,7 @@ import { AmendElements } from '../fixtures/steps/amend.elements';
 import { CtscReviewIncompleteAppeal } from '../fixtures/steps/work-allocation/ctsc.review.incomplete.appeal';
 import { CtscActionUnprocessedCorrespondence } from '../fixtures/steps/work-allocation/ctsc.action.unprocessed.correspondence';
 import { CtscReviewFtaResponse } from '../fixtures/steps/work-allocation/ctsc.review.fta.response';
+import { CtscReviewListingError } from '../fixtures/steps/work-allocation/ctsc.review.listing.error'
 import { CtscReviewAdminAction } from '../fixtures/steps/work-allocation/ctsc.review.admin.action';
 
 type MyStepsFixtures = {
@@ -116,6 +117,7 @@ type MyStepsFixtures = {
   reviewIncompleteAppealSteps: CtscReviewIncompleteAppeal;
   ctscActionUnprocessedCorrespondenceSteps: CtscActionUnprocessedCorrespondence;
   ctscReviewFtaResponseSteps: CtscReviewFtaResponse;
+  ctscReviewListingErrorSteps: CtscReviewListingError;
   ctscReviewAdminActionSteps: CtscReviewAdminAction;
 };
 
@@ -446,6 +448,10 @@ export const test = stepsFactory.extend<MyStepsFixtures>({
   ctscReviewFtaResponseSteps: async ({ page }, use) => {
     const ctscReviewFtaResponseSteps = new CtscReviewFtaResponse(page);
     await use(ctscReviewFtaResponseSteps);
+  },
+  ctscReviewListingErrorSteps: async ({ page }, use) => {
+    const ctscReviewListingErrorSteps = new CtscReviewListingError(page);
+    await use(ctscReviewListingErrorSteps);
   },
   ctscReviewAdminActionSteps: async ({ page }, use) => {
     const ctscReviewAdminActionSteps = new CtscReviewAdminAction(page);
