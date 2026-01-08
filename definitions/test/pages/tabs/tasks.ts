@@ -180,7 +180,7 @@ export class Tasks {
     let pageTitle = await this.page.locator('h1.govuk-heading-l').textContent();
     expect(pageTitle).toEqual(expectedPageTitle);
 
-    await webActions.clickLink('Cancel');
+    await webActions.clickButtonByRole('Cancel');
     await homePage.navigateToTab('Tasks');
   }
 
