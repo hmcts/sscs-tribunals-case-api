@@ -4,6 +4,7 @@ import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.UNREGISTERED;
+import static uk.gov.hmcts.reform.sscs.featureflag.FeatureFlag.SSCS_CHILD_MAINTENANCE_FT;
 
 import feign.FeignException;
 import java.time.LocalDate;
@@ -41,6 +42,7 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.exception.NonPdfBulkPrintException
 import uk.gov.hmcts.reform.sscs.evidenceshare.exception.UnableToContactThirdPartyException;
 import uk.gov.hmcts.reform.sscs.evidenceshare.model.BulkPrintInfo;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.DocumentManagementServiceWrapper;
+import uk.gov.hmcts.reform.sscs.evidenceshare.service.FeatureToggleService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.PrintService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility;
 import uk.gov.hmcts.reform.sscs.factory.DocumentRequestFactory;
@@ -57,7 +59,6 @@ import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 @Service
 public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
-    private static final String DM_STORE_USER_ID = "sscs";
     private static final String SENT_TO_FTA = "Sent to FTA";
     private final DispatchPriority dispatchPriority;
 
@@ -79,17 +80,10 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
     private final int dwpResponseDueDaysChildSupport;
 
+    private final FeatureToggleService featureToggleService;
+
     @Autowired
-    public SendToBulkPrintHandler(DocumentManagementServiceWrapper documentManagementServiceWrapper,
-                                  DocumentRequestFactory documentRequestFactory,
-                                  PdfStoreService pdfStoreService,
-                                  PrintService bulkPrintService,
-                                  EvidenceShareConfig evidenceShareConfig,
-                                  UpdateCcdCaseService updateCcdCaseService,
-                                  IdamService idamService,
-                                  @Value("${dwp.response.due.days}") int dwpResponseDueDays,
-                                  @Value("${dwp.response.due.days-child-support}") int dwpResponseDueDaysChildSupport
-    ) {
+    public SendToBulkPrintHandler(DocumentManagementServiceWrapper documentManagementServiceWrapper, DocumentRequestFactory documentRequestFactory, PdfStoreService pdfStoreService, PrintService bulkPrintService, EvidenceShareConfig evidenceShareConfig, UpdateCcdCaseService updateCcdCaseService, IdamService idamService, FeatureToggleService featureToggleService, @Value("${dwp.response.due.days}") int dwpResponseDueDays, @Value("${dwp.response.due.days-child-support}") int dwpResponseDueDaysChildSupport) {
         this.dispatchPriority = DispatchPriority.LATE;
         this.documentManagementServiceWrapper = documentManagementServiceWrapper;
         this.documentRequestFactory = documentRequestFactory;
@@ -100,6 +94,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
         this.idamService = idamService;
         this.dwpResponseDueDays = dwpResponseDueDays;
         this.dwpResponseDueDaysChildSupport = dwpResponseDueDaysChildSupport;
+        this.featureToggleService = featureToggleService;
     }
 
     @Override
@@ -107,15 +102,10 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
-        return callbackType.equals(CallbackType.SUBMITTED)
-            && ((callback.getEvent() == EventType.VALID_APPEAL_CREATED
-            || callback.getEvent() == EventType.DRAFT_TO_VALID_APPEAL_CREATED
-            || callback.getEvent() == EventType.VALID_APPEAL
-            || callback.getEvent() == EventType.INTERLOC_VALID_APPEAL
-            || callback.getEvent() == EventType.APPEAL_TO_PROCEED
-            || callback.getEvent() == EventType.SEND_TO_DWP)
-            && !callback.getCaseDetails().getCaseData().isTranslationWorkOutstanding())
-            || callback.getEvent() == EventType.RESEND_TO_DWP;
+        return callbackType.equals(
+            CallbackType.SUBMITTED) && ((callback.getEvent() == EventType.VALID_APPEAL_CREATED || callback.getEvent() == EventType.DRAFT_TO_VALID_APPEAL_CREATED || callback.getEvent() == EventType.VALID_APPEAL || callback.getEvent() == EventType.INTERLOC_VALID_APPEAL || callback.getEvent() == EventType.APPEAL_TO_PROCEED || callback.getEvent() == EventType.SEND_TO_DWP) && !callback.getCaseDetails()
+            .getCaseData()
+            .isTranslationWorkOutstanding()) || callback.getEvent() == EventType.RESEND_TO_DWP;
 
     }
 
@@ -140,13 +130,11 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
             updateCaseToFlagError(caseData, "Send to FTA Error event has been triggered from Evidence Share service");
         }
 
-        if (caseData.getBenefitType().get() == Benefit.CHILD_SUPPORT && callback.getEvent() == EventType.VALID_APPEAL) {
-            bob(caseData, bulkPrintInfo);
+        if (featureToggleService.isEnabled(SSCS_CHILD_MAINTENANCE_FT)) {
+            updateCaseToSentToDwp(callback, caseData, bulkPrintInfo);
         } else {
             updateCaseToSentToDwp(caseData, bulkPrintInfo);
         }
-
-
     }
 
     @Override
@@ -154,50 +142,20 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
         return this.dispatchPriority;
     }
 
-    private void bob(SscsCaseData caseData,
-                     BulkPrintInfo bulkPrintInfo) {
-        Long caseId = Long.valueOf(caseData.getCcdCaseId());
-        if (bulkPrintInfo != null) {
+    private void updateCaseToSentToDwp(Callback<SscsCaseData> callback, SscsCaseData caseData, BulkPrintInfo bulkPrintInfo) {
+        boolean isNotChildSupport = !isChildSupportBenefit(callback.getCaseDetails().getCaseData());
+        boolean isNotValidAppealEvent = EventType.VALID_APPEAL != callback.getEvent();
 
-
-            updateCcdCaseService.updateCaseV2(
-                caseId,
-                "requestOtherPartyData",
-                "Request Other Party Data",
-                bulkPrintInfo.getDesc(),
-                idamService.getIdamTokens(),
-                sscsCaseDetails -> {
-                });
+        if (isNotChildSupport || isNotValidAppealEvent) {
+            updateCaseToSentToDwp(caseData, bulkPrintInfo);
         }
     }
 
-    private void updateCaseToFlagError(SscsCaseData caseData, String description) {
-        Long caseId = Long.valueOf(caseData.getCcdCaseId());
-
-        updateCcdCaseService.updateCaseV2(
-            caseId,
-            EventType.SENT_TO_DWP_ERROR.getCcdType(),
-            "Send to FTA Error",
-            description,
-            idamService.getIdamTokens(),
-            sscsCaseDetails -> {
-                sscsCaseDetails.getData().setHmctsDwpState("failedSending");
-                log.info("Updated case v2 send to bulk print event -error for id {}", caseId);
-            }
-        );
-    }
-
-    private void updateCaseToSentToDwp(SscsCaseData caseData,
-                                       BulkPrintInfo bulkPrintInfo) {
+    private void updateCaseToSentToDwp(SscsCaseData caseData, BulkPrintInfo bulkPrintInfo) {
         Long caseId = Long.valueOf(caseData.getCcdCaseId());
         if (bulkPrintInfo != null) {
-            updateCcdCaseService.updateCaseV2(
-                caseId,
-                EventType.SENT_TO_DWP.getCcdType(),
-                SENT_TO_FTA,
-                bulkPrintInfo.getDesc(),
-                idamService.getIdamTokens(),
-                sscsCaseDetails -> {
+            updateCcdCaseService.updateCaseV2(caseId, EventType.SENT_TO_DWP.getCcdType(), SENT_TO_FTA,
+                bulkPrintInfo.getDesc(), idamService.getIdamTokens(), sscsCaseDetails -> {
                     SscsCaseData sscsCaseData = sscsCaseDetails.getData();
                     if (State.READY_TO_LIST.getId().equals(sscsCaseData.getCreatedInGapsFrom())) {
                         sscsCaseData.setDwpState(UNREGISTERED);
@@ -208,12 +166,26 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
                     log.info("inside bulkPrintInfo.isAllowedTypeForBulkPrint() {} ",
                         bulkPrintInfo.isAllowedTypeForBulkPrint());
                     if (bulkPrintInfo.isAllowedTypeForBulkPrint()) {
-                        log.info("Case sent to fta for case id {} with returned value {}",
-                            caseId, bulkPrintInfo.getUuid());
+                        log.info("Case sent to fta for case id {} with returned value {}", caseId,
+                            bulkPrintInfo.getUuid());
                     }
                     log.info("Updated case v2 send to bulk print event - dwp for id {}", caseId);
                 });
         }
+    }
+
+    private void updateCaseToFlagError(SscsCaseData caseData, String description) {
+        Long caseId = Long.valueOf(caseData.getCcdCaseId());
+
+        updateCcdCaseService.updateCaseV2(caseId, EventType.SENT_TO_DWP_ERROR.getCcdType(), "Send to FTA Error",
+            description, idamService.getIdamTokens(), sscsCaseDetails -> {
+                sscsCaseDetails.getData().setHmctsDwpState("failedSending");
+                log.info("Updated case v2 send to bulk print event -error for id {}", caseId);
+            });
+    }
+
+    private boolean isChildSupportBenefit(SscsCaseData caseData) {
+        return caseData.getBenefitType().map(benefit -> benefit == Benefit.CHILD_SUPPORT).orElse(false);
     }
 
     private BulkPrintInfo bulkPrintCase(Callback<SscsCaseData> sscsCaseDataCallback) {
@@ -240,8 +212,8 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
             }
             documentManagementServiceWrapper.generateDocumentAndAddToCcd(holder, caseData, idamTokens);
             List<SscsDocument> sscsDocuments = getSscsDocumentsToPrint(caseData.getSscsDocument());
-            if (CollectionUtils.isEmpty(sscsDocuments)
-                || !documentManagementServiceWrapper.checkIfDlDocumentAlreadyExists(sscsDocuments)) {
+            if (CollectionUtils.isEmpty(
+                sscsDocuments) || !documentManagementServiceWrapper.checkIfDlDocumentAlreadyExists(sscsDocuments)) {
                 throw new NoDl6DocumentException();
             }
 
@@ -259,8 +231,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
                     .build();
             } else {
                 throw new BulkPrintException(
-                    format("Failed to send to bulk print for case %s. No print id returned",
-                        caseData.getCcdCaseId()));
+                    format("Failed to send to bulk print for case %s. No print id returned", caseData.getCcdCaseId()));
             }
 
         } else {
@@ -276,9 +247,9 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
     }
 
     private int getResponseDueDays(SscsCaseData caseData) {
-        return caseData.getAppeal().getBenefitType() != null
-            && Benefit.CHILD_SUPPORT.getShortName().equalsIgnoreCase(caseData.getAppeal().getBenefitType().getCode())
-            ? dwpResponseDueDaysChildSupport : dwpResponseDueDays;
+        return caseData.getAppeal().getBenefitType() != null && Benefit.CHILD_SUPPORT.getShortName()
+            .equalsIgnoreCase(
+                caseData.getAppeal().getBenefitType().getCode()) ? dwpResponseDueDaysChildSupport : dwpResponseDueDays;
     }
 
     private String buildEventDescription(List<Pdf> pdfs, UUID bulkPrintId) {
@@ -288,19 +259,15 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
             arr.add(pdf.getName());
         }
 
-        return "Case has been sent to the FTA via Bulk Print with bulk print id: "
-            + bulkPrintId
-            + " and with documents: "
-            + String.join(", ", arr);
+        return "Case has been sent to the FTA via Bulk Print with bulk print id: " + bulkPrintId + " and with documents: " + String.join(
+            ", ", arr);
     }
 
     private boolean isAllowedReceivedTypeForBulkPrint(SscsCaseData caseData) {
-        return nonNull(caseData)
-            && nonNull(caseData.getAppeal())
-            && nonNull(caseData.getAppeal().getReceivedVia())
-            && nonNull(caseData.getCreatedInGapsFrom())
-            && !caseData.getCreatedInGapsFrom().equals(State.READY_TO_LIST.getId())
-            && evidenceShareConfig.getSubmitTypes()
+        return nonNull(caseData) && nonNull(caseData.getAppeal()) && nonNull(
+            caseData.getAppeal().getReceivedVia()) && nonNull(
+            caseData.getCreatedInGapsFrom()) && !caseData.getCreatedInGapsFrom()
+            .equals(State.READY_TO_LIST.getId()) && evidenceShareConfig.getSubmitTypes()
             .stream()
             .anyMatch(caseData.getAppeal().getReceivedVia()::equalsIgnoreCase);
     }
@@ -311,14 +278,11 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
         }
 
         Supplier<Stream<SscsDocument>> sscsDocumentStream = () -> sscsDocument.stream()
-            .filter(doc -> nonNull(doc)
-                && nonNull(doc.getValue())
-                && nonNull(doc.getValue().getDocumentFileName())
-                && nonNull(doc.getValue().getDocumentType())
-                && nonNull(doc.getValue().getDocumentLink())
-                && nonNull(doc.getValue().getDocumentLink().getDocumentUrl())
-                && StringUtils.containsIgnoreCase(doc.getValue().getDocumentFileName(), ".pdf")
-            );
+            .filter(doc -> nonNull(doc) && nonNull(doc.getValue()) && nonNull(
+                doc.getValue().getDocumentFileName()) && nonNull(doc.getValue().getDocumentType()) && nonNull(
+                doc.getValue().getDocumentLink()) && nonNull(
+                doc.getValue().getDocumentLink().getDocumentUrl()) && StringUtils.containsIgnoreCase(
+                doc.getValue().getDocumentFileName(), ".pdf"));
 
         return buildStreamOfDocuments(sscsDocumentStream);
     }
@@ -343,9 +307,9 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
             .filter(doc -> doc.getValue().getDocumentType().equals("sscs1"));
 
         Stream<SscsDocument> allOtherDocs = sscsDocumentStream.get()
-            .filter(doc -> !doc.getValue().getDocumentType().equals("dl6")
-                && !doc.getValue().getDocumentType().equals("dl16")
-                && !doc.getValue().getDocumentType().equals("sscs1"));
+            .filter(doc -> !doc.getValue().getDocumentType().equals("dl6") && !doc.getValue()
+                .getDocumentType()
+                .equals("dl16") && !doc.getValue().getDocumentType().equals("sscs1"));
 
         return Stream.concat(Stream.concat(dlDocs, appealDocs), allOtherDocs).collect(Collectors.toList());
     }

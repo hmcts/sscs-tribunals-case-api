@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.featureflag.FeatureFlag;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @Slf4j
 @Service
@@ -16,11 +18,13 @@ public class FeatureToggleService {
 
     private final LDClient ldClient;
     private final String ldUserKey;
+    private final IdamService idamService;
 
     @Autowired
-    public FeatureToggleService(LDClient ldClient, @Value("${ld.user-key}") String ldUserKey) {
+    public FeatureToggleService(LDClient ldClient, IdamService idamService, @Value("${ld.user-key}") String ldUserKey) {
         this.ldClient = ldClient;
         this.ldUserKey = ldUserKey;
+        this.idamService = idamService;
     }
 
     public boolean isEnabled(final FeatureFlag featureFlag, final String userId, final String email) {
@@ -32,6 +36,11 @@ public class FeatureToggleService {
         log.info("Retrieve boolean value for featureFlag: {} for userId: {}", featureFlag, userId);
         return ldClient.boolVariation(featureFlag.getKey(), createLaunchDarklyContext(userId, email), false);
 
+    }
+
+    public boolean isEnabled(final FeatureFlag featureFlag) {
+        final IdamTokens idamTokens = idamService.getIdamTokens();
+        return isEnabled(featureFlag, idamTokens.getUserId(), idamTokens.getEmail());
     }
 
     public boolean isSendGridEnabled() {

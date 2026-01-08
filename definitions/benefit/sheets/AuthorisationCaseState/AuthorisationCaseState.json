@@ -138,5 +138,6 @@
   {"LiveFrom": "25/06/2019", "CaseTypeID": "Benefit", "CaseStateID": "closed", "AccessProfile": "caseworker-wa-task-configuration", "CRUD": "CRU"},
   {"LiveFrom": "10/06/2022", "CaseTypeID": "Benefit", "CaseStateID": "handlingError", "AccessProfile": "caseworker-wa-task-configuration", "CRUD": "CRU"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseStateID": "listingError", "AccessProfile": "caseworker-wa-task-configuration", "CRUD": "CRU"},
-  {"LiveFrom": "25/06/2019", "CaseTypeID": "Benefit", "CaseStateID": "postHearing", "AccessProfile": "caseworker-wa-task-configuration", "CRUD": "CRU"}
+  {"LiveFrom": "25/06/2019", "CaseTypeID": "Benefit", "CaseStateID": "postHearing", "AccessProfile": "caseworker-wa-task-configuration", "CRUD": "CRU"},
+  {"LiveFrom": "08/01/2026", "CaseTypeID": "Benefit", "CaseStateID": "awaitOtherPartyData", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"}
 ]
