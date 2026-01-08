@@ -16,10 +16,9 @@ export class ReadyToList extends BaseStep {
     loginRequired: boolean = true
   ): Promise<void> {
     if (loginRequired) {
-      await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+      await this.loginUserWithCaseId(credentials.amCtscAdminNwLiverpool, false, caseId);
     }
     await this.homePage.chooseEvent('Ready to list');
-
     await this.completeReadyToListEvent();
   }
 
