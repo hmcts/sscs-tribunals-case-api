@@ -57,7 +57,7 @@ public final class WithIdamUsersExtension implements BeforeAllCallback, Paramete
 
     @Override
     public boolean supportsParameter(ParameterContext pc, ExtensionContext ec) {
-        if (!pc.isAnnotated(IdamUser.class) && !pc.isAnnotated(IdamTokensParam.class)) {
+        if (!pc.isAnnotated(IdamUser.class)) {
             return false;
         }
 
@@ -75,16 +75,9 @@ public final class WithIdamUsersExtension implements BeforeAllCallback, Paramete
         String email = "";
         if (pc.isAnnotated(IdamUser.class)) {
             email = pc.findAnnotation(IdamUser.class).orElseThrow().email();
-        } else if (pc.isAnnotated(IdamTokensParam.class)) {
-            email = pc.findAnnotation(IdamTokensParam.class).orElseThrow().email();
         }
 
-        User u = selectUser(users, email);
-
-        if (pc.isAnnotated(IdamTokensParam.class)) {
-            return requireNonNull(u.tokens(), "Provisioned user has no tokens: " + u.email());
-        }
-        return u;
+        return selectUser(users, email);
     }
 
     private static User selectUser(Map<String, User> users, String email) {
