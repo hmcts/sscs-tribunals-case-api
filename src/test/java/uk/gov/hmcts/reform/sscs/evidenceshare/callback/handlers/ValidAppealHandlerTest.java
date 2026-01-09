@@ -12,15 +12,12 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL;
 
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -49,8 +46,6 @@ class ValidAppealHandlerTest {
     private IdamService idamService;
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
-    @Captor
-    private ArgumentCaptor<Consumer<SscsCaseData>> consumerCaptor;
 
     @InjectMocks
     private ValidAppealHandler handler;
@@ -85,9 +80,7 @@ class ValidAppealHandlerTest {
     void handle_shouldTriggerRequestOtherPartyDataEvent_forSupportedScenario() {
         var caseData = SscsCaseData.builder()
             .ccdCaseId(String.valueOf(CCD_CASE_ID))
-            .appeal(Appeal.builder()
-                .benefitType(BenefitType.builder().code(CHILD_SUPPORT).build())
-                .build())
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(CHILD_SUPPORT).build()).build())
             .build();
 
         var tokens = IdamTokens.builder().userId("user-id").email("test@example.com").build();
@@ -99,14 +92,8 @@ class ValidAppealHandlerTest {
 
         handler.handle(SUBMITTED, callback);
 
-        verify(updateCcdCaseService).updateCaseV2(
-            eq(CCD_CASE_ID),
-            eq("requestOtherPartyData"),
-            eq("REQUEST_OTHER_PARTY_DATA"),
-            eq("Requesting other party data"),
-            eq(tokens),
-            any()
-        );
+        verify(updateCcdCaseService).updateCaseV2(eq(CCD_CASE_ID), eq("requestOtherPartyData"),
+            eq("REQUEST_OTHER_PARTY_DATA"), eq("Requesting other party data"), eq(tokens), any());
     }
 
     @ParameterizedTest(name = "unsupported: benefit={0}, event={1}, callbackType={2} => does not update CCD")
@@ -124,18 +111,14 @@ class ValidAppealHandlerTest {
     }
 
     private static Stream<Arguments> unsupportedScenarios() {
-        return Stream.of(
-            Arguments.of("PIP", VALID_APPEAL, SUBMITTED),
+        return Stream.of(Arguments.of("PIP", VALID_APPEAL, SUBMITTED),
             Arguments.of(CHILD_SUPPORT, APPEAL_RECEIVED, SUBMITTED),
-            Arguments.of(CHILD_SUPPORT, VALID_APPEAL, MID_EVENT)
-        );
+            Arguments.of(CHILD_SUPPORT, VALID_APPEAL, MID_EVENT));
     }
 
     private static SscsCaseData caseDataWithBenefit(String benefitCode) {
         return SscsCaseData.builder()
-            .appeal(Appeal.builder()
-                .benefitType(BenefitType.builder().code(benefitCode).build())
-                .build())
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefitCode).build()).build())
             .build();
     }
 }
