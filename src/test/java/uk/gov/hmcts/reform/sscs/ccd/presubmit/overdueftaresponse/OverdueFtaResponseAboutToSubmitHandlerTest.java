@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
@@ -11,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getCommunicationRequestFromId;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,6 +30,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.service.BusinessDaysCalculatorService;
 
 class OverdueFtaResponseAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
@@ -44,6 +47,9 @@ class OverdueFtaResponseAboutToSubmitHandlerTest {
 
     @Mock
     private IdamService idamService;
+
+    @Mock
+    private BusinessDaysCalculatorService businessDaysCalculatorService;
 
     private final CommunicationRequest overdueCommunicationsRequest = CommunicationRequest.builder()
             .id("overDueRequestId")
@@ -98,7 +104,7 @@ class OverdueFtaResponseAboutToSubmitHandlerTest {
     @BeforeEach
     void setUp() {
         openMocks(this);
-        handler = new OverdueFtaResponseAboutToSubmitHandler();
+        handler = new OverdueFtaResponseAboutToSubmitHandler(businessDaysCalculatorService);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").build();
         when(callback.getEvent()).thenReturn(EventType.OVERDUE_FTA_RESPONSE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -129,10 +135,13 @@ class OverdueFtaResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenAnUnrespondedToOverdueRequest_thenSetTaskCreatedFlag() {
+    void givenAnUnrespondedToOverdueRequest_thenSetTaskCreatedFlag() throws IOException {
         sscsCaseData.setCommunicationFields(FtaCommunicationFields.builder()
                 .ftaCommunications(List.of(overdueCommunicationsRequest))
                 .build());
+
+        given(businessDaysCalculatorService.getBusinessDayInPast(LocalDate.now(), 2))
+                .willReturn(LocalDate.now().minusDays(2));
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 

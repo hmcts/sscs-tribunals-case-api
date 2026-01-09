@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.overdueftaresponse;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getCommunicationRequestFromId;
 import static uk.gov.hmcts.reform.sscs.util.CommunicationRequestUtil.getRequestsWithoutReplies;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -20,12 +22,16 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.BusinessDaysCalculatorService;
 
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class OverdueFtaResponseAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private final BusinessDaysCalculatorService businessDaysCalculatorService;
+
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
@@ -51,8 +57,8 @@ public class OverdueFtaResponseAboutToSubmitHandler implements PreSubmitCallback
         List<CommunicationRequest> communicationRequestList = communicationFields.getFtaCommunications();
 
         CommunicationRequest overdueCommunicationRequest =  getRequestsWithoutReplies(communicationRequestList).stream()
-                .filter(request -> request.getValue().getTaskCreatedForRequest() != YesNo.YES
-                        && isDateInPast(request)).findFirst().orElse(null);
+                     .filter(request -> request.getValue().getTaskCreatedForRequest() != YesNo.YES
+                            && isDateOverdue(request)).findFirst().orElse(null);
 
         if (overdueCommunicationRequest != null) {
             sscsCaseData.getCommunicationFields().setWaTaskFtaCommunicationId(overdueCommunicationRequest.getId());
@@ -61,9 +67,16 @@ public class OverdueFtaResponseAboutToSubmitHandler implements PreSubmitCallback
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    public boolean isDateInPast(CommunicationRequest communicationRequest) {
-        return communicationRequest.getValue().getRequestDateTime() != null
-                && communicationRequest.getValue().getRequestDateTime().toLocalDate().isEqual(LocalDate.now().minusDays(2));
+    public boolean isDateOverdue(CommunicationRequest communicationRequest) {
+        try {
+            LocalDate overdueDate = businessDaysCalculatorService
+                    .getBusinessDayInPast(LocalDate.now(), 2);
+            return nonNull(communicationRequest.getValue().getRequestDateTime())
+                    && nonNull(overdueDate)
+                    && communicationRequest.getValue().getRequestDateTime().toLocalDate().isEqual(overdueDate);
+        } catch (IOException e) {
+            return communicationRequest.getValue().getRequestDateTime() != null
+                    && communicationRequest.getValue().getRequestDateTime().toLocalDate().isEqual(LocalDate.now().minusDays(2));
+        }
     }
-
 }
