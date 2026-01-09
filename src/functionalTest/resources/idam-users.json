@@ -1,0 +1,36 @@
+{
+  "profiles": {
+    "default": {
+      "forename": "Service",
+      "surname": "Account",
+      "roles": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-superuser",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-systemupdate",
+        "caseworker-sscs-judge",
+        "caseworker-sscs-dwpresponsewriter",
+        "caseworker-sscs-registrar",
+        "caseworker-caa"
+      ]
+    }
+  },
+  "overridesByEmail": {
+    "system.update.stuart.16@hmcts.net": {
+      "forename": "Service",
+      "surname": "Account",
+      "roles": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-superuser",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-systemupdate",
+        "caseworker-sscs-judge",
+        "caseworker-sscs-dwpresponsewriter",
+        "caseworker-sscs-registrar",
+        "caseworker-caa"
+      ]
+    }
+  }
+}

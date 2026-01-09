@@ -42,10 +42,6 @@ public class LocalIdamService {
         this.authTokenGenerator = authTokenGenerator;
     }
 
-    public User getUser(String email) {
-        return USERS.computeIfAbsent(email, this::fetchAndCacheUser);
-    }
-
     public User withUser(User requested) {
         try {
             User existing = getUser(requested.email());
@@ -101,6 +97,10 @@ public class LocalIdamService {
             .password(DEFAULT_PASSWORD)
             .roles(user.roles())
             .build();
+    }
+
+    private User getUser(String email) {
+        return USERS.computeIfAbsent(email, this::fetchAndCacheUser);
     }
 
     private User fetchAndCacheUser(String email) {

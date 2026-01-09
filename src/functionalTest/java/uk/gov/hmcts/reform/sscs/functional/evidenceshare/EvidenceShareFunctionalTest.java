@@ -1,21 +1,28 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_TEST_CASE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 
 import java.time.LocalDate;
 import java.util.List;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.functional.utilities.idam.annotations.IdamUser;
+import uk.gov.hmcts.reform.sscs.functional.utilities.idam.annotations.WithIdamUsers;
 import uk.gov.hmcts.reform.sscs.functional.utilities.idam.model.User;
 
+@WithIdamUsers(
+    emails = {"system.update.cm.toggle-on@hmcts.net", "system.update.cm.toggle-off@hmcts.net"}
+)
 class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
 
     public EvidenceShareFunctionalTest() {
@@ -29,26 +36,7 @@ class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
 
     // Toggle off scenario
     @Test
-    void processANonDigitalAppealWithValidMrn_shouldGenerateADl6AndAddToCcdAndUpdateState() throws Exception {
-
-        User user = getAccess().withUser(User.builder()
-            .email("system.update.stuart.16@hmcts.net")
-            .forename("Service")
-            .surname("Account")
-            .roles(List.of(
-                "caseworker",
-                "caseworker-sscs",
-                "caseworker-sscs-superuser",
-                "caseworker-sscs-clerk",
-                "caseworker-sscs-systemupdate",
-                "caseworker-sscs-judge",
-                "caseworker-sscs-dwpresponsewriter",
-                "caseworker-sscs-registrar",
-                "caseworker-caa"))
-            .build());
-
-
-        // Use the use in the following method
+    void processANonDigitalAppealWithValidMrn_shouldGenerateADl6AndAddToCcdAndUpdateStateToggleOn(@IdamUser(email = "system.update.cm.toggle-on@hmcts.net") User user) throws Exception {
 
         createNonDigitalCaseWithEvent(CREATE_TEST_CASE, Benefit.CHILD_SUPPORT, State.VALID_APPEAL, user.tokens());
 //        createNonDigitalCaseWithEvent(CREATE_TEST_CASE);
@@ -75,6 +63,51 @@ class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
             //since the SUBMITTED callback no longer contains the updated caseData, the dateCaseSentToGaps will not be present
             //better to test that in the UTs
         });
+    }
+
+    @Test
+    void processANonDigitalAppealWithValidMrn_shouldGenerateADl6AndAddToCcdAndUpdateStateToggleOff(@IdamUser(email = "system.update.cm.toggle-off@hmcts.net") User user) throws Exception {
+
+        createNonDigitalCaseWithEvent(CREATE_TEST_CASE, Benefit.CHILD_SUPPORT, State.VALID_APPEAL, user.tokens());
+//        createNonDigitalCaseWithEvent(CREATE_TEST_CASE);
+
+        String json = getJson(VALID_APPEAL_CREATED.getCcdType());
+        json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
+        json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().toString());
+        json = json.replace("CREATED_IN_GAPS_FROM", State.VALID_APPEAL.getId());
+        json = json.replaceAll("NINO_TO_BE_REPLACED", getRandomNino());
+
+        simulateCcdCallback(json, user.tokens().getServiceAuthorization());
+
+        defaultAwait().untilAsserted(() -> {
+            SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+
+            SscsCaseData caseData = caseDetails.getData();
+
+            List<SscsDocument> docs = caseData.getSscsDocument();
+            assertNotNull(docs);
+            assertEquals(1, docs.size());
+            assertEquals("dl6-" + ccdCaseId + ".pdf", docs.getFirst().getValue().getDocumentFileName());
+            assertEquals("withDwp", caseDetails.getState());
+            assertEquals(LocalDate.now().toString(), caseData.getDateSentToDwp());
+            //since the SUBMITTED callback no longer contains the updated caseData, the dateCaseSentToGaps will not be present
+            //better to test that in the UTs
+        });
+    }
+
+    @ParameterizedTest(name = "firstName={0}, surname={1}")
+    @MethodSource("provideUserArguments")
+    void processANonDigitalAppealWithValidMrn_shouldGenerateADl6AndAddToCcdAndUpdateStateToggleParamMethod(String firstName, String surname, @IdamUser(email = "system.update.cm.toggle-off@hmcts.net") User user) throws Exception {
+
+        createNonDigitalCaseWithEvent(CREATE_TEST_CASE, Benefit.CHILD_SUPPORT, State.VALID_APPEAL, user.tokens());
+    }
+
+    private static java.util.stream.Stream<org.junit.jupiter.params.provider.Arguments> provideUserArguments() {
+        return java.util.stream.Stream.of(
+            org.junit.jupiter.params.provider.Arguments.of("John", "Smith"),
+            org.junit.jupiter.params.provider.Arguments.of("Jane", "Doe"),
+            org.junit.jupiter.params.provider.Arguments.of("Bob", "Johnson")
+        );
     }
 
 }
