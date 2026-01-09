@@ -28,10 +28,8 @@ public class FeatureToggleService {
     }
 
     public boolean isEnabled(final FeatureFlag featureFlag, final String userId, final String email) {
-        ofNullable(featureFlag)
-            .orElseThrow(() -> new IllegalArgumentException("featureFlag must not be null"));
-        ofNullable(userId)
-            .orElseThrow(() -> new IllegalArgumentException("userId must not be null"));
+        ofNullable(featureFlag).orElseThrow(() -> new IllegalArgumentException("featureFlag must not be null"));
+        ofNullable(userId).orElseThrow(() -> new IllegalArgumentException("userId must not be null"));
 
         log.info("Retrieve boolean value for featureFlag: {} for userId: {}", featureFlag, userId);
         return ldClient.boolVariation(featureFlag.getKey(), createLaunchDarklyContext(userId, email), false);
@@ -41,6 +39,10 @@ public class FeatureToggleService {
     public boolean isEnabled(final FeatureFlag featureFlag) {
         final IdamTokens idamTokens = idamService.getIdamTokens();
         return isEnabled(featureFlag, idamTokens.getUserId(), idamTokens.getEmail());
+    }
+
+    public boolean isNotEnabled(final FeatureFlag featureFlag) {
+        return !isEnabled(featureFlag);
     }
 
     public boolean isSendGridEnabled() {
@@ -57,8 +59,7 @@ public class FeatureToggleService {
     }
 
     private LDContext createLdContext() {
-        var contextBuilder = LDContext.builder(ldUserKey)
-            .set("timestamp", String.valueOf(System.currentTimeMillis()));
+        var contextBuilder = LDContext.builder(ldUserKey).set("timestamp", String.valueOf(System.currentTimeMillis()));
 
         return contextBuilder.build();
     }
