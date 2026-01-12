@@ -31,7 +31,8 @@ public class CcdCallbackOrchestratorController {
     public ResponseEntity<String> send(@RequestBody String body) {
 
         Callback<SscsCaseData> callback = mapper.deserialize(body);
-        log.info("Sending message for event: {} for case id: {}", callback.getEvent(), callback.getCaseDetails().getId());
+        log.info("Sending message for event: {} for case id: {}", callback.getEvent(),
+            callback.getCaseDetails().getId());
         sendCallbackHandler.handle(callback);
         return new ResponseEntity<>("{}", HttpStatus.OK);
     }

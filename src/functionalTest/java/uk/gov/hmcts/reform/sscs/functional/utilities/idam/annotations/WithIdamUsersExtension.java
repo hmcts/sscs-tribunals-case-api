@@ -30,7 +30,6 @@ public final class WithIdamUsersExtension implements BeforeAllCallback, Paramete
         WithIdamUsers ann = context.getRequiredTestClass().getAnnotation(WithIdamUsers.class);
         if (ann == null) return;
 
-        // Requires Spring test context to be active for this test class
         ApplicationContext spring = SpringExtension.getApplicationContext(context);
         LocalIdamService localIdamService = spring.getBean(LocalIdamService.class);
 
@@ -47,7 +46,6 @@ public final class WithIdamUsersExtension implements BeforeAllCallback, Paramete
                 .roles(List.copyOf(p.roles()))
                 .build();
 
-            // This is the Spring-created/provisioned user with tokens populated
             User createdOrExisting = localIdamService.withUser(requested);
             provisioned.put(email, createdOrExisting);
         }

@@ -46,6 +46,22 @@ public class CftlibConfig implements CFTLibConfigurer {
                 "caseworker-sscs-registrar",
                 "caseworker-caa"));
 
+        // Example of creating a test user on server start-up. Easiest solution if we don't need to create on the fly.
+        createIdamUser(
+            "example.three@hmcts.net",
+            "Service",
+            "Account",
+            List.of(
+                "caseworker",
+                "caseworker-sscs",
+                "caseworker-sscs-superuser",
+                "caseworker-sscs-clerk",
+                "caseworker-sscs-systemupdate",
+                "caseworker-sscs-judge",
+                "caseworker-sscs-dwpresponsewriter",
+                "caseworker-sscs-registrar",
+                "caseworker-caa"));
+
         lib.createIdamUser("local.test@example.com", "caseworker", "caseworker-sscs");
         lib.createIdamUser(
             "super-user@example.com",

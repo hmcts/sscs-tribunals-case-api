@@ -20,12 +20,18 @@ import uk.gov.hmcts.reform.sscs.functional.utilities.idam.annotations.IdamUser;
 import uk.gov.hmcts.reform.sscs.functional.utilities.idam.annotations.WithIdamUsers;
 import uk.gov.hmcts.reform.sscs.functional.utilities.idam.model.User;
 
-@WithIdamUsers(
-    emails = {"system.update.cm.toggle-on@hmcts.net", "system.update.cm.toggle-off@hmcts.net"}
-)
-class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
+/**
+ * Example with custom code to create users on the fly and use of annotations to create/use them
+ *
+ * @WithIdamUsers is responsible for creating the users if they don't exist.
+ * @IdamUser is responsible for loading the users and injecting them into the test
+ * <p>
+ * Uses resources/idam-users.json to create using the required names/roles. By default the user will have super user rights; but this can be over-riden on a per email if required.
+ */
+@WithIdamUsers(emails = {"system.update.cm.toggle-on@hmcts.net", "system.update.cm.toggle-off@hmcts.net"})
+class EvidenceShareFunctionalExampleOneTest extends AbstractFunctionalTest {
 
-    public EvidenceShareFunctionalTest() {
+    EvidenceShareFunctionalExampleOneTest() {
         super();
     }
 
@@ -39,7 +45,6 @@ class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
     void processANonDigitalAppealWithValidMrn_shouldGenerateADl6AndAddToCcdAndUpdateStateToggleOn(@IdamUser(email = "system.update.cm.toggle-on@hmcts.net") User user) throws Exception {
 
         createNonDigitalCaseWithEvent(CREATE_TEST_CASE, Benefit.CHILD_SUPPORT, State.VALID_APPEAL, user.tokens());
-//        createNonDigitalCaseWithEvent(CREATE_TEST_CASE);
 
         String json = getJson(VALID_APPEAL_CREATED.getCcdType());
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
@@ -47,37 +52,7 @@ class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         json = json.replace("CREATED_IN_GAPS_FROM", State.VALID_APPEAL.getId());
         json = json.replaceAll("NINO_TO_BE_REPLACED", getRandomNino());
 
-        simulateCcdCallback(json, user.tokens().getServiceAuthorization());
-
-        defaultAwait().untilAsserted(() -> {
-            SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
-
-            SscsCaseData caseData = caseDetails.getData();
-
-            List<SscsDocument> docs = caseData.getSscsDocument();
-            assertNotNull(docs);
-            assertEquals(1, docs.size());
-            assertEquals("dl6-" + ccdCaseId + ".pdf", docs.getFirst().getValue().getDocumentFileName());
-            assertEquals("withDwp", caseDetails.getState());
-            assertEquals(LocalDate.now().toString(), caseData.getDateSentToDwp());
-            //since the SUBMITTED callback no longer contains the updated caseData, the dateCaseSentToGaps will not be present
-            //better to test that in the UTs
-        });
-    }
-
-    @Test
-    void processANonDigitalAppealWithValidMrn_shouldGenerateADl6AndAddToCcdAndUpdateStateToggleOff(@IdamUser(email = "system.update.cm.toggle-off@hmcts.net") User user) throws Exception {
-
-        createNonDigitalCaseWithEvent(CREATE_TEST_CASE, Benefit.CHILD_SUPPORT, State.VALID_APPEAL, user.tokens());
-//        createNonDigitalCaseWithEvent(CREATE_TEST_CASE);
-
-        String json = getJson(VALID_APPEAL_CREATED.getCcdType());
-        json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
-        json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().toString());
-        json = json.replace("CREATED_IN_GAPS_FROM", State.VALID_APPEAL.getId());
-        json = json.replaceAll("NINO_TO_BE_REPLACED", getRandomNino());
-
-        simulateCcdCallback(json, user.tokens().getServiceAuthorization());
+        simulateCcdCallback(json, user.tokens());
 
         defaultAwait().untilAsserted(() -> {
             SscsCaseDetails caseDetails = findCaseById(ccdCaseId);

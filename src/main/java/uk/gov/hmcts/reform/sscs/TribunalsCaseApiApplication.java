@@ -12,6 +12,7 @@ import jakarta.validation.ValidatorFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import okhttp3.OkHttpClient;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
@@ -47,6 +48,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
@@ -64,7 +66,11 @@ import uk.gov.hmcts.reform.sscs.jobscheduler.services.quartz.JobMapping;
 import uk.gov.hmcts.reform.sscs.service.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.RetryNotificationService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.scheduler.*;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.scheduler.CcdActionDeserializer;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.scheduler.CcdActionExecutor;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.scheduler.CcdActionSerializer;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.scheduler.CohActionSerializer;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.scheduler.CohJobPayload;
 import uk.gov.service.notify.NotificationClient;
 
 @SpringBootApplication
@@ -99,6 +105,10 @@ public class TribunalsCaseApiApplication implements CommandLineRunner {
 
     @Autowired
     private ScheduledTaskRunner taskRunner;
+    @Value("${gov.uk.notification.api.key}")
+    private String apiKey;
+    @Value("${gov.uk.notification.api.testKey}")
+    private String testApiKey;
 
     public static void main(String[] args) {
         final var instance = SpringApplication.run(TribunalsCaseApiApplication.class, args);
@@ -187,13 +197,6 @@ public class TribunalsCaseApiApplication implements CommandLineRunner {
         return new DocmosisPdfGenerationService(docmosisServiceEndpoint, docmosisServiceAccessKey, restTemplate);
     }
 
-
-    @Value("${gov.uk.notification.api.key}")
-    private String apiKey;
-
-    @Value("${gov.uk.notification.api.testKey}")
-    private String testApiKey;
-
     //    @Bean
     //    public ServletListenerRegistrationBean<ServletContextListener> appInsightsServletContextListenerRegistrationBean(
     //        ApplicationInsightsServletContextListener applicationInsightsServletContextListener) {
@@ -206,6 +209,7 @@ public class TribunalsCaseApiApplication implements CommandLineRunner {
     //    @Bean
     //    @ConditionalOnMissingBean
     //    public ApplicationInsightsServletContextListener applicationInsightsServletContextListener() {
+
     //        return new ApplicationInsightsServletContextListener();
     //    }
 
@@ -276,6 +280,25 @@ public class TribunalsCaseApiApplication implements CommandLineRunner {
             new JobClassMapping<>(CohJobPayload.class, cohActionSerializer),
             new JobClassMapping<>(String.class, ccdActionSerializer)
         ));
+    }
+
+    @Bean(name = "applicationTaskExecutor")
+    public Executor taskExecutor() {
+
+        // Creates a new async task executor implementation and decorates the task with a new object that holds the
+        // auth details in ThreadLocal. I think this is dodgy because we are treating Async code as Request Servlet scoped, which it isn't
+        // and I'm not sure what other contexts it is called in (either now or in the future).
+
+        // Also considerable regression risk as this would seem quite core...
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(10);
+        executor.setMaxPoolSize(50);
+        executor.setQueueCapacity(500);
+        executor.setThreadNamePrefix("async-");
+        executor.setTaskDecorator(new ContextCopyingTaskDecorator());
+        executor.initialize();
+
+        return executor;
     }
 
 

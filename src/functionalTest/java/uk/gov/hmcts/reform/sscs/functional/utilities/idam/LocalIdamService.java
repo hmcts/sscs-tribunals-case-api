@@ -65,9 +65,7 @@ public class LocalIdamService {
         TokenResponse accessToken = getAccessTokenResponse(requested.email(), DEFAULT_PASSWORD);
 
         User createdUser = requested.withId(created.uuid());
-        IdamTokens tokens = buildIdamTokens(createdUser, accessToken);
-
-        User cached = createdUser.withTokens(tokens);
+        User cached = createdUser.withTokens(buildIdamTokens(createdUser, accessToken));
         USERS.put(requested.email(), cached);
 
         return cached;
@@ -75,6 +73,7 @@ public class LocalIdamService {
 
     @Retryable
     public String generateServiceAuthorization() {
+        log.info("Generating service authorization token.");
         return authTokenGenerator.generate();
     }
 
@@ -99,7 +98,7 @@ public class LocalIdamService {
             .build();
     }
 
-    private User getUser(String email) {
+    public User getUser(String email) {
         return USERS.computeIfAbsent(email, this::fetchAndCacheUser);
     }
 
@@ -123,6 +122,7 @@ public class LocalIdamService {
     }
 
     private TokenResponse getAccessTokenResponse(String username, String password) {
+        log.info("Getting access token for user {}.", username);
         return idamApi.generateOpenIdToken(
             new TokenRequest(
                 oauth2Configuration.getClientId(),

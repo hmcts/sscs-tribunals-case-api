@@ -114,6 +114,8 @@ public abstract class AbstractFunctionalTest {
 
     SscsCaseDetails createCaseWithState(EventType eventType, String benefitType, String benefitDescription, String createdInGapsFrom, IdamTokens tokens) {
 
+        // Need to pass idam tokens down from test. The method above gets them internally but this returns the cached user token
+
         SscsCaseData minimalCaseData = CaseDataUtils.buildMinimalCaseData();
 
         SscsCaseData caseData = minimalCaseData.toBuilder()
@@ -167,7 +169,7 @@ public abstract class AbstractFunctionalTest {
         RestAssured.useRelaxedHTTPSValidation();
         RestAssured
             .given()
-            .header("ServiceAuthorization", idamTokens.getServiceAuthorization())
+            .header("ServiceAuthorization", "" + idamTokens.getServiceAuthorization())
             .contentType("application/json")
             .body(json)
             .when()
@@ -176,7 +178,9 @@ public abstract class AbstractFunctionalTest {
             .statusCode(HttpStatus.OK.value());
     }
 
-    public void simulateCcdCallback(String json, String authorisation) {
+    public void simulateCcdCallback(String json, IdamTokens idamTokens) {
+
+        // Again, need to pass in the correct autorization tokens so that they are fed to the Test Controller
 
         baseURI = StringUtils.isNotBlank(tcaInstance) ? tcaInstance : localInstance;
 
@@ -185,7 +189,8 @@ public abstract class AbstractFunctionalTest {
         RestAssured.useRelaxedHTTPSValidation();
         RestAssured
             .given()
-            .header("ServiceAuthorization", authorisation)
+            .header("ServiceAuthorization", "" + idamTokens.getServiceAuthorization())
+            .header("Authorization", idamTokens.getIdamOauth2Token())
             .contentType("application/json")
             .body(json)
             .when()

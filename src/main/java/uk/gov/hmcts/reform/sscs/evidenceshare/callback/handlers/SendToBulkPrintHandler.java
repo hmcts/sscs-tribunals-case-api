@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import uk.gov.hmcts.reform.sscs.RequestSnapshotHolder;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -38,6 +39,7 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUt
 import uk.gov.hmcts.reform.sscs.factory.DocumentRequestFactory;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 
 /*
@@ -119,6 +121,10 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         BulkPrintInfo bulkPrintInfo = null;
+
+        // TODO SW This is the interesting bit and seems to work ok re. getting the logged in user (not the system user). Not cached so prob needs work...
+        UserDetails userDetails = idamService.getUserDetails(RequestSnapshotHolder.get().authorization());
+
 
         try {
             bulkPrintInfo = bulkPrintCase(callback);

@@ -36,7 +36,7 @@ public class SendCallbackHandler {
         this.notificationsMessageProcessor = notificationsMessageProcessor;
     }
 
-    @Async
+    @Async("applicationTaskExecutor")
     public void handle(Callback<SscsCaseData> callback) {
         log.info("Received message for case ID: {}, event: {}", callback.getCaseDetails().getId(), callback.getEvent());
         processEvidenceShareMessageWithRetry(callback, 1);
