@@ -1,2 +1,13 @@
 [
+  {
+    "LiveFrom": "07/01/2026",
+    "CaseTypeID": "Benefit",
+    "ID": "requestOtherPartyData",
+    "Name": "Request Other Party Data",
+    "PreConditionState(s)": "validAppeal",
+    "PostConditionState": "awaitOtherPartyData",
+    "SecurityClassification": "Public",
+    "EventEnablingCondition": "appeal.benefitType.code=\"childSupport\"",
+    "Publish": "N"
+  }
 ]

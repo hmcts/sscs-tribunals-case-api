@@ -125,10 +125,6 @@ abstract class AbstractFunctionalTest {
         return createCaseWithState(eventType, benefit.getShortName(), benefit.getDescription(), null);
     }
 
-    SscsCaseDetails createCaseFromEvent(Benefit benefit, EventType eventType, State state) {
-        return createCaseWithState(eventType, benefit.getShortName(), benefit.getDescription(), null);
-    }
-
     SscsCaseDetails createCaseWithState(EventType eventType, String benefitType, String benefitDescription,
                                         String createdInGapsFrom) {
         idamTokens = idamService.getIdamTokens();

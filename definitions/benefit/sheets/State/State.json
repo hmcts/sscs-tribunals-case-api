@@ -17,6 +17,5 @@
   {"LiveFrom": "19/03/2019", "CaseTypeID": "Benefit", "ID": "withDwp", "Name": "With FTA", "Description": "Cases with FTA", "DisplayOrder": 16, "TitleDisplay": "# ${[CASE_REFERENCE]}: ${appeal.appellant.name.lastName}"},
   {"LiveFrom": "10/06/2022", "CaseTypeID": "Benefit", "ID": "handlingError", "Name": "Handling Error", "Description": "Issue with List assist Hearing", "DisplayOrder": 17, "TitleDisplay": "# ${[CASE_REFERENCE]}: ${appeal.appellant.name.lastName}"},
   {"LiveFrom": "10/06/2022", "CaseTypeID": "Benefit", "ID": "postHearing", "Name": "Post Hearing", "Description": "Issue with List assist Hearing", "DisplayOrder": 18, "TitleDisplay": "# ${[CASE_REFERENCE]}: ${appeal.appellant.name.lastName}"},
-  {"LiveFrom": "07/07/2023", "CaseTypeID": "Benefit", "ID": "withUT", "Name": "With Upper Tribunal", "Description": "Cases with Upper Tribunal decision", "DisplayOrder": 19, "TitleDisplay": "# ${[CASE_REFERENCE]}: ${appeal.appellant.name.lastName}"},
-  {"LiveFrom": "07/01/2026", "CaseTypeID": "Benefit", "ID": "awaitOtherPartyData", "Name": "Await Other Party Data", "Description": "Await Other Party Data", "DisplayOrder": 20, "TitleDisplay": "# ${[CASE_REFERENCE]}: ${appeal.appellant.name.lastName}"}
+  {"LiveFrom": "07/07/2023", "CaseTypeID": "Benefit", "ID": "withUT", "Name": "With Upper Tribunal", "Description": "Cases with Upper Tribunal decision", "DisplayOrder": 19, "TitleDisplay": "# ${[CASE_REFERENCE]}: ${appeal.appellant.name.lastName}"}
 ]
