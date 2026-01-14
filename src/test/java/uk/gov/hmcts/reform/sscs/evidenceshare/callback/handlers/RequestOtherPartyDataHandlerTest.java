@@ -57,7 +57,7 @@ class RequestOtherPartyDataHandlerTest {
 
     @Test
     void canHandle_shouldReturnTrue_forSubmittedValidAppealChildSupport() {
-        when(featureToggleService.isNotEnabled(SSCS_CHILD_MAINTENANCE_FT)).thenReturn(false);
+        toggleOn();
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getEvent()).thenReturn(VALID_APPEAL_CREATED);
         when(caseDetails.getCaseData()).thenReturn(caseDataWithBenefit(CHILD_SUPPORT));
@@ -67,13 +67,18 @@ class RequestOtherPartyDataHandlerTest {
 
     @ParameterizedTest(name = "benefit={0}, event={1}, callbackType={2} => cannot handle")
     @MethodSource("unsupportedScenarios")
-    void canHandle_shouldReturnFalse_forUnsupportedScenarios(String benefitCode, EventType eventType, CallbackType callbackType) {
-        when(featureToggleService.isNotEnabled(SSCS_CHILD_MAINTENANCE_FT)).thenReturn(false);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
+    void canHandle_shouldReturnFalse_forUnsupportedScenarios(String benefitCode, EventType eventType,
+                                                             CallbackType callbackType) {
+        toggleOn();
+
         if (callbackType == SUBMITTED) {
             when(callback.getEvent()).thenReturn(eventType);
         }
-        when(caseDetails.getCaseData()).thenReturn(caseDataWithBenefit(benefitCode));
+
+        if (callbackType == SUBMITTED && eventType == VALID_APPEAL_CREATED) {
+            when(callback.getCaseDetails()).thenReturn(caseDetails);
+            when(caseDetails.getCaseData()).thenReturn(caseDataWithBenefit(benefitCode));
+        }
 
         assertThat(handler.canHandle(callbackType, callback)).isFalse();
     }
@@ -85,17 +90,17 @@ class RequestOtherPartyDataHandlerTest {
 
     @Test
     void handle_shouldTriggerRequestOtherPartyDataEvent_forSupportedScenario() {
+
+
+        toggleOn();
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(callback.getEvent()).thenReturn(VALID_APPEAL_CREATED);
         var caseData = SscsCaseData.builder()
             .ccdCaseId(String.valueOf(CCD_CASE_ID))
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code(CHILD_SUPPORT).build()).build())
             .build();
-
-        var tokens = IdamTokens.builder().userId("user-id").email("test@example.com").build();
-
-        when(featureToggleService.isNotEnabled(SSCS_CHILD_MAINTENANCE_FT)).thenReturn(false);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(callback.getEvent()).thenReturn(VALID_APPEAL_CREATED);
         when(caseDetails.getCaseData()).thenReturn(caseData);
+        var tokens = IdamTokens.builder().userId("user-id").email("test@example.com").build();
         when(idamService.getIdamTokens()).thenReturn(tokens);
 
         handler.handle(SUBMITTED, callback);
@@ -106,13 +111,17 @@ class RequestOtherPartyDataHandlerTest {
 
     @ParameterizedTest(name = "unsupported: benefit={0}, event={1}, callbackType={2} => does not update CCD")
     @MethodSource("unsupportedScenarios")
-    void handle_shouldNotUpdateCcd_forUnsupportedScenarios(String benefitCode, EventType eventType, CallbackType callbackType) {
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(featureToggleService.isNotEnabled(SSCS_CHILD_MAINTENANCE_FT)).thenReturn(false);
+    void handle_shouldNotUpdateCcd_forUnsupportedScenarios(String benefitCode, EventType eventType,
+                                                           CallbackType callbackType) {
+
         if (eventType != VALID_APPEAL) {
             when(callback.getEvent()).thenReturn(eventType);
         }
-        when(caseDetails.getCaseData()).thenReturn(caseDataWithBenefit(benefitCode));
+
+        if (callbackType == SUBMITTED && eventType == VALID_APPEAL_CREATED) {
+            when(callback.getCaseDetails()).thenReturn(caseDetails);
+            when(caseDetails.getCaseData()).thenReturn(caseDataWithBenefit(benefitCode));
+        }
 
         handler.handle(callbackType, callback);
 
@@ -123,7 +132,9 @@ class RequestOtherPartyDataHandlerTest {
     void handle_shouldNotUpdateCcd_whenToggledOff() {
         when(featureToggleService.isNotEnabled(SSCS_CHILD_MAINTENANCE_FT)).thenReturn(true);
 
-        handler.canHandle(SUBMITTED, callback);
+        boolean canHandle = handler.canHandle(SUBMITTED, callback);
+
+        assertThat(canHandle).isFalse();
 
         verify(updateCcdCaseService, never()).updateCaseV2(any(), any(), any(), any(), any(), any());
     }
@@ -131,12 +142,16 @@ class RequestOtherPartyDataHandlerTest {
     private static Stream<Arguments> unsupportedScenarios() {
         return Stream.of(Arguments.of("PIP", VALID_APPEAL, SUBMITTED),
             Arguments.of(CHILD_SUPPORT, APPEAL_RECEIVED, SUBMITTED),
-            Arguments.of(CHILD_SUPPORT, VALID_APPEAL, MID_EVENT));
+            Arguments.of(CHILD_SUPPORT, VALID_APPEAL, MID_EVENT), Arguments.of("PIP", VALID_APPEAL_CREATED, SUBMITTED));
     }
 
     private static SscsCaseData caseDataWithBenefit(String benefitCode) {
         return SscsCaseData.builder()
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefitCode).build()).build())
             .build();
+    }
+
+    private void toggleOn() {
+        when(featureToggleService.isNotEnabled(SSCS_CHILD_MAINTENANCE_FT)).thenReturn(false);
     }
 }
