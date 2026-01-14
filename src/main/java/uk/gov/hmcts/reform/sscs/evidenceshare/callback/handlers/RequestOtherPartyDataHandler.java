@@ -19,14 +19,15 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @Slf4j
 @Service
-public class ValidAppealHandler implements CallbackHandler<SscsCaseData> {
+public class RequestOtherPartyDataHandler implements CallbackHandler<SscsCaseData> {
 
     private final UpdateCcdCaseService updateCcdCaseService;
     private final IdamService idamService;
     private final FeatureToggleService featureToggleService;
 
     @Autowired
-    public ValidAppealHandler(UpdateCcdCaseService updateCcdCaseService, IdamService idamService, FeatureToggleService featureToggleService) {
+    public RequestOtherPartyDataHandler(UpdateCcdCaseService updateCcdCaseService, IdamService idamService,
+                                        FeatureToggleService featureToggleService) {
         this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;
         this.featureToggleService = featureToggleService;
@@ -42,7 +43,8 @@ public class ValidAppealHandler implements CallbackHandler<SscsCaseData> {
         final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         final Benefit benefitType = caseData.getBenefitType().orElse(null);
 
-        return callbackType == CallbackType.SUBMITTED && callback.getEvent() == EventType.VALID_APPEAL
+        return callbackType == CallbackType.SUBMITTED
+            && callback.getEvent() == EventType.VALID_APPEAL_CREATED
             && benefitType == Benefit.CHILD_SUPPORT;
     }
 
@@ -55,9 +57,8 @@ public class ValidAppealHandler implements CallbackHandler<SscsCaseData> {
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        updateCcdCaseService.updateCaseV2(Long.valueOf(caseData.getCcdCaseId()),
-            EventType.REQUEST_OTHER_PARTY_DATA.getCcdType(), "REQUEST_OTHER_PARTY_DATA", "Requesting other party data",
-            idamService.getIdamTokens(),
+        updateCcdCaseService.updateCaseV2(Long.valueOf(caseData.getCcdCaseId()), EventType.REQUEST_OTHER_PARTY_DATA.getCcdType(),
+            "REQUEST_OTHER_PARTY_DATA", "Requesting other party data", idamService.getIdamTokens(),
             sscsCaseDetails -> log.info("Request other party details for case id {}", caseData.getCcdCaseId()));
 
     }

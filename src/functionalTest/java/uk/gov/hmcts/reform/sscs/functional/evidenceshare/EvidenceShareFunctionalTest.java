@@ -1,14 +1,13 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_TEST_CASE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 
 import java.time.LocalDate;
 import java.util.List;
-import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
@@ -20,13 +19,36 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         super();
     }
 
+    @Test
+    void processANonDigitalAppealWithNoValidMrnDate_shouldNotBeSentToDwpAndShouldBeUpdatedToFlagError() throws Exception {
+
+        createNonDigitalCaseWithEvent(CREATE_TEST_CASE);
+
+        String json = getJson(VALID_APPEAL_CREATED.getCcdType());
+        json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
+        json = json.replace("MRN_DATE_TO_BE_REPLACED", "");
+        json = json.replace("CREATED_IN_GAPS_FROM", State.VALID_APPEAL.getId());
+        json = json.replaceAll("NINO_TO_BE_REPLACED", getRandomNino());
+
+        simulateCcdCallback(json);
+
+        defaultAwait().untilAsserted(() -> {
+            SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+
+            assertThat(caseDetails.getData().getSscsDocument()).isNull();
+            assertThat(caseDetails.getState()).isEqualTo("validAppeal");
+            assertThat(caseDetails.getData().getHmctsDwpState())
+                .containsAnyOf("failedSending", "failedRobotics");
+        });
+    }
+
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         ccdCaseId = null;
     }
 
     @Test
-    public void processANonDigitalAppealWithValidMrn_shouldGenerateADl6AndAddToCcdAndUpdateState() throws Exception {
+    void processANonDigitalAppealWithValidMrn_shouldGenerateADl6AndAddToCcdAndUpdateState() throws Exception {
 
         createNonDigitalCaseWithEvent(CREATE_TEST_CASE);
 
@@ -44,41 +66,18 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
             SscsCaseData caseData = caseDetails.getData();
 
             List<SscsDocument> docs = caseData.getSscsDocument();
-            assertNotNull(docs);
-            assertEquals(1, docs.size());
-            assertEquals("dl6-" + ccdCaseId + ".pdf", docs.get(0).getValue().getDocumentFileName());
-            assertEquals("withDwp", caseDetails.getState());
-            assertEquals(LocalDate.now().toString(), caseData.getDateSentToDwp());
+            assertThat(docs).isNotNull();
+            assertThat(docs).hasSize(1);
+            assertThat(docs.get(0).getValue().getDocumentFileName()).isEqualTo("dl6-" + ccdCaseId + ".pdf");
+            assertThat(caseDetails.getState()).isEqualTo("withDwp");
+            assertThat(caseData.getDateSentToDwp()).isEqualTo(LocalDate.now().toString());
             //since the SUBMITTED callback no longer contains the updated caseData, the dateCaseSentToGaps will not be present
             //better to test that in the UTs
         });
     }
 
     @Test
-    public void processANonDigitalAppealWithNoValidMrnDate_shouldNotBeSentToDwpAndShouldBeUpdatedToFlagError() throws Exception {
-
-        createNonDigitalCaseWithEvent(CREATE_TEST_CASE);
-
-        String json = getJson(VALID_APPEAL_CREATED.getCcdType());
-        json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
-        json = json.replace("MRN_DATE_TO_BE_REPLACED", "");
-        json = json.replace("CREATED_IN_GAPS_FROM", State.VALID_APPEAL.getId());
-        json = json.replaceAll("NINO_TO_BE_REPLACED", getRandomNino());
-
-        simulateCcdCallback(json);
-
-        defaultAwait().untilAsserted(() -> {
-            SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
-
-            assertNull(caseDetails.getData().getSscsDocument());
-            assertEquals("validAppeal", caseDetails.getState());
-            assertThat(caseDetails.getData().getHmctsDwpState())
-                .containsAnyOf("failedSending", "failedRobotics");
-        });
-    }
-
-    @Test
-    public void processAnAppealWithLateMrn_shouldGenerateADl16AndAddToCcdAndUpdateState() throws Exception {
+    void processAnAppealWithLateMrn_shouldGenerateADl16AndAddToCcdAndUpdateState() throws Exception {
         createNonDigitalCaseWithEvent(CREATE_TEST_CASE);
 
         String json = getJson(VALID_APPEAL_CREATED.getCcdType());
@@ -95,16 +94,16 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
 
             List<SscsDocument> docs = caseData.getSscsDocument();
 
-            assertNotNull(docs);
-            assertEquals(1, docs.size());
-            assertEquals("dl16-" + ccdCaseId + ".pdf", docs.get(0).getValue().getDocumentFileName());
-            assertEquals("withDwp", caseDetails.getState());
-            assertEquals(LocalDate.now().toString(), caseData.getDateSentToDwp());
+            assertThat(docs).isNotNull();
+            assertThat(docs).hasSize(1);
+            assertThat(docs.get(0).getValue().getDocumentFileName()).isEqualTo("dl16-" + ccdCaseId + ".pdf");
+            assertThat(caseDetails.getState()).isEqualTo("withDwp");
+            assertThat(caseData.getDateSentToDwp()).isEqualTo(LocalDate.now().toString());
         });
     }
 
     @Test
-    public void processADigitalAppealWithValidMrn_shouldSendToWithDwpState() throws Exception {
+    void processADigitalAppealWithValidMrn_shouldSendToWithDwpState() throws Exception {
 
         createDigitalCaseWithEvent(CREATE_TEST_CASE);
 
@@ -121,10 +120,10 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
 
             SscsCaseData caseData = caseDetails.getData();
 
-            assertNull(caseData.getSscsDocument());
-            assertEquals("withDwp", caseDetails.getState());
-            assertEquals(LocalDate.now().toString(), caseData.getDateSentToDwp());
-            assertNull(caseData.getDateCaseSentToGaps());
+            assertThat(caseData.getSscsDocument()).isNull();
+            assertThat(caseDetails.getState()).isEqualTo("withDwp");
+            assertThat(caseData.getDateSentToDwp()).isEqualTo(LocalDate.now().toString());
+            assertThat(caseData.getDateCaseSentToGaps()).isNull();
         });
     }
 }

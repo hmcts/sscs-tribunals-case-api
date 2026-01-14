@@ -16,7 +16,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.UNREGISTERED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SENT_TO_DWP;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
-import static uk.gov.hmcts.reform.sscs.featureflag.FeatureFlag.SSCS_CHILD_MAINTENANCE_FT;
 
 import feign.FeignException;
 import java.time.LocalDate;
@@ -505,7 +504,7 @@ class SendToBulkPrintHandlerTest {
     @Test
     void givenChildMaintenanceValidEventAndFeatureToggledOn_shouldNotSentToDwp() {
 
-        bulkPrintCaseHappyPathSetUp(Benefit.CHILD_SUPPORT.getShortName(), EventType.VALID_APPEAL);
+        bulkPrintCaseHappyPathSetUp(Benefit.CHILD_SUPPORT.getShortName(), EventType.VALID_APPEAL_CREATED);
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
@@ -516,7 +515,7 @@ class SendToBulkPrintHandlerTest {
     @ParameterizedTest
     @CsvSource({
         "PIP, VALID_APPEAL",
-        "childSupport, VALID_APPEAL_CREATED",
+        "childSupport, VALID_APPEAL",
         "PIP, VALID_APPEAL_CREATED"
     })
     void givenNonChildMaintenanceOrNonValidEvent_shouldCallUpdateCcdCaseService(String benefitType, String eventType) {
@@ -539,7 +538,7 @@ class SendToBulkPrintHandlerTest {
                         .documentFilename(docPdf.getName()).build())
                     .build()).build()), VALID_APPEAL);
 
-        when(featureToggleService.isEnabled(SSCS_CHILD_MAINTENANCE_FT)).thenReturn(true);
+        when(featureToggleService.isEnabled()).thenReturn(true);
         when(callback.getEvent()).thenReturn(eventType);
         when(evidenceShareConfig.getSubmitTypes()).thenReturn(singletonList("paper"));
         when(callback.getCaseDetails()).thenReturn(caseDetails);

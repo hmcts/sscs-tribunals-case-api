@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.featureflag.FeatureFlag.SSCS_CHILD_MAINTENANCE_FT;
 
 import java.util.stream.Stream;
@@ -35,7 +36,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @ExtendWith(MockitoExtension.class)
-class ValidAppealHandlerTest {
+class RequestOtherPartyDataHandlerTest {
 
     private static final String CHILD_SUPPORT = "childSupport";
     private static final long CCD_CASE_ID = 1234567890L;
@@ -52,13 +53,13 @@ class ValidAppealHandlerTest {
     private FeatureToggleService featureToggleService;
 
     @InjectMocks
-    private ValidAppealHandler handler;
+    private RequestOtherPartyDataHandler handler;
 
     @Test
     void canHandle_shouldReturnTrue_forSubmittedValidAppealChildSupport() {
         when(featureToggleService.isNotEnabled(SSCS_CHILD_MAINTENANCE_FT)).thenReturn(false);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(callback.getEvent()).thenReturn(VALID_APPEAL);
+        when(callback.getEvent()).thenReturn(VALID_APPEAL_CREATED);
         when(caseDetails.getCaseData()).thenReturn(caseDataWithBenefit(CHILD_SUPPORT));
 
         assertThat(handler.canHandle(SUBMITTED, callback)).isTrue();
@@ -93,7 +94,7 @@ class ValidAppealHandlerTest {
 
         when(featureToggleService.isNotEnabled(SSCS_CHILD_MAINTENANCE_FT)).thenReturn(false);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(callback.getEvent()).thenReturn(VALID_APPEAL);
+        when(callback.getEvent()).thenReturn(VALID_APPEAL_CREATED);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         when(idamService.getIdamTokens()).thenReturn(tokens);
 

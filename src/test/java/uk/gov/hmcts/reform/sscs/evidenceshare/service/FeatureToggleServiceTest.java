@@ -17,8 +17,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.featureflag.FeatureFlag;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @ExtendWith(MockitoExtension.class)
 class FeatureToggleServiceTest {
@@ -31,12 +29,9 @@ class FeatureToggleServiceTest {
     @Mock
     private LDClient ldClient;
 
-    @Mock
-    private IdamService idamService;
-
     @BeforeEach
     void setUp() {
-        featureToggleService = new FeatureToggleService(ldClient, idamService, SOME_USER_KEY);
+        featureToggleService = new FeatureToggleService(ldClient, SOME_USER_KEY);
     }
 
     @ParameterizedTest
@@ -55,10 +50,9 @@ class FeatureToggleServiceTest {
     @ValueSource(booleans = {true, false})
     void shouldGetBooleanFeatureFlagWithoutUserDetails(boolean expected) {
 
-        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().userId(SOME_USER_ID).email(MAIL).build());
         when(ldClient.boolVariation(anyString(), any(LDContext.class), eq(Boolean.FALSE))).thenReturn(expected);
 
-        boolean result = featureToggleService.isEnabled(FeatureFlag.SSCS_CHILD_MAINTENANCE_FT);
+        boolean result = featureToggleService.isEnabled();
 
         assertEquals(expected, result);
 
@@ -67,8 +61,7 @@ class FeatureToggleServiceTest {
     @Test
     void shouldThrowWhenMandatoryFieldMissing() {
 
-        assertThrowsExactly(IllegalArgumentException.class,
-            () -> featureToggleService.isEnabled(null, SOME_USER_ID, MAIL));
+        assertThrowsExactly(IllegalArgumentException.class, () -> featureToggleService.isEnabled(null, SOME_USER_ID, MAIL));
         assertThrowsExactly(IllegalArgumentException.class,
             () -> featureToggleService.isEnabled(FeatureFlag.SSCS_CHILD_MAINTENANCE_FT, null, MAIL));
 
