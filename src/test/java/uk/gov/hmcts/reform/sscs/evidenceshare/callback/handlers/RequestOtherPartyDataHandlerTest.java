@@ -91,7 +91,6 @@ class RequestOtherPartyDataHandlerTest {
     @Test
     void handle_shouldTriggerRequestOtherPartyDataEvent_forSupportedScenario() {
 
-
         toggleOn();
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getEvent()).thenReturn(VALID_APPEAL_CREATED);
