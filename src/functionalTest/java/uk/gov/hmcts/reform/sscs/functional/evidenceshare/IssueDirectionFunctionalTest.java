@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
 import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DIRECTION_ISSUED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
 
@@ -25,12 +25,12 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 public class IssueDirectionFunctionalTest extends AbstractFunctionalTest {
 
-    @Autowired
-    private IdamService idamService;
-    private IdamTokens idamTokens;
     private static final String EVIDENCE_DOCUMENT_PDF = "evidence-document.pdf";
     @Value("${test-url}")
     protected String testUrl;
+    @Autowired
+    private IdamService idamService;
+    private IdamTokens idamTokens;
 
 
     IssueDirectionFunctionalTest() {

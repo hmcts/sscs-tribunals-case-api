@@ -22,7 +22,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
     @Test
     void processANonDigitalAppealWithNoValidMrnDate_shouldNotBeSentToDwpAndShouldBeUpdatedToFlagError() throws Exception {
 
-        createNonDigitalCaseWithEvent(CREATE_TEST_CASE);
+        createNonDigitalCaseWithEvent();
 
         String json = getJson(VALID_APPEAL_CREATED.getCcdType());
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
@@ -50,7 +50,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
     @Test
     void processANonDigitalAppealWithValidMrn_shouldGenerateADl6AndAddToCcdAndUpdateState() throws Exception {
 
-        createNonDigitalCaseWithEvent(CREATE_TEST_CASE);
+        createNonDigitalCaseWithEvent();
 
         String json = getJson(VALID_APPEAL_CREATED.getCcdType());
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
@@ -68,7 +68,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
             List<SscsDocument> docs = caseData.getSscsDocument();
             assertThat(docs).isNotNull();
             assertThat(docs).hasSize(1);
-            assertThat(docs.get(0).getValue().getDocumentFileName()).isEqualTo("dl6-" + ccdCaseId + ".pdf");
+            assertThat(docs.getFirst().getValue().getDocumentFileName()).isEqualTo("dl6-" + ccdCaseId + ".pdf");
             assertThat(caseDetails.getState()).isEqualTo("withDwp");
             assertThat(caseData.getDateSentToDwp()).isEqualTo(LocalDate.now().toString());
             //since the SUBMITTED callback no longer contains the updated caseData, the dateCaseSentToGaps will not be present
@@ -78,7 +78,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
 
     @Test
     void processAnAppealWithLateMrn_shouldGenerateADl16AndAddToCcdAndUpdateState() throws Exception {
-        createNonDigitalCaseWithEvent(CREATE_TEST_CASE);
+        createNonDigitalCaseWithEvent();
 
         String json = getJson(VALID_APPEAL_CREATED.getCcdType());
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
@@ -96,7 +96,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
 
             assertThat(docs).isNotNull();
             assertThat(docs).hasSize(1);
-            assertThat(docs.get(0).getValue().getDocumentFileName()).isEqualTo("dl16-" + ccdCaseId + ".pdf");
+            assertThat(docs.getFirst().getValue().getDocumentFileName()).isEqualTo("dl16-" + ccdCaseId + ".pdf");
             assertThat(caseDetails.getState()).isEqualTo("withDwp");
             assertThat(caseData.getDateSentToDwp()).isEqualTo(LocalDate.now().toString());
         });
