@@ -61,6 +61,7 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.DocumentManagementServiceWrapper;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.FeatureToggleService;
 import uk.gov.hmcts.reform.sscs.factory.DocumentRequestFactory;
+import uk.gov.hmcts.reform.sscs.featureflag.FeatureFlag;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
@@ -538,7 +539,7 @@ class SendToBulkPrintHandlerTest {
                         .documentFilename(docPdf.getName()).build())
                     .build()).build()), VALID_APPEAL);
 
-        when(featureToggleService.isEnabled()).thenReturn(true);
+        when(featureToggleService.isEnabled(FeatureFlag.SSCS_CHILD_MAINTENANCE_FT, null, null)).thenReturn(true);
         when(callback.getEvent()).thenReturn(eventType);
         when(evidenceShareConfig.getSubmitTypes()).thenReturn(singletonList("paper"));
         when(callback.getCaseDetails()).thenReturn(caseDetails);

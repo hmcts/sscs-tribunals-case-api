@@ -36,7 +36,7 @@ public class RequestOtherPartyDataHandler implements CallbackHandler<SscsCaseDat
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        if (featureToggleService.isNotEnabled(SSCS_CHILD_MAINTENANCE_FT)) {
+        if (!featureToggleService.isEnabled(SSCS_CHILD_MAINTENANCE_FT, null, null)) {
             return false;
         }
 

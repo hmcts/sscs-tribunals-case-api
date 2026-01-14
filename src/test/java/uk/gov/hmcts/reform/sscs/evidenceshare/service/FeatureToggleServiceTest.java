@@ -46,18 +46,6 @@ class FeatureToggleServiceTest {
 
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldGetBooleanFeatureFlagWithoutUserDetails(boolean expected) {
-
-        when(ldClient.boolVariation(anyString(), any(LDContext.class), eq(Boolean.FALSE))).thenReturn(expected);
-
-        boolean result = featureToggleService.isEnabled();
-
-        assertEquals(expected, result);
-
-    }
-
     @Test
     void shouldThrowWhenMandatoryFieldMissing() {
 

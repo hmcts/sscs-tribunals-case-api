@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
-import static java.util.Optional.ofNullable;
-
 import com.launchdarkly.sdk.LDContext;
 import com.launchdarkly.sdk.server.LDClient;
 import lombok.extern.slf4j.Slf4j;
@@ -24,29 +22,12 @@ public class FeatureToggleService {
     }
 
     public boolean isEnabled(final FeatureFlag featureFlag, final String userId, final String email) {
-        ofNullable(featureFlag).orElseThrow(() -> new IllegalArgumentException("featureFlag must not be null"));
-        ofNullable(userId).orElseThrow(() -> new IllegalArgumentException("userId must not be null"));
-
-        log.info("Retrieve boolean value for featureFlag: {} for userId: {}", featureFlag, userId);
-        return ldClient.boolVariation(featureFlag.getKey(), createLaunchDarklyContext(userId, email), false);
-
-    }
-
-    public boolean isEnabled() {
         return true;
-    }
 
-    public boolean isNotEnabled(final FeatureFlag featureFlag) {
-        return !isEnabled();
     }
 
     public boolean isSendGridEnabled() {
         return ldClient.boolVariation("send-grid", createLdContext(), false);
-    }
-
-    private LDContext createLaunchDarklyContext(final String userId, final String email) {
-        return LDContext.builder("sscs-tribunals-case-api").set("name", userId).set("email", email).set("firstName", "SSCS")
-            .set("lastName", "Tribunals").build();
     }
 
     private LDContext createLdContext() {

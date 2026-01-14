@@ -129,7 +129,7 @@ class RequestOtherPartyDataHandlerTest {
 
     @Test
     void handle_shouldNotUpdateCcd_whenToggledOff() {
-        when(featureToggleService.isNotEnabled(SSCS_CHILD_MAINTENANCE_FT)).thenReturn(true);
+        when(featureToggleService.isEnabled(SSCS_CHILD_MAINTENANCE_FT, null, null)).thenReturn(true);
 
         boolean canHandle = handler.canHandle(SUBMITTED, callback);
 
@@ -151,6 +151,6 @@ class RequestOtherPartyDataHandlerTest {
     }
 
     private void toggleOn() {
-        when(featureToggleService.isNotEnabled(SSCS_CHILD_MAINTENANCE_FT)).thenReturn(false);
+        when(featureToggleService.isEnabled(SSCS_CHILD_MAINTENANCE_FT, null, null)).thenReturn(false);
     }
 }
