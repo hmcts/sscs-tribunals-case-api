@@ -215,14 +215,18 @@ public class BaseFunctionalTest {
         expectedJson = replaceTyaInSubscription(expectedJson, "representativeSubscription", "TYA_RANDOM_NUMBER_REP", subscriptions);
         expectedJson = replaceTyaInSubscription(expectedJson, "jointPartySubscription", "TYA_RANDOM_NUMBER_JOINT_PARTY", subscriptions);
 
-        assertThatJson(response.getBody().prettyPrint())
+        String actualJson = response.getBody().prettyPrint();
+        assertThatJson(actualJson)
             .whenIgnoringPaths(
                 "case_creation_details.case_data.regionalProcessingCenter.epimsId",
                 "case_creation_details.case_data.caseManagementLocation.region",
                 "case_creation_details.case_data.regionalProcessingCenter.hearingRoute",
                 "case_creation_details.case_data.appeal.appellant.id",
                 "case_creation_details.case_data.appeal.rep.id",
-                "case_creation_details.case_data.appeal.appellant.appointee.id")
+                "case_creation_details.case_data.appeal.appellant.appointee.id"
+            )
+            .withFailMessage("Expected: %s%nActual: %s".formatted(expectedJson, actualJson)
+            )
             .isEqualTo(expectedJson);
     }
 

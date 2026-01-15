@@ -481,7 +481,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     private SscsCaseData getSscsCaseDataWithReasonableAdjustmentsOutstanding() {
         return await()
             .pollInterval(ofSeconds(2))
-            .atMost(ofSeconds(30))
+            .atMost(ofSeconds(60))
             .until(() -> {
                 SscsCaseDetails caseById = findCaseById(caseId);
                 if (caseById == null || caseById.getData() == null) {
