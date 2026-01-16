@@ -9,5 +9,16 @@
     "SecurityClassification": "Public",
     "EventEnablingCondition": "appeal.benefitType.code=\"childSupport\"",
     "Publish": "N"
+  },
+  {
+    "LiveFrom": "07/01/2026",
+    "CaseTypeID": "Benefit",
+    "ID": "addOtherPartyData",
+    "Name": "Add Other Party Data",
+    "PreConditionState(s)": "awaitOtherPartyData",
+    "PostConditionState": "awaitConfidentialityRequirements",
+    "SecurityClassification": "Public",
+    "EventEnablingCondition": "appeal.benefitType.code=\"childSupport\"",
+    "Publish": "N"
   }
 ]
