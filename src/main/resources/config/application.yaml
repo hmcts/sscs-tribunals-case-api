@@ -1983,7 +1983,7 @@ http:
         timeout: 5000
 
 ld:
-    sdk-key: AAAAAAAAAAAAA
+    sdk-key: "${LAUNCH_DARKLY_SDK_KEY:AAAAAAAAAAAAA}"
     user-key: sscs-evidence-share
 
 send-grid:

@@ -533,6 +533,7 @@
   {"LiveFrom": "18/10/2024", "CaseTypeID": "Benefit", "ID": "hearingOutcomeValue", "Label": "Hearing Outcome", "FieldType": "hearingOutcomeValue", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "07/08/2024", "CaseTypeID": "Benefit", "ID": "shouldReadyToListBeTriggered", "Label": " ", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "07/08/2024", "CaseTypeID": "Benefit", "ID": "selectNextHmcHearingType", "Label": "Do you want to select next hearing type i.e. Substantive or Directions hearing", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "07/08/2024", "CaseTypeID": "Benefit", "ID": "features", "Label": "Feature toggle", "FieldType": "DynamicList", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "10/09/2019", "CaseTypeID": "Benefit", "ID": "hmcHearingType", "Label": "Next hearing type", "FieldType": "FixedRadioList", "FieldTypeParameter": "FL_hmcHearingType", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/10/2024", "CaseTypeID": "Benefit", "ID": "completedHearingsList", "Label": "Completed Hearings", "FieldType": "Collection", "FieldTypeParameter": "hearingDetails", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/03/2025", "CaseTypeID": "Benefit", "ID": "tribunalRequestType", "Label" : "Communication type", "FieldType" : "FixedRadioList", "FieldTypeParameter": "FL_tribunalRequestType", "SecurityClassification": "PUBLIC"},

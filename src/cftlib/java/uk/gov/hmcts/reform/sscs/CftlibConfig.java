@@ -31,101 +31,44 @@ public class CftlibConfig implements CFTLibConfigurer {
     @Override
     public void configure(CFTLib lib) throws Exception {
 
-        createIdamUser(
-            "system.update@hmcts.net",
-            "Service",
-            "Account",
-            List.of(
-                "caseworker",
-                "caseworker-sscs",
-                "caseworker-sscs-superuser",
-                "caseworker-sscs-clerk",
-                "caseworker-sscs-systemupdate",
-                "caseworker-sscs-judge",
-                "caseworker-sscs-dwpresponsewriter",
-                "caseworker-sscs-registrar",
-                "caseworker-caa"));
+        createToggleUsers(lib);
+
+        createIdamUser("system.update@hmcts.net", "Service", "Account",
+            List.of("caseworker", "caseworker-sscs", "caseworker-sscs-superuser", "caseworker-sscs-clerk",
+                "caseworker-sscs-systemupdate", "caseworker-sscs-judge", "caseworker-sscs-dwpresponsewriter",
+                "caseworker-sscs-registrar", "caseworker-caa"));
 
         lib.createIdamUser("local.test@example.com", "caseworker", "caseworker-sscs");
-        lib.createIdamUser(
-            "super-user@example.com",
-            "caseworker",
-            "caseworker-sscs",
-            "caseworker-sscs-superuser",
+        lib.createIdamUser("super-user@example.com", "caseworker", "caseworker-sscs", "caseworker-sscs-superuser",
             "hearing-manager");
         lib.createIdamUser("sscs-citizen2@hmcts.net", "citizen");
         lib.createIdamUser("sscs-citizen-khan@hmcts.net", "citizen");
-        lib.createIdamUser(
-            "judge@example.com",
-            "caseworker",
-            "caseworker-sscs",
-            "caseworker-sscs-judge",
+        lib.createIdamUser("judge@example.com", "caseworker", "caseworker-sscs", "caseworker-sscs-judge",
             "caseworker-sscs-judge-salaried");
-        lib.createIdamUser(
-            "clerk@example.com",
-            "caseworker",
-            "caseworker-sscs",
-            "caseworker-sscs-clerk",
-            "hearing-manager");
-        lib.createIdamUser(
-            "registrar@example.com", "caseworker", "caseworker-sscs", "caseworker-sscs-registrar");
-        lib.createIdamUser(
-            "dwpuser@example.com",
-            "caseworker",
-            "caseworker-sscs",
-            "caseworker-sscs-dwpresponsewriter");
-        lib.createIdamUser(
-            "hmrcuser@example.com",
-            "caseworker",
-            "caseworker-sscs",
-            "caseworker-sscs-hmrcresponsewriter");
-        lib.createIdamUser(
-            "ibcauser@example.com",
-            "caseworker",
-            "caseworker-sscs",
-            "caseworker-sscs-ibcaresponsewriter");
+        lib.createIdamUser("clerk@example.com", "caseworker", "caseworker-sscs", "caseworker-sscs-clerk", "hearing-manager");
+        lib.createIdamUser("registrar@example.com", "caseworker", "caseworker-sscs", "caseworker-sscs-registrar");
+        lib.createIdamUser("dwpuser@example.com", "caseworker", "caseworker-sscs", "caseworker-sscs-dwpresponsewriter");
+        lib.createIdamUser("hmrcuser@example.com", "caseworker", "caseworker-sscs", "caseworker-sscs-hmrcresponsewriter");
+        lib.createIdamUser("ibcauser@example.com", "caseworker", "caseworker-sscs", "caseworker-sscs-ibcaresponsewriter");
         lib.createIdamUser("ctsc-administrator@hmcts.net", "caseworker", "caseworker-sscs");
         lib.createIdamUser("regional-centre-admin@fake.hmcts.net", "caseworker", "caseworker-sscs");
-        lib.createIdamUser(
-            "data.store.idam.system.user@gmail.com", "ccd-import", "manage-user", "caseworker");
-        lib.createIdamUser(
-            "wa-system-user@fake.hmcts.net", "caseworker-wa", "caseworker-wa-task-configuration");
+        lib.createIdamUser("data.store.idam.system.user@gmail.com", "ccd-import", "manage-user", "caseworker");
+        lib.createIdamUser("wa-system-user@fake.hmcts.net", "caseworker-wa", "caseworker-wa-task-configuration");
         lib.createIdamUser("tribunal-member-1@fake.hmcts.net", "caseworker", "caseworker-sscs");
         lib.createIdamUser("tribunal-member-2@fake.hmcts.net", "caseworker", "caseworker-sscs");
         lib.createIdamUser("tribunal-member-3@fake.hmcts.net", "caseworker", "caseworker-sscs");
-        lib.createIdamUser(
-            "judge-feepaid@example.com", "caseworker", "caseworker-sscs", "caseworker-sscs-judge");
-        lib.createRoles(
-            "caseworker-sscs-superuser",
-            "caseworker-sscs-clerk",
-            "caseworker-sscs-systemupdate",
-            "caseworker-sscs-judge",
-            "caseworker-sscs-judge-salaried",
-            "caseworker-sscs-dwpresponsewriter",
-            "caseworker-sscs-hmrcresponsewriter",
-            "caseworker-sscs-ibcaresponsewriter",
-            "caseworker-sscs-registrar",
-            "caseworker-sscs-callagent",
-            "caseworker-sscs-teamleader",
-            "caseworker-sscs-panelmember",
-            "caseworker-sscs-bulkscan",
-            "caseworker-sscs-anonymouscitizen",
-            "caseworker-sscs-pcqextractor",
-            "citizen",
-            "caseworker-sscs",
-            "caseworker",
-            "hearing-manager",
-            "hearing-viewer",
-            "caseworker-wa",
-            "caseworker-wa-task-configuration",
-            "caseworker-ras-validation",
+        lib.createIdamUser("judge-feepaid@example.com", "caseworker", "caseworker-sscs", "caseworker-sscs-judge");
+        lib.createRoles("caseworker-sscs-superuser", "caseworker-sscs-clerk", "caseworker-sscs-systemupdate",
+            "caseworker-sscs-judge", "caseworker-sscs-judge-salaried", "caseworker-sscs-dwpresponsewriter",
+            "caseworker-sscs-hmrcresponsewriter", "caseworker-sscs-ibcaresponsewriter", "caseworker-sscs-registrar",
+            "caseworker-sscs-callagent", "caseworker-sscs-teamleader", "caseworker-sscs-panelmember", "caseworker-sscs-bulkscan",
+            "caseworker-sscs-anonymouscitizen", "caseworker-sscs-pcqextractor", "citizen", "caseworker-sscs", "caseworker",
+            "hearing-manager", "hearing-viewer", "caseworker-wa", "caseworker-wa-task-configuration", "caseworker-ras-validation",
             "GS_profile");
         var def = Files.readAllBytes(Path.of("./definitions/benefit/CCD_SSCSDefinition_LOCAL.xlsx"));
         lib.importDefinition(def);
 
-        var roleAssignments =
-            Resources.toString(
-                Resources.getResource("am-role-assignments.json"), StandardCharsets.UTF_8);
+        var roleAssignments = Resources.toString(Resources.getResource("am-role-assignments.json"), StandardCharsets.UTF_8);
         lib.configureRoleAssignments(roleAssignments);
 
         if (parseBoolean(System.getenv("ENABLE_WORK_ALLOCATION"))) {
@@ -133,13 +76,23 @@ public class CftlibConfig implements CFTLibConfigurer {
         }
     }
 
+    private static void createToggleUsers(CFTLib lib) {
+        lib.createIdamUser("cm-toggle-off@hmcts.net",
+            "caseworker", "caseworker-sscs", "caseworker-sscs-superuser", "caseworker-sscs-clerk", "caseworker-sscs-systemupdate",
+            "caseworker-sscs-judge", "caseworker-sscs-dwpresponsewriter", "caseworker-sscs-registrar", "caseworker-caa");
+
+        lib.createIdamUser("cm-toggle-on@hmcts.net",
+            "caseworker", "caseworker-sscs", "caseworker-sscs-superuser", "caseworker-sscs-clerk", "caseworker-sscs-systemupdate",
+            "caseworker-sscs-judge", "caseworker-sscs-dwpresponsewriter", "caseworker-sscs-registrar", "caseworker-caa");
+    }
+
+    private static boolean isNotOk(HttpResponse<String> response) {
+        return response.statusCode() != 200;
+    }
+
     @SneakyThrows
     private void loadCamundaFiles() {
-        int code =
-            new ProcessBuilder("./src/cftlib/resources/scripts/camunda-deployment.sh")
-                .inheritIO()
-                .start()
-                .waitFor();
+        int code = new ProcessBuilder("./src/cftlib/resources/scripts/camunda-deployment.sh").inheritIO().start().waitFor();
 
         if (code != 0) {
             log.error("****** Camunda deployment failed ******");
@@ -151,17 +104,12 @@ public class CftlibConfig implements CFTLibConfigurer {
 
     @SneakyThrows
     private void createIdamUser(String email, String forename, String account, List<String> roles) {
-        final String json =
-            new ObjectMapper()
-                .writeValueAsString(
-                    Map.of("email", email, "forename", forename, "surname", account, "roles", roles.stream().map(r -> Map.of("code", r)).toList()));
+        final String json = new ObjectMapper().writeValueAsString(
+            Map.of("email", email, "forename", forename, "surname", account, "roles",
+                roles.stream().map(r -> Map.of("code", r)).toList()));
 
-        var request =
-            HttpRequest.newBuilder()
-                .uri(URI.create("%s/testing-support/accounts".formatted(idamHost)))
-                .header("content-type", "application/json")
-                .POST(ofString(json))
-                .build();
+        var request = HttpRequest.newBuilder().uri(URI.create("%s/testing-support/accounts".formatted(idamHost)))
+            .header("content-type", "application/json").POST(ofString(json)).build();
 
         try (var client = HttpClient.newHttpClient()) {
             var response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -169,10 +117,6 @@ public class CftlibConfig implements CFTLibConfigurer {
                 throw new RuntimeException("Failed to create idam account" + response.statusCode());
             }
         }
-    }
-
-    private static boolean isNotOk(HttpResponse<String> response) {
-        return response.statusCode() != 200;
     }
 
 }
