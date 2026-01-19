@@ -532,21 +532,6 @@
   {
     "LiveFrom": "01/01/2018",
     "CaseTypeID": "Benefit",
-    "ID": "appealDormant",
-    "Name": "Appeal dormant",
-    "Description": "Dormant appeal - no notification",
-    "DisplayOrder": 380,
-    "PreConditionState(s)": "*",
-    "PostConditionState": "dormantAppealState",
-    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
-    "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
-    "ShowEventNotes": "Y",
-    "SecurityClassification": "Public",
-    "Publish": "${CCD_DEF_PUBLISH}"
-  },
-  {
-    "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
     "ID": "appealLapsed",
     "Name": "Appeal lapsed",
     "Description": "Notification about appeal lapsed sent",
@@ -628,21 +613,6 @@
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
     "Publish": "N"
-  },
-  {
-    "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
-    "ID": "appealWithdrawn",
-    "Name": "Appeal withdrawn",
-    "Description": "Notification that an appeal has been withdrawn",
-    "DisplayOrder": 450,
-    "PreConditionState(s)": "*",
-    "PostConditionState": "dormantAppealState",
-    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
-    "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
-    "ShowEventNotes": "Y",
-    "SecurityClassification": "Public",
-    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
@@ -795,22 +765,6 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdSubmittedEvent"
-  },
-  {
-    "LiveFrom": "10/10/2019",
-    "CaseTypeID": "Benefit",
-    "ID": "confirmLapsed",
-    "Name": "Confirm lapsed",
-    "DisplayOrder": 550,
-    "PreConditionState(s)": "hearing;incompleteApplication;incompleteApplicationInformationReqsted;interlocutoryReviewState;notListable;readyToList;responseReceived;validAppeal;withDwp;handlingError",
-    "PostConditionState": "dormantAppealState",
-    "EventEnablingCondition": "appeal.benefitType.code!=\"infectedBloodCompensation\"",
-    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
-    "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
-    "ShowEventNotes": "Y",
-    "SecurityClassification": "Public",
-    "Publish": "${CCD_DEF_PUBLISH}",
-    "ShowSummary": "Y"
   },
   {
     "LiveFrom": "01/11/2021",
@@ -2310,21 +2264,6 @@
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
     "Publish": "N"
-  },
-  {
-    "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
-    "ID": "struckOut",
-    "Name": "Strike out case",
-    "Description": "Strike out due to no response",
-    "DisplayOrder": 1550,
-    "PreConditionState(s)": "*",
-    "PostConditionState": "dormantAppealState",
-    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
-    "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
-    "ShowEventNotes": "Y",
-    "SecurityClassification": "Public",
-    "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
     "LiveFrom": "01/01/2018",
