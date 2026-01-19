@@ -494,6 +494,7 @@
     "PageLabel": "Issue Further evidence",
     "PageShowCondition": "[STATE]=\"doNotUse\"",
     "RetainHiddenValue": "Yes",
-    "FieldShowCondition": "[STATE]=\"doNotUse\""
+    "FieldShowCondition": "[STATE]=\"doNotUse\"",
+    "Publish": "${CCD_DEF_PUBLISH}"
   }
 ]
