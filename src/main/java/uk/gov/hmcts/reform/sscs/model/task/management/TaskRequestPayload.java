@@ -16,9 +16,6 @@ public class TaskRequestPayload {
     @JsonProperty("search_parameters")
     private List<TaskSearchParameter<?>> searchParameters;
 
-    @JsonProperty("sorting_parameters")
-    private List<TaskSortingParameter> sortingParameters;
-
     @JsonProperty("request_context")
     private TaskRequestContext requestContext;
 }
