@@ -187,13 +187,13 @@
       "correspondence": [
         {
           "value": {
-            "sentOn": "8 Sep 2021 15:05",
+            "sentOn": "8 Oct 2021 15:05",
             "from": "benefit.appeals@notifications.service.gov.uk",
             "to": "sscstest+notify@greencroftconsulting.com",
             "documentLink": {
               "document_url": "http://dm-store:5005/documents/8a0068d4-fa4c-46e2-bf39-133d5aa8db20",
               "document_binary_url": "http://dm-store:5005/documents/8a0068d4-fa4c-46e2-bf39-133d5aa8db20/binary",
-              "document_filename": "validAppealCreated 8 Sep 2021 1505.pdf"
+              "document_filename": "validAppealCreated 8 Oct 2021 1505.pdf"
             },
             "correspondenceType": "Email"
           },
@@ -201,13 +201,13 @@
         },
         {
           "value": {
-            "sentOn": "8 Sep 2021 15:05",
+            "sentOn": "8 Oct 2021 15:05",
             "from": "PIP Appeals",
             "to": "+447398785050",
             "documentLink": {
               "document_url": "http://dm-store:5005/documents/a4c16cf8-dcda-4ca9-8cf5-3c71a2a41b38",
               "document_binary_url": "http://dm-store:5005/documents/a4c16cf8-dcda-4ca9-8cf5-3c71a2a41b38/binary",
-              "document_filename": "validAppealCreated 8 Sep 2021 1505.pdf"
+              "document_filename": "validAppealCreated 8 Oct 2021 1505.pdf"
             },
             "correspondenceType": "Sms"
           },
