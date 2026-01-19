@@ -21,9 +21,6 @@ import uk.gov.hmcts.reform.sscs.featureflag.FeatureFlag;
 @ExtendWith(MockitoExtension.class)
 class FeatureToggleServiceTest {
 
-    private static final String SOME_USER_KEY = "some-user-key";
-    private static final String MAIL = "example@email.com";
-    private static final String SOME_USER_ID = "some-user-id";
     private FeatureToggleService featureToggleService;
 
     @Mock
@@ -31,16 +28,20 @@ class FeatureToggleServiceTest {
 
     @BeforeEach
     void setUp() {
-        featureToggleService = new FeatureToggleService(ldClient, SOME_USER_KEY);
+        featureToggleService = new FeatureToggleService(ldClient, "some-user-key");
     }
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldGetTrueBooleanFeatureFlag(boolean expected) {
 
-        when(ldClient.boolVariation(anyString(), any(LDContext.class), eq(Boolean.FALSE))).thenReturn(expected);
+        when(ldClient.boolVariation(anyString(), any(LDContext.class), eq(Boolean.FALSE)))
+            .thenReturn(expected);
 
-        boolean result = featureToggleService.isEnabled(FeatureFlag.SSCS_CHILD_MAINTENANCE_FT, SOME_USER_ID, MAIL);
+        boolean result = featureToggleService.isEnabled(
+            FeatureFlag.SSCS_CHILD_MAINTENANCE_FT,
+            "some-user-id",
+            "example@email.com");
 
         assertEquals(expected, result);
 
@@ -49,9 +50,18 @@ class FeatureToggleServiceTest {
     @Test
     void shouldThrowWhenMandatoryFieldMissing() {
 
-        assertThrowsExactly(IllegalArgumentException.class, () -> featureToggleService.isEnabled(null, SOME_USER_ID, MAIL));
         assertThrowsExactly(IllegalArgumentException.class,
-            () -> featureToggleService.isEnabled(FeatureFlag.SSCS_CHILD_MAINTENANCE_FT, null, MAIL));
+            () -> featureToggleService.isEnabled(
+                null,
+                "some-user-id",
+                "example@email.com")
+        );
+        assertThrowsExactly(IllegalArgumentException.class,
+            () -> featureToggleService.isEnabled(
+                FeatureFlag.SSCS_CHILD_MAINTENANCE_FT,
+                null,
+                "example@email.com")
+        );
 
     }
 }

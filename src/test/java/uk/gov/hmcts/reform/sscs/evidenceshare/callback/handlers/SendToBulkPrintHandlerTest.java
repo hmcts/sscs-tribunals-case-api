@@ -59,9 +59,7 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.evidenceshare.exception.NonPdfBulkPrintException;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.DocumentManagementServiceWrapper;
-import uk.gov.hmcts.reform.sscs.evidenceshare.service.FeatureToggleService;
 import uk.gov.hmcts.reform.sscs.factory.DocumentRequestFactory;
-import uk.gov.hmcts.reform.sscs.featureflag.FeatureFlag;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
@@ -99,8 +97,6 @@ class SendToBulkPrintHandlerTest {
     @Mock
     private IdamService idamService;
     @Mock
-    private FeatureToggleService featureToggleService;
-    @Mock
     private Callback<SscsCaseData> callback;
     private SendToBulkPrintHandler handler;
     @Captor
@@ -110,7 +106,7 @@ class SendToBulkPrintHandlerTest {
     void setUp() {
         handler = new SendToBulkPrintHandler(documentManagementServiceWrapper,
             documentRequestFactory, pdfStoreService, bulkPrintService, evidenceShareConfig, updateCcdCaseService,
-            idamService, featureToggleService, 35, 42);
+            idamService, 35, 42, true);
         placeholders.put("Test", "Value");
     }
 
@@ -174,7 +170,8 @@ class SendToBulkPrintHandlerTest {
 
     @ParameterizedTest
     @CsvSource({"pip, 35", "childSupport, 42"})
-    void givenAMessageWhichFindsATemplate_thenConvertToSscsCaseDataAndAddPdfToCaseAndSendToBulkPrint(String benefitType, int expectedResponseDays) {
+    void givenAMessageWhichFindsATemplate_thenConvertToSscsCaseDataAndAddPdfToCaseAndSendToBulkPrint(String benefitType,
+                                                                                                     int expectedResponseDays) {
 
         when(evidenceShareConfig.getSubmitTypes()).thenReturn(singletonList("paper"));
 
@@ -217,7 +214,9 @@ class SendToBulkPrintHandlerTest {
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED,
             false);
 
-        handler.handle(CallbackType.SUBMITTED, callback);
+        new SendToBulkPrintHandler(documentManagementServiceWrapper,
+            documentRequestFactory, pdfStoreService, bulkPrintService, evidenceShareConfig, updateCcdCaseService,
+            idamService, 35, 42, false).handle(CallbackType.SUBMITTED, callback);
 
         verify(pdfStoreService, times(2)).download(eq(docUrl));
         verify(bulkPrintService).sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any(), any());
@@ -539,7 +538,6 @@ class SendToBulkPrintHandlerTest {
                         .documentFilename(docPdf.getName()).build())
                     .build()).build()), VALID_APPEAL);
 
-        when(featureToggleService.isEnabled(FeatureFlag.SSCS_CHILD_MAINTENANCE_FT, null, null)).thenReturn(true);
         when(callback.getEvent()).thenReturn(eventType);
         when(evidenceShareConfig.getSubmitTypes()).thenReturn(singletonList("paper"));
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -565,7 +563,8 @@ class SendToBulkPrintHandlerTest {
         return new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
     }
 
-    private CaseDetails<SscsCaseData> getCaseDetails(String benefitType, String receivedVia, List<SscsDocument> sscsDocuments, State state) {
+    private CaseDetails<SscsCaseData> getCaseDetails(String benefitType, String receivedVia, List<SscsDocument> sscsDocuments,
+                                                     State state) {
         SscsCaseData caseData = SscsCaseData.builder()
             .ccdCaseId("123")
             .createdInGapsFrom("validAppeal")

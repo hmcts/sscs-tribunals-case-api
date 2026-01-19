@@ -1,19 +1,20 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATEST;
-import static uk.gov.hmcts.reform.sscs.featureflag.FeatureFlag.SSCS_CHILD_MAINTENANCE_FT;
 
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
-import uk.gov.hmcts.reform.sscs.evidenceshare.service.FeatureToggleService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @Slf4j
@@ -25,30 +26,26 @@ public class RequestOtherPartyDataHandler implements CallbackHandler<SscsCaseDat
 
     private final UpdateCcdCaseService updateCcdCaseService;
     private final IdamService idamService;
-    private final FeatureToggleService featureToggleService;
+    private final boolean cmOtherPartyConfidentialityEnabled;
 
     public RequestOtherPartyDataHandler(UpdateCcdCaseService updateCcdCaseService, IdamService idamService,
-                                        FeatureToggleService featureToggleService) {
+                                        @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
         this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;
-        this.featureToggleService = featureToggleService;
+        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        if (!featureToggleService.isEnabled(SSCS_CHILD_MAINTENANCE_FT, null, null)) {
+
+        if (!cmOtherPartyConfidentialityEnabled
+            || callbackType != CallbackType.SUBMITTED
+            || callback.getEvent() != EventType.VALID_APPEAL_CREATED) {
             return false;
         }
 
-        if (callbackType != CallbackType.SUBMITTED || callback.getEvent() != EventType.VALID_APPEAL_CREATED) {
-            return false;
-        }
-
-        return callback.getCaseDetails()
-            .getCaseData()
-            .getBenefitType()
-            .map(Benefit.CHILD_SUPPORT::equals)
-            .orElse(false);
+        return Optional.ofNullable(callback.getCaseDetails()).map(CaseDetails::getCaseData).map(SscsCaseData::getBenefitType)
+            .flatMap(benefitType -> benefitType).map(Benefit.CHILD_SUPPORT::equals).orElse(false);
     }
 
     @Override
@@ -57,7 +54,7 @@ public class RequestOtherPartyDataHandler implements CallbackHandler<SscsCaseDat
             return;
         }
 
-        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         long caseId = Long.parseLong(caseData.getCcdCaseId());
 
         updateCcdCaseService.updateCaseV2(caseId, EventType.REQUEST_OTHER_PARTY_DATA.getCcdType(), SUMMARY, DESCRIPTION,

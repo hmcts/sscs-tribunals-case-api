@@ -19,6 +19,11 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         super();
     }
 
+    @BeforeEach
+    void beforeEach() {
+        ccdCaseId = null;
+    }
+
     @Test
     void processANonDigitalAppealWithNoValidMrnDate_shouldNotBeSentToDwpAndShouldBeUpdatedToFlagError() throws Exception {
 
@@ -40,11 +45,6 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
             assertThat(caseDetails.getData().getHmctsDwpState())
                 .containsAnyOf("failedSending", "failedRobotics");
         });
-    }
-
-    @BeforeEach
-    void beforeEach() {
-        ccdCaseId = null;
     }
 
     @Test

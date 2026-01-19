@@ -12,15 +12,14 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
-import static uk.gov.hmcts.reform.sscs.featureflag.FeatureFlag.SSCS_CHILD_MAINTENANCE_FT;
 
 import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -52,12 +51,15 @@ class RequestOtherPartyDataHandlerTest {
     @Mock
     private FeatureToggleService featureToggleService;
 
-    @InjectMocks
     private RequestOtherPartyDataHandler handler;
+
+    @BeforeEach
+    void setUp() {
+        handler = new RequestOtherPartyDataHandler(updateCcdCaseService, idamService, true);
+    }
 
     @Test
     void canHandle_shouldReturnTrue_forSubmittedValidAppealChildSupport() {
-        toggleOn();
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getEvent()).thenReturn(VALID_APPEAL_CREATED);
         when(caseDetails.getCaseData()).thenReturn(caseDataWithBenefit(CHILD_SUPPORT));
@@ -69,7 +71,6 @@ class RequestOtherPartyDataHandlerTest {
     @MethodSource("unsupportedScenarios")
     void canHandle_shouldReturnFalse_forUnsupportedScenarios(String benefitCode, EventType eventType,
                                                              CallbackType callbackType) {
-        toggleOn();
 
         if (callbackType == SUBMITTED) {
             when(callback.getEvent()).thenReturn(eventType);
@@ -91,7 +92,6 @@ class RequestOtherPartyDataHandlerTest {
     @Test
     void handle_shouldTriggerRequestOtherPartyDataEvent_forSupportedScenario() {
 
-        toggleOn();
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getEvent()).thenReturn(VALID_APPEAL_CREATED);
         var caseData = SscsCaseData.builder()
@@ -129,9 +129,9 @@ class RequestOtherPartyDataHandlerTest {
 
     @Test
     void handle_shouldNotUpdateCcd_whenToggledOff() {
-        when(featureToggleService.isEnabled(SSCS_CHILD_MAINTENANCE_FT, null, null)).thenReturn(true);
 
-        boolean canHandle = handler.canHandle(SUBMITTED, callback);
+        boolean canHandle = new RequestOtherPartyDataHandler(updateCcdCaseService, idamService, false).canHandle(SUBMITTED,
+            callback);
 
         assertThat(canHandle).isFalse();
 
@@ -150,7 +150,4 @@ class RequestOtherPartyDataHandlerTest {
             .build();
     }
 
-    private void toggleOn() {
-        when(featureToggleService.isEnabled(SSCS_CHILD_MAINTENANCE_FT, null, null)).thenReturn(false);
-    }
 }
