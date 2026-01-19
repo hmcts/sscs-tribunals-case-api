@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.idam.UserRole;
-import uk.gov.hmcts.reform.sscs.service.BusinessDaysCalculatorService;
+import uk.gov.hmcts.reform.sscs.utility.calendar.BusinessDaysCalculatorService;
 
 @Slf4j
 public class CommunicationRequestUtil {

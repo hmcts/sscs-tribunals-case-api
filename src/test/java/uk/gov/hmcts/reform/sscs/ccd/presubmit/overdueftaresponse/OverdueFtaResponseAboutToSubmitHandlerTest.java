@@ -30,7 +30,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.service.BusinessDaysCalculatorService;
+import uk.gov.hmcts.reform.sscs.utility.calendar.BusinessDaysCalculatorService;
 
 class OverdueFtaResponseAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";

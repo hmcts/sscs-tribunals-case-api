@@ -492,6 +492,8 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "1.0",
     "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "[STATE]=\"DoNotShow\"",
+    "RetainHiddenValue": "Yes",
     "Publish": "${CCD_DEF_PUBLISH}"
   }
 ]

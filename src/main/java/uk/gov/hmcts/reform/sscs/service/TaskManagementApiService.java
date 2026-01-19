@@ -55,6 +55,7 @@ public class TaskManagementApiService {
     }
 
     public void cancelTaskByTaskId(String taskId) {
+        log.info("Cancelling task with task ID: {}", taskId);
         taskManagementApi.cancelTask(
                 idamService.getIdamWaTokens().getServiceAuthorization(),
                 idamService.getIdamWaTokens().getIdamOauth2Token(),

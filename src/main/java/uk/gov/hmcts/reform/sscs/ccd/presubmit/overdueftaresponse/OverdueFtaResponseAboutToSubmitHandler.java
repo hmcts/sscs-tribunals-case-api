@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.service.BusinessDaysCalculatorService;
+import uk.gov.hmcts.reform.sscs.utility.calendar.BusinessDaysCalculatorService;
 
 
 @Service
@@ -50,31 +50,37 @@ public class OverdueFtaResponseAboutToSubmitHandler implements PreSubmitCallback
 
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
+        String caseId = sscsCaseData.getCcdCaseId();
 
         FtaCommunicationFields communicationFields = Optional.ofNullable(sscsCaseData.getCommunicationFields())
                 .orElse(FtaCommunicationFields.builder().build());
 
         List<CommunicationRequest> communicationRequestList = communicationFields.getFtaCommunications();
+        log.info("Communication request List size is: {} for case id: {}", communicationRequestList.size(), caseId);
 
         CommunicationRequest overdueCommunicationRequest =  getRequestsWithoutReplies(communicationRequestList).stream()
                      .filter(request -> request.getValue().getTaskCreatedForRequest() != YesNo.YES
-                            && isDateOverdue(request)).findFirst().orElse(null);
+                            && isDateOverdue(request, caseId)).findFirst().orElse(null);
 
         if (overdueCommunicationRequest != null) {
+            log.info("Found overdue communication request with id: {} for case id: {}", overdueCommunicationRequest.getId(), caseId);
             sscsCaseData.getCommunicationFields().setWaTaskFtaCommunicationId(overdueCommunicationRequest.getId());
             getCommunicationRequestFromId(overdueCommunicationRequest.getId(), communicationFields.getFtaCommunications()).getValue().setTaskCreatedForRequest(YesNo.YES);
         }
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    public boolean isDateOverdue(CommunicationRequest communicationRequest) {
+    public boolean isDateOverdue(CommunicationRequest communicationRequest, String caseId) {
         try {
             LocalDate overdueDate = businessDaysCalculatorService
                     .getBusinessDayInPast(LocalDate.now(), 2);
+            log.info("Overdue date for case id: {} calculated as: {} for communication request id: {}", caseId,
+                    overdueDate, communicationRequest.getId());
             return nonNull(communicationRequest.getValue().getRequestDateTime())
                     && nonNull(overdueDate)
                     && communicationRequest.getValue().getRequestDateTime().toLocalDate().isEqual(overdueDate);
         } catch (IOException e) {
+            log.error("Error calculating overdue date for case id: {}. Falling back to default date check.", caseId, e);
             return communicationRequest.getValue().getRequestDateTime() != null
                     && communicationRequest.getValue().getRequestDateTime().toLocalDate().isEqual(LocalDate.now().minusDays(2));
         }

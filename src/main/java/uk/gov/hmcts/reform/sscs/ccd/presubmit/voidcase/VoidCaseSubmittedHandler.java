@@ -30,6 +30,7 @@ public class VoidCaseSubmittedHandler implements PreSubmitCallbackHandler<SscsCa
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.SUBMITTED)
+                && isWorkAllocationEnabled
                 && (callback.getEvent() == EventType.VOID_CASE);
     }
 
@@ -46,9 +47,7 @@ public class VoidCaseSubmittedHandler implements PreSubmitCallbackHandler<SscsCa
 
         log.info("Handling Void Case Submitted callback for case id: {}", caseId);
 
-        if (isWorkAllocationEnabled) {
-            taskManagementApiService.cancelTasksByTaskProperties(caseId, "ftaCommunicationId");
-        }
+        taskManagementApiService.cancelTasksByTaskProperties(caseId, "ftaCommunicationId");
 
         return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
     }

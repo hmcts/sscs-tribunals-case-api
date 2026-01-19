@@ -214,5 +214,36 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "SecurityClassification": "Public",
     "Publish": "${CCD_DEF_PUBLISH}"
+  },
+  {
+    "LiveFrom": "18/03/2025",
+    "CaseTypeID": "Benefit",
+    "ID": "tribunalCommunication",
+    "Name": "Communication with Tribunal",
+    "DisplayOrder": 545,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "ShowSummary": "Y",
+    "ShowEventNotes": "Y",
+    "SecurityClassification": "Public",
+    "Publish": "${CCD_DEF_PUBLISH}",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
+    "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdSubmittedEvent"
+  },
+  {
+    "LiveFrom": "01/01/2018",
+    "CaseTypeID": "Benefit",
+    "ID": "voidCase",
+    "Name": "Void case",
+    "Description": "Voids the case",
+    "DisplayOrder": 1810,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "dormantAppealState",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
+    "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
+    "ShowEventNotes": "Y",
+    "SecurityClassification": "Public",
+    "Publish": "${CCD_DEF_PUBLISH}"
   }
 ]

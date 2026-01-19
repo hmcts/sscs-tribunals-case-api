@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.voidcase;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -63,15 +62,14 @@ class VoidCaseSubmittedHandlerTest {
     }
 
     @Test
-    void givenWorkAllocationEnabled_thenCancelTasks() {
-        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
-        verify(taskManagementApiService, times(1)).cancelTasksByTaskProperties(CASE_ID, "ftaCommunicationId");
+    void givenWorkAllocationDisabled_thenReturnFalse() {
+        handler = new VoidCaseSubmittedHandler(taskManagementApiService, false);
+        assertThat(handler.canHandle(SUBMITTED, callback)).isFalse();
     }
 
     @Test
-    void givenWorkAllocationDisabled_thenDoNotCallTaskManagementApiService() {
-        handler = new VoidCaseSubmittedHandler(taskManagementApiService, false);
+    void givenWorkAllocationEnabled_thenCancelTasks() {
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
-        verify(taskManagementApiService, times(0)).cancelTasksByTaskProperties(any(), any());
+        verify(taskManagementApiService, times(1)).cancelTasksByTaskProperties(CASE_ID, "ftaCommunicationId");
     }
 }

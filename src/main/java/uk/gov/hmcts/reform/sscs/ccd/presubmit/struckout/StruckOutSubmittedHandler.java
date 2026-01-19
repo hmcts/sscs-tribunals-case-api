@@ -30,6 +30,7 @@ public class StruckOutSubmittedHandler implements PreSubmitCallbackHandler<SscsC
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.SUBMITTED)
+                && isWorkAllocationEnabled
                 && callback.getEvent() == EventType.STRUCK_OUT;
     }
 
@@ -46,9 +47,7 @@ public class StruckOutSubmittedHandler implements PreSubmitCallbackHandler<SscsC
 
         log.info("Handling Struck Out Case Submitted callback for case id: {}", caseId);
 
-        if (isWorkAllocationEnabled) {
-            taskManagementApiService.cancelTasksByTaskProperties(caseId, "ftaCommunicationId");
-        }
+        taskManagementApiService.cancelTasksByTaskProperties(caseId, "ftaCommunicationId");
 
         return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
     }

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dormant;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -63,20 +62,17 @@ class DormantEventsSubmittedHandlerTest {
         assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
     }
 
+    @Test
+    void givenWorkAllocationDisabled_thenReturnFalse() {
+        handler = new DormantEventsSubmittedHandler(taskManagementApiService, false);
+        assertThat(handler.canHandle(SUBMITTED, callback)).isFalse();
+    }
+
     @ParameterizedTest
     @EnumSource(value = EventType.class, names = {"WITHDRAWN", "DORMANT", "CONFIRM_LAPSED"})
     void givenWorkAllocationEnabled_thenCancelTasks(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
         verify(taskManagementApiService, times(1)).cancelTasksByTaskProperties(CASE_ID, "ftaCommunicationId");
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = EventType.class, names = {"WITHDRAWN", "DORMANT", "CONFIRM_LAPSED"})
-    void givenWorkAllocationDisabled_thenDoNotCallTaskManagementApiService(EventType eventType) {
-        when(callback.getEvent()).thenReturn(eventType);
-        handler = new DormantEventsSubmittedHandler(taskManagementApiService, false);
-        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
-        verify(taskManagementApiService, times(0)).cancelTasksByTaskProperties(any(), any());
     }
 }

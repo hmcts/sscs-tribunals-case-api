@@ -32,6 +32,7 @@ public class DormantEventsSubmittedHandler  implements PreSubmitCallbackHandler<
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.SUBMITTED)
+                && isWorkAllocationEnabled
                 && (callback.getEvent() == WITHDRAWN
                 || callback.getEvent() == DORMANT
                 || callback.getEvent() == CONFIRM_LAPSED
@@ -51,9 +52,7 @@ public class DormantEventsSubmittedHandler  implements PreSubmitCallbackHandler<
 
         log.info("Handling {} Case Submitted callback for case id: {}", callback.getEvent().getCcdType(), caseId);
 
-        if (isWorkAllocationEnabled) {
-            taskManagementApiService.cancelTasksByTaskProperties(caseId, "ftaCommunicationId");
-        }
+        taskManagementApiService.cancelTasksByTaskProperties(caseId, "ftaCommunicationId");
 
         return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
     }
