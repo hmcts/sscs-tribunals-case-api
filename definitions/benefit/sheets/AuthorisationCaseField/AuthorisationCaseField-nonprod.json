@@ -1,3 +1,5 @@
 [
-  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "functionalTest", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"}
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "functionalTest", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "CaseFieldID": "awareOfAnyAdditionalOtherParties", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
+  {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "CaseFieldID": "otherParties", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"}
 ]

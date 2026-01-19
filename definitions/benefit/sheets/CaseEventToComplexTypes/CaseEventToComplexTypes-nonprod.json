@@ -128,8 +128,28 @@
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "15/01/2026",
     "FieldDisplayOrder": 13,
-    "PageID": "1.0",
-    "FieldShowCondition": "appeal.benefitType.code!= \"infectedBloodCompensation\""
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "role.name",
+    "ID": "otherPartyRoleName",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "15/01/2026",
+    "FieldDisplayOrder": 14,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "role.description",
+    "ID": "otherPartyRoleDescription",
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "otherParties.role.name=\"Other\"",
+    "LiveFrom": "15/01/2026",
+    "FieldDisplayOrder": 15,
+    "PageID": "1.0"
   },
   {
     "CaseEventID": "addOtherPartyData",
@@ -138,7 +158,7 @@
     "ID": "otherPartyAwareOfAnyAdditionalOtherParties",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "15/01/2026",
-    "FieldDisplayOrder": 12,
+    "FieldDisplayOrder": 16,
     "PageID": "1.0"
   }
 ]
