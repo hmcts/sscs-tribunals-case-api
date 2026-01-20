@@ -3,7 +3,7 @@
     "LiveFrom": "07/01/2026",
     "CaseTypeID": "Benefit",
     "ID": "requestOtherPartyData",
-    "Name": "Request Other Party Data",
+    "Name": "Request other party data",
     "PreConditionState(s)": "validAppeal",
     "PostConditionState": "awaitOtherPartyData",
     "SecurityClassification": "Public",

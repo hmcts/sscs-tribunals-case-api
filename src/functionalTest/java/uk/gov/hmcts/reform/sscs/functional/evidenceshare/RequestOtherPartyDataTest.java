@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Nested;
@@ -25,7 +27,7 @@ class RequestOtherPartyDataTest extends AbstractFunctionalTest {
 
             final SscsCaseDetails caseWithState = createCaseFromEvent(benefit, eventType);
 
-            defaultAwait().untilAsserted(() -> {
+            await().atMost(30, SECONDS).pollInterval(2, SECONDS).untilAsserted(() -> {
                 SscsCaseDetails caseDetails = findCaseById(Long.toString(caseWithState.getId()));
                 assertThat(caseDetails.getState()).isEqualTo(expectedState);
             });
@@ -43,7 +45,7 @@ class RequestOtherPartyDataTest extends AbstractFunctionalTest {
 
             final SscsCaseDetails caseWithState = createCaseFromEvent(benefit, eventType);
 
-            defaultAwait().untilAsserted(() -> {
+            await().atMost(30, SECONDS).untilAsserted(() -> {
                 SscsCaseDetails caseDetails = findCaseById(Long.toString(caseWithState.getId()));
                 assertThat(caseDetails.getState()).isEqualTo(expectedState);
             });
