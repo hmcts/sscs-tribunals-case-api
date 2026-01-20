@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
-public class AddOtherPartyDataHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class AddOtherPartyDataAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callback != null && CallbackType.ABOUT_TO_SUBMIT.equals(callbackType)
