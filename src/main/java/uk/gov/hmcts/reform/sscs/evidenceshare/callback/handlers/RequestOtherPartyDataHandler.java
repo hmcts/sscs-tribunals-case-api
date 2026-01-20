@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATEST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -10,8 +10,6 @@ import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
@@ -44,8 +42,7 @@ public class RequestOtherPartyDataHandler implements CallbackHandler<SscsCaseDat
             return false;
         }
 
-        return Optional.ofNullable(callback.getCaseDetails()).map(CaseDetails::getCaseData).map(SscsCaseData::getBenefitType)
-            .flatMap(benefitType -> benefitType).map(Benefit.CHILD_SUPPORT::equals).orElse(false);
+        return callback.getCaseDetails().getCaseData().isBenefitType(CHILD_SUPPORT);
     }
 
     @Override

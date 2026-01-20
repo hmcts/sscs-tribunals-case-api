@@ -164,7 +164,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
     }
 
     private void updateCaseToSentToDwp(Callback<SscsCaseData> callback, SscsCaseData caseData, BulkPrintInfo bulkPrintInfo) {
-        boolean isNotChildSupport = !isChildSupportBenefit(callback.getCaseDetails().getCaseData());
+        boolean isNotChildSupport = !caseData.isBenefitType(Benefit.CHILD_SUPPORT);
         boolean isNotValidAppealCreatedEvent = EventType.VALID_APPEAL_CREATED != callback.getEvent();
 
         if (isNotChildSupport || isNotValidAppealCreatedEvent) {
@@ -192,10 +192,6 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
                     log.info("Updated case v2 send to bulk print event - dwp for id {}", caseId);
                 });
         }
-    }
-
-    private boolean isChildSupportBenefit(SscsCaseData caseData) {
-        return caseData.getBenefitType().map(benefit -> benefit == Benefit.CHILD_SUPPORT).orElse(false);
     }
 
     private BulkPrintInfo bulkPrintCase(Callback<SscsCaseData> sscsCaseDataCallback) {
