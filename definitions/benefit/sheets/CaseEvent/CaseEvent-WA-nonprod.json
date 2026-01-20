@@ -207,7 +207,6 @@
     "CaseTypeID": "Benefit",
     "ID": "overdueFtaResponse",
     "Name": "Overdue FTA Response",
-    "Description": "2 days since request sent to FTA with no response",
     "DisplayOrder": 9994,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
