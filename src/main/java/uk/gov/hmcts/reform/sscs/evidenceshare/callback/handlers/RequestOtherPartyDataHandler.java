@@ -35,27 +35,40 @@ public class RequestOtherPartyDataHandler implements CallbackHandler<SscsCaseDat
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-
-        if (!cmOtherPartyConfidentialityEnabled
-            || callbackType != CallbackType.SUBMITTED
-            || (callback.getEvent() != EventType.VALID_APPEAL_CREATED && callback.getEvent() != EventType.VALID_APPEAL)) {
+        if (!cmOtherPartyConfidentialityEnabled) {
             return false;
         }
 
-        return callback.getCaseDetails().getCaseData().isBenefitType(CHILD_SUPPORT);
+        if (callbackType != CallbackType.SUBMITTED) {
+            return false;
+        }
+
+        final EventType event = callback.getEvent();
+        if (event != EventType.VALID_APPEAL_CREATED && event != EventType.VALID_APPEAL) {
+            return false;
+        }
+
+        final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        return caseData.isBenefitType(CHILD_SUPPORT);
     }
 
     @Override
     public void handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        if (!canHandle(callbackType, callback)) {
+        if (!canHandle(callbackType,
+            callback)) {
             return;
         }
 
         final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         long caseId = Long.parseLong(caseData.getCcdCaseId());
 
-        updateCcdCaseService.updateCaseV2(caseId, EventType.REQUEST_OTHER_PARTY_DATA.getCcdType(), SUMMARY, DESCRIPTION,
-            idamService.getIdamTokens(), ignored -> log.info("Request other party details for case id {}", caseId));
+        updateCcdCaseService.updateCaseV2(caseId,
+            EventType.REQUEST_OTHER_PARTY_DATA.getCcdType(),
+            SUMMARY,
+            DESCRIPTION,
+            idamService.getIdamTokens(),
+            ignored -> log.info("Requested other party details for case id {}",
+                caseId));
     }
 
     @Override
