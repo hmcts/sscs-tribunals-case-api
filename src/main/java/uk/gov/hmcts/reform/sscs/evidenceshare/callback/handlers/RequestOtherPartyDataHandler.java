@@ -67,7 +67,7 @@ public class RequestOtherPartyDataHandler implements CallbackHandler<SscsCaseDat
             SUMMARY,
             DESCRIPTION,
             idamService.getIdamTokens(),
-            ignored -> log.info("Requested other party details for case id {}",
+            ignored -> log.info("Request other party details for case id {}",
                 caseId));
     }
 

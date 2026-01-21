@@ -501,12 +501,15 @@ class SendToBulkPrintHandlerTest {
         assertThat(sscsCaseData.getHmctsDwpState()).isEqualTo("failedSending");
     }
 
-    @Test
-    void givenChildMaintenanceValidEventAndFeatureToggledOn_shouldNotSentToDwp() {
+    @ParameterizedTest
+    @ValueSource(strings = {"VALID_APPEAL_CREATED", "VALID_APPEAL"})
+    void givenChildMaintenanceAndSpecifiedEventAndFeatureToggledOn_shouldNotSentToDwp(String eventType) {
 
-        bulkPrintCaseHappyPathSetUp(Benefit.CHILD_SUPPORT.getShortName(), EventType.VALID_APPEAL_CREATED);
+        bulkPrintCaseHappyPathSetUp(Benefit.CHILD_SUPPORT.getShortName(),
+            EventType.valueOf(eventType));
 
-        handler.handle(CallbackType.SUBMITTED, callback);
+        handler.handle(CallbackType.SUBMITTED,
+            callback);
 
         verifyNoMoreInteractions(updateCcdCaseService);
 
@@ -515,7 +518,7 @@ class SendToBulkPrintHandlerTest {
     @ParameterizedTest
     @CsvSource({
         "PIP, VALID_APPEAL",
-        "childSupport, VALID_APPEAL",
+        "childSupport, APPEAL_TO_PROCEED",
         "PIP, VALID_APPEAL_CREATED"
     })
     void givenNonChildMaintenanceOrNonValidEvent_shouldCallUpdateCcdCaseService(String benefitType, String eventType) {
