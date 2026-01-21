@@ -1,5 +1,5 @@
 [
-  {"LiveFrom": "08/01/2026", "CaseTypeID": "Benefit", "CaseEventID": "awaitOtherPartyData", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "08/01/2026", "CaseTypeID": "Benefit", "CaseStateID": "awaitOtherPartyData", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "08/01/2026", "CaseTypeID": "Benefit", "CaseStateID": "awaitOtherPartyData", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
   {"LiveFrom": "08/01/2026", "CaseTypeID": "Benefit", "CaseStateID": "awaitOtherPartyData", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
   {"LiveFrom": "08/01/2026", "CaseTypeID": "Benefit", "CaseStateID": "awaitOtherPartyData", "AccessProfile": "caseworker-sscs-registrar", "CRUD": "CRUD"},
