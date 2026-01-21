@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATEST;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +38,7 @@ public class RequestOtherPartyDataHandler implements CallbackHandler<SscsCaseDat
 
         if (!cmOtherPartyConfidentialityEnabled
             || callbackType != CallbackType.SUBMITTED
-            || callback.getEvent() != EventType.VALID_APPEAL_CREATED) {
+            || (callback.getEvent() != EventType.VALID_APPEAL_CREATED && callback.getEvent() != EventType.VALID_APPEAL)) {
             return false;
         }
 
@@ -60,6 +60,6 @@ public class RequestOtherPartyDataHandler implements CallbackHandler<SscsCaseDat
 
     @Override
     public DispatchPriority getPriority() {
-        return LATEST;
+        return LATE;
     }
 }

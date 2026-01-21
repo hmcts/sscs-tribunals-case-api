@@ -1,4 +1,5 @@
 [
+  {"LiveFrom": "08/01/2026", "CaseTypeID": "Benefit", "CaseEventID": "requestOtherPartyData", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
   {"LiveFrom": "08/01/2026", "CaseTypeID": "Benefit", "CaseEventID": "requestOtherPartyData", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "R"},
   {"LiveFrom": "08/01/2026", "CaseTypeID": "Benefit", "CaseEventID": "requestOtherPartyData", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"}
 ]
