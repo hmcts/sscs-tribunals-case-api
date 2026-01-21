@@ -56,6 +56,7 @@ import uk.gov.service.notify.SendSmsResponse;
 public class NotificationSenderTest {
 
     private static final String SAMPLE_COVERSHEET = "pdf/direction-notice-coversheet-sample.pdf";
+    private static final String LARGE_PDF = "pdf/eleven-page-test-document.pdf";
     public static final String CASE_D = "78980909090099";
     public static final SscsCaseData SSCS_CASE_DATA = SscsCaseData.builder().build();
     public static final String SMS_SENDER = "sms-sender";
@@ -190,6 +191,20 @@ public class NotificationSenderTest {
         verify(notificationClient).sendPrecompiledLetterWithInputStream(any(), any());
         verify(saveCorrespondenceAsyncService)
                 .saveLetter(any(NotificationClient.class), anyString(), any(Correspondence.class), anyString());
+    }
+
+    @Test
+    public void sendLargeBundledLetterToSender() throws IOException, NotificationClientException {
+        when(notificationClient.sendPrecompiledLetterWithInputStream(any(), any())).thenReturn(letterResponse);
+        when(letterResponse.getNotificationId()).thenReturn(UUID.randomUUID());
+        byte[] largeLetter =
+                toByteArray(requireNonNull(getClass().getClassLoader().getResourceAsStream(LARGE_PDF)));
+
+        notificationSender
+                .sendBundledLetter("LN8 4DX", largeLetter, APPEAL_RECEIVED, "Bob Squires", CASE_D);
+
+        verifyNoInteractions(testNotificationClient);
+        verify(notificationClient).sendPrecompiledLetterWithInputStream(any(), any());
     }
 
     @Test
@@ -407,7 +422,7 @@ public class NotificationSenderTest {
     }
 
     @Test
-    public void saveLetterCorrespondence_emptyLetter() throws NotificationClientException {
+    public void saveLetterCorrespondence_emptyLetter() {
         notificationSender
                 .saveLettersToReasonableAdjustment(null, APPEAL_RECEIVED, "Bob Squires", CASE_D, APPELLANT);
         verifyNoInteractions(saveCorrespondenceAsyncService);
