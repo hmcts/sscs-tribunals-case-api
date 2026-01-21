@@ -8,14 +8,17 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.APPELLANT;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender.DATE_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender.ZONE_ID_LONDON;
@@ -173,29 +176,30 @@ public class NotificationSenderTest {
 
     @Test
     public void sendBundledLetterToNormalSender() throws IOException, NotificationClientException {
-        String postcode = "LN8 4DX";
-
+        ReflectionTestUtils.setField(notificationSender, "saveCorrespondence", true);
         when(notificationClient.sendPrecompiledLetterWithInputStream(any(), any())).thenReturn(letterResponse);
         when(letterResponse.getNotificationId()).thenReturn(UUID.randomUUID());
-        byte[] sampleDirectionCoversheet =
+        doNothing().when(saveCorrespondenceAsyncService)
+                .saveLetter(any(NotificationClient.class), anyString(), any(Correspondence.class), anyString());
+        byte[] sampleCoversheet =
                 toByteArray(requireNonNull(getClass().getClassLoader().getResourceAsStream(SAMPLE_COVERSHEET)));
 
         notificationSender
-                .sendBundledLetter(postcode, sampleDirectionCoversheet, APPEAL_RECEIVED, "Bob Squires", CASE_D);
+                .sendBundledLetter("LN8 4DX", sampleCoversheet, APPEAL_RECEIVED, "Bob Squires", CASE_D);
 
         verifyNoInteractions(testNotificationClient);
         verify(notificationClient).sendPrecompiledLetterWithInputStream(any(), any());
+        verify(saveCorrespondenceAsyncService)
+                .saveLetter(any(NotificationClient.class), anyString(), any(Correspondence.class), anyString());
     }
 
     @Test
-    public void sendBundledLetterToSenderIfOnBlacklist() throws IOException, NotificationClientException {
+    public void sendBundledLetterToSenderIfOnBlacklist() throws NotificationClientException {
         String postcode = "TS1 1ST";
-
         when(blacklist.getPostcodes()).thenReturn(Collections.singletonList(postcode));
         when(testNotificationClient.sendPrecompiledLetterWithInputStream(any(), any())).thenReturn(letterResponse);
         when(letterResponse.getNotificationId()).thenReturn(UUID.randomUUID());
-        byte[] sampleDirectionCoversheet =
-                toByteArray(requireNonNull(getClass().getClassLoader().getResourceAsStream(SAMPLE_COVERSHEET)));
+        byte[] sampleDirectionCoversheet = "sampleDirectionCoversheet".getBytes();
 
         notificationSender
                 .sendBundledLetter(postcode, sampleDirectionCoversheet, APPEAL_RECEIVED, "Bob Squires", CASE_D);
@@ -206,17 +210,21 @@ public class NotificationSenderTest {
 
     @Test
     public void sendLetterToNormalSender() throws NotificationClientException {
-        String postcode = "LN8 4DX";
+        ReflectionTestUtils.setField(notificationSender, "saveCorrespondence", true);
         when(notificationClient.sendLetter(any(), any(), any())).thenReturn(sendLetterResponse);
         when(sendLetterResponse.getNotificationId()).thenReturn(UUID.randomUUID());
+        doNothing().when(saveCorrespondenceAsyncService)
+                .saveLetter(any(NotificationClient.class), anyString(), any(Correspondence.class), anyString());
         Address address = Address.builder()
-                .line1("1 Appellant Ave").town("Sometown").county("Somecounty").postcode(postcode).build();
+                .line1("1 Appellant Ave").town("Sometown").county("Somecounty").postcode("LN8 4DX").build();
 
         notificationSender
                 .sendLetter(templateId, address, personalisation, APPEAL_RECEIVED, "Bob Squires", CASE_D);
 
         verifyNoInteractions(testNotificationClient);
         verify(notificationClient).sendLetter(any(), any(), any());
+        verify(saveCorrespondenceAsyncService)
+                .saveLetter(any(NotificationClient.class), anyString(), any(Correspondence.class), anyString());
     }
 
     @Test
@@ -280,7 +288,6 @@ public class NotificationSenderTest {
 
     @Test
     public void whenAnSmsIsSentWillSaveSmsNotificationInCcd() throws NotificationClientException {
-
         ReflectionTestUtils.setField(notificationSender, "saveCorrespondence", true);
 
         String smsNumber = "07999999000";
@@ -387,9 +394,11 @@ public class NotificationSenderTest {
     @Test
     public void saveLetterCorrespondence() {
         byte[] sampleLetter = "Letter".getBytes();
-        notificationSender.saveLettersToReasonableAdjustment(sampleLetter, APPEAL_RECEIVED, "Bob Squires", CASE_D, SubscriptionType.APPELLANT);
+        notificationSender
+                .saveLettersToReasonableAdjustment(sampleLetter, APPEAL_RECEIVED, "Bob Squires", CASE_D, APPELLANT);
 
-        verify(saveCorrespondenceAsyncService).saveLetter(eq(sampleLetter), correspondenceArgumentCaptor.capture(), eq(CASE_D), eq(SubscriptionType.APPELLANT));
+        verify(saveCorrespondenceAsyncService)
+                .saveLetter(eq(sampleLetter), correspondenceArgumentCaptor.capture(), eq(CASE_D), eq(APPELLANT));
         Correspondence correspondence = correspondenceArgumentCaptor.getValue();
         assertNotNull(correspondence);
         assertEquals(CorrespondenceType.Letter, correspondence.getValue().getCorrespondenceType());
@@ -400,7 +409,8 @@ public class NotificationSenderTest {
 
     @Test
     public void saveLetterCorrespondence_emptyLetter() throws NotificationClientException {
-        notificationSender.saveLettersToReasonableAdjustment(null, APPEAL_RECEIVED, "Bob Squires", CASE_D, SubscriptionType.APPELLANT);
+        notificationSender
+                .saveLettersToReasonableAdjustment(null, APPEAL_RECEIVED, "Bob Squires", CASE_D, APPELLANT);
         verifyNoInteractions(saveCorrespondenceAsyncService);
     }
 
@@ -411,13 +421,15 @@ public class NotificationSenderTest {
 
     @Test
     public void formatter_returnsCorrectYearAtEndOfYear() {
-        final String dateFormat = LocalDateTime.of(2020, 12, 31, 12, 0, 0).atZone(ZONE_ID_LONDON).format(DATE_TIME_FORMATTER);
+        final String dateFormat = LocalDateTime.of(2020, 12, 31, 12, 0, 0)
+                .atZone(ZONE_ID_LONDON).format(DATE_TIME_FORMATTER);
         assertThat(dateFormat, is("31 Dec 2020 12:00"));
     }
 
     @Test
     public void formatter_returnsCorrectYearAtStartOfYear() {
-        final String dateFormat = LocalDateTime.of(2021, 1, 1, 12, 0, 0).atZone(ZONE_ID_LONDON).format(DATE_TIME_FORMATTER);
+        final String dateFormat = LocalDateTime.of(2021, 1, 1, 12, 0, 0)
+                .atZone(ZONE_ID_LONDON).format(DATE_TIME_FORMATTER);
         assertThat(dateFormat, is("1 Jan 2021 12:00"));
     }
 }
