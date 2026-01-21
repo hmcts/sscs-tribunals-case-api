@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 
 import java.util.List;
@@ -28,63 +30,38 @@ class RequestOtherPartyDataTest extends AbstractFunctionalTest {
         @CsvSource({"PIP,withDwp", "CHILD_SUPPORT,awaitOtherPartyData"})
         @SneakyThrows
         void shouldTransitionForValidAppealCreated(Benefit benefit, String expectedState) {
-            SscsCaseDetails caseWithState = createCaseFromEvent(benefit,
-                EventType.VALID_APPEAL_CREATED);
+            SscsCaseDetails caseWithState = createCaseFromEvent(benefit, EventType.VALID_APPEAL_CREATED);
 
-            assertEventuallyInState(caseWithState.getId(),
-                expectedState);
+            assertEventuallyInState(caseWithState.getId(), expectedState);
         }
 
         @ParameterizedTest
         @CsvSource({"PIP,withDwp", "CHILD_SUPPORT,awaitOtherPartyData"})
         @SneakyThrows
         void shouldTransitionForValidAppeal(Benefit benefit, String expectedState) {
-            SscsCaseDetails caseWithState = createCaseFromEvent(benefit,
-                EventType.INCOMPLETE_APPLICATION_RECEIVED);
+            SscsCaseDetails caseWithState = createCaseFromEvent(benefit, EventType.INCOMPLETE_APPLICATION_RECEIVED);
 
             makeCaseValid(caseWithState);
 
-            simulateCcdCallback(caseWithState,
-                VALID_APPEAL,
-                EventType.VALID_APPEAL);
+            simulateCcdCallback(caseWithState, VALID_APPEAL, EventType.VALID_APPEAL);
 
-            assertEventuallyInState(caseWithState.getId(),
-                expectedState);
+            assertEventuallyInState(caseWithState.getId(), expectedState);
         }
 
         private void makeCaseValid(SscsCaseDetails caseWithState) {
             var appeal = caseWithState.getData().getAppeal();
             var appellant = appeal.getAppellant();
 
-            applyAddress(appellant.getAddress(),
-                "1 Upper West Street",
-                "Birmingham",
-                "Birmingshire",
-                "SW1A 1AA");
-            applyName(appellant.getAppointee().getName(),
-                "Mrs",
-                "Elaine",
-                "Cooper");
-            applyAddress(appellant.getAppointee().getAddress(),
-                "1 Sion Way",
-                "Manchester",
-                "Manchestershire",
-                "SW1A 1AA");
-            applyName(appeal.getRep().getName(),
-                "Mr",
-                "Donald",
-                "Smith");
-            applyAddress(appeal.getRep().getAddress(),
-                "1 Main Street",
-                "Dudley",
-                "Dudleyshire",
-                "SW1A 1AA");
+            applyAddress(appellant.getAddress(), "1 Upper West Street", "Birmingham", "Birmingshire", "SW1A 1AA");
+            applyName(appellant.getAppointee().getName(), "Mrs", "Elaine", "Cooper");
+            applyAddress(appellant.getAppointee().getAddress(), "1 Sion Way", "Manchester", "Manchestershire", "SW1A 1AA");
+            applyName(appeal.getRep().getName(), "Mr", "Donald", "Smith");
+            applyAddress(appeal.getRep().getAddress(), "1 Main Street", "Dudley", "Dudleyshire", "SW1A 1AA");
 
             appeal.getHearingOptions().setExcludeDates(List.of());
             appeal.setHearingType("paper");
 
-            updateCaseEvent(EventType.VALID_APPEAL,
-                caseWithState);
+            updateCaseEvent(EventType.VALID_APPEAL, caseWithState);
         }
 
         private void applyName(Name name, String title, String firstName, String lastName) {
@@ -109,15 +86,13 @@ class RequestOtherPartyDataTest extends AbstractFunctionalTest {
         @CsvSource({"PIP,VALID_APPEAL_CREATED,withDwp", "CHILD_SUPPORT,VALID_APPEAL_CREATED,withDwp"})
         @SneakyThrows
         void shouldTransitionForValidAppealCreated(Benefit benefit, EventType eventType, String expectedState) {
-            SscsCaseDetails caseWithState = createCaseFromEvent(benefit,
-                eventType);
-            assertEventuallyInState(caseWithState.getId(),
-                expectedState);
+            SscsCaseDetails caseWithState = createCaseFromEvent(benefit, eventType);
+            assertEventuallyInState(caseWithState.getId(), expectedState);
         }
     }
 
     private void assertEventuallyInState(long caseId, String expectedState) {
-        defaultAwait().untilAsserted(() -> {
+        await().atMost(60, SECONDS).pollInterval(2, SECONDS).untilAsserted(() -> {
             SscsCaseDetails caseDetails = findCaseById(Long.toString(caseId));
             assertThat(caseDetails.getState()).isEqualTo(expectedState);
         });
