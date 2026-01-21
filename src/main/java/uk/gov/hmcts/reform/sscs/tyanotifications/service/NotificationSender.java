@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -169,10 +172,17 @@ public class NotificationSender {
 
     public void sendBundledLetter(String appellantPostcode, byte[] directionText, NotificationEventType notificationEventType, String name, String ccdCaseId) throws NotificationClientException {
         if (directionText != null) {
+            try (PDDocument letterPdf = Loader.loadPDF(directionText)) {
+                var numberOfPages = letterPdf.getNumberOfPages();
+                if (numberOfPages > 10) {
+                    log.error("Letter exceeds Gov.Notify 10-page limit for precompiled letters [{}]", numberOfPages);
+                }
+            } catch (IOException e) {
+                log.info("Failed to calculate the number of pages contained in the letter {}", e.getMessage());
+            }
+
             NotificationClient client = getLetterNotificationClient(appellantPostcode);
-
             ByteArrayInputStream bis = new ByteArrayInputStream(directionText);
-
             final LetterResponse sendLetterResponse = sendBundledLetter(ccdCaseId, client, bis);
 
             if (saveCorrespondence) {
