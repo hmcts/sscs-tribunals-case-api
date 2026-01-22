@@ -175,7 +175,8 @@ public class NotificationSender {
             try (PDDocument letterPdf = Loader.loadPDF(directionText)) {
                 var numberOfPages = letterPdf.getNumberOfPages();
                 if (numberOfPages > 10) {
-                    log.error("Letter exceeds Gov.Notify 10-page limit for precompiled letters [{}]", numberOfPages);
+                    log.error("Letter exceeds Gov.Notify 10-page limit for precompiled letters [{}] for {}",
+                            numberOfPages, notificationEventType);
                 }
             } catch (IOException e) {
                 log.info("Failed to calculate the number of pages contained in the letter {}", e.getMessage());
