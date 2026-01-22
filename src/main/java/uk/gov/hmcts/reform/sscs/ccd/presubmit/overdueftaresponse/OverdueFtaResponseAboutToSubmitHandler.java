@@ -79,7 +79,7 @@ public class OverdueFtaResponseAboutToSubmitHandler implements PreSubmitCallback
             return nonNull(communicationRequest.getValue().getRequestDateTime())
                     && nonNull(overdueDate)
                     && (communicationRequest.getValue().getRequestDateTime().toLocalDate().isEqual(overdueDate)
-                         || communicationRequest.getValue().getRequestDateTime().toLocalDate().isBefore(overdueDate));
+                    || communicationRequest.getValue().getRequestDateTime().toLocalDate().isBefore(overdueDate));
         } catch (IOException e) {
             log.error("Error calculating overdue date for case id: {}. Falling back to default date check.", caseId, e);
             return communicationRequest.getValue().getRequestDateTime() != null
