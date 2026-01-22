@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_CORRECTED_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -164,5 +166,15 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
                 .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue()));
         sscsCaseData.getSscsDocument()
                 .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_CORRECTED_NOTICE.getValue()));
+        InternalCaseDocumentData internalCaseDocumentData = sscsCaseData.getInternalCaseDocumentData();
+        if (nonNull(internalCaseDocumentData) && nonNull(internalCaseDocumentData.getSscsInternalDocument())) {
+            internalCaseDocumentData.getSscsInternalDocument()
+                    .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue()));
+            internalCaseDocumentData.getSscsInternalDocument()
+                    .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_CORRECTED_NOTICE.getValue()));
+            if (CollectionUtils.isEmpty(internalCaseDocumentData.getSscsInternalDocument())) {
+                internalCaseDocumentData.setSscsInternalDocument(null);
+            }
+        }
     }
 }

@@ -1703,23 +1703,23 @@ notification:
                     appellant:
                         # SSCS-11586 emailId: aca83c9c-05c0-49d5-8ded-e581a0107408
                         # SSCS-11586 smsId: a51a7435-dffe-4455-9183-5c6f4f13bee3
-                        docmosisId: TB-SCS-LET-WEL-Hearing-Booked-v2.docx
+                        docmosisId: TB-SCS-LET-WEL-Hearing-Booked-v3.docx
                     representative:
                         # SSCS-11586 emailId: c7047e95-42ac-4d6a-91d9-c8f31f2685b8
                         # SSCS-11586 smsId: 5e7444fe-860c-4623-b5c5-b23af1ddbb0b
-                        docmosisId: TB-SCS-LET-WEL-Hearing-Booked-v2.docx
+                        docmosisId: TB-SCS-LET-WEL-Hearing-Booked-v3.docx
                     appointee:
                         # SSCS-11586 emailId: aca83c9c-05c0-49d5-8ded-e581a0107408
                         # SSCS-11586 smsId: a51a7435-dffe-4455-9183-5c6f4f13bee3
-                        docmosisId: TB-SCS-LET-WEL-Hearing-Booked-v2.docx
+                        docmosisId: TB-SCS-LET-WEL-Hearing-Booked-v3.docx
                     joint_party:
                         # SSCS-11586 emailId: 1df83ea1-bdd5-4ce0-901d-769c3a8509cb
                         # SSCS-11586 smsId: a11f7576-c44c-40f5-96cf-2920dce41bd5
-                        docmosisId: TB-SCS-LET-WEL-Hearing-Booked-v2.docx
+                        docmosisId: TB-SCS-LET-WEL-Hearing-Booked-v3.docx
                     other_party:
                         # SSCS-11586 emailId: c7047e95-42ac-4d6a-91d9-c8f31f2685b8
                         # SSCS-11586 smsId: 5e7444fe-860c-4623-b5c5-b23af1ddbb0b
-                        docmosisId: TB-SCS-LET-WEL-Hearing-Booked-v2.docx
+                        docmosisId: TB-SCS-LET-WEL-Hearing-Booked-v3.docx
                         # SSCS-11586 hearingReminder:
                         # SSCS-11586 appellant:
                         # SSCS-11586 emailId: 07eb8f5f-3436-4c2e-9676-7ee213239cc5
@@ -1983,7 +1983,7 @@ http:
         timeout: 5000
 
 ld:
-    sdk-key: AAAAAAAAAAAAA
+    sdk-key: ${LAUNCH_DARKLY_SDK_KEY:AAAAAAAAAAAAA}
     user-key: sscs-evidence-share
 
 send-grid:
