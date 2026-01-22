@@ -18,6 +18,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
@@ -134,8 +136,9 @@ class OverdueFtaResponseAboutToSubmitHandlerTest {
         assertThrows(IllegalStateException.class, () -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION));
     }
 
-    @Test
-    void givenAnUnrespondedToOverdueRequest_thenSetTaskCreatedFlag() throws IOException {
+    @ParameterizedTest
+    @ValueSource(ints = {2, 5, 10, 15})
+    void givenAnUnrespondedToOverdueRequest_thenSetTaskCreatedFlag(Integer daysOverdue) throws IOException {
         sscsCaseData.setCommunicationFields(FtaCommunicationFields.builder()
                 .ftaCommunications(List.of(overdueCommunicationsRequest))
                 .build());
