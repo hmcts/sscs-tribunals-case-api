@@ -117,7 +117,6 @@
     "ID": "otherPartyUnacceptableCustomerBehaviour",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "15/01/2026",
-    "FieldDisplayOrder": 12,
     "PageID": "1.0"
   },
   {
@@ -127,7 +126,6 @@
     "ID": "otherPartyRole",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "15/01/2026",
-    "FieldDisplayOrder": 13,
     "PageID": "1.0"
   },
   {
@@ -137,7 +135,6 @@
     "ID": "otherPartyRoleName",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "15/01/2026",
-    "FieldDisplayOrder": 14,
     "PageID": "1.0"
   },
   {
@@ -148,17 +145,6 @@
     "DisplayContext": "MANDATORY",
     "FieldShowCondition": "otherParties.role.name=\"Other\"",
     "LiveFrom": "15/01/2026",
-    "FieldDisplayOrder": 15,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "addOtherPartyData",
-    "CaseFieldID": "otherParties",
-    "ListElementCode": "awareOfAnyAdditionalOtherParties",
-    "ID": "otherPartyAwareOfAnyAdditionalOtherParties",
-    "DisplayContext": "MANDATORY",
-    "LiveFrom": "15/01/2026",
-    "FieldDisplayOrder": 16,
     "PageID": "1.0"
   }
 ]
