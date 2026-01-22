@@ -9,7 +9,6 @@ import static org.springframework.http.MediaType.APPLICATION_PDF;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,15 +19,12 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.awaitility.core.ConditionFactory;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,10 +33,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.ProfileValueSourceConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
-import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -117,23 +111,6 @@ abstract class AbstractFunctionalTest {
             .post(callbackUrl)
             .then()
             .statusCode(HttpStatus.OK.value());
-    }
-
-    public void simulateCcdCallback(SscsCaseDetails caseWithState, State state,
-                                    EventType eventType) throws JsonProcessingException {
-        simulateCcdCallback(mapper.writeValueAsString(
-            mapToCallback(caseWithState, caseWithState.getData().getBenefitType().orElseThrow(), state, eventType)));
-    }
-
-    private @NonNull Callback<SscsCaseData> mapToCallback(SscsCaseDetails caseDetails, Benefit benefit, State state,
-                                                          EventType eventType) {
-
-        caseDetails.getData().getAppeal()
-            .setBenefitType(BenefitType.builder().code(benefit.getShortName()).description(benefit.getDescription()).build());
-
-        return new Callback<>(
-            new CaseDetails<>(caseDetails.getId(), caseDetails.getJurisdiction(), state, caseDetails.getData(),
-                LocalDateTime.now(), caseDetails.getCaseTypeId()), Optional.empty(), eventType, true);
     }
 
     void createNonDigitalCaseWithEvent() {
@@ -241,7 +218,7 @@ abstract class AbstractFunctionalTest {
         updateCaseEvent(UPLOAD_DOCUMENT, caseDetails);
     }
 
-    private UploadResponse uploadDocToDocMgmtStore(String name) throws IOException {
+    UploadResponse uploadDocToDocMgmtStore(String name) throws IOException {
         Path evidencePath = new File(Objects.requireNonNull(
             getClass().getClassLoader().getResource(name)).getFile()).toPath();
 

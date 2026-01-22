@@ -170,7 +170,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
     ) {
         EventType event = callback.getEvent();
         boolean isChildSupport = caseData.isBenefitType(Benefit.CHILD_SUPPORT);
-        boolean isAppealEvent = event == EventType.VALID_APPEAL_CREATED || event == EventType.VALID_APPEAL;
+        boolean isAppealEvent = event == EventType.VALID_APPEAL_CREATED || event == EventType.VALID_APPEAL || event == EventType.APPEAL_TO_PROCEED;
         if (isChildSupport && isAppealEvent) {
             return;
         }

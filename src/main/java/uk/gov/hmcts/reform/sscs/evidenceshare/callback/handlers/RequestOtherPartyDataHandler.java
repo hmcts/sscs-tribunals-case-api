@@ -2,6 +2,9 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_TO_PROCEED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +30,7 @@ public class RequestOtherPartyDataHandler implements CallbackHandler<SscsCaseDat
     private final boolean cmOtherPartyConfidentialityEnabled;
 
     public RequestOtherPartyDataHandler(UpdateCcdCaseService updateCcdCaseService, IdamService idamService,
-                                        @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
+        @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
         this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;
         this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
@@ -44,7 +47,7 @@ public class RequestOtherPartyDataHandler implements CallbackHandler<SscsCaseDat
         }
 
         final EventType event = callback.getEvent();
-        if (event != EventType.VALID_APPEAL_CREATED && event != EventType.VALID_APPEAL) {
+        if (event != VALID_APPEAL_CREATED && event != VALID_APPEAL && event != APPEAL_TO_PROCEED) {
             return false;
         }
 
@@ -54,21 +57,15 @@ public class RequestOtherPartyDataHandler implements CallbackHandler<SscsCaseDat
 
     @Override
     public void handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        if (!canHandle(callbackType,
-            callback)) {
+        if (!canHandle(callbackType, callback)) {
             return;
         }
 
         final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         long caseId = Long.parseLong(caseData.getCcdCaseId());
 
-        updateCcdCaseService.updateCaseV2(caseId,
-            EventType.REQUEST_OTHER_PARTY_DATA.getCcdType(),
-            SUMMARY,
-            DESCRIPTION,
-            idamService.getIdamTokens(),
-            ignored -> log.info("Request other party details for case id {}",
-                caseId));
+        updateCcdCaseService.updateCaseV2(caseId, EventType.REQUEST_OTHER_PARTY_DATA.getCcdType(), SUMMARY, DESCRIPTION,
+            idamService.getIdamTokens(), ignored -> log.info("Request other party details for case id {}", caseId));
     }
 
     @Override

@@ -502,7 +502,7 @@ class SendToBulkPrintHandlerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"VALID_APPEAL_CREATED", "VALID_APPEAL"})
+    @ValueSource(strings = {"VALID_APPEAL_CREATED", "VALID_APPEAL", "APPEAL_TO_PROCEED"})
     void givenChildMaintenanceAndSpecifiedEventAndFeatureToggledOn_shouldNotSentToDwp(String eventType) {
 
         bulkPrintCaseHappyPathSetUp(Benefit.CHILD_SUPPORT.getShortName(),
@@ -518,8 +518,9 @@ class SendToBulkPrintHandlerTest {
     @ParameterizedTest
     @CsvSource({
         "PIP, VALID_APPEAL",
-        "childSupport, APPEAL_TO_PROCEED",
-        "PIP, VALID_APPEAL_CREATED"
+        "PIP, VALID_APPEAL_CREATED",
+        "PIP, APPEAL_TO_PROCEED",
+        "childSupport, INTERLOC_VALID_APPEAL",
     })
     void givenNonChildMaintenanceOrNonValidEvent_shouldCallUpdateCcdCaseService(String benefitType, String eventType) {
 

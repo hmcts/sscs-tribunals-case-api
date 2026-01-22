@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_TO_PROCEED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 
@@ -30,7 +31,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
-import uk.gov.hmcts.reform.sscs.evidenceshare.service.FeatureToggleService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
@@ -48,8 +48,6 @@ class RequestOtherPartyDataHandlerTest {
     private IdamService idamService;
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     private RequestOtherPartyDataHandler handler;
 
@@ -79,7 +77,9 @@ class RequestOtherPartyDataHandlerTest {
             when(callback.getEvent()).thenReturn(eventType);
         }
 
-        if (callbackType == SUBMITTED && (eventType == VALID_APPEAL || eventType == VALID_APPEAL_CREATED)) {
+        if (callbackType == SUBMITTED && (eventType == VALID_APPEAL
+            || eventType == VALID_APPEAL_CREATED
+            || eventType == APPEAL_TO_PROCEED)) {
             when(callback.getCaseDetails()).thenReturn(caseDetails);
             when(caseDetails.getCaseData()).thenReturn(caseDataWithBenefit(benefitCode));
         }
@@ -161,7 +161,7 @@ class RequestOtherPartyDataHandlerTest {
 
     private static Stream<Arguments> supportedEvents() {
         return Stream.of(Arguments.of(VALID_APPEAL_CREATED),
-            Arguments.of(VALID_APPEAL));
+            Arguments.of(VALID_APPEAL), Arguments.of(APPEAL_TO_PROCEED));
     }
 
     private static Stream<Arguments> unsupportedScenarios() {
