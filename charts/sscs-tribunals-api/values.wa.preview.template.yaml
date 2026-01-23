@@ -43,6 +43,7 @@ java:
     HMC_HEARINGS_TOPIC_NAMESPACE: "hmc-servicebus-aat"
     HMC_DEPLOYMENT_ID: "sscs-${CHANGE_ID}"
     IBC_NI_POSTCODES_FEATURE: true
+    SEND_LETTER_SERVICE_BASEURL: http://rpe-send-letter-service-preview.service.core-compute-preview.internal
 
 am-org-role-mapping-service:
   enabled: true
