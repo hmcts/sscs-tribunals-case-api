@@ -157,6 +157,7 @@ class CommunicationRequestUtilTest {
         assertEquals(question, addedRequest.getValue().getRequestMessage());
         assertEquals(topic, addedRequest.getValue().getRequestTopic());
         assertEquals("Test User", addedRequest.getValue().getRequestUserName());
+        assertEquals(YesNo.NO, addedRequest.getValue().getTaskCreatedForRequest());
         assertNotNull(addedRequest.getValue().getRequestResponseDueDate());
     }
 

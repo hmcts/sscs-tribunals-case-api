@@ -96,6 +96,7 @@ public class CommunicationRequestUtil {
                 .requestUserName(isNull(userDetails) ? null : userDetails.getName())
                 .requestUserRole(getRoleName(userDetails))
                 .requestResponseDueDate(dueDate)
+                .taskCreatedForRequest(YesNo.NO)
                 .build())
             .build());
         comms.sort(Comparator.comparing(communicationRequest ->
