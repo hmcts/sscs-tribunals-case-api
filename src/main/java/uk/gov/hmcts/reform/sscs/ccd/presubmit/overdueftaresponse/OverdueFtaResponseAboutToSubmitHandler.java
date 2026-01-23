@@ -59,13 +59,13 @@ public class OverdueFtaResponseAboutToSubmitHandler implements PreSubmitCallback
         log.info("Communication request List size is: {} for case id: {}", communicationRequestList.size(), caseId);
 
         CommunicationRequest overdueCommunicationRequest =  getRequestsWithoutReplies(communicationRequestList).stream()
-                     .filter(request -> request.getValue().getTaskCreatedForRequest() != YesNo.YES
+                     .filter(request -> ("No").equals(request.getValue().getTaskCreatedForRequest())
                             && isDateOverdue(request, caseId)).findFirst().orElse(null);
 
         if (overdueCommunicationRequest != null) {
             log.info("Found overdue communication request with id: {} for case id: {}", overdueCommunicationRequest.getId(), caseId);
             sscsCaseData.getCommunicationFields().setWaTaskFtaCommunicationId(overdueCommunicationRequest.getId());
-            getCommunicationRequestFromId(overdueCommunicationRequest.getId(), communicationFields.getFtaCommunications()).getValue().setTaskCreatedForRequest(YesNo.YES);
+            getCommunicationRequestFromId(overdueCommunicationRequest.getId(), communicationFields.getFtaCommunications()).getValue().setTaskCreatedForRequest("Yes");
         }
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }

@@ -582,5 +582,6 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
 
         assertThat(response.getData().getCommunicationFields().getWaTaskFtaCommunicationId()).isEqualTo(communicationRequest.getId());
         assertThat(response.getData().getCommunicationFields().getTribunalRequestType()).isEqualTo(TribunalRequestType.REPLY_TO_TRIBUNAL_QUERY);
+        assertThat(response.getData().getCommunicationFields().getFtaCommunications().getFirst().getValue().getTaskCreatedForRequest()).isEqualTo("Not Required");
     }
 }

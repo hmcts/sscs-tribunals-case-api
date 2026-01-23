@@ -1,3 +1,3 @@
 [
-  {"LiveFrom": "01/12/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "taskCreatedForRequest", "FieldType": "YesOrNo", "ElementLabel": "Task Created For Request", "FieldShowCondition": "requestTopic=\"DO_NOT_SHOW\"", "SecurityClassification": "PUBLIC"}
+  {"LiveFrom": "01/12/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "taskCreatedForRequest", "FieldType": "Text", "ElementLabel": "Task Created For Request", "FieldShowCondition": "requestTopic=\"DO_NOT_SHOW\"", "SecurityClassification": "PUBLIC"}
 ]

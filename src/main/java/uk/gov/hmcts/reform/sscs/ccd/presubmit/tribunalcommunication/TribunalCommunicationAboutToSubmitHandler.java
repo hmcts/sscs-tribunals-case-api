@@ -108,6 +108,7 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
         communicationRequest.getValue().setRequestResponseDueDate(null);
         if (isWorkAllocationEnabled) {
             communicationFields.setWaTaskFtaCommunicationId(chosenTribunalRequestId);
+            communicationRequest.getValue().setTaskCreatedForRequest("Not Required");
         }
     }
 
