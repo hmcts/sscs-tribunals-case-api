@@ -1,25 +1,24 @@
 [
   {
-    "LiveFrom": "15/01/2026",
-    "CaseEventID": "addOtherPartyData",
-    "CaseFieldID": "awareOfAnyAdditionalOtherParties",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 1,
-    "PageID": "1.0",
-    "PageLabel": "Aware Of Any Additional OtherParties",
-    "Publish": "${CCD_DEF_PUBLISH}"
-  },
-  {
     "CaseEventID": "addOtherPartyData",
     "CaseFieldID": "otherParties",
     "CaseTypeID": "Benefit",
     "DisplayContext": "COMPLEX",
     "LiveFrom": "15/01/2026",
     "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 2,
+    "PageFieldDisplayOrder": 1,
     "PageID": "1.0",
     "PageLabel": "Add other party data"
+  },
+  {
+    "LiveFrom": "15/01/2026",
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "awareOfAnyAdditionalOtherParties",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "1.0",
+    "Publish": "${CCD_DEF_PUBLISH}"
   }
 ]

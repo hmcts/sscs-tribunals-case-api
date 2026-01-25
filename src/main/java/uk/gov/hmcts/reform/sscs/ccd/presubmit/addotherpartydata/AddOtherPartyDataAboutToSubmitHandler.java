@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.addotherpartydata;
 
+import static java.util.Objects.nonNull;
+
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -12,8 +14,9 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 public class AddOtherPartyDataAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        return callback != null && CallbackType.ABOUT_TO_SUBMIT.equals(callbackType)
-            && EventType.ADD_OTHER_PARTY_DATA.equals(callback.getEvent());
+        return nonNull(callback) && CallbackType.ABOUT_TO_SUBMIT.equals(callbackType)
+            && EventType.ADD_OTHER_PARTY_DATA.equals(callback.getEvent())
+            && nonNull(callback.getCaseDetails().getCaseData().getOtherParties());
     }
 
     @Override
