@@ -1,0 +1,6 @@
+[
+  {"LiveFrom": "25/06/2019", "CaseTypeID": "Benefit", "CaseStateID": "awaitOtherPartyData", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
+  {"LiveFrom": "08/01/2026", "CaseTypeID": "Benefit", "CaseStateID": "awaitOtherPartyData", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
+  {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "CaseStateID": "awaitConfidentialityRequirements", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
+  {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "CaseStateID": "awaitConfidentialityRequirements", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"}
+]
