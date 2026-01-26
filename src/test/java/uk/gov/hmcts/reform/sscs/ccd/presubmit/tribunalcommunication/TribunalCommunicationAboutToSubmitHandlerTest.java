@@ -385,6 +385,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         assertNull(communicationRequest.getValue().getRequestResponseDueDate());
         assertNull(response.getData().getCommunicationFields().getFtaResponseDueDate());
         assertNull(response.getData().getCommunicationFields().getTribunalResponseProvidedDate());
+        assertThat(request.getTaskCreatedForRequest()).isNull();
     }
 
     @Test
@@ -555,7 +556,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenWorkAllocationEnabled_thenShouldSet_andShouldNotClearTribunalRequestType() {
+    void givenWorkAllocationEnabled_thenForReplyShouldSetWaTaskFtaCommunicationId_andShouldNotClearTribunalRequestType() {
 
         String replyText = "Reply text";
 
@@ -582,5 +583,6 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
 
         assertThat(response.getData().getCommunicationFields().getWaTaskFtaCommunicationId()).isEqualTo(communicationRequest.getId());
         assertThat(response.getData().getCommunicationFields().getTribunalRequestType()).isEqualTo(TribunalRequestType.REPLY_TO_TRIBUNAL_QUERY);
+        assertThat(response.getData().getCommunicationFields().getFtaCommunications().getFirst().getValue().getTaskCreatedForRequest()).isEqualTo("Not Required");
     }
 }

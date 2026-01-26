@@ -26,6 +26,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
@@ -142,15 +143,16 @@ class CommunicationRequestUtilTest {
         assertEquals("No communication request found with id: 1", exception.getMessage());
     }
 
-    @Test
-    void shouldAddCommunicationRequest() throws IOException {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldAddCommunicationRequest(boolean isFtaCommunicationAndWorkAllocationEnabled) throws IOException {
         List<CommunicationRequest> comms = new java.util.ArrayList<>();
         CommunicationRequestTopic topic = CommunicationRequestTopic.MRN_REVIEW_DECISION_NOTICE_DETAILS;
         String question = "Test question";
         UserDetails userDetails = UserDetails.builder().name("Test User").build();
         when(businessDaysCalculatorService.getBusinessDay(any(LocalDate.class), anyInt())).thenReturn(LocalDate.now());
         CommunicationRequestUtil.addCommunicationRequest(businessDaysCalculatorService,
-            comms, topic, question, userDetails);
+            comms, topic, question, userDetails, isFtaCommunicationAndWorkAllocationEnabled);
 
         assertEquals(1, comms.size());
         CommunicationRequest addedRequest = comms.getFirst();
@@ -158,16 +160,22 @@ class CommunicationRequestUtilTest {
         assertEquals(topic, addedRequest.getValue().getRequestTopic());
         assertEquals("Test User", addedRequest.getValue().getRequestUserName());
         assertNotNull(addedRequest.getValue().getRequestResponseDueDate());
+        if (isFtaCommunicationAndWorkAllocationEnabled) {
+            assertEquals("No", addedRequest.getValue().getTaskCreatedForRequest());
+        } else {
+            assertNull(addedRequest.getValue().getTaskCreatedForRequest());
+        }
     }
 
-    @Test
-    void shouldAddCommunicationRequestNoNameIfNull() throws IOException {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldAddCommunicationRequestNoNameIfNull(boolean isFtaCommunicationAndWorkAllocationEnabled) throws IOException {
         List<CommunicationRequest> comms = new java.util.ArrayList<>();
         CommunicationRequestTopic topic = CommunicationRequestTopic.MRN_REVIEW_DECISION_NOTICE_DETAILS;
         String question = "Test question";
         when(businessDaysCalculatorService.getBusinessDay(any(LocalDate.class), anyInt())).thenReturn(LocalDate.now());
         CommunicationRequestUtil.addCommunicationRequest(businessDaysCalculatorService,
-            comms, topic, question, null);
+            comms, topic, question, null, isFtaCommunicationAndWorkAllocationEnabled);
 
         assertEquals(1, comms.size());
         CommunicationRequest addedRequest = comms.getFirst();
@@ -175,6 +183,11 @@ class CommunicationRequestUtilTest {
         assertEquals(topic, addedRequest.getValue().getRequestTopic());
         assertNull(addedRequest.getValue().getRequestUserName());
         assertNotNull(addedRequest.getValue().getRequestResponseDueDate());
+        if (isFtaCommunicationAndWorkAllocationEnabled) {
+            assertEquals("No", addedRequest.getValue().getTaskCreatedForRequest());
+        } else {
+            assertNull(addedRequest.getValue().getTaskCreatedForRequest());
+        }
     }
 
     @ParameterizedTest

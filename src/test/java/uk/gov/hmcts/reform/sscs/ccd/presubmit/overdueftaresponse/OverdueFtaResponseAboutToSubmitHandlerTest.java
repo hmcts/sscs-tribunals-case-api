@@ -30,7 +30,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequestTopic;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.utility.calendar.BusinessDaysCalculatorService;
 
@@ -62,6 +61,7 @@ class OverdueFtaResponseAboutToSubmitHandlerTest {
                             .requestDateTime(LocalDateTime.now().minusDays(2))
                             .requestUserName("test user")
                             .requestResponseDueDate(LocalDate.now().plusDays(3))
+                            .taskCreatedForRequest("No")
                             .build()
             ).build();
 
@@ -74,7 +74,7 @@ class OverdueFtaResponseAboutToSubmitHandlerTest {
                             .requestDateTime(LocalDateTime.now().minusDays(2))
                             .requestUserName("test user")
                             .requestResponseDueDate(LocalDate.now().plusDays(3))
-                            .taskCreatedForRequest(YesNo.YES)
+                            .taskCreatedForRequest("Yes")
                             .build()
             ).build();
 
@@ -106,7 +106,7 @@ class OverdueFtaResponseAboutToSubmitHandlerTest {
     @BeforeEach
     void setUp() {
         openMocks(this);
-        handler = new OverdueFtaResponseAboutToSubmitHandler(businessDaysCalculatorService);
+        handler = new OverdueFtaResponseAboutToSubmitHandler(businessDaysCalculatorService, true);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").build();
         when(callback.getEvent()).thenReturn(EventType.OVERDUE_FTA_RESPONSE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -131,6 +131,12 @@ class OverdueFtaResponseAboutToSubmitHandlerTest {
     }
 
     @Test
+    void givenWorkAllocationNotEnabled_thenReturnFalse() {
+        handler = new OverdueFtaResponseAboutToSubmitHandler(businessDaysCalculatorService, false);
+        assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
+    }
+
+    @Test
     void throwsExceptionIfItCannotHandle() {
         when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
         assertThrows(IllegalStateException.class, () -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION));
@@ -149,7 +155,7 @@ class OverdueFtaResponseAboutToSubmitHandlerTest {
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(sscsCaseData.getCommunicationFields().getWaTaskFtaCommunicationId()).isEqualTo("overDueRequestId");
-        assertThat(getCommunicationRequestFromId("overDueRequestId", sscsCaseData.getCommunicationFields().getFtaCommunications()).getValue().getTaskCreatedForRequest()).isEqualTo(YesNo.YES);
+        assertThat(getCommunicationRequestFromId("overDueRequestId", sscsCaseData.getCommunicationFields().getFtaCommunications()).getValue().getTaskCreatedForRequest()).isEqualTo("Yes");
     }
 
     @Test
@@ -162,7 +168,7 @@ class OverdueFtaResponseAboutToSubmitHandlerTest {
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(sscsCaseData.getCommunicationFields().getWaTaskFtaCommunicationId()).isEqualTo("testId");
-        assertThat(getCommunicationRequestFromId("overDueRequestIdWithTask", sscsCaseData.getCommunicationFields().getFtaCommunications()).getValue().getTaskCreatedForRequest()).isEqualTo(YesNo.YES);
+        assertThat(getCommunicationRequestFromId("overDueRequestIdWithTask", sscsCaseData.getCommunicationFields().getFtaCommunications()).getValue().getTaskCreatedForRequest()).isEqualTo("Yes");
     }
 
     @Test

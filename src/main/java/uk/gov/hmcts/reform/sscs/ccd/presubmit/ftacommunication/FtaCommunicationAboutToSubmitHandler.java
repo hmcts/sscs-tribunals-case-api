@@ -76,7 +76,7 @@ public class FtaCommunicationAboutToSubmitHandler implements PreSubmitCallbackHa
 
             try {
                 addCommunicationRequest(businessDaysCalculatorService,
-                    ftaComms, topic, question, userDetails);
+                    ftaComms, topic, question, userDetails, isWorkAllocationEnabled);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

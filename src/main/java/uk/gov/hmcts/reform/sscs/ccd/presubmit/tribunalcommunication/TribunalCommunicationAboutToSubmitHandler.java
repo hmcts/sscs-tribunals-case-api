@@ -72,7 +72,7 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
                 .orElse(new ArrayList<>());
 
             try {
-                addCommunicationRequest(businessDaysCalculatorService, tribunalComms, topic, question, userDetails);
+                addCommunicationRequest(businessDaysCalculatorService, tribunalComms, topic, question, userDetails, false);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -108,6 +108,7 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
         communicationRequest.getValue().setRequestResponseDueDate(null);
         if (isWorkAllocationEnabled) {
             communicationFields.setWaTaskFtaCommunicationId(chosenTribunalRequestId);
+            communicationRequest.getValue().setTaskCreatedForRequest("Not Required");
         }
     }
 

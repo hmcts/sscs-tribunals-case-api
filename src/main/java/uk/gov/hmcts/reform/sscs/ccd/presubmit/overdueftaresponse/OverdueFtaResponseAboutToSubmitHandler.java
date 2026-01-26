@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -20,7 +21,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CommunicationRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FtaCommunicationFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.utility.calendar.BusinessDaysCalculatorService;
 
@@ -32,13 +32,17 @@ public class OverdueFtaResponseAboutToSubmitHandler implements PreSubmitCallback
 
     private final BusinessDaysCalculatorService businessDaysCalculatorService;
 
+    @Value("${feature.work-allocation.enabled}")
+    private final boolean isWorkAllocationEnabled;
+
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == EventType.OVERDUE_FTA_RESPONSE;
+                && callback.getEvent() == EventType.OVERDUE_FTA_RESPONSE
+                && isWorkAllocationEnabled;
     }
 
     @Override
@@ -59,13 +63,13 @@ public class OverdueFtaResponseAboutToSubmitHandler implements PreSubmitCallback
         log.info("Communication request List size is: {} for case id: {}", communicationRequestList.size(), caseId);
 
         CommunicationRequest overdueCommunicationRequest =  getRequestsWithoutReplies(communicationRequestList).stream()
-                     .filter(request -> request.getValue().getTaskCreatedForRequest() != YesNo.YES
+                .filter(request -> ("No").equals(request.getValue().getTaskCreatedForRequest())
                             && isDateOverdue(request, caseId)).findFirst().orElse(null);
 
         if (overdueCommunicationRequest != null) {
             log.info("Found overdue communication request with id: {} for case id: {}", overdueCommunicationRequest.getId(), caseId);
             sscsCaseData.getCommunicationFields().setWaTaskFtaCommunicationId(overdueCommunicationRequest.getId());
-            getCommunicationRequestFromId(overdueCommunicationRequest.getId(), communicationFields.getFtaCommunications()).getValue().setTaskCreatedForRequest(YesNo.YES);
+            getCommunicationRequestFromId(overdueCommunicationRequest.getId(), communicationFields.getFtaCommunications()).getValue().setTaskCreatedForRequest("Yes");
         }
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
