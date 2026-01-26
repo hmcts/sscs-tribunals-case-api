@@ -352,7 +352,7 @@ public class SendToBulkPrintHandlerTest {
     public void givenABrokenPdfException_shouldThrowAnExceptionAndFlagAnError() {
         final Callback<SscsCaseData> callback = setupMocksForFlagErrorTests();
 
-        when(bulkPrintService.sendToBulkPrint(any(), any(), any()))
+        when(bulkPrintService.sendToBulkPrint(anyList(), any(), any()))
             .thenThrow(new NonPdfBulkPrintException(new RuntimeException("error")));
 
         handler.handle(CallbackType.SUBMITTED, callback);
@@ -456,7 +456,7 @@ public class SendToBulkPrintHandlerTest {
 
         Optional<UUID> expectedOptionalUuid = Optional.empty();
 
-        when(bulkPrintService.sendToBulkPrint(any(), any(), any())).thenReturn(expectedOptionalUuid);
+        when(bulkPrintService.sendToBulkPrint(anyList(), any(), any())).thenReturn(expectedOptionalUuid);
 
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
 
