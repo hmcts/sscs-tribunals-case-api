@@ -9,5 +9,20 @@
     "SecurityClassification": "Public",
     "EventEnablingCondition": "appeal.benefitType.code=\"childSupport\"",
     "Publish": "N"
+  },
+  {
+    "LiveFrom": "07/01/2026",
+    "CaseTypeID": "Benefit",
+    "ID": "addOtherPartyData",
+    "Name": "Add Other Party Data",
+    "Description": "Add Other Party Data",
+    "DisplayOrder": 21,
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
+    "PreConditionState(s)": "awaitOtherPartyData",
+    "PostConditionState": "awaitConfidentialityRequirements",
+    "SecurityClassification": "Public",
+    "EventEnablingCondition": "appeal.benefitType.code=\"childSupport\"",
+    "Publish": "N"
   }
 ]
