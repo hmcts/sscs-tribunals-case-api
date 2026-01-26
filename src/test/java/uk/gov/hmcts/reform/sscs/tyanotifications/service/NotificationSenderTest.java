@@ -95,6 +95,17 @@ public class NotificationSenderTest {
 
     private NotificationSender notificationSender;
 
+    private final NotificationWrapper wrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
+            .notificationEventType(APPEAL_RECEIVED)
+            .newSscsCaseData(SscsCaseData.builder().ccdCaseId(CASE_D)
+                    .appeal(Appeal.builder()
+                            .appellant(Appellant.builder()
+                                    .address(Address.builder().postcode("LN8 4DX").build())
+                                    .build())
+                            .build())
+                    .build())
+            .build());
+
     @BeforeEach
     public void setUp() {
         final Boolean saveCorrespondence = false;
@@ -192,16 +203,6 @@ public class NotificationSenderTest {
                 .saveLetter(any(NotificationClient.class), anyString(), any(Correspondence.class), anyString());
         byte[] sampleCoversheet =
                 toByteArray(requireNonNull(getClass().getClassLoader().getResourceAsStream(SAMPLE_COVERSHEET)));
-        NotificationWrapper wrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
-                .notificationEventType(APPEAL_RECEIVED)
-                .newSscsCaseData(SscsCaseData.builder().ccdCaseId(CASE_D)
-                        .appeal(Appeal.builder()
-                                .appellant(Appellant.builder()
-                                        .address(Address.builder().postcode("LN8 4DX").build())
-                                        .build())
-                                .build())
-                        .build())
-                .build());
 
         notificationSender.sendBundledLetter(wrapper, sampleCoversheet, "Bob Squires");
 
@@ -217,16 +218,6 @@ public class NotificationSenderTest {
         when(letterResponse.getNotificationId()).thenReturn(UUID.randomUUID());
         byte[] largeLetter =
                 toByteArray(requireNonNull(getClass().getClassLoader().getResourceAsStream(LARGE_PDF)));
-        NotificationWrapper wrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
-                .notificationEventType(APPEAL_RECEIVED)
-                .newSscsCaseData(SscsCaseData.builder().ccdCaseId(CASE_D)
-                        .appeal(Appeal.builder()
-                                .appellant(Appellant.builder()
-                                        .address(Address.builder().postcode("LN8 4DX").build())
-                                        .build())
-                                .build())
-                        .build())
-                .build());
 
         notificationSender.sendBundledLetter(wrapper, largeLetter, "Bob Squires");
 
@@ -241,16 +232,7 @@ public class NotificationSenderTest {
         when(testNotificationClient.sendPrecompiledLetterWithInputStream(any(), any())).thenReturn(letterResponse);
         when(letterResponse.getNotificationId()).thenReturn(UUID.randomUUID());
         byte[] sampleDirectionCoversheet = "sampleDirectionCoversheet".getBytes();
-        NotificationWrapper wrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
-                .notificationEventType(APPEAL_RECEIVED)
-                .newSscsCaseData(SscsCaseData.builder().ccdCaseId(CASE_D)
-                        .appeal(Appeal.builder()
-                                .appellant(Appellant.builder()
-                                        .address(Address.builder().postcode(postcode).build())
-                                        .build())
-                                .build())
-                        .build())
-                .build());
+        wrapper.getNewSscsCaseData().getAppeal().getAppellant().getAddress().setPostcode(postcode);
 
         notificationSender.sendBundledLetter(wrapper, sampleDirectionCoversheet, "Bob Squires");
 
@@ -433,19 +415,8 @@ public class NotificationSenderTest {
     public void shouldCatchAndThrowAnyExceptionFromGovNotifyOnSendBundledLetter(String error) throws NotificationClientException, IOException {
         Exception exception = (error.equals("null")) ? new NullPointerException(error) : new NotificationClientException(error);
         doThrow(exception).when(notificationClient).sendPrecompiledLetterWithInputStream(any(), any());
-        String postcode = "LN8 4DX";
         byte[] sampleDirectionCoversheet =
                 toByteArray(requireNonNull(getClass().getClassLoader().getResourceAsStream(SAMPLE_COVERSHEET)));
-        NotificationWrapper wrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
-                .notificationEventType(APPEAL_RECEIVED)
-                .newSscsCaseData(SscsCaseData.builder().ccdCaseId(CASE_D)
-                        .appeal(Appeal.builder()
-                                .appellant(Appellant.builder()
-                                        .address(Address.builder().postcode(postcode).build())
-                                        .build())
-                                .build())
-                        .build())
-                .build());
 
         assertThrows(NotificationClientException.class, () ->
                 notificationSender.sendBundledLetter(wrapper, sampleDirectionCoversheet, "Bob Squires"));
@@ -454,6 +425,7 @@ public class NotificationSenderTest {
     @Test
     public void saveLetterCorrespondence() {
         byte[] sampleLetter = "Letter".getBytes();
+
         notificationSender
                 .saveLettersToReasonableAdjustment(sampleLetter, APPEAL_RECEIVED, "Bob Squires", CASE_D, APPELLANT);
 
