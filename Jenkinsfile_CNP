@@ -8,8 +8,8 @@ import uk.gov.hmcts.contino.GithubAPI
 def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
-def dmnBranch = "master"
-def waStandaloneBranch = "master"
+def dmnBranch = "SSCSCI-2086-Dormant-Action-Unprocessed-Corr"
+def waStandaloneBranch = "SSCSCI-2086-Dormant-Action-Unprocessed-Corr"
 
 def secrets = [
         'sscs-${env}': [
@@ -188,7 +188,7 @@ withPipeline(type, product, component) {
             env.CAMUNDA_BASE_URL = "https://camunda-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
             env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
             sh """
-            ./bin/pull-camunda-dmn-files.sh SSCSCI-2086-CTSC-Action-Unprocessed-Correspondence
+            ./bin/pull-camunda-dmn-files.sh ${dmnBranch}
             ./bin/pull-camunda-bpmn-files.sh ${waStandaloneBranch}
             ./bin/import-camunda-files.sh . sscs sscs
             """
