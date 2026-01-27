@@ -2,8 +2,7 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
 import static java.time.LocalDateTime.now;
 import static java.util.Optional.empty;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.anyLong;
@@ -38,7 +37,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @ExtendWith(MockitoExtension.class)
-public class ListingStateProcessingServiceTest {
+class ListingStateProcessingServiceTest {
 
     private ListingStateProcessingService listingStateProcessingService;
     private SscsCaseData sscsCaseData;
@@ -56,7 +55,7 @@ public class ListingStateProcessingServiceTest {
 
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         listingStateProcessingService = new ListingStateProcessingService(updateCcdCaseService, idamService);
         sscsCaseData = buildCaseData("Bloggs");
         sscsCaseData.setCcdCaseId("1");
@@ -70,7 +69,7 @@ public class ListingStateProcessingServiceTest {
     }
 
     @Test
-    public void givenResponseReceivedCase_thenInterLocReviewIsNone() {
+    void givenResponseReceivedCase_thenInterLocReviewIsNone() {
         sscsCaseData.setState(RESPONSE_RECEIVED);
         caseDetails = new CaseDetails<>(
                 1234L, "SSCS", RESPONSE_RECEIVED, sscsCaseData, now(), "Benefit"
@@ -89,24 +88,24 @@ public class ListingStateProcessingServiceTest {
         );
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
         consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
-        assertEquals(sscsCaseData.getInterlocReviewState(), InterlocReviewState.NONE);
+        assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.NONE);
     }
 
     @Test
-    public void givenDormantCase_caseShouldNotUpdate() {
+    void givenDormantCase_caseShouldNotUpdate() {
         sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
         listingStateProcessingService.processCaseState(callback,sscsCaseData, EventType.CONFIRM_PANEL_COMPOSITION);
         verify(updateCcdCaseService, never()).updateCase(any(), any(), anyString(), anyString(), anyString(), any());
     }
 
     @Test
-    public void givenNonDormantCase_caseShouldUpdate() {
+    void givenNonDormantCase_caseShouldUpdate() {
         listingStateProcessingService.processCaseState(callback,sscsCaseData, EventType.CONFIRM_PANEL_COMPOSITION);
         verify(updateCcdCaseService, times(1)).triggerCaseEventV2(any(), any(), anyString(), anyString(), any());
     }
 
     @Test
-    public void givenCaseFqpmRequiredWithOtherPartHearing_thenRemoveDirectionDueDate() {
+    void givenCaseFqpmRequiredWithOtherPartHearing_thenRemoveDirectionDueDate() {
         CcdValue<OtherParty> otherParty = CcdValue.<OtherParty>builder()
             .value(OtherParty.builder()
                 .id("1")
@@ -127,6 +126,6 @@ public class ListingStateProcessingServiceTest {
         );
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
         consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
-        assertNull(sscsCaseData.getDirectionDueDate());
+        assertThat(sscsCaseData.getDirectionDueDate()).isNull();
     }
 }

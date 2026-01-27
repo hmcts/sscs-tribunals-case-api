@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
-
 import java.util.function.Consumer;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +8,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-
 
 @Service
 public class ListingStateProcessingService {
