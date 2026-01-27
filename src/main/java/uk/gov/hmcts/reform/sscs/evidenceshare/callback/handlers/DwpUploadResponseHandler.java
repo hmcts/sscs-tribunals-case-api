@@ -203,7 +203,7 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
                 sscsCaseDetails -> {
                     SscsCaseData sscsCaseData = sscsCaseDetails.getData();
                     sscsCaseData.setDwpState(RESPONSE_SUBMITTED_DWP);
-//                    sscsCaseData.setIgnoreCallbackWarnings(YesNo.YES);
+                    //sscsCaseData.setIgnoreCallbackWarnings(YesNo.YES);
                     log.info("Updated case v2 with dwp load response event {} for id {}",
                             EventType.READY_TO_LIST,
                             callback.getCaseDetails().getId());
