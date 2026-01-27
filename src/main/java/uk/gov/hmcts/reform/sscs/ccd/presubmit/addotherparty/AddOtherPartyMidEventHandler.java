@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 public class AddOtherPartyMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        return nonNull(callback) && CallbackType.ABOUT_TO_SUBMIT.equals(callbackType)
+        return nonNull(callback) && CallbackType.MID_EVENT.equals(callbackType)
             && EventType.ADD_OTHER_PARTY_DATA.equals(callback.getEvent())
             && nonNull(callback.getCaseDetails().getCaseData().getOtherParties());
     }

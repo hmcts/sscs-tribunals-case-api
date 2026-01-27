@@ -2,7 +2,9 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.addotherparty;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_1;
@@ -50,7 +52,8 @@ public class AddOtherPartyMidEventHandlerTest {
     public void setUp() {
         handler = new AddOtherPartyMidEventHandler();
 
-        sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").build();
+        sscsCaseData = SscsCaseData.builder()
+            .ccdCaseId("ccdId").build();
 
         Appeal appeal = Appeal.builder()
             .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build();
@@ -90,11 +93,24 @@ public class AddOtherPartyMidEventHandlerTest {
         }
 
         @ParameterizedTest
-        @EnumSource(value = CallbackType.class, names = {"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
-        public void givenANonAboutToSubmitCallbackType_thenReturnFalse(CallbackType callbackType) {
-            sscsCaseData.setOtherParties(Collections.singletonList(buildOtherParty(ID_1)));
-
+        @EnumSource(value = CallbackType.class, names = {"MID_EVENT"}, mode = EnumSource.Mode.EXCLUDE)
+        void shouldReturnFalseForCanHandleWhenNotMidEvent(CallbackType callbackType) {
             assertThat(handler.canHandle(callbackType, callback)).isFalse();
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = EventType.class, names = {"ADD_OTHER_PARTY_DATA"}, mode = EnumSource.Mode.EXCLUDE)
+        void shouldReturnFalseForCanHandleWhenNotAddOtherPartyData(EventType eventType) {
+            when(callback.getEvent()).thenReturn(eventType);
+            assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
+        }
+
+        @Test
+        void shouldThrowIllegalStateExceptionIfCannotHandle() {
+            IllegalStateException ex = assertThrows(IllegalStateException.class,
+                () -> handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION));
+
+            assertThat(ex).hasMessage("Cannot handle callback");
         }
     }
 
