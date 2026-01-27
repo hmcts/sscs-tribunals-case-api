@@ -1,9 +1,9 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.addotherpartydata;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.addotherparty;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_1;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_2;
@@ -32,11 +32,11 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 @ExtendWith(MockitoExtension.class)
-public class AddOtherPartyDataAboutToSubmitHandlerTest {
+public class AddOtherPartyMidEventHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    private AddOtherPartyDataAboutToSubmitHandler handler;
+    private AddOtherPartyMidEventHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -48,7 +48,7 @@ public class AddOtherPartyDataAboutToSubmitHandlerTest {
 
     @BeforeEach
     public void setUp() {
-        handler = new AddOtherPartyDataAboutToSubmitHandler();
+        handler = new AddOtherPartyMidEventHandler();
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").build();
 
@@ -66,7 +66,7 @@ public class AddOtherPartyDataAboutToSubmitHandlerTest {
             sscsCaseData.setOtherParties(Collections.singletonList(buildOtherParty(ID_1)));
             when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
 
-            assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
+            assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
         }
 
         @Test
@@ -77,7 +77,7 @@ public class AddOtherPartyDataAboutToSubmitHandlerTest {
 
             sscsCaseData.setOtherParties(Collections.singletonList(buildOtherParty(ID_1)));
 
-            assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isTrue();
+            assertThat(handler.canHandle(MID_EVENT, callback)).isTrue();
         }
 
         @Test
@@ -86,7 +86,7 @@ public class AddOtherPartyDataAboutToSubmitHandlerTest {
             when(callback.getCaseDetails()).thenReturn(caseDetails);
             when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-            assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
+            assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
         }
 
         @ParameterizedTest
@@ -105,7 +105,7 @@ public class AddOtherPartyDataAboutToSubmitHandlerTest {
             when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
 
             assertThatThrownBy(() ->
-                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION))
+                handler.handle(MID_EVENT, callback, USER_AUTHORISATION))
                 .isInstanceOf(IllegalStateException.class);
         }
 
@@ -117,7 +117,7 @@ public class AddOtherPartyDataAboutToSubmitHandlerTest {
 
             sscsCaseData.setOtherParties(List.of(buildOtherParty(ID_1), buildOtherParty(ID_2)));
 
-            var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+            var response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
             assertThat(response.getErrors()).contains("Only one other party data can be added using this event!");
         }

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.addotherpartydata;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.addotherparty;
 
 import static java.util.Objects.nonNull;
 
@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
-public class AddOtherPartyDataAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class AddOtherPartyMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return nonNull(callback) && CallbackType.ABOUT_TO_SUBMIT.equals(callbackType)

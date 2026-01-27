@@ -17,8 +17,6 @@
     "Name": "Add Other Party Data",
     "Description": "Add Other Party Data",
     "DisplayOrder": 21,
-    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
-    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "PreConditionState(s)": "awaitOtherPartyData",
     "PostConditionState": "awaitConfidentialityRequirements",
     "SecurityClassification": "Public",
