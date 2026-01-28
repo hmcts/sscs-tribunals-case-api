@@ -7,7 +7,7 @@
   },
   "scripts": {
     "start": "node index.js",
-    "test:e2e": "npx playwright install chromium && npx playwright test definitions/test/e2e/add-note.spec.ts --config ./playwright.config.ts --project chromium --reporter=html",
+    "test:e2e": "npx playwright install chromium && npx playwright test definitions/test/e2e/manage-documents.spec.ts --config ./playwright.config.ts --project chromium --reporter=html",
     "test:pr": "yarn test:e2e --grep-invert @work-allocation --grep $TEST_SUITE",
     "test:aat": "yarn test:e2e --grep-invert @work-allocation --grep @master-pipeline",
     "test:nightly": "yarn test:e2e --grep-invert @work-allocation --grep @nightly-pipeline",
