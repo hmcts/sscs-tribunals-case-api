@@ -17,6 +17,9 @@ def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
 
+if (params.UI_URL_TO_TEST.contains('demo') && params.API_URL_TO_TEST.contains('demo')) {
+    env.NONPROD_ENVIRONMENT_NAME = "demo"
+}
 
 def secrets = [
         'sscs-${env}': [
@@ -90,17 +93,17 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
     ]
 }
 
-def setDemoEnvVars() {
+def setEnvVars(envName) {
     env.PREVIEW_BRANCH_WITH_LOCAL_CCD = false
-    env.TEST_E2E_URL_WEB = "https://manage-case.demo.platform.hmcts.net/"
-    env.TEST_E2E_API_URI = "http://sscs-tribunals-api-demo.service.core-compute-demo.internal"
-    env.CCD_API_URL = "http://ccd-data-store-api-demo.service.core-compute-demo.internal"
-    env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-demo.service.core-compute-demo.internal"
-    env.CCD_GW_API = "https://gateway-ccd.demo.platform.hmcts.net"
-    env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-demo.service.core-compute-demo.internal"
-    env.TEST_DOCUMENT_MANAGEMENT_URL = "http://dm-store-demo.service.core-compute-demo.internal"
-    env.DOCUMENT_MANAGEMENT_URL = "http://dm-store-demo.service.core-compute-demo.internal"
-    env.ENVIRONMENT = "demo"
+    env.TEST_E2E_URL_WEB = "https://manage-case.${envName}.platform.hmcts.net/"
+    env.TEST_E2E_API_URI = "http://sscs-tribunals-api-${envName}.service.core-compute-${envName}.internal"
+    env.CCD_API_URL = "http://ccd-data-store-api-${envName}.service.core-compute-${envName}.internal"
+    env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-${envName}.service.core-compute-${envName}.internal"
+    env.CCD_GW_API = "https://gateway-ccd.${envName}.platform.hmcts.net"
+    env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-${envName}.service.core-compute-${envName}.internal"
+    env.TEST_DOCUMENT_MANAGEMENT_URL = "http://dm-store-${envName}.service.core-compute-${envName}.internal"
+    env.DOCUMENT_MANAGEMENT_URL = "http://dm-store-${envName}.service.core-compute-${envName}.internal"
+    env.ENVIRONMENT = envName
     env.HEARINGS_ENABLED = "Yes"
 }
 
@@ -109,7 +112,7 @@ withNightlyPipeline(type, product, component) {
     env.TEST_URL = params.API_URL_TO_TEST
     env.POST_HEARINGS_FEATURE = false
     env.Rules = params.SecurityRules
-    setDemoEnvVars()
+    setEnvVars(env.NONPROD_ENVIRONMENT_NAME)
 
     env.TEST_E2E_URL_WEB = params.UI_URL_TO_TEST
     loadVaultSecrets(secrets)
