@@ -85,20 +85,27 @@ public class CommunicationRequestUtil {
             .orElseThrow(() -> new IllegalStateException("No communication request found with id: " + id));
     }
 
-    public static void addCommunicationRequest(BusinessDaysCalculatorService service, List<CommunicationRequest> comms, CommunicationRequestTopic topic, String question, UserDetails userDetails) throws IOException {
+    public static void addCommunicationRequest(BusinessDaysCalculatorService service, List<CommunicationRequest> comms,
+                                               CommunicationRequestTopic topic, String question, UserDetails userDetails,
+                                               boolean isFtaCommunicationAndWorkAllocationEnabled) throws IOException {
         LocalDateTime now = ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDateTime();
         LocalDate dueDate = service.getBusinessDay(now.toLocalDate(), 2);
-        comms.add(CommunicationRequest.builder()
-            .value(CommunicationRequestDetails.builder()
-                .requestMessage(question)
-                .requestTopic(topic)
-                .requestDateTime(now)
-                .requestUserName(isNull(userDetails) ? null : userDetails.getName())
-                .requestUserRole(getRoleName(userDetails))
-                .requestResponseDueDate(dueDate)
-                .taskCreatedForRequest("No")
-                .build())
-            .build());
+        CommunicationRequest newCommunicationRequest = CommunicationRequest.builder()
+                .value(CommunicationRequestDetails.builder()
+                        .requestMessage(question)
+                        .requestTopic(topic)
+                        .requestDateTime(now)
+                        .requestUserName(isNull(userDetails) ? null : userDetails.getName())
+                        .requestUserRole(getRoleName(userDetails))
+                        .requestResponseDueDate(dueDate)
+                        .build())
+                .build();
+
+        if (isFtaCommunicationAndWorkAllocationEnabled) {
+            newCommunicationRequest.getValue().setTaskCreatedForRequest("No");
+        }
+
+        comms.add(newCommunicationRequest);
         comms.sort(Comparator.comparing(communicationRequest ->
             ((CommunicationRequest) communicationRequest).getValue().getRequestDateTime()).reversed());
     }

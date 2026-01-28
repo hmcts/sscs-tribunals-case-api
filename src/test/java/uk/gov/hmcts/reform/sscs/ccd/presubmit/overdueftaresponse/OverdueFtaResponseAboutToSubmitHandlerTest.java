@@ -106,7 +106,7 @@ class OverdueFtaResponseAboutToSubmitHandlerTest {
     @BeforeEach
     void setUp() {
         openMocks(this);
-        handler = new OverdueFtaResponseAboutToSubmitHandler(businessDaysCalculatorService);
+        handler = new OverdueFtaResponseAboutToSubmitHandler(businessDaysCalculatorService, true);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").build();
         when(callback.getEvent()).thenReturn(EventType.OVERDUE_FTA_RESPONSE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -128,6 +128,12 @@ class OverdueFtaResponseAboutToSubmitHandlerTest {
     @Test
     void givenAValidAboutToStartEvent_thenReturnFalse() {
         assertFalse(handler.canHandle(ABOUT_TO_START, callback));
+    }
+
+    @Test
+    void givenWorkAllocationNotEnabled_thenReturnFalse() {
+        handler = new OverdueFtaResponseAboutToSubmitHandler(businessDaysCalculatorService, false);
+        assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
     @Test

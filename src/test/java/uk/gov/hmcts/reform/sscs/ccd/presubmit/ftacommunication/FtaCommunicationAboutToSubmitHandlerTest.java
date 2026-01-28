@@ -30,6 +30,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -111,8 +112,10 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertThrows(IllegalStateException.class, () -> handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION));
     }
 
-    @Test
-    void givenValidFtaRequest_shouldAddNewCommunicationToList() throws IOException {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void givenValidFtaRequest_shouldAddNewCommunicationToList(boolean isWorkAllocationEnabled) throws IOException {
+        ReflectionTestUtils.setField(handler, "isWorkAllocationEnabled", isWorkAllocationEnabled);
         // Setup FTA communication fields
         CommunicationRequestTopic expectedTopic = CommunicationRequestTopic.APPEAL_TYPE;
         String expectedQuestion = "Test Question";
@@ -155,6 +158,11 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         LocalDate date = LocalDate.now().plusDays(2);
         assertEquals(date, addedCom.getRequestResponseDueDate());
         assertEquals(date, response.getData().getCommunicationFields().getFtaResponseDueDate());
+        if (isWorkAllocationEnabled) {
+            assertEquals("No", resultComs.getFirst().getValue().getTaskCreatedForRequest());
+        } else {
+            assertNull(resultComs.getFirst().getValue().getTaskCreatedForRequest());
+        }
     }
 
     @Test

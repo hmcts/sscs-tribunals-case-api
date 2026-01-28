@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -31,13 +32,17 @@ public class OverdueFtaResponseAboutToSubmitHandler implements PreSubmitCallback
 
     private final BusinessDaysCalculatorService businessDaysCalculatorService;
 
+    @Value("${feature.work-allocation.enabled}")
+    private final boolean isWorkAllocationEnabled;
+
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == EventType.OVERDUE_FTA_RESPONSE;
+                && callback.getEvent() == EventType.OVERDUE_FTA_RESPONSE
+                && isWorkAllocationEnabled;
     }
 
     @Override
@@ -58,7 +63,7 @@ public class OverdueFtaResponseAboutToSubmitHandler implements PreSubmitCallback
         log.info("Communication request List size is: {} for case id: {}", communicationRequestList.size(), caseId);
 
         CommunicationRequest overdueCommunicationRequest =  getRequestsWithoutReplies(communicationRequestList).stream()
-                     .filter(request -> ("No").equals(request.getValue().getTaskCreatedForRequest())
+                .filter(request -> ("No").equals(request.getValue().getTaskCreatedForRequest())
                             && isDateOverdue(request, caseId)).findFirst().orElse(null);
 
         if (overdueCommunicationRequest != null) {

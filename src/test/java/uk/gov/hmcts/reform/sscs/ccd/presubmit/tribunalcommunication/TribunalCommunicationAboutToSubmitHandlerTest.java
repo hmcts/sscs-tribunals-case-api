@@ -385,6 +385,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         assertNull(communicationRequest.getValue().getRequestResponseDueDate());
         assertNull(response.getData().getCommunicationFields().getFtaResponseDueDate());
         assertNull(response.getData().getCommunicationFields().getTribunalResponseProvidedDate());
+        assertThat(request.getTaskCreatedForRequest()).isNull();
     }
 
     @Test
@@ -555,7 +556,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenWorkAllocationEnabled_thenShouldSet_andShouldNotClearTribunalRequestType() {
+    void givenWorkAllocationEnabled_thenForReplyShouldSetWaTaskFtaCommunicationId_andShouldNotClearTribunalRequestType() {
 
         String replyText = "Reply text";
 
