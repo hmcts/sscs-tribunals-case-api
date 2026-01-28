@@ -45,7 +45,7 @@ java:
     HMC_HEARINGS_TOPIC_NAMESPACE: "hmc-servicebus-aat"
     HMC_DEPLOYMENT_ID: "sscs-${CHANGE_ID}"
     IBC_NI_POSTCODES_FEATURE: true
-    TASK_MANAGEMENT_API_URL: https://wa-task-management-api-sscs-tribunals-api-pr-5003.preview.platform.hmcts.net
+    TASK_MANAGEMENT_API_URL: https://wa-task-management-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net
 
 am-org-role-mapping-service:
   enabled: true

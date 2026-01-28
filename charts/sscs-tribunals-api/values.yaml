@@ -128,6 +128,7 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     POST_HEARINGS_B_FEATURE: true
     LOGBACK_REQUIRE_ALERT_LEVEL: "false"
     LOGBACK_REQUIRE_ERROR_CODE: "false"
+    TASK_MANAGEMENT_API_URL: http://wa-task-management-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
 
     #    hearings=api
     IDAM_S2S_URL: "http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
