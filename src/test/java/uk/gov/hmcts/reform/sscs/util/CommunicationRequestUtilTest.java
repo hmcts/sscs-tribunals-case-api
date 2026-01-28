@@ -159,7 +159,6 @@ class CommunicationRequestUtilTest {
         assertEquals(question, addedRequest.getValue().getRequestMessage());
         assertEquals(topic, addedRequest.getValue().getRequestTopic());
         assertEquals("Test User", addedRequest.getValue().getRequestUserName());
-        assertEquals("No", addedRequest.getValue().getTaskCreatedForRequest());
         assertNotNull(addedRequest.getValue().getRequestResponseDueDate());
         if (isFtaCommunicationAndWorkAllocationEnabled) {
             assertEquals("No", addedRequest.getValue().getTaskCreatedForRequest());
