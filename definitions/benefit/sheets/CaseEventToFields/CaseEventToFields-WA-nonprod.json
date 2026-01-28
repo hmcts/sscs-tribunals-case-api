@@ -481,5 +481,20 @@
     "PageID": "1.0",
     "PageLabel": "Sent to FTA state",
     "Publish": "${CCD_DEF_PUBLISH}"
+  },
+  {
+    "CaseEventID": "sendFurtherEvidenceError",
+    "CaseFieldID": "hmctsDwpState",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "16/01/2026",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "PageLabel": "Send Further Evidence Error",
+    "PageShowCondition": "[STATE]=\"doNotUse\"",
+    "RetainHiddenValue": "Yes",
+    "FieldShowCondition": "[STATE]=\"doNotUse\"",
+    "Publish": "${CCD_DEF_PUBLISH}"
   }
 ]
