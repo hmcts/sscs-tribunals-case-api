@@ -31,6 +31,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -243,7 +244,7 @@ class ListingStateProcessingServiceTest {
     void givenChildSupportForConfirmPanelComposition_thenShouldNotUpdateCase() {
         sscsCaseData.setOtherParties(List.of(otherPartyWith(HearingOptions.builder().scheduleHearing("Yes").build())));
         sscsCaseData.setIsFqpmRequired(YesNo.YES);
-        sscsCaseData.setBenefitCode(Benefit.CHILD_BENEFIT.getShortName());
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
 
         refreshCallback(CONFIRM_PANEL_COMPOSITION);
 
@@ -252,19 +253,19 @@ class ListingStateProcessingServiceTest {
         verifyNoMoreInteractions(updateCcdCaseService);
     }
 
-    // @ParameterizedTest
-    // @MethodSource("benefitAndEventTypes")
-    // void givenNotChildSupportAndConfirmPanelComposition_thenUpdateCase(Benefit benefit, EventType eventType) {
-    //     sscsCaseData.setOtherParties(List.of(otherPartyWith(HearingOptions.builder().scheduleHearing("Yes").build())));
-    //     sscsCaseData.setIsFqpmRequired(YesNo.YES);
-    //     sscsCaseData.setBenefitCode(benefit.getShortName());
-    //
-    //     refreshCallback(eventType);
-    //
-    //     listingStateProcessingService.processCaseState(callback, sscsCaseData, eventType);
-    //
-    //     verifyReadyToListUpdateCaseV2Captured();
-    // }
+    @ParameterizedTest
+    @MethodSource("benefitAndEventTypes")
+    void givenNotChildSupportAndConfirmPanelComposition_thenUpdateCase(Benefit benefit, EventType eventType) {
+        sscsCaseData.setOtherParties(List.of(otherPartyWith(HearingOptions.builder().scheduleHearing("Yes").build())));
+        sscsCaseData.setIsFqpmRequired(YesNo.YES);
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(benefit.getShortName()).build());
+
+        refreshCallback(eventType);
+
+        listingStateProcessingService.processCaseState(callback, sscsCaseData, eventType);
+
+        verifyReadyToListUpdateCaseV2Captured();
+    }
 
     private static CcdValue<OtherParty> otherPartyWith(HearingOptions hearingOptions) {
         return CcdValue.<OtherParty>builder().value(OtherParty.builder().id("1").hearingOptions(hearingOptions).build()).build();
@@ -288,7 +289,7 @@ class ListingStateProcessingServiceTest {
     private static Stream<Arguments> benefitAndEventTypes() {
         return Stream.of(
             Arguments.of(Benefit.PIP, EventType.CONFIRM_PANEL_COMPOSITION),
-            Arguments.of(Benefit.CHILD_BENEFIT, EventType.UPDATE_OTHER_PARTY_DATA)
+            Arguments.of(Benefit.CHILD_SUPPORT, EventType.UPDATE_OTHER_PARTY_DATA)
         );
     }
 

@@ -56,8 +56,7 @@ public class ListingStateProcessingService {
                         "Update to Not Listable as the case is either awaiting hearing enquiry form or for FQPM to be set"
                     );
                 }
-            } else if (!(caseData.isBenefitType(Benefit.CHILD_SUPPORT)
-                && callback.getEvent() == EventType.CONFIRM_PANEL_COMPOSITION)) {
+            } else if (notConfirmPanelCompositionForChildSupport(callback, caseData)) {
                 updateCase(caseDetails.getId(),
                     EventType.READY_TO_LIST,
                     "Ready to list",
@@ -70,6 +69,11 @@ public class ListingStateProcessingService {
                     });
             }
         }
+    }
+
+    private static boolean notConfirmPanelCompositionForChildSupport(Callback<SscsCaseData> callback, SscsCaseData caseData) {
+        return !(caseData.isBenefitType(Benefit.CHILD_SUPPORT)
+            && callback.getEvent() == EventType.CONFIRM_PANEL_COMPOSITION);
     }
 
     private static boolean stateNotDormant(State caseState) {
