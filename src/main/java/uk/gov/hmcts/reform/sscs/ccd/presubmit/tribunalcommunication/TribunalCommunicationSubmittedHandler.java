@@ -63,6 +63,7 @@ public class TribunalCommunicationSubmittedHandler implements PreSubmitCallbackH
 
                 String taskFtaCommunicationId = sscsCaseData.getCommunicationFields().getWaTaskFtaCommunicationId();
 
+
                 if (nonNull(taskList) && !taskList.isEmpty()) {
                     Task taskToBeCancelled = taskList.stream().filter(
                                     task -> nonNull(task.getAdditionalProperties())

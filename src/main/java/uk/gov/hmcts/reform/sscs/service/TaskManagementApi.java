@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.sscs.model.task.management.TaskRequestPayload;
 
 @FeignClient(
         name = "wa",
-        url = "https://wa-task-management-api-sscs-tribunals-api-pr-4986.preview.platform.hmcts.net"
+        url = "${task-management.api.url}"
 )
 @SuppressWarnings("PMD.UseObjectForClearerAPI")
 public interface TaskManagementApi {
