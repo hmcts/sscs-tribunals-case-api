@@ -2038,6 +2038,7 @@ hmc:
     url: ${HMC_API_URL:http://localhost:8084}
     deployment-id: ${HMC_DEPLOYMENT_ID:}
 
+
 sscs.serviceCode: ${SSCS_SERVICE_CODE:BBA3}
 
 flags:
@@ -2046,6 +2047,12 @@ flags:
     postHearings.enabled: ${POST_HEARING_ENABLED:false}
 
 ---
+
+# Task-Management-api
+
+task-management:
+  api:
+    url: ${TASK_MANAGEMENT_API_URL:http://localhost:8084}
 
 # default profile (development, production etc.)
 spring:
