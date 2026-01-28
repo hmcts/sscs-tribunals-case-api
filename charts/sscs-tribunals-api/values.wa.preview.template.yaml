@@ -45,6 +45,7 @@ java:
     HMC_HEARINGS_TOPIC_NAMESPACE: "hmc-servicebus-aat"
     HMC_DEPLOYMENT_ID: "sscs-${CHANGE_ID}"
     IBC_NI_POSTCODES_FEATURE: true
+    TASK_MANAGEMENT_API_URL: http://wa-task-management-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
 
 am-org-role-mapping-service:
   enabled: true
@@ -806,7 +807,6 @@ wa-task-management-api:
       WA_SYSTEM_PASSWORD: ${WA_SYSTEM_PASSWORD}
       ALLOWED_CASE_TYPES: "benefit"
       MANDATORY_TASK_FIELD_CHECK_ENABLED: true
-      TASK_MANAGEMENT_API_URL: http://wa-task-management-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
 
 wa-task-monitor:
   java:
