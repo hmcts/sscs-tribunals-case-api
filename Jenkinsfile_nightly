@@ -106,27 +106,66 @@ def setEnvVars(envName) {
     env.ENVIRONMENT = envName
     env.HEARINGS_ENABLED = "Yes"
 }
-
-
+    
 withNightlyPipeline(type, product, component) {
     env.TEST_URL = params.API_URL_TO_TEST
     env.POST_HEARINGS_FEATURE = false
     env.Rules = params.SecurityRules
     setEnvVars(env.NONPROD_ENVIRONMENT_NAME)
-
     env.TEST_E2E_URL_WEB = params.UI_URL_TO_TEST
+
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
+    enableFortifyScan()
+    enableFullFunctionalTest()
 
-    afterAlways('DependencyCheckNightly') {
-        stage('Playwright tests') {
-            try {
-                sh './gradlew runE2eTestsNightly'
-            } catch (Error) {
-                unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
-            } finally {
-                steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'definitions/test/playwright-report/**'
-            }
+    afterAlways('fullFunctionalTest') {
+        runE2eTestsNightly()
+        publishHTML([
+                allowMissing         : true,
+                alwaysLinkToLastBuild: true,
+                keepAll              : true,
+                reportDir            : "playwright-report",
+                reportFiles          : 'index.html',
+                reportName           : 'SSCS E2E Test Report'
+        ])
+        runAccessibilityTestsNightly()
+        publishHTML([
+                allowMissing         : true,
+                alwaysLinkToLastBuild: true,
+                keepAll              : true,
+                reportDir            : "accessibility-report",
+                reportFiles          : 'index.html',
+                reportName           : 'SSCS Accessibility Test Report'
+        ])
+    }
+
+
+    afterSuccess('fortify-scan') {
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+    }
+}
+
+def runE2eTestsNightly() {
+    stage('Playwright tests') {
+        try {
+            sh './gradlew runE2eTestsNightly'
+        } catch (Error) {
+            unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+        } finally {
+            steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'definitions/test/playwright-report/**'
+        }
+    }
+}
+
+def runAccessibilityTestsNightly() {
+    stage('Accessibility tests') {
+        try {
+            sh './gradlew runAccessibilityTestsNightly'
+        } catch (Error) {
+            unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+        } finally {
+            steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'definitions/test/accessibility-report/**'
         }
     }
 }
