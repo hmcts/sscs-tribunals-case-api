@@ -5,7 +5,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
@@ -47,7 +56,8 @@ public class ListingStateProcessingService {
                         "Update to Not Listable as the case is either awaiting hearing enquiry form or for FQPM to be set"
                     );
                 }
-            } else {
+            } else if (!(caseData.isBenefitType(Benefit.CHILD_SUPPORT)
+                && callback.getEvent() == EventType.CONFIRM_PANEL_COMPOSITION)) {
                 updateCase(caseDetails.getId(),
                     EventType.READY_TO_LIST,
                     "Ready to list",
@@ -62,13 +72,13 @@ public class ListingStateProcessingService {
         }
     }
 
+    private static boolean stateNotDormant(State caseState) {
+        return !State.DORMANT_APPEAL_STATE.equals(caseState);
+    }
+
     private boolean stateNotWithFtaOrResponseReceived(CaseDetails<SscsCaseData> caseDetails) {
         return !(State.WITH_DWP.equals(caseDetails.getState())
             || State.RESPONSE_RECEIVED.equals(caseDetails.getState()));
-    }
-
-    private static boolean stateNotDormant(State caseState) {
-        return !State.DORMANT_APPEAL_STATE.equals(caseState);
     }
 
     private boolean hasDueDateSetAndOtherPartyWithoutHearingOption(SscsCaseData sscsCaseData) {
@@ -99,11 +109,14 @@ public class ListingStateProcessingService {
             && StringUtils.isBlank(hearingOptions.getOther()));
     }
 
-    private void updateCase(Long caseId, EventType eventType, String summary, String description, Consumer<SscsCaseDetails> caseDetailsConsumer) {
-        updateCcdCaseService.updateCaseV2(caseId, eventType.getCcdType(), summary, description, idamService.getIdamTokens(), caseDetailsConsumer);
+    private void updateCase(Long caseId, EventType eventType, String summary, String description,
+        Consumer<SscsCaseDetails> caseDetailsConsumer) {
+        updateCcdCaseService.updateCaseV2(caseId, eventType.getCcdType(), summary, description, idamService.getIdamTokens(),
+            caseDetailsConsumer);
     }
 
     private void triggerCaseEventV2(Long caseId, EventType eventType, String summary, String description) {
-        updateCcdCaseService.triggerCaseEventV2(caseId, eventType.getCcdType(), summary, description, idamService.getIdamTokens());
+        updateCcdCaseService.triggerCaseEventV2(caseId, eventType.getCcdType(), summary, description,
+            idamService.getIdamTokens());
     }
 }

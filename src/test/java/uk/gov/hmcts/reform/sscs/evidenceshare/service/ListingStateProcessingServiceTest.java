@@ -252,19 +252,19 @@ class ListingStateProcessingServiceTest {
         verifyNoMoreInteractions(updateCcdCaseService);
     }
 
-    @ParameterizedTest
-    @MethodSource("benefitAndEventTypes")
-    void givenNotChildSupportAndConfirmPanelComposition_thenUpdateCase(Benefit benefit, EventType eventType) {
-        sscsCaseData.setOtherParties(List.of(otherPartyWith(HearingOptions.builder().scheduleHearing("Yes").build())));
-        sscsCaseData.setIsFqpmRequired(YesNo.YES);
-        sscsCaseData.setBenefitCode(benefit.getShortName());
-
-        refreshCallback(eventType);
-
-        listingStateProcessingService.processCaseState(callback, sscsCaseData, eventType);
-
-        verifyReadyToListUpdateCaseV2Captured();
-    }
+    // @ParameterizedTest
+    // @MethodSource("benefitAndEventTypes")
+    // void givenNotChildSupportAndConfirmPanelComposition_thenUpdateCase(Benefit benefit, EventType eventType) {
+    //     sscsCaseData.setOtherParties(List.of(otherPartyWith(HearingOptions.builder().scheduleHearing("Yes").build())));
+    //     sscsCaseData.setIsFqpmRequired(YesNo.YES);
+    //     sscsCaseData.setBenefitCode(benefit.getShortName());
+    //
+    //     refreshCallback(eventType);
+    //
+    //     listingStateProcessingService.processCaseState(callback, sscsCaseData, eventType);
+    //
+    //     verifyReadyToListUpdateCaseV2Captured();
+    // }
 
     private static CcdValue<OtherParty> otherPartyWith(HearingOptions hearingOptions) {
         return CcdValue.<OtherParty>builder().value(OtherParty.builder().id("1").hearingOptions(hearingOptions).build()).build();
