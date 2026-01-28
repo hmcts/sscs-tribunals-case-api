@@ -310,7 +310,10 @@ public class SendNotificationService {
             && (YesNo.NO.equals(addressToUse.getInMainlandUk()) || isNotBlank(addressToUse.getPostcode()));
     }
 
-    private boolean sendBundledAndDocmosisLetterNotification(NotificationWrapper wrapper, Notification notification, String nameToUse, SubscriptionWithType subscriptionWithType) {
+    private boolean sendBundledAndDocmosisLetterNotification(NotificationWrapper wrapper,
+                                                             Notification notification,
+                                                             String nameToUse,
+                                                             SubscriptionWithType subscriptionWithType) {
         try {
             byte[] bundledLetter;
             if (isNotBlank(notification.getDocmosisLetterTemplate())) {
@@ -333,14 +336,10 @@ public class SendNotificationService {
                     nameToUse,
                     wrapper.getCaseId(),
                     subscriptionWithType.getSubscriptionType())
-                    : () -> notificationSender.sendBundledLetter(
-                    wrapper.getNewSscsCaseData().getAppeal().getAppellant().getAddress().getPostcode(),   // Used for whitelisting only
-                    bundledLetter,
-                    wrapper.getNotificationType(),
-                    nameToUse,
-                    wrapper.getCaseId());
+                    : () -> notificationSender.sendBundledLetter(wrapper,bundledLetter, nameToUse);
 
-                log.info("In sendBundledAndDocmosisLetterNotification method notificationSender is available {} ", notificationSender != null);
+                log.info("In sendBundledAndDocmosisLetterNotification method notificationSender is available {} ",
+                        notificationSender != null);
 
                 notificationLog(notification, "Docmosis Letter", nameToUse, wrapper);
 
