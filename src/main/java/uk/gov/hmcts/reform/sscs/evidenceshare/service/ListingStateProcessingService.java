@@ -71,7 +71,7 @@ public class ListingStateProcessingService {
         }
     }
 
-    private static boolean notConfirmPanelCompositionForChildSupport(Callback<SscsCaseData> callback, SscsCaseData caseData) {
+    private boolean notConfirmPanelCompositionForChildSupport(Callback<SscsCaseData> callback, SscsCaseData caseData) {
         return !(caseData.isBenefitType(Benefit.CHILD_SUPPORT)
             && callback.getEvent() == EventType.CONFIRM_PANEL_COMPOSITION);
     }
