@@ -17,9 +17,7 @@ def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
 
-if (params.UI_URL_TO_TEST.contains('demo') && params.API_URL_TO_TEST.contains('demo')) {
-    env.NONPROD_ENVIRONMENT_NAME = "demo"
-}
+env.NONPROD_ENVIRONMENT_NAME = (params.UI_URL_TO_TEST.contains('demo') && params.API_URL_TO_TEST.contains('demo')) ? "demo" : "aat"
 
 def secrets = [
         'sscs-${env}': [
