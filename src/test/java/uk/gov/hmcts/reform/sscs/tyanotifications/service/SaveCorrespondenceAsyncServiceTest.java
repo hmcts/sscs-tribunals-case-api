@@ -83,7 +83,7 @@ public class SaveCorrespondenceAsyncServiceTest {
 
     @ParameterizedTest
     @CsvSource({"APPELLANT, APPELLANT", "REPRESENTATIVE, REPRESENTATIVE", "APPOINTEE, APPOINTEE",
-            "JOINT_PARTY, JOINT_PARTY", "OTHER_PARTY, OTHER_PARTY"})
+                "JOINT_PARTY, JOINT_PARTY", "OTHER_PARTY, OTHER_PARTY"})
     public void willUploadPdfFormatLettersDirectlyIntoCcd(SubscriptionType subscriptionType, LetterType letterType) {
         service.saveLetter(new byte[]{}, correspondence, CCD_ID, subscriptionType);
 
