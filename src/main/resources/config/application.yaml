@@ -2046,6 +2046,12 @@ flags:
     postHearings.enabled: ${POST_HEARING_ENABLED:false}
 
 ---
+# Task-Management-api
+task-management:
+  api:
+    url: ${TASK_MANAGEMENT_API_URL:http://localhost:8087}
+
+---
 
 # default profile (development, production etc.)
 spring:

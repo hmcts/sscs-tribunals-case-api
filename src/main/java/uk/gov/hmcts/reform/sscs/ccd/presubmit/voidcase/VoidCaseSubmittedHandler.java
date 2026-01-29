@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.TaskManagementApiService;
+import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
 
 @Slf4j
 @Service
@@ -20,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.service.TaskManagementApiService;
 public class VoidCaseSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final TaskManagementApiService taskManagementApiService;
+    private final SendCallbackHandler sendCallbackHandler;
 
     @Value("${feature.work-allocation.enabled}")
     private final boolean isWorkAllocationEnabled;
@@ -30,7 +32,6 @@ public class VoidCaseSubmittedHandler implements PreSubmitCallbackHandler<SscsCa
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.SUBMITTED)
-                && isWorkAllocationEnabled
                 && (callback.getEvent() == EventType.VOID_CASE);
     }
 
@@ -44,10 +45,14 @@ public class VoidCaseSubmittedHandler implements PreSubmitCallbackHandler<SscsCa
         }
 
         final String caseId = String.valueOf(callback.getCaseDetails().getId());
-
         log.info("Handling Void Case Submitted callback for case id: {}", caseId);
 
-        taskManagementApiService.cancelTasksByTaskProperties(caseId, "ftaCommunicationId");
+        log.info("Publishing message for case id: {} for event: {}", caseId, callback.getEvent().getCcdType());
+        sendCallbackHandler.handle(callback);
+
+        if (isWorkAllocationEnabled) {
+            taskManagementApiService.cancelTasksByTaskProperties(caseId, "ftaCommunicationId");
+        }
 
         return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
     }
