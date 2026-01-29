@@ -69,9 +69,9 @@ class DormantEventsSubmittedHandlerTest {
 
     @ParameterizedTest
     @CsvSource(
-            {"WITHDRAWN,true", "WITHDRAWN,false",
-             "DORMANT,true", "DORMANT,false",
-             "CONFIRM_LAPSED,true", "CONFIRM_LAPSED,false"})
+        {"WITHDRAWN, true", "WITHDRAWN, false",
+         "DORMANT, true", "DORMANT, false",
+         "CONFIRM_LAPSED, true", "CONFIRM_LAPSED, false"})
     void givenCanHandle_thenSendCallbackMessage(EventType eventType, Boolean isWorkAllocationEnabled) {
         when(callback.getEvent()).thenReturn(eventType);
         handler = new DormantEventsSubmittedHandler(taskManagementApiService, sendCallbackHandler, isWorkAllocationEnabled);
