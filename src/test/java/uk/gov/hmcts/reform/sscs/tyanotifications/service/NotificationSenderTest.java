@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.argThat;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.verify;
@@ -199,8 +198,8 @@ public class NotificationSenderTest {
         ReflectionTestUtils.setField(notificationSender, "saveCorrespondence", true);
         when(notificationClient.sendPrecompiledLetterWithInputStream(any(), any())).thenReturn(letterResponse);
         when(letterResponse.getNotificationId()).thenReturn(UUID.randomUUID());
-        doNothing().when(saveCorrespondenceAsyncService)
-                .saveLetter(any(NotificationClient.class), anyString(), any(Correspondence.class), anyString());
+        when(saveCorrespondenceAsyncService.getSentLetterPdf(any(NotificationClient.class), anyString(), anyString()))
+                .thenReturn(new byte[0]);
         byte[] sampleCoversheet =
                 toByteArray(requireNonNull(getClass().getClassLoader().getResourceAsStream(SAMPLE_COVERSHEET)));
 
@@ -209,7 +208,7 @@ public class NotificationSenderTest {
         verifyNoInteractions(testNotificationClient);
         verify(notificationClient).sendPrecompiledLetterWithInputStream(any(), any());
         verify(saveCorrespondenceAsyncService)
-                .saveLetter(any(NotificationClient.class), anyString(), any(Correspondence.class), anyString());
+                .getSentLetterPdf(any(NotificationClient.class), anyString(), anyString());
     }
 
     @Test
@@ -245,8 +244,8 @@ public class NotificationSenderTest {
         ReflectionTestUtils.setField(notificationSender, "saveCorrespondence", true);
         when(notificationClient.sendLetter(any(), any(), any())).thenReturn(sendLetterResponse);
         when(sendLetterResponse.getNotificationId()).thenReturn(UUID.randomUUID());
-        doNothing().when(saveCorrespondenceAsyncService)
-                .saveLetter(any(NotificationClient.class), anyString(), any(Correspondence.class), anyString());
+        when(saveCorrespondenceAsyncService.getSentLetterPdf(any(NotificationClient.class), anyString(), anyString()))
+                .thenReturn(new byte[0]);
         Address address = Address.builder()
                 .line1("1 Appellant Ave").town("Sometown").county("Somecounty").postcode("LN8 4DX").build();
 
@@ -256,7 +255,7 @@ public class NotificationSenderTest {
         verifyNoInteractions(testNotificationClient);
         verify(notificationClient).sendLetter(any(), any(), any());
         verify(saveCorrespondenceAsyncService)
-                .saveLetter(any(NotificationClient.class), anyString(), any(Correspondence.class), anyString());
+                .getSentLetterPdf(any(NotificationClient.class), anyString(), anyString());
     }
 
     @Test

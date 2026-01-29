@@ -100,13 +100,9 @@ public class SendNotificationService {
     private final PdfStoreService pdfStoreService;
 
     @Autowired
-    public SendNotificationService(
-        NotificationSender notificationSender,
-        NotificationHandler notificationHandler,
-        NotificationValidService notificationValidService,
-        PdfLetterService pdfLetterService,
-        PdfStoreService pdfStoreService
-    ) {
+    public SendNotificationService(NotificationSender notificationSender, NotificationHandler notificationHandler,
+                                   NotificationValidService notificationValidService, PdfLetterService pdfLetterService,
+                                   PdfStoreService pdfStoreService) {
         this.notificationSender = notificationSender;
         this.notificationHandler = notificationHandler;
         this.notificationValidService = notificationValidService;
@@ -114,11 +110,9 @@ public class SendNotificationService {
         this.pdfStoreService = pdfStoreService;
     }
 
-    boolean sendEmailSmsLetterNotification(
-        NotificationWrapper wrapper,
-        Notification notification,
-        SubscriptionWithType subscriptionWithType,
-        NotificationEventType eventType) {
+    boolean sendEmailSmsLetterNotification(NotificationWrapper wrapper, Notification notification,
+                                           SubscriptionWithType subscriptionWithType, NotificationEventType eventType) {
+
         boolean emailSent = sendEmailNotification(wrapper, subscriptionWithType.getSubscription(), notification);
         notificationSuccessLog(wrapper, "Email", notification, notification.getEmailTemplate(), emailSent);
 

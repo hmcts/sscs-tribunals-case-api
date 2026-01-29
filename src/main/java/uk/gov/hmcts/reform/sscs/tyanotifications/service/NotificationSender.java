@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
+import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -172,8 +175,9 @@ public class NotificationSender {
 
         if (saveCorrespondence) {
             final Correspondence correspondence = getLetterCorrespondence(notificationEventType, name, null);
-            saveCorrespondenceAsyncService.saveLetter(
-                    client, sendLetterResponse.getNotificationId().toString(), correspondence, ccdCaseId);
+            var pdfForLetter = saveCorrespondenceAsyncService.getSentLetterPdf(
+                    client, sendLetterResponse.getNotificationId().toString(), ccdCaseId);
+            saveCorrespondenceAsyncService.saveSentLetterToCase(pdfForLetter, correspondence, ccdCaseId);
         }
 
         log.info("Letter Notification send for case id : {}, Gov notify id: {} ",
@@ -198,36 +202,42 @@ public class NotificationSender {
     public void sendBundledLetter(NotificationWrapper wrapper, byte[] content, String recipient)
             throws NotificationClientException {
         if (content != null) {
-            var caseData = wrapper.getNewSscsCaseData();
-            try (PDDocument pdfDoc = Loader.loadPDF(content)) {
-                var numberOfPages = pdfDoc.getNumberOfPages();
-                if (numberOfPages > 10) {
-                    log.error("{} letter exceeds Gov.Notify 10-page limit for precompiled letters [{}]",
-                            wrapper.getNotificationType(), numberOfPages);
+            boolean pageLimitExceeded = false;
 
-                    if (wrapper.getNotificationType().equals(NotificationEventType.ISSUE_FINAL_DECISION)) {
-                        Pdf pdf = new Pdf(content, pdfDoc.getDocumentInformation().getTitle());
-                        bulkPrintService.sendToBulkPrint(List.of(pdf), caseData, recipient);
-                    }
-                }
+            try (PDDocument pdfDoc = Loader.loadPDF(content)) {
+                pageLimitExceeded = pdfDoc.getNumberOfPages() > 10;
+                log.info(pageLimitExceeded ? "{} letter exceeds Gov.Notify 10-page limit for precompiled letters [{}]"
+                                : "Sending {} precompiled letter of [{}] pages",
+                        wrapper.getNotificationType(), pdfDoc.getNumberOfPages());
             } catch (IOException e) {
                 log.info("Failed to calculate the number of pages contained in the letter {}", e.getMessage());
             }
 
-            NotificationClient client =
-                    getLetterNotificationClient(caseData.getAppeal().getAppellant().getAddress().getPostcode());
-            ByteArrayInputStream bis = new ByteArrayInputStream(content);
-            final LetterResponse sendLetterResponse = sendBundledLetter(wrapper.getCaseId(), client, bis);
+            String govNotifyId = null;
+            NotificationClient client = null;
+            var caseData = wrapper.getNewSscsCaseData();
 
-            if (saveCorrespondence) {
-                final Correspondence correspondence =
-                        getLetterCorrespondence(wrapper.getNotificationType(), recipient, null);
-                saveCorrespondenceAsyncService.saveLetter(
-                        client, sendLetterResponse.getNotificationId().toString(), correspondence, wrapper.getCaseId());
+            if (wrapper.getNotificationType().equals(ISSUE_FINAL_DECISION) && pageLimitExceeded) {
+                bulkPrintService
+                        .sendToBulkPrint(List.of(new Pdf(content, ISSUE_FINAL_DECISION.name())), caseData, recipient);
+            } else {
+                client = getLetterNotificationClient(caseData.getAppeal().getAppellant().getAddress().getPostcode());
+                ByteArrayInputStream inputStream = new ByteArrayInputStream(content);
+                final LetterResponse notifyResponse = sendBundledLetter(wrapper.getCaseId(), client, inputStream);
+                govNotifyId = nonNull(notifyResponse) ? notifyResponse.getNotificationId().toString() : null;
+
+                log.info("Letter Notification send for case id : {}, Gov notify id: {} ",
+                        wrapper.getCaseId(), govNotifyId);
             }
 
-            log.info("Letter Notification send for case id : {}, Gov notify id: {} ",
-                    wrapper.getCaseId(), (sendLetterResponse != null) ? sendLetterResponse.getNotificationId() : null);
+            if (saveCorrespondence) {
+                final var correspondence = getLetterCorrespondence(wrapper.getNotificationType(), recipient, null);
+                var sentLetterPdf = nonNull(govNotifyId)
+                        ? saveCorrespondenceAsyncService.getSentLetterPdf(client, govNotifyId, wrapper.getCaseId())
+                        : content;
+                saveCorrespondenceAsyncService
+                        .saveSentLetterToCase(sentLetterPdf, correspondence, wrapper.getCaseId());
+            }
         }
     }
 
