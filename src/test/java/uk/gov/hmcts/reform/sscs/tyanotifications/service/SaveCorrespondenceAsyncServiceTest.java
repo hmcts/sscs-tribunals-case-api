@@ -50,19 +50,30 @@ public class SaveCorrespondenceAsyncServiceTest {
         byte[] bytes = "%PDF bytes".getBytes();
         when(notificationClient.getPdfForLetter(eq(NOTIFICATION_ID))).thenReturn(bytes);
 
-        byte[] pdf = service.getSentLetterPdf(notificationClient, NOTIFICATION_ID, CCD_ID);
-        service.saveSentLetterToCase(pdf, correspondence, CCD_ID);
+        service.saveLetter(notificationClient, NOTIFICATION_ID, correspondence, CCD_ID);
 
         verify(notificationClient).getPdfForLetter(eq(NOTIFICATION_ID));
-        verify(ccdNotificationsPdfService).mergeLetterCorrespondenceIntoCcdV2(any(), eq(Long.valueOf(CCD_ID)), eq(correspondence));
+        verify(ccdNotificationsPdfService)
+                .mergeLetterCorrespondenceIntoCcdV2(any(), eq(Long.valueOf(CCD_ID)), eq(correspondence));
+    }
+
+    @Test
+    public void willSaveSentLetterToCaseUploadsPdf() {
+        byte[] bytes = "%PDF bytes".getBytes();
+
+        service.saveSentLetterToCase(bytes, correspondence, CCD_ID);
+
+        verify(ccdNotificationsPdfService)
+                .mergeLetterCorrespondenceIntoCcdV2(any(), eq(Long.valueOf(CCD_ID)), eq(correspondence));
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"400 PDFNotReadyError", "400 BadRequestError"})
     public void notificationClientExceptionIsReThrown(String message) throws NotificationClientException {
-        when(notificationClient.getPdfForLetter(eq(NOTIFICATION_ID))).thenThrow(new NotificationClientException(message));
+        when(notificationClient.getPdfForLetter(eq(NOTIFICATION_ID)))
+                .thenThrow(new NotificationClientException(message));
         assertThrows(NotificationClientException.class,
-            () -> service.getSentLetterPdf(notificationClient, NOTIFICATION_ID, CCD_ID));
+            () -> service.saveLetter(notificationClient, NOTIFICATION_ID, correspondence, CCD_ID));
     }
 
     @Test
@@ -71,17 +82,23 @@ public class SaveCorrespondenceAsyncServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"APPELLANT, APPELLANT", "REPRESENTATIVE, REPRESENTATIVE", "APPOINTEE, APPOINTEE", "JOINT_PARTY, JOINT_PARTY", "OTHER_PARTY, OTHER_PARTY"})
+    @CsvSource({"APPELLANT, APPELLANT", "REPRESENTATIVE, REPRESENTATIVE", "APPOINTEE, APPOINTEE",
+            "JOINT_PARTY, JOINT_PARTY", "OTHER_PARTY, OTHER_PARTY"})
     public void willUploadPdfFormatLettersDirectlyIntoCcd(SubscriptionType subscriptionType, LetterType letterType) {
         service.saveLetter(new byte[]{}, correspondence, CCD_ID, subscriptionType);
 
-        verify(ccdNotificationsPdfService).mergeReasonableAdjustmentsCorrespondenceIntoCcdV2(any(byte[].class), eq(Long.valueOf(CCD_ID)), eq(correspondence), eq(letterType));
+        verify(ccdNotificationsPdfService).mergeReasonableAdjustmentsCorrespondenceIntoCcdV2(
+                any(byte[].class), eq(Long.valueOf(CCD_ID)), eq(correspondence), eq(letterType)
+        );
     }
 
     @Test
     public void willSaveEmailOrSmsDirectlyIntoCcd() {
         SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId(CCD_ID).build();
-        correspondence = Correspondence.builder().value(CorrespondenceDetails.builder().correspondenceType(CorrespondenceType.Email).to("Mr Blobby").build()).build();
+        correspondence = Correspondence.builder().value(CorrespondenceDetails.builder()
+                .correspondenceType(CorrespondenceType.Email).to("Mr Blobby").build())
+                .build();
+
         service.saveEmailOrSms(correspondence, sscsCaseData);
 
         verify(ccdNotificationsPdfService).mergeCorrespondenceIntoCcdV2(any(Long.class), eq(correspondence));
