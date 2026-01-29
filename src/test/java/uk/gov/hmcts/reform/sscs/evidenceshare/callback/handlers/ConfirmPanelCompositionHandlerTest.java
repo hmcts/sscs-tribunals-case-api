@@ -80,6 +80,7 @@ class ConfirmPanelCompositionHandlerTest {
                 .otherParties(singletonList(buildOtherParty()))
                 .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build()).build()).build(),
             INTERLOCUTORY_REVIEW_STATE, CONFIRM_PANEL_COMPOSITION);
+
         handler.handle(SUBMITTED, callback);
 
         verify(listingStateProcessingService).processCaseState(callback, callback.getCaseDetails().getCaseData(),

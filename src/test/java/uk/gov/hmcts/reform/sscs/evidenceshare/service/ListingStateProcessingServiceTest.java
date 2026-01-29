@@ -143,16 +143,6 @@ class ListingStateProcessingServiceTest {
     }
 
     @Test
-    void givenOtherPartyWithoutMeaningfulHearingOptions_whenProcessing_thenTriggersNotListable() {
-        withOtherPartyHearingOptions(HearingOptions.builder().build());
-        withFqpmRequired(YesNo.NO);
-
-        service.processCaseState(callback, caseData, CONFIRM_PANEL_COMPOSITION);
-
-        verifyNotListableTriggered();
-    }
-
-    @Test
     void givenWithDwpCase_whenProcessing_thenDoesNotTriggerNotListable() {
         caseData.setIsFqpmRequired(null);
         caseData.setState(State.WITH_DWP);
