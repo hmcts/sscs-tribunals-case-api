@@ -2052,7 +2052,7 @@ flags:
 
 task-management:
   api:
-    url: ${TASK_MANAGEMENT_API_URL:http://localhost:8084}
+    url: ${TASK_MANAGEMENT_API_URL:http://localhost:8087}
 
 # default profile (development, production etc.)
 spring:
