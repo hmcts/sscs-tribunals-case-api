@@ -11,12 +11,15 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.service.TaskManagementApiService;
+import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
 
 class VoidCaseSubmittedHandlerTest {
 
@@ -34,10 +37,13 @@ class VoidCaseSubmittedHandlerTest {
     @Mock
     private TaskManagementApiService taskManagementApiService;
 
+    @Mock
+    private SendCallbackHandler sendCallbackHandler;
+
     @BeforeEach
     void setUp() {
         openMocks(this);
-        handler = new VoidCaseSubmittedHandler(taskManagementApiService, true);
+        handler = new VoidCaseSubmittedHandler(taskManagementApiService, sendCallbackHandler, true);
         SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId(CASE_ID).build();
         when(callback.getEvent()).thenReturn(EventType.VOID_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -61,15 +67,24 @@ class VoidCaseSubmittedHandlerTest {
         assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
     }
 
-    @Test
-    void givenWorkAllocationDisabled_thenReturnFalse() {
-        handler = new VoidCaseSubmittedHandler(taskManagementApiService, false);
-        assertThat(handler.canHandle(SUBMITTED, callback)).isFalse();
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void givenCanHandle_thenSendCallbackMessage(Boolean isWorkAllocationEnabled) {
+        handler = new VoidCaseSubmittedHandler(taskManagementApiService, sendCallbackHandler, isWorkAllocationEnabled);
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+        verify(sendCallbackHandler, times(1)).handle(callback);
     }
 
     @Test
     void givenWorkAllocationEnabled_thenCancelTasks() {
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
         verify(taskManagementApiService, times(1)).cancelTasksByTaskProperties(CASE_ID, "ftaCommunicationId");
+    }
+
+    @Test
+    void givenWorkAllocationNotEnabled_thenDoNotCancelTasks() {
+        handler = new VoidCaseSubmittedHandler(taskManagementApiService, sendCallbackHandler, false);
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+        verify(taskManagementApiService, times(0)).cancelTasksByTaskProperties(CASE_ID, "ftaCommunicationId");
     }
 }
