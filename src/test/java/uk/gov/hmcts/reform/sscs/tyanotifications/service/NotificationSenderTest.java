@@ -5,9 +5,9 @@ import static org.apache.commons.lang3.builder.EqualsBuilder.reflectionEquals;
 import static org.apache.pdfbox.io.IOUtils.toByteArray;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.argThat;
@@ -198,8 +198,6 @@ public class NotificationSenderTest {
         ReflectionTestUtils.setField(notificationSender, "saveCorrespondence", true);
         when(notificationClient.sendPrecompiledLetterWithInputStream(any(), any())).thenReturn(letterResponse);
         when(letterResponse.getNotificationId()).thenReturn(UUID.randomUUID());
-        when(saveCorrespondenceAsyncService.getSentLetterPdf(any(NotificationClient.class), anyString(), anyString()))
-                .thenReturn(new byte[0]);
         byte[] sampleCoversheet =
                 toByteArray(requireNonNull(getClass().getClassLoader().getResourceAsStream(SAMPLE_COVERSHEET)));
 
@@ -207,8 +205,7 @@ public class NotificationSenderTest {
 
         verifyNoInteractions(testNotificationClient);
         verify(notificationClient).sendPrecompiledLetterWithInputStream(any(), any());
-        verify(saveCorrespondenceAsyncService)
-                .getSentLetterPdf(any(NotificationClient.class), anyString(), anyString());
+        verify(saveCorrespondenceAsyncService).saveSentLetterToCase(any(byte[].class), any(Correspondence.class), eq(CASE_D));
     }
 
     @Test
@@ -244,8 +241,6 @@ public class NotificationSenderTest {
         ReflectionTestUtils.setField(notificationSender, "saveCorrespondence", true);
         when(notificationClient.sendLetter(any(), any(), any())).thenReturn(sendLetterResponse);
         when(sendLetterResponse.getNotificationId()).thenReturn(UUID.randomUUID());
-        when(saveCorrespondenceAsyncService.getSentLetterPdf(any(NotificationClient.class), anyString(), anyString()))
-                .thenReturn(new byte[0]);
         Address address = Address.builder()
                 .line1("1 Appellant Ave").town("Sometown").county("Somecounty").postcode("LN8 4DX").build();
 
@@ -254,12 +249,11 @@ public class NotificationSenderTest {
 
         verifyNoInteractions(testNotificationClient);
         verify(notificationClient).sendLetter(any(), any(), any());
-        verify(saveCorrespondenceAsyncService)
-                .getSentLetterPdf(any(NotificationClient.class), anyString(), anyString());
+        verify(saveCorrespondenceAsyncService).saveLetter(eq(notificationClient), anyString(), any(Correspondence.class), eq(CASE_D));
     }
 
     @Test
-    public void sendLetterToSenderIfOnBlacklist() throws IOException, NotificationClientException {
+    public void sendLetterToSenderIfOnBlacklist() throws NotificationClientException {
         String postcode = "TS1 1ST";
         when(blacklist.getPostcodes()).thenReturn(Collections.singletonList(postcode));
         when(testNotificationClient.sendLetter(any(), any(), any())).thenReturn(sendLetterResponse);

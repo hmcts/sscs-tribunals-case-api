@@ -33,22 +33,23 @@ public class SaveCorrespondenceAsyncService {
 
     @Async
     @Retryable(maxAttemptsExpression = "#{@letterAsyncConfigProperties.maxAttempts}", backoff = @Backoff(delayExpression = "#{@letterAsyncConfigProperties.delay}", multiplierExpression = "#{@letterAsyncConfigProperties.multiplier}", random = true, maxDelayExpression = "#{@letterAsyncConfigProperties.maxDelay}"))
-    public byte[] getSentLetterPdf(NotificationClient client, String notificationId, String ccdCaseId) throws NotificationClientException {
+    public void saveLetter(NotificationClient client, String notificationId, Correspondence correspondence, String ccdCaseId) throws NotificationClientException {
 
         RetryContext context = RetrySynchronizationManager.getContext();
         if (context != null && context.getRetryCount() == 0) {
-            log.debug("delaying by {} milliseconds before making first attempt to get letter pdf for case id : {}",
-                    letterAsyncConfigProperties.getInitialDelay(), ccdCaseId);
+            log.debug("delaying by {} milliseconds before making first attempt to get letter pdf for case id : {}",letterAsyncConfigProperties.getInitialDelay(), ccdCaseId);
             try {
                 // Using  Thread.sleep here as it's already running in async and not blocking end user requests. Using CompletableFuture is too complex for this.
                 Thread.sleep(letterAsyncConfigProperties.getInitialDelay());
             } catch (InterruptedException e) {
-                log.warn("Thread was interrupted while applying sleep to get letter pdf for case id : {} ", ccdCaseId);
+                log.warn("Thread was interrupted while applying a sleep to get letter pdf for case id : {} ", ccdCaseId);
                 Thread.currentThread().interrupt();
             }
         }
         try {
-            return client.getPdfForLetter(notificationId);
+            final byte[] pdfForLetter = client.getPdfForLetter(notificationId);
+            log.info("Using merge letter correspondence V2 to upload letter correspondence for {} ", ccdCaseId);
+            ccdNotificationsPdfService.mergeLetterCorrespondenceIntoCcdV2(pdfForLetter, Long.valueOf(ccdCaseId), correspondence);
         } catch (NotificationClientException e) {
             if (e.getMessage().contains("PDFNotReadyError")) {
                 log.info("Got a PDFNotReadyError back from gov.notify for case id: {}.", ccdCaseId);
@@ -59,16 +60,16 @@ public class SaveCorrespondenceAsyncService {
         }
     }
 
-    public void saveSentLetterToCase(byte[] pdfForLetter, Correspondence correspondence, String ccdCaseId) {
-        log.info("Using merge letter correspondence V2 to upload letter correspondence for {} ", ccdCaseId);
-        ccdNotificationsPdfService.mergeLetterCorrespondenceIntoCcdV2(pdfForLetter, Long.valueOf(ccdCaseId), correspondence);
-    }
-
     @Async
     @Retryable(maxAttemptsExpression = "#{@letterAsyncConfigProperties.maxAttempts}", backoff = @Backoff(delayExpression = "#{@letterAsyncConfigProperties.delay}", multiplierExpression = "#{@letterAsyncConfigProperties.multiplier}", random = true))
     public void saveLetter(final byte[] pdfForLetter, Correspondence correspondence, String ccdCaseId, SubscriptionType subscriptionType) {
         log.info("Using notification letter correspondence V2 to upload reasonable adjustments correspondence for {} ", ccdCaseId);
         ccdNotificationsPdfService.mergeReasonableAdjustmentsCorrespondenceIntoCcdV2(pdfForLetter, Long.valueOf(ccdCaseId), correspondence, LetterType.findLetterTypeFromSubscription(subscriptionType.name()));
+    }
+
+    public void saveSentLetterToCase(byte[] pdfForLetter, Correspondence correspondence, String ccdCaseId) {
+        log.info("Using merge letter correspondence V2 to upload letter correspondence for {} ", ccdCaseId);
+        ccdNotificationsPdfService.mergeLetterCorrespondenceIntoCcdV2(pdfForLetter, Long.valueOf(ccdCaseId), correspondence);
     }
 
     @Retryable
@@ -84,5 +85,32 @@ public class SaveCorrespondenceAsyncService {
     @SuppressWarnings({"unused"})
     public void getBackendResponseFallback(Throwable e) {
         log.error("Failed saving correspondence.", e);
+    }
+
+    @Async
+    @Retryable(maxAttemptsExpression = "#{@letterAsyncConfigProperties.maxAttempts}", backoff = @Backoff(delayExpression = "#{@letterAsyncConfigProperties.delay}", multiplierExpression = "#{@letterAsyncConfigProperties.multiplier}", random = true, maxDelayExpression = "#{@letterAsyncConfigProperties.maxDelay}"))
+    public byte[] getSentLetterPdf(NotificationClient client, String notificationId, String ccdCaseId) throws NotificationClientException {
+
+        RetryContext context = RetrySynchronizationManager.getContext();
+        if (context != null && context.getRetryCount() == 0) {
+            log.debug("delaying by {} milliseconds before making first attempt to get letter pdf for case id : {}", letterAsyncConfigProperties.getInitialDelay(), ccdCaseId);
+            try {
+                // Using Thread.sleep here as it's already running in async and not blocking end user requests.
+                Thread.sleep(letterAsyncConfigProperties.getInitialDelay());
+            } catch (InterruptedException e) {
+                log.warn("Thread was interrupted while applying a sleep to get letter pdf for case id : {} ", ccdCaseId);
+                Thread.currentThread().interrupt();
+            }
+        }
+        try {
+            return client.getPdfForLetter(notificationId);
+        } catch (NotificationClientException e) {
+            if (e.getMessage() != null && e.getMessage().contains("PDFNotReadyError")) {
+                log.info("Got a PDFNotReadyError back from gov.notify for case id: {}.", ccdCaseId);
+            } else {
+                log.warn("Got a strange error '{}' back from gov.notify for case id: {}.", e.getMessage(), ccdCaseId);
+            }
+            throw e;
+        }
     }
 }
