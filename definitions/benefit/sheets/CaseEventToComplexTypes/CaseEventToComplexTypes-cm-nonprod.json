@@ -122,15 +122,6 @@
   {
     "CaseEventID": "addOtherPartyData",
     "CaseFieldID": "otherParties",
-    "ListElementCode": "role",
-    "ID": "otherPartyRole",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "15/01/2026",
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "addOtherPartyData",
-    "CaseFieldID": "otherParties",
     "ListElementCode": "role.name",
     "ID": "otherPartyRoleName",
     "DisplayContext": "OPTIONAL",
