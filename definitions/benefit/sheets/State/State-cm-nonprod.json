@@ -1,3 +1,3 @@
 [
-  {"LiveFrom": "07/01/2026", "CaseTypeID": "Benefit", "ID": "awaitOtherPartyData", "Name": "Await Other Party Data", "Description": "Await Other Party Data", "DisplayOrder": 20, "TitleDisplay": "# ${[CASE_REFERENCE]}: ${appeal.appellant.name.lastName}"}
+  {"LiveFrom": "07/01/2026", "CaseTypeID": "Benefit", "ID": "awaitOtherPartyData", "Name": "Await Other Party Data", "Description": "Await Other Party Data", "DisplayOrder": 1, "TitleDisplay": "# ${[CASE_REFERENCE]}: ${appeal.appellant.name.lastName}"}
 ]
