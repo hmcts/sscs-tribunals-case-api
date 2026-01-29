@@ -361,7 +361,7 @@
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "hearingRecordingsInfo_sscs", "TabLabel": "Hearing Recordings", "TabDisplayOrder": 28, "CaseFieldID": "isConfidentialCaseLabel", "TabFieldDisplayOrder": 1, "TabShowCondition": "sscsHearingRecordings=\"*\"", "FieldShowCondition": "isConfidentialCase =\"Yes\""},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "hearingRecordingsInfo_sscs", "TabLabel": "Hearing Recordings", "TabDisplayOrder": 28, "CaseFieldID": "sscsHearingRecordings", "TabFieldDisplayOrder": 2},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "other_party_sscs", "TabLabel": "Other Party Details", "TabDisplayOrder": 29, "CaseFieldID": "isConfidentialCaseLabel", "TabFieldDisplayOrder": 1, "TabShowCondition": "otherParties=\"*\"", "FieldShowCondition": "isConfidentialCase =\"Yes\""},
-  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "other_party_sscs", "TabLabel": "Other Party Details", "TabDisplayOrder": 29, "CaseFieldID": "otherParties", "TabFieldDisplayOrder": 1},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "other_party_sscs", "TabLabel": "Other Party Details", "TabDisplayOrder": 29, "CaseFieldID": "otherParties", "TabFieldDisplayOrder": 2},
 
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "cam_fields", "TabLabel": "CAM Fields", "TabDisplayOrder": 30, "CaseFieldID": "isConfidentialCaseLabel", "TabFieldDisplayOrder": 1, "TabShowCondition": "caseNameHmctsInternal=\"*\"", "FieldShowCondition": "isConfidentialCase =\"Yes\""},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "TabID": "cam_fields", "TabLabel": "CAM Fields", "TabDisplayOrder": 30, "CaseFieldID": "caseNameHmctsInternal", "TabFieldDisplayOrder": 2},
