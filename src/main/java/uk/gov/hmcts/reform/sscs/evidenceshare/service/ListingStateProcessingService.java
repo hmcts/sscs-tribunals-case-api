@@ -56,7 +56,7 @@ public class ListingStateProcessingService {
                         "Update to Not Listable as the case is either awaiting hearing enquiry form or for FQPM to be set"
                     );
                 }
-            } else if (notConfirmPanelCompositionForChildSupport(callback, caseData)) {
+            } else if (!isConfirmPanelCompForChildSupport(callback, caseData)) {
                 updateCase(caseDetails.getId(),
                     EventType.READY_TO_LIST,
                     "Ready to list",
@@ -71,13 +71,13 @@ public class ListingStateProcessingService {
         }
     }
 
-    private boolean notConfirmPanelCompositionForChildSupport(Callback<SscsCaseData> callback, SscsCaseData caseData) {
-        return !(caseData.isBenefitType(Benefit.CHILD_SUPPORT)
-            && callback.getEvent() == EventType.CONFIRM_PANEL_COMPOSITION);
-    }
-
     private static boolean stateNotDormant(State caseState) {
         return !State.DORMANT_APPEAL_STATE.equals(caseState);
+    }
+
+    private boolean isConfirmPanelCompForChildSupport(Callback<SscsCaseData> callback, SscsCaseData caseData) {
+        return caseData.isBenefitType(Benefit.CHILD_SUPPORT)
+            && callback.getEvent() == EventType.CONFIRM_PANEL_COMPOSITION;
     }
 
     private boolean stateNotWithFtaOrResponseReceived(CaseDetails<SscsCaseData> caseDetails) {
