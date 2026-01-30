@@ -205,7 +205,7 @@ public class NotificationSenderTest {
 
         verifyNoInteractions(testNotificationClient);
         verify(notificationClient).sendPrecompiledLetterWithInputStream(any(), any());
-        verify(saveCorrespondenceAsyncService).saveSentLetterToCase(any(byte[].class), any(Correspondence.class), eq(CASE_D));
+        verify(saveCorrespondenceAsyncService).saveLetter(any(byte[].class), any(Correspondence.class), eq(CASE_D));
     }
 
     @Test
@@ -423,7 +423,7 @@ public class NotificationSenderTest {
                 .saveLettersToReasonableAdjustment(sampleLetter, APPEAL_RECEIVED, "Bob Squires", CASE_D, APPELLANT);
 
         verify(saveCorrespondenceAsyncService)
-                .saveLetter(eq(sampleLetter), correspondenceArgumentCaptor.capture(), eq(CASE_D), eq(APPELLANT));
+                .saveLettersToReasonableAdjustment(eq(sampleLetter), correspondenceArgumentCaptor.capture(), eq(CASE_D), eq(APPELLANT));
         Correspondence correspondence = correspondenceArgumentCaptor.getValue();
         assertNotNull(correspondence);
         assertEquals(CorrespondenceType.Letter, correspondence.getValue().getCorrespondenceType());

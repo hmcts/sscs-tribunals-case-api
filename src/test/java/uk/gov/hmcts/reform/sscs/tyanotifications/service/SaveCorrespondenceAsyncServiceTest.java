@@ -61,7 +61,7 @@ public class SaveCorrespondenceAsyncServiceTest {
     public void willSaveSentLetterToCaseUploadsPdf() {
         byte[] bytes = "%PDF bytes".getBytes();
 
-        service.saveSentLetterToCase(bytes, correspondence, CCD_ID);
+        service.saveLetter(bytes, correspondence, CCD_ID);
 
         verify(ccdNotificationsPdfService)
                 .mergeLetterCorrespondenceIntoCcdV2(any(), eq(Long.valueOf(CCD_ID)), eq(correspondence));
@@ -85,7 +85,7 @@ public class SaveCorrespondenceAsyncServiceTest {
     @CsvSource({"APPELLANT, APPELLANT", "REPRESENTATIVE, REPRESENTATIVE", "APPOINTEE, APPOINTEE",
                 "JOINT_PARTY, JOINT_PARTY", "OTHER_PARTY, OTHER_PARTY"})
     public void willUploadPdfFormatLettersDirectlyIntoCcd(SubscriptionType subscriptionType, LetterType letterType) {
-        service.saveLetter(new byte[]{}, correspondence, CCD_ID, subscriptionType);
+        service.saveLettersToReasonableAdjustment(new byte[]{}, correspondence, CCD_ID, subscriptionType);
 
         verify(ccdNotificationsPdfService).mergeReasonableAdjustmentsCorrespondenceIntoCcdV2(
                 any(byte[].class), eq(Long.valueOf(CCD_ID)), eq(correspondence), eq(letterType)
