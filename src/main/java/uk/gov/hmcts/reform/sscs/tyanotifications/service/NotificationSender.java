@@ -232,7 +232,7 @@ public class NotificationSender {
             if (saveCorrespondence) {
                 final var correspondence = getLetterCorrespondence(wrapper.getNotificationType(), recipient, null);
                 if (nonNull(govNotifyId)) {
-                    saveCorrespondenceAsyncService.saveSentLetterToCase(content, correspondence, wrapper.getCaseId());
+                    saveCorrespondenceAsyncService.saveLetter(content, correspondence, wrapper.getCaseId());
                 } else {
                     saveCorrespondenceAsyncService.saveLetter(client, govNotifyId, correspondence, wrapper.getCaseId());
                 }
@@ -259,7 +259,7 @@ public class NotificationSender {
         if (pdfForLetter != null) {
             final Correspondence correspondence =
                     getLetterCorrespondence(notificationEventType, name, ReasonableAdjustmentStatus.REQUIRED);
-            saveCorrespondenceAsyncService.saveLetter(pdfForLetter, correspondence, ccdCaseId, subscriptionType);
+            saveCorrespondenceAsyncService.saveLettersToReasonableAdjustment(pdfForLetter, correspondence, ccdCaseId, subscriptionType);
 
             log.info("Letter Notification saved for case id : {}", ccdCaseId);
         }

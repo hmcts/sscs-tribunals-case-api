@@ -64,19 +64,19 @@ public class SaveCorrespondenceAsyncService {
         }
     }
 
+    public void saveLetter(byte[] pdfForLetter, Correspondence correspondence, String ccdCaseId) {
+        log.info("Using merge letter correspondence V2 to upload letter correspondence for {} ", ccdCaseId);
+        ccdNotificationsPdfService.mergeLetterCorrespondenceIntoCcdV2(pdfForLetter, Long.valueOf(ccdCaseId), correspondence);
+    }
+
     @Async
     @Retryable(maxAttemptsExpression = "#{@letterAsyncConfigProperties.maxAttempts}", backoff = @Backoff(delayExpression = "#{@letterAsyncConfigProperties.delay}", multiplierExpression = "#{@letterAsyncConfigProperties.multiplier}", random = true))
-    public void saveLetter(final byte[] pdfForLetter, Correspondence correspondence, String ccdCaseId,
-                           SubscriptionType subscriptionType) {
+    public void saveLettersToReasonableAdjustment(final byte[] pdfForLetter, Correspondence correspondence, String ccdCaseId,
+                                                  SubscriptionType subscriptionType) {
         log.info("Using notification letter correspondence V2 to upload reasonable adjustments correspondence for {} ",
                 ccdCaseId);
         ccdNotificationsPdfService.mergeReasonableAdjustmentsCorrespondenceIntoCcdV2(pdfForLetter,
                 Long.valueOf(ccdCaseId), correspondence, findLetterTypeFromSubscription(subscriptionType.name()));
-    }
-
-    public void saveSentLetterToCase(byte[] pdfForLetter, Correspondence correspondence, String ccdCaseId) {
-        log.info("Using merge letter correspondence V2 to upload letter correspondence for {} ", ccdCaseId);
-        ccdNotificationsPdfService.mergeLetterCorrespondenceIntoCcdV2(pdfForLetter, Long.valueOf(ccdCaseId), correspondence);
     }
 
     @Retryable
