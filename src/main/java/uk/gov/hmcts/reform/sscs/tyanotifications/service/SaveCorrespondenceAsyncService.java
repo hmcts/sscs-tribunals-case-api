@@ -60,8 +60,7 @@ public class SaveCorrespondenceAsyncService {
         }
     }
 
-    @Async
-    @Retryable(maxAttemptsExpression = "#{@letterAsyncConfigProperties.maxAttempts}", backoff = @Backoff(delayExpression = "#{@letterAsyncConfigProperties.delay}", multiplierExpression = "#{@letterAsyncConfigProperties.multiplier}", random = true))
+    @Retryable
     public void saveLetter(final byte[] pdfForLetter, Correspondence correspondence, String ccdCaseId, SubscriptionType subscriptionType) {
         log.info("Using notification letter correspondence V2 to upload reasonable adjustments correspondence for {} ", ccdCaseId);
         ccdNotificationsPdfService.mergeReasonableAdjustmentsCorrespondenceIntoCcdV2(pdfForLetter, Long.valueOf(ccdCaseId), correspondence, LetterType.findLetterTypeFromSubscription(subscriptionType.name()));
