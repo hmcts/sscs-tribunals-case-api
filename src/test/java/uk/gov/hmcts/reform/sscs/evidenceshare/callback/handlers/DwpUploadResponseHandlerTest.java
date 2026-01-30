@@ -150,6 +150,7 @@ public class DwpUploadResponseHandlerTest {
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
         consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
         assertEquals(RESPONSE_SUBMITTED_DWP, sscsCaseData.getDwpState());
+        assertEquals(YES, sscsCaseData.getIgnoreCallbackWarnings());
     }
 
     @Test
