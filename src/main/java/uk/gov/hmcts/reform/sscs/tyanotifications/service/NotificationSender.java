@@ -219,6 +219,8 @@ public class NotificationSender {
             if (wrapper.getNotificationType().equals(ISSUE_FINAL_DECISION) && pageLimitExceeded) {
                 bulkPrintService
                         .sendToBulkPrint(List.of(new Pdf(content, ISSUE_FINAL_DECISION.name())), caseData, recipient);
+                log.info("Sending {} Letter for case id : {} via BulkPrint because it exceeds 10 pages",
+                        wrapper.getNotificationType(), wrapper.getCaseId());
             } else {
                 client = getLetterNotificationClient(caseData.getAppeal().getAppellant().getAddress().getPostcode());
                 ByteArrayInputStream inputStream = new ByteArrayInputStream(content);
