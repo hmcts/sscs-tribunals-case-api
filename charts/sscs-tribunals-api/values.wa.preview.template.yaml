@@ -227,7 +227,7 @@ xui-webapp:
     devcpuLimits: "1000m"
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
-    image: hmctspublic.azurecr.io/xui/webapp:latest
+    image: hmctspublic.azurecr.io/xui/webapp:prod-42b83d0-20260128164342
     ingressHost: xui-${SERVICE_FQDN}
     environment:
       HEALTH_CCD_COMPONENT_API: ${CCD_GW_API}/health
