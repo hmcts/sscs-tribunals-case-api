@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.ftacommunication;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -29,7 +30,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
@@ -47,7 +50,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.idam.UserRole;
-import uk.gov.hmcts.reform.sscs.service.BusinessDaysCalculatorService;
+import uk.gov.hmcts.reform.sscs.utility.calendar.BusinessDaysCalculatorService;
 
 class FtaCommunicationAboutToSubmitHandlerTest {
 
@@ -109,8 +112,10 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         assertThrows(IllegalStateException.class, () -> handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION));
     }
 
-    @Test
-    void givenValidFtaRequest_shouldAddNewCommunicationToList() throws IOException {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void givenValidFtaRequest_shouldAddNewCommunicationToList(boolean isWorkAllocationEnabled) throws IOException {
+        ReflectionTestUtils.setField(handler, "isWorkAllocationEnabled", isWorkAllocationEnabled);
         // Setup FTA communication fields
         CommunicationRequestTopic expectedTopic = CommunicationRequestTopic.APPEAL_TYPE;
         String expectedQuestion = "Test Question";
@@ -153,6 +158,11 @@ class FtaCommunicationAboutToSubmitHandlerTest {
         LocalDate date = LocalDate.now().plusDays(2);
         assertEquals(date, addedCom.getRequestResponseDueDate());
         assertEquals(date, response.getData().getCommunicationFields().getFtaResponseDueDate());
+        if (isWorkAllocationEnabled) {
+            assertEquals("No", resultComs.getFirst().getValue().getTaskCreatedForRequest());
+        } else {
+            assertNull(resultComs.getFirst().getValue().getTaskCreatedForRequest());
+        }
     }
 
     @Test
@@ -554,5 +564,52 @@ class FtaCommunicationAboutToSubmitHandlerTest {
 
         assertNull(response.getData().getCommunicationFields().getFtaRequestType());
         assertNull(response.getData().getCommunicationFields().getTribunalRequestsToReviewDl());
+    }
+
+    @Test
+    void givenWorkAllocationEnabled_thenShouldSetWaTaskFtaCommunicationId() {
+        ReflectionTestUtils.setField(handler, "isWorkAllocationEnabled", true);
+
+        CommunicationRequestTopic expectedTopic = CommunicationRequestTopic.APPEAL_TYPE;
+        String expectedQuestion = "Test Question";
+
+        List<CommunicationRequest> existingComs = new ArrayList<>(List.of());
+        FtaCommunicationFields fields = FtaCommunicationFields.builder()
+                .commRequestTopic(expectedTopic)
+                .commRequestQuestion(expectedQuestion)
+                .ftaCommunications(existingComs)
+                .ftaRequestType(FtaRequestType.NEW_REQUEST)
+                .build();
+
+        sscsCaseData.setCommunicationFields(fields);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNotNull(response);
+        assertThat(response.getData().getCommunicationFields().getFtaCommunications().getFirst().getId())
+                .isEqualTo(response.getData().getCommunicationFields().getWaTaskFtaCommunicationId());
+    }
+
+    @Test
+    void givenWorkAllocationNotEnabled_thenShouldNotSetWaTaskFtaCommunicationId() {
+        ReflectionTestUtils.setField(handler, "isWorkAllocationEnabled", false);
+
+        CommunicationRequestTopic expectedTopic = CommunicationRequestTopic.APPEAL_TYPE;
+        String expectedQuestion = "Test Question";
+
+        List<CommunicationRequest> existingComs = new ArrayList<>(List.of());
+        FtaCommunicationFields fields = FtaCommunicationFields.builder()
+                .commRequestTopic(expectedTopic)
+                .commRequestQuestion(expectedQuestion)
+                .ftaCommunications(existingComs)
+                .ftaRequestType(FtaRequestType.NEW_REQUEST)
+                .build();
+
+        sscsCaseData.setCommunicationFields(fields);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNotNull(response);
+        assertNull(response.getData().getCommunicationFields().getWaTaskFtaCommunicationId());
     }
 }

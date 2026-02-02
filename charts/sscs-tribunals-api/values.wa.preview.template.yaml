@@ -24,6 +24,8 @@ java:
     IDAM_S2S-AUTH_MICROSERVICE: ${IDAM_S2S_AUTH_MICROSERVICE}
     IDAM_SSCS_SYSTEMUPDATE_USER: ${IDAM_SSCS_SYSTEMUPDATE_USER}
     IDAM_SSCS_SYSTEMUPDATE_PASSWORD: ${IDAM_SSCS_SYSTEMUPDATE_PASSWORD}
+    IDAM_SSCS_WA_SYSTEM_USER: ${IDAM_SSCS_WA_SYSTEM_USERNAME}
+    IDAM_SSCS_WA_SYSTEM_PASSWORD: ${IDAM_SSCS_WA_SYSTEM_PASSWORD}
     CORE_CASE_DATA_JURISDICTION_ID: SSCS
     CORE_CASE_DATA_CASE_TYPE_ID: Benefit
     TEST_URL: http://${SERVICE_NAME}
@@ -43,6 +45,7 @@ java:
     HMC_HEARINGS_TOPIC_NAMESPACE: "hmc-servicebus-aat"
     HMC_DEPLOYMENT_ID: "sscs-${CHANGE_ID}"
     IBC_NI_POSTCODES_FEATURE: true
+    TASK_MANAGEMENT_API_URL: https://wa-task-management-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net
 
 am-org-role-mapping-service:
   enabled: true
@@ -224,7 +227,7 @@ xui-webapp:
     devcpuLimits: "1000m"
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
-    image: hmctspublic.azurecr.io/xui/webapp:latest
+    image: hmctspublic.azurecr.io/xui/webapp:prod-42b83d0-20260128164342
     ingressHost: xui-${SERVICE_FQDN}
     environment:
       HEALTH_CCD_COMPONENT_API: ${CCD_GW_API}/health
@@ -972,7 +975,7 @@ ccd-message-publisher:
 sscs-cron-trigger:
   job:
     kind: CronJob
-    image: 'hmctspublic.azurecr.io/sscs/cron-trigger:pr-5'
+    image: 'hmctspublic.azurecr.io/sscs/cron-trigger:pr-208'
     releaseNameOverride: ${SERVICE_NAME}-sscs-cron-trigger
     name: ${SERVICE_NAME}-sscs-cron-trigger
     schedule: "0 10-17 * * *"
