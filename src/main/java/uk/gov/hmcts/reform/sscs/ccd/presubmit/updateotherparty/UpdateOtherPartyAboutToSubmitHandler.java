@@ -16,6 +16,7 @@ import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.roleAbsentForOthe
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.roleExistsForOtherParties;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.sendNewOtherPartyNotification;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -30,9 +31,11 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 
@@ -42,18 +45,19 @@ import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private static final String WARN_NON_SSCS1_PAPER_TO_ORAL = "The hearing type will be changed from Paper to Oral as "
-            + "at least one of the parties to the case would like to attend the hearing";
+        + "at least one of the parties to the case would like to attend the hearing";
 
     private static final String WARN_INVALID_OTHER_PARTY_ROLE_FOR_SSCS5 = "You have entered a role for the Other Party "
-            + "which is not valid for an SSCS5 case. This role will be ignored when the event completes.";
+        + "which is not valid for an SSCS5 case. This role will be ignored when the event completes.";
 
     private static final String ERR_ROLE_REQUIRED = "Role is required for the selected case";
-
+    private final CcdService ccdService;
     private IdamService idamService;
 
     @Autowired
-    UpdateOtherPartyAboutToSubmitHandler(IdamService idamService) {
+    UpdateOtherPartyAboutToSubmitHandler(IdamService idamService, CcdService ccdService) {
         this.idamService = idamService;
+        this.ccdService = ccdService;
     }
 
     @Override
@@ -62,21 +66,25 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == UPDATE_OTHER_PARTY_DATA
-                && nonNull(callback.getCaseDetails().getCaseData().getOtherParties());
+            && callback.getEvent() == UPDATE_OTHER_PARTY_DATA
+            && nonNull(callback.getCaseDetails().getCaseData().getOtherParties());
     }
 
     @Override
-    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
+        String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
+
+
+        updateConfidentialityChangedDate(callback);
 
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         sscsCaseData.setOtherPartyUcb(getOtherPartyUcb(sscsCaseData.getOtherParties()));
         sscsCaseData.setIsConfidentialCase(isConfidential(sscsCaseData));
         sscsCaseData.getOtherParties().forEach(otherPartyCcdValue -> otherPartyCcdValue.getValue()
-                .setSendNewOtherPartyNotification(sendNewOtherPartyNotification(otherPartyCcdValue)));
+            .setSendNewOtherPartyNotification(sendNewOtherPartyNotification(otherPartyCcdValue)));
         sscsCaseData.setOtherParties(clearOtherPartiesIfEmpty(sscsCaseData));
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
@@ -103,43 +111,59 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
             }
             return response;
         }
-        //Check if role is not entered for a Child support case
+        // Check if role is not entered for a Child support case
         if (!sscsCaseData.isIbcCase() && roleAbsentForOtherParties(sscsCaseData.getOtherParties())) {
             response.addError(ERR_ROLE_REQUIRED);
         }
         return response;
     }
 
+    private void updateConfidentialityChangedDate(Callback<SscsCaseData> callback) {
+        SscsCaseDetails caseDetailsBefore = ccdService.getByCaseId(callback.getCaseDetails().getId(),
+            idamService.getIdamTokens());
+
+        callback.getCaseDetails().getCaseData().getOtherParties().forEach(
+            otherParty -> caseDetailsBefore.getData().getOtherParties().stream()
+                .filter(p -> p.getValue().getId().equals(otherParty.getValue().getId())).findFirst().ifPresent((a) -> {
+
+                    if (otherParty.getValue().getConfidentialityRequired() != a.getValue().getConfidentialityRequired()) {
+                        otherParty.getValue().setConfidentialityRequiredChangedDate(LocalDateTime.now());
+                    }
+                }));
+
+
+    }
+
     private List<String> verifyHearingUnavailableDates(final List<CcdValue<OtherParty>> otherParties) {
         List<String> errors = new ArrayList<>();
         if (!isNull(otherParties)) {
             otherParties.stream()
-                    .map(CcdValue::getValue)
-                    .filter(otherParty -> hasValidHearingOptionsAndWantsToExcludeDates(otherParty))
-                    .forEach(otherParty -> errors.addAll(
-                            validateHearingOptionsAndExcludeDates(otherParty.getHearingOptions().getExcludeDates())
-                    ));
+                .map(CcdValue::getValue)
+                .filter(otherParty -> hasValidHearingOptionsAndWantsToExcludeDates(otherParty))
+                .forEach(otherParty -> errors.addAll(
+                    validateHearingOptionsAndExcludeDates(otherParty.getHearingOptions().getExcludeDates())
+                ));
         }
         return errors;
     }
 
     private boolean hasValidHearingOptionsAndWantsToExcludeDates(final OtherParty otherParty) {
         return otherParty.getHearingOptions() != null
-                && YesNo.isYes(otherParty.getHearingOptions().getWantsToAttend())
-                && YesNo.isYes(otherParty.getHearingOptions().getScheduleHearing());
+            && YesNo.isYes(otherParty.getHearingOptions().getWantsToAttend())
+            && YesNo.isYes(otherParty.getHearingOptions().getScheduleHearing());
     }
 
     private boolean isNonSscs1Case(final SscsCaseData sscsCaseData,
-                                                     final PreSubmitCallbackResponse<SscsCaseData> response) {
+        final PreSubmitCallbackResponse<SscsCaseData> response) {
         return sscsCaseData.getAppeal().getHearingType() != null
-                && HearingType.PAPER.getValue().equals(sscsCaseData.getAppeal().getHearingType())
-                && isBenefitTypeValidForHearingTypeValidation(response.getData().getBenefitType())
-                && otherPartyWantsToAttendHearing(response.getData().getOtherParties());
+            && HearingType.PAPER.getValue().equals(sscsCaseData.getAppeal().getHearingType())
+            && isBenefitTypeValidForHearingTypeValidation(response.getData().getBenefitType())
+            && otherPartyWantsToAttendHearing(response.getData().getOtherParties());
     }
 
     private boolean isBenefitTypeValidForHearingTypeValidation(final Optional<Benefit> benefitType) {
         return benefitType.filter(benefit -> SscsType.SSCS2.equals(benefit.getSscsType())
-                || SscsType.SSCS5.equals(benefit.getSscsType())).isPresent();
+            || SscsType.SSCS5.equals(benefit.getSscsType())).isPresent();
     }
 
     private boolean isBenefitTypeValidForOtherPartyValidation(final Optional<Benefit> benefitType) {

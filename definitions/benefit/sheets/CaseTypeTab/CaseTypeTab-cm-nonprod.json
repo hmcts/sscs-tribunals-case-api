@@ -1,0 +1,8 @@
+[
+  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "TabID": "confidentiality", "TabLabel": "Confidentiality", "TabDisplayOrder": 2, "CaseFieldID": "appellantLabel", "TabFieldDisplayOrder": 1, "FieldShowCondition": "appeal.benefitType.code=\"childSupport\""},
+  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "TabID": "confidentiality", "TabLabel": "Confidentiality", "TabDisplayOrder": 2, "CaseFieldID": "otherPartiesLabel", "TabFieldDisplayOrder": 2, "FieldShowCondition": "appeal.benefitType.code=\"childSupport\""},
+
+
+
+  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "TabID": "confidentiality", "TabLabel": "Confidentiality", "TabDisplayOrder": 2, "CaseFieldID": "otherParties", "TabFieldDisplayOrder": 3, "FieldShowCondition": "appeal.benefitType.code=\"childSupport\"", "DisplayContextParameter" :  "#TABLE(name,confidentialityRequired,confidentialityRequiredChangedDate)"}
+]

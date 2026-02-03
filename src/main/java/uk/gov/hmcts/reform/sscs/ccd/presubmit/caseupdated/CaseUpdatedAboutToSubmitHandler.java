@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleIbcaCase;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.resolvePostCode;
 
 import jakarta.validation.ConstraintValidatorContext;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -52,12 +53,14 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.AssociatedCaseLinkHelper;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
+import uk.gov.hmcts.reform.sscs.exception.GetCaseException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
@@ -66,6 +69,7 @@ import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
+import uk.gov.hmcts.reform.sscs.service.CcdCaseService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
@@ -86,6 +90,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final HearingDurationsService hearingDurationsService;
     private final PanelCompositionService panelCompositionService;
     private final PostcodeValidator postcodeValidator = new PostcodeValidator();
+    private final CcdCaseService ccdCaseService;
 
     private static ConstraintValidatorContext context;
     private static final String WARNING_MESSAGE = "%s has not been provided for the %s, do you want to ignore this warning and proceed?";
@@ -108,7 +113,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                                     RefDataService refDataService,
                                     VenueService venueService,
                                     HearingDurationsService hearingDurationsService,
-                                    PanelCompositionService panelCompositionService) {
+                                    PanelCompositionService panelCompositionService, CcdCaseService ccdCaseService) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
         this.airLookupService = airLookupService;
@@ -118,6 +123,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         this.hearingDurationsService = hearingDurationsService;
         this.panelCompositionService = panelCompositionService;
         this.venueService = venueService;
+        this.ccdCaseService = ccdCaseService;
     }
 
     @Override
@@ -134,6 +140,20 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                                                           String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
+        }
+
+        try {
+            SscsCaseDetails caseDetailsBefore = ccdCaseService.getCaseDetails(callback.getCaseDetails().getId());
+
+
+            if (caseDetailsBefore.getData().getAppeal().getAppellant().getConfidentialityRequired() != callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getConfidentialityRequired()) {
+                callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequiredChangedDate(
+                    LocalDateTime.now());
+            }
+
+
+        } catch (GetCaseException e) {
+            throw new RuntimeException(e);
         }
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();

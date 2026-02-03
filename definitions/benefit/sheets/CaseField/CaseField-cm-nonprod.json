@@ -1,0 +1,4 @@
+[
+  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "ID": "appellantLabel", "Label": "## Appellant", "FieldType": "Label", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "ID": "otherPartiesLabel", "Label": "## Other Parties", "FieldType": "Label", "SecurityClassification": "PUBLIC"}
+]
