@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.exception.AppealNotFoundException;
 import uk.gov.hmcts.reform.sscs.exception.DocumentNotFoundException;
+import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.service.DocumentDownloadService;
 import uk.gov.hmcts.reform.sscs.service.TribunalsService;
 
@@ -35,12 +36,15 @@ public class TyaControllerTest {
     @Mock
     private DocumentDownloadService documentDownloadService;
 
+    @Mock
+    private AuthorisationService authorisationService;
+
     private TyaController controller;
 
     @Before
     public void setUp() {
         openMocks(this);
-        controller = new TyaController(tribunalsService, documentDownloadService);
+        controller = new TyaController(tribunalsService, documentDownloadService, authorisationService);
     }
 
     @Test
