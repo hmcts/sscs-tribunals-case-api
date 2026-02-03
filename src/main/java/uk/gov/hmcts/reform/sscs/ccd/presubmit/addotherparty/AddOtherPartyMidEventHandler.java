@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.addotherparty;
 
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
+@Slf4j
 public class AddOtherPartyMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final boolean cmOtherPartyConfidentialityEnabled;
@@ -43,6 +45,7 @@ public class AddOtherPartyMidEventHandler implements PreSubmitCallbackHandler<Ss
         var preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
         if (caseData.getOtherParties().size() > 1) {
+            log.warn("Only one other party data can be added using this event!. ccdCaseId: {}", caseData.getCcdCaseId());
             preSubmitCallbackResponse.addError("Only one other party data can be added using this event!");
         }
 
