@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static org.springframework.http.ResponseEntity.ok;
@@ -10,23 +11,27 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.sscs.service.DocumentDownloadService;
 import uk.gov.hmcts.reform.sscs.service.TribunalsService;
 
-
+@Slf4j
 @RestController
 public class TyaController {
 
     private TribunalsService tribunalsService;
 
     private DocumentDownloadService documentDownloadService;
+
+    private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
 
     @Autowired
     public TyaController(TribunalsService tribunalsService, DocumentDownloadService documentDownloadService) {
@@ -47,7 +52,10 @@ public class TyaController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Document", content = {
         @Content(schema = @Schema(implementation = Resource.class))})})
     @GetMapping(value = "/document", produces = APPLICATION_PDF_VALUE)
-    public ResponseEntity<Resource> getAppealDocument(@RequestParam(value = "url") String url) {
+    public ResponseEntity<Resource> getAppealDocument(@RequestHeader(AUTHORIZATION) String authorisation,
+                                                      @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization,
+                                                      @RequestParam(value = "url") String url) {
+        log.info("authorisation: {}, serviceAuthorization: {}, url: {}", authorisation, serviceAuthorization, url);
         return documentDownloadService.downloadFile(url);
     }
 }
