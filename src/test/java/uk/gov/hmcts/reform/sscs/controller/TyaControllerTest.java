@@ -92,7 +92,7 @@ public class TyaControllerTest {
         when(documentDownloadService.downloadFile(URL)).thenReturn(responseEntity);
 
         //When
-        ResponseEntity<Resource> receivedDocument = controller.getAppealDocument(null, null, URL);
+        ResponseEntity<Resource> receivedDocument = controller.getAppealDocument(null, URL);
 
         //Then
         assertThat(receivedDocument.getStatusCode(), equalTo(HttpStatus.OK));
@@ -106,7 +106,7 @@ public class TyaControllerTest {
                 new DocumentNotFoundException());
 
         //When
-        controller.getAppealDocument(null, null, URL);
+        controller.getAppealDocument(null, URL);
     }
 
 }

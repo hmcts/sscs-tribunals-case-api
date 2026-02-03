@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static org.springframework.http.ResponseEntity.ok;
@@ -57,8 +56,7 @@ public class TyaController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Document", content = {
         @Content(schema = @Schema(implementation = Resource.class))})})
     @GetMapping(value = "/document", produces = APPLICATION_PDF_VALUE)
-    public ResponseEntity<Resource> getAppealDocument(@RequestHeader(value = AUTHORIZATION) String authorisation,
-                                                      @RequestHeader(value = SERVICE_AUTHORIZATION) String serviceAuthorization,
+    public ResponseEntity<Resource> getAppealDocument(@RequestHeader(value = SERVICE_AUTHORIZATION) String serviceAuthorization,
                                                       @RequestParam(value = "url") String url) {
         authorisationService.authorise(serviceAuthorization);
         return documentDownloadService.downloadFile(url);
