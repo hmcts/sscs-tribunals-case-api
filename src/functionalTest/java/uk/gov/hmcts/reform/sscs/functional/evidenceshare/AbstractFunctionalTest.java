@@ -61,7 +61,7 @@ abstract class AbstractFunctionalTest {
     private final String localInstance = "http://localhost:8008";
     String ccdCaseId;
     @Autowired
-    private IdamService idamService;
+    protected IdamService idamService;
     private IdamTokens idamTokens;
     @Autowired
     private CcdService ccdService;
