@@ -41,7 +41,7 @@ public class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
                 VALID_APPEAL_CREATED);
 
             await().atMost(30, SECONDS).untilAsserted(() -> {
-                SscsCaseDetails caseDetails = findCaseById(Long.toString(caseWithState.getId()));
+                SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
                 assertThat(caseDetails.getState()).isEqualTo(State.AWAIT_OTHER_PARTY_DATA.toString());
 
                 // add other party
@@ -53,7 +53,7 @@ public class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
                     return new UpdateCcdCaseService.UpdateResult("add other party", "add other party");
                 });
 
-                var cdAfterEvent = findCaseById(Long.toString(caseWithState.getId()));
+                var cdAfterEvent = findCaseById(ccdCaseId);
 
                 assertThat(cdAfterEvent.getState()).isEqualTo(State.AWAIT_CONFIDENTIALITY_REQUIREMENTS.toString());
                 assertThat(cdAfterEvent.getData().getExtendedSscsCaseData().getAwareOfAnyAdditionalOtherParties()).isEqualTo(YesNo.YES);
@@ -73,22 +73,19 @@ public class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
                 VALID_APPEAL_CREATED);
 
             await().atMost(30, SECONDS).untilAsserted(() -> {
-                SscsCaseDetails caseDetails = findCaseById(Long.toString(caseWithState.getId()));
+                SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
                 assertThat(caseDetails.getState()).isEqualTo(State.WITH_DWP.toString());
 
-                // Add other party event should fail, because the case is not in qualified status
+                // Add other party event should fail, because the case status does not qualify for ADD_OTHER_PARTY_DATA event
                 var otherParty = buildOtherParty("Mr", "X", "Bean");
 
-                assertThatThrownBy(() -> {
-                    updateCcdCaseService.updateCaseV2(caseWithState.getId(), ADD_OTHER_PARTY_DATA.getCcdType(), idamService.getIdamTokens(), (cd) -> {
-                        cd.getData().setOtherParties(List.of(new CcdValue<>(otherParty)));
-                        cd.getData().getExtendedSscsCaseData().setAwareOfAnyAdditionalOtherParties(YesNo.YES);
-                        return new UpdateCcdCaseService.UpdateResult("add other party", "add other party");
-                    });
+                assertThatThrownBy(() -> updateCcdCaseService.updateCaseV2(caseWithState.getId(), ADD_OTHER_PARTY_DATA.getCcdType(), idamService.getIdamTokens(), (cd) -> {
+                    cd.getData().setOtherParties(List.of(new CcdValue<>(otherParty)));
+                    cd.getData().getExtendedSscsCaseData().setAwareOfAnyAdditionalOtherParties(YesNo.YES);
+                    return new UpdateCcdCaseService.UpdateResult("add other party", "add other party");
+                })).hasMessageContaining("The case status did not qualify for the event");
 
-                    }).hasMessageContaining("The case status did not qualify for the event");
-
-                var cdAfterEvent = findCaseById(Long.toString(caseWithState.getId()));
+                var cdAfterEvent = findCaseById(ccdCaseId);
 
                 assertThat(cdAfterEvent.getState()).isEqualTo(State.WITH_DWP.toString());
                 assertThat(cdAfterEvent.getData().getOtherParties()).isNullOrEmpty();
