@@ -52,8 +52,8 @@ public class TyaController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Document", content = {
         @Content(schema = @Schema(implementation = Resource.class))})})
     @GetMapping(value = "/document", produces = APPLICATION_PDF_VALUE)
-    public ResponseEntity<Resource> getAppealDocument(@RequestHeader(AUTHORIZATION) String authorisation,
-                                                      @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization,
+    public ResponseEntity<Resource> getAppealDocument(@RequestHeader(value = AUTHORIZATION, required = false) String authorisation,
+                                                      @RequestHeader(value = SERVICE_AUTHORIZATION, required = false) String serviceAuthorization,
                                                       @RequestParam(value = "url") String url) {
         log.info("authorisation: {}, serviceAuthorization: {}, url: {}", authorisation, serviceAuthorization, url);
         return documentDownloadService.downloadFile(url);
