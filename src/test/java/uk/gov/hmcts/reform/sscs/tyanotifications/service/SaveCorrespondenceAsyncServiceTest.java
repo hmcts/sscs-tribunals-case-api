@@ -64,7 +64,7 @@ public class SaveCorrespondenceAsyncServiceTest {
         service.saveLetter(bytes, correspondence, CCD_ID);
 
         verify(ccdNotificationsPdfService)
-                .mergeLetterCorrespondenceIntoCcdV2(any(), eq(Long.valueOf(CCD_ID)), eq(correspondence));
+                .mergeLetterCorrespondenceIntoCcdV2(eq(bytes), eq(Long.valueOf(CCD_ID)), eq(correspondence), eq("Bulk Print"));
     }
 
     @ParameterizedTest

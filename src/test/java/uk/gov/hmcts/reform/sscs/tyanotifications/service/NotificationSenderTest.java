@@ -205,7 +205,8 @@ public class NotificationSenderTest {
 
         verifyNoInteractions(testNotificationClient);
         verify(notificationClient).sendPrecompiledLetterWithInputStream(any(), any());
-        verify(saveCorrespondenceAsyncService).saveLetter(any(byte[].class), any(Correspondence.class), eq(CASE_D));
+        verify(saveCorrespondenceAsyncService)
+                .saveLetter(eq(notificationClient), anyString(), any(Correspondence.class), eq(CASE_D));
     }
 
     @Test
