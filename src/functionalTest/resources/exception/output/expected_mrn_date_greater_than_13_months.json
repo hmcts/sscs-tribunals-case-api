@@ -74,6 +74,7 @@
             "nino": "{PERSON2_NINO}"
           },
           "confidentialityRequired": null,
+          "confidentialityRequiredChangedDate": null,
           "isAddressSameAsAppointee": null,
           "isAppointee": "Yes",
           "name": {

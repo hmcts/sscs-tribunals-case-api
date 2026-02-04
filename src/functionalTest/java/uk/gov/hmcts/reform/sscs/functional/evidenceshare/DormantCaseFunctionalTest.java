@@ -1,18 +1,18 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.DORMANT_APPEAL_STATE;
 
 import java.time.LocalDate;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 
-public class DormantCaseFunctionalTest extends AbstractFunctionalTest {
+class DormantCaseFunctionalTest extends AbstractFunctionalTest {
 
     @Test
-    public void otherDetailsChangedTest() throws Exception {
+    void otherDetailsChangedTest() throws Exception {
         SscsCaseDetails createdCase = createCaseWithState(CREATE_TEST_CASE, "Child Support",
             "Child Support", State.VALID_APPEAL.getId());
         updateCaseEvent(DORMANT, createdCase);

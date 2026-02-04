@@ -138,6 +138,7 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     HMC_API_URL: "http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     SSCS_SERVICE_CODE: BBA3
     HEARINGS_CASE_UPDATE_V2_ENABLED: true
+    CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED: false
 
 postgresql:
   enabled: false

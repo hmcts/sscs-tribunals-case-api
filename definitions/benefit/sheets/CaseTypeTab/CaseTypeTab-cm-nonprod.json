@@ -1,0 +1,8 @@
+[
+  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "TabID": "confidentiality", "TabLabel": "Confidentiality", "TabDisplayOrder": 3, "CaseFieldID": "appellantLabel", "TabFieldDisplayOrder": 1, "FieldShowCondition": "appeal.benefitType.code=\"childSupport\""},
+  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "TabID": "confidentiality", "TabLabel": "Confidentiality", "TabDisplayOrder": 3, "CaseFieldID": "appellantNameLabel", "TabFieldDisplayOrder": 2, "FieldShowCondition": "appeal.benefitType.code=\"childSupport\""},
+  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "TabID": "confidentiality", "TabLabel": "Confidentiality", "TabDisplayOrder": 3, "CaseFieldID": "appellantConfidentialityLabel", "TabFieldDisplayOrder": 4, "FieldShowCondition": "appeal.benefitType.code=\"childSupport\" AND appeal.appellant.confidentialityRequired!=\"\""},
+  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "TabID": "confidentiality", "TabLabel": "Confidentiality", "TabDisplayOrder": 3, "CaseFieldID": "appellantConfidentialityUndeterminedLabel", "TabFieldDisplayOrder": 4, "FieldShowCondition": "appeal.benefitType.code=\"childSupport\" AND appeal.appellant.confidentialityRequired=\"\""},
+  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "TabID": "confidentiality", "TabLabel": "Confidentiality", "TabDisplayOrder": 3, "CaseFieldID": "appellantConfidentialityChangeDateLabel", "TabFieldDisplayOrder": 5, "FieldShowCondition": "appeal.benefitType.code=\"childSupport\" AND appeal.appellant.confidentialityRequiredChangedDate!=\"\""}
+
+]

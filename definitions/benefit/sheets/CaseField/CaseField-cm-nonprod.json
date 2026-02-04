@@ -1,0 +1,7 @@
+[
+  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "ID": "appellantLabel", "Label": "## Appellant", "FieldType": "Label", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "ID": "appellantNameLabel", "Label": "**Name:** ${appeal.appellant.name.firstName} ${appeal.appellant.name.lastName}", "FieldType": "Label", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "ID": "appellantConfidentialityLabel", "Label": "**Confidentiality Required:** ${appeal.appellant.confidentialityRequired}", "FieldType": "Label", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "ID": "appellantConfidentialityUndeterminedLabel", "Label": "**Confidentiality Required:** Undetermined", "FieldType": "Label", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "ID": "appellantConfidentialityChangeDateLabel", "Label": "**Confidentiality Changed Date:** ${appeal.appellant.confidentialityRequiredChangedDate}", "FieldType": "Label", "SecurityClassification": "PUBLIC"}
+]
