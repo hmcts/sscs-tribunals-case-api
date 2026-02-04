@@ -58,7 +58,8 @@ public class TyaController {
     @GetMapping(value = "/document", produces = APPLICATION_PDF_VALUE)
     public ResponseEntity<Resource> getAppealDocument(@RequestHeader(value = SERVICE_AUTHORIZATION) String serviceAuthorization,
                                                       @RequestParam(value = "url") String url) {
-        authorisationService.authorise(serviceAuthorization);
+        String serviceName = authorisationService.authenticate(serviceAuthorization);
+        authorisationService.assertIsAllowedToHandleCallback(serviceName);
         return documentDownloadService.downloadFile(url);
     }
 }
