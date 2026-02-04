@@ -53,14 +53,14 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationTestRecipien
 import uk.gov.hmcts.reform.sscs.tyanotifications.controller.NotificationController;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationFactory;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.MarkdownTransformationService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationHandler;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationDispatchService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationExecutionManager;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationGateway;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationProcessingService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationValidService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.OutOfHoursCalculator;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.ReminderService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.SaveCorrespondenceAsyncService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.SendNotificationService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis.PdfLetterService;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
@@ -121,7 +121,7 @@ public class NotificationsItBase {
     protected String json;
 
     @Autowired
-    private NotificationHandler notificationHandler;
+    private NotificationExecutionManager notificationExecutionManager;
 
     @MockitoBean
     private OutOfHoursCalculator outOfHoursCalculator;
@@ -161,15 +161,15 @@ public class NotificationsItBase {
     @Qualifier("scheduler")
     protected Scheduler quartzScheduler;
 
-    protected NotificationService service;
+    protected NotificationProcessingService service;
 
     @Before
     public void setup() throws Exception {
-        NotificationSender sender = new NotificationSender(notificationClient, null, bulkPrintService, notificationTestRecipients, markdownTransformationService, saveCorrespondenceAsyncService, saveCorrespondence);
+        NotificationGateway sender = new NotificationGateway(notificationClient, null, bulkPrintService, notificationTestRecipients, markdownTransformationService, saveCorrespondenceAsyncService, saveCorrespondence);
 
-        SendNotificationService sendNotificationService = new SendNotificationService(sender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
+        NotificationDispatchService notificationDispatchService = new NotificationDispatchService(sender, notificationExecutionManager, notificationValidService, pdfLetterService, pdfStoreService);
 
-        setupNotificationService(sendNotificationService);
+        setupNotificationService(notificationDispatchService);
 
         NotificationController controller = new NotificationController(service, authorisationService, ccdService, deserializer, idamService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
@@ -197,15 +197,15 @@ public class NotificationsItBase {
         when(docmosisPdfGenerationService.generatePdf(any())).thenReturn(pdfbytes);
     }
 
-    private void setupNotificationService(SendNotificationService sendNotificationService) {
-        service = new NotificationService(factory, reminderService, notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false);
+    private void setupNotificationService(NotificationDispatchService notificationDispatchService) {
+        service = new NotificationProcessingService(factory, reminderService, notificationValidService, notificationExecutionManager, outOfHoursCalculator, notificationConfig, notificationDispatchService, false);
     }
 
-    protected NotificationService getNotificationService() {
+    protected NotificationProcessingService getNotificationService() {
         return service;
     }
 
-    protected void setupReminderController(NotificationService service) {
+    protected void setupReminderController(NotificationProcessingService service) {
         ReminderTestController reminderTestController = new ReminderTestController(service, authorisationService, ccdService, deserializer, idamService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(reminderTestController).build();
 

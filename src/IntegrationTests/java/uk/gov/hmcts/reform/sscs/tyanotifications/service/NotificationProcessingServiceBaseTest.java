@@ -5,13 +5,11 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 
 import java.util.ArrayList;
 import java.util.List;
-import junitparams.JUnitParamsRunner;
 import lombok.Getter;
 import lombok.Setter;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +17,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReasons;
@@ -49,16 +46,13 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEvent
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationFactory;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis.PdfLetterService;
 
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ActiveProfiles("integration")
 @AutoConfigureMockMvc
 @Getter
-public class NotificationServiceBase {
-    @ClassRule
-    public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
+public class NotificationProcessingServiceBaseTest {
+
     static final String DATE = "2018-01-01T14:01:18.243";
     private static final String APPEAL_NUMBER = "GLSCRR";
     static final String YES = "Yes";
@@ -71,7 +65,7 @@ public class NotificationServiceBase {
     static final String MOBILE_NUMBER_2 = "+447123456789";
 
     @Setter
-    private NotificationService notificationService;
+    private NotificationProcessingService notificationProcessingService;
 
     @Autowired
     private NotificationValidService notificationValidService;
@@ -83,10 +77,10 @@ public class NotificationServiceBase {
     private NotificationConfig notificationConfig;
 
     @MockitoSpyBean
-    private NotificationHandler notificationHandler;
+    private NotificationExecutionManager notificationExecutionManager;
 
     @Mock
-    private NotificationSender notificationSender;
+    private NotificationGateway notificationGateway;
 
     @Mock
     private ReminderService reminderService;
@@ -104,19 +98,20 @@ public class NotificationServiceBase {
     private IdamService idamService;
 
     private final Subscription subscription = Subscription.builder()
-        .tya(NotificationServiceBase.APPEAL_NUMBER)
-        .email(NotificationServiceBase.EMAIL_TEST_1)
-        .mobile(NotificationServiceBase.MOBILE_NUMBER_1)
-        .subscribeEmail(NotificationServiceBase.YES)
-        .subscribeSms(NotificationServiceBase.YES)
-        .wantSmsNotifications(NotificationServiceBase.YES)
+        .tya(NotificationProcessingServiceBaseTest.APPEAL_NUMBER)
+        .email(NotificationProcessingServiceBaseTest.EMAIL_TEST_1)
+        .mobile(NotificationProcessingServiceBaseTest.MOBILE_NUMBER_1)
+        .subscribeEmail(NotificationProcessingServiceBaseTest.YES)
+        .subscribeSms(NotificationProcessingServiceBaseTest.YES)
+        .wantSmsNotifications(NotificationProcessingServiceBaseTest.YES)
         .build();
 
+    private AutoCloseable mocks;
 
-    @Before
+    @BeforeEach
     public void setup() {
-        openMocks(this);
-        notificationService = initialiseNotificationService();
+        mocks = openMocks(this);
+        notificationProcessingService = initialiseNotificationService();
 
         Mockito.when(outOfHoursCalculator.isItOutOfHours()).thenReturn(false);
 
@@ -127,11 +122,18 @@ public class NotificationServiceBase {
         Mockito.when(idamService.getIdamTokens()).thenReturn(idamTokens);
     }
 
-    NotificationService initialiseNotificationService() {
-        SendNotificationService sendNotificationService = new SendNotificationService(notificationSender,
-            notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
-        return new NotificationService(notificationFactory, reminderService, notificationValidService,
-            notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false
+    @AfterEach
+    public void tearDown() throws Exception {
+        if (mocks != null) {
+            mocks.close();
+        }
+    }
+
+    NotificationProcessingService initialiseNotificationService() {
+        NotificationDispatchService notificationDispatchService = new NotificationDispatchService(notificationGateway,
+                notificationExecutionManager, notificationValidService, pdfLetterService, pdfStoreService);
+        return new NotificationProcessingService(notificationFactory, reminderService, notificationValidService,
+                notificationExecutionManager, outOfHoursCalculator, notificationConfig, notificationDispatchService, false
         );
     }
 
@@ -146,34 +148,34 @@ public class NotificationServiceBase {
 
     public SscsCaseData getSscsCaseData(Subscription subscription) {
         List<Event> events = new ArrayList<>();
-        events.add(Event.builder().value(EventDetails.builder().date(NotificationServiceBase.DATE).type(APPEAL_RECEIVED.getCcdType()).build()).build());
+        events.add(Event.builder().value(EventDetails.builder().date(NotificationProcessingServiceBaseTest.DATE).type(APPEAL_RECEIVED.getCcdType()).build()).build());
 
-        return SscsCaseData.builder().ccdCaseId(NotificationServiceBase.CASE_ID).events(events)
+        return SscsCaseData.builder().ccdCaseId(NotificationProcessingServiceBaseTest.CASE_ID).events(events)
             .appeal(Appeal.builder()
-                .mrnDetails(MrnDetails.builder().mrnDate(NotificationServiceBase.DATE).dwpIssuingOffice("office").build())
+                .mrnDetails(MrnDetails.builder().mrnDate(NotificationProcessingServiceBaseTest.DATE).dwpIssuingOffice("office").build())
                 .appealReasons(AppealReasons.builder().build())
                 .rep(Representative.builder()
-                    .hasRepresentative(NotificationServiceBase.YES)
+                    .hasRepresentative(NotificationProcessingServiceBaseTest.YES)
                     .name(Name.builder().firstName("Rep").lastName("lastName").build())
-                    .contact(Contact.builder().email(NotificationServiceBase.EMAIL_TEST_2).phone(NotificationServiceBase.MOBILE_NUMBER_2).build())
+                    .contact(Contact.builder().email(NotificationProcessingServiceBaseTest.EMAIL_TEST_2).phone(NotificationProcessingServiceBaseTest.MOBILE_NUMBER_2).build())
                     .address(Address.builder().line1("Rep Line 1").town("Rep Town").county("Rep County").postcode("RE9 7SE").build())
                     .build())
                 .appellant(Appellant.builder()
                     .name(Name.builder().firstName("firstName").lastName("lastName").build())
                     .address(Address.builder().line1("122 Breach Street").line2("The Village").town("My town").county("Cardiff").postcode("CF11 2HB").build())
-                    .contact(Contact.builder().email(NotificationServiceBase.EMAIL_TEST_1).phone(NotificationServiceBase.MOBILE_NUMBER_1).build())
+                    .contact(Contact.builder().email(NotificationProcessingServiceBaseTest.EMAIL_TEST_1).phone(NotificationProcessingServiceBaseTest.MOBILE_NUMBER_1).build())
                     .identity(Identity.builder().nino("NP 27 28 67 B").dob("12 March 1971").build()).build())
                 .hearingType(AppealHearingType.ORAL.name())
                 .benefitType(BenefitType.builder().code(Benefit.PIP.name()).build())
                 .hearingOptions(HearingOptions.builder()
-                    .wantsToAttend(NotificationServiceBase.YES)
+                    .wantsToAttend(NotificationProcessingServiceBaseTest.YES)
                     .build())
                 .build())
             .subscriptions(Subscriptions.builder()
                 .appellantSubscription(subscription)
                 .representativeSubscription(getSubscription().toBuilder().tya("REP_TYA").build())
                 .build())
-            .caseReference(NotificationServiceBase.CASE_REFERENCE).build();
+            .caseReference(NotificationProcessingServiceBaseTest.CASE_REFERENCE).build();
     }
 
     public SscsCaseData getSscsCaseDataForRep(Subscription subscription) {

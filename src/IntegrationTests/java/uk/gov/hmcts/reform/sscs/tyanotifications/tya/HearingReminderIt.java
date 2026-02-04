@@ -37,7 +37,7 @@ import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobExecutor;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.controller.NotificationController;
 import uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationProcessingService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.OutOfHoursCalculator;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis.PdfLetterService;
 import uk.gov.service.notify.NotificationClient;
@@ -57,7 +57,7 @@ public class HearingReminderIt {
     NotificationController controller;
 
     @Autowired
-    NotificationService notificationService;
+    NotificationProcessingService notificationProcessingService;
 
     @MockitoBean
     private AuthorisationService authorisationService;
@@ -98,7 +98,7 @@ public class HearingReminderIt {
 
     @Before
     public void setup() throws NotificationClientException {
-        controller = new NotificationController(notificationService, authorisationService, ccdService, deserializer, idamService);
+        controller = new NotificationController(notificationProcessingService, authorisationService, ccdService, deserializer, idamService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
         when(client.sendEmail(any(), any(), any(), any()))
@@ -127,7 +127,7 @@ public class HearingReminderIt {
     @Test
     public void shouldScheduleHearingReminderThenRemoveWhenPostponed() throws Exception {
 
-        ReflectionTestUtils.setField(notificationService, "covid19Feature", false);
+        ReflectionTestUtils.setField(notificationProcessingService, "covid19Feature", false);
 
         try {
             quartzScheduler.clear();

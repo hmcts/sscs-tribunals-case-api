@@ -13,19 +13,19 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.RetryNotificationService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationExecutionManager;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationProcessingService;
 
 
 public class CcdActionExecutor extends BaseActionExecutor<String> {
 
-    public CcdActionExecutor(NotificationService notificationService,
-                             RetryNotificationService retryNotificationService,
+    public CcdActionExecutor(NotificationProcessingService notificationProcessingService,
+                             NotificationExecutionManager notificationExecutionManager,
                              CcdService ccdService,
                              UpdateCcdCaseService updateCcdCaseService,
                              IdamService idamService,
                              SscsCaseCallbackDeserializer deserializer) {
-        super(notificationService, retryNotificationService, ccdService, updateCcdCaseService, idamService, deserializer);
+        super(notificationProcessingService, notificationExecutionManager, ccdService, updateCcdCaseService, idamService, deserializer);
     }
 
     @Override

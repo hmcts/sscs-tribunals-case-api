@@ -36,7 +36,7 @@ import uk.gov.service.notify.*;
 
 @Component
 @Slf4j
-public class NotificationSender {
+public class NotificationGateway {
 
     private static final String USING_TEST_GOV_NOTIFY_KEY_FOR = "Using test GovNotify key {} for {}";
     static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("d MMM y HH:mm");
@@ -51,13 +51,13 @@ public class NotificationSender {
     private final Boolean saveCorrespondence;
 
     @Autowired
-    public NotificationSender(@Qualifier("notificationClient") NotificationClient notificationClient,
-                              @Qualifier("testNotificationClient") NotificationClient testNotificationClient,
-                              BulkPrintService bulkPrintService,
-                              NotificationTestRecipients notificationTestRecipients,
-                              MarkdownTransformationService markdownTransformationService,
-                              SaveCorrespondenceAsyncService saveCorrespondenceAsyncService,
-                              @Value("${feature.save_correspondence}") Boolean saveCorrespondence
+    public NotificationGateway(@Qualifier("notificationClient") NotificationClient notificationClient,
+                               @Qualifier("testNotificationClient") NotificationClient testNotificationClient,
+                               BulkPrintService bulkPrintService,
+                               NotificationTestRecipients notificationTestRecipients,
+                               MarkdownTransformationService markdownTransformationService,
+                               SaveCorrespondenceAsyncService saveCorrespondenceAsyncService,
+                               @Value("${feature.save_correspondence}") Boolean saveCorrespondence
     ) {
         this.notificationClient = notificationClient;
         this.testNotificationClient = testNotificationClient;

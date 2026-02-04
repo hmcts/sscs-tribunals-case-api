@@ -159,6 +159,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.personalisation.SyaAppealCreatedAndReceivedPersonalisation.TWO_NEW_LINES;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.personalisation.SyaAppealCreatedAndReceivedPersonalisation.getOptionalField;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getNameForOtherParty;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getRepSalutation;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.hasAppointee;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.hasJointParty;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.hasRepresentative;
@@ -223,7 +224,6 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.extractor.HearingContactDateExt
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.MessageAuthenticationServiceImpl;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.SendNotificationHelper;
 
 @Component
 @Slf4j
@@ -607,7 +607,7 @@ public class Personalisation<E extends NotificationWrapper> {
             return getDefaultName(sscsCaseData.getAppeal().getAppellant().getName());
         } else if (subscriptionType.equals(REPRESENTATIVE)
             && hasRepresentative(wrapper)) {
-            return SendNotificationHelper.getRepSalutation(sscsCaseData.getAppeal().getRep(), true);
+            return getRepSalutation(sscsCaseData.getAppeal().getRep(), true);
         } else if (subscriptionType.equals(APPOINTEE)
             && hasAppointee(wrapper)) {
             return getDefaultName(sscsCaseData.getAppeal().getAppellant().getAppointee().getName());

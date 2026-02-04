@@ -18,17 +18,16 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.RetryNotificationService;
-
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationExecutionManager;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationProcessingService;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class FilterNotificationsEventsHandler implements CallbackHandler {
-    private final NotificationService notificationService;
+    private final NotificationProcessingService notificationProcessingService;
     private static final int RETRY = 1;
-    private final RetryNotificationService retryNotificationService;
+    private final NotificationExecutionManager notificationExecutionManager;
 
     @Value("${feature.postHearings.enabled}")
     private boolean isPostHearingsEnabled;
@@ -60,9 +59,9 @@ public class FilterNotificationsEventsHandler implements CallbackHandler {
         }
         final CcdNotificationWrapper notificationWrapper = new CcdNotificationWrapper(callback);
         try {
-            notificationService.manageNotificationAndSubscription(notificationWrapper, false);
+            notificationProcessingService.manageNotificationAndSubscription(notificationWrapper, false);
         } catch (NotificationServiceException e) {
-            retryNotificationService.rescheduleIfHandledGovNotifyErrorStatus(RETRY, notificationWrapper, e);
+            notificationExecutionManager.rescheduleIfHandledGovNotifyErrorStatus(RETRY, notificationWrapper, e);
             throw e;
         }
     }

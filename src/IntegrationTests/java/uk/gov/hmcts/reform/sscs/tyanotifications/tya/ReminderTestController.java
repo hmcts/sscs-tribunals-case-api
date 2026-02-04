@@ -19,24 +19,24 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationProcessingService;
 
 @RestController
 @Slf4j
 public class ReminderTestController {
 
-    private final NotificationService notificationService;
+    private final NotificationProcessingService notificationProcessingService;
     private final AuthorisationService authorisationService;
     private final CcdService ccdService;
     private final SscsCaseCallbackDeserializer deserializer;
     private final IdamService idamService;
 
-    public ReminderTestController(NotificationService notificationService,
+    public ReminderTestController(NotificationProcessingService notificationProcessingService,
                                   AuthorisationService authorisationService,
                                   CcdService ccdService,
                                   SscsCaseCallbackDeserializer deserializer,
                                   IdamService idamService) {
-        this.notificationService = notificationService;
+        this.notificationProcessingService = notificationProcessingService;
         this.authorisationService = authorisationService;
         this.ccdService = ccdService;
         this.deserializer = deserializer;
@@ -65,7 +65,7 @@ public class ReminderTestController {
 
             callback.getCaseDetails().getCreatedDate();
             authorisationService.authorise(serviceAuthHeader);
-            notificationService.manageNotificationAndSubscription(new CcdNotificationWrapper(notificationSscsCaseDataWrapper), true);
+            notificationProcessingService.manageNotificationAndSubscription(new CcdNotificationWrapper(notificationSscsCaseDataWrapper), true);
         } catch (Exception e) {
             log.info("Exception thrown", e);
             throw e;

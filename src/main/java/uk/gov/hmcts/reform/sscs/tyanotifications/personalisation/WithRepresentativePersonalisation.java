@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.personalisation;
 
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getRepSalutation;
 
 import java.util.Map;
 import org.springframework.stereotype.Component;
@@ -9,8 +10,6 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseData
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.SendNotificationHelper;
-
 
 @Component
 public class WithRepresentativePersonalisation extends Personalisation<CcdNotificationWrapper> {
@@ -28,7 +27,7 @@ public class WithRepresentativePersonalisation extends Personalisation<CcdNotifi
     public Map<String, Object> setRepresentativeName(Map<String, Object> personalisation, SscsCaseData sscsCaseData) {
         if (NotificationUtils.hasRepresentative(sscsCaseData.getAppeal())) {
             personalisation.put(REPRESENTATIVE_NAME,
-                SendNotificationHelper.getRepSalutation(sscsCaseData.getAppeal().getRep(), true));
+                getRepSalutation(sscsCaseData.getAppeal().getRep(), true));
         }
         overrideRepNameIfNotificationIsForAnOtherParty(personalisation);
 

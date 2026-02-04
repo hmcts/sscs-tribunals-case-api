@@ -22,21 +22,24 @@ import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobExecutor;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.RetryNotificationService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationExecutionManager;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationProcessingService;
 
 public abstract class BaseActionExecutor<T> implements JobExecutor<T> {
     protected static final Logger LOG = getLogger(BaseActionExecutor.class);
-    protected final NotificationService notificationService;
+    protected final NotificationProcessingService notificationProcessingService;
     protected final CcdService ccdService;
     protected final UpdateCcdCaseService updateCcdCaseService;
     protected final IdamService idamService;
     private final SscsCaseCallbackDeserializer deserializer;
-    private final RetryNotificationService retryNotificationService;
+    private final NotificationExecutionManager notificationExecutionManager;
 
-    BaseActionExecutor(NotificationService notificationService, RetryNotificationService retryNotificationService, CcdService ccdService, UpdateCcdCaseService updateCcdCaseService, IdamService idamService, SscsCaseCallbackDeserializer deserializer) {
-        this.notificationService = notificationService;
-        this.retryNotificationService = retryNotificationService;
+    BaseActionExecutor(NotificationProcessingService notificationProcessingService,
+                       NotificationExecutionManager notificationExecutionManager, CcdService ccdService,
+                       UpdateCcdCaseService updateCcdCaseService, IdamService idamService,
+                       SscsCaseCallbackDeserializer deserializer) {
+        this.notificationProcessingService = notificationProcessingService;
+        this.notificationExecutionManager = notificationExecutionManager;
         this.ccdService = ccdService;
         this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;
@@ -71,13 +74,13 @@ public abstract class BaseActionExecutor<T> implements JobExecutor<T> {
                 NotificationWrapper notificationWrapper = getWrapper(wrapper, payload);
 
                 try {
-                    notificationService.manageNotificationAndSubscription(notificationWrapper, true);
+                    notificationProcessingService.manageNotificationAndSubscription(notificationWrapper, true);
                     if (wrapper.getNotificationEventType().isReminder()) {
                         updateCase(caseId, wrapper, idamTokens);
                     }
                 } catch (NotificationServiceException e) {
                     LOG.info("Gov notify error, Notification event {} is rescheduled for case id {}", eventId, caseId);
-                    retryNotificationService.rescheduleIfHandledGovNotifyErrorStatus(retry + 1, notificationWrapper, e);
+                    notificationExecutionManager.rescheduleIfHandledGovNotifyErrorStatus(retry + 1, notificationWrapper, e);
                     throw e;
                 }
             } else {

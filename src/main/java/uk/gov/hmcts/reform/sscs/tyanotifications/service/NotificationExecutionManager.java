@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
+import static java.util.Objects.nonNull;
+
 import java.net.UnknownHostException;
 import java.time.ZonedDateTime;
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.jobscheduler.model.Job;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobScheduler;
+import uk.gov.hmcts.reform.sscs.tyanotifications.config.TyanRetryConfig;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationClientRuntimeException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
@@ -16,24 +19,27 @@ import uk.gov.service.notify.NotificationClientException;
 
 @Service
 @Slf4j
-public class NotificationHandler {
+public class NotificationExecutionManager {
 
     private final OutOfHoursCalculator outOfHoursCalculator;
     private final JobScheduler jobScheduler;
     private final JobGroupGenerator jobGroupGenerator;
+    private final TyanRetryConfig tyanRetryConfig;
 
     @Autowired
-    public NotificationHandler(OutOfHoursCalculator outOfHoursCalculator, JobScheduler jobScheduler, JobGroupGenerator jobGroupGenerator) {
+    public NotificationExecutionManager(OutOfHoursCalculator outOfHoursCalculator, JobScheduler jobScheduler,
+                                        JobGroupGenerator jobGroupGenerator, TyanRetryConfig tyanRetryConfig) {
         this.outOfHoursCalculator = outOfHoursCalculator;
         this.jobScheduler = jobScheduler;
         this.jobGroupGenerator = jobGroupGenerator;
+        this.tyanRetryConfig = tyanRetryConfig;
     }
 
-    public boolean sendNotification(NotificationWrapper wrapper, String notificationTemplate, final String notificationType, SendNotification sendNotification) {
+    public boolean executeNotification(NotificationWrapper wrapper, String notificationTemplate, final String notificationType, SendAction sendAction) {
         final String caseId = wrapper.getCaseId();
         try {
             log.info("Sending {} template {} for case id: {}", notificationType, notificationTemplate, caseId);
-            sendNotification.send();
+            sendAction.send();
             log.info("{} template {} sent for case id: {}", notificationType, notificationTemplate, caseId);
             return true;
         } catch (Exception ex) {
@@ -76,6 +82,20 @@ public class NotificationHandler {
         ));
     }
 
+    public void rescheduleIfHandledGovNotifyErrorStatus(final int retry,
+                                                        final NotificationWrapper notificationWrapper,
+                                                        final NotificationServiceException e) {
+        if (nonNull(e.getCause()) && e.getCause() instanceof NotificationClientException) {
+            int httpResult = ((NotificationClientException) e.getCause()).getHttpResult();
+            if (retry > 0 && retry <= tyanRetryConfig.getMax() && httpResult != 400 && httpResult != 403) {
+                Integer delayInSeconds = tyanRetryConfig.getDelayInSeconds().get(retry);
+                ZonedDateTime dateTime = ZonedDateTime.now().plusSeconds(delayInSeconds);
+                log.info("Retry {} is rescheduling in {} seconds for case id {} and event id {}", retry, delayInSeconds, notificationWrapper.getCaseId(), notificationWrapper.getNotificationType().getId());
+                scheduleNotification(notificationWrapper, retry, dateTime);
+            }
+        }
+    }
+
     private void wrapAndThrowNotificationExceptionIfRequired(NotificationWrapper wrapper, String templateId, Exception ex) {
         String caseId = wrapper.getCaseId();
         NotificationEventType notificationType = wrapper.getNotificationType();
@@ -95,7 +115,7 @@ public class NotificationHandler {
     }
 
     @FunctionalInterface
-    public interface SendNotification {
+    public interface SendAction {
         void send() throws NotificationClientException;
     }
 }

@@ -58,7 +58,7 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notification;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Template;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationClientRuntimeException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationServiceTest;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationProcessingServiceTest;
 
 @RunWith(JUnitParamsRunner.class)
 public class PdfLetterServiceTest {
@@ -107,7 +107,7 @@ public class PdfLetterServiceTest {
     @Test
     @Parameters({"APPELLANT, Yes, true", "APPELLANT, Yes, false", "REPRESENTATIVE, No, true", "REPRESENTATIVE, No, false"})
     public void willCreateAPdfToTheCorrectAddress(final SubscriptionType subscriptionType, String isScottish, boolean isScottishPoBoxFeatureEnabled) {
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+        NotificationWrapper wrapper = NotificationProcessingServiceTest.buildBaseWrapper(
             APPEAL_RECEIVED,
             appellant,
             representative,
@@ -148,7 +148,7 @@ public class PdfLetterServiceTest {
     @Test
     @Parameters({"Yes, true", "Yes, false", "No, true", "No, false"})
     public void willCreateAPdfToTheCorrectIbcAddress(String isScottish, boolean isScottishPoBoxFeatureEnabled) {
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+        NotificationWrapper wrapper = NotificationProcessingServiceTest.buildBaseWrapper(
             APPEAL_RECEIVED,
             appellant,
             representative,
@@ -193,7 +193,7 @@ public class PdfLetterServiceTest {
         when(docmosisPdfService.createPdf(any(), anyString())).thenReturn(baos.toByteArray());
         baos.close();
         doc.close();
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+        NotificationWrapper wrapper = NotificationProcessingServiceTest.buildBaseWrapper(
             APPEAL_RECEIVED,
             appellant,
             representative,
@@ -221,7 +221,7 @@ public class PdfLetterServiceTest {
         when(docmosisPdfService.createPdf(any(), anyString())).thenReturn(baos.toByteArray());
         baos.close();
         doc.close();
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+        NotificationWrapper wrapper = NotificationProcessingServiceTest.buildBaseWrapper(
             APPEAL_RECEIVED,
             appellant,
             representative,
@@ -268,7 +268,7 @@ public class PdfLetterServiceTest {
         appellant.setName(name);
         appellant.setAddress(address);
 
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+        NotificationWrapper wrapper = NotificationProcessingServiceTest.buildBaseWrapper(
             APPEAL_RECEIVED,
             appellant,
             representative,
@@ -316,7 +316,7 @@ public class PdfLetterServiceTest {
         appellant.setName(name);
         appellant.setAddress(address);
 
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+        NotificationWrapper wrapper = NotificationProcessingServiceTest.buildBaseWrapper(
             APPEAL_RECEIVED,
             appellant,
             representative,
@@ -364,7 +364,7 @@ public class PdfLetterServiceTest {
         representative.setAddress(address);
         representative.setOrganisation("My Company");
 
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+        NotificationWrapper wrapper = NotificationProcessingServiceTest.buildBaseWrapper(
             APPEAL_RECEIVED,
             appellant,
             representative,
@@ -410,7 +410,7 @@ public class PdfLetterServiceTest {
         representative.setAddress(address);
         representative.setOrganisation(null);
 
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+        NotificationWrapper wrapper = NotificationProcessingServiceTest.buildBaseWrapper(
             APPEAL_RECEIVED,
             appellant,
             representative,
@@ -434,7 +434,7 @@ public class PdfLetterServiceTest {
 
     @Test
     public void willNotGenerateALetterIfNoDocmosisTemplateExists() {
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+        NotificationWrapper wrapper = NotificationProcessingServiceTest.buildBaseWrapper(
             APPEAL_RECEIVED,
             appellant,
             representative,
@@ -450,7 +450,7 @@ public class PdfLetterServiceTest {
 
     @Test(expected = NotificationClientRuntimeException.class)
     public void willHandleLoadingAnInvalidPdf() {
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+        NotificationWrapper wrapper = NotificationProcessingServiceTest.buildBaseWrapper(
             APPEAL_RECEIVED,
             appellant,
             representative,
@@ -490,7 +490,7 @@ public class PdfLetterServiceTest {
         appellant.setName(name);
         appellant.setAddress(address);
 
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+        NotificationWrapper wrapper = NotificationProcessingServiceTest.buildBaseWrapper(
             APPEAL_RECEIVED,
             appellant,
             representative,
