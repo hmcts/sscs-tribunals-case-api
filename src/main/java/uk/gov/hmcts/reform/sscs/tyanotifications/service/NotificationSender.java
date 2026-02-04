@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION;
 
@@ -233,7 +234,7 @@ public class NotificationSender {
 
             if (saveCorrespondence) {
                 final var correspondence = getLetterCorrespondence(wrapper.getNotificationType(), recipient, null);
-                if (nonNull(govNotifyId)) {
+                if (isNull(govNotifyId)) {
                     saveCorrespondenceAsyncService.saveLetter(content, correspondence, wrapper.getCaseId());
                 } else {
                     saveCorrespondenceAsyncService.saveLetter(client, govNotifyId, correspondence, wrapper.getCaseId());

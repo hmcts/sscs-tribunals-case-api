@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
+import static java.lang.Long.valueOf;
 import static uk.gov.hmcts.reform.sscs.model.LetterType.findLetterTypeFromSubscription;
 
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +54,7 @@ public class SaveCorrespondenceAsyncService {
             final byte[] pdfForLetter = client.getPdfForLetter(notificationId);
             log.info("Using merge letter correspondence V2 to upload letter correspondence for {} ", ccdCaseId);
             ccdNotificationsPdfService
-                    .mergeLetterCorrespondenceIntoCcdV2(pdfForLetter, Long.valueOf(ccdCaseId), correspondence);
+                    .mergeLetterCorrespondenceIntoCcdV2(pdfForLetter, valueOf(ccdCaseId), correspondence);
         } catch (NotificationClientException e) {
             if (e.getMessage().contains("PDFNotReadyError")) {
                 log.info("Got a PDFNotReadyError back from gov.notify for case id: {}.", ccdCaseId);
@@ -65,8 +66,9 @@ public class SaveCorrespondenceAsyncService {
     }
 
     public void saveLetter(byte[] pdfForLetter, Correspondence correspondence, String ccdCaseId) {
-        log.info("Using merge letter correspondence V2 to upload letter correspondence for {} ", ccdCaseId);
-        ccdNotificationsPdfService.mergeLetterCorrespondenceIntoCcdV2(pdfForLetter, Long.valueOf(ccdCaseId), correspondence);
+        log.info("Using mergeLetterCorrespondenceV2 to upload BulkPrint sent letter correspondence for {} ", ccdCaseId);
+        ccdNotificationsPdfService
+                .mergeLetterCorrespondenceIntoCcdV2(pdfForLetter, valueOf(ccdCaseId), correspondence, "Bulk Print");
     }
 
     @Async
@@ -76,7 +78,7 @@ public class SaveCorrespondenceAsyncService {
         log.info("Using notification letter correspondence V2 to upload reasonable adjustments correspondence for {} ",
                 ccdCaseId);
         ccdNotificationsPdfService.mergeReasonableAdjustmentsCorrespondenceIntoCcdV2(pdfForLetter,
-                Long.valueOf(ccdCaseId), correspondence, findLetterTypeFromSubscription(subscriptionType.name()));
+                valueOf(ccdCaseId), correspondence, findLetterTypeFromSubscription(subscriptionType.name()));
     }
 
     @Retryable
@@ -85,7 +87,7 @@ public class SaveCorrespondenceAsyncService {
         log.info("Retry number {} : to upload correspondence for {}, case reference {}",
             retry, correspondence.getValue().getCorrespondenceType().name(), sscsCaseData.getCcdCaseId());
 
-        ccdNotificationsPdfService.mergeCorrespondenceIntoCcdV2(Long.valueOf(sscsCaseData.getCcdCaseId()), correspondence);
+        ccdNotificationsPdfService.mergeCorrespondenceIntoCcdV2(valueOf(sscsCaseData.getCcdCaseId()), correspondence);
     }
 
     @Recover
